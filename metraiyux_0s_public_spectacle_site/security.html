@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Security Boundary | MetrAIyux 0S</title>
-  <meta name="description" content="Public security and tenant isolation overview for MetrAIyux 0S, including 0meg4kAI review, approval gates, private admin boundaries, and proof records.">
+  <meta name="description" content="MetrAIyux 0S security architecture: 0meg4kAI runs two independent scan passes (browser-side + Worker-side at the Cloudflare edge), hard approval gates on contracts/payments/hiring/publishing, SkyeGateFS27 auth on all /admin/* routes, and 8 D1 databases logging every decision.">
   <link rel="icon" href="assets/favicon-32.png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -23,27 +23,27 @@
 
   <main>
     <section class="page-hero reveal">
-      <p class="eyebrow">Security and isolation</p>
-      <h1>The owner brain and customer workspaces do not belong in the same room.</h1>
-      <p class="lead">MetrAIyux 0S treats tenant separation as a product feature. Public visitors can learn the model; customers can use scoped workspaces; the founder's admin command, credentials, production connectors, and private runbooks stay behind the control layer.</p>
+      <p class="eyebrow">Security architecture</p>
+      <h1>Two scan layers. Hard gates. Structural isolation. Nothing configurable about the critical stops.</h1>
+      <p class="lead">0meg4kAI runs a browser-side scan before the request leaves the client and a Worker-side scan at the Cloudflare edge before any D1 write executes. The gates on contracts, payments, hiring decisions, and public publishing exist in three places — the brain router, the Worker endpoint, and the security scanner. A command has to clear all three or it does not move. SkyeGateFS27 handles auth on every /admin/* route.</p>
     </section>
 
     <section class="section">
       <div class="grid">
         <article class="card reveal">
-          <span class="tag">0meg4kAI</span>
-          <h3>Security and QA review.</h3>
-          <p>0meg4kAI reviews customer-to-admin escalation risk, connector abuse, public claim danger, tenant boundary issues, and approval requirements before sensitive work moves forward.</p>
+          <span class="tag">0meg4kAI — two passes</span>
+          <h3>Browser-side and Worker-side. Both must clear.</h3>
+          <p>The browser scanner runs synchronously before the request leaves the client — zero latency added at the network level. The Worker scanner runs at the Cloudflare edge, stateless and independent of the browser pass. Tenant boundary violations, connector abuse, public claim overreach, and approval bypass attempts are blocked at the scanner before they reach D1.</p>
         </article>
         <article class="card reveal">
-          <span class="tag">Approvals</span>
-          <h3>Human authority stays visible.</h3>
-          <p>The system can draft, route, and prepare work, but sensitive action should pass through approval gates and proof records before it becomes real.</p>
+          <span class="tag">Hard approval gates</span>
+          <h3>Contracts, payments, hiring, and publishing need human sign-off.</h3>
+          <p>These gates exist in three places simultaneously: the brain router, the Worker endpoint, and the 0meg4kAI scanner. There is no configuration option to disable them. Naomi Sterling (Finance) gates payments. Julian Mercer (Legal) gates contracts. Sienna Brooks (HR) gates hiring. Valentina Reyes (Marketing) gates public publishing.</p>
         </article>
         <article class="card reveal">
-          <span class="tag">Proof</span>
-          <h3>Security is recorded.</h3>
-          <p>Receipts, ledgers, policy pages, smoke checks, and link audits give the operating layer a history, not just a promise.</p>
+          <span class="tag">D1 proof records</span>
+          <h3>Every scan result and approval outcome is logged.</h3>
+          <p>Eight dedicated D1 databases log security scan events, routing decisions, approval outcomes, and quarantine events. The sentinel audit trail D1 database captures every 0meg4kAI decision. This is a queryable record of what the system saw, what it blocked, and what cleared — not a status page that says "all systems normal."</p>
         </article>
       </div>
     </section>
@@ -51,17 +51,24 @@
     <section class="band">
       <div class="band-inner">
         <div class="reveal">
-          <p class="eyebrow">Private surface</p>
-          <h2>Clear education. Private control.</h2>
-          <p class="lead">Visitors can understand the guardrails without receiving the keys to the building.</p>
+          <p class="eyebrow">Security boundary</p>
+          <h2>The public site describes the architecture. It does not hand over the controls.</h2>
+          <p class="lead">A serious buyer can understand the full security posture — scan layers, gate logic, auth platform, D1 audit trail — without receiving the credentials or configuration that make it run.</p>
         </div>
         <div class="panel private-boundary reveal">
-          <h3>Never publish here</h3>
+          <h3>Public — what this page covers</h3>
           <ul class="stack-list">
-            <li>Secrets, API keys, tokens, provider credentials, or account IDs.</li>
-            <li>Live deployment commands and connector configuration procedures.</li>
-            <li>Admin-only tutorial steps, internal runbooks, or operator checklists.</li>
-            <li>Customer tenant records, private ledgers, production queues, or unreleased proof.</li>
+            <li>0meg4kAI two-layer scan architecture and what each layer blocks.</li>
+            <li>Hard gate locations (brain router, Worker endpoint, security scanner) and which functions own them.</li>
+            <li>SkyeGateFS27 auth platform: Bearer token introspection and role/scope validation on /admin/* routes.</li>
+            <li>Which D1 databases log security events and what categories they track.</li>
+          </ul>
+          <h3 style="margin-top: 18px;">Private — what stays off this page</h3>
+          <ul class="stack-list">
+            <li>SkyeGate tokens, Cloudflare account IDs, API keys, and production secrets.</li>
+            <li>wrangler configuration, deployment commands, and connector setup procedures.</li>
+            <li>Internal admin runbooks, 28-lesson tutorial content, and operator checklists.</li>
+            <li>Live D1 query access, customer tenant records, and approval inbox content.</li>
           </ul>
         </div>
       </div>
@@ -70,23 +77,23 @@
     <section class="section">
       <div class="section-head reveal">
         <div>
-          <p class="eyebrow">Practical controls</p>
-          <h2>Security here is mostly about permission, evidence, and separation.</h2>
+          <p class="eyebrow">Four structural boundaries</p>
+          <h2>Tenant, admin, claim, and action — each enforced at a different layer.</h2>
         </div>
-        <p>The full build includes Cloudflare worker kits and D1 migrations for tenant isolation and security gateway behavior. The public site describes that posture, then routes qualified users to the full website instead of turning this page into a deployment manual.</p>
+        <p>Worker-level enforcement is structural, not policy. The SaaS provisioning Worker isolates each customer's D1 data at the binding level. Cloudflare Access controls every /admin/* route. 0meg4kAI scans run at the edge before D1 writes. Hard gates exist in three code locations simultaneously. None of these are toggleable settings — they are the architecture.</p>
       </div>
       <div class="grid two">
-        <article class="card reveal"><span class="tag">Tenant boundary</span><h3>Customer records are scoped.</h3><p>Customer workspace commands should become customer records first, not direct instructions to the owner layer.</p></article>
-        <article class="card reveal"><span class="tag">Admin boundary</span><h3>Owner commands stay private.</h3><p>Admin pages, connector control, production review, and deployment setup belong behind authentication and operational policy.</p></article>
-        <article class="card reveal"><span class="tag">Claim boundary</span><h3>Public claims get reviewed.</h3><p>The system should not overstate certifications, legal status, production enforcement, or live integrations without proof.</p></article>
-        <article class="card reveal"><span class="tag">Action boundary</span><h3>Risky actions need a gate.</h3><p>Send, publish, provision, escalate, charge, or production-touching actions should leave an approval trail.</p></article>
+        <article class="card reveal"><span class="tag">Tenant boundary</span><h3>Customer workspace isolation is structural.</h3><p>Each customer's data lives in its own D1 partition. 0meg4kAI verifies at runtime that no customer command can reach owner-scoped brains or another tenant's records. Worker-level enforcement — not an access policy that can be misconfigured.</p></article>
+        <article class="card reveal"><span class="tag">Admin boundary</span><h3>Eight Workers behind Cloudflare Access on /admin/*.</h3><p>SkyeGateFS27 handles Bearer token introspection and role/scope validation. A Cloudflare Access policy sits in front of every admin-scoped route. Production connectors, deployment configuration, and private runbooks never appear on public-facing pages.</p></article>
+        <article class="card reveal"><span class="tag">Claim boundary</span><h3>Public claims route through Valentina Reyes before publishing.</h3><p>Marketing brain approval gate blocks any public-facing content that overstates certifications, legal standing, or production integration status. The gate exists in the brain router, the Worker endpoint, and the 0meg4kAI scanner — all three must clear before a public claim executes.</p></article>
+        <article class="card reveal"><span class="tag">Action boundary</span><h3>Resend approval email fires before sensitive execution.</h3><p>Contracts, payments, hiring decisions, and public publishing all trigger an approval notification to the operator's admin email via Resend. The action is staged but not executed until the operator confirms. The confirmation event logs to the sentinel audit trail D1 database.</p></article>
       </div>
     </section>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>Public security posture. Private controls stay private.</p></div></div>
+      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>0meg4kAI two-layer scanning. SkyeGateFS27 auth. Hard gates on contracts, payments, hiring, and publishing.</p></div></div>
       <div class="footer-links"><a href="brain-system.html">Brains</a><a href="tech-stack.html">Tech Stack</a><a href="value.html">Value</a></div>
       <div class="footer-links"><a href="fit-check.html">Fit Check</a><a href="/Metraiyux-Marketing/index.html">Marketing &amp; Pricing</a><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a><span class="tiny">Last public revision: 2026-05-15</span></div>
     </div>

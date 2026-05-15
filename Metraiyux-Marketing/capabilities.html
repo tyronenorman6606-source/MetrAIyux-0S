@@ -1,218 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MetrAIyux 0S — Full Capabilities & Tech Stack</title>
-  <meta name="description" content="Every brain, every Worker, every surface, every integration. The complete technical picture of MetrAIyux 0S." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .cap-hero { padding: 72px 0 56px; border-bottom: 1px solid var(--border); }
-
-    /* Brain cards */
-    .brain-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      margin-top: 40px;
-    }
-    .brain-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px 24px;
-      transition: border-color 0.2s;
-    }
-    .brain-card:hover { border-color: var(--gold); }
-    .brain-card.system { border-left: 3px solid #8899ee; }
-    .brain-card.executive { border-left: 3px solid var(--gold); }
-    .brain-card.cabinet { border-left: 3px solid #5fca82; }
-    .brain-tag {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 3px;
-      margin-bottom: 10px;
-    }
-    .brain-tag.sys { background: rgba(136,153,238,0.15); color: #8899ee; }
-    .brain-tag.exec { background: var(--gold-dim); color: var(--gold-light); }
-    .brain-tag.cab { background: rgba(95,202,130,0.12); color: #5fca82; }
-    .brain-card .bname { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-    .brain-card .btitle { font-size: 0.8rem; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
-    .brain-card .bcabinet { font-size: 0.72rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
-
-    /* Worker table */
-    .worker-table { width: 100%; border-collapse: collapse; margin-top: 32px; }
-    .worker-table thead th {
-      text-align: left;
-      font-size: 0.72rem;
-      color: var(--gold);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 10px 14px;
-      border-bottom: 2px solid var(--gold);
-    }
-    .worker-table tbody td {
-      padding: 14px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
-      vertical-align: top;
-    }
-    .worker-table tbody td:first-child { color: var(--white); font-weight: 700; font-family: monospace; font-size: 0.8rem; }
-    .worker-table tbody td:not(:first-child) { color: var(--gray); }
-    .live-badge {
-      display: inline-block;
-      background: rgba(95,202,130,0.15);
-      color: #5fca82;
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 3px;
-      letter-spacing: 0.08em;
-    }
-
-    /* Tech stack */
-    .stack-section { margin-top: 48px; }
-    .stack-group { margin-bottom: 32px; }
-    .stack-group-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--gold);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .stack-items { display: flex; flex-wrap: wrap; gap: 10px; }
-    .stack-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 16px;
-    }
-    .stack-item .sname { font-size: 0.875rem; font-weight: 700; color: var(--white); margin-bottom: 2px; }
-    .stack-item .sdesc { font-size: 0.75rem; color: var(--gray); }
-
-    /* Surfaces */
-    .surface-list { margin-top: 32px; }
-    .surface-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 12px;
-      display: grid;
-      grid-template-columns: 1fr 2fr auto;
-      gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 700px) { .surface-item { grid-template-columns: 1fr; } }
-    .surface-item .sname { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-    .surface-item .surl { font-size: 0.72rem; color: var(--gold); font-family: monospace; word-break: break-all; }
-    .surface-item .sdesc { font-size: 0.82rem; color: var(--gray); line-height: 1.6; }
-    .surface-item .saudience {
-      font-size: 0.72rem;
-      color: var(--gray);
-      background: var(--near-black);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 4px 10px;
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    /* Integration grid */
-    .integ-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 32px;
-    }
-    .integ-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-    }
-    .integ-card .iname { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
-    .integ-card .irole { font-size: 0.8rem; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
-    .integ-card p { font-size: 0.8rem; color: var(--gray); line-height: 1.55; }
-
-    /* Security section */
-    .security-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-top: 32px;
-    }
-    @media (max-width: 640px) { .security-grid { grid-template-columns: 1fr; } }
-    .sec-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
-    .sec-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
-    .sec-card ul { list-style: none; }
-    .sec-card ul li { font-size: 0.82rem; color: var(--gray); padding: 5px 0; padding-left: 16px; position: relative; border-bottom: 1px solid var(--border); }
-    .sec-card ul li:last-child { border-bottom: none; }
-    .sec-card ul li::before { content: "→"; position: absolute; left: 0; color: var(--gold); }
-
-    .number-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 14px; margin-top: 32px; }
-    .num-pill { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 12px; text-align: center; }
-    .num-pill .n { font-size: 1.8rem; font-weight: 800; color: var(--gold); line-height: 1; }
-    .num-pill .l { font-size: 0.72rem; color: var(--gray); margin-top: 4px; line-height: 1.3; }
-
-    .toc {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px 28px;
-      margin: 40px 0;
-    }
-    .toc h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 14px; }
-    .toc ol { padding-left: 20px; }
-    .toc ol li { font-size: 0.875rem; color: var(--gray); padding: 4px 0; }
-    .toc ol li a { color: var(--gray); }
-    .toc ol li a:hover { color: var(--gold); text-decoration: none; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Full Capabilities — MetrAIyux 0S</title>
+  <meta name="description" content="Every brain, every Worker, every live surface, every integration, every security layer. The complete technical reference for MetrAIyux 0S.">
+  <link rel="icon" href="../metraiyux_0s_public_spectacle_site/assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
 
-  <nav>
-    <div class="nav-inner">
-      <span class="nav-logo">MetrAIyux 0S</span>
-      <ul class="nav-links">
-        <li><a href="index.html">← Main Site</a></li>
-        <li><a href="#brains">16 Brains</a></li>
-        <li><a href="#workers">8 Workers</a></li>
-        <li><a href="#stack">Tech Stack</a></li>
-        <li><a href="#surfaces">Live Surfaces</a></li>
-      </ul>
-      <a href="index.html#pricing" class="nav-cta">Get Access</a>
-    </div>
-  </nav>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="../metraiyux_0s_public_spectacle_site/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">&larr; Main</a>
+        <a class="is-active" href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">White Label</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
 
-  <section class="cap-hero">
-    <div class="container">
-      <div class="section-label">Full Capabilities Reference</div>
-      <h1>Everything MetrAIyux 0S <span>is and does.</span></h1>
-      <p class="hero-sub" style="text-align:left;margin:0">Every brain, every Worker, every live surface, every integration, every security layer — read directly from the source files. This is the complete technical picture.</p>
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Full Capabilities Reference</p>
+      <h1>Everything MetrAIyux 0S is and does.</h1>
+      <p class="lead">Every brain, every Worker, every live surface, every integration, every security layer. Read directly from the source. This is the complete technical picture.</p>
 
-      <div class="number-row">
-        <div class="num-pill"><div class="n">16</div><div class="l">Brain command personas</div></div>
-        <div class="num-pill"><div class="n">8</div><div class="l">Cloudflare Workers deployed</div></div>
-        <div class="num-pill"><div class="n">8</div><div class="l">D1 SQL databases</div></div>
-        <div class="num-pill"><div class="n">522</div><div class="l">HTML pages</div></div>
-        <div class="num-pill"><div class="n">722</div><div class="l">Knowledge base chunks</div></div>
-        <div class="num-pill"><div class="n">28</div><div class="l">Admin tutorial lessons</div></div>
-        <div class="num-pill"><div class="n">8</div><div class="l">Live public surfaces</div></div>
-        <div class="num-pill"><div class="n">2</div><div class="l">Security scan layers</div></div>
+      <div class="number-row" style="margin-top:32px;">
+        <div class="num-pill"><span class="n">16</span><span class="l">Brain command personas</span></div>
+        <div class="num-pill"><span class="n">8</span><span class="l">Cloudflare Workers deployed</span></div>
+        <div class="num-pill"><span class="n">8</span><span class="l">D1 SQL databases</span></div>
+        <div class="num-pill"><span class="n">522</span><span class="l">HTML pages</span></div>
+        <div class="num-pill"><span class="n">722</span><span class="l">Knowledge base chunks</span></div>
+        <div class="num-pill"><span class="n">28</span><span class="l">Admin tutorial lessons</span></div>
+        <div class="num-pill"><span class="n">2</span><span class="l">Security scan layers</span></div>
+        <div class="num-pill"><span class="n">0</span><span class="l">Build steps for static layer</span></div>
       </div>
 
       <div class="toc">
@@ -224,598 +56,530 @@
           <li><a href="#surfaces">Live Public Surfaces</a></li>
           <li><a href="#security">Security Architecture</a></li>
           <li><a href="#integrations">Integrations</a></li>
-          <li><a href="#content">Content & SEO Layer</a></li>
-          <li><a href="#ops">Operational Surfaces</a></li>
+          <li><a href="#content">Content &amp; Operational Surfaces</a></li>
         </ol>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 16 Brains -->
-  <section id="brains">
-    <div class="container">
-      <div class="section-label">The 16 Brain Command Personas</div>
-      <h2>Every command routes to a <span>named functional intelligence.</span></h2>
-      <p class="lead">The 16 brains are the operating core of MetrAIyux 0S. Each brain owns its domain, routes commands within that function, enforces its approval gates, and generates a timestamped JSON receipt for every action. The Main Automation Brain connects to all 16 simultaneously and coordinates cross-cabinet routing.</p>
-
-      <div class="brain-grid">
-
-        <!-- System brains -->
-        <div class="brain-card system">
-          <span class="brain-tag sys">System</span>
-          <div class="bname">Site Operator Brain</div>
-          <div class="btitle">Business Automation Control Layer — manages all platform routing, task creation, event dispatch, and ledger writes</div>
-          <div class="bcabinet">MetrAIyux 0S Control Layer</div>
+    <!-- 16 Brains -->
+    <section class="section" id="brains">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">The 16 Brain Command Personas</p>
+          <h2>Every command routes to a named functional intelligence.</h2>
         </div>
-
-        <div class="brain-card system">
-          <span class="brain-tag sys">System</span>
-          <div class="bname">0meg4kAI</div>
-          <div class="btitle">Security / QA Assistant Brain — two-layer command scanner, tenant isolation enforcement, quarantine routing, and escalation dispatch</div>
-          <div class="bcabinet">Security, QA, Tenant Isolation & Customer-Side Control</div>
-        </div>
-
-        <div class="brain-card system">
-          <span class="brain-tag sys">System</span>
-          <div class="bname">Central Company Command Brain</div>
-          <div class="btitle">Company-wide routing and executive command assistant — handles commands that span multiple cabinets or require cross-functional escalation</div>
-          <div class="bcabinet">All Cabinets</div>
-        </div>
-
-        <!-- Executive brain -->
-        <div class="brain-card executive">
-          <span class="brain-tag exec">Executive</span>
-          <div class="bname">Gray London Skyes Brain</div>
-          <div class="btitle">Founder, Principal Executive Architect & Chairman of Executive Command</div>
-          <div class="bcabinet">Executive Command Cabinet</div>
-        </div>
-
-        <!-- 12 Cabinet brains -->
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Marcus Vale Brain</div>
-          <div class="btitle">Chief Executive Officer / Chief of Operations</div>
-          <div class="bcabinet">Operations Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Celeste Monroe Brain</div>
-          <div class="btitle">Chief Revenue Officer / Director of Account Executive Strategy</div>
-          <div class="bcabinet">Sales & AE Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Adrian Cross Brain</div>
-          <div class="btitle">Chief Client Officer / Director of Client Success</div>
-          <div class="bcabinet">Client Success Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Naomi Sterling Brain</div>
-          <div class="btitle">Chief Financial Administrator / Director of Finance Operations</div>
-          <div class="bcabinet">Finance & Accounting Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Julian Mercer Brain</div>
-          <div class="btitle">Compliance Operations Director / Corporate Risk Coordinator</div>
-          <div class="bcabinet">Legal & Compliance Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Sienna Brooks Brain</div>
-          <div class="btitle">Chief Staffing Officer / Director of Workforce Operations</div>
-          <div class="bcabinet">HR & Staffing Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Orion Hayes Brain</div>
-          <div class="btitle">Chief Technology Systems Officer / Director of Platform Operations</div>
-          <div class="bcabinet">Technology & Systems Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Valentina Reyes Brain</div>
-          <div class="btitle">Chief Brand Officer / Director of Marketing Strategy</div>
-          <div class="bcabinet">Marketing & Brand Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Donovan Pierce Brain</div>
-          <div class="btitle">Director of Government & Enterprise Readiness</div>
-          <div class="bcabinet">Government & Enterprise Contracting Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Helena Ward Brain</div>
-          <div class="btitle">Strategic Partnerships Director / Vendor Relations Officer</div>
-          <div class="bcabinet">Partnerships & Vendor Relations Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Victor Saint Brain</div>
-          <div class="btitle">Director of Quality Assurance & Performance Control</div>
-          <div class="bcabinet">Quality Assurance & Performance Cabinet</div>
-        </div>
-
-        <div class="brain-card cabinet">
-          <span class="brain-tag cab">Cabinet</span>
-          <div class="bname">Amara Voss Brain</div>
-          <div class="btitle">Chief Innovation Officer / Director of Expansion Strategy</div>
-          <div class="bcabinet">Expansion & Innovation Cabinet</div>
-        </div>
-
+        <p>The 16 brains are the operating core of MetrAIyux 0S. Each brain owns its domain, routes commands within that function, enforces its approval gates, and generates a timestamped JSON receipt for every action.</p>
       </div>
 
-      <p style="color:var(--gray);font-size:0.82rem;margin-top:20px">Brain type key: <span style="color:#8899ee">■ System</span> — platform-level control and security &nbsp;&nbsp; <span style="color:var(--gold)">■ Executive</span> — founder command layer &nbsp;&nbsp; <span style="color:#5fca82">■ Cabinet</span> — functional domain intelligence</p>
-    </div>
-  </section>
-
-  <!-- 8 Workers -->
-  <section style="background:var(--near-black)" id="workers">
-    <div class="container">
-      <div class="section-label">The 8 Cloudflare Workers</div>
-      <h2>All 8 deployed. <span>All live on the global edge.</span></h2>
-      <p class="lead">Every Worker runs as an ES module on Cloudflare's global edge network. Each has its own D1 SQL database, KV namespace bindings, and Queue connections. All confirmed live with CF-Ray headers as of deployment.</p>
-
-      <table class="worker-table">
-        <thead>
-          <tr>
-            <th>Worker Name</th>
-            <th>Function</th>
-            <th>D1 Database</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>metraiyux-0s-full-system</td>
-            <td>Main system entry point — serves the full 522-page operating site, routes authenticated admin requests, proxies to all other Workers, enforces Cloudflare Access on /admin/*</td>
-            <td>—</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>admin-automation-brain</td>
-            <td>Admin command routing brain — receives authenticated operator commands, routes to all 16 brain personas, writes receipts to D1, dispatches async tasks via Queue, fires Resend approval emails</td>
-            <td>metraiyux-admin-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>omeg4kai-security-gateway</td>
-            <td>0meg4kAI security scanner — stateless command inspection at the edge, tenant isolation enforcement, privilege escalation detection, legal/financial risk scoring, quarantine routing, D1 event logging, Queue escalation</td>
-            <td>metraiyux-omega-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>sovereign-saas-provisioning-worker</td>
-            <td>Customer SaaS layer — handles signup, company profile, service selection, workspace provisioning, Stripe checkout session creation, tenant registration, customer command routing</td>
-            <td>metraiyux-saas-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>crown-site-operator</td>
-            <td>CROWN operator — command rooms, approval gate enforcement, operating ledger writes, executive command receipts, cross-cabinet task dispatch</td>
-            <td>metraiyux-crown-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>sovereign-13-cabinet-nexus-operator</td>
-            <td>NEXUS operator — CRM-style records, business inbox triage, brain-to-brain routing, contact management, relationship ledger, inbound lead processing</td>
-            <td>metraiyux-nexus-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>sovereign-13-site-operator-quantum</td>
-            <td>QUANTUM operator — route management, task creation, event dispatch, ledger endpoints, D1 with KV fallback for high-frequency reads</td>
-            <td>metraiyux-site-operator-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-          <tr>
-            <td>sovereign-13-cabinet-sentinel-operator</td>
-            <td>Sentinel operator — monitoring layer, audit trail verification, receipt integrity checks, anomaly detection across cabinet events</td>
-            <td>metraiyux-sentinel-db</td>
-            <td><span class="live-badge">LIVE</span></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p style="font-size:0.8rem;color:var(--gray);margin-top:16px">Plus: SkyeGateFS27 — the identity and auth gate — runs as its own Worker at <code style="color:var(--gold)">skyegatefs27-citadeldb.graylondonskyes.workers.dev</code>. It is a separate platform that MetrAIyux 0S connects to for token introspection and admin identity verification.</p>
-    </div>
-  </section>
-
-  <!-- Tech Stack -->
-  <section id="stack">
-    <div class="container">
-      <div class="section-label">Tech Stack</div>
-      <h2>What it's <span>actually built on.</span></h2>
-      <p class="lead">No framework dependencies. No build pipeline. No proprietary cloud lock-in. The entire platform runs on standard web technologies deployed to infrastructure you own.</p>
-
-      <div class="stack-section">
-
-        <div class="stack-group">
-          <div class="stack-group-label">Frontend</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">Vanilla HTML5</div><div class="sdesc">No framework — 522 pages, zero build step</div></div>
-            <div class="stack-item"><div class="sname">Vanilla CSS3</div><div class="sdesc">Custom design system, no preprocessor</div></div>
-            <div class="stack-item"><div class="sname">Vanilla JavaScript</div><div class="sdesc">No bundler, no transpiler, ES6+ modules</div></div>
-            <div class="stack-item"><div class="sname">localStorage</div><div class="sdesc">Browser-local brain receipts and state</div></div>
-            <div class="stack-item"><div class="sname">Fetch API</div><div class="sdesc">Worker communication from admin brain UI</div></div>
+      <!-- System Brains -->
+      <div class="reveal" style="margin-bottom:32px;">
+        <p class="eyebrow" style="color:var(--cyan);margin-bottom:16px;">System Brains</p>
+        <div class="stack-layers">
+          <div class="stack-layer">
+            <div class="stack-layer-id">Site Operator Brain</div>
+            <div>
+              <h3>Business Automation Control Layer</h3>
+              <p>Manages all platform routing, task creation, event dispatch, and ledger writes. MetrAIyux 0S Control Layer.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">0meg4kAI</div>
+            <div>
+              <h3>Security / QA Assistant Brain</h3>
+              <p>Two-layer command scanner, tenant isolation enforcement, quarantine routing, and escalation dispatch. Security, QA, Tenant Isolation &amp; Customer-Side Control.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Central Company Command Brain</div>
+            <div>
+              <h3>Company-Wide Routing &amp; Executive Command</h3>
+              <p>Handles commands that span multiple cabinets or require cross-functional escalation. Connects to all 16 brains simultaneously.</p>
+            </div>
           </div>
         </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Edge Compute (Cloudflare Workers)</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">Cloudflare Workers</div><div class="sdesc">ES module format — 8 Workers deployed</div></div>
-            <div class="stack-item"><div class="sname">D1 SQL</div><div class="sdesc">8 D1 databases — audit log, receipts, tenant store, CRM, ledger</div></div>
-            <div class="stack-item"><div class="sname">KV Storage</div><div class="sdesc">Fast lookup — security scan cache, brain state, config</div></div>
-            <div class="stack-item"><div class="sname">Cloudflare Queues</div><div class="sdesc">Async task dispatch and approval escalation</div></div>
-            <div class="stack-item"><div class="sname">Cloudflare Pages</div><div class="sdesc">Static site hosting — global CDN, zero config</div></div>
-            <div class="stack-item"><div class="sname">Cloudflare Access</div><div class="sdesc">Identity-based gate on /admin/* routes</div></div>
-            <div class="stack-item"><div class="sname">wrangler CLI</div><div class="sdesc">All Workers wrangler.toml configured, compatibility_date 2026-05-15</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Authentication & Identity</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">SkyeGateFS27</div><div class="sdesc">Sovereign auth platform — Bearer token introspection, role/scope validation, email allowlist</div></div>
-            <div class="stack-item"><div class="sname">skygate-auth-bridge.js</div><div class="sdesc">Client-side token introspection module with multi-path fallback</div></div>
-            <div class="stack-item"><div class="sname">Bearer token auth</div><div class="sdesc">Authorization header validation on all Worker endpoints</div></div>
-            <div class="stack-item"><div class="sname">Legacy ADMIN_TOKEN</div><div class="sdesc">Fallback secret-based auth for non-SkyeGate deployments</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Security</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">0meg4kAI Browser Scanner</div><div class="sdesc">Client-side regex + scoring — first pass before request leaves browser</div></div>
-            <div class="stack-item"><div class="sname">0meg4kAI Worker Scanner</div><div class="sdesc">Edge-side stateless scanner — second pass at Cloudflare Worker layer</div></div>
-            <div class="stack-item"><div class="sname">Tenant Isolation</div><div class="sdesc">Runtime enforcement — customer commands cannot reach owner brains or other tenants</div></div>
-            <div class="stack-item"><div class="sname">Hard Approval Gates</div><div class="sdesc">Non-configurable blocks on contracts, payments, hiring, legal, public publishing</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Email & Notifications</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">Resend API</div><div class="sdesc">HTML approval notification emails — fired by Worker on every gated event</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Payments & Billing</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">Stripe</div><div class="sdesc">Checkout session creation, subscription management — wired in SaaS provisioning Worker</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Brain & Knowledge Layer</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">persona-brains.json</div><div class="sdesc">16 brain persona definitions — names, cabinets, titles, routing config</div></div>
-            <div class="stack-item"><div class="sname">knowledge-base.json</div><div class="sdesc">722 knowledge chunks — scored by keyword overlap for brain context retrieval</div></div>
-            <div class="stack-item"><div class="sname">automation-brain.json</div><div class="sdesc">Main automation brain manifest — 16 connected brains, routing logic config</div></div>
-            <div class="stack-item"><div class="sname">site-operator-brain.json</div><div class="sdesc">Site operator brain config — surface registry and operator routing rules</div></div>
-            <div class="stack-item"><div class="sname">live-surface-registry.json</div><div class="sdesc">8 live proof surfaces — URLs, audiences, routing triggers, brain assignments</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">SEO & Discoverability</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">sitemap.xml</div><div class="sdesc">Full site — all 522 pages indexed</div></div>
-            <div class="stack-item"><div class="sname">robots.txt</div><div class="sdesc">Crawler directives — /admin/* noindexed</div></div>
-            <div class="stack-item"><div class="sname">llms.txt</div><div class="sdesc">AI crawler context file — first-class AI search indexing</div></div>
-            <div class="stack-item"><div class="sname">40+ city/service pages</div><div class="sdesc">Phoenix, Mesa, Tempe, Chandler, Scottsdale, Glendale, Gilbert, Peoria × service verticals</div></div>
-          </div>
-        </div>
-
-        <div class="stack-group">
-          <div class="stack-group-label">Deployment</div>
-          <div class="stack-items">
-            <div class="stack-item"><div class="sname">Zero build step</div><div class="sdesc">Static layer deploys via drag-drop or git push — no npm, no webpack, no node</div></div>
-            <div class="stack-item"><div class="sname">wrangler deploy</div><div class="sdesc">All 8 Workers deploy with a single wrangler command per Worker</div></div>
-            <div class="stack-item"><div class="sname">D1 migrations</div><div class="sdesc">SQL migration files included — schema provisions automatically on first deploy</div></div>
-            <div class="stack-item"><div class="sname">_headers file</div><div class="sdesc">Cloudflare Pages header rules — noindex on /admin/*, security headers</div></div>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
 
-  <!-- Live Surfaces -->
-  <section style="background:var(--near-black)" id="surfaces">
-    <div class="container">
-      <div class="section-label">Live Public Surfaces</div>
-      <h2>8 surfaces live <span>right now.</span></h2>
-      <p class="lead">All 8 surfaces are deployed and publicly accessible. Each surface serves a specific audience and routes to the brains that handle that context.</p>
-
-      <div class="surface-list">
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">MetrAIyux 0S Full System</div>
-            <div class="surl">metraiyux-0s-full-system.graylondonskyes.workers.dev</div>
+      <!-- Executive Brain -->
+      <div class="reveal" style="margin-bottom:32px;">
+        <p class="eyebrow" style="color:var(--gold);margin-bottom:16px;">Executive Brain</p>
+        <div class="stack-layers">
+          <div class="stack-layer">
+            <div class="stack-layer-id">Gray London Skyes Brain</div>
+            <div>
+              <h3>Founder, Principal Executive Architect &amp; Chairman</h3>
+              <p>Executive Command Cabinet. Founder and operator command, brand direction, and executive context. Chairman of Executive Command.</p>
+            </div>
           </div>
-          <div class="sdesc">The live 16-brain business command deck. All operating surfaces: public pages, admin automation, customer SaaS, proof vault, AE assets, calculators, governance, and all deployment routes. Primary demo surface for buyers and operators.</div>
-          <div class="saudience">Buyers / Operators</div>
         </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">MetrAIyux 0S Public Spectacle</div>
-            <div class="surl">metraiyux-0s-public-spectacle.pages.dev</div>
-          </div>
-          <div class="sdesc">Public-facing overview for cold prospects. Explains the value and routes qualified interest into the deeper MetrAIyux full system. Clean, sendable first look.</div>
-          <div class="saudience">Cold Prospects</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">SkyeGateFS27 Proof Surface</div>
-            <div class="surl">skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html</div>
-          </div>
-          <div class="sdesc">Explains how SkyeGate validates users, mirrors platform events, manages admin-controlled keys, and connects to MetrAIyux 0S without exposing secrets. Used when a prospect asks what makes the deployment serious.</div>
-          <div class="saudience">Technical Evaluators</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">SkyeGateFS27 Actual Gate</div>
-            <div class="surl">skygatefs13-quantumskyes.netlify.app</div>
-          </div>
-          <div class="sdesc">Live control-plane entry. Admin login, dashboard, user key request, smoke testing, platform monitor events, gate-owned operations. Used after the proof surface when a buyer is ready to see the gate itself.</div>
-          <div class="saudience">Operators / Technical</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">Main Automation Brain (Admin)</div>
-            <div class="surl">metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html</div>
-          </div>
-          <div class="sdesc">Owner-side command brain. Validates SkyeGate or legacy admin tokens, routes cabinet work to all 16 brains, records receipts, and uses the Worker backend when authenticated. Protected — not public.</div>
-          <div class="saudience">Owner / Admin Only</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">Sales Enablement Command Library</div>
-            <div class="surl">/sales-enablement/index.html</div>
-          </div>
-          <div class="sdesc">Discovery blueprint, objection handling matrix, outbound sequences, demo room script, closing room, and AE proof packet. Used by AEs and founders during active deal flow.</div>
-          <div class="saudience">AEs / Founder</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">Client OS</div>
-            <div class="surl">/client-os/index.html</div>
-          </div>
-          <div class="sdesc">Client onboarding wizard, document request center, escalation desk, renewal review, and client status board. Used when a company loses track of client work after the sale.</div>
-          <div class="saudience">Client Success Teams</div>
-        </div>
-
-        <div class="surface-item">
-          <div>
-            <div class="sname">Live Proof Router</div>
-            <div class="surl">/sales/live-proof-router.html</div>
-          </div>
-          <div class="sdesc">Interactive sales tool that matches buyer pain points to the live proof surfaces that answer them. Includes the FS27 gate map and the full MetrAIyux command deck routing. Human-feeling guided route for prospects.</div>
-          <div class="saudience">Buyers / AEs</div>
-        </div>
-
       </div>
-    </div>
-  </section>
 
-  <!-- Security Architecture -->
-  <section id="security">
-    <div class="container">
-      <div class="section-label">Security Architecture</div>
-      <h2>Two layers. <span>Nothing skips both.</span></h2>
-      <p class="lead">0meg4kAI runs first in the browser before the request leaves the client, and again at the Cloudflare Worker before anything executes. Two independent inspection passes means a command has to defeat both layers or it doesn't move.</p>
+      <!-- Cabinet Brains -->
+      <div class="reveal">
+        <p class="eyebrow" style="color:var(--mint);margin-bottom:16px;">Cabinet Brains</p>
+        <div class="brain-list">
+          <div class="brain-row">
+            <div class="brain-num">05</div>
+            <div>
+              <div class="brain-name">Marcus Vale Brain</div>
+              <div class="brain-title">Chief Executive Officer / Chief of Operations — Operations Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">06</div>
+            <div>
+              <div class="brain-name">Celeste Monroe Brain</div>
+              <div class="brain-title">Chief Revenue Officer / Director of Account Executive Strategy — Sales &amp; AE Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">07</div>
+            <div>
+              <div class="brain-name">Adrian Cross Brain</div>
+              <div class="brain-title">Chief Client Officer / Director of Client Success — Client Success Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">08</div>
+            <div>
+              <div class="brain-name">Naomi Sterling Brain</div>
+              <div class="brain-title">Chief Financial Administrator / Director of Finance Operations — Finance &amp; Accounting Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">09</div>
+            <div>
+              <div class="brain-name">Julian Mercer Brain</div>
+              <div class="brain-title">Compliance Operations Director / Corporate Risk Coordinator — Legal &amp; Compliance Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">10</div>
+            <div>
+              <div class="brain-name">Sienna Brooks Brain</div>
+              <div class="brain-title">Chief Staffing Officer / Director of Workforce Operations — HR &amp; Staffing Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">11</div>
+            <div>
+              <div class="brain-name">Orion Hayes Brain</div>
+              <div class="brain-title">Chief Technology Systems Officer / Director of Platform Operations — Technology &amp; Systems Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">12</div>
+            <div>
+              <div class="brain-name">Valentina Reyes Brain</div>
+              <div class="brain-title">Chief Brand Officer / Director of Marketing Strategy — Marketing &amp; Brand Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">13</div>
+            <div>
+              <div class="brain-name">Donovan Pierce Brain</div>
+              <div class="brain-title">Director of Government &amp; Enterprise Readiness — Government &amp; Enterprise Contracting Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">14</div>
+            <div>
+              <div class="brain-name">Helena Ward Brain</div>
+              <div class="brain-title">Strategic Partnerships Director / Vendor Relations Officer — Partnerships &amp; Vendor Relations Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">15</div>
+            <div>
+              <div class="brain-name">Victor Saint Brain</div>
+              <div class="brain-title">Director of Quality Assurance &amp; Performance Control — Quality Assurance &amp; Performance Cabinet</div>
+            </div>
+          </div>
+          <div class="brain-row">
+            <div class="brain-num">16</div>
+            <div>
+              <div class="brain-name">Amara Voss Brain</div>
+              <div class="brain-title">Chief Innovation Officer / Director of Expansion Strategy — Expansion &amp; Innovation Cabinet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <div class="security-grid">
-        <div class="sec-card">
-          <h4>Layer 1 — Browser Scanner (0meg4kAI Client)</h4>
-          <ul>
-            <li>Runs before any network request is made</li>
-            <li>Regex + keyword scoring against risk categories</li>
-            <li>Checks: privilege escalation, cross-tenant access, legal risk, financial exposure, public claim triggers</li>
-            <li>Outcomes: allow, warn, block, or quarantine-pending</li>
-            <li>Writes scan receipt to localStorage immediately</li>
-            <li>Zero latency — synchronous, no API call</li>
-          </ul>
+    <!-- 8 Workers -->
+    <section class="band" id="workers">
+      <div class="band-inner" style="grid-template-columns:1fr;">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div>
+            <p class="eyebrow">The 8 Cloudflare Workers</p>
+            <h2>All 8 deployed. All live on the global edge.</h2>
+            <p style="color:var(--soft);font-size:17px;margin-top:14px;">Every Worker runs as an ES module on Cloudflare's global edge network. Each has its own D1 SQL database, KV namespace bindings, and Queue connections. All confirmed live with CF-Ray headers as of deployment.</p>
+          </div>
         </div>
-        <div class="sec-card">
-          <h4>Layer 2 — Edge Scanner (0meg4kAI Worker)</h4>
-          <ul>
-            <li>Runs at the Cloudflare Worker before any D1 write or action executes</li>
-            <li>Stateless scanner — same scoring model, independent of browser</li>
-            <li>Records every scan decision to D1 (metraiyux-omega-db)</li>
-            <li>KV cache for repeat-pattern fast rejection</li>
-            <li>Queue dispatch for escalation events requiring admin review</li>
-            <li>Resend notification fires to admin email on quarantine or escalation</li>
-          </ul>
+        <div class="reveal">
+          <table class="worker-table">
+            <thead>
+              <tr>
+                <th>Worker Name</th>
+                <th>Function</th>
+                <th>D1 Database</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>metraiyux-0s-full-system</td>
+                <td>Main system entry — serves the full 522-page operating site, routes authenticated admin requests, proxies to all other Workers, enforces Cloudflare Access on /admin/*</td>
+                <td>—</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>admin-automation-brain</td>
+                <td>Admin command routing — receives authenticated operator commands, routes to all 16 brain personas, writes receipts to D1, dispatches async tasks via Queue, fires Resend approval emails</td>
+                <td>metraiyux-admin-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>omeg4kai-security-gateway</td>
+                <td>0meg4kAI security scanner — stateless command inspection at the edge, tenant isolation enforcement, privilege escalation detection, legal/financial risk scoring, quarantine routing, D1 event logging, Queue escalation</td>
+                <td>metraiyux-omega-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>sovereign-saas-provisioning-worker</td>
+                <td>Customer SaaS — handles signup, company profile, service selection, workspace provisioning, Stripe checkout session creation, tenant registration, customer command routing</td>
+                <td>metraiyux-saas-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>crown-site-operator</td>
+                <td>CROWN operator — command rooms, approval gate enforcement, operating ledger writes, executive command receipts, cross-cabinet task dispatch</td>
+                <td>metraiyux-crown-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>sovereign-13-cabinet-nexus-operator</td>
+                <td>NEXUS operator — CRM-style records, business inbox triage, brain-to-brain routing, contact management, relationship ledger, inbound lead processing</td>
+                <td>metraiyux-nexus-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>sovereign-13-site-operator-quantum</td>
+                <td>QUANTUM operator — route management, task creation, event dispatch, ledger endpoints, D1 with KV fallback for high-frequency reads</td>
+                <td>metraiyux-site-operator-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+              <tr>
+                <td>sovereign-13-cabinet-sentinel-operator</td>
+                <td>Sentinel operator — monitoring layer, audit trail verification, receipt integrity checks, anomaly detection across cabinet events</td>
+                <td>metraiyux-sentinel-db</td>
+                <td><span class="live-badge">LIVE</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:13px;color:var(--muted);margin-top:14px;">Plus SkyeGateFS27 — the identity and auth gate — runs as its own Worker at <code>skyegatefs27-citadeldb.graylondonskyes.workers.dev</code>. It is a separate platform that MetrAIyux 0S connects to for token introspection and admin identity verification.</p>
         </div>
-        <div class="sec-card">
-          <h4>Hard Approval Gates (Non-Configurable)</h4>
-          <ul>
+      </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="section" id="stack">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Tech Stack</p>
+          <h2>What it's actually built on.</h2>
+        </div>
+        <p>No framework dependencies. No build pipeline. No proprietary cloud lock-in. The entire platform runs on standard web technologies deployed to infrastructure you own.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom:12px;">Frontend</p>
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">Static HTML</div>
+              <div><h3>Vanilla HTML5/CSS/JS</h3><p>No framework. 522 pages. Zero build step. No npm, no webpack, no node required for static layer.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Local State</div>
+              <div><h3>localStorage + Fetch API</h3><p>Browser-local brain receipts and state. Worker communication from admin brain UI via Fetch API.</p></div>
+            </div>
+          </div>
+          <p class="eyebrow" style="margin-top:32px;margin-bottom:12px;">Edge Compute</p>
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">Workers</div>
+              <div><h3>Cloudflare Workers (ES modules)</h3><p>8 Workers deployed. compatibility_date 2026-05-15. All wrangler.toml configured.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Data</div>
+              <div><h3>D1 SQL + KV + Queues</h3><p>8 D1 databases. KV for fast lookup. Queues for async task dispatch and approval escalation.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Hosting</div>
+              <div><h3>Cloudflare Pages</h3><p>Static site hosting — global CDN, zero config, instant deploy. Cloudflare Access gates /admin/* routes.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom:12px;">Auth &amp; Security</p>
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">Identity</div>
+              <div><h3>SkyeGateFS27</h3><p>Sovereign auth platform — Bearer token introspection, role/scope validation, email allowlist. Live at its own Workers endpoint.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Security</div>
+              <div><h3>0meg4kAI (2 layers)</h3><p>Browser scanner: regex + scoring before request leaves client. Worker scanner: edge-side stateless pass before any D1 write executes.</p></div>
+            </div>
+          </div>
+          <p class="eyebrow" style="margin-top:32px;margin-bottom:12px;">Integrations</p>
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">Email</div>
+              <div><h3>Resend API</h3><p>HTML approval notification emails fired by Workers on every gated event. Templates hand-coded inside each Worker.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Billing</div>
+              <div><h3>Stripe</h3><p>Checkout session endpoint in the SaaS provisioning Worker. Customer signup &rarr; service selection &rarr; Stripe checkout &rarr; workspace provisioning.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Brain Layer</div>
+              <div><h3>persona-brains.json + knowledge-base.json</h3><p>16 brain persona definitions. 722 knowledge chunks scored by keyword overlap for brain context retrieval.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Surfaces -->
+    <section class="band" id="surfaces">
+      <div class="band-inner" style="grid-template-columns:1fr;">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div>
+            <p class="eyebrow">Live Public Surfaces</p>
+            <h2>8 surfaces live right now.</h2>
+            <p style="color:var(--soft);font-size:17px;margin-top:14px;">All surfaces are deployed and publicly accessible. Each serves a specific audience and routes to the brains that handle that context.</p>
+          </div>
+        </div>
+        <div class="stack-layers reveal">
+          <div class="stack-layer">
+            <div class="stack-layer-id">Full System</div>
+            <div>
+              <h3>metraiyux-0s-full-system.graylondonskyes.workers.dev</h3>
+              <p>The live 16-brain business command deck. All operating surfaces: public pages, admin automation, customer SaaS, proof vault, AE assets, governance, and all deployment routes. Primary demo surface for buyers and operators.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Spectacle</div>
+            <div>
+              <h3>metraiyux-0s-public-spectacle.pages.dev</h3>
+              <p>Public-facing overview for cold prospects. Explains value, architecture, brains, proof posture, and routes qualified interest into the deeper full system.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">SkyeGate Proof</div>
+            <div>
+              <h3>skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html</h3>
+              <p>Explains how SkyeGate validates users, mirrors platform events, and connects to MetrAIyux 0S without exposing secrets. Used when a prospect asks what makes the deployment serious.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Admin Brain</div>
+            <div>
+              <h3>…/admin/automation-brain.html</h3>
+              <p>Owner-side command brain. Validates SkyeGate or legacy admin tokens, routes cabinet work to all 16 brains, records receipts, and uses the Worker backend when authenticated. Protected — not public.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Sales Enablement</div>
+            <div>
+              <h3>/sales-enablement/index.html</h3>
+              <p>Discovery blueprint, objection handling matrix, outbound sequences, demo room script, closing room, and AE proof packet. Used by AEs and founders during active deal flow.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Client OS</div>
+            <div>
+              <h3>/client-os/index.html</h3>
+              <p>Client onboarding wizard, document request center, escalation desk, renewal review, and client status board. Used when a company loses track of client work after the sale.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security Architecture -->
+    <section class="section" id="security">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Security Architecture</p>
+          <h2>Two layers. Nothing skips both.</h2>
+        </div>
+        <p>0meg4kAI runs first in the browser before the request leaves the client, and again at the Cloudflare Worker before anything executes. Two independent inspection passes — a command has to defeat both layers or it doesn't move.</p>
+      </div>
+
+      <div class="two-col reveal">
+        <div class="panel">
+          <h3>Layer 1 — Browser Scanner</h3>
+          <p style="margin-top:12px;">Runs before any network request is made. Regex + keyword scoring against risk categories. Checks: privilege escalation, cross-tenant access, legal risk, financial exposure, public claim triggers. Outcomes: allow, warn, block, or quarantine-pending. Writes scan receipt to localStorage immediately. Zero latency — synchronous, no API call.</p>
+        </div>
+        <div class="panel">
+          <h3>Layer 2 — Edge Scanner (Worker)</h3>
+          <p style="margin-top:12px;">Runs at the Cloudflare Worker before any D1 write or action executes. Stateless scanner — same scoring model, independent of browser. Records every scan decision to D1 (metraiyux-omega-db). KV cache for repeat-pattern fast rejection. Queue dispatch for escalation events requiring admin review. Resend notification fires to admin email on quarantine or escalation.</p>
+        </div>
+        <div class="panel">
+          <h3>Hard Approval Gates (Non-Configurable)</h3>
+          <ul class="check-list" style="margin-top:12px;">
             <li>Contracts — no production, signing, or sending without approval receipt</li>
             <li>Payments — no transfer, invoice, or financial commitment executes autonomously</li>
             <li>Hiring / Firing — all offers, terminations, and placements require human sign-off</li>
             <li>Legal / Tax / Compliance filings — gated, always</li>
             <li>Public claims, press, and social publishing — gated, always</li>
-            <li>Gates exist in brain router, Worker endpoint, and security scanner — triple-layered</li>
           </ul>
         </div>
-        <div class="sec-card">
-          <h4>Tenant Isolation</h4>
-          <ul>
+        <div class="panel">
+          <h3>Tenant Isolation</h3>
+          <ul class="check-list" style="margin-top:12px;">
             <li>Enforced at the Worker level on every customer command</li>
             <li>Customer workspace commands cannot reach owner-scoped brains</li>
-            <li>Customer workspace commands cannot reach other tenants' D1 data</li>
-            <li>Customer commands cannot trigger production connectors or admin-scoped operations</li>
+            <li>Customer commands cannot reach other tenants' D1 data</li>
             <li>0meg4kAI scans every customer command at runtime for boundary violations</li>
             <li>Isolation is structural — not a policy toggle that can be misconfigured</li>
           </ul>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Integrations -->
-  <section style="background:var(--near-black)" id="integrations">
-    <div class="container">
-      <div class="section-label">Integrations</div>
-      <h2>What it connects to <span>and how.</span></h2>
-      <div class="integ-grid">
-        <div class="integ-card">
-          <div class="iname">SkyeGateFS27</div>
-          <div class="irole">Identity & Auth Platform</div>
-          <p>Token introspection via Bearer headers. Role and scope claim validation. Email allowlist enforcement. Admin session management. Live at its own Workers endpoint.</p>
+    <!-- Integrations -->
+    <section class="band" id="integrations">
+      <div class="band-inner" style="grid-template-columns:1fr;">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div>
+            <p class="eyebrow">Integrations</p>
+            <h2>What it connects to and how.</h2>
+          </div>
         </div>
-        <div class="integ-card">
-          <div class="iname">Resend</div>
-          <div class="irole">Transactional Email</div>
-          <p>HTML approval notification emails. Fired by every Worker on any gated event — approval requests, quarantine escalations, and admin alerts. Templates are hand-coded inside each Worker.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Stripe</div>
-          <div class="irole">Payment & Subscription Billing</div>
-          <p>Checkout session endpoint in the SaaS provisioning Worker. Customer signup flow → service selection → Stripe checkout → workspace provisioning. Price IDs configured per tier.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Cloudflare D1</div>
-          <div class="irole">Persistent SQL Storage</div>
-          <p>8 dedicated databases: admin receipts, security scan events, SaaS customer records, CROWN operating ledger, NEXUS CRM records, QUANTUM task ledger, site operator events, sentinel audit trail.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Cloudflare KV</div>
-          <div class="irole">Fast Key-Value Lookup</div>
-          <p>Security scan cache for fast repeat-pattern rejection. Brain state persistence. Config key storage. High-frequency read optimization for the QUANTUM operator.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Cloudflare Queues</div>
-          <div class="irole">Async Task Dispatch</div>
-          <p>Async escalation for security events. Task dispatch across Workers without blocking the main routing thread. Used by 0meg4kAI for quarantine escalation and by the admin automation Worker for deferred cabinet tasks.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Cloudflare Access</div>
-          <div class="irole">Identity-Based Route Gate</div>
-          <p>Enforces identity verification on /admin/* before the request reaches any Worker. Works alongside SkyeGate — Cloudflare Access gates the route, SkyeGate validates the token inside the Worker.</p>
-        </div>
-        <div class="integ-card">
-          <div class="iname">Ollama / OpenAI-compatible</div>
-          <div class="irole">Optional LLM Endpoint</div>
-          <p>The Worker architecture accepts an optional LLM endpoint for semantic enrichment on top of the deterministic routing layer. Not required — the platform operates fully without it.</p>
+        <div class="two-col reveal">
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">SkyeGateFS27</div>
+              <div><h3>Identity &amp; Auth Platform</h3><p>Token introspection via Bearer headers. Role and scope claim validation. Email allowlist enforcement. Admin session management. Live at its own Workers endpoint.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Resend</div>
+              <div><h3>Transactional Email</h3><p>HTML approval notifications. Fired by every Worker on any gated event — approval requests, quarantine escalations, and admin alerts. Templates hand-coded inside each Worker.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Stripe</div>
+              <div><h3>Payment &amp; Subscription Billing</h3><p>Checkout session endpoint in SaaS provisioning Worker. Customer signup flow &rarr; service selection &rarr; Stripe checkout &rarr; workspace provisioning.</p></div>
+            </div>
+          </div>
+          <div class="stack-layers">
+            <div class="stack-layer">
+              <div class="stack-layer-id">Cloudflare D1</div>
+              <div><h3>Persistent SQL Storage</h3><p>8 dedicated databases: admin receipts, security scan events, SaaS customer records, CROWN ledger, NEXUS CRM records, QUANTUM task ledger, site operator events, sentinel audit trail.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Cloudflare KV</div>
+              <div><h3>Fast Key-Value Lookup</h3><p>Security scan cache for fast repeat-pattern rejection. Brain state persistence. Config key storage. High-frequency read optimization for QUANTUM operator.</p></div>
+            </div>
+            <div class="stack-layer">
+              <div class="stack-layer-id">Ollama / OpenAI</div>
+              <div><h3>Optional LLM Endpoint</h3><p>The Worker architecture accepts an optional LLM endpoint for semantic enrichment on top of the deterministic routing layer. Not required — the platform operates fully without it.</p></div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Content Layer -->
-  <section id="content">
-    <div class="container">
-      <div class="section-label">Content & Operational Surfaces</div>
-      <h2>What 522 pages <span>actually covers.</span></h2>
-      <p class="lead">Every surface in the platform has a specific operational job. This is not a website with extra pages — it is a complete operating infrastructure where every section does something.</p>
+    <!-- Content Layer -->
+    <section class="section" id="content">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Content &amp; Operational Surfaces</p>
+          <h2>What 522 pages actually covers.</h2>
+        </div>
+        <p>Every surface in the platform has a specific operational job. This is not a website with extra pages — it is a complete operating infrastructure where every section does something.</p>
+      </div>
 
-      <div class="feature-grid" style="margin-top:32px">
-        <div class="feature-card">
-          <span class="feature-icon">🧠</span>
-          <h3>Admin Command Center</h3>
-          <p>Main automation brain UI, approval inbox, brain receipt viewer, task dispatch, CROWN operator dashboard, and admin tutorial (28 lessons).</p>
+      <div class="two-col reveal">
+        <div class="stack-layers">
+          <div class="stack-layer">
+            <div class="stack-layer-id">Admin Center</div>
+            <div><h3>Command &amp; Approval Infrastructure</h3><p>Main automation brain UI, approval inbox, brain receipt viewer, task dispatch, CROWN operator dashboard, and admin tutorial (28 lessons).</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Sales Tools</div>
+            <div><h3>Sales Enablement Library</h3><p>Discovery blueprint, objection matrix, outbound email sequences, demo room script, live proof router, closing room, AE proof packet, buyer intelligence by persona type.</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Revenue Ops</div>
+            <div><h3>Proposal &amp; Pipeline</h3><p>Proposal center, scope builder, timeline builder, pricing narrative, AE command center, pipeline board, territory planner, referral tracker, renewal tracker.</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">HR &amp; Staffing</div>
+            <div><h3>Workforce Workflows</h3><p>Job order intake, candidate scorecard, placement workflow, candidate intake (browser-local JSON export), client intake portal, onboarding wizard, escalation desk.</p></div>
+          </div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">📊</span>
-          <h3>Cabinet Dashboards</h3>
-          <p>One dashboard per cabinet brain — Marcus Vale/Operations, Celeste Monroe/Revenue, Naomi Sterling/Finance, Julian Mercer/Legal, and all others. Each surfaces domain-specific receipts and pending approvals.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">💼</span>
-          <h3>Sales Enablement Library</h3>
-          <p>Discovery blueprint, objection matrix (with responses), outbound email sequences, demo room script, live proof router, closing room, AE proof packet, buyer intelligence by persona type.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📋</span>
-          <h3>Proposal & Revenue Ops</h3>
-          <p>Proposal center, scope builder, timeline builder, pricing narrative, AE command center, pipeline board, territory planner, referral tracker, AE ledger, renewal tracker.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">👥</span>
-          <h3>HR & Staffing Workflows</h3>
-          <p>Job order intake, candidate scorecard, placement workflow, candidate intake (browser-local JSON export), client intake portal, onboarding wizard, escalation desk, renewal review, document request center.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🏛️</span>
-          <h3>Governance Center</h3>
-          <p>Resolution language templates, authority matrix, appointment workflow, meeting minutes template, delegation ledger. Structured for enterprise and government contract diligence.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🇺🇸</span>
-          <h3>Government Readiness</h3>
-          <p>Capability statement builder, SAM/NAICS readiness pages, subcontractor profile, procurement workflow documentation. Built for companies pursuing federal and state/local public sector contracts.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📄</span>
-          <h3>Contracts & Legal Templates</h3>
-          <p>MSA outline, SOW builder, SLA matrix, change order workflow. All gated behind Julian Mercer's Legal brain — no document moves without an approval receipt.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🔐</span>
-          <h3>Proof Vault</h3>
-          <p>Release receipts, QA smoke receipts, link audit JSONs, claims review log, deployment proof surface. Creates a diligence-ready audit trail of platform activity and deployment history.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📈</span>
-          <h3>APEX Layer</h3>
-          <p>M&A readiness surface, security trust brief, KPI scoreboard, CRM import kit, email retention sequences, investor data room index. Designed for companies preparing for acquisition, fundraising, or enterprise partnership diligence.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🌐</span>
-          <h3>Customer SaaS & Client OS</h3>
-          <p>Self-serve customer signup, workspace setup, billing checkout, customer dashboard, client onboarding wizard, status board, escalation desk, renewal review, document request. Full customer lifecycle surface.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">✍️</span>
-          <h3>Blog & Knowledge Base</h3>
-          <p>20+ long-form thought leadership articles (one per cabinet executive), 722 knowledge base chunks, 40+ city and service SEO pages, llms.txt for AI crawler indexing.</p>
+        <div class="stack-layers">
+          <div class="stack-layer">
+            <div class="stack-layer-id">Governance</div>
+            <div><h3>Authority &amp; Resolution</h3><p>Resolution language templates, authority matrix, appointment workflow, meeting minutes template, delegation ledger. Structured for enterprise and government contract diligence.</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Government</div>
+            <div><h3>Public Sector Readiness</h3><p>Capability statement builder, SAM/NAICS readiness pages, subcontractor profile, procurement workflow documentation. Built for companies pursuing federal and state/local public sector contracts.</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">Proof Vault</div>
+            <div><h3>Audit Trail &amp; APEX</h3><p>Release receipts, QA smoke receipts, link audit JSONs, claims review log, deployment proof surface. M&amp;A readiness surface, investor data room index, KPI scoreboard.</p></div>
+          </div>
+          <div class="stack-layer">
+            <div class="stack-layer-id">SEO &amp; Blog</div>
+            <div><h3>Discoverability Layer</h3><p>20+ long-form blog articles, 722 knowledge base chunks, 40+ city/service SEO pages, llms.txt for AI crawler indexing, sitemap.xml, robots.txt.</p></div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CTA -->
-  <div class="container">
-    <div class="cta-block">
-      <div class="section-label">Ready to Deploy</div>
-      <h2>16 brains. 8 Workers. <span>All live.</span></h2>
-      <p>Every component on this page is deployed and running on Cloudflare's global edge. The question isn't whether this is built — it's whether you're ready to run your company on it.</p>
-      <div class="cta-group">
-        <a href="index.html#pricing" class="btn-primary">See Plans & Pricing</a>
-        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="btn-ghost">Open the Live System →</a>
+    <!-- CTA -->
+    <section class="section" style="padding-bottom:0">
+      <div class="cta-close reveal">
+        <p class="eyebrow">Ready to Deploy</p>
+        <h2>16 brains. 8 Workers. <em>All live.</em></h2>
+        <p style="color:var(--muted);max-width:520px;margin:16px auto 0;font-size:15px;line-height:1.7;">Every component on this page is deployed and running on Cloudflare's global edge. The question isn't whether this is built — it's whether you're ready to run your company on it.</p>
+        <div class="cta-row" style="justify-content:center;margin-top:26px;">
+          <a class="btn-primary" href="index.html#pricing">See Plans &amp; Pricing</a>
+          <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open the Live System &rarr;</a>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <footer>
-    <div class="container">
-      <p>MetrAIyux 0S &mdash; <a href="index.html">Main Site</a> &mdash; <a href="sell-sheet.html">Sell Sheet</a> &mdash; <a href="white-label.html">White Label</a> &mdash; <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a></p>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>MetrAIyux 0S</strong>
+        <p>Complete technical reference. 16 brains, 8 Workers, 8 D1 databases, 522 pages, 722 knowledge base chunks. All deployed. All live.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Main Site</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">White Label</a>
+      </div>
+      <div class="footer-links">
+        <a href="index.html#pricing">Pricing</a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full System</a>
+        <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a>
+        <span class="tiny">Last revision: 2026-05-15</span>
+      </div>
     </div>
   </footer>
 
+  <script>
+    (function() { const b = document.querySelector('[data-menu-button]'), l = document.querySelector('[data-nav-links]'); if (b && l) b.addEventListener('click', () => { const o = l.classList.toggle('is-open'); b.setAttribute('aria-expanded', String(o)); }); })();
+    (function() { const items = document.querySelectorAll('.reveal'); if (!items.length || !('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('is-visible')); return; } const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } }), { threshold: 0.10 }); items.forEach(el => obs.observe(el)); })();
+    (function() { const canvas = document.querySelector('.command-canvas'); if (!canvas || !canvas.getContext) return; const ctx = canvas.getContext('2d'); const P = Array.from({ length: 72 }, (_, i) => ({ x: Math.random(), y: Math.random(), speed: 0.00045 + Math.random() * 0.0007, phase: i * 0.72, color: i % 5 === 0 ? '#f8cb5e' : i % 3 === 0 ? '#a88cff' : '#64d9ff' })); function resize() { const r = window.devicePixelRatio || 1; canvas.width = Math.floor(window.innerWidth * r); canvas.height = Math.floor(window.innerHeight * r); canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; ctx.setTransform(r, 0, 0, r, 0, 0); } function draw(t) { const w = window.innerWidth, h = window.innerHeight; ctx.clearRect(0, 0, w, h); ctx.lineWidth = 1; P.forEach((p, i) => { p.y -= p.speed * 2.4; if (p.y < -0.08) p.y = 1.08; const x = p.x * w + Math.sin(t * 0.00045 + p.phase) * 26, y = p.y * h; ctx.beginPath(); ctx.arc(x, y, i % 7 === 0 ? 2.1 : 1.2, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.globalAlpha = i % 5 === 0 ? 0.72 : 0.46; ctx.fill(); const n = P[(i + 9) % P.length], nx = n.x * w, ny = n.y * h, d = Math.hypot(nx - x, ny - y); if (d < 180) { ctx.globalAlpha = Math.max(0, 0.2 - d / 900); ctx.strokeStyle = p.color; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke(); } }); ctx.globalAlpha = 1; requestAnimationFrame(draw); } resize(); window.addEventListener('resize', resize); requestAnimationFrame(draw); })();
+  </script>
 </body>
 </html>

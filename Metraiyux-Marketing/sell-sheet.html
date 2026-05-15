@@ -1,340 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MetrAIyux 0S — B2B Sell Sheet</title>
-  <meta name="description" content="One-page business case for MetrAIyux 0S as an internal enterprise operating system." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .sell-hero {
-      padding: 72px 0 56px;
-      border-bottom: 1px solid var(--border);
-    }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-    @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
-    .val-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-    .val-table th { text-align: left; font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-    .val-table td { padding: 12px 14px; font-size: 0.875rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .val-table td:first-child { color: var(--gray); width: 38%; }
-    .val-table td:last-child { color: var(--white); }
-    .comp-table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 0.85rem; }
-    .comp-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--gold); color: var(--gold); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    .comp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--gray); }
-    .comp-table td:first-child { color: var(--white); font-weight: 600; }
-    .comp-table .yes { color: #5fca82; font-weight: 700; }
-    .comp-table .no { color: #cc6666; }
-    .comp-table .partial { color: #ccaa55; }
-    .comp-table tr.highlight td { background: var(--gold-dim); }
-    .arr-box {
-      background: var(--gold-dim);
-      border: 1px solid rgba(201,168,76,0.3);
-      border-radius: var(--radius);
-      padding: 28px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .arr-box .big { font-size: 2rem; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
-    .arr-box .sub { font-size: 0.82rem; color: var(--gray); }
-    .scenario { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 12px; }
-    .scenario .label { font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; }
-    .scenario .amount { font-size: 1.4rem; font-weight: 800; color: var(--white); }
-    .scenario p { font-size: 0.82rem; color: var(--gray); margin-top: 4px; }
-    .checklist { list-style: none; margin-top: 16px; }
-    .checklist li { font-size: 0.875rem; color: var(--gray); padding: 7px 0; padding-left: 22px; position: relative; border-bottom: 1px solid var(--border); }
-    .checklist li:last-child { border-bottom: none; }
-    .checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
-    .objection { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 14px; }
-    .objection .q { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-    .objection .a { font-size: 0.875rem; color: var(--gray); line-height: 1.65; }
-    .print-note { text-align: center; padding: 16px; background: rgba(201,168,76,0.07); border-radius: var(--radius); font-size: 0.82rem; color: var(--gray); margin-top: 24px; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sell Sheet — MetrAIyux 0S</title>
+  <meta name="description" content="Business case for MetrAIyux 0S. Direct breakdown of what you get, what it costs, what it's worth, and how it compares. For operators, procurement leads, and founders evaluating it seriously.">
+  <link rel="icon" href="../metraiyux_0s_public_spectacle_site/assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
 
-  <nav>
-    <div class="nav-inner">
-      <span class="nav-logo">MetrAIyux 0S</span>
-      <ul class="nav-links">
-        <li><a href="index.html">← Back to Main</a></li>
-        <li><a href="#valuation">Valuation</a></li>
-        <li><a href="#comparison">Comparison</a></li>
-        <li><a href="#objections">Objections</a></li>
-      </ul>
-      <a href="index.html#pricing" class="nav-cta">See Pricing</a>
-    </div>
-  </nav>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="../metraiyux_0s_public_spectacle_site/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">&larr; Main</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a class="is-active" href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">White Label</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
 
-  <section class="sell-hero">
-    <div class="container">
-      <div class="section-label">B2B Sell Sheet</div>
-      <h1>The business case for <span>MetrAIyux 0S</span></h1>
-      <p class="hero-sub" style="text-align:left;margin:0 0 0 0">For operations directors, procurement leads, and founders evaluating MetrAIyux 0S as an internal operating system or resale product. This is not marketing language. It is a direct, factual breakdown of what you get, what it costs, and what it's worth.</p>
-    </div>
-  </section>
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">B2B Sell Sheet</p>
+      <h1>The business case for MetrAIyux 0S.</h1>
+      <p class="lead">For operations directors, procurement leads, and founders evaluating MetrAIyux 0S as an internal operating system or resale product. This is not marketing language. Direct breakdown of what you get, what it costs, and what it's worth.</p>
+    </section>
 
-  <!-- What you're buying -->
-  <section>
-    <div class="container">
-      <div class="section-label">What You're Buying</div>
-      <h2>A complete <span>operating infrastructure</span> — not a SaaS subscription to one feature.</h2>
-      <div class="two-col">
+    <!-- What You're Buying -->
+    <section class="section" id="what">
+      <div class="section-head reveal">
         <div>
-          <p class="lead" style="font-size:0.95rem">MetrAIyux 0S is a deployable operating system. When you license it, you receive the full source package: 522 HTML pages, 6 Cloudflare Worker kits with D1/KV/Queue bindings, a 16-brain command routing layer, 0meg4kAI security gateway, SkyeGate auth bridge, Stripe billing integration, and complete deployment documentation.</p>
-          <p style="color:var(--gray);font-size:0.875rem;margin-top:16px">The static site deploys to Cloudflare Pages in under 30 minutes. The Worker backend deploys via wrangler. There is no proprietary cloud lock-in — you deploy on your own Cloudflare account and own the infrastructure.</p>
-          <table class="val-table">
-            <tr><th>Component</th><th>What's Included</th></tr>
-            <tr><td>Static site</td><td>522 pages — marketing, admin, sales, client portal, gov readiness, blog, knowledge base</td></tr>
-            <tr><td>Worker backend</td><td>6 Workers: Admin Automation, SaaS Provisioning, Security Gateway, Site Operator, CROWN, NEXUS</td></tr>
-            <tr><td>Data layer</td><td>D1 SQL (audit log, tenant store, approval ledger), KV (fast lookup), Queues (async dispatch)</td></tr>
-            <tr><td>Brain routing</td><td>16 personas covering every executive function, keyword classifier, JSON receipt output</td></tr>
-            <tr><td>Security</td><td>0meg4kAI browser + Worker scanner, tenant isolation, approval gate enforcement</td></tr>
-            <tr><td>Auth</td><td>SkyeGate token introspection, Bearer header validation, role/scope checking</td></tr>
-            <tr><td>Email</td><td>Resend HTML approval notifications — wired to every Worker approval event</td></tr>
-            <tr><td>Billing</td><td>Stripe checkout session, customer signup, workspace provisioning, subscription management</td></tr>
-            <tr><td>SEO</td><td>40+ city/service pages, llms.txt, robots.txt, full sitemap.xml</td></tr>
-            <tr><td>Sales tools</td><td>Discovery blueprint, objection matrix, AE command center, proposal builder, revenue ops</td></tr>
+          <p class="eyebrow">What You're Buying</p>
+          <h2>A complete operating infrastructure — not a SaaS subscription to one feature.</h2>
+        </div>
+        <p>When you license MetrAIyux 0S, you receive the full source package. Not a seat on someone else's server. Your infrastructure, your Cloudflare account, your data.</p>
+      </div>
+      <div class="two-col">
+        <div class="reveal editorial-prose">
+          <h3>What's in the package.</h3>
+          <p>522 HTML pages, 8 Cloudflare Worker kits with D1/KV/Queue bindings, a 16-brain command routing layer, 0meg4kAI security gateway, SkyeGate auth bridge, Stripe billing integration, and complete deployment documentation.</p>
+          <p>The static site deploys to Cloudflare Pages in under 30 minutes. The Worker backend deploys via wrangler. No proprietary cloud lock-in — you deploy on your own Cloudflare account.</p>
+
+          <table class="comp-table" style="margin-top:24px;">
+            <thead><tr><th>Component</th><th>What's Included</th></tr></thead>
+            <tbody>
+              <tr><td>Static site</td><td>522 pages — marketing, admin, sales, client portal, gov readiness, blog, knowledge base</td></tr>
+              <tr><td>Worker backend</td><td>8 Workers: Admin Automation, SaaS Provisioning, Security Gateway, Full System, CROWN, NEXUS, QUANTUM, Sentinel</td></tr>
+              <tr><td>Data layer</td><td>8 D1 SQL databases (audit log, tenant store, approval ledger, CRM, receipts), KV, Queues</td></tr>
+              <tr><td>Brain routing</td><td>16 personas covering every executive function, keyword classifier, JSON receipt output</td></tr>
+              <tr><td>Security</td><td>0meg4kAI browser + Worker scanner, tenant isolation, approval gate enforcement</td></tr>
+              <tr><td>Auth</td><td>SkyeGate token introspection, Bearer header validation, role/scope checking</td></tr>
+              <tr><td>Email</td><td>Resend HTML approval notifications — wired to every Worker approval event</td></tr>
+              <tr><td>Billing</td><td>Stripe checkout, customer signup, workspace provisioning, subscription management</td></tr>
+              <tr><td>Sales tools</td><td>Discovery blueprint, objection matrix, AE command center, proposal builder, revenue ops</td></tr>
+            </tbody>
           </table>
         </div>
         <div>
-          <div class="section-label" style="margin-top:0">Hard Limits (Non-Negotiable)</div>
-          <p style="color:var(--gray);font-size:0.875rem;margin-bottom:16px">These gates are baked into the brain routing logic, the Worker endpoints, and the security scanner. They cannot be configured away. They exist because an operating system that will do anything you ask is not an operating system — it's a liability.</p>
-          <ul class="checklist">
-            <li>No contract will be produced, signed, or sent without a human approval receipt</li>
-            <li>No payment, transfer, or financial commitment will execute autonomously</li>
-            <li>No hire, termination, or placement will complete without human sign-off</li>
-            <li>No legal filing, tax action, or compliance document will be submitted without approval</li>
-            <li>No public communication — social, press, or public claims — will publish without a human release</li>
-            <li>Every brain routing decision and security scan is logged to D1 with timestamp and outcome</li>
-            <li>Customer workspace commands cannot reach owner-scoped brains or other tenants</li>
-          </ul>
-          <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
-            <div class="section-label" style="margin-bottom:8px">Deployment Requirement</div>
-            <p style="font-size:0.82rem;color:var(--gray)">A Cloudflare account (free tier is sufficient for Workers and D1). A Resend API key (free tier for email). Stripe keys for billing (optional if not using SaaS provisioning). SkyeGate token for admin auth (or Cloudflare Access as an alternative). No other cloud dependencies.</p>
+          <div class="panel reveal">
+            <p class="eyebrow" style="margin-bottom:12px;">Hard Limits (Non-Negotiable)</p>
+            <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">These gates are baked into brain routing logic, Worker endpoints, and the security scanner. They cannot be configured away. An operating system that will do anything you ask is a liability, not a tool.</p>
+            <ul class="check-list">
+              <li>No contract will be produced, signed, or sent without a human approval receipt</li>
+              <li>No payment, transfer, or financial commitment will execute autonomously</li>
+              <li>No hire, termination, or placement will complete without human sign-off</li>
+              <li>No legal filing, tax action, or compliance document will be submitted without approval</li>
+              <li>No public communication — social, press, or public claims — will publish without a human release</li>
+              <li>Every brain routing decision and security scan is logged to D1 with timestamp and outcome</li>
+              <li>Customer workspace commands cannot reach owner-scoped brains or other tenants</li>
+            </ul>
+          </div>
+          <div class="panel reveal" style="margin-top:14px;">
+            <p class="eyebrow" style="margin-bottom:10px;">Deployment Requirements</p>
+            <p style="font-size:14px;color:var(--muted);">A Cloudflare account (free tier is sufficient for Workers and D1). A Resend API key (free tier for email). Stripe keys for billing (optional if not using SaaS provisioning). SkyeGate token for admin auth (or Cloudflare Access as alternative). No other cloud dependencies.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Valuation -->
-  <section style="background:var(--near-black)" id="valuation">
-    <div class="container">
-      <div class="section-label">Valuation</div>
-      <h2>What this is worth — <span>honest numbers.</span></h2>
-      <p class="lead">There are two ways to value MetrAIyux 0S: as a productized deliverable (what it would cost to build or buy something equivalent) and as a SaaS business (what it earns once customers are onboarded). Both matter depending on how you intend to use it.</p>
-      <div class="two-col" style="margin-top:40px">
+    <!-- Valuation -->
+    <section class="band" id="valuation">
+      <div class="band-inner">
+        <div class="reveal">
+          <p class="eyebrow">Valuation</p>
+          <h2>Honest numbers — what this is worth.</h2>
+          <p class="lead" style="margin-top:16px;">The asset valuation reflects replacement cost: what it would cost to build and deploy something of equivalent scope. The SaaS valuation reflects what the infrastructure generates once customers are onboarded.</p>
+          <div style="margin-top:24px;">
+            <div class="val-number">$150K–$300K</div>
+            <p style="color:var(--muted);font-size:14px;margin-top:10px;">Revised May 2026 — live deployed platform. Up from prior $85K–$220K estimate. The deployment premium: live infrastructure with operational proof eliminates deployment risk discount. All 8 Workers confirmed live via CF-Ray headers.</p>
+          </div>
+        </div>
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom:16px;">As a SaaS Business</p>
+          <div class="scenario-box">
+            <span class="s-label">Scenario A — 10 customers</span>
+            <div class="s-amount">$96K ARR</div>
+            <p>10 Growth customers at $797/mo. At 5x: <strong>$480K</strong></p>
+          </div>
+          <div class="scenario-box">
+            <span class="s-label">Scenario B — 25 customers</span>
+            <div class="s-amount">$270K ARR</div>
+            <p>Mixed average $900/mo. At 6x: <strong>$1.6M</strong></p>
+          </div>
+          <div class="scenario-box">
+            <span class="s-label">Scenario C — 50 customers</span>
+            <div class="s-amount">$898K ARR</div>
+            <p>50 Autonomous Office at $1,497/mo. At 8x: <strong>$7.2M</strong></p>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-top:14px;">The infrastructure is deployed. The ARR scenarios materialize as customers onboard. The work is sales motion, not architecture.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market Comparison -->
+    <section class="section" id="comparison">
+      <div class="section-head reveal">
         <div>
-          <div class="section-label">As a Delivered Asset</div>
-          <p style="color:var(--gray);font-size:0.875rem;margin-bottom:20px">If you were to hire a boutique agency to build something of equivalent scope — 500+ page operating site, 6 Cloudflare Workers with real D1 integrations, multi-tenant security layer, auth bridge, Stripe billing, sales enablement library — the engagement cost would be $80,000–$150,000 at minimum. Most agencies don't build Worker backends at this depth at any price.</p>
-          <div class="arr-box">
-            <div class="big">$150K–$300K</div>
-            <div class="sub">Revised valuation — live deployed platform, all 8 Workers confirmed via CF-Ray</div>
-          </div>
-          <div class="arr-box" style="background:var(--blue-dim);border-color:rgba(80,100,200,0.3)">
-            <div class="big" style="color:#8899ee">+20–35%</div>
-            <div class="sub">Deployment premium over undeployed code — operational proof eliminates deployment risk discount</div>
+          <p class="eyebrow">Market Comparison</p>
+          <h2>Against the alternatives — no spin.</h2>
+        </div>
+        <p>MetrAIyux 0S competes in a narrower space: lightweight operating systems for service SMBs and resellable infrastructure for agencies. Here's how it stacks up on the features that matter for that buyer.</p>
+      </div>
+
+      <div class="reveal">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>MetrAIyux 0S</th>
+              <th>Notion AI</th>
+              <th>ClickUp AI</th>
+              <th>Custom Agency Build</th>
+              <th>Trainual</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight"><td>Cloudflare Worker backend (owned infra)</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Possible</td><td class="no">No</td></tr>
+            <tr class="highlight"><td>Multi-tenant isolation at runtime</td><td class="yes">Yes (0meg4kAI)</td><td class="no">No</td><td class="partial">Limited</td><td class="partial">Possible</td><td class="no">No</td></tr>
+            <tr class="highlight"><td>Hard approval gates (non-configurable)</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Possible</td><td class="no">No</td></tr>
+            <tr class="highlight"><td>White-label resale model built in</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Zero build step deployment</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
+            <tr><td>Proof receipt / D1 audit trail</td><td class="yes">Yes (D1 SQL)</td><td class="partial">Limited</td><td class="partial">Limited</td><td class="partial">Depends</td><td class="no">No</td></tr>
+            <tr><td>Government readiness package</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Possible</td><td class="no">No</td></tr>
+            <tr><td>Self-hosted on your own infra</td><td class="yes">Yes (Cloudflare)</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Sales enablement library included</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+            <tr><td>Actual LLM inference</td><td class="no">No (routing only)</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Possible</td><td class="no">No</td></tr>
+            <tr><td>Monthly cost</td><td class="yes">$297–$1,497</td><td class="partial">$15–$25/user</td><td class="partial">$7–$19/user</td><td class="no">$40K–$150K build</td><td class="partial">$249–$299/mo</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px;">Notion AI and ClickUp AI have real LLM inference. MetrAIyux 0S does not — its brain layer is deterministic keyword routing. This is a factual difference, not a flaw. Deterministic means predictable and auditable. That is what makes the approval gates meaningful.</p>
+      </div>
+    </section>
+
+    <!-- Objections -->
+    <section class="band" id="objections">
+      <div class="band-inner" style="grid-template-columns:1fr;max-width:var(--wrap);">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div>
+            <p class="eyebrow">Objection Handling</p>
+            <h2>The hard questions, answered straight.</h2>
+            <p style="color:var(--muted);margin-top:14px;font-size:16px;">Including the ones where the honest answer is "not yet."</p>
           </div>
         </div>
-        <div>
-          <div class="section-label">As a SaaS Business</div>
-          <p style="color:var(--gray);font-size:0.875rem;margin-bottom:20px">Once the Workers are deployed, Stripe is live, and customers are onboarding, the valuation shifts to an ARR multiple. B2B SaaS tools in niche verticals trade at 4–8x ARR at $100K ARR and 5–12x at $500K+ ARR.</p>
-          <div class="scenario">
-            <div class="label">Scenario A — Early Traction</div>
-            <div class="amount">$96K ARR</div>
-            <p>10 Growth customers at $797/mo. At 5x ARR multiple: <strong style="color:var(--white)">$480K valuation.</strong></p>
+        <div class="reveal">
+          <div class="objection">
+            <div class="q">"You said 16 brains — but it's not actually AI, right? It's just keyword matching?"</div>
+            <div class="a">Correct. The brain routing layer uses structured keyword classification and regex pattern matching to determine which functional domain a command belongs to. There is no LLM making inferences in the browser. The system is deterministic — same command in, same routing outcome, every time. That predictability is intentional. It's what makes the approval gates and proof receipts meaningful. An LLM endpoint can be wired into the Worker backend if you want semantic understanding on top. But the platform's core value — routing structure, audit trail, approval gates — works without one.</div>
           </div>
-          <div class="scenario">
-            <div class="label">Scenario B — Proven Product</div>
-            <div class="amount">$240K ARR</div>
-            <p>25 mixed customers (Starter + Growth + Autonomous). At 6x ARR multiple: <strong style="color:var(--white)">$1.4M valuation.</strong></p>
+          <div class="objection">
+            <div class="q">"Is this deployed and running in production right now?"</div>
+            <div class="a">Yes. The full system is live at metraiyux-0s-full-system.graylondonskyes.workers.dev — serving from Cloudflare's global edge. All 8 Workers are deployed and returning responses with CF-Ray headers confirming edge invocation. Admin Automation, SaaS Provisioning, 0meg4kAI Security Gateway, CROWN, NEXUS, QUANTUM, Sentinel, and the Full System Worker. The public spectacle overview is live at metraiyux-0s-public-spectacle.pages.dev. SkyeGate auth platform is live at skyegatefs27-citadeldb.graylondonskyes.workers.dev. You are looking at a deployed system, not a demo.</div>
           </div>
-          <div class="scenario">
-            <div class="label">Scenario C — Scale</div>
-            <div class="amount">$900K ARR</div>
-            <p>50 Autonomous Office customers at $1,497/mo. At 8x ARR multiple: <strong style="color:var(--white)">$7.2M valuation.</strong></p>
+          <div class="objection">
+            <div class="q">"Who are the cabinet executives — are they AI or human?"</div>
+            <div class="a">The 13-cabinet structure is an autonomous AI command model. Each cabinet seat is a configured brain — a named functional intelligence that routes work for that domain, generates receipts, and enforces approval gates. The CEO brain routes command decisions. The Legal brain flags compliance risk. The Finance brain gates payment actions. None of them are human hires. The brains are the executives. You still make the final calls — the approval gates ensure that. What the brains do is route, classify, flag, and record. That's the product.</div>
+          </div>
+          <div class="objection">
+            <div class="q">"Why would I pay $1,497/mo when I could build this myself?"</div>
+            <div class="a">You could. The tech stack is vanilla JS, Cloudflare Workers, and standard APIs — nothing exotic. The honest answer is that building something of equivalent scope would take a senior developer 3–6 months minimum, at $100K–$200K in engineering cost, and would not include the operational content: 522 pages, 722 knowledge base chunks, sales enablement library, government readiness package, 28-lesson admin tutorial. If you have that time and budget and prefer a custom build, do it. If you want something operational now — with the Worker backend, tenant isolation, approval gates, and proof receipts already wired — that's what you're paying for.</div>
+          </div>
+          <div class="objection">
+            <div class="q">"Is there lock-in? What if I want to leave?"</div>
+            <div class="a">No proprietary cloud lock-in. The static site is plain HTML/CSS/JS and deploys to any host. The Workers run on your own Cloudflare account — not ours. The D1 data is yours. The code is yours. If you stop paying and want to continue operating what you deployed, you can. You lose access to updates, support, and new Worker kits, but the system you deployed continues to run.</div>
           </div>
         </div>
       </div>
-      <div style="margin-top:32px;padding:24px;background:rgba(80,100,200,0.07);border:1px solid rgba(80,100,200,0.2);border-radius:var(--radius)">
-        <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#8899cc;margin-bottom:8px">The Critical Caveat</h4>
-        <p style="font-size:0.875rem;color:var(--gray);line-height:1.7">The Workers are live on Cloudflare's edge right now — all six are deployed and responding. The ARR scenarios materialize as customers onboard into real workspaces. The asset value is proven. The SaaS valuation is a projection that depends on customer acquisition, not on whether the infrastructure exists. The infrastructure exists.</p>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="padding-bottom:0">
+      <div class="cta-close reveal">
+        <p class="eyebrow">Next Step</p>
+        <h2>Enough reading. <em>Let's deploy it.</em></h2>
+        <p style="color:var(--muted);max-width:540px;margin:16px auto 0;font-size:15px;line-height:1.7;">The fastest way to evaluate MetrAIyux 0S is to look at the live system and then talk through your specific use case — operator deployment, white-label resale, or enterprise internal tool.</p>
+        <div class="cta-row" style="justify-content:center;margin-top:26px;">
+          <a class="btn-primary" href="index.html#pricing">View Plans &amp; Pricing</a>
+          <a class="btn-ghost" href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener">See the Live System &rarr;</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- Comparison -->
-  <section id="comparison">
-    <div class="container">
-      <div class="section-label">Market Comparison</div>
-      <h2>Against the alternatives — <span>no spin.</span></h2>
-      <p class="lead">The honest comparison is not against Salesforce or Monday.com. MetrAIyux 0S competes in a narrower space: lightweight operating systems for service SMBs and resellable infrastructure for agencies. Here's how it stacks up on the features that matter for that buyer.</p>
-      <table class="comp-table">
-        <thead>
-          <tr>
-            <th>Capability</th>
-            <th>MetrAIyux 0S</th>
-            <th>Notion AI</th>
-            <th>ClickUp AI</th>
-            <th>Custom Agency Build</th>
-            <th>Trainual</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="highlight">
-            <td>Cloudflare Worker backend (owned infra)</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="partial">Possible</td>
-            <td class="no">No</td>
-          </tr>
-          <tr class="highlight">
-            <td>Multi-tenant isolation at runtime</td>
-            <td class="yes">Yes (0meg4kAI)</td>
-            <td class="no">No</td>
-            <td class="partial">Limited</td>
-            <td class="partial">Possible</td>
-            <td class="no">No</td>
-          </tr>
-          <tr class="highlight">
-            <td>Hard approval gates (non-configurable)</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="partial">Possible</td>
-            <td class="no">No</td>
-          </tr>
-          <tr class="highlight">
-            <td>White-label resale model built in</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Zero build step deployment</td>
-            <td class="yes">Yes</td>
-            <td class="yes">Yes</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="yes">Yes</td>
-          </tr>
-          <tr>
-            <td>Proof receipt / audit trail</td>
-            <td class="yes">Yes (D1 SQL)</td>
-            <td class="partial">Limited</td>
-            <td class="partial">Limited</td>
-            <td class="partial">Depends</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Government readiness package</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="partial">Possible</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Self-hosted on your own infra</td>
-            <td class="yes">Yes (Cloudflare)</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Sales enablement library included</td>
-            <td class="yes">Yes</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Actual LLM inference</td>
-            <td class="no">No (routing only)</td>
-            <td class="yes">Yes</td>
-            <td class="yes">Yes</td>
-            <td class="partial">Possible</td>
-            <td class="no">No</td>
-          </tr>
-          <tr>
-            <td>Monthly subscription cost</td>
-            <td class="yes">$297–$1,497</td>
-            <td class="partial">$15–$25/user</td>
-            <td class="partial">$7–$19/user</td>
-            <td class="no">$40K–$150K build</td>
-            <td class="partial">$249–$299/mo</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="font-size:0.78rem;color:var(--gray);margin-top:16px">Note: Notion AI and ClickUp AI have real LLM inference built in. MetrAIyux 0S does not — its brain layer is deterministic keyword routing. This is a factual difference, not a flaw. It means behavior is predictable and auditable, not probabilistic. Both approaches have legitimate use cases depending on what you're optimizing for.</p>
-    </div>
-  </section>
-
-  <!-- Objections -->
-  <section style="background:var(--near-black)" id="objections">
-    <div class="container">
-      <div class="section-label">Objection Handling</div>
-      <h2>The hard questions, <span>answered straight.</span></h2>
-      <p class="lead">These are the questions buyers always ask. We've answered them honestly, including the ones where the honest answer is "not yet."</p>
-
-      <div class="objection">
-        <div class="q">"You said 16 brains — but it's not actually AI, right? It's just keyword matching?"</div>
-        <div class="a">Correct. The brain routing layer uses structured keyword classification and regex pattern matching to determine which functional domain a command belongs to. There is no large language model making inferences in the browser. The system is deterministic and auditable. If you issue the same command twice, you get the same routing outcome. That predictability is intentional — it is what makes the approval gates and proof receipts meaningful. An LLM endpoint can be wired into the Worker if you want semantic understanding on top, but the platform's core value is the routing structure, the audit trail, and the approval gates — not language model output.</div>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>MetrAIyux 0S</strong>
+        <p>Sell sheet for operators, procurement leads, and founders evaluating MetrAIyux 0S as an operating platform or resale product.</p>
       </div>
-
-      <div class="objection">
-        <div class="q">"Is this deployed and running in production right now?"</div>
-        <div class="a">Yes. The full system is live at metraiyux-0s-full-system.graylondonskyes.workers.dev — serving from Cloudflare's global edge right now. All six Workers are deployed and returning responses: Admin Automation, SaaS Provisioning, 0meg4kAI Security Gateway, CROWN, NEXUS, and QUANTUM Site Operator. The public spectacle overview is live at metraiyux-0s-public-spectacle.pages.dev. The SkyeGate auth platform is live at skyegatefs27-citadeldb.graylondonskyes.workers.dev. You are looking at a deployed system, not a demo.</div>
+      <div class="footer-links">
+        <a href="index.html">Main Site</a>
+        <a href="capabilities.html">Full Capabilities</a>
+        <a href="white-label.html">White Label</a>
       </div>
-
-      <div class="objection">
-        <div class="q">"Who are the cabinet executives — are they AI or human?"</div>
-        <div class="a">The 13-cabinet structure is an autonomous AI command model. Each cabinet seat is a configured brain — a named functional intelligence that routes work for that domain, generates receipts, and enforces its approval gates. The CEO brain routes command decisions. The Legal brain flags compliance risk. The Finance brain gates payment actions. None of them are human hires — the entire point is that your company operates through the command structure without needing to staff 13 executives. The brains are the executives. That is the product.</div>
+      <div class="footer-links">
+        <a href="index.html#pricing">Pricing</a>
+        <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a>
+        <span class="tiny">Last revision: 2026-05-15</span>
       </div>
-
-      <div class="objection">
-        <div class="q">"Why would I pay $1,497/mo when I could build this myself?"</div>
-        <div class="a">You could. The tech stack is vanilla JS, Cloudflare Workers, and standard APIs — nothing exotic. The honest answer is that building something of equivalent scope and depth would take a senior developer 3–6 months minimum, at $100K–$200K in engineering cost, and would not include the operational content (522 pages, 722 knowledge base chunks, sales enablement library, government readiness package, admin tutorial). If you have that time and budget and prefer a custom build, do that. If you want something deployed and operational now — with the Worker backend, tenant isolation, approval gates, and proof receipts already wired — that's what you're paying for.</div>
-      </div>
-
-      <div class="objection">
-        <div class="q">"Is there a lock-in? What if I want to leave?"</div>
-        <div class="a">There is no proprietary cloud lock-in. The static site is plain HTML/CSS/JS and deploys to any host. The Workers run on your own Cloudflare account — not ours. The D1 data is yours. The code is yours. If you want to stop paying and continue operating what you deployed, you can. You would lose access to updates, support, and new Worker kits, but the system you already deployed continues to run.</div>
-      </div>
-
-      <div class="objection">
-        <div class="q">"What happens if Cloudflare has an outage?"</div>
-        <div class="a">The static site continues to serve — Cloudflare Pages has a separate availability tier from the Worker backend. The Worker-dependent features (D1 persistence, live approval emails, multi-tenant provisioning) would be temporarily unavailable. In that window, the browser-local mode handles routing and receipts in localStorage. Cloudflare's global network has better uptime than most on-prem or AWS-hosted alternatives for small companies, so this is a lower risk than it sounds, but it is a real dependency worth noting.</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <div class="container">
-    <div class="cta-block">
-      <div class="section-label">Next Step</div>
-      <h2>Enough reading. <span>Let's deploy it.</span></h2>
-      <p>The fastest way to evaluate MetrAIyux 0S is to look at the live system and then talk through your specific use case — operator deployment, white-label resale, or enterprise internal tool.</p>
-      <div class="cta-group">
-        <a href="index.html#pricing" class="btn-primary">View Plans & Pricing</a>
-        <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-ghost">See the Live System →</a>
-      </div>
-    </div>
-    <div class="print-note">This document is designed to be printed or shared as a PDF. Use your browser's print function (Ctrl+P / Cmd+P) and select "Save as PDF" for a clean one-pager.</div>
-  </div>
-
-  <footer>
-    <div class="container">
-      <p>MetrAIyux 0S &mdash; <a href="index.html">Main Site</a> &mdash; <a href="white-label.html">White Label</a> &mdash; <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a></p>
     </div>
   </footer>
 
+  <script>
+    (function() {
+      const btn = document.querySelector('[data-menu-button]');
+      const links = document.querySelector('[data-nav-links]');
+      if (btn && links) btn.addEventListener('click', () => { const o = links.classList.toggle('is-open'); btn.setAttribute('aria-expanded', String(o)); });
+    })();
+    (function() {
+      const items = document.querySelectorAll('.reveal');
+      if (!items.length || !('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('is-visible')); return; }
+      const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } }), { threshold: 0.10 });
+      items.forEach(el => obs.observe(el));
+    })();
+    (function() {
+      const canvas = document.querySelector('.command-canvas');
+      if (!canvas || !canvas.getContext) return;
+      const ctx = canvas.getContext('2d');
+      const particles = Array.from({ length: 72 }, (_, i) => ({ x: Math.random(), y: Math.random(), speed: 0.00045 + Math.random() * 0.0007, phase: i * 0.72, color: i % 5 === 0 ? '#f8cb5e' : i % 3 === 0 ? '#a88cff' : '#64d9ff' }));
+      function resize() { const r = window.devicePixelRatio || 1; canvas.width = Math.floor(window.innerWidth * r); canvas.height = Math.floor(window.innerHeight * r); canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; ctx.setTransform(r, 0, 0, r, 0, 0); }
+      function draw(t) { const w = window.innerWidth, h = window.innerHeight; ctx.clearRect(0, 0, w, h); ctx.lineWidth = 1; particles.forEach((p, i) => { p.y -= p.speed * 2.4; if (p.y < -0.08) p.y = 1.08; const x = p.x * w + Math.sin(t * 0.00045 + p.phase) * 26, y = p.y * h; ctx.beginPath(); ctx.arc(x, y, i % 7 === 0 ? 2.1 : 1.2, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.globalAlpha = i % 5 === 0 ? 0.72 : 0.46; ctx.fill(); const n = particles[(i + 9) % particles.length], nx = n.x * w, ny = n.y * h, d = Math.hypot(nx - x, ny - y); if (d < 180) { ctx.globalAlpha = Math.max(0, 0.2 - d / 900); ctx.strokeStyle = p.color; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke(); } }); ctx.globalAlpha = 1; requestAnimationFrame(draw); }
+      resize(); window.addEventListener('resize', resize); requestAnimationFrame(draw);
+    })();
+  </script>
 </body>
 </html>
