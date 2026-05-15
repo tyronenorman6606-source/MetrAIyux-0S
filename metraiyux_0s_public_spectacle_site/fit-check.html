@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fit Check | MetrAIyux 0S</title>
+  <meta name="description" content="Answer a series of questions to determine whether MetrAIyux 0S is useful for your company, then route to the larger website when the fit is strong.">
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span>MetrAIyux 0S</span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">Overview</a><a href="guided-tour.html">Guided Tour</a><a href="platform.html">Platform</a><a href="tech-stack.html">Tech Stack</a><a href="brain-system.html">Brains</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="nav-cta is-active" href="fit-check.html">Fit Check</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Decision route</p>
+      <h1>Use the questions to see whether the system should enter the conversation.</h1>
+      <p class="lead">A high score routes to the full MetrAIyux 0S website. A medium score points toward a phased operator system. A low score means the company should probably document process first.</p>
+    </section>
+
+    <section class="section">
+      <form class="quiz-form reveal" id="fitForm">
+        <article class="quiz-card">
+          <h3>How many active work streams need tracking each week?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="volume" value="1" checked> A few, handled manually.</label>
+            <label><input type="radio" name="volume" value="3"> Several across people or tools.</label>
+            <label><input type="radio" name="volume" value="5"> Many, with real follow-up risk.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>How scattered is your current operating stack?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="scatter" value="1" checked> Mostly organized.</label>
+            <label><input type="radio" name="scatter" value="3"> Split across tools and inboxes.</label>
+            <label><input type="radio" name="scatter" value="5"> Work gets buried or duplicated.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Do you need customer or tenant workspaces separate from owner/admin control?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="tenants" value="1" checked> Not currently.</label>
+            <label><input type="radio" name="tenants" value="3"> Soon, for cleaner intake.</label>
+            <label><input type="radio" name="tenants" value="5"> Yes, separation is required.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>How often do sensitive actions need approval?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="approvals" value="1" checked> Rarely.</label>
+            <label><input type="radio" name="approvals" value="3"> Weekly or by project.</label>
+            <label><input type="radio" name="approvals" value="5"> Often, and mistakes are costly.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Would a proof vault make your company easier to sell, manage, or defend?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="proof" value="1" checked> Not yet.</label>
+            <label><input type="radio" name="proof" value="3"> Yes, for internal clarity.</label>
+            <label><input type="radio" name="proof" value="5"> Yes, buyers need evidence.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Do different business functions need different routing intelligence?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="brains" value="1" checked> One general process is enough.</label>
+            <label><input type="radio" name="brains" value="3"> Different teams need different paths.</label>
+            <label><input type="radio" name="brains" value="5"> Yes, routing is already complex.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Would a public guided overview help people understand the offer before they talk to you?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="public" value="1" checked> Not necessary.</label>
+            <label><input type="radio" name="public" value="3"> It would reduce explanation time.</label>
+            <label><input type="radio" name="public" value="5"> It is essential to sell the system.</label>
+          </div>
+        </article>
+        <div class="cta-row">
+          <button class="button" type="button" onclick="scoreFit()">Score Fit</button>
+          <a class="button secondary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a>
+        </div>
+      </form>
+      <div class="result reveal" id="fitResult" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>Fit scoring routes serious prospects to the full website without exposing private admin setup.</p></div></div>
+      <div class="footer-links"><a href="guided-tour.html">Guided Tour</a><a href="platform.html">Platform</a><a href="value.html">Value</a></div>
+      <div class="footer-links"><a href="download.html">Public Brief</a><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a><span class="tiny">Last public revision: 2026-05-15</span></div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

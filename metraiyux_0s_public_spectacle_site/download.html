@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Public Brief | MetrAIyux 0S</title>
+  <meta name="description" content="Download or preview a public, sanitized MetrAIyux 0S brief that explains the system without exposing private admin setup details.">
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span>MetrAIyux 0S</span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">Overview</a><a href="guided-tour.html">Guided Tour</a><a href="platform.html">Platform</a><a href="tech-stack.html">Tech Stack</a><a href="brain-system.html">Brains</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="nav-cta" href="fit-check.html">Fit Check</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Shareable brief</p>
+      <h1>A clean public summary without private setup material.</h1>
+      <p class="lead">Use this page when someone needs a concise, structured record of what MetrAIyux 0S is. The export is intentionally sanitized: no keys, no deployment instructions, no connector setup, no private admin runbook.</p>
+      <div class="cta-row">
+        <button class="button" type="button" onclick="exportBrief()">Download JSON Brief</button>
+        <a class="button secondary" href="fit-check.html">Take Fit Check</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split">
+        <div class="panel reveal">
+          <h3>Brief preview</h3>
+          <textarea class="brief-box" id="briefPreview" readonly aria-label="Public brief preview"></textarea>
+        </div>
+        <aside>
+          <div class="panel private-boundary reveal">
+            <h3>Sanitization rule</h3>
+            <p class="body-copy">The public brief can explain the system's value, architecture, and fit route. It must not include private worker names as instructions, environment variable values, live credentials, deployment commands, or internal admin checklists.</p>
+          </div>
+          <div class="panel reveal">
+            <h3>Best use</h3>
+            <ul class="stack-list">
+              <li>Send to a buyer before a call.</li>
+              <li>Attach to an internal planning note.</li>
+              <li>Use as a clean system summary after the fit check.</li>
+              <li>Keep private implementation details in the admin layer.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>Public brief export for the system overview.</p></div></div>
+      <div class="footer-links"><a href="index.html">Overview</a><a href="platform.html">Platform</a><a href="security.html">Security</a></div>
+      <div class="footer-links"><a href="fit-check.html">Fit Check</a><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a><span class="tiny">Last public revision: 2026-05-15</span></div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tech Stack | MetrAIyux 0S</title>
+  <meta name="description" content="Public technical overview of the MetrAIyux 0S stack: static frontends, Cloudflare edge workers, D1, KV, Queues, proof receipts, local brains, and approval email paths.">
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span>MetrAIyux 0S</span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">Overview</a><a href="guided-tour.html">Guided Tour</a><a href="platform.html">Platform</a><a class="is-active" href="tech-stack.html">Tech Stack</a><a href="brain-system.html">Brains</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="nav-cta" href="fit-check.html">Fit Check</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Public technical stack</p>
+      <h1>Enough technical detail to build trust, not enough to expose the control plane.</h1>
+      <p class="lead">This is the public-facing stack summary. It names the architecture and the operating pattern while leaving deployment instructions, secrets, account IDs, live connector setup, and admin runbooks behind the private layer.</p>
+    </section>
+
+    <section class="section">
+      <div class="tech-table reveal">
+        <div class="tech-row">
+          <strong>Frontends</strong>
+          <p>Static public overview, full public website, customer SaaS pages, admin interfaces, proof pages, calculators, guided tools, and local browser workspaces.</p>
+          <p>Built to run fast on a static host while still connecting to worker APIs where persistence or review is needed.</p>
+        </div>
+        <div class="tech-row">
+          <strong>Edge workers</strong>
+          <p>Worker kits exist for site operator routes, NEXUS automation, admin automation, SaaS provisioning, security gateway, sentinel/crown operators, and approval workflows.</p>
+          <p>The public overview describes the pattern; actual bindings and production control remain private.</p>
+        </div>
+        <div class="tech-row">
+          <strong>Data stores</strong>
+          <p>D1 is used for structured events, tasks, approvals, customer isolation, and tenant records. KV supports fast configuration and state where appropriate. Queues support asynchronous work.</p>
+          <p>The system is designed around scoped records instead of anonymous blobs.</p>
+        </div>
+        <div class="tech-row">
+          <strong>Brains</strong>
+          <p>Local JSON and markdown brain files carry company doctrine, cabinet scopes, retrieval sources, routing language, and safety boundaries.</p>
+          <p>The browser-local brain layer can work without a paid model provider; stronger providers can sit behind private server-side connectors.</p>
+        </div>
+        <div class="tech-row">
+          <strong>Approvals</strong>
+          <p>Approval inboxes and email paths can support review before publication, production-sensitive action, customer-to-admin escalation, or connector use.</p>
+          <p>Public pages mention the workflow; they do not publish credential setup.</p>
+        </div>
+        <div class="tech-row">
+          <strong>Proof</strong>
+          <p>Proof vaults, smoke results, link audits, claims ledgers, and policy documents create a record of what was reviewed, tested, accepted, or blocked.</p>
+          <p>This is the evidence layer that keeps the system from becoming theater.</p>
+        </div>
+        <div class="tech-row">
+          <strong>MCP gateway language</strong>
+          <p>The scanned MCP bundle points toward tool-facing server patterns, live smoke checks, and credential-aware proofs.</p>
+          <p>That influence appears here as public language around gateway discipline and evidence, not as exposed tool credentials.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="band-inner">
+        <div class="reveal">
+          <p class="eyebrow">Plain English architecture</p>
+          <h2>Static where it should be. Worker-backed where it must be. Private when it controls power.</h2>
+        </div>
+        <div class="panel private-boundary reveal">
+          <h3>Public stack boundary</h3>
+          <p class="body-copy">The public overview may name Cloudflare Workers, Pages, D1, KV, Queues, Resend-style approval email, local brains, and proof receipts. It should not include command-line deployment steps, exact tokens, secret names as instructions, private worker URLs, or internal smoke-test procedures.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>Public technical overview for a private command system.</p></div></div>
+      <div class="footer-links"><a href="platform.html">Platform</a><a href="brain-system.html">Brains</a><a href="security.html">Security</a></div>
+      <div class="footer-links"><a href="fit-check.html">Fit Check</a><a href="download.html">Public Brief</a><span class="tiny">Last public revision: 2026-05-15</span></div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
