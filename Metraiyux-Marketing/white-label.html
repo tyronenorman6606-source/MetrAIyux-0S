@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetrAIyux 0S — White Label Program</title>
+  <meta name="description" content="License MetrAIyux 0S under your own brand. Sell recurring operating infrastructure to your clients without building anything from scratch." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .math-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .math-box .eq { font-size: 0.8rem; color: var(--gray); margin-bottom: 6px; font-family: monospace; }
+    .math-box .result { font-size: 1.8rem; font-weight: 800; color: var(--gold); }
+    .math-box .note { font-size: 0.8rem; color: var(--gray); margin-top: 4px; }
+    .timeline { margin-top: 40px; }
+    .tl-item { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-time { font-size: 0.78rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; padding-top: 2px; }
+    .tl-content h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .tl-content p { font-size: 0.875rem; color: var(--gray); line-height: 1.65; }
+    .what-you-own { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+    .own-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .own-card .icon { font-size: 1.3rem; display: block; margin-bottom: 8px; }
+    .own-card h4 { font-size: 0.875rem; font-weight: 700; margin-bottom: 6px; }
+    .own-card p { font-size: 0.8rem; color: var(--gray); }
+    .faq { margin-top: 40px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--white); }
+    .faq-item p { font-size: 0.875rem; color: var(--gray); line-height: 1.65; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <span class="nav-logo">MetrAIyux 0S</span>
+      <ul class="nav-links">
+        <li><a href="index.html">← Main Site</a></li>
+        <li><a href="#math">The Numbers</a></li>
+        <li><a href="#what-you-own">What You Own</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+      </ul>
+      <a href="index.html#pricing" class="nav-cta">Get Access</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-eyebrow">White Label Program</div>
+      <h1>Stop building websites. <span>Start selling infrastructure.</span></h1>
+      <p class="hero-sub">MetrAIyux 0S ships as a complete, brandable business operating system. You put your client's name on it, deploy it to their domain, and collect monthly revenue. The platform, the backend, and the operating model are already built.</p>
+      <div class="cta-group">
+        <a href="index.html#pricing" class="btn-primary">Available on Autonomous Office+</a>
+        <a href="sell-sheet.html" class="btn-ghost">See Full Sell Sheet</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- The math -->
+  <section style="background:var(--near-black)" id="math">
+    <div class="container">
+      <div class="section-label">The Economics</div>
+      <h2>What white-label looks like <span>as a business.</span></h2>
+      <p class="lead">You're paying for Autonomous Office ($1,497/mo). What you charge your clients and how many you onboard determines your margin. Here's how that looks at a few realistic scales.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:40px">
+        <div>
+          <div class="math-box">
+            <div class="eq">3 clients × $800/mo = $2,400/mo revenue</div>
+            <div class="result">$1,100/mo net</div>
+            <div class="note">After your $1,297/mo cost (Autonomous Office + Cloudflare overage buffer). Month 3 you're profitable if setup fees covered onboarding.</div>
+          </div>
+          <div class="math-box">
+            <div class="eq">8 clients × $800/mo = $6,400/mo revenue</div>
+            <div class="result">$5,000/mo net</div>
+            <div class="note">$60K/yr recurring at roughly $0 additional infrastructure cost per client (shared Worker, isolated workspaces).</div>
+          </div>
+        </div>
+        <div>
+          <div class="math-box">
+            <div class="eq">15 clients × $1,000/mo = $15,000/mo revenue</div>
+            <div class="result">$13,500/mo net</div>
+            <div class="note">$162K/yr ARR. At this point you're running a real SaaS business on top of someone else's infrastructure. This is a legitimate path.</div>
+          </div>
+          <div style="padding:20px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius)">
+            <div class="section-label" style="margin-bottom:8px">Setup Fee Leverage</div>
+            <p style="font-size:0.85rem;color:var(--gray)">Beyond monthly recurring, charge a one-time setup fee per client ($1,500–$5,000 is reasonable for what they're getting). Three clients onboarded at $2,000 setup each = $6,000 upfront, before they pay a single monthly invoice. That covers your first four months of Autonomous Office.</p>
+          </div>
+        </div>
+        <div>
+          <div style="padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);height:100%">
+            <div class="section-label" style="margin-bottom:12px">Why clients pay recurring</div>
+            <p style="font-size:0.875rem;color:var(--gray);margin-bottom:12px">Clients pay monthly because the platform is infrastructure, not a project. The Workers keep running. The approval gates keep working. New routing events keep logging to D1. Security scans keep firing.</p>
+            <p style="font-size:0.875rem;color:var(--gray);margin-bottom:12px">The comparison your client makes is not "MetrAIyux 0S vs. nothing." It's "MetrAIyux 0S vs. Salesforce ($150/user/mo), plus Notion ($20/user/mo), plus a compliance tool ($300/mo), plus an agency to tie it together ($5K/mo)." Against that stack, $800/mo for a complete branded operating system looks cheap.</p>
+            <p style="font-size:0.875rem;color:var(--gray)">That's the sale you're making.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What you own -->
+  <section id="what-you-own">
+    <div class="container">
+      <div class="section-label">What Your Client Owns</div>
+      <h2>Every client gets a <span>complete sovereign deployment.</span></h2>
+      <p class="lead">White-label is not a subdomain on your platform. It's a complete deployment under the client's brand, domain, and Cloudflare account. They own the infrastructure. You built it for them.</p>
+      <div class="what-you-own">
+        <div class="own-card">
+          <span class="icon">🌐</span>
+          <h4>Their domain, their brand</h4>
+          <p>Full logo, color, and copy replacement. Client's company name throughout. Deployed to their custom domain via Cloudflare Pages.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">⚙️</span>
+          <h4>Their own Cloudflare Workers</h4>
+          <p>Workers deploy to the client's Cloudflare account or a dedicated sub-account you manage. Either way, their data lives in their D1 database, not yours.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">🧠</span>
+          <h4>Configured brain personas</h4>
+          <p>Cabinet structure and brain personas configured for their specific operating model — staffing, consulting, construction, healthcare, whatever their vertical.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">🔒</span>
+          <h4>Isolated tenant workspaces</h4>
+          <p>If they have their own clients, each gets an isolated workspace with 0meg4kAI tenant isolation at the Worker level. The platform scales with them.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">📧</span>
+          <h4>Approval email configured</h4>
+          <p>Resend approval notifications wired to the client's email and sent from their domain. The system feels native to their operations, not like a third-party product.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">📖</span>
+          <h4>Admin tutorial access</h4>
+          <p>The 28-lesson admin tutorial is included in every deployment. Clients can self-serve after handoff without requiring ongoing support calls from you.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">🏛️</span>
+          <h4>Governance and capability docs</h4>
+          <p>Governance center, capability statements, authority matrix, and government readiness pages — all updated with the client's name and operating details.</p>
+        </div>
+        <div class="own-card">
+          <span class="icon">📦</span>
+          <h4>Handoff documentation kit</h4>
+          <p>Complete deployment kit with their wrangler config, environment variables, D1 migration history, and onboarding checklist. Transferable if they ever want to manage it themselves.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section style="background:var(--near-black)" id="how-it-works">
+    <div class="container">
+      <div class="section-label">Deployment Process</div>
+      <h2>How a white-label engagement <span>actually works.</span></h2>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">Day 1–2</div>
+          <div class="tl-content">
+            <h4>Intake and brand configuration</h4>
+            <p>Collect the client's brand assets (logo, colors, domain), operating model details (what services they sell, what functions they have, who fills which cabinet roles), and Cloudflare account credentials. Run the brand replacement pass across the static site and update cabinet persona definitions.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">Day 3–5</div>
+          <div class="tl-content">
+            <h4>Deploy static site to Cloudflare Pages</h4>
+            <p>Deploy the branded static site to the client's Cloudflare account (or your managed account with their domain). Verify DNS, SSL, and Cloudflare Access for the /admin/* route. Run the link audit and confirm all 522 pages resolve.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">Day 5–7</div>
+          <div class="tl-content">
+            <h4>Deploy and configure the 6 Workers</h4>
+            <p>Add environment secrets (SkyeGate token, Resend API key, ADMIN_TOKEN or SkyeGate role config). Run D1 migrations. Deploy all 6 Workers via wrangler. Verify each Worker endpoint responds correctly and logs to D1. Wire Resend approval notifications to client's admin email.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">Day 7–10</div>
+          <div class="tl-content">
+            <h4>Smoke test and admin onboarding</h4>
+            <p>Walk through the admin brain chat, issue test commands, verify routing receipts appear in D1, confirm 0meg4kAI quarantine triggers for test violations, and confirm approval email fires. Walk the client through the admin tutorial and their specific operating workflows.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">Day 10+</div>
+          <div class="tl-content">
+            <h4>Handoff and recurring billing starts</h4>
+            <p>Deliver the handoff documentation kit. Start the client's monthly billing. The platform is live, the client is operational, and you collect recurring revenue on infrastructure you deployed once.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="container">
+      <div class="section-label">Common Questions</div>
+      <h2>From people who have done <span>this kind of work before.</span></h2>
+      <div class="faq">
+        <div class="faq-item">
+          <h4>Can I customize the brain structure for each client?</h4>
+          <p>Yes. The brain routing system uses JSON persona definitions and a keyword classifier. You can add, rename, or reconfigure cabinet brains for each client's actual operating structure. A construction company doesn't need a Staffing brain. A staffing firm doesn't need a Construction Materials brain. The configuration is per-deployment.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What if the client already has a Cloudflare account and Workers deployed?</h4>
+          <p>The Workers are standard Cloudflare Workers (ES module format) with no conflicts with existing Worker deployments. They deploy to separate named routes. The only thing to watch is D1 namespace naming if the client has existing D1 databases — wrangler.toml bindings are configurable per deployment.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Do I need to know Cloudflare's platform to deploy this?</h4>
+          <p>You need to be comfortable with the Cloudflare dashboard, basic DNS configuration, and running wrangler CLI commands. You do not need to understand Workers internals or D1 SQL deeply — the deployment documentation covers every step and the D1 schema migrations are included. If you've deployed a web application before, this is within reach. If you haven't, budget a day to get oriented on Cloudflare basics first.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What happens when MetrAIyux 0S ships updates?</h4>
+          <p>You receive the updated Worker kits and static site patches. Applying them to client deployments is your responsibility as the white-label licensee — it's a re-deploy operation, not an automatic update. For clients on managed hosting through you, this is part of what the monthly fee covers. For clients who took a self-managed handoff, updates are optional upgrades they can choose to apply.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Can a client add their own team members to the admin layer?</h4>
+          <p>Yes. SkyeGate handles this via the allowlist configuration in the auth bridge — you add email addresses that are permitted admin-scoped access. Cloudflare Access policies can be configured per user or per group. A team of five people can all have access to their admin brain and approval inbox with different role scopes if needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="container">
+    <div class="cta-block">
+      <div class="section-label">Ready to Start</div>
+      <h2>White label is available on <span>Autonomous Office and above.</span></h2>
+      <p>Get on the Autonomous Office plan, complete the deployment, and you have everything you need to start selling this to your clients under your own brand within two weeks.</p>
+      <div class="cta-group">
+        <a href="index.html#pricing" class="btn-primary">See Autonomous Office Pricing</a>
+        <a href="sell-sheet.html" class="btn-ghost">Read the Full Sell Sheet</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>MetrAIyux 0S &mdash; <a href="index.html">Main Site</a> &mdash; <a href="sell-sheet.html">Sell Sheet</a> &mdash; <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

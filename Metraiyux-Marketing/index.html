@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetrAIyux 0S — The Business Operating System for Serious Operators</title>
+  <meta name="description" content="MetrAIyux 0S is a complete business operating system built on Cloudflare. Command routing, approval gates, client workspaces, and white-label resale — all deployable without a dev team." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .divider { height: 1px; background: var(--border); }
+    .text-center { text-align: center; }
+    .mt-8 { margin-top: 8px; }
+    .ticker-strip {
+      background: var(--gold-dim);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+      padding: 9px 0;
+      overflow: hidden;
+      font-size: 0.78rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 28s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .stack-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      color: var(--gray);
+      margin: 4px;
+    }
+    .stack-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    .pills-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; margin: 32px 0; }
+    .honest-box {
+      background: rgba(80, 100, 200, 0.07);
+      border: 1px solid rgba(80, 100, 200, 0.2);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-top: 48px;
+    }
+    .honest-box h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #8899cc; font-weight: 700; margin-bottom: 10px; }
+    .honest-box p { font-size: 0.9rem; color: var(--gray); line-height: 1.7; }
+    .cabinet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .cabinet-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+    .cabinet-item .title { font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .cabinet-item .role { font-size: 0.82rem; color: var(--gray); }
+  </style>
+</head>
+<body>
+
+  <!-- Ticker -->
+  <div class="ticker-strip" aria-hidden="true">
+    <span class="ticker-inner">
+      &nbsp;&nbsp;&bull;&nbsp;&nbsp;16-Brain Command Routing &nbsp;&nbsp;&bull;&nbsp;&nbsp; Multi-Tenant Isolation via 0meg4kAI &nbsp;&nbsp;&bull;&nbsp;&nbsp; Cloudflare Workers Backend &nbsp;&nbsp;&bull;&nbsp;&nbsp; Human Approval Gates &nbsp;&nbsp;&bull;&nbsp;&nbsp; White-Label Ready &nbsp;&nbsp;&bull;&nbsp;&nbsp; Zero Build Step Deployment &nbsp;&nbsp;&bull;&nbsp;&nbsp; SaaS Billing via Stripe &nbsp;&nbsp;&bull;&nbsp;&nbsp; Proof Receipt System &nbsp;&nbsp;&bull;&nbsp;&nbsp; 16-Brain Command Routing &nbsp;&nbsp;&bull;&nbsp;&nbsp; Multi-Tenant Isolation via 0meg4kAI &nbsp;&nbsp;&bull;&nbsp;&nbsp; Cloudflare Workers Backend &nbsp;&nbsp;&bull;&nbsp;&nbsp; Human Approval Gates &nbsp;&nbsp;&bull;&nbsp;&nbsp; White-Label Ready &nbsp;&nbsp;&bull;&nbsp;&nbsp; Zero Build Step Deployment &nbsp;&nbsp;&bull;&nbsp;&nbsp; SaaS Billing via Stripe &nbsp;&nbsp;&bull;&nbsp;&nbsp; Proof Receipt System &nbsp;&nbsp;&nbsp;
+    </span>
+  </div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <span class="nav-logo">MetrAIyux 0S</span>
+      <ul class="nav-links">
+        <li><a href="#what-it-is">Product</a></li>
+        <li><a href="capabilities.html">Tech & Capabilities</a></li>
+        <li><a href="/metraiyux_0s_public_spectacle_site/guided-tour.html">Guided Tour</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="sell-sheet.html">Sell Sheet</a></li>
+      </ul>
+      <a href="#pricing" class="nav-cta">Get Access</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-eyebrow">Business Operating System</div>
+      <h1>Your company runs on <span>one person.</span><br>Here's how to fix that.</h1>
+      <p class="hero-sub">MetrAIyux 0S gives small service companies a complete command layer — routing, approval gates, client workspaces, and proof receipts — so you operate like a 30-person firm without hiring one.</p>
+      <div class="cta-group">
+        <a href="#pricing" class="btn-primary">See Plans & Pricing</a>
+        <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-ghost">View Live Demo →</a>
+      </div>
+      <div class="pills-row">
+        <span class="stack-pill"><span class="dot"></span>Cloudflare Workers</span>
+        <span class="stack-pill"><span class="dot"></span>D1 SQL</span>
+        <span class="stack-pill"><span class="dot"></span>KV Storage</span>
+        <span class="stack-pill"><span class="dot"></span>Stripe Billing</span>
+        <span class="stack-pill"><span class="dot"></span>Resend Email</span>
+        <span class="stack-pill"><span class="dot"></span>SkyeGate Auth</span>
+        <span class="stack-pill"><span class="dot"></span>0meg4kAI Security</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Small operators lose contracts they should win.</h2>
+      <p class="lead">Not because the work isn't there. Because the presentation isn't. Enterprise buyers, government agencies, and enterprise department heads look for operating credibility before they look at price.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="num">01</div>
+          <p><strong>No command structure</strong> — work lands wherever it lands. You're triaging everything manually with no documented routing, no approval trail, no record of what got done or why.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">02</div>
+          <p><strong>No operating credibility</strong> — you look like a freelancer with a website. Larger competitors with the same service quality win simply because they look more structured.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">03</div>
+          <p><strong>No protection layer</strong> — one wrong move and a contract, a client, or a legal obligation goes sideways. There's nothing gating decisions that should have a human on them.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">04</div>
+          <p><strong>No resale leverage</strong> — if you've built internal operations, those processes are trapped in your head. You can't package them, license them, or sell them to someone else.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What it is -->
+  <section id="what-it-is">
+    <div class="container">
+      <div class="section-label">The Product</div>
+      <h2>A complete <span>operating layer</span> your company actually runs on.</h2>
+      <p class="lead">MetrAIyux 0S is not a project management tool or a chatbot wrapper. It's a structured command routing system — built on Cloudflare's global edge — that routes work to the right function, gates risky actions behind human approval, and keeps a proof receipt of everything that happens.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🧠</span>
+          <h3>16-Brain Command Routing</h3>
+          <p>Every command your company runs goes through a named functional brain — CEO/Ops, Sales, Legal, Finance, HR, Technology, Government Relations, and more. Each brain routes to its domain, logs a receipt, and flags anything that needs a human sign-off before it moves.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔒</span>
+          <h3>0meg4kAI Security Gateway</h3>
+          <p>A real two-layer security scanner that runs in the browser and again at the Cloudflare Worker level. It inspects commands for privilege escalation, cross-tenant boundary violations, legal risk, and financial exposure. It doesn't guess — it blocks, quarantines, or escalates with documented reasoning.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">✋</span>
+          <h3>Hard Approval Gates</h3>
+          <p>Contracts, payments, hiring decisions, legal filings, and public claims will never move without a human approval. This is not a setting you configure — it's a hard boundary baked into every brain and every Worker endpoint. You cannot accidentally automate something that should have a person on it.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🏢</span>
+          <h3>13-Cabinet Operating Model</h3>
+          <p>A documented executive structure with defined authority, delegation ledgers, governance center, and resolution language — all ready to present in a contract bid, a diligence review, or a government capability statement. One company, 13 defined operating functions.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📋</span>
+          <h3>Proof Receipt System</h3>
+          <p>Every routed command generates a timestamped JSON receipt with routing decision, brain assignment, approval status, and proof requirements. You get a lightweight compliance audit trail without buying compliance software.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔑</span>
+          <h3>SkyeGate Auth Bridge</h3>
+          <p>Token introspection against the SkyeGate identity platform. Bearer headers, role/scope claim validation, email allowlists, multi-path fallback. The admin layer is access-controlled by a real identity system, not a password box.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">👥</span>
+          <h3>Multi-Tenant Client Workspaces</h3>
+          <p>Each customer gets an isolated workspace enforced at the Worker level. 0meg4kAI scans every customer command at runtime to verify it cannot reach owner-scoped brains, production connectors, or other tenants' data. Tenant isolation is structural, not policy-based.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">⚡</span>
+          <h3>Cloudflare Edge Backend</h3>
+          <p>Six independent Cloudflare Workers — Admin Automation, SaaS Provisioning, Security Gateway, Site Operator, CROWN, and NEXUS — with D1 SQL for persistent storage, KV for fast lookup, and Queues for async dispatch. All wrangler.toml configured and ready to deploy.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💳</span>
+          <h3>SaaS Billing & Provisioning</h3>
+          <p>Stripe checkout sessions, customer signup, company profile, service selector, workspace setup, and billing intent — all wired. Wire in your Stripe keys and you have a subscription business with self-serve onboarding from day one.</p>
+        </div>
+      </div>
+
+      <div class="honest-box">
+        <h4>Honest Technical Note</h4>
+        <p>The brain routing layer uses structured keyword classification, not large language model inference. That is intentional — it makes behavior deterministic, auditable, and deployable without API costs or rate limits. The brains know their domain, route to the right function, and log receipts. They do not hallucinate. If you want an LLM layer on top, the Worker architecture is designed to accept an Ollama or OpenAI-compatible endpoint — but the platform runs and provides value without one.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cabinet -->
+  <section style="background: var(--near-black);">
+    <div class="container">
+      <div class="section-label">The 13-Cabinet Model</div>
+      <h2>Every function <span>documented, delegated, and deployable.</span></h2>
+      <p class="lead">Not just a website. A structured operating model that maps work to defined executive functions — so anything that needs to happen in your company has a place to go and a person or system accountable for it.</p>
+      <div class="cabinet-grid">
+        <div class="cabinet-item"><div class="title">Site Operator</div><div class="role">Business Automation Control Layer</div></div>
+        <div class="cabinet-item"><div class="title">0meg4kAI</div><div class="role">Security, QA, Tenant Isolation & Customer-Side Control</div></div>
+        <div class="cabinet-item"><div class="title">Central Command</div><div class="role">Company-Wide Routing & Executive Command</div></div>
+        <div class="cabinet-item"><div class="title">Gray London Skyes</div><div class="role">Founder, Principal Executive Architect & Chairman</div></div>
+        <div class="cabinet-item"><div class="title">Marcus Vale</div><div class="role">Chief Executive Officer / Chief of Operations</div></div>
+        <div class="cabinet-item"><div class="title">Celeste Monroe</div><div class="role">Chief Revenue Officer / AE Strategy Director</div></div>
+        <div class="cabinet-item"><div class="title">Adrian Cross</div><div class="role">Chief Client Officer / Client Success Director</div></div>
+        <div class="cabinet-item"><div class="title">Naomi Sterling</div><div class="role">Chief Financial Administrator / Finance Ops Director</div></div>
+        <div class="cabinet-item"><div class="title">Julian Mercer</div><div class="role">Compliance Operations Director / Corporate Risk</div></div>
+        <div class="cabinet-item"><div class="title">Sienna Brooks</div><div class="role">Chief Staffing Officer / Workforce Operations Director</div></div>
+        <div class="cabinet-item"><div class="title">Orion Hayes</div><div class="role">Chief Technology Systems Officer / Platform Ops</div></div>
+        <div class="cabinet-item"><div class="title">Valentina Reyes</div><div class="role">Chief Brand Officer / Marketing Strategy Director</div></div>
+        <div class="cabinet-item"><div class="title">Donovan Pierce</div><div class="role">Government & Enterprise Contracting Director</div></div>
+        <div class="cabinet-item"><div class="title">Helena Ward</div><div class="role">Strategic Partnerships Director / Vendor Relations</div></div>
+        <div class="cabinet-item"><div class="title">Victor Saint</div><div class="role">Quality Assurance & Performance Control Director</div></div>
+        <div class="cabinet-item"><div class="title">Amara Voss</div><div class="role">Chief Innovation Officer / Expansion Strategy Director</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guided Tour CTA -->
+  <section style="background:linear-gradient(160deg,#0d0d14,#0a0a0a);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+      <div>
+        <div class="section-label">Guided Tour</div>
+        <h2>Walk the system before you commit to anything.</h2>
+        <p style="color:var(--gray);font-size:1rem;line-height:1.7;margin-bottom:28px">The guided tour moves you through the same route a qualified buyer follows — from where work starts breaking, through the command layer, approval gates, and proof receipts. Seven stops. Fully interactive. No login required.</p>
+        <div class="cta-group" style="justify-content:flex-start">
+          <a href="/metraiyux_0s_public_spectacle_site/guided-tour.html" class="btn-primary">Start Guided Tour →</a>
+          <a href="/metraiyux_0s_public_spectacle_site/fit-check.html" class="btn-ghost">Take Fit Check</a>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;">
+        <div style="font-size:0.72rem;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px">7 Tour Stops</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">1</span>Operating Pressure — where work starts breaking</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">2</span>Public Front Door — how buyers understand the offer</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">3</span>Customer Workspace — where client work enters</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">4</span>Owner Command — where the 16 brains live</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">5</span>Review Gate — where risky action slows down</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">6</span>Proof Layer — where evidence gets kept</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray)"><span style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:var(--gold);flex-shrink:0">7</span>Fit Route — where the visitor gets routed out</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works" id="how">
+    <div class="container">
+      <div class="section-label">How It Works</div>
+      <h2>Deploy in hours. <span>Operate for years.</span></h2>
+      <p class="lead">The static layer deploys to Cloudflare Pages in under 30 minutes. The Workers deploy to the Cloudflare edge with wrangler. No build step, no server, no devops team required.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Deploy the static site to Cloudflare Pages</h3>
+            <p>Drag the folder or connect your git repo. The full 522-page operating site — marketing, admin, sales enablement, client portal, blog, knowledge base — goes live immediately. No build step. Zero config.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Deploy the 6 Cloudflare Workers with wrangler</h3>
+            <p>Each Worker has a configured wrangler.toml, D1 migration scripts, and KV namespace definitions. Add your environment secrets (SkyeGate token, Resend key, Stripe keys) and deploy. D1 databases provision automatically.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Protect the admin layer with SkyeGate + Cloudflare Access</h3>
+            <p>Add a Cloudflare Access rule in front of /admin/* and configure your SkyeGate token for the admin brain. Now the routing and approval layer is access-controlled by a real identity system, not public-facing.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Run your company through the command layer</h3>
+            <p>Use the admin brain chat to route work, generate approval requests, and produce receipts. Every action hits the 0meg4kAI security scanner before execution. Anything that touches contracts, payments, hiring, legal, or public publishing goes to the approval inbox first.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h3>Onboard clients or resell as your own product</h3>
+            <p>Add customers through the SaaS provisioning flow. Each customer gets an isolated workspace, their own brain routing context, and 0meg4kAI tenant isolation at the Worker level. Or white-label the entire platform and sell it as your own sovereign business OS.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who it's for -->
+  <section id="who">
+    <div class="container">
+      <div class="section-label">Who It's For</div>
+      <h2>Built for operators who run <span>serious companies</span> with small teams.</h2>
+      <div class="buyers-grid">
+        <div class="buyer-card">
+          <span class="buyer-tag">Primary</span>
+          <h3>Founders of service companies</h3>
+          <p>Staffing agencies, operations consultancies, government contractors, and technology-enabled services firms in the 1–15 person range. You're doing real enterprise-caliber work but your operating presentation doesn't show it. MetrAIyux 0S fixes that gap.</p>
+        </div>
+        <div class="buyer-card">
+          <span class="buyer-tag">Reseller</span>
+          <h3>Agencies and consultants</h3>
+          <p>You build websites and operations infrastructure for clients. MetrAIyux 0S is a product you can white-label and sell as recurring infrastructure — not a one-time project. Your client gets a sovereign business OS under their brand. You collect monthly revenue on it.</p>
+        </div>
+        <div class="buyer-card">
+          <span class="buyer-tag">Enterprise</span>
+          <h3>Department heads inside larger companies</h3>
+          <p>Operations directors, chiefs of staff, and department leads who want a lightweight AI-routing workflow layer without waiting on IT to configure Salesforce or SAP. MetrAIyux 0S deploys on Cloudflare and integrates with existing email and identity systems.</p>
+        </div>
+        <div class="buyer-card">
+          <span class="buyer-tag">Government</span>
+          <h3>Companies pursuing public sector contracts</h3>
+          <p>The platform includes a capability statement builder, SAM/NAICS readiness pages, procurement workflow documentation, and a government readiness layer that helps small firms present credibly for public-sector bids.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proof / Stats -->
+  <section class="proof" id="proof">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>This is not a template. <span>It's a complete system.</span></h2>
+      <p class="lead">The asset behind MetrAIyux 0S is unusually dense. Here's what's actually in the deployment package.</p>
+      <div class="stat-row">
+        <div class="stat-box"><div class="number">522</div><div class="label">HTML pages across all operating surfaces</div></div>
+        <div class="stat-box"><div class="number">6</div><div class="label">Cloudflare Workers with full D1, KV, and Queue bindings</div></div>
+        <div class="stat-box"><div class="number">16</div><div class="label">Brain routing personas across all functional domains</div></div>
+        <div class="stat-box"><div class="number">722</div><div class="label">Knowledge base chunks for brain context and retrieval</div></div>
+        <div class="stat-box"><div class="number">28</div><div class="label">Admin tutorial lessons covering every system layer</div></div>
+        <div class="stat-box"><div class="number">40+</div><div class="label">City and service SEO pages for local and regional search</div></div>
+        <div class="stat-box"><div class="number">20+</div><div class="label">Long-form blog articles for thought leadership and SEO</div></div>
+        <div class="stat-box"><div class="number">0</div><div class="label">Build steps required for static layer deployment</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2>Straightforward tiers. <span>No hidden seats.</span></h2>
+      <p class="lead">Every tier includes the full static site deployment. Higher tiers unlock the Worker backend, multi-tenant client workspaces, and white-label licensing.</p>
+      <div class="pricing-grid">
+
+        <div class="pricing-card">
+          <div class="tier">Starter</div>
+          <div class="price">$297<span style="font-size:1rem;font-weight:400;color:var(--gray)">/mo</span></div>
+          <div class="price-note">+ $997 one-time setup</div>
+          <ul>
+            <li>Full 522-page static site deployed</li>
+            <li>13-cabinet operating model</li>
+            <li>16-brain routing (browser-local mode)</li>
+            <li>Proof receipt system</li>
+            <li>Sales enablement library</li>
+            <li>Admin tutorial access</li>
+          </ul>
+          <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-ghost">Get Started</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="tier">Growth</div>
+          <div class="price">$797<span style="font-size:1rem;font-weight:400;color:var(--gray)">/mo</span></div>
+          <div class="price-note">+ $2,500 one-time setup</div>
+          <ul>
+            <li>Everything in Starter</li>
+            <li>All 6 Cloudflare Workers deployed</li>
+            <li>D1 persistent storage + KV + Queues</li>
+            <li>SkyeGate auth integration</li>
+            <li>0meg4kAI security gateway live</li>
+            <li>Resend approval email notifications</li>
+            <li>Up to 10 customer workspaces</li>
+            <li>Stripe billing integration</li>
+          </ul>
+          <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-primary">Get Started</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="tier">Autonomous Office</div>
+          <div class="price">$1,497<span style="font-size:1rem;font-weight:400;color:var(--gray)">/mo</span></div>
+          <div class="price-note">+ $5,000 one-time setup</div>
+          <ul>
+            <li>Everything in Growth</li>
+            <li>Unlimited client workspaces</li>
+            <li>White-label licensing included</li>
+            <li>Custom brain persona configuration</li>
+            <li>AE command center + revenue ops</li>
+            <li>Government readiness package</li>
+            <li>APEX layer: M&A + diligence room</li>
+            <li>Priority deployment support</li>
+          </ul>
+          <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-ghost">Get Started</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="tier">Enterprise</div>
+          <div class="price" style="font-size:1.5rem">Custom</div>
+          <div class="price-note">Scoped per engagement</div>
+          <ul>
+            <li>Everything in Autonomous Office</li>
+            <li>Dedicated Worker infrastructure</li>
+            <li>Custom SkyeGate identity integration</li>
+            <li>Multi-brand white-label deployment</li>
+            <li>Custom cabinet structure & brains</li>
+            <li>On-site implementation support</li>
+            <li>SLA-backed uptime agreement</li>
+          </ul>
+          <a href="mailto:contact@metraiyux.com" class="btn-ghost">Contact Us</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- White label -->
+  <section class="white-label" id="white-label">
+    <div class="container">
+      <div class="section-label">White Label Program</div>
+      <h2>Sell it as yours. <span>Keep all the revenue.</span></h2>
+      <p class="lead">MetrAIyux 0S was designed from the start to be deployable under any brand. The system includes a client workspace template, a branded command deck, and complete deployment documentation — so you can license this as your own product to your clients.</p>
+      <div class="wl-box">
+        <div>
+          <h3>You already have the clients. Now you have the product.</h3>
+          <p>If you're a consultant, agency, or technology services company, you've likely had clients ask you to "build something like what you use internally." MetrAIyux 0S is that product — ready to license.</p>
+          <p>Each white-label client gets their own branded site, their own Worker backend, their own isolated workspaces, and the full operating model under their company name. You set the price. You collect the revenue.</p>
+          <a href="white-label.html" class="btn-primary" style="display:inline-block;margin-top:8px">Explore White Label →</a>
+        </div>
+        <div>
+          <ul class="wl-list">
+            <li>Full brand replacement — your client's logo, colors, domain</li>
+            <li>Isolated Cloudflare Worker per client (or shared multi-tenant)</li>
+            <li>0meg4kAI tenant isolation enforced at runtime</li>
+            <li>Client command deck deployed to their subdomain or custom domain</li>
+            <li>You control the billing — bill monthly, annually, or project-based</li>
+            <li>Client gets admin tutorial access for self-service onboarding</li>
+            <li>Handoff documentation included in every deployment kit</li>
+            <li>Available on Autonomous Office tier and above</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust signals -->
+  <section>
+    <div class="container">
+      <div class="section-label">Why Operators Trust It</div>
+      <h2>It earns trust because it <span>admits what it won't do.</span></h2>
+      <p class="lead">The most dangerous systems are the ones that will do anything you ask. MetrAIyux 0S has explicit hard limits that cannot be configured away. Here's what makes that credible:</p>
+      <div class="trust-row">
+        <div class="trust-item">
+          <span class="icon">🚫</span>
+          <h4>No autonomous contracts</h4>
+          <p>No brain, Worker, or routing event will produce, sign, or send a contract without a human approval receipt. Period.</p>
+        </div>
+        <div class="trust-item">
+          <span class="icon">🚫</span>
+          <h4>No autonomous payments</h4>
+          <p>Any command touching payments, transfers, invoices, or financial commitments goes to the approval inbox. The system logs it, escalates it, and waits.</p>
+        </div>
+        <div class="trust-item">
+          <span class="icon">🚫</span>
+          <h4>No autonomous hiring or firing</h4>
+          <p>HR decisions — offers, terminations, placements — require explicit human sign-off. The brain routes them, the approval gate holds them.</p>
+        </div>
+        <div class="trust-item">
+          <span class="icon">🚫</span>
+          <h4>No autonomous public publishing</h4>
+          <p>Social posts, press releases, public claims, and external communications are gated. 0meg4kAI flags them. A human has to release them.</p>
+        </div>
+        <div class="trust-item">
+          <span class="icon">📋</span>
+          <h4>Every decision is logged</h4>
+          <p>D1 SQL records every brain routing decision, security scan result, approval status, and action outcome. The proof vault holds all of it.</p>
+        </div>
+        <div class="trust-item">
+          <span class="icon">🔍</span>
+          <h4>Two-layer security scanning</h4>
+          <p>0meg4kAI scans in the browser before the request leaves and again at the Cloudflare Worker before anything executes. Two chances to catch it, zero chance to skip it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="container">
+    <div class="cta-block">
+      <div class="section-label">Ready When You Are</div>
+      <h2>You built something real. <span>Time to run it like it.</span></h2>
+      <p>MetrAIyux 0S is a full operating system, not a website template. If you run a service company and you're still operating out of your head, your inbox, and a Google sheet — this is what comes next.</p>
+      <div class="cta-group">
+        <a href="#pricing" class="btn-primary">View Plans & Pricing</a>
+        <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="btn-ghost">See the Live System →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>MetrAIyux 0S &mdash; Built on Cloudflare. Operated by founders. &mdash; <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener">Live Demo</a> &mdash; <a href="capabilities.html">Tech & Capabilities</a> &mdash; <a href="sell-sheet.html">Sell Sheet</a> &mdash; <a href="white-label.html">White Label</a></p>
+      <p style="margin-top:10px">Questions: <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

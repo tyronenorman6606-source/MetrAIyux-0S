@@ -93,6 +93,87 @@ function setupCommandCanvas() {
   requestAnimationFrame(draw);
 }
 
+function setupGuidedTour() {
+  const tour = document.querySelector("[data-guided-tour]");
+  if (!tour) return;
+
+  const buttons = Array.from(tour.querySelectorAll("[data-tour-jump]"));
+  const cards = Array.from(tour.querySelectorAll("[data-tour-card]"));
+  const nodes = Array.from(tour.querySelectorAll("[data-tour-node]"));
+  const progress = tour.querySelector("[data-tour-progress]");
+  const previous = tour.querySelector("[data-tour-prev]");
+  const next = tour.querySelector("[data-tour-next]");
+  const route = tour.querySelector("[data-tour-route]");
+  let activeIndex = 0;
+
+  function updateTour(index) {
+    activeIndex = Math.max(0, Math.min(index, cards.length - 1));
+
+    cards.forEach((card, cardIndex) => {
+      card.classList.toggle("is-active", cardIndex === activeIndex);
+    });
+
+    buttons.forEach((button, buttonIndex) => {
+      const isActive = buttonIndex === activeIndex;
+      button.classList.toggle("is-active", isActive);
+      if (isActive) {
+        button.setAttribute("aria-current", "true");
+      } else {
+        button.removeAttribute("aria-current");
+      }
+    });
+
+    nodes.forEach((node, nodeIndex) => {
+      node.classList.toggle("is-active", nodeIndex === activeIndex);
+    });
+
+    if (progress) {
+      progress.style.width = `${((activeIndex + 1) / cards.length) * 100}%`;
+    }
+
+    if (previous) {
+      previous.disabled = activeIndex === 0;
+    }
+
+    if (next) {
+      next.textContent = activeIndex === cards.length - 1 ? "Finish at Fit Check" : "Continue Tour";
+    }
+
+    if (route) {
+      const card = cards[activeIndex];
+      route.href = card.dataset.route || "fit-check.html";
+      route.textContent = card.dataset.routeLabel || "Open Related Page";
+    }
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      updateTour(Number(button.dataset.tourJump || 0));
+    });
+  });
+
+  if (previous) {
+    previous.addEventListener("click", () => updateTour(activeIndex - 1));
+  }
+
+  if (next) {
+    next.addEventListener("click", () => {
+      if (activeIndex === cards.length - 1) {
+        window.location.href = "fit-check.html";
+        return;
+      }
+      updateTour(activeIndex + 1);
+    });
+  }
+
+  tour.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") updateTour(activeIndex + 1);
+    if (event.key === "ArrowLeft") updateTour(activeIndex - 1);
+  });
+
+  updateTour(0);
+}
+
 function getFitProfile(score) {
   if (score >= 24) {
     return {
@@ -215,5 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupMenu();
   setupReveal();
   setupCommandCanvas();
+  setupGuidedTour();
   previewBrief();
 });
