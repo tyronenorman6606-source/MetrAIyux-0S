@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
@@ -92,6 +92,7 @@ function copyToStage(stage, excludes) {
   fs.mkdirSync(stage, { recursive: true });
   execFileSync('rsync', [
     '-a',
+    '--no-group',
     '--delete',
     '--exclude=.git/',
     '--exclude=node_modules/',
@@ -154,16 +155,17 @@ function hashFile(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
 
-function gitValue(command, fallback = 'unknown') {
+function gitValue(args, fallback = 'unknown') {
   try {
-    return execSync(command, { cwd: root, encoding: 'utf8' }).trim() || fallback;
+    return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim() || fallback;
   } catch {
     return fallback;
   }
 }
 
 function outputSummary(stage, archive, excludes) {
-  const fileCount = Number(execSync(`find ${JSON.stringify(stage)} -type f | wc -l`, { encoding: 'utf8' }).trim());
+  let fileCount = 0;
+  walk(stage, () => { fileCount += 1; });
   const bytes = fs.statSync(archive).size;
   return { fileCount, bytes, excludedSecretLikeFiles: excludes.length };
 }
@@ -180,8 +182,8 @@ async function uploadArchive(archive, archiveHash, summary) {
   const fileBuffer = fs.readFileSync(archive);
   const fileName = path.basename(archive);
   const now = Date.now();
-  const branch = gitValue('git branch --show-current');
-  const commit = gitValue('git rev-parse --short HEAD');
+  const branch = gitValue(['branch', '--show-current']);
+  const commit = gitValue(['rev-parse', '--short', 'HEAD']);
   const dirtyCount = gitValue('git status --short', '').split(/\r?\n/).filter(Boolean).length;
   const body = {
     clientName: env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
