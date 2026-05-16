@@ -195,9 +195,7 @@ a { color: inherit; }
     flex-wrap: nowrap;
     overflow-x: auto;
     border-radius: 18px;
-    scrollbar-width: none;
   }
-  .nav::-webkit-scrollbar { display: none; }
   .nav a { flex: 0 0 auto; }
   .hero, .section, .cta { border-radius: 22px; }
   .hero { padding: 24px 20px; }
@@ -205,4 +203,17 @@ a { color: inherit; }
   .actions a, .actions button { width: 100%; text-align: center; }
   .review-card { min-height: auto; }
   .cursor-glow { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *:before, *:after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .cursor-glow,
+  .scroll-progress {
+    display: none;
+  }
 }
