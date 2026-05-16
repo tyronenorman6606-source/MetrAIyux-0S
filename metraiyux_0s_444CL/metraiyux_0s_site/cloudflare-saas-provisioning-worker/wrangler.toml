@@ -1,0 +1,21 @@
+name = "client-saas-provisioning"
+main = "src/index.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+PUBLIC_APP_URL = "https://client-domain.example"
+RESEND_FROM_EMAIL = "Client Command Deck Approval Desk <approvals@client-domain.example>"
+ADMIN_APPROVAL_EMAIL = "owner@example.com"
+
+[[kv_namespaces]]
+binding = "SAAS_KV"
+id = "REPLACE_WITH_CLIENT_SAAS_KV_ID"
+
+[[d1_databases]]
+binding = "SAAS_DB"
+database_name = "client-command-deck-saas-db"
+database_id = "REPLACE_WITH_CLIENT_SAAS_D1_ID"
+
+[[queues.producers]]
+binding = "SAAS_QUEUE"
+queue = "client-saas-queue"

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lightweight local cabinet brain for the MetrAIyux 0S Executive Office website.">
+  <title>Local Cabinet Brain · MetrAIyux 0S Executive Office</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="brain/local-brain.css">
+<link rel='icon' type='image/png' href='favicon-32.png'></head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html#top"><img class='brand-logo floating-logo' src='assets/metraiyux-0s-emblem-transparent.png' alt='MetrAIyux 0S emblem'><span class='brand-text'>MetrAIyux 0S Command Office</span></a>
+  <nav>
+    <a href="index.html#leaders">Leaders</a>
+    <a href="index.html#governance">Governance</a>
+    <a href="local-brain.html">Local Brain</a>
+    <a href="person-brains.html">16 Brains</a>
+    <a href="deployment-command-center.html">Deploy</a>
+  </nav>
+</header>
+<main>
+<section class="hero brain-hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Lightweight local intelligence layer</p>
+    <h1>Local Cabinet Brain</h1>
+    <p class="hero-lede">A private, static-first knowledge assistant for the 13-Cabinet Office. It searches the included resumes, cabinet roster, governance charter, AE positioning, and company doctrine without needing a GPU, database, or paid model provider.</p>
+    <div class="hero-actions">
+      <a class="button primary" href="#ask">Ask the Brain</a>
+      <a class="button" href="brain/LOCAL_BRAIN_README.md">Open Brain README</a>
+    </div>
+    <div class="stat-strip"><span><strong>Local</strong> docs</span><span><strong>No GPU</strong> required</span><span><strong>Optional</strong> Ollama</span><span><strong>Static</strong> fallback</span></div>
+  </div>
+  <div class="panel brain-status-panel">
+    <h3>Brain mode</h3>
+    <p id="brainStatus">Loading knowledge base...</p>
+    <p class="notice">Default mode is retrieval-only and runs in the browser. Optional local LLM mode can call Ollama or another OpenAI-compatible endpoint if you enable it locally.</p>
+  </div>
+</section>
+<section id="ask" class="section brain-shell">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Cabinet question console</p>
+      <h2>Ask about roles, cabinet duties, resumes, governance, AE positioning, and filing cautions.</h2>
+    </div>
+    <button id="clearBrain" class="button">Clear</button>
+  </div>
+  <div class="brain-grid">
+    <div class="brain-console">
+      <label for="brainQuestion">Question</label>
+      <textarea id="brainQuestion" rows="5" placeholder="Example: Which cabinet owns government contracting readiness, and how should an AE explain it to a client?"></textarea>
+      <div class="brain-controls">
+        <button id="askBrain" class="button primary">Ask local brain</button>
+        <button id="exampleBrain" class="button">Load example</button>
+      </div>
+      <div id="brainAnswer" class="brain-answer"></div>
+    </div>
+    <aside class="brain-sources">
+      <h3>Retrieved sources</h3>
+      <div id="brainSources" class="source-list"></div>
+    </aside>
+  </div>
+</section>
+<section class="section split">
+  <div>
+    <p class="eyebrow">Optional local model bridge</p>
+    <h2>Keep it light: Ollama or llama.cpp can be plugged in later.</h2>
+    <p>This site does not require a model to work. The optional bridge is for when you want answers rewritten by a small local model such as a 1B–3B instruction model through an OpenAI-compatible endpoint.</p>
+    <p>Ollama supports OpenAI-compatible APIs, while llama.cpp and llama-cpp-python can also expose OpenAI-compatible local servers. This means the brain can later point at <code>localhost</code> instead of a paid cloud provider.</p>
+  </div>
+  <div class="panel endpoint-panel">
+    <h3>Endpoint test</h3>
+    <label>Base URL</label>
+    <input id="endpointUrl" value="http://localhost:11434/v1/chat/completions">
+    <label>Model</label>
+    <input id="endpointModel" value="llama3.2:3b">
+    <button id="testEndpoint" class="button">Test optional endpoint</button>
+    <pre id="endpointResult">Not tested.</pre>
+  </div>
+</section>
+<section class="section">
+  <p class="eyebrow">Internal limits</p>
+  <h2>This is a company knowledge brain, not an unauthorized legal filing engine.</h2>
+  <p class="wide">The brain can explain the demonstrative cabinet structure, resumes, public profiles, governance language, AE positioning, and deployment steps. It should not claim fictional people are real officers, submit incorporation documents, invent licenses, or provide legal advice.</p>
+</section>
+</main>
+<footer><p>Local Cabinet Brain · Private static knowledge layer for the MetrAIyux 0S Executive Office.</p></footer>
+<script src="brain/local-brain.js"></script>
+</body>
+</html>

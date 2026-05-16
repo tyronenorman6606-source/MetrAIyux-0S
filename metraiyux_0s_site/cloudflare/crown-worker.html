@@ -1,0 +1,14 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>CROWN Cloudflare Worker Architecture · MetrAIyux 0S Executive Office</title><link rel='stylesheet' href='../style.css'><link rel='icon' type='image/png' href='../favicon-32.png'></head><body><header class='site-header'><a class='brand' href='../index.html'><img class='brand-logo floating-logo' src='../assets/metraiyux-0s-emblem-transparent.png' alt='MetrAIyux 0S emblem'><span class='brand-text'>13-Cabinet Office</span></a><nav><a href='../index.html'>Home</a><a href='index.html'>CROWN OS</a><a href='../nexus/index.html'>NEXUS</a><a href='../sentinel-os/index.html'>Sentinel</a><a href='../local-brain.html'>Local Brain</a></nav></header><main class='section crown-shell'><p class='eyebrow'>CLOUDFLARE WORKER KIT</p><h1>CROWN Cloudflare Worker Architecture</h1>
+<p class='wide'>This page documents the CROWN Cloudflare Worker path. Static mode works first. Worker mode adds shared records through D1, quick event cache through KV, and optional async processing through Queues.</p>
+<div class='upgrade-grid'>
+<article class='upgrade-card'><h3>Worker API</h3><p>Routes `/api/crown/status`, `/api/crown/route`, `/api/crown/task`, `/api/crown/approval`, and `/api/crown/ledger`.</p></article>
+<article class='upgrade-card'><h3>D1</h3><p>Stores events, tasks, and approval receipts for shared operator review.</p></article>
+<article class='upgrade-card'><h3>KV</h3><p>Optional quick cache for recent events, routing receipts, and site status flags.</p></article>
+<article class='upgrade-card'><h3>Queues</h3><p>Optional async flow for digest generation, proof review, and cabinet handoff processing.</p></article>
+</div>
+<pre><code>cd cloudflare-crown-operator
+wrangler d1 migrations apply crown-site-operator
+wrangler deploy
+curl /api/crown/status</code></pre>
+<section class='notice'>Do not connect external send actions until approval gates, auth, and audit retention are implemented.</section>
+</main><footer><p>CROWN MetrAIyux 0S · Demonstrative operating layer · Human approval required for legal, financial, hiring, contract, and public-claim decisions.</p></footer><script src='../crown-tools.js'></script></body></html>

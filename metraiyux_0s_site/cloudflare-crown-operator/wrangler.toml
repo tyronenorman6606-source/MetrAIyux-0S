@@ -1,0 +1,16 @@
+name = "crown-site-operator"
+main = "src/worker.js"
+compatibility_date = "2026-05-15"
+
+[[kv_namespaces]]
+binding = "CROWN_KV"
+id = "9bd3ae9ecac64d17bf6037ea8a072388"
+
+[[d1_databases]]
+binding = "CROWN_DB"
+database_name = "metraiyux-crown-db"
+database_id = "af310a11-125c-4363-8ce2-d08040b43f9f"
+
+[[queues.producers]]
+binding = "CROWN_QUEUE"
+queue = "crown-site-operator-events"

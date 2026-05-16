@@ -1,0 +1,58 @@
+name = "metraiyux-0s-full-system"
+main = "cloudflare/worker.js"
+compatibility_date = "2026-05-15"
+
+[assets]
+directory = "./"
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "SITE_EVENTS_KV"
+id = "fbab175e2e8445adb627b55dc60f37f0"
+
+[[queues.producers]]
+binding = "SITE_TASK_QUEUE"
+queue = "sovereign-13-site-tasks"
+
+[vars]
+ADMIN_WORKER_ORIGIN = "https://admin-automation-brain.graylondonskyes.workers.dev"
+SAAS_WORKER_ORIGIN = "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev"
+OMEGA_WORKER_ORIGIN = "https://omeg4kai-security-gateway.graylondonskyes.workers.dev"
+CROWN_WORKER_ORIGIN = "https://crown-site-operator.graylondonskyes.workers.dev"
+NEXUS_WORKER_ORIGIN = "https://sovereign-13-cabinet-nexus-operator.graylondonskyes.workers.dev"
+SENTINEL_WORKER_ORIGIN = "https://sovereign-13-cabinet-sentinel-operator.graylondonskyes.workers.dev"
+SITE_OPERATOR_WORKER_ORIGIN = "https://sovereign-13-site-operator-quantum.graylondonskyes.workers.dev"
+SKYGATEFS27_ORIGIN = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
+SKYGATE_SOURCE_APP = "metraiyux-0s"
+
+[[services]]
+binding = "SITE_OPERATOR_WORKER"
+service = "sovereign-13-site-operator-quantum"
+
+[[services]]
+binding = "ADMIN_WORKER"
+service = "admin-automation-brain"
+
+[[services]]
+binding = "SAAS_WORKER"
+service = "sovereign-saas-provisioning-worker"
+
+[[services]]
+binding = "OMEGA_WORKER"
+service = "omeg4kai-security-gateway"
+
+[[services]]
+binding = "CROWN_WORKER"
+service = "crown-site-operator"
+
+[[services]]
+binding = "NEXUS_WORKER"
+service = "sovereign-13-cabinet-nexus-operator"
+
+[[services]]
+binding = "SENTINEL_WORKER"
+service = "sovereign-13-cabinet-sentinel-operator"
+
+# Optional later if you add Workers AI:
+# [ai]
+# binding = "AI"

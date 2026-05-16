@@ -1,0 +1,29 @@
+name = "sovereign-saas-provisioning-worker"
+main = "src/index.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+PUBLIC_APP_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
+SKYMAIL_API_URL = "https://skymail-platform.graylondonskyes.workers.dev"
+SKYMAIL_PUBLIC_URL = "https://skymail-platform.graylondonskyes.workers.dev"
+RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@skyesoverlondon.com>"
+ADMIN_APPROVAL_EMAIL = "graylondonskyes@gmail.com"
+
+# Production secrets:
+# wrangler secret put SKYMAIL_SERVICE_TOKEN
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put ADMIN_TOKEN
+# wrangler secret put STRIPE_SECRET_KEY
+
+[[kv_namespaces]]
+binding = "SAAS_KV"
+id = "c3ff2ce5e6c5493997193a14af5d60e4"
+
+[[d1_databases]]
+binding = "SAAS_DB"
+database_name = "metraiyux-saas-db"
+database_id = "23fe7fca-5f9d-4aec-9bed-3ecd5784c0bc"
+
+[[queues.producers]]
+binding = "SAAS_QUEUE"
+queue = "sovereign-saas-queue"

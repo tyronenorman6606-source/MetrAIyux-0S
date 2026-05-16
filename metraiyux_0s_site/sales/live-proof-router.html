@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A public MetrAIyux 0S proof router that matches buyer needs to live command deck, SkyeGateFS27, sales, client OS, and proof surfaces.">
+  <title>Live Proof Router · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .proof-router{max-width:1180px;margin:0 auto;padding:24px}
+    .router-panel{border:1px solid rgba(255,255,255,.14);border-radius:26px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 24px 80px rgba(0,0,0,.25);padding:24px}
+    .choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:22px 0}
+    .choice-grid label{display:block;min-height:132px;padding:18px;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(0,0,0,.22);cursor:pointer}
+    .choice-grid input{accent-color:#f3d483;margin-right:8px}
+    .choice-grid strong{display:block;color:#fff;margin:8px 0}
+    .choice-grid span{display:block;color:var(--muted);font-size:.94rem}
+    .recommendation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:22px 0}
+    .surface-result{border:1px solid rgba(243,212,131,.28);border-radius:22px;background:rgba(255,255,255,.045);padding:20px}
+    .surface-result h3{color:#ffe9a8}
+    .surface-result p{color:#dbe7eb}
+    .talk-track{white-space:pre-wrap;border:1px dashed rgba(243,212,131,.36);border-radius:20px;background:rgba(0,0,0,.28);padding:18px;min-height:150px}
+    .human-note{max-width:940px;color:#d9e4e7;font-size:1.05rem}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../sales/index.html">Sales</a>
+      <a href="../sales-enablement/index.html">Enablement</a>
+      <a href="../proof/index.html">Proof</a>
+      <a href="../client-os/index.html">Client OS</a>
+      <a href="../local-brain.html">Brain</a>
+    </nav>
+  </header>
+
+  <main class="proof-router">
+    <section class="hero slim">
+      <div class="hero-copy">
+        <p class="eyebrow">Live proof router</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>Show the right proof for the buyer in front of you.</h1>
+        <p class="hero-lede">This page keeps the sales conversation human. Pick what the person actually cares about and it routes you to the live surface that proves the point.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noreferrer">Open FS27 Proof Surface</a>
+          <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Full System</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section router-panel">
+      <p class="eyebrow">Buyer signal</p>
+      <h2>What sounds like their situation?</h2>
+      <p class="human-note">You do not need to explain every layer. Find the pain first. The architecture only matters when it answers something they already feel.</p>
+      <div class="choice-grid" id="buyerSignals">
+        <label><input type="checkbox" value="website command deck metraiyux"> <strong>They need more than a website.</strong><span>The site should help capture demand, route work, and make the company feel operated.</span></label>
+        <label><input type="checkbox" value="proof gate auth skygate fs27"> <strong>They ask what makes it real.</strong><span>They want proof that this is deployed infrastructure, not a mockup or a static brochure.</span></label>
+        <label><input type="checkbox" value="sales ae discovery close follow up"> <strong>They care about revenue.</strong><span>They need better discovery, follow-up, objection handling, and closing structure.</span></label>
+        <label><input type="checkbox" value="client onboarding status escalation renewal"> <strong>Client work gets messy.</strong><span>They lose track of onboarding, status, document requests, or escalations after the sale.</span></label>
+        <label><input type="checkbox" value="admin token private 0meg4kai security tenant isolation"> <strong>They worry about control.</strong><span>They want AI help without giving customers owner credentials or private admin access.</span></label>
+        <label><input type="checkbox" value="public overview spectacle value sendable"> <strong>They need a first-look link.</strong><span>They are not ready for the full system yet; they need a clean overview first.</span></label>
+      </div>
+      <div class="button-row">
+        <button class="button primary" id="buildRoute" type="button">Build Proof Route</button>
+        <button class="button" id="clearRoute" type="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Recommended surfaces</p>
+          <h2 id="routeTitle">Start with the buyer's pain.</h2>
+        </div>
+      </div>
+      <div class="recommendation-grid" id="surfaceResults">
+        <article class="surface-result">
+          <h3>Pick one or more signals above.</h3>
+          <p>The router will choose live surfaces and a talk track that fit the conversation.</p>
+        </article>
+      </div>
+      <div class="router-panel">
+        <p class="eyebrow">Talk track</p>
+        <div class="talk-track" id="talkTrack">Listen first. Then show one proof surface that answers the actual concern.</div>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">How to say it plainly</p>
+        <h2>The offer is infrastructure.</h2>
+        <p class="wide">A client can get a public website, a protected command deck, a gate for auth and event proof, and live routing surfaces that help sales, client success, operations, and admin work stay organized. The buyer should feel helped by a person who understands their business, not pushed through a script.</p>
+      </div>
+      <aside class="panel">
+        <h3>Keep private</h3>
+        <ul>
+          <li>Admin tokens, mirror secrets, database URLs, and provider keys.</li>
+          <li>Owner-only automation controls unless the operator is intentionally demoing them.</li>
+          <li>Unverified claims about legal, hiring, payment, tax, or contract autonomy.</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer"><p>MetrAIyux 0S live proof router. Public proof links are safe to share; protected admin operations remain gated.</p></footer>
+  <script>
+    const surfaces = [
+      {id:'metraiyux-full-system', name:'MetrAIyux 0S Full System', url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/', tags:'website command deck metraiyux 16 brains autonomous business client deployment owner admin sales deck', use:'Use this as the main live demo for the client command deck.'},
+      {id:'skygate-fs27-proof-surface', name:'SkyeGateFS27 Proof Surface', url:'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html', tags:'proof gate auth skygate fs27 architecture trust sovereign infrastructure command deck', use:'Use when they ask why this is more serious than a normal website.'},
+      {id:'skygate-actual-gate', name:'SkyeGateFS27 Actual Gate', url:'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/', tags:'actual gate dashboard key admin monitor smoke test platform control auth', use:'Use when they are ready to inspect the gate itself.'},
+      {id:'sales-enablement', name:'Sales Enablement Command Library', url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales-enablement/index.html', tags:'sales ae discovery close follow up objection proposal revenue', use:'Use when the conversation is about pipeline, outreach, follow-up, or closing.'},
+      {id:'client-os', name:'Client OS', url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-os/index.html', tags:'client onboarding status escalation renewal document request delivery', use:'Use when they lose track of client work after the sale.'},
+      {id:'admin-brain', name:'Main Automation Brain', url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html', tags:'admin token private 0meg4kai security tenant isolation approval owner controls', use:'Mention as a protected owner/admin lane. Demo carefully and only with approval.'},
+      {id:'public-spectacle', name:'MetrAIyux Public Overview', url:'https://metraiyux-0s-public-spectacle.pages.dev/', tags:'public overview spectacle value sendable first look', use:'Use as the clean first-look link before the full system.'}
+    ];
+    const signals = document.getElementById('buyerSignals');
+    const results = document.getElementById('surfaceResults');
+    const talk = document.getElementById('talkTrack');
+    const title = document.getElementById('routeTitle');
+    function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+    function build(){
+      const selected = [...signals.querySelectorAll('input:checked')].map(i=>i.value).join(' ').toLowerCase();
+      if(!selected){
+        title.textContent="Start with the buyer's pain.";
+        results.innerHTML='<article class="surface-result"><h3>Pick one or more signals above.</h3><p>The router will choose live surfaces and a talk track that fit the conversation.</p></article>';
+        talk.textContent='Listen first. Then show one proof surface that answers the actual concern.';
+        return;
+      }
+      const terms = selected.split(/\s+/).filter(Boolean);
+      const ranked = surfaces.map(s=>{
+        const hay=s.tags.toLowerCase();
+        const score=terms.reduce((n,t)=>n+(hay.includes(t)?1:0),0);
+        return {...s,score};
+      }).filter(s=>s.score>0).sort((a,b)=>b.score-a.score).slice(0,3);
+      title.textContent=ranked.length ? 'Show these surfaces.' : 'Use the full system first.';
+      results.innerHTML=(ranked.length?ranked:[surfaces[0]]).map(s=>`<article class="surface-result"><h3>${esc(s.name)}</h3><p>${esc(s.use)}</p><a class="button primary" href="${esc(s.url)}" target="_blank" rel="noreferrer">Open Surface</a></article>`).join('');
+      talk.textContent='Here is the clean way to say it:\\n\\n\"I am not trying to sell you a prettier homepage. I am showing you a deployable operating surface: the public website earns attention, the command deck helps route work, and the gate protects identity and proof. Let me show you the part that matches the problem you just described.\"';
+    }
+    document.getElementById('buildRoute')?.addEventListener('click', build);
+    document.getElementById('clearRoute')?.addEventListener('click',()=>{signals.querySelectorAll('input').forEach(i=>i.checked=false);build();});
+  </script>
+</body>
+</html>

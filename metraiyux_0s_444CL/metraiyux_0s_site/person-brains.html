@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>16 Lightweight System Brains | Client Command Deck</title>
+  <meta name="description" content="Central company brain plus 13 cabinet-person brains for the executive office website.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="brain/local-brain.css">
+<link rel='icon' type='image/png' href='favicon-32.png'></head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html">13-Department Office</a>
+  <nav>
+    <a href="index.html">Cabinet</a>
+    <a href="local-brain.html">Company Brain</a>
+    <a href="person-brains.html">16 Brains</a>
+    <a href="deployment-command-center.html">Deploy</a>
+  </nav>
+</header>
+<main>
+<section class="hero">
+  <p class="eyebrow">Lightweight Local Intelligence Layer</p>
+  <h1>16 Total Brains: Site Operator, Security Gate Brain, Central Command, and 13 Cabinet Executive Brains.</h1>
+  <p>Each brain is a scoped local persona module over the included company knowledge base. This is intentionally light: no GPU required, no paid API required, and no fake autonomous claims.</p>
+  <p><span class="brain-count-badge">16 brains loaded locally</span></p>
+</section>
+<section class="panel">
+  <h2>Select a brain</h2>
+  <p id="personaStatus" class="notice">Loading local brain profiles...</p>
+  <div class="brain-select-row">
+    <label for="brainSelector">Active brain</label>
+    <select id="brainSelector"></select>
+  </div>
+  <div id="activeBrainProfile"></div>
+  <div id="brainCards" class="brain-card-grid"></div>
+</section>
+<section class="panel">
+  <h2>Ask the active brain</h2>
+  <p>This uses local retrieval and cabinet scoping. The answer stays inside the selected executive's lane unless you choose the Central Company Command Brain.</p>
+  <textarea id="personaQuestion" rows="6" placeholder="Ask this cabinet brain what it owns, what an AE should say, what it should not claim, or how it supports the 13-department office."></textarea>
+  <div class="button-row">
+    <button id="askPersonaBrain">Ask selected brain</button>
+    <button id="examplePersonaBrain" class="secondary">Load example</button>
+    <button id="clearPersonaBrain" class="ghost">Clear</button>
+  </div>
+  <div id="personaAnswer"></div>
+</section>
+<section class="panel">
+  <h2>Retrieved proof sources</h2>
+  <div id="personaSources"></div>
+</section>
+<section class="panel">
+  <h2>Operating truth</h2>
+  <p>These are not 14 heavy AI models. They are 14 lightweight local brains: one router and 13 scoped executive assistants powered by local JSON knowledge. That keeps the site deployable as a static package while leaving a path to plug in Ollama, llama.cpp, or another OpenAI-compatible local endpoint later.</p>
+</section>
+</main>
+<script src="brain/persona-brains.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+
+name = "sovereign-13-cabinet-nexus-operator"
+main = "src/worker.js"
+compatibility_date = "2026-05-15"
+
+[[kv_namespaces]]
+binding = "NEXUS_KV"
+id = "9d3935a88a7b43e0afb679f47972d350"
+
+[[d1_databases]]
+binding = "NEXUS_DB"
+database_name = "metraiyux-nexus-db"
+database_id = "60b0a208-9889-4014-aea2-0e22f5c11dcd"
+
+[[queues.producers]]
+binding = "NEXUS_QUEUE"
+queue = "sovereign-13-nexus-events"

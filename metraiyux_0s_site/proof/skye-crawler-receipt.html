@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeCrawler proof receipt for MetrAIyux 0S end-to-end user-flow crawl, Worker API proof, browser runtime checks, and screenshot artifacts.">
+  <title>SkyeCrawler Proof Receipt · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">SkyeCrawler Proof</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../operator/skye-crawler.html">SkyeCrawler</a>
+      <a href="proof-center.html">Proof Center</a>
+      <a href="../sales/live-proof-router.html">Live Router</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero slim">
+      <div class="hero-copy">
+        <p class="eyebrow">Crawler receipt</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>SkyeCrawler passed the current local full-system shakedown.</h1>
+        <p class="hero-lede">This receipt records the last SkyeCrawler run against the MetrAIyux 0S site folder before a customer handoff.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="receipt-grid">
+        <article class="panel receipt-pass"><h3>Result</h3><p><strong>Pass</strong></p><p>14 checks, 0 failures, 0 warnings.</p></article>
+        <article class="panel receipt-pass"><h3>Inventory</h3><p>524 HTML pages and 556 local references were crawled.</p></article>
+        <article class="panel receipt-pass"><h3>Browser Proof</h3><p>Desktop sweep covered 524 pages. Mobile sweep covered the first 160 pages and the critical tool flows.</p></article>
+        <article class="panel"><h3>Worker Proof</h3><p>Run <code>npm run skye:crawl:worker</code> against local Wrangler for API-backed proof.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Checks included</p>
+      <div class="table-wrap">
+        <table class="upgrade-table">
+          <thead><tr><th>Lane</th><th>Proof</th></tr></thead>
+          <tbody>
+            <tr><td>Inventory</td><td>Site directory exists, HTML count meets full-system threshold.</td></tr>
+            <tr><td>HTTP</td><td>All HTML pages load and local href/src references resolve.</td></tr>
+            <tr><td>API</td><td>Static mode records an API skip. Worker mode checks Site Operator status and route endpoints through Wrangler.</td></tr>
+            <tr><td>Browser</td><td>Desktop and mobile Chromium runtime sweeps catch hard errors, failed local requests, blank pages, and overflow.</td></tr>
+            <tr><td>User Flow</td><td>Local Brain, Persona Brain, Live Proof Router, Staffing Margin calculator, admin local tool, SaaS signup, and Client OS onboarding all complete.</td></tr>
+            <tr><td>Artifacts</td><td>Homepage, mobile homepage, proof router, and local brain screenshots were captured.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Local artifact paths</p>
+      <pre class="receipt-box">Report:
+/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-report.json
+
+Screenshots:
+/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler/
+
+System runner:
+/workspaces/MetrAIyux-0S/tools/skye-crawler.mjs</pre>
+    </section>
+  </main>
+  <footer><p>SkyeCrawler proof is operator evidence. Re-run after material code, content, navigation, or Worker changes.</p></footer>
+</body>
+</html>

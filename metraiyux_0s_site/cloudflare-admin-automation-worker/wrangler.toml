@@ -1,0 +1,40 @@
+
+name = "admin-automation-brain"
+main = "src/worker.js"
+compatibility_date = "2026-05-15"
+
+# Optional: serve the static site through the same Worker if you copy/build assets here.
+# assets = { directory = "../" }
+
+[[kv_namespaces]]
+binding = "ADMIN_KV"
+id = "48d5a0afef9447a59f59b0d7967f0c50"
+
+[[d1_databases]]
+binding = "ADMIN_DB"
+database_name = "metraiyux-admin-db"
+database_id = "4c43adac-171b-46ed-8e2c-61458479c3e2"
+
+[[queues.producers]]
+binding = "ADMIN_QUEUE"
+queue = "admin-automation-brain-events"
+
+# Optional Workers AI binding. Enable in Cloudflare dashboard / wrangler config if used.
+# [ai]
+# binding = "AI"
+
+[vars]
+WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+SKYGATEFS27_ORIGIN = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
+SKYGATE_SOURCE_APP = "metraiyux-0s"
+SKYGATE_ADMIN_EMAILS = "graylondonskyes@gmail.com"
+# SOCIAL_DISPATCH_WEBHOOK = "https://your-social-connector.example.com/post"
+# Never put ADMIN_TOKEN, RESEND_API_KEY, or SOCIAL_DISPATCH_TOKEN here. Use wrangler secret put.
+# Never put SKYGATE_EVENT_MIRROR_SECRET here. Use wrangler secret put SKYGATE_EVENT_MIRROR_SECRET.
+
+# Resend approval notifications. Use a verified Resend domain for production.
+RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@skyesoverlondon.com>"
+ADMIN_APPROVAL_EMAIL = "graylondonskyes@gmail.com"
+PUBLIC_ADMIN_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
+# RESEND_REPLY_TO = "operator@your-domain.com"
+# Never put RESEND_API_KEY here. Use wrangler secret put RESEND_API_KEY.

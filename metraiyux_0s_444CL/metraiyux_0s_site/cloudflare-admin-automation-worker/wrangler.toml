@@ -1,0 +1,36 @@
+
+name = "client-admin-automation"
+main = "src/worker.js"
+compatibility_date = "2026-05-15"
+
+# Optional: serve the static site through the same Worker if you copy/build assets here.
+# assets = { directory = "../" }
+
+[[kv_namespaces]]
+binding = "ADMIN_KV"
+id = "REPLACE_WITH_CLIENT_ADMIN_KV_ID"
+
+[[d1_databases]]
+binding = "ADMIN_DB"
+database_name = "client-command-deck-admin-db"
+database_id = "REPLACE_WITH_CLIENT_ADMIN_D1_ID"
+
+[[queues.producers]]
+binding = "ADMIN_QUEUE"
+queue = "client-admin-automation-events"
+
+# Optional Workers AI binding. Enable in Cloudflare dashboard / wrangler config if used.
+# [ai]
+# binding = "AI"
+
+[vars]
+WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+# SOCIAL_DISPATCH_WEBHOOK = "https://your-social-connector.example.com/post"
+# Never put ADMIN_TOKEN, RESEND_API_KEY, or SOCIAL_DISPATCH_TOKEN here. Use wrangler secret put.
+
+# Resend approval notifications. Use a verified Resend domain for production.
+RESEND_FROM_EMAIL = "Client Command Deck Approval Desk <approvals@client-domain.example>"
+ADMIN_APPROVAL_EMAIL = "owner@example.com"
+PUBLIC_ADMIN_URL = "https://client-domain.example"
+# RESEND_REPLY_TO = "operator@your-domain.com"
+# Never put RESEND_API_KEY here. Use wrangler secret put RESEND_API_KEY.
