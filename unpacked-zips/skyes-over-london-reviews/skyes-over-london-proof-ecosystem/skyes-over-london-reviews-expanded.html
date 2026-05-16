@@ -1,0 +1,3444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Skyes Over London Reviews</title>
+  <meta name="description" content="Skyes Over London Reviews section with client-approved review proof for websites, staffing, AE network growth, automation, AI systems, deployment support, client portals, operations, local SEO, and government-contracting readiness." />
+  <style>
+    :root {
+      --bg: #050711;
+      --panel: rgba(255,255,255,.075);
+      --panel2: rgba(255,255,255,.115);
+      --line: rgba(255,255,255,.16);
+      --text: #f7f8ff;
+      --muted: rgba(247,248,255,.72);
+      --soft: rgba(247,248,255,.52);
+      --blue: #4fc3ff;
+      --blue2: #8be0ff;
+      --gold: #f6c758;
+      --green: #58f2ac;
+      --red: #ff6685;
+      --shadow: 0 30px 100px rgba(0,0,0,.42);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--blue) rgba(255,255,255,.08);
+    }
+
+    ::-webkit-scrollbar { width: 14px; height: 14px; }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255,255,255,.08);
+      border-left: 1px solid rgba(79,195,255,.14);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      min-height: 74px;
+      border: 3px solid rgba(5,7,17,.92);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--gold), var(--blue), var(--green));
+      box-shadow: 0 0 18px rgba(79,195,255,.38), inset 0 0 12px rgba(255,255,255,.18);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--blue2), var(--gold), var(--green));
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(79,195,255,.22), transparent 34%),
+        radial-gradient(circle at 86% 0%, rgba(246,199,88,.18), transparent 32%),
+        radial-gradient(circle at 50% 100%, rgba(88,242,172,.1), transparent 34%),
+        linear-gradient(135deg, #050711 0%, #080b18 48%, #02030a 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 82%);
+      z-index: -1;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 80;
+      width: 100%;
+      height: 4px;
+      transform: scaleX(var(--scroll-progress, 0));
+      transform-origin: left center;
+      background: linear-gradient(90deg, var(--gold), var(--blue), var(--green));
+      box-shadow: 0 0 22px rgba(79,195,255,.42);
+      pointer-events: none;
+    }
+
+    .cursor-glow {
+      position: fixed;
+      left: var(--cursor-x, -240px);
+      top: var(--cursor-y, -240px);
+      z-index: 70;
+      width: 260px;
+      height: 260px;
+      translate: -50% -50%;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(246,199,88,.16), rgba(79,195,255,.10) 42%, transparent 72%);
+      filter: blur(10px);
+      mix-blend-mode: screen;
+    }
+
+    a { color: inherit; }
+
+    .reviews-page {
+      width: min(1360px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 42px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.045)),
+        rgba(255,255,255,.04);
+      box-shadow: var(--shadow);
+      padding: clamp(28px, 5vw, 66px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero:after {
+      content: "";
+      position: absolute;
+      width: 560px;
+      height: 560px;
+      right: -240px;
+      top: -230px;
+      background: radial-gradient(circle, rgba(79,195,255,.24), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 15px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-weight: 950;
+      font-size: .77rem;
+    }
+
+    .eyebrow:before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--gold), var(--blue));
+    }
+
+    .hero h2 {
+      margin: 0;
+      max-width: 1120px;
+      font-size: clamp(2.65rem, 7vw, 7.55rem);
+      line-height: .88;
+      letter-spacing: 0;
+    }
+
+    .hero h2 span {
+      color: transparent;
+      background: linear-gradient(90deg, #fff 0%, var(--blue) 52%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(79,195,255,.14));
+    }
+
+    .hero-copy {
+      max-width: 960px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: clamp(1rem, 1.4vw, 1.18rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-actions a, .hero-actions button {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 13px 17px;
+      font-weight: 950;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .hero-actions a:hover, .hero-actions button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(79,195,255,.55);
+    }
+
+    .hero-actions .primary {
+      color: #050711;
+      border: 0;
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+      box-shadow: 0 15px 50px rgba(79,195,255,.18);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(0,0,0,.2);
+      padding: 18px;
+      min-height: 114px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: clamp(1.65rem, 3vw, 2.65rem);
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--soft);
+      line-height: 1.4;
+      font-size: .88rem;
+    }
+
+    .section {
+      margin-top: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.045);
+      padding: clamp(22px, 3.2vw, 40px);
+      box-shadow: 0 18px 70px rgba(0,0,0,.2);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3.4vw, 3.25rem);
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .section-lede {
+      max-width: 860px;
+      margin: 11px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .search-box {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.22);
+      color: #fff;
+      border-radius: 999px;
+      padding: 13px 16px;
+      outline: none;
+      font-weight: 800;
+    }
+
+    .search-box::placeholder { color: rgba(255,255,255,.48); }
+
+    .visible-count {
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 13px 16px;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .filters button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .filters button span {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      height: 24px;
+      margin-left: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      color: var(--blue2);
+      font-size: .76rem;
+    }
+
+    .filters button:hover,
+    .filters button.active {
+      transform: translateY(-1px);
+      border-color: rgba(79,195,255,.74);
+      background: rgba(79,195,255,.15);
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .review-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.036));
+      min-height: 382px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 55px rgba(0,0,0,.24);
+    }
+
+    .review-card:before {
+      content: "“";
+      position: absolute;
+      right: 17px;
+      top: -26px;
+      font-size: 8rem;
+      font-family: Georgia, serif;
+      line-height: 1;
+      color: rgba(79,195,255,.12);
+      pointer-events: none;
+    }
+
+    .review-card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .review-stars {
+      color: var(--gold);
+      letter-spacing: .08em;
+      font-size: .9rem;
+    }
+
+    .review-status {
+      border: 1px solid rgba(88,242,172,.34);
+      color: #d9ffe9;
+      background: rgba(88,242,172,.10);
+      border-radius: 999px;
+      padding: 6px 8px;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-weight: 950;
+    }
+
+    .review-service {
+      display: inline-flex;
+      width: fit-content;
+      border: 1px solid rgba(88,242,172,.26);
+      background: rgba(88,242,172,.08);
+      color: #caffe5;
+      border-radius: 999px;
+      padding: 7px 9px;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-weight: 950;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .review-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.18rem;
+      letter-spacing: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .review-card blockquote {
+      margin: 0;
+      color: rgba(255,255,255,.86);
+      line-height: 1.62;
+      font-size: .965rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .review-card footer {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding-top: 15px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .review-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(79,195,255,.26), rgba(246,199,88,.18));
+      border: 1px solid rgba(255,255,255,.18);
+      font-weight: 950;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+
+    .review-card footer strong {
+      display: block;
+      font-size: .95rem;
+    }
+
+    .review-card footer span {
+      display: block;
+      color: var(--soft);
+      font-size: .8rem;
+      margin-top: 2px;
+    }
+
+    .proof-lanes {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .lane {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(0,0,0,.2);
+      padding: 17px;
+    }
+
+    .lane b { display: block; margin-bottom: 7px; }
+    .lane p { margin: 0; color: var(--muted); line-height: 1.5; font-size: .9rem; }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .year {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .year-label {
+      border: 1px solid rgba(246,199,88,.42);
+      background: rgba(246,199,88,.1);
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 950;
+    }
+
+    .year-body {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .year-body b { display: block; margin-bottom: 7px; }
+    .year-body p { margin: 0; color: var(--muted); line-height: 1.58; }
+
+    .collector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .collector-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      background: rgba(0,0,0,.18);
+    }
+
+    .collector-card h3 {
+      margin: 0 0 9px;
+      font-size: 1.1rem;
+    }
+
+    .collector-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.58;
+    }
+
+    .collector-card textarea {
+      width: 100%;
+      min-height: 250px;
+      resize: vertical;
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.28);
+      color: #fff;
+      padding: 14px;
+      line-height: 1.5;
+      font: inherit;
+      outline: none;
+    }
+
+    .collector-card button {
+      margin-top: 12px;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 17px;
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+      color: #050711;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .cta {
+      text-align: center;
+      border: 1px solid rgba(79,195,255,.38);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(79,195,255,.22), transparent 48%),
+        rgba(255,255,255,.06);
+      padding: clamp(28px, 5vw, 58px);
+    }
+
+    .cta h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.25rem);
+      letter-spacing: 0;
+      line-height: .96;
+    }
+
+    .cta p {
+      max-width: 830px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .cta-actions a {
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font-weight: 950;
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
+      background: rgba(255,255,255,.08);
+    }
+
+    .cta-actions a.primary {
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+      color: #050711;
+      border: none;
+    }
+
+    .hidden { display: none !important; }
+
+
+    .review-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .review-controls label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 10px 8px 13px;
+      font-size: .82rem;
+      font-weight: 900;
+    }
+
+    .review-controls select {
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 10px;
+      outline: none;
+      font-weight: 900;
+    }
+
+    .review-controls option {
+      color: #050711;
+    }
+
+    .review-controls button {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .review-card[data-tier="featured"] {
+      border-color: rgba(246,199,88,.34);
+      background:
+        radial-gradient(circle at top right, rgba(246,199,88,.14), transparent 38%),
+        linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+    }
+
+    .review-card[data-tier="featured"] .review-status {
+      border-color: rgba(246,199,88,.5);
+      background: rgba(246,199,88,.13);
+      color: #fff1c4;
+    }
+
+    .reviews-page.compact-view .review-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reviews-page.compact-view .review-card {
+      min-height: auto;
+    }
+
+    .reviews-page.compact-view .review-card blockquote {
+      font-size: .92rem;
+    }
+
+    .reviews-page.spotlight-view .review-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .reviews-page.spotlight-view .review-card {
+      min-height: auto;
+    }
+
+    .reviews-page.spotlight-view .review-card blockquote {
+      font-size: 1.08rem;
+    }
+
+    .review-card.is-batched-hidden {
+      display: none !important;
+    }
+
+    .no-results {
+      margin-top: 18px;
+      border: 1px solid rgba(255,102,133,.35);
+      color: #ffe4e9;
+      background: rgba(255,102,133,.1);
+      border-radius: 18px;
+      padding: 16px;
+      font-weight: 900;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .board-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .board-card b {
+      display: block;
+      font-size: clamp(1.45rem, 2.4vw, 2.35rem);
+      letter-spacing: 0;
+      color: #fff;
+    }
+
+    .board-card span {
+      display: block;
+      margin-top: 6px;
+      color: var(--soft);
+      font-size: .88rem;
+    }
+
+    .spotlight-panel {
+      margin-top: 14px;
+      border: 1px solid rgba(79,195,255,.28);
+      border-radius: 24px;
+      padding: clamp(20px, 3vw, 34px);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(79,195,255,.16), transparent 44%),
+        rgba(0,0,0,.2);
+    }
+
+    .spotlight-panel h3 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.7vw, 2.45rem);
+      letter-spacing: 0;
+    }
+
+    .spotlight-panel p:not(.eyebrow) {
+      max-width: 900px;
+      color: rgba(255,255,255,.84);
+      line-height: 1.7;
+      margin: 12px 0 0;
+      font-size: 1.05rem;
+    }
+
+    .spotlight-panel span {
+      display: inline-flex;
+      margin-top: 16px;
+      color: var(--green);
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-size: .76rem;
+    }
+
+    .review-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .review-form input,
+    .review-form textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      color: #fff;
+      padding: 13px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    .review-form textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    #builtReviewRecord {
+      min-height: 180px;
+    }
+
+    @media (max-width: 1080px) {
+
+    @media (max-width: 700px) {
+      .reviews-page { width: min(100% - 20px, 1360px); padding-top: 10px; }
+      .hero, .section, .cta { border-radius: 22px; }
+      .hero { padding: 24px 20px; }
+      .metrics, .review-grid, .proof-lanes, .board-grid { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr; }
+      .visible-count { width: fit-content; }
+      .year { grid-template-columns: 1fr; }
+      .year-label { min-height: 66px; }
+      .hero-actions a, .hero-actions button { width: 100%; text-align: center; }
+      .review-card { min-height: auto; }
+      .cursor-glow { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <span class="scroll-progress motion-chrome" aria-hidden="true"></span>
+  <span class="cursor-glow pointer-reactive" aria-hidden="true"></span>
+  <main class="reviews-page">
+    <section class="hero" id="skyes-over-london-reviews">
+      <p class="eyebrow">Client Feedback</p>
+      <h2><span>Skyes Over London Reviews</span></h2>
+      <p class="hero-copy">
+        Five years of service experience across websites, staffing solutions, AE-powered account growth, AI-assisted systems, automation, deployment support, client portals, business operations, local SEO, government-contracting readiness, and digital infrastructure.
+      </p>
+      <div class="hero-actions">
+        <a class="primary" href="#reviews">View Reviews</a>
+        <a href="#value-lanes">See Service Lanes</a>
+        <a href="mailto:skyesoverlondonlc@solenterprises.org?subject=Skyes%20Over%20London%20Review">Send a Review</a>
+        <button type="button" id="copyReviewRequestTop">Copy Review Request</button>
+      </div>
+
+      <div class="metrics" aria-label="Skyes Over London review section metrics">
+        <div class="metric"><b>115</b><span>approved review cards included in this expanded review section.</span></div>
+        <div class="metric"><b>5+</b><span>years positioned across service delivery, business support, systems, and growth work.</span></div>
+        <div class="metric"><b>13</b><span>core service lanes represented across reviews and proof categories.</span></div>
+        <div class="metric"><b>100%</b><span>client-approved review proof organized across service categories.</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="reviews">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Review Categories</p>
+          <h2>Filter the Skyes Over London Reviews</h2>
+          <p class="section-lede">
+            The review set is built around actual Skyes Over London service lanes: web development, staffing, AE network growth, automation, AI systems, deployment support, portals, operations, SEO, government-contracting readiness, and sales systems.
+          </p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-box" id="reviewSearch" type="search" placeholder="Search reviews by service, business lane, or keyword..." />
+        <div class="visible-count" id="visibleCount">115 visible</div>
+      </div>
+
+      <div class="review-controls" aria-label="Review display controls">
+        <label>
+          Sort
+          <select id="reviewSort">
+            <option value="default">Default order</option>
+            <option value="newest">Newest review year</option>
+            <option value="oldest">Oldest review year</option>
+            <option value="service">Service lane A-Z</option>
+            <option value="featured">Featured first</option>
+          </select>
+        </label>
+        <label>
+          View
+          <select id="reviewView">
+            <option value="grid">Grid</option>
+            <option value="compact">Compact</option>
+            <option value="spotlight">Spotlight</option>
+          </select>
+        </label>
+        <button type="button" id="showMoreReviews">Show More Reviews</button>
+        <button type="button" id="resetReviews">Reset Filters</button>
+      </div>
+
+      <div class="filters" aria-label="Review filters">
+        <button class="active" type="button" data-filter="all">All Reviews <span data-count="all">0</span></button>
+<button  type="button" data-filter="web">Websites <span data-count="web">0</span></button>
+<button  type="button" data-filter="staffing">Staffing / AE <span data-count="staffing">0</span></button>
+<button  type="button" data-filter="automation">Automation <span data-count="automation">0</span></button>
+<button  type="button" data-filter="ai">AI Systems <span data-count="ai">0</span></button>
+<button  type="button" data-filter="deployment">Deployment <span data-count="deployment">0</span></button>
+<button  type="button" data-filter="portal">Client Portals <span data-count="portal">0</span></button>
+<button  type="button" data-filter="gov">Government Readiness <span data-count="gov">0</span></button>
+<button  type="button" data-filter="ops">Operations <span data-count="ops">0</span></button>
+<button  type="button" data-filter="seo">Local SEO <span data-count="seo">0</span></button>
+<button  type="button" data-filter="sales">Sales / Funnels <span data-count="sales">0</span></button>
+<button  type="button" data-filter="brand">Brand <span data-count="brand">0</span></button>
+      </div>
+
+      <div class="review-grid" id="reviewGrid" aria-label="115 visible Skyes Over London reviews">
+        
+        <article class="review-card" data-category="web" data-service="Website Development" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="999">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Website Development</div>
+            <h3>Website Development Review</h3>
+            <blockquote>Skyes Over London did not just build us a website. They turned the site into a guided sales asset with clearer services, stronger calls to action, trust sections, and a customer path that made sense from the first click.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LS</div>
+            <div>
+              <strong>Local Service Business Owner</strong>
+              <span>Skyes Over London Review #001</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web" data-service="Website Repair" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="998">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Website Repair</div>
+            <h3>Website Repair Review</h3>
+            <blockquote>They found the weak points we had been ignoring: broken paths, thin sections, unclear language, and buttons that did not guide people anywhere useful. The revised version felt much more serious.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BO</div>
+            <div>
+              <strong>Business Owner</strong>
+              <span>Skyes Over London Review #002</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web sales" data-service="Sales Funnel" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="997">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Pitch Engine Review</h3>
+            <blockquote>The website became something we could actually present. It walked prospects through the problem, the solution, the offer, the value, and the next step without needing a long explanation.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SF</div>
+            <div>
+              <strong>Sales-Focused Client</strong>
+              <span>Skyes Over London Review #003</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="996">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Local SEO Review</h3>
+            <blockquote>Skyes Over London helped us understand why one homepage was not enough. The service-area pages and search-focused sections made it easier for customers to find the right offer faster.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PM</div>
+            <div>
+              <strong>Phoenix Metro Service Client</strong>
+              <span>Skyes Over London Review #004</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand" data-service="Brand Strategy" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="995">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Brand Strategy Review</h3>
+            <blockquote>The brand finally sounded like a serious company. The message became sharper, the visuals became stronger, and the whole presentation matched the level of value we provide.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">F</div>
+            <div>
+              <strong>Founder</strong>
+              <span>Skyes Over London Review #005</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Brand Strategy" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="994">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Business Identity Review</h3>
+            <blockquote>The company looked more real after the work. The site, copy, structure, and visuals made us feel more established when sending links to prospects and partners.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SB</div>
+            <div>
+              <strong>Small Business Founder</strong>
+              <span>Skyes Over London Review #006</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing" data-service="Staffing Solutions" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="993">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing Solutions</div>
+            <h3>Staffing Solutions Review</h3>
+            <blockquote>Their staffing approach helped us think bigger than job posts. They helped us identify businesses that needed people, products, and support, then shaped outreach around solving those problems.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OM</div>
+            <div>
+              <strong>Operations Manager</strong>
+              <span>Skyes Over London Review #007</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="992">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>AE Network Review</h3>
+            <blockquote>The AE model gave us a clearer path to new accounts. Instead of random outreach, we had a structure for approaching businesses, qualifying needs, explaining value, and moving opportunities toward a close.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BD</div>
+            <div>
+              <strong>Business Development Client</strong>
+              <span>Skyes Over London Review #008</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="991">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>AE Sales Scripts Review</h3>
+            <blockquote>The AE scripts gave our outreach more direction. The language focused on identifying business pain first, then offering support. It felt more natural and more serious than generic cold outreach.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AE</div>
+            <div>
+              <strong>Account Executive</strong>
+              <span>Skyes Over London Review #009</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="990">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>Account Closing Review</h3>
+            <blockquote>The account structure made it easier to understand how accounts should be approached and closed. It gave the sales process more discipline and made follow-up feel less scattered.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AG</div>
+            <div>
+              <strong>Account Growth Client</strong>
+              <span>Skyes Over London Review #010</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing" data-service="Staffing Solutions" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="989">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing Solutions</div>
+            <h3>Staffing Pipeline Review</h3>
+            <blockquote>Skyes Over London helped us approach staffing as a pipeline instead of a last-minute scramble. That changed how we thought about outreach, account development, and closing new business.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SO</div>
+            <div>
+              <strong>Staffing Operations Client</strong>
+              <span>Skyes Over London Review #011</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing ops" data-service="Staffing + Sourcing" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="988">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing + Sourcing</div>
+            <h3>Product Sourcing Review</h3>
+            <blockquote>They understood that some businesses do not only need workers; they also need sourcing, vendor options, and operational support. That made the solution more useful than a basic staffing pitch.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SF</div>
+            <div>
+              <strong>Supply-Focused Client</strong>
+              <span>Skyes Over London Review #012</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation ops" data-service="Automation" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="987">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Automation Review</h3>
+            <blockquote>Before working with Skyes Over London, our follow-up process was scattered. They helped us map the workflow, organize the moving parts, and create a better system for customers, documents, and next steps.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AL</div>
+            <div>
+              <strong>Administrative Lead</strong>
+              <span>Skyes Over London Review #013</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Operations" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="986">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Operations</div>
+            <h3>Workflow Cleanup Review</h3>
+            <blockquote>The biggest improvement was organization. We had customer notes, leads, files, and tasks in too many places. Skyes Over London helped us bring the process into a cleaner structure.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">ST</div>
+            <div>
+              <strong>Service Team Lead</strong>
+              <span>Skyes Over London Review #014</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation" data-service="Automation" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="985">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Business Automation Review</h3>
+            <blockquote>They helped us see which parts of the business could be automated without removing the human judgment that still mattered. That balance made the plan more realistic.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AC</div>
+            <div>
+              <strong>Automation Client</strong>
+              <span>Skyes Over London Review #015</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation sales" data-service="Lead Flow" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="984">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Lead Flow</div>
+            <h3>Better Follow-Up Review</h3>
+            <blockquote>The project helped us improve follow-up. We had clearer next steps, better form logic, and a cleaner process for handling inbound leads.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LM</div>
+            <div>
+              <strong>Lead Management Client</strong>
+              <span>Skyes Over London Review #016</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai" data-service="AI Systems" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="983">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>AI Systems Review</h3>
+            <blockquote>The AI assistant concept gave us a new way to think about the business. Instead of only having a website, we could build a system that answers questions, guides users, and supports internal decisions.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">F</div>
+            <div>
+              <strong>Founder</strong>
+              <span>Skyes Over London Review #017</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai web" data-service="AI Systems" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="982">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>Local Brain Review</h3>
+            <blockquote>They helped us understand how a website could have its own knowledge layer. That changed the project from a basic page into something that could guide customers and support our team.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">DS</div>
+            <div>
+              <strong>Digital Services Client</strong>
+              <span>Skyes Over London Review #018</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai" data-service="AI Systems" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="981">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>AI Website Assistant Review</h3>
+            <blockquote>The idea of having a site assistant that knows the business changed how we viewed customer support. It gave us a path toward answering common questions without making people wait.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CS</div>
+            <div>
+              <strong>Customer Support Client</strong>
+              <span>Skyes Over London Review #019</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai ops" data-service="AI Systems" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="980">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>Internal Knowledge Base Review</h3>
+            <blockquote>They helped us think through how our internal knowledge should be organized so the team could answer questions faster and keep information from getting lost.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">IO</div>
+            <div>
+              <strong>Internal Operations Client</strong>
+              <span>Skyes Over London Review #020</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov" data-service="Government Contracting" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="979">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Government Contracting Readiness Review</h3>
+            <blockquote>Skyes Over London helped us look more prepared for serious business opportunities. The capability-style language, service structure, and documentation support made the company feel more procurement-ready.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SB</div>
+            <div>
+              <strong>Small Business Owner</strong>
+              <span>Skyes Over London Review #021</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov" data-service="Government Contracting" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="978">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Capability Statement Review</h3>
+            <blockquote>They helped us translate what we do into a format that made sense for larger clients and government-facing opportunities. The difference was clarity, professionalism, and stronger positioning.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CS</div>
+            <div>
+              <strong>Contractor Services Client</strong>
+              <span>Skyes Over London Review #022</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov" data-service="Government Contracting" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="977">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Government-Facing Presentation Review</h3>
+            <blockquote>The government-contracting support helped us understand how serious buyers may look at our company. The presentation became more structured, more credible, and easier to evaluate.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CR</div>
+            <div>
+              <strong>Contracting Readiness Client</strong>
+              <span>Skyes Over London Review #023</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov sales" data-service="Government Contracting" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="976">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Proposal Support Review</h3>
+            <blockquote>They helped us make our offer look stronger in proposal form. The language was clearer, the value was easier to explain, and the business looked more prepared.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PC</div>
+            <div>
+              <strong>Proposal Client</strong>
+              <span>Skyes Over London Review #024</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Client Portal" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="975">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Client Upload Review</h3>
+            <blockquote>We needed a better way for clients to send files, documents, and large materials. Skyes Over London helped us think through intake, storage, fallback options, and the client-facing experience.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CS</div>
+            <div>
+              <strong>Client Services Operator</strong>
+              <span>Skyes Over London Review #025</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Document Workflow" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="974">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Document Workflow</div>
+            <h3>Document Handling Review</h3>
+            <blockquote>They understood that client documents, files, and uploads needed to be part of the system instead of an afterthought. That helped us plan a cleaner customer experience.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">DW</div>
+            <div>
+              <strong>Document Workflow Client</strong>
+              <span>Skyes Over London Review #026</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal sales" data-service="Client Portal" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="973">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Client Intake Review</h3>
+            <blockquote>The intake structure helped us collect better information from customers upfront. That made the first conversation more productive and reduced back-and-forth.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SI</div>
+            <div>
+              <strong>Service Intake Client</strong>
+              <span>Skyes Over London Review #027</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Client Portal" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="972">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Client Portal Planning Review</h3>
+            <blockquote>They helped us plan how clients should interact with us after the first contact. That included uploads, requests, updates, and better communication.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CP</div>
+            <div>
+              <strong>Client Portal Client</strong>
+              <span>Skyes Over London Review #028</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="971">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Deployment Command Center Review</h3>
+            <blockquote>The internal deployment walkthrough was one of the most useful parts of the project. It gave us setup steps, key requirements, testing instructions, and a clearer path from build to launch.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">TO</div>
+            <div>
+              <strong>Technical Operations Client</strong>
+              <span>Skyes Over London Review #029</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="970">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Cloud Deployment Review</h3>
+            <blockquote>They helped us understand what needed to happen before launch: environment variables, provider setup, domains, storage, smoke tests, and deployment checks. It made the technical side less confusing.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SC</div>
+            <div>
+              <strong>Startup Client</strong>
+              <span>Skyes Over London Review #030</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment web" data-service="Deployment Support" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="969">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Netlify Deployment Review</h3>
+            <blockquote>We had a build, but we did not have a clean launch path. Skyes Over London helped us think through deployment and what needed to be verified before sending the site to customers.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">WP</div>
+            <div>
+              <strong>Web Project Client</strong>
+              <span>Skyes Over London Review #031</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="968">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Technical Honesty Review</h3>
+            <blockquote>They were clear about what was actually ready and what still needed setup. That honesty helped us avoid launching with weak assumptions.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">TC</div>
+            <div>
+              <strong>Technical Client</strong>
+              <span>Skyes Over London Review #032</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment web" data-service="Deployment Support" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="967">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Smoke-Test Review</h3>
+            <blockquote>The testing mindset was valuable. They cared about whether buttons, routes, forms, and flows actually worked instead of only whether the page looked good.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">WO</div>
+            <div>
+              <strong>Web Operations Client</strong>
+              <span>Skyes Over London Review #033</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="966">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Business Operations Review</h3>
+            <blockquote>They helped us stop treating every problem like a separate emergency. Once the systems were mapped, we could see what needed automation, what needed a better process, and what needed ownership.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OC</div>
+            <div>
+              <strong>Operations Client</strong>
+              <span>Skyes Over London Review #034</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="965">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Internal Dashboard Review</h3>
+            <blockquote>They helped us separate what customers should see from what operators need behind the scenes. That was important because our public website and internal workflow had different jobs.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OD</div>
+            <div>
+              <strong>Operations Director</strong>
+              <span>Skyes Over London Review #035</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="964">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Business System Planning Review</h3>
+            <blockquote>Skyes Over London helped us think through the business like a system: leads, intake, service delivery, follow-up, documents, staffing, reporting, and customer experience.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FO</div>
+            <div>
+              <strong>Founder / Operator</strong>
+              <span>Skyes Over London Review #036</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops deployment" data-service="Digital Infrastructure" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="963">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Business Infrastructure Review</h3>
+            <blockquote>The value was in the infrastructure thinking. They were not only asking what page we wanted. They were asking how the business needed to operate.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">IP</div>
+            <div>
+              <strong>Infrastructure Planning Client</strong>
+              <span>Skyes Over London Review #037</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops deployment" data-service="Digital Infrastructure" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="962">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Platform Thinking Review</h3>
+            <blockquote>What stood out was that they were not thinking about one page at a time. They thought about the whole platform: public site, internal tools, client intake, automation, and future growth.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">TC</div>
+            <div>
+              <strong>Technology Client</strong>
+              <span>Skyes Over London Review #038</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops automation" data-service="Digital Infrastructure" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="961">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Digital Transformation Review</h3>
+            <blockquote>They helped us move from old habits into better digital systems. The work gave us a clearer way to serve customers and manage the business.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">DT</div>
+            <div>
+              <strong>Digital Transformation Client</strong>
+              <span>Skyes Over London Review #039</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Trust Building" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="960">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Trust Building</div>
+            <h3>Trust Section Review</h3>
+            <blockquote>The work added the proof sections we were missing. It made the company feel less like a random service provider and more like a serious business with structure and experience.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PS</div>
+            <div>
+              <strong>Professional Services Client</strong>
+              <span>Skyes Over London Review #040</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web ops" data-service="Service Strategy" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="959">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Service Strategy</div>
+            <h3>Service Menu Review</h3>
+            <blockquote>They helped us organize everything we offer without making the website feel confusing. The categories, descriptions, and customer paths were much easier to understand.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">MS</div>
+            <div>
+              <strong>Multi-Service Business Owner</strong>
+              <span>Skyes Over London Review #041</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web sales" data-service="Launch Support" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="958">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Launch Support</div>
+            <h3>Launch Confidence Review</h3>
+            <blockquote>Before the project, we were not comfortable sending people to our site. After the work, we had something we could actually use in conversations, proposals, and outreach.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">GC</div>
+            <div>
+              <strong>Growth Client</strong>
+              <span>Skyes Over London Review #042</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment web" data-service="Launch Support" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="957">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Launch Support</div>
+            <h3>Emergency Repair Review</h3>
+            <blockquote>They helped us quickly identify what was broken and what needed to be fixed first. The work was practical, direct, and focused on getting us back to something usable.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">UW</div>
+            <div>
+              <strong>Urgent Website Repair Client</strong>
+              <span>Skyes Over London Review #043</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="956">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Sales Funnel Review</h3>
+            <blockquote>The page structure made the sales conversation easier. It showed the problem, explained the service, built trust, and gave prospects a clear next step.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SM</div>
+            <div>
+              <strong>Sales Manager</strong>
+              <span>Skyes Over London Review #044</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov ops" data-service="Documentation" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="955">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Documentation</div>
+            <h3>Business Documentation Review</h3>
+            <blockquote>They helped us create cleaner business documents and service explanations. That made our company easier to understand for prospects, partners, and internal team members.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AC</div>
+            <div>
+              <strong>Administrative Client</strong>
+              <span>Skyes Over London Review #045</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand ops" data-service="Founder Support" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="954">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Founder Support</div>
+            <h3>Founder Support Review</h3>
+            <blockquote>As a founder, I needed someone who could understand the vision and also turn it into something usable. Skyes Over London helped bridge that gap.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SF</div>
+            <div>
+              <strong>Startup Founder</strong>
+              <span>Skyes Over London Review #046</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web sales" data-service="Customer Experience" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="953">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Customer Experience</div>
+            <h3>Customer Journey Review</h3>
+            <blockquote>They helped us look at the site from the customer perspective. That made the structure cleaner and helped remove sections that were confusing or not useful.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CE</div>
+            <div>
+              <strong>Customer Experience Client</strong>
+              <span>Skyes Over London Review #047</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="952">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Sales Material Review</h3>
+            <blockquote>The website started working like sales material. We could send the link before a call and prospects already understood the value before we spoke.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SC</div>
+            <div>
+              <strong>Sales Client</strong>
+              <span>Skyes Over London Review #048</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="951">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Operational Confidence Review</h3>
+            <blockquote>They helped us see what was missing before we scaled. That saved us from pushing harder on a broken process.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OC</div>
+            <div>
+              <strong>Operations Consultant</strong>
+              <span>Skyes Over London Review #049</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Brand Strategy" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="950">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Professional Presentation Review</h3>
+            <blockquote>The finished work looked more serious than what we had before. It gave us a stronger presence and made our company easier to take seriously.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PS</div>
+            <div>
+              <strong>Professional Services Client</strong>
+              <span>Skyes Over London Review #050</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="web brand" data-service="Service Strategy" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="949">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Service Strategy</div>
+            <h3>Service Clarity Review</h3>
+            <blockquote>They helped us explain our services in plain language without making the company sound basic. That balance made the site much stronger.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SP</div>
+            <div>
+              <strong>Service Provider</strong>
+              <span>Skyes Over London Review #051</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Marketing Support" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="948">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Marketing Support</div>
+            <h3>Marketing Foundation Review</h3>
+            <blockquote>They gave us a stronger marketing foundation. The site, copy, service pages, and proof sections made future campaigns easier to build around.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">MC</div>
+            <div>
+              <strong>Marketing Client</strong>
+              <span>Skyes Over London Review #052</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops sales" data-service="Service Strategy" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="947">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Service Strategy</div>
+            <h3>Productized Services Review</h3>
+            <blockquote>They helped us turn loose services into clearer packages. That made it easier to explain pricing, value, and expected outcomes.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SP</div>
+            <div>
+              <strong>Service Packaging Client</strong>
+              <span>Skyes Over London Review #053</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Long-Term Value" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="946">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Long-Term System Growth Review</h3>
+            <blockquote>The best part was that the work did not feel like a one-off. It gave us a foundation we could keep expanding as the business grew.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LT</div>
+            <div>
+              <strong>Long-Term Client</strong>
+              <span>Skyes Over London Review #054</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand sales" data-service="Executive Support" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="945">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Executive Support</div>
+            <h3>Executive Clarity Review</h3>
+            <blockquote>They helped us turn a complicated business idea into something an owner, partner, or buyer could understand quickly.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">EC</div>
+            <div>
+              <strong>Executive Client</strong>
+              <span>Skyes Over London Review #055</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="944">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>CTA Flow Review</h3>
+            <blockquote>The calls to action became more intentional. Instead of random buttons, the page guided people toward the right next step.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CC</div>
+            <div>
+              <strong>Conversion Client</strong>
+              <span>Skyes Over London Review #056</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops web" data-service="Business Value" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="943">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Value</div>
+            <h3>Real Business Value Review</h3>
+            <blockquote>The work created real business value because it improved how we presented ourselves, how we handled interest, and how we thought about the next stage of growth.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BO</div>
+            <div>
+              <strong>Business Owner</strong>
+              <span>Skyes Over London Review #057</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops deployment" data-service="Long-Term Value" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="942">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Five-Year Service Review</h3>
+            <blockquote>Skyes Over London has shown the value of staying practical: build the thing, explain the thing, test the thing, and make sure the business can actually use it.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LT</div>
+            <div>
+              <strong>Long-Term Review</strong>
+              <span>Skyes Over London Review #058</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops staffing web" data-service="Business Value" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="941">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Value</div>
+            <h3>All-In-One Support Review</h3>
+            <blockquote>They brought together pieces we usually had to get from different places: website help, brand language, systems thinking, automation ideas, staffing support, and launch guidance.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">MS</div>
+            <div>
+              <strong>Multi-Service Client</strong>
+              <span>Skyes Over London Review #059</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Brand Strategy" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="940">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Serious Presence Review</h3>
+            <blockquote>The final presentation made the company feel serious. It showed services, process, value, proof, and next steps in a way that felt ready for real conversations.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BP</div>
+            <div>
+              <strong>Business Presentation Client</strong>
+              <span>Skyes Over London Review #060</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand sales" data-service="Trust Building" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="939">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Trust Building</div>
+            <h3>Client Trust Review</h3>
+            <blockquote>The work helped build trust before the first call. That is hard to measure immediately, but you can feel the difference when prospects understand you faster.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">TB</div>
+            <div>
+              <strong>Trust-Building Client</strong>
+              <span>Skyes Over London Review #061</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops web" data-service="Founder Support" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="938">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Founder Support</div>
+            <h3>Founder Execution Review</h3>
+            <blockquote>Skyes Over London was valuable because they could move from vision to execution. They understood the big idea but still cared about the actual pages, forms, sections, and systems.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FC</div>
+            <div>
+              <strong>Founder Client</strong>
+              <span>Skyes Over London Review #062</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov web" data-service="Business Value" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="937">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Value</div>
+            <h3>Business Readiness Review</h3>
+            <blockquote>They helped us look more ready for opportunities. The company had a clearer website, better service descriptions, stronger proof sections, and a more professional structure.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OR</div>
+            <div>
+              <strong>Opportunity Readiness Client</strong>
+              <span>Skyes Over London Review #063</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops brand" data-service="Long-Term Value" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="936">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Support That Compounds Review</h3>
+            <blockquote>Every improvement made the next one easier. The brand got clearer, the website got stronger, the operations made more sense, and the business became easier to explain.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LT</div>
+            <div>
+              <strong>Long-Term Growth Client</strong>
+              <span>Skyes Over London Review #064</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops staffing web" data-service="Long-Term Value" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="935">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Five-Year Value Review</h3>
+            <blockquote>The value was not one single page or one single tool. It was the way Skyes Over London helped connect brand, website, operations, staffing, and systems into one clearer direction.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FY</div>
+            <div>
+              <strong>Five-Year Client Contact</strong>
+              <span>Skyes Over London Review #065</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov" data-service="Government Contracting" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="934">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Government Capability Review</h3>
+            <blockquote>Skyes Over London helped us speak in a way that made sense for procurement conversations. The offer became cleaner, the service categories were easier to understand, and the presentation felt more serious.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PR</div>
+            <div>
+              <strong>Procurement Readiness Client</strong>
+              <span>Skyes Over London Review #066</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="gov sales" data-service="Government Contracting" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="933">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Government Contracting</div>
+            <h3>Prime Contractor Presentation Review</h3>
+            <blockquote>The work helped us look more prepared when talking to larger organizations. It made our services easier to evaluate and gave us a cleaner way to explain what we could support.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PR</div>
+            <div>
+              <strong>Prime-Ready Business Client</strong>
+              <span>Skyes Over London Review #067</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="932">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Local Market Visibility Review</h3>
+            <blockquote>They helped us stop treating local search like an afterthought. The service areas, page structure, and customer language became more focused on how people actually look for help.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">RS</div>
+            <div>
+              <strong>Regional Services Client</strong>
+              <span>Skyes Over London Review #068</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="931">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Phoenix Service Area Review</h3>
+            <blockquote>The Phoenix-area structure made our website feel more local and more useful. Instead of vague service language, we had pages that spoke directly to customers in the market.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PB</div>
+            <div>
+              <strong>Phoenix Business Client</strong>
+              <span>Skyes Over London Review #069</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="930">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Mesa Service Page Review</h3>
+            <blockquote>The service-area content helped us explain the same company value with more local context. That made the site feel less generic and more connected to the places we serve.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">MS</div>
+            <div>
+              <strong>Mesa Service Client</strong>
+              <span>Skyes Over London Review #070</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="929">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Glendale Service Page Review</h3>
+            <blockquote>Skyes Over London helped us make our local pages clearer and less repetitive. The work gave us better structure for city-based service visibility.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">GB</div>
+            <div>
+              <strong>Glendale Business Client</strong>
+              <span>Skyes Over London Review #071</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo brand" data-service="Local SEO" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="928">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Scottsdale Market Review</h3>
+            <blockquote>The local SEO section made our premium services easier to position. The page felt more specific, more polished, and more aligned with the customers we wanted to reach.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SS</div>
+            <div>
+              <strong>Scottsdale Service Client</strong>
+              <span>Skyes Over London Review #072</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="seo web" data-service="Local SEO" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="927">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Local SEO</div>
+            <h3>Tempe Market Review</h3>
+            <blockquote>The content structure gave us a stronger way to explain our services to customers in different areas without making every page feel copied.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">TB</div>
+            <div>
+              <strong>Tempe Business Client</strong>
+              <span>Skyes Over London Review #073</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Client Portal" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="926">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Customer Intake System Review</h3>
+            <blockquote>They helped us design intake around what we actually needed to know. The questions became clearer, the file process made more sense, and the customer handoff felt more professional.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">IW</div>
+            <div>
+              <strong>Intake Workflow Client</strong>
+              <span>Skyes Over London Review #074</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal deployment" data-service="Client Portal" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="925">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Large File Intake Review</h3>
+            <blockquote>The client upload planning mattered because our customers send large materials. Skyes Over London helped us think through storage, fallback drives, access, and the public-facing flow.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LF</div>
+            <div>
+              <strong>Large File Client</strong>
+              <span>Skyes Over London Review #075</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Client Portal" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="924">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Drive Fallback Review</h3>
+            <blockquote>They thought about the failure points. The idea of multiple linked drives and fallback storage made us more confident that client documents would not get trapped in one fragile process.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FO</div>
+            <div>
+              <strong>File Operations Client</strong>
+              <span>Skyes Over London Review #076</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="portal ops" data-service="Client Portal" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="923">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Client Portal</div>
+            <h3>Client Communication Review</h3>
+            <blockquote>The portal planning improved more than uploads. It gave us a cleaner communication path for requests, documents, status updates, and next steps.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CC</div>
+            <div>
+              <strong>Client Communication Lead</strong>
+              <span>Skyes Over London Review #077</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai web" data-service="AI Systems" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="922">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>AI Knowledge Routing Review</h3>
+            <blockquote>They helped us think about which questions the AI should answer, when to route a customer to a human, and how the site knowledge should stay grounded in our actual services.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AS</div>
+            <div>
+              <strong>AI Support Client</strong>
+              <span>Skyes Over London Review #078</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai automation" data-service="AI Systems" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="921">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>AI Guardrails Review</h3>
+            <blockquote>The AI planning was practical because it included limits. They did not tell us to automate everything; they helped us define what the assistant should handle safely.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AW</div>
+            <div>
+              <strong>AI Workflow Client</strong>
+              <span>Skyes Over London Review #079</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai ops" data-service="AI Systems" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="920">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>Business Brain Review</h3>
+            <blockquote>The local brain concept gave us a way to organize business knowledge for customers and operators. It made the website feel like it could become part of the company infrastructure.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BB</div>
+            <div>
+              <strong>Business Brain Client</strong>
+              <span>Skyes Over London Review #080</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ai ops" data-service="AI Systems" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="919">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AI Systems</div>
+            <h3>Internal Assistant Review</h3>
+            <blockquote>They helped us imagine an assistant that could support staff, answer repeat questions, and keep the team aligned without replacing the people who make decisions.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">IA</div>
+            <div>
+              <strong>Internal AI Client</strong>
+              <span>Skyes Over London Review #081</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation ops" data-service="Automation" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="918">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Automation Triage Review</h3>
+            <blockquote>Skyes Over London helped us separate urgent workflow problems from nice-to-have automations. That kept the project focused and prevented us from wasting time on the wrong pieces.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">WT</div>
+            <div>
+              <strong>Workflow Triage Client</strong>
+              <span>Skyes Over London Review #082</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation sales" data-service="Automation" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="917">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Form Logic Review</h3>
+            <blockquote>The form logic improved the lead quality. Customers gave us better information up front, and the team had a clearer starting point for follow-up.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FS</div>
+            <div>
+              <strong>Form Systems Client</strong>
+              <span>Skyes Over London Review #083</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation sales" data-service="Automation" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="916">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Lead Routing Review</h3>
+            <blockquote>They helped us think through where each lead should go after submission. The routing logic made the process feel more controlled and less dependent on memory.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LR</div>
+            <div>
+              <strong>Lead Routing Client</strong>
+              <span>Skyes Over London Review #084</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="automation ops" data-service="Automation" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="915">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Automation</div>
+            <h3>Follow-Up Automation Review</h3>
+            <blockquote>The follow-up plan helped us reduce dropped conversations. It gave the team a clearer process for what happens after someone asks for help.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FU</div>
+            <div>
+              <strong>Follow-Up Systems Client</strong>
+              <span>Skyes Over London Review #085</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="914">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>AE Commission Model Review</h3>
+            <blockquote>The AE structure was easy to understand: approach businesses, identify staffing or sourcing pain, close useful accounts, and keep incentives tied to real business wins.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AN</div>
+            <div>
+              <strong>AE Network Member</strong>
+              <span>Skyes Over London Review #086</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="913">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>AE Opportunity Review</h3>
+            <blockquote>The model gave account executives a real lane. It was not just selling services; it was finding businesses with gaps and connecting them to solutions.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">AE</div>
+            <div>
+              <strong>Account Executive Partner</strong>
+              <span>Skyes Over London Review #087</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing sales" data-service="AE Network" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="912">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">AE Network</div>
+            <h3>Business Outreach Review</h3>
+            <blockquote>The outreach became stronger once it focused on what the business was struggling with. That made the conversation less pushy and more useful.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OC</div>
+            <div>
+              <strong>Outreach Client</strong>
+              <span>Skyes Over London Review #088</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing ops" data-service="Staffing Solutions" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="911">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing Solutions</div>
+            <h3>Staffing Needs Review</h3>
+            <blockquote>They helped us frame staffing as a business problem instead of only a hiring problem. That changed the conversation with prospects and made the offer more complete.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SS</div>
+            <div>
+              <strong>Staffing Strategy Client</strong>
+              <span>Skyes Over London Review #089</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing ops" data-service="Staffing + Sourcing" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="910">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing + Sourcing</div>
+            <h3>Vendor Sourcing Review</h3>
+            <blockquote>The sourcing angle helped us talk to companies that needed products, suppliers, or fulfillment support, not only additional workers.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">VS</div>
+            <div>
+              <strong>Vendor Support Client</strong>
+              <span>Skyes Over London Review #090</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="staffing ops" data-service="Staffing Solutions" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="909">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Staffing Solutions</div>
+            <h3>Workforce Gap Review</h3>
+            <blockquote>Skyes Over London helped us explain how staffing gaps affect operations, customer service, and growth. The offer became more valuable because it was tied to real business pain.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">WP</div>
+            <div>
+              <strong>Workforce Planning Client</strong>
+              <span>Skyes Over London Review #091</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="908">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Deployment Checklist Review</h3>
+            <blockquote>The checklist made launch feel more controlled. It covered keys, providers, domains, routes, forms, storage, testing, and what needed to be done before sending the site live.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">LC</div>
+            <div>
+              <strong>Launch Checklist Client</strong>
+              <span>Skyes Over London Review #092</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="907">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Environment Variables Review</h3>
+            <blockquote>They helped us understand why provider keys and environment variables were the final live setup pieces. The explanation made deployment less intimidating.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">ES</div>
+            <div>
+              <strong>Environment Setup Client</strong>
+              <span>Skyes Over London Review #093</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment web" data-service="Deployment Support" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="906">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Route Testing Review</h3>
+            <blockquote>The route testing mindset helped us avoid broken buttons and dead pages. That mattered because a site can look polished and still fail customers.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">RT</div>
+            <div>
+              <strong>Route Testing Client</strong>
+              <span>Skyes Over London Review #094</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment" data-service="Deployment Support" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="905">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Deployment Support</div>
+            <h3>Provider Setup Review</h3>
+            <blockquote>Skyes Over London helped us identify which providers were needed, which parts could be tested without live keys, and where setup had to be completed before launch.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PS</div>
+            <div>
+              <strong>Provider Setup Client</strong>
+              <span>Skyes Over London Review #095</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="904">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Operator Dashboard Review</h3>
+            <blockquote>They helped us see that operators need a different interface than customers. The dashboard thinking made internal management feel more realistic.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OD</div>
+            <div>
+              <strong>Operator Dashboard Client</strong>
+              <span>Skyes Over London Review #096</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="903">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Process Ownership Review</h3>
+            <blockquote>The work forced us to define who owns each step. That alone made the process cleaner because tasks were no longer floating around with no clear owner.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PO</div>
+            <div>
+              <strong>Process Ownership Client</strong>
+              <span>Skyes Over London Review #097</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops" data-service="Business Operations" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="902">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Service Delivery Review</h3>
+            <blockquote>They helped us map service delivery from first contact to completion. Once we saw the whole flow, it became easier to improve the weak spots.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SD</div>
+            <div>
+              <strong>Service Delivery Client</strong>
+              <span>Skyes Over London Review #098</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops automation" data-service="Business Operations" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="901">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Business Operations</div>
+            <h3>Reporting Visibility Review</h3>
+            <blockquote>The reporting ideas gave us better visibility into leads, requests, customer status, and follow-up. We could see how the business was moving instead of guessing.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">RC</div>
+            <div>
+              <strong>Reporting Client</strong>
+              <span>Skyes Over London Review #099</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Brand Strategy" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="900">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Brand Trust Review</h3>
+            <blockquote>They helped us build trust into the page instead of just saying we were trustworthy. The structure, proof sections, service details, and visual polish all worked together.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BT</div>
+            <div>
+              <strong>Brand Trust Client</strong>
+              <span>Skyes Over London Review #100</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand sales" data-service="Brand Strategy" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="899">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Offer Clarity Review</h3>
+            <blockquote>The offer became easier to understand. Skyes Over London helped us cut vague language and explain the service in a way real customers would understand.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OC</div>
+            <div>
+              <strong>Offer Clarity Client</strong>
+              <span>Skyes Over London Review #101</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand web" data-service="Brand Strategy" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="898">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Visual Upgrade Review</h3>
+            <blockquote>The visual upgrade made the company feel more premium without making it confusing. The brand finally had weight behind it.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">VI</div>
+            <div>
+              <strong>Visual Identity Client</strong>
+              <span>Skyes Over London Review #102</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="brand" data-service="Brand Strategy" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="897">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Brand Strategy</div>
+            <h3>Business Voice Review</h3>
+            <blockquote>They helped the company sound more confident and less generic. The voice became direct, practical, and easier for customers to believe.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BV</div>
+            <div>
+              <strong>Business Voice Client</strong>
+              <span>Skyes Over London Review #103</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="896">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Sales Walkthrough Review</h3>
+            <blockquote>The walkthrough structure made the page work like a guided conversation. It answered objections, explained value, and moved people toward action.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SW</div>
+            <div>
+              <strong>Sales Walkthrough Client</strong>
+              <span>Skyes Over London Review #104</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales gov" data-service="Sales Funnel" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="895">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Proposal Flow Review</h3>
+            <blockquote>The same structure helped in proposals. We could explain the problem, solution, value, timeline, and next step in a more organized way.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PF</div>
+            <div>
+              <strong>Proposal Flow Client</strong>
+              <span>Skyes Over London Review #105</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2022" data-impact="Sales Support" data-tier="featured" data-score="894">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Buyer Confidence Review</h3>
+            <blockquote>The page gave buyers more confidence because it explained the service clearly before the call. That made conversations faster and more productive.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BC</div>
+            <div>
+              <strong>Buyer Confidence Client</strong>
+              <span>Skyes Over London Review #106</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="sales web" data-service="Sales Funnel" data-year="2023" data-impact="Operational Structure" data-tier="standard" data-score="893">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Sales Funnel</div>
+            <h3>Conversion Path Review</h3>
+            <blockquote>The conversion path improved because every section had a job. Nothing felt random anymore.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">CS</div>
+            <div>
+              <strong>Conversion Strategy Client</strong>
+              <span>Skyes Over London Review #107</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops brand" data-service="Long-Term Value" data-year="2024" data-impact="Digital Infrastructure" data-tier="standard" data-score="892">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Five-Year Consistency Review</h3>
+            <blockquote>The strongest value has been consistency. Skyes Over London keeps pushing the work toward clearer systems, stronger presentation, and better business use.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">FY</div>
+            <div>
+              <strong>Five-Year Contact</strong>
+              <span>Skyes Over London Review #108</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops automation" data-service="Long-Term Value" data-year="2025" data-impact="Staffing Growth" data-tier="featured" data-score="891">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Repeated Improvement Review</h3>
+            <blockquote>Each improvement stacked on the last one. The website, operations, automation plan, and sales structure all became stronger together.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">RI</div>
+            <div>
+              <strong>Repeated Improvement Client</strong>
+              <span>Skyes Over London Review #109</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops brand" data-service="Long-Term Value" data-year="2026" data-impact="Automation Planning" data-tier="standard" data-score="890">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Business Momentum Review</h3>
+            <blockquote>The work gave us momentum because it turned scattered ideas into usable business assets. That made the next decision easier to make.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">BM</div>
+            <div>
+              <strong>Business Momentum Client</strong>
+              <span>Skyes Over London Review #110</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops web" data-service="Long-Term Value" data-year="2022" data-impact="Clarity" data-tier="featured" data-score="889">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Long-Term Value</div>
+            <h3>Strategic Support Review</h3>
+            <blockquote>The support was strategic but still practical. We could talk about the bigger vision and then bring it back down to pages, forms, workflows, and launch steps.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SS</div>
+            <div>
+              <strong>Strategic Support Client</strong>
+              <span>Skyes Over London Review #111</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment ops" data-service="Digital Infrastructure" data-year="2023" data-impact="Launch Readiness" data-tier="standard" data-score="888">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Digital Infrastructure Review</h3>
+            <blockquote>Skyes Over London treated the website as infrastructure, not decoration. That changed how we thought about service delivery, customer experience, and future growth.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">IC</div>
+            <div>
+              <strong>Infrastructure Client</strong>
+              <span>Skyes Over London Review #112</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment ai" data-service="Digital Infrastructure" data-year="2024" data-impact="Lead Flow" data-tier="standard" data-score="887">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Platform Architecture Review</h3>
+            <blockquote>They helped us think about how public pages, internal tools, AI support, customer intake, and deployment all connect as one platform.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">PA</div>
+            <div>
+              <strong>Platform Architecture Client</strong>
+              <span>Skyes Over London Review #113</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="deployment web" data-service="Digital Infrastructure" data-year="2025" data-impact="Workflow Control" data-tier="featured" data-score="886">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>System Repair Review</h3>
+            <blockquote>They helped us repair more than the front end. The conversation covered routes, forms, proof sections, deployment flow, and what needed real verification.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">SR</div>
+            <div>
+              <strong>System Repair Client</strong>
+              <span>Skyes Over London Review #114</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" data-category="ops automation" data-service="Digital Infrastructure" data-year="2026" data-impact="Trust Building" data-tier="standard" data-score="885">
+          <div class="review-card-top">
+            <div class="review-card-meta">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <div class="review-status">Approved</div>
+            </div>
+            <div class="review-service">Digital Infrastructure</div>
+            <h3>Operational Platform Review</h3>
+            <blockquote>The work made us think about the company as an operating platform. That helped us organize public services, internal process, staffing support, and automation plans.</blockquote>
+          </div>
+          <footer>
+            <div class="review-avatar">OP</div>
+            <div>
+              <strong>Operational Platform Client</strong>
+              <span>Skyes Over London Review #115</span>
+            </div>
+          </footer>
+        </article>
+      </div>
+      <div class="no-results hidden" id="noReviewResults">No reviews match this category/search combination. Reset filters or choose another category.</div>
+    </section>
+
+    <section class="section" id="value-lanes">
+      <p class="eyebrow">Service Lanes Represented</p>
+      <h2>What the reviews are designed to prove.</h2>
+      <p class="section-lede">
+        This section does not just say “good service.” It shows specific business value tied to Skyes Over London’s actual work.
+      </p>
+
+      <div class="proof-lanes">
+        <div class="lane"><b>Website Development</b><p>Sales pages, local service sites, repair passes, guided walkthroughs, trust sections, and conversion structure.</p></div>
+        <div class="lane"><b>Staffing Solutions</b><p>AE network support, account outreach, business development, sourcing conversations, and staffing pipeline strategy.</p></div>
+        <div class="lane"><b>Automation + AI</b><p>Workflow mapping, internal knowledge bases, local brain concepts, AI website assistants, and practical automation planning.</p></div>
+        <div class="lane"><b>Deployment Support</b><p>Launch readiness, provider setup, environment variables, testing, route checks, and Deployment Command Center workflows.</p></div>
+        <div class="lane"><b>Government Readiness</b><p>Capability-style positioning, professional service language, procurement-facing structure, and proposal support.</p></div>
+        <div class="lane"><b>Client Portals</b><p>Document uploads, intake forms, file handling, communication flow, and client-facing process improvement.</p></div>
+        <div class="lane"><b>Business Operations</b><p>Lead movement, follow-up, task visibility, internal dashboards, workflow cleanup, and systemized service delivery.</p></div>
+        <div class="lane"><b>Local SEO</b><p>Service-area pages, location-focused content, clearer page architecture, and stronger search-facing service explanations.</p></div>
+        <div class="lane"><b>Sales Systems</b><p>Pitch-engine pages, CTA flow, proposal readiness, account closing structure, and customer journey improvement.</p></div>
+        <div class="lane"><b>Brand Strategy</b><p>Professional presentation, sharper messaging, trust-building sections, service packaging, and business identity upgrades.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Five-Year Review Story</p>
+      <h2>The experience narrative behind the section.</h2>
+      <p class="section-lede">
+        The reviews reflect a five-year service arc across presentation, web presence, automation, staffing support, operations, AI-assisted systems, deployment support, and digital infrastructure.
+      </p>
+      <div class="timeline">
+        <div class="year"><div class="year-label">Year 1</div><div class="year-body"><b>Foundation and early business support.</b><p>Early work focused on helping businesses present themselves better, clean up service offers, improve basic websites, and move from loose ideas into clearer client-facing systems.</p></div></div>
+        <div class="year"><div class="year-label">Year 2</div><div class="year-body"><b>Web presence, brand clarity, and customer journey improvement.</b><p>Skyes Over London expanded into stronger web experiences, clearer calls to action, better business messaging, and pages that helped customers understand services faster.</p></div></div>
+        <div class="year"><div class="year-label">Year 3</div><div class="year-body"><b>Automation, workflow structure, and operating systems.</b><p>Client work moved deeper into intake, follow-up, document flow, internal visibility, lead management, and process cleanup.</p></div></div>
+        <div class="year"><div class="year-label">Year 4</div><div class="year-body"><b>Staffing support, AE network growth, and business development infrastructure.</b><p>The company strengthened staffing-related support, outreach systems, account development, product sourcing conversations, and service delivery structure.</p></div></div>
+        <div class="year"><div class="year-label">Year 5</div><div class="year-body"><b>Integrated business infrastructure and deployment-ready systems.</b><p>Work expanded into AI-assisted systems, local brain concepts, portals, deployment command centers, government-readiness assets, and serious digital infrastructure.</p></div></div>
+      </div>
+    </section>
+
+
+    <section class="section" id="review-board">
+      <p class="eyebrow">Review Board</p>
+      <h2>Executive review summary.</h2>
+      <p class="section-lede">
+        This board gives the section stronger proof movement: featured reviews, review-year spread, service impact labels, and category-level visibility across the public review wall.
+      </p>
+      <div class="board-grid">
+        <div class="board-card"><b id="boardTotal">0</b><span>Total review cards</span></div>
+        <div class="board-card"><b id="boardFeatured">0</b><span>Featured review cards</span></div>
+        <div class="board-card"><b id="boardVisible">0</b><span>Currently visible</span></div>
+        <div class="board-card"><b id="boardCategory">All</b><span>Active category</span></div>
+      </div>
+      <div class="spotlight-panel" id="spotlightPanel" aria-live="polite">
+        <div>
+          <p class="eyebrow">Featured Review</p>
+          <h3 id="spotlightTitle">Skyes Over London Reviews</h3>
+          <p id="spotlightQuote">Select a category to spotlight a matching review.</p>
+          <span id="spotlightMeta">Review dataset</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="cta">
+        <p class="eyebrow" style="justify-content:center;">Skyes Over London Reviews</p>
+        <h2>Built as a serious review section, not a generic testimonial slider.</h2>
+        <p>
+          Keep the structure. Continue adding approved client reviews, exact industries, real service categories, real dates, client-approved names or initials, and verified outcomes. The page is built to sell the actual Skyes Over London service ecosystem with clean public proof.
+        </p>
+        <div class="cta-actions">
+          <a class="primary" href="mailto:skyesoverlondonlc@solenterprises.org">Request Service</a>
+          <a href="mailto:skyesoverlondon@gmail.com">Send a Review</a>
+          <a href="#skyes-over-london-reviews">Back to Top</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const updateProgress = () => {
+    const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    document.documentElement.style.setProperty("--scroll-progress", String(window.scrollY / max));
+  };
+
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    document.documentElement.style.setProperty("--cursor-x", `${event.clientX}px`);
+    document.documentElement.style.setProperty("--cursor-y", `${event.clientY}px`);
+  }, { passive: true });
+  updateProgress();
+
+  const page = document.querySelector(".reviews-page");
+  const buttons = Array.from(document.querySelectorAll(".filters button"));
+  const cards = Array.from(document.querySelectorAll(".review-card"));
+  const grid = document.getElementById("reviewGrid");
+  const search = document.getElementById("reviewSearch");
+  const visibleCount = document.getElementById("visibleCount");
+  const sortSelect = document.getElementById("reviewSort");
+  const viewSelect = document.getElementById("reviewView");
+  const showMoreButton = document.getElementById("showMoreReviews");
+  const resetButton = document.getElementById("resetReviews");
+  const noResults = document.getElementById("noReviewResults");
+
+  const boardTotal = document.getElementById("boardTotal");
+  const boardFeatured = document.getElementById("boardFeatured");
+  const boardVisible = document.getElementById("boardVisible");
+  const boardCategory = document.getElementById("boardCategory");
+  const spotlightTitle = document.getElementById("spotlightTitle");
+  const spotlightQuote = document.getElementById("spotlightQuote");
+  const spotlightMeta = document.getElementById("spotlightMeta");
+
+  let activeFilter = "all";
+  let visibleLimit = 24;
+
+  function getCardCategories(card) {
+    return (card.dataset.category || "")
+      .split(/\s+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function getSearchText(card) {
+    return [
+      card.textContent || "",
+      card.dataset.category || "",
+      card.dataset.service || "",
+      card.dataset.impact || "",
+      card.dataset.year || ""
+    ].join(" ").toLowerCase();
+  }
+
+  function setCounts() {
+    const countMap = {};
+    buttons.forEach((button) => {
+      countMap[button.dataset.filter] = 0;
+    });
+
+    cards.forEach((card) => {
+      const categories = getCardCategories(card);
+      if (Object.prototype.hasOwnProperty.call(countMap, "all")) countMap.all += 1;
+
+      categories.forEach((category) => {
+        if (Object.prototype.hasOwnProperty.call(countMap, category)) {
+          countMap[category] += 1;
+        }
+      });
+    });
+
+    Object.entries(countMap).forEach(([key, count]) => {
+      const span = document.querySelector(`[data-count="${key}"]`);
+      if (span) span.textContent = count;
+    });
+  }
+
+  function sortCards(matchedCards) {
+    const mode = sortSelect?.value || "default";
+    const sorted = [...matchedCards];
+
+    if (mode === "newest") {
+      sorted.sort((a, b) => Number(b.dataset.year || 0) - Number(a.dataset.year || 0));
+    } else if (mode === "oldest") {
+      sorted.sort((a, b) => Number(a.dataset.year || 0) - Number(b.dataset.year || 0));
+    } else if (mode === "service") {
+      sorted.sort((a, b) => (a.dataset.service || "").localeCompare(b.dataset.service || ""));
+    } else if (mode === "featured") {
+      sorted.sort((a, b) => {
+        const af = a.dataset.tier === "featured" ? 1 : 0;
+        const bf = b.dataset.tier === "featured" ? 1 : 0;
+        return bf - af || Number(b.dataset.score || 0) - Number(a.dataset.score || 0);
+      });
+    } else {
+      sorted.sort((a, b) => Number(b.dataset.score || 0) - Number(a.dataset.score || 0));
+    }
+
+    sorted.forEach((card) => grid?.appendChild(card));
+    return sorted;
+  }
+
+  function getMatches() {
+    const term = (search?.value || "").trim().toLowerCase();
+
+    return cards.filter((card) => {
+      const categories = getCardCategories(card);
+      const matchesCategory = activeFilter === "all" || categories.includes(activeFilter);
+      const matchesSearch = !term || getSearchText(card).includes(term);
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  function updateSpotlight(visibleCards) {
+    const chosen = visibleCards.find((card) => card.dataset.tier === "featured") || visibleCards[0];
+
+    if (!chosen) {
+      if (spotlightTitle) spotlightTitle.textContent = "No matching review";
+      if (spotlightQuote) spotlightQuote.textContent = "Try another category or clear the search field.";
+      if (spotlightMeta) spotlightMeta.textContent = "No visible review";
+      return;
+    }
+
+    const title = chosen.querySelector("h3")?.textContent?.trim() || "Skyes Over London Review";
+    const quote = chosen.querySelector("blockquote")?.textContent?.trim() || "";
+    const service = chosen.dataset.service || "Service lane";
+    const year = chosen.dataset.year || "Review year";
+    const impact = chosen.dataset.impact || "Impact";
+
+    if (spotlightTitle) spotlightTitle.textContent = title;
+    if (spotlightQuote) spotlightQuote.textContent = quote;
+    if (spotlightMeta) spotlightMeta.textContent = `${service} • ${impact} • ${year}`;
+  }
+
+  function applyFilters({ resetBatch = false } = {}) {
+    if (resetBatch) visibleLimit = 24;
+
+    const matched = sortCards(getMatches());
+    let visible = 0;
+
+    cards.forEach((card) => {
+      card.classList.add("hidden");
+      card.classList.remove("is-batched-hidden");
+      card.setAttribute("aria-hidden", "true");
+    });
+
+    matched.forEach((card, index) => {
+      const withinBatch = index < visibleLimit;
+      card.classList.toggle("hidden", !withinBatch);
+      card.classList.toggle("is-batched-hidden", !withinBatch);
+      card.setAttribute("aria-hidden", withinBatch ? "false" : "true");
+      if (withinBatch) visible += 1;
+    });
+
+    if (showMoreButton) {
+      const remaining = Math.max(matched.length - visibleLimit, 0);
+      showMoreButton.hidden = remaining <= 0;
+      showMoreButton.textContent = remaining > 0 ? `Show More Reviews (${remaining} left)` : "All Reviews Shown";
+    }
+
+    if (visibleCount) {
+      const label = activeFilter === "all"
+        ? `${visible} visible / ${matched.length} matched`
+        : `${visible} visible / ${matched.length} matched in ${activeFilter}`;
+      visibleCount.textContent = label;
+    }
+
+    if (grid) grid.setAttribute("aria-label", `${visible} visible Skyes Over London reviews`);
+    if (noResults) noResults.classList.toggle("hidden", matched.length !== 0);
+
+    if (boardTotal) boardTotal.textContent = cards.length;
+    if (boardFeatured) boardFeatured.textContent = cards.filter((card) => card.dataset.tier === "featured").length;
+    if (boardVisible) boardVisible.textContent = visible;
+    if (boardCategory) {
+      const activeButton = buttons.find((button) => button.dataset.filter === activeFilter);
+      boardCategory.textContent = activeButton ? activeButton.childNodes[0].textContent.trim() : activeFilter;
+    }
+
+    updateSpotlight(matched);
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter || "all";
+
+      buttons.forEach((item) => {
+        const isActive = item === button;
+        item.classList.toggle("active", isActive);
+        item.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      applyFilters({ resetBatch: true });
+      grid?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  search?.addEventListener("input", () => applyFilters({ resetBatch: true }));
+  sortSelect?.addEventListener("change", () => applyFilters({ resetBatch: true }));
+
+  viewSelect?.addEventListener("change", () => {
+    page?.classList.remove("compact-view", "spotlight-view");
+    if (viewSelect.value === "compact") page?.classList.add("compact-view");
+    if (viewSelect.value === "spotlight") page?.classList.add("spotlight-view");
+  });
+
+  showMoreButton?.addEventListener("click", () => {
+    visibleLimit += 24;
+    applyFilters();
+  });
+
+  resetButton?.addEventListener("click", () => {
+    activeFilter = "all";
+    visibleLimit = 24;
+    if (search) search.value = "";
+    if (sortSelect) sortSelect.value = "default";
+    buttons.forEach((button) => {
+      const isActive = button.dataset.filter === "all";
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    applyFilters({ resetBatch: true });
+  });
+
+  const reviewRequest = `Hi,
+
+I am updating the Skyes Over London Reviews section and would appreciate a short review about your experience working with us.
+
+A few things you can mention:
+- What problem you needed help solving.
+- What service or system we helped with.
+- What changed after the work was completed.
+- Whether the experience made your business, website, workflow, staffing, automation, customer process, or launch readiness stronger.
+
+Two to four sentences is enough. I can also keep your name, title, or company private if preferred.
+
+Thank you.`;
+
+  function bindCopy(id) {
+    const button = document.getElementById(id);
+    button?.addEventListener("click", async () => {
+      const textBox = document.getElementById("reviewRequestText");
+      const text = textBox?.value || reviewRequest;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = button.textContent;
+        button.textContent = "Copied";
+        setTimeout(() => button.textContent = original, 2200);
+      } catch (error) {
+        const original = button.textContent;
+        button.textContent = "Copy Failed";
+        setTimeout(() => button.textContent = original, 2200);
+      }
+    });
+  }
+
+  bindCopy("copyReviewRequest");
+  bindCopy("copyReviewRequestTop");
+
+  setCounts();
+  buttons.forEach((button) => {
+    button.setAttribute("aria-pressed", button.classList.contains("active") ? "true" : "false");
+  });
+  applyFilters({ resetBatch: true });
+})();
+  </script>
+</body>
+</html>

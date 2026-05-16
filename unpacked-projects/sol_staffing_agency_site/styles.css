@@ -607,3 +607,65 @@ body {
     min-width: 0;
   }
 }
+
+/* MCP surface pass: service lanes must read top-to-bottom, not icon / heading / copy columns. */
+.service-ledger-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.35rem);
+}
+
+.service-ledger-stack .service-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: .9rem;
+  min-height: 15.5rem;
+  padding: clamp(1.25rem, 2.4vw, 1.8rem);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(99,215,255,.11), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+}
+
+.service-ledger-stack .service-card .icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(99,215,255,.32);
+  background: rgba(3,12,22,.72);
+  color: #dce7ff;
+  font-size: 1.2rem;
+}
+
+.service-ledger-stack .lane-copy {
+  display: grid;
+  gap: .65rem;
+  min-width: 0;
+}
+
+.service-ledger-stack .service-card h3 {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+  line-height: 1.06;
+}
+
+.service-ledger-stack .service-card p {
+  margin: 0;
+  max-width: 64ch;
+  color: #d6def7;
+  font-size: 1rem;
+  line-height: 1.68;
+}
+
+@media(max-width: 780px) {
+  .service-ledger-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .service-ledger-stack .service-card {
+    min-height: 0;
+  }
+}
