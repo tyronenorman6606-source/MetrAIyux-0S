@@ -1,0 +1,25 @@
+{
+  "name": "skygatefs27-citadeldb",
+  "version": "5.0.0-fs27-citadeldb-auth-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run validate:env && npm run sync:env-website",
+    "integrate:app": "node ./scripts/scaffold-app-into-skygate.mjs",
+    "smoke:proof": "node ./smoke/smoke-proof.mjs",
+    "verify:skins": "node ./scripts/verify-skins.mjs",
+    "validate:env": "node ./scripts/validate-env-ultimate.mjs",
+    "sync:env-website": "node ./scripts/sync-env-website.mjs",
+    "deploy:hook": "node ./scripts/trigger-netlify-build-hook.mjs",
+    "env:update": "npm run build && npm run deploy:hook",
+    "audit:consumers": "node ./scripts/audit-consumer-adoption.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "10.4.1",
+    "@netlify/neon": "0.1.2",
+    "@upstash/ratelimit": "2.0.8",
+    "@upstash/redis": "1.36.2",
+    "stripe": "20.3.1",
+    "yauzl": "2.10.0"
+  }
+}
