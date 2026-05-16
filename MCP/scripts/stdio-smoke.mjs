@@ -40,6 +40,7 @@ try {
   assert(resourceUris.includes('quantumskyes://design/no-frankenstein-policy'), 'no-frankenstein policy resource missing');
   assert(resourceUris.includes('quantumskyes://design/perfection-checklist'), 'perfection checklist resource missing');
   assert(resourceUris.includes('quantumskyes://design/advanced-stack'), 'advanced stack resource missing');
+  assert(resourceUris.includes('quantumskyes://design/stack-catalog'), 'advanced stack catalog resource missing');
   assert(resourceUris.includes('quantumskyes://design/open-source-stack'), 'open-source stack resource missing');
   assert(resourceUris.includes('quantumskyes://design/logo-standards'), 'logo standards resource missing');
   assert(resourceUris.includes('quantumskyes://design/surface-video-reel'), 'surface video reel resource missing');
@@ -93,6 +94,7 @@ try {
   assert(toolNames.includes('design_logo_audit'), 'design_logo_audit tool missing');
   assert(toolNames.includes('design_pattern_pack'), 'design_pattern_pack tool missing');
   assert(toolNames.includes('design_open_source_stack'), 'design_open_source_stack tool missing');
+  assert(toolNames.includes('design_stack_catalog'), 'design_stack_catalog tool missing');
   assert(toolNames.includes('design_recipe_plan'), 'design_recipe_plan tool missing');
 
   const elements = await client.callTool({
@@ -126,6 +128,15 @@ try {
   assert(patternText.includes('@react-three/fiber'), 'pattern pack did not include R3F dependency');
   assert(patternText.includes('EffectComposer'), 'pattern pack did not include postprocessing usage');
 
+  const chromePattern = await client.callTool({
+    name: 'design_pattern_pack',
+    arguments: { patternId: 'neon-motion-chrome' }
+  });
+  const chromePatternText = chromePattern.content.map((item) => item.text || '').join('\n');
+  assert(chromePatternText.includes('NeonMotionChrome.tsx'), 'pattern pack did not return neon motion chrome implementation');
+  assert(chromePatternText.includes('::-webkit-scrollbar'), 'neon motion chrome pattern should include custom scrollbar CSS');
+  assert(chromePatternText.includes('useScroll'), 'neon motion chrome pattern should include scroll progress motion');
+
   const recipe = await client.callTool({
     name: 'design_open_source_stack',
     arguments: { recipeId: 'framer-motion-interaction-system' }
@@ -134,17 +145,42 @@ try {
   assert(recipeText.includes('framer-motion'), 'open-source recipe did not return Framer Motion recipe');
   assert(recipeText.includes('useMotionValue'), 'open-source recipe did not include concrete Framer Motion import');
 
+  const stackCatalog = await client.callTool({
+    name: 'design_stack_catalog',
+    arguments: { category: '3d' }
+  });
+  const stackCatalogText = stackCatalog.content.map((item) => item.text || '').join('\n');
+  assert(stackCatalogText.includes('@react-three/fiber'), 'stack catalog should expose React Three Fiber');
+  assert(stackCatalogText.includes('@react-three/drei'), 'stack catalog should expose Drei');
+  assert(stackCatalogText.includes('@react-three/postprocessing'), 'stack catalog should expose postprocessing');
+
+  const motionCatalog = await client.callTool({
+    name: 'design_stack_catalog',
+    arguments: { category: 'animation' }
+  });
+  const motionCatalogText = motionCatalog.content.map((item) => item.text || '').join('\n');
+  assert(motionCatalogText.includes('framer-motion'), 'stack catalog should expose Framer Motion');
+  assert(motionCatalogText.includes('"motion"'), 'stack catalog should expose Motion');
+
+  const vectorRecipe = await client.callTool({
+    name: 'design_open_source_stack',
+    arguments: { tag: 'rive' }
+  });
+  const vectorRecipeText = vectorRecipe.content.map((item) => item.text || '').join('\n');
+  assert(vectorRecipeText.includes('@rive-app/react-canvas'), 'open-source stack should expose Rive recipe');
+
   const recipePlan = await client.callTool({
     name: 'design_recipe_plan',
     arguments: {
       product: 'Advanced website',
       surface: 'public page with Framer Motion, Three.js, cursor trail, neon scrollbar, screenshots, GSAP Lenis, Theatre',
-      effects: ['cursorTrail', 'neonScrollbar', 'textEffects', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas']
+      effects: ['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas']
     }
   });
   const recipePlanText = recipePlan.content.map((item) => item.text || '').join('\n');
   assert(recipePlanText.includes('theatre-directed-scene'), 'recipe plan should include Theatre recipe');
   assert(recipePlanText.includes('neon-scrollbar-cursor-trail'), 'recipe plan should include cursor/scrollbar recipe');
+  assert(recipePlanText.includes('neon-motion-chrome-kit'), 'recipe plan should include neon motion chrome recipe');
   assert(recipePlanText.includes('actual-surface-video-reel'), 'recipe plan should include screenshot video reel recipe');
 
   const logoManifest = await client.callTool({
@@ -244,9 +280,9 @@ try {
   const goodStack = await client.callTool({
     name: 'design_stack_audit',
     arguments: {
-      packageJson: '{"dependencies":{"three":"latest","gsap":"latest","lenis":"latest","framer-motion":"latest"}}',
-      source: "import * as THREE from 'three';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\nimport Lenis from 'lenis';\nimport { motion } from 'framer-motion';\ngsap.registerPlugin(ScrollTrigger); new Lenis(); console.log(THREE.Scene, motion);",
-      required: ['three', 'gsap', 'lenis', 'framerMotion']
+      packageJson: '{"dependencies":{"three":"latest","gsap":"latest","lenis":"latest","framer-motion":"latest","@react-three/fiber":"latest","@react-three/drei":"latest","@react-three/postprocessing":"latest","@theatre/core":"latest","@lottiefiles/dotlottie-web":"latest","@rive-app/react-canvas":"latest","ogl":"latest","pixi.js":"latest"}}',
+      source: "import * as THREE from 'three';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\nimport Lenis from 'lenis';\nimport { motion } from 'framer-motion';\nimport { Canvas } from '@react-three/fiber';\nimport { Float } from '@react-three/drei';\nimport { EffectComposer } from '@react-three/postprocessing';\nimport { getProject } from '@theatre/core';\nimport { DotLottie } from '@lottiefiles/dotlottie-web';\nimport { useRive } from '@rive-app/react-canvas';\nimport { Renderer } from 'ogl';\nimport { Application } from 'pixi.js';\ngsap.registerPlugin(ScrollTrigger); new Lenis(); new DotLottie({ canvas: document.createElement('canvas'), src: '/motion.lottie' }); useRive({ src: '/motion.riv' }); new Renderer(); new Application(); console.log(THREE.Scene, motion, Canvas, Float, EffectComposer, getProject);",
+      required: ['three', 'gsap', 'lenis', 'framerMotion', 'r3f', 'drei', 'postprocessing', 'theatre', 'dotlottie', 'rive', 'ogl', 'pixi']
     }
   });
   const goodStackText = goodStack.content.map((item) => item.text || '').join('\n');
@@ -265,8 +301,8 @@ try {
   const goodEffects = await client.callTool({
     name: 'design_effect_audit',
     arguments: {
-      source: "import { motion, useMotionValue, useSpring } from 'framer-motion'; window.addEventListener('pointermove', () => {}); const css = '::-webkit-scrollbar{width:16px}::-webkit-scrollbar-track{border:1px solid rgba(100,217,255,.55);background:linear-gradient(#111,#222)}::-webkit-scrollbar-thumb{background:linear-gradient(#f8cb5e,#64d9ff);box-shadow:0 0 18px #64d9ff}.glow-text{text-shadow:0 0 12px #fff;background-clip:text}'; const img = <img className='surface-frame' src='/proof.png' />;",
-      requested: ['cursorTrail', 'neonScrollbar', 'textEffects', 'surfaceScreenshots']
+      source: "import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion'; window.addEventListener('pointermove', () => {}); const css = '::-webkit-scrollbar{width:16px}::-webkit-scrollbar-track{border:1px solid rgba(100,217,255,.08);background:rgba(255,255,255,.08)}::-webkit-scrollbar-thumb{background:linear-gradient(#f8cb5e,#64d9ff);box-shadow:0 0 18px #64d9ff}.glow-text{text-shadow:0 0 12px #fff;background-clip:text}.scroll-progress{}.motion-chrome .scanline{}.neon-magnetic{}'; const img = <img className='surface-frame' src='/proof.png' />;",
+      requested: ['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots']
     }
   });
   const goodEffectsText = goodEffects.content.map((item) => item.text || '').join('\n');

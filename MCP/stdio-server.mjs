@@ -39,7 +39,27 @@ const advancedStackImports = {
   motion: [/from\s+['"]motion\/react['"]/, /from\s+['"]motion['"]/, /from\s+['"]framer-motion['"]/],
   r3f: [/from\s+['"]@react-three\/fiber['"]/],
   drei: [/from\s+['"]@react-three\/drei['"]/],
-  postprocessing: [/from\s+['"]@react-three\/postprocessing['"]/]
+  postprocessing: [/from\s+['"]@react-three\/postprocessing['"]/],
+  theatre: [/from\s+['"]@theatre\/core['"]/, /getProject\s*\(/],
+  dotlottie: [/from\s+['"]@lottiefiles\/dotlottie-(?:web|react)['"]/, /new\s+DotLottie\s*\(/],
+  rive: [/from\s+['"]@rive-app\/react-canvas['"]/, /useRive\s*\(/],
+  ogl: [/from\s+['"]ogl['"]/, /new\s+(?:Renderer|Program|Mesh)\s*\(/],
+  pixi: [/from\s+['"]pixi\.js['"]/, /new\s+Application\s*\(/]
+};
+const advancedStackPackages = {
+  framerMotion: ['framer-motion'],
+  three: ['three'],
+  gsap: ['gsap'],
+  lenis: ['lenis'],
+  motion: ['motion', 'framer-motion'],
+  r3f: ['@react-three/fiber'],
+  drei: ['@react-three/drei'],
+  postprocessing: ['@react-three/postprocessing'],
+  theatre: ['@theatre/core', '@theatre/studio'],
+  dotlottie: ['@lottiefiles/dotlottie-web', '@lottiefiles/dotlottie-react'],
+  rive: ['@rive-app/react-canvas'],
+  ogl: ['ogl'],
+  pixi: ['pixi.js']
 };
 const genericTemplateSignals = [
   /dark\s+saas/i,
@@ -56,6 +76,7 @@ const effectSignals = {
   cursorTrail: [/cursor-trail/, /pointermove/, /useMotionValue/, /useSpring/],
   neonScrollbar: [/::-webkit-scrollbar/, /scrollbar-color/, /scrollbar-thumb/, /scrollbar-track/],
   textEffects: [/text-shadow/, /background-clip:\s*text/, /glow-text/, /neon-text/, /split[-_\s]?text/, /text-scan/],
+  motionChrome: [/scroll-progress/, /motion-chrome/, /neon-motion/, /scanline/, /magnetic[-_\s]?/, /pointer-reactive/, /useScroll/, /useTransform/],
   surfaceScreenshots: [/<img[\s\S]+src=/, /<video[\s\S]+src=|<source[\s\S]+src=/, /\.(?:png|jpg|jpeg|webp|avif|mp4|webm)['")]/, /screenshot/i, /surface-frame/, /surface-reel/, /proof capture/i, /recordVideo/i, /page\.(?:click|fill|goto|mouse|keyboard|locator)/i],
   theatre: [/from\s+['"]@theatre\/core['"]/, /getProject\s*\(/, /sheet\.object/, /@theatre\/studio/],
   gsapScroll: [/ScrollTrigger/, /gsap\.registerPlugin/, /scrub\s*:/, /pin\s*:/],
@@ -95,6 +116,7 @@ const effectToRecipes = {
   cursorTrail: ['framer-motion-interaction-system', 'neon-scrollbar-cursor-trail'],
   neonScrollbar: ['neon-scrollbar-cursor-trail'],
   textEffects: ['premium-text-effects-lab'],
+  motionChrome: ['neon-motion-chrome-kit', 'framer-motion-interaction-system', 'premium-text-effects-lab'],
   surfaceScreenshots: ['actual-surface-screenshot-stage', 'actual-surface-video-reel'],
   theatre: ['theatre-directed-scene'],
   gsapScroll: ['gsap-lenis-scroll-stage'],
@@ -104,10 +126,164 @@ const effectToStack = {
   cursorTrail: ['framerMotion'],
   neonScrollbar: [],
   textEffects: ['framerMotion'],
+  motionChrome: ['framerMotion'],
   surfaceScreenshots: [],
   theatre: ['theatre'],
   gsapScroll: ['gsap', 'lenis'],
   threeCanvas: ['three', 'r3f']
+};
+const stackCatalogData = {
+  name: 'skye-advanced-frontend-stack-catalog',
+  version: '0.1.0',
+  purpose: 'Single source of truth for the free/open-source motion, scroll, WebGL, and visual-design libraries this MCP should recommend and audit.',
+  rule: 'Use these as implementation primitives. The generated project must install/import them in the target app when selected; the MCP server itself only exposes the recipes and audits.',
+  installSets: {
+    essentialMotion: ['framer-motion', 'motion', 'gsap', 'lenis'],
+    essential3d: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
+    directedMotion: ['@theatre/core', '@theatre/studio'],
+    vectorMotion: ['@lottiefiles/dotlottie-web', '@lottiefiles/dotlottie-react', '@rive-app/react-canvas'],
+    shaderAndCanvas: ['ogl', 'pixi.js'],
+    usefulUi: ['lucide-react']
+  },
+  libraries: [
+    {
+      id: 'framer-motion',
+      package: 'framer-motion',
+      category: 'animation',
+      useFor: ['React UI motion', 'layout transitions', 'scroll transforms', 'cursor trails', 'microinteractions'],
+      recipeIds: ['framer-motion-interaction-system', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit', 'premium-text-effects-lab'],
+      imports: ["import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion';"],
+      auditStack: 'framerMotion'
+    },
+    {
+      id: 'motion',
+      package: 'motion',
+      category: 'animation',
+      useFor: ['Modern Motion package', 'motion/react component animation', 'lighter UI animation when the project standardizes on Motion'],
+      recipeIds: ['framer-motion-interaction-system'],
+      imports: ["import { motion } from 'motion/react';"],
+      auditStack: 'motion'
+    },
+    {
+      id: 'gsap',
+      package: 'gsap',
+      category: 'scroll',
+      useFor: ['timelines', 'ScrollTrigger', 'pinning', 'scrubbed funnels', 'text/stage choreography'],
+      recipeIds: ['gsap-lenis-scroll-stage', 'premium-text-effects-lab'],
+      imports: ["import gsap from 'gsap';", "import { ScrollTrigger } from 'gsap/ScrollTrigger';", 'gsap.registerPlugin(ScrollTrigger);'],
+      auditStack: 'gsap'
+    },
+    {
+      id: 'lenis',
+      package: 'lenis',
+      category: 'scroll',
+      useFor: ['smooth scroll feel', 'ScrollTrigger integration', 'scroll-led pages'],
+      recipeIds: ['gsap-lenis-scroll-stage'],
+      imports: ["import Lenis from 'lenis';", 'new Lenis({ lerp: 0.18, smoothWheel: true });'],
+      auditStack: 'lenis'
+    },
+    {
+      id: 'three',
+      package: 'three',
+      category: '3d',
+      useFor: ['raw Three.js scenes', 'custom geometry/materials', 'shader objects', 'WebGL product symbols'],
+      recipeIds: ['three-r3f-shader-scene', 'drei-postprocessing-cinema'],
+      imports: ["import * as THREE from 'three';"],
+      auditStack: 'three'
+    },
+    {
+      id: 'react-three-fiber',
+      package: '@react-three/fiber',
+      category: '3d',
+      useFor: ['React Three canvas', 'useFrame runtime animation', 'interactive hero scenes'],
+      recipeIds: ['three-r3f-shader-scene', 'drei-postprocessing-cinema'],
+      imports: ["import { Canvas, useFrame } from '@react-three/fiber';"],
+      auditStack: 'r3f'
+    },
+    {
+      id: 'drei',
+      package: '@react-three/drei',
+      category: '3d',
+      useFor: ['Float', 'PerspectiveCamera', 'Stars', 'Environment', 'ScrollControls', 'loader helpers'],
+      recipeIds: ['drei-postprocessing-cinema'],
+      imports: ["import { Float, PerspectiveCamera, Stars } from '@react-three/drei';"],
+      auditStack: 'drei'
+    },
+    {
+      id: 'postprocessing',
+      package: '@react-three/postprocessing',
+      category: '3d',
+      useFor: ['Bloom', 'Vignette', 'DepthOfField', 'cinematic finish'],
+      recipeIds: ['drei-postprocessing-cinema'],
+      imports: ["import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';"],
+      auditStack: 'postprocessing'
+    },
+    {
+      id: 'theatre',
+      package: '@theatre/core',
+      companionPackages: ['@theatre/studio'],
+      category: 'directed-motion',
+      useFor: ['keyframed scene direction', 'camera beats', 'art-directed 3D state', 'timeline-controlled hero moments'],
+      recipeIds: ['theatre-directed-scene'],
+      imports: ["import { getProject } from '@theatre/core';"],
+      auditEffect: 'theatre'
+    },
+    {
+      id: 'dotlottie',
+      package: '@lottiefiles/dotlottie-web',
+      companionPackages: ['@lottiefiles/dotlottie-react'],
+      category: 'vector-motion',
+      useFor: ['real Lottie/dotLottie animation assets', 'workflow illustrations', 'animated brand/system media'],
+      recipeIds: ['dotlottie-web-motion-asset'],
+      imports: ["import { DotLottie } from '@lottiefiles/dotlottie-web';"],
+      auditEffect: 'surfaceScreenshots'
+    },
+    {
+      id: 'rive',
+      package: '@rive-app/react-canvas',
+      category: 'vector-motion',
+      useFor: ['interactive state-machine vector animations', 'animated mascots/icons/product diagrams when a real Rive asset exists'],
+      recipeIds: ['rive-interactive-motion-asset'],
+      imports: ["import { useRive, useStateMachineInput } from '@rive-app/react-canvas';"],
+      auditNote: 'Must include a real .riv asset and reduced-motion/static fallback.'
+    },
+    {
+      id: 'ogl',
+      package: 'ogl',
+      category: 'shader-canvas',
+      useFor: ['lightweight shader backgrounds', 'custom WebGL planes', 'generative visual fields outside React Three'],
+      recipeIds: ['ogl-shader-backdrop'],
+      imports: ["import { Renderer, Program, Mesh, Triangle } from 'ogl';"],
+      auditNote: 'Treat like WebGL: cap DPR, pause when hidden, provide reduced-motion fallback.'
+    },
+    {
+      id: 'pixi',
+      package: 'pixi.js',
+      category: 'canvas-2d',
+      useFor: ['sprite-heavy 2D scenes', 'particles', 'game-like interfaces', 'interactive canvas layers'],
+      recipeIds: ['pixi-sprite-stage'],
+      imports: ["import { Application, Container, Sprite } from 'pixi.js';"],
+      auditNote: 'Use when sprite/canvas rendering beats DOM or Three. Keep DPR and particle counts controlled.'
+    },
+    {
+      id: 'react-bits',
+      package: 'copy/adapt source',
+      category: 'inspiration',
+      useFor: ['animated component ideas', 'text effects', 'buttons', 'backgrounds', 'loaders'],
+      recipeIds: ['open-component-motion-inspiration'],
+      imports: ['Copy source into the project, then own accessibility, tokens, and reduced-motion fallback.'],
+      auditNote: 'Do not stack random effects from demos; adapt one visual language.'
+    },
+    {
+      id: 'animata',
+      package: 'copy/adapt source',
+      category: 'inspiration',
+      useFor: ['copyable animated UI/component references'],
+      recipeIds: ['open-component-motion-inspiration'],
+      imports: ['Copy source into the project, then rewrite to local style and QA it.'],
+      auditNote: 'Use as reference, not as an unreviewed dependency dump.'
+    }
+  ]
 };
 
 function readJson(filePath, fallback = {}) {
@@ -207,6 +383,7 @@ This MCP is design-only. It exposes rules, patterns, reference notes, and QA too
 - quantumskyes://design/no-frankenstein-policy
 - quantumskyes://design/perfection-checklist
 - quantumskyes://design/advanced-stack
+- quantumskyes://design/stack-catalog
 - quantumskyes://design/open-source-stack
 - quantumskyes://design/logo-standards
 - quantumskyes://design/surface-video-reel
@@ -387,9 +564,10 @@ function stackAudit({ source = '', packageJson = '', required = [] } = {}) {
   const lowerPackage = String(packageJson || '').toLowerCase();
   const detected = {};
   for (const [name, patterns] of Object.entries(advancedStackImports)) {
+    const packageNames = advancedStackPackages[name] || [name];
     detected[name] = {
       imported: patterns.some((pattern) => pattern.test(combined)),
-      dependency: lowerPackage.includes(`"${name}"`) || (name === 'framerMotion' && lowerPackage.includes('"framer-motion"')) || (name === 'r3f' && lowerPackage.includes('"@react-three/fiber"')) || (name === 'drei' && lowerPackage.includes('"@react-three/drei"')) || (name === 'postprocessing' && lowerPackage.includes('"@react-three/postprocessing"'))
+      dependency: packageNames.some((packageName) => lowerPackage.includes(`"${packageName.toLowerCase()}"`))
     };
   }
   const missing = required.filter((name) => !detected[name]?.imported);
@@ -417,11 +595,11 @@ function effectAudit({ source = '', requested = [] } = {}) {
   if ((requested || []).includes('neonScrollbar')) {
     const widthMatches = [...text.matchAll(/::-webkit-scrollbar\s*\{[\s\S]{0,120}?(?:width|height)\s*:\s*(\d+)px/gi)].map((match) => Number(match[1]));
     const hasWideScrollbar = widthMatches.some((value) => value >= 14);
-    const hasVisibleTrack = /::-webkit-scrollbar-track[\s\S]{0,260}(?:rgba\([^)]+0\.[4-9][^)]+\)|box-shadow|linear-gradient|border)/i.test(text);
+    const hasVisibleTrack = /::-webkit-scrollbar-track[\s\S]{0,260}(?:rgba\([^)]+(?:0?\.(?:0[5-9]|[1-9][0-9]?))[)]*\)|box-shadow|linear-gradient|border|background\s*:\s*(?!transparent))/i.test(text);
     const hasNeonThumb = /::-webkit-scrollbar-thumb[\s\S]{0,360}(?:box-shadow|linear-gradient|radial-gradient|cyan|gold|violet|neon|#(?:64d9ff|27f2ff|f8cb5e|f4c75b|a88cff|8a63ff))/i.test(text);
-  const scrollbarBlocks = text.match(/::-webkit-scrollbar(?:-[\w-]+)?\s*\{[^}]*\}/gi) || [];
-  const hidesScrollbar = /scrollbar-width\s*:\s*none/i.test(text)
-    || scrollbarBlocks.some((block) => /display\s*:\s*none|opacity\s*:\s*0(?:[;\s}]|\.0)/i.test(block));
+    const scrollbarBlocks = text.match(/::-webkit-scrollbar(?:-[\w-]+)?\s*\{[^}]*\}/gi) || [];
+    const hidesScrollbar = /scrollbar-width\s*:\s*none/i.test(text)
+      || scrollbarBlocks.some((block) => /display\s*:\s*none|opacity\s*:\s*0(?:[;\s}]|\.0)/i.test(block));
     if (!hasWideScrollbar) issues.push('Neon scrollbar must be visibly present: use a 14px+ scrollbar width/height, not a thin hidden default.');
     if (!hasVisibleTrack) issues.push('Neon scrollbar track must stay slightly opaque/visible with border, gradient, or inset glow.');
     if (!hasNeonThumb) issues.push('Neon scrollbar thumb must include visible neon highlight: gradient, glow, or bright brand color.');
@@ -676,6 +854,7 @@ function inferRequestedEffects(text) {
   if (/cursor[-\s]?trail|pointer[-\s]?trail|usemotionvalue|usespring/.test(lower)) effects.push('cursorTrail');
   if (/scrollbar|scroll bar|thicker scroll|neon thumb/.test(lower)) effects.push('neonScrollbar');
   if (/text effect|glow text|glowing text|neon text|shimmer|split text|typography effect/.test(lower)) effects.push('textEffects');
+  if (/motion chrome|scroll progress|progress rail|scanline|magnetic|pointer reactive|neon motion/.test(lower)) effects.push('motionChrome');
   if (/screenshot|actual surface|browser proof|app surface|product surface/.test(lower)) effects.push('surfaceScreenshots');
   if (/@theatre|theatre\/core|theatre\/studio|getproject\s*\(|sheet\.object/.test(lower)) effects.push('theatre');
   if (/gsap|lenis|scrolltrigger|pinned|scrub|scroll funnel|scroll stage/.test(lower)) effects.push('gsapScroll');
@@ -756,7 +935,7 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
     'skye.proof.quality-gates'
   ];
   if (isInfrastructure) supporting.splice(1, 0, 'skye.webgl.living-command-field');
-  supporting.push('skye.fx.text-effects', 'skye.fx.neon-scrollbar', 'skye.fx.cursor-trail', 'client.surface.actual-screenshot-stage', 'client.surface.actual-video-reel', 'skye.brand.existing-logo-system');
+  supporting.push('skye.fx.text-effects', 'skye.fx.neon-scrollbar', 'skye.fx.neon-motion-chrome', 'skye.fx.cursor-trail', 'client.surface.actual-screenshot-stage', 'client.surface.actual-video-reel', 'skye.brand.existing-logo-system');
   return {
     product,
     surface,
@@ -771,10 +950,10 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
     advancedStackEnforcement: 'Call design_pattern_pack for every implementation pattern, wire the returned files/concepts into source code, then call design_stack_audit with source and package.json.',
     openSourceRecipeRule: 'Call design_open_source_stack and pick recipes by library/behavior before applying any brand styling.',
     openSourceRecipes: [...new Set([...(isInfrastructure
-      ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'premium-text-effects-lab']
+      ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit', 'premium-text-effects-lab']
       : isApp
-        ? ['framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail']
-        : ['framer-motion-interaction-system', 'premium-text-effects-lab']), ...plan.requiredOpenSourceRecipes])],
+        ? ['framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit']
+        : ['framer-motion-interaction-system', 'neon-motion-chrome-kit', 'premium-text-effects-lab']), ...plan.requiredOpenSourceRecipes])],
     requestedEffects: plan.requestedEffects,
     noveltyRules: [
       'Do not reuse the previous dark command-card page shape.',
@@ -785,6 +964,7 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
       'When proof copy claims a workflow, record the actual browser performing that workflow and render the MP4/WebM proof.',
       'Use premium text effects with restraint: glow, shimmer, reveal, split-line, or chromatic edge only where it raises the composition.',
       'Use a visible branded scrollbar treatment when the experience is scroll-led.',
+      'When the request references the Legal Skyes neon scrollbar or stronger motion chrome, pull the neon-motion-chrome pattern pack and audit neonScrollbar plus motionChrome.',
       'Use approved logo assets first; reject rounded-square initial badges unless the user explicitly approved that as the logo.',
       'Use first-person operator copy for founder-built products: I built, I route, I show, I keep.',
       'Use cursor trails or pointer-reactive accents only when they improve the premium feel and do not block usability.'
@@ -919,6 +1099,31 @@ function openSourceRecipes({ recipeId, tag } = {}) {
   };
 }
 
+function stackCatalog({ category, libraryId, packageName } = {}) {
+  let libraries = stackCatalogData.libraries;
+  if (category) libraries = libraries.filter((library) => library.category === category);
+  if (libraryId) libraries = libraries.filter((library) => library.id === libraryId);
+  if (packageName) {
+    const needle = String(packageName).toLowerCase();
+    libraries = libraries.filter((library) => {
+      const packages = [library.package, ...(library.companionPackages || [])]
+        .filter(Boolean)
+        .map((item) => String(item).toLowerCase());
+      return packages.some((item) => item.includes(needle));
+    });
+  }
+  return {
+    name: stackCatalogData.name,
+    version: stackCatalogData.version,
+    purpose: stackCatalogData.purpose,
+    rule: stackCatalogData.rule,
+    installSets: stackCatalogData.installSets,
+    categories: [...new Set(stackCatalogData.libraries.map((library) => library.category))],
+    libraries,
+    available: stackCatalogData.libraries.map((library) => library.id)
+  };
+}
+
 const server = new McpServer({
   name: 'quantumskyes-design-mcp',
   version: '0.2.0'
@@ -995,6 +1200,12 @@ server.registerResource('advanced-stack', 'quantumskyes://design/advanced-stack'
   description: 'When to use Motion, GSAP, Lenis, Three.js, and related advanced frontend tools.',
   mimeType: 'text/markdown'
 }, (uri) => textResource(uri, readText(path.join(designRoot, 'docs', 'ADVANCED_STACK.md'))));
+
+server.registerResource('stack-catalog', 'quantumskyes://design/stack-catalog', {
+  title: 'Advanced Frontend Stack Catalog',
+  description: 'Query-friendly catalog for GSAP, Framer Motion, Motion, Lenis, Three/R3F/Drei/postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, and inspiration sources.',
+  mimeType: 'application/json'
+}, (uri) => textResource(uri, JSON.stringify(stackCatalog(), null, 2), 'application/json'));
 
 server.registerResource('open-source-stack', 'quantumskyes://design/open-source-stack', {
   title: 'Open Source Spectacle Recipes',
@@ -1129,11 +1340,11 @@ server.registerTool('design_content_audit', {
 
 server.registerTool('design_stack_audit', {
   title: 'Audit Advanced Stack Usage',
-  description: 'Fail generated work that claims advanced design but does not actually import/use Three, GSAP, Lenis, Motion, R3F, Drei, or postprocessing.',
+  description: 'Fail generated work that claims advanced design but does not actually import/use Three, GSAP, Lenis, Motion, R3F, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, or Pixi.',
   inputSchema: {
     source: z.string().optional().describe('Concatenated relevant source files: TS/TSX/JS/JSX/CSS/HTML'),
     packageJson: z.string().optional().describe('package.json text'),
-    required: z.array(z.enum(['framerMotion', 'three', 'gsap', 'lenis', 'motion', 'r3f', 'drei', 'postprocessing'])).optional().describe('Required stack imports for this brief')
+    required: z.array(z.enum(['framerMotion', 'three', 'gsap', 'lenis', 'motion', 'r3f', 'drei', 'postprocessing', 'theatre', 'dotlottie', 'rive', 'ogl', 'pixi'])).optional().describe('Required stack imports for this brief')
   }
 }, async (args) => {
   return { content: [{ type: 'text', text: JSON.stringify(stackAudit(args), null, 2) }] };
@@ -1141,10 +1352,10 @@ server.registerTool('design_stack_audit', {
 
 server.registerTool('design_effect_audit', {
   title: 'Audit Requested Visual Effects',
-  description: 'Fail generated work that claims cursor trails, neon scrollbars, screenshots, text effects, Theatre direction, GSAP scroll, or Three/R3F scenes without source signals.',
+  description: 'Fail generated work that claims cursor trails, neon scrollbars, motion chrome, screenshots, text effects, Theatre direction, GSAP scroll, or Three/R3F scenes without source signals.',
   inputSchema: {
     source: z.string().optional().describe('Concatenated generated source files'),
-    requested: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Requested effects to verify')
+    requested: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Requested effects to verify')
   }
 }, async (args) => {
   return { content: [{ type: 'text', text: JSON.stringify(effectAudit(args), null, 2) }] };
@@ -1251,6 +1462,18 @@ server.registerTool('design_open_source_stack', {
   return { content: [{ type: 'text', text: JSON.stringify(openSourceRecipes(args), null, 2) }] };
 });
 
+server.registerTool('design_stack_catalog', {
+  title: 'Get Advanced Frontend Stack Catalog',
+  description: 'Return the MCP-approved frontend stack catalog: GSAP, Framer Motion, Motion, Lenis, Three/R3F/Drei/postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, React Bits, Animata.',
+  inputSchema: {
+    category: z.string().optional().describe('Optional category, e.g. animation, scroll, 3d, directed-motion, vector-motion, shader-canvas, canvas-2d, inspiration'),
+    libraryId: z.string().optional().describe('Optional library id, e.g. gsap, framer-motion, three, react-three-fiber, dotlottie'),
+    packageName: z.string().optional().describe('Optional npm package name or partial package name')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(stackCatalog(args), null, 2) }] };
+});
+
 server.registerTool('design_recipe_plan', {
   title: 'Compose Open Source Recipe Plan',
   description: 'Turn a product/surface/effect request into required open-source recipes, stack imports, and audits.',
@@ -1259,7 +1482,7 @@ server.registerTool('design_recipe_plan', {
     surface: z.string().optional(),
     goal: z.string().optional(),
     audience: z.string().optional(),
-    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional()
+    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional()
   }
 }, async (args) => {
   return { content: [{ type: 'text', text: JSON.stringify(recipePlan(args), null, 2) }] };
@@ -1298,7 +1521,7 @@ server.registerTool('design_quality_gate', {
       'Run design_content_generate or design_content_audit when writing public copy',
       'Run design_validate on public copy/markup',
       'Run design_stack_audit when the brief requires Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing',
-      'Run design_effect_audit when screenshots, cursor trail, neon scrollbar, text effects, Theatre, scroll stage, or Three/R3F canvas are requested',
+      'Run design_effect_audit when screenshots, cursor trail, neon scrollbar, motion chrome, text effects, Theatre, scroll stage, or Three/R3F canvas are requested',
       'Run design_e2e_proof_audit whenever copy says the app routes, logs in, signs up, restores, monitors, filters, deploys, or does another workflow',
       'Run design_performance_audit before browser QA; reject lazy Lenis, high DPR, high particles, eager screenshots, and missing reduced-motion/mobile fallbacks',
       'Capture browser screenshot at 1440x1000',

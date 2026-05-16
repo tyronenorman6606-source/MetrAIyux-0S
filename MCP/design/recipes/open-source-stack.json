@@ -92,7 +92,71 @@
       "useWhen": "The user asks for visible scrollbar, neon UI chrome, cursor trail, or tactile premium interaction.",
       "mustShow": ["custom scrollbar CSS", "14px+ visible scrollbar width", "slightly opaque neon track", "glowing neon thumb", "pointer-reactive cursor trail on desktop", "mobile fallback"],
       "avoid": ["cursor trail blocking clicks", "thin invisible scrollbar on scroll-led pages", "hover-only scrollbar visibility", "scrollbar-width: none"],
-      "starter": "Use CSS scrollbar thumb/track styling with a visible rgba track, neon gradient thumb, glow box-shadow, and a fixed pointer-events-none Framer Motion glow following pointer spring values."
+      "starter": "Use CSS scrollbar thumb/track styling with a visible rgba track, neon gradient thumb, glow box-shadow, and a fixed pointer-events-none Framer Motion glow following pointer spring values.",
+      "sourceUrls": ["https://skyes-over-london-legal.pages.dev/legal/", "https://motion.dev/"]
+    },
+    {
+      "id": "neon-motion-chrome-kit",
+      "tags": ["scrollbar", "scroll-progress", "cursor-trail", "scanline", "shimmer", "magnetic", "neon", "motion-chrome"],
+      "packages": ["framer-motion"],
+      "imports": ["import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';"],
+      "useWhen": "The page needs the Legal Skyes neon scrollbar plus stronger full-page motion polish: top scroll progress, pointer-reactive glow, animated scanline, shimmer display type, and magnetic hover utilities.",
+      "mustShow": ["NeonMotionChrome wrapper or equivalent", "custom 14px+ scrollbar", "scroll progress rail bound to useScroll", "desktop cursor glow with pointer-events none", "mobile and prefers-reduced-motion fallbacks"],
+      "avoid": ["decorative overlays that block clicks", "global motion with no reduced-motion escape", "using chrome to hide a weak layout", "one-color purple/blue glow everywhere"],
+      "starter": "Use the neon-motion-chrome pattern pack. Wrap the page once, put .neon-gradient-text only on the hero/display line, use .neon-glow-panel for one or two proof surfaces, and add .neon-magnetic only to real controls.",
+      "sourceUrls": ["https://skyes-over-london-legal.pages.dev/legal/", "https://motion.dev/"]
+    },
+    {
+      "id": "dotlottie-web-motion-asset",
+      "tags": ["lottie", "dotlottie", "webgl", "webgpu", "motion-asset", "vector-animation"],
+      "packages": ["@lottiefiles/dotlottie-web or @lottiefiles/dotlottie-react"],
+      "imports": ["import { DotLottie } from '@lottiefiles/dotlottie-web';"],
+      "useWhen": "A product page needs real vector motion assets, loading states, illustrated workflows, or lightweight branded animations instead of CSS pretending to be media.",
+      "mustShow": ["real .lottie or Lottie JSON asset", "loop/autoplay only when it supports the story", "pause/freeze or reduced-motion fallback", "size constrained so it does not dominate the layout"],
+      "avoid": ["random stock Lotties", "large looping animations beside dense forms", "autoplay animation with no reduced-motion fallback"],
+      "starter": "Use dotLottie for focused workflow/brand motion. Keep hero motion short, test mobile playback, and freeze or replace with a poster under prefers-reduced-motion.",
+      "sourceUrls": ["https://github.com/lottiefiles/dotlottie-web", "https://docs.lottiefiles.com/"]
+    },
+    {
+      "id": "rive-interactive-motion-asset",
+      "tags": ["rive", "state-machine", "interactive-animation", "vector-animation", "motion-asset"],
+      "packages": ["@rive-app/react-canvas"],
+      "imports": ["import { useRive, useStateMachineInput } from '@rive-app/react-canvas';"],
+      "useWhen": "The page has a real .riv file and needs interactive vector animation: state-machine icons, product diagrams, animated controls, or brand characters.",
+      "mustShow": ["real .riv asset", "state machine or explicit playback control", "static poster or reduced-motion fallback", "bounded dimensions"],
+      "avoid": ["inventing a Rive dependency without a .riv asset", "using Rive for simple hover effects that CSS or Motion can handle", "unbounded animation beside forms or dense UI"],
+      "starter": "Use Rive only when the asset exists. Wire state machine inputs to real page state or pointer interactions and provide a still fallback."
+    },
+    {
+      "id": "ogl-shader-backdrop",
+      "tags": ["ogl", "shader", "webgl", "canvas", "generative-background"],
+      "packages": ["ogl"],
+      "imports": ["import { Renderer, Program, Mesh, Triangle } from 'ogl';"],
+      "useWhen": "A lightweight shader field or custom WebGL backdrop is enough and React Three would be heavier than needed.",
+      "mustShow": ["Renderer with capped DPR", "Program/shader source", "animation loop paused or reduced under prefers-reduced-motion", "pointer-events none when decorative"],
+      "avoid": ["shader backdrop hiding the product subject", "uncapped DPR", "running animation on hidden tabs", "calling it Three.js when it is OGL"],
+      "starter": "Use OGL for one restrained shader plane behind the main subject. Cap DPR near 1.25, pause on visibilitychange, and keep text readability clean."
+    },
+    {
+      "id": "pixi-sprite-stage",
+      "tags": ["pixi", "sprites", "canvas", "particles", "2d", "game-ui"],
+      "packages": ["pixi.js"],
+      "imports": ["import { Application, Container, Sprite } from 'pixi.js';"],
+      "useWhen": "The design needs many 2D sprites, particles, game-like UI, or canvas interactions where DOM and Three are the wrong tool.",
+      "mustShow": ["Application with explicit resize/DPR settings", "real sprite or particle assets", "cleanup/destroy on unmount", "mobile particle reduction"],
+      "avoid": ["using Pixi for basic cards/buttons", "uncapped retina rendering", "thousands of particles on mobile", "canvas blocking forms or navigation"],
+      "starter": "Use Pixi for sprite-heavy or game-like motion only. Cap resolution, lower particle counts on compact screens, and keep DOM UI accessible above the canvas."
+    },
+    {
+      "id": "open-component-motion-inspiration",
+      "tags": ["reactbits", "animata", "copy-paste", "animated-components", "inspiration"],
+      "packages": ["copy source into project, then own and simplify it"],
+      "imports": ["Audit copied snippets for accessibility, reduced-motion, bundle size, and local design fit before shipping."],
+      "useWhen": "A designer/developer needs free component ideas for text effects, background motion, buttons, tabs, loaders, progress, or interactive blocks.",
+      "mustShow": ["adapted source rather than iframe/embed dependency", "one visual language", "reduced-motion fallback", "no unreviewed dependency sprawl"],
+      "avoid": ["copying five unrelated effects into one viewport", "shipping external demo code without accessibility review", "using inspiration components instead of product-specific UX"],
+      "starter": "Pull one component idea, rewrite names/tokens to the local design system, remove novelty that fights the page goal, then run design_effect_audit and browser screenshots.",
+      "sourceUrls": ["https://animata.design/", "https://reactbits.dev/"]
     },
     {
       "id": "premium-text-effects-lab",

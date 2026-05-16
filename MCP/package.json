@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "description": "MCP server exposing Skye/Spectacle design resources, directives, registry patterns, and QA tools.",
+  "designStackDependencies": {
+    "essentialMotion": ["framer-motion", "motion", "gsap", "lenis"],
+    "essential3d": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing"],
+    "directedMotion": ["@theatre/core", "@theatre/studio"],
+    "vectorMotion": ["@lottiefiles/dotlottie-web", "@lottiefiles/dotlottie-react", "@rive-app/react-canvas"],
+    "shaderAndCanvas": ["ogl", "pixi.js"],
+    "ui": ["lucide-react"],
+    "note": "These are target-app recipe dependencies exposed by the MCP. The MCP server runtime itself only needs the dependencies below."
+  },
   "scripts": {
     "start": "node stdio-server.mjs",
     "smoke:stdio": "node scripts/stdio-smoke.mjs"

@@ -40,6 +40,7 @@ Required when applicable:
 - UI motion: real `motion` imports or a documented local equivalent.
 - Framer Motion requests: real `framer-motion` imports, or `motion/react` only when the project has standardized on the newer Motion package.
 - R3F spectacle scenes: real `@react-three/fiber`, `@react-three/drei`, and `@react-three/postprocessing` imports.
+- Legal Skyes-style neon chrome: pull `neon-motion-chrome`, not just a scrollbar snippet. The source must include visible custom scrollbar CSS, scroll progress, pointer-reactive polish, and mobile/reduced-motion fallbacks.
 
 Run `design_stack_audit` with the source and `package.json` before claiming the MCP produced advanced work. Run `design_performance_audit` before browser QA so premium motion stays fast, not draggy.
 
@@ -142,6 +143,7 @@ Use these when the art direction asks for a premium digital/product feel:
 - Neon or glow text effects, shimmer lines, split-line reveals, and chromatic edge accents with restraint.
 - Cursor trail or pointer-reactive accent that does not block inputs.
 - Thicker branded scrollbar with visible slightly opaque track and neon thumb treatment for scroll-led experiences. Never hide it or make it only appear on hover when the user asked for visible scrollbars.
+- Full neon motion chrome when requested: branded scrollbar, scroll progress rail, scanline/grid atmosphere, pointer glow, shimmer title utility, and magnetic hover utility.
 - Sticky/persistent scroll cues when the user needs to understand that the page keeps unfolding.
 
 ## Use These References

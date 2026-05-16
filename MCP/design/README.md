@@ -24,6 +24,8 @@ When the MCP brief requires advanced tools, generated work must prove it with so
 - Three/R3F scenes need real `three` or `@react-three/fiber` imports.
 - Scroll funnels need real `gsap`, `ScrollTrigger`, and `lenis` imports.
 - Motion systems need real `motion` imports or a documented local equivalent.
+- Vector/canvas motion systems need real dotLottie, Rive, OGL, Pixi, or Theatre imports when those are selected.
+- Neon browser chrome needs a real custom scrollbar, scroll progress, pointer-reactive polish, and reduced-motion/mobile fallbacks. Pull `neon-motion-chrome` instead of only saying "neon".
 - The `design_stack_audit` tool must pass before the work is described as advanced.
 - The `design_performance_audit` tool must pass before advanced motion/WebGL/screenshot-heavy work is shipped.
 
@@ -42,25 +44,28 @@ When actual screenshots need to feel alive, read `quantumskyes://design/surface-
 1. Read `quantumskyes://directives/index`.
 2. Read `quantumskyes://design/registry`.
 3. Read `quantumskyes://design/open-source-stack`.
-4. Read `quantumskyes://design/pattern-manifest`.
-5. Read `quantumskyes://design/logo-standards` when the page has any brand mark.
-6. Read `quantumskyes://design/surface-video-reel` when screenshot animation, workflow proof, or video proof is requested.
-7. Call `design_compose_brief`.
-8. Call `design_recipe_plan` for the product and requested effects.
-9. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
-10. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
-11. Call `design_pattern_pack` for every required implementation pattern.
-12. Build from those real implementation patterns, not from a static lookalike.
-13. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
-14. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
-15. Call `design_e2e_proof_audit` when public copy claims signup, auth, routing, restore, monitoring, filtering, deploy, handoff, or other app behavior.
-15. Call `design_validate` on the public copy/markup/source.
-16. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
-17. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing.
-18. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, text effects, Theatre, scroll, or 3D are requested.
-19. Call `design_performance_audit` before browser QA.
-20. Run browser screenshots.
-21. Fix before deploy.
+4. Read `quantumskyes://design/stack-catalog` when the user asks for GSAP, Framer Motion, Three.js, R3F, shaders, vector motion, or "all the good animation stuff."
+5. Read `quantumskyes://design/pattern-manifest`.
+6. Read `quantumskyes://design/logo-standards` when the page has any brand mark.
+7. Read `quantumskyes://design/surface-video-reel` when screenshot animation, workflow proof, or video proof is requested.
+8. Call `design_compose_brief`.
+9. Call `design_recipe_plan` for the product and requested effects.
+10. Call `design_stack_catalog` when choosing packages.
+11. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
+12. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
+13. Call `design_pattern_pack` for every required implementation pattern.
+14. Use `design_pattern_pack({ patternId: "neon-motion-chrome" })` when the brief asks for the Legal Skyes scrollbar, neon scroll chrome, cursor trail, scroll progress, shimmer text, or stronger page motion.
+15. Build from those real implementation patterns, not from a static lookalike.
+16. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
+17. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
+18. Call `design_e2e_proof_audit` when public copy claims signup, auth, routing, restore, monitoring, filtering, deploy, handoff, or other app behavior.
+19. Call `design_validate` on the public copy/markup/source.
+20. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
+21. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, or Pixi.
+22. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, motion chrome, text effects, Theatre, scroll, or 3D are requested.
+23. Call `design_performance_audit` before browser QA.
+24. Run browser screenshots.
+25. Fix before deploy.
 
 ## Public Page Safety
 

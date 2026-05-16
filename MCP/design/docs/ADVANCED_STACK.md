@@ -10,6 +10,17 @@ Before applying brand styling, pull concrete recipes from `quantumskyes://design
 - `framer-motion` when a request names Framer Motion or the project already uses that package.
 - `gsap` + ScrollTrigger for pinned scroll stories, cinematic product funnels, and timeline control.
 - `lenis` for smooth scroll when scroll motion is part of the experience.
+- `@lottiefiles/dotlottie-web` or `@lottiefiles/dotlottie-react` for real vector motion assets when a custom animated media object is stronger than another CSS glow.
+- Theatre.js when a hero or 3D scene needs keyframed art direction instead of purely code-timed motion.
+
+## Free Motion Sources To Check First
+
+- GSAP: Webflow made GSAP free for commercial use in 2025. Use it for ScrollTrigger, timelines, and complex choreography.
+- Motion: free/open-source animation library for React, JavaScript, and Vue. Use it for UI motion, scroll progress, layout movement, and pointer-reactive polish.
+- Lenis: open-source smooth scrolling with platform-friendly behavior. Use it only when the scroll experience is part of the page concept.
+- dotLottie Web: official LottieFiles player for Lottie/dotLottie web animations, including modern rendering backends. Use it for real reusable vector motion assets.
+- Theatre.js: browser-based motion direction for DOM/WebGL variables. Use it for cinematic scenes that need a designer-style timeline.
+- Animata / React Bits: free/open-source copyable animated component references. Use them as inspiration or source-owned snippets, not as a pile of unrelated effects.
 
 ## WebGL / Three.js
 
@@ -36,5 +47,6 @@ Before applying brand styling, pull concrete recipes from `quantumskyes://design
 - Use neon/glowing text, shimmer, split text, or chromatic text effects as purposeful visual hierarchy.
 - Use cursor trails or pointer-reactive glow for premium interactive pages, with mobile/reduced-motion fallbacks.
 - Use a thicker branded scrollbar with a visible slightly opaque track and neon thumb/track highlights on scroll-led spectacle pages.
+- Legal Skyes-style browser chrome should be a reusable system: neon scrollbar, top scroll progress rail, pointer-reactive glow, scanline/grid texture, shimmer title utility, and magnetic control utility.
 - Do not hide custom scrollbars, make them ultra-thin, or rely on hover-only visibility when the user asked for visible scrollbars.
 - Sticky scroll cues are allowed when they help users understand a long cinematic page.
