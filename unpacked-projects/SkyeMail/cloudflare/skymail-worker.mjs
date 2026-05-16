@@ -128,6 +128,34 @@ function getCitadelSql(env) {
   return url ? neon(url) : null;
 }
 
+const SKYMAIL_TABLES = [
+  "users",
+  "user_keys",
+  "threads",
+  "messages",
+  "attachments",
+  "google_mailboxes",
+  "user_preferences",
+  "mail_contacts",
+  "resend_webhook_events",
+  "message_delivery_events",
+  "hosted_mailboxes",
+  "skymail_backup_events",
+];
+
+function schemaName(env) {
+  const schema = clean(env.SKYMAIL_DB_SCHEMA || "skymail");
+  return /^[a-z_][a-z0-9_]*$/i.test(schema) ? schema : "skymail";
+}
+
+function qualifySkymailSql(text, env) {
+  const schema = schemaName(env);
+  return String(text || "").replace(
+    new RegExp(`\\b(from|join|into|update)\\s+(${SKYMAIL_TABLES.join("|")})\\b`, "gi"),
+    (_match, keyword, table) => `${keyword} ${schema}.${table}`,
+  );
+}
+
 function databaseUrlWithSearchPath(value, env) {
   const raw = clean(value);
   if (!raw) return "";
@@ -147,13 +175,13 @@ function databaseUrlWithSearchPath(value, env) {
 
 async function query(env, text, params = []) {
   const sql = getPrimarySql(env);
-  return await sql.query(text, params);
+  return await sql.query(qualifySkymailSql(text, env), params);
 }
 
 async function queryCitadel(env, text, params = []) {
   const sql = getCitadelSql(env);
   if (!sql) return { skipped: true, reason: "CITADEL_DATABASE_URL is not configured." };
-  return await sql.query(text, params);
+  return await sql.query(qualifySkymailSql(text, env), params);
 }
 
 async function requireAuth(request, env) {
