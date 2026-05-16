@@ -379,6 +379,18 @@ function setupProofPlayer() {
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
+  function seekTo(seconds) {
+    const max = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : seconds;
+    const nextTime = Math.max(0, Math.min(max, seconds));
+    if (typeof video.fastSeek === "function") {
+      video.fastSeek(nextTime);
+    } else {
+      video.currentTime = nextTime;
+    }
+    timeline.value = String(nextTime);
+    if (current) current.textContent = formatTime(nextTime);
+  }
+
   function sync() {
     const max = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 100;
     timeline.max = String(max);
@@ -391,8 +403,7 @@ function setupProofPlayer() {
   shell.querySelectorAll("[data-proof-skip]").forEach((button) => {
     button.addEventListener("click", () => {
       const delta = Number(button.dataset.proofSkip || 0);
-      const max = Number.isFinite(video.duration) ? video.duration : video.currentTime + delta;
-      video.currentTime = Math.max(0, Math.min(max, video.currentTime + delta));
+      seekTo(video.currentTime + delta);
       sync();
     });
   });
@@ -423,7 +434,7 @@ function setupProofPlayer() {
   }
 
   timeline.addEventListener("input", () => {
-    video.currentTime = Number(timeline.value) || 0;
+    seekTo(Number(timeline.value) || 0);
     sync();
   });
 
