@@ -1,0 +1,41 @@
+{
+  "name": "MetrAIyux public proof walkthrough",
+  "slug": "metraiyux-public-proof",
+  "mode": "frames",
+  "siteRoot": "metraiyux_0s_public_spectacle_site",
+  "outDir": "test-artifacts/proof-recordings/metraiyux-public-proof",
+  "viewport": { "width": 1440, "height": 900 },
+  "videoSize": { "width": 1440, "height": 900 },
+  "frameSeconds": 7,
+  "boundaries": [
+    "No .env values, private keys, bearer tokens, or owner-only credentials are shown.",
+    "The proof page demonstrates public and browser-local behavior; production persistence depends on configured Cloudflare and provider credentials."
+  ],
+  "chapters": [
+    {
+      "path": "index.html",
+      "title": "Public front door links into the full proof walkthrough",
+      "body": "The homepage nav, hero CTA, hero video, and proof gallery can route a buyer to the standalone proof page.",
+      "actions": [
+        { "type": "screenshot", "name": "homepage-proof-entry" },
+        { "type": "scroll", "y": 950, "afterMs": 600 },
+        { "type": "screenshot", "name": "homepage-proof-gallery" }
+      ],
+      "capture": false
+    },
+    {
+      "path": "proof-walkthrough.html",
+      "title": "Standalone proof page leads with the long real browser video",
+      "body": "The first proof surface is the 8:07 MP4 that shows customer signup, workspace setup, billing intent, brain routing, NEXUS, CROWN, and proof vault states.",
+      "holdMs": 800,
+      "actions": [
+        { "type": "screenshot", "name": "proof-page-video" },
+        { "type": "scroll", "y": 850, "afterMs": 600 },
+        { "type": "screenshot", "name": "proof-route-grid" },
+        { "type": "scroll", "y": 950, "afterMs": 600 },
+        { "type": "screenshot", "name": "proof-state-screenshots" }
+      ],
+      "capture": false
+    }
+  ]
+}
