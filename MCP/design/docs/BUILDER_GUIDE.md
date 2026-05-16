@@ -22,6 +22,7 @@ Important MCP resources:
 - `design_stack_audit` verifies advanced-stack claims against real source imports/runtime usage.
 - `design_effect_audit` verifies requested effects against real source signals.
 - `design_performance_audit` rejects lazy Lenis, uncapped WebGL, heavy particles, eager screenshots, and missing motion/mobile fallbacks.
+- `design_stack_catalog` returns the approved package catalog for GSAP, Framer Motion, Motion, Lenis, Three/R3F/Drei/postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, React Bits, and Animata.
 - `design_open_source_stack` returns concrete open-source recipes so output is not just SkyeSol styling.
 - `design_recipe_plan` converts product/effect asks into required recipes, imports, and audits.
 - `design_logo_manifest` lists approved logo, mark, emblem, and icon assets.
@@ -56,24 +57,26 @@ Not allowed:
 1. Read `quantumskyes://directives/index`.
 2. Read `quantumskyes://design/registry`.
 3. Read `quantumskyes://design/open-source-stack`.
-4. Read `quantumskyes://design/pattern-manifest`.
-5. Read `quantumskyes://design/logo-standards` when the page has any logo or brand mark.
-6. Read `quantumskyes://design/surface-video-reel` when screenshot animation, app workflow proof, or video proof is requested.
-7. Call `design_compose_brief`.
-8. Call `design_recipe_plan` for the product and requested effects.
-9. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
-10. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
-11. Call `design_pattern_pack` for every required implementation pattern.
-12. Build from those real implementation patterns, not from a static lookalike.
-13. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
-14. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
-15. Call `design_validate` on the public copy/markup/source.
-16. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
-17. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing.
-18. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, text effects, Theatre, scroll, or 3D are requested.
-19. Call `design_performance_audit` before browser QA.
-20. Run browser screenshots.
-21. Fix before deploy.
+4. Read `quantumskyes://design/stack-catalog`.
+5. Read `quantumskyes://design/pattern-manifest`.
+6. Read `quantumskyes://design/logo-standards` when the page has any logo or brand mark.
+7. Read `quantumskyes://design/surface-video-reel` when screenshot animation, app workflow proof, or video proof is requested.
+8. Call `design_compose_brief`.
+9. Call `design_recipe_plan` for the product and requested effects.
+10. Call `design_stack_catalog` for package selection.
+11. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
+12. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
+13. Call `design_pattern_pack` for every required implementation pattern.
+14. Build from those real implementation patterns, not from a static lookalike.
+15. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
+16. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
+17. Call `design_validate` on the public copy/markup/source.
+18. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
+19. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, or Pixi.
+20. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, text effects, Theatre, scroll, or 3D are requested.
+21. Call `design_performance_audit` before browser QA.
+22. Run browser screenshots.
+23. Fix before deploy.
 
 ## Content Voice Rule
 
@@ -105,6 +108,13 @@ Pass examples:
 - `import Lenis from 'lenis'`
 - `import { motion } from 'motion/react'`
 - `import { Canvas } from '@react-three/fiber'`
+- `import { Float } from '@react-three/drei'`
+- `import { EffectComposer } from '@react-three/postprocessing'`
+- `import { getProject } from '@theatre/core'`
+- `import { DotLottie } from '@lottiefiles/dotlottie-web'`
+- `import { useRive } from '@rive-app/react-canvas'`
+- `import { Renderer } from 'ogl'`
+- `import { Application } from 'pixi.js'`
 
 Fail examples:
 
@@ -142,6 +152,10 @@ The MCP is not allowed to act like a SkyeSol restyler. It must pull implementati
 - `drei-postprocessing-cinema`
 - `gsap-lenis-scroll-stage`
 - `theatre-directed-scene`
+- `dotlottie-web-motion-asset`
+- `rive-interactive-motion-asset`
+- `ogl-shader-backdrop`
+- `pixi-sprite-stage`
 - `actual-surface-screenshot-stage`
 - `actual-surface-video-reel`
 - `brand-logo-asset-discipline`

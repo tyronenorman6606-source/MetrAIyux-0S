@@ -11,7 +11,10 @@ Before applying brand styling, pull concrete recipes from `quantumskyes://design
 - `gsap` + ScrollTrigger for pinned scroll stories, cinematic product funnels, and timeline control.
 - `lenis` for smooth scroll when scroll motion is part of the experience.
 - `@lottiefiles/dotlottie-web` or `@lottiefiles/dotlottie-react` for real vector motion assets when a custom animated media object is stronger than another CSS glow.
+- `@rive-app/react-canvas` for interactive vector state-machine assets when a real `.riv` file exists.
 - Theatre.js when a hero or 3D scene needs keyframed art direction instead of purely code-timed motion.
+- OGL for lightweight custom shader backdrops when React Three is too much.
+- PixiJS for sprite-heavy 2D scenes, game-like UI, and particle layers.
 
 ## Free Motion Sources To Check First
 
@@ -19,7 +22,9 @@ Before applying brand styling, pull concrete recipes from `quantumskyes://design
 - Motion: free/open-source animation library for React, JavaScript, and Vue. Use it for UI motion, scroll progress, layout movement, and pointer-reactive polish.
 - Lenis: open-source smooth scrolling with platform-friendly behavior. Use it only when the scroll experience is part of the page concept.
 - dotLottie Web: official LottieFiles player for Lottie/dotLottie web animations, including modern rendering backends. Use it for real reusable vector motion assets.
+- Rive: use real `.riv` assets for interactive vector motion and state machines.
 - Theatre.js: browser-based motion direction for DOM/WebGL variables. Use it for cinematic scenes that need a designer-style timeline.
+- OGL / PixiJS: use these when a lightweight shader or sprite canvas is a better fit than Three.js.
 - Animata / React Bits: free/open-source copyable animated component references. Use them as inspiration or source-owned snippets, not as a pile of unrelated effects.
 
 ## WebGL / Three.js
