@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Security Boundary | MetrAIyux 0S</title>
-  <meta name="description" content="MetrAIyux 0S security architecture: 0meg4kAI runs two independent scan passes (browser-side + Worker-side at the Cloudflare edge), hard approval gates on contracts/payments/hiring/publishing, SkyeGateFS27 auth on all /admin/* routes, and 8 D1 databases logging every decision.">
+  <meta name="description" content="I secure MetrAIyux 0S with 0meg4kAI two-pass scans, hard gates on contracts/payments/hiring/publishing, SkyeGateFS27 auth, and D1 proof records.">
   <link rel="icon" href="assets/favicon-32.png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +15,7 @@
       <a class="brand" href="index.html"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span>MetrAIyux 0S</span></a>
       <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
       <div class="nav-links" data-nav-links>
-        <a href="index.html">Overview</a><a href="guided-tour.html">Guided Tour</a><a href="platform.html">Platform</a><a href="tech-stack.html">Tech Stack</a><a href="brain-system.html">Brains</a><a class="is-active" href="security.html">Security</a><a href="value.html">Value</a><a href="/Metraiyux-Marketing/index.html">Pricing &amp; Plans</a>
+        <a href="index.html">Overview</a><a href="guided-tour.html">Live Tour</a><a href="platform.html">Platform</a><a href="tech-stack.html">Tech Stack</a><a href="brain-system.html">Brains</a><a class="is-active" href="security.html">Security</a><a href="value.html">Value</a><a href="/Metraiyux-Marketing/index.html">Pricing &amp; Plans</a>
         <a class="nav-cta" href="fit-check.html">Fit Check</a>
       </div>
     </nav>
@@ -23,17 +23,21 @@
 
   <main>
     <section class="page-hero reveal">
-      <p class="eyebrow">Security architecture</p>
-      <h1>Two scan layers. Hard gates. Structural isolation. Nothing configurable about the critical stops.</h1>
-      <p class="lead">0meg4kAI runs a browser-side scan before the request leaves the client and a Worker-side scan at the Cloudflare edge before any D1 write executes. The gates on contracts, payments, hiring decisions, and public publishing exist in three places — the brain router, the Worker endpoint, and the security scanner. A command has to clear all three or it does not move. SkyeGateFS27 handles auth on every /admin/* route.</p>
+      <p class="eyebrow">🔒 Security architecture</p>
+      <h1>I make the risky moves slow down on purpose.</h1>
+      <p class="lead">I run 0meg4kAI in the browser before the request leaves the client and again at the Cloudflare edge before any D1 write executes. Contracts, payments, hiring, public claims, and publishing all hit gates in the brain router, the Worker endpoint, and the security scanner. 🔒</p>
+      <div class="cta-row">
+        <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener">View FS27 Proof</a>
+        <a class="button secondary" href="tech-stack.html">Inspect Stack</a>
+      </div>
     </section>
 
     <section class="section">
       <div class="grid">
         <article class="card reveal">
           <span class="tag">0meg4kAI — two passes</span>
-          <h3>Browser-side and Worker-side. Both must clear.</h3>
-          <p>The browser scanner runs synchronously before the request leaves the client — zero latency added at the network level. The Worker scanner runs at the Cloudflare edge, stateless and independent of the browser pass. Tenant boundary violations, connector abuse, public claim overreach, and approval bypass attempts are blocked at the scanner before they reach D1.</p>
+          <h3>I scan browser-side and Worker-side. Both must clear.</h3>
+          <p>I run the browser scanner before the request leaves the client. I run the Worker scanner at the Cloudflare edge before D1 gets touched. Tenant boundary violations, connector abuse, public claim overreach, and approval bypass attempts get blocked before they become records.</p>
         </article>
         <article class="card reveal">
           <span class="tag">Hard approval gates</span>
@@ -48,12 +52,32 @@
       </div>
     </section>
 
+    <section class="section">
+      <div class="proof-window-grid reveal">
+        <a class="proof-window" href="assets/product-shots/fs27-gate-proof.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/fs27-gate-proof.png" alt="SkyeGateFS27 proof surface screenshot">
+        </a>
+        <div class="proof-window-copy">
+          <article class="voice-note">
+            <p class="eyebrow">🛡️ What I show publicly</p>
+            <h2>I let buyers see the gate, not the keys.</h2>
+            <p>I use the public proof surface to show the architecture: introspection, mirrored events, admin key management, platform monitoring, and the route back to MetrAIyux 0S. I do not publish secrets to prove I have control.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Boundary</span>
+            <h3>I want trust without leakage.</h3>
+            <p>The buyer can inspect the protection story. I keep private implementation setup and admin runbooks out of public reach.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="band">
       <div class="band-inner">
         <div class="reveal">
-          <p class="eyebrow">Security boundary</p>
-          <h2>The public site describes the architecture. It does not hand over the controls.</h2>
-          <p class="lead">A serious buyer can understand the full security posture — scan layers, gate logic, auth platform, D1 audit trail — without receiving the credentials or configuration that make it run.</p>
+          <p class="eyebrow">🧱 Security boundary</p>
+          <h2>I show the architecture without handing over the controls.</h2>
+          <p class="lead">I want a serious buyer to understand the security posture — scan layers, gate logic, auth platform, D1 audit trail — without receiving the private implementation handoff.</p>
         </div>
         <div class="panel private-boundary reveal">
           <h3>Public — what this page covers</h3>
@@ -65,8 +89,8 @@
           </ul>
           <h3 style="margin-top: 18px;">Private — what stays off this page</h3>
           <ul class="stack-list">
-            <li>SkyeGate tokens, Cloudflare account IDs, API keys, and production secrets.</li>
-            <li>wrangler configuration, deployment commands, and connector setup procedures.</li>
+            <li>Private access setup, protected owner controls, and backend configuration.</li>
+            <li>Internal deployment procedures and admin-only implementation details.</li>
             <li>Internal admin runbooks, 28-lesson tutorial content, and operator checklists.</li>
             <li>Live D1 query access, customer tenant records, and approval inbox content.</li>
           </ul>
@@ -80,7 +104,7 @@
           <p class="eyebrow">Four structural boundaries</p>
           <h2>Tenant, admin, claim, and action — each enforced at a different layer.</h2>
         </div>
-        <p>Worker-level enforcement is structural, not policy. The SaaS provisioning Worker isolates each customer's D1 data at the binding level. Cloudflare Access controls every /admin/* route. 0meg4kAI scans run at the edge before D1 writes. Hard gates exist in three code locations simultaneously. None of these are toggleable settings — they are the architecture.</p>
+        <p>I enforce separation in the architecture, not in a policy note. I use the SaaS provisioning Worker to isolate each customer's D1 data at the binding level. Cloudflare Access controls every /admin/* route. 0meg4kAI scans run at the edge before D1 writes. Hard gates exist in three code locations at the same time.</p>
       </div>
       <div class="grid two">
         <article class="card reveal"><span class="tag">Tenant boundary</span><h3>Customer workspace isolation is structural.</h3><p>Each customer's data lives in its own D1 partition. 0meg4kAI verifies at runtime that no customer command can reach owner-scoped brains or another tenant's records. Worker-level enforcement — not an access policy that can be misconfigured.</p></article>
@@ -93,9 +117,9 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>0meg4kAI two-layer scanning. SkyeGateFS27 auth. Hard gates on contracts, payments, hiring, and publishing.</p></div></div>
+      <div class="footer-brand"><img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><div><strong>MetrAIyux 0S</strong><p>I use 0meg4kAI two-layer scanning, SkyeGateFS27 auth, and hard gates on contracts, payments, hiring, and publishing.</p></div></div>
       <div class="footer-links"><a href="brain-system.html">Brains</a><a href="tech-stack.html">Tech Stack</a><a href="value.html">Value</a></div>
-      <div class="footer-links"><a href="fit-check.html">Fit Check</a><a href="/Metraiyux-Marketing/index.html">Marketing &amp; Pricing</a><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a><span class="tiny">Last public revision: 2026-05-15</span></div>
+      <div class="footer-links"><a href="fit-check.html">Fit Check</a><a href="/Metraiyux-Marketing/index.html">Marketing &amp; Pricing</a><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a><span class="tiny">Last public revision: 2026-05-16</span></div>
     </div>
   </footer>
   <script src="script.js"></script>

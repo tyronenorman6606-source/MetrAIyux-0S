@@ -31,6 +31,42 @@ function setupReveal() {
   items.forEach((item) => observer.observe(item));
 }
 
+function setupPointerGlow() {
+  if (window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const glow = document.createElement("div");
+  glow.className = "pointer-glow cursor-trail";
+  glow.setAttribute("aria-hidden", "true");
+  document.body.appendChild(glow);
+
+  let targetX = -120;
+  let targetY = -120;
+  let currentX = targetX;
+  let currentY = targetY;
+  let visible = false;
+
+  window.addEventListener("pointermove", (event) => {
+    targetX = event.clientX - 17;
+    targetY = event.clientY - 17;
+    visible = true;
+    glow.style.opacity = "1";
+  });
+
+  window.addEventListener("pointerleave", () => {
+    visible = false;
+    glow.style.opacity = "0";
+  });
+
+  function frame() {
+    currentX += (targetX - currentX) * 0.34;
+    currentY += (targetY - currentY) * 0.34;
+    glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+    if (!visible) glow.style.opacity = "0";
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+}
+
 function setupCommandCanvas() {
   const canvas = document.querySelector(".command-canvas");
   if (!canvas || !canvas.getContext) return;
@@ -91,6 +127,37 @@ function setupCommandCanvas() {
   resize();
   window.addEventListener("resize", resize);
   requestAnimationFrame(draw);
+}
+
+function setupCommandTabs() {
+  const buttons = Array.from(document.querySelectorAll("[data-command-tab]"));
+  const panels = Array.from(document.querySelectorAll("[data-command-panel]"));
+  const title = document.querySelector("[data-command-title]");
+  if (!buttons.length || !panels.length) return;
+
+  const titles = {
+    route: "Prospect route opened",
+    gate: "SkyeGateFS27 bridge",
+    brains: "Sixteen-brain routing",
+    proof: "Live proof ledger"
+  };
+
+  function activate(tab) {
+    buttons.forEach((button) => {
+      const active = button.dataset.commandTab === tab;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.commandPanel !== tab;
+    });
+    if (title) title.textContent = titles[tab] || "Command surface";
+  }
+
+  buttons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.classList.contains("is-active")));
+    button.addEventListener("click", () => activate(button.dataset.commandTab));
+  });
 }
 
 function setupGuidedTour() {
@@ -177,28 +244,28 @@ function setupGuidedTour() {
 function getFitProfile(score) {
   if (score >= 24) {
     return {
-      level: "High fit: full command-system candidate",
-      next: "Route to the full MetrAIyux 0S website and review a build path for admin command, customer workspaces, proof, and automation gates.",
+      level: "High fit: I would show you the full command deck",
+      next: "I would route you to the full MetrAIyux 0S website and talk through admin command, customer workspaces, proof, and automation gates.",
       href: fullWebsiteUrl
     };
   }
   if (score >= 16) {
     return {
-      level: "Strong fit: operator-system candidate",
-      next: "Start with the guided public overview, then evaluate the full website for phased deployment.",
+      level: "Strong fit: I would start you in phases",
+      next: "I would start with the live public tour, then evaluate the full website for phased deployment.",
       href: `${fullWebsiteUrl}saas/`
     };
   }
   if (score >= 9) {
     return {
-      level: "Early fit: structured-operations candidate",
-      next: "Use the public overview as a planning tool. The system may be useful after process cleanup, service mapping, and approval design.",
+      level: "Early fit: I would clean the operating map first",
+      next: "I would use the public overview as a planning tool and consider the command system after process cleanup, service mapping, and approval design.",
       href: "guided-tour.html"
     };
   }
   return {
-    level: "Not urgent yet",
-    next: "The company may need basic process documentation before a full command system is worth the lift.",
+    level: "Not urgent yet: I would not force this",
+    next: "I would document the company’s process before putting a full command system on top.",
     href: "value.html"
   };
 }
@@ -261,9 +328,9 @@ function buildBriefObject() {
     platform: "MetrAIyux 0S",
     publicOverviewUrl,
     fullWebsiteUrl,
-    publicPositioning: "A public, guided overview for a founder-controlled company operating system with admin command, customer SaaS workspaces, proof receipts, approval gates, and a 16-brain operating model.",
+    publicPositioning: "I built this public overview for a founder-controlled company operating system with admin command, customer SaaS workspaces, proof receipts, approval gates, and a 16-brain operating model.",
     coreCapabilities: [
-      "Public buyer education and guided fit routing",
+      "Public buyer education and live fit routing",
       "Customer signup, onboarding, service selection, and workspace paths",
       "Owner/admin command layer kept separate from public pages",
       "Local brain library for cabinet-style routing and company doctrine",
@@ -271,7 +338,7 @@ function buildBriefObject() {
       "Proof vault, approval records, smoke-test receipts, and audit posture",
       "Cloudflare edge architecture for Workers, Pages, D1, KV, Queues, and email approval workflows"
     ],
-    publicBoundary: "Deployment commands, credentials, connector setup, production secrets, and internal operator runbooks are not published on the public overview site.",
+    publicBoundary: "Private implementation setup, owner controls, customer records, and internal operator runbooks are not published on the public overview site.",
     generatedAt: new Date().toISOString()
   };
 }
@@ -295,7 +362,9 @@ function previewBrief() {
 document.addEventListener("DOMContentLoaded", () => {
   setupMenu();
   setupReveal();
+  setupPointerGlow();
   setupCommandCanvas();
+  setupCommandTabs();
   setupGuidedTour();
   previewBrief();
 });
