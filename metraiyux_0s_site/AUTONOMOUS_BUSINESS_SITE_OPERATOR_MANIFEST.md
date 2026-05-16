@@ -4,12 +4,14 @@ Generated: 2026-05-15T08:38:09.893724Z
 
 ## Upgrade Summary
 
-This release adds a 15th lightweight brain: **Site Operator Brain**.
+This release aligns the Site Operator Brain, 0meg4kAI, Central Command, and 13 cabinet brains into the 16-brain runtime.
 
 ## Brain Count
 
-- Existing company/cabinet brains: 14
-- New site operator/conductor brain: 1
+- Cabinet executive brains: 13
+- Central Company Command Brain: 1
+- Site Operator Brain: 1
+- 0meg4kAI security/QA brain: 1
 - Total system brains: 16
 
 ## Added
