@@ -1,11 +1,20 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { hasValidOperatorSession } from './_lib/security.js';
 
+const functionDir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_CANDIDATES = [
+  functionDir,
+  path.resolve(functionDir, '..'),
+  path.resolve(functionDir, '../..'),
+  path.resolve(functionDir, '../../..'),
   process.cwd(),
+  path.resolve(process.cwd(), 'SkyeVault-Drop'),
   process.env.LAMBDA_TASK_ROOT ? path.resolve(process.env.LAMBDA_TASK_ROOT, '..') : '',
-  '/var/task'
+  process.env.LAMBDA_TASK_ROOT ? path.resolve(process.env.LAMBDA_TASK_ROOT, '../..') : '',
+  '/var/task',
+  '/var/task/SkyeVault-Drop'
 ].filter(Boolean);
 const PAGES = {
   admin: 'internal-pages/admin.html',
