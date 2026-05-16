@@ -1,0 +1,119 @@
+import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
+import { cleanText, requirePortalKey, safeFileName } from './_lib/security.js';
+import { loadLedger, writeAuditEventSafe } from './_lib/config.js';
+import { createDownloadUrl, getDriveFileMetadata } from './_lib/google-drive.js';
+
+function fail(message, statusCode = 400) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  throw error;
+}
+
+function normalizeEmail(value) {
+  return cleanText(value, 180).toLowerCase();
+}
+
+function safeEntry(entry) {
+  const file = entry.driveFile || {};
+  return {
+    id: entry.id,
+    completedAt: entry.completedAt || '',
+    sessionId: entry.sessionId || '',
+    submissionId: entry.submissionId || '',
+    clientRequestId: entry.clientRequestId || '',
+    destinationName: entry.destinationName || entry.destinationId || 'Vault storage',
+    clientName: entry.clientName || '',
+    clientEmail: entry.clientEmail || '',
+    projectName: entry.projectName || '',
+    clientReference: entry.clientReference || '',
+    assetType: entry.assetType || '',
+    deadline: entry.deadline || '',
+    fileName: safeFileName(entry.fileName || file.name || 'vault-file'),
+    fileSize: Number(entry.fileSize || file.size || 0),
+    mimeType: entry.mimeType || file.mimeType || 'application/octet-stream',
+    fileFingerprint: entry.fileFingerprint || null,
+    scan: entry.scan ? {
+      status: entry.scan.status || '',
+      verdict: entry.scan.verdict || ''
+    } : null,
+    receiptSignature: entry.receiptSignature || ''
+  };
+}
+
+function entryFileId(entry) {
+  return cleanText(entry.driveFile?.id || entry.driveFile?.key || '', 500);
+}
+
+async function clientEntries(email, receiptId = '') {
+  const ledger = await loadLedger(2500);
+  const wantedReceipt = cleanText(receiptId, 120);
+  return ledger.entries
+    .filter((entry) => normalizeEmail(entry.clientEmail) === email)
+    .filter((entry) => !wantedReceipt || entry.id === wantedReceipt)
+    .sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')));
+}
+
+export async function handler(event) {
+  if (event.httpMethod === 'OPTIONS') return handleOptions(event);
+  const wrongMethod = method(event, ['POST']);
+  if (wrongMethod) return wrongMethod;
+
+  try {
+    const body = await readJson(event);
+    requirePortalKey(event, body);
+
+    const email = normalizeEmail(body.clientEmail || body.email);
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('Enter the email used for the vault upload.');
+
+    const action = cleanText(body.action || 'list', 40).toLowerCase();
+    const receiptId = cleanText(body.receiptId, 120);
+    const entries = await clientEntries(email, receiptId);
+
+    if (action === 'download') {
+      if (!receiptId) fail('Receipt ID is required to download a vault file.');
+      const entry = entries.find((item) => item.id === receiptId);
+      if (!entry) fail('No matching vault receipt was found for that email.', 404);
+      const fileId = entryFileId(entry);
+      if (!fileId) fail('This receipt does not include a downloadable vault object.', 409);
+
+      const metadata = await getDriveFileMetadata(fileId);
+      const objectSession = metadata.appProperties?.sessionId || '';
+      if (entry.sessionId && objectSession && objectSession !== entry.sessionId) {
+        fail('Vault object metadata does not match the receipt.', 409);
+      }
+      const expiresInSeconds = Math.min(3600, Math.max(300, Number(body.expiresInSeconds || 900)));
+      const downloadUrl = createDownloadUrl(fileId, {
+        fileName: entry.fileName || metadata.name,
+        mimeType: entry.mimeType || metadata.mimeType,
+        expires: expiresInSeconds
+      });
+      await writeAuditEventSafe('client-vault-download-link-created', {
+        receiptId: entry.id,
+        sessionId: entry.sessionId,
+        clientEmail: email,
+        fileName: entry.fileName,
+        fileSize: entry.fileSize,
+        expiresInSeconds
+      });
+      return json(200, {
+        ok: true,
+        item: safeEntry(entry),
+        downloadUrl,
+        expiresAt: new Date(Date.now() + expiresInSeconds * 1000).toISOString()
+      }, noStoreCors(event));
+    }
+
+    if (action !== 'list') fail('Unsupported client vault action.', 400);
+    await writeAuditEventSafe('client-vault-list-viewed', {
+      clientEmail: email,
+      resultCount: entries.length
+    });
+    return json(200, {
+      ok: true,
+      items: entries.map(safeEntry),
+      count: entries.length
+    }, noStoreCors(event));
+  } catch (error) {
+    return json(error.statusCode || 500, { ok: false, error: error.message }, noStoreCors(event));
+  }
+}

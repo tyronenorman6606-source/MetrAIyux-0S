@@ -269,6 +269,23 @@ window.scoreStaffingFit = scoreStaffingFit;
 })();
 
 (function() {
+  const progress = document.createElement('div');
+  progress.className = 'scroll-progress';
+  progress.setAttribute('aria-hidden', 'true');
+  progress.innerHTML = '<span></span>';
+  document.body.appendChild(progress);
+  const fill = progress.querySelector('span');
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    fill.style.transform = `scaleX(${pct})`;
+  };
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+})();
+
+(function() {
   const canvas = document.querySelector('.command-canvas');
   if (!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
