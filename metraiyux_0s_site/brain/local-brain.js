@@ -150,7 +150,18 @@ function scoreText(query, haystack) {
     'sovereign infrastructure',
     'pricing',
     'stripe',
-    'subscription'
+    'subscription',
+    'marketplace',
+    'vault',
+    'skye vault',
+    'campaign',
+    'brain campaign',
+    'ecosystem portal',
+    'product hub',
+    'empire',
+    'embed',
+    'upload',
+    'source tag'
   ].forEach(phrase => {
     if ((query || '').toLowerCase().includes(phrase) && hay.includes(phrase)) score += 7;
   });
@@ -373,6 +384,22 @@ function smartDirectAnswer(query, route, surfaces) {
     return `${primaryOwner} owns the technical lane. The useful answer should identify the surface, route the change, check auth/proof implications, and only then push to production. ${secondaryOwner} should confirm the operational receipt or routing result.`;
   }
 
+  if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {
+    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOL Enterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
+  }
+
+  if (hasAny(q, ['vault', 'upload', 'file drop', 'storage', 'send files', 'client upload'])) {
+    return `Skye Vault at https://skyevault-drop.netlify.app is the empire-wide client file drop and storage system. It accepts uploads via drag-drop, supports source routing with ?source= tags, and is embeddable on any site via iframe or the vault-widget.js script. Backend uses Cloudflare R2. ${primaryOwner} handles the vault conversation; for pricing, loop in ${secondaryOwner}.`;
+  }
+
+  if (hasAny(q, ['campaign', 'brain campaign', 'run campaign', 'autonomous', 'auto sell', 'ai campaign'])) {
+    return `Brain campaigns route sales and marketing tasks autonomously through the 16-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Celeste Monroe), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
+  }
+
+  if (hasAny(q, ['portal', 'ecosystem portal', 'empire hub', 'all sites', 'all properties'])) {
+    return `The Ecosystem Portal at https://metraiyux-ecosystem-portal.pages.dev/ links all 7+ empire properties: SOL Enterprises, MetrAIyux 0S, Public Spectacle, Marketing, Skye BCC, Legal Center (Legal Skyes), and Skye Vault. It includes a particle field canvas, property cards, vault upload spotlight, and a full legal policy strip.`;
+  }
+
   return `${primaryOwner} is the primary owner for this question through ${primary?.cabinet || 'the routed cabinet lane'}. ${secondaryOwner} is the secondary check. The practical answer is to keep the request inside that owner lane, use the live proof surface when one matches, and create a receipt or escalation if the answer touches money, legal claims, admin access, client commitments, or public promises.`;
 }
 
@@ -472,10 +499,11 @@ async function fetchJson(path) {
 async function loadKB() {
   const status = document.getElementById('brainStatus');
   try {
-    const [kbData, registry, legalData, personas, siteOperator, offers] = await Promise.all([
+    const [kbData, registry, legalData, marketplaceData, personas, siteOperator, offers] = await Promise.all([
       fetchJson('brain/knowledge-base.json'),
       fetchJson('brain/live-surface-registry.json'),
       fetchJson('brain/legal-sync.json'),
+      fetchJson('brain/marketplace-sync.json'),
       fetchJson('brain/persona-brains.json'),
       fetchJson('brain/site-operator-brain.json'),
       fetchJson('brain/sales-offer-registry.json')
@@ -495,7 +523,8 @@ async function loadKB() {
       ...personasToChunks(PERSONA_REGISTRY),
       ...siteOperatorToChunks(SITE_OPERATOR),
       ...offersToChunks(SALES_OFFERS),
-      ...(LEGAL_DATA?.chunks || [])
+      ...(LEGAL_DATA?.chunks || []),
+      ...(marketplaceData?.chunks || [])
     ];
 
     const brainCount = PERSONA_REGISTRY?.total_brains || SITE_OPERATOR?.total_system_brains || TOTAL_BRAINS;
@@ -504,7 +533,8 @@ async function loadKB() {
       PERSONA_REGISTRY ? 'persona registry' : null,
       SITE_OPERATOR ? 'site-operator routes' : null,
       SALES_OFFERS ? 'sales offer registry' : null,
-      LEGAL_DATA ? 'legal center' : null
+      LEGAL_DATA ? 'legal center' : null,
+      marketplaceData ? 'marketplace catalog' : null
     ].filter(Boolean);
     if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} local knowledge chunks with ${extras.join(', ')}.`;
     renderSources([]);

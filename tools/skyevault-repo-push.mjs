@@ -8,10 +8,17 @@ const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has('--dry-run');
 const keepStage = args.has('--keep-stage');
+const argValue = (name) => {
+  const prefix = `${name}=`;
+  return process.argv.slice(2).find((arg) => arg.startsWith(prefix))?.slice(prefix.length) || '';
+};
+const existingArchive = argValue('--upload-archive');
+const existingFileCount = Number(argValue('--file-count') || 0);
+const existingSecretExcludeCount = Number(argValue('--secret-excludes') || 0);
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 
-const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.claude', 'test-artifacts', 'backups', 'wal_archive', '.skyevault-out']);
-const SKIP_EXTS = new Set(['.zip', '.tar', '.gz', '.tgz', '.7z', '.rar', '.dump', '.backup', '.bak', '.sqlite', '.sqlite3', '.db', '.pem', '.key', '.p12', '.pfx', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.mp4', '.mov', '.avi', '.pdf']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
+const SKIP_EXTS = new Set(['.zip', '.tar', '.gz', '.tgz', '.7z', '.rar', '.dump', '.backup', '.bak', '.sqlite', '.sqlite3', '.db', '.pem', '.key', '.p12', '.pfx']);
 const SECRET_PATTERNS = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |)?PRIVATE KEY-----/],
   ['openai-key', /\bsk-[A-Za-z0-9_-]{20,}\b/],
@@ -79,7 +86,15 @@ function secretHits(file) {
 
 function secretExcludes() {
   const excludes = [];
+  let checked = 0;
+  let lastProgress = Date.now();
   walk(root, (file) => {
+    checked += 1;
+    const now = Date.now();
+    if (now - lastProgress > 10000) {
+      console.log(`Scanned ${checked} candidate files...`);
+      lastProgress = now;
+    }
     const hits = secretHits(file);
     if (hits.length) excludes.push({ file: rel(file), hits });
   });
@@ -98,10 +113,13 @@ function copyToStage(stage, excludes) {
     '--exclude=node_modules/',
     '--exclude=.netlify/',
     '--exclude=.wrangler/',
+    '--exclude=.wrangler-dry-run/',
     '--exclude=.claude/',
     '--exclude=test-artifacts/',
+    '--exclude=test-results/',
     '--exclude=backups/',
     '--exclude=wal_archive/',
+    '--exclude=.staffing-db/',
     '--exclude=.skyevault-out/',
     '--exclude=.env',
     '--exclude=.env.*',
@@ -184,7 +202,7 @@ async function uploadArchive(archive, archiveHash, summary) {
   const now = Date.now();
   const branch = gitValue(['branch', '--show-current']);
   const commit = gitValue(['rev-parse', '--short', 'HEAD']);
-  const dirtyCount = gitValue('git status --short', '').split(/\r?\n/).filter(Boolean).length;
+  const dirtyCount = gitValue(['status', '--short'], '').split(/\r?\n/).filter(Boolean).length;
   const body = {
     clientName: env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
     clientEmail: env.SKYEVAULT_CLIENT_EMAIL || 'operator@example.com',
@@ -275,6 +293,35 @@ async function uploadArchive(archive, archiveHash, summary) {
     manifestUpdated: completion.manifest?.updated,
     notificationOk: completion.notification?.ok ?? null
   };
+}
+
+if (existingArchive) {
+  const archive = path.resolve(root, existingArchive);
+  if (!fs.existsSync(archive)) throw new Error(`Archive not found: ${archive}`);
+  const archiveHash = hashFile(archive);
+  const summary = {
+    fileCount: existingFileCount,
+    bytes: fs.statSync(archive).size,
+    excludedSecretLikeFiles: existingSecretExcludeCount
+  };
+  console.log(`Using existing sanitized archive: ${archive}`);
+  console.log(`Files: ${summary.fileCount || 'not provided'}`);
+  console.log(`Bytes: ${summary.bytes}`);
+  console.log(`SHA-256: ${archiveHash}`);
+  console.log(`Secret-looking files excluded: ${summary.excludedSecretLikeFiles || 'not provided'}`);
+  if (dryRun) {
+    console.log('Dry run complete. Upload skipped.');
+    process.exit(0);
+  }
+  const receipt = await uploadArchive(archive, archiveHash, summary);
+  const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const outDir = path.join(root, '.skyevault-out');
+  fs.mkdirSync(outDir, { recursive: true });
+  const receiptPath = path.join(outDir, `skyevault-receipt-${receipt.receiptId || stamp}.json`);
+  fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  console.log(JSON.stringify(receipt, null, 2));
+  console.log(`Receipt written: ${receiptPath}`);
+  process.exit(0);
 }
 
 const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');

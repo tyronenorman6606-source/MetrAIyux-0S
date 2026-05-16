@@ -55,6 +55,88 @@ async function recordWorkspaceMailbox(env, workspaceId, skymail){
   }
   return row;
 }
+function cardDisplayName(workspace, owner){
+  return String(owner?.full_name || owner?.name || workspace?.company_name || workspace?.slug || "Workspace Owner").trim();
+}
+function buildWorkspaceKeyCard(env, workspace, owner, skymail, mailboxReceipt){
+  const mailboxEmail = mailboxReceipt?.mailbox_email || skymail?.data?.mailbox?.mailbox_email || "";
+  const skymailUrl = String(env.SKYMAIL_PUBLIC_URL || env.SKYMAIL_API_URL || "https://skymail-platform.graylondonskyes.workers.dev").replace(/\/+$/, "");
+  const setup = new URL(`${skymailUrl}/login`);
+  setup.searchParams.set("workspace_id", workspace.id);
+  if (mailboxEmail) setup.searchParams.set("mailbox", mailboxEmail);
+  setup.searchParams.set("next", "vault-setup");
+  const keyState = skymail?.data?.key_state || {};
+  return {
+    id: id("keycard"),
+    type: "skymail_vault_key_card",
+    title: "SkyeMail Vault Key Card",
+    workspace_id: workspace.id,
+    customer_id: workspace.customer_id || "",
+    workspace_slug: workspace.slug,
+    company_name: workspace.company_name,
+    plan_id: workspace.plan_id,
+    recipient_email: owner?.email || workspace.approval_email || "",
+    display_name: cardDisplayName(workspace, owner),
+    mailbox_email: mailboxEmail,
+    setup_url: setup.toString(),
+    recovery_policy: "client_managed_optional_admin_recovery",
+    key_state: {
+      active: Boolean(keyState.active),
+      version: keyState.version || null,
+      setup_required: !keyState.active,
+    },
+    security_model: [
+      "Client creates the vault key pair in their browser.",
+      "SkyeMail stores the public key for inbound encryption.",
+      "The private key is stored only after being wrapped by the client's Vault Passphrase.",
+      "Admin recovery is optional and must be disclosed if enabled.",
+    ],
+    mdp_rendering: {
+      requested: Boolean(env.MDP_KEYCARD_WEBHOOK_URL || env.MCP_KEYCARD_WEBHOOK_URL),
+      format: "resume_style_workspace_security_card",
+    },
+    created_at: now(),
+  };
+}
+async function sendKeyCardToMdp(env, card){
+  const url = env.MDP_KEYCARD_WEBHOOK_URL || env.MCP_KEYCARD_WEBHOOK_URL || "";
+  if(!url) return {status:"not_configured", response:null};
+  const secret = env.MDP_KEYCARD_WEBHOOK_SECRET || env.MCP_KEYCARD_WEBHOOK_SECRET || "";
+  try {
+    const res = await fetch(url, {
+      method:"POST",
+      headers:{
+        "content-type":"application/json",
+        ...(secret ? {"authorization":`Bearer ${secret}`, "x-metraiyux-keycard-secret":secret} : {})
+      },
+      body:JSON.stringify({type:"metraiyux.workspace.key_card.issue", card})
+    });
+    const text = await res.text();
+    let data; try{ data=text?JSON.parse(text):null; }catch{ data={raw:text.slice(0,1000)}; }
+    return {status:res.ok?"sent":"failed", http_status:res.status, response:data};
+  } catch(error) {
+    return {status:"failed", error:error?.message || "MDP key-card dispatch failed."};
+  }
+}
+async function recordWorkspaceKeyCard(env, workspace, owner, skymail, mailboxReceipt){
+  const card = buildWorkspaceKeyCard(env, workspace, owner, skymail, mailboxReceipt);
+  const mdp = await sendKeyCardToMdp(env, card);
+  const row = {
+    ...card,
+    status: "issued",
+    mdp_status: mdp.status,
+    mdp_response: mdp,
+    payload: card,
+    updated_at: now(),
+  };
+  if(env.SAAS_KV) await env.SAAS_KV.put(`workspace_key_card:${workspace.id}`, JSON.stringify(row));
+  if(env.SAAS_DB) {
+    await env.SAAS_DB.prepare(`INSERT INTO workspace_key_cards
+      (id,workspace_id,customer_id,card_type,recipient_email,display_name,mailbox_email,setup_url,recovery_policy,status,mdp_status,mdp_response,payload,created_at,updated_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(row.id,row.workspace_id,row.customer_id,row.type,row.recipient_email,row.display_name,row.mailbox_email,row.setup_url,row.recovery_policy,row.status,row.mdp_status,JSON.stringify(row.mdp_response||{}),JSON.stringify(row.payload||{}),row.created_at,row.updated_at).run();
+  }
+  return row;
+}
 export default { async fetch(req, env){
   if(req.method==='OPTIONS') return new Response(null,{headers:cors});
   const url=new URL(req.url); const path=url.pathname;
@@ -81,17 +163,26 @@ export default { async fetch(req, env){
 	      const owner={email:b.owner_email||b.email||b.approval_email||'', full_name:b.full_name||b.owner_name||''};
 	      const skymail = await createSkyeMailClient(env).provisionWorkspaceMailbox(workspace, owner);
 	      const mailboxReceipt = await recordWorkspaceMailbox(env, workspace_id, skymail);
+	      const keyCard = await recordWorkspaceKeyCard(env, workspace, owner, skymail, mailboxReceipt);
 	      await recordProvisioningEvent(env, workspace_id, 'skymail.workspace_mailbox', {skymail, mailboxReceipt}, skymail.ok?'completed':(skymail.skipped?'skipped':'needs_attention'));
+	      await recordProvisioningEvent(env, workspace_id, 'skymail.vault_key_card', {keyCard}, keyCard.mdp_status === 'failed' ? 'needs_attention' : 'completed');
 	      if(env.SAAS_QUEUE) await env.SAAS_QUEUE.send({type:'workspace_provisioning', workspace_id, plan_id, services:workspace.services, skymail:mailboxReceipt, at:now()});
 	      await audit(env,'system','create_workspace','workspace',workspace_id,b);
-	      await email(env,'Workspace provisioning approval needed',`<h2>Workspace pending</h2><p>Workspace ${workspace_id} for ${b.company_name||slug} is ready for approval.</p><p>Plan: ${plan_id}</p><p>SkyeMail: ${mailboxReceipt.mailbox_email || mailboxReceipt.provisioning_status}</p>`);
-	      return json({ok:true, workspace_id, slug, status:'pending_provisioning', queued:!!env.SAAS_QUEUE, persistence:env.SAAS_DB?'d1':'kv_fallback', skymail:{ok:skymail.ok, skipped:!!skymail.skipped, mailbox:mailboxReceipt, response:skymail.data||null, error:skymail.error||null}});
+	      await email(env,'Workspace provisioning approval needed',`<h2>Workspace pending</h2><p>Workspace ${workspace_id} for ${b.company_name||slug} is ready for approval.</p><p>Plan: ${plan_id}</p><p>SkyeMail: ${mailboxReceipt.mailbox_email || mailboxReceipt.provisioning_status}</p><p>Vault key card: ${keyCard.setup_url}</p>`);
+	      return json({ok:true, workspace_id, slug, status:'pending_provisioning', queued:!!env.SAAS_QUEUE, persistence:env.SAAS_DB?'d1':'kv_fallback', skymail:{ok:skymail.ok, skipped:!!skymail.skipped, mailbox:mailboxReceipt, key_card:keyCard, response:skymail.data||null, error:skymail.error||null}});
 	    }
 	    if(path==='/api/saas/skymail/status'){
 	      const workspace_id=url.searchParams.get('workspace_id')||'';
 	      if(!workspace_id) return json({ok:false,error:'workspace_id_required'},400);
 	      if(env.SAAS_DB){ const rows=await env.SAAS_DB.prepare('SELECT * FROM workspace_mailboxes WHERE workspace_id=? ORDER BY created_at DESC LIMIT 10').bind(workspace_id).all(); return json({ok:true, rows:rows.results||[]}); }
 	      if(env.SAAS_KV){ const row=await env.SAAS_KV.get(`workspace_mailbox:${workspace_id}`,'json'); return json({ok:true, rows:row?[row]:[]}); }
+	      return json({ok:false,error:'no_persistence_bound'},500);
+	    }
+	    if(path==='/api/saas/key-card'){
+	      const workspace_id=url.searchParams.get('workspace_id')||'';
+	      if(!workspace_id) return json({ok:false,error:'workspace_id_required'},400);
+	      if(env.SAAS_DB){ const rows=await env.SAAS_DB.prepare('SELECT * FROM workspace_key_cards WHERE workspace_id=? ORDER BY created_at DESC LIMIT 10').bind(workspace_id).all(); return json({ok:true, rows:rows.results||[]}); }
+	      if(env.SAAS_KV){ const row=await env.SAAS_KV.get(`workspace_key_card:${workspace_id}`,'json'); return json({ok:true, rows:row?[row]:[]}); }
 	      return json({ok:false,error:'no_persistence_bound'},500);
 	    }
     if(path==='/api/saas/billing/checkout-session' && req.method==='POST'){
