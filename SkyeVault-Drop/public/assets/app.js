@@ -10,6 +10,7 @@ const state = {
   uploading: false,
   receipts: [],
   pendingFinalizations: [],
+  clientVaultItems: [],
   requestIds: new Map(),
   fingerprints: new Map(),
   submissionId: '',
@@ -47,6 +48,11 @@ const pauseUpload = document.querySelector('#pauseUpload');
 const copyReceipts = document.querySelector('#copyReceipts');
 const downloadReceipts = document.querySelector('#downloadReceipts');
 const turnstileWrap = document.querySelector('#turnstileWrap');
+const clientVaultForm = document.querySelector('#clientVaultForm');
+const clientVaultKeyWrap = document.querySelector('#clientVaultKeyWrap');
+const clientVaultList = document.querySelector('#clientVaultList');
+const clientVaultCount = document.querySelector('#clientVaultCount');
+const clearClientVault = document.querySelector('#clearClientVault');
 
 function showStatus(message, type = '') {
   statusBox.className = `status-card ${type}`.trim();
@@ -780,6 +786,86 @@ function renderReceipts() {
   receiptPanel.classList.toggle('hidden', state.receipts.length === 0);
 }
 
+function clientVaultPayload(action, receiptId = '') {
+  const data = new FormData(clientVaultForm);
+  return {
+    action,
+    receiptId,
+    clientEmail: data.get('clientEmail'),
+    portalKey: data.get('portalKey')
+  };
+}
+
+async function clientVaultApi(body) {
+  const headers = body.portalKey ? { 'x-portal-key': body.portalKey } : {};
+  return api('/api/client-vault', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+}
+
+function renderClientVaultItems(items = []) {
+  state.clientVaultItems = items;
+  if (!clientVaultList || !clientVaultCount) return;
+  clientVaultList.textContent = '';
+  clientVaultCount.textContent = items.length ? `${items.length} item${items.length === 1 ? '' : 's'}` : 'No files';
+
+  if (!items.length) {
+    const empty = document.createElement('p');
+    empty.className = 'muted big-copy';
+    empty.textContent = 'No completed vault receipts were found for that email.';
+    clientVaultList.append(empty);
+    return;
+  }
+
+  for (const item of items) {
+    const row = document.createElement('article');
+    row.className = 'client-vault-row';
+    const main = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = item.fileName || 'Vault file';
+    const meta = document.createElement('p');
+    meta.textContent = `${formatBytes(item.fileSize)} · ${item.projectName || 'No project label'} · ${item.completedAt || 'completed'}`;
+    const proof = document.createElement('p');
+    proof.className = 'receipt-id';
+    const fp = item.fileFingerprint?.value ? ` · fp ${String(item.fileFingerprint.value).slice(0, 12)}…` : '';
+    proof.textContent = `Receipt ${item.id}${item.scan?.status ? ` · scan ${item.scan.status}` : ''}${fp}`;
+    main.append(title, meta, proof);
+
+    const actions = document.createElement('div');
+    actions.className = 'vault-file-actions';
+    const download = document.createElement('button');
+    download.className = 'secondary-btn compact';
+    download.type = 'button';
+    download.textContent = 'Download';
+    download.addEventListener('click', async () => {
+      download.disabled = true;
+      download.textContent = 'Preparing...';
+      try {
+        const result = await clientVaultApi(clientVaultPayload('download', item.id));
+        window.open(result.downloadUrl, '_blank', 'noopener');
+        showStatus(`Download link ready for ${result.item?.fileName || item.fileName}.`, 'success');
+      } catch (error) {
+        showStatus(error.message || 'Could not create download link.', 'error');
+      } finally {
+        download.disabled = false;
+        download.textContent = 'Download';
+      }
+    });
+    actions.append(download);
+    row.append(main, actions);
+    clientVaultList.append(row);
+  }
+}
+
+async function openClientVault() {
+  const body = clientVaultPayload('list');
+  const result = await clientVaultApi(body);
+  renderClientVaultItems(result.items || []);
+  showStatus(result.count ? 'Vault files loaded.' : 'No matching vault files found.', result.count ? 'success' : '');
+}
+
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -845,6 +931,7 @@ async function loadPublicConfig() {
   setText(destinationCount, String((config.destinations || []).length));
   setText(chunkSizeLabel, `${config.chunkSizeMb || 8} MB`);
   setText(portalModeLabel, config.portalKeyRequired ? 'Code protected' : 'Open link');
+  if (clientVaultKeyWrap) clientVaultKeyWrap.classList.toggle('hidden', !config.portalKeyRequired);
   if (config.maxFilesPerSubmission) queueSummary.title = `${config.maxFilesPerSubmission} file submission limit · ${config.maxTotalSubmissionGb || 5000} GB total package limit`;
   if (config.turnstileSiteKey) {
     renderTurnstile(config.turnstileSiteKey).catch((error) => showStatus(error.message, 'error'));
@@ -968,6 +1055,34 @@ if (downloadReceipts) {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  });
+}
+
+if (clientVaultForm) {
+  clientVaultForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!clientVaultForm.checkValidity()) {
+      clientVaultForm.reportValidity();
+      return;
+    }
+    const button = clientVaultForm.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    try {
+      await openClientVault();
+    } catch (error) {
+      renderClientVaultItems([]);
+      showStatus(error.message || 'Could not open vault view.', 'error');
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+}
+
+if (clearClientVault) {
+  clearClientVault.addEventListener('click', () => {
+    renderClientVaultItems([]);
+    if (clientVaultCount) clientVaultCount.textContent = 'Locked';
+    if (clientVaultForm) clientVaultForm.reset();
   });
 }
 

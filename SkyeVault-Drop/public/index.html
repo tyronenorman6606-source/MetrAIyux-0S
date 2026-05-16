@@ -23,6 +23,7 @@
           <a href="#what-to-send">What To Send</a>
           <a href="#process">Proof Route</a>
           <a href="#repo-snapshots">Repo Vault</a>
+          <a href="#my-vault">My Vault</a>
           <a class="nav-cta" href="#upload">Open Vault</a>
         </div>
       </nav>
@@ -294,6 +295,33 @@
             <button id="retryPending" class="secondary-btn small-btn" type="button">Retry pending receipts</button>
           </div>
         </section>
+      </section>
+
+      <section id="my-vault" class="client-vault-panel panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Client Vault</p>
+            <h2>Find and download your stored files.</h2>
+          </div>
+          <span id="clientVaultCount" class="queue-summary">Locked</span>
+        </div>
+        <form id="clientVaultForm" class="client-vault-form">
+          <div class="grid two">
+            <label>
+              <span>Email used on upload</span>
+              <input name="clientEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+            </label>
+            <label id="clientVaultKeyWrap">
+              <span>Vault access code</span>
+              <input name="portalKey" type="password" autocomplete="off" placeholder="Provided access code" />
+            </label>
+          </div>
+          <div class="vault-actions-row">
+            <button class="primary-btn" type="submit">Open my vault</button>
+            <button id="clearClientVault" class="secondary-btn" type="button">Lock view</button>
+          </div>
+        </form>
+        <div id="clientVaultList" class="client-vault-list" aria-live="polite"></div>
       </section>
 
       <section class="faq-grid">
