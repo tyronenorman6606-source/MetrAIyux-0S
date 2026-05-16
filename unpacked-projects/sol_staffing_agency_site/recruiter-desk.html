@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recruiter Desk | Skyes Over London Staffing</title>
+  <meta name="description" content="Internal recruiter desk workflow for job-order review, sourcing, screening, candidate submission, follow-up, and quality control." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Recruiting Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Recruiter Desk</p>
+      <h1>Internal recruiter workflow for sourcing, screening, and submissions.</h1>
+      <p class="lead">This page turns a qualified job order into recruiter actions: source, screen, document, submit, follow up, and close the loop with account ownership.</p>
+    </div>
+    <aside class="hero-card reveal">
+      <div class="card-topline">Recruiting Standard</div>
+      <h2>Do not source blind.</h2>
+      <p>Recruiters need complete role facts, pay, schedule, location, urgency, and disqualifiers before candidate outreach.</p>
+    </aside>
+  </div>
+</section>
+<section class="section-pad">
+  <div class="cards three">
+    <article class="service-card reveal"><h3>Job Order Review</h3><ul><li>Confirm title and duties</li><li>Confirm pay range</li><li>Confirm schedule</li><li>Confirm location</li><li>Confirm must-haves</li><li>Confirm disqualifiers</li></ul></article>
+    <article class="service-card reveal"><h3>Candidate Sourcing</h3><ul><li>Search talent pool</li><li>Referral outreach</li><li>Job-board outreach</li><li>Local market sourcing</li><li>Social channels</li><li>Past applicants</li></ul></article>
+    <article class="service-card reveal"><h3>Screening</h3><ul><li>Availability</li><li>Commute</li><li>Shift fit</li><li>Experience</li><li>Pay expectations</li><li>Communication readiness</li></ul></article>
+    <article class="service-card reveal"><h3>Submission</h3><ul><li>Candidate summary</li><li>Experience match</li><li>Availability</li><li>Pay alignment</li><li>Concerns</li><li>Next action</li></ul></article>
+    <article class="service-card reveal"><h3>Follow-Up</h3><ul><li>Employer feedback</li><li>Candidate status</li><li>Interview/start confirmation</li><li>Missing docs</li><li>No-show risk</li><li>Close notes</li></ul></article>
+    <article class="service-card reveal"><h3>Quality Loop</h3><ul><li>Start check</li><li>Supervisor feedback</li><li>Issue tracking</li><li>Replacement trigger</li><li>Outcome logged</li><li>Source strategy updated</li></ul></article>
+  </div>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Candidate Submission</p><h2>Submit candidate to account owner.</h2><p>Internal recruiter form. Do not include sensitive documents here.</p></div>
+  <form class="contact-form reveal" name="candidate-submission" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="candidate-submission" />
+    <label>Candidate Name<input name="candidate_name" required /></label>
+    <label>Role / Job Order<input name="job_order" required /></label>
+    <label>Recruiter<input name="recruiter" /></label>
+    <label>Availability<input name="availability" /></label>
+    <label>Pay Alignment<input name="pay_alignment" /></label>
+    <label>Summary<textarea name="summary" rows="7" placeholder="Experience, fit, concerns, commute, schedule, why submit, next action"></textarea></label>
+    <button class="btn primary" type="submit">Submit Candidate</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

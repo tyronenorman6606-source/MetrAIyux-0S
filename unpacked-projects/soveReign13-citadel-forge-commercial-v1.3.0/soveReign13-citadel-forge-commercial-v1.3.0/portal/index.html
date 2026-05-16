@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoveReign13 Citadel Forge</title>
+  <meta name="description" content="SoveReign13 Citadel Forge is a sovereign GitHub replacement platform with Git hosting, organizations, issues, pull requests, releases, package registries, self-hosted CI runners, commercial signup control, usage tracking, and deployment command tooling." />
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <script src="/config.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="mark">S13</div>
+      <p class="eyebrow">Sovereign source-control command layer</p>
+      <h1>Run your own forge. Sell access like a real platform.</h1>
+      <p class="lede">Citadel Forge wraps Forgejo’s development platform with SoveReign13 commercial operations: tenant provisioning, upstream-auth handoff, plans, entitlements, usage snapshots, checkout sessions, billing webhooks, admin metrics, audit logs, and self-hosted SceptR runners.</p>
+      <div class="actions">
+        <a id="forge-link" class="button primary" href="#">Open Forge</a>
+        <a id="control-link" class="button" href="#">Open Control Plane</a>
+        <a class="button" href="#lead-form">Request Access</a>
+      </div>
+      <div class="proof-row">
+        <span>Repos</span><span>PRs</span><span>Issues</span><span>Packages</span><span>CI</span><span>Usage</span><span>Billing Hooks</span>
+      </div>
+    </section>
+
+    <section class="grid" id="lanes"></section>
+
+    <section class="panel split">
+      <div>
+        <p class="eyebrow">Platform truth</p>
+        <h2>Forgejo is the forge. SoveReign13 is the operator brain.</h2>
+        <p>Users get real Git workflows: organizations, repositories, issues, pull requests, releases, wiki, package registry, and Actions-style CI. Operators get account records, plan limits, API keys, metering, billing-event intake, lead capture, admin metrics, and audit records.</p>
+      </div>
+      <div class="stacked">
+        <div class="mini"><b>Veyra3.1</b><span>Domain, routing, SSL, and origin mapping doctrine.</span></div>
+        <div class="mini"><b>SceptR</b><span>Build/deploy/release command lane through Forgejo Runner.</span></div>
+        <div class="mini"><b>Reliquary</b><span>Backup/export/rollback lane for repo and database custody.</span></div>
+      </div>
+    </section>
+
+    <section class="panel" id="lead-form">
+      <p class="eyebrow">Commercial intake</p>
+      <h2>Capture buyers before payment is wired.</h2>
+      <form class="lead" onsubmit="return submitLead(event)">
+        <input id="leadEmail" type="email" required placeholder="buyer@email.com" />
+        <input id="leadCompany" placeholder="Company / team" />
+        <select id="leadPlan"><option value="starter">Starter</option><option value="studio">Studio</option><option value="agency">Agency</option><option value="enterprise">Enterprise</option></select>
+        <button class="button primary" type="submit">Request access</button>
+      </form>
+      <pre id="leadOut">Lead capture writes to the control plane when CONTROL_DOMAIN is live.</pre>
+    </section>
+  </main>
+  <script>
+    const cfg = window.SOVEREIGN13 || {};
+    document.getElementById('forge-link').href = cfg.forgeUrl || '#';
+    document.getElementById('control-link').href = cfg.controlUrl || '#';
+    const lanes = document.getElementById('lanes');
+    (cfg.lanes || []).forEach((lane) => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = lane.href;
+      a.innerHTML = `<span>${lane.name}</span><p>${lane.label}</p>`;
+      lanes.appendChild(a);
+    });
+    async function submitLead(event){
+      event.preventDefault();
+      const control = String(cfg.controlUrl || '').replace(/\/$/, '');
+      const out = document.getElementById('leadOut');
+      if(!control){ out.textContent = 'CONTROL_DOMAIN is not configured.'; return false; }
+      const payload = { email: leadEmail.value, company: leadCompany.value, planInterest: leadPlan.value, source:'portal' };
+      try{
+        const res = await fetch(`${control}/api/leads`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) });
+        const body = await res.json();
+        out.textContent = JSON.stringify(body,null,2);
+      } catch(error){ out.textContent = error.message; }
+      return false;
+    }
+  </script>
+</body>
+</html>

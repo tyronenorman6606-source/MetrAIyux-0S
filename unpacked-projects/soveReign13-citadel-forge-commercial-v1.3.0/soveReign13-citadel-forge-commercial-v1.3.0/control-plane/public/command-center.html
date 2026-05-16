@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoveReign13 Deployment Command Center</title>
+  <style>
+    :root { color-scheme: dark; --bg:#05070d; --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.14); --text:#eef4ff; --muted:#9fb0c8; --hot:#8de7ff; --gold:#f6d073; --bad:#ff7997; --ok:#8dffbd; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial;background:radial-gradient(circle at 8% 0%,rgba(141,231,255,.18),transparent 26%),radial-gradient(circle at 90% 0%,rgba(246,208,115,.16),transparent 24%),var(--bg);color:var(--text)}
+    header,main{padding:28px clamp(18px,4vw,58px)} header{border-bottom:1px solid var(--line);background:rgba(5,7,13,.82);backdrop-filter:blur(16px);position:sticky;top:0;z-index:10}
+    h1{font-size:clamp(30px,5vw,64px);margin:8px 0;letter-spacing:-.06em} h2{margin:0 0 10px}.sub{color:var(--muted);max-width:950px;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{grid-column:span 12;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.28)}@media(min-width:950px){.half{grid-column:span 6}.third{grid-column:span 4}.two{grid-column:span 8}}
+    button,input{font:inherit;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.32);color:var(--text);padding:11px 13px}button{cursor:pointer;background:linear-gradient(135deg,rgba(141,231,255,.2),rgba(246,208,115,.16));font-weight:800}pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.34);border:1px solid var(--line);border-radius:18px;padding:14px;max-height:360px;overflow:auto}.pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:12px}.ok{color:var(--ok)}.bad{color:var(--bad)}.gold{color:var(--gold)}.step{padding:13px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.22);margin:10px 0}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}code{color:var(--gold)}a{color:var(--hot)}
+  </style>
+</head>
+<body>
+<header>
+  <span class="pill">Internal Operator Surface · SoveReign13 v1.3.0</span>
+  <h1>Deployment Command Center</h1>
+  <p class="sub">This page is for the operator only. It checks whether Citadel Forge is safe to move from local alpha into customer-facing deployment. It does not replace server-side smoke commands.</p>
+</header>
+<main class="grid">
+  <section class="card half">
+    <h2>1. Run readiness</h2>
+    <p class="sub">Use dev headers only on an isolated test host. In production, this should authenticate through your upstream gate or JWT/OIDC.</p>
+    <div class="row"><input id="email" value="admin@example.com"><input id="roles" value="admin"><button onclick="readiness()">Run readiness check</button></div>
+    <pre id="readiness">Waiting.</pre>
+  </section>
+  <section class="card half">
+    <h2>2. Shell proof commands</h2>
+    <pre>cp .env.example .env
+chmod +x scripts/*.sh
+./scripts/init-env.sh
+nano .env
+./scripts/package-test.sh
+./scripts/deploy.sh
+./scripts/smoke.sh
+./scripts/commercial-smoke.sh</pre>
+  </section>
+  <section class="card third"><h2>Auth gate</h2><div class="step">Set <code>TRUSTED_HEADER_AUTH=true</code> only behind your real gate.</div><div class="step">Gate must inject <code>x-s13-gate-secret</code> matching <code>TRUSTED_HEADER_AUTH_SECRET</code>.</div><div class="step">Never expose direct trusted headers without the secret.</div></section>
+  <section class="card third"><h2>Billing</h2><div class="step">Set <code>STRIPE_SECRET_KEY</code>.</div><div class="step">Set <code>STRIPE_PRICE_STARTER/STUDIO/AGENCY</code>.</div><div class="step">Set <code>STRIPE_WEBHOOK_SECRET</code> and test checkout session completion.</div></section>
+  <section class="card third"><h2>Forge engine</h2><div class="step">Create first Forgejo admin.</div><div class="step">Create admin API token.</div><div class="step">Set <code>FORGEJO_ADMIN_TOKEN</code>.</div><div class="step">Provision a tenant org and create a repo through the control plane.</div></section>
+  <section class="card two"><h2>Customer-ready gate</h2><p class="sub">Do not sell the public claim “fully automated hosted GitHub replacement” until all blockers are gone and a workflow runs on a registered runner.</p><pre>Required live proof:
+✅ /health
+✅ /api/plans
+✅ /api/deployment/readiness
+✅ tenant account created
+✅ Forgejo org provisioned
+✅ repo created via /api/accounts/:id/repos
+✅ runner registered
+✅ workflow executed
+✅ backup created
+✅ restore rehearsal completed</pre></section>
+  <section class="card third"><h2>Links</h2><p><a href="/">Control Plane</a></p><p><a href="/api/config">Config JSON</a></p><p><a href="/health">Health JSON</a></p></section>
+</main>
+<script>
+const headers=()=>({'content-type':'application/json','x-dev-email':document.getElementById('email').value,'x-dev-roles':document.getElementById('roles').value});
+async function readiness(){const r=await fetch('/api/deployment/readiness',{headers:headers()});const t=await r.text();let j;try{j=JSON.parse(t)}catch{j={raw:t}}document.getElementById('readiness').textContent=JSON.stringify(j,null,2)}
+</script>
+</body>
+</html>

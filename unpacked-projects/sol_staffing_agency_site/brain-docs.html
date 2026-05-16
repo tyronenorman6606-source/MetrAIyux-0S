@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Brain Docs | Skyes Over London Staffing</title>
+  <meta name="description" content="Documentation for the local in-site staffing brain architecture, corpus, local memory, limitations, and upgrade path." />
+  <link rel="stylesheet" href="./styles.css" />
+  
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Staffing Brain</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a href="./brain.html">Brain</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="article-hero section-pad">
+  <div class="article-wrap reveal">
+    <p class="eyebrow">Brain Documentation</p>
+    <h1>How the local staffing brain works.</h1>
+    <p class="lead">The site brain is a local-first assistant designed to make the staffing website more useful without needing an AI bill.</p>
+  </div>
+</section>
+<section class="article-section section-pad">
+  <article class="article-body reveal">
+    <h2>Purpose</h2>
+    <p>The local brain helps visitors and operators understand staffing models, route requests, collect better intake, use safe government-contracting language, and find the correct page or form.</p>
+    <h2>Architecture</h2>
+    <p>The brain loads <code>brain/brain-corpus.json</code>, then uses JavaScript keyword scoring and rule-based routing to answer questions. It stores optional local notes in browser localStorage.</p>
+    <h2>Why this is useful</h2>
+    <p>It gives the site a smart-feeling assistant without calling paid AI providers. It also protects the company from risky claims by repeating safe-claim warnings when government, jobs, proof, or certifications are discussed.</p>
+    <h2>Limitations</h2>
+    <p>It is not a real LLM. It cannot reason deeply, inspect uploaded files, access private systems, or verify current government registrations. For that, connect a server-backed model or authenticated tools.</p>
+    <h2>Upgrade path</h2>
+    <p>Keep the local brain as fallback, then add a backend function that calls a GPU-hosted model, Ollama, vLLM, Cloudflare Worker, or another approved inference endpoint. Add authenticated database memory when upstream auth is ready.</p>
+  </article>
+  <aside class="article-side reveal">
+    <h3>Brain Links</h3>
+    <div class="pill-list">
+      <a class="pill-link" href="./brain.html">Brain Console</a>
+      <a class="pill-link" href="./brain-command.html">Brain Command</a>
+      <a class="pill-link" href="./brain/brain-corpus.json">Corpus JSON</a>
+      <a class="pill-link" href="./brain/brain-config.json">Brain Config</a>
+    </div>
+  </aside>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, local brain, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./brain.html">Brain</a>
+      <a href="./brain-command.html">Brain Command</a>
+      <a href="./services.html">Services</a>
+      <a href="./government.html">Government</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

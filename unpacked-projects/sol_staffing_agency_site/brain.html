@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Local Brain | Skyes Over London Staffing</title>
+  <meta name="description" content="Local in-site staffing brain for routing, checklists, safe claims, AE scripts, local memory, and staffing guidance without an external AI provider." />
+  <link rel="stylesheet" href="./styles.css" />
+  
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Staffing Brain</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a href="./brain.html">Brain</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Local Staffing Brain</p>
+      <h1>A brain living inside the site.</h1>
+      <p class="lead">This is a local-first, browser-side staffing assistant. It can route visitors, answer common staffing questions, show checklists, protect government-claim language, remember notes locally, and guide users to the correct page without any API key.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#brain-console">Open Brain Console</a>
+        <a class="btn ghost" href="./brain-command.html">Brain Command</a>
+      </div>
+    </div>
+    <aside class="hero-card reveal">
+      <div class="card-topline">Local-First</div>
+      <h2>No provider bill required.</h2>
+      <p>The included brain is static JavaScript + JSON. It uses browser localStorage for local memory and does not call OpenAI, Gemini, or any external AI provider.</p>
+      <div class="pipeline">
+        <span style="--w:100%">Local corpus</span>
+        <span style="--w:95%">Rule routing</span>
+        <span style="--w:90%">Browser memory</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="brain-console" class="section-pad brain-section">
+  <div class="brain-layout reveal">
+    <div class="brain-panel">
+      <div class="section-head">
+        <p class="eyebrow">Ask SOL Brain</p>
+        <h2>Staffing routing, scripts, checklists, and safe-claim guardrails.</h2>
+      </div>
+      <div class="brain-chips">
+        <button data-brain-prompt="What do you need for an employer job order?">Employer job order</button>
+        <button data-brain-prompt="How do I screen a candidate?">Candidate screening</button>
+        <button data-brain-prompt="Help me with a government prime subcontracting inquiry">Gov / prime inquiry</button>
+        <button data-brain-prompt="Give me an AE employer opener script">AE script</button>
+        <button data-brain-prompt="What government claims are unsafe?">Safe claims</button>
+        <button data-brain-prompt="What do you remember?">Show memory</button>
+      </div>
+      <textarea id="brainInput" rows="6" placeholder="Ask the local brain about staffing, candidates, government contracting, AE scripts, pricing, routing, or site pages. Use Ctrl/⌘ + Enter to send."></textarea>
+      <div class="hero-actions">
+        <button class="btn primary" id="brainAsk" type="button">Ask Brain</button>
+        <button class="btn ghost" id="brainAskLive" type="button">Ask Live Brain</button>
+        <button class="btn ghost" id="brainClear" type="button">Clear Local Memory</button>
+      </div>
+    </div>
+    <div class="brain-panel">
+      <h3>Conversation</h3>
+      <div id="brainOutput" class="brain-output"></div>
+    </div>
+    <div class="brain-panel brain-memory-panel">
+      <h3>Local Memory</h3>
+      <p>This memory stays in this browser using localStorage. It is not a secure database.</p>
+      <pre id="brainMemory" class="mini-code"></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="section-head reveal">
+    <p class="eyebrow">What the local brain knows</p>
+    <h2>It is loaded with the site’s staffing doctrine and routing logic.</h2>
+  </div>
+  <div class="cards three">
+    <article class="service-card reveal"><h3>Staffing Models</h3><p>Temporary, temp-to-hire, direct placement, project crews, administrative staffing, field support, and government-ready workforce support.</p></article>
+    <article class="service-card reveal"><h3>Intake Checklists</h3><p>Employer job orders, candidate profiles, government/prime opportunities, and AE qualification standards.</p></article>
+    <article class="service-card reveal"><h3>Safe Claims</h3><p>Guardrails for SAM, UEI, CAGE, certifications, GSA Schedule, set-aside status, fake jobs, and fake case studies.</p></article>
+    <article class="service-card reveal"><h3>Sales Scripts</h3><p>Employer openers, job-order close language, prime contractor opener, and candidate screening opener.</p></article>
+    <article class="service-card reveal"><h3>Routing</h3><p>Directs users to employer intake, candidate application, government inquiry, AE recruiting, pricing, or brain command.</p></article>
+    <article class="service-card reveal"><h3>Local Memory</h3><p>Can save notes locally in the browser when users say “remember that” or “note that.”</p></article>
+  </div>
+</section>
+<script src="./brain/brain-fallback.js"></script>
+<script src="./brain/brain.js"></script>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, local brain, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./brain.html">Brain</a>
+      <a href="./brain-command.html">Brain Command</a>
+      <a href="./services.html">Services</a>
+      <a href="./government.html">Government</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

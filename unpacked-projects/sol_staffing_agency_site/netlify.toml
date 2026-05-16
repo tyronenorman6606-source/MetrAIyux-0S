@@ -1,0 +1,417 @@
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[edge_functions]]
+  function = "auth-gate"
+  path = "/*"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[redirects]]
+  from = "/ae"
+  to = "/ae-command.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin-dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/staffing-login.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/government"
+  to = "/government.html"
+  status = 200
+
+[[redirects]]
+  from = "/capability"
+  to = "/capability-statement.html"
+  status = 200
+
+[[redirects]]
+  from = "/employers"
+  to = "/employers.html"
+  status = 200
+
+[[redirects]]
+  from = "/candidates"
+  to = "/candidates.html"
+  status = 200
+
+[[redirects]]
+  from = "/services"
+  to = "/services.html"
+  status = 200
+
+[[redirects]]
+  from = "/insights"
+  to = "/blog.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/models"
+  to = "/pricing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/jobs"
+  to = "/jobs.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/apply"
+  to = "/candidate-application.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/employer-portal"
+  to = "/employer-portal.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/gov-opportunities"
+  to = "/government-opportunities.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/areas"
+  to = "/service-areas.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/phoenix-staffing-agency"
+  to = "/phoenix-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/glendale-staffing-agency"
+  to = "/glendale-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/mesa-staffing-agency"
+  to = "/mesa-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/tempe-staffing-agency"
+  to = "/tempe-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/scottsdale-staffing-agency"
+  to = "/scottsdale-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/chandler-staffing-agency"
+  to = "/chandler-staffing-agency.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/proposal"
+  to = "/proposal-builder.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/case-studies"
+  to = "/case-studies.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/proof"
+  to = "/case-studies.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/ae-recruiting"
+  to = "/ae-recruiting.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/candidate-onboarding"
+  to = "/candidate-onboarding.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/procurement-packet"
+  to = "/procurement-packet.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/quality-control-plan"
+  to = "/quality-control-plan.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/deployment-command"
+  to = "/deployment-command.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/sales-scripts"
+  to = "/sales-scripts.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/operations"
+  to = "/operations-hub.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/client-packet"
+  to = "/client-welcome-packet.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/vendor-packet"
+  to = "/vendor-packet.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/contract-vehicles"
+  to = "/contract-vehicles.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/forms-directory"
+  to = "/forms-directory.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/email-sequences"
+  to = "/email-sequences.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/hospitality-event-staffing"
+  to = "/hospitality-event-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/facilities-support-staffing"
+  to = "/facilities-support-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/call-center-staffing"
+  to = "/call-center-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/data-entry-staffing"
+  to = "/data-entry-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/light-industrial-staffing"
+  to = "/light-industrial-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/executive-search-support"
+  to = "/executive-search-support.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/recruiter-desk"
+  to = "/recruiter-desk.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/training"
+  to = "/training-academy.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/academy"
+  to = "/training-academy.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/bill-rate-calculator"
+  to = "/bill-rate-calculator.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/timesheets"
+  to = "/timesheet-invoice-control.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/risk-register"
+  to = "/risk-register.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/compliance"
+  to = "/compliance-posture.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/crm"
+  to = "/crm-pipeline.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/pipeline"
+  to = "/crm-pipeline.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/placements"
+  to = "/placement-tracker.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/agreement-packet"
+  to = "/agreement-packet.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/campaigns"
+  to = "/landing-pages.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/urgent-staffing"
+  to = "/campaign-urgent-staffing.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/join-talent-pool"
+  to = "/campaign-candidate-pool.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/prime-support"
+  to = "/campaign-prime-support.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/brain"
+  to = "/brain.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/local-brain"
+  to = "/brain.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/brain-command"
+  to = "/brain-command.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/brain-docs"
+  to = "/brain-docs.html"
+  status = 200
+
+
+[[redirects]]
+  from = "/system"
+  to = "/system-overview.html"
+  status = 200
+
+[[redirects]]
+  from = "/walkthrough"
+  to = "/system-overview.html"
+  status = 200

@@ -1,0 +1,36 @@
+name = "skymail-platform"
+main = "cloudflare/skymail-worker.mjs"
+compatibility_date = "2026-05-16"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[assets]
+directory = "cf-assets"
+binding = "ASSETS"
+
+[vars]
+SKYGATE_SOURCE_APP = "skymail"
+SKYMAIL_DB_SCHEMA = "skymail"
+MAILBOX_PROVIDER = "stalwart"
+MAIL_FROM_FALLBACK_NAME = "SkyeMail"
+INBOUND_PROVIDER = "resend"
+
+# Put real values in Cloudflare secrets, not in this file:
+# wrangler secret put NEON_DATABASE_URL
+# wrangler secret put JWT_SECRET
+# wrangler secret put SKYGATEFS27_ORIGIN
+# wrangler secret put SKYGATE_EVENT_MIRROR_SECRET
+# wrangler secret put SKYMAIL_SERVICE_TOKEN
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put RESEND_WEBHOOK_SECRET
+# wrangler secret put STALWART_BASE_URL
+# wrangler secret put STALWART_MANAGEMENT_API_KEY
+# wrangler secret put SKYMAIL_PRIMARY_DOMAIN
+# wrangler secret put SKYMAIL_ALLOWED_DOMAINS
+# wrangler secret put SKYMAIL_IMAP_HOST
+# wrangler secret put SKYMAIL_SMTP_HOST
+# wrangler secret put SKYMAIL_JMAP_URL
+# wrangler secret put CITADEL_BACKUP_URL
+# wrangler secret put CITADEL_BACKUP_TOKEN
+# Optional direct Citadel database backup if it is reachable from Workers through a compatible driver:
+# wrangler secret put CITADEL_DATABASE_URL

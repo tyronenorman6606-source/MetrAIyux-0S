@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoveReign13 Node OS Command Center</title>
+  <meta name="description" content="Internal deployment command center for SoveReign13 Node OS, Orynth 7.6, local AI, CDE, and proof operations." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">SoveReign13 Node OS · v0.3.0 · Aegis Autonomy</p>
+        <h1>AI-native sovereign node command center.</h1>
+        <p class="lede">This surface is internal/operator-facing only. It proves local AI services, model pulls, Orynth routing, CDE launch, ISO build, and deployment readiness.</p>
+        <div class="hero-actions">
+          <a href="#ai">AI proof</a>
+          <a href="#deploy">Deploy</a>
+          <a href="#cde">CDE</a>
+          <a href="#aegis">Aegis</a>
+        </div>
+      </div>
+      <div class="orb" aria-hidden="true">
+        <span>S13</span>
+      </div>
+    </section>
+
+    <section class="grid" id="ai">
+      <article class="card priority">
+        <p class="tag">First AI Proof</p>
+        <h2>Bring Orynth online</h2>
+        <p>Run these after boot. The OS starts Ollama, Open WebUI, and the Orynth Router. Model weights are pulled after install because they are large.</p>
+        <pre><button data-copy>Copy</button><code>sudo systemctl status ollama open-webui orynth-router --no-pager
+s13-ai-status
+s13-gpu-detect
+s13-install-brain lite
+s13-router-chat "Confirm the local AI lane is online."</code></pre>
+      </article>
+
+      <article class="card">
+        <p class="tag">Local endpoints</p>
+        <h2>Service URLs</h2>
+        <ul class="slots">
+          <li>Command Center: <code>http://127.0.0.1:1313</code></li>
+          <li>Open WebUI: <code>http://127.0.0.1:8080</code></li>
+          <li>Orynth Router: <code>http://127.0.0.1:13131/health</code></li>
+          <li>Ollama API: <code>http://127.0.0.1:11434</code></li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <p class="tag">Model profiles</p>
+        <h2>Pull lanes</h2>
+        <pre><button data-copy>Copy</button><code>s13-install-brain tiny
+s13-install-brain lite
+s13-install-brain coder
+s13-install-brain heavy
+s13-install-brain embeddings</code></pre>
+      </article>
+
+      <article class="card">
+        <p class="tag">Router test</p>
+        <h2>OpenAI-compatible local route</h2>
+        <pre><button data-copy>Copy</button><code>curl -s http://127.0.0.1:13131/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"local","messages":[{"role":"user","content":"Write a one sentence health check."}]}' | jq -r '.choices[0].message.content'</code></pre>
+      </article>
+    </section>
+
+    <section class="grid" id="cde">
+      <article class="card priority">
+        <p class="tag">Cloud IDE</p>
+        <h2>Start deployable CDE</h2>
+        <p>This uses the official code-server container and mounts the SoveReign13 workspaces directory. Change the password before using it beyond localhost.</p>
+        <pre><button data-copy>Copy</button><code>export S13_CDE_PASSWORD='replace-this-now'
+s13-start-cde /srv/sove-reign13/workspaces
+# Open http://127.0.0.1:8443</code></pre>
+      </article>
+
+      <article class="card">
+        <p class="tag">Workspace layout</p>
+        <h2>Persistent paths</h2>
+        <ul class="slots">
+          <li><code>/srv/sove-reign13/workspaces</code></li>
+          <li><code>/srv/sove-reign13/models</code></li>
+          <li><code>/srv/sove-reign13/reliquary</code></li>
+          <li><code>/srv/sove-reign13/secrets</code></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid" id="deploy">
+      <article class="card priority">
+        <p class="tag">Build Proof</p>
+        <h2>Build the ISO</h2>
+        <pre><button data-copy>Copy</button><code>./scripts/check-prereqs.sh
+./scripts/smoke.sh
+./scripts/build-iso.sh
+ls -lh ./result/iso/</code></pre>
+      </article>
+
+      <article class="card">
+        <p class="tag">USB</p>
+        <h2>Write installer</h2>
+        <pre><button data-copy>Copy</button><code>lsblk
+sudo ./scripts/write-usb.sh /dev/sdX</code></pre>
+      </article>
+
+      <article class="card">
+        <p class="tag">Hardening</p>
+        <h2>Before hostile networks</h2>
+        <ul class="slots">
+          <li>Change the live password.</li>
+          <li>Use SSH keys, not passwords.</li>
+          <li>Keep Ollama bound to localhost.</li>
+          <li>Do not expose Open WebUI without auth/reverse proxy.</li>
+          <li>Keep provider keys in <code>/srv/sove-reign13/secrets</code>.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid" id="aegis">
+      <article class="card priority">
+        <p class="tag">Aegis Agent</p>
+        <h2>Repo scan, plan, propose, apply</h2>
+        <pre><button data-copy>Copy</button><code>s13-agent-init /srv/sove-reign13/workspaces/my-repo
+s13-agent-scan /srv/sove-reign13/workspaces/my-repo
+s13-agent-plan /srv/sove-reign13/workspaces/my-repo "close the public landing/app split"
+s13-agent-propose /srv/sove-reign13/workspaces/my-repo "fix broken routes and return a unified diff"
+s13-agent-apply /srv/sove-reign13/workspaces/my-repo .s13/runs/propose-*/proposed.patch "./scripts/smoke.sh"</code></pre>
+        <p>The agent writes every run under <code>.s13/runs</code>. It validates patches with <code>git apply --check</code> before editing.</p>
+      </article>
+
+      <article class="card">
+        <p class="tag">Reliquary</p>
+        <h2>Backup before risky work</h2>
+        <pre><button data-copy>Copy</button><code>s13-backup /srv/sove-reign13/workspaces/my-repo
+s13-reliquary list /srv/sove-reign13/workspaces/my-repo/.s13/reliquary
+s13-reliquary verify /path/to/archive.manifest.json</code></pre>
+        <p>Archives include a manifest and SHA256 checksum. This is the rollback lane before autonomous edits.</p>
+      </article>
+
+      <article class="card">
+        <p class="tag">System Doctor</p>
+        <h2>One command health payload</h2>
+        <pre><button data-copy>Copy</button><code>s13-doctor
+s13-ai-status
+s13-router-health
+s13-gpu-detect</code></pre>
+        <p>Use this before claiming the node is ready.</p>
+      </article>
+    </section>
+
+    <section class="card footer-card">
+      <p class="tag">Claim Boundary</p>
+      <p>SoveReign13 Node OS is a branded NixOS-based downstream operating-system profile with a real local AI runtime lane. It is not a newly written kernel and does not ship model weights inside the repo.</p>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>

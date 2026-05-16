@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skyegate Login | Skyes Over London Staffing</title>
+  <meta name="description" content="Skyegate FS27 authentication bridge for Skyes Over London Staffing internal systems." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Skyegate FS27 Login</small>
+      </span>
+    </a>
+    <nav class="nav active">
+      <a href="./index.html">Home</a>
+      <a href="./brain.html">Brain</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero section-pad compact">
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Auth Bridge</p>
+          <h1>Sign in with Skyegate FS27.</h1>
+          <p class="lead">Internal staffing OS pages, records, uploads, and the live brain require an active Skyegate FS27 token. This page exchanges that token for an HttpOnly site session.</p>
+          <div class="hero-actions">
+            <a class="btn ghost" id="skyegateLoginLink" href="#" hidden>Open Skyegate</a>
+          </div>
+        </div>
+        <form class="contact-form reveal auth-card" id="loginForm">
+          <label>Skyegate FS27 Token
+            <textarea name="token" rows="7" autocomplete="off" spellcheck="false" placeholder="Paste a Skyegate FS27 bearer/session token"></textarea>
+          </label>
+          <button class="btn primary" type="submit">Create Staffing Session</button>
+          <p id="loginStatus" class="form-status" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script src="./script.js"></script>
+  <script src="./assets/staffing-login.js"></script>
+</body>
+</html>

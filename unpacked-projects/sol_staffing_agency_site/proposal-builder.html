@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Client Proposal Builder | Skyes Over London Staffing</title>
+  <meta name="description" content="Client proposal builder page for staffing services, engagement models, job orders, and next actions." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Staffing Division</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Client Proposal Builder</p>
+      <h1>Turn a staffing conversation into a clean client proposal.</h1>
+      <p class="lead">Use this page as a client-facing proposal surface after an AE qualifies the role, timeline, model, and decision path. Replace placeholders before sending.</p>
+      <div class="hero-actions"><a class="btn primary" href="#proposal-form">Build Proposal Request</a><a class="btn ghost" href="./pricing.html">Engagement Models</a></div>
+    </div>
+    <aside class="hero-card reveal">
+      <div class="card-topline">Proposal Standard</div>
+      <h2>Specific beats generic.</h2>
+      <p>A real staffing proposal should include role scope, headcount, location, schedule, pricing model, onboarding path, replacement policy, timeline, and next action.</p>
+    </aside>
+  </div>
+</section>
+<section class="section-pad">
+  <div class="section-head reveal"><p class="eyebrow">Proposal Sections</p><h2>What every serious staffing proposal should cover.</h2></div>
+  <div class="cards three">
+    <article class="service-card reveal"><h3>Hiring Problem</h3><p>Summarize the employer’s pain: open roles, missed coverage, urgent project, seasonal pressure, turnover, or backlog.</p></article>
+    <article class="service-card reveal"><h3>Recommended Model</h3><p>Temporary, temp-to-hire, direct placement, project crew, government support, or mixed staffing model.</p></article>
+    <article class="service-card reveal"><h3>Role Scope</h3><p>Duties, location, shift, headcount, pay range, start date, required skills, screening needs, and disqualifiers.</p></article>
+    <article class="service-card reveal"><h3>Delivery Workflow</h3><p>Intake, sourcing, screening, submission, interview or start process, onboarding coordination, and follow-up cadence.</p></article>
+    <article class="service-card reveal"><h3>Commercial Terms</h3><p>Bill-rate model, direct-hire fee, conversion rules, payment terms, replacement policy, and signed agreement requirements.</p></article>
+    <article class="service-card reveal"><h3>Next Action</h3><p>Approve the proposal, sign agreement, submit missing details, schedule kickoff, or confirm first candidate review window.</p></article>
+  </div>
+</section>
+<section id="proposal-form" class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Proposal Intake</p><h2>Capture the details needed to write a proposal.</h2><p>This form is for internal AE/operator use unless you want clients filling it directly.</p></div>
+  <form class="contact-form reveal" name="proposal-intake" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="proposal-intake" />
+    <label>Client / Company<input name="client" required /></label>
+    <label>AE / Owner<input name="owner" /></label>
+    <label>Contact Email<input name="email" type="email" /></label>
+    <label>Engagement Type<select name="engagement"><option>Temporary staffing</option><option>Temp-to-hire</option><option>Direct placement</option><option>Project crew</option><option>Government / prime support</option><option>Mixed model</option></select></label>
+    <label>Commercial Terms<textarea name="terms" rows="5" placeholder="Bill rate, markup, placement fee, conversion, payment terms, replacement policy, if known"></textarea></label>
+    <label>Scope<textarea name="scope" rows="7" placeholder="Hiring problem, roles, headcount, schedule, location, pay, timeline, requirements, next action"></textarea></label>
+    <button class="btn primary" type="submit">Submit Proposal Intake</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

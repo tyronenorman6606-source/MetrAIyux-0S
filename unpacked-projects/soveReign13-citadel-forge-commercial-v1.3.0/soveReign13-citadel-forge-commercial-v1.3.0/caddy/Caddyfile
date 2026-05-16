@@ -1,0 +1,35 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$PORTAL_DOMAIN} {
+    encode gzip zstd
+    header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    }
+    reverse_proxy portal:80
+}
+
+{$CONTROL_DOMAIN} {
+    encode gzip zstd
+    header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    }
+    reverse_proxy control-plane:8080
+}
+
+{$FORGE_DOMAIN} {
+    encode gzip zstd
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+    reverse_proxy forgejo:3000
+}

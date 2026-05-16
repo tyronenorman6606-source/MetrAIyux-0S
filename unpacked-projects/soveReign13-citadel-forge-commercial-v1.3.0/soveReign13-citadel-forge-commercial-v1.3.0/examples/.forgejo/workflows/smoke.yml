@@ -1,0 +1,21 @@
+name: Citadel Smoke
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  node-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove runner can execute shell
+        run: |
+          echo "SoveReign13 Citadel Forge runner online"
+          node --version || true
+          npm --version || true
+      - name: Repo inventory
+        run: |
+          pwd
+          ls -la
