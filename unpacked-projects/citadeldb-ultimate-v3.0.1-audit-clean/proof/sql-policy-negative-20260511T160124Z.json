@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "generatedAt": "2026-05-11T16:01:24.203Z",
+  "results": [
+    {
+      "sql": "",
+      "expectOk": false,
+      "name": "empty",
+      "result": {
+        "ok": false,
+        "error": "SQL is empty"
+      },
+      "ok": true
+    },
+    {
+      "sql": "select 1",
+      "expectOk": true,
+      "name": "select",
+      "result": {
+        "ok": true,
+        "statementKind": "SELECT"
+      },
+      "ok": true
+    },
+    {
+      "sql": "select 1; select 2",
+      "expectOk": false,
+      "name": "multi_statement",
+      "result": {
+        "ok": false,
+        "error": "Only one SQL statement is allowed per console execution"
+      },
+      "ok": true
+    },
+    {
+      "sql": "drop database citadel",
+      "expectOk": false,
+      "name": "drop_database",
+      "result": {
+        "ok": false,
+        "error": "Blocked by SQL console safety policy: /\\bDROP\\s+DATABASE\\b/i"
+      },
+      "ok": true
+    },
+    {
+      "sql": "alter role app_user with password x",
+      "expectOk": false,
+      "name": "alter_role",
+      "result": {
+        "ok": false,
+        "error": "Blocked by SQL console safety policy: /\\bALTER\\s+ROLE\\b/i"
+      },
+      "ok": true
+    },
+    {
+      "sql": "create extension file_fdw",
+      "expectOk": false,
+      "name": "create_extension",
+      "result": {
+        "ok": false,
+        "error": "Blocked by SQL console safety policy: /\\bCREATE\\s+EXTENSION\\b/i"
+      },
+      "ok": true
+    },
+    {
+      "sql": "select pg_sleep(10)",
+      "expectOk": false,
+      "name": "pg_sleep",
+      "result": {
+        "ok": false,
+        "error": "Blocked by SQL console safety policy: /\\bpg_sleep\\s*\\(/i"
+      },
+      "ok": true
+    }
+  ],
+  "failed": []
+}

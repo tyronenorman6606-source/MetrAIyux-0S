@@ -1,0 +1,16 @@
+{
+  "name": "supabase-pack",
+  "status": "optional",
+  "purpose": "Developer-product service pack over or beside CitadelDB-managed Postgres.",
+  "upstream": {
+    "repo": "https://github.com/supabase/supabase",
+    "docker_path": "docker/",
+    "docs": "https://supabase.com/docs/guides/self-hosting/docker"
+  },
+  "citadeldb_boundary": [
+    "CitadelDB owns app provisioning",
+    "CitadelDB owns backup/restore receipts",
+    "CitadelDB owns migration receipts",
+    "Supabase services may be attached as optional service pack"
+  ]
+}

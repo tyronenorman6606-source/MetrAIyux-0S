@@ -1,0 +1,232 @@
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, cpSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
+const SKYEGATE_URL = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+const SITE_URL = 'https://citadeldb-ultimate.pages.dev';
+
+mkdirSync('dist', { recursive: true });
+mkdirSync('dist/assets', { recursive: true });
+
+if (existsSync('public/assets')) cpSync('public/assets', 'dist/assets', { recursive: true });
+if (existsSync('public/app')) cpSync('public/app', 'dist/app', { recursive: true });
+if (existsSync('public/favicon.png')) copyFileSync('public/favicon.png', 'dist/favicon.png');
+
+const referenceAssets = resolve('../../skyesol_spectacle_reference/assets');
+for (const file of ['skyes-primary-logo.png', 'skyes-over-london-deity-logo.png']) {
+  const source = join(referenceAssets, file);
+  if (existsSync(source)) copyFileSync(source, join('dist/assets', file));
+}
+
+const packages = [
+  ['Starter Ops', '$299 setup + $79/mo', 'Private Postgres setup, owner packet, backup receipts, restore proof, and a launch handoff.'],
+  ['Business Command', '$799 setup + $199/mo', 'Dedicated app database lane, guided migration, dashboard packet, monthly proof, and priority setup.'],
+  ['White-Glove Managed', '$1.5k+ setup + $499/mo+', 'Business database setup, migration, monitored ops, restore drills, and operator-led support.']
+];
+
+const stages = [
+  ['Gate', 'Buyer creates SkyegateFS27 auth before access is sold.'],
+  ['Provision', 'Private Postgres, roles, connection packet, and app database lane are staged.'],
+  ['Prove', 'Backup receipt, restore check, write test, and owner-safe handoff proof are generated.'],
+  ['Operate', 'Monthly status, incidents, backup age, restore age, and handoff notes stay visible.']
+];
+
+const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CitadelDB Ultimate | Proof-Backed Postgres Command Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050507">
+  <meta name="description" content="CitadelDB Ultimate sells proof-backed private Postgres setup, monitoring, backup, restore, and app-owner database handoff through SkyegateFS27 auth.">
+  <meta property="og:title" content="CitadelDB Ultimate">
+  <meta property="og:description" content="Private Postgres command center for app owners: setup, proof, backup, restore, monitoring, and Skyegate-authenticated access.">
+  <meta property="og:url" content="${SITE_URL}">
+  <meta property="og:image" content="/assets/citadeldb-ultimate-logo.png">
+  <link rel="icon" href="/favicon.png">
+  <style>
+    :root{--bg:#050507;--panel:#0d0d14;--panel2:#14141f;--ink:#f4f0e8;--soft:#d8d0c2;--muted:#a9a297;--gold:#f4c75b;--gold2:#f8df96;--cyan:#7ee7ff;--violet:#8b5cf6;--green:#8dffc5;--red:#ff8c7a;--line:rgba(244,199,91,.18);--line2:rgba(126,231,255,.16);--max:1240px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--ink);background:radial-gradient(980px 580px at 14% 8%,rgba(139,92,246,.18),transparent 64%),radial-gradient(880px 560px at 86% 8%,rgba(126,231,255,.10),transparent 62%),radial-gradient(680px 420px at 58% 86%,rgba(244,199,91,.09),transparent 64%),linear-gradient(180deg,#08080e,#040406 58%,#08080d);font-family:"Aptos","SF Pro Text","Segoe UI Variable",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}body:before{content:"";position:fixed;inset:0;z-index:-1;opacity:.10;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E")}a{color:inherit}button,input,select{font:inherit}.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:22px;min-height:72px;padding:12px clamp(18px,4vw,44px);border-bottom:1px solid rgba(244,199,91,.12);background:rgba(5,5,8,.76);backdrop-filter:blur(18px)}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand img{width:42px;height:42px;object-fit:contain}.brand strong,.brand small{display:block}.brand strong{color:var(--gold);font-size:14px;text-transform:uppercase;letter-spacing:0}.brand small{color:rgba(244,240,232,.62);font-size:12px}.nav-links{display:flex;gap:20px}.nav-links a{color:var(--muted);font-size:12px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:0}.nav-links a:hover{color:var(--gold2)}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:12px 16px;border:1px solid var(--line);border-radius:7px;color:var(--ink);background:rgba(255,255,255,.045);font-size:12px;font-weight:800;text-decoration:none;text-transform:uppercase;cursor:pointer}.button.primary{color:#111;border-color:transparent;background:linear-gradient(135deg,var(--gold2),var(--gold))}
+    .hero{width:min(1320px,calc(100% - 40px));min-height:100vh;margin:0 auto;padding:112px 0 54px;display:grid;grid-template-rows:auto minmax(560px,1fr);gap:28px}.hero-copy>p{margin:0 0 14px;color:var(--gold);font-size:12px;font-weight:800;text-transform:uppercase}.hero h1{max-width:1180px;margin:0;font-family:"Aptos Display","SF Pro Display","Segoe UI Variable Display",ui-sans-serif,system-ui,sans-serif;font-size:clamp(58px,7vw,98px);font-weight:720;line-height:.96;letter-spacing:0;text-wrap:balance}.hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.hero-row span{max-width:780px;color:var(--soft);font-size:18px;line-height:1.58}.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end}
+    .command-stage{position:relative;overflow:hidden;border:1px solid rgba(244,199,91,.16);border-radius:10px;background:linear-gradient(180deg,rgba(20,20,30,.92),rgba(5,5,8,.86));box-shadow:0 44px 130px rgba(0,0,0,.46)}#dbCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.88}.console{position:relative;z-index:2;display:grid;grid-template-columns:230px 1fr;min-height:560px;margin:18px;border:1px solid rgba(244,199,91,.16);border-radius:10px;background:rgba(5,5,9,.66);backdrop-filter:blur(10px)}.side{padding:16px;border-right:1px solid rgba(244,199,91,.12)}.side a{display:flex;align-items:center;gap:10px;padding:12px;border-radius:7px;color:var(--muted);text-decoration:none}.side a.active{color:var(--ink);background:rgba(126,231,255,.08)}.console-main{padding:18px}.console-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}.console-head strong{font-size:22px}.console-head span{display:block;color:var(--muted);font-size:13px}.status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.status-grid article,.proof-card{border:1px solid rgba(244,199,91,.14);border-radius:8px;background:rgba(5,5,9,.52);padding:14px}.status-grid span,.proof-card span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase}.status-grid strong{display:block;margin-top:20px}.ok{color:var(--green)}.proof-card{position:relative;min-height:260px;margin-top:14px;overflow:hidden}.proof-card h2{max-width:780px;margin:22px 0 14px;font-family:"Aptos Display","SF Pro Display","Segoe UI Variable Display",ui-sans-serif,system-ui,sans-serif;font-size:clamp(32px,4.6vw,62px);font-weight:700;line-height:1.02;letter-spacing:0;text-wrap:balance}.proof-card p{max-width:640px;color:var(--soft);font-size:17px;line-height:1.62}.proof-card img{position:absolute;right:22px;bottom:-80px;width:min(30vw,260px);opacity:.13;filter:drop-shadow(0 28px 70px rgba(244,199,91,.22))}
+    .section{width:min(var(--max),calc(100% - 40px));margin:0 auto;padding:96px 0;border-top:1px solid var(--line)}.section-title{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.42fr);gap:28px;align-items:end;margin-bottom:26px}.label,.section-title p{margin:0 0 12px;color:var(--gold);font-size:12px;font-weight:800;text-transform:uppercase}.section-title h2{margin:0;max-width:900px;font-family:"Aptos Display","SF Pro Display","Segoe UI Variable Display",ui-sans-serif,system-ui,sans-serif;font-size:clamp(32px,4.8vw,64px);font-weight:700;line-height:1;letter-spacing:0;overflow-wrap:anywhere;text-wrap:balance}.section-title>span{color:var(--soft);line-height:1.58}.flow{display:grid;gap:18px}.flow article{position:relative;display:grid;grid-template-columns:100px 1fr;gap:18px;min-height:170px;padding:22px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(135deg,rgba(20,20,31,.88),rgba(8,8,12,.76));overflow:hidden}.flow strong{color:var(--gold);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.flow h3{margin:0 0 10px;font-family:"Aptos Display","SF Pro Display","Segoe UI Variable Display",ui-sans-serif,system-ui,sans-serif;font-size:clamp(26px,3.2vw,44px);font-weight:700;line-height:1;letter-spacing:0}.flow p{margin:0;color:var(--muted);font-size:17px;line-height:1.58}
+    .offer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.offer{min-height:280px;padding:22px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,rgba(18,18,28,.78),rgba(8,8,12,.68))}.offer strong{display:block;margin:40px 0 12px;color:var(--gold2);font-size:32px}.offer p{color:var(--muted);line-height:1.62}.offer a{color:var(--cyan);font-weight:900;text-decoration:none}
+    .signup-wrap{display:grid;grid-template-columns:minmax(0,.82fr) minmax(360px,1fr);gap:16px}.signup-panel,.proof-panel{border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,rgba(18,18,28,.78),rgba(8,8,12,.68));padding:22px}.proof-list{display:grid;gap:12px}.proof-list div{display:flex;gap:10px;color:var(--soft)}.proof-list b{color:var(--green)}form{display:grid;gap:12px}.field{display:grid;gap:7px}.field label{color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase}.field input,.field select{width:100%;min-height:46px;padding:12px 13px;border:1px solid rgba(255,255,255,.14);border-radius:7px;color:var(--ink);background:rgba(255,255,255,.06)}.field select option{background:#090913;color:#fff}.signup-status{min-height:72px;margin:14px 0 0;padding:14px;border:1px solid rgba(126,231,255,.18);border-radius:8px;color:#d9fbff;background:rgba(126,231,255,.055);line-height:1.55;overflow-wrap:anywhere}.signup-status.good{border-color:rgba(141,255,197,.32);background:rgba(141,255,197,.08);color:var(--green)}.signup-status.bad{border-color:rgba(255,140,122,.38);background:rgba(255,140,122,.09);color:var(--red)}footer{width:min(var(--max),calc(100% - 40px));margin:0 auto;padding:40px 0;color:var(--muted);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    @media(max-width:980px){.nav-links{display:none}.hero-row,.console,.section-title,.signup-wrap{grid-template-columns:1fr}.actions{justify-content:stretch}.button{width:100%}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-right:0;border-bottom:1px solid rgba(244,199,91,.12)}.status-grid,.offer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.proof-card img{width:200px}}@media(max-width:640px){.hero,.section,footer{width:min(100% - 32px,var(--max))}.hero{min-height:auto;padding-top:96px;grid-template-rows:auto 520px}.hero h1{font-size:clamp(38px,11vw,48px);line-height:1.02}.hero-row span{font-size:16px}.console{margin:10px;min-height:500px}.side,.status-grid,.offer-grid{grid-template-columns:1fr}.console-head{display:grid}.proof-card h2{font-size:clamp(30px,8.8vw,40px)}.flow article{grid-template-columns:1fr}.section{padding:68px 0}.proof-card img{display:none}}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="CitadelDB home">
+      <img src="/assets/citadeldb-app-icon-192.png" alt="">
+      <span><strong>CitadelDB</strong><small>Proof-backed Postgres command</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#access">Access</a>
+      <a href="#packages">Packages</a>
+      <a href="#signup">Signup</a>
+      <a href="/app">Private app</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p>CitadelDB Ultimate // App-first database control plane</p>
+        <h1>Proof-backed Postgres.</h1>
+        <div class="hero-row">
+          <span>Private database setup, restore-tested backup proof, owner-safe handoff, monitoring packets, and SkyegateFS27 signup for app owners who need the serious lane.</span>
+          <div class="actions">
+            <a class="button primary" href="#signup">Create Skyegate account</a>
+            <a class="button" href="#access">View command flow</a>
+          </div>
+        </div>
+      </div>
+
+      <section class="command-stage" aria-label="CitadelDB command center preview">
+        <canvas id="dbCanvas" aria-hidden="true"></canvas>
+        <div class="console">
+          <aside class="side">
+            <a class="active" href="#access">◈ Command</a>
+            <a href="#packages">◇ Packages</a>
+            <a href="#signup">◇ Signup</a>
+            <a href="/app">◇ Private app</a>
+          </aside>
+          <div class="console-main">
+            <div class="console-head">
+              <div><strong>Postgres deployment lane</strong><span>Buyer-safe preview of the managed database path</span></div>
+              <a class="button primary" href="#signup">Start auth</a>
+            </div>
+            <div class="status-grid">
+              <article><span>Gate</span><strong class="ok">SkyegateFS27</strong></article>
+              <article><span>Database</span><strong>Private Postgres</strong></article>
+              <article><span>Backup</span><strong>Receipt-ready</strong></article>
+              <article><span>Restore</span><strong>Proof-tested</strong></article>
+            </div>
+            <article class="proof-card">
+              <span>Selected composition</span>
+              <h2>App owners see the command path before they buy.</h2>
+              <p>No raw logs. No internal smoke text. Just the client-safe lane: authenticated signup, provisioned database, backup proof, restore proof, and operator handoff.</p>
+              <img src="/assets/citadeldb-ultimate-logo-transparent.png" alt="">
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="section" id="access">
+      <div class="section-title">
+        <div><p>Scroll proof funnel</p><h2>From signup to database handoff.</h2></div>
+        <span>Each step is staged as buyer-facing proof, not developer debug output.</span>
+      </div>
+      <div class="flow">
+        ${stages.map(([title, body], index) => `<article><strong>${String(index + 1).padStart(2, '0')}</strong><div><h3>${title}</h3><p>${body}</p></div></article>`).join('')}
+      </div>
+    </section>
+
+    <section class="section" id="packages">
+      <div class="section-title">
+        <div><p>Usage packages</p><h2>Sell managed access first, then scale the control plane.</h2></div>
+        <span>Packages match the current offer: setup, private database access, proof reports, and guided handoff.</span>
+      </div>
+      <div class="offer-grid">
+        ${packages.map(([title, price, body]) => `<article class="offer"><p class="label">${title}</p><strong>${price}</strong><p>${body}</p><a href="#signup">Start with Skyegate auth</a></article>`).join('')}
+      </div>
+    </section>
+
+    <section class="section" id="signup">
+      <div class="section-title">
+        <div><p>SkyegateFS27 signup</p><h2>Create the buyer account before access is sold.</h2></div>
+        <span>Signup creates the authenticated buyer record and stores the returned session locally for the buyer.</span>
+      </div>
+      <div class="signup-wrap">
+        <aside class="proof-panel">
+          <p class="label">After signup</p>
+          <div class="proof-list">
+            <div><b>✓</b><span>SkyegateFS27 user and session are created.</span></div>
+            <div><b>✓</b><span>Customer record attaches to the selected package.</span></div>
+            <div><b>✓</b><span>Buyer is ready for approval, payment, and private database provisioning.</span></div>
+            <div><b>✓</b><span>Operator handoff stays behind the private access lane.</span></div>
+          </div>
+        </aside>
+        <section class="signup-panel">
+          <form id="signupForm">
+            <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" required></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+            <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+            <div class="field"><label for="plan">Package</label><select id="plan" name="plan"><option value="starter">Starter Ops</option><option value="business">Business Command</option><option value="managed">White-Glove Managed</option></select></div>
+            <button class="button primary" type="submit">Create Skyegate auth</button>
+          </form>
+          <p id="signupStatus" class="signup-status">Ready. This form creates a SkyegateFS27 buyer account and stores the returned session locally.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>CitadelDB Ultimate · Skyes Over London · SOLEnterprises</span>
+    <span>Private Postgres · Proof-backed deployment · SkyegateFS27 auth</span>
+  </footer>
+
+  <script>
+    const SKYEGATE_URL = ${JSON.stringify(SKYEGATE_URL)};
+    const canvas = document.getElementById('dbCanvas');
+    const ctx = canvas.getContext('2d');
+    const particles = Array.from({length: 130}, () => ({x: Math.random(), y: Math.random(), r: Math.random() * 1.7 + .35, s: Math.random() * .4 + .12, c: Math.random() > .58 ? '#f4c75b' : Math.random() > .5 ? '#7ee7ff' : '#8b5cf6'}));
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      if (canvas.width !== Math.floor(rect.width * dpr) || canvas.height !== Math.floor(rect.height * dpr)) {
+        canvas.width = Math.floor(rect.width * dpr); canvas.height = Math.floor(rect.height * dpr); ctx.setTransform(dpr,0,0,dpr,0,0);
+      }
+      ctx.clearRect(0,0,rect.width,rect.height);
+      const cx = rect.width * .58, cy = rect.height * .48;
+      const grd = ctx.createRadialGradient(cx, cy, 10, cx, cy, Math.min(rect.width, rect.height) * .48);
+      grd.addColorStop(0, 'rgba(126,231,255,.22)'); grd.addColorStop(.42, 'rgba(244,199,91,.08)'); grd.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grd; ctx.fillRect(0,0,rect.width,rect.height);
+      ctx.strokeStyle = 'rgba(126,231,255,.42)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.ellipse(cx, cy, Math.min(rect.width,520)*.38, Math.min(rect.height,300)*.42, -.34, 0, Math.PI*2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(244,199,91,.68)'; ctx.beginPath(); ctx.ellipse(cx, cy + 8, Math.min(rect.width,500)*.34, Math.min(rect.height,280)*.10, 0, 0, Math.PI*2); ctx.stroke();
+      for (const p of particles) { p.y -= p.s / 900; if (p.y < 0) p.y = 1; ctx.fillStyle = p.c; ctx.globalAlpha = .75; ctx.beginPath(); ctx.arc(p.x * rect.width, p.y * rect.height, p.r, 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha = 1; requestAnimationFrame(draw);
+    }
+    draw();
+
+    const form = document.getElementById('signupForm');
+    const status = document.getElementById('signupStatus');
+    function setStatus(message, state) { status.className = 'signup-status' + (state ? ' ' + state : ''); status.textContent = message; }
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const payload = { name: data.get('name'), display_name: data.get('name'), email: data.get('email'), password: data.get('password'), plan_name: data.get('plan'), profile: { source: 'citadeldb-public-site', requested_package: data.get('plan'), product: 'CitadelDB Ultimate' } };
+      setStatus('Creating SkyegateFS27 account...', '');
+      try {
+        const response = await fetch(SKYEGATE_URL + '/auth/signup', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Signup failed');
+        localStorage.setItem('citadeldb_skygate_session', result.session?.token || '');
+        localStorage.setItem('citadeldb_skygate_customer_id', String(result.user?.primary_customer_id || ''));
+        localStorage.setItem('citadeldb_skygate_email', result.user?.email || '');
+        const verification = result.verification?.required ? ' Verification is required before full access.' : '';
+        setStatus('Skyegate auth created for ' + result.user.email + '. Customer #' + result.user.primary_customer_id + ' is ready for payment/setup approval.' + verification, 'good');
+        form.reset();
+      } catch (error) {
+        setStatus(error.message || 'Signup failed. Try again or contact Gray for manual onboarding.', 'bad');
+      }
+    });
+  </script>
+</body>
+</html>`;
+
+writeFileSync('dist/index.html', html);
+writeFileSync('dist/ai-summary.md', `# CitadelDB Ultimate
+
+CitadelDB Ultimate is a proof-backed private Postgres deployment and monitoring offer.
+
+Public site:
+- App-first database command center.
+- SkyegateFS27 signup.
+- Managed packages.
+- Client-safe backup and restore proof language.
+
+Signup posts to ${SKYEGATE_URL}/auth/signup and stores the returned Skyegate session/customer id locally.
+`);

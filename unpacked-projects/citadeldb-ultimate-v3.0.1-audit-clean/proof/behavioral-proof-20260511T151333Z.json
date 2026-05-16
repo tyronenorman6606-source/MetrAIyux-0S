@@ -1,0 +1,182 @@
+{
+  "ok": false,
+  "generatedAt": "2026-05-11T15:13:33.792Z",
+  "phases": [
+    {
+      "name": "runtime_integrity_scan",
+      "command": "node tools/runtime-integrity-scan.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair",
+      "status": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"proof\": \"proof/runtime-integrity-20260511T151333Z.json\",\n  \"counts\": {\n    \"files\": 285,\n    \"codeFiles\": 25,\n    \"checks\": 38,\n    \"failed\": 0\n  },\n  \"failed\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "site_build",
+      "command": "node build.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/site",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "operator_dashboard_npm_install",
+      "command": "npm install --omit=dev",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard",
+      "status": 0,
+      "stdout": "\nup to date, audited 70 packages in 1s\n\n16 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+      "stderr": ""
+    },
+    {
+      "name": "gateway_npm_install",
+      "command": "npm install --omit=dev",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway",
+      "status": 0,
+      "stdout": "\nup to date, audited 85 packages in 1s\n\n17 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+      "stderr": ""
+    },
+    {
+      "name": "operator_dashboard_boot",
+      "command": "node server.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard",
+      "stdout": "CitadelDB Operator Dashboard v2.2 Truth Correction listening on :17413\n",
+      "stderr": "",
+      "probes": [
+        {
+          "url": "http://127.0.0.1:17413/",
+          "expectText": "CitadelDB",
+          "result": {
+            "ok": true,
+            "status": 200,
+            "text": "<!doctype html><html lang=\"en\"><head>\n<meta charset=\"utf-8\"><title>Overview · CitadelDB Ultimate · Skyes Over London</title>\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root{color-scheme:dark;--bg:#07070b;--panel:#10111b;--muted:#a7adbd;--line:#2a2d3d;--gold:#d7aa43;--ok:#5cffb1;--bad:#ff5c7a;--blue:#90b4ff}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top left,#241a37,#07070b 38%,#030306);color:#f7f8ff}\nbody:before{content:\"\";position:fixed;inset:0;background:linear-gradient(120deg,rgba(215,170,67,.10),transparent 30%,rgba(144,180,255,.08));pointer-events:none}\nheader{padding:28px;border-bottom:1px solid var(--line);background:rgba(10,10,16,.72);position:sticky;top:0;backdrop-filter:blur(18px);z-index:2}\nh1{margin:0;font-size:24px;letter-spacing:-.04em}.sub{color:var(--muted);margin-top:6px;line-height:1.55}main{padding:28px;display:grid;gap:22px;max-width:1350px;margin:auto;position:relative;z-index:1}\n.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}\n.panel{border:1px solid var(--line);border-radius:22px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.022));box-shadow:0 24px 70px rgba(0,0,0,.35)}\n.metric{font-size:34px;font-weight:800;letter-spacing:-.06em}.label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em}\ntable{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.12em}\n.ok{color:var(--ok)}.bad{color:var(--bad)}.pill{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);display:inline-block}\nnav{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}a{color:#ffe29a;text-decoration:none}a:hover{text-decoration:underline}code{color:#ffe29a}pre{overflow:auto;white-space:pre-wrap}\ninput,select,textarea{width:100%;padding:12px 13px;border-radius:13px;border:1px solid var(--line);background:#080914;color:#fff;margin:7px 0 13px}\nbutton{background:linear-gradient(135deg,#ffe29a,#d7aa43);border:0;color:#111;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer}\nbutton:hover{filter:brightness(1.08)}.cta{display:inline-flex;background:linear-gradient(135deg,#ffe29a,#d7aa43);color:#111!important;padding:11px 15px;border-radius:999px;font-weight:900;text-decoration:none!important}.notice{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04)}\n@media(max-width:900px){.grid,.two{grid-template-columns:1fr 1fr}}@media(max-width:620px){.grid,.two{grid-template-columns:1fr}header,main{padding:18px}}\n</style></head><body><header><div style=\"display:flex;align-items:center;gap:14px\"><img src=\"/assets/citadeldb-app-icon-192.png\" alt=\"CitadelDB\" style=\"width:54px;height:54px;border-radius:14px;object-fit:cover;box-shadow:0 0 30px rgba(215,170,67,.22)\"><div><h1>CitadelDB Ultimate</h1><div class=\"sub\">Sovereign Database Command Infrastructure by Skyes Over London · SoveReign13 Infrastructure Family</div></div>\n<nav><a href=\"/\">Overview</a><a href=\"/setup-wizard\">Setup Wizard</a><a href=\"/onboarding\">First Run</a><a href=\"/guided\">Guided Ops</a><a href=\"/live-gates\">Live Gates</a><a href=\"/commercial\">Commercial</a><a href=\"/branches\">Branches</a><a href=\"/platform\">Platform</a><a href=\"/table-browser\">Table Browser</a><a href=\"/self-service\">Self-Service Console</a><a href=\"/app-lifecycle\">App Lifecycle</a><a href=\"/app-onboarding\">App Onboarding</a><a href=\"/launchpad\">Database Launchpad</a><a href=\"/wizard\">Connect App</a><a href=\"/ai-debug\">AI Debug</a><a href=\"/actions\">Actions</a><a href=\"/jobs\">Jobs</a><a href=\"/apps\">Apps</a><a href=\"/catalog\">Catalog</a><a href=\"/tenants\">Tenants</a><a href=\"/security\">Security</a><a hre",
+            "headers": {
+              "connection": "keep-alive",
+              "content-length": "5573",
+              "content-type": "text/html; charset=utf-8",
+              "date": "Mon, 11 May 2026 15:13:41 GMT",
+              "etag": "W/\"15c5-f2voJZP/c9J911XWI1634DUhhXg\"",
+              "keep-alive": "timeout=5",
+              "x-powered-by": "Express"
+            }
+          }
+        },
+        {
+          "url": "http://127.0.0.1:17413/setup-wizard",
+          "expectText": "Setup Wizard",
+          "result": {
+            "ok": true,
+            "status": 200,
+            "text": "<!doctype html><html lang=\"en\"><head>\n<meta charset=\"utf-8\"><title>Setup Wizard · CitadelDB Ultimate · Skyes Over London</title>\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root{color-scheme:dark;--bg:#07070b;--panel:#10111b;--muted:#a7adbd;--line:#2a2d3d;--gold:#d7aa43;--ok:#5cffb1;--bad:#ff5c7a;--blue:#90b4ff}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top left,#241a37,#07070b 38%,#030306);color:#f7f8ff}\nbody:before{content:\"\";position:fixed;inset:0;background:linear-gradient(120deg,rgba(215,170,67,.10),transparent 30%,rgba(144,180,255,.08));pointer-events:none}\nheader{padding:28px;border-bottom:1px solid var(--line);background:rgba(10,10,16,.72);position:sticky;top:0;backdrop-filter:blur(18px);z-index:2}\nh1{margin:0;font-size:24px;letter-spacing:-.04em}.sub{color:var(--muted);margin-top:6px;line-height:1.55}main{padding:28px;display:grid;gap:22px;max-width:1350px;margin:auto;position:relative;z-index:1}\n.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}\n.panel{border:1px solid var(--line);border-radius:22px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.022));box-shadow:0 24px 70px rgba(0,0,0,.35)}\n.metric{font-size:34px;font-weight:800;letter-spacing:-.06em}.label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em}\ntable{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.12em}\n.ok{color:var(--ok)}.bad{color:var(--bad)}.pill{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);display:inline-block}\nnav{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}a{color:#ffe29a;text-decoration:none}a:hover{text-decoration:underline}code{color:#ffe29a}pre{overflow:auto;white-space:pre-wrap}\ninput,select,textarea{width:100%;padding:12px 13px;border-radius:13px;border:1px solid var(--line);background:#080914;color:#fff;margin:7px 0 13px}\nbutton{background:linear-gradient(135deg,#ffe29a,#d7aa43);border:0;color:#111;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer}\nbutton:hover{filter:brightness(1.08)}.cta{display:inline-flex;background:linear-gradient(135deg,#ffe29a,#d7aa43);color:#111!important;padding:11px 15px;border-radius:999px;font-weight:900;text-decoration:none!important}.notice{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04)}\n@media(max-width:900px){.grid,.two{grid-template-columns:1fr 1fr}}@media(max-width:620px){.grid,.two{grid-template-columns:1fr}header,main{padding:18px}}\n</style></head><body><header><div style=\"display:flex;align-items:center;gap:14px\"><img src=\"/assets/citadeldb-app-icon-192.png\" alt=\"CitadelDB\" style=\"width:54px;height:54px;border-radius:14px;object-fit:cover;box-shadow:0 0 30px rgba(215,170,67,.22)\"><div><h1>CitadelDB Ultimate</h1><div class=\"sub\">Sovereign Database Command Infrastructure by Skyes Over London · SoveReign13 Infrastructure Family</div></div>\n<nav><a href=\"/\">Overview</a><a href=\"/setup-wizard\">Setup Wizard</a><a href=\"/onboarding\">First Run</a><a href=\"/guided\">Guided Ops</a><a href=\"/live-gates\">Live Gates</a><a href=\"/commercial\">Commercial</a><a href=\"/branches\">Branches</a><a href=\"/platform\">Platform</a><a href=\"/table-browser\">Table Browser</a><a href=\"/self-service\">Self-Service Console</a><a href=\"/app-lifecycle\">App Lifecycle</a><a href=\"/app-onboarding\">App Onboarding</a><a href=\"/launchpad\">Database Launchpad</a><a href=\"/wizard\">Connect App</a><a href=\"/ai-debug\">AI Debug</a><a href=\"/actions\">Actions</a><a href=\"/jobs\">Jobs</a><a href=\"/apps\">Apps</a><a href=\"/catalog\">Catalog</a><a href=\"/tenants\">Tenants</a><a href=\"/security\">Security</a><a",
+            "headers": {
+              "connection": "keep-alive",
+              "content-length": "5843",
+              "content-type": "text/html; charset=utf-8",
+              "date": "Mon, 11 May 2026 15:13:41 GMT",
+              "etag": "W/\"16d3-jATi/oG9fUWMq9VfeOZdqX2g/QE\"",
+              "keep-alive": "timeout=5",
+              "x-powered-by": "Express"
+            }
+          }
+        },
+        {
+          "url": "http://127.0.0.1:17413/live-gates/protected-routes",
+          "expectText": "Protected Route Registry",
+          "result": {
+            "ok": true,
+            "status": 200,
+            "text": "<!doctype html><html lang=\"en\"><head>\n<meta charset=\"utf-8\"><title>Protected Routes · CitadelDB Ultimate · Skyes Over London</title>\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root{color-scheme:dark;--bg:#07070b;--panel:#10111b;--muted:#a7adbd;--line:#2a2d3d;--gold:#d7aa43;--ok:#5cffb1;--bad:#ff5c7a;--blue:#90b4ff}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top left,#241a37,#07070b 38%,#030306);color:#f7f8ff}\nbody:before{content:\"\";position:fixed;inset:0;background:linear-gradient(120deg,rgba(215,170,67,.10),transparent 30%,rgba(144,180,255,.08));pointer-events:none}\nheader{padding:28px;border-bottom:1px solid var(--line);background:rgba(10,10,16,.72);position:sticky;top:0;backdrop-filter:blur(18px);z-index:2}\nh1{margin:0;font-size:24px;letter-spacing:-.04em}.sub{color:var(--muted);margin-top:6px;line-height:1.55}main{padding:28px;display:grid;gap:22px;max-width:1350px;margin:auto;position:relative;z-index:1}\n.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}\n.panel{border:1px solid var(--line);border-radius:22px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.022));box-shadow:0 24px 70px rgba(0,0,0,.35)}\n.metric{font-size:34px;font-weight:800;letter-spacing:-.06em}.label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em}\ntable{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.12em}\n.ok{color:var(--ok)}.bad{color:var(--bad)}.pill{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);display:inline-block}\nnav{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}a{color:#ffe29a;text-decoration:none}a:hover{text-decoration:underline}code{color:#ffe29a}pre{overflow:auto;white-space:pre-wrap}\ninput,select,textarea{width:100%;padding:12px 13px;border-radius:13px;border:1px solid var(--line);background:#080914;color:#fff;margin:7px 0 13px}\nbutton{background:linear-gradient(135deg,#ffe29a,#d7aa43);border:0;color:#111;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer}\nbutton:hover{filter:brightness(1.08)}.cta{display:inline-flex;background:linear-gradient(135deg,#ffe29a,#d7aa43);color:#111!important;padding:11px 15px;border-radius:999px;font-weight:900;text-decoration:none!important}.notice{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04)}\n@media(max-width:900px){.grid,.two{grid-template-columns:1fr 1fr}}@media(max-width:620px){.grid,.two{grid-template-columns:1fr}header,main{padding:18px}}\n</style></head><body><header><div style=\"display:flex;align-items:center;gap:14px\"><img src=\"/assets/citadeldb-app-icon-192.png\" alt=\"CitadelDB\" style=\"width:54px;height:54px;border-radius:14px;object-fit:cover;box-shadow:0 0 30px rgba(215,170,67,.22)\"><div><h1>CitadelDB Ultimate</h1><div class=\"sub\">Sovereign Database Command Infrastructure by Skyes Over London · SoveReign13 Infrastructure Family</div></div>\n<nav><a href=\"/\">Overview</a><a href=\"/setup-wizard\">Setup Wizard</a><a href=\"/onboarding\">First Run</a><a href=\"/guided\">Guided Ops</a><a href=\"/live-gates\">Live Gates</a><a href=\"/commercial\">Commercial</a><a href=\"/branches\">Branches</a><a href=\"/platform\">Platform</a><a href=\"/table-browser\">Table Browser</a><a href=\"/self-service\">Self-Service Console</a><a href=\"/app-lifecycle\">App Lifecycle</a><a href=\"/app-onboarding\">App Onboarding</a><a href=\"/launchpad\">Database Launchpad</a><a href=\"/wizard\">Connect App</a><a href=\"/ai-debug\">AI Debug</a><a href=\"/actions\">Actions</a><a href=\"/jobs\">Jobs</a><a href=\"/apps\">Apps</a><a href=\"/catalog\">Catalog</a><a href=\"/tenants\">Tenants</a><a href=\"/security\">Security</",
+            "headers": {
+              "connection": "keep-alive",
+              "content-length": "5164",
+              "content-type": "text/html; charset=utf-8",
+              "date": "Mon, 11 May 2026 15:13:41 GMT",
+              "etag": "W/\"142c-fDsXqOg8WkLQzKussD3YXSTjQog\"",
+              "keep-alive": "timeout=5",
+              "x-powered-by": "Express"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "gateway_boot",
+      "command": "node src/server.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway",
+      "stdout": "CitadelDB Gateway v2.2 Truth Correction listening on 0.0.0.0:17313\n",
+      "stderr": "",
+      "probes": [
+        {
+          "url": "http://127.0.0.1:17313/health",
+          "result": {
+            "ok": false,
+            "status": 500,
+            "text": "{\"ok\":false,\"error\":\"connect ECONNREFUSED 127.0.0.1:15432\"}",
+            "headers": {
+              "connection": "keep-alive",
+              "content-length": "59",
+              "content-type": "application/json; charset=utf-8",
+              "date": "Mon, 11 May 2026 15:13:43 GMT",
+              "etag": "W/\"3b-Fp0/bCUwF0v5s20K6mnTTG9OoKs\"",
+              "keep-alive": "timeout=5",
+              "x-powered-by": "Express"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "runtime_integrity_scan_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "site_build_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "operator_dashboard_install_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "gateway_install_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/",
+      "ok": true,
+      "status": 200,
+      "expectText": "CitadelDB"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/setup-wizard",
+      "ok": true,
+      "status": 200,
+      "expectText": "Setup Wizard"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/live-gates/protected-routes",
+      "ok": false,
+      "status": 200,
+      "expectText": "Protected Route Registry"
+    },
+    {
+      "name": "gateway_probe_http://127.0.0.1:17313/health",
+      "ok": true,
+      "status": 500,
+      "body": "{\"ok\":false,\"error\":\"connect ECONNREFUSED 127.0.0.1:15432\"}"
+    }
+  ],
+  "notes": [],
+  "failed": [
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/live-gates/protected-routes",
+      "ok": false,
+      "status": 200,
+      "expectText": "Protected Route Registry"
+    }
+  ]
+}

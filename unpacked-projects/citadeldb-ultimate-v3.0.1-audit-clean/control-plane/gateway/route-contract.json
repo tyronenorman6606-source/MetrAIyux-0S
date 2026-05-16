@@ -1,0 +1,551 @@
+{
+  "product": "CitadelDB Ultimate",
+  "version": "3.0.1",
+  "generatedFrom": "control-plane/gateway/src/server.mjs",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "security": "public",
+      "type": "health",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/restores",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/capacity",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/readiness",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/migrations/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/migrations",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/restore/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/service-catalog",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs/:id",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/claim",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/start",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/finish",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/command-receipts",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/policy-findings",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tenants",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tenants",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/connection",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/write-smoke-job",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/ai/status",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/ai/debug",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "ai_debug",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/rotate-credential",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "credential_rotation",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/database/test-url",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/setup-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/guided/setup-checklist",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/guided/proof-action",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "guided_proof_action",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/guided/diagnostic-bundle",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/setup/env-readiness",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/setup/generate-secrets",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "setup_generate_secrets",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/setup/plan",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/onboarding-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/proof-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/migration-plan",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/lifecycle-action",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "app_lifecycle_action",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/rollback-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/lifecycle-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "self_service_database_provision",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "self_service_sql_execute",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/plans",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/accounts",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/teams",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/teams/:teamSlug/usage",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/schema",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "table_browser_list",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "table_browser_preview",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/entitlements/:teamSlug",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/commercial/subscriptions",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "security": "stripe_signature",
+      "type": "webhook",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/events",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "branch_request",
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/branches",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/readiness",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/live-gates/protected-routes",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "GET",
+      "path": "/admin/live-gates/status",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/live-gates/check",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/branches/:branchSlug/proof-packet",
+      "security": "admin",
+      "type": "admin_read",
+      "protectedKey": null,
+      "mutating": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    }
+  ]
+}

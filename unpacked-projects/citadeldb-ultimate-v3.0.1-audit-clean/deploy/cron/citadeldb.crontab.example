@@ -1,0 +1,10 @@
+# CitadelDB cron example
+# Install with: crontab deploy/cron/citadeldb.crontab.example
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 3 * * * cd /opt/citadeldb && ./cli/citadel backup-now >> logs/cron-backup.log 2>&1
+0 4 * * 0 cd /opt/citadeldb && ./cli/citadel restore-test >> logs/cron-restore-test.log 2>&1
+0 5 * * * cd /opt/citadeldb && ./cli/citadel policy-check >> logs/cron-policy-check.log 2>&1
+30 5 * * * cd /opt/citadeldb && ./cli/citadel backup-manifest >> logs/cron-backup-manifest.log 2>&1

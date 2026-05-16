@@ -1,0 +1,170 @@
+{
+  "ok": false,
+  "generatedAt": "2026-05-11T15:12:43.853Z",
+  "phases": [
+    {
+      "name": "runtime_integrity_scan",
+      "command": "node tools/runtime-integrity-scan.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair",
+      "status": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"proof\": \"proof/runtime-integrity-20260511T151243Z.json\",\n  \"counts\": {\n    \"files\": 278,\n    \"codeFiles\": 25,\n    \"checks\": 38,\n    \"failed\": 0\n  },\n  \"failed\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "site_build",
+      "command": "node build.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/site",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "operator_dashboard_npm_install",
+      "command": "npm install --omit=dev",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard",
+      "status": 0,
+      "stdout": "\nadded 69 packages, and audited 70 packages in 4s\n\n16 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+      "stderr": ""
+    },
+    {
+      "name": "gateway_npm_install",
+      "command": "npm install --omit=dev",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway",
+      "status": 0,
+      "stdout": "\nadded 84 packages, and audited 85 packages in 3s\n\n17 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+      "stderr": ""
+    },
+    {
+      "name": "operator_dashboard_boot",
+      "command": "node server.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard",
+      "stdout": "CitadelDB Operator Dashboard v2.2 Truth Correction listening on :17413\n",
+      "stderr": "node:internal/deps/undici/undici:13510\n      Error.captureStackTrace(err);\n            ^\n\nTypeError: fetch failed\n\u001b[90m    at node:internal/deps/undici/undici:13510:13\u001b[39m\n\u001b[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\u001b[39m\n    at async gateway \u001b[90m(file:///mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard/\u001b[39mserver.mjs:14:15\u001b[90m)\u001b[39m\n    at async Promise.all (index 0)\n    at async \u001b[90mfile:///mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/operator-dashboard/\u001b[39mserver.mjs:71:73 {\n  [cause]: Error: connect ECONNREFUSED 127.0.0.1:7313\n  \u001b[90m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16)\u001b[39m {\n    errno: \u001b[33m-111\u001b[39m,\n    code: \u001b[32m'ECONNREFUSED'\u001b[39m,\n    syscall: \u001b[32m'connect'\u001b[39m,\n    address: \u001b[32m'127.0.0.1'\u001b[39m,\n    port: \u001b[33m7313\u001b[39m\n  }\n}\n\nNode.js v22.16.0\n",
+      "probes": [
+        {
+          "url": "http://127.0.0.1:17413/",
+          "expectText": "CitadelDB",
+          "result": {
+            "ok": false,
+            "status": 0,
+            "error": "fetch failed"
+          }
+        },
+        {
+          "url": "http://127.0.0.1:17413/setup-wizard",
+          "expectText": "Setup Wizard",
+          "result": {
+            "ok": false,
+            "status": 0,
+            "error": "fetch failed"
+          }
+        },
+        {
+          "url": "http://127.0.0.1:17413/live-gates/protected-routes",
+          "expectText": "Protected Route Registry",
+          "result": {
+            "ok": false,
+            "status": 0,
+            "error": "fetch failed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gateway_boot",
+      "command": "node src/server.mjs",
+      "cwd": "/mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway",
+      "stdout": "",
+      "stderr": "file:///mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway/src/db.mjs:7\n    throw new Error('DATABASE_URL is required');\n          ^\n\nError: DATABASE_URL is required\n    at createPool \u001b[90m(file:///mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway/\u001b[39msrc/db.mjs:7:11\u001b[90m)\u001b[39m\n    at \u001b[90mfile:///mnt/data/citadeldb-ultimate-v2.4-behavioral-proof-repair/control-plane/gateway/\u001b[39msrc/server.mjs:21:14\n\u001b[90m    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\u001b[39m\n\u001b[90m    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\u001b[39m\n\u001b[90m    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\u001b[39m\n\nNode.js v22.16.0\n",
+      "probes": [
+        {
+          "url": "http://127.0.0.1:17313/health",
+          "result": {
+            "ok": false,
+            "status": 0,
+            "error": "fetch failed"
+          }
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "runtime_integrity_scan_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "site_build_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "operator_dashboard_install_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "gateway_install_exit_0",
+      "ok": true,
+      "status": 0
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/",
+      "ok": false,
+      "status": 0,
+      "expectText": "CitadelDB",
+      "error": "fetch failed"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/setup-wizard",
+      "ok": false,
+      "status": 0,
+      "expectText": "Setup Wizard",
+      "error": "fetch failed"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/live-gates/protected-routes",
+      "ok": false,
+      "status": 0,
+      "expectText": "Protected Route Registry",
+      "error": "fetch failed"
+    },
+    {
+      "name": "gateway_probe_http://127.0.0.1:17313/health",
+      "ok": false,
+      "status": 0,
+      "error": "fetch failed"
+    }
+  ],
+  "notes": [],
+  "failed": [
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/",
+      "ok": false,
+      "status": 0,
+      "expectText": "CitadelDB",
+      "error": "fetch failed"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/setup-wizard",
+      "ok": false,
+      "status": 0,
+      "expectText": "Setup Wizard",
+      "error": "fetch failed"
+    },
+    {
+      "name": "dashboard_probe_http://127.0.0.1:17413/live-gates/protected-routes",
+      "ok": false,
+      "status": 0,
+      "expectText": "Protected Route Registry",
+      "error": "fetch failed"
+    },
+    {
+      "name": "gateway_probe_http://127.0.0.1:17313/health",
+      "ok": false,
+      "status": 0,
+      "error": "fetch failed"
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+CMD="${1:-}"
+shift || true
+
+case "$CMD" in
+  health)
+    ./scripts/healthcheck.sh
+    ;;
+  provision)
+    APP="${1:-}"
+    if [ -z "$APP" ]; then echo "Usage: citadel provision <app-slug>" >&2; exit 1; fi
+    ./scripts/create-app-db.sh "$APP"
+    ;;
+  migrate)
+    APP="${1:-}"
+    DIR="${2:-}"
+    if [ -z "$APP" ] || [ -z "$DIR" ]; then echo "Usage: citadel migrate <app-slug> <migration-dir>" >&2; exit 1; fi
+    ./scripts/migrate.sh "$APP" "$DIR"
+    ;;
+  backup-now)
+    ./scripts/backup-now.sh
+    ;;
+  backup-app)
+    APP="${1:-}"
+    if [ -z "$APP" ]; then echo "Usage: citadel backup-app <app-slug>" >&2; exit 1; fi
+    ./scripts/backup-app.sh "$APP"
+    ;;
+  backup-encrypted)
+    ./scripts/backup-encrypted.sh
+    ;;
+  restore-test)
+    ./scripts/restore-test.sh
+    ;;
+  restore-app-test)
+    APP="${1:-}"
+    if [ -z "$APP" ]; then echo "Usage: citadel restore-app-test <app-slug>" >&2; exit 1; fi
+    ./scripts/restore-app-test.sh "$APP"
+    ;;
+  smoke-all)
+    ./scripts/smoke-all.sh
+    ;;
+  readiness)
+    if [ -f .env ]; then set -a; source .env; set +a; fi
+    curl -sS "http://127.0.0.1:${GATEWAY_PORT:-7313}/admin/readiness" -H "Authorization: Bearer ${GATEWAY_ADMIN_TOKEN:-}" | python3 -m json.tool
+    ;;
+  capacity)
+    if [ -f .env ]; then set -a; source .env; set +a; fi
+    curl -sS "http://127.0.0.1:${GATEWAY_PORT:-7313}/admin/capacity" -H "Authorization: Bearer ${GATEWAY_ADMIN_TOKEN:-}" | python3 -m json.tool
+    ;;
+  jobs)
+    if [ -f .env ]; then set -a; source .env; set +a; fi
+    curl -sS "http://127.0.0.1:${GATEWAY_PORT:-7313}/admin/jobs" -H "Authorization: Bearer ${GATEWAY_ADMIN_TOKEN:-}" | python3 -m json.tool
+    ;;
+  enqueue-job)
+    JOB_TYPE="${1:-}"
+    if [ -z "$JOB_TYPE" ]; then echo "Usage: citadel enqueue-job <job-type>" >&2; exit 1; fi
+    if [ -f .env ]; then set -a; source .env; set +a; fi
+    curl -sS -X POST "http://127.0.0.1:${GATEWAY_PORT:-7313}/admin/jobs"       -H "Authorization: Bearer ${GATEWAY_ADMIN_TOKEN:-}"       -H "Content-Type: application/json"       -d "{"jobType":"${JOB_TYPE}","requestedBy":"cli"}" | python3 -m json.tool
+    ;;
+  validate-env)
+    ./scripts/validate-env.sh
+    ;;
+  object-backup-sync)
+    ./reliquary/sync-object-backups.sh
+    ;;
+  policy-check)
+    ./tools/policy-check.sh
+    ;;
+  backup-manifest)
+    ./reliquary/generate-backup-manifest.sh
+    ;;
+  service-catalog-export)
+    ./tools/export-service-catalog.sh
+    ;;
+  architecture-guard)
+    ./tools/public-architecture-guard.sh
+    ;;
+  vps-preflight)
+    ./scripts/vps-preflight.sh
+    ;;
+  route-contract-proof)
+    ./tools/route-contract-proof.sh
+    ;;
+  express-async-error-proof)
+    ./tools/express-async-error-proof.sh
+    ;;
+  mutating-route-audit-proof)
+    ./tools/mutating-route-audit-proof.sh
+    ;;
+  runtime-reference-proof)
+    ./tools/runtime-reference-proof.sh
+    ;;
+  lifecycle-packet-composition-proof)
+    ./tools/lifecycle-packet-composition-proof.sh
+    ;;
+  migration-init-parity-proof)
+    ./tools/migration-init-parity-proof.sh
+    ;;
+  provisioning-ddl-proof)
+    ./tools/provisioning-ddl-proof.sh
+    ;;
+  gateway-worker-job-parity-proof)
+    ./tools/gateway-worker-job-parity-proof.sh
+    ;;
+  schema-query-consistency-proof)
+    ./tools/schema-query-consistency-proof.sh
+    ;;
+  sql-policy-negative-proof)
+    ./tools/sql-policy-negative-proof.sh
+    ;;
+  postgres-ddl-safety-proof)
+    ./tools/postgres-ddl-safety-proof.sh
+    ;;
+  handler-guard-proof)
+    ./tools/handler-guard-proof.sh
+    ;;
+  worker-allowlist-proof)
+    ./tools/worker-allowlist-proof.sh
+    ;;
+  database-lifecycle-proof)
+    ./tools/database-lifecycle-proof.sh
+    ;;
+  gateway-sql-console-proof)
+    ./tools/gateway-sql-console-proof.sh
+    ;;
+  generate-live-e2e-env)
+    ./tools/generate-live-e2e-env.sh
+    ;;
+  live-stack-e2e)
+    ./tools/live-stack-e2e.sh
+    ;;
+  route-protection-proof)
+    ./tools/route-protection-proof.sh
+    ;;
+  behavioral-proof)
+    ./tools/behavioral-proof.sh
+    ;;
+  runtime-integrity-scan)
+    ./tools/runtime-integrity-scan.sh
+    ;;
+  truth-correction-proof)
+    ./tools/truth-correction-proof.sh
+    ;;
+  hard-proof-truth-scan)
+    ./tools/hard-proof-truth-scan.sh
+    ;;
+  live-gate-hardening-proof)
+    ./tools/live-gate-hardening-proof.sh
+    ;;
+  commercial-closure-proof)
+    ./tools/commercial-closure-proof.sh
+    ;;
+  platform-closure-proof)
+    ./tools/platform-closure-proof.sh
+    ;;
+  self-service-console-proof)
+    ./tools/self-service-console-proof.sh
+    ;;
+  app-lifecycle-proof)
+    ./tools/app-lifecycle-proof.sh
+    ;;
+  app-onboarding-proof)
+    ./tools/app-onboarding-proof.sh
+    ;;
+  setup-wizard-proof)
+    ./tools/setup-wizard-proof.sh
+    ;;
+  dashboard-route-proof)
+    ./tools/dashboard-route-proof.sh
+    ;;
+  guided-ops-proof)
+    ./tools/guided-ops-proof.sh
+    ;;
+  launchpad-proof)
+    ./tools/launchpad-proof.sh
+    ;;
+  ai-debug-preflight)
+    ./tools/ai-debug-preflight.sh
+    ;;
+  skygate-bridge-proof)
+    ./tools/skygate-bridge-proof.sh
+    ;;
+  vps-only-closure-proof)
+    ./tools/vps-only-closure-proof.sh "${1:-}"
+    ;;
+  webapp-proof)
+    ./tools/webapp-proof.sh
+    ;;
+  final-release-gate)
+    ./tools/final-release-gate.sh
+    ;;
+  final-package-seal)
+    ./tools/final-package-seal.sh
+    ;;
+  final-rc-smoke)
+    ./tools/final-rc-smoke.sh
+    ;;
+  package-integrity)
+    ./tools/package-integrity-proof.sh
+    ;;
+  repo-hygiene)
+    ./tools/repo-hygiene-scan.sh
+    ;;
+  public-surface-scan)
+    ./tools/public-surface-scan.sh
+    ;;
+  release-self-audit)
+    ./tools/release-self-audit.sh
+    ;;
+  release-manifest)
+    ./tools/generate-release-manifest.sh "${1:-0.8.0}"
+    ;;
+  deployment-checklist)
+    ./tools/generate-deployment-checklist.sh "${1:-citadeldb}"
+    ;;
+  claims)
+    cat claims/CLAIMS_LEDGER.md
+    ;;
+  *)
+    cat <<'EOF'
+CitadelDB CLI
+
+Commands:
+  health
+  provision <app-slug>
+  migrate <app-slug> <migration-dir>
+  backup-now
+  backup-app <app-slug>
+  backup-encrypted
+  restore-test
+  restore-app-test <app-slug>
+  smoke-all
+  readiness
+  capacity
+  jobs
+  enqueue-job <job-type>
+  validate-env
+  object-backup-sync
+  policy-check
+  backup-manifest
+  service-catalog-export
+  architecture-guard
+  vps-preflight
+  route-contract-proof
+  express-async-error-proof
+  mutating-route-audit-proof
+  runtime-reference-proof
+  lifecycle-packet-composition-proof
+  migration-init-parity-proof
+  provisioning-ddl-proof
+  gateway-worker-job-parity-proof
+  schema-query-consistency-proof
+  sql-policy-negative-proof
+  postgres-ddl-safety-proof
+  handler-guard-proof
+  worker-allowlist-proof
+  database-lifecycle-proof
+  gateway-sql-console-proof
+  generate-live-e2e-env
+  live-stack-e2e
+  route-protection-proof
+  behavioral-proof
+  runtime-integrity-scan
+  truth-correction-proof
+  hard-proof-truth-scan
+  live-gate-hardening-proof
+  commercial-closure-proof
+  platform-closure-proof
+  self-service-console-proof
+  app-lifecycle-proof
+  app-onboarding-proof
+  setup-wizard-proof
+  dashboard-route-proof
+  guided-ops-proof
+  launchpad-proof
+  ai-debug-preflight
+  skygate-bridge-proof
+  vps-only-closure-proof
+  webapp-proof
+  final-release-gate
+  final-package-seal
+  final-rc-smoke
+  package-integrity
+  repo-hygiene
+  public-surface-scan
+  release-self-audit
+  release-manifest
+  deployment-checklist
+  claims
+EOF
+    ;;
+esac

@@ -1,0 +1,28 @@
+policies:
+  starter-serious:
+    full_backup: daily
+    encrypted_backup: weekly
+    restore_test: weekly
+    local_retention_days: 14
+    offsite_retention_months: 3
+    pitr: planned
+
+  paid-client:
+    full_backup: daily
+    differential_backup: every_6_hours
+    wal_archive: continuous
+    restore_test: weekly
+    local_retention_days: 14
+    offsite_retention_months: 12
+    pitr: required
+
+  critical:
+    full_backup: daily
+    differential_backup: hourly
+    wal_archive: continuous
+    replica: required
+    restore_test: daily
+    local_retention_days: 30
+    offsite_retention_months: 24
+    pitr: required
+    failover_drill: monthly

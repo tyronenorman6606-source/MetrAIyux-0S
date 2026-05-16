@@ -1,0 +1,218 @@
+{
+  "gateway": {
+    "exists": true,
+    "size": 77905,
+    "lines": 1899
+  },
+  "db": {
+    "exists": true,
+    "size": 599,
+    "lines": 26
+  },
+  "worker": {
+    "exists": true,
+    "size": 4278,
+    "lines": 144
+  },
+  "dashboard": {
+    "exists": true,
+    "size": 70697,
+    "lines": 1116
+  },
+  "protected": {
+    "exists": true,
+    "size": 2196,
+    "lines": 79
+  },
+  "runtime_scan": {
+    "exists": true,
+    "size": 4871,
+    "lines": 137
+  },
+  "gateway_routes_count": 68,
+  "gateway_routes_sample": [
+    {
+      "method": "GET",
+      "path": "/health"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/receipt"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/restores"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/capacity"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/readiness"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/migrations/receipt"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/migrations"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/restore/receipt"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/service-catalog"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs/:id"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/claim"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/start"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/finish"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/command-receipts"
+    }
+  ],
+  "worker_allowed_jobs": [
+    "app-write-smoke",
+    "backup-encrypted",
+    "backup-manifest",
+    "backup-now",
+    "branch-clone",
+    "health",
+    "object-backup-sync",
+    "policy-check",
+    "restore-test",
+    "smoke-all",
+    "validate-env"
+  ],
+  "protected_keys": [
+    "ai_debug",
+    "app_lifecycle_action",
+    "backup_restore_actions",
+    "branch_request",
+    "credential_rotation",
+    "guided_proof_action",
+    "self_service_database_provision",
+    "self_service_sql_execute",
+    "setup_generate_secrets",
+    "table_browser_list",
+    "table_browser_preview"
+  ],
+  "migration_files": [
+    "migrations/citadel-core/002_operator_jobs.sql",
+    "migrations/citadel-core/003_tenant_registry.sql",
+    "migrations/citadel-core/004_self_service_console.sql",
+    "migrations/citadel-core/005_platform_accounts_billing_usage.sql",
+    "migrations/citadel-core/006_commercial_control_plane.sql",
+    "migrations/citadel-core/007_live_gate_hardening.sql"
+  ],
+  "created_tables": [
+    "citadel.app_environments",
+    "citadel.command_receipts",
+    "citadel.cutover_receipts",
+    "citadel.operator_jobs",
+    "citadel.policy_findings",
+    "citadel.tenants",
+    "commercial.billing_customers",
+    "commercial.entitlement_checks",
+    "commercial.payment_events",
+    "commercial.subscriptions",
+    "live_gate.branch_receipts",
+    "live_gate.live_gate_checks",
+    "live_gate.route_gate_events",
+    "live_gate.usage_events",
+    "platform.accounts",
+    "platform.branch_events",
+    "platform.database_branches",
+    "platform.plans",
+    "platform.project_ownership",
+    "platform.quota_events",
+    "platform.team_members",
+    "platform.teams",
+    "platform.usage_snapshots",
+    "self_service.connection_events",
+    "self_service.project_databases",
+    "self_service.projects",
+    "self_service.query_history"
+  ],
+  "gateway_table_refs": [
+    "citadel.app_credentials",
+    "citadel.apps",
+    "citadel.audit_events",
+    "citadel.backup_receipts",
+    "citadel.command_receipts",
+    "citadel.migration_receipts",
+    "citadel.operator_jobs",
+    "citadel.policy_findings",
+    "citadel.restore_receipts",
+    "citadel.tenants",
+    "commercial.entitlement_checks",
+    "commercial.payment_events",
+    "commercial.subscriptions",
+    "information_schema.tables",
+    "live_gate.branch_receipts",
+    "live_gate.live_gate_checks",
+    "live_gate.route_gate_events",
+    "live_gate.usage_events",
+    "platform.accounts",
+    "platform.branch_events",
+    "platform.database_branches",
+    "platform.plans",
+    "platform.project_ownership",
+    "platform.team_members",
+    "platform.teams",
+    "self_service.connection_events",
+    "self_service.project_databases",
+    "self_service.projects",
+    "self_service.query_history"
+  ],
+  "missing_table_refs": [
+    "citadel.app_credentials",
+    "citadel.apps",
+    "citadel.audit_events",
+    "citadel.backup_receipts",
+    "citadel.migration_receipts",
+    "citadel.restore_receipts",
+    "information_schema.tables"
+  ]
+}
