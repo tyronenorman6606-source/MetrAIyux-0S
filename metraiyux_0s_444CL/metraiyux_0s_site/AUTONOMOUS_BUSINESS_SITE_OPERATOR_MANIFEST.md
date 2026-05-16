@@ -4,7 +4,7 @@ Generated: 2026-05-15T08:38:09.893724Z
 
 ## Upgrade Summary
 
-This release adds a 15th lightweight brain: **Site Operator Brain**.
+This release aligns the Site Operator Brain, Security Gate Brain, Central Command, and 13 cabinet brains into the 16-brain runtime.
 
 ## Brain Count
 

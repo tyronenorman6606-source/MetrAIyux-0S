@@ -1,6 +1,6 @@
 # Local Cabinet Brain
 
-This package now includes a lightweight local brain for the Client Command Deck Executive Office.
+This package now includes a local command brain for the Client Command Deck Executive Office.
 
 ## What it does
 

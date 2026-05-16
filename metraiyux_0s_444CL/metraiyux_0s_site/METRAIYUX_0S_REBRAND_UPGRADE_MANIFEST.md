@@ -22,7 +22,7 @@ Generated: 2026-05-15T11:31:56+00:00
 - Security/QA assistant: Security Gate Brain
 - Customer layer: tenant-isolated SaaS workspaces
 - Operating model: 13-department company workflow
-- Brain count: 16 lightweight brains
+- Brain count: 16 operating brains
 - Backend path: Cloudflare Workers, D1, KV, Queues, Resend approval email notifications
 
 ## Smoke results

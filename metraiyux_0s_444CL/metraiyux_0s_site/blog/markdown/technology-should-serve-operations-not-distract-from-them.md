@@ -16,7 +16,7 @@ Every tool should answer a simple question: what operational problem does this s
 
 ## The local brain as a lightweight command assistant
 
-A lightweight local brain does not need to be a giant model to be useful. It can begin as a structured retrieval layer over company documents, resumes, cabinet rules, governance notes, blog articles, and setup instructions.
+A local command brain does not need to be a giant model to be useful. It can begin as a structured retrieval layer over company documents, resumes, cabinet rules, governance notes, blog articles, and setup instructions.
 
 This gives operators a fast way to ask questions about the company structure, cabinet responsibilities, AE positioning, and deployment process without sending every question to a paid provider.
 

@@ -24,7 +24,7 @@ This package has been rebranded so the overall platform identity is now **Client
 - Security/QA assistant: Security Gate Brain
 - Customer side: tenant-isolated SaaS workspaces
 - Operating model: 13-department office structure
-- Brain count: 16 lightweight brains
+- Brain count: 16 operating brains
 - Deployment path: static site + Cloudflare Workers + D1 + KV + Queues + Resend approval emails
 
 ## Safety and deployment boundary

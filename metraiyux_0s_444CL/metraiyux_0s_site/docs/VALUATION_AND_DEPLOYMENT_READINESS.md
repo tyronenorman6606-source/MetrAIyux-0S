@@ -24,7 +24,7 @@ Revenue-backed SaaS/company value: **$750,000-$3,500,000+** only after real cust
 
 - Full public website and deployed public overview site.
 - Executive cabinet system and founder/operator context.
-- 16 lightweight brains: cabinet scopes, Main Automation Brain, and Security Gate Brain security/QA review.
+- 16 operating brains: cabinet scopes, Main Automation Brain, and Security Gate Brain security/QA review.
 - Customer SaaS layer and tenant-isolation doctrine.
 - Admin tutorial and approval-gated automation surface.
 - Cloudflare Worker kits, D1 migrations, KV/Queue patterns, and smoke-test material.
