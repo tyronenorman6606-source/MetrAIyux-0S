@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client Intake | Skye Business Command Center</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <nav class="nav"><a class="brand" href="/customer-portal.html"><span class="orb"></span><span>Skye Intake</span></a><div class="navlinks"><a href="/customer-portal.html">Portal</a><a href="/support.html">Support</a><a href="/billing.html">Billing</a></div></nav>
+    <section class="hero compact">
+      <p class="eyebrow">Branded onboarding</p>
+      <h1>Set up your workspace without leaving the platform.</h1>
+      <p class="lead">This keeps customer onboarding under your brand. Production wiring can push these answers into the internal form, CRM, and operator workflows.</p>
+    </section>
+    <form class="panel" data-portal-form="intake">
+      <div class="grid two">
+        <label>Business name<input name="businessName" required></label>
+        <label>Primary contact<input name="primaryContact" required></label>
+        <label>Contact email<input name="email" type="email" required></label>
+        <label>Website or domain<input name="domain" placeholder="example.com"></label>
+        <label>Main service line<input name="serviceLine" placeholder="What do you sell or deliver?"></label>
+        <label>Monthly request volume<select name="volume"><option>Under 25</option><option>25 to 100</option><option>100 to 500</option><option>500+</option></select></label>
+      </div>
+      <label>What should this command center help organize first?<textarea name="workflowNeed" required></textarea></label>
+      <div class="actions"><button class="btn primary" type="submit">Save intake</button><a class="btn ghost" href="/customer-portal.html">Back to portal</a></div>
+      <p class="proof-strip" data-form-result hidden></p>
+    </form>
+  </main>
+  <script src="/assets/customer-portal.js"></script>
+</body>
+</html>

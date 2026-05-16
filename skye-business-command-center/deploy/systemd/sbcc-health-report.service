@@ -1,0 +1,8 @@
+[Unit]
+Description=Skye Business Command Center health report
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/skye-business-command-center
+ExecStart=/bin/bash /opt/skye-business-command-center/scripts/health-report.sh

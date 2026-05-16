@@ -1,0 +1,1 @@
+Hey [Name], this is [Your Name] with Skyes Over London. I’m setting up branded business ops portals for local companies: CRM, support inbox, quote forms, invoices, and customer follow-up in one dashboard. Setup starts at $497. Want me to show you what it would look like for [Business Name]?

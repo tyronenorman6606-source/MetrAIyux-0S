@@ -1,0 +1,28 @@
+{
+  email {$PUBLIC_SUPPORT_EMAIL}
+}
+
+{$HUB_HOST} {
+  encode zstd gzip
+  reverse_proxy hub:80
+}
+
+{$FREESCOUT_HOST} {
+  encode zstd gzip
+  reverse_proxy freescout:80
+}
+
+{$ESPOCRM_HOST} {
+  encode zstd gzip
+  reverse_proxy espocrm:80
+}
+
+{$INVOICESHELF_HOST} {
+  encode zstd gzip
+  reverse_proxy invoiceshelf:8080
+}
+
+{$FORMBRICKS_HOST} {
+  encode zstd gzip
+  reverse_proxy formbricks:3000
+}

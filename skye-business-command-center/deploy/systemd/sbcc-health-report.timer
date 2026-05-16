@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Skye Business Command Center health report every hour
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1h
+Unit=sbcc-health-report.service
+
+[Install]
+WantedBy=timers.target

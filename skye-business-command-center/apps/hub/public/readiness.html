@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Production Readiness | Skye Business Command Center</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="hero"><div class="eyebrow">Operator-grade closure</div><h1>Production Readiness Room</h1><p>This page separates what is already packaged from what must be verified on the live client server before handoff.</p><div class="cta-row"><a class="btn" href="index.html">Product page</a><a class="btn secondary" href="setup.html">Setup walkthrough</a><a class="btn secondary" href="proof.html">Proof ledger</a></div></header>
+<main class="grid-section">
+<section class="card"><h2>Packaged and ready</h2><p>Branded hub, landing page, setup walkthrough, command center, pricing, client onboarding, handoff page, launch room, demo room, maintenance console, scripts, docs, templates, and deployment orchestration.</p></section>
+<section class="card"><h2>Must be live-verified</h2><p>Real DNS, HTTPS, SMTP, secrets, app installer screens, admin accounts, mail routing, backup archive verification, support reply, form submission, CRM lead, and invoice/estimate creation.</p></section>
+<section class="card"><h2>Client-safe claim</h2><p>Sell deployment, hosting support, configuration, branding, workflow setup, training, and monthly maintenance. Do not claim banking, tax, legal, payment gateway, or compliance certification.</p></section>
+<section class="card"><h2>Dedicated instance policy</h2><p>For serious production tonight, each paying client should get a dedicated VPS or isolated compose project. Avoid shared databases across unrelated businesses until tenant isolation is formally engineered and tested.</p></section>
+</main>
+<section class="wide"><h2>Acceptance checklist</h2><ol><li>Run <code>bash scripts/preflight.sh</code>.</li><li>Run <code>docker compose -f docker-compose.yml -f docker-compose.prod.override.yml up -d --build</code>.</li><li>Run <code>bash scripts/acceptance.sh</code>.</li><li>Run <code>bash scripts/backup.sh</code> then <code>bash scripts/verify-backup.sh ./backups</code>.</li><li>Run <code>bash scripts/client-readiness-report.sh</code> and archive the generated report.</li></ol></section>
+</body></html>
