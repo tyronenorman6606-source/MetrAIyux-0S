@@ -217,7 +217,7 @@ export async function loadAuditEvents(limit = 80) {
 
 export async function loadLedger(limit = 120) {
   const folderId = getConfigFolderId();
-  const safeLimit = Math.min(120, Math.max(1, Number(limit || 120)));
+  const safeLimit = Math.min(2500, Math.max(1, Number(limit || 120)));
   const receiptFiles = await listJsonFilesByPrefix(folderId, RECEIPT_PREFIX, Math.min(250, safeLimit)).catch(() => []);
   const receiptEntries = [];
 

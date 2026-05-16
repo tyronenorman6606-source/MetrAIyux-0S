@@ -538,6 +538,21 @@ export async function getDriveFileMetadata(fileId) {
   };
 }
 
+export function createDownloadUrl(fileId, { fileName = '', mimeType = '', expires = 900 } = {}) {
+  const key = String(fileId || '').trim();
+  if (!key) {
+    const error = new Error('R2 object key is required.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const safeName = objectName(fileName || key.split('/').pop() || 'vault-download.bin');
+  const query = new URLSearchParams({
+    'response-content-disposition': `attachment; filename="${safeName.replace(/"/g, '')}"`
+  });
+  if (mimeType) query.set('response-content-type', String(mimeType).slice(0, 160));
+  return presignUrl('GET', key, { query, expires });
+}
+
 export function maxObjectBytes() {
   return MAX_SINGLE_OBJECT_BYTES;
 }
