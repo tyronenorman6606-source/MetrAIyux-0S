@@ -91,10 +91,25 @@ export function assertAllowedOrigin(event) {
   const origin = getHeader(event, 'origin');
   if (!allowed.length || allowed.includes('*')) return;
   if (!origin) return;
-  const host = getHeader(event, 'host');
-  const forwardedProto = getHeader(event, 'x-forwarded-proto') || 'https';
-  if (host && origin === `${forwardedProto}://${host}`) return;
-  if (!allowed.includes(origin)) {
+  const host = String(getHeader(event, 'host') || '').split(',')[0].trim();
+  const forwardedProto = String(getHeader(event, 'x-forwarded-proto') || 'https').split(',')[0].trim() || 'https';
+  const sameSiteOrigins = [
+    host ? `${forwardedProto}://${host}` : '',
+    host ? `https://${host}` : '',
+    process.env.URL,
+    process.env.DEPLOY_URL,
+    process.env.DEPLOY_PRIME_URL
+  ].filter(Boolean);
+  const matchesSameSite = sameSiteOrigins.some((sameSiteOrigin) => {
+    try {
+      const left = new URL(origin);
+      const right = new URL(sameSiteOrigin);
+      return left.protocol === right.protocol && left.host === right.host;
+    } catch {
+      return origin === sameSiteOrigin;
+    }
+  });
+  if (!matchesSameSite && !allowed.includes(origin)) {
     const error = new Error('Origin is not allowed for this upload portal.');
     error.statusCode = 403;
     throw error;
