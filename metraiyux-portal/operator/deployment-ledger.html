@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deployment Ledger — MetrAIyux Empire</title>
+<meta name="description" content="Live deployment ledger for the Skyes Over London / MetrAIyux empire. Every Cloudflare Worker, Pages project, Netlify deploy, and internal surface with status, URL, and receipt.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#030a0f">
+<style>
+:root {
+  --bg: #030a0f;
+  --surface: #05131c;
+  --panel: #061724;
+  --line: rgba(126,231,255,0.11);
+  --line-bright: rgba(126,231,255,0.32);
+  --text: #e8f4ff;
+  --muted: #6a8fa8;
+  --soft: #b8d8ef;
+  --cyan: #7ee7ff;
+  --gold: #f4c75b;
+  --violet: #8b5cf6;
+  --green: #3dcc7a;
+  --amber: #f59e0b;
+  --fire: #e84c30;
+  --teal: #3dd6b5;
+  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --radius: 12px;
+  --topbar-h: 52px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* scan overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(126,231,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126,231,255,0.02) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* neon scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--cyan), var(--violet)); border-radius: 4px; }
+
+a { color: inherit; text-decoration: none; }
+
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ───── TOPBAR ───── */
+.topbar {
+  background: rgba(5, 19, 28, 0.96);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: var(--topbar-h);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(18px);
+  flex-shrink: 0;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ledger-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #030a0f;
+  box-shadow: 0 0 16px rgba(244,199,91,0.35);
+}
+
+.topbar-brand strong { font-size: 0.88rem; letter-spacing: 0.04em; }
+.topbar-brand span { color: var(--muted); font-size: 0.74rem; margin-left: 4px; }
+
+.topbar-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.topbar-stat {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.topbar-stat strong { color: var(--cyan); }
+.topbar-stat.gold strong { color: var(--gold); }
+.topbar-stat.green strong { color: var(--green); }
+
+.topbar-actions { display: flex; gap: 8px; }
+
+.topbar-btn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  font-size: 0.76rem;
+  font-family: var(--font);
+  background: rgba(126,231,255,0.06);
+  color: var(--soft);
+  cursor: pointer;
+  transition: 0.18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-btn:hover { border-color: var(--line-bright); color: var(--text); }
+
+/* ───── MAIN CONTENT ───── */
+.main {
+  padding: 24px 20px 48px;
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ───── PAGE HEADER ───── */
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header .eyebrow {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.page-header h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.page-header p { color: var(--muted); font-size: 0.84rem; }
+
+.header-stamp {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.header-stamp strong { display: block; color: var(--green); font-size: 0.8rem; margin-bottom: 4px; }
+
+/* ───── FILTER BAR ───── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+
+.filter-btn:hover { border-color: var(--line-bright); color: var(--text); }
+.filter-btn.active {
+  background: rgba(126,231,255,0.1);
+  border-color: rgba(126,231,255,0.3);
+  color: var(--cyan);
+}
+
+/* ───── LEDGER TABLE ───── */
+.ledger-wrap {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 860px;
+}
+
+.ledger-table thead th {
+  background: var(--panel);
+  padding: 10px 14px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.ledger-table thead th:first-child { padding-left: 20px; }
+
+.ledger-row {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.14s ease;
+  cursor: pointer;
+}
+
+.ledger-row:last-child { border-bottom: none; }
+
+.ledger-row:hover { background: rgba(126,231,255,0.03); }
+
+.ledger-row td {
+  padding: 12px 14px;
+  vertical-align: middle;
+}
+
+.ledger-row td:first-child { padding-left: 20px; }
+
+.row-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-name .row-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  background: rgba(126,231,255,0.08);
+  border: 1px solid rgba(126,231,255,0.12);
+  flex-shrink: 0;
+}
+
+.row-url {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--cyan);
+  opacity: 0.8;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-url a {
+  color: inherit;
+  transition: opacity 0.16s;
+}
+
+.row-url a:hover { opacity: 1; }
+
+/* platform pill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.pill-cf { background: rgba(244,199,91,0.12); border: 1px solid rgba(244,199,91,0.22); color: var(--gold); }
+.pill-netlify { background: rgba(61,214,181,0.12); border: 1px solid rgba(61,214,181,0.22); color: var(--teal); }
+.pill-local { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.22); color: var(--amber); }
+.pill-worker { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.22); color: var(--violet); }
+
+/* status badge */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-live { color: var(--green); }
+.status-live::before { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-g 2s ease-in-out infinite; }
+.status-dev { color: var(--amber); }
+.status-dev::before { background: var(--amber); }
+.status-building { color: var(--cyan); }
+.status-building::before { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); animation: pulse-g 1.2s ease-in-out infinite; }
+
+@keyframes pulse-g { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.row-date {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.row-env {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.row-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: var(--cyan);
+  opacity: 0.6;
+  transition: 0.16s;
+  text-decoration: none;
+}
+
+.ledger-row:hover .row-open { opacity: 1; }
+
+/* ───── RECEIPT SECTION ───── */
+.receipt-head {
+  margin: 28px 0 14px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.receipt-head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.receipt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+.receipt-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.receipt-card .r-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.receipt-card .r-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(126,231,255,0.05);
+}
+
+.receipt-card .r-line:last-child { border-bottom: none; }
+.receipt-card .r-key { color: var(--muted); }
+.receipt-card .r-val { color: var(--soft); text-align: right; }
+.receipt-card .r-val.ok { color: var(--green); }
+.receipt-card .r-val.warn { color: var(--amber); }
+
+/* ───── FOOTER ───── */
+.op-footer {
+  border-top: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ───── MOBILE ───── */
+@media (max-width: 680px) {
+  .topbar-stats { display: none; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .header-stamp { text-align: left; }
+  .main { padding: 16px 12px 40px; }
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;0,9..40,900&display=swap">
+</head>
+<body>
+<div class="page">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="ledger-mark">≡</div>
+      <strong>Deployment Ledger</strong>
+      <span>MetrAIyux Empire</span>
+    </div>
+    <div class="topbar-stats">
+      <div class="topbar-stat green"><strong id="liveCount">9</strong>&nbsp;live</div>
+      <div class="topbar-stat"><strong id="devCount">2</strong>&nbsp;dev</div>
+      <div class="topbar-stat gold"><strong>11</strong>&nbsp;total surfaces</div>
+      <div class="topbar-stat"><strong id="ledgerClock">—</strong></div>
+    </div>
+    <div class="topbar-actions">
+      <a href="/operator/" class="topbar-btn">← Operator</a>
+      <a href="/" class="topbar-btn">Portal</a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="eyebrow">// PRODUCTION DEPLOYMENT LEDGER — EMPIRE-WIDE</div>
+        <h1>Every deploy. Every surface. Every receipt.</h1>
+        <p>I keep this ledger so I can prove the empire is live, locate any surface in under 10 seconds, and know exactly what is deployed where.</p>
+      </div>
+      <div class="header-stamp">
+        <strong>All systems operational</strong>
+        <div>Last updated: <span id="ledgerDate">—</span></div>
+        <div>Operator: gray-london-skyes</div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar" role="group" aria-label="Filter deployments">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="cf-pages">CF Pages</button>
+      <button class="filter-btn" data-filter="cf-worker">CF Worker</button>
+      <button class="filter-btn" data-filter="netlify">Netlify</button>
+      <button class="filter-btn" data-filter="local">Local / Dev</button>
+      <button class="filter-btn" data-filter="live">Live Only</button>
+    </div>
+
+    <!-- LEDGER TABLE -->
+    <div class="ledger-wrap">
+      <table class="ledger-table" id="ledgerTable">
+        <thead>
+          <tr>
+            <th>Surface</th>
+            <th>Type</th>
+            <th>Platform</th>
+            <th>Status</th>
+            <th>URL</th>
+            <th>Environment</th>
+            <th>Last Deploy</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RECEIPT SECTION -->
+    <div class="receipt-head">Deploy receipts</div>
+    <div class="receipt-grid">
+
+      <div class="receipt-card">
+        <div class="r-title">MetrAIyux 0S Worker <span class="status status-live">Live</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">metraiyux-0s-full-system</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Workers</span></div>
+        <div class="r-line"><span class="r-key">account</span><span class="r-val">graylondonskyes</span></div>
+        <div class="r-line"><span class="r-key">wrangler</span><span class="r-val ok">deployed</span></div>
+        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
+      </div>
+
+      <div class="receipt-card">
+        <div class="r-title">Ecosystem Portal <span class="status status-live">Live</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">metraiyux-ecosystem-portal</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Pages</span></div>
+        <div class="r-line"><span class="r-key">output_dir</span><span class="r-val">metraiyux-portal/</span></div>
+        <div class="r-line"><span class="r-key">routes</span><span class="r-val ok">/operator, /vault, /sovereign, /beta</span></div>
+        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
+      </div>
+
+      <div class="receipt-card">
+        <div class="r-title">Legal Center <span class="status status-live">Live</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">skyes-over-london-legal</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Pages</span></div>
+        <div class="r-line"><span class="r-key">policies</span><span class="r-val ok">30+ live</span></div>
+        <div class="r-line"><span class="r-key">sms_route</span><span class="r-val ok">/sms-consent/ live</span></div>
+        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
+      </div>
+
+      <div class="receipt-card">
+        <div class="r-title">Skye Vault <span class="status status-live">Live</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">skyevault-drop</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Netlify</span></div>
+        <div class="r-line"><span class="r-key">storage</span><span class="r-val">Cloudflare R2</span></div>
+        <div class="r-line"><span class="r-key">embed</span><span class="r-val ok">vault-widget.js ready</span></div>
+        <div class="r-line"><span class="r-key">source_routing</span><span class="r-val ok">?source= param live</span></div>
+      </div>
+
+      <div class="receipt-card">
+        <div class="r-title">SkyeGate FS27 <span class="status status-live">Live</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">skyegatefs27-citadeldb</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Workers</span></div>
+        <div class="r-line"><span class="r-key">auth</span><span class="r-val ok">bearer introspection live</span></div>
+        <div class="r-line"><span class="r-key">mirror_secret</span><span class="r-val ok">platform events ready</span></div>
+        <div class="r-line"><span class="r-key">proof_surface</span><span class="r-val ok">gate-proofx.html live</span></div>
+      </div>
+
+      <div class="receipt-card">
+        <div class="r-title">Skye BCC <span class="status status-dev">Dev</span></div>
+        <div class="r-line"><span class="r-key">project</span><span class="r-val">skye-business-command-center</span></div>
+        <div class="r-line"><span class="r-key">platform</span><span class="r-val warn">Local / Pending CF Pages</span></div>
+        <div class="r-line"><span class="r-key">crm</span><span class="r-val">records, inbox, tickets</span></div>
+        <div class="r-line"><span class="r-key">invoicing</span><span class="r-val">estimates + invoices</span></div>
+        <div class="r-line"><span class="r-key">env</span><span class="r-val warn">development</span></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="op-footer">
+    <span>MetrAIyux Empire Deployment Ledger · Skyes Over London LC</span>
+    <span>Operator: gray-london-skyes · grayskyes@solenterprises.org</span>
+    <span id="footerTs">—</span>
+  </footer>
+
+</div>
+
+<script>
+const DEPLOYS = [
+  {
+    name: 'SOL Enterprises',
+    icon: 'S',
+    type: 'Website',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://solenterprises.org/',
+    displayUrl: 'solenterprises.org',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'MetrAIyux 0S',
+    icon: '0',
+    type: 'OS Worker',
+    platform: 'cf-worker',
+    platformLabel: 'CF Worker',
+    status: 'live',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/',
+    displayUrl: 'metraiyux-0s-full-system.workers.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'MetrAIyux Public Spectacle',
+    icon: '◈',
+    type: 'Public Page',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-0s-public-spectacle.pages.dev/',
+    displayUrl: 'metraiyux-0s-public-spectacle.pages.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'SkyeGate FS27',
+    icon: '🔒',
+    type: 'Auth Gate',
+    platform: 'cf-worker',
+    platformLabel: 'CF Worker',
+    status: 'live',
+    url: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html',
+    displayUrl: 'skyegatefs27-citadeldb.workers.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'MetrAIyux Marketing',
+    icon: 'M',
+    type: 'Marketing',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-marketing.pages.dev/',
+    displayUrl: 'metraiyux-marketing.pages.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Marketplace',
+    icon: '◈',
+    type: 'Product Hub',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-marketing.pages.dev/marketplace.html',
+    displayUrl: 'metraiyux-marketing.pages.dev/marketplace',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Legal Center',
+    icon: '⚖',
+    type: 'Legal Hub',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://skyes-over-london-legal.pages.dev/',
+    displayUrl: 'skyes-over-london-legal.pages.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Skye Vault',
+    icon: '↑',
+    type: 'File Storage',
+    platform: 'netlify',
+    platformLabel: 'Netlify',
+    status: 'live',
+    url: 'https://skyevault-drop.netlify.app/',
+    displayUrl: 'skyevault-drop.netlify.app',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Ecosystem Portal',
+    icon: '⬡',
+    type: 'Command Portal',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-ecosystem-portal.pages.dev/',
+    displayUrl: 'metraiyux-ecosystem-portal.pages.dev',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Operator Portal',
+    icon: 'OP',
+    type: 'Internal Dashboard',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-ecosystem-portal.pages.dev/operator/',
+    displayUrl: 'metraiyux-ecosystem-portal.pages.dev/operator',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Sovereign Business Command',
+    icon: '⬡',
+    type: 'Sales Page',
+    platform: 'cf-pages',
+    platformLabel: 'CF Pages',
+    status: 'live',
+    url: 'https://metraiyux-ecosystem-portal.pages.dev/sovereign',
+    displayUrl: 'metraiyux-ecosystem-portal.pages.dev/sovereign',
+    env: 'production',
+    lastDeploy: '2025-05'
+  },
+  {
+    name: 'Skye Business Command Center',
+    icon: 'B',
+    type: 'Client Product',
+    platform: 'local',
+    platformLabel: 'Local / Dev',
+    status: 'dev',
+    url: '../skye-business-command-center/apps/hub/public/index.html',
+    displayUrl: 'skye-business-command-center (local)',
+    env: 'development',
+    lastDeploy: '—'
+  }
+];
+
+const PILL_CLASS = {
+  'cf-pages': 'pill-cf',
+  'cf-worker': 'pill-worker',
+  'netlify': 'pill-netlify',
+  'local': 'pill-local'
+};
+
+const STATUS_CLASS = {
+  'live': 'status-live',
+  'dev': 'status-dev',
+  'building': 'status-building'
+};
+
+const STATUS_LABEL = {
+  'live': 'Live',
+  'dev': 'Dev',
+  'building': 'Building'
+};
+
+function renderRows(filter = 'all') {
+  const tbody = document.getElementById('ledgerBody');
+  const rows = DEPLOYS.filter(d => {
+    if (filter === 'all') return true;
+    if (filter === 'live') return d.status === 'live';
+    return d.platform === filter;
+  });
+
+  tbody.innerHTML = rows.map(d => `
+    <tr class="ledger-row" data-platform="${d.platform}" data-status="${d.status}" onclick="window.open('${d.url}','_blank')">
+      <td>
+        <div class="row-name">
+          <div class="row-icon">${d.icon}</div>
+          ${d.name}
+        </div>
+      </td>
+      <td style="color:var(--soft);font-size:0.8rem;">${d.type}</td>
+      <td><span class="pill ${PILL_CLASS[d.platform]}">${d.platformLabel}</span></td>
+      <td><span class="status ${STATUS_CLASS[d.status]}">${STATUS_LABEL[d.status]}</span></td>
+      <td class="row-url"><a href="${d.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${d.displayUrl}</a></td>
+      <td class="row-env">${d.env}</td>
+      <td class="row-date">${d.lastDeploy}</td>
+      <td><a class="row-open" href="${d.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open →</a></td>
+    </tr>
+  `).join('');
+
+  document.getElementById('liveCount').textContent = DEPLOYS.filter(d => d.status === 'live').length;
+  document.getElementById('devCount').textContent = DEPLOYS.filter(d => d.status === 'dev').length;
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderRows(btn.dataset.filter);
+  });
+});
+
+function tick() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', { hour12: false });
+  const d = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const cl = document.getElementById('ledgerClock');
+  const ld = document.getElementById('ledgerDate');
+  const ft = document.getElementById('footerTs');
+  if (cl) cl.textContent = t;
+  if (ld) ld.textContent = d;
+  if (ft) ft.textContent = `Generated: ${d}`;
+}
+
+renderRows();
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

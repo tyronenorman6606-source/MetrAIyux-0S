@@ -499,11 +499,12 @@ async function fetchJson(path) {
 async function loadKB() {
   const status = document.getElementById('brainStatus');
   try {
-    const [kbData, registry, legalData, marketplaceData, personas, siteOperator, offers] = await Promise.all([
+    const [kbData, registry, legalData, marketplaceData, obsidianData, personas, siteOperator, offers] = await Promise.all([
       fetchJson('brain/knowledge-base.json'),
       fetchJson('brain/live-surface-registry.json'),
       fetchJson('brain/legal-sync.json'),
       fetchJson('brain/marketplace-sync.json'),
+      fetchJson('brain/obsidian-sync.json'),
       fetchJson('brain/persona-brains.json'),
       fetchJson('brain/site-operator-brain.json'),
       fetchJson('brain/sales-offer-registry.json')
@@ -524,7 +525,8 @@ async function loadKB() {
       ...siteOperatorToChunks(SITE_OPERATOR),
       ...offersToChunks(SALES_OFFERS),
       ...(LEGAL_DATA?.chunks || []),
-      ...(marketplaceData?.chunks || [])
+      ...(marketplaceData?.chunks || []),
+      ...(obsidianData?.chunks || [])
     ];
 
     const brainCount = PERSONA_REGISTRY?.total_brains || SITE_OPERATOR?.total_system_brains || TOTAL_BRAINS;
@@ -534,7 +536,8 @@ async function loadKB() {
       SITE_OPERATOR ? 'site-operator routes' : null,
       SALES_OFFERS ? 'sales offer registry' : null,
       LEGAL_DATA ? 'legal center' : null,
-      marketplaceData ? 'marketplace catalog' : null
+      marketplaceData ? 'marketplace catalog' : null,
+      obsidianData ? 'Obsidian vault sync' : null
     ].filter(Boolean);
     if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} local knowledge chunks with ${extras.join(', ')}.`;
     renderSources([]);

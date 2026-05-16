@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Operator Portal — MetrAIyux Empire Command</title>
+<meta name="description" content="Internal operator command room for the Skyes Over London / MetrAIyux empire. All live surfaces, brain status, deploy ledger, and system health in one place.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#030a0f">
+<style>
+:root {
+  --bg: #030a0f;
+  --surface: #05131c;
+  --rail: #061520;
+  --line: rgba(126,231,255,0.12);
+  --line-bright: rgba(126,231,255,0.36);
+  --text: #e8f4ff;
+  --muted: #6a8fa8;
+  --soft: #b8d8ef;
+  --cyan: #7ee7ff;
+  --gold: #f4c75b;
+  --violet: #8b5cf6;
+  --green: #3dcc7a;
+  --amber: #f59e0b;
+  --fire: #e84c30;
+  --teal: #3dd6b5;
+  --radius: 14px;
+  --sidebar-w: 220px;
+  --topbar-h: 52px;
+  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* scan grid overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(126,231,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126,231,255,0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* neon scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--cyan), var(--violet)); border-radius: 4px; }
+
+a { color: inherit; text-decoration: none; }
+
+/* ───── LAYOUT ───── */
+.shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: var(--topbar-h) 1fr;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+/* ───── TOPBAR ───── */
+.topbar {
+  grid-column: 1 / -1;
+  background: rgba(5, 19, 28, 0.96);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.op-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 0.78rem;
+  color: #030a0f;
+  letter-spacing: -0.02em;
+  box-shadow: 0 0 18px rgba(126,231,255,0.3);
+}
+
+.topbar-brand strong { font-size: 0.88rem; letter-spacing: 0.04em; }
+.topbar-brand span { color: var(--muted); font-size: 0.74rem; margin-left: 4px; }
+
+.topbar-status {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.status-dot.amber { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+.topbar-time {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--cyan);
+  letter-spacing: 0.06em;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.topbar-btn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  font-size: 0.76rem;
+  font-family: var(--font);
+  background: rgba(126,231,255,0.06);
+  color: var(--soft);
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.topbar-btn:hover {
+  border-color: var(--line-bright);
+  background: rgba(126,231,255,0.12);
+  color: var(--text);
+}
+
+.topbar-btn.primary {
+  background: linear-gradient(135deg, rgba(126,231,255,0.2), rgba(244,199,91,0.15));
+  border-color: rgba(126,231,255,0.3);
+  color: var(--cyan);
+}
+
+/* ───── SIDEBAR ───── */
+.sidebar {
+  background: var(--rail);
+  border-right: 1px solid var(--line);
+  padding: 16px 0;
+  overflow-y: auto;
+  position: sticky;
+  top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+}
+
+.sidebar-section {
+  padding: 0 12px;
+  margin-bottom: 24px;
+}
+
+.sidebar-label {
+  font-size: 0.64rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--soft);
+  font-size: 0.84rem;
+  transition: 0.16s ease;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: rgba(126,231,255,0.07);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: rgba(126,231,255,0.12);
+  color: var(--cyan);
+  border: 1px solid rgba(126,231,255,0.18);
+}
+
+.nav-item .nav-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  font-size: 0.74rem;
+  flex-shrink: 0;
+}
+
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.nav-dot.dev { background: var(--amber); }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 8px 12px 16px;
+}
+
+/* ───── MAIN ───── */
+.main {
+  overflow-y: auto;
+  padding: 20px;
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+/* ───── HERO STRIP ───── */
+.hero-strip {
+  background:
+    radial-gradient(circle at 8% 50%, rgba(126,231,255,0.12), transparent 38%),
+    radial-gradient(circle at 88% 30%, rgba(244,199,91,0.10), transparent 36%),
+    linear-gradient(135deg, rgba(5,19,28,0.95), rgba(3,10,15,0.95));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-strip::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.5;
+}
+
+.hero-copy .eyebrow {
+  font-size: 0.66rem;
+  font-family: var(--mono);
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  margin-bottom: 6px;
+}
+
+.hero-copy h1 {
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.hero-copy p { color: var(--muted); font-size: 0.86rem; max-width: 480px; }
+
+.hero-metrics {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.hero-metric {
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(126,231,255,0.04);
+}
+
+.hero-metric strong {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--cyan);
+}
+
+.hero-metric span {
+  display: block;
+  font-size: 0.66rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 3px;
+}
+
+/* ───── SURFACE GRID ───── */
+.grid-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.grid-head h2 {
+  font-size: 0.84rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.grid-head a {
+  font-size: 0.76rem;
+  color: var(--cyan);
+  opacity: 0.8;
+  transition: 0.16s;
+}
+
+.grid-head a:hover { opacity: 1; }
+
+.surface-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.surface-card {
+  background:
+    linear-gradient(180deg, rgba(5,19,28,0.9), rgba(3,10,15,0.9));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: 0.18s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.surface-card:hover {
+  border-color: var(--line-bright);
+  background: rgba(126,231,255,0.04);
+  transform: translateY(-1px);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.66rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: rgba(126,231,255,0.08);
+  border: 1px solid rgba(126,231,255,0.14);
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+
+.card-tag.gold { background: rgba(244,199,91,0.1); border-color: rgba(244,199,91,0.2); color: var(--gold); }
+.card-tag.violet { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); color: var(--violet); }
+.card-tag.teal { background: rgba(61,214,181,0.1); border-color: rgba(61,214,181,0.2); color: var(--teal); }
+.card-tag.amber { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber); }
+.card-tag.fire { background: rgba(232,76,48,0.1); border-color: rgba(232,76,48,0.2); color: var(--fire); }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
+  font-family: var(--mono);
+  color: var(--green);
+}
+
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+.status-badge.dev { color: var(--amber); }
+.status-badge.dev::before { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+
+.card-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-url {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-desc {
+  font-size: 0.79rem;
+  color: var(--soft);
+  opacity: 0.8;
+  line-height: 1.45;
+}
+
+.card-action {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  opacity: 0.7;
+  transition: 0.16s;
+}
+
+.surface-card:hover .card-action { opacity: 1; }
+
+/* ───── INTERNAL TOOLS ROW ───── */
+.tools-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.tool-card {
+  background: rgba(5,19,28,0.9);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  opacity: 0.7;
+}
+
+.tool-card:hover {
+  border-color: var(--line-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+.tool-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  background: rgba(126,231,255,0.08);
+  border: 1px solid rgba(126,231,255,0.14);
+}
+
+.tool-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.tool-desc {
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.tool-link {
+  font-size: 0.74rem;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ───── SYSTEM HEALTH ───── */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.health-tile {
+  background: rgba(5,19,28,0.9);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+}
+
+.health-val {
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: var(--cyan);
+  display: block;
+  line-height: 1;
+}
+
+.health-val.gold { color: var(--gold); }
+.health-val.green { color: var(--green); }
+.health-val.violet { color: var(--violet); }
+
+.health-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 6px;
+  display: block;
+}
+
+/* ───── CONSOLE STRIP ───── */
+.console-strip {
+  background: rgba(3,10,15,0.96);
+  border: 1px solid rgba(126,231,255,0.18);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.console-line { line-height: 1.6; }
+.console-line .c-key { color: var(--cyan); }
+.console-line .c-val { color: var(--text); }
+.console-line .c-ok { color: var(--green); }
+.console-line .c-warn { color: var(--amber); }
+.console-line .c-hash { color: var(--violet); opacity: 0.7; }
+
+/* ───── FOOTER ───── */
+.op-footer {
+  border-top: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  grid-column: 2;
+}
+
+/* ───── MOBILE ───── */
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-h) auto 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+  }
+
+  .sidebar-section { display: flex; gap: 4px; margin-bottom: 0; padding: 0 8px; }
+  .sidebar-label { display: none; }
+  .sidebar-divider { display: none; }
+  .nav-item { white-space: nowrap; flex-shrink: 0; padding: 6px 10px; }
+  .hero-metrics { display: none; }
+  .op-footer { grid-column: 1; }
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;0,9..40,900&display=swap">
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="op-mark">OP</div>
+      <strong>Operator Portal</strong>
+      <span>MetrAIyux Empire</span>
+    </div>
+    <div class="topbar-status">
+      <div class="status-chip"><span class="status-dot"></span>All systems live</div>
+      <div class="status-chip"><span class="status-dot"></span>16 brains active</div>
+      <div class="status-chip"><span class="status-dot amber"></span>2 surfaces local</div>
+      <div class="topbar-time" id="opClock">—</div>
+    </div>
+    <div class="topbar-actions">
+      <a href="/operator/deployment-ledger.html" class="topbar-btn primary">Deployment Ledger</a>
+      <a href="/" class="topbar-btn">← Portal</a>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" aria-label="Operator navigation">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Command</div>
+      <a href="/operator/" class="nav-item active">
+        <span class="nav-icon">⬡</span>
+        Overview
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="/operator/deployment-ledger.html" class="nav-item">
+        <span class="nav-icon">≡</span>
+        Deploy Ledger
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="/vault.html" class="nav-item">
+        <span class="nav-icon">⬡</span>
+        Vault
+        <span class="nav-dot live"></span>
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Live Surfaces</div>
+      <a href="https://solenterprises.org/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">S</span>
+        SOL Enterprises
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">0</span>
+        MetrAIyux 0S
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">◈</span>
+        Spectacle
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://metraiyux-marketing.pages.dev/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">M</span>
+        Marketing
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://skyes-over-london-legal.pages.dev/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">⚖</span>
+        Legal Center
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://skyevault-drop.netlify.app/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">↑</span>
+        Skye Vault
+        <span class="nav-dot live"></span>
+      </a>
+      <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">🔒</span>
+        SkyeGate FS27
+        <span class="nav-dot live"></span>
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Local / Dev</div>
+      <a href="../skye-business-command-center/apps/hub/public/index.html" class="nav-item">
+        <span class="nav-icon">B</span>
+        Skye BCC
+        <span class="nav-dot dev"></span>
+      </a>
+      <a href="/sovereign" class="nav-item">
+        <span class="nav-icon">⬡</span>
+        Sovereign Build
+        <span class="nav-dot live"></span>
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Legal</div>
+      <a href="https://skyes-over-london-legal.pages.dev/legal/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">§</span>
+        Full Policy Hub
+      </a>
+      <a href="https://skyes-over-london-legal.pages.dev/legal/privacy/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">§</span>
+        Privacy
+      </a>
+      <a href="https://skyes-over-london-legal.pages.dev/legal/ai-terms/" target="_blank" rel="noopener" class="nav-item">
+        <span class="nav-icon">§</span>
+        AI Terms
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- HERO STRIP -->
+    <section class="hero-strip">
+      <div class="hero-copy">
+        <div class="eyebrow">// OPERATOR COMMAND SURFACE — RESTRICTED</div>
+        <h1>I run the empire from here.</h1>
+        <p>Every live surface, deployed Worker, brain, vault, and legal route — accessible from one room. I built this so I never have to hunt for a link.</p>
+      </div>
+      <div class="hero-metrics">
+        <div class="hero-metric">
+          <strong>9+</strong>
+          <span>Live Surfaces</span>
+        </div>
+        <div class="hero-metric">
+          <strong>16</strong>
+          <span>Active Brains</span>
+        </div>
+        <div class="hero-metric">
+          <strong>8+</strong>
+          <span>CF Workers</span>
+        </div>
+        <div class="hero-metric">
+          <strong>30+</strong>
+          <span>Policies Live</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTEM HEALTH -->
+    <section>
+      <div class="grid-head">
+        <h2>// System Health</h2>
+      </div>
+      <div class="health-grid">
+        <div class="health-tile">
+          <strong class="health-val green">LIVE</strong>
+          <span class="health-label">SOL Enterprises</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val">LIVE</strong>
+          <span class="health-label">MetrAIyux 0S</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val">LIVE</strong>
+          <span class="health-label">Spectacle</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val green">LIVE</strong>
+          <span class="health-label">Skye Vault</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val gold">LIVE</strong>
+          <span class="health-label">Legal Center</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val violet">LIVE</strong>
+          <span class="health-label">SkyeGate FS27</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val">LIVE</strong>
+          <span class="health-label">Marketing</span>
+        </div>
+        <div class="health-tile">
+          <strong class="health-val gold">16</strong>
+          <span class="health-label">Brain Runtime</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERNAL TOOLS -->
+    <section>
+      <div class="grid-head">
+        <h2>// Internal Tools</h2>
+        <a href="/operator/deployment-ledger.html">View all deploys →</a>
+      </div>
+      <div class="tools-row">
+        <a href="/operator/deployment-ledger.html" class="tool-card">
+          <div class="tool-icon">≡</div>
+          <div>
+            <div class="tool-name">Deployment Ledger</div>
+            <div class="tool-desc">Full table of every CF Worker, Pages project, and Netlify deploy with status and receipt.</div>
+          </div>
+          <div class="tool-link">Open Ledger →</div>
+        </a>
+        <a href="/vault.html" class="tool-card">
+          <div class="tool-icon">↑</div>
+          <div>
+            <div class="tool-name">Vault Upload</div>
+            <div class="tool-desc">Internal file drop. Client uploads, receipts, and R2 storage routing.</div>
+          </div>
+          <div class="tool-link">Open Vault →</div>
+        </a>
+        <a href="https://metraiyux-marketing.pages.dev/marketplace.html" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-icon">◈</div>
+          <div>
+            <div class="tool-name">Marketplace</div>
+            <div class="tool-desc">Product hub. Brain campaigns, white-label deck, vault embed, and full product catalog.</div>
+          </div>
+          <div class="tool-link">Open Marketplace →</div>
+        </a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-icon">⚖</div>
+          <div>
+            <div class="tool-name">Legal Hub</div>
+            <div class="tool-desc">30+ live policies. Terms, privacy, AI, SMS, SaaS, DMCA, enterprise MSA.</div>
+          </div>
+          <div class="tool-link">Open Legal →</div>
+        </a>
+        <a href="/sovereign" class="tool-card">
+          <div class="tool-icon">⬡</div>
+          <div>
+            <div class="tool-name">Sovereign Business Command</div>
+            <div class="tool-desc">Sales page. Sovereign business infrastructure offer — Command Website, Business Command System, Sovereign Operating Layer.</div>
+          </div>
+          <div class="tool-link">Open Page →</div>
+        </a>
+        <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-icon">🔒</div>
+          <div>
+            <div class="tool-name">SkyeGate FS27</div>
+            <div class="tool-desc">Auth introspection, bearer validation, platform event mirroring, and gate proof surface.</div>
+          </div>
+          <div class="tool-link">Open Gate →</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ALL LIVE SURFACES -->
+    <section>
+      <div class="grid-head">
+        <h2>// All Deployed Surfaces</h2>
+        <a href="/operator/deployment-ledger.html">Full ledger →</a>
+      </div>
+      <div class="surface-grid">
+
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag violet">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">SOL Enterprises</div>
+          <div class="card-url">solenterprises.org</div>
+          <div class="card-desc">Flagship holding company site. Services, portfolio, AI division, NexusConnect, SkyeSuite apps.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag gold">CF Worker</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">MetrAIyux 0S</div>
+          <div class="card-url">graylondonskyes.workers.dev</div>
+          <div class="card-desc">Protected company OS. 13-cabinet model, 16 brains, client SaaS workspaces, and proof receipts.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">MetrAIyux Public Spectacle</div>
+          <div class="card-url">metraiyux-0s-public-spectacle.pages.dev</div>
+          <div class="card-desc">Buyer education site. Guided tour, platform map, tech stack, fit check, brain system overview.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://metraiyux-marketing.pages.dev/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag teal">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">MetrAIyux Marketing</div>
+          <div class="card-url">metraiyux-marketing.pages.dev</div>
+          <div class="card-desc">Full capability statements, sell sheets, white-label program, valuation briefs, and marketplace.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://metraiyux-marketing.pages.dev/marketplace.html" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag teal">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Marketplace</div>
+          <div class="card-url">metraiyux-marketing.pages.dev/marketplace</div>
+          <div class="card-desc">Product hub. Brain campaigns, vault embed, white-label deck, and autonomous sales routing.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://skyes-over-london-legal.pages.dev/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag amber">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Legal Center</div>
+          <div class="card-url">skyes-over-london-legal.pages.dev</div>
+          <div class="card-desc">30+ live policies. Terms, privacy, AI terms, SMS, SaaS, DMCA, enterprise MSA, DPA, cookie.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://skyevault-drop.netlify.app/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag fire">Netlify</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Skye Vault</div>
+          <div class="card-url">skyevault-drop.netlify.app</div>
+          <div class="card-desc">Empire file storage. Drag-drop upload, Cloudflare R2, source tagging, signed receipts.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag violet">CF Worker</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">SkyeGate FS27</div>
+          <div class="card-url">skyegatefs27-citadeldb.workers.dev</div>
+          <div class="card-desc">Auth gate. Bearer introspection, platform event mirror, admin key control, proof surface.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="https://metraiyux-ecosystem-portal.pages.dev/" target="_blank" rel="noopener" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Ecosystem Portal</div>
+          <div class="card-url">metraiyux-ecosystem-portal.pages.dev</div>
+          <div class="card-desc">Master navigation hub. All 9+ empire properties, vault spotlight, legal strip, marketplace card.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="/sovereign" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Sovereign Business Command</div>
+          <div class="card-url">metraiyux-ecosystem-portal.pages.dev/sovereign</div>
+          <div class="card-desc">Sales page for the Sovereign Business Command System offer. Public front door + private command infrastructure pitch.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="../skye-business-command-center/apps/hub/public/index.html" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag amber">Local / Dev</span>
+            <span class="status-badge dev">DEV</span>
+          </div>
+          <div class="card-name">Skye Business Command Center</div>
+          <div class="card-url">skye-business-command-center (local)</div>
+          <div class="card-desc">Sellable operations portal. CRM, shared inbox, ticketing, estimates, invoices, client handoff.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+        <a href="/operator/deployment-ledger.html" class="surface-card">
+          <div class="card-top">
+            <span class="card-tag">CF Pages</span>
+            <span class="status-badge">LIVE</span>
+          </div>
+          <div class="card-name">Deployment Ledger</div>
+          <div class="card-url">metraiyux-ecosystem-portal.pages.dev/operator/deployment-ledger.html</div>
+          <div class="card-desc">Full live ledger of all CF Workers, Pages projects, and Netlify deploys. Status, receipts, links.</div>
+          <div class="card-action">Open →</div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- CONSOLE STRIP -->
+    <section class="console-strip" aria-label="System console readout">
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">operator:</span> <span class="c-val">gray-london-skyes</span></div>
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">empire_surfaces:</span> <span class="c-ok">9 live</span> / <span class="c-warn">2 dev</span></div>
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">brain_runtime:</span> <span class="c-val">16 active</span> · <span class="c-key">router:</span> <span class="c-val">site-operator-brain</span></div>
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">vault:</span> <span class="c-ok">live at skyevault-drop.netlify.app</span> · <span class="c-key">r2:</span> <span class="c-val">ready</span></div>
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">legal_policies:</span> <span class="c-val">30+</span> · <span class="c-key">jurisdiction:</span> <span class="c-val">Arizona</span></div>
+      <div class="console-line"><span class="c-hash">#</span> <span class="c-key">deployment_ledger:</span> <span class="c-ok">→ /operator/deployment-ledger.html</span></div>
+    </section>
+
+  </main>
+
+  <footer class="op-footer">
+    <span>MetrAIyux Empire Operator Portal · Skyes Over London LC</span>
+    <span>grayskyes@solenterprises.org</span>
+    <span id="footerDate">—</span>
+  </footer>
+
+</div>
+
+<script>
+function tick() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', { hour12: false });
+  const d = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const el = document.getElementById('opClock');
+  const fe = document.getElementById('footerDate');
+  if (el) el.textContent = t;
+  if (fe) fe.textContent = d;
+}
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sovereign Business Command Systems | Skyes Over London</title>
+  <meta
+    name="description"
+    content="Skyes Over London builds sovereign business command systems: public websites connected to private operating infrastructure, portals, dashboards, automation, AI support, secure intake, files, workflows, and founder command layers."
+  />
+  <meta name="theme-color" content="#030712" />
+
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(15, 23, 42, 0.78);
+      --panel-strong: rgba(8, 13, 28, 0.92);
+      --line: rgba(148, 163, 184, 0.22);
+      --line-bright: rgba(125, 249, 255, 0.42);
+      --text: #f8fafc;
+      --muted: #a7b2c8;
+      --soft: #dbeafe;
+      --cyan: #67e8f9;
+      --blue: #60a5fa;
+      --gold: #f8d66d;
+      --green: #86efac;
+      --pink: #f0abfc;
+      --danger: #fb7185;
+      --shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(96, 165, 250, 0.18), transparent 32%),
+        radial-gradient(circle at 78% 5%, rgba(240, 171, 252, 0.14), transparent 28%),
+        radial-gradient(circle at 50% 55%, rgba(103, 232, 249, 0.10), transparent 38%),
+        linear-gradient(180deg, #020617 0%, #030712 44%, #020617 100%);
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.05));
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 460px;
+      height: 460px;
+      right: -160px;
+      bottom: -160px;
+      border-radius: 999px;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(248, 214, 109, 0.20), transparent 68%);
+      filter: blur(8px);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(20px);
+      background: rgba(2, 6, 23, 0.74);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .nav-inner {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+    }
+
+    .brand-mark {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #020617;
+      font-weight: 950;
+      letter-spacing: -0.08em;
+      background:
+        radial-gradient(circle at 35% 25%, #ffffff, transparent 18%),
+        linear-gradient(135deg, var(--gold), var(--cyan) 50%, var(--blue));
+      box-shadow:
+        0 0 24px rgba(103, 232, 249, 0.42),
+        0 0 46px rgba(248, 214, 109, 0.18);
+      animation: floatMark 5.5s ease-in-out infinite;
+    }
+
+    @keyframes floatMark {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 0.98rem;
+      letter-spacing: 0.02em;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: -2px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      font-size: 0.86rem;
+      padding: 9px 12px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      border-color: rgba(103, 232, 249, 0.28);
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      padding: 12px 17px;
+      min-height: 46px;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.82);
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: 0.22s ease;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(103, 232, 249, 0.46);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    .btn-primary {
+      color: #031018;
+      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      border-color: rgba(255, 255, 255, 0.34);
+    }
+
+    .btn-ghost {
+      background: rgba(2, 6, 23, 0.38);
+    }
+
+    .hero {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 88px 0 42px;
+      display: grid;
+      grid-template-columns: 1.06fr 0.94fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-weight: 950;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      box-shadow: 0 0 20px rgba(103, 232, 249, 0.55);
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 6.8rem);
+      line-height: 0.92;
+      letter-spacing: -0.085em;
+      margin-bottom: 24px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff 0%, var(--cyan) 45%, var(--gold) 88%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      color: #d7deef;
+      font-size: clamp(1.05rem, 1.65vw, 1.34rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .hero-card {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.72)),
+        radial-gradient(circle at 20% 0%, rgba(103, 232, 249, 0.18), transparent 42%);
+      border: 1px solid rgba(103, 232, 249, 0.24);
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background:
+        radial-gradient(circle at 72% 26%, rgba(248, 214, 109, 0.18), transparent 28%),
+        radial-gradient(circle at 30% 70%, rgba(96, 165, 250, 0.16), transparent 34%);
+      pointer-events: none;
+    }
+
+    .orbital {
+      position: relative;
+      min-height: 450px;
+      display: grid;
+      place-items: center;
+    }
+
+    .core-orb {
+      position: relative;
+      width: min(340px, 78vw);
+      height: min(340px, 78vw);
+      border-radius: 50%;
+      border: 1px solid rgba(103, 232, 249, 0.32);
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(103, 232, 249, 0.18), transparent 38%),
+        radial-gradient(circle at 35% 25%, rgba(248, 214, 109, 0.18), transparent 16%),
+        rgba(2, 6, 23, 0.62);
+      box-shadow:
+        inset 0 0 90px rgba(103, 232, 249, 0.11),
+        0 0 70px rgba(103, 232, 249, 0.16);
+    }
+
+    .core-orb::before,
+    .core-orb::after {
+      content: "";
+      position: absolute;
+      inset: 27px;
+      border: 1px solid rgba(248, 214, 109, 0.38);
+      border-radius: 50%;
+      animation: spin 18s linear infinite;
+    }
+
+    .core-orb::after {
+      inset: 58px;
+      border-color: rgba(96, 165, 250, 0.36);
+      animation-duration: 12s;
+      animation-direction: reverse;
+      transform: rotateX(58deg);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .core-label {
+      position: relative;
+      text-align: center;
+      z-index: 2;
+      padding: 20px;
+    }
+
+    .core-label b {
+      display: block;
+      font-size: 3rem;
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+
+    .core-label span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .satellite {
+      position: absolute;
+      width: 170px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.78);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.32);
+      backdrop-filter: blur(18px);
+    }
+
+    .satellite strong {
+      display: block;
+      color: var(--soft);
+      font-size: 0.9rem;
+    }
+
+    .satellite small {
+      color: var(--muted);
+      display: block;
+      margin-top: 3px;
+      font-size: 0.74rem;
+      line-height: 1.4;
+    }
+
+    .s1 { top: 4px; left: 20px; }
+    .s2 { top: 50px; right: 0; }
+    .s3 { bottom: 52px; right: 16px; }
+    .s4 { bottom: 8px; left: 46px; }
+
+    .section {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 62px 0;
+    }
+
+    .section-head {
+      max-width: 860px;
+      margin-bottom: 26px;
+    }
+
+    .section h2 {
+      font-size: clamp(2rem, 4.5vw, 4.35rem);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+      margin-bottom: 16px;
+    }
+
+    .section .lead {
+      color: #cbd5e1;
+      font-size: 1.06rem;
+      max-width: 820px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(2, 6, 23, 0.72));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.26);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.45), transparent);
+      opacity: 0.8;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin-bottom: 0;
+      font-size: 0.96rem;
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      color: #07111d;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      box-shadow: 0 0 30px rgba(103, 232, 249, 0.20);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .statement {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(248, 214, 109, 0.13), transparent 30%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(2, 6, 23, 0.78));
+      border: 1px solid rgba(248, 214, 109, 0.22);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .statement p {
+      font-size: clamp(1.32rem, 2.4vw, 2rem);
+      line-height: 1.16;
+      letter-spacing: -0.04em;
+      color: #eef6ff;
+      margin-bottom: 0;
+    }
+
+    .layers {
+      display: grid;
+      gap: 12px;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 16px;
+      align-items: start;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.58);
+    }
+
+    .layer b {
+      color: var(--gold);
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .layer span {
+      color: #cbd5e1;
+      font-size: 0.96rem;
+    }
+
+    .proof-bar {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      border: 1px solid rgba(103, 232, 249, 0.28);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(103, 232, 249, 0.16), transparent 34%),
+        linear-gradient(180deg, rgba(8, 13, 28, 0.92), rgba(2, 6, 23, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      border: 1px solid rgba(248, 214, 109, 0.22);
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 2.1rem;
+      line-height: 1;
+      color: #d9f99d;
+      letter-spacing: -0.04em;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .offer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .offer-card {
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .offer-card ul {
+      margin: 18px 0 0;
+      padding-left: 18px;
+      color: #cbd5e1;
+    }
+
+    .offer-card li {
+      margin: 8px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(34, 197, 94, 0.11);
+      border: 1px solid rgba(134, 239, 172, 0.20);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    .process {
+      counter-reset: step;
+      display: grid;
+      gap: 14px;
+    }
+
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 66px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(148, 163, 184, 0.17);
+      background: rgba(15, 23, 42, 0.66);
+    }
+
+    .step::before {
+      content: counter(step, decimal-leading-zero);
+      width: 52px;
+      height: 52px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(103, 232, 249, 0.95), rgba(248, 214, 109, 0.95));
+      color: #020617;
+      font-weight: 950;
+    }
+
+    .step h3 {
+      margin-bottom: 4px;
+    }
+
+    .step p {
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .cta {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 40px auto 0;
+      padding: 42px;
+      border-radius: 34px;
+      border: 1px solid rgba(103, 232, 249, 0.30);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(103, 232, 249, 0.20), transparent 34%),
+        radial-gradient(circle at 78% 12%, rgba(248, 214, 109, 0.16), transparent 32%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.88));
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .cta h2 {
+      font-size: clamp(2.2rem, 5vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: #dbeafe;
+      font-size: 1.04rem;
+    }
+
+    .form {
+      display: grid;
+      gap: 12px;
+      background: rgba(2, 6, 23, 0.62);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #dbeafe;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.74);
+      color: var(--text);
+      padding: 12px 13px;
+      outline: none;
+      font: inherit;
+      transition: 0.18s ease;
+    }
+
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(103, 232, 249, 0.64);
+      box-shadow: 0 0 0 4px rgba(103, 232, 249, 0.08);
+    }
+
+    .form-note {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 0;
+    }
+
+    .footer {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 46px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      border-top: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .footer strong {
+      color: var(--text);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(120px);
+      z-index: 50;
+      width: min(560px, calc(100% - 30px));
+      border-radius: 18px;
+      border: 1px solid rgba(103, 232, 249, 0.34);
+      background: rgba(2, 6, 23, 0.92);
+      color: #dbeafe;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      transition: 0.24s ease;
+      backdrop-filter: blur(18px);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .split,
+      .cta {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3,
+      .grid-4,
+      .offer,
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .orbital {
+        min-height: 420px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu {
+        display: inline-flex;
+      }
+
+      .nav.open .nav-links {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 82px;
+        display: grid;
+        padding: 14px;
+        background: rgba(2, 6, 23, 0.96);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .nav.open .nav-links a {
+        border-color: rgba(148, 163, 184, 0.12);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        padding-top: 54px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .offer,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        padding: 18px;
+      }
+
+      .orbital {
+        min-height: 520px;
+      }
+
+      .core-orb {
+        width: 270px;
+        height: 270px;
+      }
+
+      .core-label b {
+        font-size: 2.25rem;
+      }
+
+      .satellite {
+        width: 150px;
+      }
+
+      .s1 { top: 0; left: 0; }
+      .s2 { top: 80px; right: 0; }
+      .s3 { bottom: 84px; right: 2px; }
+      .s4 { bottom: 2px; left: 8px; }
+
+      .layer,
+      .step {
+        grid-template-columns: 1fr;
+      }
+
+      .cta {
+        padding: 24px;
+      }
+
+      .footer {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="nav" id="nav">
+      <div class="nav-inner">
+        <a class="brand" href="#top" aria-label="Skyes Over London home">
+          <span class="brand-mark">S</span>
+          <span>
+            <strong>Skyes Over London</strong>
+            <span>Sovereign Business Infrastructure</span>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="/" style="opacity:.7;">← Portal</a>
+          <a href="#problem">Problem</a>
+          <a href="#system">System</a>
+          <a href="#layers">Layers</a>
+          <a href="#proof">Proof</a>
+          <a href="#offers">Build Options</a>
+          <a href="#contact">Start</a>
+        </nav>
+
+        <button class="btn mobile-menu" type="button" data-menu-toggle>Menu</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Not a website shop</div>
+          <h1>
+            Public front door.
+            <span class="gradient-text">Private command system.</span>
+          </h1>
+          <p class="hero-copy">
+            Skyes Over London builds sovereign business command systems for companies that need more than a basic page online. The website becomes the public operating front. Behind it, your business can run portals, dashboards, secure intake, files, automation, approval workflows, AI-assisted support, and founder-level control.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contact">Request a Command Build</a>
+            <a class="btn btn-ghost" href="#system">See What This Includes</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Business command system diagram">
+          <div class="orbital">
+            <div class="core-orb">
+              <div class="core-label">
+                <b>Command<br />System</b>
+                <span>Website attached</span>
+              </div>
+            </div>
+
+            <div class="satellite s1">
+              <strong>Public Front</strong>
+              <small>Trust pages, service pages, lead paths, proof walls.</small>
+            </div>
+
+            <div class="satellite s2">
+              <strong>Private Ops</strong>
+              <small>Dashboards, approvals, admin rooms, staff workflows.</small>
+            </div>
+
+            <div class="satellite s3">
+              <strong>AI Support</strong>
+              <small>Human-gated command units, routing, drafts, task support.</small>
+            </div>
+
+            <div class="satellite s4">
+              <strong>Secure Data</strong>
+              <small>Files, portals, records, database-backed workflows.</small>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="problem">
+        <div class="section-head">
+          <div class="eyebrow">The real problem</div>
+          <h2>Most businesses do not need another empty page.</h2>
+          <p class="lead">
+            They need the systems behind the page to stop being scattered. A normal website tells people what the company does. A command system helps the company operate.
+          </p>
+        </div>
+
+        <div class="grid grid-3">
+          <article class="card">
+            <div class="icon">01</div>
+            <h3>Everything is disconnected.</h3>
+            <p>
+              Website, email, files, customer messages, intake forms, staff processes, notes, approvals, and follow-up often live in separate places with no clean owner view.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="icon">02</div>
+            <h3>The owner has no command surface.</h3>
+            <p>
+              Leads arrive, customers ask questions, files move around, staff need direction, and decisions get buried inside texts, spreadsheets, inboxes, and memory.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="icon">03</div>
+            <h3>Basic websites do not solve operations.</h3>
+            <p>
+              A brochure page can look polished and still fail the business. The value is in the operating layer behind the front door.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="system">
+        <div class="split">
+          <div class="statement">
+            <div class="eyebrow">The difference</div>
+            <p>
+              We do not sell pages. We build sovereign business command systems with public websites attached to the front.
+            </p>
+          </div>
+
+          <div class="grid grid-2">
+            <article class="card">
+              <h3>Client Intake</h3>
+              <p>Turn interest into structured requests, consultations, uploads, quotes, staff requests, bookings, and routed follow-up.</p>
+            </article>
+
+            <article class="card">
+              <h3>Private Dashboards</h3>
+              <p>Give owners and operators a private view of leads, requests, records, approvals, files, tasks, and live operating status.</p>
+            </article>
+
+            <article class="card">
+              <h3>Approval Gates</h3>
+              <p>Use human-gated workflows so automation can assist without taking uncontrolled action on sensitive decisions.</p>
+            </article>
+
+            <article class="card">
+              <h3>AI Command Units</h3>
+              <p>Connect AI-assisted support to real business workflows: drafts, routing, customer handling, internal tasks, and operational prompts.</p>
+            </article>
+
+            <article class="card">
+              <h3>Secure File Flow</h3>
+              <p>Support document intake, client uploads, receipts, internal review, storage routing, and clean owner access.</p>
+            </article>
+
+            <article class="card">
+              <h3>Proof-Ready Delivery</h3>
+              <p>Build with deployment receipts, route checks, working links, live surfaces, and clear evidence that the system does what it claims.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="layers">
+        <div class="section-head">
+          <div class="eyebrow">Operating layers</div>
+          <h2>A business system needs more than a homepage.</h2>
+          <p class="lead">
+            A serious client build can include the public brand layer, private command layer, data layer, automation layer, AI support layer, and proof layer.
+          </p>
+        </div>
+
+        <div class="layers">
+          <div class="layer">
+            <b>Public Layer</b>
+            <span>Client-facing website, service pages, conversion paths, trust sections, proof pages, contact paths, local pages, and guided pitch content.</span>
+          </div>
+
+          <div class="layer">
+            <b>Portal Layer</b>
+            <span>Client portals, upload flows, account views, request dashboards, staff forms, quote paths, document review areas, and customer service rooms.</span>
+          </div>
+
+          <div class="layer">
+            <b>Command Layer</b>
+            <span>Owner dashboards, admin tools, internal boards, approval inboxes, lead routing, staff workflows, task surfaces, and founder command rooms.</span>
+          </div>
+
+          <div class="layer">
+            <b>Automation Layer</b>
+            <span>Workflow triggers, follow-up support, form routing, email workflows, status updates, recurring actions, and human-gated automation queues.</span>
+          </div>
+
+          <div class="layer">
+            <b>AI Layer</b>
+            <span>Business-aware assistants, internal prompt surfaces, customer support copilots, content drafting, decision support, and workflow-aware command units.</span>
+          </div>
+
+          <div class="layer">
+            <b>Proof Layer</b>
+            <span>Deployment ledgers, route checks, surface inventories, receipts, live proof pages, browser-tested workflows, and visible accountability for what was built.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="proof">
+        <div class="proof-bar">
+          <div class="section-head">
+            <div class="eyebrow">Production receipts</div>
+            <h2>Proof over hype.</h2>
+            <p class="lead">
+              AI has made it easy for people to overpromise. Our standard is different: visible systems, working routes, real operating surfaces, and proof-led delivery.
+            </p>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <strong>Live</strong>
+              <span>Operating surfaces</span>
+            </div>
+
+            <div class="metric">
+              <strong>Private</strong>
+              <span>Command rooms</span>
+            </div>
+
+            <div class="metric">
+              <strong>Gated</strong>
+              <span>Human approvals</span>
+            </div>
+
+            <div class="metric">
+              <strong>Audited</strong>
+              <span>Route proof</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="offers">
+        <div class="section-head">
+          <div class="eyebrow">Build options</div>
+          <h2>Choose the operating depth your company needs.</h2>
+          <p class="lead">
+            Every business does not need the same system. The right build depends on how much of the business you want connected behind the public front.
+          </p>
+        </div>
+
+        <div class="offer">
+          <article class="card offer-card">
+            <div>
+              <span class="badge">Public Front</span>
+              <h3>Command Website</h3>
+              <p>For businesses that need a stronger public presence with clear services, stronger trust, guided conversion, and working intake.</p>
+              <ul>
+                <li>Service pages</li>
+                <li>Lead capture</li>
+                <li>Proof sections</li>
+                <li>Mobile-first experience</li>
+                <li>Basic routing and intake</li>
+              </ul>
+            </div>
+            <a class="btn btn-ghost" href="#contact">Start Here</a>
+          </article>
+
+          <article class="card offer-card">
+            <div>
+              <span class="badge">Private Ops</span>
+              <h3>Business Command System</h3>
+              <p>For operators who want the website connected to private dashboards, admin tools, client flows, and workflow control.</p>
+              <ul>
+                <li>Private dashboards</li>
+                <li>Client portals</li>
+                <li>Approval inboxes</li>
+                <li>File and form workflows</li>
+                <li>Email and follow-up routing</li>
+              </ul>
+            </div>
+            <a class="btn btn-primary" href="#contact">Request Build</a>
+          </article>
+
+          <article class="card offer-card">
+            <div>
+              <span class="badge">Full Infrastructure</span>
+              <h3>Sovereign Operating Layer</h3>
+              <p>For companies that want a serious digital operating system with AI support, automation workers, data-backed workflows, and proof-led deployment.</p>
+              <ul>
+                <li>AI command units</li>
+                <li>Automation workers</li>
+                <li>Database-backed flows</li>
+                <li>Deployment ledger</li>
+                <li>Founder command center</li>
+              </ul>
+            </div>
+            <a class="btn btn-ghost" href="#contact">Plan Infrastructure</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="process">
+        <div class="section-head">
+          <div class="eyebrow">How it works</div>
+          <h2>From scattered tools to one controlled operating front.</h2>
+        </div>
+
+        <div class="process">
+          <article class="step">
+            <div>
+              <h3>Map the business.</h3>
+              <p>We identify what the company sells, how customers enter, where files live, who approves what, how staff communicates, and where the owner needs visibility.</p>
+            </div>
+          </article>
+
+          <article class="step">
+            <div>
+              <h3>Build the public front.</h3>
+              <p>The visible website is designed to explain the business clearly, earn trust, route visitors properly, and create action instead of passive browsing.</p>
+            </div>
+          </article>
+
+          <article class="step">
+            <div>
+              <h3>Connect the private layer.</h3>
+              <p>Behind the public front, the business gets portals, dashboards, intake, files, workflows, admin views, and secure operating surfaces.</p>
+            </div>
+          </article>
+
+          <article class="step">
+            <div>
+              <h3>Add automation with control.</h3>
+              <p>Automation can assist with routing, follow-up, drafting, organization, and repetitive work while sensitive steps remain human-approved.</p>
+            </div>
+          </article>
+
+          <article class="step">
+            <div>
+              <h3>Prove the system.</h3>
+              <p>Delivery is measured by working routes, usable surfaces, clean flows, visible receipts, and a system the business can actually operate.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta" id="contact">
+        <div>
+          <div class="eyebrow">Start the command build</div>
+          <h2>Your website should become the doorway into your business system.</h2>
+          <p>
+            Send the basics and we will map the public front, private command layer, intake routes, workflow needs, and proof standard for your build.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="mailto:skyesoverlondonlc@solenterprises.org?subject=Command%20System%20Build%20Request">Email Skyes Over London</a>
+            <a class="btn btn-ghost" href="tel:+16232607073">Call 623-260-7073</a>
+          </div>
+        </div>
+
+        <form class="form" data-command-form>
+          <label>
+            Company Name
+            <input name="company" placeholder="Company or organization" required />
+          </label>
+
+          <label>
+            Your Name
+            <input name="name" placeholder="Decision maker or operator" required />
+          </label>
+
+          <label>
+            Email
+            <input type="email" name="email" placeholder="name@company.com" required />
+          </label>
+
+          <label>
+            What do you need built?
+            <select name="need" required>
+              <option value="">Select one</option>
+              <option>Command website</option>
+              <option>Client portal</option>
+              <option>Private dashboard</option>
+              <option>Automation workflow</option>
+              <option>AI command unit</option>
+              <option>Full business command system</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+
+          <label>
+            Current Situation
+            <textarea name="details" placeholder="Tell us what is scattered, broken, missing, or ready to be upgraded."></textarea>
+          </label>
+
+          <button class="btn btn-primary" type="submit">Create Request Draft</button>
+          <p class="form-note">
+            This form creates a ready-to-send email draft from your browser.
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Skyes Over London</strong><br />
+        Sovereign business command systems with public websites attached to the front.
+      </div>
+
+      <div>
+        skyesoverlondonlc@solenterprises.org<br />
+        skyesoverlondon@gmail.com<br />
+        623-260-7073
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" data-toast>
+    Request draft created. Your email app should open with the details ready to send.
+  </div>
+
+  <script>
+    const nav = document.querySelector("#nav");
+    const menuToggle = document.querySelector("[data-menu-toggle]");
+    const form = document.querySelector("[data-command-form]");
+    const toast = document.querySelector("[data-toast]");
+
+    menuToggle?.addEventListener("click", () => {
+      nav.classList.toggle("open");
+    });
+
+    document.querySelectorAll(".nav-links a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+      });
+    });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 3800);
+    }
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+      const company = data.get("company") || "";
+      const name = data.get("name") || "";
+      const email = data.get("email") || "";
+      const need = data.get("need") || "";
+      const details = data.get("details") || "";
+
+      const subject = encodeURIComponent(`Command System Build Request - ${company}`);
+      const body = encodeURIComponent(
+`Company: ${company}
+Name: ${name}
+Email: ${email}
+Build Need: ${need}
+
+Current Situation:
+${details}
+
+I want to discuss a Skyes Over London sovereign business command system.`
+      );
+
+      window.location.href = `mailto:skyesoverlondonlc@solenterprises.org?subject=${subject}&body=${body}`;
+      showToast("Request draft created. Your email app should open with the details ready to send.");
+    });
+  </script>
+</body>
+</html>

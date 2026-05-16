@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MetrAIyux 0S | Autonomous Business Command Deck</title>
+  <meta name="description" content="I built MetrAIyux 0S as a deployed command deck: public buyer education, client workspaces, owner-admin command, SkyeGateFS27 auth, proof receipts, and 16 named operating brains.">
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="home-redesign">
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <audio data-site-ambience loop preload="metadata">
+    <source src="assets/audio/project-utopia-cc0.ogg" type="audio/ogg">
+  </audio>
+  <aside class="ambience-dock" aria-label="Site ambience controls">
+    <button type="button" data-ambience-toggle aria-pressed="false">Ambience Off</button>
+    <label>
+      <span>Volume</span>
+      <input type="range" min="0" max="1" value="0.22" step="0.01" data-ambience-volume aria-label="Ambience volume">
+    </label>
+    <a href="https://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">CC0 audio</a>
+  </aside>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html" aria-label="MetrAIyux 0S home">
+        <img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <span>MetrAIyux 0S</span>
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a class="is-active" href="index.html">Overview</a>
+        <a href="guided-tour.html">Live Tour</a>
+        <a href="platform.html">Platform</a>
+        <a href="tech-stack.html">Tech Stack</a>
+        <a href="brain-system.html">Brains</a>
+        <a href="proof-walkthrough.html">Proof</a>
+        <a href="security.html">Security</a>
+        <a href="value.html">Value</a>
+        <a href="https://metraiyux-marketing.pages.dev/index.html">Pricing &amp; Plans</a>
+        <a class="nav-cta" href="fit-check.html">Fit Check</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="command-hero" aria-labelledby="hero-title">
+      <div class="hero-title-band reveal">
+        <p class="eyebrow">👋 Built by Gray London Skyes</p>
+        <h1 id="hero-title">I do not sell websites. I build control rooms for the business behind them.</h1>
+        <div class="hero-brief">
+          <p>I built MetrAIyux 0S to give an operation a public front door, client workspace, founder command deck, SkyeGateFS27 access, proof receipts, and sixteen operating brains that can route the work after someone says yes. Our agents, gates, and networks keep moving after the first yes. ⚡</p>
+          <div class="cta-row">
+            <a class="button" href="guided-tour.html">Step Inside</a>
+            <a class="button secondary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales/live-proof-router.html" target="_blank" rel="noopener">Open Live Proof</a>
+            <a class="button secondary" href="proof-walkthrough.html">Watch Proof Walkthrough</a>
+            <a class="button secondary" href="fit-check.html">Check Your Fit</a>
+          </div>
+        </div>
+        <div class="hero-proof-stage" aria-label="Live MetrAIyux surfaces">
+          <figure class="hero-proof hero-proof-primary hero-proof-video">
+            <a class="proof-video-link" href="proof-walkthrough.html" aria-label="Open the full MetrAIyux 0S proof walkthrough">
+              <video autoplay muted loop playsinline poster="assets/product-shots/metraiyux-0s-real-workflow-proof-poster.png" aria-label="Browser-recorded MetrAIyux 0S workflow showing customer command routing, admin brain response, local brain retrieval, and NEXUS receipt creation">
+                <source src="assets/product-shots/metraiyux-0s-real-workflow-proof.mp4" type="video/mp4">
+                <source src="assets/product-shots/metraiyux-0s-real-workflow-proof.webm" type="video/webm">
+              </video>
+            </a>
+            <figcaption><span>01</span> Real 0S workflow proof</figcaption>
+          </figure>
+          <figure class="hero-proof hero-proof-secondary">
+            <img src="assets/product-shots/fs27-gate-proof.png" alt="SkyeGateFS27 proof surface screenshot" loading="lazy" decoding="async">
+            <figcaption><span>02</span> SkyeGateFS27 access proof</figcaption>
+          </figure>
+          <div class="hero-proof-note">
+            <span>Live proof stack</span>
+            <strong>Public front door → protected rooms → receipts</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="command-center-shell reveal" aria-label="MetrAIyux command deck preview">
+        <aside class="command-rail" aria-label="Command lanes">
+          <img src="assets/metraiyux-0s-emblem-transparent.png" alt="">
+          <button type="button" class="is-active" data-command-tab="route">Route</button>
+          <button type="button" data-command-tab="gate">Gate</button>
+          <button type="button" data-command-tab="brains">Brains</button>
+          <button type="button" data-command-tab="proof">Proof</button>
+        </aside>
+
+        <section class="command-screen" aria-live="polite">
+          <div class="screen-header">
+            <div>
+              <span>Live command surface</span>
+              <strong data-command-title>Prospect route opened</strong>
+            </div>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open full system</a>
+          </div>
+
+          <div class="screen-body">
+            <div class="operator-feed" data-command-panel="route">
+              <p class="feed-label">Inbound signal</p>
+              <h2>“I need more than a site. I need the work to stop living in scattered tools.”</h2>
+              <div class="feed-grid">
+                <span><b>Primary brain</b> Celeste Monroe</span>
+                <span><b>Secondary brain</b> Orion Hayes</span>
+                <span><b>Suggested surface</b> Live Proof Router</span>
+                <span><b>Next move</b> Live tour</span>
+              </div>
+            </div>
+
+            <div class="operator-feed" data-command-panel="gate" hidden>
+              <p class="feed-label">Access and event gate</p>
+              <h2>I use SkyeGateFS27 to validate bearer tokens and mirror platform events without exposing admin controls.</h2>
+              <div class="feed-grid">
+                <span><b>Auth</b> Introspection bridge</span>
+                <span><b>Evidence</b> Mirrored platform events</span>
+                <span><b>Public proof</b> FS27 gate map</span>
+                <span><b>Private line</b> Secrets stay off this site</span>
+              </div>
+            </div>
+
+            <div class="operator-feed" data-command-panel="brains" hidden>
+              <p class="feed-label">Operating model</p>
+              <h2>We use sixteen named brains to turn vague work into accountable lanes: sales, ops, finance, legal, HR, tech, marketing, proof, and expansion.</h2>
+              <div class="feed-grid">
+                <span><b>Founder</b> Gray London Skyes</span>
+                <span><b>Revenue</b> Celeste Monroe</span>
+                <span><b>Security</b> 0meg4kAI</span>
+                <span><b>Proof</b> Victor Saint</span>
+              </div>
+            </div>
+
+            <div class="operator-feed" data-command-panel="proof" hidden>
+              <p class="feed-label">Verification layer</p>
+              <h2>I route every serious claim back to a live surface: deployed Worker, sitemap, proof page, fit route, or buyer-facing command deck.</h2>
+              <div class="feed-grid">
+                <span><b>Live E2E</b> 71 checks</span>
+                <span><b>Failures</b> 0</span>
+                <span><b>Warnings</b> 0</span>
+                <span><b>Surfaces</b> 8 live links</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="proof-column" aria-label="Live proof status">
+          <div class="proof-badge">
+            <span>Brains</span>
+            <strong>16</strong>
+          </div>
+          <div class="proof-badge">
+            <span>Live surfaces</span>
+            <strong>8</strong>
+          </div>
+          <div class="proof-badge">
+            <span>E2E pass</span>
+            <strong>71</strong>
+          </div>
+          <a class="proof-link" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener">View FS27 proof surface</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="proof-strip redesign-strip reveal" aria-label="System proof metrics">
+      <div class="metric"><strong>16</strong><span>We route work through named brains for sales, delivery, finance, compliance, tech, marketing, client success, proof, and founder command.</span></div>
+      <div class="metric"><strong>8</strong><span>We keep live surfaces connected: public overview, proof router, FS27 gate, admin brain, client OS, pricing, founder page, and fit route.</span></div>
+      <div class="metric"><strong>D1</strong><span>I use Cloudflare data layers so actions leave receipts instead of living in memory. 🧾</span></div>
+      <div class="metric"><strong>$150K+</strong><span>I value this as a deployed asset because the Workers, proof, auth bridge, and browser-tested routes are already live.</span></div>
+    </section>
+
+    <section class="section proof-funnel-section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">👀 What I put in front of buyers</p>
+          <h2>I do not ask people to imagine the system. I show them the working surfaces.</h2>
+        </div>
+        <p>I start you inside the command surface, then I move you into the receipts: the router, the client lane, the FS27 gate, the pricing surface, and the full command deck. If you need to understand what I built, I want you looking at the machine, not reading empty claims.</p>
+      </div>
+
+      <div class="journey-rail reveal">
+        <article>
+          <span>👁️ Offer</span>
+          <h3>I open with the control room.</h3>
+          <p>I put routing, gates, proof, and live surfaces in the first experience so the offer feels real before a call ever happens.</p>
+        </article>
+        <article>
+          <span>🧭 Flow</span>
+          <h3>I move you through the work.</h3>
+          <p>I show how scattered requests become client workspace activity, founder command, review gates, and proof receipts.</p>
+        </article>
+        <article>
+          <span>✅ Fit</span>
+          <h3>I separate curiosity from need.</h3>
+          <p>I ask whether the operation needs client separation, approvals, proof, and multi-function routing before I send someone deeper.</p>
+        </article>
+        <article>
+          <span>📸 Proof</span>
+          <h3>I back claims with live surfaces.</h3>
+          <p>I show FS27 and MetrAIyux running, while the private implementation lane and owner-only controls stay protected.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section live-proof-gallery" id="proof-gallery">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">📸 Proof from inside the live system</p>
+          <h2>I record the 0S doing work, not just the landing page moving.</h2>
+        </div>
+          <p>I captured the customer command room routing a request, the admin brain answering, the local brain retrieving sources, and NEXUS creating a receipt. These are not mockups; this is the actual 0S workflow I open when someone asks what MetrAIyux 0S actually does. 🔥</p>
+      </div>
+      <figure class="surface-reel reveal">
+        <video autoplay muted loop playsinline controls poster="assets/product-shots/metraiyux-0s-real-workflow-proof-poster.png">
+          <source src="assets/product-shots/metraiyux-0s-real-workflow-proof.mp4" type="video/mp4">
+          <source src="assets/product-shots/metraiyux-0s-real-workflow-proof.webm" type="video/webm">
+        </video>
+        <figcaption>
+          <span>Browser-recorded 0S workflow reel</span>
+          <strong>We use the actual customer portal, admin brain, local brain, and NEXUS receipt builder in-browser before the still screenshots.</strong>
+          <a class="proof-page-link" href="proof-walkthrough.html">Watch the 7:59 standalone proof walkthrough</a>
+        </figcaption>
+      </figure>
+      <div class="proof-shot-grid">
+        <a class="proof-shot large reveal" href="assets/product-shots/real-0s-customer-command-routed.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/real-0s-customer-command-routed.png" alt="MetrAIyux 0S customer command routed to the right brains" loading="lazy" decoding="async">
+          <span>Customer Portal</span>
+          <h3>I route a customer command from the workspace menu into the operating brain path.</h3>
+        </a>
+        <a class="proof-shot reveal" href="assets/product-shots/real-0s-admin-brain-ledger.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/real-0s-admin-brain-ledger.png" alt="MetrAIyux 0S admin automation brain response and ledger" loading="lazy" decoding="async">
+          <span>Admin Brain</span>
+          <h3>I show the brain answering and writing the command ledger.</h3>
+        </a>
+        <a class="proof-shot reveal" href="assets/product-shots/real-0s-local-brain-answer.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/real-0s-local-brain-answer.png" alt="MetrAIyux 0S local brain answer with retrieved sources" loading="lazy" decoding="async">
+          <span>Local Brain</span>
+          <h3>I ask the browser-local brain and show the retrieved sources.</h3>
+        </a>
+        <a class="proof-shot reveal" href="assets/product-shots/real-0s-nexus-receipt.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/real-0s-nexus-receipt.png" alt="MetrAIyux 0S NEXUS receipt created from business inbox triage" loading="lazy" decoding="async">
+          <span>NEXUS Receipt</span>
+          <h3>I create a local receipt after the brain mesh classifies the request.</h3>
+        </a>
+        <a class="proof-shot reveal" href="assets/product-shots/fs27-gate-proof.png" target="_blank" rel="noopener">
+          <img src="assets/product-shots/fs27-gate-proof.png" alt="SkyeGateFS27 proof surface screenshot" loading="lazy" decoding="async">
+          <span>FS27 Gate</span>
+          <h3>I keep the access proof visible without exposing private owner controls.</h3>
+        </a>
+      </div>
+    </section>
+
+    <section class="band operator-band">
+      <div class="band-inner">
+        <div class="operator-portrait reveal">
+          <img src="assets/gray-skyes-founder-headshot.png" alt="Gray London Skyes, founder of MetrAIyux 0S">
+        </div>
+        <div class="founder-copy reveal">
+          <p class="eyebrow">🧠 Founder-built infrastructure</p>
+          <h2>Built by Gray London Skyes for companies that need more than a prettier homepage.</h2>
+          <p class="lead">I build sovereign web infrastructure through Skyes Over London: public sites that can sell, private command layers that can run the work, and proof surfaces that make the system easier to trust. MetrAIyux 0S is that idea pushed into a full operating deck: client workspaces, founder command, gated actions, live proof, and sixteen brains that route real business pressure into lanes.</p>
+          <div class="cta-row">
+            <a class="button" href="operator-notes.html">Meet the Founder</a>
+            <a class="button secondary" href="https://metraiyux-marketing.pages.dev/index.html">View Pricing &amp; Plans</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">System architecture</p>
+          <h2>Five layers, one product: website, workspace, admin, gate, proof.</h2>
+        </div>
+        <p>I split the product into layers so a buyer can see what matters without getting the private playbook: what they can inspect, where client work lives, how founder command stays separate, how access is checked, and where proof gets produced.</p>
+      </div>
+
+      <div class="architecture redesign-architecture reveal">
+        <div class="layer"><div class="layer-id">Public</div><div><h3>I give buyers a clean front door.</h3><p>I use the overview, route, value map, and fit check to make the system understandable before a call.</p></div></div>
+        <div class="layer"><div class="layer-id">Client</div><div><h3>I keep client work in its own lane.</h3><p>Client intake, status, documents, service mapping, and requests stay away from founder command.</p></div></div>
+        <div class="layer"><div class="layer-id">Command</div><div><h3>I route work through sixteen brains.</h3><p>Sales, operations, finance, legal, HR, tech, proof, and expansion get named ownership instead of floating around.</p></div></div>
+        <div class="layer"><div class="layer-id">Gate</div><div><h3>I use SkyeGateFS27 for access and events.</h3><p>Bearer introspection and mirrored platform events connect the public proof story to protected operations.</p></div></div>
+        <div class="layer"><div class="layer-id">Proof</div><div><h3>I make claims point somewhere real.</h3><p>Screenshots, live pages, status APIs, browser tests, and ledgers back up the story.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="live-surfaces">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Live proof surfaces</p>
+          <h2>I can send one link or walk someone through the whole deck.</h2>
+        </div>
+        <p>I do not send every buyer to the same place. An owner may need the overview. A technical evaluator may need FS27. A closer may need pricing. A client operator may need the Client OS. I route the conversation instead of dumping everyone at the same door.</p>
+      </div>
+
+      <div class="surface-grid">
+        <a class="surface-card reveal" href="guided-tour.html">
+          <span>Buyer route</span>
+          <h3>Step through the operating flow</h3>
+          <p>I use this when someone needs to feel the move from pressure to proof.</p>
+        </a>
+        <a class="surface-card reveal" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales/live-proof-router.html" target="_blank" rel="noopener">
+          <span>Proof router</span>
+          <h3>Match pain to surface</h3>
+          <p>I use this when a qualified prospect needs the right live link fast.</p>
+        </a>
+        <a class="surface-card reveal" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener">
+          <span>FS27 gate</span>
+          <h3>Show the auth/event bridge</h3>
+          <p>I use this when trust, auth, and event proof are the conversation.</p>
+        </a>
+        <a class="surface-card reveal" href="https://metraiyux-marketing.pages.dev/index.html">
+          <span>Commercial lane</span>
+          <h3>Pricing and plans</h3>
+          <p>I use this when the buyer is ready to compare deployment options.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="fit">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">✅ Fit route</p>
+          <h2>I ask the questions that tell us whether this belongs in the business now.</h2>
+        </div>
+        <p>I built this for operators with scattered work, approval risk, client separation needs, and buyers who expect proof. If the fit is weak, I would rather say that clearly than force the wrong sale.</p>
+      </div>
+
+      <form class="quiz-form reveal" id="fitForm">
+        <article class="quiz-card">
+          <h3>How much of your work currently lives in scattered inboxes, docs, spreadsheets, chats, and memory?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="scatter" value="1" checked> Low. Most work has a place.</label>
+            <label><input type="radio" name="scatter" value="3"> Medium. Important work gets lost sometimes.</label>
+            <label><input type="radio" name="scatter" value="5"> High. The company runs on manual chasing.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Do customers, candidates, vendors, or internal staff need different access lanes?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="access" value="1" checked> Not yet.</label>
+            <label><input type="radio" name="access" value="3"> Some separation would help.</label>
+            <label><input type="radio" name="access" value="5"> Yes. Mixed access is already risky.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>How often do you need human approval before something goes public, gets sent, or touches production?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="approval" value="1" checked> Rarely.</label>
+            <label><input type="radio" name="approval" value="3"> Weekly.</label>
+            <label><input type="radio" name="approval" value="5"> Daily or mission critical.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Would proof receipts, ledgers, and live proof links make the company easier to trust?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="proof" value="1" checked> Nice, but not needed.</label>
+            <label><input type="radio" name="proof" value="3"> Useful for internal control.</label>
+            <label><input type="radio" name="proof" value="5"> Essential for buyers, partners, or scale.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>Do you need a public website that teaches the system before asking people to sign up?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="education" value="1" checked> Simple brochure is enough.</label>
+            <label><input type="radio" name="education" value="3"> A serious overview would help.</label>
+            <label><input type="radio" name="education" value="5"> Yes. People need the full story.</label>
+          </div>
+        </article>
+        <article class="quiz-card">
+          <h3>How ready is your company to use an operator/admin layer separate from customer workspaces?</h3>
+          <div class="choice-grid">
+            <label><input type="radio" name="admin" value="1" checked> Not ready.</label>
+            <label><input type="radio" name="admin" value="3"> Ready for a phased start.</label>
+            <label><input type="radio" name="admin" value="5"> Ready now.</label>
+          </div>
+        </article>
+        <div class="cta-row">
+          <button class="button" type="button" onclick="scoreFit()">Score Fit</button>
+          <a class="button secondary" href="fit-check.html">Open Full Fit Check Page</a>
+        </div>
+      </form>
+      <div class="result reveal" id="fitResult" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <div>
+          <strong>MetrAIyux 0S</strong>
+        <p>I keep this page public enough to sell the deployed command deck and protected enough to keep the private implementation lane, customer data, and owner controls out of view.</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="guided-tour.html">Live Tour</a>
+        <a href="platform.html">Platform Map</a>
+        <a href="tech-stack.html">Tech Stack</a>
+        <a href="fit-check.html">Fit Check</a>
+      </div>
+      <div class="footer-links">
+        <a href="https://metraiyux-marketing.pages.dev/index.html">Marketing &amp; Pricing</a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open Full Website</a>
+        <a href="download.html">Public Brief</a>
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener">Legal Center</a>
+        <a href="../metraiyux-portal/vault.html?source=metraiyux" target="_blank" rel="noopener">Send Files</a>
+        <span class="tiny">Last public revision: 2026-05-16</span>
+      </div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
