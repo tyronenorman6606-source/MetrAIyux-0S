@@ -1,7 +1,0 @@
-
-function dominionScope(id){return document.querySelector(`[data-tool="${id}"]`)}
-function dominionCollect(id){const el=dominionScope(id); const data={tool:id,savedAt:new Date().toISOString(),fields:{}}; el.querySelectorAll('[data-field]').forEach(x=>data.fields[x.dataset.field]=x.value); return data}
-function dominionSave(id){const data=dominionCollect(id); localStorage.setItem('dominion:'+id, JSON.stringify(data,null,2)); const out=document.getElementById(id+'-output'); if(out) out.textContent='Saved locally at '+data.savedAt+'\n'+JSON.stringify(data,null,2)}
-function dominionExport(id){const data=dominionCollect(id); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=id+'-export.json'; a.click(); URL.revokeObjectURL(a.href)}
-function dominionClear(id){const el=dominionScope(id); el.querySelectorAll('[data-field]').forEach(x=>x.value=''); localStorage.removeItem('dominion:'+id); const out=document.getElementById(id+'-output'); if(out) out.textContent='Cleared.'}
-window.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-tool]').forEach(el=>{const id=el.dataset.tool; const saved=localStorage.getItem('dominion:'+id); if(saved){try{const data=JSON.parse(saved); Object.entries(data.fields||{}).forEach(([k,v])=>{const f=el.querySelector(`[data-field="${k}"]`); if(f) f.value=v}); const out=document.getElementById(id+'-output'); if(out) out.textContent='Loaded saved local draft.'}catch(e){}}})})

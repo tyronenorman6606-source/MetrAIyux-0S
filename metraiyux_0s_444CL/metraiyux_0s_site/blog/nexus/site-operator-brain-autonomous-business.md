@@ -1,5 +1,0 @@
-# Why the Site Operator Brain Is the Control Layer for an Client Command Deck business automation
-
-A practical look at routing, receipts, approvals, and why the Site Operator Brain should coordinate instead of hallucinate authority.
-
-The NEXUS layer routes business signals to the correct cabinet/person brain, creates receipts, and escalates human approval gates where required.
