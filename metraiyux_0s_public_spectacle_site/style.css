@@ -2259,9 +2259,9 @@ textarea:focus {
 .operator-portrait {
   position: relative;
   overflow: hidden;
-  min-height: 500px;
+  min-height: 420px;
   display: grid;
-  place-items: end center;
+  place-items: center;
 }
 
 .operator-portrait::before {
@@ -2279,8 +2279,13 @@ textarea:focus {
 .operator-portrait img {
   position: relative;
   z-index: 1;
-  max-height: 510px;
-  object-fit: contain;
+  width: min(390px, 92%);
+  aspect-ratio: 1;
+  border: 1px solid rgba(248, 203, 94, 0.32);
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center;
+  background: rgba(5, 8, 12, 0.76);
   filter:
     drop-shadow(0 28px 60px rgba(0, 0, 0, 0.62))
     drop-shadow(0 0 32px rgba(248, 203, 94, 0.28));
@@ -2436,11 +2441,11 @@ textarea:focus {
   }
 
   .operator-portrait {
-    min-height: 360px;
+    min-height: 320px;
   }
 
   .operator-portrait img {
-    max-height: 370px;
+    width: min(300px, 88%);
   }
 }
 

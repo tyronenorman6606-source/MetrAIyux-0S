@@ -181,6 +181,29 @@ const PROXIES = [
   ['/api/nexus/', 'NEXUS_WORKER_ORIGIN', 'NEXUS_WORKER'],
   ['/api/sentinel/', 'SENTINEL_WORKER_ORIGIN', 'SENTINEL_WORKER']
 ];
+const PRIVATE_SOURCE_PATHS = [
+  /^\/cloudflare(?:\/|$)/i,
+  /^\/cloudflare-[^/]+(?:\/|$)/i,
+  /^\/wrangler(?:\.[^/]+)?\.toml$/i,
+  /^\/_(?:headers|redirects)$/i,
+  /\/wrangler(?:\.[^/]+)?\.toml$/i,
+  /\/migrations\/[^/]+\.(?:sql|js)$/i,
+  /\/schema\.sql$/i,
+  /\/README(?:_[^/]+)?\.md$/i
+];
+function isPrivateSourcePath(pathname) {
+  return PRIVATE_SOURCE_PATHS.some(pattern => pattern.test(pathname));
+}
+function privateSourceResponse() {
+  return new Response('Private implementation source is not public. Use /security.html or /tech-stack.html for the buyer-facing architecture overview.', {
+    status: 404,
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-robots-tag': 'noindex, nofollow'
+    }
+  });
+}
 async function proxyApi(request, env, url) {
   const hit = PROXIES.find(([prefix]) => url.pathname.startsWith(prefix));
   if (!hit) return null;
@@ -198,6 +221,7 @@ async function proxyApi(request, env, url) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (isPrivateSourcePath(url.pathname)) return privateSourceResponse();
     if (request.method === 'OPTIONS') return json({ok:true});
     if (url.pathname === '/api/skygate/auth-introspect' && request.method === 'POST') {
       const gate = await introspectSkygate(request, env);
