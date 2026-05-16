@@ -12,6 +12,8 @@
     "cloudflare:deploy": "npm run build:cloudflare-assets && node tools/deploy-cloudflare.mjs",
     "cloudflare:secrets:check": "node tools/sync-cloudflare-secrets.mjs --dry-run",
     "cloudflare:secrets:push": "node tools/sync-cloudflare-secrets.mjs --apply",
+    "proof:mcp": "node tools/run-mcp-upgrade-proof.mjs",
+    "proof:live-email": "node tools/run-live-proof-demo.mjs",
     "smoke:standalone-proof": "node smoke/smoke-standalone-proof.mjs",
     "smoke:proof": "node smoke/smoke-proof.mjs"
   },

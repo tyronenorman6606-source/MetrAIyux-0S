@@ -140,6 +140,7 @@ const SKYMAIL_TABLES = [
   "resend_webhook_events",
   "message_delivery_events",
   "hosted_mailboxes",
+  "workspace_key_cards",
   "skymail_backup_events",
 ];
 
@@ -820,6 +821,110 @@ async function activeKeyState(env, userId) {
   return rows[0] ? { active: true, version: rows[0].version } : { active: false, version: null };
 }
 
+function publicSkymailUrl(env) {
+  return clean(env.SKYMAIL_PUBLIC_URL || env.PUBLIC_APP_URL || "https://skymail-platform.graylondonskyes.workers.dev").replace(/\/+$/, "");
+}
+
+function buildVaultSetupUrl(env, { workspaceId, mailboxEmail }) {
+  const url = new URL(`${publicSkymailUrl(env)}/login`);
+  if (workspaceId) url.searchParams.set("workspace_id", workspaceId);
+  if (mailboxEmail) url.searchParams.set("mailbox", mailboxEmail);
+  url.searchParams.set("next", "vault-setup");
+  return url.toString();
+}
+
+function buildWorkspaceKeyCard(env, { user, mailbox, body, keyState }) {
+  const workspaceId = clean(body.workspace_id || body.workspaceId);
+  const recipientEmail = clean(body.owner_email || body.email || body.approval_email || user.email);
+  const displayName = clean(body.owner_name || body.full_name || body.company_name || user.handle || user.email);
+  return {
+    type: "skymail_vault_key_card",
+    title: "SkyeMail Vault Key Card",
+    workspace_id: workspaceId || null,
+    customer_id: clean(body.customer_id) || null,
+    company_name: clean(body.company_name) || null,
+    workspace_slug: clean(body.workspace_slug || body.slug) || null,
+    plan_id: clean(body.plan_id) || null,
+    skymail_user_id: user.id,
+    handle: user.handle,
+    recipient_email: recipientEmail,
+    display_name: displayName,
+    mailbox_id: mailbox.id,
+    mailbox_email: mailbox.mailbox_email,
+    setup_url: buildVaultSetupUrl(env, { workspaceId, mailboxEmail: mailbox.mailbox_email }),
+    recovery_policy: "client_managed_optional_admin_recovery",
+    key_state: {
+      active: Boolean(keyState.active),
+      version: keyState.version || null,
+      setup_required: !keyState.active,
+    },
+    security_model: [
+      "The client creates the vault key pair in their browser.",
+      "SkyeMail stores the public key for inbound encryption.",
+      "The private key is stored only after being wrapped by the client's Vault Passphrase.",
+      "Admin recovery is optional and must be disclosed if enabled.",
+    ],
+    artifact_hint: {
+      style: "resume_style_workspace_security_card",
+      audience: "client_owner",
+      contains_private_key: false,
+      contains_passphrase: false,
+    },
+    created_at: new Date().toISOString(),
+  };
+}
+
+async function dispatchKeyCard(env, card) {
+  const url = clean(env.SKYMAIL_MDP_KEYCARD_WEBHOOK_URL || env.MDP_KEYCARD_WEBHOOK_URL || env.MCP_KEYCARD_WEBHOOK_URL);
+  if (!url) return { status: "not_configured", response: null };
+  const secret = clean(env.SKYMAIL_MDP_KEYCARD_WEBHOOK_SECRET || env.MDP_KEYCARD_WEBHOOK_SECRET || env.MCP_KEYCARD_WEBHOOK_SECRET);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(secret ? { authorization: `Bearer ${secret}`, "x-skymail-keycard-secret": secret } : {}),
+      },
+      body: JSON.stringify({ type: "skymail.workspace.key_card.issue", card }),
+    });
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text.slice(0, 1000) }; }
+    return { status: res.ok ? "sent" : "failed", http_status: res.status, response: data };
+  } catch (error) {
+    return { status: "failed", error: error.message || "Key-card dispatch failed." };
+  }
+}
+
+async function issueWorkspaceKeyCard(env, { user, mailbox, body, keyState }) {
+  const card = buildWorkspaceKeyCard(env, { user, mailbox, body, keyState });
+  const mdp = await dispatchKeyCard(env, card);
+  const rows = await query(env, `
+    insert into workspace_key_cards(
+      user_id, mailbox_id, workspace_id, customer_id, card_type, recipient_email,
+      display_name, mailbox_email, setup_url, recovery_policy, status,
+      mdp_status, mdp_response_json, payload_json, updated_at
+    )
+    values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'issued',$11,$12::jsonb,$13::jsonb,now())
+    returning *
+  `, [
+    user.id,
+    mailbox.id,
+    card.workspace_id,
+    card.customer_id,
+    card.type,
+    card.recipient_email,
+    card.display_name,
+    card.mailbox_email,
+    card.setup_url,
+    card.recovery_policy,
+    mdp.status,
+    JSON.stringify(mdp),
+    JSON.stringify(card),
+  ]);
+  return { ...card, id: rows[0]?.id || null, mdp_status: mdp.status, mdp_response: mdp };
+}
+
 async function handleAuthFs27(request, env, ctx) {
   const claims = await introspectFs27(env, bearer(request));
   const user = await ensureUserFromFs27(env, claims);
@@ -917,10 +1022,12 @@ async function handleMailboxProvision(request, env, ctx) {
     returning *
   `, [user.id, email, local, domain, provisioned.provider, provisioned.provider_account_id, JSON.stringify(provisioned.provider_payload || {}), env.SKYMAIL_IMAP_HOST || null, env.SKYMAIL_SMTP_HOST || null, env.SKYMAIL_JMAP_URL || null]);
   const mailbox = rows[0];
-  const event = { type: "skymail.mailbox.provisioned", actor: user.email, org_id: auth.fs27_customer_id || null, ws_id: mailbox.id, meta: { mailbox_email: mailbox.mailbox_email, provider: mailbox.provider, provider_account_id: mailbox.provider_account_id } };
+  const keyState = await activeKeyState(env, user.id);
+  const keyCard = await issueWorkspaceKeyCard(env, { user, mailbox, body: { ...body, customer_id: auth.fs27_customer_id || null }, keyState });
+  const event = { type: "skymail.mailbox.provisioned", actor: user.email, org_id: auth.fs27_customer_id || null, ws_id: mailbox.id, meta: { mailbox_email: mailbox.mailbox_email, provider: mailbox.provider, provider_account_id: mailbox.provider_account_id, key_card_id: keyCard.id || null, key_card_mdp_status: keyCard.mdp_status } };
   ctx.waitUntil(mirrorFs27(env, event));
   ctx.waitUntil(backupCitadel(env, { ...event, id: `mailbox_${mailbox.id}` }));
-  return json({ ok: true, mailbox, credentials_issued: Boolean(provisioned.mailbox_password_once), credential_note: provisioned.credential_note || null, mailbox_password_once: provisioned.mailbox_password_once || null });
+  return json({ ok: true, mailbox, key_card: keyCard, credentials_issued: Boolean(provisioned.mailbox_password_once), credential_note: provisioned.credential_note || null, mailbox_password_once: provisioned.mailbox_password_once || null });
 }
 
 async function handleWorkspaceProvision(request, env, ctx) {
@@ -982,12 +1089,13 @@ async function handleWorkspaceProvision(request, env, ctx) {
   `, [user.id, mailboxEmail, local, domain, provisioned.provider, provisioned.provider_account_id, status, provisioningStatus, JSON.stringify(provisioned.provider_payload || {}), env.SKYMAIL_IMAP_HOST || null, env.SKYMAIL_SMTP_HOST || null, env.SKYMAIL_JMAP_URL || null, lastError]);
   const mailbox = rows[0];
   const keyState = await activeKeyState(env, user.id);
+  const keyCard = await issueWorkspaceKeyCard(env, { user, mailbox, body, keyState });
   const event = {
     type: "skymail.workspace.mailbox_provisioned",
     actor: user.email,
     org_id: body.customer_id || null,
     ws_id: body.workspace_id || mailbox.id,
-    meta: { workspace_id: body.workspace_id || null, mailbox_email: mailbox.mailbox_email, provider: mailbox.provider, provisioning_status: mailbox.provisioning_status, key_state: keyState },
+    meta: { workspace_id: body.workspace_id || null, mailbox_email: mailbox.mailbox_email, provider: mailbox.provider, provisioning_status: mailbox.provisioning_status, key_state: keyState, key_card_id: keyCard.id || null, key_card_mdp_status: keyCard.mdp_status },
   };
   ctx.waitUntil(mirrorFs27(env, event));
   ctx.waitUntil(backupCitadel(env, { ...event, id: `workspace_mailbox_${body.workspace_id || mailbox.id}` }));
@@ -1001,9 +1109,11 @@ async function handleWorkspaceProvision(request, env, ctx) {
     inbox_ready: mailbox.status === "active" && keyState.active,
     provider_ready: provider.configured,
     key_state: keyState,
+    key_card: keyCard,
     next_steps: [
       ...(provider.configured ? [] : ["Configure hosted mailbox provider credentials, currently STALWART_MANAGEMENT_API_KEY or external provisioner env."]),
       ...(keyState.active ? [] : ["Client must complete SkyeMail vault key setup on first login before encrypted inbound mail can populate the inbox."]),
+      ...(keyCard.mdp_status === "not_configured" ? ["Configure MDP_KEYCARD_WEBHOOK_URL or MCP_KEYCARD_WEBHOOK_URL if you want a rendered key-card/resume artifact sent to your MDP server."] : []),
     ],
     credentials_issued: Boolean(provisioned.mailbox_password_once),
     credential_note: provisioned.credential_note || null,

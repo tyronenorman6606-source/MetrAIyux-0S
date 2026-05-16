@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "run_id": "buyer-demo-1778941796",
+  "started_at": "2026-05-16T14:30:04.759Z",
+  "completed_at": "2026-05-16T14:30:17.453Z",
+  "public_demo_url": "https://skymail-platform.graylondonskyes.workers.dev/live-proof",
+  "domain": "solenterprises.org",
+  "actors": [
+    {
+      "label": "Proof Operator A",
+      "mailbox": "proof-a-buyer-demo-1778941796@solenterprises.org",
+      "user_id": "5d3598ca-b71a-4340-aeb1-600684059a46"
+    },
+    {
+      "label": "Proof Operator B",
+      "mailbox": "proof-b-buyer-demo-1778941796@solenterprises.org",
+      "user_id": "581e6993-5469-431c-a22e-8439eae205c2"
+    }
+  ],
+  "runs": [
+    {
+      "label": "A sends to B",
+      "from": "proof-a-buyer-demo-1778941796@solenterprises.org",
+      "to": "proof-b-buyer-demo-1778941796@solenterprises.org",
+      "subject": "SkyeMail live proof A to B buyer-demo-1778941796",
+      "resend_id": "bdfe7065-1c49-42aa-84d5-28ac19da3db5",
+      "imported_to_inbox": true,
+      "imported_message_id": "25d945d3-f11c-4bc3-8ace-9ffa52d78430",
+      "provider_message_id": "d6c260aa-855c-44ba-86c2-16f6412462a6",
+      "event_count": 3
+    },
+    {
+      "label": "B replies to A",
+      "from": "proof-b-buyer-demo-1778941796@solenterprises.org",
+      "to": "proof-a-buyer-demo-1778941796@solenterprises.org",
+      "subject": "SkyeMail live proof B to A buyer-demo-1778941796",
+      "resend_id": "61885b8c-395d-42de-9340-37e9c97a5d5f",
+      "imported_to_inbox": true,
+      "imported_message_id": "5733314b-1e7d-4617-af78-769e785ab833",
+      "provider_message_id": "3197548d-3140-4242-b201-c1d6af9a0918",
+      "event_count": 3
+    }
+  ],
+  "security": {
+    "vault_keys_active": true,
+    "private_keys_exposed": false,
+    "inbox_storage": "encrypted payloads in Neon skymail.messages",
+    "provider_events": "Resend webhooks processed by SkyeMail Cloudflare Worker"
+  }
+}

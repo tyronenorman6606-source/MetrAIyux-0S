@@ -238,6 +238,30 @@ create index if not exists idx_hosted_mailboxes_user_created on skymail.hosted_m
 create index if not exists idx_hosted_mailboxes_domain on skymail.hosted_mailboxes(domain, local_part);
 create index if not exists idx_hosted_mailboxes_provider_account on skymail.hosted_mailboxes(provider, provider_account_id);
 
+create table if not exists skymail.workspace_key_cards (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references skymail.users(id) on delete cascade,
+  mailbox_id uuid references skymail.hosted_mailboxes(id) on delete set null,
+  workspace_id text,
+  customer_id text,
+  card_type text not null default 'skymail_vault_key_card',
+  recipient_email text,
+  display_name text,
+  mailbox_email text,
+  setup_url text,
+  recovery_policy text not null default 'client_managed_optional_admin_recovery',
+  status text not null default 'issued',
+  mdp_status text not null default 'not_configured',
+  mdp_response_json jsonb,
+  payload_json jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_workspace_key_cards_user_created on skymail.workspace_key_cards(user_id, created_at desc);
+create index if not exists idx_workspace_key_cards_workspace on skymail.workspace_key_cards(workspace_id, created_at desc);
+create index if not exists idx_workspace_key_cards_email on skymail.workspace_key_cards(lower(recipient_email));
+
 create table if not exists skymail.skymail_backup_events (
   id text primary key,
   type text not null,

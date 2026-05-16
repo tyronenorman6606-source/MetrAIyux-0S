@@ -15,6 +15,9 @@ const pages = [
   "founder",
   "keys",
   "login",
+  "live-proof",
+  "marketing",
+  "mcp-proof",
   "message",
   "monitoring",
   "onboarding",
@@ -54,6 +57,7 @@ for (const page of pages) {
 }
 
 copyDir(path.join(root, "assets"), path.join(out, "assets"));
+copyDir(path.join(root, "proof"), path.join(out, "proof"));
 copyDir(path.join(root, "suite"), path.join(out, "suite"));
 copyDir(path.join(root, "dist"), path.join(out, "dist"));
 

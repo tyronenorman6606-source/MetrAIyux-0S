@@ -1,33 +1,32 @@
 :root{
-  --bg0:#fffaf0;
-  --bg1:#fff2cc;
-  --glass:rgba(255,255,255,.80);
-  --glass-strong:rgba(255,255,255,.90);
-  --stroke:rgba(120,90,20,.18);
+  --bg0:#f8faf7;
+  --bg1:#eaf4ee;
+  --glass:rgba(255,255,255,.86);
+  --glass-strong:rgba(255,255,255,.94);
+  --stroke:rgba(34,74,74,.18);
   --text:rgba(18,18,18,.96);
   --muted:rgba(18,18,18,.68);
-  --gold:#d4af37;
-  --gold2:#b8860b;
-  --gold3:#7a5a14;
+  --gold:#c99a16;
+  --gold2:#007f92;
+  --gold3:#116745;
+  --cyan:#007f92;
   --danger:#b00020;
   --ok:#0a7a3d;
   --shadow:0 18px 55px rgba(0,0,0,.12);
   --shadow-soft:0 12px 30px rgba(0,0,0,.08);
-  --radius:22px;
+  --radius:8px;
   --sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:var(--sans);color:var(--text);background:
-  radial-gradient(1200px 600px at 20% 10%, rgba(212,175,55,.22), transparent 60%),
-  radial-gradient(900px 500px at 90% 30%, rgba(184,134,11,.16), transparent 55%),
-  radial-gradient(1000px 600px at 50% 95%, rgba(212,175,55,.18), transparent 60%),
-  linear-gradient(160deg,var(--bg0),var(--bg1));overflow-x:hidden}
+  linear-gradient(135deg, rgba(255,255,255,.9), rgba(234,244,238,.92)),
+  linear-gradient(90deg, rgba(0,127,146,.1), rgba(201,154,22,.08));overflow-x:hidden}
 a{color:var(--gold2);text-decoration:none}
 button,input,textarea,select{font:inherit}
 .wrap{min-height:100%;display:flex;flex-direction:column}
-.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(255,255,255,.66);border-bottom:1px solid rgba(120,90,20,.12)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(248,250,247,.82);border-bottom:1px solid rgba(34,74,74,.12)}
 .nav{max-width:1420px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand{display:flex;align-items:center;gap:12px;min-width:230px}
 .brand img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(212,175,55,.28)) drop-shadow(0 0 26px rgba(184,134,11,.18));animation:floatPulse 3.4s ease-in-out infinite}
@@ -35,10 +34,10 @@ button,input,textarea,select{font:inherit}
 .brand .name{display:flex;flex-direction:column;line-height:1.08}
 .brand .name span{font-size:12px;color:var(--muted)}
 .navlinks{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-.pill,.btn,.linkbtn{padding:10px 13px;border:1px solid rgba(120,90,20,.22);background:rgba(255,255,255,.74);border-radius:999px;color:var(--text);font-size:13px;cursor:pointer;text-decoration:none}
+.pill,.btn,.linkbtn{padding:10px 13px;border:1px solid rgba(34,74,74,.18);background:rgba(255,255,255,.76);border-radius:8px;color:var(--text);font-size:13px;cursor:pointer;text-decoration:none}
 .pill:hover,.btn:hover,.linkbtn:hover{background:rgba(212,175,55,.12)}
-.btn{border-radius:14px;font-weight:700;letter-spacing:.18px}
-.btn.gold{border-color:rgba(212,175,55,.55);background:linear-gradient(135deg, rgba(212,175,55,.90), rgba(184,134,11,.78));color:#1c1605}
+.btn{border-radius:8px;font-weight:700;letter-spacing:0}
+.btn.gold{border-color:rgba(201,154,22,.42);background:linear-gradient(135deg, rgba(241,200,90,.92), rgba(201,154,22,.82));color:#201500}
 .btn.ok{border-color:rgba(10,122,61,.35);background:rgba(10,122,61,.08)}
 .btn.danger{border-color:rgba(176,0,32,.32);background:rgba(176,0,32,.08)}
 .btn.ghost{background:rgba(255,255,255,.58)}
@@ -48,38 +47,38 @@ button,input,textarea,select{font:inherit}
 .card{background:var(--glass);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
 .rail{position:sticky;top:82px;align-self:start;display:grid;gap:14px}
 @media(max-width:1040px){.rail{position:static}}
-.rail-card{background:var(--glass);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow-soft);padding:16px}
+.rail-card{background:var(--glass);border:1px solid var(--stroke);border-radius:8px;box-shadow:var(--shadow-soft);padding:16px}
 .rail-title{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .navlist{display:grid;gap:8px}
-.navitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid rgba(120,90,20,.12);border-radius:14px;background:rgba(255,255,255,.66);color:var(--text)}
-.navitem.active{background:linear-gradient(135deg, rgba(212,175,55,.18), rgba(255,255,255,.84));border-color:rgba(212,175,55,.38)}
+.navitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid rgba(34,74,74,.14);border-radius:8px;background:rgba(255,255,255,.76);color:var(--text)}
+.navitem.active{background:linear-gradient(135deg, rgba(0,127,146,.12), rgba(255,255,255,.88));border-color:rgba(0,127,146,.34)}
 .navitem .left{display:flex;flex-direction:column;gap:2px}
 .navitem small{color:var(--muted)}
-.count{min-width:28px;padding:4px 8px;border-radius:999px;text-align:center;background:rgba(212,175,55,.14);border:1px solid rgba(212,175,55,.22);font-size:11px;color:#6a4e00}
+.count{min-width:28px;padding:4px 8px;border-radius:999px;text-align:center;background:rgba(0,127,146,.1);border:1px solid rgba(0,127,146,.2);font-size:11px;color:#075867}
 .main{display:grid;gap:18px}
 .hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px}
 @media(max-width:1200px){.hero{grid-template-columns:1fr}}
 .h1{font-size:38px;line-height:1.03;margin:0 0 10px}
 .sub{margin:0;color:var(--muted);font-size:15px;line-height:1.65}
 .mini{font-size:12px;color:var(--muted);line-height:1.55}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid rgba(120,90,20,.22);background:rgba(255,255,255,.70);font-size:12px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid rgba(34,74,74,.18);background:rgba(255,255,255,.78);font-size:12px;color:var(--muted)}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.notice{border:1px solid rgba(120,90,20,.16);background:rgba(255,255,255,.72);padding:12px;border-radius:14px;color:var(--muted);font-size:13px;line-height:1.6}
+.notice{border:1px solid rgba(34,74,74,.16);background:rgba(255,255,255,.76);padding:12px;border-radius:8px;color:var(--muted);font-size:13px;line-height:1.6}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
-.stat{padding:14px;border:1px solid rgba(120,90,20,.12);background:rgba(255,255,255,.72);border-radius:16px}
+.stat{padding:14px;border:1px solid rgba(34,74,74,.14);background:rgba(255,255,255,.76);border-radius:8px}
 .stat b{display:block;font-size:20px;margin-bottom:6px}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
 .searchbar{display:grid;grid-template-columns:1.1fr 180px auto;gap:10px;align-items:end}
 @media(max-width:840px){.searchbar{grid-template-columns:1fr}}
 label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
-input,textarea,select{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(120,90,20,.14);background:rgba(255,255,255,.84);color:var(--text);outline:none;font-size:14px}
+input,textarea,select{width:100%;padding:12px;border-radius:8px;border:1px solid rgba(34,74,74,.16);background:rgba(255,255,255,.88);color:var(--text);outline:none;font-size:14px}
 textarea{min-height:180px;resize:vertical}
 .fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:860px){.fieldgrid{grid-template-columns:1fr}}
 .mailtable{display:grid;gap:12px}
-.mail{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:14px;border:1px solid rgba(120,90,20,.12);border-radius:18px;background:rgba(255,255,255,.72)}
+.mail{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:14px;border:1px solid rgba(34,74,74,.14);border-radius:8px;background:rgba(255,255,255,.78)}
 .mail.unread{border-color:rgba(212,175,55,.45);box-shadow:0 10px 26px rgba(212,175,55,.08)}
 @media(max-width:860px){.mail{grid-template-columns:auto 1fr}.mail-actions{grid-column:1 / -1;justify-content:flex-start}}
 .mail-check{padding-top:2px}

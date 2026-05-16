@@ -33,26 +33,54 @@
     </nav>
 
     <main class="platform-main">
-      <section class="hero-panel">
+      <section class="hero-panel app-first-panel">
         <div>
-          <span class="eyebrow">Standalone Mail Control Plane</span>
-          <h1>SkyeMail now has a coherent platform shell over the real standalone vault, not just a one-off compose form.</h1>
-          <p class="hero-copy">This suite layer stages handoffs, drafts, campaign planning, and operations notes while the real mailbox, compose, contacts, and settings surfaces continue to run from the standalone SkyeMail app in this same folder.</p>
+          <span class="eyebrow">MCP-driven app-first command center</span>
+          <h1>SkyeMail opens as the working email platform, not a brochure.</h1>
+          <p class="hero-copy">The first screen is the command surface: live inbox routing, compose handoff, sender posture, vault keys, proof receipts, and the real standalone SkyeMail pages sitting behind the suite.</p>
           <div class="hero-actions">
             <a class="platform-button" data-nav="mailbox" href="apps/mailbox/index.html">Open Mailbox Control</a>
             <a class="platform-button ghost" data-nav="templates" href="apps/templates/index.html">Open Compose Studio</a>
             <a class="platform-button ghost" data-nav="campaigns" href="apps/campaigns/index.html">Open Campaign Lanes</a>
           </div>
         </div>
-        <aside class="hero-sidecard">
-          <img class="platform-emblem" src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeMail emblem" />
+        <aside class="hero-sidecard command-preview" aria-label="SkyeMail live command preview">
+          <div class="command-preview-top">
+            <img class="platform-emblem" src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeMail emblem" />
+            <div>
+              <strong>SkyeMail Control</strong>
+              <span>Live app shell</span>
+            </div>
+          </div>
           <div class="metric-grid">
             <div class="metric-card"><strong>Live Surfaces</strong><span>6 route-safe pages</span></div>
             <div class="metric-card"><strong>Recent Handoffs</strong><span data-bind="handoffCount">0</span></div>
             <div class="metric-card"><strong>Draft Queue</strong><span data-bind="draftCount">0</span></div>
             <div class="metric-card"><strong>Campaigns</strong><span data-bind="campaignCount">0</span></div>
           </div>
+          <div class="command-lanes">
+            <a data-nav="mailbox" href="apps/mailbox/index.html"><b>Inbox</b><span>triage and selected-message packets</span></a>
+            <a data-nav="templates" href="apps/templates/index.html"><b>Compose</b><span>stage to the real send lane</span></a>
+            <a data-nav="ops" href="apps/ops/index.html"><b>Vault/Ops</b><span>keys, onboarding, sender posture</span></a>
+          </div>
         </aside>
+      </section>
+
+      <section class="panel-stack two-up">
+        <article class="platform-panel proof-video-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Live email proof</span>
+            <h2>Two inboxes send, receive, reply, and receive back.</h2>
+          </div>
+          <video class="suite-proof-video" src="../proof/videos/skymail-live-proof-browser.webm" poster="../proof/screenshots/skymail-live-proof-browser.png" autoplay muted playsinline controls preload="metadata"></video>
+        </article>
+        <article class="platform-panel proof-video-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Full MCP pass</span>
+            <h2>Every listed MCP resource and tool hits this platform.</h2>
+          </div>
+          <video class="suite-proof-video" src="../proof/videos/skymail-mcp-proof-browser.webm" poster="../proof/screenshots/skymail-mcp-proof-browser.png" autoplay muted playsinline controls preload="metadata"></video>
+        </article>
       </section>
 
       <section class="panel-stack two-up">
