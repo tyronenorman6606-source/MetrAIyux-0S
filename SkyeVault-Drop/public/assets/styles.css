@@ -1004,9 +1004,11 @@ button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
   .asset-grid,
   .proof-grid,
   .grid.two { grid-template-columns: 1fr; }
-  .file-row { grid-template-columns: 1fr; }
+  .file-row,
+  .client-vault-row { grid-template-columns: 1fr; }
   .client-nav { align-items: flex-start; border-radius: 24px; }
   .nav-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .vault-file-actions { justify-content: flex-start; }
 }
 
 .pending-row {
@@ -1020,10 +1022,50 @@ button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
 }
 
 .upload-actions-row,
-.receipt-toolbar {
+.receipt-toolbar,
+.vault-actions-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  align-items: center;
+}
+
+.client-vault-panel {
+  margin-top: 24px;
+}
+
+.client-vault-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.client-vault-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.client-vault-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(255,255,255,0.035);
+}
+
+.client-vault-row p {
+  margin: 7px 0 0;
+  color: var(--muted);
+}
+
+.vault-file-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -1433,6 +1475,7 @@ button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
 .destination-pill,
 .receipt-row,
 .file-row,
+.client-vault-row,
 .consent-box,
 .notice-copy,
 .receipt-panel {
