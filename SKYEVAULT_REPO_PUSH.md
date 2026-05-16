@@ -1,0 +1,30 @@
+# SkyeVault Repo Push
+
+Use this repo-side command to send a sanitized snapshot of this workspace into SkyeVault-Drop.
+
+```bash
+npm run vault:dry-run
+npm run vault:push
+```
+
+The command builds `.skyevault-out/MetrAIyux-0S-repo-safe-*.zip`, scans the staged files for live-looking secrets, uploads the zip through SkyeVault-Drop's existing `/api/upload-session` and `/api/upload-complete` flow, and writes a local receipt JSON under `.skyevault-out/`.
+
+It excludes `.env*`, `.git`, `node_modules`, `.netlify`, `.wrangler`, backups, WAL archives, database dumps/files, private keys, existing archive bundles, generated test artifacts, and any text file that matches the credential scanner.
+
+Required local env values:
+
+- `SKYEVAULT_DROP_URL` in root `.env`, or it falls back to `https://skyevault-drop.netlify.app`.
+- `CLIENT_PORTAL_KEY` in `SkyeVault-Drop/.env`, or `SKYEVAULT_PORTAL_KEY` in root `.env`.
+- Optional `SKYEVAULT_UPLOAD_ORIGIN` if the deployed vault allows a different origin than `https://client-drop-vault-r2.netlify.app`.
+- Optional `SKYEVAULT_CLIENT_NAME`, `SKYEVAULT_CLIENT_EMAIL`, and `SKYEVAULT_PROJECT_NAME` to control receipt metadata.
+
+For a client-owned vault, set these in that client's repo or shell:
+
+```bash
+SKYEVAULT_DROP_URL=https://their-vault.netlify.app
+SKYEVAULT_UPLOAD_ORIGIN=https://their-allowed-origin.example
+SKYEVAULT_PORTAL_KEY=their-client-upload-code
+SKYEVAULT_CLIENT_NAME="Client Company"
+SKYEVAULT_CLIENT_EMAIL=operator@client.com
+npm run vault:push
+```

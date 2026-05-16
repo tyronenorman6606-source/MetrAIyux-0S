@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop Admin</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="shell admin-shell">
+      <section class="hero-card admin-hero">
+        <div class="orb orb-a"></div>
+        <div class="orb orb-b"></div>
+        <div class="brand-mark" aria-hidden="true">CDV</div>
+        <p class="eyebrow">Internal routing command</p>
+        <h1>Vault destinations</h1>
+        <p class="lede">Control the active Cloudflare R2 prefixes, fallback order, upload limits, notifications, and intake ledger.</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Access</p>
+            <h2>Protected operator session</h2>
+          </div>
+          <div class="button-row"><a class="admin-link" href="/setup.html">Setup</a><a class="admin-link" href="/">Upload portal</a><button id="logoutOperator" class="secondary-btn compact" type="button">Log out</button></div>
+        </div>
+
+        <div class="grid token-grid">
+          <label>
+            <span>Optional ADMIN_TOKEN override</span>
+            <input id="adminToken" type="password" autocomplete="off" placeholder="Usually blank after operator login" />
+          </label>
+          <button id="loadConfig" class="secondary-btn" type="button">Load dashboard</button>
+        </div>
+      </section>
+
+      <section class="panel repo-operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Repository snapshots</p>
+            <h2>Send a safe repo package into this vault</h2>
+          </div>
+          <div class="button-row"><a class="admin-link" href="/setup.html#repo-snapshot-setup">Setup guide</a></div>
+        </div>
+        <p class="muted big-copy">Use the repo-side command when a project workspace needs to be stored as one receipt-backed archive. It builds a sanitized zip, excludes secrets and generated junk, uploads through this vault, then writes a local receipt JSON.</p>
+        <div class="repo-command-grid">
+          <article>
+            <strong>1. Prove the package locally</strong>
+            <code>npm run vault:dry-run</code>
+          </article>
+          <article>
+            <strong>2. Upload and create a receipt</strong>
+            <code>npm run vault:push</code>
+          </article>
+          <article>
+            <strong>3. Track the proof</strong>
+            <code>.skyevault-out/skyevault-receipt-*.json</code>
+          </article>
+        </div>
+        <p class="notice-copy">The command excludes .env files, .git, node_modules, Netlify/Wrangler folders, backups, database dumps, WAL archives, private keys, old archive bundles, and files flagged by the built-in credential scan.</p>
+      </section>
+
+      <section id="adminWorkspace" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Config</p>
+            <h2>Routing settings</h2>
+          </div>
+          <div class="button-row">
+            <button id="addDestination" class="secondary-btn" type="button">Add destination</button>
+            <button id="testDestinations" class="secondary-btn" type="button">Test R2 access</button>
+            <button id="runHealth" class="secondary-btn" type="button">Run health preflight</button>
+            <button id="runMaintenance" class="secondary-btn" type="button">Run maintenance</button>
+            <button id="runBackup" class="secondary-btn" type="button">Backup metadata</button>
+            <button id="testNotifications" class="secondary-btn" type="button">Test notification</button>
+            <button id="saveConfig" class="primary-btn compact" type="button">Save changes</button>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <label>
+            <span>Portal brand name</span>
+            <input id="configBrandName" />
+          </label>
+          <label>
+            <span>Support email</span>
+            <input id="configSupportEmail" type="email" />
+          </label>
+          <label class="wide">
+            <span>Public hero headline</span>
+            <textarea id="configPublicHeadline" rows="2"></textarea>
+          </label>
+          <label class="wide">
+            <span>Public subheadline</span>
+            <textarea id="configPublicSubheadline" rows="3"></textarea>
+          </label>
+          <label class="wide">
+            <span>Upload instructions</span>
+            <textarea id="configPublicInstructions" rows="3"></textarea>
+          </label>
+          <label class="wide">
+            <span>Retention / handling notice</span>
+            <textarea id="configRetentionNotice" rows="3"></textarea>
+          </label>
+          <label>
+            <span>Routing mode</span>
+            <select id="configRoutingMode">
+              <option value="priority">Priority / fallback</option>
+              <option value="manual">Manual destination selection</option>
+            </select>
+          </label>
+          <label>
+            <span>Chunk size MB</span>
+            <input id="configChunkSize" type="number" min="1" max="128" step="1" />
+          </label>
+          <label>
+            <span>Max files per submission</span>
+            <input id="configMaxFilesPerSubmission" type="number" min="1" max="200" step="1" />
+          </label>
+          <label>
+            <span>Max total submission GB</span>
+            <input id="configMaxTotalSubmissionGb" type="number" min="1" max="5000" step="1" />
+          </label>
+          <label class="check-row">
+            <input id="configRequireUsageRights" type="checkbox" />
+            <span>Require asset permission confirmation</span>
+          </label>
+          <label class="check-row">
+            <input id="configRequireRetentionAck" type="checkbox" />
+            <span>Require storage/project-use acknowledgement</span>
+          </label>
+          <label class="check-row">
+            <input id="configRequireClientName" type="checkbox" />
+            <span>Require client name</span>
+          </label>
+          <label class="check-row">
+            <input id="configRequireClientEmail" type="checkbox" />
+            <span>Require client email</span>
+          </label>
+          <label class="check-row">
+            <input id="configRequireProjectName" type="checkbox" />
+            <span>Require project / website name</span>
+          </label>
+          <label class="wide">
+            <span>Blocked extensions</span>
+            <input id="configBlockedExtensions" placeholder=".exe,.msi,.bat,.cmd,.scr,.ps1,.vbs,.js,.jar,.com,.sh" />
+          </label>
+        </div>
+
+        <div id="destinationList" class="destination-list"></div>
+      </section>
+
+
+
+      <section id="exportPanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Export center</p>
+            <h2>Download ledgers, manifests, audit events, and backups</h2>
+          </div>
+          <div class="button-row">
+            <button id="exportLedgerCsv" class="secondary-btn compact" type="button">Ledger CSV</button>
+            <button id="exportLedgerJson" class="secondary-btn compact" type="button">Ledger JSON</button>
+            <button id="exportSessionsCsv" class="secondary-btn compact" type="button">Sessions CSV</button>
+            <button id="exportEventsCsv" class="secondary-btn compact" type="button">Events CSV</button>
+            <button id="exportAllJson" class="primary-btn compact" type="button">All JSON</button>
+          </div>
+        </div>
+        <p class="muted">Exports are generated server-side from R2-backed receipts, manifests, config, and audit files. Metadata backups write a JSON snapshot back into the vault.</p>
+      </section>
+
+      <section id="healthPanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Health preflight</p>
+            <h2>Readiness gates</h2>
+          </div>
+        </div>
+        <p class="muted">Checks config-folder access, destination folder access, write healthchecks, notifications, abuse controls, and recent proof events.</p>
+        <div id="healthList" class="health-grid"></div>
+      </section>
+
+      <section id="maintenancePanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Maintenance lifecycle</p>
+            <h2>Stale-session sweep</h2>
+          </div>
+        </div>
+        <p class="muted">Marks abandoned upload sessions as stale and writes an R2-backed maintenance report. It does not delete client files.</p>
+        <div id="maintenanceList" class="ledger-list"></div>
+      </section>
+
+      <section id="sessionsPanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Session manifests</p>
+            <h2>Pending and completed upload sessions</h2>
+          </div>
+        </div>
+        <p class="muted">This shows upload sessions created by the portal, including abandoned uploads that never reached receipt finalization.</p>
+        <div id="sessionsList" class="ledger-list"></div>
+      </section>
+
+      <section id="eventsPanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Operator proof trail</p>
+            <h2>Audit events</h2>
+          </div>
+        </div>
+        <p class="muted">This records operator saves, R2 tests, session creation, and upload completion as R2-backed JSON event files.</p>
+        <div id="eventsList" class="ledger-list"></div>
+      </section>
+
+      <section id="ledgerPanel" class="panel hidden">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Recent intake</p>
+            <h2>Upload ledger</h2>
+          </div>
+        </div>
+        <div id="ledgerList" class="ledger-list"></div>
+      </section>
+
+      <div id="adminStatus" class="status-card hidden" role="status" aria-live="polite"></div>
+    </main>
+
+    <template id="destinationTemplate">
+      <article class="destination-card">
+        <div class="destination-card-head">
+          <strong class="destination-title">Destination</strong>
+          <button class="danger-btn remove-destination" type="button">Remove</button>
+        </div>
+        <div class="grid two">
+          <label>
+            <span>ID</span>
+            <input data-field="id" placeholder="primary" />
+          </label>
+          <label>
+            <span>Name</span>
+            <input data-field="name" placeholder="Primary Client Intake" />
+          </label>
+          <label class="wide">
+            <span>R2 destination prefix</span>
+            <input data-field="folderId" placeholder="client-uploads/primary" />
+          </label>
+          <label>
+            <span>Priority</span>
+            <input data-field="priority" type="number" min="1" step="1" />
+          </label>
+          <label>
+            <span>Role</span>
+            <select data-field="role">
+              <option value="primary">Primary</option>
+              <option value="fallback">Fallback</option>
+              <option value="project">Project</option>
+              <option value="archive">Archive</option>
+            </select>
+          </label>
+          <label>
+            <span>Max file size GB</span>
+            <input data-field="maxFileSizeGb" type="number" min="1" step="1" />
+          </label>
+          <label>
+            <span>Accept</span>
+            <input data-field="accept" placeholder="*, video/*, image/*, .zip" />
+          </label>
+          <label class="check-row">
+            <input data-field="enabled" type="checkbox" />
+            <span>Enabled</span>
+          </label>
+          <label class="wide">
+            <span>Description</span>
+            <textarea data-field="description" rows="3"></textarea>
+          </label>
+        </div>
+        <pre class="test-output hidden"></pre>
+      </article>
+    </template>
+
+    <script src="/assets/admin.js" type="module"></script>
+  </body>
+</html>

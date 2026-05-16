@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "skye:serve:site": "cd metraiyux_0s_site && python3 -m http.server 4173 --bind 127.0.0.1",
+    "skye:control": "node tools/skye-crawler-control.mjs",
+    "skye:crawl": "node tools/skye-crawler.mjs",
+    "skye:crawl:static": "SKIP_API=1 node tools/skye-crawler.mjs",
+    "skye:crawl:worker": "BASE_URL=http://127.0.0.1:4174/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker node tools/skye-crawler.mjs",
+    "skye:crawl:live": "BASE_URL=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live node tools/skye-crawler.mjs",
+    "vault:push": "node tools/skyevault-repo-push.mjs",
+    "vault:dry-run": "node tools/skyevault-repo-push.mjs --dry-run"
+  }
+}

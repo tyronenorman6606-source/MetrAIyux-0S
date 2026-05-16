@@ -1,2 +1,30 @@
 .env
 node_modules/
+
+# Local Netlify folder
+.netlify
+
+# Secret and local runtime files
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*credentials*.json
+*service-account*.json
+
+# Database/runtime backups
+*.dump
+*.backup
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+backups/
+wal_archive/
+
+# Local vault packaging output
+.skyevault-out/

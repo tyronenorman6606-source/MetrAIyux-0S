@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Client Drop Vault Operator Login</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="shell admin-shell operator-shell">
+      <section class="hero-card admin-hero">
+        <div class="orb orb-a"></div>
+        <div class="orb orb-b"></div>
+        <div class="brand-mark" aria-hidden="true">OP</div>
+        <p class="eyebrow">Protected operator entry</p>
+        <h1>Operator access required.</h1>
+        <p class="lede">Enter the deployment ADMIN_TOKEN once to open the internal admin/setup pages through an HttpOnly operator session cookie.</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Login</p>
+            <h2>Start protected session</h2>
+          </div>
+          <a class="admin-link" href="/">Upload portal</a>
+        </div>
+        <form id="operatorForm" class="grid token-grid">
+          <label>
+            <span>ADMIN_TOKEN</span>
+            <input id="operatorToken" type="password" autocomplete="current-password" placeholder="Paste admin token" required />
+          </label>
+          <button class="primary-btn compact" type="submit">Unlock operator pages</button>
+        </form>
+        <div id="operatorStatus" class="status-card hidden" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script src="/assets/operator.js" type="module"></script>
+  </body>
+</html>

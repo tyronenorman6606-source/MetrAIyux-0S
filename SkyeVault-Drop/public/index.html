@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop</title>
+    <meta name="description" content="SkyeVault-Drop is the private Skyes Over London vault for client assets, source packages, media, and receipt-backed delivery files." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body class="client-site">
+    <div class="spectacle-field" aria-hidden="true"></div>
+    <main class="site-shell">
+      <nav class="client-nav" aria-label="Client upload portal navigation">
+        <a class="nav-brand sky-brand" href="#top" aria-label="SkyeVault-Drop home">
+          <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+          <span>
+            <strong>Skyes Over London</strong>
+            <small id="navBrandName">Drop Vault</small>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a href="#what-to-send">What To Send</a>
+          <a href="#process">Proof Route</a>
+          <a href="#repo-snapshots">Repo Vault</a>
+          <a class="nav-cta" href="#upload">Open Vault</a>
+        </div>
+      </nav>
+
+      <section id="top" class="site-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">SKYE-OPS // private client intake</p>
+          <h1 id="brandName">SkyeVault-Drop</h1>
+          <p id="publicHeadline" class="headline-kicker">I built SkyeVault-Drop so client files, media, and repo snapshots stop drifting through inboxes and land in one receipt-backed vault.</p>
+          <p id="publicSubheadline" class="lede">The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.</p>
+          <div class="hero-actions">
+            <a class="primary-btn link-btn" href="#upload">Open secure intake</a>
+            <a class="secondary-btn link-btn" href="#what-to-send">See what belongs here</a>
+          </div>
+          <div class="trust-row premium-trust">
+            <span>Cloudflare R2 direct upload</span>
+            <span>Multipart large-file handling</span>
+            <span>Receipt-backed ledger</span>
+            <span>Sanitized repo snapshots</span>
+            <span>Operator review route</span>
+          </div>
+        </div>
+        <aside class="hero-stage-card surface-video-stage" aria-label="Actual SkyeVault-Drop intake surface reel">
+          <div class="surface-reel-frame">
+            <video
+              class="surface-reel"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="auto"
+              poster="/assets/proof/skyevault-upload-receipt-proof.png"
+              aria-label="Animated reel of the SkyeVault-Drop upload receipt, operator dashboard, and health proof"
+            >
+              <source src="/assets/proof/skyevault-surface-reel.mp4" type="video/mp4" />
+              <img src="/assets/proof/skyevault-upload-receipt-proof.png" alt="SkyeVault-Drop upload receipt proof" loading="lazy" decoding="async" />
+            </video>
+            <div class="surface-reel-caption">
+              <span>Actual Surface Proof</span>
+              <strong>Upload receipt, operator dashboard, health gates</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="vault-metrics" aria-label="Vault proof metrics">
+        <div><strong>R2</strong><span>direct storage route</span></div>
+        <div><strong>Receipt</strong><span>proof after completion</span></div>
+        <div><strong>Ledger</strong><span>operator review trail</span></div>
+        <div><strong>Zip</strong><span>safe repo snapshot lane</span></div>
+      </section>
+
+      <section id="what-to-send" class="section-grid">
+        <article class="panel rich-panel">
+          <p class="eyebrow">Manifest</p>
+          <h2>I need the full production signal, not fragments.</h2>
+          <p class="muted big-copy">A useful upload tells me what the file is, where it belongs, who approved it, and what deadline it supports. That context turns a stored file into a route I can actually move.</p>
+          <div class="asset-grid">
+            <div><strong>Website content</strong><p>Page copy, service descriptions, pricing sheets, bios, menus, policies, FAQs, and location details.</p></div>
+            <div><strong>Brand evidence</strong><p>Logos, brand guides, font notes, color references, screenshots, mockups, and inspiration links.</p></div>
+            <div><strong>Media assets</strong><p>Photos, raw images, 4K footage, edited videos, reels, banners, product shots, and gallery folders.</p></div>
+            <div><strong>Project records</strong><p>Contracts, approvals, intake worksheets, sitemap notes, revision lists, launch notes, and handoff files.</p></div>
+            <div><strong>Source packages</strong><p>Sanitized repo snapshots, deploy bundles, static exports, dependency manifests, and handoff archives.</p></div>
+          </div>
+        </article>
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Operator rule</p>
+          <h2>Name the file like it may become proof.</h2>
+          <p class="muted big-copy">Rename giant assets before upload when possible. <span class="code-pill">home-hero-video-final-4k.mp4</span> tells me more than <span class="code-pill">IMG_9041.mov</span>.</p>
+          <ul class="check-list">
+            <li>Put related files into a zip when sending a large folder.</li>
+            <li>Send code repositories as one sanitized zip instead of loose source files.</li>
+            <li>Use the notes box for deadlines, target pages, and revision context.</li>
+            <li>Confirm you have permission to send and use the uploaded assets.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="process" class="process-strip" aria-label="Upload process">
+        <div>
+          <p class="eyebrow">Proof Route</p>
+          <h2>I route the upload into proof.</h2>
+        </div>
+        <div class="process-steps">
+          <article><span>1</span><strong>Add client context</strong><p>Tell me who the files belong to, what project they support, and how urgent the asset is.</p></article>
+          <article><span>2</span><strong>Upload directly</strong><p>The browser sends file data straight to Cloudflare R2 using signed multipart upload URLs.</p></article>
+          <article><span>3</span><strong>Keep receipt proof</strong><p>Completed uploads are verified, written to the ledger, and ready for operator review.</p></article>
+        </div>
+      </section>
+
+      <section id="repo-snapshots" class="section-grid repo-snapshot-section">
+        <article class="panel rich-panel">
+          <p class="eyebrow">Repo Snapshot Lane</p>
+          <h2>I can archive a whole codebase without dragging the wrong files with it.</h2>
+          <p class="muted big-copy">The repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger.</p>
+          <div class="command-stack" aria-label="Repository snapshot commands">
+            <span class="code-pill">npm run vault:dry-run</span>
+            <span class="code-pill">npm run vault:push</span>
+          </div>
+        </article>
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Safety behavior</p>
+          <h2>The snapshot route refuses the usual leak paths.</h2>
+          <p class="muted big-copy">The package skips local secrets, generated dependency folders, backup data, database files, private keys, old archives, and text files flagged by the credential scanner.</p>
+          <ul class="check-list">
+            <li>Use dry run first to create and inspect the sanitized archive.</li>
+            <li>Use push when the archive is ready for the vault ledger.</li>
+            <li>Save the receipt ID with the project or release notes.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="upload" class="upload-layout">
+        <aside class="panel upload-instructions">
+          <p class="eyebrow">Vault Console</p>
+          <h2>One package. Full context. Clean receipt.</h2>
+          <p id="publicInstructions" class="muted big-copy">Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.</p>
+          <div class="mini-metrics">
+            <div><strong id="destinationCount">0</strong><span>active destinations</span></div>
+            <div><strong id="chunkSizeLabel">8 MB</strong><span>upload chunk size</span></div>
+            <div><strong id="portalModeLabel">Code protected</strong><span>portal access</span></div>
+          </div>
+          <div id="destinationSummary" class="destination-summary"></div>
+          <div class="operator-seal">
+            <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+            <p>I use this intake surface to keep client files out of scattered threads and inside a receipt-backed operator route.</p>
+          </div>
+          <p id="retentionNotice" class="notice-copy">Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.</p>
+        </aside>
+
+        <section class="panel upload-panel" aria-labelledby="uploadTitle">
+          <div class="panel-heading upload-heading">
+            <div>
+              <p class="eyebrow">Command Input</p>
+              <h2 id="uploadTitle">Send files</h2>
+            </div>
+            <span id="queueSummary" class="queue-summary">No files selected</span>
+          </div>
+
+          <form id="uploadForm" class="upload-form">
+            <div class="grid two">
+              <label>
+                <span>Client name</span>
+                <input name="clientName" autocomplete="name" placeholder="Your name or company" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input name="clientEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Phone / text number</span>
+                <input name="clientPhone" autocomplete="tel" placeholder="Optional, for time-sensitive file questions" />
+              </label>
+              <label>
+                <span>Website or project URL</span>
+                <input name="websiteUrl" type="url" placeholder="https://example.com" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Project / website</span>
+                <input name="projectName" placeholder="Project, website, campaign, or vault folder label" required />
+              </label>
+              <label>
+                <span>Client reference / job number</span>
+                <input name="clientReference" placeholder="Optional internal reference" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Asset type</span>
+                <select name="assetType">
+                  <option value="General project package">General project package</option>
+                  <option value="Website content">Website content</option>
+                  <option value="Brand assets">Brand assets</option>
+                  <option value="Photos / gallery">Photos / gallery</option>
+                  <option value="4K video / large media">4K video / large media</option>
+                  <option value="Revision request">Revision request</option>
+                  <option value="Launch / handoff docs">Launch / handoff docs</option>
+                </select>
+              </label>
+              <label>
+                <span>Needed by</span>
+                <input name="deadline" type="date" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label id="portalKeyWrap" class="hidden">
+                <span>Upload access code</span>
+                <input name="portalKey" type="password" autocomplete="off" placeholder="Provided access code" />
+              </label>
+              <label>
+                <span>Destination</span>
+                <select name="destinationId" id="destinationSelect">
+                  <option value="">Auto route to best available folder</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" rows="4" placeholder="Tell me what these files are for, what page they belong to, what changed, and any deadline context."></textarea>
+            </label>
+
+            <label class="hp-field" aria-hidden="true">
+              <span>Company website confirmation</span>
+              <input name="companyWebsite" tabindex="-1" autocomplete="off" />
+            </label>
+            <input name="turnstileToken" type="hidden" />
+            <div id="turnstileWrap" class="turnstile-wrap hidden"></div>
+
+            <div class="dropzone" id="dropzone">
+              <input id="fileInput" name="files" type="file" multiple />
+              <div>
+                <strong>Drop files into the vault</strong>
+                <p>Docs, images, videos, zips, brand packages, repo snapshots, exports, and production assets.</p>
+              </div>
+            </div>
+
+            <div class="queue-tools">
+              <button id="clearQueue" class="secondary-btn small-btn" type="button">Clear selected files</button>
+              <span id="selectedSize" class="muted">0 B selected</span>
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+
+            <div class="consent-box">
+              <label class="check-row strong-check">
+                <input name="usageRightsAccepted" type="checkbox" required />
+                <span>I confirm I have permission to send these files for project use.</span>
+              </label>
+              <label class="check-row strong-check">
+                <input name="retentionAcknowledged" type="checkbox" required />
+                <span>I understand these files will be stored for intake, production, review, and delivery.</span>
+              </label>
+            </div>
+
+            <div class="upload-actions-row">
+              <button class="primary-btn" type="submit">Start secure upload</button>
+              <button id="pauseUpload" class="secondary-btn" type="button" disabled>Pause current upload</button>
+            </div>
+          </form>
+
+          <div id="receiptPanel" class="receipt-panel hidden" aria-live="polite">
+            <div class="receipt-head">
+              <p class="eyebrow">Receipt</p>
+              <h3>Upload intake complete</h3>
+            </div>
+            <div class="receipt-toolbar">
+              <button id="copyReceipts" class="secondary-btn small-btn" type="button">Copy receipt JSON</button>
+              <button id="downloadReceipts" class="secondary-btn small-btn" type="button">Download receipt JSON</button>
+            </div>
+            <div id="receiptList" class="receipt-list"></div>
+          </div>
+
+          <div id="pendingPanel" class="receipt-panel warning-panel hidden" aria-live="polite">
+            <div class="receipt-head">
+              <p class="eyebrow">Receipt recovery</p>
+              <h3>Uploaded files waiting on ledger finalization</h3>
+            </div>
+            <p class="muted">These files reached storage, but the receipt call did not finish. Do not re-upload the same giant file. Retry finalization instead.</p>
+            <div id="pendingList" class="receipt-list"></div>
+            <button id="retryPending" class="secondary-btn small-btn" type="button">Retry pending receipts</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="faq-grid">
+        <article class="panel"><strong>Can I upload large videos?</strong><p>Yes. Keep the tab open until completion. Very large uploads depend on your connection and browser stability.</p></article>
+        <article class="panel"><strong>Should I email files too?</strong><p>No. Use this vault as the source of truth for production assets. Email or text is better for notes, not large files.</p></article>
+        <article class="panel"><strong>Can I send a repo?</strong><p>Yes. Use a sanitized zip or the repo snapshot command so secrets and generated junk stay out of the vault package.</p></article>
+        <article class="panel"><strong>What happens after upload?</strong><p>I review the intake ledger, confirm the files landed, and route them into the active project workflow.</p></article>
+      </section>
+    </main>
+
+    <template id="fileTemplate">
+      <article class="file-row">
+        <div>
+          <strong class="file-name"></strong>
+          <p class="file-meta"></p>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress"><span></span></div>
+          <small class="progress-label">Queued</small>
+        </div>
+        <button class="danger-btn small-btn remove-file" type="button">Remove</button>
+      </article>
+    </template>
+
+    <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
+    <script src="/assets/app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "skyevault-drop",
+  "version": "2.0.0",
+  "private": true,
+  "description": "SkyeVault-Drop production intake vault with Cloudflare R2 multipart uploads, protected operator pages, export center, scanner workflow, signed/replayable notifications, scheduled maintenance, metadata backup, setup helpers, and live proof scripts.",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "smoke": "node scripts/smoke-local.mjs && node scripts/oss-audit.mjs && node scripts/setup-audit.mjs && node scripts/client-surface-audit.mjs && node scripts/closure-audit.mjs && node scripts/e2e-mock-browser-flow.mjs",
+    "check": "node --check netlify/functions/upload-session.js && node --check netlify/functions/upload-complete.js && node --check netlify/functions/admin-config.js && node --check netlify/functions/admin-drive-test.js && node --check netlify/functions/admin-health.js && node --check netlify/functions/maintenance-sweep.js && node --check netlify/functions/scheduled-maintenance.js && node --check netlify/functions/admin-export.js && node --check netlify/functions/admin-backup.js && node --check netlify/functions/admin-notification-test.js && node --check netlify/functions/admin-notification-replay.js && node --check netlify/functions/setup-folder-helper.js && node --check netlify/functions/setup-diagnostics.js && node --check netlify/functions/public-config.js && node --check netlify/functions/upload-status.js && node --check netlify/functions/operator-session.js && node --check netlify/functions/operator-logout.js && node --check netlify/functions/operator-page.js && node --check netlify/functions/_lib/google-drive.js && node --check netlify/functions/_lib/config.js && node --check netlify/functions/_lib/security.js && node --check netlify/functions/_lib/rate-limit.js && node --check netlify/functions/_lib/notifications.js && node --check netlify/functions/_lib/scanner.js && node --check netlify/functions/_lib/exporters.js && node --check scripts/oss-audit.mjs && node --check scripts/setup-audit.mjs && node --check scripts/client-surface-audit.mjs && node --check scripts/live-drive-smoke.mjs && node --check scripts/closure-audit.mjs && node --check scripts/e2e-mock-browser-flow.mjs && node --check scripts/e2e-playwright.spec.mjs",
+    "live:drive-smoke": "node scripts/live-drive-smoke.mjs",
+    "live:r2-smoke": "node scripts/live-drive-smoke.mjs",
+    "oss:audit": "node scripts/oss-audit.mjs",
+    "setup:audit": "node scripts/setup-audit.mjs",
+    "client:audit": "node scripts/client-surface-audit.mjs && node scripts/closure-audit.mjs",
+    "closure:audit": "node scripts/closure-audit.mjs",
+    "e2e:mock-browser": "node scripts/e2e-mock-browser-flow.mjs",
+    "e2e:browser": "node scripts/e2e-playwright.spec.mjs",
+    "exports:audit": "node scripts/closure-audit.mjs"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "latest"
+  }
+}

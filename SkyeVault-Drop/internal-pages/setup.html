@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop Setup Command Center</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <meta
+      name="description"
+      content="Internal setup command center for deploying SkyeVault-Drop on Netlify with private Cloudflare R2 storage."
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="shell setup-shell">
+      <section class="hero-card setup-hero">
+        <div class="orb orb-a"></div>
+        <div class="orb orb-b"></div>
+        <div class="brand-mark" aria-hidden="true">SET</div>
+        <p class="eyebrow">Internal deployment command center</p>
+        <h1>Launch SkyeVault-Drop without hunting through docs.</h1>
+        <p class="lede">
+          Build your Cloudflare R2 vault settings, Netlify environment variables, routing config, and live proof checklist from one page.
+        </p>
+        <div class="trust-row">
+          <span>Baby-step checklist</span>
+          <span>Env generator</span>
+          <span>Protected operator session</span>
+          <span>Live diagnostics</span>
+        </div>
+        <div class="button-row setup-nav-row">
+          <a class="secondary-btn" href="/">Upload portal</a>
+          <a class="secondary-btn" href="/admin.html">Admin dashboard</a>
+          <button id="logoutOperator" class="secondary-btn" type="button">Log out</button>
+        </div>
+      </section>
+
+      <section class="panel setup-warning">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Truth gate</p>
+            <h2>What this page can and cannot do</h2>
+          </div>
+        </div>
+        <p>
+          This protected operator page can walk you through every value, generate safe tokens, generate the bootstrap JSON, configure alerts, and check the deployed environment after you add the Netlify variables. It cannot create Cloudflare R2 keys for you from the browser, and it never stores secrets anywhere except your own clipboard/page session when you paste them.
+        </p>
+      </section>
+
+      <section class="panel setup-progress-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Progress</p>
+            <h2>Deployment checklist</h2>
+          </div>
+          <div class="button-row">
+            <button id="resetChecklist" class="secondary-btn compact" type="button">Reset checklist</button>
+          </div>
+        </div>
+        <div id="setupChecklist" class="setup-checklist"></div>
+      </section>
+
+      <section class="panel setup-steps-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Baby steps</p>
+            <h2>Do this in order</h2>
+          </div>
+        </div>
+        <div class="setup-steps">
+          <article class="setup-step">
+            <span class="step-number">01</span>
+            <div>
+              <h3>Confirm your Cloudflare account</h3>
+              <p>Open Cloudflare, confirm the account that owns the R2 bucket for this vault.</p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <span class="step-number">02</span>
+            <div>
+              <h3>Create an R2 access key</h3>
+              <p>Create an R2 access key, then create a JSON key. Copy the service account email and keep the private key safe. Do not commit it to GitHub.</p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <span class="step-number">03</span>
+            <div>
+              <h3>Choose R2 prefixes</h3>
+              <p>Use private R2 prefixes for config, primary intake, overflow/fallback intake, and backups.</p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <span class="step-number">04</span>
+            <div>
+              <h3>Deploy through Git on Netlify</h3>
+              <p>Push this package to GitHub, import the repo in Netlify, and deploy it as a normal Git-based Netlify site so Functions and npm dependencies build correctly.</p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <span class="step-number">05</span>
+            <div>
+              <h3>Add environment variables</h3>
+              <p>Use the generator below. Paste the values into Netlify Site configuration → Environment variables. Keep R2 secrets private.</p>
+            </div>
+          </article>
+          <article class="setup-step">
+            <span class="step-number">06</span>
+            <div>
+              <h3>Redeploy, test, then send the upload link</h3>
+              <p>Trigger a deploy after adding env vars. Open this page on the live site, run diagnostics, then upload a small proof file before sending the client portal URL.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel setup-generator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Generator</p>
+            <h2>Build your Netlify environment values</h2>
+          </div>
+          <button id="generateTokens" class="secondary-btn compact" type="button">Generate tokens</button>
+        </div>
+
+        <div class="grid two">
+          <label>
+            <span>Deployed site origin</span>
+            <input id="siteOrigin" placeholder="https://your-site.netlify.app" autocomplete="off" />
+          </label>
+          <label>
+            <span>Optional custom upload origin</span>
+            <input id="customOrigin" placeholder="https://uploads.yourdomain.com" autocomplete="off" />
+          </label>
+          <label>
+            <span>ADMIN_TOKEN</span>
+            <input id="adminTokenValue" type="text" autocomplete="off" placeholder="Generate or paste a long random token" />
+          </label>
+          <label>
+            <span>CLIENT_PORTAL_KEY</span>
+            <input id="portalKeyValue" type="text" autocomplete="off" placeholder="Generate or paste the client upload code" />
+          </label>
+          <label>
+            <span>R2 access key ID</span>
+            <input id="serviceAccountEmail" placeholder="R2 access key ID" autocomplete="off" />
+          </label>
+          <label>
+            <span>R2 secret access key</span>
+            <input id="privateKeyValue" type="password" placeholder="R2 secret access key" autocomplete="off" />
+          </label>
+          <label>
+            <span>R2 config prefix</span>
+            <input id="configFolderId" placeholder="vault-system" autocomplete="off" />
+          </label>
+          <label>
+            <span>R2 bucket</span>
+            <input id="r2BucketValue" placeholder="client-drop-vault" autocomplete="off" />
+          </label>
+          <label>
+            <span>Portal brand name</span>
+            <input id="brandNameValue" value="SkyeVault-Drop" autocomplete="off" />
+          </label>
+          <label>
+            <span>Support email</span>
+            <input id="supportEmailValue" type="email" placeholder="support@example.com" autocomplete="off" />
+          </label>
+          <label class="wide">
+            <span>Public hero headline</span>
+            <textarea id="publicHeadlineValue" rows="2">I built SkyeVault-Drop so client files, media, and repo snapshots stop drifting through inboxes and land in one receipt-backed vault.</textarea>
+          </label>
+          <label class="wide">
+            <span>Public subheadline</span>
+            <textarea id="publicSubheadlineValue" rows="3">The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.</textarea>
+          </label>
+          <label class="wide">
+            <span>Upload instructions</span>
+            <textarea id="publicInstructionsValue" rows="3">Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.</textarea>
+          </label>
+          <label class="wide">
+            <span>Retention / handling notice</span>
+            <textarea id="retentionNoticeValue" rows="3">Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.</textarea>
+          </label>
+          <label>
+            <span>Routing mode</span>
+            <select id="routingModeValue">
+              <option value="priority">Priority / fallback</option>
+              <option value="manual">Manual folder selection</option>
+            </select>
+          </label>
+          <label>
+            <span>Upload chunk size MB</span>
+            <input id="chunkSizeValue" type="number" min="1" max="128" step="1" value="8" />
+          </label>
+          <label>
+            <span>Max files per submission</span>
+            <input id="maxFilesPerSubmissionValue" type="number" min="1" max="200" step="1" value="25" />
+          </label>
+          <label>
+            <span>Max total submission GB</span>
+            <input id="maxTotalSubmissionGbValue" type="number" min="1" max="5000" step="1" value="5000" />
+          </label>
+          <label class="check-row">
+            <input id="requireUsageRightsValue" type="checkbox" checked />
+            <span>Require asset permission confirmation</span>
+          </label>
+          <label class="check-row">
+            <input id="requireRetentionAckValue" type="checkbox" checked />
+            <span>Require storage/project-use acknowledgement</span>
+          </label>
+          <label class="check-row">
+            <input id="requireClientNameValue" type="checkbox" checked />
+            <span>Require client name</span>
+          </label>
+          <label class="check-row">
+            <input id="requireClientEmailValue" type="checkbox" checked />
+            <span>Require client email</span>
+          </label>
+          <label class="check-row">
+            <input id="requireProjectNameValue" type="checkbox" checked />
+            <span>Require project / website name</span>
+          </label>
+          <label class="wide">
+            <span>Blocked extensions</span>
+            <input id="blockedExtensionsValue" value=".exe,.msi,.bat,.cmd,.scr,.ps1,.vbs,.js,.jar,.com,.sh" />
+          </label>
+        </div>
+
+        <section class="setup-notification-fields">
+          <div class="destination-builder-head">
+            <div>
+              <p class="eyebrow">Alerts</p>
+              <h3>Optional upload notifications</h3>
+            </div>
+          </div>
+          <div class="grid two">
+            <label>
+              <span>NOTIFY_WEBHOOK_URL</span>
+              <input id="notifyWebhookUrl" placeholder="Slack/Discord/Relay13/webhook endpoint" autocomplete="off" />
+            </label>
+            <label>
+              <span>NOTIFY_WEBHOOK_SECRET</span>
+              <input id="notifyWebhookSecret" placeholder="Optional shared webhook secret" autocomplete="off" />
+            </label>
+            <label>
+              <span>RESEND_API_KEY</span>
+              <input id="resendApiKey" placeholder="Optional Resend key for email alerts" autocomplete="off" />
+            </label>
+            <label>
+              <span>NOTIFY_EMAIL_TO</span>
+              <input id="notifyEmailTo" type="email" placeholder="you@example.com" autocomplete="off" />
+            </label>
+            <label class="wide">
+              <span>NOTIFY_EMAIL_FROM</span>
+              <input id="notifyEmailFrom" placeholder="SkyeVault-Drop <uploads@yourdomain.com>" autocomplete="off" />
+            </label>
+            <label>
+              <span>CLIENT_RECEIPT_EMAILS</span>
+              <select id="clientReceiptEmails"><option value="false">false</option><option value="true">true</option></select>
+            </label>
+            <label>
+              <span>CLIENT_RECEIPT_EMAIL_FROM</span>
+              <input id="clientReceiptEmailFrom" placeholder="SkyeVault-Drop <uploads@yourdomain.com>" autocomplete="off" />
+            </label>
+            <label>
+              <span>TURNSTILE_SITE_KEY</span>
+              <input id="turnstileSiteKey" placeholder="Optional Cloudflare Turnstile site key" autocomplete="off" />
+            </label>
+            <label>
+              <span>TURNSTILE_SECRET_KEY</span>
+              <input id="turnstileSecretKey" placeholder="Optional Cloudflare Turnstile secret key" autocomplete="off" />
+            </label>
+            <label>
+              <span>SCAN_MODE</span>
+              <select id="scannerMode"><option value="none">none</option><option value="manual_review">manual_review</option><option value="external_webhook">external_webhook</option></select>
+            </label>
+            <label>
+              <span>SCANNER_WEBHOOK_URL</span>
+              <input id="scannerWebhookUrl" placeholder="Optional scanner/review webhook endpoint" autocomplete="off" />
+            </label>
+            <label>
+              <span>SCANNER_WEBHOOK_SECRET</span>
+              <input id="scannerWebhookSecret" placeholder="Optional scanner HMAC secret" autocomplete="off" />
+            </label>
+            <label>
+              <span>SCAN_BLOCK_FLAGGED</span>
+              <select id="scanBlockFlagged"><option value="false">false</option><option value="true">true</option></select>
+            </label>
+            <label class="wide">
+              <span>BACKUP_PREFIX</span>
+              <input id="backupFolderId" placeholder="Optional R2 prefix for metadata backups" autocomplete="off" />
+            </label>
+          </div>
+        </section>
+
+        <div class="destination-builder-head">
+          <div>
+            <p class="eyebrow">Folders</p>
+            <h3>Vault destinations</h3>
+          </div>
+          <button id="addSetupDestination" class="secondary-btn compact" type="button">Add destination</button>
+        </div>
+        <div id="setupDestinationList" class="destination-list setup-destination-list"></div>
+      </section>
+
+      <section class="panel setup-output-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Copy/paste</p>
+            <h2>Generated deployment values</h2>
+          </div>
+          <button id="refreshOutput" class="secondary-btn compact" type="button">Refresh output</button>
+        </div>
+
+        <div class="output-block">
+          <div class="output-heading">
+            <h3>Netlify environment block</h3>
+            <button class="copy-btn" data-copy-target="envOutput" type="button">Copy</button>
+          </div>
+          <pre id="envOutput" class="code-output"></pre>
+        </div>
+
+        <div class="output-block">
+          <div class="output-heading">
+            <h3>Bootstrap R2 config JSON</h3>
+            <button class="copy-btn" data-copy-target="jsonOutput" type="button">Copy</button>
+          </div>
+          <pre id="jsonOutput" class="code-output"></pre>
+        </div>
+
+        <div class="output-block">
+          <div class="output-heading">
+            <h3>Local/live proof commands</h3>
+            <button class="copy-btn" data-copy-target="commandOutput" type="button">Copy</button>
+          </div>
+          <pre id="commandOutput" class="code-output"></pre>
+        </div>
+      </section>
+
+      <section id="repo-snapshot-setup" class="panel repo-operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Repo snapshot command</p>
+            <h2>Let an operator push a whole workspace into the vault safely</h2>
+          </div>
+        </div>
+        <p class="muted big-copy">Add the repo-side helper to any project that needs controlled vault snapshots. The helper packages a sanitized zip locally, scans staged text files for common secret patterns, uploads through this vault's R2 multipart API, and writes a receipt JSON.</p>
+        <div class="repo-command-grid">
+          <article>
+            <strong>Required local values</strong>
+            <code>SKYEVAULT_DROP_URL</code>
+            <code>CLIENT_PORTAL_KEY</code>
+          </article>
+          <article>
+            <strong>Test without upload</strong>
+            <code>npm run vault:dry-run</code>
+          </article>
+          <article>
+            <strong>Upload with proof</strong>
+            <code>npm run vault:push</code>
+          </article>
+        </div>
+        <p class="notice-copy">If your deployed vault uses a custom allowed origin, set <span class="code-pill">SKYEVAULT_UPLOAD_ORIGIN</span> locally before running the push command.</p>
+      </section>
+
+      <section class="panel setup-diagnostics-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Diagnostics</p>
+            <h2>After deploy: check the live environment</h2>
+          </div>
+          <button id="runDiagnostics" class="primary-btn compact" type="button">Run diagnostics</button>
+        </div>
+        <div class="grid two">
+          <label>
+            <span>Live site origin</span>
+            <input id="diagnosticOrigin" placeholder="https://your-site.netlify.app" autocomplete="off" />
+          </label>
+          <label>
+            <span>Optional admin token override</span>
+            <input id="diagnosticToken" type="password" placeholder="Blank uses protected operator session" autocomplete="off" />
+          </label>
+        </div>
+        <label class="check-row live-test-row">
+          <input id="diagnosticLiveTest" type="checkbox" />
+          <span>Also test R2 credentials and config-prefix read access. This uses your live Netlify Function environment.</span>
+        </label>
+        <div id="diagnosticResults" class="diagnostic-results hidden"></div>
+      </section>
+    </main>
+
+    <template id="setupDestinationTemplate">
+      <article class="destination-card setup-destination-card">
+        <div class="destination-card-head">
+          <strong class="destination-title">Destination</strong>
+          <button class="danger-btn remove-setup-destination" type="button">Remove</button>
+        </div>
+        <div class="grid two">
+          <label>
+            <span>ID</span>
+            <input data-field="id" placeholder="primary" />
+          </label>
+          <label>
+            <span>Name</span>
+            <input data-field="name" placeholder="Primary Client Intake" />
+          </label>
+          <label class="wide">
+            <span>R2 destination prefix</span>
+            <input data-field="folderId" placeholder="client-uploads/primary" />
+          </label>
+          <label>
+            <span>Priority</span>
+            <input data-field="priority" type="number" min="1" step="1" />
+          </label>
+          <label>
+            <span>Role</span>
+            <select data-field="role">
+              <option value="primary">Primary</option>
+              <option value="fallback">Fallback</option>
+              <option value="project">Project</option>
+              <option value="archive">Archive</option>
+            </select>
+          </label>
+          <label>
+            <span>Max file size GB</span>
+            <input data-field="maxFileSizeGb" type="number" min="1" step="1" />
+          </label>
+          <label>
+            <span>Accept</span>
+            <input data-field="accept" placeholder="* or video/*,.zip,application/pdf" />
+          </label>
+          <label class="wide">
+            <span>Description</span>
+            <input data-field="description" placeholder="What this folder is for" />
+          </label>
+          <label class="check-row wide">
+            <input data-field="enabled" type="checkbox" />
+            <span>Enabled</span>
+          </label>
+        </div>
+      </article>
+    </template>
+
+    <script src="/assets/setup.js" type="module"></script>
+  </body>
+</html>
