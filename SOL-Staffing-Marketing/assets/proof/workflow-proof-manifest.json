@@ -1,0 +1,93 @@
+{
+  "generated_at": "2026-05-16T14:24:45.616Z",
+  "product": "Skyes Over London Staffing",
+  "source_package": "/workspaces/MetrAIyux-0S/unpacked-projects/sol_staffing_agency_site",
+  "recording_script": "/workspaces/MetrAIyux-0S/tools/record-sol-staffing-proof.mjs",
+  "recording_method": "Playwright browser recordVideo against the unpacked site local server",
+  "base_url_during_recording": "http://127.0.0.1:8890",
+  "video_assets": {
+    "mp4": {
+      "path": "assets/proof/sol-staffing-real-workflow.mp4",
+      "codec": "h264",
+      "width": 1440,
+      "height": 900,
+      "duration_seconds": 27.333333,
+      "bytes": 1691509,
+      "sha256": "71a0ec85f66aef45b29022009f72be70710272272986aa815e3918c6d561d884"
+    },
+    "webm": {
+      "path": "assets/proof/sol-staffing-real-workflow.webm",
+      "codec": "vp8",
+      "width": 1440,
+      "height": 900,
+      "duration_seconds": 27.32,
+      "bytes": 3156463,
+      "sha256": "1eccb721176095897b2b115530d8eba8f1c6905748c80cf093f5f64e66250935"
+    },
+    "poster": {
+      "path": "assets/proof/sol-staffing-real-workflow-poster.png",
+      "width": 1440,
+      "height": 900,
+      "sha256": "993fc82dae2b81659d55109d04c3644314b1e5e0d77587c927babde8a37762dc"
+    }
+  },
+  "proof_report": {
+    "path": "assets/proof/sol-staffing-real-workflow-proof.json",
+    "sha256": "55abb3a557624277d0750ce5079598291a5996eb5f8a5876637668d720521508"
+  },
+  "browser_playback_verification": {
+    "report": "/workspaces/MetrAIyux-0S/test-artifacts/sol-main-unpacked-proof/browser-video-playback-report.json",
+    "unpacked_home": {
+      "readyState": 4,
+      "currentTime": 2.198,
+      "paused": false,
+      "visible": true,
+      "source": "http://127.0.0.1:4188/unpacked-projects/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4"
+    },
+    "unpacked_proof_page": {
+      "readyState": 4,
+      "currentTime": 2.115,
+      "paused": false,
+      "visible": true,
+      "source": "http://127.0.0.1:4188/unpacked-projects/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4"
+    },
+    "marketing_page": {
+      "readyState": 4,
+      "currentTime": 3.938,
+      "paused": false,
+      "visible": true,
+      "source": "http://127.0.0.1:4188/unpacked-projects/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4"
+    },
+    "mcp_audit_statement": "Browser check: video readyState >= 2, currentTime > 0, paused === false, and visible in viewport on the unpacked home page, unpacked proof page, and marketing page."
+  },
+  "action_path": [
+    "goto:index.html",
+    "click:Request Staff CTA",
+    "fill:employer staffing request",
+    "submit:employer staffing request to staffing-submit function",
+    "dialog:Received. The staffing OS database has the record.",
+    "goto:staffing-login.html",
+    "fill:Skyegate FS27 dev token",
+    "submit:staffing-auth-session creates HttpOnly admin session",
+    "route:admin-dashboard authenticated",
+    "fill:manual admin record",
+    "submit:manual admin record to staffing-records function",
+    "select-file:secure upload vault",
+    "submit:secure file to staffing-files function",
+    "submit:authenticated live brain endpoint request (503:not_configured)",
+    "goto:local brain page",
+    "click:local SOL brain answers job-order checklist"
+  ],
+  "claims_proven": [
+    "public employer intake submits through staffing-submit",
+    "Skyegate FS27 token creates an authenticated admin session",
+    "admin dashboard reads/writes staffing records",
+    "secure upload vault stores an authenticated file",
+    "authenticated GPU/Ollama brain endpoint route responds with configuration guardrail",
+    "local SOL brain answers a job-order workflow prompt"
+  ],
+  "honest_limits": [
+    "The local proof intentionally clears private GPU/Ollama endpoint environment variables so the video shows the protected brain route's configuration guardrail instead of waiting on a private model.",
+    "The workflow proves the route, auth gate, records, upload vault, and local brain behavior. A production model endpoint still needs configured model infrastructure."
+  ]
+}

@@ -4,27 +4,131 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fit Check - SOL Staffing OS</title>
-  <meta name="description" content="Check whether a staffing team is ready for SOL Staffing OS.">
+  <meta name="description" content="Score whether a staffing operation needs the SOL Staffing OS command room, Skyegate FS27 gate, records, uploads, and proof receipts.">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-fit">
   <canvas class="command-canvas" aria-hidden="true"></canvas>
-  <header class="topbar"><nav class="nav-shell" aria-label="Primary navigation"><a class="brand" href="index.html"><img class="brand-logo-real" src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo"><span class="brand-copy"><strong>Skyes Over London</strong><span>Staffing OS</span></span></a><button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><div class="nav-links" data-nav-links><a href="index.html">Overview</a><a href="guided-tour.html">Walkthrough</a><a href="platform.html">Platform</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="is-active nav-cta" href="fit-check.html">Fit Check</a></div></nav></header>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html"><img class="brand-logo-real" src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo"><span class="brand-copy"><strong>Skyes Over London</strong><span>Staffing OS</span></span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><a class="mobile-top-cta nav-cta" href="fit-check.html">Fit Check</a><div class="nav-links" data-nav-links><a href="index.html">Overview</a><a href="guided-tour.html">Walkthrough</a><a href="platform.html">Platform</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="is-active nav-cta" href="fit-check.html">Fit Check</a></div>
+    </nav>
+  </header>
+
   <main>
-    <section class="page-hero reveal"><p class="eyebrow">Operator Fit Check</p><h1>Should this team launch the full Staffing OS?</h1><p class="lead">Score the pressure inside the staffing workflow. Higher scores mean the team needs more than a public website.</p></section>
-    <section class="section">
-      <form id="fitForm" class="contact-form reveal" onsubmit="event.preventDefault(); scoreStaffingFit();">
-        <label>Employer job-order volume<select name="job_orders"><option value="2">A few inquiries</option><option value="6">Weekly job orders</option><option value="10">Multiple active roles</option></select></label>
-        <label>Candidate pipeline pressure<select name="candidate_pressure"><option value="2">Small candidate pool</option><option value="6">Steady applications</option><option value="10">Recruiter workflow needed</option></select></label>
-        <label>Document handling<select name="documents"><option value="2">Minimal documents</option><option value="6">Some signed packets</option><option value="10">Secure upload workflow needed</option></select></label>
-        <label>Internal admin need<select name="admin_need"><option value="2">One operator</option><option value="6">Shared operator process</option><option value="10">Admin command needed</option></select></label>
-        <label>Brain/workflow support<select name="brain_need"><option value="2">Static guidance is enough</option><option value="6">Checklists and prompts help</option><option value="10">Private model endpoint is useful</option></select></label>
-        <button class="btn-primary" type="submit">Score Fit</button>
+    <section class="fit-command reveal" aria-labelledby="fit-title">
+      <div class="fit-command-copy">
+        <p class="eyebrow">Operator Fit Check</p>
+        <h1 id="fit-title">I built this to test whether the staffing work needs a command room.</h1>
+        <p class="lead">I do not use this page to flatter a buyer into a bigger package. I use it to check whether job orders, candidates, files, gates, proof receipts, and operator pressure are already too heavy for a brochure.</p>
+      </div>
+
+      <form id="fitForm" class="fit-console" onsubmit="event.preventDefault(); scoreStaffingFit();" aria-label="SOL Staffing OS fit check">
+        <div class="fit-console-top">
+          <div>
+            <span class="console-kicker">Assessment console</span>
+            <strong>Route the pressure</strong>
+          </div>
+          <button class="btn-primary" type="submit">Score Fit</button>
+        </div>
+
+        <div class="fit-console-grid">
+          <div class="fit-controls">
+            <label class="fit-lane">
+              <span><strong>Employer job-order volume</strong><small>How much buyer pressure we need to route</small></span>
+              <select name="job_orders">
+                <option value="2">A few loose inquiries</option>
+                <option value="6">Weekly job orders</option>
+                <option value="10">Multiple active roles need routing</option>
+              </select>
+            </label>
+            <label class="fit-lane">
+              <span><strong>Candidate pipeline pressure</strong><small>How quickly applicants become an operator burden</small></span>
+              <select name="candidate_pressure">
+                <option value="2">Small candidate pool</option>
+                <option value="6">Steady applications</option>
+                <option value="10">Recruiter desk needs a lane</option>
+              </select>
+            </label>
+            <label class="fit-lane">
+              <span><strong>Document handling</strong><small>Whether files need a protected room</small></span>
+              <select name="documents">
+                <option value="2">Minimal documents</option>
+                <option value="6">Signed packets are starting</option>
+                <option value="10">Secure upload vault is needed</option>
+              </select>
+            </label>
+            <label class="fit-lane">
+              <span><strong>Internal admin need</strong><small>Whether the work needs a protected command view</small></span>
+              <select name="admin_need">
+                <option value="2">One operator can still hold it</option>
+                <option value="6">Shared operator process</option>
+                <option value="10">Admin command room is needed</option>
+              </select>
+            </label>
+            <label class="fit-lane">
+              <span><strong>Brain/workflow support</strong><small>Whether our brain route should support the operator</small></span>
+              <select name="brain_need">
+                <option value="2">Static guidance is enough</option>
+                <option value="6">Checklists and prompts help</option>
+                <option value="10">Private brain endpoint belongs here</option>
+              </select>
+            </label>
+          </div>
+
+          <aside class="fit-scoreboard" aria-live="polite">
+            <div class="score-ring" style="--score: 20">
+              <span id="fitScore">10</span>
+              <small>/ 50</small>
+            </div>
+            <div>
+              <p class="score-label" id="fitTier">Public Front Door</p>
+              <h2 id="fitHeadline">I would keep this in the public lane first.</h2>
+              <p id="fitSummary">The buyer pressure is not heavy enough yet for the full protected operating layer. I would use the public front door, collect clean facts, and keep the gates quiet until real records start moving.</p>
+            </div>
+            <div class="fit-bars" aria-hidden="true">
+              <span style="--bar: 20"></span>
+              <span style="--bar: 20"></span>
+              <span style="--bar: 20"></span>
+              <span style="--bar: 20"></span>
+              <span style="--bar: 20"></span>
+            </div>
+          </aside>
+        </div>
       </form>
-      <div id="fitResult" class="fit-result reveal" aria-live="polite"></div>
+    </section>
+
+    <section class="fit-ledger section">
+      <div class="fit-ledger-head">
+        <div>
+          <p class="eyebrow">Decision Receipt</p>
+          <h2>I separate brochure pressure from operating pressure.</h2>
+        </div>
+        <p>The score is not a sales trick. It tells us whether we should keep the buyer in the public front door, open the form-to-record route, or move them toward the Skyegate FS27 gate, protected admin room, upload vault, and proof receipts.</p>
+      </div>
+      <div class="fit-ledger-grid">
+        <article>
+          <span>01</span>
+          <h3>Public Front Door</h3>
+          <p>I keep the buyer on the public side when the operation still needs verified facts, service lanes, policies, and clean intake language before we route deeper work.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Record Route</h3>
+          <p>We route the first serious pressure into records before we add every protected room. This is where job orders, candidates, and operator follow-up stop living in memory.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Protected Staffing OS</h3>
+          <p>When the pressure is already real, I open the Skyegate FS27 gate, protected admin command room, secure upload vault, private brain route, and proof receipts.</p>
+        </article>
+      </div>
+      <div id="fitResult" class="fit-result fit-receipt reveal" aria-live="polite"></div>
     </section>
   </main>
-  <footer class="footer"><div class="footer-inner"><div><strong>SOL Staffing OS</strong><p>Fit check for staffing beta teams.</p></div><div class="footer-links"><a href="guided-tour.html">Walkthrough</a><a href="sell-sheet.html">Sell Sheet</a></div></div></footer>
+
+  <footer class="footer"><div class="footer-inner"><div><strong>SOL Staffing OS</strong><p>Fit check for staffing beta teams.</p></div><div class="footer-links"><a href="platform.html#long-proof">Long Proof</a><a href="guided-tour.html">Walkthrough</a><a href="sell-sheet.html">Sell Sheet</a></div></div></footer>
   <script src="app.js"></script>
 </body>
 </html>

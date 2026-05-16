@@ -1,17 +1,9 @@
 {
-  "generated_at": "2026-05-16T02:30:54.540Z",
   "verified_on": "2026-05-16",
   "product": "SOL Staffing OS",
-  "source_package_absolute": "/workspaces/MetrAIyux-0S/unpacked-projects/sol_staffing_agency_site",
-  "source_package_relative_to_marketing": "../unpacked-projects/sol_staffing_agency_site",
-  "source_app": "unpacked-projects/sol_staffing_agency_site",
-  "recording_script": "/workspaces/MetrAIyux-0S/tools/record-sol-staffing-proof.mjs",
-  "design_mcp_recipe": "quantumskyes://design/surface-video-reel",
-  "proof_report_absolute": "/workspaces/MetrAIyux-0S/test-artifacts/sol-real-e2e-proof/sol-staffing-real-workflow-proof.json",
-  "source_browser_recording_absolute": "/workspaces/MetrAIyux-0S/test-artifacts/sol-real-e2e-proof/sol-staffing-real-workflow-recording.webm",
+  "receipt_type": "public-safe browser workflow proof",
   "marketing_video_asset": "assets/screenshots/sol-surface-reel.mp4",
   "poster_asset": "assets/screenshots/sol-proof-workflow-poster.png",
-  "base_url_during_recording": "http://127.0.0.1:8890",
   "video_asset_details": {
     "format": "mp4",
     "codec": "h264",
@@ -31,54 +23,37 @@
     "bytes": 4065114,
     "sha256": "83dd58ea41412f55d53eaad6795071d7ef701d806775f962134ed503c4b35c72"
   },
-  "poster_sha256": "295b1d60459ac536b6d9fa375f9045151bd212d73c8fb0b62260090e39a57dc3",
-  "proof_report_sha256": "5fbe4b63141719168083482c052084e45271cc58bada64b0af6e8bb0c3d2f087",
   "browser_playback_verification": {
-    "report": "/workspaces/MetrAIyux-0S/test-artifacts/sol-marketing-redesign/mcp-final-browser-report.json",
     "desktop": {
       "videoVisible": true,
       "readyState": 4,
-      "currentTime": 2.18,
-      "paused": false,
-      "source": "http://127.0.0.1:4188/SOL-Staffing-Marketing/assets/screenshots/sol-surface-reel.mp4"
+      "currentTimeGreaterThanZero": true,
+      "paused": false
     },
     "mobile": {
       "videoVisible": true,
       "readyState": 4,
-      "currentTime": 1.86,
-      "paused": false,
-      "source": "http://127.0.0.1:4188/SOL-Staffing-Marketing/assets/screenshots/sol-surface-reel.mp4"
-    },
-    "mcp_audit_statement": "Browser check: video readyState >= 2, currentTime > 0, paused === false, and visible in viewport on desktop and mobile."
+      "currentTimeGreaterThanZero": true,
+      "paused": false
+    }
   },
   "action_path": [
-    "goto:index.html",
-    "click:Request Staff CTA",
-    "fill:employer staffing request",
-    "submit:employer staffing request to staffing-submit function",
-    "dialog:Received. The staffing OS database has the record.",
-    "goto:staffing-login.html",
-    "fill:Skyegate FS27 dev token",
-    "submit:staffing-auth-session creates HttpOnly admin session",
-    "route:admin-dashboard authenticated",
-    "fill:manual admin record",
-    "submit:manual admin record to staffing-records function",
-    "select-file:secure upload vault",
-    "submit:secure file to staffing-files function",
-    "submit:authenticated live brain endpoint request",
-    "goto:local brain page",
-    "click:local SOL brain answers job-order checklist"
+    "open public staffing front door",
+    "submit employer staffing request",
+    "open Skyegate FS27 gate",
+    "enter protected admin command room",
+    "create staffing record",
+    "send file through secure upload vault",
+    "check authenticated brain route",
+    "open local staffing brain answer"
   ],
   "claims_proven": [
-    "public employer intake submits through staffing-submit",
-    "Skyegate FS27 token creates an authenticated admin session",
-    "admin dashboard reads/writes staffing records",
-    "secure upload vault stores an authenticated file",
-    "authenticated GPU/Ollama brain endpoint route responds",
-    "local SOL brain answers a job-order workflow prompt"
+    "public employer intake routes into staffing records",
+    "Skyegate FS27 creates an authenticated admin session",
+    "protected admin command room reads and writes records",
+    "secure upload vault accepts an authenticated file",
+    "authenticated brain route responds",
+    "local staffing brain answers a job-order workflow prompt"
   ],
-  "notes": [
-    "The marketing homepage video must continue to use this proof manifest when it claims browser-recorded SOL Staffing OS workflow proof.",
-    "Static screenshots in assets/screenshots are secondary receipts; the MP4 is the primary workflow proof."
-  ]
+  "public_note": "This receipt proves the public-safe workflow path without exposing private setup, credentials, local paths, or internal runbooks."
 }

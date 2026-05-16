@@ -19,7 +19,12 @@ Marketing assets for the SOL Staffing OS package. Built in the same dark editori
 
 ## Proof Video
 
-The homepage proof stage uses `assets/screenshots/sol-surface-reel.mp4`. That file is generated from a real Playwright `recordVideo` browser session against `../unpacked-projects/sol_staffing_agency_site`, not a slideshow of still screenshots. The source-of-truth receipt for that asset is now kept in `assets/proof/sol-video-proof-manifest.json`.
+The homepage proof stage now uses the unpacked site's proof video first:
+
+- `../unpacked-projects/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4`
+- `../unpacked-projects/sol_staffing_agency_site/assets/proof/workflow-proof-manifest.json`
+
+The older local `assets/screenshots/sol-surface-reel.mp4` remains as a fallback asset, but the primary proof source is the main unpacked site package.
 
 Recorded path: public homepage, employer intake submit, Skyegate FS27 session creation, authenticated admin dashboard, manual record creation, secure upload, authenticated brain endpoint request, and local SOL brain answer.
 

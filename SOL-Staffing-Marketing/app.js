@@ -44,29 +44,72 @@
 function scoreStaffingFit() {
   const form = document.getElementById('fitForm');
   const result = document.getElementById('fitResult');
-  if (!form || !result) return;
-  const total = Array.from(new FormData(form).values())
-    .reduce((sum, value) => sum + Number(value || 0), 0);
+  if (!form) return;
+  const values = Array.from(new FormData(form).values()).map(value => Number(value || 0));
+  const total = values.reduce((sum, value) => sum + value, 0);
 
-  let headline = 'Document first, deploy second.';
-  let body = 'A basic public launch may be enough right now. Build the agency facts, verified jobs, service model, and compliance posture before activating the full operating layer.';
-  let action = 'Start with the Launch Site package.';
+  let headline = 'I would keep this in the public lane first.';
+  let body = 'The buyer pressure is not heavy enough yet for the full protected operating layer. I would use the public front door, collect clean facts, and keep the gates quiet until real records start moving.';
+  let action = 'Keep this as a Public Front Door until the operation proves enough live pressure.';
+  let tier = 'Public Front Door';
+  let next = ['Publish the public staffing front door', 'Route only basic intake first', 'Lock verified business facts before opening protected rooms'];
 
   if (total >= 25) {
-    headline = 'Strong fit for the live Staffing OS.';
-    body = 'You have enough intake, records, document, access, and proof pressure to justify the auth-gated admin layer, backend records, upload vault, and live brain wiring.';
-    action = 'Move toward the Live Staffing OS deployment.';
+    headline = 'This belongs in the protected Staffing OS.';
+    body = 'The pressure is already operational: job orders, candidates, files, admin control, and brain support all need a command room. We route this through Skyegate FS27, protected records, upload vault, proof receipts, and the private brain endpoint.';
+    action = 'Move this buyer toward the Protected Staffing OS deployment.';
+    tier = 'Protected Staffing OS';
+    next = ['Open the Skyegate FS27 gate', 'Route employer and candidate forms into records', 'Gate upload vault and private brain endpoint behind operator access'];
   } else if (total >= 16) {
-    headline = 'Good fit for a phased launch.';
-    body = 'The public site and form-to-record backend should come first. Add uploads, model endpoint, and deeper internal workflows once the first live records start moving.';
-    action = 'Use a phased deployment.';
+    headline = 'I would route records before opening every room.';
+    body = 'The operation has enough pressure to stop treating intake like loose messages, but not enough to justify every protected surface at once. We route forms into records first, then add gates, uploads, and brain support as the work proves itself.';
+    action = 'Use the Record Route phase before selling the full protected OS.';
+    tier = 'Record Route';
+    next = ['Turn public intake into typed records', 'Give the operator an admin review lane', 'Hold sensitive uploads until retention and policy are ready'];
   }
 
-  result.classList.add('is-visible');
-  result.innerHTML = `<h3>${headline}</h3><p>${body}</p><p><strong>${action}</strong></p>`;
+  const score = document.getElementById('fitScore');
+  const tierEl = document.getElementById('fitTier');
+  const headlineEl = document.getElementById('fitHeadline');
+  const summaryEl = document.getElementById('fitSummary');
+  const ring = document.querySelector('.score-ring');
+  const bars = Array.from(document.querySelectorAll('.fit-bars span'));
+  const percent = Math.round((total / 50) * 100);
+
+  if (score) score.textContent = String(total);
+  if (tierEl) tierEl.textContent = tier;
+  if (headlineEl) headlineEl.textContent = headline;
+  if (summaryEl) summaryEl.textContent = body;
+  if (ring) ring.style.setProperty('--score', percent);
+  bars.forEach((bar, index) => {
+    const value = values[index] || 0;
+    bar.style.setProperty('--bar', Math.max(12, value * 10));
+  });
+
+  if (result) {
+    result.classList.add('is-visible');
+    result.innerHTML = `
+      <div>
+        <span class="console-kicker">Recommended path</span>
+        <h3>${tier}</h3>
+        <p>${body}</p>
+      </div>
+      <div>
+        <span class="console-kicker">Next actions</span>
+        <ol>${next.map(item => `<li>${item}</li>`).join('')}</ol>
+        <p><strong>${action}</strong></p>
+      </div>`;
+  }
 }
 
 window.scoreStaffingFit = scoreStaffingFit;
+
+(function() {
+  const form = document.getElementById('fitForm');
+  if (!form) return;
+  form.addEventListener('change', scoreStaffingFit);
+  scoreStaffingFit();
+})();
 
 (function() {
   const items = document.querySelectorAll('.reveal');
@@ -83,6 +126,21 @@ window.scoreStaffingFit = scoreStaffingFit;
     });
   }, { threshold: 0.10 });
   items.forEach(el => observer.observe(el));
+})();
+
+(function() {
+  const videos = Array.from(document.querySelectorAll('video[autoplay]'));
+  videos.forEach(video => {
+    video.muted = true;
+    video.setAttribute('muted', '');
+    const play = () => {
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {});
+    };
+    if (video.readyState >= 2) play();
+    video.addEventListener('loadeddata', play, { once: true });
+    video.addEventListener('canplay', play, { once: true });
+  });
 })();
 
 (function() {

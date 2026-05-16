@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-05-16T16:35:39.684Z",
+  "product": "SOL Staffing OS",
+  "proof_type": "Actual SOL Staffing system proof: real browser public route walk plus protected workflow proof from the operating system.",
+  "long_reel": {
+    "path": "assets/proof/sol-staffing-long-proof-reel.mp4",
+    "bytes": 6113456,
+    "sha256": "d6bd163033c99d662fb00e44d3b196c9e657b3ed099b16f5812473e96ae873a3"
+  },
+  "poster": {
+    "path": "assets/proof/sol-staffing-long-proof-poster.png",
+    "bytes": 440961,
+    "sha256": "9ca827d2f98f288ad3fbe689be65dfe52ffa8ffeb8900b4258e3e14b49bb4f5c"
+  },
+  "long_reel_duration_seconds": 82.933333,
+  "source_segments": [
+    {
+      "label": "Actual SOL Staffing system public route walk",
+      "duration_seconds": 55.6,
+      "source": "SOL Staffing public system routes: homepage, employers, candidates, services, government, pricing"
+    },
+    {
+      "label": "Actual SOL Staffing protected workflow recording",
+      "duration_seconds": 27.333333,
+      "source": "SOL Staffing operating workflow: employer intake, Skyegate FS27, admin records, upload vault, brain route"
+    }
+  ],
+  "public_route_receipts": [
+    {
+      "label": "Live staffing homepage",
+      "url": "https://sol-staffing-agency-site.pages.dev/",
+      "screenshot": "assets/proof/public-index.png"
+    },
+    {
+      "label": "Employer intake lane",
+      "url": "https://sol-staffing-agency-site.pages.dev/employers.html",
+      "screenshot": "assets/proof/public-employers.png"
+    },
+    {
+      "label": "Candidate lane",
+      "url": "https://sol-staffing-agency-site.pages.dev/candidates.html",
+      "screenshot": "assets/proof/public-candidates.png"
+    },
+    {
+      "label": "Service map",
+      "url": "https://sol-staffing-agency-site.pages.dev/services.html",
+      "screenshot": "assets/proof/public-services.png"
+    },
+    {
+      "label": "Government surface",
+      "url": "https://sol-staffing-agency-site.pages.dev/government.html",
+      "screenshot": "assets/proof/public-government.png"
+    },
+    {
+      "label": "Pricing path",
+      "url": "https://sol-staffing-agency-site.pages.dev/pricing.html",
+      "screenshot": "assets/proof/public-pricing.png"
+    }
+  ],
+  "protected_workflow_receipts": [
+    {
+      "label": "Employer intake submitted",
+      "evidence": "public employer intake submits through staffing-submit"
+    },
+    {
+      "label": "Skyegate FS27 admin session",
+      "evidence": "token creates authenticated admin session"
+    },
+    {
+      "label": "Admin record write",
+      "evidence": "admin dashboard reads/writes staffing records"
+    },
+    {
+      "label": "Secure upload vault",
+      "evidence": "authenticated file upload stored"
+    },
+    {
+      "label": "Private brain route",
+      "evidence": "authenticated brain endpoint route responds with configuration guardrail"
+    },
+    {
+      "label": "Local SOL brain",
+      "evidence": "job-order workflow prompt receives answer"
+    }
+  ],
+  "claims_proven": [
+    "public employer intake submits through staffing-submit",
+    "Skyegate FS27 token creates an authenticated admin session",
+    "admin dashboard reads/writes staffing records",
+    "secure upload vault stores an authenticated file",
+    "authenticated GPU/Ollama brain endpoint route responds with configuration guardrail",
+    "local SOL brain answers a job-order workflow prompt"
+  ],
+  "action_path": [
+    "goto:index.html",
+    "click:Request Staff CTA",
+    "fill:employer staffing request",
+    "submit:employer staffing request to staffing-submit function",
+    "dialog:Received. The staffing OS database has the record.",
+    "goto:staffing-login.html",
+    "fill:Skyegate FS27 dev token",
+    "submit:staffing-auth-session creates HttpOnly admin session",
+    "route:admin-dashboard authenticated",
+    "fill:manual admin record",
+    "submit:manual admin record to staffing-records function",
+    "select-file:secure upload vault",
+    "submit:secure file to staffing-files function",
+    "submit:authenticated live brain endpoint request (503:not_configured)",
+    "goto:local brain page",
+    "click:local SOL brain answers job-order checklist"
+  ],
+  "honest_limits": [
+    "The local proof intentionally clears private GPU/Ollama endpoint environment variables so the video shows the protected brain route's configuration guardrail instead of waiting on a private model.",
+    "The workflow proves the route, auth gate, records, upload vault, and local brain behavior. A production model endpoint still needs configured model infrastructure."
+  ],
+  "browser_playback_verification": {
+    "mcp_audit_statement": "Browser check: video readyState >= 2, currentTime > 0, paused === false, and visible in viewport on the marketing platform long-proof section. The video itself is the actual SOL Staffing system route walk plus protected workflow recording, not a marketing-site replay.",
+    "platform_long_proof_desktop": {
+      "readyState": 4,
+      "currentTime": 3.630211,
+      "paused": false,
+      "visible": true,
+      "source": "assets/proof/sol-staffing-long-proof-reel.mp4"
+    },
+    "platform_long_proof_mobile": {
+      "readyState": 4,
+      "currentTime": 2.624177,
+      "paused": false,
+      "visible": true,
+      "source": "assets/proof/sol-staffing-long-proof-reel.mp4"
+    }
+  },
+  "public_note": "This proof reel shows the actual SOL Staffing system surfaces and protected workflow. The marketing page only embeds and links the receipt."
+}
