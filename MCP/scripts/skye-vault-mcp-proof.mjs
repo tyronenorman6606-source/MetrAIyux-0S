@@ -149,7 +149,7 @@ try {
     }),
     effects: await callTool('design_effect_audit', {
       source,
-      requested: ['surfaceScreenshots', 'neonScrollbar', 'motionChrome', 'textEffects']
+      requested: ['livingBackground', 'surfaceScreenshots', 'neonScrollbar', 'motionChrome', 'textEffects']
     }),
     proof: await callTool('design_e2e_proof_audit', {
       source,

@@ -344,6 +344,17 @@ html {
   opacity: 1;
 }
 
+.vault-living-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0.9;
+  mix-blend-mode: screen;
+}
+
 .file-list,
 .destination-list,
 .ledger-list {
@@ -1792,9 +1803,9 @@ textarea:focus {
 /* MCP app-first command center pass: real sidebars, rails, and vault-grid atmosphere */
 body {
   background:
-    linear-gradient(116deg, rgba(229,193,106,0.08), transparent 28%),
-    linear-gradient(244deg, rgba(88,230,161,0.08), transparent 30%),
-    linear-gradient(135deg, #030409 0%, #0b0e14 46%, #05070a 100%);
+    radial-gradient(1100px 720px at 72% 14%, rgba(100,217,255,0.09), transparent 66%),
+    radial-gradient(900px 760px at 12% 8%, rgba(229,193,106,0.1), transparent 62%),
+    linear-gradient(135deg, #030409 0%, #090c13 46%, #040609 100%);
 }
 
 body::after {
@@ -1823,9 +1834,9 @@ body::after {
 
 .client-site .site-shell {
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
+  grid-template-columns: 226px minmax(0, 1fr);
   gap: 18px 24px;
-  width: min(1480px, calc(100% - 34px));
+  width: min(1560px, calc(100% - 34px));
 }
 
 .client-nav {
@@ -1942,11 +1953,13 @@ body::after {
 }
 
 .site-hero {
-  min-height: 740px;
-  grid-template-columns: minmax(0, 0.86fr) minmax(420px, 1.14fr);
+  min-height: min(820px, calc(100vh - 132px));
+  grid-template-columns: minmax(0, 0.76fr) minmax(520px, 1.24fr);
+  gap: 28px;
   background:
-    linear-gradient(135deg, rgba(229,193,106,0.12), rgba(255,255,255,0.02) 38%),
-    linear-gradient(90deg, rgba(3,5,10,0.92), rgba(3,5,10,0.62)),
+    radial-gradient(680px 420px at 78% 40%, rgba(100,217,255,0.14), transparent 68%),
+    linear-gradient(135deg, rgba(229,193,106,0.12), rgba(255,255,255,0.018) 38%),
+    linear-gradient(90deg, rgba(3,5,10,0.9), rgba(3,5,10,0.52)),
     rgba(8,8,14,0.8);
 }
 
@@ -1964,7 +1977,27 @@ body::after {
 }
 
 .surface-reel-frame {
-  min-height: 690px;
+  min-height: min(740px, calc(100vh - 184px));
+  transform: perspective(1200px) rotateY(-5deg) rotateX(1deg);
+  transform-origin: center;
+  box-shadow:
+    0 34px 130px rgba(0,0,0,0.62),
+    0 0 80px rgba(100,217,255,0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.surface-reel-frame::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  z-index: 1;
+  pointer-events: none;
+  border: 1px solid rgba(229,193,106,0.18);
+  border-radius: 50%;
+  box-shadow:
+    0 0 60px rgba(229,193,106,0.08),
+    inset 0 0 50px rgba(100,217,255,0.06);
+  transform: rotate(-12deg) scaleX(1.32);
 }
 
 .surface-video-stage {
@@ -1973,6 +2006,52 @@ body::after {
   background:
     linear-gradient(180deg, rgba(100,217,255,0.08), rgba(229,193,106,0.04)),
     rgba(2,3,7,0.66);
+}
+
+.surface-reel {
+  object-fit: cover;
+  object-position: 58% 50%;
+  filter: saturate(1.08) contrast(1.08);
+}
+
+.vault-core-signal {
+  position: absolute;
+  z-index: 4;
+  min-width: 180px;
+  border: 1px solid rgba(100,217,255,0.24);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(3,5,10,0.76);
+  box-shadow: 0 18px 70px rgba(0,0,0,0.42), 0 0 28px rgba(100,217,255,0.1);
+  backdrop-filter: blur(14px);
+}
+
+.vault-core-signal span,
+.vault-core-signal strong {
+  display: block;
+}
+
+.vault-core-signal span {
+  color: var(--gold);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.vault-core-signal strong {
+  margin-top: 5px;
+  color: #eef9ff;
+  font-size: 0.84rem;
+}
+
+.signal-a {
+  top: 34px;
+  right: 28px;
+}
+
+.signal-b {
+  left: 24px;
+  bottom: 96px;
 }
 
 .upload-layout {
@@ -2104,10 +2183,15 @@ body::after {
 
   .surface-reel-frame {
     min-height: 260px;
+    transform: none;
   }
 
   .site-hero::after,
   .admin-hero::after {
     inset: 8px;
+  }
+
+  .vault-core-signal {
+    display: none;
   }
 }
