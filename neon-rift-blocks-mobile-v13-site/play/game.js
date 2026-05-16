@@ -31,6 +31,10 @@
     blast: $('rotateBtn'),
     guard: $('holdBtn'),
     superBtn: $('riftMobileBtn'),
+    thumbStrike: $('thumbStrikeBtn'),
+    thumbBlast: $('thumbBlastBtn'),
+    thumbGuard: $('thumbGuardBtn'),
+    thumbSuper: $('thumbSuperBtn'),
     pause: $('pauseBtn'),
     mute: $('muteBtn'),
     toast: $('toast'),
@@ -464,6 +468,7 @@
     ui.riftValue.textContent = `${Math.floor(state.rift)}%`;
     ui.riftLabel.textContent = state.rift >= 100 ? 'Super ready' : state.rift >= 35 ? 'Rift shot ready' : 'Rift charging';
     ui.superBtn.classList.toggle('ready', state.rift >= 35);
+    ui.thumbSuper?.classList.toggle('ready', state.rift >= 35);
     ui.mute.textContent = state.muted ? 'MUTE' : 'SFX';
   }
 
@@ -668,6 +673,10 @@
     ui.blast.addEventListener('click', blast);
     ui.guard.addEventListener('click', guard);
     ui.superBtn.addEventListener('click', superMove);
+    ui.thumbStrike?.addEventListener('click', strike);
+    ui.thumbBlast?.addEventListener('click', blast);
+    ui.thumbGuard?.addEventListener('click', guard);
+    ui.thumbSuper?.addEventListener('click', superMove);
     ui.pause.addEventListener('click', () => {
       if (!state.running) return;
       state.paused = !state.paused;

@@ -1,9 +1,5 @@
-const CACHE_NAME = 'neon-rift-blocks-v13.0.0';
+const CACHE_NAME = 'neon-rift-duel-v16.0.1';
 const ASSETS = [
-  './',
-  './index.html',
-  './styles.css',
-  './game.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/icon-192.svg',
@@ -23,13 +19,29 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).then(() => caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)))
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  const isAppShell = event.request.mode === 'navigate'
+    || url.pathname.endsWith('/play/')
+    || url.pathname.endsWith('/play/index.html')
+    || url.pathname.endsWith('/play/game.js')
+    || url.pathname.endsWith('/play/styles.css');
+
+  if (isAppShell) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then((response) => response)
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
