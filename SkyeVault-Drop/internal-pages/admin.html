@@ -219,8 +219,37 @@
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Recent intake</p>
-            <h2>Upload ledger</h2>
+            <h2>Vault file browser</h2>
           </div>
+          <span id="vaultFileCount" class="queue-summary">Locked</span>
+        </div>
+        <div class="vault-summary-grid" aria-label="Vault file summary">
+          <article><strong id="vaultTotalSize">0 B</strong><span>stored in loaded receipts</span></article>
+          <article><strong id="vaultLatestFile">No files loaded</strong><span>latest vault object</span></article>
+          <article><strong id="vaultClientCount">0</strong><span>clients in this view</span></article>
+        </div>
+        <div class="vault-browser-tools" aria-label="Vault browser filters">
+          <label>
+            <span>Search vault files</span>
+            <input id="vaultSearch" type="search" placeholder="File, client, project, email, receipt, destination" />
+          </label>
+          <label>
+            <span>Client filter</span>
+            <select id="vaultClientFilter">
+              <option value="">All clients</option>
+            </select>
+          </label>
+          <label>
+            <span>Scan status</span>
+            <select id="vaultStatusFilter">
+              <option value="">All statuses</option>
+              <option value="clean">Clean</option>
+              <option value="skipped">Skipped</option>
+              <option value="warning">Warning</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </label>
+          <button id="vaultClearFilters" class="secondary-btn compact" type="button">Clear filters</button>
         </div>
         <div id="ledgerList" class="ledger-list"></div>
       </section>
@@ -281,6 +310,9 @@
       </article>
     </template>
 
+    <script src="/assets/vendor/gsap.min.js" defer></script>
+    <script src="/assets/vendor/lenis.min.js" defer></script>
+    <script src="/assets/vault-motion.js" defer></script>
     <script src="/assets/admin.js" type="module"></script>
   </body>
 </html>

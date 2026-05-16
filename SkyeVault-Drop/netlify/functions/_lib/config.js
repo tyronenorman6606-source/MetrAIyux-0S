@@ -218,10 +218,25 @@ export async function loadAuditEvents(limit = 80) {
 export async function loadLedger(limit = 120) {
   const folderId = getConfigFolderId();
   const safeLimit = Math.min(2500, Math.max(1, Number(limit || 120)));
-  const receiptFiles = await listJsonFilesByPrefix(folderId, RECEIPT_PREFIX, Math.min(250, safeLimit)).catch(() => []);
+  const summaryFile = await findFileInFolder(folderId, LEDGER_FILE);
+  if (summaryFile) {
+    const ledger = await downloadJsonFile(summaryFile.id, { entries: [] });
+    const entries = (Array.isArray(ledger.entries) ? ledger.entries : [])
+      .sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')))
+      .slice(0, safeLimit);
+    return {
+      entries,
+      source: 'cloudflare-r2-summary',
+      fileId: summaryFile.id,
+      receiptCount: ledger.entries?.length || entries.length
+    };
+  }
+
+  const fallbackReceiptLimit = Math.min(35, safeLimit);
+  const receiptFiles = await listJsonFilesByPrefix(folderId, RECEIPT_PREFIX, fallbackReceiptLimit).catch(() => []);
   const receiptEntries = [];
 
-  for (const file of receiptFiles.slice(0, safeLimit)) {
+  for (const file of receiptFiles.slice(0, fallbackReceiptLimit)) {
     try {
       const receipt = await downloadJsonFile(file.id, null);
       const entry = receipt?.entry || receipt;
@@ -231,23 +246,16 @@ export async function loadLedger(limit = 120) {
     }
   }
 
-  const summaryFile = await findFileInFolder(folderId, LEDGER_FILE);
-  let summaryEntries = [];
-  if (summaryFile) {
-    const ledger = await downloadJsonFile(summaryFile.id, { entries: [] });
-    summaryEntries = Array.isArray(ledger.entries) ? ledger.entries : [];
-  }
-
   const merged = new Map();
-  for (const entry of [...summaryEntries, ...receiptEntries]) {
+  for (const entry of receiptEntries) {
     if (entry?.id) merged.set(entry.id, entry);
   }
   const entries = [...merged.values()].sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')));
 
   return {
     entries,
-    source: receiptEntries.length ? 'receipts+summary' : (summaryFile ? 'cloudflare-r2-summary' : 'new'),
-    fileId: summaryFile?.id || null,
+    source: receiptEntries.length ? 'receipt-scan' : 'new',
+    fileId: null,
     receiptCount: receiptEntries.length
   };
 }

@@ -17,9 +17,13 @@ export async function handler(event) {
     const type = String(event.queryStringParameters?.type || 'ledger').toLowerCase();
     const format = String(event.queryStringParameters?.format || 'json').toLowerCase();
     const { config, source } = await loadConfig();
-    const ledger = await loadLedger();
-    const sessions = await loadSessionManifests(250);
-    const events = await loadAuditEvents(250);
+    const wantsLedger = type === 'all' || type === 'ledger';
+    const wantsSessions = type === 'all' || type === 'sessions';
+    const wantsEvents = type === 'all' || type === 'events';
+    const ledger = wantsLedger ? await loadLedger(2500) : { entries: [] };
+    const sideLimit = type === 'all' ? 18 : 40;
+    const sessions = wantsSessions ? await loadSessionManifests(sideLimit) : [];
+    const events = wantsEvents ? await loadAuditEvents(sideLimit) : [];
     const payload = {
       app: 'client-drop-vault',
       exportVersion: 1,

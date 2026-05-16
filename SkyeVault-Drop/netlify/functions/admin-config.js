@@ -2,10 +2,10 @@ import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.
 import { requireAdmin } from './_lib/security.js';
 import { loadConfig, saveConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 
-function dashboardLimit() {
-  const value = Number(process.env.DASHBOARD_LIST_LIMIT || 120);
-  if (!Number.isFinite(value) || value <= 0) return 120;
-  return Math.min(250, Math.max(1, Math.floor(value)));
+function dashboardLimit(defaultValue = 40, maxValue = 80) {
+  const value = Number(process.env.DASHBOARD_LIST_LIMIT || defaultValue);
+  if (!Number.isFinite(value) || value <= 0) return defaultValue;
+  return Math.min(maxValue, Math.max(1, Math.floor(value)));
 }
 
 export async function handler(event) {
@@ -21,10 +21,12 @@ export async function handler(event) {
       const includeSessions = event.queryStringParameters?.sessions === 'true';
       const includeEvents = event.queryStringParameters?.events === 'true';
       const { config, source, configFileId, warning } = await loadConfig();
-      const limit = dashboardLimit();
-      const ledger = includeLedger ? await loadLedger(limit) : null;
-      const sessions = includeSessions ? await loadSessionManifests(limit) : null;
-      const events = includeEvents ? await loadAuditEvents(limit) : null;
+      const combinedRequest = [includeLedger, includeSessions, includeEvents].filter(Boolean).length > 1;
+      const ledgerLimit = dashboardLimit(120, 250);
+      const activityLimit = combinedRequest ? dashboardLimit(18, 18) : dashboardLimit(40, 80);
+      const ledger = includeLedger ? await loadLedger(ledgerLimit) : null;
+      const sessions = includeSessions ? await loadSessionManifests(activityLimit) : null;
+      const events = includeEvents ? await loadAuditEvents(activityLimit) : null;
       return json(200, { ok: true, source, configFileId, warning, config, ledger, sessions, events }, noStoreCors(event));
     }
 

@@ -2,7 +2,12 @@ const state = {
   config: null,
   ledger: [],
   sessions: [],
-  events: []
+  events: [],
+  vaultFilters: {
+    query: '',
+    client: '',
+    status: ''
+  }
 };
 
 const adminToken = document.querySelector('#adminToken');
@@ -37,6 +42,14 @@ const healthPanel = document.querySelector('#healthPanel');
 const healthList = document.querySelector('#healthList');
 const maintenancePanel = document.querySelector('#maintenancePanel');
 const maintenanceList = document.querySelector('#maintenanceList');
+const vaultFileCount = document.querySelector('#vaultFileCount');
+const vaultTotalSize = document.querySelector('#vaultTotalSize');
+const vaultLatestFile = document.querySelector('#vaultLatestFile');
+const vaultClientCount = document.querySelector('#vaultClientCount');
+const vaultSearch = document.querySelector('#vaultSearch');
+const vaultClientFilter = document.querySelector('#vaultClientFilter');
+const vaultStatusFilter = document.querySelector('#vaultStatusFilter');
+const vaultClearFilters = document.querySelector('#vaultClearFilters');
 
 const fields = {
   brandName: document.querySelector('#configBrandName'),
@@ -73,6 +86,76 @@ function formatBytes(bytes) {
     unit += 1;
   }
   return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function entrySearchText(entry = {}) {
+  const file = entry.driveFile || {};
+  return [
+    entry.id,
+    entry.fileName,
+    file.name,
+    entry.clientName,
+    entry.clientEmail,
+    entry.projectName,
+    entry.assetType,
+    entry.destinationName,
+    entry.destinationId,
+    entry.submissionId,
+    entry.clientReference,
+    entry.scan?.status
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function filteredLedger(entries = state.ledger) {
+  const query = normalizeText(state.vaultFilters.query);
+  const client = normalizeText(state.vaultFilters.client);
+  const status = normalizeText(state.vaultFilters.status);
+  return entries.filter((entry) => {
+    if (query && !entrySearchText(entry).includes(query)) return false;
+    if (client && normalizeText(entry.clientName || entry.clientEmail) !== client) return false;
+    if (status && normalizeText(entry.scan?.status || 'unknown') !== status) return false;
+    return true;
+  });
+}
+
+function renderVaultSummary(entries = state.ledger) {
+  const visibleEntries = filteredLedger(entries);
+  const clients = new Set(entries.map((entry) => normalizeText(entry.clientName || entry.clientEmail)).filter(Boolean));
+  const visibleClients = new Set(visibleEntries.map((entry) => normalizeText(entry.clientName || entry.clientEmail)).filter(Boolean));
+  const totalBytes = visibleEntries.reduce((sum, entry) => sum + Number(entry.fileSize || entry.driveFile?.size || 0), 0);
+  const latest = visibleEntries
+    .slice()
+    .sort((a, b) => Date.parse(b.completedAt || 0) - Date.parse(a.completedAt || 0))[0];
+
+  if (vaultFileCount) vaultFileCount.textContent = `${visibleEntries.length} of ${entries.length} file${entries.length === 1 ? '' : 's'}`;
+  if (vaultTotalSize) vaultTotalSize.textContent = formatBytes(totalBytes);
+  if (vaultLatestFile) vaultLatestFile.textContent = latest?.fileName || latest?.driveFile?.name || 'No files loaded';
+  if (vaultClientCount) vaultClientCount.textContent = String(visibleClients.size || clients.size || 0);
+
+  if (vaultClientFilter) {
+    const previous = vaultClientFilter.value;
+    const labels = Array.from(new Map(entries.map((entry) => {
+      const label = entry.clientName || entry.clientEmail || '';
+      return [normalizeText(label), label];
+    }).filter(([key]) => key)).values()).sort((a, b) => a.localeCompare(b));
+    vaultClientFilter.textContent = '';
+    const all = document.createElement('option');
+    all.value = '';
+    all.textContent = 'All clients';
+    vaultClientFilter.append(all);
+    for (const label of labels) {
+      const option = document.createElement('option');
+      option.value = normalizeText(label);
+      option.textContent = label;
+      vaultClientFilter.append(option);
+    }
+    vaultClientFilter.value = labels.some((label) => normalizeText(label) === previous) ? previous : '';
+    state.vaultFilters.client = vaultClientFilter.value;
+  }
 }
 
 async function api(path, options = {}) {
@@ -302,11 +385,17 @@ function renderEvents(events = []) {
 
 function renderLedger(entries = []) {
   ledgerList.textContent = '';
+  const visibleEntries = filteredLedger(entries);
+  renderVaultSummary(entries);
   if (!entries.length) {
     ledgerList.append(appendText('p', 'No uploads recorded yet.', 'muted'));
     return;
   }
-  for (const entry of entries.slice(0, 80)) {
+  if (!visibleEntries.length) {
+    ledgerList.append(appendText('p', 'No vault files match those filters.', 'muted'));
+    return;
+  }
+  for (const entry of visibleEntries.slice(0, 200)) {
     const row = document.createElement('article');
     row.className = 'ledger-row';
     const file = entry.driveFile || {};
@@ -363,6 +452,13 @@ function renderLedger(entries = []) {
     row.append(title, clientLine, detailLine, metaLine, actions);
     ledgerList.append(row);
   }
+  if (visibleEntries.length > 200) {
+    ledgerList.append(appendText('p', 'Showing first 200 matching files. Narrow the search to see a specific object.', 'muted'));
+  }
+}
+
+function refreshVaultBrowser() {
+  renderLedger(state.ledger);
 }
 
 
@@ -549,6 +645,37 @@ if (notificationButton) {
   });
 }
 
+if (vaultSearch) {
+  vaultSearch.addEventListener('input', () => {
+    state.vaultFilters.query = vaultSearch.value;
+    refreshVaultBrowser();
+  });
+}
+
+if (vaultClientFilter) {
+  vaultClientFilter.addEventListener('change', () => {
+    state.vaultFilters.client = vaultClientFilter.value;
+    refreshVaultBrowser();
+  });
+}
+
+if (vaultStatusFilter) {
+  vaultStatusFilter.addEventListener('change', () => {
+    state.vaultFilters.status = vaultStatusFilter.value;
+    refreshVaultBrowser();
+  });
+}
+
+if (vaultClearFilters) {
+  vaultClearFilters.addEventListener('click', () => {
+    state.vaultFilters = { query: '', client: '', status: '' };
+    if (vaultSearch) vaultSearch.value = '';
+    if (vaultClientFilter) vaultClientFilter.value = '';
+    if (vaultStatusFilter) vaultStatusFilter.value = '';
+    refreshVaultBrowser();
+  });
+}
+
 if (logoutButton) {
   logoutButton.addEventListener('click', async () => {
     await fetch('/api/operator-logout', { method: 'POST' }).catch(() => null);
@@ -559,3 +686,7 @@ if (logoutButton) {
 
 const savedToken = localStorage.getItem('cdv-admin-token');
 if (savedToken) adminToken.value = savedToken;
+
+loadDashboard().catch((error) => {
+  showStatus(error.message || 'Could not load the admin dashboard.', 'error');
+});

@@ -290,6 +290,60 @@ textarea:focus {
 .danger-btn:hover { transform: translateY(-1px); }
 button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
 
+html {
+  scrollbar-color: rgba(229, 193, 106, 0.9) rgba(11, 17, 31, 0.76);
+  scrollbar-width: auto;
+}
+
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(11, 17, 31, 0.86);
+  border: 1px solid rgba(229, 193, 106, 0.18);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid rgba(11, 17, 31, 0.86);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold), var(--green), var(--blue));
+  box-shadow: 0 0 18px rgba(100, 217, 255, 0.48);
+}
+
+.scroll-progress {
+  --scroll-progress: 0;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: calc(var(--scroll-progress) * 100%);
+  height: 4px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--gold), var(--green), var(--blue));
+  box-shadow: 0 0 18px rgba(100, 217, 255, 0.62);
+}
+
+.cursor-trail {
+  position: fixed;
+  z-index: 99;
+  top: -22px;
+  left: -22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(100, 217, 255, 0.32), rgba(88, 230, 161, 0.1) 48%, transparent 70%);
+  mix-blend-mode: screen;
+  transition: opacity 160ms ease;
+}
+
+.cursor-trail.is-visible {
+  opacity: 1;
+}
+
 .file-list,
 .destination-list,
 .ledger-list {
@@ -390,12 +444,58 @@ button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
 
 .ledger-row a { color: var(--gold-2); font-weight: 800; }
 
+.vault-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.vault-summary-grid article {
+  min-width: 0;
+  border: 1px solid rgba(229, 193, 106, 0.2);
+  border-radius: 8px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(229,193,106,0.12), rgba(100,217,255,0.08));
+}
+
+.vault-summary-grid strong {
+  display: block;
+  overflow: hidden;
+  color: #fff4c8;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 18px rgba(229, 193, 106, 0.28);
+}
+
+.vault-summary-grid span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.vault-browser-tools {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(180px, 240px) minmax(160px, 220px) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 16px;
+}
+
+.ledger-actions {
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
   .hero-card { min-height: 420px; }
   .grid.two, .token-grid, .file-row { grid-template-columns: 1fr; }
   .panel-heading { align-items: flex-start; flex-direction: column; }
   .button-row { justify-content: flex-start; }
+  .vault-summary-grid,
+  .vault-browser-tools { grid-template-columns: 1fr; }
 }
 
 .setup-shell {
