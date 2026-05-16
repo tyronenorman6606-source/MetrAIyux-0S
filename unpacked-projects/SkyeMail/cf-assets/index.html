@@ -359,6 +359,15 @@ small{ color: var(--muted); }
       Example: <span class="mono">https://your-site.netlify.app/u/yourbrand</span><br/>
       Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your Vault Passphrase.
     </div>
+
+    <div class="hr"></div>
+
+    <div class="grid2">
+      <div class="kpi"><b>What is the vault key?</b><div>Your workspace creates a public/private key pair. The public key receives encrypted mail. The private key is what opens it.</div></div>
+      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your Vault Passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
+      <div class="kpi"><b>What Resend does</b><div>Resend delivers inbound and outbound email events. SkyeMail then encrypts inbound content into the vault before saving the inbox record.</div></div>
+      <div class="kpi"><b>What recovery means</b><div>If recovery is off and you lose the passphrase, encrypted content may be unrecoverable. If recovery is on, a separate admin-recovery copy is stored encrypted.</div></div>
+    </div>
   </div>
 
   <div class="righthero">

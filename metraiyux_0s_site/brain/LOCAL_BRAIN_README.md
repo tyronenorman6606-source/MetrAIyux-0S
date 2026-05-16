@@ -1,6 +1,6 @@
 # Local Cabinet Brain
 
-This package now includes a lightweight local brain for the MetrAIyux 0S Executive Office.
+This package now includes a local command brain for the MetrAIyux 0S Executive Office.
 
 ## What it does
 

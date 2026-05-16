@@ -207,7 +207,7 @@ async function run() {
 
     await gotoStep(page, baseUrl, 'saas/service-selector.html', 'Service selection chooses what the workspace includes', 'This is the app-owner dashboard path: pick modules, save the offer shape, and provision the workspace.');
     await choose(page, 'select[name="plan"]', 'autonomous-office');
-    for (const label of ['15-Brain command routing', 'Admin automation brain', 'Client success workflows', 'Social content drafts', 'Proof vault', 'Customer dashboard']) {
+    for (const label of ['16-Brain command routing', 'Admin automation brain', 'Client success workflows', 'Social content drafts', 'Proof vault', 'Customer dashboard']) {
       await checkByValue(page, label);
     }
     await fill(page, 'textarea[name="notes"]', 'Start with customer command routing, admin approvals, proof receipts, and weekly content workflows.');

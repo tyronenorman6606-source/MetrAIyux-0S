@@ -16,7 +16,7 @@ Its job is to test opportunities through pilots, budgets, timelines, owner assig
 
 ## AI should be useful before it is impressive
 
-A lightweight local brain can be more useful than a massive AI system if it answers the company’s actual questions. Operators need to know cabinet roles, sales language, setup steps, governance rules, resumes, blog positions, and documentation paths.
+A local command brain can be more useful than a massive AI system if it answers the company’s actual questions. Operators need to know cabinet roles, sales language, setup steps, governance rules, resumes, blog positions, and documentation paths.
 
 The first AI layer should make the company easier to operate. Heavy models, GPU hosting, autonomous agents, and provider integrations can be added later when the workflows are ready.
 

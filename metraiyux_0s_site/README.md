@@ -77,7 +77,7 @@ Added public pricing/signup/onboarding/customer portal pages and a Cloudflare Sa
 
 ## 0meg4kAI Tenant Isolation Upgrade
 
-This package includes a 16th lightweight brain named 0meg4kAI. It is the security/QA assistant for the Main Automation Brain and protects the owner/admin layer from customer SaaS workspaces. Customer commands must be reviewed before they can create admin-facing tasks or touch production connectors. Live enforcement requires Cloudflare Worker deployment, D1/KV/Queue bindings, upstream auth, and secrets stored server-side only.
+This package includes a Security/QA operating brain named 0meg4kAI. It is the security/QA assistant for the Main Automation Brain and protects the owner/admin layer from customer SaaS workspaces. Customer commands must be reviewed before they can create admin-facing tasks or touch production connectors. Live enforcement requires Cloudflare Worker deployment, D1/KV/Queue bindings, upstream auth, and secrets stored server-side only.
 
 
 ## SkyeCrawler Operator QA

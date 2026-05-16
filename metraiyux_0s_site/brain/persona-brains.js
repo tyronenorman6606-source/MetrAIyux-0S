@@ -137,7 +137,7 @@ function renderBrainCards(){
 }
 function renderBrainProfile(){
   const b=activeBrain();
-  document.getElementById('activeBrainProfile').innerHTML=`<div class="active-brain-profile"><img src="${brainPortrait(b)}" alt="${b.name}"><div><p class="eyebrow">Active Lightweight Brain</p><h2>${b.name}</h2><p>${brainTitle(b)}</p><p><strong>Cabinet:</strong> ${b.cabinet}</p><p><strong>Purpose:</strong> ${brainPurpose(b)}</p><p><strong>Can answer:</strong> ${brainCanAnswer(b).join(' · ')}</p>${brainProfileActions(b)}</div></div>`;
+  document.getElementById('activeBrainProfile').innerHTML=`<div class="active-brain-profile"><img src="${brainPortrait(b)}" alt="${b.name}"><div><p class="eyebrow">Active Operating Brain</p><h2>${b.name}</h2><p>${brainTitle(b)}</p><p><strong>Cabinet:</strong> ${b.cabinet}</p><p><strong>Purpose:</strong> ${brainPurpose(b)}</p><p><strong>Can answer:</strong> ${brainCanAnswer(b).join(' · ')}</p>${brainProfileActions(b)}</div></div>`;
 }
 async function loadPersonaBrain(){
   const status=document.getElementById('personaStatus');

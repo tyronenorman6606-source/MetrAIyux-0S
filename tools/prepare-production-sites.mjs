@@ -99,8 +99,8 @@ function updatePublicSiteBridge() {
 
   updateFile(path.join(PUBLIC_ROOT, 'script.js'), (content) =>
     content.replace(
-      "const data={platform:'MetrAIyux 0S',summary:'Protected autonomous business operating system with owner admin command, customer SaaS layer, 16 lightweight brains, 0meg4kAI QA/security, Resend approvals, Cloudflare Worker/D1/KV/Queues architecture.',generatedAt:new Date().toISOString()};",
-      `const data={platform:'MetrAIyux 0S',publicOverviewUrl:'${PUBLIC_URL}/',fullWebsiteUrl:'${FULL_URL}/',summary:'Protected autonomous business operating system with owner admin command, customer SaaS layer, 16 lightweight brains, 0meg4kAI QA/security, Resend approvals, Cloudflare Worker/D1/KV/Queues architecture.',generatedAt:new Date().toISOString()};`,
+      "const data={platform:'MetrAIyux 0S',summary:'Protected autonomous business operating system with owner admin command, customer SaaS layer, 16 operating brains, 0meg4kAI QA/security, Resend approvals, Cloudflare Worker/D1/KV/Queues architecture.',generatedAt:new Date().toISOString()};",
+      `const data={platform:'MetrAIyux 0S',publicOverviewUrl:'${PUBLIC_URL}/',fullWebsiteUrl:'${FULL_URL}/',summary:'Protected autonomous business operating system with owner admin command, customer SaaS layer, 16 operating brains, 0meg4kAI QA/security, Resend approvals, Cloudflare Worker/D1/KV/Queues architecture.',generatedAt:new Date().toISOString()};`,
     ),
   );
 

@@ -12,7 +12,7 @@ Added:
 - Optional Cloudflare KV, Queue, and D1 binding plan.
 - `quantum-tools.js` for browser-local task/event/proof receipt generation.
 - Updated homepage navigation and homepage upgrade section.
-- Updated persona brain registry to 15 total brains.
+- Updated persona brain registry to 16 total brains.
 - Updated local brain knowledge base.
 - New downloadable markdown templates.
 
