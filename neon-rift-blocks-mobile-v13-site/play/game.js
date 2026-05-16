@@ -16,6 +16,7 @@
     overlay: $('overlay'),
     overlayTitle: $('overlayTitle'),
     overlayCopy: $('overlayCopy'),
+    upgradeMount: $('upgradeMount'),
     score: $('score'),
     wave: $('level'),
     combo: $('combo'),
@@ -46,6 +47,44 @@
     { name: 'Sable Monk', ship: 'Moon Fang', hp: 1700, color: '#ffd663', rate: 0.78 },
     { name: 'Scar Admiral', ship: 'Grave Engine', hp: 2100, color: '#ff4c72', rate: 1.18 },
   ];
+
+  const WEAPONS = {
+    laser: { name: 'Pulse Laser', color: '#35f5ff', desc: 'Fast reliable shots.' },
+    spread: { name: 'Prism Spread', color: '#ff4def', desc: 'Wide fan for swarms.' },
+    missile: { name: 'Ghost Missile', color: '#ffd663', desc: 'Homing rounds chase targets.' },
+    beam: { name: 'Rift Beam', color: '#9dffef', desc: 'Piercing beam bursts through lanes.' },
+  };
+
+  const UPGRADE_POOL = [
+    { id: 'laser_plus', title: 'Twin Pulse', desc: '+1 laser projectile and stronger auto-fire.', apply: () => { addUpgrade('laserPlus'); } },
+    { id: 'spread', title: 'Prism Spread', desc: 'Switch auto-fire to a wide fan shot.', apply: () => { state.weapon = 'spread'; addUpgrade('spreadPower'); } },
+    { id: 'missile', title: 'Ghost Missiles', desc: 'Switch auto-fire to homing missiles.', apply: () => { state.weapon = 'missile'; addUpgrade('missilePower'); } },
+    { id: 'beam', title: 'Rift Beam', desc: 'Switch auto-fire to piercing beam pulses.', apply: () => { state.weapon = 'beam'; addUpgrade('beamPower'); } },
+    { id: 'pierce', title: 'Piercing Rounds', desc: 'Bullets survive extra hits and drill swarms.', apply: () => { addUpgrade('pierce'); } },
+    { id: 'burn', title: 'Burn Payload', desc: 'Shots splash extra damage on impact.', apply: () => { addUpgrade('burn'); } },
+    { id: 'drone', title: 'Orbit Drone', desc: 'Adds an ally drone that fires beside you.', apply: () => { addUpgrade('drone'); } },
+    { id: 'magnet', title: 'Pickup Magnet', desc: 'Pulls heal, guard, and rift pickups toward the ship.', apply: () => { addUpgrade('magnet'); } },
+    { id: 'hull', title: 'Hull Plating', desc: '+18 max hull and immediate repair.', apply: () => { state.player.maxHull += 18; state.player.hull = clamp(state.player.hull + 28, 0, state.player.maxHull); addUpgrade('hull'); } },
+    { id: 'rift', title: 'Rift Capacitor', desc: 'Start every wave with more Rift and charge faster.', apply: () => { addUpgrade('riftCap'); state.rift = clamp(state.rift + 34, 0, 100); } },
+    { id: 'guard', title: 'Parry Battery', desc: 'Guard lasts longer and parries hit harder.', apply: () => { addUpgrade('guard'); } },
+    { id: 'engine', title: 'Phase Engine', desc: 'Dash and drag movement become safer.', apply: () => { addUpgrade('engine'); } },
+  ];
+
+  function baseProfile() {
+    return { version: 16, xp: 0, best: 0, runs: 0, unlocks: {}, permanent: { hull: 0, rift: 0, drone: 0 }, lastReceipt: null };
+  }
+
+  function loadDuelProfile() {
+    try {
+      return { ...baseProfile(), ...(JSON.parse(localStorage.getItem('nrd_profile_v16') || '{}')) };
+    } catch (_) {
+      return baseProfile();
+    }
+  }
+
+  function saveDuelProfile() {
+    localStorage.setItem('nrd_profile_v16', JSON.stringify(state.profile || baseProfile()));
+  }
 
   function ensureLegacyProofReceipt() {
     const existing = localStorage.getItem('nrb_profile_v13');
@@ -94,6 +133,10 @@
     toastTimer: 0,
     player: null,
     boss: null,
+    profile: null,
+    weapon: 'laser',
+    upgrades: {},
+    enemies: [],
     bullets: [],
     enemyBullets: [],
     hazards: [],
@@ -101,6 +144,10 @@
     particles: [],
     floaters: [],
     stars: [],
+    fireTimer: 0,
+    droneTimer: 0,
+    autoFire: true,
+    draftChoices: [],
     cooldowns: {},
   };
 
@@ -117,8 +164,8 @@
       x: W / 2,
       y: H - 110,
       r: 16,
-      hull: 100,
-      maxHull: 100,
+      hull: 100 + Number(state.profile?.permanent?.hull || 0) * 8,
+      maxHull: 100 + Number(state.profile?.permanent?.hull || 0) * 8,
       guard: 100,
       vx: 0,
       invuln: 0,
@@ -144,6 +191,7 @@
   }
 
   function startRun() {
+    state.profile = loadDuelProfile();
     Object.assign(state, {
       running: true,
       paused: false,
@@ -153,20 +201,30 @@
       wave: 1,
       combo: 0,
       comboTimer: 0,
-      rift: 50,
+      rift: 50 + Number(state.profile?.permanent?.rift || 0) * 4,
       shake: 0,
       player: resetPlayer(),
       boss: null,
+      weapon: 'laser',
+      upgrades: {},
+      enemies: [],
       bullets: [],
       enemyBullets: [],
       hazards: [],
       pickups: [],
       particles: [],
       floaters: [],
+      fireTimer: 0,
+      droneTimer: 0,
+      autoFire: true,
+      draftChoices: [],
       cooldowns: { strike: 0, blast: 0, guard: 0, super: 0, dash: 0 },
     });
+    if (Number(state.profile?.permanent?.drone || 0) > 0) addUpgrade('drone');
     state.boss = makeBoss();
+    spawnSwarm(5);
     ui.overlay.classList.remove('active');
+    if (ui.upgradeMount) ui.upgradeMount.innerHTML = '';
     document.body.classList.add('is-playing');
     toast('Wave 1: duel live');
   }
@@ -174,9 +232,18 @@
   function endRun(reason) {
     state.running = false;
     document.body.classList.remove('is-playing');
+    state.profile = state.profile || loadDuelProfile();
+    state.profile.runs = Number(state.profile.runs || 0) + 1;
+    state.profile.best = Math.max(Number(state.profile.best || 0), Math.floor(state.score));
+    state.profile.xp = Number(state.profile.xp || 0) + Math.floor(state.score / 75) + state.wave * 25;
+    state.profile.lastReceipt = { score: Math.floor(state.score), wave: state.wave, weapon: WEAPONS[state.weapon]?.name || state.weapon, at: new Date().toISOString() };
+    if (state.wave >= 3) state.profile.permanent.hull = Math.min(5, Number(state.profile.permanent.hull || 0) + 1);
+    if (state.wave >= 5) state.profile.permanent.rift = Math.min(5, Number(state.profile.permanent.rift || 0) + 1);
+    if (state.wave >= 7) state.profile.permanent.drone = Math.min(1, Number(state.profile.permanent.drone || 0) + 1);
+    saveDuelProfile();
     ui.overlay.classList.add('active');
     ui.overlayTitle.textContent = 'Signal Down';
-    ui.overlayCopy.textContent = `${reason}. Score ${Math.floor(state.score).toLocaleString()} - wave ${state.wave}.`;
+    ui.overlayCopy.textContent = `${reason}. Score ${Math.floor(state.score).toLocaleString()} - wave ${state.wave}. Best ${Number(state.profile.best || 0).toLocaleString()}.`;
   }
 
   function toast(text) {
@@ -245,6 +312,96 @@
     if (state.boss.hp <= 0) nextWave();
   }
 
+  function addUpgrade(key) {
+    state.upgrades[key] = Number(state.upgrades[key] || 0) + 1;
+  }
+
+  function upgradeLevel(key) {
+    return Number(state.upgrades?.[key] || 0);
+  }
+
+  function makeUpgradeChoices() {
+    const copy = [...UPGRADE_POOL];
+    const out = [];
+    while (out.length < 3 && copy.length) out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+    return out;
+  }
+
+  function showUpgradeDraft() {
+    state.paused = true;
+    state.draftChoices = makeUpgradeChoices();
+    ui.overlay.classList.add('active');
+    ui.overlayTitle.textContent = `Wave ${state.wave} Upgrade`;
+    ui.overlayCopy.textContent = 'Pick one upgrade. Your weapon, bullets, pickups, and ship build change during the run.';
+    ui.upgradeMount.innerHTML = `
+      <div class="upgrade-grid">
+        ${state.draftChoices.map((item, idx) => `<button class="upgrade-card" data-upgrade="${idx}" type="button"><b>${item.title}</b><span>${item.desc}</span></button>`).join('')}
+      </div>
+    `;
+    document.querySelectorAll('[data-upgrade]').forEach((btn) => {
+      btn.addEventListener('click', () => chooseUpgrade(Number(btn.dataset.upgrade)));
+    });
+  }
+
+  function chooseUpgrade(index) {
+    const item = state.draftChoices[index];
+    if (!item) return;
+    item.apply();
+    if (ui.upgradeMount) ui.upgradeMount.innerHTML = '';
+    ui.overlay.classList.remove('active');
+    state.paused = false;
+    state.last = performance.now();
+    toast(`${item.title} online`);
+  }
+
+  function damageEnemy(enemy, amount, label = 'HIT', color = '#35f5ff') {
+    enemy.hp -= amount;
+    state.score += amount * (1 + Math.min(2.2, state.combo * 0.04));
+    state.combo += 1;
+    state.comboTimer = 1.25;
+    state.rift = clamp(state.rift + amount * 0.035, 0, 100);
+    burst(enemy.x, enemy.y, color, 9, 0.65);
+    if (enemy.hp <= 0) {
+      enemy.dead = true;
+      addFloater(label, enemy.x, enemy.y, color);
+      if (Math.random() < 0.35) state.pickups.push({ x: enemy.x, y: enemy.y, r: 12, vy: 95, type: pick(['rift', 'heal', 'guard', 'weapon']) });
+    }
+  }
+
+  function nearestTarget(from) {
+    const living = state.enemies.filter((enemy) => !enemy.dead);
+    let best = state.boss;
+    let bestDist = best ? dist(from, best) : Infinity;
+    living.forEach((enemy) => {
+      const d = dist(from, enemy);
+      if (d < bestDist) {
+        best = enemy;
+        bestDist = d;
+      }
+    });
+    return best;
+  }
+
+  function spawnSwarm(count = 4) {
+    const cap = 12 + Math.min(6, state.wave);
+    const room = Math.max(0, cap - state.enemies.filter((enemy) => !enemy.dead).length);
+    count = Math.min(count, room);
+    for (let i = 0; i < count; i += 1) {
+      const kind = pick(['drone', 'charger', 'sniper']);
+      state.enemies.push({
+        kind,
+        x: rand(38, W - 38),
+        y: rand(-160, -30) - i * 22,
+        vx: rand(-46, 46),
+        vy: kind === 'charger' ? rand(70, 120) : rand(34, 70),
+        hp: kind === 'sniper' ? 155 + state.wave * 14 : 105 + state.wave * 12,
+        r: kind === 'charger' ? 15 : 13,
+        attack: rand(0.7, 1.4),
+        color: kind === 'sniper' ? '#ffd663' : kind === 'charger' ? '#ff4c72' : '#35f5ff',
+      });
+    }
+  }
+
   function hitPlayer(amount, source) {
     const p = state.player;
     if (p.invuln > 0) return;
@@ -277,8 +434,10 @@
     state.enemyBullets.length = 0;
     state.hazards.length = 0;
     state.boss = makeBoss();
+    spawnSwarm(4 + Math.min(8, state.wave));
     toast(`Wave ${state.wave}: ${state.boss.ship}`);
     sound('wave');
+    showUpgradeDraft();
   }
 
   function dash(dir) {
@@ -296,9 +455,9 @@
     const b = state.boss;
     const dx = Math.abs(p.x - b.x);
     const reach = dx < 118 ? 1 : 0.45;
-    const damage = Math.floor((150 + state.wave * 24 + state.combo * 10) * reach);
+    const damage = Math.floor((150 + state.wave * 24 + state.combo * 10 + upgradeLevel('laserPlus') * 16) * reach);
     damageBoss(damage, reach === 1 ? 'RAIL STRIKE' : 'GLANCE', reach === 1 ? '#ffd663' : '#35f5ff');
-    state.bullets.push({ x: p.x, y: p.y - 20, vx: (b.x - p.x) * 0.9, vy: -520, r: 4, damage: 38, color: '#ffd663', life: 0.5 });
+    spawnPlayerShot('rail', p.x, p.y - 20, 0, -610, 52 + upgradeLevel('pierce') * 10, '#ffd663', { pierce: 1 + upgradeLevel('pierce') });
     sound('strike');
     vibrate(10);
   }
@@ -306,10 +465,7 @@
   function blast() {
     if (!state.running || state.cooldowns.blast > 0) return;
     state.cooldowns.blast = 0.22;
-    const p = state.player;
-    for (let i = -1; i <= 1; i += 1) {
-      state.bullets.push({ x: p.x, y: p.y - 18, vx: i * 95, vy: -580, r: 5, damage: 78, color: '#35f5ff', life: 1.2 });
-    }
+    fireWeapon(true);
     sound('blast');
   }
 
@@ -344,6 +500,77 @@
     vibrate(full ? [30, 40, 30] : 18);
   }
 
+  function spawnPlayerShot(kind, x, y, vx, vy, damage, color, opts = {}) {
+    state.bullets.push({
+      kind,
+      x,
+      y,
+      vx,
+      vy,
+      r: opts.r || 5,
+      damage,
+      color,
+      life: opts.life || 1.25,
+      pierce: opts.pierce || upgradeLevel('pierce'),
+      burn: upgradeLevel('burn'),
+      homing: Boolean(opts.homing),
+      beam: Boolean(opts.beam),
+    });
+  }
+
+  function fireWeapon(manual = false) {
+    if (!state.running || state.paused) return;
+    const p = state.player;
+    const level = 1 + upgradeLevel('laserPlus');
+    const power = manual ? 1.35 : 1;
+    const weapon = state.weapon;
+    if (weapon === 'spread') {
+      const count = 3 + Math.min(4, upgradeLevel('spreadPower') + Math.floor(level / 2));
+      for (let i = 0; i < count; i += 1) {
+        const spread = (i - (count - 1) / 2) * 72;
+        spawnPlayerShot('spread', p.x, p.y - 20, spread, -610, (42 + upgradeLevel('spreadPower') * 14) * power, WEAPONS.spread.color, { r: 5, life: 1.1 });
+      }
+      return;
+    }
+    if (weapon === 'missile') {
+      const count = manual ? 3 : 1 + Math.min(2, upgradeLevel('missilePower'));
+      for (let i = 0; i < count; i += 1) {
+        spawnPlayerShot('missile', p.x + (i - 1) * 14, p.y - 12, rand(-55, 55), -300, (76 + upgradeLevel('missilePower') * 22) * power, WEAPONS.missile.color, { r: 7, homing: true, life: 2.1 });
+      }
+      return;
+    }
+    if (weapon === 'beam') {
+      const x = p.x + rand(-8, 8);
+      spawnPlayerShot('beam', x, p.y - 30, 0, -900, (120 + upgradeLevel('beamPower') * 34) * power, WEAPONS.beam.color, { r: 9, pierce: 8, beam: true, life: 0.75 });
+      burst(x, p.y - 42, WEAPONS.beam.color, 8, 0.35);
+      return;
+    }
+    const count = Math.min(4, 1 + upgradeLevel('laserPlus'));
+    for (let i = 0; i < count; i += 1) {
+      const offset = (i - (count - 1) / 2) * 12;
+      spawnPlayerShot('laser', p.x + offset, p.y - 20, offset * 1.8, -660, (46 + upgradeLevel('laserPlus') * 12) * power, WEAPONS.laser.color, { r: 4, life: 1.1 });
+    }
+  }
+
+  function updateAutoFire(dt) {
+    if (!state.autoFire || !state.running || state.paused) return;
+    const rate = clamp(0.36 - upgradeLevel('laserPlus') * 0.035, 0.16, 0.36);
+    state.fireTimer -= dt;
+    if (state.fireTimer <= 0) {
+      state.fireTimer = rate;
+      fireWeapon(false);
+    }
+    if (upgradeLevel('drone')) {
+      state.droneTimer -= dt;
+      if (state.droneTimer <= 0) {
+        state.droneTimer = 0.42;
+        const p = state.player;
+        spawnPlayerShot('drone', p.x - 34, p.y - 12, -35, -620, 34 + state.wave * 4, '#7cffb1', { r: 4 });
+        spawnPlayerShot('drone', p.x + 34, p.y - 12, 35, -620, 34 + state.wave * 4, '#7cffb1', { r: 4 });
+      }
+    }
+  }
+
   function spawnEnemyFire(dt) {
     const b = state.boss;
     if (!b || b.stunned > 0) return;
@@ -351,6 +578,7 @@
     if (b.attack > 0) return;
     b.attack = rand(0.42, 0.9);
     const pattern = state.wave % 3;
+    if (state.enemies.length < Math.min(10, 3 + state.wave) && Math.random() < 0.28) spawnSwarm(2);
     if (pattern === 0) {
       for (let i = -2; i <= 2; i += 1) {
         state.enemyBullets.push({ x: b.x, y: b.y + 34, vx: i * 52, vy: 230 + state.wave * 15, r: 6, damage: 9 + state.wave, color: b.color });
@@ -387,6 +615,7 @@
     if (Math.random() < dt * 0.45) b.vx += rand(-26, 26);
     b.vx = clamp(b.vx, -82, 82);
 
+    updateAutoFire(dt);
     spawnEnemyFire(dt);
     stepObjects(dt);
     updateParticles(dt);
@@ -396,12 +625,50 @@
   function stepObjects(dt) {
     const p = state.player;
     const b = state.boss;
+    state.enemies.forEach((enemy) => {
+      enemy.x += enemy.vx * dt;
+      enemy.y += enemy.vy * dt;
+      if (enemy.x < 24 || enemy.x > W - 24) enemy.vx *= -1;
+      enemy.attack -= dt;
+      if (enemy.attack <= 0 && enemy.y > 20) {
+        enemy.attack = enemy.kind === 'sniper' ? 1.25 : 1.8;
+        const target = state.player;
+        state.enemyBullets.push({ x: enemy.x, y: enemy.y + 12, vx: (target.x - enemy.x) * (enemy.kind === 'sniper' ? 0.8 : 0.35), vy: enemy.kind === 'sniper' ? 330 : 245, r: enemy.kind === 'sniper' ? 5 : 4, damage: enemy.kind === 'charger' ? 12 : 8, color: enemy.color });
+      }
+      if (enemy.kind === 'charger' && dist(enemy, p) < enemy.r + p.r) {
+        enemy.dead = true;
+        hitPlayer(14 + state.wave, 'Ram impact');
+      }
+    });
     state.bullets.forEach((o) => {
+      if (o.homing) {
+        const target = nearestTarget(o);
+        if (target) {
+          const angle = Math.atan2(target.y - o.y, target.x - o.x);
+          o.vx += Math.cos(angle) * 620 * dt;
+          o.vy += Math.sin(angle) * 620 * dt;
+          const speed = Math.hypot(o.vx, o.vy) || 1;
+          const max = 520;
+          o.vx = o.vx / speed * Math.min(max, speed);
+          o.vy = o.vy / speed * Math.min(max, speed);
+        }
+      }
       o.x += o.vx * dt;
       o.y += o.vy * dt;
       o.life -= dt;
+      state.enemies.forEach((enemy) => {
+        if (enemy.dead || o.life <= 0) return;
+        if (dist(o, enemy) < o.r + enemy.r) {
+          damageEnemy(enemy, o.damage, String(o.kind || 'RIFT').toUpperCase(), o.color);
+          if (o.burn) burst(enemy.x, enemy.y, '#ff8d4d', 6 + o.burn * 2, 0.4);
+          if (o.pierce > 0) o.pierce -= 1;
+          else o.life = -1;
+        }
+      });
       if (dist(o, b) < o.r + 32) {
-        o.life = -1;
+        if (o.burn) damageBoss(o.burn * 18, 'BURN', '#ff8d4d');
+        if (o.pierce > 0) o.pierce -= 1;
+        else o.life = -1;
         damageBoss(o.damage, 'BLAST', o.color);
       }
     });
@@ -422,16 +689,28 @@
       }
     });
     state.pickups.forEach((o) => {
+      if (upgradeLevel('magnet')) {
+        const d = Math.max(1, dist(o, p));
+        if (d < 170 + upgradeLevel('magnet') * 45) {
+          o.x += ((p.x - o.x) / d) * 190 * dt;
+          o.y += ((p.y - o.y) / d) * 190 * dt;
+        }
+      }
       o.y += o.vy * dt;
       if (dist(o, p) < o.r + p.r) {
         o.dead = true;
         if (o.type === 'heal') p.hull = clamp(p.hull + 12, 0, p.maxHull);
         if (o.type === 'guard') p.guard = 100;
         if (o.type === 'rift') state.rift = clamp(state.rift + 24, 0, 100);
+        if (o.type === 'weapon') {
+          state.weapon = pick(Object.keys(WEAPONS));
+          addFloater(WEAPONS[state.weapon].name.toUpperCase(), p.x, p.y - 22, WEAPONS[state.weapon].color);
+        }
         addFloater(o.type.toUpperCase(), p.x, p.y - 22, '#7cffb1');
       }
     });
     state.bullets = state.bullets.filter((o) => o.life > 0 && o.y > -40 && o.x > -60 && o.x < W + 60);
+    state.enemies = state.enemies.filter((enemy) => !enemy.dead && enemy.y < H + 60);
     state.enemyBullets = state.enemyBullets.filter((o) => !o.dead && o.y < H + 50 && o.x > -80 && o.x < W + 80);
     state.hazards = state.hazards.filter((o) => !o.dead && o.y < H + 60);
     state.pickups = state.pickups.filter((o) => !o.dead && o.y < H + 40);
@@ -463,7 +742,7 @@
     ui.combo.textContent = state.combo;
     ui.hull.textContent = Math.ceil(state.player?.hull || 0);
     ui.mode.textContent = state.boss ? `${state.boss.name}: ${state.boss.ship}` : 'Neon Rift Duel';
-    ui.status.textContent = state.boss ? `Boss ${Math.ceil(state.boss.hp)}/${state.boss.maxHp} - Hull ${Math.ceil(state.player.hull)} - Guard ${Math.ceil(state.player.guard)}` : 'Start run';
+    ui.status.textContent = state.boss ? `${WEAPONS[state.weapon]?.name || 'Pulse'} - Boss ${Math.ceil(state.boss.hp)}/${state.boss.maxHp} - Swarm ${state.enemies.length} - Hull ${Math.ceil(state.player.hull)}` : 'Start run';
     ui.riftFill.style.width = `${state.rift}%`;
     ui.riftValue.textContent = `${Math.floor(state.rift)}%`;
     ui.riftLabel.textContent = state.rift >= 100 ? 'Super ready' : state.rift >= 35 ? 'Rift shot ready' : 'Rift charging';
@@ -571,6 +850,32 @@
   }
 
   function drawObjects() {
+    state.enemies.forEach((enemy) => {
+      ctx.save();
+      ctx.translate(enemy.x, enemy.y);
+      ctx.shadowColor = enemy.color;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = enemy.color;
+      if (enemy.kind === 'sniper') {
+        ctx.beginPath();
+        ctx.moveTo(0, -enemy.r);
+        ctx.lineTo(enemy.r, enemy.r);
+        ctx.lineTo(-enemy.r, enemy.r);
+        ctx.closePath();
+        ctx.fill();
+      } else if (enemy.kind === 'charger') {
+        ctx.rotate(state.t * 4);
+        ctx.fillRect(-enemy.r, -enemy.r, enemy.r * 2, enemy.r * 2);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, enemy.r, 0, TAU);
+        ctx.fill();
+      }
+      ctx.strokeStyle = '#f8fbff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+    });
     state.bullets.forEach((o) => circle(o.x, o.y, o.r, o.color));
     state.enemyBullets.forEach((o) => circle(o.x, o.y, o.r, o.color));
     state.pickups.forEach((o) => {
@@ -613,7 +918,11 @@
     ctx.textAlign = 'left';
     ctx.fillText(`COMBO ${state.combo}`, 18, H - 50);
     ctx.textAlign = 'right';
-    ctx.fillText(`RIFT ${Math.floor(state.rift)}%`, W - 18, H - 50);
+    ctx.fillText(`${WEAPONS[state.weapon]?.name || 'Pulse'} · RIFT ${Math.floor(state.rift)}%`, W - 18, H - 50);
+    if (upgradeLevel('drone')) {
+      circle(state.player.x - 34, state.player.y + Math.sin(state.t * 6) * 8, 5, '#7cffb1');
+      circle(state.player.x + 34, state.player.y + Math.cos(state.t * 6) * 8, 5, '#7cffb1');
+    }
   }
 
   function drawAttract() {
