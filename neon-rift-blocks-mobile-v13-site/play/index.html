@@ -8,178 +8,73 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Neon Rift" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="description" content="Neon Rift Blocks: Gravity Protocol is a phone-first installable block-combat space duel with rail slams, guard parries, rift shots, full-screen supers, enemy ships, anomaly drafts, Zen Flow, Campaign Map, Rift Sanctuary, Rift Relics, Run Lab modifiers, Mode Mastery, Ritual Ops live events, Pilot License identity, Rift Codex collection tracking, Weekly League scoring, Skill Matrix upgrades, Challenge Forge targets, local run analytics, mood audio, cosmetics, comfort controls, offline play, and touch-first controls." />
-    <meta property="og:title" content="Neon Rift Blocks: Gravity Protocol" />
-    <meta property="og:description" content="A phone-first installable block-combat space duel with rail slams, guard parries, rift shots, fighting-game combo pressure, enemy ships, mood audio, Zen Flow, Campaign Map, Rift Sanctuary, Rift Relics, Run Lab modifiers, Mode Mastery, Ritual Ops, Pilot License, Rift Codex, Weekly League, Coach Drills, Skill Matrix, Challenge Forge, local analytics, Crown Trials, Weekly Curator, Run Receipts, daily signal chests, focus cards, and progression." />
+    <meta name="description" content="Neon Rift Duel is a phone-first space-fighter boss rush with drag movement, rail strikes, blasts, guard parries, rift shots, full supers, pickups, hazards, waves, and arcade combo scoring." />
+    <meta property="og:title" content="Neon Rift Duel" />
+    <meta property="og:description" content="A mobile arcade space-fighter boss rush. No rows, no grid: move, dodge, strike, blast, guard, parry, and fire Rift supers." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="assets/social-card.svg" />
-    <title>Neon Rift Blocks: Gravity Protocol v13</title>
+    <title>Neon Rift Duel</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="assets/icon-192.svg" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app-shell" id="appShell">
-      <div class="ambient ambient-one"></div>
-      <div class="ambient ambient-two"></div>
-      <div class="ambient ambient-three"></div>
-
-      <header class="topbar">
-        <div class="brand-lockup" aria-label="Neon Rift Blocks">
-          <img class="brand-mark" src="assets/icon.svg" alt="" />
-          <div class="brand-copy">
-            <p class="eyebrow">Gravity Protocol</p>
-            <h1>Neon Rift</h1>
-          </div>
-        </div>
-        <div class="top-actions">
-          <button id="moodBtn" class="pill-btn mood-pill" type="button" aria-label="Open mood audio deck">Mood <b id="moodChip">Alpha</b></button>
-          <button id="seasonBtn" class="pill-btn" type="button" aria-label="Open season vault">Vault</button>
-          <button id="liveOpsBtn" class="pill-btn" type="button" aria-label="Open ritual ops">Rituals</button>
-          <button id="academyBtn" class="pill-btn" type="button" aria-label="Open rift academy">Academy</button>
-          <button id="rivalsBtn" class="pill-btn" type="button" aria-label="Open rival runs">Rivals</button>
-          <button id="mapBtn" class="pill-btn" type="button" aria-label="Open campaign map">Map</button>
-          <button id="sanctuaryBtn" class="pill-btn" type="button" aria-label="Open sanctuary">Sanctuary</button>
-          <button id="relicsBtn" class="pill-btn" type="button" aria-label="Open rift relics">Relics</button>
-          <button id="runLabBtn" class="pill-btn" type="button" aria-label="Open run lab">Run Lab</button>
-          <button id="licenseBtn" class="pill-btn" type="button" aria-label="Open pilot license">License</button>
-          <button id="codexBtn" class="pill-btn" type="button" aria-label="Open rift codex">Codex</button>
-          <button id="leagueBtn" class="pill-btn" type="button" aria-label="Open weekly league">League</button>
-          <button id="coachBtn" class="pill-btn" type="button" aria-label="Open local coach">Coach</button>
-          <button id="matrixBtn" class="pill-btn" type="button" aria-label="Open skill matrix">Matrix</button>
-          <button id="forgeBtn" class="pill-btn" type="button" aria-label="Open challenge forge">Forge</button>
-          <button id="protocolBtn" class="pill-btn" type="button" aria-label="Open 13-step protocol">Protocol</button>
-          <button id="analyticsBtn" class="pill-btn" type="button" aria-label="Open run analytics">Analytics</button>
-          <button id="companionsBtn" class="pill-btn" type="button" aria-label="Open rift companions">Companions</button>
-          <button id="chronicleBtn" class="pill-btn" type="button" aria-label="Open rift chronicle">Chronicle</button>
-          <button id="aftercareBtn" class="pill-btn" type="button" aria-label="Open post-run aftercare">Aftercare</button>
-          <button id="crownBtn" class="pill-btn" type="button" aria-label="Open crown trials">Crown</button>
-          <button id="curatorBtn" class="pill-btn" type="button" aria-label="Open weekly curator">Curator</button>
-          <button id="finalBtn" class="pill-btn" type="button" aria-label="Open final pass console">Final</button>
-          <button id="profileBtn" class="pill-btn" type="button" aria-label="Open profile">Rank <b id="rankChip">1</b></button>
-          <button id="installBtn" class="install-btn" type="button" hidden>Install</button>
-        </div>
-      </header>
-
-      <main class="play-layout">
-        <section class="score-strip" aria-label="Run stats">
-          <article>
-            <span>Score</span>
-            <strong id="score">0</strong>
-          </article>
-          <article>
-            <span>Best</span>
-            <strong id="best">0</strong>
-          </article>
-          <article>
-            <span>Level</span>
-            <strong id="level">1</strong>
-          </article>
-          <article>
-            <span>Combo</span>
-            <strong id="combo">0</strong>
-          </article>
+    <div class="app-shell duel-shell" id="appShell">
+      <main class="duel-layout">
+        <section class="score-strip duel-stats" aria-label="Run stats">
+          <article><span>Score</span><strong id="score">0</strong></article>
+          <article><span>Wave</span><strong id="level">1</strong></article>
+          <article><span>Combo</span><strong id="combo">0</strong></article>
+          <article><span>Hull</span><strong id="lines">100</strong></article>
         </section>
 
-        <section class="arena-card" aria-label="Game arena">
-          <div class="status-row">
+        <section class="arena-card duel-arena" aria-label="Neon Rift Duel arena">
+          <div class="status-row duel-status">
             <div class="status-copy">
-              <span id="modeLabel">Endurance</span>
-              <strong id="missionText">Clear 4 total lines</strong>
+              <span id="modeLabel">Neon Rift Duel</span>
+              <strong id="missionText">Drag ship. Strike, Blast, Guard, Super.</strong>
             </div>
             <div class="status-buttons">
-              <button id="moodMiniBtn" class="icon-btn" type="button" aria-label="Open mood audio deck">🎧</button>
-              <button id="muteBtn" class="icon-btn" type="button" aria-label="Toggle sound">🔊</button>
-              <button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause game">Ⅱ</button>
+              <button id="muteBtn" class="icon-btn" type="button" aria-label="Toggle sound">SFX</button>
+              <button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause game">PAUSE</button>
             </div>
           </div>
 
-          <div class="rift-zone">
+          <div class="rift-zone duel-rift">
             <div class="rift-head">
-              <span id="riftLabel">Rift dormant</span>
+              <span id="riftLabel">Rift charging</span>
               <b id="riftValue">0%</b>
             </div>
-            <button id="riftBtn" class="rift-button" type="button" aria-label="Activate rift surge">RIFT</button>
             <div class="rift-meter" aria-hidden="true"><div id="riftFill"></div></div>
           </div>
 
-          <div class="board-stage" id="boardStage">
-            <canvas id="gameCanvas" width="320" height="640" aria-label="Neon Rift Blocks board"></canvas>
+          <div class="board-stage duel-stage" id="boardStage">
+            <canvas id="gameCanvas" width="390" height="720" aria-label="Neon Rift Duel game canvas"></canvas>
             <div id="overlay" class="overlay active" aria-live="polite">
               <div class="overlay-panel" id="overlayPanel">
-                <p class="eyebrow" id="overlayKicker">Phone-first arcade</p>
-                <h2 id="overlayTitle">Enter the Rift</h2>
-                <p id="overlayCopy">Slam for rail strikes, hold to guard/parry, clear lines for combo damage, and fire Rift shots or full supers before the rival ship breaks your hull.</p>
-                <div class="mode-grid" id="modeGrid" aria-label="Select game mode">
-                  <button class="mode-card active" data-mode="endurance" type="button"><b>Endurance</b><span>No timer. Infinite climb.</span></button>
-                  <button class="mode-card" data-mode="blitz" type="button"><b>Blitz</b><span>3-minute score attack.</span></button>
-                  <button class="mode-card" data-mode="daily" type="button"><b>Daily Rift</b><span>Seeded modifier run.</span></button>
-                  <button class="mode-card" data-mode="onslaught" type="button"><b>Onslaught</b><span>Hard mode. More chaos.</span></button>
-                </div>
+                <p class="eyebrow" id="overlayKicker">Mobile arcade boss rush</p>
+                <h2 id="overlayTitle">Neon Rift Duel</h2>
+                <p id="overlayCopy">Drag the ship. Strike up close, Blast from range, Guard to parry, and spend Rift on shots or full supers. This is not a falling-block game.</p>
                 <div class="overlay-actions">
-                  <button id="primaryBtn" class="primary-btn" type="button">Start Run</button>
+                  <button id="primaryBtn" class="primary-btn" type="button">Launch Duel</button>
                   <button id="howBtn" class="secondary-btn" type="button">Controls</button>
-                </div>
-                <div class="profile-mini" id="profileMini">
-                  <span>XP <b id="xpText">0</b></span>
-                  <span>Shards <b id="shardsText">0</b></span>
-                  <span>Achievements <b id="achText">0</b></span>
                 </div>
               </div>
             </div>
             <div id="toast" class="toast" aria-live="polite"></div>
           </div>
         </section>
-
-        <aside class="side-panel" aria-label="Queue, hold, and run info">
-          <article class="mini-card hold-card">
-            <div class="mini-title">Hold</div>
-            <canvas id="holdCanvas" width="112" height="112"></canvas>
-          </article>
-          <article class="mini-card queue-card">
-            <div class="mini-title">Next</div>
-            <canvas id="nextCanvas" width="112" height="288"></canvas>
-          </article>
-          <article class="mini-card run-card">
-            <div class="mini-title">Run Engine</div>
-            <div class="stat-line"><span>Lines</span><b id="lines">0</b></div>
-            <div class="stat-line"><span>Time</span><b id="timeText">∞</b></div>
-            <div class="stat-line"><span>Shield</span><b id="shieldText">0</b></div>
-            <div class="stat-line"><span>Surges</span><b id="surgeText">0</b></div>
-            <div class="stat-line"><span>Rival</span><b id="rivalText">None</b></div>
-          </article>
-          <article class="mini-card today-card-side">
-            <div class="mini-title">Today's Ritual</div>
-            <div class="stat-line"><span>Streak</span><b id="todayStreakText">0</b></div>
-            <div class="stat-line"><span>Prestige</span><b id="prestigeText">0</b></div>
-            <div class="stat-line"><span>v13</span><b>Final Pass RC</b></div>
-            <button id="liveOpsSideBtn" class="side-action" type="button">Signal Chest</button>
-            <button id="academySideBtn" class="side-action" type="button">Rift Academy</button>
-          </article>
-          <article class="mini-card mood-card-side">
-            <div class="mini-title">Mood Engine</div>
-            <div class="stat-line"><span>Tone</span><b id="moodSideText">Alpha Calm</b></div>
-            <div class="stat-line"><span>Beat</span><b id="beatSideText">8 Hz</b></div>
-            <button id="moodSideBtn" class="side-action" type="button">Tune Mood</button>
-          </article>
-        </aside>
       </main>
 
-      <nav class="touch-controls" aria-label="Touch controls">
-        <button id="holdBtn" type="button"><span>Guard</span><b>↥</b></button>
-        <button id="leftBtn" type="button"><span>Dash L</span><b>←</b></button>
-        <button id="rotateBtn" class="large" type="button"><span>Spin</span><b>⟳</b></button>
-        <button id="rightBtn" type="button"><span>Dash R</span><b>→</b></button>
-        <button id="dropBtn" type="button"><span>Strike</span><b>↓</b></button>
-        <button id="riftMobileBtn" class="rift-mobile" type="button"><span>Super</span><b>⚡</b></button>
+      <nav class="touch-controls duel-controls" aria-label="Touch controls">
+        <button id="holdBtn" type="button"><span>Guard</span><b>G</b></button>
+        <button id="leftBtn" type="button"><span>Dash L</span><b>&lt;</b></button>
+        <button id="rotateBtn" class="large" type="button"><span>Blast</span><b>B</b></button>
+        <button id="rightBtn" type="button"><span>Dash R</span><b>&gt;</b></button>
+        <button id="dropBtn" type="button"><span>Strike</span><b>S</b></button>
+        <button id="riftMobileBtn" class="rift-mobile" type="button"><span>Super</span><b>R</b></button>
       </nav>
-
-      <section class="install-panel" id="installPanel">
-        <h2>Install from your website</h2>
-        <p>Android: tap <b>Install</b>. iPhone: open in Safari, tap Share, then <b>Add to Home Screen</b>. The game caches offline after first launch.</p>
-        <p class="fine-print">Mood audio includes original offline binaural ambience loops plus clean CC0/open-source import documentation for expanding the soundtrack safely. v13 adds the Final Pass Console, release checklist, player-first oath, Founder Kit, wellness reset, and annual-value readiness layer. v12 adds Mood Mastery, Crown Trials, Weekly Curator cosmetics, shareable Run Receipts, Founder Score, plus v11 adds Rift Companions, Chronicle arcs, post-run Aftercare, local run memories, plus Skill Matrix upgrades, Challenge Forge targets, a 13-step Gravity Protocol progression path, local run analytics, Pilot License identity, Rift Codex collection tracking, Weekly League scoring, adaptive Coach Drills, Pulse Goals, daily signal chests, rotating rift weather, focus cards, saved launch loadouts, Rift Relics, Run Lab modifiers, Mode Mastery, Campaign Map goals, Rift Sanctuary idle serenity, Ritual Plans, and a stronger $13/year subscription model.</p>
-      </section>
     </div>
 
     <script src="game.js" defer></script>
