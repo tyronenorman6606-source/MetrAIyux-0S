@@ -3,9 +3,9 @@ import { requireAdmin } from './_lib/security.js';
 import { loadConfig, saveConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 
 function dashboardLimit() {
-  const value = Number(process.env.DASHBOARD_LIST_LIMIT || 10);
-  if (!Number.isFinite(value) || value <= 0) return 10;
-  return Math.min(120, Math.max(1, Math.floor(value)));
+  const value = Number(process.env.DASHBOARD_LIST_LIMIT || 120);
+  if (!Number.isFinite(value) || value <= 0) return 120;
+  return Math.min(250, Math.max(1, Math.floor(value)));
 }
 
 export async function handler(event) {

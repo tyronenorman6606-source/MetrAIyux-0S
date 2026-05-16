@@ -328,6 +328,27 @@ function renderLedger(entries = []) {
     }
     const actions = document.createElement('div');
     actions.className = 'button-row ledger-actions';
+    const download = document.createElement('button');
+    download.className = 'primary-btn compact';
+    download.type = 'button';
+    download.textContent = 'Download file';
+    download.addEventListener('click', async () => {
+      download.disabled = true;
+      download.textContent = 'Preparing...';
+      try {
+        const data = await api('/api/admin-vault-download', {
+          method: 'POST',
+          body: JSON.stringify({ receiptId: entry.id })
+        });
+        window.open(data.downloadUrl, '_blank', 'noopener');
+        showStatus(`Download link ready for ${data.item?.fileName || entry.fileName || 'vault file'}.`, 'success');
+      } catch (error) {
+        showStatus(error.message, 'error');
+      } finally {
+        download.disabled = false;
+        download.textContent = 'Download file';
+      }
+    });
     const replay = document.createElement('button');
     replay.className = 'secondary-btn compact';
     replay.type = 'button';
@@ -338,7 +359,7 @@ function renderLedger(entries = []) {
     replayClient.type = 'button';
     replayClient.textContent = 'Replay + client receipt';
     replayClient.addEventListener('click', () => replayNotification(entry.id, true).catch((error) => showStatus(error.message, 'error')));
-    actions.append(replay, replayClient);
+    actions.append(download, replay, replayClient);
     row.append(title, clientLine, detailLine, metaLine, actions);
     ledgerList.append(row);
   }
