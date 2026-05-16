@@ -155,6 +155,67 @@ textarea {
   transition: opacity 160ms ease;
 }
 
+.ambience-dock {
+  position: fixed;
+  right: max(14px, calc((100vw - 1480px) / 2));
+  bottom: 18px;
+  z-index: 54;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(94vw, 520px);
+  padding: 10px;
+  border: 1px solid rgba(100, 217, 255, 0.32);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(248, 203, 94, 0.12), rgba(100, 217, 255, 0.09)),
+    rgba(4, 9, 14, 0.86);
+  box-shadow:
+    0 0 28px rgba(100, 217, 255, 0.18),
+    0 18px 58px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(16px);
+}
+
+.ambience-dock button,
+.ambience-dock a {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(248, 203, 94, 0.38);
+  border-radius: 8px;
+  padding: 0 10px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  font: 950 11px/1 var(--font-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ambience-dock button[aria-pressed="true"] {
+  color: #061015;
+  background: linear-gradient(135deg, var(--gold), var(--cyan));
+  box-shadow: 0 0 24px rgba(100, 217, 255, 0.34);
+}
+
+.ambience-dock label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  color: var(--soft);
+  font: 950 11px/1 var(--font-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ambience-dock input[type="range"] {
+  width: 92px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
 .topbar {
   position: sticky;
   top: 0;
@@ -2827,7 +2888,7 @@ textarea:focus {
   min-height: 42px;
   border: 1px solid rgba(100, 217, 255, 0.28);
   border-radius: 8px;
-  color: var(--ice);
+  color: var(--ink);
   background: rgba(255, 255, 255, 0.055);
   box-shadow: inset 0 0 18px rgba(100, 217, 255, 0.06);
   font: 950 12px/1 var(--font-label);
@@ -2967,6 +3028,28 @@ textarea:focus {
   }
 
   .pointer-glow {
+    display: none;
+  }
+
+  .ambience-dock {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    justify-content: space-between;
+    gap: 8px;
+    max-width: none;
+  }
+
+  .ambience-dock label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ambience-dock input[type="range"] {
+    width: 100%;
+  }
+
+  .ambience-dock a {
     display: none;
   }
 
