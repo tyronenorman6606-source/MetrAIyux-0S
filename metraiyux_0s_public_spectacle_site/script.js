@@ -434,6 +434,42 @@ function setupProofPlayer() {
   sync();
 }
 
+function setupSiteAmbience() {
+  const audio = document.querySelector("[data-site-ambience]");
+  const toggle = document.querySelector("[data-ambience-toggle]");
+  const volume = document.querySelector("[data-ambience-volume]");
+  if (!audio || !toggle) return;
+
+  const setToggle = () => {
+    const isPlaying = !audio.paused;
+    toggle.textContent = isPlaying ? "Ambience On" : "Ambience Off";
+    toggle.setAttribute("aria-pressed", String(isPlaying));
+  };
+
+  if (volume) {
+    audio.volume = Number(volume.value) || 0.22;
+    volume.addEventListener("input", () => {
+      audio.volume = Number(volume.value) || 0;
+    });
+  } else {
+    audio.volume = 0.22;
+  }
+
+  toggle.addEventListener("click", async () => {
+    if (audio.paused) {
+      await audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+    setToggle();
+  });
+
+  audio.addEventListener("play", setToggle);
+  audio.addEventListener("pause", setToggle);
+  audio.addEventListener("ended", setToggle);
+  setToggle();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupMenu();
   setupReveal();
@@ -442,5 +478,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCommandTabs();
   setupGuidedTour();
   setupProofPlayer();
+  setupSiteAmbience();
   previewBrief();
 });
