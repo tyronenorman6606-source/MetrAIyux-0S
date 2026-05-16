@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fit Check - SOL Staffing OS</title>
+  <meta name="description" content="Check whether a staffing team is ready for SOL Staffing OS.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <header class="topbar"><nav class="nav-shell" aria-label="Primary navigation"><a class="brand" href="index.html"><img class="brand-logo-real" src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo"><span class="brand-copy"><strong>Skyes Over London</strong><span>Staffing OS</span></span></a><button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><div class="nav-links" data-nav-links><a href="index.html">Overview</a><a href="guided-tour.html">Walkthrough</a><a href="platform.html">Platform</a><a href="security.html">Security</a><a href="value.html">Value</a><a class="is-active nav-cta" href="fit-check.html">Fit Check</a></div></nav></header>
+  <main>
+    <section class="page-hero reveal"><p class="eyebrow">Operator Fit Check</p><h1>Should this team launch the full Staffing OS?</h1><p class="lead">Score the pressure inside the staffing workflow. Higher scores mean the team needs more than a public website.</p></section>
+    <section class="section">
+      <form id="fitForm" class="contact-form reveal" onsubmit="event.preventDefault(); scoreStaffingFit();">
+        <label>Employer job-order volume<select name="job_orders"><option value="2">A few inquiries</option><option value="6">Weekly job orders</option><option value="10">Multiple active roles</option></select></label>
+        <label>Candidate pipeline pressure<select name="candidate_pressure"><option value="2">Small candidate pool</option><option value="6">Steady applications</option><option value="10">Recruiter workflow needed</option></select></label>
+        <label>Document handling<select name="documents"><option value="2">Minimal documents</option><option value="6">Some signed packets</option><option value="10">Secure upload workflow needed</option></select></label>
+        <label>Internal admin need<select name="admin_need"><option value="2">One operator</option><option value="6">Shared operator process</option><option value="10">Admin command needed</option></select></label>
+        <label>Brain/workflow support<select name="brain_need"><option value="2">Static guidance is enough</option><option value="6">Checklists and prompts help</option><option value="10">Private model endpoint is useful</option></select></label>
+        <button class="btn-primary" type="submit">Score Fit</button>
+      </form>
+      <div id="fitResult" class="fit-result reveal" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="footer-inner"><div><strong>SOL Staffing OS</strong><p>Fit check for staffing beta teams.</p></div><div class="footer-links"><a href="guided-tour.html">Walkthrough</a><a href="sell-sheet.html">Sell Sheet</a></div></div></footer>
+  <script src="app.js"></script>
+</body>
+</html>

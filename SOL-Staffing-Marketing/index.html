@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SOL Staffing OS — The Live Operating Layer for Staffing Firms</title>
+  <meta name="description" content="SOL Staffing OS is a deployable staffing platform with employer intake, candidate workflows, Skyegate FS27 auth, records, secure uploads, admin dashboard, and a GPU/Ollama brain endpoint.">
+  <link rel="alternate" type="application/json" title="SOL Staffing OS video proof manifest" href="assets/proof/sol-video-proof-manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+
+  <div class="ticker-strip" aria-hidden="true">
+    <span class="ticker-inner">
+      &nbsp;&nbsp;Skyegate FS27 Auth Bridge &nbsp;&bull;&nbsp; Cloudflare Pages Functions &nbsp;&bull;&nbsp; Form-to-Record Backend &nbsp;&bull;&nbsp; Secure Upload Vault &nbsp;&bull;&nbsp; Admin Dashboard &nbsp;&bull;&nbsp; Live Brain Endpoint &nbsp;&bull;&nbsp; Employer Intake &nbsp;&bull;&nbsp; Candidate Pipeline &nbsp;&bull;&nbsp; Government Pursuit Layer &nbsp;&bull;&nbsp; AE Sales System &nbsp;&bull;&nbsp; Staffing OS &nbsp;&bull;&nbsp; Skyegate FS27 Auth Bridge &nbsp;&bull;&nbsp; Cloudflare KV Records &nbsp;&bull;&nbsp; Form-to-Record Backend &nbsp;&bull;&nbsp; Secure Upload Vault &nbsp;&bull;&nbsp; Admin Dashboard &nbsp;&bull;&nbsp;
+    </span>
+  </div>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html" aria-label="SOL Staffing OS"><img class="brand-logo-real" src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo"><span class="brand-copy"><strong>Skyes Over London</strong><span>Staffing OS</span></span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a class="is-active" href="index.html">Overview</a>
+        <a href="guided-tour.html">Walkthrough</a>
+        <a href="platform.html">Platform</a>
+        <a href="security.html">Security</a>
+        <a href="value.html">Value</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Pricing &amp; Sell Sheet</a>
+        <a class="nav-cta" href="fit-check.html">Fit Check</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="command-hero" aria-labelledby="hero-title">
+      <div class="actual-screen-stage reveal proof-theater" aria-label="Actual SOL Staffing OS proof theater">
+        <div class="proof-theater-brand" aria-label="Real Skyes Over London Staffing brand asset">
+          <img src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo">
+          <div>
+            <span>Skyes Over London</span>
+            <strong>Staffing OS live proof theatre</strong>
+          </div>
+          <p>Real brand asset. Real browser-recorded workflow from ../unpacked-projects/sol_staffing_agency_site.</p>
+        </div>
+        <div class="surface-video-shell">
+          <video id="surfaceVideo" class="surface-reel-video" autoplay muted loop playsinline preload="auto" poster="assets/screenshots/sol-proof-workflow-poster.png" data-proof-manifest="assets/proof/sol-video-proof-manifest.json" data-source-package="../unpacked-projects/sol_staffing_agency_site" data-source-report="../test-artifacts/sol-real-e2e-proof/sol-staffing-real-workflow-proof.json" aria-label="Playwright-recorded browser proof video of SOL Staffing OS workflow actions">
+            <source src="assets/screenshots/sol-surface-reel.mp4" type="video/mp4">
+          </video>
+          <canvas id="surfaceReel" class="surface-reel-canvas" width="1440" height="900" aria-label="Fallback animated reel of actual SOL Staffing OS screens"></canvas>
+          <div class="surface-video-glass">
+            <span class="live-badge">Actual E2E proof video</span>
+            <strong id="surfaceReelTitle">Employer intake in motion</strong>
+            <p id="surfaceReelCaption">Playwright recording: intake submit, FS27 auth, admin records, secure upload, and brain endpoint.</p>
+          </div>
+          <div class="surface-progress" aria-hidden="true"><span id="surfaceReelProgress"></span></div>
+        </div>
+
+        <div class="screen-stack" aria-hidden="true">
+          <figure class="actual-screen is-one" data-reel-title="Employer intake in motion" data-reel-caption="The live proof starts where the browser is already moving through the staffing request.">
+            <img src="assets/screenshots/sol-home-command.png" loading="lazy" decoding="async" alt="Actual SOL Staffing OS homepage screenshot">
+            <figcaption><span>01</span> Public staffing home</figcaption>
+          </figure>
+          <figure class="actual-screen is-two" data-reel-title="Employer intake submitted" data-reel-caption="The browser fills and submits a staffing request through the staffing-submit function.">
+            <img src="assets/screenshots/sol-employer-intake-filled.png" loading="lazy" decoding="async" alt="Actual employer intake form filled with staffing request details">
+            <figcaption><span>02</span> Employer intake in action</figcaption>
+          </figure>
+          <figure class="actual-screen is-three" data-reel-title="Skyegate FS27 session created" data-reel-caption="The browser exchanges a Skyegate FS27 token and opens the authenticated admin dashboard.">
+            <img src="assets/screenshots/sol-brain-answer.png" loading="lazy" decoding="async" alt="Actual SOL local brain answering an employer job order prompt">
+            <figcaption><span>03</span> Brain answer running</figcaption>
+          </figure>
+          <figure class="actual-screen is-four" data-reel-title="Admin records and upload vault" data-reel-caption="The admin surface creates a record and stores a secure file behind auth.">
+            <img src="assets/screenshots/sol-admin-dashboard-live.png" loading="lazy" decoding="async" alt="Actual admin dashboard screenshot with records, uploads, and live brain panels">
+            <figcaption><span>04</span> Admin dashboard surface</figcaption>
+          </figure>
+          <figure class="actual-screen is-five" data-reel-title="Brain endpoints respond" data-reel-caption="The proof path checks the authenticated live brain route and the local SOL brain response.">
+            <img src="assets/screenshots/sol-login-gate.png" loading="lazy" decoding="async" alt="Actual Skyegate FS27 login bridge page with token field">
+            <figcaption><span>05</span> Skyegate FS27 gate</figcaption>
+          </figure>
+        </div>
+
+        <div class="screen-proof-rail">
+          <span>Actual captures</span>
+          <strong>5</strong>
+          <p>Primary proof is a Playwright browser recording of ../unpacked-projects/sol_staffing_agency_site doing the workflow. Screenshots stay here as secondary receipts.</p>
+          <a class="proof-link" href="assets/screenshots/sol-admin-dashboard-live.png">Open screenshot</a>
+          <a class="proof-link" href="assets/proof/sol-video-proof-manifest.json">Open video proof manifest</a>
+        </div>
+      </div>
+
+      <div class="hero-title-band reveal">
+        <div>
+          <p class="eyebrow">Deployable staffing command deck</p>
+          <h1 id="hero-title">Anyone can launch a staffing website. SOL gives the agency a control room.</h1>
+        </div>
+        <div class="hero-brief">
+          <p>Public buyer education. Employer intake. Candidate pipeline. Skyegate FS27 access. Admin records. Secure uploads. Cloudflare KV storage, and a live authenticated brain endpoint already wired for tonight's demos.</p>
+          <div class="cta-row">
+            <a class="button" href="guided-tour.html">Walk the System</a>
+            <a class="button secondary" href="fit-check.html">Check Fit</a>
+            <a class="button secondary" href="https://sol-staffing-agency-site.pages.dev/">Open Live Platform</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="proof-strip">
+      <div class="metric reveal"><strong>100+</strong><span>Pages, templates, data files, and operating assets in the package</span></div>
+      <div class="metric reveal"><strong>FS27</strong><span>Skyegate token introspection and session bridge for internal surfaces</span></div>
+      <div class="metric reveal"><strong>Live</strong><span>Form submissions become typed staffing records through Cloudflare Pages Functions</span></div>
+      <div class="metric reveal"><strong>Brain</strong><span>Authenticated live endpoint answered during production smoke</span></div>
+    </div>
+
+    <section class="section" id="problem">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">The Problem</p>
+          <h2>Most staffing startups look like a contact form with ambition.</h2>
+        </div>
+        <p>Employers, candidates, AEs, and government buyers need different workflows. If everything lands in one inbox, the agency looks smaller than it is and the operator becomes the database.</p>
+      </div>
+      <div class="two-col">
+        <div class="editorial-prose reveal">
+          <h3>A staffing agency is an operations machine.</h3>
+          <p>Every job order needs role details, pay, headcount, shift, location, requirements, decision path, and follow-up. Every candidate needs screening, readiness, availability, documents, and placement tracking.</p>
+          <p>When those pieces are scattered across emails and spreadsheets, speed dies. Worse, the agency cannot prove what happened, who touched it, or what needs approval.</p>
+        </div>
+        <div class="editorial-prose reveal">
+          <h3>Credibility is a workflow problem.</h3>
+          <p>Buyers do not only judge your brand. They judge your intake discipline, compliance posture, document handling, and ability to turn a request into a real record.</p>
+          <p>SOL Staffing OS gives the agency a visible front-end and a private operating layer behind it. The public site sells. The backend catches the work.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="system">
+      <div class="band-inner">
+        <div class="reveal">
+          <p class="eyebrow">The Product</p>
+          <h2>A staffing agency stack, packaged as one deployable OS.</h2>
+          <p class="lead" style="margin-top:18px;">This is not just a prettier staffing website. It includes employer pages, candidate flows, AE sales materials, government procurement surfaces, internal operator pages, auth-protected admin, secure uploads, and a brain layer that can run locally or call a private model endpoint.</p>
+          <div class="cta-row">
+            <a class="btn-primary" href="capabilities.html">Full Capabilities &rarr;</a>
+            <a class="btn-ghost" href="sell-sheet.html">Read the Sell Sheet</a>
+          </div>
+        </div>
+        <div class="terminal reveal">
+          <div class="terminal-bar">
+            <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+            <span class="terminal-title">sol-staffing-os / intake-routing</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="prompt">&gt;</span> <span class="cmd">submit: employer-job-order</span></div>
+            <div><span class="dim">&nbsp;&nbsp;classifying record...</span></div>
+            <div><span class="ok">&nbsp;&nbsp;collection: job_orders</span></div>
+            <div><span class="brain-name">&nbsp;&nbsp;status: new</span> <span class="dim">audit written</span></div>
+            <div>&nbsp;</div>
+            <div><span class="prompt">&gt;</span> <span class="cmd">open: admin-dashboard</span></div>
+            <div><span class="dim">&nbsp;&nbsp;checking Skyegate FS27 token...</span></div>
+            <div><span class="ok">&nbsp;&nbsp;active session confirmed</span></div>
+            <div>&nbsp;</div>
+            <div><span class="prompt">&gt;</span> <span class="cmd">ask live brain: government pursuit checklist</span></div>
+            <div><span class="warn">&nbsp;&nbsp;safe-claim guardrails enforced</span></div>
+            <div><span class="ok">&nbsp;&nbsp;live brain answered in production smoke</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="modules">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Operating Modules</p>
+          <h2>Every side of the staffing business has a lane.</h2>
+        </div>
+        <p>The package is organized around the actual work: sales, client intake, candidate pipeline, government pursuits, compliance posture, documents, records, and admin command.</p>
+      </div>
+      <div class="brain-list reveal">
+        <div class="brain-row"><div class="brain-num">01</div><div><div class="brain-name">Employer Intake</div><div class="brain-title">Job orders, quote requests, service pages, city pages, industry pages, and client kickoff flows.</div></div></div>
+        <div class="brain-row"><div class="brain-num">02</div><div><div class="brain-name">Candidate Pipeline</div><div class="brain-title">Applications, readiness checks, recruiter desk, candidate submissions, onboarding, and placement tracking.</div></div></div>
+        <div class="brain-row"><div class="brain-num">03</div><div><div class="brain-name">AE Sales Desk</div><div class="brain-title">AE command, sales scripts, CRM pipeline, campaigns, commission templates, and lead qualification.</div></div></div>
+        <div class="brain-row"><div class="brain-num">04</div><div><div class="brain-name">Government Readiness</div><div class="brain-title">Capability statement, procurement packet, contract vehicles, go/no-go, NAICS, and safe-claim rules.</div></div></div>
+        <div class="brain-row"><div class="brain-num">05</div><div><div class="brain-name">Admin Records</div><div class="brain-title">Cloudflare Pages Functions classify forms into leads, job orders, candidates, placements, gov pursuits, risks, vendors, and documents.</div></div></div>
+        <div class="brain-row"><div class="brain-num">06</div><div><div class="brain-name">Secure Uploads</div><div class="brain-title">Authenticated file upload/download with size/type limits and audit metadata for operational documents.</div></div></div>
+        <div class="brain-row"><div class="brain-num">07</div><div><div class="brain-name">Skyegate Auth</div><div class="brain-title">FS27 token introspection, HttpOnly session cookie, protected edge routes, and admin role enforcement.</div></div></div>
+        <div class="brain-row"><div class="brain-num">08</div><div><div class="brain-name">Staffing Brain</div><div class="brain-title">Authenticated live brain function for private operator intelligence, with browser fallback still available.</div></div></div>
+      </div>
+    </section>
+
+    <section class="band" id="pricing">
+      <div class="band-inner" style="grid-template-columns:1fr;">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div>
+            <p class="eyebrow">Packages</p>
+            <h2>Price the offer around deployment depth.</h2>
+            <p style="color:var(--soft);font-size:17px;margin-top:14px;">Use these as sales-positioning packages. The code package is deployable now; production operations still need verified business data, legal/compliance review, Skyegate env, storage retention, and model endpoint settings.</p>
+          </div>
+        </div>
+        <div class="pricing-grid reveal">
+          <article class="plan-card"><span class="tag">Starter</span><h3>Launch Site</h3><div class="price">$2,500</div><p>Deploy the public staffing website, SEO pages, contact forms, basic content replacement, and launch checklist.</p><ul class="check-list"><li>Public pages live</li><li>Forms connected</li><li>Brand/contact replacement</li><li>Static brain fallback</li></ul></article>
+          <article class="plan-card featured"><span class="tag">Recommended</span><h3>Live Staffing OS</h3><div class="price">$7,500</div><p>Deploy the serious operating layer: Skyegate auth, admin dashboard, records, uploads, and live brain wiring.</p><ul class="check-list"><li>Skyegate FS27 auth bridge</li><li>Cloudflare KV records database</li><li>Secure file vault</li><li>Live brain endpoint config</li></ul></article>
+          <article class="plan-card"><span class="tag">Managed</span><h3>Operator Command</h3><div class="price">$1,500/mo</div><p>Ongoing admin support, content updates, workflow tuning, smoke tests, route additions, and dashboard improvements.</p><ul class="check-list"><li>Monthly workflow review</li><li>New forms and routes</li><li>Record/export support</li><li>Brain corpus updates</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="trust">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Hard Limits</p>
+          <h2>It gets serious by saying what it will not fake.</h2>
+        </div>
+        <p>The product can organize staffing operations. It cannot create verified insurance, workers comp, UEI/CAGE, SAM registration, payroll compliance, client contracts, or active job openings out of thin air.</p>
+      </div>
+      <div class="two-col reveal">
+        <ul class="check-list">
+          <li>No government registration, certification, insurance, bonding, or past performance claim should publish until verified.</li>
+          <li>No sensitive onboarding, payroll, tax, I-9, background-check, or medical documents should be collected without retention and compliance review.</li>
+          <li>No placement, hire, termination, payroll, legal, tax, or HR compliance decision should execute without human authority.</li>
+        </ul>
+        <ul class="check-list">
+          <li>The live brain endpoint requires authenticated access and configured model infrastructure before private use.</li>
+          <li>The admin layer requires Skyegate FS27 introspection env vars before production deployment.</li>
+          <li>The package is strongest when business data, legal terms, verified jobs, and compliance policies are filled in honestly.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" style="padding-bottom:0">
+      <div class="cta-close reveal">
+        <p class="eyebrow">Next Step</p>
+        <h2>Sell the staffing firm<br><em>and the operating system behind it.</em></h2>
+        <p style="color:var(--muted);max-width:580px;margin:18px auto 0;font-size:16px;line-height:1.7;">The public site gets attention. The operating layer catches the work. That is the difference between a staffing brochure and a staffing platform.</p>
+        <div class="cta-row" style="justify-content:center;margin-top:28px;">
+          <a class="btn-primary" href="sell-sheet.html">Open Sell Sheet</a>
+          <a class="btn-ghost" href="https://sol-staffing-agency-site.pages.dev/admin-dashboard.html">View Admin Surface &rarr;</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>SOL Staffing OS</strong>
+        <p>Deployable staffing agency website and live operating package: records, auth, uploads, dashboard, brain, and production documentation.</p>
+      </div>
+      <div class="footer-links">
+        <a href="capabilities.html">Full Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">Operator Program</a>
+      </div>
+      <div class="footer-links">
+        <a href="https://sol-staffing-agency-site.pages.dev/">Live Platform</a>
+        <a href="https://sol-staffing-agency-site.pages.dev/LIVE_PLATFORM_README.md">Deployment Notes</a>
+        <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+        <span class="tiny">Last revision: 2026-05-15</span>
+      </div>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

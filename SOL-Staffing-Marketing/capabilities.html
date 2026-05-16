@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capabilities — SOL Staffing OS</title>
+  <meta name="description" content="Complete capabilities reference for SOL Staffing OS: pages, workflows, auth, backend records, secure uploads, live brain, and deployment requirements.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html" aria-label="SOL Staffing OS"><img class="brand-logo-real" src="assets/brand/skyes-over-london-diety-logo-transparent.png" alt="Skyes Over London Staffing logo"><span class="brand-copy"><strong>Skyes Over London</strong><span>Staffing OS</span></span></a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">&larr; Main</a>
+        <a class="is-active" href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">Operator Program</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Full Capabilities Reference</p>
+      <h1>Everything the staffing OS does.</h1>
+      <p class="lead">This is the operational reference for the deployable package: public staffing pages, internal workflow pages, Skyegate auth, Netlify backend, secure uploads, admin dashboard, and brain endpoint.</p>
+      <div class="number-row">
+        <div class="num-pill"><span class="n">100+</span><span class="l">Operating files and assets</span></div>
+        <div class="num-pill"><span class="n">12</span><span class="l">Record collections</span></div>
+        <div class="num-pill"><span class="n">FS27</span><span class="l">Skyegate auth receiver</span></div>
+        <div class="num-pill"><span class="n">2</span><span class="l">Brain modes</span></div>
+        <div class="num-pill"><span class="n">0</span><span class="l">Build step for static layer</span></div>
+        <div class="num-pill"><span class="n">1</span><span class="l">Admin command dashboard</span></div>
+      </div>
+      <div class="toc">
+        <h4>Contents</h4>
+        <ol>
+          <li><a href="#public">Public Sales Surface</a></li>
+          <li><a href="#internal">Internal Operating Pages</a></li>
+          <li><a href="#backend">Backend Functions</a></li>
+          <li><a href="#auth">Skyegate FS27 Auth</a></li>
+          <li><a href="#brain">Brain Layer</a></li>
+          <li><a href="#deployment">Deployment Requirements</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="public">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Public Surface</p><h2>A complete staffing agency front door.</h2></div>
+        <p>The public layer gives commercial employers, candidates, AEs, and government buyers a clear path instead of one generic contact page.</p>
+      </div>
+      <div class="stack-layers reveal">
+        <div class="stack-layer"><div class="stack-layer-id">Employer</div><div><h3>Job-order and buying flows</h3><p>Employer pages, pricing, job-order forms, industry pages, city pages, client welcome packet, and quote requests.</p></div></div>
+        <div class="stack-layer"><div class="stack-layer-id">Candidate</div><div><h3>Candidate application and readiness</h3><p>Candidate application, jobs/pool positioning, onboarding readiness, recruiter desk, and submission templates.</p></div></div>
+        <div class="stack-layer"><div class="stack-layer-id">Government</div><div><h3>Procurement-safe presence</h3><p>Government page, capability statement shell, procurement packet, contract vehicles, go/no-go, and safe-claim rules.</p></div></div>
+        <div class="stack-layer"><div class="stack-layer-id">Content</div><div><h3>SEO and trust library</h3><p>Staffing blogs, vertical pages, service areas, case studies shell, compliance posture, FAQ, privacy, terms, and deployment docs.</p></div></div>
+      </div>
+    </section>
+
+    <section class="band" id="internal">
+      <div class="band-inner" style="grid-template-columns:1fr;">
+        <div class="section-head reveal" style="grid-template-columns:1fr;">
+          <div><p class="eyebrow">Internal Pages</p><h2>Operator workflows are already mapped.</h2><p style="color:var(--soft);margin-top:14px;">The internal pages are no longer naked static pages in production. The new edge gate protects the serious operator surfaces behind Skyegate FS27 session validation.</p></div>
+        </div>
+        <div class="reveal">
+          <table class="worker-table">
+            <thead><tr><th>Surface</th><th>Purpose</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>admin-dashboard.html</td><td>Records, secure uploads, manual entries, live brain prompt surface, and collection summaries.</td><td><span class="live-badge">ADDED</span></td></tr>
+              <tr><td>ae-command / sales-scripts / crm</td><td>AE prospecting, lead capture, scripts, pipeline tracking, and campaign support.</td><td><span class="live-badge">GATED</span></td></tr>
+              <tr><td>recruiter-desk / placement-tracker</td><td>Candidate submission, screening, placement stages, and quality control workflows.</td><td><span class="live-badge">GATED</span></td></tr>
+              <tr><td>risk-register / timesheets / vendor-packet</td><td>Operational risk, billing controls, vendor/subcontractor onboarding, and document readiness.</td><td><span class="live-badge">GATED</span></td></tr>
+              <tr><td>brain-command / deployment-command</td><td>Brain corpus workflow, production notes, smoke tests, and deployment control.</td><td><span class="live-badge">GATED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="backend">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Backend</p><h2>Cloudflare Pages Functions turn the brochure into records.</h2></div>
+        <p>The backend is intentionally compact: server-side submission capture, authenticated record access, upload vault, auth session bridge, and live brain endpoint.</p>
+      </div>
+      <div class="two-col reveal">
+        <ul class="check-list">
+          <li><code>staffing-submit</code> accepts form data, classifies it, and writes a typed record.</li>
+          <li><code>staffing-records</code> provides authenticated admin list/create/update access.</li>
+          <li><code>staffing-files</code> stores and retrieves authenticated documents with type and size limits.</li>
+          <li><code>staffing-auth-session</code> exchanges a Skyegate token for an HttpOnly session cookie.</li>
+        </ul>
+        <ul class="check-list">
+          <li>Record collections include leads, job orders, candidates, placements, timesheets, government pursuits, AE leads, vendors, risks, brain feedback, documents, and audit.</li>
+          <li>Netlify Blobs are used on Netlify, with local `.staffing-db/` fallback for smoke tests.</li>
+          <li>Public forms submit through `script.js` and become records without changing every HTML form manually.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="auth">
+      <div class="band-inner">
+        <div class="reveal">
+          <p class="eyebrow">Skyegate FS27</p>
+          <h2>Auth is received from the gateway, not invented locally.</h2>
+          <p class="lead" style="margin-top:16px;">The staffing OS validates tokens through the Skyegate FS27 introspection endpoint, then sets a site-scoped HttpOnly session for internal pages and admin functions.</p>
+        </div>
+        <div class="terminal reveal">
+          <div class="terminal-bar"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">auth flow</span></div>
+          <div class="terminal-body">
+            <div><span class="prompt">&gt;</span> operator pastes FS27 token</div>
+            <div><span class="dim">&nbsp;&nbsp;POST /.netlify/functions/staffing-auth-session</span></div>
+            <div><span class="ok">&nbsp;&nbsp;introspect: active=true</span></div>
+            <div><span class="ok">&nbsp;&nbsp;Set-Cookie: sol_staffing_auth; HttpOnly</span></div>
+            <div><span class="dim">&nbsp;&nbsp;edge gate checks protected route</span></div>
+            <div><span class="ok">&nbsp;&nbsp;admin opens</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="brain">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Brain Layer</p><h2>Local fallback first. Real model endpoint when configured.</h2></div>
+        <p>The original local browser brain still works without a provider bill. The upgraded function can call Ollama or an OpenAI-compatible GPU/vLLM endpoint from an authenticated session.</p>
+      </div>
+      <div class="two-col reveal">
+        <div class="panel"><p class="eyebrow">Local Mode</p><p>Static JavaScript plus JSON corpus. Good for routing, checklists, safe-claim reminders, AE scripts, and browser-local notes.</p></div>
+        <div class="panel"><p class="eyebrow">Live Mode</p><p>Server function calls `OLLAMA_BASE_URL` or `GPU_BRAIN_ENDPOINT`. Good for private operator reasoning once model infrastructure and auth are configured.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="deployment" style="padding-bottom:0">
+      <div class="cta-close reveal">
+        <p class="eyebrow">Deployment Requirements</p>
+        <h2>Small env list. Big operational difference.</h2>
+        <p style="color:var(--muted);max-width:680px;margin:16px auto 0;">Set Skyegate introspection, optional login URL, admin roles, and either Ollama or GPU endpoint vars. Then review storage retention and compliance before collecting sensitive staffing documents.</p>
+        <div class="cta-row" style="justify-content:center;margin-top:26px;">
+          <a class="btn-primary" href="https://sol-staffing-agency-site.pages.dev/">Open Live Platform</a>
+          <a class="btn-ghost" href="sell-sheet.html">Open Sell Sheet</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div><strong>SOL Staffing OS</strong><p>Capabilities reference for the deployable staffing platform.</p></div><div class="footer-links"><a href="index.html">Overview</a><a href="sell-sheet.html">Sell Sheet</a><a href="white-label.html">Operator Program</a></div></div></footer>
+  <script src="app.js"></script>
+</body>
+</html>
