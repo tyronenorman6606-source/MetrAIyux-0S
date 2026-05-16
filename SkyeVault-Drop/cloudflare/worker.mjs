@@ -5,6 +5,8 @@ import { handler as adminExport } from '../netlify/functions/admin-export.js';
 import { handler as adminHealth } from '../netlify/functions/admin-health.js';
 import { handler as adminNotificationReplay } from '../netlify/functions/admin-notification-replay.js';
 import { handler as adminNotificationTest } from '../netlify/functions/admin-notification-test.js';
+import { handler as adminVaultDownload } from '../netlify/functions/admin-vault-download.js';
+import { handler as clientVault } from '../netlify/functions/client-vault.js';
 import { handler as maintenanceSweep } from '../netlify/functions/maintenance-sweep.js';
 import { handler as operatorLogout } from '../netlify/functions/operator-logout.js';
 import { handler as operatorSession } from '../netlify/functions/operator-session.js';
@@ -25,6 +27,8 @@ const HANDLERS = {
   'admin-health': adminHealth,
   'admin-notification-replay': adminNotificationReplay,
   'admin-notification-test': adminNotificationTest,
+  'admin-vault-download': adminVaultDownload,
+  'client-vault': clientVault,
   'maintenance-sweep': maintenanceSweep,
   'operator-logout': operatorLogout,
   'operator-session': operatorSession,
