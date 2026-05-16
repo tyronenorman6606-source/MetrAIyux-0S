@@ -1,6 +1,6 @@
 # MetrAIyux 0S — Social Media Copy
 
-All copy below is written for a human founder's voice, not corporate brand voice. Adapt tone as needed. No hashtag spam. No emoji overload. Say the real thing.
+All copy below is written for a human owner's voice, not corporate brand voice. Adapt tone as needed. No hashtag spam. No emoji overload. Say the real thing.
 
 ---
 
@@ -10,7 +10,7 @@ All copy below is written for a human founder's voice, not corporate brand voice
 
 I built a company that runs on one person.
 
-Not because I wanted it that way. Because that's what happens when you're the founder, the ops lead, the sales team, the account manager, and the person who answers the phone.
+Not because I wanted it that way. Because that's what happens when you're the owner, the ops lead, the sales team, the account manager, and the person who answers the phone.
 
 The problem with that setup is not that it doesn't work. It's that it doesn't scale, it doesn't survive your vacation, and it doesn't look credible to the enterprise buyers and government agencies you're actually trying to close.
 
@@ -129,7 +129,7 @@ The live system is here: https://metraiyux-0s-public-spectacle.pages.dev/
 
 Worth it?
 
-Gray
+Owner
 
 ---
 
@@ -149,7 +149,7 @@ Sell sheet is here if you want to look before we talk: [link]
 
 15 minutes this week?
 
-Gray
+Owner
 
 ---
 

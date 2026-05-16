@@ -215,12 +215,13 @@ export async function loadAuditEvents(limit = 80) {
   return events.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
 }
 
-export async function loadLedger() {
+export async function loadLedger(limit = 120) {
   const folderId = getConfigFolderId();
-  const receiptFiles = await listJsonFilesByPrefix(folderId, RECEIPT_PREFIX, 250).catch(() => []);
+  const safeLimit = Math.min(120, Math.max(1, Number(limit || 120)));
+  const receiptFiles = await listJsonFilesByPrefix(folderId, RECEIPT_PREFIX, Math.min(250, safeLimit)).catch(() => []);
   const receiptEntries = [];
 
-  for (const file of receiptFiles.slice(0, 120)) {
+  for (const file of receiptFiles.slice(0, safeLimit)) {
     try {
       const receipt = await downloadJsonFile(file.id, null);
       const entry = receipt?.entry || receipt;

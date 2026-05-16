@@ -56,7 +56,7 @@ MetrAIyux 0S is a live business operating system consisting of:
 
 **8 D1 SQL Databases** — one per Worker: metraiyux-admin-db, metraiyux-omega-db, metraiyux-saas-db, metraiyux-crown-db, metraiyux-nexus-db, metraiyux-site-operator-db, metraiyux-sentinel-db, plus SkyeGate's own database.
 
-**16-Brain Autonomous Command Model** — Site Operator, 0meg4kAI Security, Central Command, Gray London Skyes (Founder), Marcus Vale (Operations), Celeste Monroe (Sales/AE), Adrian Cross (Client Success), Naomi Sterling (Finance), Julian Mercer (Legal/Compliance), Sienna Brooks (HR/Staffing), Orion Hayes (Technology), Valentina Reyes (Marketing/Brand), Donovan Pierce (Government/Enterprise), Helena Ward (Partnerships), Victor Saint (QA/Performance), Amara Voss (Innovation/Expansion).
+**16-Brain Autonomous Command Model** — Site Operator, 0meg4kAI Security, Central Command, Owner Command (Owner), Marcus Vale (Operations), Celeste Monroe (Sales/AE), Adrian Cross (Client Success), Naomi Sterling (Finance), Julian Mercer (Legal/Compliance), Sienna Brooks (HR/Staffing), Orion Hayes (Technology), Valentina Reyes (Marketing/Brand), Donovan Pierce (Government/Enterprise), Helena Ward (Partnerships), Victor Saint (QA/Performance), Amara Voss (Innovation/Expansion).
 
 **SkyeGateFS27 Auth Platform** — Live at its own Cloudflare Worker. Bearer token introspection, role/scope validation, email allowlist, admin session management. Separate deployable platform that MetrAIyux 0S consumes.
 

@@ -1,13 +1,20 @@
 .env
 node_modules/
+**/node_modules/
 
 # Local Netlify folder
 .netlify
+**/.netlify/
+**/.wrangler/
+**/.wrangler-dry-run/
+.claude/
 
 # Secret and local runtime files
 .env.*
 !.env.example
 !.env.*.example
+.secrets/
+**/.secrets/
 *.pem
 *.key
 *.p12
@@ -15,6 +22,8 @@ node_modules/
 id_rsa*
 *credentials*.json
 *service-account*.json
+*.log
+*.env
 
 # Database/runtime backups
 *.dump
@@ -25,6 +34,48 @@ id_rsa*
 *.db
 backups/
 wal_archive/
+.staffing-db/
 
 # Local vault packaging output
 .skyevault-out/
+
+# Generated packages and local proof artifacts
+*.zip
+*.tar
+*.gz
+*.tgz
+*.7z
+*.rar
+test-artifacts/
+
+# Staged credential-scan exclusions
+SkyeGateFS27/env.template
+skye-business-command-center/docker-compose.yml
+skye-business-command-center/scripts/reports/client-readiness-20260515-141242.md
+skyesol_current_public_site/SkyeSol/skyesol-main/WebPile ProтАФMonaco Editor/index.html
+skyesol_current_public_site/SkyeSol/skyesol-main/WebPile ProтАФMonaco Editor/test/internal.test.mjs
+skyesol_current_public_site/SkyeSol/skyesol-main/WebPile ProтАФMonaco Editor/test/saml_c14n.test.mjs
+skyesol_current_public_site/SkyeSol/skyesol-main/WebPile ProтАФMonaco Editor/test/siem.test.mjs
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/CONNECT_YOUR_APP.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/control-plane/gateway/src/appConnection.mjs
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/control-plane/gateway/src/server.mjs
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/deploy/vps-postgres/docker-compose.yml
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/docs/FRAMEWORK_DATABASE_GUIDE.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/operator-dashboard/server.mjs
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/proof/v3.0-initial-route-contract-inspection.json
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/scripts/create-app-db.sh
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/django.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/frameworks.json
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/laravel.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/nextjs-prisma.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/node-express.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-frameworks/rails.md
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/templates/app-integration/env.example
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/tools/behavioral-proof.mjs
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/tools/create-app-onboarding-packet.sh
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/tools/generate-app-env.sh
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/tools/generate-live-e2e-env.sh
+unpacked-projects/citadeldb-ultimate-v3.0.1-audit-clean/tools/rotate-app-credential.sh
+unpacked-projects/sove-reign13-node-os-v0.3.0-aegis-autonomy/sove-reign13-node-os-v0.3.0-aegis-autonomy/env/sove-reign13.env
+unpacked-projects/soveReign13-citadel-forge-commercial-v1.3.0/soveReign13-citadel-forge-commercial-v1.3.0/forgejo/custom/conf/app.ini
+unpacked-projects/soveReign13-citadel-forge-commercial-v1.3.0/soveReign13-citadel-forge-commercial-v1.3.0/scripts/init-env.sh

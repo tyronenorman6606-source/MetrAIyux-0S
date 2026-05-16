@@ -16,12 +16,16 @@
     "closure:audit": "node scripts/closure-audit.mjs",
     "e2e:mock-browser": "node scripts/e2e-mock-browser-flow.mjs",
     "e2e:browser": "node scripts/e2e-playwright.spec.mjs",
-    "exports:audit": "node scripts/closure-audit.mjs"
+    "exports:audit": "node scripts/closure-audit.mjs",
+    "cloudflare:build": "node scripts/build-cloudflare-internal-pages.mjs",
+    "cloudflare:check": "npm run cloudflare:build && node --check cloudflare/worker.mjs && npx wrangler deploy --dry-run --outdir .wrangler-dry-run",
+    "cloudflare:deploy": "npm run cloudflare:build && npx wrangler deploy"
   },
   "engines": {
     "node": ">=18.18.0"
   },
   "devDependencies": {
-    "netlify-cli": "latest"
+    "netlify-cli": "latest",
+    "wrangler": "latest"
   }
 }

@@ -28,4 +28,4 @@ Suggested: deploy to `marketing.metraiyux.com` or `get.metraiyux.com` and link f
 All copy in this folder follows three rules:
 1. Say what the product actually does — no vague "AI-powered" claims
 2. Acknowledge what isn't done yet — the production gaps are real and disclosed in the sell sheet and valuation brief
-3. Write like a founder talking to another founder — not like a marketing department talking at a prospect
+3. Write like an owner talking to another owner — not like a marketing department talking at a prospect
