@@ -211,13 +211,18 @@ async function bootSOLBrain() {
     output.scrollTop = output.scrollHeight;
 
     try {
-      const res = await fetch("/.netlify/functions/brain", {
+      const runtime = window.SOLRuntime;
+      const request = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
         body: JSON.stringify({ prompt: question })
-      });
-      const data = await res.json().catch(() => ({}));
+      };
+      const response = runtime?.fetchJson
+        ? await runtime.fetchJson("/.netlify/functions/brain", request)
+        : { res: await fetch("/.netlify/functions/brain", request), data: null };
+      const res = response.res;
+      const data = response.data || await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.answer || `HTTP ${res.status}`);
       liveNode.textContent = data.answer || "No answer returned.";
     } catch (error) {

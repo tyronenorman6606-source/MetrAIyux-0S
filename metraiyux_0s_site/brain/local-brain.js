@@ -243,6 +243,24 @@ function routePool() {
 
 function chooseRoute(query) {
   const q = (query || '').toLowerCase();
+  if (hasAny(q, ['buyer', 'prospect', 'lead', 'ae', 'sales']) && hasAny(q, ['auth', 'proof', 'gate', 'skygate', 'fs27', 'trust', 'more than a website'])) {
+    return {
+      intent: 'buyer_auth_proof_demo',
+      primary: profileById('celeste-monroe-brain'),
+      secondary: profileById('0meg4kai-security-brain'),
+      createTask: 'Qualify the buyer, send the proof surface, and have 0meg4kAI check gate/security language',
+      score: 99
+    };
+  }
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
+    return {
+      intent: 'brain_count_or_runtime',
+      primary: profileById('site-operator-brain'),
+      secondary: profileById('central-company-command-brain'),
+      createTask: 'Explain the 16-brain runtime accurately',
+      score: 99
+    };
+  }
   const routeCandidates = routePool().map(route => {
     let score = scoreText(query, routeHay(route));
     (route.triggers || []).forEach(trigger => {
@@ -325,17 +343,18 @@ function smartDirectAnswer(query, route, surfaces) {
   const secondaryOwner = ownerName(secondary);
   const firstSurface = surfaces[0];
 
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', '14 brains', 'local brains'])) {
-    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. The right answer is not "14" anymore. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
-  }
-
-  if (hasAny(q, ['skygate', 'fs27', 'auth', 'token', 'bearer', 'session', 'introspect', 'platform events', 'mirror secret', 'admin key'])) {
-    return `Route this through ${primaryOwner}. FS27 is the gate layer: it validates bearer/session state through auth introspection, accepts mirrored platform events through the mirror-secret path, and keeps admin/key surfaces away from public copy. MetrAIyux 0S should consume that gate as proof, identity, and event context, then route the work to the correct cabinet brain.`;
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
+    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
   }
 
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {
     const linkLine = firstSurface ? ` The first surface I would send is ${firstSurface.name}, because ${firstSurface.sales_use || firstSurface.purpose}` : '';
-    return `${primaryOwner} owns the sales lane, with ${secondaryOwner} checking the strategic frame. The pitch should stay concrete: this is not just a website, it is a public site backed by a protected command deck, auth gate, proof loop, routing layer, and operating rooms the client can actually use.${linkLine}`;
+    const proofLine = hasAny(q, ['auth', 'gate', 'skygate', 'fs27', 'proof', 'trust']) ? ` Keep ${secondaryOwner} in the review because the buyer is asking about gate/proof language, not just a pretty demo.` : '';
+    return `${primaryOwner} owns the buyer conversation, with ${secondaryOwner} checking the risk/proof lane. The pitch should stay concrete: this is not just a website, it is a public site backed by a protected command deck, auth gate, proof loop, routing layer, and operating rooms the client can actually use.${proofLine}${linkLine}`;
+  }
+
+  if (hasAny(q, ['skygate', 'fs27', 'auth', 'token', 'bearer', 'session', 'introspect', 'platform events', 'mirror secret', 'admin key'])) {
+    return `Route this through ${primaryOwner}. FS27 is the gate layer: it validates bearer/session state through auth introspection, accepts mirrored platform events through the mirror-secret path, and keeps admin/key surfaces away from public copy. MetrAIyux 0S should consume that gate as proof, identity, and event context, then route the work to the correct cabinet brain.`;
   }
 
   if (hasAny(q, ['price', 'pricing', 'stripe', 'subscription', 'billing', 'invoice', 'quote', 'package', 'cost', 'retainer'])) {

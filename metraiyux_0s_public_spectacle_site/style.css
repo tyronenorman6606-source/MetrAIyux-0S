@@ -2787,6 +2787,86 @@ textarea:focus {
   object-fit: contain;
 }
 
+.proof-video-controls {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(100, 217, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(100, 217, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(3, 8, 14, 0.9);
+}
+
+.proof-time-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 54px;
+  gap: 12px;
+  align-items: center;
+  color: var(--soft);
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.proof-time-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+.proof-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.proof-button-row button,
+.proof-button-row select {
+  min-height: 42px;
+  border: 1px solid rgba(100, 217, 255, 0.28);
+  border-radius: 8px;
+  color: var(--ice);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 0 18px rgba(100, 217, 255, 0.06);
+  font: 950 12px/1 var(--font-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.proof-button-row button {
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.proof-button-row button:hover,
+.proof-button-row button:focus-visible,
+.proof-button-row select:hover,
+.proof-button-row select:focus-visible {
+  border-color: rgba(248, 203, 94, 0.68);
+  color: var(--gold);
+  box-shadow:
+    0 0 22px rgba(100, 217, 255, 0.16),
+    inset 0 0 20px rgba(248, 203, 94, 0.08);
+}
+
+.proof-button-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding-left: 10px;
+  color: var(--soft);
+  font: 950 12px/1 var(--font-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.proof-button-row select {
+  padding: 0 10px;
+}
+
 .proof-route-section {
   padding-top: clamp(36px, 6vw, 84px);
 }
@@ -2969,6 +3049,33 @@ textarea:focus {
   .long-proof-video video {
     min-height: 0;
     aspect-ratio: 16 / 9;
+  }
+
+  .proof-video-controls {
+    padding: 12px;
+  }
+
+  .proof-time-row {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .proof-button-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .proof-button-row button,
+  .proof-button-row label {
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .proof-button-row label {
+    grid-column: 1 / -1;
+    padding-left: 0;
   }
 
   .proof-route-grid {

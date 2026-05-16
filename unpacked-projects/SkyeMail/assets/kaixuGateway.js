@@ -11,6 +11,7 @@ function resolveKaixuGatewayBase(){
   const configuredBase =
     (runtime.kaixuGateway && runtime.kaixuGateway.baseUrl) ||
     runtime.kaixuGatewayBase ||
+    runtime.apiBase ||
     KAIXU_DEFAULT_FUNCTIONS_BASE;
   const normalized = String(configuredBase || "").trim() || KAIXU_DEFAULT_FUNCTIONS_BASE;
   return normalized.replace(/\/+$/, "");

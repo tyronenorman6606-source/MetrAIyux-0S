@@ -42,10 +42,34 @@
         <p>This walkthrough shows the actual MetrAIyux 0S screens: customer signup, onboarding, service selection, workspace setup, billing intent, customer command routing, admin brain response, local brain retrieval, NEXUS routing, CROWN command, and the proof vault. No private `.env` values or owner secrets are shown.</p>
       </div>
 
-      <figure class="surface-reel long-proof-video reveal">
-        <video controls playsinline preload="metadata" poster="assets/product-shots/metraiyux-0s-long-real-proof-poster.png" aria-label="Eight minute MetrAIyux 0S proof walkthrough video">
+      <figure class="surface-reel long-proof-video reveal" data-proof-player>
+        <video controls playsinline preload="metadata" poster="assets/product-shots/metraiyux-0s-long-real-proof-poster.png" aria-label="Eight minute MetrAIyux 0S proof walkthrough video" data-proof-video>
           <source src="assets/product-shots/metraiyux-0s-long-real-proof.mp4" type="video/mp4">
         </video>
+        <div class="proof-video-controls" aria-label="Proof video controls">
+          <div class="proof-time-row">
+            <span data-proof-current>0:00</span>
+            <input type="range" min="0" max="100" value="0" step="0.1" aria-label="Proof video timeline" data-proof-timeline>
+            <span data-proof-duration>8:07</span>
+          </div>
+          <div class="proof-button-row">
+            <button type="button" data-proof-skip="-30">-30s</button>
+            <button type="button" data-proof-skip="-10">-10s</button>
+            <button type="button" data-proof-toggle>Play / Pause</button>
+            <button type="button" data-proof-skip="10">+10s</button>
+            <button type="button" data-proof-skip="30">+30s</button>
+            <button type="button" data-proof-restart>Restart</button>
+            <label>Speed
+              <select data-proof-speed aria-label="Proof video playback speed">
+                <option value="0.75">0.75x</option>
+                <option value="1" selected>1x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+              </select>
+            </label>
+          </div>
+        </div>
         <figcaption>
           <span>8:07 proof walkthrough</span>
           <strong>I use the customer menu, owner/admin command surfaces, local brain, NEXUS routing, CROWN rooms, and proof vault so buyers can see the system instead of trusting empty claims. ⚡</strong>

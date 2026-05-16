@@ -1,6 +1,6 @@
 # Sentinel Site Operator Brain — Cloudflare Worker Kit
 
-This Worker adds a lightweight API for the 15th brain: the Site Operator Brain. It can route business signals, create tasks, store receipts in KV, write structured records to D1, and enqueue async work.
+This Worker adds a lightweight API for the Site Operator Brain: the Site Operator Brain. It can route business signals, create tasks, store receipts in KV, write structured records to D1, and enqueue async work.
 
 ## Endpoints
 

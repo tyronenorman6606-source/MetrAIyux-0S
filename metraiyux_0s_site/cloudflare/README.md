@@ -1,6 +1,6 @@
 # Cloudflare Worker Deployment Kit — Site Operator Brain
 
-This package includes an optional Cloudflare Worker for the 15th brain: the **Site Operator Brain**.
+This package includes an optional Cloudflare Worker for the Site Operator Brain: the **Site Operator Brain**.
 
 ## What it does
 

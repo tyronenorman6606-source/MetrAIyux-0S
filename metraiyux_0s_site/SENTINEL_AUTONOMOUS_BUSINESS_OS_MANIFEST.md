@@ -2,7 +2,7 @@
 
 Generated: 2026-05-15T08:58:24.490400Z
 
-This upgrade continues from the QUANTUM OPS package and adds a stronger autonomous business operating layer around the 15th brain.
+This upgrade continues from the QUANTUM OPS package and adds a stronger autonomous business operating layer around the Site Operator Brain.
 
 ## Added
 

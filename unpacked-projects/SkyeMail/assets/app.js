@@ -1,4 +1,11 @@
-const API_BASE = "/.netlify/functions";
+const SMV_RUNTIME_CONFIG = window.SMV_RUNTIME_CONFIG || {};
+const API_BASES = [...new Set([
+  SMV_RUNTIME_CONFIG.apiBase,
+  ...(Array.isArray(SMV_RUNTIME_CONFIG.apiBases) ? SMV_RUNTIME_CONFIG.apiBases : []),
+  "/.netlify/functions",
+  "/api"
+].filter(Boolean).map(base => String(base).replace(/\/+$/, "")))];
+const API_BASE = API_BASES[0] || "/.netlify/functions";
 const API_FUNCTION_PREFIX = "skymail-standalone-";
 const APP_ROOT_URL = new URL("./", window.location.href);
 const HOSTED_API_BASE = (() => {
@@ -45,7 +52,7 @@ function clearToken(){ localStorage.removeItem("SMV_TOKEN"); }
 function getHandle(){ return localStorage.getItem("SMV_HANDLE") || ""; }
 function setHandle(h){ localStorage.setItem("SMV_HANDLE", h); }
 
-function smvApiUrl(path = "", functionPrefix = API_FUNCTION_PREFIX){
+function smvApiUrl(path = "", functionPrefix = API_FUNCTION_PREFIX, apiBase = API_BASE){
   const normalized = String(path || "");
   if(/^https?:\/\//i.test(normalized)) return normalized;
   const parsed = new URL(normalized.startsWith("/") ? normalized : `/${normalized}`, "https://skymail.local");
@@ -53,7 +60,7 @@ function smvApiUrl(path = "", functionPrefix = API_FUNCTION_PREFIX){
     return `${HOSTED_API_BASE}/${parsed.pathname.replace(/^\/+/, "")}${parsed.search}${parsed.hash}`;
   }
   const functionName = `${functionPrefix}${parsed.pathname.replace(/^\/+/, "")}`;
-  return `${API_BASE}/${functionName}${parsed.search}${parsed.hash}`;
+  return `${apiBase}/${functionName}${parsed.search}${parsed.hash}`;
 }
 
 async function readApiResponse(res){
@@ -74,26 +81,35 @@ async function apiFetch(path, opts = {}){
   if(token) headers.Authorization = "Bearer " + token;
 
   const requestOptions = Object.assign({ credentials: "include" }, opts, { headers });
-  let res = await fetch(smvApiUrl(path), requestOptions);
-  let { data } = await readApiResponse(res);
+  let lastRes = null;
+  let lastData = null;
+  let lastError = null;
 
-  if(!res.ok && res.status === 404 && API_FUNCTION_PREFIX){
-    const fallbackRes = await fetch(smvApiUrl(path, ""), requestOptions);
-    const fallback = await readApiResponse(fallbackRes);
-    if(fallbackRes.ok){
-      return fallback.data;
-    }
-    if(!(fallbackRes.status === 404 && fallback.data && fallback.data.backend_missing)){
-      res = fallbackRes;
-      data = fallback.data;
+  for(const apiBase of API_BASES){
+    for(const prefix of [API_FUNCTION_PREFIX, ""]){
+      if(prefix === "" && !API_FUNCTION_PREFIX) continue;
+      try{
+        const res = await fetch(smvApiUrl(path, prefix, apiBase), requestOptions);
+        const { data } = await readApiResponse(res);
+        if(res.ok) return data;
+        lastRes = res;
+        lastData = data;
+        if(![404, 502, 503, 504].includes(res.status)){
+          const err = new Error((data && data.error) ? data.error : ("HTTP " + res.status));
+          err.status = res.status;
+          err.data = data;
+          throw err;
+        }
+      }catch(err){
+        lastError = err;
+        if(err.status && ![404, 502, 503, 504].includes(err.status)) throw err;
+      }
     }
   }
 
-  if(res.ok) return data;
-
-  const err = new Error((data && data.error) ? data.error : ("HTTP " + res.status));
-  err.status = res.status;
-  err.data = data;
+  const err = lastError || new Error((lastData && lastData.error) ? lastData.error : ("HTTP " + (lastRes ? lastRes.status : "backend unavailable")));
+  err.status = lastRes ? lastRes.status : 0;
+  err.data = lastData;
   throw err;
 }
 
@@ -165,6 +181,7 @@ function safe(s){ return (s || "").replace(/[<>&"]/g, (c) => ({ "<":"&lt;", ">":
 
 window.SMVRuntime = {
   apiBase: API_BASE,
+  apiBases: API_BASES,
   apiUrl: smvApiUrl,
   appRoot: APP_ROOT_URL.pathname,
   href: smvHref,

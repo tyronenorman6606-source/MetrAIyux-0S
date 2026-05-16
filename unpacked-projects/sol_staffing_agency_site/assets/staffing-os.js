@@ -41,15 +41,20 @@
   }
 
   async function api(path, options = {}) {
-    const res = await fetch(path, {
+    const request = {
       credentials: "same-origin",
       ...options,
       headers: options.body instanceof FormData ? options.headers : {
         "Content-Type": "application/json",
         ...(options.headers || {})
       }
-    });
-    const data = await res.json().catch(() => ({}));
+    };
+    const runtime = window.SOLRuntime;
+    const response = runtime?.fetchJson
+      ? await runtime.fetchJson(path, request)
+      : { res: await fetch(path, request), data: null };
+    const res = response.res;
+    const data = response.data || await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
     return data;
   }
@@ -104,7 +109,7 @@
   async function loadFiles() {
     const data = await api("/.netlify/functions/staffing-files");
     els.fileList.innerHTML = (data.files || []).map(file => `
-      <a class="pill-link" href="/.netlify/functions/staffing-files?id=${encodeURIComponent(file.id)}">
+      <a class="pill-link" href="${window.SOLRuntime?.apiUrl ? window.SOLRuntime.apiUrl(`staffing-files?id=${encodeURIComponent(file.id)}`) : `/.netlify/functions/staffing-files?id=${encodeURIComponent(file.id)}`}">
         ${escapeHtml(file.name)}<br>
         <small>${escapeHtml(file.label || file.content_type || "")} ${Number(file.size || 0)} bytes</small>
       </a>
@@ -135,13 +140,12 @@
     els.brainLiveOutput.textContent = "Thinking through the live endpoint...";
     const prompt = new FormData(els.brainLiveForm).get("prompt");
     try {
-      const res = await fetch("/.netlify/functions/brain", {
+      const { res, data } = await window.SOLRuntime.fetchJson("/.netlify/functions/brain", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt })
       });
-      const data = await res.json().catch(() => ({}));
       if (!res.ok && !data.answer) throw new Error(data.error || `HTTP ${res.status}`);
       els.brainLiveOutput.textContent = data.answer || "No answer returned.";
     } catch (error) {
@@ -176,7 +180,7 @@
   });
 
   els.logoutBtn?.addEventListener("click", async () => {
-    await fetch("/.netlify/functions/staffing-auth-logout", { method: "POST", credentials: "same-origin" });
+    await window.SOLRuntime.fetchJson("/.netlify/functions/staffing-auth-logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
     location.href = "./staffing-login.html";
   });
 

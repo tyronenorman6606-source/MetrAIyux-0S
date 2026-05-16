@@ -147,13 +147,13 @@ function databaseUrlWithSearchPath(value, env) {
 
 async function query(env, text, params = []) {
   const sql = getPrimarySql(env);
-  return await sql(text, params);
+  return await sql.query(text, params);
 }
 
 async function queryCitadel(env, text, params = []) {
   const sql = getCitadelSql(env);
   if (!sql) return { skipped: true, reason: "CITADEL_DATABASE_URL is not configured." };
-  return await sql(text, params);
+  return await sql.query(text, params);
 }
 
 async function requireAuth(request, env) {

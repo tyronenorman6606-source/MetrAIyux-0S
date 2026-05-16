@@ -4,8 +4,8 @@
   const skyegateLink = document.getElementById("skyegateLoginLink");
   const next = new URLSearchParams(location.search).get("next") || "./admin-dashboard.html";
 
-  fetch("/.netlify/functions/staffing-auth-config")
-    .then(res => res.json())
+  window.SOLRuntime.fetchJson("/.netlify/functions/staffing-auth-config", { credentials: "same-origin" })
+    .then(({ data: config }) => config)
     .then(config => {
       if (config.login_url && skyegateLink) {
         skyegateLink.href = config.login_url;
@@ -22,12 +22,11 @@
     const token = new FormData(form).get("token");
 
     try {
-      const res = await fetch("/.netlify/functions/staffing-auth-session", {
+      const { res, data } = await window.SOLRuntime.fetchJson("/.netlify/functions/staffing-auth-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token })
       });
-      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       status.textContent = "Session created. Opening dashboard...";
       location.href = next;

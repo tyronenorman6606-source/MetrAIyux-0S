@@ -1673,7 +1673,7 @@
       "source": "proof/proof-center.html",
       "title": "Proof Center",
       "heading": "Enterprise Upgrade",
-      "text": "Proof Center & Readiness Ledger 13-Cabinet Office Enterprise Upgrade Proof Center & Readiness Ledger Home Services Government AE Playbook Client Intake Proof Center 16 Brains Local Brain Blogs Deploy The Proof Center separates completed package assets from operator-dependent tasks. This prevents the site from claiming production readiness where live business setup is still required. Area Status Evidence 13 Executive Profiles Built HTML and Markdown resumes included. Founder Image Correction Built Gray London Skyes uses the approved founder asset. 14 Lightweight Brains Built Central brain plus 13 persona brains included. Longform Blogs Built 12 HTML posts and 12 Markdown posts included. Service Pages Built 12 service pages plus index included. Government Pages Built Readiness center, capability statement, checklist, subcontractor profile. Live Entity Filing Operator Required Must use real legal records and verified officer details. Payment / CRM / Email Integration Operator Required Provider keys and account setup required. Open full readiness ledger"
+      "text": "Proof Center & Readiness Ledger 13-Cabinet Office Enterprise Upgrade Proof Center & Readiness Ledger Home Services Government AE Playbook Client Intake Proof Center 16 Brains Local Brain Blogs Deploy The Proof Center separates completed package assets from operator-dependent tasks. This prevents the site from claiming production readiness where live business setup is still required. Area Status Evidence 13 Executive Profiles Built HTML and Markdown resumes included. Founder Image Correction Built Gray London Skyes uses the approved founder asset. 16 Operating Brains Built Site Operator, 0meg4kAI, Central Command, and 13 cabinet brains included. Longform Blogs Built 12 HTML posts and 12 Markdown posts included. Service Pages Built 12 service pages plus index included. Government Pages Built Readiness center, capability statement, checklist, subcontractor profile. Live Entity Filing Operator Required Must use real legal records and verified officer details. Payment / CRM / Email Integration Operator Required Provider keys and account setup required. Open full readiness ledger"
     },
     {
       "id": "enterprise-upgrade-25",
@@ -3964,7 +3964,7 @@
       "id": "autonomous-site-operator-572",
       "title": "Site Operator Brain",
       "source": "AUTONOMOUS_BUSINESS_SITE_OPERATOR_MANIFEST.md",
-      "text": "The Site Operator Brain is the 15th lightweight brain. It coordinates 14 existing company/cabinet brains, routes incoming site/business messages, creates event receipts, queues task recommendations, and requires human approval for legal, financial, hiring, filing, contract, and public-claim actions."
+      "text": "The Site Operator Brain routes the 16-brain runtime. It coordinates Site Operator, 0meg4kAI, Central Command, and the cabinet brains, routes incoming site/business messages, creates event receipts, queues task recommendations, and requires human approval for legal, financial, hiring, filing, contract, and public-claim actions."
     },
     {
       "id": "autonomous-site-operator-573",
@@ -4348,7 +4348,7 @@
       "id": "sentinel-doc-614",
       "title": "README_SENTINEL_WORKER.md",
       "source": "cloudflare-sentinel-operator/README_SENTINEL_WORKER.md",
-      "text": "# Sentinel Site Operator Brain — Cloudflare Worker Kit\n\nThis Worker adds a lightweight API for the 15th brain: the Site Operator Brain. It can route business signals, create tasks, store receipts in KV, write structured records to D1, and enqueue async work.\n\n## Endpoints\n\n- `GET /api/sentinel/status`\n- `POST /api/sentinel/route` with `{ \"text\": \"...\" }`\n- `POST /api/sentinel/task` with task JSON\n- `GET /api/sentinel/ledger`\n\n## Deployment outline\n\n1. Install Wrangler.\n2. Create a KV namespace for `SENTINEL_LEDGER`.\n3. Create a D1 database named `sentinel_business_os`.\n4. Run `wrangler d1 execute sentinel_business_os --file schema.sql`.\n5. Create a Queue named `sentinel-business-events` if using queue mode.\n6. Replace IDs in `wrangler.sentinel.toml`.\n7. Deploy with `wrangler deploy --config wrangler.sentinel.toml`.\n\nHigh-risk actions must still go through human approval gates.\n",
+      "text": "# Sentinel Site Operator Brain — Cloudflare Worker Kit\n\nThis Worker adds a lightweight API for the Site Operator Brain: the Site Operator Brain. It can route business signals, create tasks, store receipts in KV, write structured records to D1, and enqueue async work.\n\n## Endpoints\n\n- `GET /api/sentinel/status`\n- `POST /api/sentinel/route` with `{ \"text\": \"...\" }`\n- `POST /api/sentinel/task` with task JSON\n- `GET /api/sentinel/ledger`\n\n## Deployment outline\n\n1. Install Wrangler.\n2. Create a KV namespace for `SENTINEL_LEDGER`.\n3. Create a D1 database named `sentinel_business_os`.\n4. Run `wrangler d1 execute sentinel_business_os --file schema.sql`.\n5. Create a Queue named `sentinel-business-events` if using queue mode.\n6. Replace IDs in `wrangler.sentinel.toml`.\n7. Deploy with `wrangler deploy --config wrangler.sentinel.toml`.\n\nHigh-risk actions must still go through human approval gates.\n",
       "tags": [
         "sentinel",
         "cloudflare",
@@ -4370,7 +4370,7 @@
       "id": "sentinel-doc-616",
       "title": "SENTINEL_AUTONOMOUS_BUSINESS_OS_MANIFEST.md",
       "source": "SENTINEL_AUTONOMOUS_BUSINESS_OS_MANIFEST.md",
-      "text": "# SENTINEL MetrAIyux 0S Upgrade Manifest\n\nGenerated: 2026-05-15T08:58:24.490400Z\n\nThis upgrade continues from the QUANTUM OPS package and adds a stronger autonomous business operating layer around the 15th brain.\n\n## Added\n\n- Sentinel OS hub and 20 operating pages.\n- Browser-local triage, receipt, export, and clear tools.\n- 16-brain routing matrix with primary/secondary brain review rules.\n- Human approval gate center.\n- Cloudflare Worker kit for `/api/sentinel/status`, `/api/sentinel/route`, `/api/sentinel/task`, and `/api/sentinel/ledger`.\n- D1 schema for events, tasks, approvals, and proof receipts.\n- KV, Queue, and D1 deployment notes.\n- New downloadable markdown templates.\n- Updated sitemap, llms.txt, and local brain knowledge base.\n\n## Safety posture\n\nThe system can route, draft, summarize, queue, score, and generate receipts. It must not autonomously sign contracts, move funds, file government documents, provide regulated advice, hire/fire, or publish unsupported public claims.\n",
+      "text": "# SENTINEL MetrAIyux 0S Upgrade Manifest\n\nGenerated: 2026-05-15T08:58:24.490400Z\n\nThis upgrade continues from the QUANTUM OPS package and adds a stronger autonomous business operating layer around the Site Operator Brain.\n\n## Added\n\n- Sentinel OS hub and 20 operating pages.\n- Browser-local triage, receipt, export, and clear tools.\n- 16-brain routing matrix with primary/secondary brain review rules.\n- Human approval gate center.\n- Cloudflare Worker kit for `/api/sentinel/status`, `/api/sentinel/route`, `/api/sentinel/task`, and `/api/sentinel/ledger`.\n- D1 schema for events, tasks, approvals, and proof receipts.\n- KV, Queue, and D1 deployment notes.\n- New downloadable markdown templates.\n- Updated sitemap, llms.txt, and local brain knowledge base.\n\n## Safety posture\n\nThe system can route, draft, summarize, queue, score, and generate receipts. It must not autonomously sign contracts, move funds, file government documents, provide regulated advice, hire/fire, or publish unsupported public claims.\n",
       "tags": [
         "sentinel",
         "cloudflare",
@@ -4473,7 +4473,7 @@
       "source": "nexus/site-operator-scorecard.html",
       "title": "Site Operator Scorecard",
       "heading": "Site Operator Scorecard",
-      "text": "Measure the 15th brain by routing quality, not fantasy autonomy. Classification accuracy, Escalation discipline, Receipt completeness, Unresolved risk, Human approvals, Proof quality"
+      "text": "Measure the Site Operator Brain by routing quality, not fantasy autonomy. Classification accuracy, Escalation discipline, Receipt completeness, Unresolved risk, Human approvals, Proof quality"
     },
     {
       "id": "nexus-631",
@@ -4529,7 +4529,7 @@
       "source": "blog/nexus/site-operator-brain-autonomous-business.html",
       "title": "Why the Site Operator Brain Is the Control Layer for an MetrAIyux 0S business automation",
       "heading": "NEXUS longform blog",
-      "text": "A practical look at routing, receipts, approvals, and why the 15th brain should coordinate instead of hallucinate authority."
+      "text": "A practical look at routing, receipts, approvals, and why the Site Operator Brain should coordinate instead of hallucinate authority."
     },
     {
       "id": "nexus-639",

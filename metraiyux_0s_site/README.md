@@ -40,7 +40,7 @@ Open `local-brain.html` to use the browser-side cabinet knowledge assistant. It 
 Open `deployment-command-center.html` for operator setup guidance.
 
 
-## 14 Lightweight Local Brains
+## 16 Operating Local Brains
 
 This build includes one Central Company Command Brain and 13 individual cabinet-person brains. Open `person-brains.html` to select an executive brain, ask scoped questions, and view retrieved local proof sources. The brains are lightweight JSON/persona modules over the included knowledge base. They do not require a GPU, database, paid API, or live model endpoint.
 

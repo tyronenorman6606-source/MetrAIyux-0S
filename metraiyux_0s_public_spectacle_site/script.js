@@ -359,6 +359,81 @@ function previewBrief() {
   box.value = JSON.stringify(buildBriefObject(), null, 2);
 }
 
+function setupProofPlayer() {
+  const shell = document.querySelector("[data-proof-player]");
+  if (!shell) return;
+
+  const video = shell.querySelector("[data-proof-video]");
+  const timeline = shell.querySelector("[data-proof-timeline]");
+  const current = shell.querySelector("[data-proof-current]");
+  const duration = shell.querySelector("[data-proof-duration]");
+  const toggle = shell.querySelector("[data-proof-toggle]");
+  const restart = shell.querySelector("[data-proof-restart]");
+  const speed = shell.querySelector("[data-proof-speed]");
+  if (!video || !timeline) return;
+
+  const formatTime = (seconds) => {
+    const safe = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+    const mins = Math.floor(safe / 60);
+    const secs = Math.floor(safe % 60);
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  };
+
+  function sync() {
+    const max = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 100;
+    timeline.max = String(max);
+    timeline.value = String(Math.min(video.currentTime || 0, max));
+    if (current) current.textContent = formatTime(video.currentTime);
+    if (duration) duration.textContent = formatTime(max);
+    if (toggle) toggle.textContent = video.paused ? "Play" : "Pause";
+  }
+
+  shell.querySelectorAll("[data-proof-skip]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const delta = Number(button.dataset.proofSkip || 0);
+      const max = Number.isFinite(video.duration) ? video.duration : video.currentTime + delta;
+      video.currentTime = Math.max(0, Math.min(max, video.currentTime + delta));
+      sync();
+    });
+  });
+
+  if (toggle) {
+    toggle.addEventListener("click", async () => {
+      if (video.paused) {
+        await video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+      sync();
+    });
+  }
+
+  if (restart) {
+    restart.addEventListener("click", async () => {
+      video.currentTime = 0;
+      await video.play().catch(() => {});
+      sync();
+    });
+  }
+
+  if (speed) {
+    speed.addEventListener("change", () => {
+      video.playbackRate = Number(speed.value) || 1;
+    });
+  }
+
+  timeline.addEventListener("input", () => {
+    video.currentTime = Number(timeline.value) || 0;
+    sync();
+  });
+
+  video.addEventListener("loadedmetadata", sync);
+  video.addEventListener("timeupdate", sync);
+  video.addEventListener("play", sync);
+  video.addEventListener("pause", sync);
+  sync();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupMenu();
   setupReveal();
@@ -366,5 +441,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCommandCanvas();
   setupCommandTabs();
   setupGuidedTour();
+  setupProofPlayer();
   previewBrief();
 });

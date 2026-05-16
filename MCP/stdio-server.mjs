@@ -67,7 +67,7 @@ const proofActionSignals = [
 ];
 const e2eProofSignals = {
   video: [/<video\b/i, /<source[^>]+src=["'][^"']+\.(?:mp4|webm)["']/i, /\.(?:mp4|webm)\b/i],
-  browserRecording: [/recordVideo/i, /\bE2E browser recording\b/i, /\bbrowser recording\b/i, /\bPlaywright\b/i, /page\.(?:click|fill|goto|mouse|keyboard|locator|screenshot|waitForSelector)/i],
+  browserRecording: [/recordVideo/i, /record-proof-walkthrough\.mjs/i, /proof-recipes\//i, /proof-report\.json/i, /\bE2E browser recording\b/i, /\bbrowser recording\b/i, /\bPlaywright\b/i, /page\.(?:click|fill|goto|mouse|keyboard|locator|screenshot|waitForSelector)/i],
   actionPath: [/\b(?:click|fill|type|scroll|wheel|route|login|submit|filter|search|score|validate|open|gate|approve|restore|backup|deploy|monitor|handoff)\b/i, /page\.(?:click|fill|goto|mouse|keyboard|locator)/i],
   playbackVerified: [/readyState\s*(?:>=?|={2,3})\s*[2-4]/i, /currentTime\s*>\s*0/i, /paused\s*(?:={2,3}|is)\s*false/i, /\bvisible\b/i],
   poster: [/<video\b[^>]*\bposter\s*=/i],
@@ -210,6 +210,7 @@ This MCP is design-only. It exposes rules, patterns, reference notes, and QA too
 - quantumskyes://design/open-source-stack
 - quantumskyes://design/logo-standards
 - quantumskyes://design/surface-video-reel
+- quantumskyes://design/proof-recording-playbook
 - quantumskyes://content/first-person-operator-voice
 - quantumskyes://design/assets-manifest
 - quantumskyes://design/pattern-manifest
@@ -560,6 +561,46 @@ function contentGenerate({ product = 'the system', audience = 'serious operators
     copy: selected.join('\n'),
     voice: 'first-person operator/company POV',
     audit: contentAudit({ content: selected.join('\n'), requireFirstPerson: true })
+  };
+}
+
+function proofRecipe({ name = 'Client proof walkthrough', slug = '', siteRoot = '', baseUrl = '', workflow = [] } = {}) {
+  const cleanSlug = slug || String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'client-proof';
+  const steps = workflow.length
+    ? workflow
+    : [
+        { path: 'index.html', title: 'Open the real product surface', body: 'Show the actual first screen, not a mockup.', actions: [{ type: 'screenshot', name: 'first-screen' }] },
+        { path: 'index.html', title: 'Prove the claimed workflow', body: 'Click, fill, route, submit, or scroll through the behavior the copy claims.', actions: [{ type: 'scroll', y: 900, afterMs: 600 }, { type: 'screenshot', name: 'workflow-proof' }] }
+      ];
+  const recipe = {
+    name,
+    slug: cleanSlug,
+    mode: 'frames',
+    ...(siteRoot ? { siteRoot } : {}),
+    ...(baseUrl ? { baseUrl } : {}),
+    outDir: `test-artifacts/proof-recordings/${cleanSlug}`,
+    viewport: { width: 1440, height: 900 },
+    videoSize: { width: 1440, height: 900 },
+    frameSeconds: 7,
+    boundaries: [
+      'No .env values, private keys, bearer tokens, or owner-only credentials are shown.',
+      'Show real browser-visible behavior; do not call a static landing screenshot proof of app workflow.'
+    ],
+    chapters: steps.map((step, index) => ({
+      path: step.path || 'index.html',
+      ...(step.url ? { url: step.url } : {}),
+      title: step.title || `Proof step ${index + 1}`,
+      body: step.body || 'Browser-visible proof state.',
+      actions: step.actions || [{ type: 'screenshot', name: `proof-step-${index + 1}` }],
+      capture: step.capture ?? false
+    }))
+  };
+  return {
+    ok: true,
+    command: `npm run proof:record -- --config proof-recipes/${cleanSlug}.json`,
+    recipe,
+    writeTo: `proof-recipes/${cleanSlug}.json`,
+    rule: 'Use this recipe with tools/record-proof-walkthrough.mjs, then render the generated MP4 in the public proof page and run design_e2e_proof_audit.'
   };
 }
 

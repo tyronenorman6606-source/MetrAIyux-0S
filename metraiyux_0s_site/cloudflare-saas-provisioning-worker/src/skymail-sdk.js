@@ -24,6 +24,9 @@ export function skymailConfigured(env) {
 export function createSkyeMailClient(env) {
   const baseUrl = normalizeOrigin(env.SKYMAIL_API_URL || env.SKYMAIL_PUBLIC_URL);
   const token = clean(env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN);
+  const serviceBinding = env.SKYMAIL_WORKER && typeof env.SKYMAIL_WORKER.fetch === "function"
+    ? env.SKYMAIL_WORKER
+    : null;
 
   async function request(path, payload) {
     if (!token) {
@@ -34,14 +37,27 @@ export function createSkyeMailClient(env) {
         error: "SKYMAIL_SERVICE_TOKEN is not configured on the 0S SaaS worker.",
       };
     }
-    const res = await fetch(`${baseUrl}${path}`, {
+    const init = {
       method: "POST",
       headers: {
         "content-type": "application/json",
         authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload || {}),
-    });
+    };
+    let res;
+    try {
+      res = serviceBinding
+        ? await serviceBinding.fetch(new Request(`${baseUrl}${path}`, init))
+        : await fetch(`${baseUrl}${path}`, init);
+    } catch (error) {
+      return {
+        ok: false,
+        status: 502,
+        data: null,
+        error: error?.message || "SkyeMail request failed before a response was returned.",
+      };
+    }
     const text = await res.text();
     let data = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
@@ -75,6 +91,7 @@ export function createSkyeMailClient(env) {
       requested_local_part: mailboxLocal,
       requested_domain: domain || null,
       skymail_url: baseUrl,
+      transport: serviceBinding ? "cloudflare_service_binding" : "public_fetch",
     };
   }
 
