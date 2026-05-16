@@ -102,6 +102,13 @@
     { id: 'scar_rain', name: 'Scar Rain', desc: 'Garbage scars pulse in from below.', garbageEvery: 44, scoreMult: 1.42 },
   ];
 
+  const BATTLE_SQUADRONS = [
+    { id: 'vanta', name: 'Vanta Wraith', ship: 'Void Ronin', hp: 1800, tempo: 0.92, color: '#ff4def', style: 'rushdown' },
+    { id: 'orion', name: 'Orion Breaker', ship: 'Rail Saint', hp: 2150, tempo: 0.78, color: '#35f5ff', style: 'zoner' },
+    { id: 'sable', name: 'Sable Monk', ship: 'Moon Fang', hp: 2400, tempo: 0.7, color: '#ffd663', style: 'counter' },
+    { id: 'scar', name: 'Scar Admiral', ship: 'Grave Engine', hp: 2850, tempo: 1.08, color: '#ff4c72', style: 'boss' },
+  ];
+
   const AUDIO_MOODS = {
     alpha: {
       label: 'Alpha Calm',
@@ -1891,6 +1898,25 @@
     return { ...item, progress: 0, text: item.label.replace('{target}', item.target) };
   }
 
+  function makeBattleState(mode, rng, rank, startLevel) {
+    const offset = mode === 'onslaught' ? 3 : mode === 'blitz' ? 1 : Math.floor(rng() * BATTLE_SQUADRONS.length);
+    const baseEnemy = BATTLE_SQUADRONS[(offset + startLevel + rank) % BATTLE_SQUADRONS.length];
+    const maxHp = Math.floor(baseEnemy.hp + startLevel * 190 + rank * 80);
+    return {
+      enemy: { ...baseEnemy },
+      enemyHp: maxHp,
+      enemyMaxHp: maxHp,
+      enemyMeter: 16,
+      playerHull: mode === 'zen' ? 130 : 100,
+      playerMaxHull: mode === 'zen' ? 130 : 100,
+      wave: 1,
+      chainName: 'Neutral',
+      lastStrike: 0,
+      lastEnemyHit: 0,
+      warning: '',
+    };
+  }
+
   function makeState(mode) {
     const cfg = MODES[mode] || MODES.endurance;
     const daily = cfg.daily ? dailyInfo() : null;
@@ -1933,6 +1959,7 @@
       riftEvent: activeRiftEvent(),
       focusCard: activeFocusCard(),
       drill: activeDrill(),
+      battle: makeBattleState(mode, rng, rank, cfg.startLevel),
       pulseGoal: makePulseGoal(rng),
       pulseProgress: {},
       runPerks: {
@@ -1961,6 +1988,8 @@
       mission: null,
       floaters: [],
       particles: [],
+      riftNodes: [],
+      nodeChain: 0,
       garbageTimer: 0,
       levelChoiceGiven: cfg.startLevel,
       shake: 0,
@@ -2167,6 +2196,7 @@
     markCodex(`mode_${mode}`, 1);
     state.mission = defaultMission(state.rng, state.level);
     refillQueue();
+    spawnRiftNodes(3);
     spawnNext();
     state.started = true;
     state.startedAt = performance.now();
@@ -2290,6 +2320,7 @@
   function lockPiece() {
     if (!state.piece || state.gameOver) return;
     const p = state.piece;
+    const lockedCells = [];
     for (let y = 0; y < p.shape.length; y += 1) {
       for (let x = 0; x < p.shape[y].length; x += 1) {
         if (!p.shape[y][x]) continue;
@@ -2297,9 +2328,11 @@
         const by = p.y + y;
         if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
           state.grid[by][bx] = { type: p.type, power: powerForCell(p, x, y) };
+          lockedCells.push({ x: bx, y: by });
         }
       }
     }
+    collectTouchedRiftNodes(lockedCells);
     state.stats.pieces += 1;
     progressPulse('piece', 1);
     sound('lock');
@@ -2315,6 +2348,7 @@
 
     if (!fullRows.length) {
       state.combo = 0;
+      battleDropPressure(lockedStackPressure());
       return;
     }
 
@@ -2347,6 +2381,8 @@
     const dailyMod = state.daily?.mod || {};
     const riftGain = (count * 13 + Math.max(0, state.combo - 1) * 4 + powerCells.length * 8) * (dailyMod.riftMult || 1) * state.runPerks.riftMult;
     state.riftCharge = Math.min(100, state.riftCharge + riftGain);
+
+    battleLineStrike(count, powerCells.length);
 
     addFloater(`+${formatNumber(gained + comboBonus)}`, BOARD_W / 2, 140 + rand(-30, 40), count >= 4 ? '#ffd663' : '#35f5ff');
     spawnLineParticles(fullRows, count >= 4 ? '#ffd663' : '#35f5ff');
@@ -2437,16 +2473,210 @@
     state.stats.surges += 1;
     profile.totalSurges += 1;
     state.score += 500 * state.level;
+    triggerRiftStorm();
     progressMission('surge', 1);
     progressPulse('surge', 1);
     progressQuest('surge', 1);
     unlock('first_rift');
     sound('surge');
     haptic([30, 40, 30]);
-    showToast('RIFT SURGE: 1.8x clear value');
+    showToast('RIFT STORM: board cut + scoring burn');
     for (let i = 0; i < 32; i += 1) {
       state.particles.push({ x: rand(10, BOARD_W - 10), y: rand(20, BOARD_H - 20), vx: rand(-0.08, 0.08), vy: rand(-0.18, -0.02), life: rand(500, 1000), color: i % 2 ? '#ff4def' : '#35f5ff', size: rand(2, 5) });
     }
+  }
+
+  function spawnRiftNodes(count = 1) {
+    if (!state?.grid) return;
+    state.riftNodes = Array.isArray(state.riftNodes) ? state.riftNodes : [];
+    const targetCount = Math.min(6, state.riftNodes.length + count);
+    let guard = 0;
+    while (state.riftNodes.length < targetCount && guard < 80) {
+      guard += 1;
+      const x = Math.floor(state.rng() * COLS);
+      const y = HIDDEN_ROWS + 2 + Math.floor(state.rng() * (VISIBLE_ROWS - 5));
+      const occupied = state.grid[y]?.[x] || state.riftNodes.some((node) => node.x === x && node.y === y);
+      if (occupied) continue;
+      state.riftNodes.push({
+        x,
+        y,
+        value: 180 + state.level * 45 + Math.floor(state.rng() * 90),
+        color: state.rng() > 0.5 ? '#35f5ff' : '#ff4def',
+      });
+    }
+  }
+
+  function collectTouchedRiftNodes(cells = []) {
+    if (!state.riftNodes?.length) return;
+    const touched = [];
+    state.riftNodes = state.riftNodes.filter((node) => {
+      const hit = cells.some((cell) => cell.x === node.x && cell.y === node.y);
+      if (hit) touched.push(node);
+      return !hit;
+    });
+    touched.forEach((node) => collectRiftNode(node));
+    if (state.riftNodes.length < 3) spawnRiftNodes(3 - state.riftNodes.length);
+  }
+
+  function collectRiftNode(node) {
+    state.nodeChain += 1;
+    state.score += node.value * state.level;
+    state.riftCharge = Math.min(100, state.riftCharge + 18 + state.nodeChain * 2);
+    battleDamage(110 + state.nodeChain * 28, `Node juggle x${state.nodeChain}`, node.color);
+    progressPulse('core', 1);
+    progressQuest('core', 1);
+    addFloater(`NODE x${state.nodeChain}`, node.x * CELL + CELL / 2, (node.y - HIDDEN_ROWS) * CELL + CELL / 2, node.color);
+    burstAt(node.x, node.y, node.color, 14);
+    if (state.nodeChain % 3 === 0) {
+      state.chronoTimer = Math.max(state.chronoTimer, 3600);
+      state.shield = Math.min(3, state.shield + 1);
+      addFloater('CHAIN SHIELD', BOARD_W / 2, 120, '#7cffb1');
+    }
+    sound('core');
+    haptic([8, 18, 8]);
+  }
+
+  function triggerRiftStorm() {
+    const rowPressure = [];
+    for (let y = HIDDEN_ROWS; y < ROWS; y += 1) {
+      const occupied = state.grid[y].reduce((sum, cell) => sum + (cell ? 1 : 0), 0);
+      if (occupied >= 4) rowPressure.push({ y, occupied });
+    }
+    rowPressure.sort((a, b) => b.occupied - a.occupied);
+    const targets = rowPressure.slice(0, 3);
+    targets.forEach(({ y }, idx) => {
+      for (let x = 0; x < COLS; x += 1) {
+        if (!state.grid[y][x]) continue;
+        if (idx === 0 || x % 2 === idx % 2 || state.rng() > 0.58) {
+          burstAt(x, y, idx === 0 ? '#ffd663' : '#35f5ff', 5);
+          state.grid[y][x] = null;
+        }
+      }
+    });
+    if (targets.length) {
+      state.score += (targets.length * 420 + state.level * 120) * state.level;
+      battleDamage(520 + targets.length * 180 + state.level * 45, 'Rift Super', '#ffd663');
+      addFloater('RIFT CUT', BOARD_W / 2, 96, '#ffd663');
+      state.chronoTimer = Math.max(state.chronoTimer, 4200);
+    }
+    spawnRiftNodes(2);
+  }
+
+  function lockedStackPressure() {
+    let pressure = 0;
+    for (let y = HIDDEN_ROWS; y < ROWS; y += 1) {
+      const filled = state.grid[y].reduce((sum, cell) => sum + (cell ? 1 : 0), 0);
+      if (filled >= 7) pressure += filled - 6;
+    }
+    return pressure;
+  }
+
+  function battleDropPressure(stackPressure = 0) {
+    if (!state.battle || !state.started || state.gameOver) return;
+    const chip = 16 + state.level * 3 + Math.max(0, 5 - stackPressure) * 2;
+    state.battle.enemyMeter = Math.min(100, state.battle.enemyMeter + 4 + stackPressure * 1.5);
+    if (state.stats.pieces % 5 === 0) {
+      battleDamage(chip, 'Tracer chip', '#9dffef', false);
+    }
+  }
+
+  function comboName(lines, combo) {
+    if (lines >= 4 && combo >= 4) return 'Astral Ultra';
+    if (lines >= 4) return 'Meteor Break';
+    if (combo >= 5) return 'Rift Rush';
+    if (combo >= 3) return 'Star Juggle';
+    if (lines >= 2) return 'Twin Barrage';
+    return 'Laser Poke';
+  }
+
+  function battleLineStrike(lines, powerCells = 0) {
+    if (!state.battle || !lines) return;
+    const combo = Math.max(1, state.combo);
+    const name = comboName(lines, combo);
+    const riftBoost = state.riftActive ? 1.65 : 1;
+    const damage = Math.floor((130 * lines + 52 * combo + powerCells * 95 + state.level * 26) * riftBoost);
+    state.battle.chainName = name;
+    state.battle.enemyMeter = Math.max(0, state.battle.enemyMeter - lines * 12 - combo * 2);
+    battleDamage(damage, `${name} ${lines}L`, lines >= 4 ? '#ffd663' : '#35f5ff');
+    if (lines >= 4) {
+      state.chronoTimer = Math.max(state.chronoTimer, 1800);
+      state.shake = 220;
+      ui.boardStage.classList.add('shake');
+      setTimeout(() => ui.boardStage.classList.remove('shake'), 220);
+    }
+  }
+
+  function battleDamage(amount, label, color = '#35f5ff', loud = true) {
+    if (!state.battle || state.gameOver) return;
+    const battle = state.battle;
+    battle.enemyHp = Math.max(0, battle.enemyHp - Math.floor(amount));
+    battle.lastStrike = performance.now();
+    battle.chainName = label;
+    addFloater(`${label} -${formatNumber(amount)}`, BOARD_W / 2, 58 + rand(-8, 12), color);
+    for (let i = 0; i < Math.min(28, 5 + Math.floor(amount / 80)); i += 1) {
+      state.particles.push({ x: rand(72, BOARD_W - 72), y: rand(26, 92), vx: rand(-0.18, 0.18), vy: rand(-0.1, 0.18), life: rand(260, 720), color, size: rand(2, 5) });
+    }
+    if (loud) {
+      sound(amount >= 500 ? 'surge' : 'clear');
+      haptic(amount >= 500 ? [18, 22, 18] : 12);
+    }
+    if (battle.enemyHp <= 0) nextBattleWave();
+  }
+
+  function nextBattleWave() {
+    const battle = state.battle;
+    battle.wave += 1;
+    const next = BATTLE_SQUADRONS[(BATTLE_SQUADRONS.findIndex((enemy) => enemy.id === battle.enemy.id) + battle.wave) % BATTLE_SQUADRONS.length];
+    const maxHp = Math.floor(next.hp + state.level * 220 + battle.wave * 260 + rankForXP(profile.xp) * 70);
+    battle.enemy = { ...next };
+    battle.enemyMaxHp = maxHp;
+    battle.enemyHp = maxHp;
+    battle.enemyMeter = Math.max(24, 54 - battle.wave * 3);
+    state.score += 900 * battle.wave * state.level;
+    state.riftCharge = Math.min(100, state.riftCharge + 26);
+    state.shield = Math.min(3, state.shield + (battle.wave % 2 === 0 ? 1 : 0));
+    spawnRiftNodes(2);
+    addFloater(`WAVE ${battle.wave}: ${next.ship}`, BOARD_W / 2, 86, next.color);
+    showToast(`Enemy down. ${next.name} entering.`);
+  }
+
+  function enemyBattleAttack() {
+    if (!state.battle || state.gameOver || state.pendingChoice) return;
+    const battle = state.battle;
+    const enemy = battle.enemy;
+    const damage = Math.max(6, Math.floor(10 + state.level * 1.6 + battle.wave * 2.2));
+    battle.enemyMeter = 0;
+    battle.lastEnemyHit = performance.now();
+    battle.warning = `${enemy.ship} fired`;
+    if (state.shield > 0 && state.rng() > 0.45) {
+      state.shield -= 1;
+      addFloater('SHIELD PARRY', BOARD_W / 2, 118, '#7cffb1');
+      battleDamage(120 + state.level * 18, 'Counter parry', '#7cffb1', false);
+      showToast('Shield parry countered the volley');
+      return;
+    }
+    battle.playerHull = Math.max(0, battle.playerHull - damage);
+    addFloater(`HULL -${damage}`, BOARD_W / 2, 118, enemy.color);
+    haptic([22, 32, 22]);
+    sound('fail');
+    if (enemy.style === 'rushdown' || enemy.style === 'boss' || state.mode === 'onslaught') addGarbageRow();
+    else if (enemy.style === 'zoner') plasmaScarColumn();
+    else state.chronoTimer = Math.max(0, state.chronoTimer - 1200);
+    if (battle.playerHull <= 0) endRun('Hull breached by enemy ace');
+  }
+
+  function plasmaScarColumn() {
+    const col = Math.floor(state.rng() * COLS);
+    for (let y = Math.max(HIDDEN_ROWS + 6, ROWS - 9); y < ROWS; y += 1) {
+      if (state.rng() < 0.48 && !state.grid[y][col]) {
+        state.grid[y][col] = { type: 'G', power: null };
+        burstAt(col, y, '#ff4def', 3);
+      }
+    }
+    state.shake = 220;
+    ui.boardStage.classList.add('shake');
+    setTimeout(() => ui.boardStage.classList.remove('shake'), 220);
+    showToast('Enemy plasma scar');
   }
 
   function progressMission(type, amount = 1, setMax = false) {
@@ -2787,6 +3017,13 @@
     if (state.chronoTimer > 0) state.chronoTimer = Math.max(0, state.chronoTimer - dt);
     if (state.shake > 0) state.shake = Math.max(0, state.shake - dt);
 
+    if (state.battle) {
+      const tempo = Number(state.battle.enemy?.tempo || 1);
+      const pressureTax = Math.min(1.3, lockedStackPressure() * 0.08);
+      state.battle.enemyMeter = Math.min(100, state.battle.enemyMeter + (dt / 1000) * (5.4 * tempo + state.level * 0.22 + pressureTax));
+      if (state.battle.enemyMeter >= 100) enemyBattleAttack();
+    }
+
     const dailyGarbage = state.daily?.mod?.garbageEvery || 0;
     const garbageEvery = state.cfg.garbageEvery || dailyGarbage;
     if (garbageEvery && state.lines >= 4) {
@@ -2938,6 +3175,30 @@
     }
     ctx.restore();
 
+    if (state.riftNodes?.length) {
+      const pulse = 0.72 + Math.sin(performance.now() / 180) * 0.18;
+      state.riftNodes.forEach((node) => {
+        const x = node.x * CELL + CELL / 2;
+        const y = (node.y - HIDDEN_ROWS) * CELL + CELL / 2;
+        if (y < 0 || y > BOARD_H) return;
+        ctx.save();
+        ctx.globalAlpha = pulse;
+        ctx.shadowColor = node.color;
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = node.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, CELL * 0.34, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = node.color;
+        ctx.globalAlpha = 0.18;
+        ctx.beginPath();
+        ctx.arc(x, y, CELL * 0.24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
     if (state.riftActive) {
       ctx.save();
       ctx.globalAlpha = 0.17 + Math.sin(performance.now() / 120) * 0.05;
@@ -2953,6 +3214,78 @@
       ctx.fillRect(0, 0, BOARD_W, BOARD_H);
       ctx.restore();
     }
+  }
+
+  function drawBattleHud() {
+    if (!state.battle) return;
+    const battle = state.battle;
+    const enemy = battle.enemy;
+    const now = performance.now();
+    const enemyPct = Math.max(0, Math.min(1, battle.enemyHp / battle.enemyMaxHp));
+    const hullPct = Math.max(0, Math.min(1, battle.playerHull / battle.playerMaxHull));
+    const meterPct = Math.max(0, Math.min(1, battle.enemyMeter / 100));
+    const hitFlash = Math.max(0, 1 - (now - battle.lastStrike) / 320);
+    const danger = Math.max(0, meterPct - 0.72) / 0.28;
+
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    ctx.fillStyle = 'rgba(2, 3, 10, 0.72)';
+    roundRect(ctx, 8, 8, BOARD_W - 16, 58, 14);
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255,255,255,${0.16 + danger * 0.22})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#f8fbff';
+    ctx.font = '900 11px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`W${battle.wave} ${enemy.name}`, 18, 25);
+    ctx.fillStyle = enemy.color;
+    ctx.font = '800 9px system-ui, sans-serif';
+    ctx.fillText(enemy.ship.toUpperCase(), 18, 39);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#9aa7c3';
+    ctx.fillText(battle.chainName.toUpperCase(), BOARD_W - 18, 25);
+    ctx.fillStyle = '#7cffb1';
+    ctx.fillText(`HULL ${Math.ceil(battle.playerHull)}%`, BOARD_W - 18, 39);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.11)';
+    roundRect(ctx, 18, 45, BOARD_W - 36, 8, 999);
+    ctx.fill();
+    const hpGrad = ctx.createLinearGradient(18, 45, BOARD_W - 18, 45);
+    hpGrad.addColorStop(0, enemy.color);
+    hpGrad.addColorStop(1, '#ffd663');
+    ctx.fillStyle = hpGrad;
+    roundRect(ctx, 18, 45, (BOARD_W - 36) * enemyPct, 8, 999);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(124,255,177,0.82)';
+    roundRect(ctx, 18, 56, (BOARD_W - 36) * hullPct, 4, 999);
+    ctx.fill();
+    ctx.fillStyle = `rgba(255,76,114,${0.32 + danger * 0.5})`;
+    roundRect(ctx, 18, 62, (BOARD_W - 36) * meterPct, 2, 999);
+    ctx.fill();
+
+    const shipX = BOARD_W / 2;
+    const shipY = 84 + Math.sin(now / 180) * 3;
+    ctx.translate(shipX, shipY);
+    ctx.globalAlpha = 0.55 + hitFlash * 0.35;
+    ctx.shadowColor = enemy.color;
+    ctx.shadowBlur = 16 + hitFlash * 18;
+    ctx.fillStyle = enemy.color;
+    ctx.beginPath();
+    ctx.moveTo(0, -18 - hitFlash * 4);
+    ctx.lineTo(34, 10);
+    ctx.lineTo(10, 4);
+    ctx.lineTo(0, 18);
+    ctx.lineTo(-10, 4);
+    ctx.lineTo(-34, 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#f8fbff';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.restore();
   }
 
   function draw() {
@@ -2994,6 +3327,8 @@
       ctx.fillText(f.text, f.x, f.y);
       ctx.restore();
     });
+
+    drawBattleHud();
 
     drawMiniCanvases();
   }
@@ -3045,7 +3380,9 @@
     ui.modeLabel.textContent = state.daily ? `${state.cfg.label}: ${state.daily.mod.name}` : state.cfg.label;
     const missionProgress = state.mission ? ` (${Math.min(state.mission.progress, state.mission.target)}/${state.mission.target})` : '';
     const pulse = state.pulseGoal ? ` · ${state.pulseGoal.text} (${Math.min(Number(state.pulseProgress?.[state.pulseGoal.type] || 0), state.pulseGoal.target)}/${state.pulseGoal.target})` : '';
-    ui.missionText.textContent = state.mission ? `${state.mission.text}${missionProgress}${pulse}` : `Mission initializing${pulse}`;
+    const nodes = state.riftNodes?.length ? ` · Hit ${state.riftNodes.length} Rift Nodes` : '';
+    const battle = state.battle ? ` · Duel ${state.battle.enemy.ship} ${Math.ceil(state.battle.enemyHp)}/${state.battle.enemyMaxHp}` : '';
+    ui.missionText.textContent = state.mission ? `${state.mission.text}${missionProgress}${battle}${nodes}${pulse}` : `Mission initializing${battle}${nodes}${pulse}`;
     ui.timeText.textContent = state.cfg.timeLimit ? formatClock(state.timeLeft) : '∞';
     ui.shieldText.textContent = state.shield;
     ui.surgeText.textContent = state.stats.surges;
@@ -3095,7 +3432,7 @@
     setOverlay(`
       <p class="eyebrow">Phone-first ritual arcade</p>
       <h2>Enter the Rift</h2>
-      <p>Swipe to move, tap to rotate, flick down to slam. Draft anomalies, farm shards, tune calming audio, unlock cosmetics, and push daily/weekly contracts so this turns into a real habit loop.</p>
+      <p>Swipe to fly the block engine, but the run is a ship duel now: clears hit enemy hull, combos become attack strings, shields can parry volleys, and Rift Storm is your super.</p>
       <div class="mode-grid" id="modeGrid">
         ${Object.entries(MODES).map(([key, mode]) => `
           <button class="mode-card ${selectedMode === key ? 'active' : ''}" data-mode="${key}" type="button">
@@ -3195,9 +3532,9 @@
     setOverlay(`
       <p class="eyebrow">Control deck</p>
       <h2>Play Fast</h2>
-      <p><b>Tap board</b> to rotate. <b>Swipe left/right</b> to move. <b>Swipe down</b> to slam. <b>Swipe up</b> to hold. Use the Mood Deck when you want calm, focus, or late-night tones.</p>
+      <p><b>Tap board</b> to rotate. <b>Swipe left/right</b> to move. <b>Swipe down</b> to slam. <b>Swipe up</b> to hold. Clear lines to attack the rival ship before its meter fires back.</p>
       <div class="profile-list">
-        <div class="profile-row"><b>Rift Surge</b><span>Clear lines until the meter hits 100%, then hit RIFT for a scoring burn.</span></div>
+        <div class="profile-row"><b>Rift Super</b><span>Clear lines until the meter hits 100%, then hit RIFT for a board cut and heavy ship damage.</span></div>
         <div class="profile-row"><b>Power Cores</b><span>Q bursts clusters, B slices a row, C slows time, S grants shield.</span></div>
         <div class="profile-row"><b>Anomaly Drafts</b><span>Every few levels you pick a run perk. This is what turns a good run into a long session.</span></div>
       </div>

@@ -1526,3 +1526,157 @@ body[data-trail="trail-aura-wave"] .toast {
   border-color: rgba(53,245,255,.72);
   box-shadow: 0 0 36px rgba(53,245,255,.2), 0 0 24px rgba(255,214,99,.16), 0 12px 35px rgba(0,0,0,.36);
 }
+
+/* v14 mobile arcade repair: reduce chrome, enlarge thumb play, make the board the product */
+@media (max-width: 720px) {
+  .app-shell {
+    padding-top: 8px;
+    padding-inline: 8px;
+    padding-bottom: calc(170px + var(--safe-bottom));
+  }
+
+  body.is-playing .topbar {
+    display: none;
+  }
+
+  .topbar {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  h1 {
+    font-size: 25px;
+    white-space: nowrap;
+  }
+
+  .top-actions {
+    width: auto;
+    max-width: 160px;
+    margin-left: auto;
+    overflow: visible;
+    justify-content: flex-end;
+  }
+
+  .top-actions .pill-btn:not(.mood-pill):not(#profileBtn),
+  .top-actions .install-btn {
+    display: none;
+  }
+
+  .score-strip {
+    gap: 5px;
+  }
+
+  body.is-playing .score-strip {
+    display: none;
+  }
+
+  .score-strip article {
+    padding: 7px 6px;
+    border-radius: 14px;
+  }
+
+  .score-strip span {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .score-strip strong {
+    font-size: 18px;
+  }
+
+  .arena-card {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .status-row,
+  .rift-zone {
+    margin-bottom: 6px;
+  }
+
+  body.is-playing .status-row,
+  body.is-playing .rift-zone,
+  body.is-playing .side-panel {
+    display: none;
+  }
+
+  .status-copy strong {
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .status-buttons .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 13px;
+  }
+
+  .board-stage {
+    width: min(100%, 360px);
+    border-radius: 18px;
+  }
+
+  body.is-playing .board-stage {
+    width: min(100%, 340px);
+  }
+
+  .side-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.is-playing .today-card-side,
+  body.is-playing .mood-card-side {
+    display: none;
+  }
+
+  .touch-controls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 10px calc(10px + var(--safe-bottom));
+  }
+
+  .touch-controls button {
+    min-height: 64px;
+    border-radius: 20px;
+  }
+
+  .touch-controls b {
+    font-size: 25px;
+  }
+
+  .touch-controls .large {
+    grid-row: auto;
+    min-height: 64px;
+  }
+
+  .touch-controls .rift-mobile {
+    border-color: rgba(255, 214, 99, 0.62);
+    background: linear-gradient(145deg, rgba(255, 214, 99, 0.22), rgba(53, 245, 255, 0.12));
+  }
+
+  .overlay {
+    padding: 10px;
+  }
+
+  .overlay-panel {
+    width: min(100%, 360px);
+    max-height: min(96%, 700px);
+    padding: 15px;
+    border-radius: 22px;
+  }
+
+  .overlay-panel h2 {
+    letter-spacing: 0;
+  }
+
+  .compact-actions {
+    grid-template-columns: 1fr 1fr;
+    max-height: 210px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+}
