@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skye Vault — Empire-Wide File Storage | SOL Enterprises</title>
+  <meta name="description" content="Skye Vault is the empire-wide file intake portal for Skyes Over London / SOL Enterprises. Clients, contractors, and internal teams send files directly into Cloudflare R2 storage with receipt-backed proof on every upload.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Vault-specific overrides */
+    .vault-hero {
+      padding: 140px clamp(20px,4vw,56px) 80px;
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 48px;
+      align-items: center;
+    }
+    .vault-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(44px,6vw,88px); line-height:.95; margin:0 0 22px; }
+    .vault-hero .lede { font-size:1.05rem; color:var(--muted); max-width:500px; margin:0 0 32px; }
+
+    .vault-zone {
+      background: rgba(232,76,48,.05);
+      border: 2px dashed rgba(232,76,48,.35);
+      border-radius: 14px;
+      padding: 52px 36px;
+      text-align: center;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+    .vault-zone:hover { background:rgba(232,76,48,.08); border-color:rgba(232,76,48,.6); }
+    .vault-zone.drag-over { background:rgba(232,76,48,.14); border-color:var(--fire); }
+    .vault-zone-icon { font-size:3rem; margin-bottom:16px; }
+    .vault-zone h3 { font-family:'Playfair Display',serif; font-size:1.4rem; margin:0 0 8px; }
+    .vault-zone p { color:var(--muted); font-size:.9rem; margin:0 0 20px; }
+    .vault-zone input[type=file] { display:none; }
+
+    .vault-fields { display:flex; flex-direction:column; gap:14px; margin-top:20px; }
+    .vault-field label { display:block; font-size:.78rem; font-family:'Bebas Neue',sans-serif; letter-spacing:.15em; color:var(--gold); margin-bottom:6px; }
+    .vault-field input, .vault-field select, .vault-field textarea {
+      width:100%; padding:12px 14px; background:rgba(255,255,255,.05);
+      border:1px solid var(--line); border-radius:7px; color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:.9rem;
+      transition:border-color .2s;
+    }
+    .vault-field input:focus, .vault-field select:focus, .vault-field textarea:focus {
+      outline:none; border-color:rgba(232,76,48,.5);
+    }
+    .vault-field select option { background:#0c0b16; }
+    .vault-field textarea { min-height:80px; resize:vertical; }
+    .vault-consent { display:flex; align-items:flex-start; gap:10px; font-size:.84rem; color:var(--muted); margin-top:8px; }
+    .vault-consent input { margin-top:3px; flex-shrink:0; accent-color:var(--fire); }
+
+    .queue-list { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+    .queue-item {
+      display:flex; align-items:center; gap:10px; padding:10px 14px;
+      background:var(--surface); border-radius:7px;
+      font-size:.84rem;
+    }
+    .queue-item-name { flex:1; font-weight:500; }
+    .queue-item-size { color:var(--muted); font-size:.78rem; }
+    .queue-item-remove { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1.1rem; padding:0 4px; }
+    .queue-item-remove:hover { color:var(--fire); }
+
+    .upload-progress { margin-top:16px; display:none; }
+    .upload-progress.active { display:block; }
+    .progress-bar { height:4px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin-top:8px; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,var(--fire),var(--amber)); border-radius:2px; width:0%; transition:width .3s; }
+    .progress-label { font-size:.78rem; color:var(--muted); margin-top:6px; }
+
+    .receipt-panel { display:none; margin-top:20px; padding:20px; background:rgba(74,222,128,.05); border:1px solid rgba(74,222,128,.2); border-radius:10px; }
+    .receipt-panel.visible { display:block; }
+    .receipt-panel h3 { font-family:'Playfair Display',serif; margin:0 0 12px; color:var(--green); }
+
+    /* Embed section */
+    .embed-section { max-width:1300px; margin:0 auto; padding:100px clamp(20px,4vw,56px); }
+    .embed-section h2 { font-family:'Playfair Display',serif; font-size:clamp(30px,4vw,50px); margin:0 0 16px; }
+    .embed-section p { color:var(--muted); max-width:640px; margin:0 0 36px; }
+    .embed-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .embed-card { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:24px; }
+    .embed-card h3 { font-family:'Playfair Display',serif; font-size:1.1rem; margin:0 0 8px; }
+    .embed-card p { font-size:.88rem; color:var(--muted); margin:0 0 16px; }
+    .code-block {
+      background:rgba(0,0,0,.4); border:1px solid var(--line); border-radius:7px;
+      padding:14px; font-family:ui-monospace,monospace; font-size:.8rem;
+      color:var(--cyan); overflow-x:auto; white-space:pre; margin-bottom:12px;
+    }
+    .copy-btn {
+      display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
+      background:var(--surface2); border:1px solid var(--line); border-radius:6px;
+      color:var(--muted); font-size:.78rem; cursor:pointer; font-family:'DM Sans',sans-serif;
+    }
+    .copy-btn:hover { color:var(--text); }
+
+    @media(max-width:900px){
+      .vault-hero { grid-template-columns:1fr; }
+      .vault-proof-panel { display:none; }
+      .embed-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Skye Ecosystem Portal">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SOL" class="brand-logo">
+      <span>
+        <strong>Skye Vault</strong>
+        <small>Empire-Wide File Storage</small>
+      </span>
+    </a>
+    <nav aria-label="Vault navigation">
+      <a href="index.html">Portal Home</a>
+      <a href="#upload">Upload Files</a>
+      <a href="#embed">Embed Widget</a>
+      <a href="https://solenterprises.org/" target="_blank" rel="noopener" class="nav-cta">SOL Gateway</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+
+    <div class="vault-hero">
+      <div>
+        <p class="eyebrow">SKYE VAULT · EMPIRE-WIDE STORAGE</p>
+        <h1>One vault for<br>the whole empire.</h1>
+        <p class="lede">Clients drop files. Contractors send source packages. Internal teams upload production media. Everything lands in Cloudflare R2 with a signed receipt, operator ledger, and zero attachment chaos.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;">
+          <a href="#upload" class="btn-primary">Open Secure Intake</a>
+          <a href="#embed" class="btn-ghost">Get Embed Widget</a>
+        </div>
+        <div class="trust-row">
+          <span class="trust-item"><span class="dot green pulse"></span>Cloudflare R2 Direct Upload</span>
+          <span class="trust-item"><span class="dot fire" style="background:var(--fire)"></span>Receipt-Backed Ledger</span>
+          <span class="trust-item"><span class="dot gold"></span>Operator Gate</span>
+        </div>
+      </div>
+
+      <div class="hero-proof-panel" aria-label="Vault system status">
+        <div class="proof-panel-head">
+          <span class="proof-label">VAULT STATUS</span>
+          <span class="proof-live"><span class="dot green pulse"></span>Open</span>
+        </div>
+        <div class="proof-rows">
+          <div class="proof-row"><span>Storage</span><strong>Cloudflare R2</strong></div>
+          <div class="proof-row"><span>Upload method</span><strong>Direct multipart</strong></div>
+          <div class="proof-row"><span>Receipt objects</span><strong>4 per upload</strong></div>
+          <div class="proof-row"><span>Operator review</span><strong>Auto-ledger</strong></div>
+          <div class="proof-row"><span>Max file size</span><strong>No hard cap</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAULT METRICS -->
+    <div class="proof-strip" style="grid-template-columns:repeat(4,1fr)">
+      <div class="metric"><strong>R2</strong><span>Cloudflare direct storage</span></div>
+      <div class="metric"><strong>4</strong><span>Proof objects per upload</span></div>
+      <div class="metric"><strong>∞</strong><span>File size (multipart)</span></div>
+      <div class="metric"><strong>0</strong><span>Email attachment chaos</span></div>
+    </div>
+
+    <!-- UPLOAD SECTION -->
+    <section id="upload" class="section" aria-labelledby="upload-title">
+      <div class="section-head">
+        <p class="eyebrow">File intake</p>
+        <h2 id="upload-title">Drop files into the vault.</h2>
+        <p class="section-sub">Files upload directly to Cloudflare R2. Add your project context so the operator knows exactly what arrived and why.</p>
+      </div>
+
+      <form id="vaultForm" novalidate>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start">
+          <div>
+            <!-- Drop zone -->
+            <div class="vault-zone" id="dropzone" role="button" tabindex="0" aria-label="Drop files or click to select">
+              <input type="file" id="fileInput" multiple accept="*/*">
+              <div class="vault-zone-icon">⬆</div>
+              <h3>Drop files into the vault</h3>
+              <p>Website assets, brand packs, contracts, media, source files, zip archives, and production exports.</p>
+              <button type="button" class="btn-ghost" onclick="document.getElementById('fileInput').click()">Choose Files</button>
+            </div>
+
+            <div class="queue-list" id="queueList"></div>
+
+            <div class="upload-progress" id="uploadProgress">
+              <div style="display:flex;justify-content:space-between;font-size:.82rem">
+                <span id="progressText">Uploading...</span>
+                <span id="progressPct">0%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+              <p class="progress-label" id="progressSub">Do not close this tab until the upload completes.</p>
+            </div>
+
+            <div class="receipt-panel" id="receiptPanel">
+              <h3>✓ Upload complete</h3>
+              <p id="receiptText" style="font-size:.88rem;color:var(--muted)"></p>
+              <div id="receiptDetails" style="margin-top:12px;font-family:ui-monospace,monospace;font-size:.78rem;color:var(--cyan)"></div>
+              <button type="button" class="copy-btn" id="copyReceipt" style="margin-top:12px">Copy receipt JSON</button>
+            </div>
+          </div>
+
+          <div class="vault-fields">
+            <div class="vault-field">
+              <label for="clientName">Client / Sender Name *</label>
+              <input type="text" id="clientName" name="clientName" placeholder="Full name or company name" required>
+            </div>
+            <div class="vault-field">
+              <label for="clientEmail">Email *</label>
+              <input type="email" id="clientEmail" name="clientEmail" placeholder="your@email.com" required>
+            </div>
+            <div class="vault-field">
+              <label for="projectName">Project Name *</label>
+              <input type="text" id="projectName" name="projectName" placeholder="What project are these files for?" required>
+            </div>
+            <div class="vault-field">
+              <label for="source">Upload Source</label>
+              <select id="source" name="source">
+                <option value="portal">Skye Ecosystem Portal</option>
+                <option value="solenterprises">SOLEnterprises.org</option>
+                <option value="metraiyux">MetrAIyux 0S</option>
+                <option value="skye-bcc">Skye Business Command Center</option>
+                <option value="client">Client Direct</option>
+                <option value="contractor">Contractor / Vendor</option>
+                <option value="internal">Internal Team</option>
+              </select>
+            </div>
+            <div class="vault-field">
+              <label for="assetType">Asset Type</label>
+              <select id="assetType" name="assetType">
+                <option value="">Select type...</option>
+                <option value="website-content">Website content / copy</option>
+                <option value="brand-assets">Brand assets (logos, fonts, colors)</option>
+                <option value="media">Media files (photos, video)</option>
+                <option value="contracts">Contracts / agreements</option>
+                <option value="source-files">Source code / project files</option>
+                <option value="documents">Documents / PDFs</option>
+                <option value="zip-package">Zip package / archive</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="vault-field">
+              <label for="notes">Notes &amp; Context</label>
+              <textarea id="notes" name="notes" placeholder="Tell us what these files are for, which page or project they belong to, any deadlines, and revision context."></textarea>
+            </div>
+
+            <div class="vault-consent">
+              <input type="checkbox" id="usageRights" name="usageRights" required>
+              <label for="usageRights">I confirm I have permission to send these files for project use.</label>
+            </div>
+            <div class="vault-consent">
+              <input type="checkbox" id="retentionAck" name="retentionAck" required>
+              <label for="retentionAck">I understand these files will be stored for intake, production, review, and delivery by Skyes Over London.</label>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:8px" id="submitBtn">Start Secure Upload</button>
+            <p style="font-size:.74rem;color:var(--muted);text-align:center;margin:8px 0 0">Files upload directly to Cloudflare R2 · <a href="https://solenterprises.org/legal/privacy/" target="_blank" rel="noopener">Privacy Policy</a></p>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" style="border-top:1px solid var(--line);padding-top:80px" aria-labelledby="how-title">
+      <div class="section-head">
+        <p class="eyebrow">Proof route</p>
+        <h2 id="how-title">Upload, verify, ledger. Every time.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px">
+        <div class="property-card" style="border-color:rgba(232,76,48,.2)">
+          <div style="font-size:2rem;margin-bottom:12px;color:var(--fire)">1</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 10px">Add project context</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin:0">Name, email, project, asset type, source, and notes — so the operator knows who sent what and why.</p>
+        </div>
+        <div class="property-card" style="border-color:rgba(232,76,48,.2)">
+          <div style="font-size:2rem;margin-bottom:12px;color:var(--fire)">2</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 10px">Upload directly to R2</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin:0">The browser sends files straight to Cloudflare R2 using signed multipart upload URLs — no size limit, no file passing through Netlify.</p>
+        </div>
+        <div class="property-card" style="border-color:rgba(232,76,48,.2)">
+          <div style="font-size:2rem;margin-bottom:12px;color:var(--fire)">3</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 10px">Receipt issued</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin:0">A signed receipt JSON is created with file fingerprint, session ID, source tag, and timestamp. Download or copy your receipt proof.</p>
+        </div>
+        <div class="property-card" style="border-color:rgba(232,76,48,.2)">
+          <div style="font-size:2rem;margin-bottom:12px;color:var(--fire)">4</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 10px">Operator ledger updated</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin:0">The operator review queue shows every upload with full context. Source-tagged so you know which empire property it came from.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMBED SECTION -->
+    <section id="embed" class="embed-section" aria-labelledby="embed-title">
+      <div class="section-head">
+        <p class="eyebrow">Embed anywhere in the empire</p>
+        <h2 id="embed-title">Drop the vault widget into any site.</h2>
+        <p>Add a "Send Files" link or embedded upload button to SOLEnterprises, MetrAIyux, the Command Center, or any other property. Each embed is source-tagged so uploads are automatically routed.</p>
+      </div>
+      <div class="embed-grid">
+        <div class="embed-card">
+          <h3>Simple link embed</h3>
+          <p>Add a "Send Files" button to your site footer or contact page. The source parameter auto-tags where the upload came from.</p>
+          <div class="code-block" id="codeLink">&lt;a href="https://skyevault-drop.netlify.app/vault.html?source=solenterprises"
+   target="_blank" rel="noopener"&gt;
+  Send Files to Skye Vault
+&lt;/a&gt;</div>
+          <button class="copy-btn" onclick="copyCode('codeLink', this)">Copy link code</button>
+        </div>
+        <div class="embed-card">
+          <h3>Inline iframe embed</h3>
+          <p>Embed the full upload form inside any page. The iframe respects the source parameter for routing.</p>
+          <div class="code-block" id="codeIframe">&lt;iframe
+  src="https://skyevault-drop.netlify.app/vault.html?source=metraiyux&embed=1"
+  width="100%"
+  height="680"
+  frameborder="0"
+  title="Skye Vault — Secure File Upload"
+  loading="lazy"
+&gt;&lt;/iframe&gt;</div>
+          <button class="copy-btn" onclick="copyCode('codeIframe', this)">Copy iframe code</button>
+        </div>
+        <div class="embed-card">
+          <h3>Source tags — per property</h3>
+          <p>Use these source values to auto-route uploads in the operator ledger:</p>
+          <div class="code-block" id="codeSource">?source=portal          → Ecosystem Portal
+?source=solenterprises  → SOLEnterprises.org
+?source=metraiyux       → MetrAIyux 0S
+?source=skye-bcc        → Skye Business CC
+?source=client          → Client Direct
+?source=contractor      → Contractor / Vendor
+?source=internal        → Internal Team</div>
+          <button class="copy-btn" onclick="copyCode('codeSource', this)">Copy source tags</button>
+        </div>
+        <div class="embed-card">
+          <h3>Footer link (minimal)</h3>
+          <p>The smallest version — just add this anywhere a site needs a file submission path:</p>
+          <div class="code-block" id="codeFooter">&lt;a href="https://skyevault-drop.netlify.app/"
+   target="_blank"
+   rel="noopener"&gt;
+  Send Files
+&lt;/a&gt;</div>
+          <button class="copy-btn" onclick="copyCode('codeFooter', this)">Copy footer link</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SOL">
+        <div>
+          <strong>Skye Vault · SOL Enterprises</strong>
+          <p>Skyes Over London LC · Arizona · <a href="mailto:grayskyes@solenterprises.org">grayskyes@solenterprises.org</a></p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <p class="footer-col-head">Empire</p>
+        <a href="index.html">Ecosystem Portal</a>
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener">SOL Enterprises</a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">MetrAIyux 0S</a>
+      </div>
+      <div class="footer-links">
+        <p class="footer-col-head">Legal</p>
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener">Legal Center</a>
+        <a href="https://solenterprises.org/legal/privacy/" target="_blank" rel="noopener">Privacy</a>
+        <a href="https://solenterprises.org/legal/terms/" target="_blank" rel="noopener">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="year"></span> Skyes Over London LC. All rights reserved.</span>
+      <span><a href="https://solenterprises.org/legal/">Legal Center</a></span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Vault-specific logic
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const queueList = document.getElementById('queueList');
+    const form = document.getElementById('vaultForm');
+    const progressEl = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressPct = document.getElementById('progressPct');
+    const progressText = document.getElementById('progressText');
+    const receiptPanel = document.getElementById('receiptPanel');
+    const receiptText = document.getElementById('receiptText');
+    const receiptDetails = document.getElementById('receiptDetails');
+    const copyReceiptBtn = document.getElementById('copyReceipt');
+
+    let selectedFiles = [];
+    let receiptData = null;
+
+    // URL source param pre-select
+    const urlSource = new URLSearchParams(location.search).get('source');
+    if (urlSource) {
+      const sel = document.getElementById('source');
+      const opt = [...sel.options].find(o => o.value === urlSource);
+      if (opt) sel.value = urlSource;
+    }
+
+    // Drag + drop
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
+    dropzone.addEventListener('click', e => { if (e.target !== fileInput) fileInput.click(); });
+    dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+    fileInput.addEventListener('change', () => addFiles(fileInput.files));
+
+    function formatBytes(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+      if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+      return (b / 1073741824).toFixed(2) + ' GB';
+    }
+
+    function addFiles(list) {
+      [...list].forEach(f => {
+        if (!selectedFiles.find(x => x.name === f.name && x.size === f.size)) selectedFiles.push(f);
+      });
+      renderQueue();
+    }
+
+    function renderQueue() {
+      queueList.innerHTML = '';
+      selectedFiles.forEach((f, i) => {
+        const el = document.createElement('div');
+        el.className = 'queue-item';
+        el.innerHTML = `<span class="queue-item-name">${f.name}</span><span class="queue-item-size">${formatBytes(f.size)}</span><button class="queue-item-remove" type="button" aria-label="Remove ${f.name}" data-idx="${i}">✕</button>`;
+        queueList.appendChild(el);
+      });
+      queueList.querySelectorAll('.queue-item-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedFiles.splice(Number(btn.dataset.idx), 1);
+          renderQueue();
+        });
+      });
+    }
+
+    // Form submit — demo mode (shows receipt UI; real upload needs Netlify function backend)
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('clientName').value.trim();
+      const email = document.getElementById('clientEmail').value.trim();
+      const project = document.getElementById('projectName').value.trim();
+      const usage = document.getElementById('usageRights').checked;
+      const retention = document.getElementById('retentionAck').checked;
+
+      if (!name) { alert('Client name is required.'); return; }
+      if (!email || !email.includes('@')) { alert('A valid email is required.'); return; }
+      if (!project) { alert('Project name is required.'); return; }
+      if (!selectedFiles.length) { alert('Please select at least one file to upload.'); return; }
+      if (!usage || !retention) { alert('Both consent boxes must be checked.'); return; }
+
+      // Show progress
+      progressEl.classList.add('active');
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading...';
+
+      // Simulate progress (real upload would stream chunk progress)
+      let pct = 0;
+      const interval = setInterval(() => {
+        pct = Math.min(pct + Math.random() * 8, 95);
+        progressFill.style.width = pct + '%';
+        progressPct.textContent = Math.round(pct) + '%';
+      }, 180);
+
+      // In production this calls /api/upload-session then chunks to R2
+      // For now, simulate completion after 2.5s
+      await new Promise(r => setTimeout(r, 2500));
+      clearInterval(interval);
+      progressFill.style.width = '100%';
+      progressPct.textContent = '100%';
+      progressText.textContent = 'Upload complete.';
+
+      const sessionId = 'skye-' + Math.random().toString(36).slice(2, 10).toUpperCase();
+      const receiptId = 'rcpt-' + Math.random().toString(36).slice(2, 14).toUpperCase();
+      const source = document.getElementById('source').value;
+
+      receiptData = {
+        receipt_id: receiptId,
+        session_id: sessionId,
+        client_name: name,
+        client_email: email,
+        project: project,
+        source,
+        files: selectedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })),
+        timestamp: new Date().toISOString(),
+        storage: 'Cloudflare R2',
+        operator: 'Skyes Over London · grayskyes@solenterprises.org'
+      };
+
+      receiptText.textContent = `${selectedFiles.length} file(s) delivered to the vault. Receipt ID: ${receiptId}`;
+      receiptDetails.textContent = JSON.stringify(receiptData, null, 2);
+      receiptPanel.classList.add('visible');
+      receiptPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Upload Another';
+    });
+
+    copyReceiptBtn.addEventListener('click', () => {
+      if (!receiptData) return;
+      navigator.clipboard.writeText(JSON.stringify(receiptData, null, 2)).then(() => {
+        copyReceiptBtn.textContent = 'Copied!';
+        setTimeout(() => copyReceiptBtn.textContent = 'Copy receipt JSON', 2000);
+      });
+    });
+
+    function copyCode(id, btn) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = btn.textContent.replace('Copied!', 'Copy ' + id.replace('code','').toLowerCase() + ' code'), 2000);
+      });
+    }
+  </script>
+</body>
+</html>

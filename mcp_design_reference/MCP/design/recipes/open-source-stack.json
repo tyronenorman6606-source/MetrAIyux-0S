@@ -1,0 +1,108 @@
+{
+  "name": "skye-open-source-spectacle-recipes",
+  "version": "0.1.0",
+  "purpose": "Concrete open-source frontend recipes agents must pull when the user asks for advanced effects. These recipes are not SkyeSol styling; they are implementation primitives.",
+  "rule": "Pick recipes by behavior first, then apply brand taste. Do not make everything look like SkyeSol.",
+  "recipes": [
+    {
+      "id": "framer-motion-interaction-system",
+      "tags": ["framer-motion", "hover", "layout", "cursor", "microinteraction"],
+      "packages": ["framer-motion"],
+      "imports": ["import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion';"],
+      "useWhen": "The page needs premium UI interaction, cursor-responsive layers, spring movement, layout transitions, or scroll-bound transforms.",
+      "mustShow": ["visible motion component", "spring or scroll value", "reduced-motion/mobile fallback"],
+      "avoid": ["static CSS pretending to be Framer Motion", "animating every element at once"],
+      "starter": "Use motion components for CTA/surface panels; use useMotionValue/useSpring for cursor glow; use useScroll/useTransform for scroll-bound depth."
+    },
+    {
+      "id": "three-r3f-shader-scene",
+      "tags": ["three", "r3f", "webgl", "shader", "3d", "canvas"],
+      "packages": ["three", "@react-three/fiber"],
+      "imports": ["import { Canvas, useFrame } from '@react-three/fiber';", "import * as THREE from 'three';"],
+      "useWhen": "The first viewport needs a living object, shader field, spatial product symbol, particle system, or interactive canvas.",
+      "mustShow": ["Canvas in first viewport", "useFrame runtime motion", "Three object/material/geometry"],
+      "avoid": ["flat CSS glow sold as Three.js", "canvas hidden below fold"],
+      "starter": "Build one dominant product object or shader field; bind camera/object motion to pointer and time."
+    },
+    {
+      "id": "drei-postprocessing-cinema",
+      "tags": ["drei", "postprocessing", "bloom", "camera", "stars", "float"],
+      "packages": ["@react-three/drei", "@react-three/postprocessing"],
+      "imports": ["import { Float, PerspectiveCamera, Stars } from '@react-three/drei';", "import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';"],
+      "useWhen": "A Three/R3F scene needs cinematic lighting, depth, bloom, floating objects, stars, camera helpers, or visual finish.",
+      "mustShow": ["EffectComposer", "Bloom or Vignette", "Drei helper used visibly"],
+      "avoid": ["postprocessing import unused", "over-bloom that hides the product"],
+      "starter": "Wrap the scene with EffectComposer, add Bloom/Vignette, use Float/Stars/PerspectiveCamera to make the visual feel staged."
+    },
+    {
+      "id": "gsap-lenis-scroll-stage",
+      "tags": ["gsap", "ScrollTrigger", "lenis", "scroll", "pinning", "scrub"],
+      "packages": ["gsap", "lenis"],
+      "imports": ["import gsap from 'gsap';", "import { ScrollTrigger } from 'gsap/ScrollTrigger';", "import Lenis from 'lenis';"],
+      "useWhen": "The page needs a scroll-led story, sticky/pinned sections, scrubbed transitions, rails, staged proof, or cinematic funnel.",
+      "mustShow": ["gsap.registerPlugin(ScrollTrigger)", "new Lenis()", "at least one scrub/pin/reveal timeline"],
+      "avoid": ["basic anchor scroll presented as GSAP", "scroll-jacking forms or core workflows"],
+      "starter": "Create Lenis raf loop, bind ScrollTrigger.update, and stage sections with scrubbed opacity/position/progress rails."
+    },
+    {
+      "id": "theatre-directed-scene",
+      "tags": ["theatre", "timeline", "3d-direction", "art-direction"],
+      "packages": ["@theatre/core", "@theatre/studio"],
+      "imports": ["import { getProject } from '@theatre/core';"],
+      "useWhen": "A 3D scene or hero needs director-like keyframed parameters, camera beats, or reusable art-directed states.",
+      "mustShow": ["Theatre project/sheet or documented reason not to load studio in production", "state values wired into scene"],
+      "avoid": ["shipping studio UI to buyers by accident", "Theatre dependency installed but unused"],
+      "starter": "Use getProject for scene state; wire sheet values to camera, light, object rotation, or section beats."
+    },
+    {
+      "id": "actual-surface-screenshot-stage",
+      "tags": ["screenshot", "surface", "app-preview", "browser-proof"],
+      "packages": ["playwright for capture", "frontend image rendering"],
+      "imports": ["Use generated screenshot assets from browser QA; render them as first-class product media."],
+      "useWhen": "The user has an app, dashboard, website, game, or tool where the real surface matters.",
+      "mustShow": ["desktop screenshot", "mobile screenshot when relevant", "caption proving what surface is shown"],
+      "avoid": ["stock imagery", "random logos", "fake UI if real UI exists"],
+      "starter": "Capture real surfaces with Playwright, place them in an angled/staged gallery or first viewport subject."
+    },
+    {
+      "id": "actual-surface-video-reel",
+      "tags": ["screenshot", "surface", "video", "ffmpeg", "browser-proof", "app-preview", "e2e-proof", "workflow-recording"],
+      "packages": ["ffmpeg", "playwright recordVideo", "HTML video"],
+      "imports": ["Use Playwright recordVideo or dense browser-action frames, encode with ffmpeg, render with <video autoplay muted loop playsinline>."],
+      "useWhen": "The user asks for actual screenshots to become animated proof, or the page claims the app performs a workflow.",
+      "mustShow": ["real browser action path", "generated MP4 or WebM asset", "video first in the proof stage", "poster image", "browser check that video is visible and playing", "design_e2e_proof_audit passes for workflow claims"],
+      "avoid": ["CSS-only video claims", "fake UI reels", "static landing screenshots called workflow proof", "headline-first hero when actual surface proof was requested"],
+      "starter": "Use Playwright to goto/click/fill/scroll/submit through the claimed flow, record video or dense frames, encode H.264 with -movflags +faststart, render MP4/WebM, then verify readyState/currentTime/paused/visible in browser E2E."
+    },
+    {
+      "id": "brand-logo-asset-discipline",
+      "tags": ["logo", "brand", "identity", "wordmark", "asset"],
+      "packages": ["workspace logo assets", "browser screenshot review"],
+      "imports": ["Call design_logo_manifest before drawing or generating any mark.", "Call design_logo_audit before shipping."],
+      "useWhen": "Any page has a logo, brand mark, wordmark, favicon, nav identity, or product mark.",
+      "mustShow": ["existing logo asset when available", "transparent/floating placement when the asset supports it", "clean wordmark fallback when no asset exists", "desktop/mobile screenshot review"],
+      "avoid": ["rounded-square initial badges", "CSS-generated brand marks", "random shields/cubes/spark icons", "replacing finished logos with generic initials"],
+      "starter": "Use the approved logo asset path from design_logo_manifest. If there is no exact asset, use typography-only wordmark plus parent brand endorsement rather than inventing a permanent emblem."
+    },
+    {
+      "id": "neon-scrollbar-cursor-trail",
+      "tags": ["scrollbar", "cursor-trail", "neon", "pointer", "chrome"],
+      "packages": ["framer-motion for cursor trail", "CSS scrollbar selectors"],
+      "imports": ["import { motion, useMotionValue, useSpring } from 'framer-motion';"],
+      "useWhen": "The user asks for visible scrollbar, neon UI chrome, cursor trail, or tactile premium interaction.",
+      "mustShow": ["custom scrollbar CSS", "14px+ visible scrollbar width", "slightly opaque neon track", "glowing neon thumb", "pointer-reactive cursor trail on desktop", "mobile fallback"],
+      "avoid": ["cursor trail blocking clicks", "thin invisible scrollbar on scroll-led pages", "hover-only scrollbar visibility", "scrollbar-width: none"],
+      "starter": "Use CSS scrollbar thumb/track styling with a visible rgba track, neon gradient thumb, glow box-shadow, and a fixed pointer-events-none Framer Motion glow following pointer spring values."
+    },
+    {
+      "id": "premium-text-effects-lab",
+      "tags": ["text-effects", "glow", "shimmer", "split-text", "typography", "neon"],
+      "packages": ["framer-motion", "gsap optional"],
+      "imports": ["import { motion } from 'framer-motion';", "import gsap from 'gsap';"],
+      "useWhen": "The user asks for glowing text, neon text, text effects, split reveals, or high-impact display type.",
+      "mustShow": ["one deliberate display text effect", "no negative letter spacing", "mobile text fit verified"],
+      "avoid": ["every heading glowing", "illegible bloom", "text columns dragging down mobile"],
+      "starter": "Use one hero-scale glow/shimmer effect; animate reveal with Framer Motion or GSAP split-line timing."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "proof": "LEGAL_LAYOUT_GLOBAL_CARD_GRID_BLEED_FIXED",
+  "root_cause": "The global .card rule used grid-column: span 4, and the legal section menu also had class card. Inside .legal-layout that made the side menu span implicit grid columns, pushing and visually colliding with the terms document.",
+  "fixes": [
+    "Forced .legal-layout to a controlled two-column grid on desktop.",
+    "Forced .legal-layout > .toc into column 1 and .legal-layout > .legal-doc into column 2.",
+    "Neutralized inherited .card grid-column behavior inside legal layouts.",
+    "Collapsed legal layout to one clean column under 1120px.",
+    "Removed max-height/sticky behavior on narrow screens so menu cannot cover content."
+  ]
+}

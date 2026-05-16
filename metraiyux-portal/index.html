@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skye Ecosystem Portal — SOL Enterprises Command Hub</title>
+  <meta name="description" content="The central command portal for the Skye Over London / SOL Enterprises ecosystem. Access every deployed property: operating system, proof gate, client tools, legal center, file vault, and the flagship SOL presence.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="Skye Ecosystem Portal">
+  <meta property="og:description" content="One command surface linking every deployed Skye / SOL property.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Skye Ecosystem Portal">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SOL" class="brand-logo">
+      <span>
+        <strong>Skye Ecosystem</strong>
+        <small>SOL Enterprises Command Portal</small>
+      </span>
+    </a>
+    <nav aria-label="Portal navigation">
+      <a href="#properties">Properties</a>
+      <a href="#vault">Vault</a>
+      <a href="#legal">Legal</a>
+      <a href="/beta">Beta</a>
+      <a href="https://solenterprises.org/" target="_blank" rel="noopener" class="nav-cta">SOL Gateway</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <p class="eyebrow">SKYES OVER LONDON · SOL ENTERPRISES</p>
+        <h1 id="hero-title">One Empire.<br>Eight Properties.</h1>
+        <p class="hero-lede">The operating system, the flagship site, the client command center, the legal fortress, the file vault, the marketing layer — all connected. All deployed. All live.</p>
+        <div class="hero-actions">
+          <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="btn-primary">Enter the OS</a>
+          <a href="#properties" class="btn-ghost">Browse Properties</a>
+          <a href="/beta" class="btn-ghost">Join the Beta</a>
+        </div>
+        <div class="trust-row">
+          <span class="trust-item"><span class="dot green"></span>8 deployed properties</span>
+          <span class="trust-item"><span class="dot gold"></span>16 operating brains</span>
+          <span class="trust-item"><span class="dot cyan"></span>Arizona LLC · Governed</span>
+        </div>
+      </div>
+
+      <aside class="hero-proof-panel" aria-label="Ecosystem status">
+        <div class="proof-panel-head">
+          <span class="proof-label">ECOSYSTEM STATUS</span>
+          <span class="proof-live"><span class="dot green pulse"></span>All systems operational</span>
+        </div>
+        <div class="proof-rows">
+          <div class="proof-row"><span>SOL Gateway</span><strong>solenterprises.org</strong></div>
+          <div class="proof-row"><span>OS Command</span><strong>MetrAIyux 0S · Live</strong></div>
+          <div class="proof-row"><span>Legal Center</span><strong>Fortress Active</strong></div>
+          <div class="proof-row"><span>File Vault</span><strong>R2 · Open</strong></div>
+          <div class="proof-row"><span>Brains</span><strong>16 / 16 Ready</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- PROOF STRIP -->
+    <div class="proof-strip" aria-label="Ecosystem metrics">
+      <div class="metric"><strong>8</strong><span>Deployed properties</span></div>
+      <div class="metric"><strong>16</strong><span>Operating brains</span></div>
+      <div class="metric"><strong>30+</strong><span>Legal policies live</span></div>
+      <div class="metric"><strong>8</strong><span>Cloudflare Workers</span></div>
+      <div class="metric"><strong>R2</strong><span>Vault storage</span></div>
+    </div>
+
+    <!-- BETA INVITATION -->
+    <section class="beta-callout section" aria-labelledby="beta-callout-title">
+      <div class="beta-copy">
+        <p class="eyebrow">Company beta now open</p>
+        <h2 id="beta-callout-title">Two weeks free for teams ready to test the live stack.</h2>
+        <p>We pushed the operating system, gate, vault, database command center, portal, staffing surface, and worker fleet into production shape. The beta page includes a real screenshot reel from the deployed apps, the newsletter copy, fair-use terms, and the access request flow.</p>
+        <div class="beta-actions">
+          <a href="/beta" class="btn-primary">Open Beta Page</a>
+          <a href="/newsletter" class="btn-ghost">Read Newsletter</a>
+        </div>
+      </div>
+      <a class="beta-preview" href="/beta" aria-label="Open Skye Beta Week page">
+        <img src="assets/beta-week/metraiyux-command.png" alt="MetrAIyux 0S command deck screenshot from the beta proof set">
+        <div>
+          <strong>Skye Beta Week</strong>
+          <span>Live proof reel, repo screenshots, and beta terms</span>
+        </div>
+      </a>
+    </section>
+
+    <!-- PROPERTY GRID -->
+    <section id="properties" class="section" aria-labelledby="properties-title">
+      <div class="section-head">
+        <p class="eyebrow">The portfolio</p>
+        <h2 id="properties-title">Every deployed surface. Controlled from one place.</h2>
+        <p class="section-sub">Each property serves a specific function in the Skye Over London operating model. Click any card to open it.</p>
+      </div>
+
+      <div class="properties-grid">
+
+        <!-- SOLEnterprises -->
+        <article class="property-card accent-violet" data-category="flagship">
+          <div class="card-badge">Flagship</div>
+          <div class="card-icon">⬡</div>
+          <h3>SOL Enterprises</h3>
+          <p class="card-domain">solenterprises.org</p>
+          <p>The public-facing Skyes Over London web presence. Services, portfolio, platforms, AI division, NexusConnect, team, blog, and the full SOLEnterprises brand experience.</p>
+          <ul class="card-tags">
+            <li>Full service suite</li>
+            <li>SkyeSuite apps</li>
+            <li>Client portals</li>
+          </ul>
+          <a href="https://solenterprises.org/" target="_blank" rel="noopener" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- MetrAIyux OS -->
+        <article class="property-card accent-gold" data-category="os">
+          <div class="card-badge">Company OS</div>
+          <div class="card-icon">⬡</div>
+          <h3>MetrAIyux 0S</h3>
+          <p class="card-domain">graylondonskyes.workers.dev</p>
+          <p>The protected autonomous company operating system. 13-cabinet model, 16 named brains, client SaaS workspaces, admin command, Cloudflare edge deployment, and proof receipts on every action.</p>
+          <ul class="card-tags">
+            <li>13-Cabinet model</li>
+            <li>16 named brains</li>
+            <li>Cloudflare edge</li>
+          </ul>
+          <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- MetrAIyux Public Spectacle -->
+        <article class="property-card accent-cyan" data-category="marketing">
+          <div class="card-badge">Public Overview</div>
+          <div class="card-icon">⬡</div>
+          <h3>MetrAIyux Public Spectacle</h3>
+          <p class="card-domain">metraiyux-0s-public-spectacle.pages.dev</p>
+          <p>The public buyer education site for MetrAIyux 0S. Guided tour, platform map, tech stack, fit check, brain system overview, and operator context — without exposing admin controls.</p>
+          <ul class="card-tags">
+            <li>Guided tour</li>
+            <li>Fit check quiz</li>
+            <li>Buyer education</li>
+          </ul>
+          <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- SkyeGateFS27 -->
+        <article class="property-card accent-violet" data-category="proof">
+          <div class="card-badge">Proof Gate</div>
+          <div class="card-icon">⬡</div>
+          <h3>SkyeGateFS27</h3>
+          <p class="card-domain">skyegatefs27-citadeldb.graylondonskyes.workers.dev</p>
+          <p>The auth and evidence gate behind deployable command decks. Bearer introspection, platform-event mirroring, admin key control, monitor activity, and the public proof surface for serious buyers.</p>
+          <ul class="card-tags">
+            <li>Auth introspection</li>
+            <li>Proof events</li>
+            <li>Command-deck trust</li>
+          </ul>
+          <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener" class="card-cta">Open Proof Surface →</a>
+        </article>
+
+        <!-- Metraiyux Marketing -->
+        <article class="property-card accent-teal" data-category="marketing">
+          <div class="card-badge">Marketing &amp; Sales</div>
+          <div class="card-icon">⬡</div>
+          <h3>MetrAIyux Marketing</h3>
+          <p class="card-domain">metraiyux marketing layer</p>
+          <p>Full capability statements, sell sheets, white-label program details, and valuation briefs. Built for account executives, prospective clients, and white-label partners.</p>
+          <ul class="card-tags">
+            <li>Sell sheets</li>
+            <li>White-label program</li>
+            <li>Capabilities doc</li>
+          </ul>
+          <a href="../Metraiyux-Marketing/index.html" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- Skye Business Command Center -->
+        <article class="property-card accent-blue" data-category="client">
+          <div class="card-badge">Client Product</div>
+          <div class="card-icon">⬡</div>
+          <h3>Skye Business Command Center</h3>
+          <p class="card-domain">skye-business-command-center</p>
+          <p>A sellable, branded operations portal for small businesses. CRM-style records, shared inbox, ticketing, estimates, invoices, intake forms, deployment controls, and client handoff workflows.</p>
+          <ul class="card-tags">
+            <li>CRM + inbox</li>
+            <li>Invoice + payments</li>
+            <li>Handoff workflows</li>
+          </ul>
+          <a href="../skye-business-command-center/apps/hub/public/index.html" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- Legal Center -->
+        <article class="property-card accent-amber" data-category="legal" id="legal">
+          <div class="card-badge">Legal Fortress</div>
+          <div class="card-icon">⬡</div>
+          <h3>Legal Center</h3>
+          <p class="card-domain">skyes-over-london-legal.pages.dev</p>
+          <p>The public legal and compliance hub for the entire Skye ecosystem. Terms, privacy, AI terms, SMS consent, DMCA, enterprise MSA, SaaS platform terms, DPA, and 30+ policy documents — all live.</p>
+          <ul class="card-tags">
+            <li>30+ policies</li>
+            <li>Arizona governed</li>
+            <li>Twilio verified</li>
+          </ul>
+          <a href="https://skyes-over-london-legal.pages.dev/legal/" target="_blank" rel="noopener" class="card-cta">Open Property →</a>
+        </article>
+
+        <!-- Skye Vault -->
+        <article class="property-card accent-fire" data-category="vault" id="vault">
+          <div class="card-badge">File Vault</div>
+          <div class="card-icon">⬡</div>
+          <h3>Skye Vault</h3>
+          <p class="card-domain">skyevault · Cloudflare R2</p>
+          <p>The empire-wide file intake portal. Clients, contractors, and internal teams drop files directly into Cloudflare R2 storage. Receipt-backed ledger, scoped upload codes, multipart handling, and proof trail on every upload.</p>
+          <ul class="card-tags">
+            <li>Direct R2 upload</li>
+            <li>Receipt ledger</li>
+            <li>Operator gate</li>
+          </ul>
+          <a href="vault.html" class="card-cta">Open Vault →</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- VAULT SPOTLIGHT -->
+    <section class="vault-spotlight section" aria-labelledby="vault-title">
+      <div class="vault-left">
+        <p class="eyebrow">Empire-wide storage</p>
+        <h2 id="vault-title">One vault for the whole empire. Every upload tracked, receipted, and routed.</h2>
+        <p>Clients send website assets. Contractors drop source files. Internal teams upload production media. Everything lands in Cloudflare R2 with a signed receipt, operator audit trail, and zero email attachment chaos.</p>
+        <ul class="vault-features">
+          <li><span class="check">✓</span>Cloudflare R2 direct-to-storage upload — no file size anxiety</li>
+          <li><span class="check">✓</span>Scoped upload codes per client, project, or team</li>
+          <li><span class="check">✓</span>Receipt proof on every completed upload</li>
+          <li><span class="check">✓</span>Operator review ledger with session manifests</li>
+          <li><span class="check">✓</span>Embed on any site in the ecosystem via widget</li>
+          <li><span class="check">✓</span>Source tagging — know which property sent the upload</li>
+        </ul>
+        <div class="vault-actions">
+          <a href="vault.html" class="btn-primary">Open Skye Vault</a>
+          <a href="vault.html#embed" class="btn-ghost">Get Embed Widget</a>
+        </div>
+      </div>
+      <div class="vault-right">
+        <div class="vault-demo-card">
+          <div class="vault-demo-head">
+            <span class="vault-demo-label">SKYE VAULT · R2 STORAGE</span>
+            <span class="dot green pulse"></span>
+          </div>
+          <div class="vault-demo-rows">
+            <div class="vault-row"><span class="vrow-icon">↑</span><div><strong>brand-assets-2026.zip</strong><span>2.4 GB · Client Upload · Receipt issued</span></div></div>
+            <div class="vault-row"><span class="vrow-icon">↑</span><div><strong>contract-signed-final.pdf</strong><span>812 KB · Contractor Drop · Manifest matched</span></div></div>
+            <div class="vault-row"><span class="vrow-icon">↑</span><div><strong>hero-video-4k-master.mp4</strong><span>8.1 GB · Media Upload · Multipart complete</span></div></div>
+            <div class="vault-row in-progress"><span class="vrow-icon spin">↑</span><div><strong>site-source-package.zip</strong><span>Uploading · 67% · Operator review pending</span></div></div>
+          </div>
+          <div class="vault-demo-footer">
+            <span>4 proof objects per upload</span>
+            <span>Ledger auto-updates</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEGAL STRIP -->
+    <section class="legal-strip section" aria-labelledby="legal-overview-title">
+      <div class="legal-strip-head">
+        <p class="eyebrow">Legal fortress</p>
+        <h2 id="legal-overview-title">Every surface is backed by a public legal center.</h2>
+        <p>30+ policies. One URL. Every product in the ecosystem links to it.</p>
+      </div>
+      <div class="legal-policies">
+        <a href="https://skyes-over-london-legal.pages.dev/legal/terms/" target="_blank" rel="noopener" class="policy-pill">Terms of Service</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/privacy/" target="_blank" rel="noopener" class="policy-pill">Privacy Policy</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/ai-terms/" target="_blank" rel="noopener" class="policy-pill">AI Terms</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/sms-communications/" target="_blank" rel="noopener" class="policy-pill">SMS Consent</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/dmca-ip/" target="_blank" rel="noopener" class="policy-pill">DMCA / IP</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/enterprise-msa/" target="_blank" rel="noopener" class="policy-pill">Enterprise MSA</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/saas-platform/" target="_blank" rel="noopener" class="policy-pill">SaaS Platform</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/data-processing-addendum/" target="_blank" rel="noopener" class="policy-pill">DPA</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/acceptable-use/" target="_blank" rel="noopener" class="policy-pill">Acceptable Use</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/cookie-policy/" target="_blank" rel="noopener" class="policy-pill">Cookie Policy</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/payments-refunds/" target="_blank" rel="noopener" class="policy-pill">Payments &amp; Refunds</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/" target="_blank" rel="noopener" class="policy-pill accent">View All 30+ →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SOL">
+        <div>
+          <strong>Skyes Over London / SOL Enterprises</strong>
+          <p>Skyes Over London LC · Arizona · <a href="mailto:grayskyes@solenterprises.org">grayskyes@solenterprises.org</a></p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <p class="footer-col-head">Properties</p>
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener">SOL Enterprises</a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">MetrAIyux 0S</a>
+        <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener">Public Spectacle</a>
+        <a href="https://metraiyux-0s-public-spectacle.pages.dev/brain-system.html#operating-brain-rooms" target="_blank" rel="noopener">Brain Wall</a>
+        <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener">FS27 Proof Gate</a>
+        <a href="../Metraiyux-Marketing/index.html">Marketing</a>
+        <a href="../skye-business-command-center/apps/hub/public/index.html">Command Center</a>
+        <a href="vault.html">Skye Vault</a>
+        <a href="/beta">Beta Week</a>
+      </div>
+      <div class="footer-links">
+        <p class="footer-col-head">Legal</p>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/" target="_blank" rel="noopener">Legal Center</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/privacy/" target="_blank" rel="noopener">Privacy</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/terms/" target="_blank" rel="noopener">Terms</a>
+        <a href="https://skyes-over-london-legal.pages.dev/legal/ai-terms/" target="_blank" rel="noopener">AI Terms</a>
+        <a href="https://skyes-over-london-legal.pages.dev/contact/" target="_blank" rel="noopener">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="year"></span> Skyes Over London LC / SOL Enterprises. All rights reserved.</span>
+      <span>Arizona · <a href="https://skyes-over-london-legal.pages.dev/legal/">Legal Center</a></span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

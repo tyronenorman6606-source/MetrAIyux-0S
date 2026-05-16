@@ -1,0 +1,49 @@
+{
+  "name": "skye-advanced-pattern-pack",
+  "version": "0.1.0",
+  "purpose": "Production-minded implementation patterns that actually use Motion, GSAP, Lenis, Three.js, React Three Fiber, Drei, and postprocessing.",
+  "rule": "Agents must pull open-source recipes first, then one of these implementation patterns before building a premium public surface. Do not merely describe motion or 3D; use a pattern, wire real imports into source, and pass design_stack_audit.",
+  "auditRule": "Package installs, prose, static canvas substitutes, and repeated dark card templates fail. Required open-source stack must be imported and visibly used in runtime source.",
+  "dependencies": {
+    "core": ["react", "react-dom", "vite", "typescript"],
+    "motion": ["framer-motion", "motion", "gsap", "lenis"],
+    "direction": ["@theatre/core", "@theatre/studio"],
+    "webgl": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing"],
+    "icons": ["lucide-react"]
+  },
+  "patterns": [
+    {
+      "id": "cinematic-command-hero",
+      "title": "Cinematic Command Hero",
+      "files": [
+        "cinematic-command-hero/CinematicCommandHero.tsx",
+        "cinematic-command-hero/cinematic-command-hero.css"
+      ],
+      "uses": ["motion", "three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing"],
+      "quality": "Full-width editorial headline, living WebGL command object, proof strip, CTA, reduced-motion-safe composition.",
+      "bestFor": ["MCP server", "AI platform", "database control plane", "developer tool", "premium infrastructure product"]
+    },
+    {
+      "id": "scroll-proof-funnel",
+      "title": "Scroll Proof Funnel",
+      "files": [
+        "scroll-proof-funnel/ScrollProofFunnel.tsx",
+        "scroll-proof-funnel/scroll-proof-funnel.css"
+      ],
+      "uses": ["gsap", "ScrollTrigger", "lenis", "motion"],
+      "quality": "Pinned/scrubbed funnel for process storytelling without turning the page into cards and paragraphs.",
+      "bestFor": ["signup journey", "deployment proof", "service offer", "technical onboarding"]
+    },
+    {
+      "id": "app-first-command-center",
+      "title": "App-First Command Center",
+      "files": [
+        "app-first-command-center/AppFirstCommandCenter.tsx",
+        "app-first-command-center/app-first-command-center.css"
+      ],
+      "uses": ["motion", "lucide-react"],
+      "quality": "The first viewport is the tool surface itself: tabs, status, controls, proof, and action density.",
+      "bestFor": ["dashboard", "control plane", "admin console", "operator app", "database command center"]
+    }
+  ]
+}

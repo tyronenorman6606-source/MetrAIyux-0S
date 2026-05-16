@@ -1,0 +1,164 @@
+{
+  "name": "skye-elements-registry",
+  "version": "0.1.0",
+  "purpose": "Composable design elements for Skye/Spectacle MCP generation. Elements are referenced by namespace so sources can be combined without turning into a Frankenstein page.",
+  "compositionPolicy": {
+    "rule": "Use one primary visual language per page, then add supporting elements only when they serve the same story.",
+    "forbidden": [
+      "Mixing unrelated hero styles from multiple products",
+      "Using an asset because it exists instead of because it clarifies the offer",
+      "Stacking every animation library on one page",
+      "Combining dark luxury, playful SaaS, brutalist, and app UI styles in the same viewport",
+      "Treating screenshots, logos, and 3D objects as interchangeable decorations",
+      "Claiming advanced open-source tooling without real imports",
+      "Reusing the same dark card/dashboard template with a different brand name"
+    ],
+    "required": [
+      "Choose one primary pattern",
+      "Choose one subject type",
+      "Choose one motion language",
+      "Choose one conversion path",
+      "Run design_stack_audit when advanced tooling is required",
+      "Run design_performance_audit when advanced motion, WebGL, screenshots, or scroll effects are used",
+      "Run browser QA after implementation"
+    ]
+  },
+  "namespaces": {
+    "skye.core": "Foundational Skye/Spectacle palette, typography, spacing, and proof language.",
+    "skye.motion": "Motion and scroll choreography patterns.",
+    "skye.fx": "Premium cursor, scrollbar, neon text, shimmer, and interaction polish.",
+    "skye.webgl": "Three.js/WebGL scene patterns.",
+    "skye.proof": "Client-safe proof panels and operator evidence patterns.",
+    "skye.brand": "Logo, wordmark, identity asset discipline, and anti-generic-brand rules.",
+    "skyesol.reference": "Read-only extracted SkyeSol assets and style notes.",
+    "client.surface": "App-first surfaces, dashboards, command centers, and control panels."
+  },
+  "elements": [
+    {
+      "id": "skye.core.full-width-command-hero",
+      "type": "hero",
+      "tier": "primary",
+      "description": "A wide first viewport with headline across the page, short support copy, obvious CTA, and one command-surface visual.",
+      "useWhen": "The product needs a premium first impression and must avoid left-column text walls.",
+      "requiredPairings": ["skye.proof.quality-gates", "skye.motion.reveal-system"],
+      "doNotPairWith": ["skye.core.split-logo-hero"]
+    },
+    {
+      "id": "client.surface.app-first-command-center",
+      "type": "hero",
+      "tier": "primary",
+      "description": "The app/tool UI is the first screen, with real controls, tabs, status, and workflow density.",
+      "useWhen": "The user asked for an app, dashboard, database command center, editor, game, or internal tool.",
+      "requiredPairings": ["skye.proof.status-strip", "skye.core.compact-navigation"],
+      "doNotPairWith": ["skye.core.marketing-only-hero"]
+    },
+    {
+      "id": "skye.webgl.living-command-field",
+      "type": "visual-system",
+      "tier": "enhancement",
+      "description": "A restrained WebGL/Three.js ambient scene: particles, depth, glow, camera parallax, and product symbolism.",
+      "useWhen": "The product benefits from a sense of living infrastructure or spatial control.",
+      "requiredPairings": ["skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.motion.heavy-scroll-jacking"]
+    },
+    {
+      "id": "skye.motion.scroll-proof-funnel",
+      "type": "scroll-story",
+      "tier": "primary",
+      "description": "A scroll-led story that stages signup, setup, proof, handoff, and conversion with one clear action per stage.",
+      "useWhen": "A buyer must understand a process or trust path before signup.",
+      "requiredPairings": ["skye.proof.operator-proof-panel"],
+      "doNotPairWith": ["skye.core.long-copy-sections"]
+    },
+    {
+      "id": "skye.proof.operator-proof-panel",
+      "type": "proof",
+      "tier": "support",
+      "description": "Client-safe trust evidence: checks, receipts, status, timestamps, proof labels, and handoff state.",
+      "useWhen": "The page needs proof without exposing internal smoke logs or raw debug output.",
+      "requiredPairings": ["skye.proof.public-copy-filter"],
+      "doNotPairWith": ["skye.proof.raw-smoke-output"]
+    },
+    {
+      "id": "skyesol.reference.transparent-founder-scene",
+      "type": "authority",
+      "tier": "primary",
+      "description": "Transparent founder media staged as an authority object, paired with proof metrics and editorial copy.",
+      "useWhen": "Founder/operator trust is part of the sale.",
+      "requiredPairings": ["skye.core.editorial-headline", "skye.proof.metric-row"],
+      "doNotPairWith": ["skye.core.avatar-card"]
+    },
+    {
+      "id": "skye.motion.reveal-system",
+      "type": "motion",
+      "tier": "support",
+      "description": "Subtle entrance, hover, and section reveal motion with reduced-motion fallback.",
+      "useWhen": "Almost every premium page, unless motion is disabled.",
+      "requiredPairings": [],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.fx.cursor-trail",
+      "type": "interaction-effect",
+      "tier": "enhancement",
+      "description": "Pointer-reactive glow/cursor trail for premium pages, with mobile and reduced-motion fallback.",
+      "useWhen": "The user asks for cursor trail, high-end interaction polish, or spectacle feel.",
+      "requiredPairings": ["skye.motion.reveal-system"],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.fx.neon-scrollbar",
+      "type": "scroll-effect",
+      "tier": "enhancement",
+      "description": "Thicker branded scrollbar with an always-visible, slightly opaque neon track and glowing thumb treatment for scroll-led experiences.",
+      "useWhen": "The page is a long cinematic scroll or the user asks for a visible custom scrollbar.",
+      "requiredPairings": ["skye.motion.scroll-proof-funnel"],
+      "doNotPairWith": ["skye.core.hidden-browser-chrome", "skye.fx.hover-only-scrollbar"]
+    },
+    {
+      "id": "skye.fx.text-effects",
+      "type": "typography-effect",
+      "tier": "enhancement",
+      "description": "Glow, shimmer, split-line, reveal, or chromatic text treatments used as hierarchy, not clutter.",
+      "useWhen": "The art direction needs neon/glowing/premium display text effects.",
+      "requiredPairings": ["skye.core.full-width-command-hero"],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "client.surface.actual-screenshot-stage",
+      "type": "surface-proof",
+      "tier": "primary",
+      "description": "Use browser/app/product screenshots as the actual visual subject when the surface itself matters.",
+      "useWhen": "The product has a real app, dashboard, website, or generated surface that needs to be shown.",
+      "requiredPairings": ["skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.random-stock-visual"]
+    },
+    {
+      "id": "client.surface.actual-video-reel",
+      "type": "surface-proof",
+      "tier": "primary",
+      "description": "A real MP4/WebM reel recorded from actual browser/app workflows and rendered as the first proof subject.",
+      "useWhen": "The user asks for screenshots animated into video-style proof, the surface needs to feel live, or the copy claims the app does a workflow.",
+      "requiredPairings": ["client.surface.actual-screenshot-stage", "skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.fake-ui-preview"]
+    },
+    {
+      "id": "skye.brand.existing-logo-system",
+      "type": "brand-identity",
+      "tier": "required",
+      "description": "Use approved logo, mark, emblem, and wordmark assets before inventing any new mark.",
+      "useWhen": "Every branded public page, nav, hero, favicon, app shell, or client surface.",
+      "requiredPairings": ["skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.generated-initial-badge", "skye.core.random-stock-visual"]
+    },
+    {
+      "id": "skye.proof.quality-gates",
+      "type": "qa",
+      "tier": "required",
+      "description": "Desktop/mobile browser screenshots, no mobile horizontal scroll, visible subject, visible CTA, clean public copy.",
+      "useWhen": "Every generated public page or app surface.",
+      "requiredPairings": [],
+      "doNotPairWith": []
+    }
+  ]
+}
