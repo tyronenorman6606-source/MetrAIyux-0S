@@ -1788,3 +1788,326 @@ textarea:focus {
     transform: none;
   }
 }
+
+/* MCP app-first command center pass: real sidebars, rails, and vault-grid atmosphere */
+body {
+  background:
+    linear-gradient(116deg, rgba(229,193,106,0.08), transparent 28%),
+    linear-gradient(244deg, rgba(88,230,161,0.08), transparent 30%),
+    linear-gradient(135deg, #030409 0%, #0b0e14 46%, #05070a 100%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(229,193,106,0.11) 1px, transparent 1px),
+    linear-gradient(rgba(100,217,255,0.075) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, transparent 0 22px, rgba(255,255,255,0.025) 22px 23px);
+  background-size: 84px 84px, 84px 84px, 180px 180px;
+  mask-image: linear-gradient(90deg, rgba(0,0,0,0.88), rgba(0,0,0,0.42) 68%, transparent);
+}
+
+.orb {
+  display: none;
+}
+
+.logo-mark {
+  padding: 8px;
+  object-fit: contain;
+  background: rgba(3,3,8,0.48);
+}
+
+.client-site .site-shell {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 18px 24px;
+  width: min(1480px, calc(100% - 34px));
+}
+
+.client-nav {
+  grid-column: 1 / -1;
+}
+
+.vault-sidecar,
+.admin-sidecar {
+  position: sticky;
+  top: 94px;
+  z-index: 8;
+  align-self: start;
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(229,193,106,0.2);
+  border-radius: 8px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)),
+    rgba(3,5,10,0.8);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.36);
+  backdrop-filter: blur(18px);
+}
+
+.vault-sidecar {
+  grid-column: 1;
+  grid-row: 2 / span 8;
+}
+
+.vault-sidecar a,
+.admin-sidecar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 10px;
+  color: #eee1c8;
+  text-decoration: none;
+  font-weight: 850;
+  background: rgba(255,255,255,0.035);
+}
+
+.vault-sidecar a:hover,
+.admin-sidecar nav a:hover {
+  border-color: rgba(100,217,255,0.38);
+  background: linear-gradient(135deg, rgba(229,193,106,0.12), rgba(100,217,255,0.08));
+}
+
+.vault-sidecar a span,
+.admin-sidecar nav a span {
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.sidecar-brand {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 4px 12px;
+  color: var(--gold-2);
+  text-decoration: none;
+}
+
+.sidecar-brand img {
+  width: 48px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(229,193,106,0.36));
+}
+
+.sidecar-brand strong,
+.sidecar-brand span {
+  display: block;
+}
+
+.sidecar-brand span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.sidecar-proof {
+  margin-top: 6px;
+  border: 1px solid rgba(100,217,255,0.16);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(100,217,255,0.045);
+}
+
+.sidecar-proof strong {
+  color: #dffaff;
+}
+
+.sidecar-proof p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.client-site .site-hero,
+.client-site .vault-metrics,
+.client-site .section-grid,
+.client-site .process-strip,
+.client-site .upload-layout,
+.client-site .client-vault-panel,
+.client-site .faq-grid {
+  grid-column: 2;
+}
+
+.site-hero {
+  min-height: 740px;
+  grid-template-columns: minmax(0, 0.86fr) minmax(420px, 1.14fr);
+  background:
+    linear-gradient(135deg, rgba(229,193,106,0.12), rgba(255,255,255,0.02) 38%),
+    linear-gradient(90deg, rgba(3,5,10,0.92), rgba(3,5,10,0.62)),
+    rgba(8,8,14,0.8);
+}
+
+.site-hero::after,
+.admin-hero::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  border: 1px solid rgba(100,217,255,0.12);
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(100,217,255,0.08) 50%, transparent 52%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(229,193,106,0.045) 34px 35px);
+}
+
+.surface-reel-frame {
+  min-height: 690px;
+}
+
+.surface-video-stage {
+  border: 1px solid rgba(100,217,255,0.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(100,217,255,0.08), rgba(229,193,106,0.04)),
+    rgba(2,3,7,0.66);
+}
+
+.upload-layout {
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.upload-instructions {
+  position: sticky;
+  top: 94px;
+}
+
+.client-vault-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.58fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.client-vault-panel .panel-heading,
+.client-vault-panel .client-vault-form {
+  grid-column: 1;
+}
+
+.client-vault-panel .client-vault-list {
+  grid-column: 2;
+  margin-top: 0;
+  min-height: 220px;
+  border: 1px solid rgba(100,217,255,0.14);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(2,3,7,0.36);
+}
+
+.admin-shell {
+  width: min(1500px, calc(100% - 32px));
+  max-width: none;
+  grid-template-columns: 258px minmax(0, 1fr);
+  gap: 18px 24px;
+}
+
+.admin-sidecar {
+  grid-column: 1;
+  grid-row: 1 / span 12;
+  top: 24px;
+}
+
+.admin-sidecar nav {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-shell > :not(.admin-sidecar) {
+  grid-column: 2;
+}
+
+.admin-hero {
+  min-height: 360px;
+  background:
+    linear-gradient(135deg, rgba(229,193,106,0.13), rgba(100,217,255,0.05)),
+    linear-gradient(90deg, rgba(5,7,12,0.9), rgba(5,7,12,0.58)),
+    rgba(8,8,14,0.82);
+}
+
+.admin-hero h1 {
+  max-width: 920px;
+}
+
+#ledgerPanel {
+  border-color: rgba(100,217,255,0.22);
+  background:
+    linear-gradient(180deg, rgba(100,217,255,0.07), rgba(255,255,255,0.025)),
+    rgba(5,7,12,0.82);
+}
+
+@media (max-width: 1080px) {
+  .client-site .site-shell,
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .vault-sidecar,
+  .admin-sidecar,
+  .client-site .site-hero,
+  .client-site .vault-metrics,
+  .client-site .section-grid,
+  .client-site .process-strip,
+  .client-site .upload-layout,
+  .client-site .client-vault-panel,
+  .client-site .faq-grid,
+  .admin-shell > :not(.admin-sidecar) {
+    grid-column: 1;
+  }
+
+  .vault-sidecar,
+  .admin-sidecar,
+  .upload-instructions {
+    position: relative;
+    top: auto;
+  }
+
+  .vault-sidecar,
+  .admin-sidecar nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sidecar-brand,
+  .sidecar-proof {
+    grid-column: 1 / -1;
+  }
+
+  .site-hero,
+  .upload-layout,
+  .client-vault-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .client-vault-panel .panel-heading,
+  .client-vault-panel .client-vault-form,
+  .client-vault-panel .client-vault-list {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .vault-sidecar,
+  .admin-sidecar nav {
+    grid-template-columns: 1fr;
+  }
+
+  .surface-reel-frame {
+    min-height: 260px;
+  }
+
+  .site-hero::after,
+  .admin-hero::after {
+    inset: 8px;
+  }
+}
