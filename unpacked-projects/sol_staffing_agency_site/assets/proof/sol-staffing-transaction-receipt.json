@@ -1,0 +1,299 @@
+{
+  "generated_at": "2026-05-16T14:58:31.145Z",
+  "source_app": "unpacked-projects/sol_staffing_agency_site",
+  "base_url": "http://127.0.0.1:8890",
+  "operator": {
+    "email": "proof-operator@localhost",
+    "role": "admin"
+  },
+  "transactions": {
+    "auth_session": {
+      "status": 200,
+      "ok": true,
+      "data": {
+        "ok": true,
+        "auth": {
+          "active": true,
+          "sub": "local-dev",
+          "email": "proof-operator@localhost",
+          "username": "proof-operator@localhost",
+          "role": "admin",
+          "scope": "admin.read admin.write staffing.read staffing.write",
+          "org": "local",
+          "customer_id": null,
+          "session_id": null,
+          "source": "skyegate-fs27"
+        }
+      }
+    },
+    "public_job_order": {
+      "status": 200,
+      "ok": true,
+      "id": "rec_1778943477379_38666647",
+      "collection": "job_orders",
+      "form_name": "staffing-request",
+      "title": "Temporary staffing",
+      "created_at": "2026-05-16T14:57:57.366Z"
+    },
+    "manual_admin_record": {
+      "status": 200,
+      "ok": true,
+      "id": "rec_1778943494542_f53d55fc",
+      "collection": "gov_pursuits",
+      "form_name": "admin-manual-entry",
+      "title": "Government warehouse staffing pursuit",
+      "created_at": "2026-05-16T14:58:14.542Z"
+    },
+    "secure_upload": {
+      "status": 200,
+      "ok": true,
+      "id": "doc_1778943497874_080e0d90",
+      "name": "proof-upload.txt",
+      "label": "Proof upload packet",
+      "size": 72,
+      "content_type": "text/plain",
+      "linked_record_id": "playwright-proof",
+      "created_at": "2026-05-16T14:58:17.898Z"
+    },
+    "authenticated_brain_route": {
+      "status": 503,
+      "ok": false,
+      "mode": "not_configured",
+      "answer": "Live GPU/Ollama brain is wired but not configured. Set OLLAMA_BASE_URL + OLLAMA_MODEL, or GPU_BRAIN_ENDPOINT + GPU_BRAIN_MODEL, then retry from an authenticated Skyegate FS27 session.",
+      "error": null
+    },
+    "local_brain_answer": {
+      "ok": true,
+      "answer_excerpt": "Local brain loaded. Ask about staffing, job orders, candidates, government contracting, AE scripts, pricing, routing, or safe claims."
+    },
+    "audit_entries": {
+      "status": 200,
+      "ok": true,
+      "entries": [
+        {
+          "id": "audit_1778943497901_ee1e9f52",
+          "action": "document_uploaded",
+          "collection": "documents",
+          "record_id": "doc_1778943497874_080e0d90",
+          "at": "2026-05-16T14:58:17.898Z"
+        },
+        {
+          "id": "audit_1778943494615_a648c6ee",
+          "action": "record_created",
+          "collection": "gov_pursuits",
+          "record_id": "rec_1778943494542_f53d55fc",
+          "at": "2026-05-16T14:58:14.615Z"
+        },
+        {
+          "id": "audit_1778943478233_ded18c13",
+          "action": "form_submitted",
+          "collection": "job_orders",
+          "record_id": "rec_1778943477379_38666647",
+          "at": "2026-05-16T14:57:57.366Z"
+        }
+      ]
+    }
+  },
+  "summaries": {
+    "after_public_intake": {
+      "status": 200,
+      "ok": true,
+      "data": {
+        "ok": true,
+        "summary": {
+          "leads": 0,
+          "job_orders": 1,
+          "candidates": 0,
+          "placements": 0,
+          "timesheets": 0,
+          "gov_pursuits": 0,
+          "ae_leads": 0,
+          "vendors": 0,
+          "risks": 0,
+          "brain_feedback": 0,
+          "documents": 0,
+          "audit": 1
+        },
+        "recent": [
+          {
+            "id": "audit_1778943478233_ded18c13",
+            "collection": "job_orders",
+            "title": "Untitled",
+            "contact": "",
+            "type": ""
+          },
+          {
+            "id": "rec_1778943477379_38666647",
+            "collection": "job_orders",
+            "status": "new",
+            "created_at": "2026-05-16T14:57:57.366Z",
+            "title": "Acme Logistics",
+            "contact": "ops@example.com",
+            "type": "staffing-request"
+          }
+        ],
+        "collections": [
+          "leads",
+          "job_orders",
+          "candidates",
+          "placements",
+          "timesheets",
+          "gov_pursuits",
+          "ae_leads",
+          "vendors",
+          "risks",
+          "brain_feedback",
+          "documents",
+          "audit"
+        ]
+      }
+    },
+    "final": {
+      "status": 200,
+      "ok": true,
+      "data": {
+        "ok": true,
+        "summary": {
+          "leads": 0,
+          "job_orders": 1,
+          "candidates": 0,
+          "placements": 0,
+          "timesheets": 0,
+          "gov_pursuits": 1,
+          "ae_leads": 0,
+          "vendors": 0,
+          "risks": 0,
+          "brain_feedback": 0,
+          "documents": 1,
+          "audit": 3
+        },
+        "recent": [
+          {
+            "id": "audit_1778943497901_ee1e9f52",
+            "collection": "documents",
+            "title": "Untitled",
+            "contact": "",
+            "type": ""
+          },
+          {
+            "id": "audit_1778943494615_a648c6ee",
+            "collection": "gov_pursuits",
+            "title": "Untitled",
+            "contact": "",
+            "type": ""
+          },
+          {
+            "id": "audit_1778943478233_ded18c13",
+            "collection": "job_orders",
+            "title": "Untitled",
+            "contact": "",
+            "type": ""
+          },
+          {
+            "id": "doc_1778943497874_080e0d90",
+            "collection": "documents",
+            "status": "stored",
+            "created_at": "2026-05-16T14:58:17.898Z",
+            "title": "Untitled",
+            "contact": "",
+            "type": ""
+          },
+          {
+            "id": "rec_1778943494542_f53d55fc",
+            "collection": "gov_pursuits",
+            "status": "new",
+            "created_at": "2026-05-16T14:58:14.542Z",
+            "title": "Untitled",
+            "contact": "procurement@example.gov",
+            "type": "admin-manual-entry"
+          },
+          {
+            "id": "rec_1778943477379_38666647",
+            "collection": "job_orders",
+            "status": "new",
+            "created_at": "2026-05-16T14:57:57.366Z",
+            "title": "Acme Logistics",
+            "contact": "ops@example.com",
+            "type": "staffing-request"
+          }
+        ],
+        "collections": [
+          "leads",
+          "job_orders",
+          "candidates",
+          "placements",
+          "timesheets",
+          "gov_pursuits",
+          "ae_leads",
+          "vendors",
+          "risks",
+          "brain_feedback",
+          "documents",
+          "audit"
+        ]
+      }
+    }
+  },
+  "assertions": [
+    {
+      "name": "job_order_record_created",
+      "ok": true,
+      "evidence": {
+        "status": 200,
+        "ok": true,
+        "id": "rec_1778943477379_38666647",
+        "collection": "job_orders",
+        "form_name": "staffing-request",
+        "title": "Temporary staffing",
+        "created_at": "2026-05-16T14:57:57.366Z"
+      }
+    },
+    {
+      "name": "admin_record_created",
+      "ok": true,
+      "evidence": {
+        "status": 200,
+        "ok": true,
+        "id": "rec_1778943494542_f53d55fc",
+        "collection": "gov_pursuits",
+        "form_name": "admin-manual-entry",
+        "title": "Government warehouse staffing pursuit",
+        "created_at": "2026-05-16T14:58:14.542Z"
+      }
+    },
+    {
+      "name": "secure_upload_stored",
+      "ok": true,
+      "evidence": {
+        "status": 200,
+        "ok": true,
+        "id": "doc_1778943497874_080e0d90",
+        "name": "proof-upload.txt",
+        "label": "Proof upload packet",
+        "size": 72,
+        "content_type": "text/plain",
+        "linked_record_id": "playwright-proof",
+        "created_at": "2026-05-16T14:58:17.898Z"
+      }
+    },
+    {
+      "name": "brain_route_responded",
+      "ok": true,
+      "evidence": {
+        "status": 503,
+        "ok": false,
+        "mode": "not_configured",
+        "answer": "Live GPU/Ollama brain is wired but not configured. Set OLLAMA_BASE_URL + OLLAMA_MODEL, or GPU_BRAIN_ENDPOINT + GPU_BRAIN_MODEL, then retry from an authenticated Skyegate FS27 session.",
+        "error": null
+      }
+    },
+    {
+      "name": "local_brain_answered",
+      "ok": true,
+      "evidence": {
+        "ok": true,
+        "answer_excerpt": "Local brain loaded. Ask about staffing, job orders, candidates, government contracting, AE scripts, pricing, routing, or safe claims."
+      }
+    }
+  ]
+}
