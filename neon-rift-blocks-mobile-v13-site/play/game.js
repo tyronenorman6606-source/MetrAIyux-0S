@@ -103,10 +103,10 @@
   ];
 
   const BATTLE_SQUADRONS = [
-    { id: 'vanta', name: 'Vanta Wraith', ship: 'Void Ronin', hp: 1800, tempo: 0.92, color: '#ff4def', style: 'rushdown' },
-    { id: 'orion', name: 'Orion Breaker', ship: 'Rail Saint', hp: 2150, tempo: 0.78, color: '#35f5ff', style: 'zoner' },
-    { id: 'sable', name: 'Sable Monk', ship: 'Moon Fang', hp: 2400, tempo: 0.7, color: '#ffd663', style: 'counter' },
-    { id: 'scar', name: 'Scar Admiral', ship: 'Grave Engine', hp: 2850, tempo: 1.08, color: '#ff4c72', style: 'boss' },
+    { id: 'vanta', name: 'Vanta Wraith', ship: 'Void Ronin', hp: 980, tempo: 0.92, color: '#ff4def', style: 'rushdown' },
+    { id: 'orion', name: 'Orion Breaker', ship: 'Rail Saint', hp: 1160, tempo: 0.78, color: '#35f5ff', style: 'zoner' },
+    { id: 'sable', name: 'Sable Monk', ship: 'Moon Fang', hp: 1320, tempo: 0.7, color: '#ffd663', style: 'counter' },
+    { id: 'scar', name: 'Scar Admiral', ship: 'Grave Engine', hp: 1560, tempo: 1.08, color: '#ff4c72', style: 'boss' },
   ];
 
   const AUDIO_MOODS = {
@@ -1901,7 +1901,7 @@
   function makeBattleState(mode, rng, rank, startLevel) {
     const offset = mode === 'onslaught' ? 3 : mode === 'blitz' ? 1 : Math.floor(rng() * BATTLE_SQUADRONS.length);
     const baseEnemy = BATTLE_SQUADRONS[(offset + startLevel + rank) % BATTLE_SQUADRONS.length];
-    const maxHp = Math.floor(baseEnemy.hp + startLevel * 190 + rank * 80);
+    const maxHp = Math.floor(baseEnemy.hp + startLevel * 90 + rank * 35);
     return {
       enemy: { ...baseEnemy },
       enemyHp: maxHp,
@@ -1911,6 +1911,7 @@
       playerMaxHull: mode === 'zen' ? 130 : 100,
       wave: 1,
       chainName: 'Neutral',
+      technique: 'Ready',
       lastStrike: 0,
       lastEnemyHit: 0,
       warning: '',
@@ -2280,6 +2281,7 @@
     }
     state.score += dropped * (state.riftActive ? 4 : 2);
     state.stats.slams += 1;
+    battleSlamStrike(dropped);
     progressMission('slam', 1);
     progressPulse('slam', 1);
     progressQuest('slam', 1);
@@ -2306,6 +2308,7 @@
     progressQuest('hold', 1);
     sound('rotate');
     haptic(14);
+    battleGuardCancel();
   }
 
   function canAct() {
@@ -2464,7 +2467,11 @@
   function activateRift() {
     if (!state.started || state.paused || state.gameOver || state.pendingChoice) return;
     if (state.riftCharge < 100 || state.riftActive) {
-      showToast(state.riftActive ? 'Rift already burning' : 'Charge rift to 100%');
+      if (!state.riftActive && state.riftCharge >= 28) {
+        fireRiftShot();
+        return;
+      }
+      showToast(state.riftActive ? 'Rift already burning' : 'Charge 28% for shot, 100% for super');
       return;
     }
     state.riftCharge = 0;
@@ -2484,6 +2491,16 @@
     for (let i = 0; i < 32; i += 1) {
       state.particles.push({ x: rand(10, BOARD_W - 10), y: rand(20, BOARD_H - 20), vx: rand(-0.08, 0.08), vy: rand(-0.18, -0.02), life: rand(500, 1000), color: i % 2 ? '#ff4def' : '#35f5ff', size: rand(2, 5) });
     }
+  }
+
+  function fireRiftShot() {
+    const spent = Math.min(42, Math.max(28, Math.floor(state.riftCharge)));
+    state.riftCharge = Math.max(0, state.riftCharge - spent);
+    const damage = 210 + spent * 5 + state.level * 28 + Math.max(0, state.combo) * 18;
+    battleDamage(damage, 'Rift Shot', '#9dffef');
+    state.score += damage * 2;
+    state.chronoTimer = Math.max(state.chronoTimer, 1100);
+    showToast('Rift Shot fired');
   }
 
   function spawnRiftNodes(count = 1) {
@@ -2580,6 +2597,31 @@
     }
   }
 
+  function battleSlamStrike(dropped = 0) {
+    if (!state.battle || !state.started || state.gameOver) return;
+    const clean = Math.max(0, 12 - lockedStackPressure());
+    const styleBonus = state.piece?.type === 'I' ? 36 : state.piece?.type === 'T' ? 28 : state.piece?.type === 'X' ? 64 : 0;
+    const damage = Math.floor(72 + dropped * 9 + clean * 4 + styleBonus + state.level * 11);
+    const meterGain = 7 + Math.min(18, Math.floor(dropped / 2));
+    state.riftCharge = Math.min(100, state.riftCharge + meterGain);
+    battleDamage(damage, dropped >= 12 ? 'Rail Slam' : 'Boost Strike', dropped >= 12 ? '#ffd663' : '#35f5ff', false);
+    state.battle.enemyMeter = Math.max(0, state.battle.enemyMeter - Math.min(16, Math.floor(dropped / 2)));
+    state.battle.technique = dropped >= 12 ? 'Rail Slam' : 'Boost Strike';
+  }
+
+  function battleGuardCancel() {
+    if (!state.battle || !state.started || state.gameOver) return;
+    const battle = state.battle;
+    const parryWindow = battle.enemyMeter >= 68;
+    const hullGain = parryWindow ? 10 : 4;
+    battle.playerHull = Math.min(battle.playerMaxHull, battle.playerHull + hullGain);
+    battle.enemyMeter = Math.max(0, battle.enemyMeter - (parryWindow ? 36 : 18));
+    state.riftCharge = Math.min(100, state.riftCharge + (parryWindow ? 18 : 7));
+    battle.technique = parryWindow ? 'Perfect Guard' : 'Guard Cancel';
+    battleDamage(parryWindow ? 180 + state.level * 24 : 70 + state.level * 10, battle.technique, parryWindow ? '#7cffb1' : '#9dffef', false);
+    showToast(parryWindow ? 'Perfect Guard counter' : 'Guard cancel armed');
+  }
+
   function comboName(lines, combo) {
     if (lines >= 4 && combo >= 4) return 'Astral Ultra';
     if (lines >= 4) return 'Meteor Break';
@@ -2627,7 +2669,7 @@
     const battle = state.battle;
     battle.wave += 1;
     const next = BATTLE_SQUADRONS[(BATTLE_SQUADRONS.findIndex((enemy) => enemy.id === battle.enemy.id) + battle.wave) % BATTLE_SQUADRONS.length];
-    const maxHp = Math.floor(next.hp + state.level * 220 + battle.wave * 260 + rankForXP(profile.xp) * 70);
+    const maxHp = Math.floor(next.hp + state.level * 110 + battle.wave * 155 + rankForXP(profile.xp) * 45);
     battle.enemy = { ...next };
     battle.enemyMaxHp = maxHp;
     battle.enemyHp = maxHp;
@@ -2635,6 +2677,7 @@
     state.score += 900 * battle.wave * state.level;
     state.riftCharge = Math.min(100, state.riftCharge + 26);
     state.shield = Math.min(3, state.shield + (battle.wave % 2 === 0 ? 1 : 0));
+    battle.playerHull = Math.min(battle.playerMaxHull, battle.playerHull + 16);
     spawnRiftNodes(2);
     addFloater(`WAVE ${battle.wave}: ${next.ship}`, BOARD_W / 2, 86, next.color);
     showToast(`Enemy down. ${next.name} entering.`);
@@ -3246,9 +3289,9 @@
 
     ctx.textAlign = 'right';
     ctx.fillStyle = '#9aa7c3';
-    ctx.fillText(battle.chainName.toUpperCase(), BOARD_W - 18, 25);
+    ctx.fillText(String(battle.chainName || battle.technique).toUpperCase(), BOARD_W - 18, 25);
     ctx.fillStyle = '#7cffb1';
-    ctx.fillText(`HULL ${Math.ceil(battle.playerHull)}%`, BOARD_W - 18, 39);
+    ctx.fillText(`${String(battle.technique || 'READY').toUpperCase()} · HULL ${Math.ceil(battle.playerHull)}%`, BOARD_W - 18, 39);
 
     ctx.fillStyle = 'rgba(255,255,255,0.11)';
     roundRect(ctx, 18, 45, BOARD_W - 36, 8, 999);
@@ -3381,7 +3424,7 @@
     const missionProgress = state.mission ? ` (${Math.min(state.mission.progress, state.mission.target)}/${state.mission.target})` : '';
     const pulse = state.pulseGoal ? ` · ${state.pulseGoal.text} (${Math.min(Number(state.pulseProgress?.[state.pulseGoal.type] || 0), state.pulseGoal.target)}/${state.pulseGoal.target})` : '';
     const nodes = state.riftNodes?.length ? ` · Hit ${state.riftNodes.length} Rift Nodes` : '';
-    const battle = state.battle ? ` · Duel ${state.battle.enemy.ship} ${Math.ceil(state.battle.enemyHp)}/${state.battle.enemyMaxHp}` : '';
+    const battle = state.battle ? ` · ${state.battle.technique}: ${state.battle.enemy.ship} ${Math.ceil(state.battle.enemyHp)}/${state.battle.enemyMaxHp}` : '';
     ui.missionText.textContent = state.mission ? `${state.mission.text}${missionProgress}${battle}${nodes}${pulse}` : `Mission initializing${battle}${nodes}${pulse}`;
     ui.timeText.textContent = state.cfg.timeLimit ? formatClock(state.timeLeft) : '∞';
     ui.shieldText.textContent = state.shield;
@@ -3432,7 +3475,7 @@
     setOverlay(`
       <p class="eyebrow">Phone-first ritual arcade</p>
       <h2>Enter the Rift</h2>
-      <p>Swipe to fly the block engine, but the run is a ship duel now: clears hit enemy hull, combos become attack strings, shields can parry volleys, and Rift Storm is your super.</p>
+      <p>This is block combat now: Slam throws rail strikes, Hold is guard/parry, clears become combo strings, and Rift fires shots at 28% or a full-screen super at 100%.</p>
       <div class="mode-grid" id="modeGrid">
         ${Object.entries(MODES).map(([key, mode]) => `
           <button class="mode-card ${selectedMode === key ? 'active' : ''}" data-mode="${key}" type="button">
@@ -3532,9 +3575,11 @@
     setOverlay(`
       <p class="eyebrow">Control deck</p>
       <h2>Play Fast</h2>
-      <p><b>Tap board</b> to rotate. <b>Swipe left/right</b> to move. <b>Swipe down</b> to slam. <b>Swipe up</b> to hold. Clear lines to attack the rival ship before its meter fires back.</p>
+      <p><b>Tap board</b> to spin. <b>Swipe left/right</b> to dash. <b>Swipe down</b> to rail slam. <b>Swipe up</b> to guard. Every slam hits, every clear combos, and enemy meter means incoming fire.</p>
       <div class="profile-list">
         <div class="profile-row"><b>Rift Super</b><span>Clear lines until the meter hits 100%, then hit RIFT for a board cut and heavy ship damage.</span></div>
+        <div class="profile-row"><b>Rift Shot</b><span>Tap RIFT at 28%+ for a fast projectile when you need damage before the full super.</span></div>
+        <div class="profile-row"><b>Guard/Parry</b><span>Use Hold while enemy meter is high to heal hull, drain their meter, and counterhit.</span></div>
         <div class="profile-row"><b>Power Cores</b><span>Q bursts clusters, B slices a row, C slows time, S grants shield.</span></div>
         <div class="profile-row"><b>Anomaly Drafts</b><span>Every few levels you pick a run perk. This is what turns a good run into a long session.</span></div>
       </div>
