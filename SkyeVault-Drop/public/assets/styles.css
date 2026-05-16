@@ -2111,3 +2111,165 @@ body::after {
     inset: 8px;
   }
 }
+
+/* Redo pass: SkyeMail-inspired spectacle without the failed canvas/crop treatment. */
+.client-site .site-shell {
+  grid-template-columns: 1fr;
+  gap: 18px;
+  width: min(1400px, calc(100% - 34px));
+}
+
+.vault-sidecar {
+  grid-column: 1;
+  grid-row: auto;
+  position: relative;
+  top: auto;
+  grid-template-columns: minmax(210px, 0.9fr) repeat(4, minmax(140px, 1fr)) minmax(240px, 1.1fr);
+  align-items: center;
+  padding: 10px;
+}
+
+.vault-sidecar a {
+  min-height: 62px;
+}
+
+.vault-sidecar .sidecar-proof {
+  margin-top: 0;
+}
+
+.client-site .site-hero,
+.client-site .vault-metrics,
+.client-site .section-grid,
+.client-site .process-strip,
+.client-site .upload-layout,
+.client-site .client-vault-panel,
+.client-site .faq-grid {
+  grid-column: 1;
+}
+
+.site-hero {
+  min-height: min(760px, calc(100vh - 170px));
+  grid-template-columns: minmax(0, 0.98fr) minmax(420px, 1.02fr);
+  gap: 28px;
+  padding: 48px;
+  background:
+    radial-gradient(820px 520px at 74% 34%, rgba(100,217,255,0.15), transparent 66%),
+    radial-gradient(720px 520px at 16% 18%, rgba(229,193,106,0.12), transparent 62%),
+    linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.018) 48%),
+    rgba(6,7,12,0.76);
+}
+
+.hero-copy {
+  display: grid;
+  align-content: center;
+}
+
+.headline-kicker {
+  max-width: 700px;
+  color: #f6df76;
+  font-size: clamp(1.5rem, 3vw, 3.2rem);
+  line-height: 1.02;
+  text-shadow: 0 0 24px rgba(229,193,106,0.12);
+}
+
+.hero-copy .lede {
+  max-width: 620px;
+  font-size: 1.08rem;
+}
+
+.surface-reel-frame {
+  min-height: min(620px, calc(100vh - 260px));
+  box-shadow:
+    0 34px 130px rgba(0,0,0,0.52),
+    0 0 82px rgba(100,217,255,0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.surface-reel-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  inset: 12%;
+  border: 1px solid rgba(229,193,106,0.16);
+  border-radius: 50%;
+  transform: scaleX(1.22) rotate(-8deg);
+  box-shadow: 0 0 70px rgba(229,193,106,0.07), inset 0 0 48px rgba(100,217,255,0.055);
+}
+
+.surface-reel {
+  object-position: center;
+}
+
+@media (max-width: 1080px) {
+  .vault-sidecar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vault-sidecar {
+    grid-template-columns: 1fr;
+    grid-row: 3;
+  }
+
+  .site-hero {
+    grid-row: 2;
+    padding: 18px;
+  }
+
+  .surface-reel-frame {
+    min-height: 260px;
+  }
+}
+
+/* Final redo correction: keep the command surface as a real sidebar on wide screens. */
+@media (min-width: 1081px) {
+  .client-site .site-shell {
+    grid-template-columns: 248px minmax(0, 1fr);
+    gap: 18px 24px;
+  }
+
+  .vault-sidecar {
+    grid-column: 1;
+    grid-row: 2 / span 8;
+    position: sticky;
+    top: 100px;
+    align-self: start;
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .vault-sidecar a {
+    min-height: 54px;
+  }
+
+  .vault-sidecar .sidecar-proof {
+    margin-top: 8px;
+  }
+
+  .client-site .site-hero,
+  .client-site .vault-metrics,
+  .client-site .section-grid,
+  .client-site .process-strip,
+  .client-site .upload-layout,
+  .client-site .client-vault-panel,
+  .client-site .faq-grid {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-hero .hero-copy {
+    order: 1;
+  }
+
+  .site-hero .hero-stage-card {
+    order: 2;
+  }
+}
