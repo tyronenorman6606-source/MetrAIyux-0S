@@ -2780,3 +2780,335 @@ body:not(.page-home):not(.page-fit) .page-hero p {
     display: none;
   }
 }
+
+/* ============================================================
+   MCP redesign pass: proof-led website, stable media, no overlap.
+   Pulled from the local QuantumSkyes MCP directive, surface-video rule,
+   logo rule, and neon motion chrome pattern.
+   ============================================================ */
+
+.mcp-redesign {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(180deg, #06080b 0%, #0d1111 38%, #111006 70%, #050608 100%);
+  background-size: 58px 58px, 58px 58px, auto;
+}
+
+.mcp-redesign::after {
+  display: none;
+}
+
+.mcp-redesign .topbar {
+  border-bottom-color: rgba(248,203,94,0.22);
+  background: rgba(4,6,7,0.9);
+}
+
+.mcp-redesign .brand-logo-real {
+  width: 74px !important;
+  height: 58px !important;
+  filter: drop-shadow(0 0 18px rgba(248,203,94,0.32));
+}
+
+.mcp-proof-runway {
+  width: min(1440px, calc(100vw - 32px));
+  margin: 0 auto;
+  min-height: auto;
+  padding: clamp(48px, 7vw, 96px) 0 clamp(36px, 6vw, 74px);
+}
+
+.mcp-proof-runway .hero-title-band {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  gap: clamp(22px, 4vw, 56px);
+  align-items: end;
+  border: 1px solid rgba(248,203,94,0.22);
+  border-radius: 8px;
+  padding: clamp(22px, 4vw, 52px);
+  background:
+    linear-gradient(120deg, rgba(248,203,94,0.14), transparent 34%),
+    linear-gradient(280deg, rgba(100,217,255,0.10), transparent 38%),
+    rgba(6,9,10,0.86);
+  box-shadow: 0 26px 90px rgba(0,0,0,0.34);
+}
+
+.mcp-proof-runway .hero-title-band h1,
+.mcp-platform-runway h1 {
+  max-width: 13ch;
+  font-size: clamp(44px, 7vw, 104px);
+  line-height: .94;
+  letter-spacing: 0;
+}
+
+.mcp-proof-runway .hero-brief {
+  display: grid;
+  gap: 18px;
+  align-content: end;
+  padding: clamp(18px, 2.2vw, 28px);
+  border-left: 1px solid rgba(100,217,255,0.2);
+  background: rgba(0,0,0,0.16);
+}
+
+.mcp-proof-runway .hero-brief p {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--soft);
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.72;
+}
+
+.mcp-proof-runway .funnel-path {
+  width: 100%;
+  margin-top: clamp(16px, 2vw, 26px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+}
+
+.mcp-proof-runway .funnel-path article {
+  min-height: 210px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: clamp(18px, 2.3vw, 28px);
+  background: rgba(8,12,13,0.92);
+}
+
+.mcp-proof-runway .funnel-path span {
+  width: max-content;
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.mcp-proof-runway .funnel-path h3,
+.mcp-proof-runway .funnel-path p {
+  margin: 0;
+}
+
+.mcp-proof-runway .funnel-path h3 {
+  font-size: clamp(20px, 2.1vw, 30px);
+  line-height: 1.08;
+}
+
+.mcp-proof-runway .funnel-path p {
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.mcp-video-receipt .actual-screen-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .55fr);
+  grid-template-areas:
+    "brand rail"
+    "video rail";
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mcp-video-receipt .proof-theater-brand {
+  grid-area: brand;
+  min-height: 118px;
+  border: 1px solid rgba(248,203,94,0.22);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(8,12,13,0.86);
+}
+
+.mcp-video-receipt .surface-video-shell {
+  grid-area: video;
+  min-height: 0;
+  border-radius: 8px;
+}
+
+.mcp-video-receipt .surface-reel-video {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: #020304;
+}
+
+.mcp-video-receipt .screen-stack {
+  display: none;
+}
+
+.mcp-video-receipt .screen-proof-rail {
+  grid-area: rail;
+  min-height: 100%;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  border: 1px solid rgba(100,217,255,0.2);
+  border-radius: 8px;
+  padding: clamp(18px, 2.5vw, 28px);
+  background:
+    linear-gradient(180deg, rgba(100,217,255,0.1), transparent 46%),
+    rgba(8,12,13,0.9);
+}
+
+.mcp-video-receipt .screen-proof-rail strong {
+  font-size: clamp(58px, 8vw, 118px);
+  line-height: .82;
+}
+
+.mcp-video-receipt .proof-link {
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mcp-ops-ledger .brain-list {
+  grid-template-columns: 1fr;
+  gap: 1px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+}
+
+.mcp-ops-ledger .brain-row {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 24px);
+  min-height: 118px;
+  padding: clamp(18px, 2.2vw, 28px);
+  border: 0;
+  background: rgba(8,12,13,0.92);
+}
+
+.mcp-ops-ledger .brain-row:nth-child(odd),
+.mcp-ops-ledger .brain-row:nth-child(even) {
+  padding-left: clamp(18px, 2.2vw, 28px);
+  padding-right: clamp(18px, 2.2vw, 28px);
+  border-left: 0;
+}
+
+.mcp-ops-ledger .brain-name {
+  font-size: clamp(20px, 2.1vw, 30px);
+  color: var(--ink);
+}
+
+.mcp-ops-ledger .brain-title {
+  max-width: 82ch;
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.mcp-platform-runway {
+  width: min(1380px, calc(100vw - 32px));
+  margin: clamp(30px, 5vw, 70px) auto 0;
+  padding: clamp(22px, 4vw, 54px);
+  border: 1px solid rgba(111,242,199,0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(120deg, rgba(111,242,199,0.12), transparent 34%),
+    linear-gradient(280deg, rgba(248,203,94,0.1), transparent 38%),
+    rgba(6,9,10,0.9);
+}
+
+.page-platform .cards.three {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  grid-template-columns: 1fr;
+}
+
+.page-platform .cards.three .plan-card {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) auto;
+  gap: clamp(14px, 2vw, 26px);
+  align-items: center;
+  min-height: 132px;
+}
+
+.page-platform .cards.three .plan-card h3,
+.page-platform .cards.three .plan-card p {
+  margin: 0;
+}
+
+.page-platform .cards.three .plan-card .tag {
+  align-self: center;
+  justify-self: start;
+}
+
+.page-platform .platform-link-map {
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.page-platform .surface-links a {
+  min-height: 78px;
+}
+
+.page-platform .long-proof-stage {
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, .55fr);
+}
+
+.page-platform .long-proof-video video {
+  object-fit: contain;
+  background: #020304;
+}
+
+@media (max-width: 980px) {
+  .mcp-proof-runway .hero-title-band,
+  .mcp-video-receipt .actual-screen-stage,
+  .mcp-platform-runway,
+  .page-platform .platform-link-map,
+  .page-platform .long-proof-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .mcp-video-receipt .actual-screen-stage {
+    grid-template-areas:
+      "brand"
+      "video"
+      "rail";
+  }
+
+  .mcp-proof-runway .hero-brief {
+    border-left: 0;
+    border-top: 1px solid rgba(100,217,255,0.2);
+  }
+
+  .mcp-proof-runway .funnel-path {
+    grid-template-columns: 1fr;
+  }
+
+  .page-platform .cards.three .plan-card {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 620px) {
+  .mcp-proof-runway,
+  .mcp-platform-runway {
+    width: calc(100vw - 24px);
+  }
+
+  .mcp-proof-runway .hero-title-band,
+  .mcp-platform-runway {
+    padding: 18px;
+  }
+
+  .mcp-proof-runway .hero-title-band h1,
+  .mcp-platform-runway h1 {
+    max-width: 100%;
+    font-size: clamp(38px, 13vw, 56px);
+    line-height: 1;
+  }
+
+  .mcp-ops-ledger .brain-row {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+}
