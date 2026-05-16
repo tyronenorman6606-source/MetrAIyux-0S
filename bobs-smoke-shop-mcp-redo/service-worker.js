@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bobs-smoke-shop-pwa-v1';
+const CACHE_NAME = 'bobs-smoke-shop-pwa-v6';
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -12,8 +12,15 @@ const CORE_ASSETS = [
   '/script.js',
   '/manifest.webmanifest',
   '/favicon.png',
-  '/assets/logo/bobs-smoke-shop-3d-logo.png',
-  '/assets/banners/storefront-hero-banner.png',
+  '/assets/live-site/bobs-live-logo.png',
+  '/assets/live-site/bobs-live-storefront.png',
+  '/assets/live-site/live-product-g-device.png',
+  '/assets/live-site/live-glass-green.png',
+  '/assets/live-site/live-glass-color.png',
+  '/assets/live-site/live-wraps-display.jpeg',
+  '/assets/live-site/live-zemis-wraps.jpeg',
+  '/assets/live-site/live-cigars.jpeg',
+  '/assets/live-site/live-stiiizy-wraps.jpg',
   '/assets/banners/interior-showcase-banner.png',
   '/assets/qr/bobs-smoke-shop-preview-qr.svg',
   '/assets/qr/bobs-smoke-shop-preview-qr.png'
