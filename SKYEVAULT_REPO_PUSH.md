@@ -49,6 +49,8 @@ SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
 npm run vault:git:remote:proof
 ```
 
+The remote service gives developers normal `git push`, `git fetch`, and `git clone` behavior against a vault URL, plus an authenticated operator console at `/__skyevault/ui`. Operators can inspect refs/events/neural maps and export a cloneable Git bundle from the API when a portable download is needed.
+
 See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
 
 For a client-owned vault, set these in that client's repo or shell:

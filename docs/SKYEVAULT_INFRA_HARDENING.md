@@ -85,6 +85,14 @@ git fetch vault
 
 The remote service stores bare repos, writes ref-update ledgers, and emits neural-map JSON from `post-receive` hooks. See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
 
+The same service exposes an authenticated operator console and API:
+
+- `GET /__skyevault/ui` for repo/refs/events/neural-map inspection.
+- `POST /__skyevault/repos` for explicit repo provisioning.
+- `POST /__skyevault/repos/:workspace/:repo/export` for cloneable Git bundle export.
+
+The end-to-end proof verifies push, clone, fetch, protected-branch force-push rejection, UI rendering, API access, bundle export, and clone-from-bundle restore.
+
 ## Audit
 
 Read local operator state:

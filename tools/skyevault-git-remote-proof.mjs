@@ -41,6 +41,14 @@ function waitForReady(child) {
   });
 }
 
+function curlJson(url, token, args = []) {
+  return JSON.parse(run('curl', ['-fsS', '-H', `Authorization: Bearer ${token}`, ...args, url]));
+}
+
+function curlText(url, token, args = []) {
+  return run('curl', ['-fsS', '-H', `Authorization: Bearer ${token}`, ...args, url]);
+}
+
 const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
 const proofRoot = path.join(os.tmpdir(), `skyevault-git-remote-proof-${stamp}`);
 const storageRoot = path.join(proofRoot, 'remote-storage');
@@ -60,6 +68,7 @@ try {
   ready = await waitForReady(server);
   const client = path.join(proofRoot, 'client');
   const clone = path.join(proofRoot, 'clone');
+  const bundleClone = path.join(proofRoot, 'bundle-clone');
   const remoteUrl = `${ready.baseUrl}/acme/demo.git`;
   const authedRemoteUrl = remoteUrl.replace('http://', `http://x-token:${token}@`);
 
@@ -92,7 +101,23 @@ try {
   run('git', ['fetch', 'origin'], { cwd: clone, stdio: 'pipe' });
   const remoteHead = run('git', ['rev-parse', 'origin/main'], { cwd: clone });
 
-  const repos = JSON.parse(run('curl', ['-fsS', '-H', `Authorization: Bearer ${token}`, `${ready.baseUrl}/__skyevault/repos`]));
+  const ui = curlText(`${ready.baseUrl}/__skyevault/ui`, token);
+  if (!ui.includes('SkyeVault Git Remote')) throw new Error('Operator UI did not render the SkyeVault Git Remote console.');
+  const createdRepo = curlJson(`${ready.baseUrl}/__skyevault/repos`, token, [
+    '-X', 'POST',
+    '-H', 'content-type: application/json',
+    '--data', JSON.stringify({ workspaceId: 'acme', repoId: 'created-from-api' })
+  ]);
+  const repos = curlJson(`${ready.baseUrl}/__skyevault/repos`, token);
+  const detail = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo`, token);
+  const apiRefs = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/refs`, token);
+  const apiEvents = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/events`, token);
+  const apiNeuralMap = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/neural-map`, token);
+  const bundleExport = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/export`, token, ['-X', 'POST']);
+  if (!fs.existsSync(bundleExport.export.path)) throw new Error('Exported bundle was not written to disk.');
+  run('git', ['clone', bundleExport.export.path, bundleClone], { cwd: proofRoot, stdio: 'pipe' });
+  const bundleHead = run('git', ['rev-parse', 'HEAD'], { cwd: bundleClone });
+  if (bundleHead !== remoteHead) throw new Error('Exported bundle clone does not match remote HEAD.');
   const ledger = fs.existsSync(ready.ledgerPath) ? fs.readFileSync(ready.ledgerPath, 'utf8').split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line)) : [];
   const neuralFiles = fs.existsSync(ready.neuralDir) ? fs.readdirSync(ready.neuralDir).filter((name) => name.endsWith('.json')) : [];
   const report = {
@@ -103,10 +128,23 @@ try {
     storageRoot,
     firstHead,
     remoteHead,
+    bundleHead,
     forcePushRejected,
+    uiOk: true,
+    createdRepo: createdRepo.repo.id,
     repos: repos.repos,
+    repoDetail: detail.repo,
+    apiRefs: apiRefs.refs.length,
+    apiEvents: apiEvents.events.length,
+    apiNeuralNodes: apiNeuralMap.neuralMap?.nodes?.length || 0,
+    bundleExport: {
+      fileName: bundleExport.export.fileName,
+      bytes: bundleExport.export.bytes,
+      sha256: bundleExport.export.sha256
+    },
     refEvents: ledger.filter((event) => event.event === 'git.ref-update').length,
     requestEvents: ledger.filter((event) => event.event === 'git.remote-request').length,
+    exportEvents: ledger.filter((event) => event.event === 'git.remote-export').length,
     neuralFiles
   };
   console.log(JSON.stringify(report, null, 2));
