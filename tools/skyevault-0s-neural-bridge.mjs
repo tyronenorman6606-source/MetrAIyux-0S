@@ -134,7 +134,7 @@ const outputPath = resolvePath(argValue('--output'), path.join(root, 'metraiyux_
 const workspaceDir = resolvePath(argValue('--workspace-dir'), path.join(root, 'metraiyux_0s_site', 'brain', 'skyevault-workspaces'));
 const maxEvents = Number.parseInt(argValue('--max-events') || '500', 10);
 
-const remoteEvents = sortByTime(readJsonl(remoteLedgerPath).filter((event) => event.event && event.event !== 'parse-error')).slice(-maxEvents);
+const remoteEvents = sortByTime(readJsonl(remoteLedgerPath).filter((event) => event.event && event.event !== 'parse-error' && event.workspaceId && event.repoId)).slice(-maxEvents);
 const uploadEvents = sortByTime(readJsonl(uploadLedgerPath).filter((event) => event.event && event.event !== 'parse-error')).slice(-maxEvents);
 const receipts = readReceipts(outDir).slice(-200);
 const safeUploads = receipts.map((receipt) => ({

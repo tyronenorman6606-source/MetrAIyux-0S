@@ -1,4 +1,5 @@
 import { wrap } from "./_lib/wrap.js";
+import crypto from "crypto";
 import { buildCors, json, badRequest } from "./_lib/http.js";
 import { getSessionById, verifySessionToken } from "./_lib/sessions.js";
 import { lookupKey } from "./_lib/authz.js";
@@ -117,11 +118,31 @@ export default wrap(async (req) => {
       client_id: "kx_live",
       username: keyRow.customer_email || `customer:${keyRow.customer_id}`,
       token_type: "Bearer",
+      exp: keyRow.expires_at ? Math.floor(new Date(keyRow.expires_at).getTime() / 1000) : null,
       sub: `api_key:${keyRow.api_key_id}`,
       customer_id: keyRow.customer_id,
       api_key_id: keyRow.api_key_id,
       org: keyRow.customer_id,
-      role: keyRow.role || "deployer"
+      role: keyRow.role || "deployer",
+      vault_storage_mb: keyRow.customer_vault_storage_mb || null,
+      vault_file_limit: keyRow.customer_vault_file_limit || null,
+      vault_workspace_limit: keyRow.customer_vault_workspace_limit || null,
+      limits: {
+        vault_storage_mb: keyRow.customer_vault_storage_mb || null,
+        vault_file_limit: keyRow.customer_vault_file_limit || null,
+        vault_workspace_limit: keyRow.customer_vault_workspace_limit || null
+      },
+      gate_card_id: gateCardId(`api_key:${keyRow.api_key_id}`, keyRow.customer_email, keyRow.customer_id),
+      gate_card: gateCard({
+        sub: `api_key:${keyRow.api_key_id}`,
+        email: keyRow.customer_email || null,
+        customerId: keyRow.customer_id,
+        role: keyRow.role || "deployer",
+        scope: keyScopeString(keyRow).split(/\s+/).filter(Boolean),
+        principal: "api_key",
+        expiresAt: keyRow.expires_at || null,
+        metadata: keyRow.key_metadata || {}
+      })
     }, cors);
   }
 
@@ -141,4 +162,38 @@ function keyScopeString(keyRow) {
     base.push("keys.read", "keys.write", "admin.read", "admin.write");
   }
   return base.join(" ");
+}
+
+function scopeArr(scope) {
+  if (!scope) return [];
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope).split(/\s+/).filter(Boolean);
+}
+
+function gateCardId(sub, email, customerId) {
+  const seed = [sub, email, customerId].filter(Boolean).join("|") || "skyegatefs27";
+  return `gate_basic_${crypto.createHash("sha256").update(seed).digest("hex").slice(0, 20)}`;
+}
+
+function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], principal = "session", expiresAt = null, metadata = {} }) {
+  const cardType = metadata?.card_type === "pentest_hour_key" ? "pentest_gate_card" : "basic_gate_card";
+  const cardId = cardType === "pentest_gate_card"
+    ? gateCardId(sub, email, customerId).replace("gate_basic_", "gate_pentest_")
+    : gateCardId(sub, email, customerId);
+  return {
+    id: cardId,
+    type: cardType,
+    status: "active",
+    principal,
+    sub,
+    email: email || null,
+    customer_id: customerId || null,
+    role: role || "user",
+    session_id: sessionId,
+    scope,
+    expires_at: expiresAt,
+    metadata,
+    usage_required: false,
+    reloadable: true
+  };
 }
