@@ -1,0 +1,23 @@
+/* Floating folder-based menu */
+:root{--menu-bg:rgba(6,4,12,0.92);--menu-accent:#ffd400;--menu-text:#f3eeff}
+.folder-menu{position:fixed;right:18px;bottom:18px;z-index:12050;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.menu-toggle{width:54px;height:54px;border-radius:999px;background:linear-gradient(90deg,#6d2cff,#ffd400);border:none;color:#07060a;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,0.45)}
+.menu-panel{position:fixed;right:18px;bottom:86px;width:320px;max-height:68vh;overflow:auto;border-radius:12px;padding:12px;background:var(--menu-bg);color:var(--menu-text);box-shadow:0 30px 80px rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:none}
+.menu-panel.show{display:block}
+.menu-panel h4{margin:6px 0 8px;font-size:0.92rem;color:var(--menu-accent);letter-spacing:0.08em;text-transform:uppercase}
+.menu-section{margin-bottom:8px;padding:6px;border-radius:8px}
+.menu-section .section-title{font-weight:700;margin-bottom:6px;font-size:0.95rem}
+.menu-section ul{list-style:none;padding-left:0;margin:0}
+.menu-section li{margin:6px 0}
+.menu-section a{color:var(--menu-text);text-decoration:none;font-size:0.95rem;display:block;padding:6px;border-radius:6px}
+.menu-section a:hover{background:rgba(255,255,255,0.03)}
+.menu-footer{font-size:0.82rem;color:rgba(243,238,255,0.7);padding-top:8px;border-top:1px solid rgba(255,255,255,0.03);margin-top:8px}
+.menu-search{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:var(--menu-text);margin-bottom:8px}
+@media (max-width:520px){.menu-panel{right:12px;left:12px;width:auto;bottom:86px}}
+body.proof-atlas .menu-toggle{background:#11110f;color:#f4efe5;box-shadow:0 14px 34px rgba(17,17,15,0.18)}
+body.proof-atlas .menu-panel{background:rgba(244,239,229,0.96);color:#11110f;border:1px solid rgba(17,17,15,0.14);box-shadow:0 26px 70px rgba(17,17,15,0.18)}
+body.proof-atlas .menu-panel h4{color:#9d1f16}
+body.proof-atlas .menu-section a{color:rgba(17,17,15,0.78)}
+body.proof-atlas .menu-section a:hover{background:rgba(17,17,15,0.06);color:#11110f}
+body.proof-atlas .menu-search{background:rgba(17,17,15,0.04);border-color:rgba(17,17,15,0.14);color:#11110f}
+body.proof-atlas .menu-footer{color:rgba(17,17,15,0.56);border-top-color:rgba(17,17,15,0.1)}

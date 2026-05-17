@@ -34,17 +34,32 @@ const forbiddenPublicTerms = [
 const advancedStackImports = {
   framerMotion: [/from\s+['"]framer-motion['"]/],
   three: [/from\s+['"]three['"]/, /import\s+\*\s+as\s+THREE\s+from\s+['"]three['"]/],
-  gsap: [/from\s+['"]gsap['"]/, /from\s+['"]gsap\/ScrollTrigger['"]/, /gsap\.registerPlugin/],
-  lenis: [/from\s+['"]lenis['"]/, /new\s+Lenis\s*\(/],
+  gsap: [/from\s+['"]gsap['"]/, /from\s+['"]gsap\/ScrollTrigger['"]/],
+  lenis: [/from\s+['"]lenis['"]/],
   motion: [/from\s+['"]motion\/react['"]/, /from\s+['"]motion['"]/, /from\s+['"]framer-motion['"]/],
   r3f: [/from\s+['"]@react-three\/fiber['"]/],
   drei: [/from\s+['"]@react-three\/drei['"]/],
   postprocessing: [/from\s+['"]@react-three\/postprocessing['"]/],
-  theatre: [/from\s+['"]@theatre\/core['"]/, /getProject\s*\(/],
-  dotlottie: [/from\s+['"]@lottiefiles\/dotlottie-(?:web|react)['"]/, /new\s+DotLottie\s*\(/],
-  rive: [/from\s+['"]@rive-app\/react-canvas['"]/, /useRive\s*\(/],
-  ogl: [/from\s+['"]ogl['"]/, /new\s+(?:Renderer|Program|Mesh)\s*\(/],
-  pixi: [/from\s+['"]pixi\.js['"]/, /new\s+Application\s*\(/]
+  theatre: [/from\s+['"]@theatre\/core['"]/],
+  dotlottie: [/from\s+['"]@lottiefiles\/dotlottie-(?:web|react)['"]/],
+  rive: [/from\s+['"]@rive-app\/react-canvas['"]/],
+  ogl: [/from\s+['"]ogl['"]/],
+  pixi: [/from\s+['"]pixi\.js['"]/]
+};
+const advancedStackRuntime = {
+  framerMotion: [/<motion\./, /useMotionValue\s*\(/, /useSpring\s*\(/, /useScroll\s*\(/, /whileHover\s*=/, /whileInView\s*=/],
+  three: [/THREE\./, /new\s+THREE\./, /<(?:icosahedronGeometry|torusGeometry|pointsMaterial|meshStandardMaterial)\b/],
+  gsap: [/gsap\.(?:registerPlugin|to|fromTo|timeline)\s*\(/, /ScrollTrigger/],
+  lenis: [/new\s+Lenis\s*\(/, /\.raf\s*\(/],
+  motion: [/<motion\./, /motionNext\.\w+/, /useMotionValue\s*\(/, /useScroll\s*\(/],
+  r3f: [/<Canvas\b/, /useFrame\s*\(/],
+  drei: [/<(?:Float|PerspectiveCamera|Stars)\b/],
+  postprocessing: [/<(?:EffectComposer|Bloom|Vignette)\b/],
+  theatre: [/getProject\s*\(/, /sheet\s*\(/, /sheet\.object|theatreSheet\.object/, /onValuesChange\s*\(/, /theatreScene\.value/],
+  dotlottie: [/new\s+DotLottie\s*\([\s\S]{0,700}(?:src\s*:|\.lottie|\.json)/, /data-motion-asset=["'{][\s\S]{0,180}\.(?:lottie|json)/],
+  rive: [/useRive\s*\([\s\S]{0,700}src\s*:[\s\S]{0,220}\.riv/, /data-rive-src=["'{][\s\S]{0,180}\.riv/, /useStateMachineInput\s*\(/],
+  ogl: [/new\s+(?:OglRenderer|OglProgram|OglMesh|Renderer|Program|Mesh)\s*\(/, /new\s+OglTriangle\s*\(/],
+  pixi: [/new\s+(?:PixiApplication|Application)\s*\(/, /\.init\s*\([\s\S]{0,260}canvas/, /new\s+PixiGraphics\s*\(/]
 };
 const advancedStackPackages = {
   framerMotion: ['framer-motion'],
@@ -77,6 +92,7 @@ const effectSignals = {
   neonScrollbar: [/::-webkit-scrollbar/, /scrollbar-color/, /scrollbar-thumb/, /scrollbar-track/],
   textEffects: [/text-shadow/, /background-clip:\s*text/, /glow-text/, /neon-text/, /split[-_\s]?text/, /text-scan/],
   motionChrome: [/scroll-progress/, /motion-chrome/, /neon-motion/, /scanline/, /magnetic[-_\s]?/, /pointer-reactive/, /useScroll/, /useTransform/],
+  livingBackground: [/skyesol-living-field/, /living-background/, /alive-background/, /liquid-field/, /aurora wave|aurora[-_\s]?band|drawWave/, /requestAnimationFrame[\s\S]{0,600}(?:particle|canvas|wave)/i, /pointer parallax|mouse parallax|pointermove|mousemove[\s\S]{0,400}(?:tx|ty|parallax)/i],
   surfaceScreenshots: [/<img[\s\S]+src=/, /<video[\s\S]+src=|<source[\s\S]+src=/, /\.(?:png|jpg|jpeg|webp|avif|mp4|webm)['")]/, /screenshot/i, /surface-frame/, /surface-reel/, /proof capture/i, /recordVideo/i, /page\.(?:click|fill|goto|mouse|keyboard|locator)/i],
   theatre: [/from\s+['"]@theatre\/core['"]/, /getProject\s*\(/, /sheet\.object/, /@theatre\/studio/],
   gsapScroll: [/ScrollTrigger/, /gsap\.registerPlugin/, /scrub\s*:/, /pin\s*:/],
@@ -117,6 +133,7 @@ const effectToRecipes = {
   neonScrollbar: ['neon-scrollbar-cursor-trail'],
   textEffects: ['premium-text-effects-lab'],
   motionChrome: ['neon-motion-chrome-kit', 'framer-motion-interaction-system', 'premium-text-effects-lab'],
+  livingBackground: ['skyesol-living-background', 'neon-motion-chrome-kit'],
   surfaceScreenshots: ['actual-surface-screenshot-stage', 'actual-surface-video-reel'],
   theatre: ['theatre-directed-scene'],
   gsapScroll: ['gsap-lenis-scroll-stage'],
@@ -127,6 +144,7 @@ const effectToStack = {
   neonScrollbar: [],
   textEffects: ['framerMotion'],
   motionChrome: ['framerMotion'],
+  livingBackground: [],
   surfaceScreenshots: [],
   theatre: ['theatre'],
   gsapScroll: ['gsap', 'lenis'],
@@ -380,11 +398,13 @@ This MCP is design-only. It exposes rules, patterns, reference notes, and QA too
 
 - quantumskyes://design/registry
 - quantumskyes://design/elements
+- quantumskyes://design/fifty-k-standard
 - quantumskyes://design/no-frankenstein-policy
 - quantumskyes://design/perfection-checklist
 - quantumskyes://design/advanced-stack
 - quantumskyes://design/stack-catalog
 - quantumskyes://design/open-source-stack
+- quantumskyes://design/variety-system
 - quantumskyes://design/logo-standards
 - quantumskyes://design/surface-video-reel
 - quantumskyes://design/proof-recording-playbook
@@ -567,20 +587,25 @@ function stackAudit({ source = '', packageJson = '', required = [] } = {}) {
     const packageNames = advancedStackPackages[name] || [name];
     detected[name] = {
       imported: patterns.some((pattern) => pattern.test(combined)),
+      runtime: (advancedStackRuntime[name] || []).some((pattern) => pattern.test(combined)),
       dependency: packageNames.some((packageName) => lowerPackage.includes(`"${packageName.toLowerCase()}"`))
     };
   }
   const missing = required.filter((name) => !detected[name]?.imported);
+  const missingRuntime = required.filter((name) => detected[name]?.imported && !detected[name]?.runtime);
+  const missingDependencies = required.filter((name) => !detected[name]?.dependency);
   const unusedDependencies = Object.entries(detected)
     .filter(([, value]) => value.dependency && !value.imported)
     .map(([name]) => name);
   return {
-    ok: missing.length === 0,
+    ok: missing.length === 0 && missingRuntime.length === 0 && missingDependencies.length === 0,
     required,
     detected,
     missingImports: missing,
+    missingRuntime,
+    missingDependencies,
     unusedDependencies,
-    rule: 'Advanced design claims must be backed by real imports and visible runtime use, not package installs or prose.'
+    rule: 'Advanced design claims must be backed by real imports, dependencies, and visible runtime use; shallow labels, package installs, or prose do not pass.'
   };
 }
 
@@ -855,6 +880,7 @@ function inferRequestedEffects(text) {
   if (/scrollbar|scroll bar|thicker scroll|neon thumb/.test(lower)) effects.push('neonScrollbar');
   if (/text effect|glow text|glowing text|neon text|shimmer|split text|typography effect/.test(lower)) effects.push('textEffects');
   if (/motion chrome|scroll progress|progress rail|scanline|magnetic|pointer reactive|neon motion/.test(lower)) effects.push('motionChrome');
+  if (/skyesol|living background|alive background|alive page|command field|aurora|liquid field|moving background|animated background/.test(lower)) effects.push('livingBackground');
   if (/screenshot|actual surface|browser proof|app surface|product surface/.test(lower)) effects.push('surfaceScreenshots');
   if (/@theatre|theatre\/core|theatre\/studio|getproject\s*\(|sheet\.object/.test(lower)) effects.push('theatre');
   if (/gsap|lenis|scrolltrigger|pinned|scrub|scroll funnel|scroll stage/.test(lower)) effects.push('gsapScroll');
@@ -908,33 +934,172 @@ function recipePlan({ product = 'the product', surface = 'public page', goal = '
   };
 }
 
+function varietyPlan({ product = 'the product', surface = 'public page', goal = 'premium design', audience = 'buyers and users', previousArchetype = '', preferredArchetype = '' } = {}) {
+  const text = `${product} ${surface} ${goal} ${audience}`.toLowerCase();
+  const isPublicSurface = /\b(?:public|website|site|landing|home|homepage|brand|marketing|showcase|portfolio|editorial|service)\b/.test(text);
+  const explicitAppSurface = /\b(?:dashboard|admin|console|control plane|control-panel|control panel|app shell|actual app|product ui|tool ui|portal ui|database console|inbox ui)\b/.test(text);
+  const wantsProof = /proof|receipt|case study|screenshot|video|workflow|browser|e2e|audit/.test(text);
+  const wantsProcess = /signup|onboarding|funnel|flow|route|gate|provision|intake|handoff|staffing|mailbox|auth/.test(text);
+  const wantsProduct = /ai|brain|engine|infra|server|database|mcp|gpu|ollama|technical|developer|api/.test(text);
+  const wantsFounder = /founder|gray|operator|personal|authority|portfolio/.test(text);
+  const wantsMinimal = /minimal|quiet|luxury|editorial|restraint|white|light/.test(text);
+  const archetypes = [
+    {
+      id: 'app-operating-surface',
+      patternPack: 'app-first-command-center',
+      firstViewportStructure: 'actual tool surface as the first screen',
+      visualSubject: 'working dashboard shell with controls, states, and proof',
+      motionLanguage: 'restrained interface motion and status transitions',
+      proofFormat: 'live app screenshot or browser-action reel',
+      paletteDiscipline: 'functional dark or light OS palette with one accent',
+      typographyPosture: 'compact operational headings, scannable labels',
+      conversionPath: 'open tool, inspect status, perform action'
+    },
+    {
+      id: 'editorial-proof-atlas',
+      patternPack: 'editorial-proof-atlas',
+      firstViewportStructure: 'large editorial proof/media spread',
+      visualSubject: 'one dominant screenshot, receipt, founder note, or video',
+      motionLanguage: 'staggered editorial reveals, minimal hover lift',
+      proofFormat: 'annotated screenshots, receipt timeline, before-after panels',
+      paletteDiscipline: 'warm ivory/ink/red or white/charcoal/gold',
+      typographyPosture: 'architectural serif with sparse body copy',
+      conversionPath: 'proof, trust, qualified CTA'
+    },
+    {
+      id: 'kinetic-process-funnel',
+      patternPack: 'kinetic-process-funnel',
+      firstViewportStructure: 'scroll-led workflow stages',
+      visualSubject: 'process rail with one stage per viewport',
+      motionLanguage: 'GSAP/Lenis scrubbed progression',
+      proofFormat: 'stage receipts and browser-action video where behavior is claimed',
+      paletteDiscipline: 'black/metal/gold or charcoal/cyan/red',
+      typographyPosture: 'oversized stage words, short explanations',
+      conversionPath: 'intake, gate, provision, proof, handoff'
+    },
+    {
+      id: 'spatial-product-lab',
+      patternPack: 'spatial-product-lab',
+      firstViewportStructure: 'interactive inspection scene',
+      visualSubject: 'single WebGL product/system object',
+      motionLanguage: 'pointer-reactive 3D with restrained bloom',
+      proofFormat: 'spec chips, live metrics, surface screenshot below',
+      paletteDiscipline: 'deep green/gold, silver/black, or white/ink',
+      typographyPosture: 'technical-luxury display with compact controls',
+      conversionPath: 'inspect, compare, request access'
+    },
+    {
+      id: 'cinematic-command',
+      patternPack: 'cinematic-command-hero',
+      firstViewportStructure: 'full-bleed command scene',
+      visualSubject: 'living WebGL artifact or command room',
+      motionLanguage: 'cinematic 3D drift plus proof strip',
+      proofFormat: 'operator proof panel and QA receipts',
+      paletteDiscipline: 'obsidian/gold/cyan with strict restraint',
+      typographyPosture: 'large serif headline, short operator copy',
+      conversionPath: 'claim, proof, primary action'
+    },
+    {
+      id: 'founder-authority',
+      patternPack: 'luxury-editorial-command',
+      firstViewportStructure: 'founder/media authority scene',
+      visualSubject: 'transparent founder media or signature proof artifact',
+      motionLanguage: 'slow editorial reveal and pointer accents',
+      proofFormat: 'operator notes, metrics, receipts',
+      paletteDiscipline: 'ivory/black/gold or documentary monochrome',
+      typographyPosture: 'editorial authority with first-person copy',
+      conversionPath: 'trust, proof, call or private access'
+    },
+    {
+      id: 'minimal-luxury',
+      patternPack: 'luxury-editorial-command',
+      firstViewportStructure: 'high-whitespace editorial stack',
+      visualSubject: 'one photo, object, or proof artifact',
+      motionLanguage: 'almost still; one bespoke interaction',
+      proofFormat: 'small verified receipts and sharp claims',
+      paletteDiscipline: 'light neutral, ink, one metallic/accent',
+      typographyPosture: 'architectural type with quiet labels',
+      conversionPath: 'positioning, proof, invitation'
+    }
+  ];
+  const scored = archetypes.map((item) => {
+    let score = 0;
+    if (preferredArchetype && item.id === preferredArchetype) score += 9;
+    if (previousArchetype && item.id === previousArchetype) score -= 7;
+    if (explicitAppSurface && item.id === 'app-operating-surface') score += 6;
+    if (isPublicSurface && item.id === 'app-operating-surface') score -= 5;
+    if (wantsProof && item.id === 'editorial-proof-atlas') score += 4;
+    if (wantsProcess && item.id === 'kinetic-process-funnel') score += 4;
+    if (wantsProduct && item.id === 'spatial-product-lab') score += 4;
+    if (wantsFounder && item.id === 'founder-authority') score += 4;
+    if (wantsMinimal && item.id === 'minimal-luxury') score += 4;
+    if (isPublicSurface && item.id === 'editorial-proof-atlas') score += 2;
+    if (isPublicSurface && item.id === 'cinematic-command') score += 1;
+    if (!score && item.id === 'editorial-proof-atlas') score += 1;
+    return { ...item, score };
+  }).sort((a, b) => b.score - a.score);
+  const directions = scored.slice(0, 4).map((item, index) => ({
+    rank: index + 1,
+    ...item,
+    requiredPatternPacks: [item.patternPack, item.id === 'kinetic-process-funnel' ? 'neon-motion-chrome' : null].filter(Boolean),
+    requiredAudits: ['design_stack_audit', 'design_effect_audit', 'design_performance_audit', 'desktop/mobile browser QA'],
+    rejectIf: [
+      `Looks like previous archetype: ${previousArchetype || 'unknown'}`,
+      'First viewport can be rebranded by swapping logo/headline',
+      'Proof is decorative instead of tied to the product workflow',
+      'All sections collapse into identical cards'
+    ]
+  }));
+  return {
+    product,
+    surface,
+    goal,
+    audience,
+    rule: 'Choose one design DNA before coding. Do not default every product to the same SkyeSol dark command-card style. App-first is allowed only for explicit app/admin/dashboard/control-plane surfaces, not because copy says operator, system, tool, or MCP.',
+    selectionSignals: {
+      isPublicSurface,
+      explicitAppSurface,
+      wantsProof,
+      wantsProcess,
+      wantsProduct,
+      wantsFounder,
+      wantsMinimal
+    },
+    previousArchetype: previousArchetype || null,
+    selected: directions[0],
+    alternates: directions.slice(1),
+    allArchetypes: archetypes.map(({ id, patternPack, paletteDiscipline }) => ({ id, patternPack, paletteDiscipline })),
+    receiptFieldsRequired: ['chosenArchetype', 'patternPack', 'visualSubject', 'motionLanguage', 'proofFormat', 'paletteDiscipline', 'browserQaPaths']
+  };
+}
+
 function composeBrief({ product = 'the product', surface = 'public page', goal = 'premium conversion', audience = 'buyers and developers', intensity = 'cinematic but usable' }) {
   const text = `${product} ${surface} ${goal} ${audience}`;
-  const isInfrastructure = /infrastructure|ai|database|mcp|server|control|postgres|auth|gateway|skyegate/i.test(text);
-  const isApp = /app|dashboard|tool|editor|operator|portal/i.test(text);
-  const primaryPattern = isInfrastructure
-    ? 'cinematic-command-hero'
-    : isApp
-      ? 'app-first-command-center'
-      : 'cinematic-command-hero';
-  const implementationPatterns = isInfrastructure
-    ? ['cinematic-command-hero', 'scroll-proof-funnel']
-    : isApp
-      ? ['app-first-command-center', 'scroll-proof-funnel']
-      : ['cinematic-command-hero'];
+  const variety = varietyPlan({ product, surface, goal, audience });
+  const primaryPattern = variety.selected.patternPack;
+  const isInfrastructure = primaryPattern === 'cinematic-command-hero' || primaryPattern === 'spatial-product-lab';
+  const isApp = primaryPattern === 'app-first-command-center';
+  const implementationPatterns = [
+    primaryPattern,
+    /funnel|flow|route|gate|provision|intake|handoff|onboarding/i.test(text) ? 'scroll-proof-funnel' : null
+  ].filter(Boolean);
   const requiredStack = isInfrastructure
     ? ['framerMotion', 'three', 'r3f', 'drei', 'postprocessing', 'gsap', 'lenis']
-    : isApp
+    : primaryPattern === 'kinetic-process-funnel'
       ? ['framerMotion', 'gsap', 'lenis']
       : ['framerMotion'];
   const plan = recipePlan({ product, surface, goal, audience });
   const mergedRequiredStack = [...new Set([...requiredStack, ...plan.requiredStack.filter((item) => item !== 'theatre')])];
+  const isLuxury = /luxury|bespoke|fifty.?k|\$50k|premium.?agency|high.?end|editorial|flagship/i.test(text);
   const supporting = [
     'skye.motion.reveal-system',
     'skye.proof.operator-proof-panel',
     'skye.proof.quality-gates'
   ];
   if (isInfrastructure) supporting.splice(1, 0, 'skye.webgl.living-command-field');
+  if (isLuxury) {
+    supporting.unshift('skye.luxury.singular-visual-thesis', 'skye.luxury.editorial-headline-system', 'skye.luxury.strategic-whitespace', 'skye.motion.staggered-reveal-choreography', 'skye.luxury.custom-easing-signature', 'skye.luxury.bespoke-interaction-layer');
+  }
   supporting.push('skye.fx.text-effects', 'skye.fx.neon-scrollbar', 'skye.fx.neon-motion-chrome', 'skye.fx.cursor-trail', 'client.surface.actual-screenshot-stage', 'client.surface.actual-video-reel', 'skye.brand.existing-logo-system');
   return {
     product,
@@ -944,6 +1109,8 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
     intensity,
     primaryPattern,
     implementationPatterns,
+    chosenArchetype: variety.selected.id,
+    varietySelection: variety.selected,
     requiredStack: mergedRequiredStack,
     mustUsePatternPackTool: true,
     mustUseRecipePlanTool: true,
@@ -953,7 +1120,9 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
       ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit', 'premium-text-effects-lab']
       : isApp
         ? ['framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit']
-        : ['framer-motion-interaction-system', 'neon-motion-chrome-kit', 'premium-text-effects-lab']), ...plan.requiredOpenSourceRecipes])],
+        : ['framer-motion-interaction-system', 'neon-motion-chrome-kit', 'premium-text-effects-lab']),
+      ...(isLuxury ? ['fifty-k-typography-whitespace-system', 'framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'premium-text-effects-lab'] : []),
+      ...plan.requiredOpenSourceRecipes])],
     requestedEffects: plan.requestedEffects,
     noveltyRules: [
       'Do not reuse the previous dark command-card page shape.',
@@ -987,6 +1156,7 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
       'No mobile overflow.',
       'No fake advanced-stack claims without imports.',
       'No repeating the same command-center template.',
+      'No app-first command surface unless the user explicitly asked for an app/admin/dashboard/control-plane UI.',
       'No generic agency voice when the product is founder-built.'
     ],
     browserQa: validateDesignText('').requiredBrowserChecks
@@ -1057,6 +1227,9 @@ function validateDesignText(input) {
     for (const missing of audit.missingImports) {
       issues.push(`Advanced stack claimed but missing real import/runtime use: ${missing}`);
     }
+    for (const missing of audit.missingRuntime) {
+      issues.push(`Advanced stack claimed but missing real import/runtime use: ${missing}`);
+    }
   }
   const requestedEffects = inferRequestedEffects(text);
   if (requestedEffects.length) {
@@ -1124,9 +1297,100 @@ function stackCatalog({ category, libraryId, packageName } = {}) {
   };
 }
 
+const luxuryTypographySignals = {
+  architecturalScale: [/clamp\(\s*(?:3\.[5-9]|[4-9])\s*rem/, /font-size\s*:\s*(?:[4-9]\d*(?:\.\d+)?rem|[6-9]\d*(?:\.\d+)?vw)/i],
+  tightLineHeight: [/line-height\s*:\s*0\.(?:9[0-9]|[89]\d)/, /line-height\s*:\s*1\.0[0-5]/],
+  negativeTracking: [/letter-spacing\s*:\s*-0\.0[1-4]em/],
+  displayWeight: [/font-weight\s*:\s*(?:700|800|900|bold|extrabold|black)\b/, /font-weight:\s*(?:7|8|9)00/],
+  bodyWeightContrast: [/font-weight\s*:\s*(?:300|400|light|regular|normal)\b/]
+};
+const luxuryWhitespaceSignals = {
+  heroScale: [/padding-block\s*:\s*clamp\(\s*(?:[89]|1[0-9])\s*rem/, /padding-top\s*:\s*(?:clamp\(\s*(?:[89]|1[0-9])\s*rem|(?:[89]|1[0-9])\s*rem)/i],
+  sectionScale: [/padding-block\s*:\s*clamp\(\s*[6-9]\s*rem/, /padding-(?:top|bottom)\s*:\s*(?:clamp\(\s*[6-9]\s*rem|[7-9]\s*rem|1[0-9]\s*rem)/i],
+  horizontalRoom: [/padding-inline\s*:\s*clamp\(\s*[2-9]\s*rem/, /padding-(?:left|right)\s*:\s*(?:clamp\(\s*[2-9]\s*rem|[4-9]\s*rem)/i]
+};
+const luxuryMotionSignals = {
+  customEasing: [/cubic-bezier\(0\.1[0-9],\s*1,/, /cubic-bezier\(0(?:\.[0-9]+)?,\s*0\.5[5-9]/, /--ease-(?:expo|circ|back)-out/],
+  staggerPattern: [/delay\s*:\s*i\s*\*\s*0\.0[5-9]/, /delay\s*:\s*(?:0\.0[5-9]|0\.1[0-5])/, /stagger\s*(?::|=)\s*0\.0[5-9]/],
+  durationRange: [/duration\s*:\s*0\.[4-9]/, /duration\s*:\s*0\.[5-7]/],
+  revealOrder: [/custom\s*=\s*\{?[0-3]\}?/, /delay.*i\s*\*/, /variants.*hidden.*visible/i]
+};
+const luxuryInteractionSignals = {
+  magneticOrTilt: [/magnetic/, /useMotionValue.*pointermove|pointermove.*useMotionValue/, /perspective\s*:\s*\d{3,4}px.*rotateX|rotateY/i],
+  cursorBespoke: [/cursor-trail/, /useSpring.*mouse|mouse.*useSpring/, /cursor-reactive/],
+  hoverReveal: [/whileHover.*textDecoration|textDecoration.*whileHover/, /hover.*translate(?:X|Y)\s*\(-?[1-9]/, /hover.*clipPath|clipPath.*hover/i],
+  drawUnderline: [/strokeDashoffset|strokeDasharray/, /draw.*underline|underline.*draw/i, /svg.*line.*animate|animate.*svg.*line/i]
+};
+
+function luxuryAudit({ source = '', level = 'full' } = {}) {
+  const text = String(source || '');
+  const issues = [];
+  const detected = { typography: {}, whitespace: {}, motion: {}, interaction: {} };
+
+  // Typography checks
+  detected.typography.architecturalScale = luxuryTypographySignals.architecturalScale.some((p) => p.test(text));
+  detected.typography.tightLineHeight = luxuryTypographySignals.tightLineHeight.some((p) => p.test(text));
+  detected.typography.negativeTracking = luxuryTypographySignals.negativeTracking.some((p) => p.test(text));
+  detected.typography.displayWeight = luxuryTypographySignals.displayWeight.some((p) => p.test(text));
+  detected.typography.bodyWeightContrast = luxuryTypographySignals.bodyWeightContrast.some((p) => p.test(text));
+
+  if (!detected.typography.architecturalScale) issues.push('Typography: hero headline must use architectural scale — clamp(3.5rem, 8vw, 9rem) or larger. Default font sizes read as $5K, not $50K.');
+  if (!detected.typography.tightLineHeight) issues.push('Typography: display headline must have tight line-height (0.9–1.05). Auto or 1.5 line-height on a hero reads as template.');
+  if (!detected.typography.negativeTracking) issues.push('Typography: display headline needs intentional tracking (letter-spacing: -0.02em to -0.04em). Zero or positive tracking on a hero headline reads as unstyled.');
+  if (!detected.typography.displayWeight) issues.push('Typography: display headline must use a heavy weight (700+). A medium-weight hero headline looks generic.');
+  if (!detected.typography.bodyWeightContrast) issues.push('Typography: body text must contrast with the display weight (300 or 400). Uniform weight throughout reads as template.');
+
+  // Whitespace checks
+  detected.whitespace.heroScale = luxuryWhitespaceSignals.heroScale.some((p) => p.test(text));
+  detected.whitespace.sectionScale = luxuryWhitespaceSignals.sectionScale.some((p) => p.test(text));
+  detected.whitespace.horizontalRoom = luxuryWhitespaceSignals.horizontalRoom.some((p) => p.test(text));
+
+  if (!detected.whitespace.heroScale) issues.push('Whitespace: hero needs generous padding-block — clamp(8rem, 15vw, 14rem) or equivalent. Tight hero padding reads as kit-built.');
+  if (!detected.whitespace.sectionScale) issues.push('Whitespace: sections need ≥6rem padding-block (desktop). Below that, the page reads dense and cheap.');
+  if (!detected.whitespace.horizontalRoom) issues.push('Whitespace: content needs horizontal breathing room — clamp(2rem, 6vw, 6rem) padding-inline. Content touching viewport edges reads as unstyled.');
+
+  // Motion choreography checks
+  detected.motion.customEasing = luxuryMotionSignals.customEasing.some((p) => p.test(text));
+  detected.motion.staggerPattern = luxuryMotionSignals.staggerPattern.some((p) => p.test(text));
+  detected.motion.durationRange = luxuryMotionSignals.durationRange.some((p) => p.test(text));
+
+  const hasMotion = /motion|framer|gsap|animation|transition/i.test(text);
+  if (hasMotion) {
+    if (!detected.motion.customEasing) issues.push('Motion: all transitions must use a custom cubic-bezier, not the default ease. Add --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1) and use it throughout.');
+    if (!detected.motion.staggerPattern) issues.push('Motion: entrance reveals must stagger — delay: i * 0.08 or equivalent. Simultaneous reveals read as template code, not choreography.');
+    if (!detected.motion.durationRange) issues.push('Motion: reveal duration must be 400ms–700ms. Faster reads as functional, slower reads as heavy. Neither reads as premium.');
+  }
+
+  // Bespoke interaction check
+  detected.interaction.hasBespoke = Object.values(luxuryInteractionSignals).some((patterns) => patterns.some((p) => p.test(text)));
+  if (hasMotion && !detected.interaction.hasBespoke) issues.push('Interaction: at least one hover/cursor/transition treatment must be bespoke — magnetic pull, cursor spring, tilt parallax, clip-path reveal, or SVG draw. UI-kit defaults do not qualify.');
+
+  const score = {
+    typography: Object.values(detected.typography).filter(Boolean).length,
+    whitespace: Object.values(detected.whitespace).filter(Boolean).length,
+    motion: Object.values(detected.motion).filter(Boolean).length,
+    interaction: detected.interaction.hasBespoke ? 1 : 0
+  };
+  const maxScore = { typography: 5, whitespace: 3, motion: hasMotion ? 3 : 0, interaction: hasMotion ? 1 : 0 };
+  const totalPossible = Object.values(maxScore).reduce((a, b) => a + b, 0);
+  const totalScore = Object.values(score).reduce((a, b) => a + b, 0);
+  const pct = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) : 100;
+
+  return {
+    ok: issues.length === 0,
+    fiftyKScore: `${pct}%`,
+    grade: pct >= 90 ? '$50K' : pct >= 70 ? '$20K' : pct >= 50 ? '$10K' : '$5K template',
+    issues,
+    detected,
+    score,
+    maxScore,
+    rule: 'A $50K website has architectural typography, strategic whitespace, choreographed motion with custom easing, and at least one bespoke interaction. Template output cannot command bespoke pricing.'
+  };
+}
+
 const server = new McpServer({
   name: 'quantumskyes-design-mcp',
-  version: '0.2.0'
+  version: '0.3.0'
 });
 
 server.registerResource('workspace-overview', 'quantumskyes://workspace/overview', {
@@ -1212,6 +1476,12 @@ server.registerResource('open-source-stack', 'quantumskyes://design/open-source-
   description: 'Concrete recipes for Framer Motion, Three/R3F, Drei, postprocessing, GSAP, Lenis, Theatre, screenshots, cursor trails, scrollbar chrome, and text effects.',
   mimeType: 'application/json'
 }, (uri) => textResource(uri, readText(path.join(designRoot, 'recipes', 'open-source-stack.json')), 'application/json'));
+
+server.registerResource('variety-system', 'quantumskyes://design/variety-system', {
+  title: 'Skye Design Variety System',
+  description: 'Design DNA, archetypes, variation axes, and anti-sameness rules for high-end generation.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readText(path.join(designRoot, 'docs', 'VARIETY_SYSTEM.md'))));
 
 server.registerResource('logo-standards', 'quantumskyes://design/logo-standards', {
   title: 'Logo Standards',
@@ -1355,7 +1625,7 @@ server.registerTool('design_effect_audit', {
   description: 'Fail generated work that claims cursor trails, neon scrollbars, motion chrome, screenshots, text effects, Theatre direction, GSAP scroll, or Three/R3F scenes without source signals.',
   inputSchema: {
     source: z.string().optional().describe('Concatenated generated source files'),
-    requested: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Requested effects to verify')
+    requested: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Requested effects to verify')
   }
 }, async (args) => {
   return { content: [{ type: 'text', text: JSON.stringify(effectAudit(args), null, 2) }] };
@@ -1482,10 +1752,25 @@ server.registerTool('design_recipe_plan', {
     surface: z.string().optional(),
     goal: z.string().optional(),
     audience: z.string().optional(),
-    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional()
+    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional()
   }
 }, async (args) => {
   return { content: [{ type: 'text', text: JSON.stringify(recipePlan(args), null, 2) }] };
+});
+
+server.registerTool('design_variety_plan', {
+  title: 'Compose Design Variety Plan',
+  description: 'Choose distinct design DNA and pattern packs so high-end pages do not all become the same SkyeSol-style site.',
+  inputSchema: {
+    product: z.string().optional(),
+    surface: z.string().optional(),
+    goal: z.string().optional(),
+    audience: z.string().optional(),
+    previousArchetype: z.string().optional().describe('Prior page archetype to avoid repeating'),
+    preferredArchetype: z.string().optional().describe('Optional archetype to force when the user already chose one')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(varietyPlan(args), null, 2) }] };
 });
 
 server.registerTool('design_pattern_pack', {
@@ -1510,6 +1795,8 @@ server.registerTool('design_quality_gate', {
     required: [
       'Read quantumskyes://directives/index',
       'Read quantumskyes://design/registry',
+      'Read quantumskyes://design/variety-system',
+      'Call design_variety_plan and record the chosen design DNA before coding',
       'Read quantumskyes://design/logo-standards before creating or replacing any logo/mark',
       'Pick an approved first-viewport pattern',
       'Call design_recipe_plan for the requested product/effects',
@@ -1556,6 +1843,83 @@ Read the directive, registry, elements registry, open-source stack recipes, patt
     }
   ]
 }));
+
+server.registerResource('fifty-k-standard', 'quantumskyes://design/fifty-k-standard', {
+  title: '$50K Design Standard',
+  description: 'What separates $50K bespoke digital work from $5K templates — typography, whitespace, choreography, and singular visual thesis.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, `# $50K Design Standard
+
+## What a $50K website has that a $5K template does not
+
+### Visual Thesis
+One dominant idea drives every composition decision. Not a list of features. Not a card grid. One idea — fully committed to — visible in the first viewport.
+
+### Typographic Intention
+- **Architectural scale**: hero headline at \`clamp(3.5rem, 8vw, 9rem)\` or larger
+- **Intentional tracking**: \`letter-spacing: -0.02em\` to \`-0.04em\` on display text
+- **Tight line-height**: \`0.9\`–\`1.05\` on headlines, never auto
+- **Weight contrast**: Black/ExtraBold display + Regular/Light body
+- **No system fonts** in hero headlines
+
+### Strategic Whitespace
+The most expensive-looking ingredient is space.
+- First viewport ≥30% negative space
+- Section \`padding-block: clamp(6rem, 12vw, 10rem)\`
+- Hero inner \`padding-block: clamp(8rem, 15vw, 14rem)\`
+- Content \`padding-inline: clamp(2rem, 6vw, 6rem)\`
+- Hero body copy ≤2 lines on first load
+
+### Motion Choreography
+Every animation has purpose, timing, and arc.
+- Custom easing: \`--ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1)\`
+- Staggered entrance: headline (0ms) → subtext (80ms) → CTA (160ms) → visual (240ms)
+- Duration: \`400ms\`–\`700ms\` for reveals
+- Scroll stagger: elements reveal at offset positions
+
+### Bespoke Interaction
+At least one treatment that could not come from a UI kit:
+- Magnetic button pull
+- Cursor-reactive spring with custom lerp
+- Clip-path or mask reveal on hover
+- SVG underline draw timing
+- Tilt/parallax surface panel
+
+## Audit
+Run \`design_luxury_audit\` to score typography, whitespace, choreography, and bespoke interaction.
+
+- **$50K**: ≥90% score, 0 critical issues
+- **$20K**: 70%–89%, ≤2 issues
+- **$10K**: 50%–69%, resolvable with targeted fixes
+- **$5K template**: <50%, requires redesign
+`));
+
+server.registerTool('design_luxury_audit', {
+  title: '$50K Design Quality Audit',
+  description: 'Score the output against $50K design criteria: architectural typography scale, intentional tracking/line-height/weight-contrast, strategic whitespace (hero ≥8rem, sections ≥6rem, horizontal room), custom cubic-bezier motion choreography, staggered entrance sequence, and at least one bespoke interaction.',
+  inputSchema: {
+    source: z.string().optional().describe('Concatenated source: CSS, HTML, JSX, TSX — all styling and motion code'),
+    level: z.enum(['typography', 'whitespace', 'motion', 'full']).optional().describe('Audit scope; defaults to full')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(luxuryAudit(args), null, 2) }] };
+});
+
+server.registerResource('production-ledger', 'quantumskyes://production/ledger', {
+  title: 'CEO Live Deployment Ledger',
+  description: 'Canonical production surface inventory — 13 Cloudflare Pages, 11 Workers, 36 HTTP checks. Source of truth pulled from API, not estimates.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readIfExists(path.join(repoRoot, 'LIVE_DEPLOYMENT_LEDGER.md'), 'Ledger not found.')));
+
+server.registerTool('production_ledger', {
+  title: 'CEO Live Deployment Ledger',
+  description: 'Return the canonical LIVE_DEPLOYMENT_LEDGER.md — all deployed Cloudflare Pages projects, Workers, HTTP verification results, and the CEO Contribution Map.',
+  inputSchema: {}
+}, async () => {
+  const ledgerPath = path.join(repoRoot, 'LIVE_DEPLOYMENT_LEDGER.md');
+  const text = readIfExists(ledgerPath, 'Ledger not found at LIVE_DEPLOYMENT_LEDGER.md.');
+  return { content: [{ type: 'text', text }] };
+});
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
