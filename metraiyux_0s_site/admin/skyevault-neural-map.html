@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Neural Map</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .vault-map-shell { display: grid; gap: 1rem; }
+    .vault-map-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .vault-stat { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); border-radius: .75rem; padding: 1rem; }
+    .vault-stat span { display: block; color: rgba(255,255,255,.66); font-size: .82rem; }
+    .vault-stat strong { display: block; margin-top: .35rem; font-size: 1.7rem; }
+    .vault-map-canvas-wrap { border: 1px solid rgba(255,255,255,.14); border-radius: .75rem; min-height: 420px; background: #070910; overflow: hidden; }
+    #vaultMapCanvas { width: 100%; height: 420px; display: block; }
+    .vault-table { width: 100%; border-collapse: collapse; }
+    .vault-table th, .vault-table td { border-bottom: 1px solid rgba(255,255,255,.12); padding: .75rem; text-align: left; vertical-align: top; }
+    .vault-table th { color: rgba(255,255,255,.68); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+    .vault-table code { overflow-wrap: anywhere; }
+    @media (max-width: 900px) { .vault-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .vault-map-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">Admin Automation OS</span></a>
+  <nav><a href="../index.html">Home</a><a href="index.html">Admin Hub</a><a href="automation-brain.html">Main Brain Chat</a><a href="../local-brain.html">Local Brain</a></nav>
+</header>
+<main class="site-shell admin-shell vault-map-shell">
+  <section class="admin-hero">
+    <p class="eyebrow">SkyeVault x 0S</p>
+    <h1>SkyeVault Neural Map</h1>
+    <p class="hero-lede">Gate owns access, SkyeVault owns repo storage, and 0S owns the map of what changed.</p>
+    <div id="vaultMapStatus" class="mode-banner"><span class="status-pill">Loading vault map</span></div>
+  </section>
+
+  <section class="vault-map-grid" aria-label="SkyeVault map summary">
+    <article class="vault-stat"><span>Repos</span><strong id="repoCount">0</strong></article>
+    <article class="vault-stat"><span>Receipts</span><strong id="receiptCount">0</strong></article>
+    <article class="vault-stat"><span>Graph Nodes</span><strong id="nodeCount">0</strong></article>
+    <article class="vault-stat"><span>Stored</span><strong id="storedBytes">0 B</strong></article>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Vault Graph</h2>
+    <div class="vault-map-canvas-wrap"><canvas id="vaultMapCanvas"></canvas></div>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Repos</h2>
+    <table class="vault-table">
+      <thead><tr><th>Workspace / Repo</th><th>Activity</th><th>Latest Head</th></tr></thead>
+      <tbody id="repoRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Recent Uploads</h2>
+    <table class="vault-table">
+      <thead><tr><th>Receipt</th><th>File</th><th>Size</th></tr></thead>
+      <tbody id="uploadRows"></tbody>
+    </table>
+  </section>
+</main>
+<footer class="footer"><p>MetrAIyux 0S command system - SkyeVault neural-map bridge.</p></footer>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+
+  function setStatus(text, ok = true) {
+    $('vaultMapStatus').innerHTML = '<span class="status-pill">' + esc(text) + '</span>';
+    $('vaultMapStatus').style.borderColor = ok ? 'rgba(125,220,138,.45)' : 'rgba(255,140,122,.45)';
+  }
+
+  function drawGraph(map) {
+    const canvas = $('vaultMapCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    const nodes = (map.nodes || []).map((node, index) => {
+      const angle = (index / Math.max(1, map.nodes.length)) * Math.PI * 2;
+      const radius = Math.min(rect.width, rect.height) * (node.type === 'vault-hub' ? 0 : .32);
+      return {
+        ...node,
+        x: rect.width / 2 + Math.cos(angle) * radius,
+        y: rect.height / 2 + Math.sin(angle) * radius
+      };
+    });
+    const byId = new Map(nodes.map((node) => [node.id, node]));
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(125,220,138,.24)';
+    (map.links || []).forEach((link) => {
+      const a = byId.get(link.source);
+      const b = byId.get(link.target);
+      if (!a || !b) return;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+    nodes.forEach((node) => {
+      const size = Math.max(5, Math.min(18, Number(node.size || 8)));
+      ctx.beginPath();
+      ctx.fillStyle = node.type === 'vault-hub' ? '#7ddc8a' : node.type === 'repo' ? '#87cefa' : node.type === 'commit' ? '#f2c66d' : '#d9e5d4';
+      ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+      ctx.fill();
+      if (node.type === 'vault-hub' || node.type === 'repo') {
+        ctx.fillStyle = 'rgba(255,255,255,.9)';
+        ctx.font = '12px ui-sans-serif, system-ui';
+        ctx.fillText(node.label || node.id, node.x + size + 5, node.y + 4);
+      }
+    });
+  }
+
+  function render(map) {
+    $('repoCount').textContent = map.repo_count || 0;
+    $('receiptCount').textContent = map.receipt_count || 0;
+    $('nodeCount').textContent = (map.nodes || []).length;
+    $('storedBytes').textContent = map.total_receipt_human || '0 B';
+    $('repoRows').innerHTML = (map.repos || []).map((repo) => '<tr><td><strong>' + esc(repo.workspace_id + '/' + repo.repo_id) + '</strong></td><td>' + esc((repo.ref_updates || 0) + ' ref updates, ' + (repo.requests || 0) + ' requests, ' + (repo.exports || 0) + ' exports') + '</td><td><code>' + esc(repo.latest_head || 'empty') + '</code><br>' + esc(repo.latest_subject || '') + '</td></tr>').join('') || '<tr><td colspan="3">No repos yet.</td></tr>';
+    $('uploadRows').innerHTML = (map.uploads || []).slice(-12).reverse().map((upload) => '<tr><td><code>' + esc(upload.receipt_ref) + '</code></td><td>' + esc(upload.fileName || 'vault upload') + '<br><code>' + esc(upload.sha256_prefix || '') + '</code></td><td>' + esc(upload.fileSize ? new Intl.NumberFormat().format(upload.fileSize) + ' bytes' : '0 B') + '</td></tr>').join('') || '<tr><td colspan="3">No uploads yet.</td></tr>';
+    drawGraph(map);
+    setStatus('Ready - ' + (map.safety || 'map loaded'));
+  }
+
+  fetch('../brain/skyevault-vault-map.json')
+    .then((res) => {
+      if (!res.ok) throw new Error('Map not generated');
+      return res.json();
+    })
+    .then(render)
+    .catch((error) => setStatus(error.message, false));
+
+  window.addEventListener('resize', () => {
+    fetch('../brain/skyevault-vault-map.json').then((res) => res.ok ? res.json() : null).then((map) => { if (map) drawGraph(map); });
+  });
+</script>
+<script src="../script.js"></script>
+</body>
+</html>

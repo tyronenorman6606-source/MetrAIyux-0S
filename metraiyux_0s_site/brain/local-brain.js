@@ -4,6 +4,7 @@ let PERSONA_REGISTRY = null;
 let SITE_OPERATOR = null;
 let LEGAL_DATA = null;
 let SALES_OFFERS = null;
+let SKYEVAULT_MAP = null;
 
 const TOTAL_BRAINS = 16;
 const BRAIN_ID_ALIASES = {
@@ -24,6 +25,13 @@ const localRouteRules = [
     secondary: 'orion-hayes-brain',
     create_task: 'Gate, token, tenant-isolation, admin-secret, or customer-side security review',
     triggers: ['auth', 'token', 'bearer', 'session', 'skygate', 'fs27', 'gate', 'introspect', 'mirror secret', 'platform events', 'tenant', 'admin key', 'secret', 'customer isolation', 'security']
+  },
+  {
+    intent: 'skyevault_git_infra',
+    route_to: 'orion-hayes-brain',
+    secondary: '0meg4kai-security-brain',
+    create_task: 'Treat SkyeVault as the Git/storage engine, Gate as the authority layer, and 0S as the neural-map operating layer',
+    triggers: ['skyevault git', 'git remote', 'git clone', 'git push', 'git fetch', 'repo vault', 'bundle export', 'restore repo', 'git diff', 'branch protection', 'vault neural map', 'workspace brain map']
   },
   {
     intent: 'brain_count_or_runtime',
@@ -384,6 +392,12 @@ function smartDirectAnswer(query, route, surfaces) {
     return `${primaryOwner} owns the technical lane. The useful answer should identify the surface, route the change, check auth/proof implications, and only then push to production. ${secondaryOwner} should confirm the operational receipt or routing result.`;
   }
 
+  if (hasAny(q, ['skyevault git', 'git remote', 'git clone', 'git push', 'git fetch', 'repo vault', 'bundle export', 'restore repo', 'git diff', 'branch protection', 'vault neural map', 'workspace brain map'])) {
+    const repoCount = SKYEVAULT_MAP?.repo_count ?? 0;
+    const receiptCount = SKYEVAULT_MAP?.receipt_count ?? 0;
+    return `${primaryOwner} owns the Git/storage implementation, with ${secondaryOwner} checking access and tenant boundaries. The correct architecture is Gate for identity/roles/limits, SkyeVault for Git push/fetch/clone/export/restore, and 0S for the neural map that explains what changed. The current 0S vault map has ${repoCount} repos and ${receiptCount} upload receipts loaded from brain/skyevault-vault-map.json.`;
+  }
+
   if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {
     return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOL Enterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
   }
@@ -499,7 +513,7 @@ async function fetchJson(path) {
 async function loadKB() {
   const status = document.getElementById('brainStatus');
   try {
-    const [kbData, registry, legalData, marketplaceData, obsidianData, personas, siteOperator, offers] = await Promise.all([
+    const [kbData, registry, legalData, marketplaceData, obsidianData, personas, siteOperator, offers, skyevaultMap] = await Promise.all([
       fetchJson('brain/knowledge-base.json'),
       fetchJson('brain/live-surface-registry.json'),
       fetchJson('brain/legal-sync.json'),
@@ -507,7 +521,8 @@ async function loadKB() {
       fetchJson('brain/obsidian-sync.json'),
       fetchJson('brain/persona-brains.json'),
       fetchJson('brain/site-operator-brain.json'),
-      fetchJson('brain/sales-offer-registry.json')
+      fetchJson('brain/sales-offer-registry.json'),
+      fetchJson('brain/skyevault-vault-map.json')
     ]);
 
     if (!kbData) throw new Error('knowledge-base missing');
@@ -517,6 +532,7 @@ async function loadKB() {
     PERSONA_REGISTRY = personas;
     SITE_OPERATOR = siteOperator;
     SALES_OFFERS = offers;
+    SKYEVAULT_MAP = skyevaultMap;
 
     KB = [
       ...(kbData.chunks || []),
@@ -524,6 +540,7 @@ async function loadKB() {
       ...personasToChunks(PERSONA_REGISTRY),
       ...siteOperatorToChunks(SITE_OPERATOR),
       ...offersToChunks(SALES_OFFERS),
+      ...skyevaultToChunks(SKYEVAULT_MAP),
       ...(LEGAL_DATA?.chunks || []),
       ...(marketplaceData?.chunks || []),
       ...(obsidianData?.chunks || [])
@@ -537,6 +554,7 @@ async function loadKB() {
       SALES_OFFERS ? 'sales offer registry' : null,
       LEGAL_DATA ? 'legal center' : null,
       marketplaceData ? 'marketplace catalog' : null,
+      skyevaultMap ? 'SkyeVault repo map' : null,
       obsidianData ? 'Obsidian vault sync' : null
     ].filter(Boolean);
     if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} local knowledge chunks with ${extras.join(', ')}.`;
@@ -615,6 +633,19 @@ function offersToChunks(offers) {
     heading: offer.name || offer.title || offer.id || `Offer ${index + 1}`,
     text: flattenValue(offer),
     source: 'brain/sales-offer-registry.json'
+  }));
+  return chunks;
+}
+
+function skyevaultToChunks(map) {
+  if (!map) return [];
+  const chunks = [...(map.chunks || [])];
+  (map.repos || []).forEach(repo => chunks.push({
+    id: `skyevault-map-repo-${repo.workspace_id}-${repo.repo_id}`,
+    title: 'SkyeVault 0S Neural Map',
+    heading: `${repo.workspace_id}/${repo.repo_id}`,
+    text: `SkyeVault repo ${repo.workspace_id}/${repo.repo_id}: ${repo.ref_updates || 0} ref updates, ${repo.requests || 0} Git requests, ${repo.exports || 0} exports, latest subject ${repo.latest_subject || 'none'}, latest head ${repo.latest_head || 'none'}. Gate should authorize access; 0S should show this in the workspace brain map.`,
+    source: 'brain/skyevault-vault-map.json'
   }));
   return chunks;
 }
