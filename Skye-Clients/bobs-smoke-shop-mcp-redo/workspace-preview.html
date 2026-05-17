@@ -10,8 +10,13 @@
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/styles.css">
+  <style>
+    body.workspace-password-pending > .site-shell {
+      visibility: hidden;
+    }
+  </style>
 </head>
-<body>
+<body class="workspace-password-pending">
 <div class="site-shell">
 <header class="topbar">
   <nav class="nav">
@@ -38,7 +43,7 @@
           <div class="login-card">
             <div class="kicker">Preview Login</div>
             <p><strong>Email:</strong> bob@bobs-smoke-shop-preview.com</p>
-            <p><strong>Access code:</strong> BOBS-FREE-WEEK-2026</p>
+            <p><strong>Access code:</strong> Sent through the workspace chat widget after Bob requests access.</p>
             <p><strong>Workspace:</strong> Bob's Smoke Shop Private Preview</p>
           </div>
           <div class="hero-actions">
@@ -67,7 +72,7 @@
         <div class="login-card compact-login">
           <div class="kicker">Tester Access</div>
           <p><strong>Email:</strong> bob@bobs-smoke-shop-preview.com</p>
-          <p><strong>Access code:</strong> BOBS-FREE-WEEK-2026</p>
+          <p><strong>Access code:</strong> Sent through the workspace chat widget after Bob requests access.</p>
         </div>
         <div class="workspace-meter">
           <div><strong>7</strong><span>app scans</span></div>
@@ -133,6 +138,31 @@
   </div>
 </footer>
 </div>
+<script>
+  window.MetrAIyuxWorkspaceChatConfig = {
+    workspaceId: "bob-smoke-shop-preview-001",
+    workspaceSlug: "bobs-smoke-shop",
+    clientName: "Bob's Smoke Shop",
+    appName: "Bob's Smoke Shop Workspace Preview",
+    launcherText: "Bob's workspace chat",
+    operatorName: "MetrAIyux Operator",
+    accent: "#64d6ff",
+    apiBase: "https://relay13-core.graylondonskyes.workers.dev/",
+    accountDisclaimer: "Messages are tied to Bob's workspace account and may be used for support, proof receipts, QA, and follow-up inside this client build lane.",
+    accessReply: "Bob, your workspace popup password is bobs27.",
+    accessTriggers: ["password", "access", "code", "unlock", "bobs27", "workspace"],
+    passwordGate: {
+      enabled: true,
+      password: "bobs27",
+      storageKey: "metraiyux.workspaceGate.bob-smoke-shop-preview-001",
+      storage: "session",
+      title: "Bob's private workspace",
+      prompt: "Enter the workspace password to unlock Bob's preview room.",
+      chatButtonText: "Send password through chat"
+    }
+  };
+</script>
+<script src="/assets/workspace-chat-widget.js"></script>
 <script src="/script.js"></script>
 </body>
 </html>

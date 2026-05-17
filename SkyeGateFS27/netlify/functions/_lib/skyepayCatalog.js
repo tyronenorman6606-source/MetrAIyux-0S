@@ -54,14 +54,14 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 10,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "auto_unlock_after_confirmed_payment",
+    setup_handling: "paid_pending_owner_approval",
     storefront: true,
     badge: "7-day trial",
     includes: [
       "Client workspace",
       "Private app closeout",
       "Basic AI command routing",
-      "Automatic activation after confirmed payment"
+      "Paid status plus owner-approved activation"
     ],
     gate_policy: {
       monthly_cap_cents: 25000,
@@ -84,14 +84,14 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 20,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "auto_unlock_after_confirmed_payment",
+    setup_handling: "owner_approved_after_route_scope",
     storefront: true,
     badge: "Growth lane",
     includes: [
       "Recurring workflow routing",
       "Proof exports",
       "Weekly operating rhythm",
-      "Automatic activation after confirmed payment"
+      "Paid status plus owner-approved activation"
     ],
     gate_policy: {
       monthly_cap_cents: 75000,
@@ -214,9 +214,11 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 30,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "auto_unlock_after_confirmed_payment",
+    setup_handling: "owner_approved_after_sovereign_stack_review",
     storefront: true,
     badge: "Full office",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_sovereign_stack_review",
     includes: [
       "Managed operating office",
       "Approval inboxes",
@@ -762,7 +764,7 @@ export const SKYPAY_OFFERS = [
     plan_name: "starter-command",
     title: "Starter Command",
     family: "metraiyux",
-    description: "A managed starter operating room for preview clients who are ready to keep the app and unlock after confirmed SkyePay checkout.",
+    description: "A managed starter operating room for preview clients who are ready to keep the app after confirmed SkyePay checkout and owner-approved activation.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["metraiyux_starter_command_setup", "metraiyux_starter_command_monthly"],
@@ -899,8 +901,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_routex_workforce_command_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope"
   },
   {
     id: "metraiyux-autonomous-office",
@@ -928,8 +930,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_autonomous_office_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_sovereign_stack_review"
   },
   {
     id: "metraiyux-enterprise-command",
@@ -957,8 +959,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_enterprise_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_gate_scope"
   },
   ...SKYEMUSICNEXUS_OFFERS,
   {

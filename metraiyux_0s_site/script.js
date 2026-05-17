@@ -2126,6 +2126,8 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
     const xThumb = xRail.querySelector('.mcp-neon-scroll-thumb');
     let activeHorizontal = horizontalSource();
     let raf = 0;
+    let dragRaf = 0;
+    let pendingDrag = null;
     let metrics = null;
 
     function measure(){
@@ -2150,14 +2152,12 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
       return { ySource, yTrack, yMax, yRatio, ySize, xSource, xTrack, xMax, xRatio, xSize, pageMode };
     }
 
-    function updateRails(){
-      raf = 0;
-      metrics = measure();
-      yThumb.style.height = `${Math.floor(metrics.ySize)}px`;
-      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(metrics.yRatio * Math.max(0, metrics.yTrack - metrics.ySize))}px`);
-      xThumb.style.width = `${Math.floor(metrics.xSize)}px`;
-      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(metrics.xRatio * Math.max(0, metrics.xTrack - metrics.xSize))}px`);
-      xRail.dataset.scrollMode = metrics.pageMode ? 'page' : 'horizontal';
+    function paintRails(view){
+      yThumb.style.height = `${Math.floor(view.ySize)}px`;
+      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(view.yRatio * Math.max(0, view.yTrack - view.ySize))}px`);
+      xThumb.style.width = `${Math.floor(view.xSize)}px`;
+      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(view.xRatio * Math.max(0, view.xTrack - view.xSize))}px`);
+      xRail.dataset.scrollMode = view.pageMode ? 'page' : 'horizontal';
     }
 
     function scheduleUpdate(){
@@ -2165,69 +2165,105 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
       raf = window.requestAnimationFrame(updateRails);
     }
 
-    function setVerticalRatio(ratio){
-      const next = measure();
-      window.scrollTo({ top: clamp(ratio, 0, 1) * next.yMax, left: window.scrollX, behavior: 'auto' });
+    function updateRails(){
+      raf = 0;
+      metrics = measure();
+      paintRails(metrics);
+    }
+
+    function flushDrag(){
+      dragRaf = 0;
+      if(!pendingDrag) return;
+      const { axis, ratio, snapshot } = pendingDrag;
+      pendingDrag = null;
+      const next = snapshot || measure();
+      const bounded = clamp(ratio, 0, 1);
+
+      if(axis === 'y'){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: next.pageMode ? yRatio : next.xRatio
+        });
+      }else if(next.pageMode){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: yRatio
+        });
+      }else{
+        next.xSource.scrollLeft = bounded * next.xMax;
+        paintRails({
+          ...next,
+          xRatio: clamp(next.xSource.scrollLeft / Math.max(1, next.xMax), 0, 1)
+        });
+      }
       scheduleUpdate();
     }
 
-    function setHorizontalRatio(ratio){
-      const next = measure();
-      if(next.pageMode){
-        setVerticalRatio(ratio);
-        return;
-      }
-      next.xSource.scrollLeft = clamp(ratio, 0, 1) * next.xMax;
-      scheduleUpdate();
+    function queueDrag(axis, ratio, snapshot){
+      pendingDrag = { axis, ratio, snapshot };
+      if(!dragRaf) dragRaf = window.requestAnimationFrame(flushDrag);
     }
 
     function bindRail(rail, thumb, axis, setter){
       let dragging = false;
       let pointerOffset = 0;
+      let dragSnapshot = null;
+      let railStart = 0;
+      let track = 1;
+      let size = 1;
 
       function ratioFromEvent(event, keepOffset){
-        const latest = measure();
-        const railRect = rail.getBoundingClientRect();
-        const thumbRect = thumb.getBoundingClientRect();
-        const track = axis === 'y' ? latest.yTrack : latest.xTrack;
-        const size = axis === 'y' ? latest.ySize : latest.xSize;
-        const start = axis === 'y' ? railRect.top : railRect.left;
         const coordinate = axis === 'y' ? event.clientY : event.clientX;
         const localOffset = keepOffset ? pointerOffset : size / 2;
-        return clamp((coordinate - start - localOffset) / Math.max(1, track - size), 0, 1);
+        return clamp((coordinate - railStart - localOffset) / Math.max(1, track - size), 0, 1);
       }
 
       rail.addEventListener('pointerdown', (event) => {
         event.preventDefault();
         dragging = true;
+        dragSnapshot = measure();
+        const railRect = rail.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        railStart = axis === 'y' ? railRect.top : railRect.left;
+        track = axis === 'y' ? dragSnapshot.yTrack : dragSnapshot.xTrack;
+        size = axis === 'y' ? dragSnapshot.ySize : dragSnapshot.xSize;
+        document.documentElement.classList.add('mcp-neon-scroll-dragging');
         rail.classList.add('is-dragging');
         rail.setPointerCapture?.(event.pointerId);
-        const thumbRect = thumb.getBoundingClientRect();
         pointerOffset = event.target === thumb || thumb.contains(event.target)
           ? (axis === 'y' ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
           : (axis === 'y' ? thumbRect.height / 2 : thumbRect.width / 2);
-        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)));
+        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)), dragSnapshot);
       });
 
       rail.addEventListener('pointermove', (event) => {
         if(!dragging) return;
         event.preventDefault();
-        setter(ratioFromEvent(event, true));
+        setter(ratioFromEvent(event, true), dragSnapshot);
       });
 
       function endDrag(event){
         if(!dragging) return;
         dragging = false;
+        dragSnapshot = null;
+        document.documentElement.classList.remove('mcp-neon-scroll-dragging');
         rail.classList.remove('is-dragging');
         rail.releasePointerCapture?.(event.pointerId);
+        scheduleUpdate();
       }
 
       rail.addEventListener('pointerup', endDrag);
       rail.addEventListener('pointercancel', endDrag);
     }
 
-    bindRail(yRail, yThumb, 'y', setVerticalRatio);
-    bindRail(xRail, xThumb, 'x', setHorizontalRatio);
+    bindRail(yRail, yThumb, 'y', (ratio, snapshot) => queueDrag('y', ratio, snapshot));
+    bindRail(xRail, xThumb, 'x', (ratio, snapshot) => queueDrag('x', ratio, snapshot));
 
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
     window.addEventListener('resize', () => {

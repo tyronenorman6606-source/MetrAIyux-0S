@@ -3,335 +3,143 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Empire Pallets — Phoenix Pallet Supply</title>
+  <title>Empire Pallets — Phoenix Commercial Pallet Supply</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
-
     :root {
-      --gold: #D4A017;
-      --gold-bright: #F0C040;
-      --gold-glow: rgba(212,160,23,0.35);
-      --bg: #07080A;
-      --bg2: #0c0e12;
-      --plate: rgba(255,255,255,0.03);
-      --border: rgba(212,160,23,0.2);
-      --border-hot: rgba(212,160,23,0.45);
-      --ink: #E8E4DC;
-      --muted: #6a6458;
-      --steel: #2a2d35;
+      --gold: #D4A017; --gold-glow: rgba(212,160,23,0.32);
+      --bg: #07090C; --plate: rgba(255,255,255,0.03);
+      --border: rgba(212,160,23,0.18); --border-hot: rgba(212,160,23,0.42);
+      --ink: #E8E4DC; --muted: #60584E;
     }
+    html, body { width: 100%; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    canvas#bg { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.3; }
+    .flyer { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 0 0 64px; }
 
-    html, body {
-      width: 100%; min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Inter', system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    /* HEADER */
+    .header { text-align: center; padding: 52px 24px 38px; position: relative; }
+    .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.24em; color: var(--gold); text-transform: uppercase; margin-bottom: 22px; }
+    .eyebrow::before, .eyebrow::after { content: ''; display: block; width: 32px; height: 1px; background: var(--gold); opacity: 0.5; }
+    .logo-wrap { margin-bottom: 18px; }
+    .logo-wrap img { width: 160px; height: auto; filter: drop-shadow(0 0 28px var(--gold-glow)); }
+    .co-name { font-family: 'Oswald', sans-serif; font-size: clamp(3rem, 9vw, 5.2rem); font-weight: 700; letter-spacing: 0.04em; line-height: 0.9; text-transform: uppercase; color: #fff; }
+    .co-name .empire { color: var(--gold); text-shadow: 0 0 50px var(--gold-glow); }
+    .sub { font-family: 'Oswald', sans-serif; font-size: clamp(0.9rem, 2.5vw, 1.2rem); font-weight: 400; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-top: 10px; }
 
-    canvas#grid {
-      position: fixed; inset: 0;
-      width: 100%; height: 100%;
-      pointer-events: none; z-index: 0;
-      opacity: 0.35;
-    }
+    /* LOCATION BAND */
+    .loc-band { background: linear-gradient(135deg, rgba(212,160,23,0.09), rgba(212,160,23,0.03)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 15px 20px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .loc-item { display: flex; align-items: center; gap: 8px; font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 6px var(--gold); flex-shrink: 0; }
+    .sep { color: var(--border); font-size: 16px; }
 
-    .flyer {
-      position: relative; z-index: 1;
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 0 64px;
-    }
+    /* SERVICES */
+    .section-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.26em; color: var(--muted); text-transform: uppercase; text-align: center; padding: 32px 24px 18px; }
+    .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; }
+    @media (max-width: 460px) { .services { grid-template-columns: repeat(2, 1fr); } }
+    .svc { background: var(--plate); border: 1px solid var(--border); border-radius: 8px; padding: 0 0 16px; text-align: center; overflow: hidden; transition: border-color 0.2s, background 0.2s; }
+    .svc:hover { border-color: var(--border-hot); background: rgba(212,160,23,0.04); }
+    .svc-img { width: 100%; height: 76px; object-fit: cover; display: block; opacity: 0.82; }
+    .svc-body { padding: 10px 12px 0; }
+    .svc-name { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); margin-bottom: 4px; }
+    .svc-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
 
-    /* ── HEADER ── */
-    .header {
-      text-align: center;
-      padding: 52px 24px 36px;
-      position: relative;
-    }
-    .header::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 11px; letter-spacing: 0.24em;
-      color: var(--gold); text-transform: uppercase;
-      margin-bottom: 22px;
-    }
-    .eyebrow::before, .eyebrow::after {
-      content: ''; display: block;
-      width: 28px; height: 1px;
-      background: var(--gold); opacity: 0.6;
-    }
-    .logo-wrap img {
-      width: 160px; height: auto;
-      filter: drop-shadow(0 0 28px var(--gold-glow));
-      margin-bottom: 18px;
-    }
-    .co-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: clamp(2.8rem, 9vw, 5rem);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      line-height: 0.9;
-      text-transform: uppercase;
-      color: #fff;
-    }
-    .co-name .empire { color: var(--gold); text-shadow: 0 0 40px var(--gold-glow); }
-    .sub-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: clamp(1rem, 3vw, 1.4rem);
-      font-weight: 400;
-      letter-spacing: 0.2em;
-      color: var(--muted); text-transform: uppercase;
-      margin-top: 8px;
-    }
+    /* INDUSTRIES */
+    .industries { margin: 22px 20px 0; background: var(--plate); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+    .ind-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.22em; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; text-align: center; }
+    .ind-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .ind-tag { background: rgba(212,160,23,0.07); border: 1px solid rgba(212,160,23,0.2); color: var(--ink); font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; padding: 5px 12px; border-radius: 4px; }
 
-    /* ── PHOENIX BAND ── */
-    .location-band {
-      background: linear-gradient(135deg, rgba(212,160,23,0.1), rgba(212,160,23,0.04));
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .loc-item {
-      display: flex; align-items: center; gap: 8px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--ink);
-    }
-    .loc-item .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold);
-      flex-shrink: 0;
-    }
-    .loc-sep { color: var(--border); font-size: 18px; }
+    /* CONTACT */
+    .contact { margin: 18px 20px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 460px) { .contact { grid-template-columns: 1fr; } }
+    .contact-card { background: var(--plate); border: 1px solid var(--border); border-radius: 8px; padding: 16px 14px; text-align: center; }
+    .c-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 0.22em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .c-val { font-family: 'Oswald', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--gold); }
+    .c-val a { color: inherit; text-decoration: none; }
+    .c-sub { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
 
-    /* ── SERVICES ── */
-    .section-label {
-      font-family: 'Oswald', sans-serif;
-      font-size: 10px; letter-spacing: 0.26em;
-      color: var(--muted); text-transform: uppercase;
-      text-align: center;
-      padding: 32px 24px 18px;
-    }
-    .services {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 0 20px;
-    }
-    @media (max-width: 480px) { .services { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 320px) { .services { grid-template-columns: 1fr; } }
+    /* CTA */
+    .cta-row { text-align: center; padding: 26px 20px 0; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-p { display: inline-block; background: var(--gold); color: #000; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 15px 38px; border-radius: 6px; box-shadow: 0 0 32px var(--gold-glow), 0 4px 14px rgba(0,0,0,0.5); transition: box-shadow 0.2s, transform 0.15s; }
+    .btn-p:hover { box-shadow: 0 0 52px rgba(212,160,23,0.6); transform: translateY(-2px); }
+    .btn-s { display: inline-block; background: transparent; color: var(--gold); border: 1px solid var(--gold); font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 15px 38px; border-radius: 6px; transition: background 0.2s; }
+    .btn-s:hover { background: rgba(212,160,23,0.08); }
 
-    .svc {
-      background: var(--plate);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 14px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .svc:hover {
-      border-color: var(--border-hot);
-      background: rgba(212,160,23,0.06);
-    }
-    .svc::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .svc:hover::after { opacity: 1; }
-    .svc-icon { font-size: 26px; margin-bottom: 10px; display: block; }
-    .svc-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: 13px; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--ink); margin-bottom: 4px;
-    }
-    .svc-desc {
-      font-size: 11px; color: var(--muted); line-height: 1.5;
-    }
-
-    /* ── INDUSTRIES BAND ── */
-    .industries {
-      margin: 24px 20px 0;
-      background: var(--plate);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px 20px;
-    }
-    .ind-label {
-      font-family: 'Oswald', sans-serif;
-      font-size: 10px; letter-spacing: 0.22em;
-      color: var(--gold); text-transform: uppercase;
-      margin-bottom: 10px; text-align: center;
-    }
-    .ind-tags {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-    }
-    .ind-tag {
-      background: rgba(212,160,23,0.08);
-      border: 1px solid rgba(212,160,23,0.22);
-      color: var(--ink);
-      font-family: 'Oswald', sans-serif;
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 5px 12px; border-radius: 4px;
-    }
-
-    /* ── CONTACT ── */
-    .contact {
-      margin: 20px 20px 0;
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    }
-    @media (max-width: 480px) { .contact { grid-template-columns: 1fr; } }
-    .contact-card {
-      background: var(--plate);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 14px;
-      text-align: center;
-    }
-    .contact-card .c-label {
-      font-family: 'Oswald', sans-serif;
-      font-size: 9px; letter-spacing: 0.22em;
-      color: var(--muted); text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .contact-card .c-val {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.95rem; font-weight: 600;
-      color: var(--gold);
-    }
-    .contact-card .c-val a { color: inherit; text-decoration: none; }
-    .contact-card .c-sub {
-      font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5;
-    }
-
-    /* ── CTA ── */
-    .cta-row {
-      text-align: center;
-      padding: 28px 20px 0;
-      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-    }
-    .btn-primary {
-      display: inline-block;
-      background: var(--gold);
-      color: #000;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      text-decoration: none;
-      padding: 15px 36px; border-radius: 6px;
-      box-shadow: 0 0 28px var(--gold-glow), 0 4px 14px rgba(0,0,0,0.5);
-      transition: box-shadow 0.2s, transform 0.15s;
-    }
-    .btn-primary:hover {
-      box-shadow: 0 0 48px rgba(212,160,23,0.6), 0 4px 20px rgba(0,0,0,0.5);
-      transform: translateY(-2px);
-    }
-    .btn-secondary {
-      display: inline-block;
-      background: transparent;
-      color: var(--gold);
-      border: 1px solid var(--gold);
-      font-family: 'Oswald', sans-serif;
-      font-size: 1rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      text-decoration: none;
-      padding: 15px 36px; border-radius: 6px;
-      transition: background 0.2s, color 0.2s;
-    }
-    .btn-secondary:hover {
-      background: rgba(212,160,23,0.1);
-    }
-
-    /* ── FOOTER NOTE ── */
-    .footer-bar {
-      margin: 28px 20px 0;
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-    }
-    .footer-bar p {
-      font-size: 11px; color: var(--muted);
-    }
-    .footer-bar .website {
-      font-family: 'Oswald', sans-serif;
-      font-size: 12px; letter-spacing: 0.1em;
-      color: var(--gold);
-    }
+    /* FOOTER */
+    .footer-bar { margin: 26px 20px 0; border-top: 1px solid var(--border); padding-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .footer-bar p { font-size: 11px; color: var(--muted); }
+    .footer-bar .site { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 0.1em; color: var(--gold); }
   </style>
 </head>
 <body>
-  <canvas id="grid"></canvas>
-
+  <canvas id="bg"></canvas>
   <div class="flyer">
 
     <header class="header">
-      <div class="eyebrow">Phoenix, AZ</div>
+      <div class="eyebrow">Phoenix, Arizona</div>
       <div class="logo-wrap">
         <img src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
       </div>
       <h1 class="co-name"><span class="empire">Empire</span> Pallets</h1>
-      <p class="sub-name">Commercial Pallet Supply &amp; Logistics</p>
+      <p class="sub">Commercial Pallet Supply &amp; Logistics</p>
     </header>
 
-    <div class="location-band">
+    <div class="loc-band">
       <div class="loc-item"><div class="dot"></div>New Pallets</div>
-      <div class="loc-sep">|</div>
+      <span class="sep">|</span>
       <div class="loc-item"><div class="dot"></div>Recycled Pallets</div>
-      <div class="loc-sep">|</div>
+      <span class="sep">|</span>
       <div class="loc-item"><div class="dot"></div>Phoenix Area</div>
     </div>
 
-    <div class="section-label">Our Services</div>
+    <div class="section-label">Services</div>
 
     <div class="services">
       <div class="svc">
-        <span class="svc-icon">🪵</span>
-        <div class="svc-name">New Pallets</div>
-        <div class="svc-desc">Grade-A pallets built to spec, ready for your operation</div>
+        <img class="svc-img" src="assets/media/new-pallets-service.png" alt="New Pallets">
+        <div class="svc-body">
+          <div class="svc-name">New Pallets</div>
+          <div class="svc-desc">Grade-A stock built to spec</div>
+        </div>
       </div>
       <div class="svc">
-        <span class="svc-icon">♻️</span>
-        <div class="svc-name">Recycled Pallets</div>
-        <div class="svc-desc">Quality recycled stock — cost-efficient for high-volume needs</div>
+        <img class="svc-img" src="assets/media/recycled-pallets-service.png" alt="Recycled Pallets">
+        <div class="svc-body">
+          <div class="svc-name">Recycled Pallets</div>
+          <div class="svc-desc">Quality recycled — cost-efficient at volume</div>
+        </div>
       </div>
       <div class="svc">
-        <span class="svc-icon">🚛</span>
-        <div class="svc-name">Pickup &amp; Removal</div>
-        <div class="svc-desc">We haul your used pallets — free up dock space fast</div>
+        <img class="svc-img" src="assets/media/warehouse-forklift-hero.png" alt="Pickup">
+        <div class="svc-body">
+          <div class="svc-name">Pickup &amp; Removal</div>
+          <div class="svc-desc">We haul used pallets, free up your dock</div>
+        </div>
       </div>
       <div class="svc">
-        <span class="svc-icon">🚚</span>
-        <div class="svc-name">Drop-Trailer Program</div>
-        <div class="svc-desc">Dedicated trailer on-site — pull when you need, swap when full</div>
+        <img class="svc-img" src="assets/media/flatbed-hero.png" alt="Drop Trailer">
+        <div class="svc-body">
+          <div class="svc-name">Drop-Trailer</div>
+          <div class="svc-desc">Dedicated trailer on-site, swap when full</div>
+        </div>
       </div>
       <div class="svc">
-        <span class="svc-icon">🔥</span>
-        <div class="svc-name">Heat Treatment</div>
-        <div class="svc-desc">ISPM-15 compliant HT support for export and compliance needs</div>
+        <img class="svc-img" src="assets/media/heat-treatment-service.png" alt="Heat Treatment">
+        <div class="svc-body">
+          <div class="svc-name">Heat Treatment</div>
+          <div class="svc-desc">ISPM-15 compliant HT support</div>
+        </div>
       </div>
       <div class="svc">
-        <span class="svc-icon">📐</span>
-        <div class="svc-name">Custom Pallets</div>
-        <div class="svc-desc">Non-standard sizes and specs built to your load requirements</div>
+        <img class="svc-img" src="assets/media/custom-pallets-service.png" alt="Custom Pallets">
+        <div class="svc-body">
+          <div class="svc-name">Custom Pallets</div>
+          <div class="svc-desc">Non-standard sizes to your spec</div>
+        </div>
       </div>
     </div>
 
@@ -343,7 +151,7 @@
         <span class="ind-tag">Manufacturing</span>
         <span class="ind-tag">Food &amp; Beverage</span>
         <span class="ind-tag">Retail &amp; eCommerce</span>
-        <span class="ind-tag">Construction Supply</span>
+        <span class="ind-tag">Construction</span>
         <span class="ind-tag">Logistics &amp; 3PL</span>
       </div>
     </div>
@@ -352,7 +160,7 @@
       <div class="contact-card">
         <div class="c-label">Phone</div>
         <div class="c-val"><a href="tel:4806626551">480-662-6551</a></div>
-        <div class="c-sub">Call to discuss your pallet needs</div>
+        <div class="c-sub">Call to discuss your needs</div>
       </div>
       <div class="contact-card">
         <div class="c-label">Email</div>
@@ -367,45 +175,33 @@
     </div>
 
     <div class="cta-row">
-      <a class="btn-primary" href="tel:4806626551">Call 480-662-6551</a>
-      <a class="btn-secondary" href="/quote.html">Request a Quote</a>
+      <a class="btn-p" href="tel:4806626551">Call 480-662-6551</a>
+      <a class="btn-s" href="quote.html">Request a Quote</a>
     </div>
 
     <div class="footer-bar">
-      <p>Reliable pallet supply, recycling, pickup, and trailer programs for Phoenix-area businesses.</p>
-      <span class="website">empirepalletsaz.com</span>
+      <p>Reliable pallet supply, recycling, pickup, and trailer programs — Phoenix area.</p>
+      <span class="site">empirepalletsaz.com</span>
     </div>
 
   </div>
 
   <script>
-    // Industrial grid background
     (function () {
-      const c = document.getElementById('grid');
+      const c = document.getElementById('bg');
       if (!c || !c.getContext) return;
       const ctx = c.getContext('2d');
-      function resize() { c.width = window.innerWidth; c.height = window.innerHeight; draw(); }
       function draw() {
-        ctx.clearRect(0, 0, c.width, c.height);
-        const size = 44;
-        ctx.strokeStyle = 'rgba(212,160,23,0.12)';
-        ctx.lineWidth = 0.5;
-        for (let x = 0; x <= c.width + size; x += size) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke();
-        }
-        for (let y = 0; y <= c.height + size; y += size) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke();
-        }
-        // Dots at intersections
-        ctx.fillStyle = 'rgba(212,160,23,0.22)';
-        for (let x = 0; x <= c.width + size; x += size) {
-          for (let y = 0; y <= c.height + size; y += size) {
-            ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI * 2); ctx.fill();
-          }
-        }
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const s = 44;
+        ctx.strokeStyle = 'rgba(212,160,23,0.15)'; ctx.lineWidth = 0.5;
+        for (let x = 0; x <= c.width; x += s) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
+        for (let y = 0; y <= c.height; y += s) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
+        ctx.fillStyle = 'rgba(212,160,23,0.25)';
+        for (let x = 0; x <= c.width; x += s)
+          for (let y = 0; y <= c.height; y += s) { ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI * 2); ctx.fill(); }
       }
-      resize();
-      window.addEventListener('resize', resize);
+      draw(); window.addEventListener('resize', draw);
     })();
   </script>
 </body>

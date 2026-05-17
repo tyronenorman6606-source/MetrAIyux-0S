@@ -59,7 +59,30 @@
     const url=new URL('https://skyesol.netlify.app/skyepay.html');
     url.searchParams.set('client', client || 'metraiyux-0s');
     url.searchParams.set('offer', offers[plan] || offers['starter-command']);
+    url.searchParams.set('skyemerit_code', 'SKYEMERIT-FIRST-BEST');
     return url.toString();
+  }
+  function issueSkyeMeritPack(data={}, source='static_onboarding'){
+    const email=String(data.email || data.customer_email || data.approval_email || '').trim().toLowerCase();
+    const pack={
+      id:rid('skyemerit'),
+      pack_id:'SKYEMERIT-FIRST-PACK',
+      type:'skyemerit_pack',
+      status:'issued_static_mode',
+      source,
+      email,
+      customer_id:data.customer_id || '',
+      workspace_id:data.workspace_id || '',
+      issued_at:now(),
+      gate_required:true,
+      kaixu_credit_cents:600,
+      kaixu_credit_label:'$6 premium kAIxu model spend credit',
+      coupon_codes:['SKYEMERIT-FIRST-23','SKYEMERIT-FIRST-28','SKYEMERIT-FIRST-31'],
+      channels:['resend','skymail','relay13','connectlog','fs27_event_mirror'],
+      rule:'Discount only applies to eligible spend bands; Free99 still requires a gate session.'
+    };
+    write('saas_skyemerit_pack', pack);
+    return pack;
   }
   function wirePlanLinks(){
     document.querySelectorAll('a[data-plan]').forEach((link)=>{
@@ -83,7 +106,8 @@
         return;
       }
       const workspace = read('saas_active_workspace', {}) || {};
-      el.innerHTML = `<span class="status-pill">Signed in</span><h3>${session.client}</h3><p><strong>Workspace:</strong> ${session.workspace}</p><p><strong>Email:</strong> ${session.email}</p><p><strong>Status:</strong> ${session.status}</p><p><strong>Usage:</strong> ${workspace.included_usage?.scans ?? 0} scans, ${workspace.included_usage?.commands ?? 0} commands, ${workspace.included_usage?.proof_exports ?? 0} proof exports, ${workspace.included_usage?.tester_seats ?? 0} tester seats</p>`;
+      const merit = read('saas_skyemerit_pack', null);
+      el.innerHTML = `<span class="status-pill">Signed in</span><h3>${session.client}</h3><p><strong>Workspace:</strong> ${session.workspace}</p><p><strong>Email:</strong> ${session.email}</p><p><strong>Status:</strong> ${session.status}</p><p><strong>Usage:</strong> ${workspace.included_usage?.scans ?? 0} scans, ${workspace.included_usage?.commands ?? 0} commands, ${workspace.included_usage?.proof_exports ?? 0} proof exports, ${workspace.included_usage?.tester_seats ?? 0} tester seats</p>${merit ? `<p><strong>SkyeMerit:</strong> ${merit.kaixu_credit_label}; ${merit.coupon_codes.join(', ')}. Gate required.</p>` : ''}`;
     });
   }
   async function postJson(url, payload){
@@ -135,12 +159,12 @@
       if(!session){ location.href='client-login.html'; return; }
       location.href=`customer-dashboard.html?workspace=${encodeURIComponent(session.workspace_id)}`;
     },
-    saveSignup(){ const data=getForm('signupForm'); const rec={id:rid('signup'), type:'signup_intent', status:'local_saved_needs_backend', created_at:now(), ...data}; const all=read('saas_signups',[]); all.push(rec); write('saas_signups',all); output('signupReceipt',rec); return rec; },
-    saveOnboarding(){ const data=getForm('onboardingForm'); const rec={id:rid('onboarding'), type:'customer_onboarding', status:'ready_for_workspace_provisioning', created_at:now(), ...data}; const all=read('saas_onboarding',[]); all.push(rec); write('saas_onboarding',all); output('onboardingReceipt',rec); return rec; },
+    saveSignup(){ const data=getForm('signupForm'); const skyemerit=issueSkyeMeritPack(data,'signup'); const rec={id:rid('signup'), type:'signup_intent', status:'local_saved_needs_backend', created_at:now(), skyemerit, ...data}; const all=read('saas_signups',[]); all.push(rec); write('saas_signups',all); output('signupReceipt',rec); return rec; },
+    saveOnboarding(){ const data=getForm('onboardingForm'); const skyemerit=issueSkyeMeritPack(data,'onboarding'); const rec={id:rid('onboarding'), type:'customer_onboarding', status:'ready_for_workspace_provisioning', created_at:now(), skyemerit, ...data}; const all=read('saas_onboarding',[]); all.push(rec); write('saas_onboarding',all); output('onboardingReceipt',rec); return rec; },
     saveCompanyProfile(){ const data=getForm('companyProfileForm'); const rec={id:rid('company'), type:'company_profile', status:'profile_saved', updated_at:now(), ...data}; write('saas_company_profile',rec); output('companyProfileReceipt',rec); return rec; },
     saveServices(){ const data=getForm('serviceSelectorForm'); const services=[...document.querySelectorAll('input[name="services"]:checked')].map(x=>x.value); const rec={id:rid('services'), type:'service_selection', status:'services_selected', created_at:now(), plan:data.plan, services, notes:data.notes||''}; write('saas_service_selection',rec); output('serviceReceipt',rec); return rec; },
     createWorkspace(){ const profile=read('saas_company_profile',{}), services=read('saas_service_selection',{}), onboarding=read('saas_onboarding',[]).slice(-1)[0]||{}; const workspace={id:rid('ws'), type:'customer_workspace', status:'local_workspace_ready_for_cloudflare_provisioning', created_at:now(), profile, services, onboarding, modules:['admin_brain','approval_inbox','company_profile','service_selector','client_os','proof_vault','skyeprofitconsole_free99']}; write('saas_workspace',workspace); output('workspaceReceipt',workspace); return workspace; },
-    makeBillingIntent(){ const data=getForm('billingForm'); const checkout_url=skyePayUrl(data.plan || query.get('plan') || 'starter-command', data.client_slug || 'metraiyux-0s'); const rec={id:rid('bill'), type:'skyepay_billing_intent', status:'ready_for_skyepay_checkout', created_at:now(), checkout_url, owner_approval_required:true, ...data, next:'Open SkyePay to create the Stripe Checkout Session. FS27 keeps activation pending until owner approval.'}; const all=read('saas_billing_intents',[]); all.push(rec); write('saas_billing_intents',all); output('billingReceipt',rec); return rec; },
+    makeBillingIntent(){ const data=getForm('billingForm'); const checkout_url=skyePayUrl(data.plan || query.get('plan') || 'starter-command', data.client_slug || 'metraiyux-0s'); const skyemerit=read('saas_skyemerit_pack', null) || issueSkyeMeritPack({email:data.billing_email},'billing'); const rec={id:rid('bill'), type:'skyepay_billing_intent', status:'ready_for_skyepay_checkout', created_at:now(), checkout_url, skyemerit, owner_approval_required:true, ...data, next:'Open SkyePay to create the Stripe Checkout Session. FS27 applies SkyeMerit only to eligible spend and keeps activation behind the gate.'}; const all=read('saas_billing_intents',[]); all.push(rec); write('saas_billing_intents',all); output('billingReceipt',rec); return rec; },
     openSkyePay(){ const data=getForm('billingForm'); const url=skyePayUrl(data.plan || query.get('plan') || 'starter-command', data.client_slug || 'metraiyux-0s'); this.makeBillingIntent(); location.href=url; },
     command(){ const data=getForm('customerCommandForm'); const session=getActiveSession(); const rec={id:rid('cmd'), type:'customer_workspace_command', workspace_id:data.workspace_id || query.get('workspace') || session?.workspace_id || '', client:session?.client || '', status:'routed_to_site_operator_brain_static_mode', created_at:now(), command:data.command||'', priority:data.priority||'normal', route:this.routeCommand(data.command||'')}; const all=read('saas_customer_commands',[]); all.push(rec); write('saas_customer_commands',all); output('commandReceipt',rec); return rec; },
     routeCommand(text){ const t=text.toLowerCase(); if(/post|social|content|blog|marketing/.test(t)) return {primary:'Valentina Reyes / Marketing Brain', secondary:'Victor Saint / QA Brain', approval_required:true}; if(/hire|candidate|recruit|staff|worker/.test(t)) return {primary:'Sienna Brooks / Staffing Brain', secondary:'Marcus Vale / Operations Brain', approval_required:true}; if(/contract|legal|compliance|filing|claim/.test(t)) return {primary:'Julian Mercer / Compliance Brain', secondary:'Victor Saint / QA Brain', approval_required:true}; if(/invoice|price|billing|payment/.test(t)) return {primary:'Naomi Sterling / Finance Brain', secondary:'Marcus Vale / Operations Brain', approval_required:true}; if(/lead|sale|proposal|close/.test(t)) return {primary:'Celeste Monroe / Revenue Brain', secondary:'Adrian Cross / Client Success Brain', approval_required:false}; return {primary:'Site Operator Brain', secondary:'Central Company Command Brain', approval_required:false}; },

@@ -1,8 +1,8 @@
 {
-  "version": "skye-content-forge-free99-routing",
+  "version": "platform-integration-accounting",
   "updated_at": "2026-05-17T00:00:00Z",
   "source_of_truth": "../STRIPE_PRODUCT_PRICE_CATALOG.md",
-  "positioning": "MetrAIyux 0S, SkyeGateFS27, kAIxU, Lane Vault, SkyeCorp, Skye Business Command Center, SkyeRouteX, SkyeMusicNexus Lite and paid music ops, SkyeRoutexFlow Workforce Command v0.4.0, SkyeProfitConsole Free99, SkyeMediaCenter Free99, Skye Content Forge Free99, and SOL Staffing offers should be sold from approved catalog entries only. The system sells serious deployed business infrastructure: websites, command decks, workforce route command, managed gates, AI operating rooms, governance, billing visibility, proof surfaces, and support.",
+  "positioning": "MetrAIyux 0S, SkyeGateFS27, the SkyePay Store, SkyeMerit protected first-time merit packs, SkyeVault access plans, SkyeCard usage offers, SkyeMail, kAIxU, Lane Vault, SkyeCorp, Skye Business Command Center, SkyeRouteX, SkyeMusicNexus Lite and paid music ops, SkyeRoutexFlow Workforce Command v0.4.0, SkyeProfitConsole Free99, SkyeMediaCenter Free99, Skye Content Forge Free99, and SOL Staffing offers should be sold from approved catalog entries only. The system sells serious deployed business infrastructure: websites, command decks, workforce route command, managed gates, AI operating rooms, governance, billing visibility, proof surfaces, buyable store routes, advertising angles, and support.",
   "sales_rule": "Use exact prices only when an offer status is approved. Use starts-at language for approved_floor. Use discovery and custom proposal language for quote_only. Never turn valuations, financing examples, default caps, internal model costs, or calculator outputs into checkout prices.",
   "guardrails": [
     "Do not invent Stripe links, discounts, guarantees, or payment terms.",
@@ -10,6 +10,7 @@
     "Do not publish admin playbooks, secrets, deployment requirements, or private client operations as buyer-facing copy.",
     "Do not present valuation ranges or ARR forecasts as product prices.",
     "Route managed gate, metering, billing, and margin questions to Naomi Sterling or Orion Hayes before close.",
+    "SkyeMerit is Free99 to receive and may lower only eligible SkyePay spend bands. Do not describe it as cash, uncapped discounting, Stripe promo stacking, or an auth bypass.",
     "SkyeProfitConsole is Free99, meaning no charge, but never describe it as ungated; a 0S or FS27 gate session remains required.",
     "SkyeMediaCenter is Free99, meaning no charge, but never describe it as ungated; a 0S or FS27 gate session remains required for app boot, intake, admin, list/search, publish, stats, and file delivery.",
     "Skye Content Forge is Free99, meaning no charge, but never describe it as ungated; a 0S, FS27, SkyGate, or local admin gate session remains required for app boot and every API route.",
@@ -21,9 +22,18 @@
     "metraiyux_brain_runtime": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/person-brains.html",
     "metraiyux_connectlog_relay13_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html",
     "metraiyux_skyeroutex_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyeroutex-workforce-command.html",
-    "metraiyux_skyeroutex_workforce_v040": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyeroutex-workforce-command-v0.4.0/index.html",
+    "metraiyux_skyeroutex_workforce_v040": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/index.html",
     "skygate_proof": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html",
+    "skygate_skyepay_store": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+    "skygate_skyepay_offers_api": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay/offers?client=metraiyux-0s",
+    "skyevault_drop": "https://skyevault-drop.graylondonskyes.workers.dev/",
+    "skyemail_platform": "https://skyemail-platform.graylondonskyes.workers.dev/",
+    "skyemail_marketing": "https://skyemail-platform.graylondonskyes.workers.dev/marketing",
+    "metraiyux_platform_integration_ledger": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/operator/platform-integration-ledger.html",
     "ecosystem_portal": "https://metraiyux-ecosystem-portal.pages.dev/",
+    "metraiyux_skyemerit_wallet": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/skyemerit.html",
+    "metraiyux_skyemerit_operator": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/operator/skyemerit-admin.html",
+    "metraiyux_skyemerit_receipt": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skyemerit-expansion-receipt.html",
     "metraiyux_skyeprofitconsole_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyeprofitconsole-profit-console.html",
     "metraiyux_skyeprofitconsole_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeProfitConsole/index.html",
     "metraiyux_skyemediacenter_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-media-center-operator-proof.html",
@@ -43,12 +53,22 @@
       "stripe_action": "Create approved recurring plans and setup fees from data/plans.json only."
     },
     {
+      "folder": "metraiyux_0s_site/saas/skyemerit.html",
+      "role": "SkyeMerit customer wallet: first-time kAIxu credit, protected discount bands, SkyePay checkout preview, and proof-safe buyer explanation.",
+      "stripe_action": "Do not create a paid Stripe product for the merit pack itself. Apply SkyeMerit only as metadata and eligible line-item adjustment inside approved SkyePay checkout flows."
+    },
+    {
+      "folder": "metraiyux_0s_site/operator/skyemerit-admin.html",
+      "role": "SkyeMerit owner control surface for issuing packs and reviewing delivery payloads through Resend, SkyeMail, Relay13, ConnectLog, and FS27 mirror when configured.",
+      "stripe_action": "Operator-only issue surface. Do not expose admin token requirements or private delivery configuration in buyer-facing checkout copy."
+    },
+    {
       "folder": "metraiyux_0s_site/SkyeRouteX",
       "role": "SkyeRouteX Workforce Command source package: dispatch, routes, stops, workforce, proof vault, analytics, runtime smoke, and app-fabric mount.",
       "stripe_action": "Use the metraiyux-routex-workforce-command SkyePay offer; activation remains owner-approved until production provider proof is selected and verified."
     },
     {
-      "folder": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+      "folder": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0",
       "role": "SkyeRoutexFlow Workforce Command v0.4.0 local proof platform: city/state markets, provider jobs, contractor job boards, applicant pools, assignments, proof media, payment state, disputes, market reports, export packets, storage adapters, provider guards, audit integrity, and SkyeHands handoff boundaries.",
       "stripe_action": "Sell through metraiyux-routex-workforce-command; activation remains owner-approved until production provider proof is selected and verified."
     },
@@ -76,6 +96,26 @@
       "folder": "SkyeGateFS27",
       "role": "Gate, auth, events, usage, top-ups, monitor, and managed control-plane path.",
       "stripe_action": "Create managed gate subscription, onboarding, maintenance, and variable top-up products."
+    },
+    {
+      "folder": "SkyeGateFS27/skyepay-store.html",
+      "role": "Public FS27 SkyePay storefront and offer catalog for checkout-safe plans, add-ons, SkyeVault access, SkyeCard usage offers, owner-approved activations, and advertising links.",
+      "stripe_action": "Use approved SkyePay catalog entries only. Paid MetrAIyux, RouteX, SkyeVault, SkyeCard, and music offers remain owner-approved where the catalog marks activation as pending owner approval."
+    },
+    {
+      "folder": "SkyeVault-Drop",
+      "role": "Gated file-drop, workspace handoff, and vault access platform for buyer proof, package delivery, uploads, and protected storage routes.",
+      "stripe_action": "Sell through approved SkyeVault access offers only. Do not describe access as unlimited storage, anonymous upload, or managed secret custody without separate scope and provider proof."
+    },
+    {
+      "folder": "metraiyux_0s_site/live/SkyeMail",
+      "role": "FS27-backed SkyeMail platform with gate card onboarding, mailbox claim, alias same-inbox proof, Resend-backed inbox, sent proof, pricing pages, and public changelog.",
+      "stripe_action": "Pricing is public and charge-ready, but billing stays inactive until checkout products and activation policy are explicitly wired."
+    },
+    {
+      "folder": "metraiyux_0s_site/data/platform-integration-ledger.json",
+      "role": "Machine-readable changelog-to-system accounting ledger for platform integrations, buyer routes, advertising angles, proof paths, and boundaries.",
+      "stripe_action": "No direct checkout. Keep advertising, sales proof, and route claims aligned with the SkyePay catalog and platform integration audit."
     },
     {
       "folder": "skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu",
@@ -135,6 +175,71 @@
           "product_name": "Skye Content Forge Free99 gated feature",
           "price_label": "Free99 / $0",
           "lookup_key": "do_not_create_skyecontentforge_free99"
+        },
+        {
+          "product_name": "SkyeMerit First-Time Pack Free99 gated feature",
+          "price_label": "Free99 / $0 to receive; eligible SkyePay spend may be reduced by capped merit math",
+          "lookup_key": "do_not_create_skyemerit_first_time_pack"
+        }
+      ]
+    },
+    {
+      "id": "skyevault-access-plans",
+      "folder": "SkyeVault-Drop",
+      "status": "approved_pending_owner_approval",
+      "brain_owner": "naomi-sterling-brain",
+      "stripe_action": "Create/sync SkyeVault access plans through SkyePay only. Access stays gated and owner-approved; do not promise unlimited storage or automatic managed custody.",
+      "items": [
+        {
+          "product_name": "SkyeVault Starter Access",
+          "price_label": "$49/mo",
+          "lookup_key": "skyevault_starter_access_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeVault Pro Access",
+          "price_label": "$149/mo",
+          "lookup_key": "skyevault_pro_access_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeVault Command Access",
+          "price_label": "$499/mo",
+          "lookup_key": "skyevault_command_access_monthly",
+          "gate_session_required": true
+        }
+      ]
+    },
+    {
+      "id": "skyecard-usage-offers",
+      "folder": "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+      "status": "approved",
+      "brain_owner": "naomi-sterling-brain",
+      "stripe_action": "Create/sync one-time SkyeCard usage and service-credit offers through SkyePay only. Usage credits do not bypass owner approval, gate sessions, usage metering, or provider-cost controls.",
+      "items": [
+        {
+          "product_name": "SkyeCard AI Boost",
+          "price_label": "$25 once for $30 AI usage credit",
+          "lookup_key": "skyecard_ai_boost_25",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeCard Push Pack",
+          "price_label": "$49 once",
+          "lookup_key": "skyecard_push_pack_49",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeCard Launch Credit",
+          "price_label": "$99 once for $150 service credit",
+          "lookup_key": "skyecard_launch_credit_99",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeCard Audit Pack",
+          "price_label": "$299 once",
+          "lookup_key": "skyecard_audit_pack_299",
+          "gate_session_required": true
         }
       ]
     },
@@ -691,7 +796,7 @@
       "price_type": "recurring",
       "billing_period": "month",
       "lookup_key": "metraiyux_routex_workforce_command_monthly",
-      "source_folder": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+      "source_folder": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0",
       "source_file": "metraiyux_0s_site/data/plans.json",
       "status": "approved",
       "owner_approval_required": true,
@@ -718,7 +823,7 @@
       "price_type": "one_time",
       "billing_period": "once",
       "lookup_key": "metraiyux_routex_workforce_command_setup",
-      "source_folder": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+      "source_folder": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0",
       "source_file": "metraiyux_0s_site/data/plans.json",
       "status": "approved",
       "owner_approval_required": true,

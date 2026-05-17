@@ -569,7 +569,118 @@ for (const article of BUSINESS_INSIGHTS) {
   const upgrade = LONGFORM_UPGRADES[article.slug];
   if (upgrade) Object.assign(article, upgrade);
 }
-const INSIGHT_ROUTES = ['/insights/', ...BUSINESS_INSIGHTS.map(article => `/insights/${article.slug}/`)];
+const PUBLICATION_CATEGORIES = [
+  { slug:'operating-rhythm', name:'Operating Rhythm', deck:'Weekly cadence, scorecards, decision logs, and owner visibility.', color:'#0b6f73' },
+  { slug:'local-growth', name:'Local Growth', deck:'Search, market research, pages, proof, and buyer action loops.', color:'#7c1a26' },
+  { slug:'revenue-systems', name:'Revenue Systems', deck:'Lead capture, quote control, follow-up, handoff, and sales operations.', color:'#855c00' },
+  { slug:'records-proof', name:'Records and Proof', deck:'Receipts, vaults, records, customer proof, and financial hygiene.', color:'#415a77' },
+  { slug:'trust-risk', name:'Trust and Risk', deck:'Security, reviews, compliance-safe proof, and public claims control.', color:'#5e548e' },
+  { slug:'automation-stack', name:'Automation Stack', deck:'Where 0S, gates, vaults, reviews, ledgers, and portals reduce repeated work.', color:'#2f6f4e' }
+];
+const PILLAR_META = {
+  'weekly-company-command-rhythm': { category:'operating-rhythm', series:'company-command', publishAt:'2026-05-01', pillar:true },
+  'local-visibility-that-converts': { category:'local-growth', series:'visibility-engine', publishAt:'2026-05-02', pillar:true },
+  'customer-intake-follow-up-system': { category:'revenue-systems', series:'revenue-control', publishAt:'2026-05-03', pillar:true },
+  'records-receipts-and-money-hygiene': { category:'records-proof', series:'proof-ledger', publishAt:'2026-05-04', pillar:true },
+  'small-business-security-without-paranoia': { category:'trust-risk', series:'trust-and-risk', publishAt:'2026-05-05', pillar:true },
+  'reviews-social-proof-without-shady-tactics': { category:'trust-risk', series:'trust-and-risk', publishAt:'2026-05-06', pillar:true },
+  'market-research-before-growth-spend': { category:'local-growth', series:'visibility-engine', publishAt:'2026-05-07', pillar:true }
+};
+const FIELD_GUIDE_BLUEPRINTS = [
+  ['quote-follow-up-rhythm','Quote follow-up rhythm that does not feel desperate','Turn sent quotes into a clean follow-up lane with owner visibility, source tracking, objection notes, and next actions.','Revenue Systems','revenue-systems','revenue-control','2026-05-08',['0S','GATE'],['sbaPlan'],['sent quotes','customer objections','follow-up dates','closed-lost reasons'],['define quote stages','write two follow-up templates','track objections','review stuck quotes weekly']],
+  ['service-page-that-sells-one-job','Build a service page that sells one real job','A service page should answer a specific buyer problem, show proof, and route the customer into one action.','Local Growth','local-growth','visibility-engine','2026-05-09',['MKT','0S'],['googleRanking','sbaMarket'],['target job','service area','proof assets','conversion action'],['pick one job','write fit and non-fit rules','place proof near the CTA','measure calls and requests']],
+  ['owner-decision-log-template','The owner decision log that stops repeated confusion','Record pricing exceptions, public claims, customer promises, and system changes before they become memory fights.','Operating Rhythm','operating-rhythm','company-command','2026-05-10',['0S','ATLAS'],['sbaPlan'],['decision date','owner','reason','proof link'],['log every exception','attach evidence','review unresolved decisions','close decisions in writing']],
+  ['review-request-after-delivery','Review request timing after delivery','Ask for reviews when value is fresh, the request is neutral, and the workflow can learn from the response.','Trust and Risk','trust-risk','trust-and-risk','2026-05-11',['REV','0S'],['ftcReviews','ftcReviewRule'],['eligible customers','request timing','response status','theme learned'],['define eligibility','write neutral request','track requests sent','extract service themes']],
+  ['monthly-receipt-close','Monthly receipt close for messy small teams','Create a monthly close rhythm that finds missing receipts, subscriptions, refunds, and owner decisions early.','Records and Proof','records-proof','proof-ledger','2026-05-12',['VAULT','0S'],['irsRecords'],['missing receipts','unknown transactions','subscriptions','open invoices'],['reconcile accounts','attach proof','list missing files','write owner summary']],
+  ['security-access-cleanup','Access cleanup before a security problem','Remove old users, turn on MFA, fix recovery emails, and separate public pages from protected workflows.','Trust and Risk','trust-risk','trust-and-risk','2026-05-13',['GATE','VAULT'],['ftcCyber','nistSmallBusiness'],['critical accounts','MFA status','former users','backup owners'],['list accounts','remove old access','turn on MFA','test recovery paths']],
+  ['market-test-one-page-brief','One-page market test brief','Before launching a campaign, define the buyer, local signal, competitor standard, proof gap, and stop rule.','Local Growth','local-growth','visibility-engine','2026-05-14',['0S','ATLAS'],['sbaMarket','censusBuilder'],['buyer','market','proof gap','stop rule'],['write buyer trigger','check competitors','use public data','set continue-stop rule']],
+  ['customer-file-handoff','Customer file handoff that survives busy weeks','Make photos, approvals, scopes, receipts, and review context travel with the customer record.','Records and Proof','records-proof','proof-ledger','2026-05-15',['VAULT','0S'],['ftcData','irsRecords'],['scope','approval','receipt','completion proof'],['name files clearly','attach proof at each stage','export packet','review missing proof']],
+  ['public-claim-control','Public claim control for fast-moving teams','Every claim about what is live, verified, automated, secure, or available needs proof before it becomes copy.','Trust and Risk','trust-risk','trust-and-risk','2026-05-16',['ATLAS','0S'],['ftcData'],['claim','proof route','reviewer','status'],['write claim register','open proof link','mark unsupported claims','remove stale copy']],
+  ['lead-source-scorecard','Lead source scorecard for owners','Stop arguing from memory by tracking source, speed, quality, close rate, and follow-up completion.','Revenue Systems','revenue-systems','revenue-control','2026-05-17',['0S','MKT'],['sbaMarket'],['source','first response','qualified lead','closed revenue'],['tag every request','review by source','cut weak spend','double down on clean lanes']],
+  ['portal-vs-website','When a business needs a portal instead of another website page','Use public pages for buyer education and portals for status, files, approvals, gates, and protected workflows.','Automation Stack','automation-stack','automation-stack','2026-05-17',['0S','GATE','VAULT'],['ftcData'],['public content','private state','files','approvals'],['split public/private needs','gate sensitive flows','store files in vault','link proof from pages']],
+  ['weekly-review-minutes','Weekly review minutes that become action','Turn meeting notes into assigned tasks, due dates, proof links, and closed decisions.','Operating Rhythm','operating-rhythm','company-command','2026-05-20',['0S','ATLAS'],['sbaPlan'],['action owner','due date','proof link','status'],['write decisions live','assign owners','review proof next week','archive closed actions']],
+  ['city-service-cluster','City-service content cluster without spam','Build one real pillar and supporting pages around actual service fit instead of flooding thin city pages.','Local Growth','local-growth','visibility-engine','2026-05-22',['MKT','0S'],['googleRanking','sbaMarket'],['city fit','service fit','proof','conversion'],['choose one city','choose one service','write pillar page','publish supporting FAQs']],
+  ['customer-status-board','Customer status board for service businesses','Give every active customer a visible state so jobs stop disappearing between quote, schedule, delivery, and proof.','Revenue Systems','revenue-systems','revenue-control','2026-05-25',['0S','GATE'],['sbaPlan'],['new','quoted','scheduled','delivered','closed'],['define states','assign owner','review stuck work','send status updates']],
+  ['subscription-audit','Subscription audit for cash leaks','Find recurring tools, duplicate services, unused seats, price changes, and cancellation proof before they drain cash.','Records and Proof','records-proof','proof-ledger','2026-05-27',['VAULT','SOLE'],['irsRecords'],['vendor','amount','owner','proof'],['export card charges','tag subscriptions','cancel unused tools','save cancellation proof']],
+  ['backup-restore-drill','Backup restore drill for small teams','Do not trust backups until one file, folder, or record has been restored and documented.','Trust and Risk','trust-risk','trust-and-risk','2026-05-29',['VAULT','GATE'],['ftcCyber','nistSmallBusiness'],['backup scope','restore owner','test result','date'],['choose critical folder','restore sample','record result','fix gaps']],
+  ['content-from-operations','Turn operations into useful content','Use real customer questions, service mistakes, proof gaps, and owner decisions to create articles that teach instead of shouting.','Automation Stack','automation-stack','automation-stack','2026-06-01',['0S','MKT'],['sbaMarket'],['customer question','operating lesson','proof link','CTA'],['mine weekly notes','choose one lesson','write manual method','link system help']],
+  ['review-theme-mining','Mine review themes for service improvements','Review language can expose what buyers value, where delivery breaks, and what website copy should explain.','Trust and Risk','trust-risk','trust-and-risk','2026-06-03',['REV','MKT'],['ftcReviewRule','googleRanking'],['theme','frequency','service fix','copy update'],['tag review themes','find repeated praise','find repeated friction','update training and pages']],
+  ['proof-before-automation','Proof before automation','Automate repeated evidence after the manual path works; do not automate confusion.','Automation Stack','automation-stack','automation-stack','2026-06-05',['0S','ATLAS'],['sbaPlan'],['manual steps','proof artifact','repeat count','owner approval'],['run manually first','record exceptions','define proof','automate the repeat lane']],
+  ['landing-page-to-intake','Connect the landing page to intake','A page is not finished until the request path, owner queue, response rule, and proof storage are ready.','Revenue Systems','revenue-systems','revenue-control','2026-06-08',['MKT','0S','VAULT'],['googleStart','sbaPlan'],['CTA','form fields','owner queue','proof storage'],['test CTA','submit request','check queue','store proof packet']],
+  ['quarterly-operating-reset','Quarterly operating reset','Every quarter, retire stale offers, clean links, update proof, review cash lanes, and pick the next system build.','Operating Rhythm','operating-rhythm','company-command','2026-06-10',['0S','ATLAS','SOLE'],['sbaPlan','sbaMarket'],['retired links','current offers','cash lanes','next build'],['audit public links','close stale offers','review metrics','choose next system']]
+];
+function categoryFor(slug){ return PUBLICATION_CATEGORIES.find(category => category.slug === slug) || PUBLICATION_CATEGORIES[0]; }
+function isPublished(article, at = TODAY){ return !article.publishAt || article.publishAt <= at; }
+function publicationStatus(article){ return isPublished(article) ? 'published' : 'scheduled'; }
+function sortInsights(a,b){ return String(b.publishAt || '').localeCompare(String(a.publishAt || '')) || a.title.localeCompare(b.title); }
+function makeFieldGuide([slug,title,deck,topic,category,series,publishAt,platformKeys,sources,metrics,worksheet]){
+  const categoryName = categoryFor(category).name;
+  return {
+    slug,
+    title,
+    deck,
+    topic,
+    category,
+    series,
+    publishAt,
+    readTime:'11 min',
+    platformKeys,
+    sources,
+    manual:[
+      `Write the current ${topic.toLowerCase()} problem in one sentence before changing tools or pages.`,
+      `Track ${metrics.slice(0,3).join(', ')} in one visible owner review lane.`,
+      `Assign the next action, the proof needed, and the date this lane gets reviewed again.`
+    ],
+    system:[
+      `MetrAIyux 0S turns the repeated ${topic.toLowerCase()} work into a surface, gate, receipt, vault record, or owner-visible task instead of another loose note.`,
+      `The related major platforms give this guide somewhere real to go: ${platformKeys.map(key => MAJOR_PLATFORM_LINKS.find(p => p.key === key)?.name || key).join(', ')}.`,
+      'The system should carry repeated evidence while the owner keeps final judgment on claims, pricing, risk, and customer promises.'
+    ],
+    longformPromise:`This ${categoryName} field guide is built to become one operating move this week: inspect the current lane, run the manual worksheet, then decide what the 0S should carry on a schedule.`,
+    diagnostics:[
+      { label:'Current state', title:`The ${topic.toLowerCase()} lane is visible`, copy:`The owner can open one place and see the status, owner, proof, and next action without reading every message or remembering the whole week.` },
+      { label:'Buyer or team impact', title:'The workflow changes behavior', copy:'The guide should improve response, trust, speed, clarity, or control. If it only creates more copy, it is not an operating asset yet.' },
+      { label:'System handoff', title:'The repeat work has a home', copy:'Once the manual loop is clear, the repeated pieces can move into 0S rooms, gates, vault records, deployment receipts, or proof-led pages.' }
+    ],
+    metrics,
+    worksheet,
+    mistakes:[
+      'Publishing the idea before the proof path exists.',
+      'Tracking a metric nobody reviews or owns.',
+      'Automating the workflow before the manual version is clear.',
+      'Linking to a minor or broken deployment instead of a major live platform.',
+      'Letting internal status noise leak into buyer-facing pages.'
+    ],
+    sections:[
+      [`Why this ${topic.toLowerCase()} problem costs more than it looks`,[
+        `Most companies feel this problem as friction before they can measure it. The buyer waits, the owner guesses, the team repeats itself, or a public page says something the operation cannot support. ${title} matters because the business needs a visible lane that connects what the market sees to what the team can actually do.`,
+        `The first fix is not more software. The first fix is a shared operating view. When the owner can see ${metrics.slice(0,4).join(', ')}, the problem becomes specific enough to manage. Without that view, the company usually buys another tool and still has the same confusion in a prettier place.`
+      ]],
+      ['The manual method',[
+        `Start with the smallest useful record. For this lane, that means ${worksheet.slice(0,3).join(', ')}. Keep the language plain. A useful record should say what happened, who owns the next move, what proof exists, and when the owner will review it again.`,
+        `Manual work is not failure. It is how the company learns the shape of the workflow. Run the manual version until the repeated steps are obvious. Then the system can take over the repeat work without hiding the exceptions that still need human judgment.`
+      ]],
+      ['The 0S handoff',[
+        `The 0S should not turn every thought into automation. It should carry the repeated evidence: forms, gates, vault files, route receipts, review records, published pages, and deployment status. That lets the owner spend less time hunting for facts and more time deciding what changes the company should make.`,
+        `For this guide, the handoff is simple: the public page educates or converts, the private workflow tracks status and proof, and the major platform links provide the real places where a prospect, owner, or operator can continue.`
+      ]],
+      ['How to publish this as part of the content engine',[
+        `This article belongs to the ${categoryName} cluster. It should link back to the pillar article, point to the relevant major platforms, and feed one scheduled social or email excerpt. The content is not just for SEO. It is a reusable operating explanation for sales, onboarding, support, and owner training.`,
+        `The scheduled publisher should release one useful guide at a time, record a proof receipt, and queue a follow-up task for repurposing. If a claim cannot be proven, it should stay in draft until the proof exists.`
+      ]],
+      ['Next operating move',[
+        `This week, pick one metric from this guide and make it visible. Then pick one worksheet action and assign it. Do not wait for a perfect dashboard. A simple operating move that gets reviewed is more valuable than a full system nobody uses.`,
+        `After the first review, decide whether the lane should become a page, gate, vault record, review route, or 0S task. That is how content becomes operations instead of decoration.`
+      ]]
+    ]
+  };
+}
+for (const article of BUSINESS_INSIGHTS) Object.assign(article, PILLAR_META[article.slug] || {});
+BUSINESS_INSIGHTS.push(...FIELD_GUIDE_BLUEPRINTS.map(makeFieldGuide));
+const PUBLISHED_INSIGHTS = BUSINESS_INSIGHTS.filter(article => isPublished(article)).sort(sortInsights);
+const UPCOMING_INSIGHTS = BUSINESS_INSIGHTS.filter(article => !isPublished(article)).sort((a,b) => String(a.publishAt || '').localeCompare(String(b.publishAt || '')));
+const CATEGORY_ROUTES = PUBLICATION_CATEGORIES.map(category => `/insights/category/${category.slug}/`);
+const INSIGHT_ROUTES = ['/insights/','/insights/schedule/', ...CATEGORY_ROUTES, ...PUBLISHED_INSIGHTS.map(article => `/insights/${article.slug}/`)];
 
 function text(v){ return String(v ?? '').replace(/\s+/g, ' ').trim(); }
 function html(v){ return text(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
@@ -649,7 +760,73 @@ function listChips(items = []){
   return items.map(item => `<span>${html(item)}</span>`).join('');
 }
 function articleCard(article){
-  return `<a class="article-card neon-magnetic" href="/insights/${html(article.slug)}/"><span>${html(article.topic)}</span><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><small>${html(article.readTime)} read</small></a>`;
+  const category = categoryFor(article.category);
+  return `<a class="article-card neon-magnetic" href="/insights/${html(article.slug)}/" data-category="${html(category.slug)}"><span>${html(category.name)}</span><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><small>${html(article.publishAt || TODAY)} / ${html(article.readTime)} read</small></a>`;
+}
+function categoryCard(category){
+  const published = PUBLISHED_INSIGHTS.filter(article => article.category === category.slug);
+  const scheduled = UPCOMING_INSIGHTS.filter(article => article.category === category.slug);
+  const latest = published[0];
+  return `<a class="category-card glass" href="/insights/category/${html(category.slug)}/" style="--category-accent:${html(category.color)}"><span>${html(category.name)}</span><h3>${html(published.length)} live guides</h3><p>${html(category.deck)}</p><small>${scheduled.length ? `${scheduled.length} scheduled` : 'cluster current'}${latest ? ` / latest: ${latest.publishAt}` : ''}</small></a>`;
+}
+function scheduleRow(article){
+  const category = categoryFor(article.category);
+  const status = publicationStatus(article);
+  const href = status === 'published' ? `/insights/${article.slug}/` : '#upcoming';
+  const action = status === 'published' ? 'Read live guide' : 'Queued by 0S worker';
+  return `<article class="schedule-row ${html(status)}" data-status="${html(status)}" data-category="${html(category.slug)}"><div><span>${html(article.publishAt || TODAY)}</span><strong>${html(category.name)}</strong></div><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><a class="btn small ${status === 'published' ? 'primary' : 'ghost'}" href="${html(href)}">${html(action)}</a></article>`;
+}
+function calendarArticle(article){
+  const category = categoryFor(article.category);
+  return {
+    slug: article.slug,
+    title: article.title,
+    deck: article.deck,
+    topic: article.topic,
+    category: category.slug,
+    category_name: category.name,
+    series: article.series || category.slug,
+    publish_at: article.publishAt || TODAY,
+    status: publicationStatus(article),
+    url: `${SITE_URL}/insights/${article.slug}/`,
+    read_time: article.readTime,
+    pillar: Boolean(article.pillar),
+    platforms: (article.platformKeys || []).map(key => MAJOR_PLATFORM_LINKS.find(platform => platform.key === key)).filter(Boolean).map(platform => ({key:platform.key, name:platform.name, url:platform.url})),
+    sources: (article.sources || []).map(key => SOURCE_LIBRARY[key]).filter(Boolean)
+  };
+}
+function editorialCalendarPayload(){
+  return {
+    version:'23.1.0',
+    updated_at:TODAY,
+    engine:'valley_verified_0s_scheduled_publisher',
+    worker:{
+      url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley/content-schedule',
+      tick_url:'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley/content-schedule/tick',
+      cron:'17 13 * * 1,3,5',
+      timezone:'UTC',
+      behavior:'The 0S Worker reads this feed, finds scheduled articles whose publish_at date has arrived, records a receipt, and queues an operator publish task.'
+    },
+    counts:{
+      total:BUSINESS_INSIGHTS.length,
+      published:PUBLISHED_INSIGHTS.length,
+      scheduled:UPCOMING_INSIGHTS.length,
+      categories:PUBLICATION_CATEGORIES.length,
+      major_platforms:MAJOR_PLATFORM_LINKS.length
+    },
+    categories:PUBLICATION_CATEGORIES.map(category => ({
+      slug:category.slug,
+      name:category.name,
+      deck:category.deck,
+      color:category.color,
+      url:`${SITE_URL}/insights/category/${category.slug}/`,
+      published:PUBLISHED_INSIGHTS.filter(article => article.category === category.slug).length,
+      scheduled:UPCOMING_INSIGHTS.filter(article => article.category === category.slug).length
+    })),
+    published:PUBLISHED_INSIGHTS.map(calendarArticle),
+    upcoming:UPCOMING_INSIGHTS.map(calendarArticle),
+    all:BUSINESS_INSIGHTS.slice().sort((a,b) => String(a.publishAt || '').localeCompare(String(b.publishAt || '')) || a.title.localeCompare(b.title)).map(calendarArticle)
+  };
 }
 function manualSystemColumns(article){
   return `<section class="split-grid insight-playbook"><article class="section glass"><p class="eyebrow">Manual operating method</p><h2>Do this before software</h2><div class="check-list">${article.manual.map(item => `<span>${html(item)}</span>`).join('')}</div></article><article class="section glass"><p class="eyebrow">How 0S makes it easier</p><h2>Turn the habit into a system</h2><div class="check-list">${article.system.map(item => `<span>${html(item)}</span>`).join('')}</div></article></section>`;
@@ -673,8 +850,10 @@ function articleOperatingClose(article){
   return `<section class="article-section operating-close"><h2>How to put this into the next operating week</h2><p>Do not turn this into a giant transformation project. Pick one visible lane from this article, write the current state in plain language, and run the manual worksheet for one week. If the work cannot survive one week on paper or in a simple sheet, software will only hide the confusion. The owner should be able to point to the current number, the person responsible, the next action, and the proof that shows whether the action happened.</p><p>After the manual loop works, decide what deserves a system. Repeated actions become forms, gates, vault records, deployment receipts, review routes, or public pages. One-off judgment stays with the owner. That separation is the heart of a useful operating system: people keep the decisions, and the system carries the repeated evidence so the company does not have to rebuild memory every Monday.</p><p>Use the public page and the private workflow differently. The public page should help a buyer, customer, or partner understand the business and take action. The private workflow should help the owner see status, proof, exceptions, and next decisions. When those two views are mixed together, the website becomes cluttered and the operation becomes vague. When they are separated but connected, the company can educate the market without exposing internal noise.</p><p>The final test is whether the lesson changes behavior by next week. If nothing gets assigned, measured, stored, fixed, published, retired, or routed, the article was just reading material. Turn one insight into a visible operating move, then let the system carry the repeat work once the move proves useful.</p></section>`;
 }
 function insightIndexPage(){
-  const featuredArticle = BUSINESS_INSIGHTS[0];
-  const articleList = BUSINESS_INSIGHTS.map(articleCard).join('');
+  const featuredArticle = PUBLISHED_INSIGHTS.find(article => article.slug === 'weekly-company-command-rhythm') || PUBLISHED_INSIGHTS[0];
+  const articleList = PUBLISHED_INSIGHTS.map(articleCard).join('');
+  const categoryList = PUBLICATION_CATEGORIES.map(categoryCard).join('');
+  const schedulePreview = UPCOMING_INSIGHTS.slice(0, 5).map(scheduleRow).join('');
   const platformRail = majorPlatformCards();
   return base({
     title:'Business Operating Insights | Valley Verified',
@@ -682,15 +861,45 @@ function insightIndexPage(){
     canonical:`${SITE_URL}/insights/`,
     bodyClass:'website-page insights-page operator-journal-page',
     schema:{ '@context':'https://schema.org', '@type':'Blog', name:'Valley Verified Business Operating Insights', url:`${SITE_URL}/insights/`, about:['small business operations','local visibility','MetrAIyux 0S','company systems'] }
-  }, `<section class="hero glass subhero journal-hero"><div><p class="eyebrow">Business operating journal</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">Run the company better before you buy another shiny tool.</h1><p class="hero-text">This is the practical side of Valley Verified: how owners can tighten visibility, intake, records, security, reviews, and growth. Each note gives the manual method first, then shows where the 0S turns repeat work into a system.</p><div class="hero-actions"><a class="btn primary" href="/insights/${html(featuredArticle.slug)}/">Start with the weekly rhythm</a><a class="btn" href="${REQUEST_BUILD_HREF}">Ask about 0S</a><a class="btn ghost" href="/for-businesses/">Claim or improve a profile</a></div></div><aside class="atlas-panel journal-index-panel"><p class="eyebrow">Only major platforms</p><div class="hero-card website-metrics">${metric(BUSINESS_INSIGHTS.length,'operator notes')}${metric(MAJOR_PLATFORM_LINKS.length,'major platforms')}${metric('0','dead-link promos')}${metric('1','inquiry path')}</div><div class="atlas-list"><div><strong>Editorial rule</strong><span>Useful business education first. System links only where they make the manual work easier.</span></div><div><strong>Backlink rule</strong><span>No minor deployment dump here; only the major 0S/company platforms are listed.</span></div></div></aside></section>
+  }, `<section class="hero glass subhero journal-hero"><div><p class="eyebrow">Business operating journal</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">Run the company better before you buy another shiny tool.</h1><p class="hero-text">This is the practical side of Valley Verified: a publication engine for owners running real companies. Each guide teaches the manual method first, then shows where 0S turns repeated work into gates, vault records, receipts, pages, reviews, and owner-visible tasks.</p><div class="hero-actions"><a class="btn primary" href="/insights/${html(featuredArticle.slug)}/">Start with the weekly rhythm</a><a class="btn" href="/insights/schedule/">Editorial calendar</a><a class="btn ghost" href="${REQUEST_BUILD_HREF}">Ask about 0S</a></div></div><aside class="atlas-panel journal-index-panel"><p class="eyebrow">Publication engine</p><div class="hero-card website-metrics">${metric(PUBLISHED_INSIGHTS.length,'live guides')}${metric(UPCOMING_INSIGHTS.length,'scheduled')}${metric(PUBLICATION_CATEGORIES.length,'topic clusters')}${metric('0','dead-link promos')}</div><div class="atlas-list"><div><strong>Editorial rule</strong><span>Useful business education first. System links only where they make the manual work easier.</span></div><div><strong>Only major platforms</strong><span>No minor deployment dump here; only the major 0S/company platforms are listed.</span></div><div><strong>Schedule rule</strong><span>The 0S Worker checks the calendar feed and queues publish receipts on a Monday, Wednesday, Friday rhythm.</span></div></div></aside></section>
 <section class="section glass insight-feature"><div class="section-head"><div><p class="eyebrow">Data health and growth signals</p><h2>Build an operating company, not a pile of pages.</h2></div><a class="btn small" href="/network/">Open network</a></div><p class="section-intro">Marketplace intelligence is only useful when it changes how the company operates. A business gets stronger when the boring loops are visible: weekly planning, public information, customer intake, file proof, security, reviews, and market tests. The 0S does not replace the owner. It gives the owner rooms, gates, receipts, and live surfaces so the work stops disappearing.</p></section>
+<section class="section glass publication-clusters"><div class="section-head"><div><p class="eyebrow">Valley Verified field library</p><h2>Six topic clusters for running a company.</h2></div><a class="btn small" href="/insights/schedule/">See schedule</a></div><div class="category-grid">${categoryList}</div></section>
 <section class="article-grid-section"><div class="article-grid">${articleList}</div></section>
+<section class="section glass schedule-preview" id="upcoming"><div class="section-head"><div><p class="eyebrow">Scheduled by 0S</p><h2>Next articles in the publishing queue.</h2></div><a class="btn small primary" href="/insights/schedule/">Open full calendar</a></div><div class="schedule-grid">${schedulePreview || '<p class="section-intro">The current calendar has no upcoming drafts.</p>'}</div></section>
 <section class="section glass major-platforms"><div class="section-head"><div><p class="eyebrow">Major 0S platforms referenced</p><h2>Backlinks with a reason to exist.</h2></div><a class="btn small primary" href="${REQUEST_BUILD_HREF}">Inquire</a></div><div class="tile-grid major-platform-grid">${platformRail}</div></section>`);
+}
+function insightCategoryPage(category){
+  const published = PUBLISHED_INSIGHTS.filter(article => article.category === category.slug);
+  const scheduled = UPCOMING_INSIGHTS.filter(article => article.category === category.slug);
+  const articleList = published.map(articleCard).join('');
+  const scheduleList = scheduled.map(scheduleRow).join('');
+  return base({
+    title:`${category.name} | Valley Verified Insights`,
+    description:category.deck,
+    canonical:`${SITE_URL}/insights/category/${category.slug}/`,
+    bodyClass:'website-page insights-page insights-category-page',
+    schema:{ '@context':'https://schema.org', '@type':'CollectionPage', name:`${category.name} business guides`, url:`${SITE_URL}/insights/category/${category.slug}/`, description:category.deck }
+  }, `<section class="hero glass subhero category-hero" style="--category-accent:${html(category.color)}"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">Valley Verified topic cluster</p><h1>${html(category.name)}</h1><p class="hero-text">${html(category.deck)}</p><div class="hero-actions"><a class="btn primary" href="/insights/schedule/">Editorial calendar</a><a class="btn" href="${REQUEST_BUILD_HREF}">Ask about this system</a></div></div><aside class="hero-card website-metrics">${metric(published.length,'live guides')}${metric(scheduled.length,'scheduled')}${metric('M/W/F','0S cadence')}</aside></section>
+<section class="article-grid-section"><div class="article-grid">${articleList || '<article class="article-card"><span>Draft</span><h3>No live guides yet</h3><p>This cluster is scheduled, but not public yet.</p><small>0S queue</small></article>'}</div></section>
+<section class="section glass schedule-preview"><div class="section-head"><div><p class="eyebrow">Queue for this cluster</p><h2>Upcoming releases</h2></div></div><div class="schedule-grid">${scheduleList || '<p class="section-intro">No upcoming releases in this cluster.</p>'}</div></section>`);
+}
+function insightSchedulePage(){
+  const allRows = [...PUBLISHED_INSIGHTS, ...UPCOMING_INSIGHTS].sort((a,b) => String(a.publishAt || '').localeCompare(String(b.publishAt || '')) || a.title.localeCompare(b.title)).map(scheduleRow).join('');
+  return base({
+    title:'Editorial Calendar | Valley Verified Insights',
+    description:'The Valley Verified 0S scheduled publisher calendar for business operating guides, topic clusters, live articles, and upcoming releases.',
+    canonical:`${SITE_URL}/insights/schedule/`,
+    bodyClass:'website-page insights-page insights-schedule-page',
+    schema:{ '@context':'https://schema.org', '@type':'CollectionPage', name:'Valley Verified editorial calendar', url:`${SITE_URL}/insights/schedule/`, description:'Scheduled business operating education powered by the 0S Worker.' }
+  }, `<section class="hero glass subhero schedule-hero"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">0S scheduled publisher</p><h1>Editorial calendar for the company-running library.</h1><p class="hero-text">This page is the public calendar. The JSON feed is the machine contract. The 0S Worker reads the feed, finds due articles, records a proof receipt, and queues the next publish task so Valley Verified can release useful operating guides on a schedule.</p><div class="hero-actions"><a class="btn primary" href="/api/insights-editorial-calendar.json">Open calendar feed</a><a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley/content-schedule" target="_blank" rel="noopener">Worker schedule API</a><a class="btn ghost" href="${REQUEST_BUILD_HREF}">Inquire</a></div></div><aside class="hero-card website-metrics">${metric(BUSINESS_INSIGHTS.length,'total guides')}${metric(PUBLISHED_INSIGHTS.length,'published')}${metric(UPCOMING_INSIGHTS.length,'scheduled')}${metric('13:17 UTC','M/W/F tick')}</aside></section>
+<section class="section glass publication-clusters"><div class="section-head"><div><p class="eyebrow">Topic clusters</p><h2>Major platform links stay attached to business value.</h2></div></div><div class="category-grid">${PUBLICATION_CATEGORIES.map(categoryCard).join('')}</div></section>
+<section class="section glass schedule-preview"><div class="section-head"><div><p class="eyebrow">Release queue</p><h2>Published and upcoming guides</h2></div></div><div class="schedule-grid full-calendar">${allRows}</div></section>`);
 }
 function insightArticlePage(article){
   const platforms = MAJOR_PLATFORM_LINKS.filter(platform => article.platformKeys.includes(platform.key));
-  const related = BUSINESS_INSIGHTS.filter(item => item.slug !== article.slug).slice(0, 3).map(articleCard).join('');
-  const body = `<article class="insight-article"><header class="hero glass subhero article-hero"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">${html(article.topic)} / ${html(article.readTime)} read</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">${html(article.title)}</h1><p class="hero-text">${html(article.deck)}</p>${article.longformPromise ? `<p class="article-promise">${html(article.longformPromise)}</p>` : ''}<div class="hero-actions"><a class="btn primary" href="${REQUEST_BUILD_HREF}">Ask about this system</a><a class="btn" href="/for-businesses/">Business owner path</a></div></div><aside class="article-rail"><p class="eyebrow">System backlinks</p>${platforms.map(platform => `<a href="${html(platform.url)}" target="_blank" rel="noopener"><strong>${html(platform.name)}</strong><span>${html(platform.use)}</span></a>`).join('')}</aside></header>
+  const category = categoryFor(article.category);
+  const related = PUBLISHED_INSIGHTS.filter(item => item.slug !== article.slug && item.category === article.category).concat(PUBLISHED_INSIGHTS.filter(item => item.slug !== article.slug && item.category !== article.category)).slice(0, 3).map(articleCard).join('');
+  const body = `<article class="insight-article"><header class="hero glass subhero article-hero" style="--category-accent:${html(category.color)}"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">${html(category.name)} / ${html(article.publishAt || TODAY)} / ${html(article.readTime)} read</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">${html(article.title)}</h1><p class="hero-text">${html(article.deck)}</p>${article.longformPromise ? `<p class="article-promise">${html(article.longformPromise)}</p>` : ''}<div class="hero-actions"><a class="btn primary" href="${REQUEST_BUILD_HREF}">Ask about this system</a><a class="btn" href="/insights/category/${html(category.slug)}/">${html(category.name)}</a><a class="btn ghost" href="/for-businesses/">Business owner path</a></div></div><aside class="article-rail"><p class="eyebrow">System backlinks</p>${platforms.map(platform => `<a href="${html(platform.url)}" target="_blank" rel="noopener"><strong>${html(platform.name)}</strong><span>${html(platform.use)}</span></a>`).join('')}</aside></header>
 ${manualSystemColumns(article)}
 ${operatorDiagnostics(article)}
 <section class="section glass article-body">${articleSections(article)}${articleOperatingClose(article)}</section>
@@ -701,7 +910,7 @@ ${operatorDiagnostics(article)}
     description:article.deck,
     canonical:`${SITE_URL}/insights/${article.slug}/`,
     bodyClass:'website-page insights-page insight-article-page',
-    schema:{ '@context':'https://schema.org', '@type':'BlogPosting', headline:article.title, description:article.deck, datePublished:TODAY, dateModified:TODAY, author:{ '@type':'Organization', name:'Valley Verified' }, publisher:{ '@type':'Organization', name:'Valley Verified' }, mainEntityOfPage:`${SITE_URL}/insights/${article.slug}/` }
+    schema:{ '@context':'https://schema.org', '@type':'BlogPosting', headline:article.title, description:article.deck, datePublished:article.publishAt || TODAY, dateModified:TODAY, articleSection:category.name, author:{ '@type':'Organization', name:'Valley Verified' }, publisher:{ '@type':'Organization', name:'Valley Verified' }, mainEntityOfPage:`${SITE_URL}/insights/${article.slug}/` }
   }, body);
 }
 async function copyOptional(src, dest){
@@ -783,11 +992,18 @@ for(const [slug,title,desc,h1,cards] of pages){
 }
 
 await write('insights/index.html', insightIndexPage());
-for(const article of BUSINESS_INSIGHTS){
+await write('insights/schedule/index.html', insightSchedulePage());
+for(const category of PUBLICATION_CATEGORIES){
+  await write(`insights/category/${category.slug}/index.html`, insightCategoryPage(category));
+}
+for(const article of PUBLISHED_INSIGHTS){
   await write(`insights/${article.slug}/index.html`, insightArticlePage(article));
 }
+const editorialCalendar = editorialCalendarPayload();
+await writeJson('data/insights-editorial-calendar.json', editorialCalendar);
+await writeJson('api/insights-editorial-calendar.json', editorialCalendar);
 
-const websiteContent = { version:'23.0.0', updated_at:TODAY, purpose:'Public website layer for Valley Verified', routes:['/','/featured/','/about/','/how-it-works/','/for-businesses/','/advertise/','/network/','/contact/', ...INSIGHT_ROUTES], counts:{ published_businesses:count, featured_pages:featuredShown.length, insights:BUSINESS_INSIGHTS.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, websites:websiteCount, phones:phoneCount, emails:emailCount, duplicate_merges:report.records?.exact_merges || null }, claims_guardrails:['Seeded public records are not automatically owner-verified.','Paid exposure intent does not equal paid activation until webhook and admin approval complete.','Duplicate prevention is enforced through canonical identity, collision reports, and suppression workflows.','Business insights should educate first and link only to major live 0S/company platforms.'] };
+const websiteContent = { version:'23.1.0', updated_at:TODAY, purpose:'Public website layer for Valley Verified', routes:['/','/featured/','/about/','/how-it-works/','/for-businesses/','/advertise/','/network/','/contact/', ...INSIGHT_ROUTES], counts:{ published_businesses:count, featured_pages:featuredShown.length, insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, websites:websiteCount, phones:phoneCount, emails:emailCount, duplicate_merges:report.records?.exact_merges || null }, claims_guardrails:['Seeded public records are not automatically owner-verified.','Paid exposure intent does not equal paid activation until webhook and admin approval complete.','Duplicate prevention is enforced through canonical identity, collision reports, and suppression workflows.','Business insights should educate first and link only to major live 0S/company platforms.','Scheduled articles appear in the editorial calendar before publish, but public article routes are generated only when publish_at has arrived.'] };
 await writeJson('data/website-content.json', websiteContent);
 await writeJson('api/website-content.json', { updated_at:TODAY, href:'/data/website-content.json', routes:websiteContent.routes, counts:websiteContent.counts });
 const brainSalesGuide = {
@@ -886,6 +1102,9 @@ if(!llms.includes('## Public website')){
 if(!llms.includes('## Business insights')){
   llms += `\n## Business insights\nThe /insights/ section is a public operating journal for business owners. It teaches manual company-running methods first, then shows how MetrAIyux 0S, SkyeVault, SkyeGateFS27/SkyePay, the Deployment Atlas, Skyes Over London Reviews, and SOLEnterprises reduce repeated admin work. Only major live platforms should be linked from this section.\n`;
 }
+if(!llms.includes('## Editorial publishing schedule')){
+  llms += `\n## Editorial publishing schedule\nValley Verified has a multi-category insight library at /insights/ with category routes, /insights/schedule/, and a machine-readable calendar at /api/insights-editorial-calendar.json. The calendar separates published guides from scheduled guides. The 0S Worker endpoint /api/valley/content-schedule reads the feed, detects due scheduled articles, stores receipts, and queues operator publish tasks on the configured cron.\n`;
+}
 await write('llms.txt', llms);
 
 // Append CSS polish if needed.
@@ -901,17 +1120,22 @@ if(!css.includes('v23 longform insights layer')){
   css += longformCssBlock;
   await fs.writeFile(cssPath, css);
 }
+const publicationCssBlock = `\n/* v23 publication engine layer */\n.publication-clusters{margin-top:16px}.category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.category-card{min-height:230px;display:grid;gap:14px;align-content:space-between;border-left:5px solid var(--category-accent,#0b6f73)}.category-card span{width:max-content;border:1px solid color-mix(in srgb,var(--category-accent,#0b6f73),transparent 72%);border-radius:999px;background:color-mix(in srgb,var(--category-accent,#0b6f73),transparent 90%);color:var(--category-accent,#0b6f73);font-size:11px;font-weight:950;text-transform:uppercase;padding:7px 9px}.category-card h3{font-family:var(--display);font-size:32px;line-height:1;margin:0}.category-card p{margin:0;color:var(--ink-soft);line-height:1.58}.category-card small{color:var(--ink-soft);font-weight:850;text-transform:uppercase}.schedule-preview{margin-top:16px}.schedule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.schedule-grid.full-calendar{grid-template-columns:1fr}.schedule-row{border:1px solid var(--line);border-radius:8px;background:rgba(255,250,240,.72);padding:16px;display:grid;grid-template-columns:minmax(130px,.26fr) minmax(0,1fr) auto;gap:12px;align-items:center}.schedule-row>div{display:grid;gap:5px}.schedule-row>div span{color:var(--oxblood);font-weight:950}.schedule-row>div strong{color:var(--ink-soft);font-size:12px;text-transform:uppercase}.schedule-row h3{font-family:var(--display);font-size:27px;line-height:1;margin:0}.schedule-row p{margin:0;color:var(--ink-soft);line-height:1.5}.schedule-row.scheduled{background:repeating-linear-gradient(135deg,rgba(255,250,240,.82),rgba(255,250,240,.82) 16px,rgba(11,111,115,.055) 16px,rgba(11,111,115,.055) 32px)}.schedule-hero .hero-card,.category-hero .hero-card{background:linear-gradient(135deg,color-mix(in srgb,var(--category-accent,#0b6f73),transparent 88%),rgba(255,250,240,.78))}.article-hero{border-top:4px solid var(--category-accent,#0b6f73)}@media(max-width:1050px){.category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.schedule-row{grid-template-columns:1fr;align-items:start}.schedule-row .btn{width:max-content}}@media(max-width:760px){.category-grid,.schedule-grid{grid-template-columns:1fr}.schedule-row h3{font-size:24px}}\n`;
+if(!css.includes('v23 publication engine layer')){
+  css += publicationCssBlock;
+  await fs.writeFile(cssPath, css);
+}
 
 const readiness = await maybeReadJson('data/v22-code-readiness.json', {});
 const priorV23Readiness = await maybeReadJson('data/v23-website-readiness.json', { proof:{} });
 const effectiveHeaderReplacements = Math.max(headerReplacements, Number(priorV23Readiness.proof?.header_replacements || 0), 1);
 const effectiveFooterInserts = Math.max(footerInserts, Number(priorV23Readiness.proof?.footer_inserts || 0));
-await writeJson('data/v23-website-readiness.json', { version:'23.0.0', updated_at:TODAY, completed:['public_homepage_rewritten','clean_public_nav','about_page','how_it_works_page','for_businesses_page','advertise_page','network_page','contact_page','insights_operating_journal','major_platform_backlinks','website_content_json','sitemap_public_routes','llms_website_context','footer_public_guardrails'], proof:{ published_businesses:count, insights:BUSINESS_INSIGHTS.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts, previous_closure:readiness.version || '22.0.0' } });
+await writeJson('data/v23-website-readiness.json', { version:'23.1.0', updated_at:TODAY, completed:['public_homepage_rewritten','clean_public_nav','about_page','how_it_works_page','for_businesses_page','advertise_page','network_page','contact_page','insights_operating_journal','insights_topic_clusters','insights_editorial_calendar','insights_schedule_feed','0s_scheduled_publisher_contract','major_platform_backlinks','website_content_json','sitemap_public_routes','llms_website_context','footer_public_guardrails'], proof:{ published_businesses:count, insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts, previous_closure:readiness.version || '22.0.0' } });
 await writeJson('api/v23-website-readiness.json', { updated_at:TODAY, href:'/data/v23-website-readiness.json' });
 
 const seedReport = await maybeReadJson('seed-report.json', {});
-seedReport.version = '23.0.0';
-seedReport.website = { public_routes:websiteContent.routes, public_nav:'simplified', homepage:'rewritten_for_marketplace_sales', header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts };
+seedReport.version = '23.1.0';
+seedReport.website = { public_routes:websiteContent.routes, public_nav:'simplified', homepage:'rewritten_for_marketplace_sales', insight_publication_engine:{published:PUBLISHED_INSIGHTS.length, scheduled:UPCOMING_INSIGHTS.length, categories:PUBLICATION_CATEGORIES.length, calendar:'/api/insights-editorial-calendar.json'}, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts };
 await writeJson('seed-report.json', seedReport);
 
-console.log(`v23 website enhanced: ${websiteContent.routes.length} public website routes, ${headerReplacements} headers cleaned, ${footerInserts} footers inserted.`);
+console.log(`v23 website enhanced: ${websiteContent.routes.length} public website routes, ${PUBLISHED_INSIGHTS.length} live insights, ${UPCOMING_INSIGHTS.length} scheduled, ${headerReplacements} headers cleaned, ${footerInserts} footers inserted.`);

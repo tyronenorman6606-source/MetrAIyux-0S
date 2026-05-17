@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetrAIyux 0S production changelog with Cloudflare deployment evidence, proof receipts, SkyePay, Skyes Reviews, and legacy release history.">
+  <meta name="description" content="MetrAIyux 0S production changelog with ConnectLog, Relay13, FS27, Cloudflare deployment evidence, proof receipts, SkyePay, Skyes Reviews, and release history.">
   <title>Changelog · MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
@@ -17,12 +17,17 @@
       --changelog-violet: #a88cff;
     }
 
+    html {
+      overflow-x: hidden;
+    }
+
     body {
       background:
         radial-gradient(circle at 12% 0%, rgba(53, 183, 255, .18), transparent 30%),
         radial-gradient(circle at 84% 8%, rgba(243, 212, 131, .14), transparent 34%),
         radial-gradient(circle at 55% 100%, rgba(168, 140, 255, .13), transparent 36%),
         var(--bg);
+      overflow-x: hidden;
     }
 
     .changelog-shell {
@@ -174,8 +179,10 @@
     }
 
     .release-version {
-      width: 54px;
-      height: 54px;
+      min-width: 54px;
+      min-height: 54px;
+      width: auto;
+      height: auto;
       display: inline-grid;
       place-items: center;
       border-radius: 8px;
@@ -183,6 +190,11 @@
       color: var(--changelog-gold);
       font-weight: 900;
       background: rgba(243, 212, 131, .08);
+      padding: 8px 10px;
+      max-width: 142px;
+      line-height: 1.08;
+      text-align: center;
+      overflow-wrap: anywhere;
     }
 
     .release-body h2 {
@@ -356,12 +368,12 @@
       <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
         <p class="eyebrow">Generated May 17 2026 UTC</p>
         <h2>Full production in the changelog.</h2>
-        <p>The current MCP production ledger records live surfaces, Cloudflare routes, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, and public-safe receipts without exposing private controls.</p>
+        <p>The current production ledger records live surfaces, Cloudflare routes, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, and public-safe receipts without exposing private controls.</p>
         <div class="proof-grid">
-          <div class="proof-stat"><strong>24</strong><span>Live production surfaces</span></div>
-          <div class="proof-stat"><strong>13</strong><span>Cloudflare Pages projects</span></div>
-          <div class="proof-stat"><strong>11</strong><span>Cloudflare Workers</span></div>
-          <div class="proof-stat"><strong>36</strong><span>HTTP checks verified</span></div>
+          <div class="proof-stat"><strong>34</strong><span>Live production surfaces</span></div>
+          <div class="proof-stat"><strong>17</strong><span>Cloudflare Pages projects</span></div>
+          <div class="proof-stat"><strong>17</strong><span>Cloudflare Workers</span></div>
+          <div class="proof-stat"><strong>120</strong><span>Live stress reads</span></div>
         </div>
       </aside>
     </section>
@@ -372,16 +384,37 @@
         <article class="release-entry">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">0S + Relay13</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>ConnectLog</span><span>Relay13</span><span>FS27 Gate</span><span>Production Proof</span></div>
+            <h2>I hardened the public 0S story around the production relationship infrastructure.</h2>
+            <p>ConnectLog, Relay13, FS27, and the 0S proof surfaces now present the system as production infrastructure: Worker, D1, scoped keys, activation proof, message history, WebSocket proof, gate routing, and ledgered deployment evidence.</p>
+            <ul class="release-points">
+              <li>I removed weak public framing from the 0S home, ConnectLog app, ConnectLog landing, operator hub, proof receipt, proof center, Cabinet Brain, live-surface registry, and FS27 gate lane.</li>
+              <li>I redeployed the 0S hardening release and recorded the deployment and version IDs in the production ledger.</li>
+              <li>I redeployed the FS27 gate lane and recorded the deployment and version IDs in the production ledger.</li>
+              <li>Live browser proof passed on desktop and mobile for the 0S home, ConnectLog app, landing, hub, receipt, proof center, Cabinet Brain, FS27 gate lane, and live-surface registry.</li>
+              <li>The strict request pass hit 120 live reads across 0S, Relay13 health, ConnectLog bridge health, and FS27 with zero failures.</li>
+              <li>The CEO ledger, vault deployment ledger, and Live Surface Registry now point to the final deployment IDs and proof artifact.</li>
+            </ul>
+            <div class="receipt-row"><span>0S deploy 795461c3</span><span>FS27 deploy cbcf8b54</span><span>Relay13 Worker</span><span>D1 proof</span><span>120 live reads</span><span>Zero failures</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
             <span class="release-version">Free99+</span>
           </div>
           <div class="release-body">
             <div class="tag-row"><span>SkyeProfitConsole</span><span>Free99</span><span>Money Moves</span><span>Gate Session</span></div>
             <h2>I built SkyeProfitConsole into a Free99 close room with real money controls.</h2>
-            <p>I keep SkyeProfitConsole Free99, meaning no charge, while routing the app through a 0S/FS27 gate session, proof receipts, and a gated local runtime. The close room ranks cash-now lanes, shows blocked margin, calculates payback, generates close briefs, and archives those briefs without opening anonymous access.</p>
+            <p>I keep SkyeProfitConsole Free99, meaning no charge, while routing the app through a 0S/FS27 gate session, proof receipts, and a gated runtime. The close room ranks cash-now lanes, shows blocked margin, calculates payback, generates close briefs, and archives those briefs without opening anonymous access.</p>
             <ul class="release-points">
               <li>I added a Money Moves panel with fastest-cash ranking, ready/approved cash-now value, blocked-margin detection, and selected-pack payback multiple.</li>
               <li>I added close brief generation so a selected profit pack can produce the ask, owner, deadline, expected profit, margin, payback, risk flags, and split allocation.</li>
-              <li>I expanded the runtime with gated <code>/api/runtime/close-briefs</code> storage, close-brief board counts, workflow timeline events, and the same 401 boundary used by review, execution, and dispatch.</li>
+              <li>I expanded the runtime with gated close-brief storage, close-brief board counts, workflow timeline events, and the same 401 boundary used by review, execution, and dispatch.</li>
               <li>I updated the price cards, SaaS surfaces, hub, receipt, operator route, README, and LLM context to keep the feature marked Free99 while showing the higher-value app capabilities.</li>
               <li>Browser proof now walks through gate unlock, runtime sync, profit pack creation, close brief generation, runtime archive, nonblank canvas rendering, desktop/mobile screenshots, and video playback verification.</li>
             </ul>
@@ -399,14 +432,14 @@
             <h2>I shipped Valley Verified as a no-obligation visibility gift with real client build proof.</h2>
             <p>Valley Verified now sells itself through the workflow: customers can receive a free public business page after their first paid month, and optional upgrades stay positioned as extra reach only when the owner wants them.</p>
             <ul class="release-points">
-              <li>I renamed and deployed the network as Valley Verified at <a href="https://valley-verified.pages.dev/" target="_blank" rel="noopener">valley-verified.pages.dev</a> with the new logo, pulse/float/glow treatment, living background, text effects, and clean public copy.</li>
+              <li>I renamed and deployed the Valley Verified network with the new logo, pulse/float/glow treatment, living background, text effects, and clean public copy.</li>
               <li>I made Bob's Smoke Shop and Empire Pallets featured businesses with dedicated Valley pages that link into their live apps, while the live apps link back to their Valley Verified posts.</li>
               <li>I added share paths for Email, Text, LinkedIn, Facebook, X, native share, and copy-link flows across Valley pages, Bob, Empire, and the 0S client-build sections.</li>
               <li>I added the Request a Build and live client builds sections with actual Bob and Empire video previews so prospects can see the free public page path and the full app path side by side.</li>
               <li>I wired the 0S marketplace fit-check/brain section to explain which offer fits the buyer, route people to links, and keep Valley Verified described as a gift with no obligation to upgrade.</li>
               <li>Production browser proof returned HTTP 200 for the Valley home, Bob featured page, Empire featured page, long-tail business fallback, Bob after age gate, Empire, 0S home, and 0S marketplace.</li>
             </ul>
-            <div class="receipt-row"><span>Clean Pages URLs</span><span>Two-way backlinks</span><span>Share actions</span><span>Client videos</span><span>MCP receipts</span><span>Browser QA</span></div>
+            <div class="receipt-row"><span>Clean Pages URLs</span><span>Two-way backlinks</span><span>Share actions</span><span>Client videos</span><span>Tooling receipts</span><span>Browser QA</span></div>
           </div>
         </article>
 
@@ -428,7 +461,7 @@
               <li>I keep the app shell, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, exchange hub, content requests, inbox, community posts, and workflow proof behind a 0S, FS27, or SkyGate session.</li>
               <li>We verified ungated artist/release/workflow/exchange reads return 401, seeded gate sessions unlock the app, and desktop/mobile browser routes render without horizontal overflow.</li>
             </ul>
-            <div class="receipt-row"><span>Artist exchange</span><span>Content add-ons</span><span>Gate required</span><span>401 proof</span><span>MCP receipt</span></div>
+            <div class="receipt-row"><span>Artist exchange</span><span>Content add-ons</span><span>Gate required</span><span>401 proof</span><span>Tooling receipt</span></div>
           </div>
         </article>
 
@@ -443,7 +476,7 @@
             <p>SkyePay production exposes Stripe-backed offers while the private tester lane stays clean and owner-controlled.</p>
             <ul class="release-points">
               <li>61 Stripe-backed offers are exposed by the public store.</li>
-              <li>Live <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe Checkout</span> handoff was verified with a cs_live session.</li>
+              <li>Live Stripe Checkout handoff was verified with a live checkout session.</li>
               <li>Bob's private tester lane is simplified to a free tester-week handoff.</li>
               <li>Owner approval and payment state stay inside the FS27 production flow.</li>
             </ul>
@@ -478,12 +511,12 @@
           <div class="release-body">
             <div class="tag-row"><span>Ledger</span><span>Cloudflare</span><span>Proof</span></div>
             <h2>Production ledger captured from Cloudflare source APIs.</h2>
-            <p>The MCP production record now summarizes Cloudflare Pages, Workers, HTTP checks, and browser proof artifacts.</p>
+            <p>The production record now summarizes Cloudflare Pages, Workers, HTTP checks, and browser proof artifacts.</p>
             <ul class="release-points">
-              <li>24 live production surfaces are recorded in the MCP ledger.</li>
+              <li>24 live production surfaces are recorded in the ledger.</li>
               <li>13 Cloudflare Pages projects and 11 Workers are listed with deployment evidence.</li>
               <li>36 HTTP routes were verified with no failures at capture time.</li>
-              <li>Proof artifacts were saved under test-artifacts/live-deployment-ledger.</li>
+              <li>Proof artifacts were saved in the production evidence archive.</li>
             </ul>
             <div class="receipt-row"><span>Cloudflare inventory</span><span>Worker inventory</span><span>HTTP checks</span><span>CEO contribution map</span></div>
           </div>
@@ -500,9 +533,9 @@
             <p>This entry transfers the old 0S release receipt so the previous public proof is still visible inside the upgraded changelog surface.</p>
             <ul class="release-points">
               <li>Governance Center added the resolution pack, authority matrix, appointment workflow, minutes, and delegation ledger.</li>
-              <li>Pricing Center added package pages and a browser-local package fit calculator.</li>
+              <li>Pricing Center added package pages and an operator-side package fit calculator.</li>
               <li>SEO Library added Arizona service-area pages plus index coverage.</li>
-              <li>Smoke Check kept internal links checked after build.</li>
+              <li>Link Check kept internal routes verified after build.</li>
             </ul>
             <p class="legacy-note">This replaces the older one-page release receipt as the public release record while preserving the original proof claims.</p>
           </div>

@@ -22,8 +22,8 @@ const PLANS = {
     setup: 1500,
     skyepay_offer_id: "metraiyux-starter-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
     // Customer-facing platform features — shown in marketing, portal, and SDK
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
@@ -63,8 +63,8 @@ const PLANS = {
     setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -102,8 +102,8 @@ const PLANS = {
     setup: 6500,
     skyepay_offer_id: "metraiyux-routex-workforce-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -146,8 +146,8 @@ const PLANS = {
     setup: 7500,
     skyepay_offer_id: "metraiyux-autonomous-office",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_sovereign_stack_review",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -186,8 +186,8 @@ const PLANS = {
     setup: 15000,
     skyepay_offer_id: "metraiyux-enterprise-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_gate_scope",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -305,9 +305,9 @@ const SOVEREIGN_STACK = {
     { id: "citadeldb", title: "CitadelDB", replaces: ["neon"], status: "owner_selectable_database_lane" },
     { id: "skyevault", title: "SkyeVault", replaces: ["google_drive", "github_repo_storage"], status: "owner_selectable_vault_lane" },
     { id: "skyemail", title: "SkyeMail", replaces: ["gmail_only_business_email"], status: "workspace_mailbox_lane" },
-    { id: "skyepay", title: "SkyePay", replaces: ["manual_unlock_checkout"], status: "stripe_confirmed_auto_unlock_lane" },
+    { id: "skyepay", title: "SkyePay", replaces: ["loose_payment_links"], status: "stripe_confirmed_controlled_activation_lane" },
     { id: "skyemerit", title: "SkyeMerit", replaces: ["unbounded_coupons", "manual_discount_math"], status: "gated_merit_credit_discount_lane" },
-    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "stripe_confirmed_auto_unlock_workforce_command_lane" },
+    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "owner_approved_workforce_command_lane" },
     { id: "fs27", title: "SkyeGateFS27", replaces: ["loose_api_keys", "unmetered_ai"], status: "parent_gate_and_telemetry_lane" }
   ]
 };
@@ -890,7 +890,7 @@ function buildVisualRows(env, workspace, plan, stack, commands, events) {
       company_name: workspace?.company_name || workspace?.workspace || "Customer workspace",
       plan_id: planId,
       status: workspace?.status || "workspace_tracked",
-      activation: workspace?.activation || "auto_unlock_after_confirmed_skyepay_payment"
+      activation: workspace?.activation || "paid_status_then_plan_policy_activation"
     },
     kpis: [
       { label: "AI cap", value: `$${aiCap.toLocaleString()}`, detail: `$${aiUsed.toFixed(2)} metered`, tone: "gold" },
@@ -1324,7 +1324,7 @@ export default {
 
       if (path === "/api/saas/billing/checkout-success") {
         const session_id = url.searchParams.get("session_id") || "";
-        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Your workspace unlocks automatically after Stripe confirms the payment webhook. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
+        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Stripe confirmation records paid status. Workspace activation follows the plan policy and any required owner approval. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
       }
 
       if (path === "/api/saas/billing/checkout-cancel") {

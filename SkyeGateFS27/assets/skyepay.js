@@ -138,6 +138,8 @@
     $("#skyemeritCredit").textContent = state.skyemerit?.first_time_kaixu_credit_cents
       ? `${money(state.skyemerit.first_time_kaixu_credit_cents)} premium kAIxu credit`
       : "$6 premium kAIxu credit";
+    const requested = params.get("skyemerit_code") || params.get("skyemerit");
+    if (requested && Array.from(select.options).some((option) => option.value === requested)) select.value = requested;
     select.addEventListener("change", renderSkyeMeritPreview);
   }
 

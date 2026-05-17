@@ -10,6 +10,7 @@ async function exists(rel){ try { await fs.access(path.join(DIST, rel)); return 
 function ok(cond, label){ if(cond){ console.log(`✅ ${label}`); pass++; } else { console.error(`☐ ${label}`); fail++; } }
 function json(body){ try { return JSON.parse(body); } catch { return {}; } }
 const routes = ['about','how-it-works','for-businesses','advertise','network','contact'];
+const insightCategories = ['operating-rhythm','local-growth','revenue-systems','records-proof','trust-risk','automation-stack'];
 const home = await read('index.html');
 ok(home.includes('Arizona verified business network'), 'homepage rewritten as public website');
 ok(home.includes('Explore the marketplace'), 'homepage has buyer CTA');
@@ -39,7 +40,15 @@ ok(await exists('insights/index.html'), '/insights/ exists');
 const insights = await read('insights/index.html');
 ok(insights.includes('Business operating journal'), '/insights/ has operating journal hero');
 ok(insights.includes('Only major platforms'), '/insights/ carries major platform rule');
+ok(insights.includes('Publication engine') && insights.includes('Valley Verified field library'), '/insights/ is a publication library, not one post');
+ok(insights.includes('Scheduled by 0S'), '/insights/ shows scheduled 0S queue');
 ok(insights.includes('MetrAIyux 0S Full System') && insights.includes('SkyeVault') && insights.includes('SOLEnterprises'), '/insights/ lists major platforms only');
+ok(await exists('insights/schedule/index.html'), '/insights/schedule/ exists');
+const schedule = await read('insights/schedule/index.html');
+ok(schedule.includes('0S scheduled publisher') && schedule.includes('/api/insights-editorial-calendar.json'), '/insights/schedule/ exposes worker calendar contract');
+for (const category of insightCategories) {
+  ok(await exists(`insights/category/${category}/index.html`), `/insights/category/${category}/ exists`);
+}
 ok(await exists('insights/weekly-company-command-rhythm/index.html'), 'weekly command article exists');
 const weekly = await read('insights/weekly-company-command-rhythm/index.html');
 ok(weekly.includes('Manual operating method') && weekly.includes('How 0S makes it easier'), 'article includes manual method and 0S bridge');
@@ -65,28 +74,47 @@ for (const slug of articleSlugs) {
   const wordCount = articleHtml.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
   ok(wordCount >= 1500, `${slug} clears longform word floor`);
 }
+ok(await exists('insights/lead-source-scorecard/index.html'), 'published field guide exists');
+const leadSource = await read('insights/lead-source-scorecard/index.html');
+const leadSourceWords = leadSource.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+ok(leadSourceWords >= 1000, 'published field guide clears depth floor');
+ok(!(await exists('insights/weekly-review-minutes/index.html')), 'future scheduled guide is not publicly routed before publish date');
+const calendar = json(await read('data/insights-editorial-calendar.json'));
+ok(calendar.version === '23.1.0', 'editorial calendar JSON is v23.1');
+ok(calendar.counts?.total >= 28, 'editorial calendar has full multi-post library');
+ok(calendar.counts?.published >= 18, 'editorial calendar has current published guides');
+ok(calendar.counts?.scheduled >= 10, 'editorial calendar has upcoming guides');
+ok(calendar.worker?.cron === '17 13 * * 1,3,5', 'editorial calendar documents 0S cron');
+ok((calendar.categories || []).length === 6, 'editorial calendar has six topic clusters');
+const calendarApi = json(await read('api/insights-editorial-calendar.json'));
+ok(calendarApi.engine === 'valley_verified_0s_scheduled_publisher', 'calendar API feed exposes scheduler engine');
 const directory = await read('directory/index.html');
 ok(directory.includes('public-topbar'), 'directory header uses simplified public nav');
 ok(!directory.includes('AE Command</a><a href="/accounts/'), 'directory no longer shows dense operator nav chain');
 const data = json(await read('data/website-content.json'));
-ok(data.version === '23.0.0', 'website-content JSON is v23');
+ok(data.version === '23.1.0', 'website-content JSON is v23.1');
 ok((data.routes || []).includes('/for-businesses/'), 'website-content includes owner route');
 ok((data.routes || []).includes('/featured/'), 'website-content includes featured route');
 ok((data.routes || []).includes('/insights/'), 'website-content includes insights route');
-ok(data.counts?.insights >= 7, 'website-content records insight count');
+ok((data.routes || []).includes('/insights/schedule/'), 'website-content includes schedule route');
+ok(data.counts?.insights >= 18 && data.counts?.insights_total >= 28, 'website-content records published and total insight counts');
 ok((data.claims_guardrails || []).some(x => x.includes('not automatically owner-verified')), 'website-content preserves claim guardrail');
 const readiness = json(await read('data/v23-website-readiness.json'));
-ok(readiness.version === '23.0.0', 'v23 readiness JSON exists');
+ok(readiness.version === '23.1.0', 'v23.1 readiness JSON exists');
 ok((readiness.proof?.header_replacements || 0) > 0, 'v23 cleaned generated headers');
+ok(readiness.proof?.insights_scheduled >= 10, 'v23.1 readiness records scheduled content');
 const sitemap = await read('sitemap-pages.xml');
 ok(sitemap.includes('/about/'), 'sitemap includes /about/');
 ok(sitemap.includes('/advertise/'), 'sitemap includes /advertise/');
 ok(sitemap.includes('/insights/weekly-company-command-rhythm/'), 'sitemap includes insight article routes');
+ok(sitemap.includes('/insights/schedule/'), 'sitemap includes schedule route');
 const llms = await read('llms.txt');
 ok(llms.includes('## Public website'), 'llms.txt includes public website context');
 ok(llms.includes('## Business insights'), 'llms.txt includes business insights context');
+ok(llms.includes('## Editorial publishing schedule'), 'llms.txt includes scheduled publishing context');
 const seed = json(await read('seed-report.json'));
-ok(seed.version === '23.0.0', 'seed report promoted to v23');
+ok(seed.version === '23.1.0', 'seed report promoted to v23.1');
 ok(seed.website?.homepage === 'rewritten_for_marketplace_sales', 'seed report records website rewrite');
+ok(seed.website?.insight_publication_engine?.scheduled >= 10, 'seed report records insight publication engine');
 if(fail){ console.error(`v23 website smoke failed: ${fail} failed, ${pass} passed`); process.exit(1); }
 console.log(`v23 website smoke passed: ${pass} checks passed`);

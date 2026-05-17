@@ -1,9 +1,9 @@
 {
-  "version": "live-surfaces-skye-content-forge-free99",
+  "version": "live-surfaces-platform-accounting",
   "updated_at": "2026-05-17T00:00:00Z",
   "primary_folder": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
   "gate_folder": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
-  "positioning": "MetrAIyux 0S is the client-facing autonomous business command deck. SkyeGateFS27 is the gate that gives those decks identity, event evidence, key control, and deployment tracking. Together they let Gray sell websites as sovereign web infrastructure, not disposable pages. SkyeProfitConsole adds a Free99 no-charge app lane, SkyeMusicNexus adds Free99 Lite plus paid music ops and drop add-ons, and all music lanes still require a 0S, FS27, or SkyGate session. SkyeMediaCenter adds Free99 no-charge media intake, review, dispatch, publish, stats, and file-delivery access under the same gate-session rule. Skye Content Forge adds Free99 no-charge approved-source scanning, original content generation, drafts, export, scheduler, backup, and deployment-hook proof under a 0S, FS27, SkyGate, or operator admin gate session.",
+  "positioning": "MetrAIyux 0S is the client-facing autonomous business command deck. SkyeGateFS27 is the gate that gives those decks identity, event evidence, key control, payment routing, and deployment tracking. SkyePay Store is the live catalog and checkout origin; SkyeVault adds gated file/workspace access; SkyeCard adds controlled usage and service-credit cards; SkyeMail adds FS27-backed mailbox proof and alias routing. SkyeMerit adds first-time protected merit packs, capped discount math, and kAIxu credit without bypassing SkyePay, owner approval, or gate sessions. Together they let Gray sell websites as sovereign web infrastructure, not disposable pages. SkyeProfitConsole adds a Free99 no-charge app lane, SkyeMusicNexus adds Free99 Lite plus paid music ops and drop add-ons, and all music lanes still require a 0S, FS27, or SkyGate session. SkyeMediaCenter adds Free99 no-charge media intake, review, dispatch, publish, stats, and file-delivery access under the same gate-session rule. Skye Content Forge adds Free99 no-charge approved-source scanning, original content generation, drafts, export, scheduler, backup, and deployment-hook proof under a 0S, FS27, SkyGate, or operator admin gate session.",
   "sales_rule": "Lead with the buyer's operating pain, then route them to the live proof surface that answers that pain. Do not narrate the architecture as internal setup instructions. Do not expose tokens, mirror secrets, database URLs, or owner-only admin playbooks.",
   "deployment_ledger": {
     "path": "/workspaces/MetrAIyux-0S/LIVE_DEPLOYMENT_LEDGER.md",
@@ -18,7 +18,7 @@
     "stripe_sync_receipt": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
     "public_atlas_proof": "test-artifacts/ledger-stripe-sync-prod/browser-qa.json"
   },
-  "surface_count": 32,
+  "surface_count": 39,
   "surfaces": [
     {
       "id": "skygate-fs27-proof-surface",
@@ -61,6 +61,98 @@
       "sales_use": "Use after the proof surface when the buyer is ready to see the gate itself.",
       "primary_brain": "orion-hayes-brain",
       "secondary_brain": "victor-saint-brain"
+    },
+    {
+      "id": "skygate-skyepay-store",
+      "name": "SkyePay Ecosystem Store",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+      "local_path": "/workspaces/MetrAIyux-0S/SkyeGateFS27/skyepay-store.html",
+      "audience": "buyers, customers, operators, finance reviewers",
+      "privacy": "public catalog with Stripe checkout and controlled activation paths",
+      "purpose": "Live FS27 storefront for approved MetrAIyux, RouteX, SkyeMusicNexus, SkyeVault, SkyeCard, and repo-approved checkout offers. It keeps buyer-facing payment paths inside FS27 instead of legacy checkout URLs.",
+      "route_when": [
+        "buy",
+        "checkout",
+        "store",
+        "skypay",
+        "stripe",
+        "offer catalog",
+        "trial",
+        "owner approval",
+        "usage card",
+        "vault plan"
+      ],
+      "sales_use": "Use when the buyer asks what can be purchased now or needs one public catalog link. Explain that owner-approved app lanes do not auto-unlock from payment alone.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "celeste-monroe-brain"
+    },
+    {
+      "id": "skyevault-drop-workspace",
+      "name": "SkyeVault Drop Workspace",
+      "url": "https://skyevault-drop.graylondonskyes.workers.dev/",
+      "local_path": "/workspaces/MetrAIyux-0S/SkyeVault-Drop/public/index.html",
+      "audience": "buyers, customers, operators, file-handoff reviewers",
+      "privacy": "public entry with gated upload, admin, and provisioning lanes",
+      "purpose": "Gated file, upload, and workspace handoff surface used by SkyeVault access plans and by larger app lanes that need proof-safe storage boundaries.",
+      "route_when": [
+        "vault",
+        "file",
+        "upload",
+        "handoff",
+        "workspace storage",
+        "r2",
+        "skyevault",
+        "client files",
+        "proof files"
+      ],
+      "sales_use": "Use when a buyer asks where files, proof packets, uploads, or larger audio handoffs live. Keep storage limits and provider-proof boundaries explicit.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "skye-card-usage-offers",
+      "name": "SkyeCard Usage Offers",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+      "local_path": "/workspaces/MetrAIyux-0S/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+      "audience": "buyers and customers who need small add-ons without changing a full subscription",
+      "privacy": "public catalog; activation and credits remain controlled by FS27 policy",
+      "purpose": "SkyeCard AI Boost, Push Pack, Launch Credit, and Audit Pack usage offers with metadata-based credit buckets and owner-approval boundaries.",
+      "route_when": [
+        "usage card",
+        "skyecard",
+        "ai boost",
+        "push pack",
+        "launch credit",
+        "audit pack",
+        "small add on",
+        "credit"
+      ],
+      "sales_use": "Use when the buyer needs a smaller add-on or proof/audit credit instead of a whole plan upgrade. Do not describe credits as cash or uncapped usage.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "victor-saint-brain"
+    },
+    {
+      "id": "skyemail-platform",
+      "name": "SkyeMail Platform",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/SkyeMail/index.html",
+      "audience": "buyers, customers, operators, mailbox evaluators",
+      "privacy": "public app with FS27-backed onboarding and gated mailbox state",
+      "purpose": "SkyeMail mailbox, alias, onboarding, inbox, sent record, and live proof surface connected to FS27 gate-card identity and Resend-backed mail routing.",
+      "route_when": [
+        "email",
+        "mailbox",
+        "skymail",
+        "skyemail",
+        "alias",
+        "inbox",
+        "resend",
+        "gate card",
+        "mail proof"
+      ],
+      "sales_use": "Use when a buyer asks about owned email, aliases, mailbox proof, or business inbox infrastructure. Say billing is charge-ready but not active yet unless that changes.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "valentina-reyes-brain"
     },
     {
       "id": "metraiyux-full-system",
@@ -512,8 +604,8 @@
     {
       "id": "metraiyux-skyeroutex-workforce-v040",
       "name": "SkyeRoutexFlow Workforce Command v0.4.0",
-      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyeroutex-workforce-command-v0.4.0/index.html",
-      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/index.html",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/index.html",
       "audience": "operators, dispatchers, workforce marketplaces, staffing teams, technical evaluators",
       "privacy": "public wrapper around the API proof platform; live actions require the approved runtime",
       "purpose": "Runtime proof platform for city/state markets, provider job posting, contractor job boards, applicant pools, assignment actions, proof submission, payment-state ledgering, disputes, market reports, export packets, storage adapters, provider guards, audit integrity, and SkyeHands handoff boundaries.",
@@ -743,11 +835,71 @@
       "sales_use": "Mention only as the owner-side QA gate. Do not send customers here; send customers to the live review intake instead.",
       "primary_brain": "victor-saint-brain",
       "secondary_brain": "site-operator-brain"
+    },
+    {
+      "id": "metraiyux-skyemerit-wallet",
+      "name": "SkyeMerit Wallet",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/skyemerit.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/saas/skyemerit.html",
+      "audience": "customers, first-time users, buyers comparing plan costs",
+      "privacy": "public information with gated checkout application",
+      "purpose": "Customer-visible SkyeMerit wallet and calculator for first-time kAIxu credit, protected discount bands, and SkyePay checkout behavior.",
+      "route_when": [
+        "coupon",
+        "discount",
+        "merit",
+        "skyemerit",
+        "first time credit",
+        "kaixu credit",
+        "how much off",
+        "payment discount"
+      ],
+      "sales_use": "Use when a buyer asks whether they get first-time help, how the discount is capped, or why large builds are not blanket-discounted.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-skyemerit-operator-control",
+      "name": "SkyeMerit Operator Control",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/operator/skyemerit-admin.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/operator/skyemerit-admin.html",
+      "audience": "owner and approved operators",
+      "privacy": "operator admin token required for live issue endpoint",
+      "purpose": "Owner control surface for issuing SkyeMerit packs, previewing protected discount math, and dispatching events to Resend, SkyeMail, Relay13, ConnectLog, and FS27 mirror when configured.",
+      "route_when": [
+        "issue merit",
+        "coupon admin",
+        "discount control",
+        "operator merit",
+        "send merit pack"
+      ],
+      "sales_use": "Mention only as the owner-side control surface. Do not send customers here.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "site-operator-brain"
+    },
+    {
+      "id": "metraiyux-skyemerit-proof-receipt",
+      "name": "SkyeMerit Expansion Receipt",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skyemerit-expansion-receipt.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/skyemerit-expansion-receipt.html",
+      "audience": "buyers, operators, finance reviewers, technical evaluators",
+      "privacy": "public proof receipt with no private tokens",
+      "purpose": "Records SkyeMerit wallet, capped discount math, kAIxu credit, SkyePay metadata, 0S Worker routes, FS27 checkout support, and auth/owner-approval boundaries.",
+      "route_when": [
+        "skyemerit proof",
+        "discount proof",
+        "coupon proof",
+        "kaixu credit proof",
+        "first time merit receipt"
+      ],
+      "sales_use": "Use when a buyer or internal reviewer wants proof that SkyeMerit is controlled, capped, and not an auth bypass.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "0meg4kai-security-brain"
     }
   ],
   "brain_guidance": {
     "gray-london-skyes-brain": "Frame the system as sovereign web infrastructure: public site, command deck, auth gate, proof loop, and client-specific deployment strategy.",
-    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, a Free99 Lite preview, or paid one-song/release-drop music work that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session. Use Skye Content Forge when the pain is content repurposing, approved-source scanning, draft production, scheduler proof, or Free99 content publishing under auth.",
+    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use SkyeMerit when the buyer asks about first-time credits, coupon math, or why large tickets are not blanket-discounted. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, a Free99 Lite preview, or paid one-song/release-drop music work that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session. Use Skye Content Forge when the pain is content repurposing, approved-source scanning, draft production, scheduler proof, or Free99 content publishing under auth.",
     "marcus-vale-brain": "Use HouseOperations for task/vendor/schedule/owner-alert operating discipline and SkyeRouteX for route-heavy operating discipline. Keep live provider, cloud persistence, and production deployment claims gated until proof exists.",
     "orion-hayes-brain": "Explain technical depth in plain language: FS27 validates identity, MetrAIyux routes work, HouseOperations runs command workflows, SkyeBox keeps TOTP private and encrypted, ConnectLog captures relationship context, Relay13 handles production messaging, SkyeRouteX handles route-heavy workforce command, SkyeProfitConsole handles gated Free99 profit runtime proof, SkyeMediaCenter handles gated Free99 media intake/review/publish/file proof, Skye Content Forge handles gated Free99 source scan/generate/export/scheduler/backup proof, Cloudflare serves the system, and event receipts prove activity.",
     "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 Lite into anonymous access, or claims that paid drops include live DSP/distributor/payment authority before provider proof.",
