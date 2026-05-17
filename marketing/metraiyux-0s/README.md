@@ -7,11 +7,22 @@ Marketing assets for MetrAIyux 0S. All copy is written to be human-voiced, speci
 | File | What It Is |
 |---|---|
 | `index.html` | Main marketing landing page — the primary public-facing pitch |
+| `marketplace.html` | Product marketplace — 17-brain, 9-Worker, SkyeVault Git remote catalog |
 | `sell-sheet.html` | B2B sell sheet — full business case with honest objection handling |
 | `white-label.html` | White label program page — for agencies and resellers |
+| `proof.html` | Live proof report — includes kAIxu 6.7 and SkyeVault Git remote proof rollups |
 | `style.css` | Shared design system (gold/navy palette, dark mode) |
 | `social-copy.md` | LinkedIn posts, Twitter/X posts, cold email templates, ad copy, video hook scripts |
-| `valuation-brief.md` | Investor/partner valuation brief — plain numbers, production gaps disclosed |
+| `valuation-brief.md` | Investor/partner valuation brief — revised for 9 Workers, 17 brains, kAIxu, and Git-level SkyeVault |
+
+## Current Release Notes
+
+The May 17, 2026 copy pass reflects the current infrastructure state:
+
+- 17 operating brains, including the kAIxu 6.7 sovereign inference lane.
+- 9 Cloudflare Workers, with the kAIxu brain added to the deployed Worker stack.
+- SkyeVault as both an archive upload vault and a Git remote for clone, push, fetch, protected refs/tags, quota checks, verified snapshots, bundle restore, CLI access, SSH wrapper, and per-workspace neural maps.
+- Proof surfaces updated for SkyeVault Git remote verification and the public changelog.
 
 ## Live Product
 
@@ -27,5 +38,5 @@ Suggested: deploy to `marketing.metraiyux.com` or `get.metraiyux.com` and link f
 
 All copy in this folder follows three rules:
 1. Say what the product actually does — no vague "AI-powered" claims
-2. Acknowledge what isn't done yet — the production gaps are real and disclosed in the sell sheet and valuation brief
+2. Acknowledge what isn't done yet — paying customer traction is still the commercial gap, while infrastructure proof is separated into the proof report and changelog
 3. Write like an owner talking to another owner — not like a marketing department talking at a prospect

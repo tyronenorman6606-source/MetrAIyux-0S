@@ -6,7 +6,7 @@ Updated: 2026-05-15T11:13:02Z
 
 The customer SaaS layer must remain separate from the owner/admin company OS. Customers can run their own workspace. They cannot access the owner Main Automation Brain, owner credentials, owner social connectors, admin audit ledgers, private founder/admin materials, or production publishing authority.
 
-## 16-Brain Structure
+## 17-Brain Structure
 
 1. Main Automation Brain / Site Operator Brain — owner/admin command.  
 2. 0meg4kAI — security, QA, tenant isolation, approval decisioning.  

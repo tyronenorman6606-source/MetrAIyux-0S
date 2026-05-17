@@ -1,6 +1,6 @@
 # 0meg4kAI Security / QA Assistant Brain
 
-Version: 16-brain tenant-isolation upgrade  
+Version: 17-brain tenant-isolation upgrade
 Created: 2026-05-15T11:13:02Z
 
 ## Purpose

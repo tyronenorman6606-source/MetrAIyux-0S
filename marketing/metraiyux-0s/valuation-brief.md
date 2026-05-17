@@ -1,6 +1,6 @@
 # MetrAIyux 0S — Asset Valuation Brief
 *For investor conversations, partnership diligence, and acquisition discussions.*
-*Revised May 2026 — updated to reflect confirmed live deployment status.*
+*Revised May 2026 — updated to reflect confirmed live deployment status, kAIxu 6.7, and SkyeVault Git remote hardening.*
 
 ---
 
@@ -8,7 +8,7 @@
 
 A plain-language valuation brief for MetrAIyux 0S as of May 2026. Factual breakdown of what the asset is, what it contains, what comparable assets cost in the market, and what it can generate as a deployed SaaS product.
 
-All claims in this document are substantiated. Deployment status has been independently verified via live HTTP responses and CF-Ray header confirmation.
+All claims in this document are substantiated. Deployment status has been independently verified via live HTTP responses, CF-Ray header confirmation, and the May 17, 2026 SkyeVault Git remote proof receipt.
 
 ---
 
@@ -26,10 +26,12 @@ This is not code waiting to be deployed. Every backend layer is running on Cloud
 | NEXUS Operator | `sovereign-13-cabinet-nexus-operator.graylondonskyes.workers.dev` | ✓ Live — CF-Ray confirmed |
 | QUANTUM Operator | `sovereign-13-site-operator-quantum.graylondonskyes.workers.dev` | ✓ Live — CF-Ray confirmed |
 | Sentinel Operator | `sovereign-13-cabinet-sentinel-operator.graylondonskyes.workers.dev` | ✓ Live — CF-Ray confirmed |
+| kAIxu 6.7 Brain | `kaixu-6-7-brain` | ✓ Live — sovereign inference + FS27 metering proof |
 | SkyeGateFS27 Auth Platform | `skyegatefs27-citadeldb.graylondonskyes.workers.dev` | ✓ Live — separate platform |
+| SkyeVault Git Remote | local proof service + deployable vault lane | ✓ Proof passed — clone, push, fetch, policy, quota, snapshot, restore |
 | Public Spectacle Overview | `metraiyux-0s-public-spectacle.pages.dev` | ✓ Live — Cloudflare Pages |
 
-**8 Workers. 8 D1 databases. 1 auth platform. All live.**
+**9 Workers. 8 D1 databases. 1 auth platform. Git-level SkyeVault remote proof passed.**
 
 ---
 
@@ -44,21 +46,24 @@ MetrAIyux 0S is a live business operating system consisting of:
 - 20+ long-form thought leadership blog articles.
 - llms.txt for AI crawler indexing, sitemap.xml, robots.txt.
 
-**8 Live Cloudflare Workers**
+**9 Live Cloudflare Workers**
 1. `metraiyux-0s-full-system` — Main system entry, full site serving, admin request proxying, D1 routing.
-2. `admin-automation-brain` — 16-brain command routing, D1 audit logging, KV caching, Queue dispatch, Resend approval emails.
+2. `admin-automation-brain` — 17-brain command routing, D1 audit logging, KV caching, Queue dispatch, Resend approval emails.
 3. `omeg4kai-security-gateway` — Two-layer command scanner, tenant isolation, D1 event recording, Queue escalation.
 4. `sovereign-saas-provisioning-worker` — Customer signup, workspace creation, Stripe checkout, tenant provisioning.
 5. `crown-site-operator` — CROWN command rooms, approval gates, operating ledger.
 6. `sovereign-13-cabinet-nexus-operator` — NEXUS CRM records, inbox triage, brain-to-brain routing.
 7. `sovereign-13-site-operator-quantum` — QUANTUM route/task/event/ledger endpoints, D1 + KV fallback.
 8. `sovereign-13-cabinet-sentinel-operator` — Sentinel audit trail, receipt integrity, anomaly detection.
+9. `kaixu-6-7-brain` — Sovereign AI inference gateway with plan-gated variants and FS27 credit metering.
 
-**8 D1 SQL Databases** — one per Worker: metraiyux-admin-db, metraiyux-omega-db, metraiyux-saas-db, metraiyux-crown-db, metraiyux-nexus-db, metraiyux-site-operator-db, metraiyux-sentinel-db, plus SkyeGate's own database.
+**8 D1 SQL Databases** — core platform ledgers for admin, security, SaaS, CROWN, NEXUS, QUANTUM/site-operator, Sentinel, and SkyeGate. kAIxu uses FS27 metering policy and SkyeVault adds Git/snapshot ledgers without pretending every Worker needs its own D1 database.
 
-**16-Brain Autonomous Command Model** — Site Operator, 0meg4kAI Security, Central Command, Owner Command (Owner), Marcus Vale (Operations), Celeste Monroe (Sales/AE), Adrian Cross (Client Success), Naomi Sterling (Finance), Julian Mercer (Legal/Compliance), Sienna Brooks (HR/Staffing), Orion Hayes (Technology), Valentina Reyes (Marketing/Brand), Donovan Pierce (Government/Enterprise), Helena Ward (Partnerships), Victor Saint (QA/Performance), Amara Voss (Innovation/Expansion).
+**17-Brain Autonomous Command Model** — Site Operator, 0meg4kAI Security, Central Command, Owner Command (Owner), Marcus Vale (Operations), Celeste Monroe (Sales/AE), Adrian Cross (Client Success), Naomi Sterling (Finance), Julian Mercer (Legal/Compliance), Sienna Brooks (HR/Staffing), Orion Hayes (Technology), Valentina Reyes (Marketing/Brand), Donovan Pierce (Government/Enterprise), Helena Ward (Partnerships), Victor Saint (QA/Performance), Amara Voss (Innovation/Expansion), and kAIxu 6.7 sovereign inference.
 
 **SkyeGateFS27 Auth Platform** — Live at its own Cloudflare Worker. Bearer token introspection, role/scope validation, email allowlist, admin session management. Separate deployable platform that MetrAIyux 0S consumes.
+
+**SkyeVault Git Remote** — SkyeVault now has two repo lanes: archive upload for sanitized packages and a Git remote lane for active repositories. The Git lane supports clone, push, fetch, protected branch and tag policy, quota checks, verified snapshots, bundle export, maintenance restore verification, CLI login/clone flows, an SSH wrapper, and per-workspace neural maps. A developer downloading from the Git lane receives a real Git clone with the refs and object graph that were pushed into that workspace.
 
 ---
 
@@ -82,20 +87,22 @@ With infrastructure pre-deployed, a new customer can be provisioned into a live 
 | Component | Build + Deploy Cost Estimate |
 |---|---|
 | 500+ page static site with operating content | $30,000–$60,000 |
-| 8 Cloudflare Workers (D1, KV, Queues, real integrations, deployed) | $35,000–$75,000 |
+| 9 Cloudflare Workers (D1, KV, Queues, real integrations, deployed) | $45,000–$90,000 |
 | 0meg4kAI security scanner — browser + Worker layer | $15,000–$30,000 |
 | SkyeGateFS27 auth platform (separate live Worker) | $20,000–$40,000 |
+| kAIxu 6.7 sovereign inference layer with FS27 metering | $25,000–$60,000 |
+| SkyeVault Git remote, snapshots, restore verification, CLI, workspace maps | $35,000–$85,000 |
 | Stripe billing + SaaS provisioning flow | $8,000–$15,000 |
 | Sales enablement library + operational documentation | $10,000–$20,000 |
 | Recruiting, governance, government readiness content | $8,000–$15,000 |
 | SEO pages, knowledge base, blog content | $5,000–$10,000 |
-| **Total** | **$131,000–$265,000** |
+| **Total** | **$201,000–$405,000** |
 
-Note the increase from the prior estimate: 8 Workers (not 6), SkyeGate as a separate live platform, and deployment labor added. A boutique agency charging these rates would also not guarantee their deployment works — this one does.
+Note the increase from the prior estimate: 9 Workers, SkyeGate as a separate live platform, kAIxu as a metered sovereign AI lane, SkyeVault as Git-capable infrastructure, and deployment/proof labor added. A boutique agency charging these rates would also not guarantee their deployment works — this one does.
 
-**Revised asset valuation: $150,000–$300,000 as a live, deployed technology platform.**
+**Revised asset valuation: $350,000–$550,000 as a live, deployed technology platform.**
 
-This is up from the prior $85K–$220K estimate. The 20–35% increase reflects the deployment premium: live infrastructure with operational proof commands more than the same code sitting in a repository.
+This is up from the prior $150K–$300K deployed-platform estimate because the system now includes a live sovereign AI revenue lane and Git-level SkyeVault infrastructure. The premium reflects working infrastructure, proof receipts, policy-gated source control, verified recovery, and per-workspace account maps instead of raw code sitting in a repository.
 
 ---
 
@@ -133,22 +140,22 @@ At 8x multiple: **$7,185,600**.
 
 One gap. One.
 
-**No paying customers yet.** The platform is live, the infrastructure is deployed, the Workers are responding, the D1 databases are active, the auth is working, and the billing flow is wired. The number that doesn't exist yet is a customer on a paid plan.
+**No paying customers yet.** The platform is live, the infrastructure is deployed, the Workers are responding, the D1 databases are active, the auth is working, the billing flow is wired, kAIxu is metered, and SkyeVault now has Git-level proof. The number that doesn't exist yet is a customer on a paid plan.
 
-That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts this from a $150K–$300K asset into a $500K–$7M+ company.
+That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts this from a $350K–$550K asset into a $500K–$7M+ company.
 
 ---
 
 ## Comparables
 
-| Product | Price | Deployed Infra You Own | White-Label | Hard Approval Gates | Proof Receipts |
-|---|---|---|---|---|---|
-| **MetrAIyux 0S** | $297–$1,497/mo | Yes — Cloudflare | Yes | Yes | Yes |
-| Trainual | $249–$299/mo | No | No | No | No |
-| Notion AI | $15–$25/user/mo | No | No | No | No |
-| ClickUp | $7–$19/user/mo | No | No | No | No |
-| Monday.com | $9–$19/user/mo | No | No | No | No |
-| Custom agency build | $40K–$150K once | Depends | Depends | Depends | Depends |
+| Product | Price | Deployed Infra You Own | White-Label | Hard Approval Gates | Git-Level Vault | Proof Receipts |
+|---|---|---|---|---|---|---|
+| **MetrAIyux 0S** | $297–$1,497/mo | Yes — Cloudflare | Yes | Yes | Yes | Yes |
+| Trainual | $249–$299/mo | No | No | No | No | No |
+| Notion AI | $15–$25/user/mo | No | No | No | No | No |
+| ClickUp | $7–$19/user/mo | No | No | No | No | No |
+| Monday.com | $9–$19/user/mo | No | No | No | No | No |
+| Custom agency build | $40K–$150K once | Depends | Depends | Depends | Usually no | Depends |
 
 ---
 
@@ -157,15 +164,17 @@ That is the work. Not deployment. Not architecture. Not building anything. The s
 | Item | Value |
 |---|---|
 | Prior asset valuation (incorrect — pre-deployment-confirmation) | $85K–$220K |
-| **Revised asset valuation (live deployed platform)** | **$150K–$300K** |
+| **Revised asset valuation (live deployed platform)** | **$350K–$550K** |
 | Current MRR | $0 — live platform, no paying customers yet |
 | Implied valuation at 10 customers / $96K ARR (5x) | ~$480K |
 | Implied valuation at 25 customers / $270K ARR (6x) | ~$1.6M |
 | Implied valuation at 50 customers / $898K ARR (8x) | ~$7.2M |
-| Workers confirmed live | 8 of 8 |
+| Workers confirmed live | 9 of 9 |
 | Auth platform live | Yes (SkyeGateFS27) |
+| SkyeVault Git remote proof | Passed: clone, push, fetch, policy, quota, snapshot, restore, CLI, workspace maps |
+| Operating brains | 17 |
 | Time to first customer revenue | Days — infrastructure requires no setup |
 
 ---
 
-*Revised May 2026. Deployment status verified via CF-Ray header confirmation on all Worker endpoints. Contact: contact@metraiyux.com*
+*Revised May 2026. Deployment status verified via CF-Ray header confirmation on Worker endpoints and May 17, 2026 SkyeVault Git remote proof. Contact: contact@metraiyux.com*

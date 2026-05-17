@@ -5,6 +5,10 @@
 
 This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 16-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
 
+## Deep Feature Inventory
+
+The current repo-evidenced 0S feature inventory lives at `FEATURE_INVENTORY.md`. It was generated from MCP mining, route scans, docs, live-surface registries, package scripts, proof receipts, and platform ledgers on 2026-05-17. Use it as the first source before writing product copy, sales pages, pitch material, or public claims so the system is not undersold.
+
 ## SkyeMerit Protected Merit System
 
 This build includes SkyeMerit as a no-charge first-time merit lane inside the 0S SaaS and SkyePay system. SkyeMerit gives first-time users a `$6` premium kAIxu credit and protected discount rules that lower only eligible SkyePay spend bands. It does not remove FS27, owner approval, checkout policy, or gate-session requirements.

@@ -6,7 +6,7 @@ This is a directional internal valuation note, not a formal appraisal, investmen
 
 ## Executive Answer
 
-Current deployed asset value: **$85,000-$220,000** as a production-presentable proprietary business-OS asset with a live public overview, full-system production route, public sitemap/robots, refreshed public ZIP, admin/customer architecture, 16-brain model, proof posture, and deployment-ready Cloudflare operating kits.
+Current deployed asset value: **$85,000-$220,000** as a production-presentable proprietary business-OS asset with a live public overview, full-system production route, public sitemap/robots, refreshed public ZIP, admin/customer architecture, 17-brain model, proof posture, and deployment-ready Cloudflare operating kits.
 
 Deployed operating-platform value: **$275,000-$750,000** when the live public overview, full website route, D1-backed Worker layer, protected admin flow, Resend approval path, customer signup/onboarding, tenant isolation, and smoke receipts are treated as one operating asset.
 
@@ -16,7 +16,7 @@ Revenue-backed SaaS/company value: **$750,000-$3,500,000+** only after real cust
 
 - The public overview is now deployed at `https://metraiyux-0s-public-spectacle.pages.dev/`.
 - The public overview routes to the larger full system at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/`.
-- The public surface now includes a guided tour, fit check, platform map, tech stack overview, 16-brain explanation, security boundary, value case, public brief export, sitemap, and robots file.
+- The public surface now includes a guided tour, fit check, platform map, tech stack overview, 17-brain explanation, security boundary, value case, public brief export, sitemap, and robots file.
 - The public overview ZIP was refreshed to match the deployed asset.
 - Private admin/setup material remains out of the public surface, which improves diligence posture.
 
@@ -24,7 +24,7 @@ Revenue-backed SaaS/company value: **$750,000-$3,500,000+** only after real cust
 
 - Full public website and deployed public overview site.
 - Executive cabinet system and founder/operator context.
-- 16 operating brains: cabinet scopes, Main Automation Brain, and 0meg4kAI security/QA review.
+- 17 operating brains: cabinet scopes, Main Automation Brain, and 0meg4kAI security/QA review.
 - Customer SaaS layer and tenant-isolation doctrine.
 - Admin tutorial and approval-gated automation surface.
 - Cloudflare Worker kits, D1 migrations, KV/Queue patterns, and smoke-test material.

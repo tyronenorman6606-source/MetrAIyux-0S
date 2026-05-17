@@ -7,7 +7,7 @@ Generated: 2026-05-15T09:35:00-07:00
 - NEXUS OS hub and 20 operating rooms.
 - Business inbox triage and browser-local ledger tools.
 - CRM-style record builder framework.
-- 16-brain mesh protocol pages.
+- 17-brain mesh protocol pages.
 - Human approval gates and founder override pages.
 - Cloudflare Worker kit with route, task, status, and ledger endpoints.
 - D1 schema for events, tasks, and approvals.
