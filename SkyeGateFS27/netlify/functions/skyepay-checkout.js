@@ -1,6 +1,7 @@
 import { wrap } from "./_lib/wrap.js";
 import { json, badRequest } from "./_lib/http.js";
 import { audit } from "./_lib/audit.js";
+import { q } from "./_lib/db.js";
 import {
   cleanRequestToken,
   resolveSkyePayReturnOrigin,
@@ -16,6 +17,10 @@ import {
   resolveSkyePayTrialDays,
   upsertSkyePayOrderFromSession
 } from "./_lib/skyepayCatalog.js";
+import {
+  SKYEMERIT_AUTO_CODE,
+  buildSkyeMeritCheckout
+} from "./_lib/skyeMerit.js";
 
 function allowDryRun(req) {
   const url = new URL(req.url);
@@ -49,6 +54,24 @@ function makeOrderId(body) {
 function stripeIdempotencyKey(body, orderId) {
   const token = cleanRequestToken(body.idempotency_key, 190) || orderId;
   return `skyepay:${token}`.slice(0, 255);
+}
+
+async function firstTimeSkyeMeritEligible(email) {
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!normalized) return false;
+  try {
+    const res = await q(
+      `select id
+       from skyepay_orders
+       where lower(customer_email)=lower($1)
+         and payment_status in ('paid','complete','no_payment_required','trialing','active')
+       limit 1`,
+      [normalized]
+    );
+    return !res.rowCount;
+  } catch {
+    return true;
+  }
 }
 
 export default wrap(async (req) => {
@@ -85,7 +108,21 @@ export default wrap(async (req) => {
 
   const orderId = makeOrderId(body);
   const trialDays = resolveSkyePayTrialDays(offer, client);
-  const metadata = buildSkyePayMetadata({ client, offer, body, orderId, trialDays });
+  const firstTimeEligible = body.skyemerit_first_time && await firstTimeSkyeMeritEligible(body.customer_email);
+  const requestedSkyeMeritCode = body.skyemerit_apply
+    ? (body.skyemerit_code || (firstTimeEligible ? SKYEMERIT_AUTO_CODE : ""))
+    : "";
+  const skyeMeritCheckout = requestedSkyeMeritCode
+    ? buildSkyeMeritCheckout({
+      offer,
+      trialDays,
+      code: requestedSkyeMeritCode,
+      packId: body.skyemerit_pack_id,
+      firstTimeEligible
+    })
+    : null;
+  const bodyWithMerit = { ...body, skyeMeritCheckout };
+  const metadata = buildSkyePayMetadata({ client, offer, body: bodyWithMerit, orderId, trialDays });
   const Stripe = (await import("stripe")).default;
   const stripe = new Stripe(secret, { apiVersion: "2024-06-20" });
   const { success_url, cancel_url } = sessionReturnUrls(origin, client.slug);
@@ -95,8 +132,8 @@ export default wrap(async (req) => {
     cancel_url,
     customer_email: body.customer_email,
     client_reference_id: orderId,
-    allow_promotion_codes: true,
-    line_items: await buildStripeLineItemsWithCatalogPrices({ stripe, offer, client, trialDays }),
+    allow_promotion_codes: skyeMeritCheckout?.applied ? false : true,
+    line_items: await buildStripeLineItemsWithCatalogPrices({ stripe, offer, client, trialDays, skyeMeritCheckout }),
     metadata,
     expires_at: Math.floor(Date.now() / 1000) + (60 * 60 * 2),
     ...(offer.mode === "subscription" ? {
@@ -124,7 +161,13 @@ export default wrap(async (req) => {
   await audit("system", "SKYEPAY_CHECKOUT_CREATED", `skyepay:${order?.id || orderId}`, {
     client_slug: client.slug,
     offer_id: offer.id,
-    stripe_session_id: session.id
+    stripe_session_id: session.id,
+    skyemerit: skyeMeritCheckout ? {
+      applied: skyeMeritCheckout.applied,
+      code: skyeMeritCheckout.code || skyeMeritCheckout.requested_code,
+      discount_cents: skyeMeritCheckout.applied_discount_cents || 0,
+      adjusted_due_cents: skyeMeritCheckout.adjusted_due_cents || null
+    } : null
   });
 
   return json(200, {
@@ -138,6 +181,7 @@ export default wrap(async (req) => {
     activation_path: offer.activation_path || null,
     trial_days: trialDays,
     zero_upfront_trial: trialDays > 0,
+    skyemerit: skyeMeritCheckout,
     client: {
       slug: client.slug,
       client_name: client.client_name,

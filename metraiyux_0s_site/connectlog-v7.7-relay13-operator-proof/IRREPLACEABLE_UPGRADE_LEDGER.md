@@ -20,7 +20,7 @@ ConnectLog v3 was a hardened local contact vault with QR sharing. v4 adds the mi
 
 ✅ ICS reminders: any contact can export a calendar reminder for the next follow-up.
 
-✅ All-contact vCard export: the entire local vault can be handed off to phone/contact tools through one `.vcf` file.
+✅ All-contact vCard export: the entire relationship vault can be handed off to phone/contact tools through one `.vcf` file.
 
 ✅ Shareable HTML card: the owner profile can export a standalone branded HTML card containing the ConnectLog QR and vCard download link.
 
@@ -28,7 +28,7 @@ ConnectLog v3 was a hardened local contact vault with QR sharing. v4 adds the mi
 
 ☐ Built-in auth. This is intentionally excluded because upstream auth will own access control.
 
-☐ Cloud sync. This remains local-first. A future upstream sync adapter can be added without destroying the local vault model.
+☐ Managed cloud sync is separate from the current Relay13 messaging proof. Future upstream sync adapters can be added without destroying the relationship-vault model.
 
 ☐ Scraping engine. This package accepts seed data produced by an outside scraper, but it does not scrape the web itself.
 

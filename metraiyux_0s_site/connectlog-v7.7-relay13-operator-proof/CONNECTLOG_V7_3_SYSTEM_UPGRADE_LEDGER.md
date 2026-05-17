@@ -2,7 +2,7 @@
 
 ## Boundary
 
-ConnectLog remains a standalone static/offline-first contact and card app. Relay13 remains optional. This upgrade adds operator deployment control, diagnostics, and safer bridge operations without making Relay13 mandatory.
+ConnectLog is a production relationship/contact/card app. Relay13 is the production messaging backend. This upgrade adds operator deployment control, diagnostics, and safer bridge operations without exposing private operator credentials.
 
 ## Implemented
 
@@ -16,9 +16,9 @@ ConnectLog remains a standalone static/offline-first contact and card app. Relay
 
 ✅ Copyable Relay13 env/settings block.
 
-✅ Browser diagnostics button that checks IndexedDB/app state and optionally calls Relay13 `/api/health` when an origin is configured.
+✅ Browser diagnostics button that checks IndexedDB/app state and calls Relay13 `/api/health` when an origin is configured.
 
-✅ Deployment status deck showing app version, local vault counts, Relay13 mode, outbox queue state, and remote readiness.
+✅ Deployment status deck showing app version, relationship-vault counts, Relay13 mode, delivery queue state, and production bridge readiness.
 
 ✅ Proof checklist that keeps local proof separate from live Cloudflare proof.
 

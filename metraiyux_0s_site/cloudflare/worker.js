@@ -113,18 +113,25 @@ function bearer(request){
 function skygateOrigin(env){
   return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || '').replace(/\/+$/,'');
 }
+function skygateRequest(env, path, init = {}) {
+  if (env.SKYGATEFS27_WORKER?.fetch) {
+    return env.SKYGATEFS27_WORKER.fetch(new Request(`https://skyegatefs27.internal${path}`, init));
+  }
+  const origin = skygateOrigin(env);
+  return fetch(`${origin}${path}`, init);
+}
 function mirrorSecret(env){
   return String(env.SKYGATE_EVENT_MIRROR_SECRET || env.SKYGATEFS27_EVENT_MIRROR_SECRET || '').trim();
 }
 async function introspectSkygate(request, env){
   const origin = skygateOrigin(env);
   const token = bearer(request);
-  if (!origin) return {ok:false, status:501, error:'SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured.'};
+  if (!origin && !env.SKYGATEFS27_WORKER?.fetch) return {ok:false, status:501, error:'SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN or SKYGATEFS27_WORKER is not configured.'};
   if (!token) return {ok:false, status:401, error:'Missing Authorization bearer token.'};
   const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
   let last = null;
   for (const path of paths) {
-    const res = await fetch(`${origin}${path}`, {
+    const res = await skygateRequest(env, path, {
       method:'POST',
       headers:{'content-type':'application/json'},
       body:JSON.stringify({token})
@@ -139,7 +146,7 @@ async function introspectSkygate(request, env){
 async function mirrorSkygateEvent(env, payload={}, actorContext=null){
   const origin = skygateOrigin(env);
   const secret = mirrorSecret(env);
-  if (!origin || !secret) return {ok:false, skipped:true, reason:'Skyegate origin or mirror secret is not configured.'};
+  if ((!origin && !env.SKYGATEFS27_WORKER?.fetch) || !secret) return {ok:false, skipped:true, reason:'Skyegate origin/service binding or mirror secret is not configured.'};
   const actor = actorContext?.data?.email || actorContext?.data?.username || actorContext?.data?.sub || payload.actor || 'metraiyux-0s';
   const body = {
     source_app: env.SKYGATE_SOURCE_APP || 'metraiyux-0s',
@@ -150,7 +157,7 @@ async function mirrorSkygateEvent(env, payload={}, actorContext=null){
     event_ts: payload.event_ts || new Date().toISOString(),
     meta: payload.meta || {}
   };
-  const res = await fetch(`${origin}/platform/events`, {
+  const res = await skygateRequest(env, '/platform/events', {
     method:'POST',
     headers:{'content-type':'application/json','x-skygate-mirror-secret':secret},
     body:JSON.stringify(body)

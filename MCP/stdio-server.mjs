@@ -155,7 +155,7 @@ const genericTemplateSignals = [
 ];
 const effectSignals = {
   cursorTrail: [/cursor-trail/, /pointermove/, /useMotionValue/, /useSpring/],
-  neonScrollbar: [/::-webkit-scrollbar/, /scrollbar-color/, /scrollbar-thumb/, /scrollbar-track/],
+  neonScrollbar: [/::-webkit-scrollbar/, /scrollbar-color/, /scrollbar-thumb/, /scrollbar-track/, /mcp-neon-scroll-rail/, /mcp-neon-scroll-thumb/],
   textEffects: [/text-shadow/, /background-clip:\s*text/, /glow-text/, /neon-text/, /split[-_\s]?text/, /text-scan/],
   motionChrome: [/scroll-progress/, /motion-chrome/, /neon-motion/, /scanline/, /magnetic[-_\s]?/, /pointer-reactive/, /useScroll/, /useTransform/],
   livingBackground: [/skyesol-living-field/, /living-background/, /alive-background/, /liquid-field/, /aurora wave|aurora[-_\s]?band|drawWave/, /requestAnimationFrame[\s\S]{0,600}(?:particle|canvas|wave)/i, /pointer parallax|mouse parallax|pointermove|mousemove[\s\S]{0,400}(?:tx|ty|parallax)/i],
@@ -1008,6 +1008,262 @@ function patternPack(patternId) {
   };
 }
 
+function resolveWorkspaceTarget(requestedPath = '.') {
+  const raw = String(requestedPath || '.');
+  const resolved = path.isAbsolute(raw) ? path.resolve(raw) : path.resolve(repoRoot, raw);
+  if (resolved !== repoRoot && !resolved.startsWith(repoRoot + path.sep)) {
+    throw new Error(`Path escapes workspace root: ${requestedPath}`);
+  }
+  return resolved;
+}
+
+function walkTargetFiles(root, predicate, acc = []) {
+  if (!fs.existsSync(root)) return acc;
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git' || entry.name === '.wrangler' || entry.name === '.netlify') continue;
+    const full = path.join(root, entry.name);
+    if (entry.isDirectory()) walkTargetFiles(full, predicate, acc);
+    else if (predicate(full)) acc.push(full);
+  }
+  return acc;
+}
+
+function firstExistingPath(paths) {
+  return paths.find((filePath) => filePath && fs.existsSync(filePath)) || null;
+}
+
+function targetImplementationPaths(targetFolder) {
+  const htmlFiles = walkTargetFiles(targetFolder, (filePath) => filePath.endsWith('.html'));
+  const cssFiles = walkTargetFiles(targetFolder, (filePath) => filePath.endsWith('.css'));
+  const jsFiles = walkTargetFiles(targetFolder, (filePath) => /\.(?:js|mjs)$/.test(filePath));
+  const assetDir = path.join(targetFolder, 'assets', 'mcp-implementation');
+  const indexPath = firstExistingPath([path.join(targetFolder, 'index.html'), htmlFiles[0]]);
+  const cssPath = firstExistingPath([
+    path.join(targetFolder, 'style.css'),
+    path.join(targetFolder, 'assets', 'styles.css'),
+    path.join(targetFolder, 'src', 'styles.css'),
+    cssFiles[0]
+  ]) || path.join(assetDir, 'mcp-effects.css');
+  const jsPath = firstExistingPath([
+    path.join(targetFolder, 'script.js'),
+    path.join(targetFolder, 'assets', 'app.js'),
+    path.join(targetFolder, 'src', 'main.js'),
+    jsFiles[0]
+  ]) || path.join(assetDir, 'mcp-effects.js');
+  return { htmlFiles, cssFiles, jsFiles, assetDir, indexPath, cssPath, jsPath };
+}
+
+function managedBlock(text, id, body, kind = 'css') {
+  const start = kind === 'js' ? `// BEGIN quantumskyes:${id}` : `/* BEGIN quantumskyes:${id} */`;
+  const end = kind === 'js' ? `// END quantumskyes:${id}` : `/* END quantumskyes:${id} */`;
+  const block = `${start}\n${String(body || '').trim()}\n${end}`;
+  const pattern = new RegExp(`${start.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${end.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+  if (pattern.test(text)) return text.replace(pattern, block);
+  return `${String(text || '').replace(/\s*$/, '')}\n\n${block}\n`;
+}
+
+function addClassToTag(html, tagName, className) {
+  const tagPattern = new RegExp(`<${tagName}\\b([^>]*)>`, 'i');
+  return html.replace(tagPattern, (match, attrs) => {
+    if (new RegExp(`\\b${className}\\b`).test(match)) return match;
+    const classAttr = attrs.match(/\sclass=(["'])(.*?)\1/i);
+    if (classAttr) {
+      return match.replace(classAttr[0], ` class=${classAttr[1]}${classAttr[2]} ${className}${classAttr[1]}`);
+    }
+    return `<${tagName}${attrs} class="${className}">`;
+  });
+}
+
+function addAttributeToHtmlTag(html, attrName) {
+  if (new RegExp(`\\b${attrName}\\b`, 'i').test(html.match(/<html\b[^>]*>/i)?.[0] || '')) return html;
+  return html.replace(/<html\b([^>]*)>/i, `<html ${attrName}$1>`);
+}
+
+function injectAfterBodyOpen(html, marker, snippet) {
+  if (html.includes(marker)) return html;
+  return html.replace(/<body\b([^>]*)>/i, (match, attrs) => `<body${attrs}>\n${snippet}`);
+}
+
+function injectAssetTagsIfNeeded(html, indexPath, cssPath, jsPath) {
+  let next = html;
+  const rel = (filePath) => path.relative(path.dirname(indexPath), filePath).split(path.sep).join('/');
+  if (!next.includes('data-mcp-generated-css') && cssPath.includes(`${path.sep}mcp-implementation${path.sep}`)) {
+    next = next.replace(/<\/head>/i, `<link rel="stylesheet" href="${rel(cssPath)}" data-mcp-generated-css>\n</head>`);
+  }
+  if (!next.includes('data-mcp-generated-js') && jsPath.includes(`${path.sep}mcp-implementation${path.sep}`)) {
+    next = next.replace(/<\/body>/i, `<script src="${rel(jsPath)}" data-mcp-generated-js></script>\n</body>`);
+  }
+  return next;
+}
+
+function applyMcpParts({
+  targetFolder: requestedTarget = '.',
+  effects = [],
+  componentIds = [],
+  patternIds = [],
+  mode = 'apply'
+} = {}) {
+  const targetFolder = resolveWorkspaceTarget(requestedTarget);
+  const dryRun = mode === 'dryRun';
+  const requestedEffects = [...new Set([...(effects || []), ...inferRequestedEffects(`${componentIds.join(' ')} ${patternIds.join(' ')}`)])];
+  const requestedPatterns = new Set(patternIds || []);
+  if (requestedEffects.includes('neonScrollbar')) requestedPatterns.add('adaptive-neon-scrollbar');
+  if (requestedEffects.includes('livingBackground')) requestedPatterns.add('skyesol-living-background');
+  if (requestedEffects.includes('motionChrome') || requestedEffects.includes('cursorTrail')) requestedPatterns.add('neon-motion-chrome');
+
+  const paths = targetImplementationPaths(targetFolder);
+  const changedFiles = [];
+  const skipped = [];
+  const cssBlocks = [];
+  const jsBlocks = [];
+  let html = paths.indexPath && fs.existsSync(paths.indexPath) ? readIfExists(paths.indexPath) : '';
+
+  if (!fs.existsSync(targetFolder)) {
+    return { ok: false, error: `Target folder does not exist: ${path.relative(repoRoot, targetFolder)}` };
+  }
+
+  if (requestedPatterns.has('adaptive-neon-scrollbar')) {
+    const pack = patternPack('adaptive-neon-scrollbar');
+    cssBlocks.push({ id: 'adaptive-neon-scrollbar-css', body: pack.files['adaptive-neon-scrollbar/adaptive-neon-scrollbar.css'] || '' });
+    jsBlocks.push({ id: 'adaptive-neon-scrollbar-js', body: pack.files['adaptive-neon-scrollbar/adaptive-neon-scrollbar.js'] || '' });
+    if (html) html = addAttributeToHtmlTag(html, 'data-mcp-neon-scrollbar');
+  }
+
+  if (requestedPatterns.has('skyesol-living-background')) {
+    const pack = patternPack('skyesol-living-background');
+    const livingJs = String(pack.files['skyesol-living-background/skyesol-living-background.js'] || '')
+      .replace(/^\s*export\s+function\s+mountSkyeSolLivingBackground/, 'function mountSkyeSolLivingBackground');
+    cssBlocks.push({ id: 'skyesol-living-background-css', body: pack.files['skyesol-living-background/skyesol-living-background.css'] || '' });
+    jsBlocks.push({
+      id: 'skyesol-living-background-js',
+      body: `
+${livingJs}
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();`
+    });
+    if (html) {
+      html = addClassToTag(html, 'body', 'skyesol-living-page');
+      html = injectAfterBodyOpen(html, 'skyesol-living-field', '<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>');
+    }
+  }
+
+  if (requestedPatterns.has('neon-motion-chrome')) {
+    const pack = patternPack('neon-motion-chrome');
+    cssBlocks.push({ id: 'neon-motion-chrome-css', body: pack.files['neon-motion-chrome/neon-motion-chrome.css'] || '' });
+    jsBlocks.push({
+      id: 'neon-motion-chrome-vanilla-js',
+      body: `
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();`
+    });
+    if (html) html = injectAfterBodyOpen(html, 'neon-motion-chrome', '<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>');
+  }
+
+  if (requestedEffects.includes('textEffects')) {
+    cssBlocks.push({
+      id: 'premium-text-effects-css',
+      body: `
+.neon-gradient-text,.premium-text-effects-lab,.skye-gradient-text{
+  color:transparent;
+  background:linear-gradient(90deg,#fff 0%,var(--mcp-neon-scrollbar-a,#f3d483) 31%,var(--mcp-neon-scrollbar-b,#35b7ff) 63%,var(--mcp-neon-scrollbar-c,#6ff2c7) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  text-shadow:0 0 28px rgba(53,183,255,.18),0 0 34px rgba(243,212,131,.12);
+}`
+    });
+    if (html) html = addClassToTag(html, 'h1', 'neon-gradient-text');
+  }
+
+  if (cssBlocks.length === 0 && jsBlocks.length === 0 && !html) {
+    skipped.push('No implementable MCP parts were selected for this static apply pass.');
+  }
+
+  if (!dryRun) {
+    fs.mkdirSync(path.dirname(paths.cssPath), { recursive: true });
+    fs.mkdirSync(path.dirname(paths.jsPath), { recursive: true });
+    let cssText = readIfExists(paths.cssPath);
+    for (const block of cssBlocks) cssText = managedBlock(cssText, block.id, block.body, 'css');
+    if (cssBlocks.length) {
+      fs.writeFileSync(paths.cssPath, cssText);
+      changedFiles.push(path.relative(repoRoot, paths.cssPath));
+    }
+
+    let jsText = readIfExists(paths.jsPath);
+    for (const block of jsBlocks) jsText = managedBlock(jsText, block.id, block.body, 'js');
+    if (jsBlocks.length) {
+      fs.writeFileSync(paths.jsPath, jsText);
+      changedFiles.push(path.relative(repoRoot, paths.jsPath));
+    }
+
+    if (paths.indexPath && html) {
+      html = injectAssetTagsIfNeeded(html, paths.indexPath, paths.cssPath, paths.jsPath);
+      fs.writeFileSync(paths.indexPath, html);
+      changedFiles.push(path.relative(repoRoot, paths.indexPath));
+    }
+  }
+
+  const combined = [
+    paths.indexPath ? readIfExists(paths.indexPath) : html,
+    readIfExists(paths.cssPath),
+    readIfExists(paths.jsPath)
+  ].join('\n\n');
+  return {
+    ok: true,
+    mode,
+    targetFolder: path.relative(repoRoot, targetFolder),
+    appliedPatterns: [...requestedPatterns],
+    appliedEffects: requestedEffects,
+    changedFiles: [...new Set(changedFiles)],
+    skipped,
+    sourcePaths: {
+      index: paths.indexPath ? path.relative(repoRoot, paths.indexPath) : null,
+      css: path.relative(repoRoot, paths.cssPath),
+      js: path.relative(repoRoot, paths.jsPath)
+    },
+    audits: {
+      effects: effectAudit({ source: combined, requested: requestedEffects }),
+      performance: performanceAudit({ source: combined })
+    },
+    rule: 'This tool writes selected MCP implementation parts into the target source. It is intentionally stronger than a receipt.'
+  };
+}
+
 function stackAudit({ source = '', packageJson = '', required = [] } = {}) {
   const combined = `${source}\n${packageJson}`;
   const lowerPackage = String(packageJson || '').toLowerCase();
@@ -1048,16 +1304,28 @@ function effectAudit({ source = '', requested = [] } = {}) {
   const issues = [];
   if ((requested || []).includes('neonScrollbar')) {
     const widthMatches = [...text.matchAll(/::-webkit-scrollbar\s*\{[\s\S]{0,120}?(?:width|height)\s*:\s*(\d+)px/gi)].map((match) => Number(match[1]));
-    const hasWideScrollbar = widthMatches.some((value) => value >= 14);
-    const hasVisibleTrack = /::-webkit-scrollbar-track[\s\S]{0,260}(?:rgba\([^)]+(?:0?\.(?:0[5-9]|[1-9][0-9]?))[)]*\)|box-shadow|linear-gradient|border|background\s*:\s*(?!transparent))/i.test(text);
-    const hasNeonThumb = /::-webkit-scrollbar-thumb[\s\S]{0,360}(?:box-shadow|linear-gradient|radial-gradient|cyan|gold|violet|neon|#(?:64d9ff|27f2ff|f8cb5e|f4c75b|a88cff|8a63ff))/i.test(text);
+    const customRailY = text.match(/\.mcp-neon-scroll-rail-y\s*\{[\s\S]{0,260}?width\s*:\s*(?:(\d+)px|var\(--mcp-neon-scrollbar-size\))/i);
+    const customRailX = text.match(/\.mcp-neon-scroll-rail-x\s*\{[\s\S]{0,260}?height\s*:\s*(?:(\d+)px|var\(--mcp-neon-scrollbar-size\))/i);
+    const customRailSize = Number(text.match(/--mcp-neon-scrollbar-size\s*:\s*(\d+)px/i)?.[1] || 0);
+    const hasCustomRail = /mcp-neon-scroll-rail-y/i.test(text)
+      && /mcp-neon-scroll-rail-x/i.test(text)
+      && /mcp-neon-scroll-thumb/i.test(text)
+      && /pointerdown|setPointerCapture|scrollTo|scrollLeft/i.test(text);
+    const hasWideCustomRail = hasCustomRail
+      && ((Number(customRailY?.[1] || customRailSize) >= 12)
+        && (Number(customRailX?.[1] || customRailSize) >= 12));
+    const hasWideScrollbar = widthMatches.some((value) => value >= 14) || hasWideCustomRail;
+    const hasVisibleTrack = /::-webkit-scrollbar-track[\s\S]{0,260}(?:rgba\([^)]+(?:0?\.(?:0[5-9]|[1-9][0-9]?))[)]*\)|box-shadow|linear-gradient|border|background\s*:\s*(?!transparent))/i.test(text)
+      || /\.mcp-neon-scroll-rail[\s\S]{0,520}(?:rgba\([^)]+(?:0?\.(?:0[5-9]|[1-9][0-9]?))[)]*\)|box-shadow|linear-gradient|border|backdrop-filter)/i.test(text);
+    const hasNeonThumb = /::-webkit-scrollbar-thumb[\s\S]{0,360}(?:box-shadow|linear-gradient|radial-gradient|cyan|gold|violet|neon|#(?:64d9ff|27f2ff|f8cb5e|f4c75b|a88cff|8a63ff))/i.test(text)
+      || /\.mcp-neon-scroll-thumb[\s\S]{0,520}(?:box-shadow|linear-gradient|radial-gradient|cyan|gold|violet|neon|#(?:64d9ff|27f2ff|f8cb5e|f4c75b|a88cff|8a63ff))/i.test(text);
     const scrollbarBlocks = text.match(/::-webkit-scrollbar(?:-[\w-]+)?\s*\{[^}]*\}/gi) || [];
     const hidesScrollbar = /scrollbar-width\s*:\s*none/i.test(text)
       || scrollbarBlocks.some((block) => /display\s*:\s*none|opacity\s*:\s*0(?:[;\s}]|\.0)/i.test(block));
-    if (!hasWideScrollbar) issues.push('Neon scrollbar must be visibly present: use a 14px+ scrollbar width/height, not a thin hidden default.');
+    if (!hasWideScrollbar) issues.push('Neon scrollbar must be visibly present: use a 14px+ native scrollbar or 12px+ always-visible custom rail.');
     if (!hasVisibleTrack) issues.push('Neon scrollbar track must stay slightly opaque/visible with border, gradient, or inset glow.');
     if (!hasNeonThumb) issues.push('Neon scrollbar thumb must include visible neon highlight: gradient, glow, or bright brand color.');
-    if (hidesScrollbar) issues.push('Scrollbar must not be hidden or fully transparent.');
+    if (hidesScrollbar && !hasCustomRail) issues.push('Native scrollbars may only be hidden when an always-visible custom rail is implemented.');
   }
   return {
     ok: missing.length === 0 && issues.length === 0,
@@ -2064,6 +2332,20 @@ server.registerTool('repo_read', {
 }, async ({ path: requestedPath }) => {
   const filePath = safeJoin(repoRoot, requestedPath);
   return { content: [{ type: 'text', text: readText(filePath) }] };
+});
+
+server.registerTool('design_apply_mcp_parts', {
+  title: 'Apply MCP Parts To Target',
+  description: 'Write selected MCP design parts into a workspace target. This is the implementation side: it edits CSS/JS/HTML for supported effects instead of only producing a receipt.',
+  inputSchema: {
+    targetFolder: z.string().describe('Workspace-relative or absolute target folder to modify'),
+    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Effects to apply when supported by static MCP parts'),
+    componentIds: z.array(z.string()).optional().describe('Component ids or aliases to infer effects/patterns'),
+    patternIds: z.array(z.string()).optional().describe('Pattern ids from quantumskyes://design/pattern-manifest to apply when supported'),
+    mode: z.enum(['apply', 'dryRun']).optional().describe('apply writes files; dryRun reports planned writes only')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(applyMcpParts(args), null, 2) }] };
 });
 
 server.registerTool('design_find', {

@@ -2,7 +2,7 @@
 
 ## Scope
 
-ConnectLog remains a standalone local-first relationship/contact/card app. Relay13 remains a standalone messaging backend. v7.6 strengthens the optional bridge by adding an operator-run activation proof path instead of relying on setup notes or visual UI claims.
+ConnectLog is a production relationship/contact/card app. Relay13 is the standalone production messaging backend. v7.6 strengthens the bridge by adding an operator-run activation proof path instead of relying on setup notes or visual UI claims.
 
 ## Added
 
@@ -24,9 +24,9 @@ ConnectLog remains a standalone local-first relationship/contact/card app. Relay
 
 ## Still intentionally preserved
 
-- Local fallback mode remains active.
+- Protected delivery queue mode remains active for browsers without Relay13 credentials.
 - Local inbox/outbox remains usable when Relay13 is absent or unhealthy.
-- API keys are still browser-local operator settings and are never embedded in public QR payloads.
+- API keys remain private operator settings and are never embedded in public QR payloads.
 - ConnectLog does not claim live remote delivery until a deployed Relay13 Worker passes activation proof.
 
 ## Proof run
@@ -43,4 +43,4 @@ ConnectLog v7.6 Relay13 activation-proof smoke checks passed.
 
 ## Honest boundary
 
-This package proves source wiring, UI wiring, local fallback behavior, and proof-runner presence. It does not prove Cloudflare live delivery until Relay13 is deployed, D1 migrations are applied remotely, a workspace/API key exists, and the v7.6 activation proof is run against the live Worker origin.
+This package proves source wiring, UI wiring, delivery-queue behavior, and proof-runner presence. Current production receipts also prove Cloudflare live delivery with Relay13 deployed, D1 migrations applied remotely, workspace/API key present, and activation proof run against the live Worker origin.

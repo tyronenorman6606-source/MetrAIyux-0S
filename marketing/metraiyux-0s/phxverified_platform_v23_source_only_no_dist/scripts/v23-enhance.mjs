@@ -269,6 +269,306 @@ const BUSINESS_INSIGHTS = [
     ]
   }
 ];
+const LONGFORM_UPGRADES = {
+  'weekly-company-command-rhythm': {
+    readTime:'16 min',
+    longformPromise:'Use this as a weekly owner meeting you can run with a spreadsheet, a notebook, or the full 0S. The point is not ceremony. The point is to keep money, customers, delivery, proof, and risk visible at the same time.',
+    diagnostics:[
+      { label:'Money signal', title:'Cash and revenue are reviewed together', copy:'Revenue can look fine while cash is getting squeezed by refunds, slow collections, inventory, payroll timing, or tools nobody uses. The weekly rhythm should show revenue, collected cash, open invoices, and upcoming obligations in the same view.' },
+      { label:'Customer signal', title:'Every open request has a next action', copy:'A lead is not real operating value until somebody owns it. Review new leads, unanswered requests, quotes sent, quotes accepted, jobs scheduled, and follow-ups due.' },
+      { label:'Proof signal', title:'Public claims match live evidence', copy:'Before the company says a page, portal, offer, checkout, review surface, or customer route is live, the owner should be able to open the link and see proof.' }
+    ],
+    metrics:['Collected cash this week','Open invoices older than 7 days','New leads and first-response time','Quotes sent and quote acceptance rate','Jobs or orders delivered','Follow-ups due today','Reviews requested and received','Broken links or public claims needing cleanup'],
+    worksheet:['Open the same scorecard every Monday or Friday. Do not change the format every week.','Mark each lane green, yellow, or red. Green means stable, yellow means attention, red means owner intervention.','Pick three fixes only: one revenue fix, one customer fix, and one proof or delivery fix.','Write the decision in past-tense language once it is done so next week starts from evidence, not memory.','Move anything that needs a build, gate, vault, page, or proof record into the 0S inquiry path.'],
+    mistakes:['Letting the meeting become a complaint session instead of a decision session.','Tracking vanity metrics without tracking the next action.','Reviewing marketing without reviewing intake and follow-up.','Promising public progress before the live route has been opened in a browser.','Ending the meeting with ten priorities and no owner for each one.'],
+    sections:[
+      ['Why most owner meetings do not change the business',[
+        'Small companies rarely fail because the owner has no instincts. They fail because the business keeps asking the owner to remember too much at once. Leads live in text threads, payments live in dashboards, receipts live in inboxes, website changes live in half-finished folders, and customer problems live in whoever got yelled at last. A weekly rhythm does not make the company more corporate. It makes the company visible enough to be managed.',
+        'The mistake is treating a weekly meeting like a motivational ritual. The useful version is a control room. It answers five questions every week: what money moved, what customers are waiting, what delivery is blocked, what proof is public, and what risk needs a decision. When those five lanes are reviewed together, the owner can see the real constraint instead of chasing the loudest notification.'
+      ]],
+      ['The manual scorecard that works before software',[
+        'Start with one sheet. Across the top, put the date. Down the left side, put cash, revenue, open invoices, new leads, unanswered leads, quotes sent, jobs scheduled, jobs delivered, review requests, broken links, customer escalations, and owner decisions. Add one owner column and one next-action column. That is enough to expose most operating problems without buying anything.',
+        'The discipline is to keep the scorecard boring. Do not make it a dashboard project. A dashboard that takes three days to maintain is another liability. The owner should be able to update the weekly board in twenty minutes and read the business in ten. If a number cannot be found quickly, that is not a failure of the meeting; it is a signal that the system does not yet know where the fact lives.'
+      ]],
+      ['Separate lagging numbers from operating signals',[
+        'Revenue is a lagging number. By the time monthly revenue looks bad, the company may have already dropped leads, quoted too slowly, ignored reviews, or sold the wrong offer. The weekly rhythm should include leading indicators: first-response time, quote acceptance, follow-up backlog, delivery exceptions, and proof gaps. These are the numbers that warn the owner before the bank balance becomes the alarm.',
+        'The best weekly scorecards include both truth and motion. Truth is the current state: how much cash, how many leads, how many open jobs, how many late responses. Motion is the next action: who calls, who fixes the page, who uploads receipts, who gets the review request, who checks the broken link. A scorecard without motion is a report. A scorecard with motion becomes management.'
+      ]],
+      ['Run the meeting in lanes, not vibes',[
+        'Use five lanes: money, customers, delivery, proof, and risk. Money covers cash, invoices, subscriptions, refunds, margins, and upcoming obligations. Customers covers leads, quotes, follow-ups, complaints, reviews, and repeat buyers. Delivery covers jobs, orders, files, scope changes, and handoffs. Proof covers public pages, screenshots, receipts, review surfaces, deployment records, and live links. Risk covers security, access, stale promises, compliance, and anything that could embarrass the company if ignored.',
+        'Each lane gets a color and an owner decision. Green means the lane is stable and no owner action is needed. Yellow means a person needs to move something before next week. Red means the owner must decide now because delay is costing money, trust, or control. This color system is simple enough to keep and serious enough to stop the company from drifting.'
+      ]],
+      ['The decision log is the memory of the company',[
+        'A decision that is not written down becomes folklore. Pricing exceptions, refund promises, delivery changes, customer escalations, vendor commitments, tool cancellations, and public launch decisions need a small log. The log should include date, decision, owner, reason, due date, and proof. The reason matters because three months later the company will forget why the decision was made and may accidentally reverse it.',
+        'This is especially important when the company is moving fast. Fast teams create many tiny decisions. If those decisions stay inside chat messages, the owner has to become the archive. A decision log lets the company operate with memory even when the owner is tired, busy, or working across multiple surfaces.'
+      ]],
+      ['Where the 0S belongs in the rhythm',[
+        'The 0S is most useful when the company already knows its lanes. It gives those lanes rooms: a deployment atlas for live surfaces, a vault for receipts and proof, gates for protected flows, public pages for buyers, review surfaces for reputation, and operator notes for decisions. It does not remove the need for the owner to think. It removes the repeated hunt for scattered facts.',
+        'In the weekly rhythm, the owner can ask: what went live, what needs proof, what public link should be removed, what customer flow needs a gate, what receipt belongs in the vault, what page should point back into the system, and what decision needs to be visible next week. That is the difference between a software stack and an operating system.'
+      ]],
+      ['A practical first month rollout',[
+        'Week one is inventory. List the numbers you can already find and the numbers you cannot. Week two is ownership. Assign one person or one role to each lane. Week three is cleanup. Fix the most expensive leak, usually slow follow-up, missing receipts, stale public copy, or unclaimed review requests. Week four is system design. Decide what should become a repeatable workflow instead of a manual chase.',
+        'By the end of the first month, the company should have one scorecard, one decision log, one proof folder or vault, one public link checklist, and one owner review cadence. That is enough to make the business calmer. Then the 0S can turn the repeated parts into surfaces, gates, receipts, and automated handoffs.'
+      ]]
+    ]
+  },
+  'local-visibility-that-converts': {
+    readTime:'17 min',
+    longformPromise:'This is a practical local visibility playbook for businesses that want calls, quotes, bookings, and trust instead of empty traffic.',
+    diagnostics:[
+      { label:'Discovery', title:'The public record is complete', copy:'Name, category, hours, phone, website, service area, description, photos, and proof should tell a buyer what the business does and what to do next.' },
+      { label:'Conversion', title:'The page answers the buyer in motion', copy:'A local buyer is comparing quickly. The page needs service clarity, location signal, trust proof, and a call or request path without forcing the buyer to decode the brand.' },
+      { label:'Control', title:'Dead links are removed from the public story', copy:'Visibility becomes dangerous when old routes, stale offers, or broken pages stay public. The operating layer should know which links are live.' }
+    ],
+    metrics:['Profile completeness','Calls or quote requests by page','Service-page click-through','Direction or map actions','Review count and response rate','Broken public links found','Pages with current hours and service area','Claimed versus unclaimed profiles'],
+    worksheet:['Search the business name, top service, and city. Write down what a buyer sees before clicking.','Fix the business profile basics: category, hours, phone, website, description, service area, and photos.','Create one page for the highest-value service and one page for the strongest local market.','Add one clear action to each page: call, quote, booking, claim, or compare.','Review the live links weekly and remove anything that 404s or misrepresents the offer.'],
+    mistakes:['Treating ranking as the goal instead of buyer action.','Using vague service descriptions that do not match search intent.','Sending every visitor to a generic homepage with no local context.','Letting old domains, staging links, and abandoned tools stay public.','Listing every minor deployment instead of the major surfaces a buyer or owner can trust.'],
+    sections:[
+      ['Visibility is not the same as being chosen',[
+        'A business can show up and still lose the buyer. Local visibility only matters when it helps a person make a decision. The buyer wants to know whether the company handles the job, serves the area, looks alive, has proof, and gives a clean next step. Ranking without those answers is just a louder leak.',
+        'Google Business Profile guidance pushes owners to keep information accurate and complete, and local ranking guidance centers relevance, distance, and prominence. That maps cleanly to real buyer behavior. Relevance means the business clearly matches the job. Distance means the buyer can understand service area. Prominence means the business looks active, known, and trusted enough to call.'
+      ]],
+      ['Start with the public record before writing more copy',[
+        'The manual method begins with cleanup. Confirm the business name, primary category, secondary categories, phone, website, hours, holiday hours, service area, description, attributes, photos, and appointment or quote links. Then search the business from a private browser and a phone. What shows up first? What is wrong? What would confuse a buyer?',
+        'This step is not glamorous, but it is often where money leaks. A wrong phone number, old website, missing category, unclear service area, or dead page can waste every marketing dollar that follows. A business should not buy traffic to a broken front door.'
+      ]],
+      ['Build pages around buyer decisions',[
+        'A useful local page answers a specific question. For example: emergency HVAC repair in Glendale, pallet pickup in Phoenix, smoke shop near Litchfield Park, bookkeeping for contractors, or review management for a local service business. The page should not be a general brand essay. It should explain the service, the area, the proof, the process, the response window, and the next action.',
+        'The page should also be honest about fit. If the company does not serve a city, does not offer emergency work, does not handle commercial accounts, or requires a minimum order, say so. Clear fit improves conversion because the right buyer feels less friction and the wrong buyer self-selects out before wasting time.'
+      ]],
+      ['Proof belongs close to the action',[
+        'Do not hide trust proof in a separate gallery that buyers never open. Put proof near the action: review excerpts, project photos, service examples, verification status, business page links, receipts, or live app routes. The buyer should not have to search the site to answer "is this real?"',
+        'For a Valley Verified page, the proof can include the business category, city, contact routes, website handoff, claim status, and system links. For a full 0S build, the proof can include deployment receipts, live surfaces, gates, review pages, and vault-backed records. The more expensive the service, the closer proof should be to the buying decision.'
+      ]],
+      ['The local visibility loop',[
+        'Run the loop monthly: search, inspect, fix, publish, measure, and remove. Search the important terms. Inspect what appears. Fix wrong information. Publish one useful page or update. Measure calls, quote requests, form starts, and page clicks. Remove dead links and stale claims. This loop is more valuable than randomly posting content because it keeps the public record aligned with the business.',
+        'The loop should also include competitor observation. The point is not to copy competitors. It is to understand the buyer standard in the market. If every strong competitor shows pricing ranges, emergency hours, service photos, and hundreds of reviews, a vague page with no proof is not ready.'
+      ]],
+      ['Where the 0S improves the loop',[
+        'The 0S makes local visibility easier by connecting pages to operations. A Valley Verified profile can become a public discovery point. A full system can route inquiries into forms, gates, payment flows, review surfaces, and proof storage. The Deployment Atlas keeps track of what is live so stale experiments do not stay in public circulation.',
+        'The result is a cleaner handoff. A buyer sees a useful page, takes action, enters a workflow, and the owner can later review what happened. That is better than a pile of disconnected landing pages that generate mystery leads and no operating memory.'
+      ]],
+      ['A 30-day local visibility plan',[
+        'Days one through seven: fix public business data and remove broken links. Days eight through fourteen: build or improve the highest-value local service page. Days fifteen through twenty-one: add proof, review prompts, photos, and a clear quote or call path. Days twenty-two through thirty: measure actions, follow up on every request, and decide which service or city deserves the next page.',
+        'Do not publish ten weak pages. Publish one page that answers real buyer questions and routes action cleanly. Then repeat the loop. Compounding local visibility comes from consistent accuracy, proof, and follow-up.'
+      ]]
+    ]
+  },
+  'customer-intake-follow-up-system': {
+    readTime:'15 min',
+    longformPromise:'Use this to stop paying for leads that disappear inside inboxes, texts, DMs, and quote chaos.',
+    diagnostics:[
+      { label:'Capture', title:'Every request becomes a record', copy:'A customer request should never exist only as a notification. It needs customer info, source, need, timeline, owner, status, and next action.' },
+      { label:'Speed', title:'The first response window is defined', copy:'If the team does not know the expected response time, the customer decides the company is slow before the owner sees the problem.' },
+      { label:'Memory', title:'Proof travels with the job', copy:'Photos, receipts, scopes, approvals, quote changes, and delivery notes should stay attached to the customer journey.' }
+    ],
+    metrics:['First-response time','Requests by source','Unanswered requests','Quotes sent','Quote acceptance rate','Follow-ups due','Closed-lost reasons','Jobs missing proof files'],
+    worksheet:['Define the minimum fields for a qualified request.','Create five statuses: new, contacted, quoted, scheduled, closed.','Write response-time rules for business hours and after-hours messages.','Create follow-up templates for quote sent, no response, scheduling, and post-delivery review.','Store files and decisions with the request instead of leaving them in chat threads.'],
+    mistakes:['Buying more leads before fixing response speed.','Letting every salesperson invent their own qualification questions.','Quoting without recording scope assumptions.','Forgetting to follow up after the customer asks one clarifying question.','Losing proof after delivery and then struggling to collect reviews or defend work.'],
+    sections:[
+      ['The cheapest growth is often fewer dropped requests',[
+        'A business can feel like it needs more marketing when the real problem is that existing demand is leaking. A customer asks a question, someone replies late, the quote is missing context, the follow-up never happens, and the owner calls it a slow month. Before spending more money on ads, the company needs to know how many requests arrived, where they came from, who answered, what happened next, and why they did or did not close.',
+        'This is not about installing a giant CRM on day one. It is about respecting the moment when a buyer raises their hand. The intake system should make that moment visible and give it a path.'
+      ]],
+      ['Define the request record',[
+        'At minimum, capture name, contact method, service or product, location, timeline, budget signal if relevant, source, notes, files, owner, status, and next action. If a field does not help qualify, route, price, schedule, or follow up, leave it out. Long forms can kill action. Thin forms can create chaos. The right form captures enough to move.',
+        'Every request should become a record even if the first message came by phone, text, email, social DM, or walk-in conversation. Manual entry is fine at first. The habit matters more than the tool. If the company cannot count requests, it cannot diagnose revenue leaks.'
+      ]],
+      ['Create statuses that match the real workflow',[
+        'Most small teams need simple statuses: new, contacted, qualifying, quoted, scheduled, delivered, won, lost, and nurture. The key is that each status has a rule. New means no human has responded. Contacted means the first response happened. Quoted means price or scope has been sent. Scheduled means the work has a date. Delivered means the job is complete and proof should be collected.',
+        'Do not create twenty statuses because the tool allows it. Too many statuses become decoration. The owner should be able to open the queue and immediately see where money is stuck.'
+      ]],
+      ['Follow-up is part of sales, not begging',[
+        'A good follow-up system is respectful and useful. It reminds the customer what they asked for, confirms the next step, answers the common objection, and gives an easy way to respond. It does not harass. It does not pretend urgency where none exists. It simply keeps the conversation from dying because everyone got busy.',
+        'Write templates for common moments: thanks for reaching out, need more info, quote sent, checking in, schedule confirmation, pre-delivery checklist, delivery complete, review request, and dormant lead reactivation. Templates should sound human and be edited when the situation needs judgment.'
+      ]],
+      ['Proof should be collected during the job, not after the fact',[
+        'If the business waits until the end to gather photos, approvals, receipts, notes, and review context, proof will be incomplete. Build proof into the workflow. Before work starts, capture scope. During work, capture changes. After delivery, capture completion and customer response. That proof protects the company and fuels marketing later.',
+        'This matters for disputes, reviews, repeat sales, training, and owner visibility. A job without proof is harder to defend and harder to learn from.'
+      ]],
+      ['Where 0S changes the workload',[
+        'MetrAIyux 0S can turn the intake path into an operating surface. The request can enter a form, attach files, move through a gate, create a packet, store proof in a vault, and later appear in an owner review. SkyeGateFS27 is useful when access, payment, or protected customer state matters. SkyeVault is useful when the record needs to survive beyond the conversation.',
+        'The value is not "automation" as a buzzword. The value is that every request has a place, every place has a state, and the owner can see where money is leaking without reading every message manually.'
+      ]],
+      ['A 14-day intake repair plan',[
+        'Days one through three: count every request from the last thirty days and mark what happened. Days four through six: define the required fields and statuses. Days seven through ten: build the form or sheet, write response templates, and assign ownership. Days eleven through fourteen: run the live queue daily and record first-response time and follow-up backlog.',
+        'After two weeks, the owner should know whether the business needs more leads or simply needs to stop wasting the leads it already earned.'
+      ]]
+    ]
+  },
+  'records-receipts-and-money-hygiene': {
+    readTime:'16 min',
+    longformPromise:'This is a practical records system for owners who want cleaner cash visibility, easier taxes, stronger proof, and fewer mystery files.',
+    diagnostics:[
+      { label:'Income', title:'Money in can be explained', copy:'Deposits, invoices, payment processor records, cash sales, refunds, and discounts should tie back to a customer, sale, or operating event.' },
+      { label:'Expense', title:'Money out has support', copy:'Receipts, bills, card statements, subscriptions, vendor agreements, payroll records, and assets need labels and storage.' },
+      { label:'Proof', title:'Files are retrievable under pressure', copy:'The test is simple: can the owner find the right receipt, scope, invoice, or proof screenshot in under two minutes?' }
+    ],
+    metrics:['Uncategorized transactions','Receipts missing','Open invoices','Refunds and chargebacks','Recurring subscriptions','Cash collected versus invoiced','Monthly close completed date','Files found within two minutes'],
+    worksheet:['Create folders by year, month, and record type.','Use file names with date, vendor or customer, amount, and document type.','Reconcile weekly if volume is high and monthly at minimum.','Keep a missing-receipt list instead of pretending everything is clean.','Attach proof files to the customer, invoice, job, or deployment whenever possible.'],
+    mistakes:['Waiting until tax season to organize a full year of records.','Saving screenshots with random file names that cannot be searched.','Mixing personal and business expenses without notes.','Canceling tools without saving invoices or exports.','Treating receipts as accounting-only instead of operational proof.'],
+    sections:[
+      ['Records are not just for taxes',[
+        'The IRS guidance is direct: records should clearly show income and expenses, and supporting documents matter. That is the compliance reason. The operating reason is just as important. Clean records tell the owner what sold, what cost too much, what repeated, what was refunded, what is late, and what proof exists when a customer or vendor question comes back.',
+        'A business with messy records pays twice. It pays in tax-season stress, and it pays every week when the owner cannot see cash clearly. The goal is not perfect bookkeeping theatre. The goal is a record system that helps the company make decisions while also keeping the accountant from having to reconstruct the year from chaos.'
+      ]],
+      ['Build a record map before buying tools',[
+        'A simple record map has six buckets: income, expenses, payroll, assets, contracts, and customer proof. Income includes invoices, deposits, payment processor reports, cash logs, refunds, and discounts. Expenses include receipts, bills, subscriptions, vendor payments, card statements, and reimbursements. Payroll includes wages, contractor payments, taxes, and timesheets. Assets include equipment, vehicles, software, and depreciation support. Contracts include scopes, approvals, and change orders. Customer proof includes photos, messages, delivery confirmation, and review context.',
+        'Once the buckets exist, tools become easier to choose. Without the map, the company just moves mess into new software.'
+      ]],
+      ['Use naming rules that survive busy weeks',[
+        'A good file name is boring: YYYY-MM-DD_vendor-or-customer_amount_type. A receipt might be 2026-05-17_home-depot_187-42_receipt.pdf. A customer proof file might be 2026-05-17_bobs-smoke-shop_delivery-photo.jpg. The point is searchability. The owner should not need to remember which device captured the file or who uploaded it.',
+        'Folders should follow the same logic. Year, month, record type, and customer or vendor are usually enough. If the system requires clever memory, it will fail when the business gets busy.'
+      ]],
+      ['Monthly close for small teams',[
+        'A monthly close can be simple. Reconcile bank and card accounts. Label unknown transactions. Attach missing receipts. Review open invoices. Check subscriptions. Export payment processor reports. Save payroll records. Write a short owner summary: cash in, cash out, unpaid money, unusual expenses, refunds, and decisions needed.',
+        'The close should produce questions, not just files. Why did this subscription double? Why are these invoices late? Why did this service lane produce revenue but weak cash? Why are refunds clustered around one offer? Those questions help the owner fix operations before the numbers repeat.'
+      ]],
+      ['Receipts protect customer trust',[
+        'Receipts and proof also matter outside accounting. If a customer disputes scope, if a vendor claims unpaid work, if a platform questions a charge, or if a review misstates what happened, the company needs records. A screenshot, approval, signed scope, delivery photo, payment receipt, or change note can prevent a small issue from becoming expensive.',
+        'This is why records should attach to jobs and customer flows, not only to accounting folders. Accounting asks "what did this cost?" Operations asks "what happened?" The strongest system answers both.'
+      ]],
+      ['Where SkyeVault and 0S fit',[
+        'SkyeVault gives the company a place for receipts, proof packets, screenshots, files, exports, and handoff records. MetrAIyux 0S can connect those records to pages, gates, payment flows, deployment receipts, and operating notes. That means a proof file can be part of the workflow, not an afterthought someone uploads weeks later.',
+        'The owner still needs discipline. The system does not magically make bad file habits good. But it gives the discipline a durable place to live and makes it easier to prove the business is operating from evidence.'
+      ]],
+      ['A first-week cleanup sprint',[
+        'Day one: list every place business records currently live. Day two: create the six buckets. Day three: clean this month only. Day four: clean last month. Day five: create the missing-receipt list. Day six: reconcile open invoices and subscriptions. Day seven: write the first owner record summary.',
+        'Do not start by organizing the entire history of the company. Start with the current month and build the rhythm. Historical cleanup can follow once the live system is stable.'
+      ]]
+    ]
+  },
+  'small-business-security-without-paranoia': {
+    readTime:'17 min',
+    longformPromise:'This is security without performance: clear controls, fewer exposed doors, better backups, and a response plan a small team can actually use.',
+    diagnostics:[
+      { label:'Access', title:'Every important account has an owner', copy:'Website, domain, email, payment, file storage, social, analytics, booking, and bank access should have current owners, MFA, and recovery methods.' },
+      { label:'Data', title:'The business collects less sensitive information', copy:'If the company does not need a piece of customer data, it should not collect it. If it must collect it, access should be limited.' },
+      { label:'Recovery', title:'Backups and response steps are tested', copy:'A backup that has never been restored is a hope, not a recovery plan. The team needs a simple breach and outage checklist.' }
+    ],
+    metrics:['Accounts with MFA enabled','Former users removed','Critical files backed up','Backup restore test date','Devices with auto-updates on','Sensitive data locations','Public routes retired','Incident response contacts confirmed'],
+    worksheet:['List every critical account and who owns it.','Turn on MFA for email, domain, website, payments, file storage, and admin tools.','Remove old users and shared passwords.','Back up files and test restoring one important folder.','Write a one-page incident plan with contacts, shutdown steps, and customer communication rules.'],
+    mistakes:['Thinking security is only a big-company issue.','Keeping old admin accounts because nobody wants to check.','Collecting customer data the business does not actually need.','Using public pages for sensitive workflows.','Assuming backups work without testing a restore.'],
+    sections:[
+      ['Security is mostly boring on purpose',[
+        'The FTC small-business guidance emphasizes practical basics: update software, require strong passwords, use MFA, back up important files, secure devices, train staff, and have a response plan. NIST CSF 2.0 gives owners a helpful structure: govern, identify, protect, detect, respond, and recover. None of that requires pretending to be a giant enterprise. It requires building habits that make common failures less damaging.',
+        'The goal is not paranoia. The goal is fewer mystery doors. A small business should know who can access important systems, where customer data lives, what public links exist, how files are backed up, and what happens if something goes wrong.'
+      ]],
+      ['Start with account inventory',[
+        'List the domain registrar, website host, email provider, payment processor, bank portal, file storage, booking system, CRM, social accounts, ad accounts, review platforms, analytics, and admin tools. For each account, record owner, login method, MFA status, recovery email, backup admin, billing owner, and whether old users still have access.',
+        'This inventory often exposes the real risk immediately. Former contractors still have access. Shared passwords are floating around. Recovery emails point to dead inboxes. Nobody knows who owns the domain. These problems are common and fixable.'
+      ]],
+      ['Protect customer data by collecting less of it',[
+        'FTC guidance on personal information starts with a simple idea: know what you collect, keep only what you need, protect it, dispose of it safely, and plan for incidents. Small businesses often collect too much because forms are easy to add. Every extra field becomes something to protect.',
+        'Ask: do we need full birth dates, home addresses, IDs, payment details, medical notes, or sensitive context? If not, do not collect it. If yes, limit access and decide how long it should live. Data minimization is one of the cheapest security controls because the safest record is the one the company never needed to hold.'
+      ]],
+      ['Backups need proof',[
+        'A backup policy should answer what is backed up, where it lives, who can restore it, how often it runs, and when it was last tested. Many businesses believe they have backups because a platform says files sync. Sync is not always backup. If ransomware, deletion, billing failure, or accidental overwrite happens, the owner needs a restore path.',
+        'Test one restore per quarter. Pick an important folder, restore it to a safe location, and write down the result. This turns backup from a belief into proof.'
+      ]],
+      ['Separate public pages from protected workflows',[
+        'A public marketing page should not be the same surface as sensitive admin operations. Quote requests, payment flows, customer files, private notes, and operator controls need appropriate gates. The more public experiments a company launches, the more important it becomes to know which routes are live, which are gated, and which should be retired.',
+        'This is where many fast-moving teams get sloppy. A test page ships, an old function route stays available, a staging form collects real data, or a dashboard link appears in public navigation. Link discipline is a security control.'
+      ]],
+      ['Where 0S changes the workload',[
+        'SkyeGateFS27 keeps access-sensitive flows behind gate logic. SkyeVault keeps proof and files out of casual website content. The Deployment Atlas shows live surfaces and helps operators remove or demote routes that should not be part of the public story. Together, those pieces create a cleaner boundary between public proof and protected operation.',
+        'The owner still needs account inventory, MFA, backups, and response planning. The system helps by making surfaces explicit. You cannot secure what you cannot see.'
+      ]],
+      ['A one-page incident plan',[
+        'Write the plan before the bad day. Include who decides, who communicates, how to contact vendors, how to freeze affected accounts, where backups live, where customer notices are drafted, and what proof needs to be preserved. Keep it short enough that a tired person can use it.',
+        'The plan should also say what not to do: do not delete evidence, do not make public claims before facts are confirmed, do not keep using compromised accounts, and do not hide customer-impacting issues from the person responsible for customer trust.'
+      ]]
+    ]
+  },
+  'reviews-social-proof-without-shady-tactics': {
+    readTime:'16 min',
+    longformPromise:'This is a review system that builds trust without fake pressure, fake praise, or manipulative incentives.',
+    diagnostics:[
+      { label:'Ask', title:'Every real customer gets a neutral request', copy:'The business should ask at the right moment without filtering only happy customers or writing the review for them.' },
+      { label:'Respond', title:'Reviews become service intelligence', copy:'Responses should be timely, specific, and useful. Review themes should feed training, FAQ updates, and offer improvements.' },
+      { label:'Prove', title:'Social proof has a home', copy:'Good proof should not live only in screenshots. It should be searchable, linkable, and connected to the customer journey.' }
+    ],
+    metrics:['Review requests sent','Review conversion rate','Average response time','Negative review response rate','Themes repeated by customers','Service fixes from reviews','Public proof pages updated','Reviews tied to completed jobs'],
+    worksheet:['Pick the exact moment when a review request should be sent.','Write a neutral request that does not pressure for positivity.','Create response templates for praise, complaints, confusion, and fake-looking reviews.','Review themes monthly and turn them into service improvements.','Publish proof in a way buyers can inspect without exaggeration.'],
+    mistakes:['Only asking customers who seem happy.','Offering rewards only for positive reviews.','Ignoring negative reviews until they define the public story.','Copying review text into marketing without context or permission rules.','Treating reviews as decoration instead of operational feedback.'],
+    sections:[
+      ['Buyers trust reviews because they are imperfect',[
+        'A review profile with only polished praise can look less believable than one with real detail, range, and human response. Buyers know reviews can be gamed. The FTC warns against fake reviews, misleading review practices, and incentives that distort the record. A serious review system should make trust easier, not shakier.',
+        'The goal is to ask real customers, keep the request neutral, respond with care, and learn from patterns. A review program should never pressure customers to say what the company wants to hear. It should make it easy for real customers to say what happened.'
+      ]],
+      ['Ask at the right operational moment',[
+        'The best review moment is after value is delivered and while the experience is still fresh. For a service business, that might be after completion photos and payment confirmation. For a retail business, it might be after a helpful visit or repeat purchase. For a B2B company, it might be after a milestone or measurable result.',
+        'Do not wait weeks, and do not ask before the customer has enough experience to speak honestly. The request should be short, neutral, and easy: thank you, here is the link, your honest feedback helps buyers and helps us improve.'
+      ]],
+      ['Review requests need rules',[
+        'Write rules so the team does not improvise. Ask every eligible real customer, not only the ones who seem thrilled. Do not provide a script that tells customers what to say. Do not offer compensation for positive reviews. Do not block negative feedback from view. Do not post fake customer stories. Keep the rules where staff can see them.',
+        'These rules protect the business. A short-term fake boost can create long-term trust damage. Real reviews are slower but stronger because they can survive scrutiny.'
+      ]],
+      ['Respond like the review is public training',[
+        'A review response is not only for the reviewer. It is for every future buyer reading how the company behaves under praise, confusion, and criticism. Thank specific details when possible. For complaints, acknowledge, avoid arguing, invite a private resolution when appropriate, and show what the company will improve without revealing private customer information.',
+        'The owner should review responses monthly. If customers keep mentioning late replies, unclear pricing, messy scheduling, or great staff behavior, that is operating intelligence. Reviews are not just reputation. They are a customer research feed.'
+      ]],
+      ['Turn proof into usable assets',[
+        'A good review can support FAQ copy, service pages, sales conversations, training, and offer refinement. The company should collect themes: fast response, clean work, friendly staff, transparent pricing, convenient scheduling, strong follow-through, or specific product knowledge. Those themes show what buyers actually value.',
+        'Do not over-polish the language. The power of reviews is that they sound like customers. Use themes to improve the business and link to inspectable proof where appropriate.'
+      ]],
+      ['Where the 0S changes the workload',[
+        'Skyes Over London Reviews can turn review proof into a searchable surface with real detail pages instead of scattered screenshots. MetrAIyux 0S can connect completed work, proof receipts, review requests, public pages, and owner review. That means reputation becomes part of the operating loop.',
+        'The system cannot manufacture trust. It can make earned trust easier to collect, organize, inspect, and connect to the buyer journey.'
+      ]],
+      ['A review system you can run this week',[
+        'Day one: define eligible customers and the request moment. Day two: write the neutral request and response templates. Day three: build the tracking sheet or workflow. Day four: send requests for recent completed work. Day five: respond to every unanswered review. Day six: extract themes. Day seven: update one page or FAQ using what customers actually said.',
+        'Repeat weekly. The habit compounds because reviews, responses, and service fixes reinforce each other.'
+      ]]
+    ]
+  },
+  'market-research-before-growth-spend': {
+    readTime:'15 min',
+    longformPromise:'Use this before buying ads, launching a new offer, expanding to a new city, or building a page nobody asked for.',
+    diagnostics:[
+      { label:'Buyer', title:'The customer is specific enough to find', copy:'A growth test needs a defined buyer, problem, geography, budget context, and trigger. "Everyone" is not a market.' },
+      { label:'Demand', title:'There is evidence of need', copy:'Search behavior, competitor activity, public data, sales conversations, and customer questions should point toward a real problem.' },
+      { label:'Test', title:'The first campaign is small and measurable', copy:'A market test should have one offer, one page, one audience, one follow-up path, and one measurement window.' }
+    ],
+    metrics:['Target market size signal','Competitor count and strength','Search intent quality','Landing page conversion','Cost per qualified inquiry','Follow-up completion rate','Offer objections','Revenue from test cohort'],
+    worksheet:['Write the buyer, job-to-be-done, city or niche, and urgency trigger.','List three competitors and what proof they show.','Use public data to understand local population, industry, income, or business density where relevant.','Build one focused page and one follow-up path.','Set a decision rule before spending: continue, revise, or stop.'],
+    mistakes:['Launching because the idea feels exciting instead of because the market shows signal.','Copying a competitor without understanding their economics.','Testing too many offers at once.','Measuring clicks while ignoring qualified conversations and revenue.','Keeping failed experiments public after the test ends.'],
+    sections:[
+      ['Research is not homework; it is risk reduction',[
+        'The SBA frames market research as a way to understand customers and reduce risk. That is the whole point. A small company does not have unlimited money to waste on weak offers, vague audiences, or new service lanes that only sound good in a meeting. Research helps the owner decide where to place the next bet.',
+        'Census Business Builder and similar public data tools can help owners understand demographics, economic patterns, and local market context. Search results, competitor pages, reviews, customer calls, and sales objections add another layer. None of these sources are perfect. Together, they can keep the company from guessing blindly.'
+      ]],
+      ['Write the growth brief first',[
+        'Before launching, write one page: buyer, problem, trigger, geography, current alternatives, why the business can win, proof needed, offer, price signal, channel, follow-up path, and stop rule. If the brief sounds vague, the campaign will be vague. If the buyer cannot be described clearly, the page will not convert clearly.',
+        'The brief should also name what the company is not testing. Scope discipline matters. A small test cannot answer every question. It should answer one question well enough to decide the next move.'
+      ]],
+      ['Understand the competitor standard',[
+        'Search the city, service, and buyer problem. Open the strongest competitors. What do they show? Pricing ranges, reviews, photos, case studies, emergency availability, online booking, service guarantees, industry certifications, financing, or before-and-after proof? The goal is not imitation. The goal is to understand what the buyer already sees.',
+        'If the market standard is strong proof and your page has vague copy, the test is unfair. If competitors are weak and buyers still search often, that may be an opening. Research helps you see both threat and opportunity.'
+      ]],
+      ['Use public data to ground local decisions',[
+        'Public data can help a business choose where to focus. Population, household income, business density, industry clusters, commuting patterns, and local employer mix can all influence whether an offer makes sense. A contractor, accountant, retail store, medical-adjacent service, or B2B provider may care about different signals.',
+        'The owner does not need to become a statistician. The owner needs enough context to avoid spending money in a market that does not match the offer.'
+      ]],
+      ['Design the smallest useful test',[
+        'A useful test has one audience, one offer, one page, one route for inquiries, and one follow-up workflow. The page should answer the buyer problem, show proof, explain fit, and ask for one action. The follow-up should be ready before traffic starts. Otherwise the company may prove demand exists and still waste it.',
+        'Pick a measurement window. For some offers, two weeks is enough to see directional signal. For expensive B2B or seasonal services, the window may be longer. Decide in advance what will count as continue, revise, or stop.'
+      ]],
+      ['Where the 0S changes the workload',[
+        'MetrAIyux 0S can turn a research brief into a controlled deployment: a focused page, proof links, inquiry route, vault records, deployment atlas entry, and follow-up path. The system helps the owner know what is live, what is being tested, and what should be removed if the experiment fails.',
+        'That removal part matters. Failed experiments are not shameful. Leaving failed links public is sloppy. A good operating system makes it easier to test and easier to clean up.'
+      ]],
+      ['A practical market test calendar',[
+        'Week one: write the brief, inspect competitors, gather public data, and define the offer. Week two: build the page and follow-up path. Week three: send traffic or outreach to the test. Week four: review qualified inquiries, objections, conversion, and revenue. Decide continue, revise, or stop.',
+        'The discipline is to make the decision from evidence. If the market shows promise, scale the lane. If the offer is wrong, revise. If there is no signal, stop and remove or demote the public route.'
+      ]]
+    ]
+  }
+};
+for (const article of BUSINESS_INSIGHTS) {
+  const upgrade = LONGFORM_UPGRADES[article.slug];
+  if (upgrade) Object.assign(article, upgrade);
+}
 const INSIGHT_ROUTES = ['/insights/', ...BUSINESS_INSIGHTS.map(article => `/insights/${article.slug}/`)];
 
 function text(v){ return String(v ?? '').replace(/\s+/g, ' ').trim(); }
@@ -345,11 +645,32 @@ function majorPlatformCards(keys = MAJOR_PLATFORM_LINKS.map(p => p.key)){
 function sourceLinks(keys = []){
   return keys.map(key => SOURCE_LIBRARY[key]).filter(Boolean).map(source => `<a href="${html(source.url)}" target="_blank" rel="noopener">${html(source.label)}</a>`).join('');
 }
+function listChips(items = []){
+  return items.map(item => `<span>${html(item)}</span>`).join('');
+}
 function articleCard(article){
   return `<a class="article-card neon-magnetic" href="/insights/${html(article.slug)}/"><span>${html(article.topic)}</span><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><small>${html(article.readTime)} read</small></a>`;
 }
 function manualSystemColumns(article){
   return `<section class="split-grid insight-playbook"><article class="section glass"><p class="eyebrow">Manual operating method</p><h2>Do this before software</h2><div class="check-list">${article.manual.map(item => `<span>${html(item)}</span>`).join('')}</div></article><article class="section glass"><p class="eyebrow">How 0S makes it easier</p><h2>Turn the habit into a system</h2><div class="check-list">${article.system.map(item => `<span>${html(item)}</span>`).join('')}</div></article></section>`;
+}
+function operatorDiagnostics(article){
+  const diagnostics = article.diagnostics || [];
+  const metrics = article.metrics || [];
+  const worksheet = article.worksheet || [];
+  const mistakes = article.mistakes || [];
+  return `<section class="section glass operator-diagnostics"><div class="section-head"><div><p class="eyebrow">Operator diagnostics</p><h2>What to inspect before you buy another tool.</h2></div></div><div class="diagnostic-grid">${diagnostics.map(item => `<article><span>${html(item.label)}</span><h3>${html(item.title)}</h3><p>${html(item.copy)}</p></article>`).join('')}</div></section>
+<section class="split-grid operator-lists"><article class="section glass"><p class="eyebrow">Numbers to watch</p><h2>Measure the operating truth.</h2><div class="check-list compact-list">${listChips(metrics)}</div></article><article class="section glass"><p class="eyebrow">Owner worksheet</p><h2>Run this manually first.</h2><div class="check-list compact-list">${listChips(worksheet)}</div></article></section>
+<section class="section glass mistake-panel"><div class="section-head"><div><p class="eyebrow">Avoid the expensive version</p><h2>Common ways this breaks.</h2></div></div><div class="mistake-grid">${mistakes.map(item => `<span>${html(item)}</span>`).join('')}</div></section>`;
+}
+function articleSections(article){
+  return article.sections.map(([title, copy]) => {
+    const paragraphs = Array.isArray(copy) ? copy : [copy];
+    return `<section class="article-section"><h2>${html(title)}</h2>${paragraphs.map(paragraph => `<p>${html(paragraph)}</p>`).join('')}</section>`;
+  }).join('');
+}
+function articleOperatingClose(article){
+  return `<section class="article-section operating-close"><h2>How to put this into the next operating week</h2><p>Do not turn this into a giant transformation project. Pick one visible lane from this article, write the current state in plain language, and run the manual worksheet for one week. If the work cannot survive one week on paper or in a simple sheet, software will only hide the confusion. The owner should be able to point to the current number, the person responsible, the next action, and the proof that shows whether the action happened.</p><p>After the manual loop works, decide what deserves a system. Repeated actions become forms, gates, vault records, deployment receipts, review routes, or public pages. One-off judgment stays with the owner. That separation is the heart of a useful operating system: people keep the decisions, and the system carries the repeated evidence so the company does not have to rebuild memory every Monday.</p><p>Use the public page and the private workflow differently. The public page should help a buyer, customer, or partner understand the business and take action. The private workflow should help the owner see status, proof, exceptions, and next decisions. When those two views are mixed together, the website becomes cluttered and the operation becomes vague. When they are separated but connected, the company can educate the market without exposing internal noise.</p><p>The final test is whether the lesson changes behavior by next week. If nothing gets assigned, measured, stored, fixed, published, retired, or routed, the article was just reading material. Turn one insight into a visible operating move, then let the system carry the repeat work once the move proves useful.</p></section>`;
 }
 function insightIndexPage(){
   const featuredArticle = BUSINESS_INSIGHTS[0];
@@ -369,9 +690,10 @@ function insightIndexPage(){
 function insightArticlePage(article){
   const platforms = MAJOR_PLATFORM_LINKS.filter(platform => article.platformKeys.includes(platform.key));
   const related = BUSINESS_INSIGHTS.filter(item => item.slug !== article.slug).slice(0, 3).map(articleCard).join('');
-  const body = `<article class="insight-article"><header class="hero glass subhero article-hero"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">${html(article.topic)} / ${html(article.readTime)} read</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">${html(article.title)}</h1><p class="hero-text">${html(article.deck)}</p><div class="hero-actions"><a class="btn primary" href="${REQUEST_BUILD_HREF}">Ask about this system</a><a class="btn" href="/for-businesses/">Business owner path</a></div></div><aside class="article-rail"><p class="eyebrow">System backlinks</p>${platforms.map(platform => `<a href="${html(platform.url)}" target="_blank" rel="noopener"><strong>${html(platform.name)}</strong><span>${html(platform.use)}</span></a>`).join('')}</aside></header>
+  const body = `<article class="insight-article"><header class="hero glass subhero article-hero"><div><a class="back-link" href="/insights/">Insights</a><p class="eyebrow">${html(article.topic)} / ${html(article.readTime)} read</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">${html(article.title)}</h1><p class="hero-text">${html(article.deck)}</p>${article.longformPromise ? `<p class="article-promise">${html(article.longformPromise)}</p>` : ''}<div class="hero-actions"><a class="btn primary" href="${REQUEST_BUILD_HREF}">Ask about this system</a><a class="btn" href="/for-businesses/">Business owner path</a></div></div><aside class="article-rail"><p class="eyebrow">System backlinks</p>${platforms.map(platform => `<a href="${html(platform.url)}" target="_blank" rel="noopener"><strong>${html(platform.name)}</strong><span>${html(platform.use)}</span></a>`).join('')}</aside></header>
 ${manualSystemColumns(article)}
-<section class="section glass article-body">${article.sections.map(([title, copy]) => `<section class="article-section"><h2>${html(title)}</h2><p>${html(copy)}</p></section>`).join('')}</section>
+${operatorDiagnostics(article)}
+<section class="section glass article-body">${articleSections(article)}${articleOperatingClose(article)}</section>
 <section class="section glass source-notes"><div class="section-head"><div><p class="eyebrow">Source notes</p><h2>Public guidance used for this note.</h2></div></div><div class="source-link-grid">${sourceLinks(article.sources)}</div></section>
 <section class="section glass related-insights"><div class="section-head"><div><p class="eyebrow">Keep building the system</p><h2>Read next</h2></div><a class="btn small" href="/insights/">All insights</a></div><div class="article-grid compact">${related}</div></section></article>`;
   return base({
@@ -572,6 +894,11 @@ let css = await fs.readFile(cssPath, 'utf8');
 const cssBlock = `\n/* v23 public website layer */\n.public-topbar{background:rgba(255,250,240,.9);border-color:rgba(23,20,16,.16)}.public-nav a{font-size:12px}.public-nav .nav-operator{border-color:rgba(11,111,115,.34);color:#0b6f73}.public-site-main{padding-bottom:28px}.website-hero{position:relative;overflow:hidden}.website-hero h1{max-width:1040px}.website-positioning .proof-card,.website-money-path .section{min-height:270px}.website-feature{min-height:245px}.website-proof .detail-grid,.website-page .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.website-proof .detail-grid div,.website-page .detail-grid div{border:1px solid var(--line);border-radius:8px;background:rgba(255,250,240,.64);padding:14px;display:grid;gap:6px}.website-proof .detail-grid strong,.website-page .detail-grid strong{color:var(--oxblood);text-transform:uppercase;letter-spacing:0;font-size:12px}.website-proof .detail-grid span,.website-page .detail-grid span{color:var(--ink-soft);line-height:1.55}.brand.mini{display:flex}\n.operator-journal-page .site-main,.insight-article-page .site-main{width:min(1180px,calc(100% - 32px))}.journal-hero{align-items:stretch}.journal-hero .hero-text,.article-hero .hero-text{max-width:820px}.journal-index-panel{background:var(--charcoal);color:var(--paper-soft)}.article-grid-section{margin-top:16px}.article-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.article-grid.compact{grid-template-columns:repeat(3,minmax(0,1fr))}.article-card{min-height:260px;border:1px solid var(--line);border-radius:8px;background:rgba(255,250,240,.78);box-shadow:var(--shadow-soft);padding:20px;display:grid;align-content:space-between;gap:14px}.article-card>span{width:max-content;border:1px solid rgba(11,111,115,.28);border-radius:999px;padding:7px 9px;background:rgba(11,111,115,.08);color:var(--teal);font-size:11px;font-weight:900;text-transform:uppercase}.article-card h3{margin:0;font-family:var(--display);font-size:30px;line-height:1}.article-card p{margin:0;color:var(--ink-soft);line-height:1.58}.article-card small{color:var(--oxblood);font-weight:900;text-transform:uppercase}.insight-feature .section-intro{max-width:980px;font-size:18px}.major-platform-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.major-platform-tile{min-height:210px}.article-hero{grid-template-columns:minmax(0,1fr) minmax(290px,.54fr);align-items:stretch}.article-rail{display:grid;gap:10px;border:1px solid var(--line);border-radius:8px;background:var(--charcoal);padding:22px;color:var(--paper-soft)}.article-rail a{display:grid;gap:5px;border:1px solid rgba(255,250,240,.16);border-radius:8px;padding:12px;background:rgba(255,250,240,.06)}.article-rail strong{font-family:var(--display);font-size:22px;line-height:1}.article-rail span{color:rgba(255,250,240,.72);font-size:13px;line-height:1.45}.insight-playbook .section{min-height:390px}.check-list{display:grid;gap:10px;margin-top:16px}.check-list span{display:block;border:1px solid rgba(23,20,16,.12);border-radius:8px;background:rgba(255,250,240,.62);padding:12px;color:var(--ink-soft);line-height:1.55}.article-body{padding:34px}.article-section{max-width:900px;margin:0 auto 30px}.article-section:last-child{margin-bottom:0}.article-section h2{font-size:42px;line-height:1;margin:0 0 12px}.article-section p{font-size:18px;line-height:1.74}.source-link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.source-link-grid a{border:1px solid var(--line);border-radius:8px;background:rgba(255,250,240,.62);padding:12px;color:var(--teal);font-weight:850}.related-insights .article-card{min-height:230px}@media(max-width:1050px){.article-grid,.article-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}.article-hero{grid-template-columns:1fr}.major-platform-grid{grid-template-columns:1fr}}@media(max-width:800px){.website-metrics,.website-proof .detail-grid,.website-page .detail-grid{grid-template-columns:1fr}.website-hero{min-height:auto}.public-nav .nav-operator{display:none}.operator-journal-page .site-main,.insight-article-page .site-main{width:min(100% - 20px,1180px)}.article-grid,.article-grid.compact,.source-link-grid{grid-template-columns:1fr}.article-card{min-height:220px}.article-card h3{font-size:26px}.article-body{padding:20px}.article-section h2{font-size:30px}.article-section p{font-size:16px}.insight-playbook .section{min-height:auto}}\n`;
 if(!css.includes('v23 public website layer')){
   css += cssBlock;
+  await fs.writeFile(cssPath, css);
+}
+const longformCssBlock = `\n/* v23 longform insights layer */\n.article-promise{max-width:860px;margin:18px 0 0;color:var(--ink);font-weight:750;line-height:1.65;border-left:3px solid var(--teal);padding-left:16px}.operator-diagnostics{margin-top:16px}.diagnostic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.diagnostic-grid article{border:1px solid var(--line);border-radius:8px;background:rgba(255,250,240,.64);padding:18px;display:grid;gap:8px}.diagnostic-grid span{width:max-content;border:1px solid rgba(124,26,38,.24);border-radius:999px;padding:7px 9px;background:rgba(124,26,38,.08);color:var(--oxblood);font-size:11px;font-weight:900;text-transform:uppercase}.diagnostic-grid h3{font-family:var(--display);font-size:28px;line-height:1;margin:0}.diagnostic-grid p{margin:0;color:var(--ink-soft);line-height:1.58}.operator-lists{margin-top:16px}.compact-list span{font-size:15px}.mistake-panel{margin-top:16px}.mistake-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mistake-grid span{display:block;border:1px solid rgba(124,26,38,.22);border-radius:8px;background:rgba(124,26,38,.06);padding:13px;color:var(--ink-soft);line-height:1.55}.article-section{border-bottom:1px solid rgba(23,20,16,.11);padding-bottom:28px}.article-section:last-child{border-bottom:0;padding-bottom:0}.article-section p+p{margin-top:14px}.article-body{counter-reset:insight-section}.article-section h2{position:relative}.article-section h2:before{counter-increment:insight-section;content:counter(insight-section,decimal-leading-zero);display:block;color:var(--teal);font-family:var(--sans);font-size:12px;font-weight:950;margin-bottom:8px}@media(max-width:1050px){.diagnostic-grid{grid-template-columns:1fr}.mistake-grid{grid-template-columns:1fr}}\n`;
+if(!css.includes('v23 longform insights layer')){
+  css += longformCssBlock;
   await fs.writeFile(cssPath, css);
 }
 

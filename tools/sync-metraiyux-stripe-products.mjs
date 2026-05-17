@@ -32,6 +32,45 @@ if (!stripeKey) {
 }
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const musicPricingPath = path.join(ROOT, "metraiyux_0s_site", "data", "skyemusicnexus-pricing.json");
+const musicPricing = JSON.parse(fs.readFileSync(musicPricingPath, "utf8"));
+
+function dollarsToCents(value) {
+  return Math.round(Number(value || 0) * 100);
+}
+
+function musicPriceSpecs(item) {
+  if (item.monthly && item.setup !== undefined) {
+    return [
+      { kind: "setup", nickname: `${item.name} setup`, lookupKey: item.lookup_keys[0], amount: dollarsToCents(item.setup) },
+      { kind: "monthly", nickname: `${item.name} monthly`, lookupKey: item.lookup_keys[1], amount: dollarsToCents(item.monthly), interval: "month" }
+    ];
+  }
+  if (item.billing === "monthly_with_setup") {
+    return [
+      { kind: "setup", nickname: `${item.name} setup`, lookupKey: item.lookup_keys[0], amount: dollarsToCents(item.setup) },
+      { kind: "monthly", nickname: `${item.name} monthly`, lookupKey: item.lookup_keys[1], amount: dollarsToCents(item.amount), interval: "month" }
+    ];
+  }
+  if (item.billing === "monthly") {
+    return [{ kind: "monthly", nickname: `${item.name} monthly`, lookupKey: item.lookup_key, amount: dollarsToCents(item.amount), interval: "month" }];
+  }
+  return [{ kind: "one-time", nickname: item.name, lookupKey: item.lookup_key, amount: dollarsToCents(item.amount) }];
+}
+
+const musicOffers = [
+  ...musicPricing.paid_tiers,
+  ...musicPricing.addons.filter((item) => item.billing !== "quote_starting_at")
+].map((item) => ({
+  planId: item.id,
+  productName: item.name,
+  description: `${item.summary} Gate session required; paid checkout does not create live distributor, DSP, payment, legal, label, identity-provider, or deployed persistence claims without separate provider proof.`,
+  sourceFolder: "metraiyux_0s_site/SkyeMusicNexus",
+  brainOwner: "naomi-sterling-brain",
+  ownerApprovalRequired: true,
+  prices: musicPriceSpecs(item),
+  includes: `skyemusicnexus_${item.id.replace(/^skyemusicnexus-/, "").replace(/-/g, "_")}_gate_required`
+}));
 
 const offers = [
   {
@@ -121,6 +160,7 @@ const offers = [
     ],
     includes: "managed_connectlog_relay13_houseops_skyebox_custom_skyeroutex_v040"
   },
+  ...musicOffers,
   {
     planId: "skygatefs27-managed",
     productName: "SkyeGateFS27 Managed Control Plane",

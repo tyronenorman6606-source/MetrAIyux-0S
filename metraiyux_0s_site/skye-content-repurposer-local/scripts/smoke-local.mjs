@@ -11,6 +11,7 @@ const required = [
   'public/index.html',
   'public/styles.css',
   'public/gate-session.js',
+  'public/mcp-effects.js',
   'public/app.js',
   'public/skye-content-forge-logo.svg',
   'docs/SETUP.md',
@@ -114,6 +115,7 @@ try {
   if (!index.includes('Schedule Publish')) throw new Error('Index page does not include publisher UI');
   if (!index.includes('Runtime + recovery')) throw new Error('Index page does not include always-on recovery UI');
   if (!index.includes('gate-session.js')) throw new Error('Index page does not load gate session script');
+  if (!index.includes('mcp-effects.js')) throw new Error('Index page does not load MCP browser effects script');
   if (!index.includes('Free99 means no charge')) throw new Error('Index page does not explain Free99 no-charge boundary');
 
   const draftsPath = path.join(root, 'data', 'drafts.json');

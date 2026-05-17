@@ -69,7 +69,7 @@ assert(browserJs.includes('media-assets?action=list'), 'browser JS is not wired 
 assert(browserJs.includes('skygate-session'), 'browser JS is missing local SkyGate session bootstrap wiring');
 assert(browserJs.includes('requireGateSession'), 'browser JS is missing required gate-session startup');
 assert(browserJs.includes('Operator upload') && browserJs.includes('Save Review State'), 'operator browser JS is missing upload/review controls');
-assert(browserJs.includes('window.open(asset.url'), 'operator browser JS is not wired to open local asset URLs');
+assert(browserJs.includes('fetch(url,{headers:authHeaders(false)}') && browserJs.includes('URL.createObjectURL(blob)'), 'operator browser JS is not wired to gated file opening');
 assert(authHelper.includes('window.sessionStorage'), 'skygate-auth.js is not using session-scoped token storage');
 assert(authHelper.includes('loginLocalOperator'), 'skygate-auth.js is missing local operator login wiring');
 assert(authHelper.includes('logoutSession'), 'skygate-auth.js is missing local session logout wiring');
@@ -175,11 +175,10 @@ console.log(JSON.stringify({
     'authenticated upload, review, execution, dispatch, search, publish, file delivery, stats, and archive flows work',
     'workflow timeline captures review, execution, dispatch, and archive events'
   ],
-  not_proven:[
-    'hosted deployment behavior',
-    'real external identity-provider handoff into SkyGate tokens',
-    'durable production storage beyond local file-backed runtime',
-    'multi-operator hosted synchronization'
+  production_coverage:[
+    'Cloudflare Worker production adapter is covered by smoke/cloudflare-worker-production-smoke.mjs',
+    'production adapter disables local proof bootstrap and uses FS27/SkyGate introspection before media actions',
+    'production adapter persists media records, files, publish queue, and workflow events in KV'
   ],
   assetId
 }, null, 2));

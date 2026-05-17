@@ -2,6 +2,7 @@ import { wrap } from "./_lib/wrap.js";
 import { json } from "./_lib/http.js";
 import { skyePayHeaders } from "./_lib/skyepaySecurity.js";
 import { getSkyePayClient, listSkyePayOffers, listSkyePayPlatformRoutes } from "./_lib/skyepayCatalog.js";
+import { publicSkyeMeritCatalog } from "./_lib/skyeMerit.js";
 import { REPO_STRIPE_CATALOG_SOURCE, SKYPAY_REPO_STRIPE_OFFER_COUNT } from "./_lib/skyepayRepoStripeOffers.js";
 
 export default wrap(async (req) => {
@@ -24,6 +25,7 @@ export default wrap(async (req) => {
       checkout_rule: "approved and approved_floor fixed-amount offers only",
       excluded_from_instant_checkout: ["quote_only", "do_not_create", "approved_metered", "one_time_variable"]
     },
+    skyemerit: publicSkyeMeritCatalog(),
     client,
     offers: listSkyePayOffers(client),
     platform_routes: listSkyePayPlatformRoutes()

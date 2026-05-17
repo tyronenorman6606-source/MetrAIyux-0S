@@ -28,7 +28,7 @@
 
 ## Honest limits
 
-☐ This remains a static local-first PWA. It does not automatically send SMS/email after a phone saves a vCard because that requires a messaging backend, user permission, or an OS-level share action.
+☐ Phone-contact QR does not automatically send SMS/email after a phone saves a vCard because that requires user permission or an OS-level share action; owned app conversations route through Relay13.
 
 ☐ Phone-camera QR codes have real payload limits. The app includes the welcome message in the phone QR and only includes the card photo when the compact thumbnail keeps the QR payload safe. Full-photo contact export is handled by downloadable `.vcf` and card HTML.
 

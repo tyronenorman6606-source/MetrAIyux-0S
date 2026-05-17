@@ -23,7 +23,7 @@
     </a>
     <div class="top-title">
       <p class="micro">SkyeMusicNexus // Artist Field</p>
-      <h1>Release music through a living signal stage.</h1>
+      <h1>Release music through a living artist exchange.</h1>
     </div>
     <div class="session-rack">
       <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
@@ -37,12 +37,12 @@
   <main class="nexus-shell">
     <section class="hero-stage panel-xl">
       <div class="hero-copy">
-        <p class="eyebrow">release engine · living signal stage</p>
+        <p class="eyebrow">release engine · social exchange · content runway</p>
         <h2>Every artist becomes a signal node. Every release becomes a launch object.</h2>
-        <p class="lede">Register the act, forge the drop, move it into operations, watch streams turn into ledger motion, and leave a proof trail that can survive a real smoke test.</p>
+        <p class="lede">Register the act, forge the drop, request content, move through the community exchange, unlock progress, and leave a proof trail that can survive a real smoke test.</p>
         <div class="hero-actions">
           <button class="primary" data-jump="releaseForge">Forge Release</button>
-          <button class="secondary" data-jump="artistNebula">Register Artist</button>
+          <button class="secondary" data-jump="creatorExchange">Open Exchange</button>
         </div>
       </div>
       <div class="vinyl-core" aria-label="animated music nexus visual">
@@ -67,8 +67,10 @@
     <section class="signal-map" aria-label="music nexus signal map">
       <button class="node active" data-lens="distribution"><span>01</span>Distribution Spine</button>
       <button class="node" data-lens="royalty"><span>02</span>Royalty River</button>
-      <button class="node" data-lens="proof"><span>03</span>Proof Chain</button>
-      <button class="node" data-lens="ops"><span>04</span>Ops Sequencer</button>
+      <button class="node" data-lens="content"><span>03</span>Content Requests</button>
+      <button class="node" data-lens="community"><span>04</span>Community Relay</button>
+      <button class="node" data-lens="progression"><span>05</span>Achievement Orbit</button>
+      <button class="node" data-lens="proof"><span>06</span>Proof Chain</button>
     </section>
 
     <section class="lens panel-xl" id="lensPanel">
@@ -78,6 +80,99 @@
         <p id="lensText">This lane frames each release as a live capsule with targets, review state, stream telemetry, and operations checkpoints.</p>
       </div>
       <div class="wave-reader" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <section class="exchange-grid" id="creatorExchange">
+      <article class="panel-xl exchange-command">
+        <div class="section-head">
+          <div>
+            <p class="micro">Content Request Exchange</p>
+            <h3>Creator Exchange: request content, message the lane, and turn a release into a campaign.</h3>
+          </div>
+          <span class="tag">SkyGate + Relay13-ready</span>
+        </div>
+        <div class="exchange-panels">
+          <form id="contentRequestForm" class="field-grid">
+            <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+            <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+            <label>Request type<select name="requestType"><option value="social-caption-pack">Social caption pack</option><option value="cover-canvas-request">Cover / canvas request</option><option value="short-form-clip-brief">Short-form clip brief</option><option value="press-epk-copy">Press / EPK copy</option><option value="release-content-kit">Release content kit</option></select></label>
+            <label>Budget lane<select name="budgetLane"><option value="Free99 Lite brief">Free99 Lite brief</option><option value="Single Song Drop">Single Song Drop</option><option value="Release Content Kit">Release Content Kit</option><option value="Studio plan">Studio plan</option></select></label>
+            <label class="wide">Request title<input name="title" required placeholder="Visual rollout for Neon Weather" /></label>
+            <label class="wide">Creative brief<textarea name="brief" rows="4" placeholder="What does the song feel like, what assets exist, and what should the content make people do?"></textarea></label>
+            <button class="primary wide" type="submit">Open Content Request</button>
+          </form>
+          <div>
+            <div id="contentRequestResult" class="result-card compact">No content request opened yet.</div>
+            <div id="contentRequestList" class="exchange-list"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel exchange-inbox">
+        <div class="section-head">
+          <p class="micro">Inbox Relay</p>
+          <h3>Artist-to-artist and operator messages</h3>
+        </div>
+        <form id="messageForm" class="field-grid thin">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>To<input name="recipientId" placeholder="creator-exchange or artist id" /></label>
+          <label class="wide">Topic<input name="topic" placeholder="Collab, content, playlist, show slot" /></label>
+          <label class="wide">Message<textarea name="body" required rows="3" placeholder="What do you need from the exchange?"></textarea></label>
+          <button class="secondary wide" type="submit">Send Inbox Signal</button>
+        </form>
+        <div id="messageResult" class="result-card compact">Inbox idle.</div>
+        <div id="inboxList" class="exchange-list"></div>
+      </article>
+
+      <article class="panel exchange-community">
+        <div class="section-head">
+          <p class="micro">Community Relay</p>
+          <h3>Collab calls and progress signals</h3>
+        </div>
+        <form id="communityPostForm" class="field-grid thin">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Release ID<input name="linkedReleaseId" placeholder="optional" /></label>
+          <label class="wide">Category<select name="category"><option value="collab-request">Collab request</option><option value="producer-call">Producer call</option><option value="feedback-ask">Feedback ask</option><option value="show-slot">Show slot</option><option value="milestone">Milestone</option></select></label>
+          <label class="wide">Post<textarea name="body" required rows="3" placeholder="Ask the community for the next useful move."></textarea></label>
+          <button class="secondary wide" type="submit">Post Community Signal</button>
+        </form>
+        <div id="communityPostResult" class="result-card compact">Community relay idle.</div>
+        <div id="communityWall" class="exchange-list"></div>
+      </article>
+
+      <article class="panel exchange-progress">
+        <div class="section-head">
+          <p class="micro">Achievement Orbit</p>
+          <h3>Progress artists can feel</h3>
+        </div>
+        <div id="progressRail" class="progress-stack"></div>
+        <div id="achievementOrbit" class="achievement-grid"></div>
+      </article>
+
+      <article class="panel-xl exchange-campaign">
+        <div class="section-head">
+          <div>
+            <p class="micro">Release Campaign Forge</p>
+            <h3>Turn a release into content people can actually use.</h3>
+          </div>
+          <span class="tag">captions · hooks · tasks</span>
+        </div>
+        <div class="exchange-panels">
+          <form id="releaseCampaignForm" class="field-grid">
+            <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+            <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+            <label class="wide">Release title<input name="releaseTitle" placeholder="Neon Weather" /></label>
+            <label>Mood<input name="mood" placeholder="late-night, confident, cinematic" /></label>
+            <label>Platforms<input name="platforms" placeholder="TikTok, Instagram, YouTube" /></label>
+            <label class="wide">Offer lane<select name="offerLane"><option value="Free99 Lite brief">Free99 Lite brief</option><option value="Social Caption Pack">Social Caption Pack</option><option value="Release Content Kit">Release Content Kit</option><option value="Community Campaign Sprint">Community Campaign Sprint</option></select></label>
+            <button class="primary wide" type="submit">Build Release Campaign</button>
+          </form>
+          <div>
+            <div id="campaignResult" class="result-card compact">No campaign built yet.</div>
+            <div id="campaignPack" class="campaign-pack"></div>
+          </div>
+        </div>
+      </article>
     </section>
 
     <section class="dual-grid">

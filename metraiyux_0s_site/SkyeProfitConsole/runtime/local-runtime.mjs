@@ -13,9 +13,15 @@ function createId(prefix = "spca") {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function numberOr(value, fallback = 0) {
+  const next = Number(value);
+  return Number.isFinite(next) ? next : fallback;
+}
+
 function defaultStore() {
   return {
     reviewPacks: [],
+    closeBriefs: [],
     executionItems: [],
     dispatchItems: [],
     workflowEvents: [],
@@ -96,6 +102,39 @@ function normalizeDispatchItem(item = {}) {
   };
 }
 
+function normalizeCloseBrief(brief = {}) {
+  const splitAllocation = Array.isArray(brief.splitAllocation)
+    ? brief.splitAllocation.map((item) => ({
+      name: typeof item.name === "string" && item.name.trim() ? item.name.trim() : "lane",
+      percent: numberOr(item.percent),
+      amount: numberOr(item.amount)
+    }))
+    : [];
+  return {
+    id: typeof brief.id === "string" && brief.id ? brief.id : createId("brief"),
+    packId: typeof brief.packId === "string" ? brief.packId : "",
+    label: typeof brief.label === "string" && brief.label.trim() ? brief.label.trim() : "Alias close brief",
+    target: typeof brief.target === "string" && brief.target.trim() ? brief.target.trim() : "AE-FlowPro",
+    owner: typeof brief.owner === "string" && brief.owner.trim() ? brief.owner.trim() : "profit-ops",
+    ask: numberOr(brief.ask),
+    directCost: numberOr(brief.directCost),
+    grossProfit: numberOr(brief.grossProfit),
+    expectedProfit: numberOr(brief.expectedProfit),
+    margin: numberOr(brief.margin),
+    paybackMultiple: numberOr(brief.paybackMultiple),
+    confidence: numberOr(brief.confidence),
+    action: typeof brief.action === "string" && brief.action.trim() ? brief.action.trim() : "advance to execution",
+    deadline: typeof brief.deadline === "string" && brief.deadline.trim() ? brief.deadline.trim() : new Date().toISOString().slice(0, 10),
+    splitAllocation,
+    risks: Array.isArray(brief.risks)
+      ? brief.risks.filter((risk) => typeof risk === "string" && risk.trim()).map((risk) => risk.trim()).slice(0, 8)
+      : [],
+    notes: typeof brief.notes === "string" ? brief.notes : "",
+    status: typeof brief.status === "string" && brief.status ? brief.status : "archived",
+    createdAt: typeof brief.createdAt === "string" && brief.createdAt ? brief.createdAt : new Date().toISOString()
+  };
+}
+
 function normalizeWorkflowEvent(event = {}) {
   return {
     id: typeof event.id === "string" && event.id ? event.id : createId("event"),
@@ -105,6 +144,7 @@ function normalizeWorkflowEvent(event = {}) {
     owner: typeof event.owner === "string" ? event.owner : "",
     target: typeof event.target === "string" ? event.target : "",
     reviewPackId: typeof event.reviewPackId === "string" ? event.reviewPackId : "",
+    closeBriefId: typeof event.closeBriefId === "string" ? event.closeBriefId : "",
     executionItemId: typeof event.executionItemId === "string" ? event.executionItemId : "",
     dispatchItemId: typeof event.dispatchItemId === "string" ? event.dispatchItemId : "",
     status: typeof event.status === "string" ? event.status : "",
@@ -128,6 +168,7 @@ function loadStore() {
     const parsed = JSON.parse(fs.readFileSync(storePath, "utf8"));
     return {
       reviewPacks: Array.isArray(parsed.reviewPacks) ? parsed.reviewPacks.map(normalizeReviewPack) : [],
+      closeBriefs: Array.isArray(parsed.closeBriefs) ? parsed.closeBriefs.map(normalizeCloseBrief) : [],
       executionItems: Array.isArray(parsed.executionItems) ? parsed.executionItems.map(normalizeExecutionItem) : [],
       dispatchItems: Array.isArray(parsed.dispatchItems) ? parsed.dispatchItems.map(normalizeDispatchItem) : [],
       workflowEvents: Array.isArray(parsed.workflowEvents) ? parsed.workflowEvents.map(normalizeWorkflowEvent) : [],
@@ -144,6 +185,7 @@ function saveStore(store) {
   ensureStoreDir();
   const next = {
     reviewPacks: Array.isArray(store.reviewPacks) ? store.reviewPacks.map(normalizeReviewPack) : [],
+    closeBriefs: Array.isArray(store.closeBriefs) ? store.closeBriefs.map(normalizeCloseBrief) : [],
     executionItems: Array.isArray(store.executionItems) ? store.executionItems.map(normalizeExecutionItem) : [],
     dispatchItems: Array.isArray(store.dispatchItems) ? store.dispatchItems.map(normalizeDispatchItem) : [],
     workflowEvents: Array.isArray(store.workflowEvents) ? store.workflowEvents.map(normalizeWorkflowEvent).slice(0, 160) : [],
@@ -200,9 +242,30 @@ function computeDispatchBoard(dispatchItems) {
   return board;
 }
 
+function computeCloseBriefBoard(closeBriefs) {
+  const board = {
+    total: closeBriefs.length,
+    close_now: 0,
+    protect_margin: 0,
+    tighten_proof: 0,
+    reprice: 0,
+    other: 0
+  };
+  for (const brief of closeBriefs) {
+    const action = String(brief.action || "").toLowerCase();
+    if (action.includes("close")) board.close_now += 1;
+    else if (action.includes("margin")) board.protect_margin += 1;
+    else if (action.includes("proof")) board.tighten_proof += 1;
+    else if (action.includes("reprice")) board.reprice += 1;
+    else board.other += 1;
+  }
+  return board;
+}
+
 function computeWorkflowTimeline(workflowEvents) {
   const summary = {
     archive: 0,
+    brief: 0,
     review: 0,
     execution: 0,
     dispatch: 0,
@@ -319,9 +382,13 @@ function notFound(res) {
 
 const args = process.argv.slice(2);
 let port = 0;
+let host = process.env.SKYE_PROFIT_HOST || process.env.HOST || "127.0.0.1";
 for (let index = 0; index < args.length; index += 1) {
   if (args[index] === "--port") {
     port = Number.parseInt(args[index + 1] || "", 10);
+  }
+  if (args[index] === "--host") {
+    host = args[index + 1] || host;
   }
 }
 
@@ -341,6 +408,7 @@ const server = http.createServer(async (req, res) => {
       surface: "SkyeProfitConsole",
       mode: "same-folder-local-runtime",
       review_pack_count: store.reviewPacks.length,
+      close_brief_count: store.closeBriefs.length,
       execution_item_count: store.executionItems.length,
       dispatch_item_count: store.dispatchItems.length
     });
@@ -354,6 +422,8 @@ const server = http.createServer(async (req, res) => {
       mode: "same-folder-local-runtime",
       review_pack_count: store.reviewPacks.length,
       review_board: computeBoard(store.reviewPacks),
+      close_brief_count: store.closeBriefs.length,
+      close_brief_board: computeCloseBriefBoard(store.closeBriefs),
       execution_item_count: store.executionItems.length,
       execution_board: computeExecutionBoard(store.executionItems),
       dispatch_item_count: store.dispatchItems.length,
@@ -369,6 +439,16 @@ const server = http.createServer(async (req, res) => {
     json(res, 200, {
       ok: true,
       review_board: computeBoard(store.reviewPacks)
+    });
+    return;
+  }
+
+  if (method === "GET" && url.pathname === "/api/runtime/close-briefs") {
+    if (!requireGate(req, res)) return;
+    json(res, 200, {
+      ok: true,
+      close_brief_board: computeCloseBriefBoard(store.closeBriefs),
+      close_briefs: [...store.closeBriefs].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     });
     return;
   }
@@ -413,6 +493,37 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (method === "POST" && url.pathname === "/api/runtime/close-briefs") {
+    if (!requireGate(req, res)) return;
+    try {
+      const body = await readBody(req);
+      const nextBrief = normalizeCloseBrief(body);
+      const nextStore = saveStore({
+        ...store,
+        closeBriefs: [nextBrief, ...store.closeBriefs],
+        workflowEvents: pushWorkflowEvent(store, {
+          type: "close_brief_archived",
+          category: "brief",
+          detail: `Archived close brief ${nextBrief.label}`,
+          owner: nextBrief.owner,
+          target: nextBrief.target,
+          closeBriefId: nextBrief.id,
+          status: nextBrief.status,
+          checkpoint: nextBrief.action
+        })
+      });
+      json(res, 200, {
+        ok: true,
+        close_brief: nextBrief,
+        close_brief_board: computeCloseBriefBoard(nextStore.closeBriefs),
+        workflow_timeline: computeWorkflowTimeline(nextStore.workflowEvents).summary
+      });
+    } catch (error) {
+      json(res, 400, { ok: false, error: "invalid_json", detail: error.message });
+    }
+    return;
+  }
+
   if (method === "POST" && url.pathname === "/api/runtime/close-review-packs") {
     if (!requireGate(req, res)) return;
     try {
@@ -440,6 +551,18 @@ const server = http.createServer(async (req, res) => {
     } catch (error) {
       json(res, 400, { ok: false, error: "invalid_json", detail: error.message });
     }
+    return;
+  }
+
+  if (method === "GET" && url.pathname.startsWith("/api/runtime/close-briefs/")) {
+    if (!requireGate(req, res)) return;
+    const closeBriefId = decodeURIComponent(url.pathname.split("/").pop() || "");
+    const closeBrief = store.closeBriefs.find((item) => item.id === closeBriefId);
+    if (!closeBrief) {
+      notFound(res);
+      return;
+    }
+    json(res, 200, { ok: true, close_brief: closeBrief });
     return;
   }
 
@@ -649,8 +772,8 @@ const server = http.createServer(async (req, res) => {
   notFound(res);
 });
 
-server.listen(port, "127.0.0.1", () => {
+server.listen(port, host, () => {
   const address = server.address();
   const actualPort = typeof address === "object" && address ? address.port : port;
-  process.stdout.write(`${JSON.stringify({ ok: true, port: actualPort })}\n`);
+  process.stdout.write(`${JSON.stringify({ ok: true, host, port: actualPort })}\n`);
 });

@@ -745,6 +745,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
         aria-label="Draggable Overearth universe viewport"
       >
         <div
+          ref={avatarOrbitRef}
           className="world-charge-orbit spectacle-orbit worldskin-orbit"
           style={{
             '--world-charge': `${Math.max(8, stats.energy)}%`,
@@ -755,11 +756,6 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
             '--neural-color': activeNeuralLane.color
           }}
         >
-          <div ref={avatarOrbitRef} className="worldskin-entity-aura" aria-hidden="true">
-            <span className="worldskin-entity-aura__shell" />
-            <span className="worldskin-entity-aura__voice" />
-            <span className="worldskin-entity-aura__sweep" />
-          </div>
           <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
           <div className="worldskin-pulse-field" aria-hidden="true">
             <span />

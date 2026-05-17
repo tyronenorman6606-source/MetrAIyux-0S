@@ -1,4 +1,14 @@
 import { createSkyeMailClient, skymailConfigured } from "./skymail-sdk.js";
+import {
+  SKYEMERIT_AUTO_CODE,
+  SKYEMERIT_FIRST_TIME_PACK_ID,
+  buildFirstTimeSkyeMeritPack,
+  buildSkyeMeritCheckout,
+  calculateSkyeMerit,
+  publicSkyeMeritCatalog,
+  selectSkyeMerit,
+  skyeMeritMetadata
+} from "./skyemerit.js";
 
 // AI_CREDIT_VALUE_CENTS: 1 credit = 1 cent FS27 billable spend.
 // Credits are the customer-facing abstraction — never expose dollar amounts.
@@ -12,8 +22,8 @@ const PLANS = {
     setup: 1500,
     skyepay_offer_id: "metraiyux-starter-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     // Customer-facing platform features — shown in marketing, portal, and SDK
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
@@ -53,8 +63,8 @@ const PLANS = {
     setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -92,8 +102,8 @@ const PLANS = {
     setup: 6500,
     skyepay_offer_id: "metraiyux-routex-workforce-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_route_scope_and_runtime_proof",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -136,8 +146,8 @@ const PLANS = {
     setup: 7500,
     skyepay_offer_id: "metraiyux-autonomous-office",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -176,8 +186,8 @@ const PLANS = {
     setup: 15000,
     skyepay_offer_id: "metraiyux-enterprise-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_scope_review",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -242,6 +252,12 @@ function publicPlans() {
       skyepay_offer_id: plan.skyepay_offer_id,
       owner_approval_required: plan.owner_approval_required,
       activation_path: plan.activation_path,
+      skyemerit: {
+        first_time_pack_id: SKYEMERIT_FIRST_TIME_PACK_ID,
+        auto_code: SKYEMERIT_AUTO_CODE,
+        kaixu_credit_cents: 600,
+        gate_required: true
+      },
     };
   }
   return out;
@@ -290,7 +306,8 @@ const SOVEREIGN_STACK = {
     { id: "skyevault", title: "SkyeVault", replaces: ["google_drive", "github_repo_storage"], status: "owner_selectable_vault_lane" },
     { id: "skyemail", title: "SkyeMail", replaces: ["gmail_only_business_email"], status: "workspace_mailbox_lane" },
     { id: "skyepay", title: "SkyePay", replaces: ["manual_unlock_checkout"], status: "stripe_confirmed_auto_unlock_lane" },
-    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "owner_approved_workforce_command_lane" },
+    { id: "skyemerit", title: "SkyeMerit", replaces: ["unbounded_coupons", "manual_discount_math"], status: "gated_merit_credit_discount_lane" },
+    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "stripe_confirmed_auto_unlock_workforce_command_lane" },
     { id: "fs27", title: "SkyeGateFS27", replaces: ["loose_api_keys", "unmetered_ai"], status: "parent_gate_and_telemetry_lane" }
   ]
 };
@@ -449,6 +466,156 @@ async function email(env, subject, html) {
     body: JSON.stringify({ from: env.RESEND_FROM_EMAIL, to: [env.ADMIN_APPROVAL_EMAIL], subject, html })
   });
   return { sent: res.ok, status: res.status, body: await res.text() };
+}
+
+function skyeMeritCheckoutOffer(plan, planId) {
+  return {
+    id: `saas-${planId}-setup`,
+    title: `${plan?.name || planId} Setup`,
+    currency: "usd",
+    mode: "payment",
+    line_items: [
+      {
+        id: "setup",
+        name: `${plan?.name || planId} Setup`,
+        amount_cents: Math.round(Number(plan?.setup || 0) * 100),
+        type: "one_time",
+        lookup_key: `${planId}_setup`
+      }
+    ]
+  };
+}
+
+function skyeMeritHtml(pack) {
+  const codes = (pack.coupon_codes || []).map((code) => `<li><b>${code}</b></li>`).join("");
+  return `<h2>Your SkyeMerit pack is active</h2>
+    <p>Your first-time pack includes a $${((pack.kaixu_credit_cents || 0) / 100).toFixed(2)} premium kAIxu model spend credit.</p>
+    <p>Use the SkyePay checkout lane to apply the best eligible SkyeMerit. Free99 means no charge, but the gate session still applies.</p>
+    <ul>${codes}</ul>
+    <p>Pack: ${pack.pack_id}</p>`;
+}
+
+async function sendCustomerEmail(env, to, subject, html) {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL || !to) return { sent: false, reason: "resend_not_configured" };
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: env.RESEND_FROM_EMAIL, to: [to], subject, html })
+  });
+  return { sent: res.ok, status: res.status, body: await res.text() };
+}
+
+async function optionalJsonPost(url, payload, secret = "") {
+  if (!url) return { status: "skipped", reason: "url_not_configured" };
+  const headers = { "content-type": "application/json" };
+  if (secret) headers.authorization = `Bearer ${secret}`;
+  try {
+    const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(payload) });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text.slice(0, 1000) }; }
+    return { status: res.ok ? "sent" : "failed", http_status: res.status, response: data };
+  } catch (error) {
+    return { status: "failed", error: error?.message || "dispatch_failed" };
+  }
+}
+
+async function sendSkyeMailSystemMessage(env, pack) {
+  const token = String(env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN || "").trim();
+  if (!token || !pack.email) return { status: "skipped", reason: "skymail_not_configured" };
+  const base = String(env.SKYMAIL_API_URL || env.SKYMAIL_PUBLIC_URL || "https://skyemail-platform.graylondonskyes.workers.dev").replace(/\/+$/, "");
+  const path = String(env.SKYMAIL_SKYEMERIT_PATH || "/api/skymail/system-message");
+  const payload = {
+    type: "skyemerit.pack_issued",
+    to: pack.email,
+    subject: "Your SkyeMerit pack is active",
+    html: skyeMeritHtml(pack),
+    pack
+  };
+  const init = {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload)
+  };
+  try {
+    const res = env.SKYMAIL_WORKER && typeof env.SKYMAIL_WORKER.fetch === "function"
+      ? await env.SKYMAIL_WORKER.fetch(new Request(`${base}${path}`, init))
+      : await fetch(`${base}${path}`, init);
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text.slice(0, 1000) }; }
+    return { status: res.ok ? "sent" : "failed", http_status: res.status, response: data };
+  } catch (error) {
+    return { status: "failed", error: error?.message || "skymail_send_failed" };
+  }
+}
+
+async function deliverSkyeMeritPack(env, pack) {
+  const relayUrl = env.RELAY13_SKYEMERIT_URL || env.RELAY13_EVENT_URL || "";
+  const connectLogUrl = env.CONNECTLOG_SKYEMERIT_URL || env.CONNECTLOG_EVENT_URL || "";
+  const relaySecret = env.RELAY13_API_TOKEN || env.RELAY13_EVENT_SECRET || "";
+  const connectLogSecret = env.CONNECTLOG_API_TOKEN || env.CONNECTLOG_EVENT_SECRET || "";
+  const event = {
+    source_app: "metraiyux-0s",
+    type: "skyemerit.pack_issued",
+    action: "skyemerit.pack_issued",
+    lane: "skyemerit",
+    customer_id: pack.customer_id || null,
+    workspace_id: pack.workspace_id || null,
+    actor: pack.email || "new_customer",
+    resource_type: "skyemerit_pack",
+    resource_id: pack.id,
+    billable: false,
+    privileged: true,
+    status: "issued",
+    summary: "First-time SkyeMerit pack issued",
+    payload: redactPayload(pack),
+    event_ts: pack.issued_at
+  };
+  return {
+    resend: await sendCustomerEmail(env, pack.email, "Your SkyeMerit pack is active", skyeMeritHtml(pack)),
+    skymail: await sendSkyeMailSystemMessage(env, pack),
+    relay13: await optionalJsonPost(relayUrl, event, relaySecret),
+    connectlog: await optionalJsonPost(connectLogUrl, event, connectLogSecret),
+    fs27_mirror: await mirrorToFs27(env, event)
+  };
+}
+
+async function recordSkyeMeritPack(env, pack, delivery) {
+  const row = { ...pack, delivery, updated_at: now() };
+  if (env.SAAS_KV) await env.SAAS_KV.put(`skyemerit_pack:${pack.id}`, JSON.stringify(row));
+  if (env.SAAS_KV && pack.email) await env.SAAS_KV.put(`skyemerit_pack_email:${pack.email}`, JSON.stringify(row));
+  if (env.SAAS_DB) {
+    try {
+      await env.SAAS_DB.prepare(`INSERT INTO skyemerit_packs
+        (id,pack_id,customer_id,workspace_id,email,status,kaixu_credit_cents,coupon_codes,delivery,payload,created_at,updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+        .bind(pack.id, pack.pack_id, pack.customer_id || "", pack.workspace_id || "", pack.email || "", pack.status, pack.kaixu_credit_cents || 0, JSON.stringify(pack.coupon_codes || []), JSON.stringify(delivery || {}), JSON.stringify(row), pack.issued_at, row.updated_at)
+        .run();
+    } catch (error) {
+      row.persistence_warning = error?.message || "skyemerit_packs migration not applied";
+    }
+  }
+  return row;
+}
+
+async function issueSkyeMeritPack(env, payload = {}, source = "signup") {
+  const pack = buildFirstTimeSkyeMeritPack({
+    email: payload.email || payload.customer_email || payload.approval_email || "",
+    customerId: payload.customer_id || "",
+    workspaceId: payload.workspace_id || "",
+    source
+  });
+  const delivery = await deliverSkyeMeritPack(env, pack);
+  const record = await recordSkyeMeritPack(env, pack, delivery);
+  await audit(env, pack.email || "public", "skyemerit_pack_issued", "skyemerit_pack", pack.id, {
+    customer_id: pack.customer_id || null,
+    workspace_id: pack.workspace_id || null,
+    delivery,
+    status: "issued",
+    billable: false
+  });
+  return record;
 }
 
 async function audit(env, actor, action, resource_type, resource_id, payload) {
@@ -832,14 +999,34 @@ export default {
           skymail_url: env.SKYMAIL_API_URL || env.SKYMAIL_PUBLIC_URL || null,
           fs27_event_mirror: { configured: !!fs27MirrorUrl(env), signed: !!fs27MirrorSecret(env) },
           sovereign_stack: SOVEREIGN_STACK,
+          skyemerit: publicSkyeMeritCatalog(),
           ai_rate_card: publicRateCard(),
           visual_data_kit: { endpoint: "/api/saas/customer-visuals", schema: "0s.customer_visuals.v1" },
           time: now()
         });
       }
 
-      if (path === "/api/saas/plans") return json({ plans: publicPlans(), ai_rate_card: publicRateCard(), sovereign_stack: SOVEREIGN_STACK });
-      if (path === "/api/saas/sovereign-stack") return json({ ok: true, sovereign_stack: SOVEREIGN_STACK, ai_rate_card: publicRateCard() });
+      if (path === "/api/saas/plans") return json({ plans: publicPlans(), ai_rate_card: publicRateCard(), sovereign_stack: SOVEREIGN_STACK, skyemerit: publicSkyeMeritCatalog() });
+      if (path === "/api/saas/sovereign-stack") return json({ ok: true, sovereign_stack: SOVEREIGN_STACK, ai_rate_card: publicRateCard(), skyemerit: publicSkyeMeritCatalog() });
+
+      if (path === "/api/saas/skyemerit/catalog") return json(publicSkyeMeritCatalog());
+
+      if (path === "/api/saas/skyemerit/preview" && req.method === "POST") {
+        const b = await body(req);
+        const subtotal = Math.round(Number(b.subtotal_cents ?? Number(b.subtotal_usd || 0) * 100));
+        const code = b.code || b.skyemerit_code || SKYEMERIT_AUTO_CODE;
+        const result = code === SKYEMERIT_AUTO_CODE
+          ? selectSkyeMerit({ subtotalCents: subtotal, code, firstTimeEligible: b.first_time_eligible !== false })
+          : calculateSkyeMerit(code, subtotal);
+        return json({ ok: result.ok !== false, result, catalog: publicSkyeMeritCatalog() });
+      }
+
+      if (path === "/api/saas/skyemerit/issue" && req.method === "POST") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+        const b = await body(req);
+        const pack = await issueSkyeMeritPack(env, b, b.source || "owner_dashboard");
+        return json({ ok: true, pack, catalog: publicSkyeMeritCatalog() });
+      }
 
       if (path === "/api/saas/customer-visuals") {
         if (String(env.CUSTOMER_VISUALS_PUBLIC || "").toLowerCase() !== "true" && !auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
@@ -939,8 +1126,9 @@ export default {
         const customer = { id: customer_id, full_name: b.full_name || "", email: b.email || "", company_name: b.company_name || "", phone: b.phone || "", plan_id, status: "signup_received", created_at: now() };
         if (env.SAAS_KV) await env.SAAS_KV.put(`customer:${customer_id}`, JSON.stringify(customer));
         if (env.SAAS_DB) await env.SAAS_DB.prepare("INSERT INTO customers (id,full_name,email,company_name,phone,plan_id,status,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(customer_id, customer.full_name, customer.email, customer.company_name, customer.phone, plan_id, customer.status, customer.created_at).run();
+        const skyemerit = await issueSkyeMeritPack(env, { ...b, customer_id, email: customer.email }, "signup");
         await audit(env, b.email || "public", "signup", "customer", customer_id, b);
-        return json({ ok: true, customer_id, plan_id, next: "create_workspace", persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
+        return json({ ok: true, customer_id, plan_id, skyemerit, next: "create_workspace", persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
       }
 
       if (path === "/api/saas/workspaces" && req.method === "POST") {
@@ -962,13 +1150,15 @@ export default {
         const skymail = await createSkyeMailClient(env).provisionWorkspaceMailbox(workspace, owner);
         const mailboxReceipt = await recordWorkspaceMailbox(env, workspace_id, skymail);
         const keyCard = await recordWorkspaceKeyCard(env, workspace, owner, skymail, mailboxReceipt);
+        const skyemerit = await issueSkyeMeritPack(env, { ...b, customer_id: workspace.customer_id, workspace_id, email: owner.email }, "workspace_onboarding");
         await recordProvisioningEvent(env, workspace_id, "sovereign_stack.selected", { database_lane, vault_lane, mail_lane, stackReceipt, stack: SOVEREIGN_STACK }, "recorded");
         await recordProvisioningEvent(env, workspace_id, "skymail.workspace_mailbox", { skymail, mailboxReceipt }, skymail.ok ? "completed" : skymail.skipped ? "skipped" : "needs_attention");
         await recordProvisioningEvent(env, workspace_id, "skymail.vault_key_card", { keyCard }, keyCard.mdp_status === "failed" ? "needs_attention" : "completed");
+        await recordProvisioningEvent(env, workspace_id, "skyemerit.pack_issued", { skyemerit }, "completed");
         if (env.SAAS_QUEUE) await env.SAAS_QUEUE.send({ type: "workspace_provisioning", workspace_id, plan_id, services: workspace.services, skymail: mailboxReceipt, at: now() });
         await audit(env, "system", "create_workspace", "workspace", workspace_id, { ...b, workspace_id, plan_id, database_lane, vault_lane, mail_lane });
         await email(env, "Workspace provisioning receipt", `<h2>Workspace provisioning recorded</h2><p>Workspace ${workspace_id} for ${b.company_name || slug} is pending provisioning.</p><p>Plan: ${plan_id}</p><p>Database lane: ${database_lane}</p><p>Vault lane: ${vault_lane}</p><p>Mail lane: ${mail_lane}</p><p>SkyeMail: ${mailboxReceipt.mailbox_email || mailboxReceipt.provisioning_status}</p><p>Vault key card: ${keyCard.setup_url}</p>`);
-        return json({ ok: true, workspace_id, slug, status: "pending_provisioning", queued: !!env.SAAS_QUEUE, persistence: env.SAAS_DB ? "d1" : "kv_fallback", sovereign_stack: { database_lane, vault_lane, mail_lane, fs27_event_mirror: !!fs27MirrorUrl(env), receipt: stackReceipt }, skymail: { ok: skymail.ok, skipped: !!skymail.skipped, mailbox: mailboxReceipt, key_card: keyCard, response: skymail.data || null, error: skymail.error || null } });
+        return json({ ok: true, workspace_id, slug, status: "pending_provisioning", queued: !!env.SAAS_QUEUE, persistence: env.SAAS_DB ? "d1" : "kv_fallback", sovereign_stack: { database_lane, vault_lane, mail_lane, fs27_event_mirror: !!fs27MirrorUrl(env), receipt: stackReceipt }, skymail: { ok: skymail.ok, skipped: !!skymail.skipped, mailbox: mailboxReceipt, key_card: keyCard, response: skymail.data || null, error: skymail.error || null }, skyemerit });
       }
 
       if (path === "/api/saas/skymail/status") {
@@ -1020,9 +1210,9 @@ export default {
       if (path === "/api/saas/billing/checkout-session" && req.method === "POST") {
         const b = await body(req);
         const plan_id = b.plan_id || "starter-command";
+        const plan = PLANS[plan_id];
         const prices = STRIPE_PRICES[plan_id];
         if (!prices) {
-          const plan = PLANS[plan_id];
           if (plan?.owner_approval_required) {
             return json({ ok: false, error: "owner_approved_plan_requires_custom_checkout", plan_id, checkout_url: plan.checkout_url, activation_path: plan.activation_path }, 409);
           }
@@ -1040,10 +1230,16 @@ export default {
         const baseUrl = env.SAAS_PUBLIC_URL || "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev";
         const successUrl = `${baseUrl}/api/saas/billing/checkout-success?subscription_id=${subscription_id}&session_id={CHECKOUT_SESSION_ID}`;
         const cancelUrl = `${baseUrl}/api/saas/billing/checkout-cancel?subscription_id=${subscription_id}`;
+        const skyeMeritCheckout = b.skyemerit_apply === false || b.skyemerit_apply === "false"
+          ? null
+          : buildSkyeMeritCheckout({
+            offer: skyeMeritCheckoutOffer(plan, plan_id),
+            code: b.skyemerit_code || SKYEMERIT_AUTO_CODE,
+            packId: b.skyemerit_pack_id || SKYEMERIT_FIRST_TIME_PACK_ID,
+            firstTimeEligible: b.skyemerit_first_time !== false
+          });
         const params = new URLSearchParams({
           mode: "payment",
-          "line_items[0][price]": prices.setup,
-          "line_items[0][quantity]": "1",
           success_url: successUrl,
           cancel_url: cancelUrl,
           "metadata[workspace_id]": b.workspace_id || "",
@@ -1052,6 +1248,21 @@ export default {
           "metadata[subscription_id]": subscription_id,
           "metadata[monthly_price_id]": prices.monthly,
         });
+        if (skyeMeritCheckout?.applied) {
+          const item = skyeMeritCheckout.line_items[0];
+          params.set("line_items[0][price_data][currency]", "usd");
+          params.set("line_items[0][price_data][unit_amount]", String(item.amount_cents));
+          params.set("line_items[0][price_data][product_data][name]", `${plan.name} Setup - SkyeMerit adjusted`);
+          params.set("line_items[0][quantity]", "1");
+          params.set("allow_promotion_codes", "false");
+        } else {
+          params.set("line_items[0][price]", prices.setup);
+          params.set("line_items[0][quantity]", "1");
+          params.set("allow_promotion_codes", "true");
+        }
+        for (const [key, value] of Object.entries(skyeMeritMetadata(skyeMeritCheckout))) {
+          params.set(`metadata[${key}]`, String(value));
+        }
         if (b.customer_email) params.set("customer_email", b.customer_email);
 
         const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
@@ -1067,7 +1278,7 @@ export default {
           const s = await env.SAAS_KV.get(`subscription:${subscription_id}`, "json");
           if (s) { s.provider_subscription_id = session.id; await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(s)); }
         }
-        return json({ ok: true, subscription_id, checkout_url: session.url, stripe_session_id: session.id, plan_id, persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
+        return json({ ok: true, subscription_id, checkout_url: session.url, stripe_session_id: session.id, plan_id, skyemerit: skyeMeritCheckout, persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
       }
 
       if (path === "/api/saas/billing/webhook" && req.method === "POST") {
@@ -1099,7 +1310,12 @@ export default {
               if (ws) { ws.status = "active"; ws.updated_at = updated_at; await env.SAAS_KV.put(`workspace:${workspaceId}`, JSON.stringify(ws)); }
             }
             await audit(env, "stripe_webhook", "workspace_activated", "workspace", workspaceId, { stripe_session_id: session.id, subscription_id: subscriptionId });
-            await recordProvisioningEvent(env, workspaceId, "billing.checkout_completed", { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency }, "completed");
+            await recordProvisioningEvent(env, workspaceId, "billing.checkout_completed", { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency, skyemerit: session.metadata?.skyemerit_code ? {
+              applied: session.metadata.skyemerit_applied,
+              code: session.metadata.skyemerit_code,
+              discount_cents: session.metadata.skyemerit_discount_cents,
+              adjusted_due_cents: session.metadata.skyemerit_adjusted_due_cents
+            } : null }, "completed");
             await email(env, "Payment confirmed — workspace active", `<h2>Payment received</h2><p>Workspace: ${workspaceId}</p><p>Stripe session: ${session.id}</p><p>Amount: $${((session.amount_total || 0) / 100).toFixed(2)} ${(session.currency || "usd").toUpperCase()}</p>`);
           }
         }
@@ -1108,7 +1324,7 @@ export default {
 
       if (path === "/api/saas/billing/checkout-success") {
         const session_id = url.searchParams.get("session_id") || "";
-        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Your workspace is activating. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
+        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Your workspace unlocks automatically after Stripe confirms the payment webhook. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
       }
 
       if (path === "/api/saas/billing/checkout-cancel") {

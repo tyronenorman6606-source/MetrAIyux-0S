@@ -76,7 +76,7 @@ async function seedGate(context) {
     const session = {
       token,
       source: "skyemusicnexus-e2e",
-      client: "MetrAIyux 0S Free99 e2e",
+      client: "MetrAIyux 0S Free99 Lite e2e",
       status: "free99_gate_session",
       issued_at: new Date().toISOString()
     };
@@ -85,7 +85,7 @@ async function seedGate(context) {
     localStorage.setItem("saas_client_session", JSON.stringify({
       token,
       workspace_id: "skyemusicnexus-e2e",
-      client: "MetrAIyux 0S Free99 e2e",
+      client: "MetrAIyux 0S Free99 Lite e2e",
       email: "music-e2e@metraiyux.local",
       status: "active"
     }));
@@ -104,10 +104,10 @@ async function main() {
     const ungated = await ungatedContext.newPage();
     ungated.on("pageerror", (error) => pageErrors.push(`ungated: ${error.message}`));
     await ungated.goto(`${baseUrl}/SkyeMusicNexus/index.html`, { waitUntil: "domcontentloaded" });
-    await expectText(ungated, "SkyeMusicNexus is Free99, not ungated.");
-    await expectText(ungated, "Free99 means no charge");
+    await expectText(ungated, "SkyeMusicNexus Lite is Free99, not ungated.");
+    await expectText(ungated, "Free99 means the Lite lane has no charge");
     expect(await ungated.locator("#skyeMusicGate").isVisible(), "Ungated SkyeMusicNexus route should show gate overlay.");
-    assertions.push("Ungated SkyeMusicNexus app route displays the Free99 gate-session overlay.");
+    assertions.push("Ungated SkyeMusicNexus app route displays the Free99 Lite gate-session overlay.");
     await ungated.screenshot({ path: path.join(ARTIFACT_DIR, "app-ungated-overlay.png"), fullPage: true });
     await ungatedContext.close();
 
@@ -116,28 +116,28 @@ async function main() {
     const page = await context.newPage();
     page.on("pageerror", (error) => pageErrors.push(`gated: ${error.message}`));
 
-    await checkPage(page, baseUrl, "index.html", "0S home desktop", ["SkyeMusicNexus", "Free99"], "home-desktop.png");
-    assertions.push("0S home exposes SkyeMusicNexus and Free99 expansion language.");
+    await checkPage(page, baseUrl, "index.html", "0S home desktop", ["SkyeMusicNexus", "Free99 Lite", "Single Song Drop"], "home-desktop.png");
+    assertions.push("0S home exposes SkyeMusicNexus Lite and paid drop language.");
 
-    await checkPage(page, baseUrl, "live/skyemusicnexus-neofront.html", "SkyeMusicNexus hub desktop", ["Free99 music operating stage", "gate session", "no charge"], "hub-desktop.png");
-    assertions.push("SkyeMusicNexus hub states Free99/no charge while preserving the gate-session boundary.");
+    await checkPage(page, baseUrl, "live/skyemusicnexus-neofront.html", "SkyeMusicNexus hub desktop", ["SkyeMusicNexus Lite is Free99", "Single Song Drop", "gate session"], "hub-desktop.png");
+    assertions.push("SkyeMusicNexus hub states Free99 Lite plus paid drops while preserving the gate-session boundary.");
 
-    await checkPage(page, baseUrl, "proof/skyemusicnexus-expansion-receipt.html", "SkyeMusicNexus receipt desktop", ["SkyeMusicNexus was imported as a Free99, gated feature", "Zip removed", "Gate session"], "receipt-desktop.png");
-    assertions.push("Expansion receipt documents archive unpack, zip removal, gate session, and commercial posture.");
+    await checkPage(page, baseUrl, "proof/skyemusicnexus-expansion-receipt.html", "SkyeMusicNexus receipt desktop", ["SkyeMusicNexus Lite is Free99", "paid music ops", "Gate session"], "receipt-desktop.png");
+    assertions.push("Expansion receipt documents archive unpack, zip removal, gate session, and paid music ops posture.");
 
-    await checkPage(page, baseUrl, "pricing/index.html#skyemusicnexus-free99", "Commercial pricing desktop", ["SkyeMusicNexus", "Free99", "no charge"], "pricing-desktop.png");
-    await checkPage(page, baseUrl, "saas/pricing.html#skyemusicnexus-free99", "SaaS pricing desktop", ["SkyeMusicNexus", "Free99", "no charge"], "saas-pricing-desktop.png");
-    await checkPage(page, baseUrl, "saas/index.html", "SaaS overview desktop", ["SkyeMusicNexus Free99", "gate session still required"], "saas-overview-desktop.png");
-    await checkPage(page, baseUrl, "admin/index.html", "Admin hub desktop", ["SkyeMusicNexus Free99", "music function auth boundary"], "admin-hub-desktop.png");
-    assertions.push("Pricing, SaaS overview, and admin hub expose SkyeMusicNexus as Free99/no-charge gated access.");
+    await checkPage(page, baseUrl, "pricing/index.html#skyemusicnexus-lite-free99", "Commercial pricing desktop", ["SkyeMusicNexus Lite", "Free99", "Single Song Drop"], "pricing-desktop.png");
+    await checkPage(page, baseUrl, "saas/pricing.html#skyemusicnexus-lite-free99", "SaaS pricing desktop", ["SkyeMusicNexus Studio", "Single Song Drop", "Free99"], "saas-pricing-desktop.png");
+    await checkPage(page, baseUrl, "saas/index.html", "SaaS overview desktop", ["SkyeMusicNexus Lite", "Buy Single Song Drop"], "saas-overview-desktop.png");
+    await checkPage(page, baseUrl, "admin/index.html", "Admin hub desktop", ["SkyeMusicNexus Lite + paid drops", "music function auth boundary"], "admin-hub-desktop.png");
+    assertions.push("Pricing, SaaS overview, and admin hub expose SkyeMusicNexus as Free99 Lite plus paid gated access.");
 
     await page.goto(`${baseUrl}/sales/live-proof-router.html`, { waitUntil: "domcontentloaded" });
     await page.locator('input[value*="music artist release"]').check();
     await page.locator("#buildRoute").click();
-    await expectText(page, "SkyeMusicNexus Free99 Music Stage");
+    await expectText(page, "SkyeMusicNexus Lite + Paid Drops");
     await assertNoHorizontalScroll(page, "Sales proof router desktop");
     await page.screenshot({ path: path.join(ARTIFACT_DIR, "sales-router-desktop.png"), fullPage: true });
-    assertions.push("Sales proof router recommends the Free99 music stage for music operations needs.");
+    assertions.push("Sales proof router recommends the Lite + paid drops music stage for music operations needs.");
 
     await page.goto(`${baseUrl}/SkyeMusicNexus/index.html`, { waitUntil: "domcontentloaded" });
     await expectText(page, "Command Field");
@@ -148,17 +148,17 @@ async function main() {
     await page.screenshot({ path: path.join(ARTIFACT_DIR, "app-shell-gated-desktop.png"), fullPage: true });
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage desktop", ["Release music through a living signal stage", "Artist Nebula", "Release Forge"], "artist-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage desktop", ["Release music through a living artist exchange", "Creator Exchange", "Content Request Exchange", "Achievement Orbit", "Release Campaign Forge"], "artist-stage-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/admin.html", "Operator stage desktop", ["Move releases like live assets", "Payout Gate", "Analytics Prism"], "operator-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/admin.html", "Operator stage desktop", ["Move releases, content requests", "Payout Gate", "Analytics Prism", "Exchange Console"], "operator-stage-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
     assertions.push("Artist and operator stages render end to end with the seeded gate session.");
 
     const mobile = await context.newPage();
     mobile.on("pageerror", (error) => pageErrors.push(`mobile: ${error.message}`));
     await mobile.setViewportSize({ width: 390, height: 844 });
-    await checkPage(mobile, baseUrl, "live/skyemusicnexus-neofront.html", "SkyeMusicNexus hub mobile", ["Free99 music operating stage", "no charge"], "hub-mobile.png");
-    await checkPage(mobile, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage mobile", ["Release music through a living signal stage", "Artist Nebula"], "artist-stage-mobile.png");
+    await checkPage(mobile, baseUrl, "live/skyemusicnexus-neofront.html", "SkyeMusicNexus hub mobile", ["SkyeMusicNexus Lite is Free99", "Single Song Drop"], "hub-mobile.png");
+    await checkPage(mobile, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage mobile", ["Release music through a living artist exchange", "Creator Exchange"], "artist-stage-mobile.png");
     assertions.push("Mobile hub and artist stage render without horizontal overflow.");
 
     expect(pageErrors.length === 0, `Browser page errors:\n${pageErrors.join("\n")}`);
@@ -169,7 +169,11 @@ async function main() {
       baseUrl,
       checkedAt: new Date().toISOString(),
       gate: {
-        free99_no_charge: true,
+        free99_lite_no_charge: true,
+        paid_addons_available: true,
+        social_exchange_available: true,
+        content_requests_available: true,
+        achievements_available: true,
         gate_session_required: true,
         seeded_gate_token: GATE_TOKEN
       },

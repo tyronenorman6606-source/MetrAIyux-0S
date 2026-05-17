@@ -44,6 +44,27 @@ ok(await exists('insights/weekly-company-command-rhythm/index.html'), 'weekly co
 const weekly = await read('insights/weekly-company-command-rhythm/index.html');
 ok(weekly.includes('Manual operating method') && weekly.includes('How 0S makes it easier'), 'article includes manual method and 0S bridge');
 ok(weekly.includes('SBA: Write your business plan'), 'article includes source notes');
+const weeklyWords = weekly.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+ok(weeklyWords >= 1800, 'weekly command article is longform');
+ok(weekly.includes('Operator diagnostics') && weekly.includes('Owner worksheet') && weekly.includes('Common ways this breaks'), 'article includes operator diagnostics, worksheet, and mistakes');
+const localVisibility = await read('insights/local-visibility-that-converts/index.html');
+const localWords = localVisibility.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+ok(localWords >= 1700, 'local visibility article is longform');
+ok(localVisibility.includes('A 30-day local visibility plan'), 'local visibility article includes implementation plan');
+const articleSlugs = [
+  'weekly-company-command-rhythm',
+  'local-visibility-that-converts',
+  'customer-intake-follow-up-system',
+  'records-receipts-and-money-hygiene',
+  'small-business-security-without-paranoia',
+  'reviews-social-proof-without-shady-tactics',
+  'market-research-before-growth-spend'
+];
+for (const slug of articleSlugs) {
+  const articleHtml = await read(`insights/${slug}/index.html`);
+  const wordCount = articleHtml.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+  ok(wordCount >= 1500, `${slug} clears longform word floor`);
+}
 const directory = await read('directory/index.html');
 ok(directory.includes('public-topbar'), 'directory header uses simplified public nav');
 ok(!directory.includes('AE Command</a><a href="/accounts/'), 'directory no longer shows dense operator nav chain');

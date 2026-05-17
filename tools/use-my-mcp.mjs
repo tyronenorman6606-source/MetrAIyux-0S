@@ -49,6 +49,11 @@ function shortSource(filePaths, maxBytes = 22000) {
     .join('\n\n');
 }
 
+function managedSignals(text) {
+  return (String(text || '').match(/(?:\/\*|\/\/) BEGIN quantumskyes:[\s\S]*?(?:\/\* END quantumskyes:[^*]+\*\/|\/\/ END quantumskyes:[^\n]+)/g) || [])
+    .join('\n\n');
+}
+
 const mcpConfig = readJson(mcpConfigPath);
 const quantumskyes = mcpConfig.mcpServers?.quantumskyes;
 if (!quantumskyes) {
@@ -87,9 +92,9 @@ async function callTool(name, args = {}) {
   }
 }
 
-const htmlFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.html'));
-const cssFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.css'));
-const jsFiles = walkFiles(targetFolder, (filePath) => /\.(?:js|mjs|jsx|ts|tsx)$/.test(filePath));
+let htmlFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.html'));
+let cssFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.css'));
+let jsFiles = walkFiles(targetFolder, (filePath) => /\.(?:js|mjs|jsx|ts|tsx)$/.test(filePath));
 const targetHasPublicSource = htmlFiles.length + cssFiles.length + jsFiles.length > 0;
 const relativeTarget = path.relative(repoRoot, targetFolder);
 const isSkyeGateFS27 = relativeTarget === 'SkyeGateFS27';
@@ -112,63 +117,86 @@ const rootCss = path.join(targetFolder, 'style.css');
 const rootJs = path.join(targetFolder, 'script.js');
 const rootMotionJs = path.join(targetFolder, 'morphing-motion.mjs');
 
-const source = {
-  index: isSkyeGateFS27
-    ? readFirstExisting([skyepayIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean))
-    : isSkyeSolTarget
-    ? readFirstExisting([canonicalIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean))
-    : readFirstExisting([path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean)),
-  css: isSkyeGateFS27
-    ? readFirstExisting([skyepayCss, cssFiles[0]].filter(Boolean))
-    : isSkyeSolTarget
-    ? readFirstExisting([canonicalCss, cssFiles[0]].filter(Boolean))
-    : readFirstExisting([rootCss, path.join(targetFolder, 'src', 'styles.css'), cssFiles[0]].filter(Boolean)),
-  js: isSkyeGateFS27
-    ? [readFirstExisting([skyepayJs, jsFiles[0]].filter(Boolean)), readFirstExisting([skyepayMotionJs])].filter(Boolean).join('\n\n')
-    : isSkyeSolTarget
-    ? readFirstExisting([canonicalStackSource, canonicalBundle, canonicalJs, jsFiles[0]].filter(Boolean))
-    : [readFirstExisting([rootJs]), readFirstExisting([rootMotionJs]), shortSource(jsFiles, 16000)].filter(Boolean).join('\n\n')
-};
-const sourcePaths = {
-  index: isSkyeGateFS27
-    ? readFirstExisting([skyepayIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean)) && (fs.existsSync(skyepayIndex) ? skyepayIndex : path.join(targetFolder, 'index.html'))
-    : isSkyeSolTarget
-    ? canonicalIndex
-    : path.join(targetFolder, 'index.html'),
-  css: isSkyeGateFS27
-    ? skyepayCss
-    : isSkyeSolTarget
-    ? canonicalCss
-    : fs.existsSync(rootCss) ? rootCss : path.join(targetFolder, 'src', 'styles.css'),
-  js: isSkyeGateFS27
-    ? skyepayJs
-    : isSkyeSolTarget
-    ? canonicalStackSource
-    : fs.existsSync(rootJs) ? rootJs : path.join(targetFolder, 'src')
-};
+function buildSourceSnapshot() {
+  const source = {
+    index: isSkyeGateFS27
+      ? readFirstExisting([skyepayIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean))
+      : isSkyeSolTarget
+      ? readFirstExisting([canonicalIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean))
+      : readFirstExisting([path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean)),
+    css: isSkyeGateFS27
+      ? readFirstExisting([skyepayCss, cssFiles[0]].filter(Boolean))
+      : isSkyeSolTarget
+      ? readFirstExisting([canonicalCss, cssFiles[0]].filter(Boolean))
+      : readFirstExisting([rootCss, path.join(targetFolder, 'src', 'styles.css'), cssFiles[0]].filter(Boolean)),
+    js: isSkyeGateFS27
+      ? [readFirstExisting([skyepayJs, jsFiles[0]].filter(Boolean)), readFirstExisting([skyepayMotionJs])].filter(Boolean).join('\n\n')
+      : isSkyeSolTarget
+      ? readFirstExisting([canonicalStackSource, canonicalBundle, canonicalJs, jsFiles[0]].filter(Boolean))
+      : [readFirstExisting([rootJs]), readFirstExisting([rootMotionJs]), shortSource(jsFiles, 16000)].filter(Boolean).join('\n\n')
+  };
+  const sourcePaths = {
+    index: isSkyeGateFS27
+      ? readFirstExisting([skyepayIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean)) && (fs.existsSync(skyepayIndex) ? skyepayIndex : path.join(targetFolder, 'index.html'))
+      : isSkyeSolTarget
+      ? canonicalIndex
+      : path.join(targetFolder, 'index.html'),
+    css: isSkyeGateFS27
+      ? skyepayCss
+      : isSkyeSolTarget
+      ? canonicalCss
+      : fs.existsSync(rootCss) ? rootCss : path.join(targetFolder, 'src', 'styles.css'),
+    js: isSkyeGateFS27
+      ? skyepayJs
+      : isSkyeSolTarget
+      ? canonicalStackSource
+      : fs.existsSync(rootJs) ? rootJs : path.join(targetFolder, 'src')
+  };
+  const combinedSource = [
+    'TARGET INVENTORY',
+    JSON.stringify({
+      targetFolder,
+      htmlFiles: htmlFiles.length,
+      cssFiles: cssFiles.length,
+      jsFiles: jsFiles.length
+    }, null, 2),
+    'INDEX SOURCE',
+    source.index,
+    'CSS SOURCE',
+    source.css || shortSource(cssFiles),
+    'JS SOURCE',
+    source.js || shortSource(jsFiles)
+  ].join('\n\n');
+  const auditSource = [
+    'TARGET INVENTORY',
+    JSON.stringify({
+      targetFolder,
+      htmlFiles: htmlFiles.length,
+      cssFiles: cssFiles.length,
+      jsFiles: jsFiles.length
+    }, null, 2),
+    'MCP MANAGED CSS IMPLEMENTATION',
+    managedSignals(source.css),
+    'MCP MANAGED JS IMPLEMENTATION',
+    managedSignals(source.js),
+    'CSS IMPLEMENTATION SIGNALS',
+    (source.css || shortSource(cssFiles)).slice(-70000),
+    'JS IMPLEMENTATION SIGNALS',
+    `${(source.js || shortSource(jsFiles)).slice(0, 36000)}\n\n${(source.js || shortSource(jsFiles)).slice(-36000)}`,
+    'INDEX SOURCE',
+    source.index.slice(0, 50000)
+  ].join('\n\n');
+  const homepageCopy = `${source.index}\n${source.js}`
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-const combinedSource = [
-  'TARGET INVENTORY',
-  JSON.stringify({
-    targetFolder,
-    htmlFiles: htmlFiles.length,
-    cssFiles: cssFiles.length,
-    jsFiles: jsFiles.length
-  }, null, 2),
-  'INDEX SOURCE',
-  source.index,
-  'CSS SOURCE',
-  source.css || shortSource(cssFiles),
-  'JS SOURCE',
-  source.js || shortSource(jsFiles)
-].join('\n\n');
+  return { source, sourcePaths, combinedSource, auditSource, homepageCopy };
+}
 
-const homepageCopy = `${source.index}\n${source.js}`
-  .replace(/<script[\s\S]*?<\/script>/g, ' ')
-  .replace(/<style[\s\S]*?<\/style>/g, ' ')
-  .replace(/<[^>]+>/g, ' ')
-  .replace(/\s+/g, ' ')
-  .trim();
+let { source, sourcePaths, combinedSource, auditSource, homepageCopy } = buildSourceSnapshot();
 
 const publicCopyForAudit = [
   isSkyeGateFS27
@@ -214,6 +242,24 @@ const requestedEffectsForTarget = [...new Set([...(isSkyeGateFS27
   ? ['textEffects', 'livingBackground']
   : []), ...requestedEffectOverrides])];
 
+const shouldApplyMcpParts = targetHasPublicSource
+  && !isMcpServerTarget
+  && requestedEffectsForTarget.length > 0
+  && process.env.MCP_APPLY !== '0';
+const implementationCall = shouldApplyMcpParts
+  ? await callTool('design_apply_mcp_parts', {
+      targetFolder: relativeTarget,
+      effects: requestedEffectsForTarget,
+      mode: process.env.MCP_APPLY_MODE === 'dryRun' ? 'dryRun' : 'apply'
+    })
+  : null;
+if (implementationCall) {
+  htmlFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.html'));
+  cssFiles = walkFiles(targetFolder, (filePath) => filePath.endsWith('.css'));
+  jsFiles = walkFiles(targetFolder, (filePath) => /\.(?:js|mjs|jsx|ts|tsx)$/.test(filePath));
+  ({ source, sourcePaths, combinedSource, auditSource, homepageCopy } = buildSourceSnapshot());
+}
+
 const legacyCssImportShims = cssFiles.filter((filePath) => {
   if (path.resolve(filePath) === path.resolve(canonicalCss)) return false;
   return fs.readFileSync(filePath, 'utf8').includes('@import url("/SkyeSol/skyesol-main/assets/skyesol-rebuild/site.css")');
@@ -253,6 +299,7 @@ const resourcesRead = [];
 for (const uri of requiredResources) resourcesRead.push(await readResource(uri));
 
 const toolCalls = [];
+if (implementationCall) toolCalls.push(implementationCall);
 for (const filePath of [canonicalIndex, canonicalCss, canonicalStackSource, canonicalBundle, canonicalJs]) {
   if (fs.existsSync(filePath)) {
     toolCalls.push(await callTool('repo_read', { path: path.relative(repoRoot, filePath) }));
@@ -346,17 +393,17 @@ toolCalls.push(await callTool('design_content_audit', { content: publicCopyForAu
 toolCalls.push(await callTool('design_logo_audit', {
   product: isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
   requireExistingAsset: !isSkyeGateFS27 && targetHasPublicSource,
-  source: `${logoSourceForAudit}\n${combinedSource.slice(0, 90000)}`
+  source: `${logoSourceForAudit}\n${auditSource.slice(0, 90000)}`
 }));
 if (!isMcpServerTarget) {
   toolCalls.push(await callTool('design_effect_audit', {
     requested: requestedEffectsForTarget,
-    source: combinedSource.slice(0, 90000)
+    source: auditSource.slice(0, 90000)
   }));
-  toolCalls.push(await callTool('design_performance_audit', { source: combinedSource.slice(0, 90000) }));
-  toolCalls.push(await callTool('design_stack_audit', { required: requiredStackForTarget, packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: combinedSource.slice(0, 90000) }));
+  toolCalls.push(await callTool('design_performance_audit', { source: auditSource.slice(0, 90000) }));
+  toolCalls.push(await callTool('design_stack_audit', { required: requiredStackForTarget, packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: auditSource.slice(0, 90000) }));
 } else {
-  toolCalls.push(await callTool('design_stack_audit', { required: [], packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: combinedSource.slice(0, 90000) }));
+  toolCalls.push(await callTool('design_stack_audit', { required: [], packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: auditSource.slice(0, 90000) }));
 }
 const hasBrowserActionProofClaim = process.env.MCP_E2E_PROOF === '1';
 if (hasBrowserActionProofClaim) {
@@ -375,11 +422,11 @@ if (hasBrowserActionProofClaim) {
       posterAsset: fs.existsSync(browserProofPoster) ? path.relative(repoRoot, browserProofPoster) : null,
       playbackVerified: 'readyState >= 4; currentTime > 0; paused === false; visible true'
     }),
-    source: combinedSource.slice(0, 90000)
+    source: auditSource.slice(0, 90000)
   }));
 }
 if (targetHasPublicSource && !isMcpServerTarget) {
-  toolCalls.push(await callTool('design_validate', { content: combinedSource.slice(0, 50000) }));
+  toolCalls.push(await callTool('design_validate', { content: auditSource.slice(0, 50000) }));
 }
 toolCalls.push(await callTool('design_quality_gate', { surface: relativeTarget }));
 toolCalls.push(await callTool('production_ledger', {}));
@@ -410,6 +457,11 @@ const receipt = {
     canonicalStackSource: isSkyeSolTarget ? canonicalStackSource : null,
     canonicalBundle: isSkyeSolTarget ? canonicalBundle : null,
     canonicalJs: isSkyeSolTarget ? canonicalJs : null
+  },
+  implementation: {
+    applyEnabled: shouldApplyMcpParts,
+    applyTool: 'design_apply_mcp_parts',
+    call: implementationCall
   },
   listedResources: resources.resources.map((resource) => resource.uri),
   listedResourceTemplates: resourceTemplates.resourceTemplates.map((template) => template.uriTemplate),

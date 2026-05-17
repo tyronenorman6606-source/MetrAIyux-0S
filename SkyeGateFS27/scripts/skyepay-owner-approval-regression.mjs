@@ -24,26 +24,26 @@ assert.ok(vaultStarter, "SkyeVault starter offer should exist");
 const routexSetup = routex.line_items.find((item) => item.id === "setup");
 const routexMonthly = routex.line_items.find((item) => item.id === "monthly");
 
-assert.equal(routex.owner_approval_required, true, "RouteX must require owner approval");
-assert.equal(routex.activation_path, "owner_approved_after_route_scope_and_runtime_proof");
+assert.equal(routex.owner_approval_required, false, "RouteX must auto-unlock after confirmed payment");
+assert.equal(routex.activation_path, "auto_unlock_after_confirmed_payment");
 assert.equal(resolveSkyePayTrialDays(routex, client), 0, "RouteX must not be a zero-upfront trial");
 assert.equal(routexSetup.amount_cents, 650000, "RouteX setup must be $6,500");
 assert.equal(routexMonthly.amount_cents, 149700, "RouteX monthly must be $1,497");
 assert.equal(routexSetup.lookup_key, "metraiyux_routex_workforce_command_setup");
 assert.equal(routexMonthly.lookup_key, "metraiyux_routex_workforce_command_monthly");
 
-assert.equal(skyePayOfferRequiresOwnerApproval(routex), true);
+assert.equal(skyePayOfferRequiresOwnerApproval(routex), false);
 assert.deepEqual(skyePayOrderStatusesForPayment({ offer: routex, paymentConfirmed: true }), {
-  approval_status: "paid_pending_owner_approval",
-  owner_status: "pending_owner_approval",
-  provisioning_status: "waiting_for_owner_approval"
+  approval_status: "payment_confirmed",
+  owner_status: "auto_unlock_pending",
+  provisioning_status: "auto_unlock_pending"
 });
 
-assert.equal(skyePayOfferRequiresOwnerApproval(starter), true, "Starter app lane should also hold for owner approval");
+assert.equal(skyePayOfferRequiresOwnerApproval(starter), false, "Starter app lane should auto-unlock after confirmed payment");
 assert.deepEqual(skyePayOrderStatusesForPayment({ offer: starter, paymentConfirmed: true }), {
-  approval_status: "paid_pending_owner_approval",
-  owner_status: "pending_owner_approval",
-  provisioning_status: "waiting_for_owner_approval"
+  approval_status: "payment_confirmed",
+  owner_status: "auto_unlock_pending",
+  provisioning_status: "auto_unlock_pending"
 });
 
 assert.equal(skyePayOfferRequiresOwnerApproval(vaultStarter), false, "Vault subscriptions are the auto-provision exception");
@@ -65,9 +65,9 @@ const metadata = buildSkyePayMetadata({
   orderId: "skypay_routex_owner_approval_proof"
 });
 
-assert.equal(metadata.owner_approval_required, "true");
-assert.equal(metadata.approval_status, "paid_pending_owner_approval");
-assert.equal(metadata.activation_path, "owner_approved_after_route_scope_and_runtime_proof");
+assert.equal(metadata.owner_approval_required, "false");
+assert.equal(metadata.approval_status, "auto_unlock_after_confirmed_payment");
+assert.equal(metadata.activation_path, "auto_unlock_after_confirmed_payment");
 
 const demo = makeDemoSession({
   client,
@@ -76,8 +76,8 @@ const demo = makeDemoSession({
   origin: "http://127.0.0.1:4197"
 });
 
-assert.equal(demo.owner_approval_required, true);
-assert.equal(demo.approval_status, "demo_pending_owner_approval");
+assert.equal(demo.owner_approval_required, false);
+assert.equal(demo.approval_status, "demo_checkout");
 assert.match(demo.url, /offer=metraiyux-routex-workforce-command/);
 
 console.log(JSON.stringify({

@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-05-17T00:00:00Z",
-  "chunk_count": 731,
+  "chunk_count": 733,
   "chunks": [
     {
       "id": "adrian-cross-2",
@@ -5135,21 +5135,35 @@
       "text": "SkyeMediaCenter app boot, public intake, operator theater, media-assets, media-search, media-publish, media-stats, and media-file flows require a 0S or FS27 gate session. Ungated list, search, publish, stats, file delivery, and asset actions return 401 instead of exposing Free99 as anonymous access."
     },
     {
-      "id": "skyemusicnexus-free99-expansion-1",
-      "source": "live/skyemusicnexus-neofront.html",
-      "title": "SkyeMusicNexus Free99 Expansion",
-      "heading": "Free99 gated music nexus",
-      "text": "SkyeMusicNexus is mounted inside MetrAIyux 0S as a Free99 no-charge music operating app for artist records, release forge, royalty ledger motion, payout review, analytics, operations workflow, and proof boundaries. Free99 means no charge, not anonymous access."
+      "id": "skyecontentforge-free99-expansion-1",
+      "source": "live/skye-content-forge-publisher.html",
+      "title": "Skye Content Forge Free99 Expansion",
+      "heading": "Free99 gated content publisher",
+      "text": "Skye Content Forge is mounted inside MetrAIyux 0S as a Free99 no-charge content publisher for approved source scanning, source-note extraction, original content generation, draft archives, Markdown export, Google Drive upload when configured, scheduler ticks, publish queue, GitHub backup/restore, Netlify/Cloudflare hooks, and official social API boundaries. Free99 means no charge, not anonymous access."
     },
     {
-      "id": "skyemusicnexus-free99-expansion-2",
+      "id": "skyecontentforge-gate-boundary-2",
+      "source": "skye-content-repurposer-local/public/gate-session.js",
+      "title": "Skye Content Forge Gate Boundary",
+      "heading": "Gate session required",
+      "text": "Skye Content Forge app boot waits for a 0S, FS27, SkyGate, or local admin gate session. Every /api/* route rejects ungated requests with 401, including health, source scan, generation, export, scheduler, backup, restore, deployment, and publishing routes. Free99 does not bypass auth."
+    },
+    {
+      "id": "skyemusicnexus-lite-paid-addons-1",
+      "source": "live/skyemusicnexus-neofront.html",
+      "title": "SkyeMusicNexus Lite + Paid Add-ons",
+      "heading": "Free99 Lite and paid music ops",
+      "text": "SkyeMusicNexus is mounted inside MetrAIyux 0S as a gated music operating app. SkyeMusicNexus Lite is Free99/no charge for a limited music preview. Studio, Label Command, Managed Music Ops, Single Song Drop, release drops, catalog import, royalty ledger setup, payout review, artist profile, seat, and release-pack add-ons are paid and still require a gate session."
+    },
+    {
+      "id": "skyemusicnexus-gate-boundary-paid-addons-2",
       "source": "SkyeMusicNexus/gate-session.js",
       "title": "SkyeMusicNexus Gate Boundary",
       "heading": "Gate session required",
-      "text": "SkyeMusicNexus app boot, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, and workflow proof require a 0S, FS27, or SkyGate session. Ungated artist, release, and operations reads return 401 instead of exposing Free99 as anonymous access."
+      "text": "SkyeMusicNexus app boot, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, paid drops, and workflow proof require a 0S, FS27, or SkyGate session. Ungated artist, release, and operations reads return 401 instead of exposing Free99 Lite or paid access as anonymous access."
     }
   ],
-  "updated_for": "skyemusicnexus-free99-routing",
+  "updated_for": "skye-content-forge-free99-routing",
   "updated_at": "2026-05-17T00:00:00Z",
   "platform": {
     "name": "MetrAIyux 0S",

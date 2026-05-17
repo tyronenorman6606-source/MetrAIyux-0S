@@ -16,7 +16,7 @@ Use these metadata keys on every Product or Price where Stripe lets you add meta
 | --- | --- |
 | `source_folder` | Folder that owns the offer. |
 | `source_file` | File where the price was found or approved. |
-| `offer_family` | `metraiyux`, `skygate`, `kaixu`, `lane_vault`, `skyecorp`, `business_command_center`, `sol_staffing`. |
+| `offer_family` | `metraiyux`, `skyemusicnexus`, `skygate`, `kaixu`, `lane_vault`, `skyecorp`, `business_command_center`, `sol_staffing`. |
 | `plan_id` | Stable internal id. |
 | `status` | `approved`, `approved_floor`, `quote_only`, `do_not_create`. |
 | `brain_owner` | Brain that should speak to the offer first. |
@@ -56,23 +56,51 @@ Source files:
 - `metraiyux_0s_site/live/skyemusicnexus-neofront.html`
 - `metraiyux_0s_site/proof/skyemusicnexus-expansion-receipt.html`
 - `metraiyux_0s_site/SkyeMusicNexus/PLATFORM_TRUTH.json`
+- `metraiyux_0s_site/data/skyemusicnexus-pricing.json`
+- `metraiyux_0s_site/live/skye-content-forge-publisher.html`
+- `metraiyux_0s_site/proof/skye-content-forge-expansion-receipt.html`
+- `metraiyux_0s_site/skye-content-repurposer-local/README.md`
+- `metraiyux_0s_site/skye-content-repurposer-local/package.json`
 
-Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRouteX workforce command lane, the held-rate HouseOperations + SkyeBox scope expansion, and the Free99 SkyeProfitConsole and SkyeMusicNexus features. Standard plans are ready to create in Stripe. RouteX has a named SkyePay offer, but activation stays owner-approved until production provider proof is selected and verified. HouseOperations + SkyeBox does not create new Stripe products in this pass. SkyeProfitConsole and SkyeMusicNexus are Free99, meaning no charge, and still require a gate session.
+Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRouteX workforce command lane, the held-rate HouseOperations + SkyeBox scope expansion, Free99 SkyeProfitConsole/SkyeMediaCenter/Skye Content Forge, and SkyeMusicNexus Lite plus paid music ops tiers and drop add-ons. Standard plans are ready to create in Stripe. RouteX has a named SkyePay offer, but activation stays owner-approved until production provider proof is selected and verified. SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, and SkyeMusicNexus Lite are Free99, meaning no charge, and still require a gate session. SkyeMusicNexus Studio, Label Command, Managed Music Ops, and add-ons are paid SkyePay offers.
 
 ### Create In Stripe
 
 | Product | Price nickname | Type | Amount | Billing | Lookup key | Metadata |
 | --- | --- | --- | ---: | --- | --- | --- |
-| MetrAIyux 0S - Starter Command | Starter Command monthly | Recurring | $397.00 | Monthly | `metraiyux_starter_command_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=starter-command`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_static_ready` |
+| MetrAIyux 0S - Starter Command | Starter Command monthly | Recurring | $397.00 | Monthly | `metraiyux_starter_command_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=starter-command`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_static_ready_content_forge_free99` |
 | MetrAIyux 0S - Starter Command Setup | Starter Command setup | One-time | $1,500.00 | Once | `metraiyux_starter_command_setup` | same as above, `setup_for=starter-command` |
-| MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $997.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map` |
+| MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $997.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map_content_forge_free99` |
 | MetrAIyux 0S - Growth Cabinet Setup | Growth Cabinet setup | One-time | $3,500.00 | Once | `metraiyux_growth_cabinet_setup` | same as above, `setup_for=growth-cabinet` |
-| MetrAIyux 0S - RouteX Workforce Command | RouteX Workforce Command monthly | Recurring | $1,497.00 | Monthly | `metraiyux_routex_workforce_command_monthly` | `source_folder=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0`, `plan_id=routex-workforce-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=marcus-vale-brain`, `includes=skyeroutex_v040_api_browser_proof_v83_local_runtime` |
+| MetrAIyux 0S - RouteX Workforce Command | RouteX Workforce Command monthly | Recurring | $1,497.00 | Monthly | `metraiyux_routex_workforce_command_monthly` | `source_folder=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0`, `plan_id=routex-workforce-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=marcus-vale-brain`, `includes=skyeroutex_v040_api_browser_proof_v83_local_runtime_content_forge_free99` |
 | MetrAIyux 0S - RouteX Workforce Command Setup | RouteX Workforce Command setup | One-time | $6,500.00 | Once | `metraiyux_routex_workforce_command_setup` | same as above, `setup_for=routex-workforce-command` |
-| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $2,497.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_v040_handoff` |
+| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $2,497.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_v040_handoff_content_forge_free99` |
 | MetrAIyux 0S - Autonomous Office Setup | Autonomous Office setup | One-time | $7,500.00 | Once | `metraiyux_autonomous_office_setup` | same as above, `setup_for=autonomous-office` |
-| MetrAIyux 0S - Enterprise | Enterprise monthly | Recurring | $3,997.00 | Monthly | `metraiyux_enterprise_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=enterprise-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=managed_connectlog_relay13_houseops_skyebox_custom_skyeroutex_v040` |
+| MetrAIyux 0S - Enterprise | Enterprise monthly | Recurring | $3,997.00 | Monthly | `metraiyux_enterprise_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=enterprise-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=managed_connectlog_relay13_houseops_skyebox_custom_skyeroutex_v040_content_forge_free99` |
 | MetrAIyux 0S - Enterprise Setup | Enterprise setup | One-time | $15,000.00 | Once | `metraiyux_enterprise_setup` | same as above, `setup_for=enterprise` |
+| SkyeMusicNexus Studio | Studio monthly | Recurring | $497.00 | Monthly | `skyemusicnexus_studio_monthly` | `source_folder=metraiyux_0s_site/SkyeMusicNexus`, `source_file=metraiyux_0s_site/data/skyemusicnexus-pricing.json`, `plan_id=skyemusicnexus-studio`, `offer_family=skyemusicnexus`, `status=approved_pending_sync`, `brain_owner=naomi-sterling-brain`, `gate_session_required=true` |
+| SkyeMusicNexus Studio Setup | Studio setup | One-time | $1,500.00 | Once | `skyemusicnexus_studio_setup` | same as above, `setup_for=skyemusicnexus-studio` |
+| SkyeMusicNexus Label Command | Label Command monthly | Recurring | $1,497.00 | Monthly | `skyemusicnexus_label_command_monthly` | `source_folder=metraiyux_0s_site/SkyeMusicNexus`, `source_file=metraiyux_0s_site/data/skyemusicnexus-pricing.json`, `plan_id=skyemusicnexus-label-command`, `offer_family=skyemusicnexus`, `status=approved_pending_sync`, `brain_owner=naomi-sterling-brain`, `gate_session_required=true` |
+| SkyeMusicNexus Label Command Setup | Label Command setup | One-time | $6,500.00 | Once | `skyemusicnexus_label_command_setup` | same as above, `setup_for=skyemusicnexus-label-command` |
+| SkyeMusicNexus Managed Music Ops | Managed Music Ops monthly | Recurring | $3,997.00 | Monthly | `skyemusicnexus_managed_music_ops_monthly` | `source_folder=metraiyux_0s_site/SkyeMusicNexus`, `source_file=metraiyux_0s_site/data/skyemusicnexus-pricing.json`, `plan_id=skyemusicnexus-managed-music-ops`, `offer_family=skyemusicnexus`, `status=approved_pending_sync`, `owner_approval_required=true`, `brain_owner=naomi-sterling-brain`, `gate_session_required=true` |
+| SkyeMusicNexus Managed Music Ops Setup | Managed Music Ops setup | One-time | $15,000.00 | Once | `skyemusicnexus_managed_music_ops_setup` | same as above, `setup_for=skyemusicnexus-managed-music-ops` |
+| SkyeMusicNexus Single Song Drop | Single Song Drop | One-time | $199.00 | Once | `skyemusicnexus_single_song_drop` | `source_folder=metraiyux_0s_site/SkyeMusicNexus`, `source_file=metraiyux_0s_site/data/skyemusicnexus-pricing.json`, `plan_id=skyemusicnexus-single-song-drop`, `offer_family=skyemusicnexus`, `status=approved_pending_sync`, `brain_owner=naomi-sterling-brain`, `gate_session_required=true` |
+| SkyeMusicNexus Release Drop Plus | Release Drop Plus | One-time | $399.00 | Once | `skyemusicnexus_release_drop_plus` | same as above, `plan_id=skyemusicnexus-release-drop-plus` |
+| SkyeMusicNexus EP Drop | EP Drop | One-time | $799.00 | Once | `skyemusicnexus_ep_drop` | same as above, `plan_id=skyemusicnexus-ep-drop` |
+| SkyeMusicNexus Album Drop | Album Drop | One-time | $1,497.00 | Once | `skyemusicnexus_album_drop` | same as above, `plan_id=skyemusicnexus-album-drop` |
+| SkyeMusicNexus Catalog Import Pack | Catalog Import Pack | One-time | $299.00 | Once | `skyemusicnexus_catalog_import_pack` | same as above, `plan_id=skyemusicnexus-catalog-import-pack` |
+| SkyeMusicNexus Royalty Ledger Setup | Royalty Ledger Setup | One-time | $249.00 | Once | `skyemusicnexus_royalty_ledger_setup` | same as above, `plan_id=skyemusicnexus-royalty-ledger-setup` |
+| SkyeMusicNexus Payout Review Pack | Payout Review Pack | One-time | $149.00 | Once | `skyemusicnexus_payout_review_pack` | same as above, `plan_id=skyemusicnexus-payout-review-pack` |
+| SkyeMusicNexus Artist Profile Buildout | Artist Profile Buildout | One-time | $99.00 | Once | `skyemusicnexus_artist_profile_buildout` | same as above, `plan_id=skyemusicnexus-artist-profile-buildout` |
+| SkyeMusicNexus Social Caption Pack | Social Caption Pack | One-time | $99.00 | Once | `skyemusicnexus_social_caption_pack` | same as above, `plan_id=skyemusicnexus-social-caption-pack` |
+| SkyeMusicNexus Cover / Canvas Request | Cover / Canvas Request | One-time | $199.00 | Once | `skyemusicnexus_cover_canvas_request` | same as above, `plan_id=skyemusicnexus-cover-canvas-request` |
+| SkyeMusicNexus Short-Form Clip Brief | Short-Form Clip Brief | One-time | $249.00 | Once | `skyemusicnexus_short_form_clip_brief` | same as above, `plan_id=skyemusicnexus-short-form-clip-brief` |
+| SkyeMusicNexus Release Content Kit | Release Content Kit | One-time | $499.00 | Once | `skyemusicnexus_release_content_kit` | same as above, `plan_id=skyemusicnexus-release-content-kit` |
+| SkyeMusicNexus Community Campaign Sprint | Community Campaign Sprint | One-time | $899.00 | Once | `skyemusicnexus_community_campaign_sprint` | same as above, `plan_id=skyemusicnexus-community-campaign-sprint` |
+| SkyeMusicNexus Extra Artist Seat | Extra Artist Seat monthly | Recurring | $29.00 | Monthly | `skyemusicnexus_extra_artist_seat_monthly` | same as above, `plan_id=skyemusicnexus-extra-artist-seat` |
+| SkyeMusicNexus Extra Release Pack | Extra Release Pack monthly | Recurring | $99.00 | Monthly | `skyemusicnexus_extra_release_pack_monthly` | same as above, `plan_id=skyemusicnexus-extra-release-pack` |
+| SkyeMusicNexus White-Label Artist Portal | White-label portal monthly | Recurring | $197.00 | Monthly | `skyemusicnexus_white_label_artist_portal_monthly` | same as above, `plan_id=skyemusicnexus-white-label-artist-portal` |
+| SkyeMusicNexus White-Label Artist Portal Setup | White-label portal setup | One-time | $997.00 | Once | `skyemusicnexus_white_label_artist_portal_setup` | same as above, `setup_for=skyemusicnexus-white-label-artist-portal` |
 
 ### Live Stripe Sync Receipt
 
@@ -101,7 +129,9 @@ Synced on 2026-05-17 from the root `.env` Stripe credentials into account `acct_
 | Enterprise / Government Readiness | See table above. Enterprise now has a fixed base price at $3,997/mo after the ConnectLog + Relay13, HouseOperations + SkyeBox, and SkyeRouteX expansion. Custom quotes/invoices for scope beyond the base. | |
 | HouseOperations + SkyeBox as standalone managed custody | Do not create new Stripe products yet. | Added to existing MetrAIyux plan scope at held rates. Standalone pricing requires a separate managed-security custody policy and live deployment proof. |
 | SkyeProfitConsole Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S or FS27 gate session, and runtime calls reject ungated requests. |
-| SkyeMusicNexus Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S, FS27, or SkyGate session, and music artist/release/workflow reads reject ungated requests. |
+| Skye Content Forge Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S, FS27, SkyGate, or local admin gate session, and source scan, generation, export, scheduler, backup, and deployment routes reject ungated requests. |
+| SkyeMusicNexus Lite Free99 gated feature | Do not create a paid Stripe product for Lite. | Free99 means no charge only for Lite. Access still requires a 0S, FS27, or SkyGate session, and music artist/release/workflow reads reject ungated requests. |
+| SkyeMusicNexus Provider Integration Proof Lane | Quote or owner-approved proof lane starting at $2,500. | Do not claim live distributor ingestion, DSP royalty settlement, payment movement, production identity handoff, label/legal authority, or deployed persistence until separate provider integrations are approved and proven. |
 | RouteX production deployment beyond local proof | Use custom scope before activation. | v0.4.0 proves local API/browser flows; production database, storage, payment, notification, identity/compliance, route-intelligence, DNS/SSL, and live operations must be selected and verified. |
 | `metraiyux_0s_site/pricing/*.html` 13-cabinet package pages | Do not create Stripe products yet. | Files explicitly say pricing is demonstrative/placeholder and must be edited before client use. |
 

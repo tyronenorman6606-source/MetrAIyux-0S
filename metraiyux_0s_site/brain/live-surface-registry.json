@@ -1,9 +1,9 @@
 {
-  "version": "2026-05-17-connectlog-relay13-stripe-production-sync",
-  "updated_at": "2026-05-17T18:52:20Z",
+  "version": "live-surfaces-skye-content-forge-free99",
+  "updated_at": "2026-05-17T00:00:00Z",
   "primary_folder": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
   "gate_folder": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
-  "positioning": "MetrAIyux 0S is the client-facing autonomous business command deck. SkyeGateFS27 is the gate that gives those decks identity, event evidence, key control, and deployment tracking. Together they let Gray sell websites as sovereign web infrastructure, not disposable pages. SkyeProfitConsole and SkyeMusicNexus add Free99 no-charge app lanes that still require a 0S or FS27 gate session. SkyeMediaCenter adds Free99 no-charge media intake, review, dispatch, publish, stats, and file-delivery access under the same gate-session rule.",
+  "positioning": "MetrAIyux 0S is the client-facing autonomous business command deck. SkyeGateFS27 is the gate that gives those decks identity, event evidence, key control, and deployment tracking. Together they let Gray sell websites as sovereign web infrastructure, not disposable pages. SkyeProfitConsole adds a Free99 no-charge app lane, SkyeMusicNexus adds Free99 Lite plus paid music ops and drop add-ons, and all music lanes still require a 0S, FS27, or SkyGate session. SkyeMediaCenter adds Free99 no-charge media intake, review, dispatch, publish, stats, and file-delivery access under the same gate-session rule. Skye Content Forge adds Free99 no-charge approved-source scanning, original content generation, drafts, export, scheduler, backup, and deployment-hook proof under a 0S, FS27, SkyGate, or operator admin gate session.",
   "sales_rule": "Lead with the buyer's operating pain, then route them to the live proof surface that answers that pain. Do not narrate the architecture as internal setup instructions. Do not expose tokens, mirror secrets, database URLs, or owner-only admin playbooks.",
   "deployment_ledger": {
     "path": "/workspaces/MetrAIyux-0S/LIVE_DEPLOYMENT_LEDGER.md",
@@ -18,7 +18,7 @@
     "stripe_sync_receipt": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
     "public_atlas_proof": "test-artifacts/ledger-stripe-sync-prod/browser-qa.json"
   },
-  "surface_count": 29,
+  "surface_count": 32,
   "surfaces": [
     {
       "id": "skygate-fs27-proof-surface",
@@ -113,7 +113,7 @@
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeProfitConsole/index.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeProfitConsole/index.html",
       "audience": "gated customers, operators, revenue teams, technical evaluators",
-      "privacy": "Free99 app; gate session required before boot; browser-local state by default",
+      "privacy": "Free99 app; gate session required before boot; gate-protected session state",
       "purpose": "Spatial profit field for profit packs, margin and split simulation, proof events, JSON export, and optional same-folder runtime sync.",
       "route_when": [
         "open skyeprofitconsole",
@@ -130,11 +130,11 @@
     },
     {
       "id": "metraiyux-skyeprofitconsole-runtime",
-      "name": "SkyeProfitConsole Local Runtime",
+      "name": "SkyeProfitConsole Runtime Lane",
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeProfitConsole/runtime.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeProfitConsole/runtime/local-runtime.mjs",
       "audience": "operators and technical evaluators",
-      "privacy": "local runtime; API calls require gate session header",
+      "privacy": "operator runtime; API calls require a gate-session header",
       "purpose": "Same-folder Node runtime for review packs, execution items, dispatch items, and workflow timeline proof. Ungated API calls return 401.",
       "route_when": [
         "profit runtime",
@@ -150,18 +150,23 @@
     },
     {
       "id": "metraiyux-skyemusicnexus-expansion",
-      "name": "SkyeMusicNexus Free99 Expansion Hub",
+      "name": "SkyeMusicNexus Lite + Artist Exchange Hub",
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyemusicnexus-neofront.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/skyemusicnexus-neofront.html",
       "audience": "buyers, customers, operators, music teams, technical evaluators",
       "privacy": "public proof hub with gated app/function boundary",
-      "purpose": "Routes buyers and operators into the SkyeMusicNexus Free99 no-charge music operating stage while making clear that app boot and music functions still require a 0S, FS27, or SkyGate session.",
+      "purpose": "Routes buyers and operators into the SkyeMusicNexus Lite Free99 lane, paid Studio/Label/Managed tiers, paid drop add-ons, content requests, community exchange, achievements, and release campaigns while making clear that app boot and music functions still require a 0S, FS27, or SkyGate session.",
       "route_when": [
         "skyemusicnexus",
         "music nexus",
         "music operations",
         "artist records",
         "release forge",
+        "content requests",
+        "artist inbox",
+        "community relay",
+        "achievement progression",
+        "release campaign",
         "royalty ledger",
         "payout gate",
         "analytics prism",
@@ -170,7 +175,7 @@
         "no charge",
         "gate session"
       ],
-      "sales_use": "Use when a prospect wants artist/release operations, royalty motion, payout review, analytics, or music workflow proof without a paid add-on, or asks what Free99 includes without bypassing auth.",
+      "sales_use": "Use when a prospect wants artist/release operations, content requests, social exchange, progression, release campaigns, royalty motion, payout review, analytics, or music workflow proof without a paid add-on, or asks what Free99 includes without bypassing auth.",
       "primary_brain": "valentina-reyes-brain",
       "secondary_brain": "0meg4kai-security-brain"
     },
@@ -181,12 +186,17 @@
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/index.html",
       "audience": "gated customers, operators, artists, music teams, technical evaluators",
       "privacy": "Free99 app; gate session required before app use; local function proof by default",
-      "purpose": "Routed music command shell with Artist Stage, Operator Stage, artist registration, release submission, review/publish/reporting, royalty ledger credits, payout queue, operations workflows, analytics, and proof boundaries.",
+      "purpose": "Gated music operating app for Free99 Lite previews, paid music operations, content requests, artist inbox threads, community posts, achievement progression, and release campaign packs. Free99 applies only to Lite; paid checkout does not bypass auth.",
       "route_when": [
         "open skyemusicnexus",
         "artist stage",
         "operator stage",
         "release forge",
+        "content request exchange",
+        "artist inbox",
+        "community relay",
+        "achievement orbit",
+        "release campaign forge",
         "royalty river",
         "payout review",
         "music analytics",
@@ -291,6 +301,76 @@
       "secondary_brain": "0meg4kai-security-brain"
     },
     {
+      "id": "metraiyux-skyecontentforge-expansion",
+      "name": "Skye Content Forge Free99 Expansion Hub",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-content-forge-publisher.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/skye-content-forge-publisher.html",
+      "audience": "buyers, customers, operators, content teams, technical evaluators",
+      "privacy": "public proof hub with gated app/API boundary",
+      "purpose": "Routes buyers and operators into the Skye Content Forge Free99 no-charge content publisher while making clear that app boot and every API route still require a 0S, FS27, SkyGate, or operator admin gate session.",
+      "route_when": [
+        "skye content forge",
+        "content forge",
+        "content repurposer",
+        "content publisher",
+        "free99",
+        "no charge",
+        "source scan",
+        "content generation",
+        "draft archive",
+        "scheduler tick",
+        "backup restore",
+        "deployment hooks",
+        "gate session"
+      ],
+      "sales_use": "Use when a prospect wants content repurposing, source scanning, draft generation, scheduler proof, export/backup controls, or asks what Free99 content access includes without bypassing auth.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-skyecontentforge-app",
+      "name": "Skye Content Forge Gated Content Publisher App",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-content-repurposer-local/public/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skye-content-repurposer-local/public/index.html",
+      "audience": "gated customers, operators, content teams, technical evaluators",
+      "privacy": "Free99 app; gate session required before boot; live/local Node API required for runtime actions",
+      "purpose": "Content command shell for approved source scanning, generation, draft archive, export, Drive upload when configured, scheduler ticks, publish queue, GitHub backup/restore, deployment hooks, and social API boundaries.",
+      "route_when": [
+        "open skye content forge",
+        "content command",
+        "approved sources",
+        "generate content",
+        "export markdown",
+        "drive upload",
+        "scheduler",
+        "publish queue",
+        "backup github"
+      ],
+      "sales_use": "Use after the expansion hub when a qualified user has or can create a gate session and understands provider credentials are required for live publishing.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "victor-saint-brain"
+    },
+    {
+      "id": "metraiyux-skyecontentforge-receipt",
+      "name": "Skye Content Forge Expansion Receipt",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skye-content-forge-expansion-receipt.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/skye-content-forge-expansion-receipt.html",
+      "audience": "operators, technical evaluators, buyers needing proof",
+      "privacy": "public proof receipt with provider boundary notes",
+      "purpose": "Records import, gate session wiring, API 401 proof, smoke checks, pricing/catalog update, scheduler/backup boundary, and provider credential boundary for Skye Content Forge.",
+      "route_when": [
+        "content forge proof",
+        "content forge receipt",
+        "free99 proof",
+        "api 401",
+        "gate proof",
+        "scheduler proof"
+      ],
+      "sales_use": "Use when a technical evaluator asks how Free99 content access remains controlled by auth and what was actually tested.",
+      "primary_brain": "victor-saint-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
       "id": "metraiyux-connectlog-relay13-expansion",
       "name": "ConnectLog + Relay13 Operator Proof",
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html",
@@ -340,8 +420,8 @@
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/houseoperations-skyebox-operator-proof.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/houseoperations-skyebox-operator-proof.html",
       "audience": "buyers, operators, owner-admins, technical evaluators",
-      "privacy": "public proof hub with local-only security boundary",
-      "purpose": "Routes buyers and operators into the paired HouseOperations local command app and SkyeBox local encrypted authenticator vault without claiming cloud sync or managed secret custody.",
+      "privacy": "public proof hub with private device custody boundary",
+      "purpose": "Routes buyers and operators into the paired HouseOperations command app and SkyeBox private encrypted authenticator vault without claiming cloud sync or managed secret custody.",
       "route_when": [
         "houseoperations",
         "house operations",
@@ -355,7 +435,7 @@
         "2fa vault",
         "skyebox"
       ],
-      "sales_use": "Use when a prospect asks how the 0S handles household-style operations, vendor pressure, owner alerts, proof closeout, or local authenticator custody handoff.",
+      "sales_use": "Use when a prospect asks how the 0S handles household-style operations, vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff.",
       "primary_brain": "marcus-vale-brain",
       "secondary_brain": "0meg4kai-security-brain"
     },
@@ -365,8 +445,8 @@
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/index.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/HouseOperations/index.html",
       "audience": "operators, owner-admins, service businesses, technical evaluators",
-      "privacy": "public static app with browser-local state",
-      "purpose": "Local app-first command surface for tasks, schedule, vendors, owner alerts, assignments, proof saves, exports, runtime endpoints, and the nested SkyeBox authenticator vault.",
+      "privacy": "public app with private device custody",
+      "purpose": "App-first command surface for tasks, schedule, vendors, owner alerts, assignments, proof saves, exports, runtime endpoints, and the nested SkyeBox authenticator vault.",
       "route_when": [
         "open houseoperations",
         "task command",
@@ -414,7 +494,7 @@
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/index.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/index.html",
       "audience": "operators, dispatchers, route-heavy businesses, technical evaluators",
-      "privacy": "public static shell with local runtime proof and protected provider boundary",
+      "privacy": "public runtime shell with protected provider boundary",
       "purpose": "Routed workforce command shell with dashboard, routes, stops, workforce, proof vault, analytics, runtime, settings, static contract endpoints, and legacy console links.",
       "route_when": [
         "open routex",
@@ -435,8 +515,8 @@
       "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyeroutex-workforce-command-v0.4.0/index.html",
       "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/index.html",
       "audience": "operators, dispatchers, workforce marketplaces, staffing teams, technical evaluators",
-      "privacy": "public static wrapper around local API proof platform; live actions require local or deployed Node runtime",
-      "purpose": "Local proof platform for city/state markets, provider job posting, contractor job boards, applicant pools, assignment actions, proof submission, payment-state ledgering, disputes, market reports, export packets, storage adapters, provider guards, audit integrity, and SkyeHands handoff boundaries.",
+      "privacy": "public wrapper around the API proof platform; live actions require the approved runtime",
+      "purpose": "Runtime proof platform for city/state markets, provider job posting, contractor job boards, applicant pools, assignment actions, proof submission, payment-state ledgering, disputes, market reports, export packets, storage adapters, provider guards, audit integrity, and SkyeHands handoff boundaries.",
       "route_when": [
         "v0.4.0",
         "provider jobs",
@@ -447,7 +527,7 @@
         "market report",
         "export packet",
         "workforce api",
-        "local proof"
+        "runtime proof"
       ],
       "sales_use": "Use when a technical buyer wants to inspect the new backend-backed Workforce Command platform beyond the older V83 static shell.",
       "primary_brain": "orion-hayes-brain",
@@ -667,13 +747,13 @@
   ],
   "brain_guidance": {
     "gray-london-skyes-brain": "Frame the system as sovereign web infrastructure: public site, command deck, auth gate, proof loop, and client-specific deployment strategy.",
-    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or local authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, or a Free99 no-charge music feature that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session.",
+    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, a Free99 Lite preview, or paid one-song/release-drop music work that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session. Use Skye Content Forge when the pain is content repurposing, approved-source scanning, draft production, scheduler proof, or Free99 content publishing under auth.",
     "marcus-vale-brain": "Use HouseOperations for task/vendor/schedule/owner-alert operating discipline and SkyeRouteX for route-heavy operating discipline. Keep live provider, cloud persistence, and production deployment claims gated until proof exists.",
-    "orion-hayes-brain": "Explain technical depth in plain language: FS27 validates identity, MetrAIyux routes work, HouseOperations runs local command workflows, SkyeBox keeps TOTP local and encrypted, ConnectLog captures relationship context, Relay13 handles deployable messaging, SkyeRouteX handles route-heavy workforce command, SkyeProfitConsole handles gated Free99 profit runtime proof, SkyeMediaCenter handles gated Free99 media intake/review/publish/file proof, Cloudflare serves the system, and event receipts prove activity.",
-    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 into anonymous access.",
+    "orion-hayes-brain": "Explain technical depth in plain language: FS27 validates identity, MetrAIyux routes work, HouseOperations runs command workflows, SkyeBox keeps TOTP private and encrypted, ConnectLog captures relationship context, Relay13 handles production messaging, SkyeRouteX handles route-heavy workforce command, SkyeProfitConsole handles gated Free99 profit runtime proof, SkyeMediaCenter handles gated Free99 media intake/review/publish/file proof, Skye Content Forge handles gated Free99 source scan/generate/export/scheduler/backup proof, Cloudflare serves the system, and event receipts prove activity.",
+    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 Lite into anonymous access, or claims that paid drops include live DSP/distributor/payment authority before provider proof.",
     "site-operator-brain": "Route customer feedback to the review intake, route proof-seeking prospects to the review wall, and route publication decisions through the 0S QA queue.",
     "adrian-cross-brain": "When a client wants to talk about their experience, thank them and route them to the Skyes Over London Live Review Intake. When a prospect asks what customers say, route them to the Reviews Proof Wall. Use ConnectLog when the buyer needs relationship continuity after meetings, calls, events, recruiting, or vendor conversations.",
-    "valentina-reyes-brain": "Use the Reviews Proof Wall as public social proof. Keep review copy proof-safe and do not invent outcomes, client names, or consent. Route media-intake, asset-review, publish, and content-proof questions to SkyeMediaCenter when the user needs Free99 no-charge media operations under a gate session.",
+    "valentina-reyes-brain": "Use the Reviews Proof Wall as public social proof. Keep review copy proof-safe and do not invent outcomes, client names, or consent. Route media-intake, asset-review, publish, and content-proof questions to SkyeMediaCenter when the user needs Free99 no-charge media operations under a gate session. Route content repurposing, approved-source scanning, draft generation, and scheduler-proof questions to Skye Content Forge when the user needs Free99 no-charge content publishing under a gate session.",
     "victor-saint-brain": "Review submissions before publication. Confirm consent, public-name preference, category fit, and proof safety; only five approved unpublished reviews should be batched for production. Relay13 live delivery claims can be made only with the current production proof artifacts, and never with admin token, API key, or private setup details exposed."
   },
   "public_claim_boundary": [
@@ -689,12 +769,14 @@
     "Do not claim SkyeRouteX live payment movement, live provider callback proof, live production database proof, deployed DNS/SSL proof, or GPS/navigation operations until the specific production checks pass.",
     "Do not claim SkyeMediaCenter is anonymous or ungated. Free99 means no charge only; app boot, intake, admin, asset list/search, publish, stats, and file delivery require a gate session.",
     "Do not claim SkyeMediaCenter production storage, CDN publication, live customer tenancy, or managed media operations beyond the local/imported proof until separate deployment proof exists.",
-    "Do not claim SkyeMusicNexus is anonymous or ungated. Free99 means no charge only; app boot, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, and workflow proof require a gate session.",
-    "Do not claim SkyeMusicNexus live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until provider integrations are approved and proven."
+    "Do not claim SkyeMusicNexus is anonymous or ungated. Free99 means no charge only for Lite; paid tiers and add-ons still require a gate session. App boot, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, paid drops, and workflow proof require a gate session.",
+    "Do not claim SkyeMusicNexus paid drops include live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until provider integrations are approved and proven.",
+    "Do not claim Skye Content Forge is anonymous or ungated. Free99 means no charge only; app boot, health, source scan, generation, export, scheduler, backup, restore, deployment, and publish APIs require a gate session.",
+    "Do not claim Skye Content Forge provider publishing works without configured Drive, GitHub, Netlify, Cloudflare, Meta, Instagram, LinkedIn, OpenAI credentials, and platform permissions."
   ],
   "brain_routes": {
     "naomi-sterling-brain": "Use SkyeProfitConsole when a buyer asks about profit packs, margins, split checks, Free99 access, or no-charge profit tooling. Always say Free99 still requires a gate session.",
-    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 into anonymous access.",
-    "valentina-reyes-brain": "Use SkyeMusicNexus when a buyer asks about artist records, release forge, royalty motion, payout review, music workflow proof, Free99 access, or no-charge music tooling. Always say Free99 still requires a gate session."
+    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, attempts to turn Free99 into anonymous access, or paid-drop/live-provider claims before proof.",
+    "valentina-reyes-brain": "Use SkyeMusicNexus when a buyer asks about artist records, release forge, royalty motion, payout review, music workflow proof, Free99 Lite access, paid Studio/Label/Managed music ops, or one-song/release drops. Use Skye Content Forge when a buyer asks about approved-source scanning, content drafts, repurposing, scheduler proof, export/backup, or Free99 content publishing. Always say every lane still requires a gate session."
   }
 }

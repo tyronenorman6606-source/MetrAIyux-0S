@@ -19,6 +19,18 @@ function withRequestId(res, request_id) {
   }
 }
 
+function recordMonitorEvent(promise, context) {
+  try {
+    if (context && typeof context.waitUntil === "function") {
+      context.waitUntil(promise);
+      return;
+    }
+    promise.catch((err) => console.warn("monitor emit failed:", err?.message || err));
+  } catch (err) {
+    console.warn("monitor scheduling failed:", err?.message || err);
+  }
+}
+
 async function safeBodyPreview(res) {
   try {
     const ct = (res.headers.get("content-type") || "").toLowerCase();
@@ -61,7 +73,7 @@ export function wrap(handler) {
         extra.slow = true;
       }
 
-      await emitEvent({
+      recordMonitorEvent(emitEvent({
         request_id,
         level,
         kind,
@@ -70,7 +82,7 @@ export function wrap(handler) {
         http_status: status,
         duration_ms,
         extra
-      });
+      }), context);
 
       return out;
     } catch (err) {
@@ -78,7 +90,7 @@ export function wrap(handler) {
 
       // Best-effort detailed monitor record.
       const ser = serializeError(err);
-      await emitEvent({
+      recordMonitorEvent(emitEvent({
         request_id,
         level: "error",
         kind: "thrown_error",
@@ -93,7 +105,7 @@ export function wrap(handler) {
         upstream_status: ser?.upstream?.status || null,
         upstream_body: ser?.upstream?.body || null,
         extra: { error: ser }
-      });
+      }), context);
 
       // Avoid 502s: always return JSON.
       console.error("Function error:", err);

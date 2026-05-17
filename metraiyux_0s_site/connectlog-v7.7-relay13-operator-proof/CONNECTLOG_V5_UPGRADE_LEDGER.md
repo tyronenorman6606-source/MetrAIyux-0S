@@ -53,7 +53,7 @@ No external AI, cloud service, or auth provider is required.
 
 ## Boundaries not claimed
 
-- No auth was added.
+- Public source still does not expose operator credentials.
 - No live cloud sync was added.
 - No backend notification worker was added.
 - Mobile QR camera scanning still requires deployed HTTPS/device testing.

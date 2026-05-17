@@ -4,8 +4,8 @@ SkyeMusicNexus was rebuilt into a real experiential music operating app while pr
 
 ## Primary Surfaces
 
-- `public/index.html` — Artist Stage: Artist Nebula, Release Forge, Royalty River, Ops Sequencer, Live Constellation, Proof Chain.
-- `public/admin.html` — Operator Stage: Review Chamber, Payout Gate, Analytics Prism, Capsule Wall.
+- `public/index.html` — Artist Stage: Artist Nebula, Release Forge, Content Request Exchange, Inbox Relay, Community Relay, Achievement Orbit, Release Campaign Forge, Royalty River, Ops Sequencer, Live Constellation, Proof Chain.
+- `public/admin.html` — Operator Stage: Review Chamber, Exchange Console, Payout Gate, Analytics Prism, Capsule Wall.
 - `public/neo-nexus.css` — custom NeoFront display system.
 - `public/neo-nexus.js` — browser runtime wired into the existing handlers.
 
@@ -15,6 +15,7 @@ SkyeMusicNexus was rebuilt into a real experiential music operating app while pr
 - `netlify/functions/music-releases.js`
 - `netlify/functions/music-payments.js`
 - `netlify/functions/music-analytics.js`
+- `netlify/functions/music-exchange.js`
 - `netlify/functions/skygate-session.js`
 - `public/skygate-auth.js`
 
@@ -49,4 +50,4 @@ SKYGATE_LOCAL_OPERATOR_ROLE=admin
 
 ## Honest Boundary
 
-Local handlers and browser wiring are proven. Production identity-provider handoff, live DSP/distribution ingestion, and live royalty settlement remain external provider boundaries until connected and tested.
+Local handlers and browser wiring are proven, including content requests, Relay13-ready inbox threads, community posts, release campaign packs, and achievement progression. Production identity-provider handoff, live Relay13 worker bridging, live DSP/distribution ingestion, and live royalty settlement remain external provider boundaries until connected and tested.

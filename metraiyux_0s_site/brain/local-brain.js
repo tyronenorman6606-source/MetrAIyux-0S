@@ -38,7 +38,7 @@ const localRouteRules = [
     route_to: 'site-operator-brain',
     secondary: 'central-company-command-brain',
     create_task: 'Explain the 16-brain runtime and route the question to the right owner',
-    triggers: ['how many brains', 'brain count', '16 brains', 'local brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
+    triggers: ['how many brains', 'brain count', '16 brains', 'cabinet brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
   },
   {
     intent: 'client_review_or_feedback',
@@ -291,7 +291,7 @@ function chooseRoute(query) {
       score: 99
     };
   }
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
     return {
       intent: 'brain_count_or_runtime',
       primary: profileById('site-operator-brain'),
@@ -400,7 +400,7 @@ function smartDirectAnswer(query, route, surfaces) {
   const secondaryOwner = ownerName(secondary);
   const firstSurface = surfaces[0];
 
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
     return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
   }
 
@@ -413,7 +413,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['houseoperations', 'house operations', 'house ops', 'owner alerts', 'vendor pressure', 'skye box', 'skyebox', 'authenticator vault', 'totp', '2fa vault'])) {
-    return `${primaryOwner} owns the operations answer, with ${secondaryOwner} checking the security boundary. Route the user to /live/houseoperations-skyebox-operator-proof.html for the 0S expansion hub. HouseOperations proves task, vendor, schedule, assignment, alert, proof-save, and export workflows. SkyeBox proves a local encrypted TOTP vault. Do not claim cloud sync, password recovery, managed secret custody, or enterprise credential compliance without a separate approved scope.`;
+    return `${primaryOwner} owns the operations answer, with ${secondaryOwner} checking the security boundary. Route the user to /live/houseoperations-skyebox-operator-proof.html for the 0S expansion hub. HouseOperations proves task, vendor, schedule, assignment, alert, proof-save, and export workflows. SkyeBox proves a private encrypted TOTP vault. Do not claim cloud sync, password recovery, managed secret custody, or enterprise credential compliance without a separate approved scope.`;
   }
 
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {
@@ -608,10 +608,10 @@ async function loadKB() {
       skyevaultMap ? 'SkyeVault repo map' : null,
       obsidianData ? 'Obsidian vault sync' : null
     ].filter(Boolean);
-    if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} local knowledge chunks with ${extras.join(', ')}.`;
+    if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} private knowledge chunks with ${extras.join(', ')}.`;
     renderSources([]);
   } catch (e) {
-    if (status) status.textContent = 'Could not load the local brain data. Serve the site from a local/static server and confirm brain/knowledge-base.json is present.';
+    if (status) status.textContent = 'Could not load the cabinet brain data. Serve the site from the 0S Worker or an operator server and confirm brain/knowledge-base.json is present.';
   }
 }
 
@@ -738,7 +738,7 @@ document.getElementById('testEndpoint')?.addEventListener('click', async () => {
         model,
         messages: [
           { role: 'system', content: 'You are a serious MetrAIyux 0S cabinet router. Answer with the owner brain, secondary brain, next action, and one guardrail.' },
-          { role: 'user', content: 'Reply with one sentence confirming the local brain endpoint works.' }
+          { role: 'user', content: 'Reply with one sentence confirming the private brain endpoint works.' }
         ],
         stream: false
       })

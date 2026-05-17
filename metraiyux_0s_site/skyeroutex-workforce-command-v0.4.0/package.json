@@ -10,7 +10,9 @@
     "smoke": "node scripts/smoke-routex-operator.mjs",
     "migrate": "node scripts/migrate-db.mjs",
     "reset": "node scripts/reset-db.mjs",
-    "start:prod": "scripts/run-production.sh .env.production",
+    "start:prod": "node scripts/run-production-env.mjs .env.production",
+    "start:prod:root": "node scripts/run-production-env.mjs ../../.env",
+    "check:prod:root-env": "node scripts/run-production-env.mjs ../../.env --check",
     "smoke:browser": "node scripts/smoke-browser-panels.mjs",
     "smoke:routex": "node scripts/smoke-routex-operator.mjs",
     "smoke:all": "npm run smoke:browser && npm run smoke:browser-clicks && npm run smoke:routex && npm run smoke:storage && npm run smoke:storage:s3 && npm run smoke:integrations && npm run smoke:webhooks && npm run smoke:native-providers && npm run smoke:provider-webhooks && npm run smoke:runtime-bus && npm run smoke:guards && npm run smoke:security && npm run smoke:integrity && npm run smoke:audit-chain && npm run smoke:auth-control && npm run smoke:admin-invites && npm run smoke:migrations && npm run smoke:reset && npm run smoke:deploy && npm run smoke:mount",
@@ -32,6 +34,7 @@
     "smoke:migrations": "node scripts/smoke-migrations.mjs",
     "smoke:reset": "node scripts/smoke-reset-db.mjs",
     "smoke:deploy": "node scripts/smoke-deploy-readiness.mjs",
+    "smoke:live-env": "node scripts/smoke-live-env-readiness.mjs",
     "deploy:check": "node scripts/smoke-deploy-readiness.mjs",
     "smoke:mount": "node scripts/smoke-skyehands-mount.mjs",
     "stress:concurrency": "node scripts/stress-concurrency.mjs"

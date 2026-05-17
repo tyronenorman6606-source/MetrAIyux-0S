@@ -44,10 +44,28 @@
     "SkyGate Session"
   ],
   "sourceDependency": false,
-  "notProven": [
-    "hosted deployment behavior",
-    "external SkyGate identity handoff",
-    "durable production storage",
-    "multi-operator hosted synchronization"
+  "productionAdapter": {
+    "host": "metraiyux_0s_site/cloudflare/worker.js",
+    "routes": [
+      "/.netlify/functions/media-assets",
+      "/.netlify/functions/media-file",
+      "/.netlify/functions/media-publish",
+      "/.netlify/functions/media-search",
+      "/.netlify/functions/media-stats",
+      "/.netlify/functions/skygate-session",
+      "/api/media/assets",
+      "/api/media/file",
+      "/api/media/publish",
+      "/api/media/search",
+      "/api/media/stats",
+      "/api/media/session"
+    ],
+    "auth": "FS27/SkyGate bearer introspection required",
+    "storage": "Cloudflare KV via SkyeMediaCenter namespaces",
+    "commercial": "Free99 no-charge access; gate session still required"
+  },
+  "productionProof": [
+    "cloudflare-worker-production-smoke",
+    "0s:skyemediacenter:smoke"
   ]
 }

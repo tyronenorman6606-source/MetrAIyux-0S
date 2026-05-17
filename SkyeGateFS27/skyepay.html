@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SkyePay | SkyeGateFS27</title>
-  <meta name="description" content="SkyePay is the SkyeGateFS27 free trial, Stripe checkout, owner approval, and controlled workspace activation route." />
+  <meta name="description" content="SkyePay is the SkyeGateFS27 free trial, Stripe checkout, automatic paid unlock, and controlled workspace activation route." />
   <link rel="canonical" href="https://skyesol.netlify.app/skyepay.html" />
   <link rel="stylesheet" href="assets/skyepay.css" />
   <script type="importmap">
@@ -82,6 +82,17 @@
             Company
             <input name="company_name" autocomplete="organization" placeholder="Bob's Smoke Shop" />
           </label>
+
+          <div class="skyemerit-panel">
+            <label>
+              SkyeMerit
+              <select id="skyemeritCode" name="skyemerit_code">
+                <option value="SKYEMERIT-FIRST-BEST">Auto first-time SkyeMerit</option>
+              </select>
+            </label>
+            <p><strong id="skyemeritCredit">$6 premium kAIxu credit</strong> issues with the first-time pack. Free99 still requires the gate.</p>
+            <p id="skyemeritPreview" class="fine-print">SkyeMerit preview loads with the offer catalog.</p>
+          </div>
 
           <div class="offer-select" id="offerSelect" aria-label="SkyePay offers"></div>
 

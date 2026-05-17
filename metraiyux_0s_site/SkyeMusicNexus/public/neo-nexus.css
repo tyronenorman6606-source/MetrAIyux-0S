@@ -61,3 +61,27 @@ button:hover,.ghost:hover,.primary:hover,.secondary:hover{transform:translateY(-
 @media(max-width:1180px){.hero-stage,.ops-hero,.lens{grid-template-columns:1fr}.hero-stage{min-height:auto;padding-bottom:210px}.hero-meters{grid-template-columns:repeat(2,1fr)}.dual-grid,.triple-grid,.operator-grid,.wide-list{grid-template-columns:1fr}.vinyl-core{width:min(72vw,420px)}}
 @media(max-width:760px){.nexus-topline{position:relative;grid-template-columns:auto 1fr}.session-rack{grid-column:1/-1;justify-content:flex-start}.hero-copy h2,.ops-hero h2{font-size:clamp(46px,18vw,74px)}.signal-map{grid-template-columns:1fr}.hero-stage{padding-bottom:0}.hero-meters{position:relative;left:auto;right:auto;bottom:auto;grid-column:1/-1}.field-grid{grid-template-columns:1fr}.proof-chain{grid-template-columns:1fr}.proof-links a{min-width:0}.vinyl-core{width:min(82vw,340px)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.signal-map{grid-template-columns:repeat(6,1fr)}
+.exchange-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.exchange-command,.exchange-campaign{grid-column:1/-1}
+.exchange-panels{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:18px;align-items:start}
+.exchange-list,.campaign-pack{position:relative;z-index:2;display:grid;gap:12px;margin-top:14px;max-height:420px;overflow:auto;padding-right:4px}
+.progress-stack{position:relative;z-index:2;display:grid;gap:12px;border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.24);padding:14px;margin-bottom:12px}
+.progress-score{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.progress-score strong{font-size:24px;letter-spacing:-.04em;color:var(--gold)}
+.progress-score span{color:var(--soft);font-weight:850}
+.progress-bar{height:12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);overflow:hidden}
+.progress-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--lime),var(--cyan),var(--pink));box-shadow:0 0 18px rgba(88,245,255,.35)}
+.achievement-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.achievement{border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.24);padding:12px;display:grid;gap:5px}
+.achievement.unlocked{border-color:rgba(157,255,127,.34);background:linear-gradient(135deg,rgba(157,255,127,.12),rgba(88,245,255,.07))}
+.achievement span,.achievement small{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--soft);font-weight:900}
+.achievement strong{font-size:15px;color:var(--text)}
+.campaign-card{gap:12px}
+.campaign-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.campaign-columns div{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.035);display:grid;gap:8px}
+.campaign-columns strong{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.campaign-columns span{font-size:12px;color:var(--soft);line-height:1.45}
+@media(max-width:1180px){.exchange-panels{grid-template-columns:1fr}.signal-map{grid-template-columns:repeat(3,1fr)}.exchange-grid,.campaign-columns{grid-template-columns:1fr}}
+@media(max-width:760px){.achievement-grid{grid-template-columns:1fr}.progress-score{align-items:flex-start;flex-direction:column}.signal-map{grid-template-columns:1fr}}

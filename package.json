@@ -9,6 +9,7 @@
     "skye:crawl:skyepay": "SKYE_CRAWLER_PROFILE=skyepay SITE_DIR=/workspaces/MetrAIyux-0S/SkyeGateFS27 BASE_URL=http://127.0.0.1:4197/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay node tools/skye-crawler.mjs",
     "gateway:skyepay:scan": "npm run skye:crawl:skyepay",
     "gateway:skyepay:owner-approval": "cd SkyeGateFS27 && npm run test:skyepay:owner-approval",
+    "gateway:skyepay:auto-unlock": "cd SkyeGateFS27 && npm run test:skyepay:auto-unlock",
     "skye:crawl:worker": "BASE_URL=http://127.0.0.1:4174/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker node tools/skye-crawler.mjs",
     "skye:crawl:live": "BASE_URL=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live node tools/skye-crawler.mjs",
     "proof:record": "node tools/record-proof-walkthrough.mjs",
@@ -25,6 +26,7 @@
     "0s:connectlog-relay13:e2e": "node metraiyux_0s_site/tests/connectlog-relay13-e2e.mjs",
     "0s:houseops-skyebox:e2e": "node metraiyux_0s_site/tests/houseoperations-skyebox-e2e.mjs",
     "0s:houseops:claims": "node metraiyux_0s_site/tests/houseoperations-claim-contract.mjs",
+    "0s:houseops:skyepay": "node metraiyux_0s_site/tests/houseoperations-skyepay-offer-proof.mjs",
     "0s:connectlog-relay13:prod-proof": "node metraiyux_0s_site/tests/connectlog-relay13-production-proof.mjs",
     "0s:skyeroutex:runtime": "cd metraiyux_0s_site/SkyeRouteX && npm run verify:runtime",
     "0s:skyeroutex:v04": "cd metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0 && npm run smoke:all",
@@ -36,7 +38,8 @@
     "0s:skyeprofitconsole:proof": "npm run 0s:skyeprofitconsole:smoke && npm run 0s:skyeprofitconsole:e2e",
     "0s:skyemusicnexus:smoke": "cd metraiyux_0s_site/SkyeMusicNexus && npm run smoke",
     "0s:skyemusicnexus:e2e": "node metraiyux_0s_site/tests/skyemusicnexus-integration-e2e.mjs",
-    "0s:skyemusicnexus:proof": "npm run 0s:skyemusicnexus:smoke && npm run 0s:skyemusicnexus:e2e",
+    "0s:skyemusicnexus:video": "node metraiyux_0s_site/tests/skyemusicnexus-exchange-video-proof.mjs",
+    "0s:skyemusicnexus:proof": "npm run 0s:skyemusicnexus:smoke && npm run 0s:skyemusicnexus:skyepay && npm run 0s:skyemusicnexus:e2e && npm run 0s:skyemusicnexus:video",
     "brain:sync:obsidian": "node tools/sync-obsidian-brain.mjs",
     "obsidian:graph": "node tools/generate-obsidian-neural-map.mjs",
     "obsidian:web-graph": "node tools/generate-public-neural-map.mjs",
@@ -64,7 +67,8 @@
     "vault:cli": "node tools/skyevault-cli.mjs",
     "vault:diff": "node tools/skyevault-vault-diff.mjs",
     "vault:ledger": "node tools/skyevault-ledger.mjs",
-    "0s:skyemediacenter:smoke": "cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs"
+    "0s:skyemediacenter:smoke": "cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs && node smoke/cloudflare-worker-production-smoke.mjs",
+    "0s:skyemusicnexus:skyepay": "node metraiyux_0s_site/tests/skyemusicnexus-skyepay-offer-proof.mjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

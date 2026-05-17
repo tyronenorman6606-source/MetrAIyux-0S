@@ -25,6 +25,8 @@ for (const [needle, label] of [
   ['id="constellationNodes"', "constellation nodes"],
   ['id="splitStack"', "split furnace"],
   ['id="packForm"', "profit pack forge"],
+  ['id="moneyMoves"', "money moves panel"],
+  ['id="generateCloseBrief"', "close brief generator"],
   ['id="loomColumns"', "signal loom"],
   ['id="proofFeed"', "proof chain"],
   ['id="syncRuntime"', "runtime sync control"],
@@ -40,6 +42,9 @@ for (const [needle, label] of [
   ["function normalizeSplits", "split normalization"],
   ["function renderLoom", "signal loom rendering"],
   ["function renderProof", "proof rendering"],
+  ["function renderMoney", "money move rendering"],
+  ["function generateCloseBrief", "close brief generation"],
+  ["async function pushCloseBriefToRuntime", "runtime close brief archive integration"],
   ["async function pushPackToRuntime", "runtime archive integration"],
   ["function drawField", "canvas field renderer"]
 ]) mustContain(js, needle, label);
@@ -50,6 +55,7 @@ mustContain(gateJs, "x-skye-gate-session", "runtime gate header");
 mustContain(runtimeSource, "function serveStatic", "static asset server");
 mustContain(runtimeSource, "function requireGate", "runtime gate session enforcement");
 mustContain(runtimeSource, "/api/runtime/close-review-packs", "review-pack endpoint");
+mustContain(runtimeSource, "/api/runtime/close-briefs", "close-brief endpoint");
 mustContain(runtimeSource, "/api/runtime/execution-board", "execution-board endpoint");
 mustContain(runtimeSource, "/api/runtime/dispatch-board", "dispatch-board endpoint");
 
@@ -113,7 +119,29 @@ try {
     headers: { "content-type": "application/json", ...gateHeaders },
     body: JSON.stringify({ owner: "profit-ops", target: "AE-FlowPro", channel: "activation", status: "ready", checkpoint: "dispatch_ready", notes: "Dispatch proof." })
   }).then((res) => res.json());
+  const closeBriefCreated = await fetch(`${base}/api/runtime/close-briefs`, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...gateHeaders },
+    body: JSON.stringify({
+      label: "Neo-front smoke close brief",
+      target: "AE-FlowPro",
+      owner: "profit-ops",
+      ask: 9900,
+      directCost: 2700,
+      grossProfit: 7200,
+      expectedProfit: 6552,
+      margin: 72.7,
+      paybackMultiple: 3.7,
+      confidence: 91,
+      action: "ask for the close",
+      deadline: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+      splitAllocation: [{ name: "ae", percent: 40, amount: 2880 }],
+      risks: ["clean enough to move"],
+      notes: "Smoke proof close brief."
+    })
+  }).then((res) => res.json());
   const timeline = await fetch(`${base}/api/runtime/workflow-timeline`, { headers: gateHeaders }).then((res) => res.json());
+  const status = await fetch(`${base}/api/runtime/status`, { headers: gateHeaders }).then((res) => res.json());
   runtimeProof = {
     index_served: index.includes("Neo-Front Profit Field"),
     css_served: css.includes("profit-field-panel"),
@@ -122,6 +150,8 @@ try {
     created_status: created.review_pack.review.status,
     execution_status: executionCreated.execution_item.status,
     dispatch_status: dispatchCreated.dispatch_item.status,
+    close_brief_status: closeBriefCreated.close_brief.status,
+    close_brief_count: status.close_brief_count,
     timeline_dispatch: timeline.workflow_timeline.dispatch
   };
 } finally {
@@ -137,6 +167,8 @@ console.log(JSON.stringify({
     "canvas-profit-field-present",
     "profit-pack-forge-present",
     "split-furnace-present",
+    "money-moves-present",
+    "close-brief-runtime-flow-present",
     "signal-loom-present",
     "proof-chain-present",
     "static-assets-served-by-runtime",

@@ -38,10 +38,11 @@
       "id": "adaptive-neon-scrollbar",
       "title": "Adaptive Neon Scrollbar",
       "files": [
-        "adaptive-neon-scrollbar/adaptive-neon-scrollbar.css"
+        "adaptive-neon-scrollbar/adaptive-neon-scrollbar.css",
+        "adaptive-neon-scrollbar/adaptive-neon-scrollbar.js"
       ],
-      "uses": ["CSS scrollbar selectors", "brand token fallbacks", "vertical and horizontal scrollbar styling"],
-      "quality": "Optional, theme-adaptive scrollbar part with a slightly transparent rail, glowing neon thumb, horizontal and vertical coverage, and no cursor or motion dependency.",
+      "uses": ["hidden native scrollbar override", "brand token fallbacks", "draggable fixed vertical rail", "draggable fixed horizontal rail", "vertical and horizontal scrollbar controls"],
+      "quality": "Optional, theme-adaptive scrollbar part that hides basic native scrollbars and replaces them with always-visible draggable neon rails on the viewport edges.",
       "bestFor": ["explicit custom scrollbar request", "scroll-led page affordance", "brand-matched browser chrome", "long tables or horizontal nav rails"]
     },
     {

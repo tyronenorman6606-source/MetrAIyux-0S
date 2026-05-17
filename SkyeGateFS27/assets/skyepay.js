@@ -7,6 +7,7 @@
     dryRun: params.get("dry_run") === "1" || params.get("proof") === "1",
     offers: [],
     client: null,
+    skyemerit: null,
     selectedOfferId: ""
   };
 
@@ -39,6 +40,60 @@
     $("#statusText").textContent = text;
   }
 
+  function calculateMerit(rule, subtotalCents) {
+    const subtotal = Math.max(0, Math.round(Number(subtotalCents || 0)));
+    if (!rule) return null;
+    const min = Math.max(0, Math.round(Number(rule.min_transaction_cents || 0)));
+    const max = rule.max_transaction_cents == null ? null : Math.max(0, Math.round(Number(rule.max_transaction_cents || 0)));
+    if (subtotal < min || (max != null && subtotal > max)) return null;
+    const floor = Math.max(0, Math.round(Number(rule.floor_cents || 0)));
+    const cap = rule.cap_cents == null ? subtotal : Math.max(0, Math.round(Number(rule.cap_cents || 0)));
+    const eligible = Math.max(0, Math.min(subtotal, cap) - floor);
+    const discount = Math.min(subtotal, Math.round((eligible * Number(rule.rate_bps || 0)) / 10000));
+    return {
+      code: rule.code,
+      title: rule.title,
+      eligible_cents: eligible,
+      discount_cents: discount,
+      payable_cents: Math.max(0, subtotal - discount)
+    };
+  }
+
+  function bestMeritForOffer(offer) {
+    const subtotal = Number(offer?.skyemerit?.discountable_cents || 0);
+    const rules = state.skyemerit?.rules || [];
+    const selectedCode = $("#skyemeritCode")?.value || "SKYEMERIT-FIRST-BEST";
+    if (selectedCode === "none" || subtotal <= 0) return null;
+    const candidates = rules
+      .filter((rule) => selectedCode === "SKYEMERIT-FIRST-BEST" ? rule.family === "first_time" : rule.code === selectedCode)
+      .map((rule) => calculateMerit(rule, subtotal))
+      .filter(Boolean)
+      .sort((a, b) => b.discount_cents - a.discount_cents);
+    return candidates[0] || null;
+  }
+
+  function renderSkyeMeritPreview() {
+    const panel = $("#skyemeritPreview");
+    if (!panel) return;
+    const offer = state.offers.find((item) => item.id === state.selectedOfferId) || state.offers[0];
+    const merit = bestMeritForOffer(offer);
+    if (!offer) {
+      panel.textContent = "Choose an offer to preview SkyeMerit.";
+      return;
+    }
+    if (!merit) {
+      const hasDiscountable = Number(offer.skyemerit?.discountable_cents || 0) > 0;
+      panel.textContent = hasDiscountable
+        ? "No SkyeMerit is selected for this checkout."
+        : "This lane has no SkyeMerit-discountable charge today; the first-time pack still carries the kAIxu credit after onboarding.";
+      return;
+    }
+    panel.innerHTML = `
+      <strong>${escapeHtml(merit.title)}</strong>
+      <span>${escapeHtml(merit.code)} lowers eligible checkout spend by ${money(merit.discount_cents)}. Customer pays ${money(merit.payable_cents)} on the eligible charge. Stripe promo-code stacking turns off when this applies.</span>
+    `;
+  }
+
   async function fetchJson(url, options) {
     const res = await fetch(url, options);
     const data = await res.json().catch(() => ({}));
@@ -48,6 +103,7 @@
 
   function renderClient(data) {
     state.client = data.client;
+    state.skyemerit = data.skyemerit || null;
     const allOffers = data.offers || [];
     const defaultOfferId = params.get("offer") || state.client.default_offer_id || allOffers[0]?.id || "";
     state.offers = isBobLane()
@@ -66,7 +122,23 @@
     $("#includedUsage").innerHTML = (state.client.included_usage || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
     renderContact();
     if (state.dryRun) $("#proofModeBadge").textContent = "Proof mode";
+    renderSkyeMeritPicker();
     renderOffers();
+  }
+
+  function renderSkyeMeritPicker() {
+    const select = $("#skyemeritCode");
+    if (!select) return;
+    const rules = state.skyemerit?.rules || [];
+    select.innerHTML = `
+      <option value="SKYEMERIT-FIRST-BEST">Auto first-time SkyeMerit</option>
+      ${rules.map((rule) => `<option value="${escapeHtml(rule.code)}">${escapeHtml(rule.title)} - ${Number(rule.rate_percent || 0)}%</option>`).join("")}
+      <option value="none">No SkyeMerit</option>
+    `;
+    $("#skyemeritCredit").textContent = state.skyemerit?.first_time_kaixu_credit_cents
+      ? `${money(state.skyemerit.first_time_kaixu_credit_cents)} premium kAIxu credit`
+      : "$6 premium kAIxu credit";
+    select.addEventListener("change", renderSkyeMeritPreview);
   }
 
   function renderBobLaneShell() {
@@ -189,6 +261,7 @@
         </div>
       `;
       $("#checkoutBtn").textContent = "Start Bob's free tester week";
+      renderSkyeMeritPreview();
       return;
     }
     wrap.classList.remove("bob-offer-summary");
@@ -206,8 +279,10 @@
       btn.addEventListener("click", () => {
         state.selectedOfferId = btn.dataset.offerId;
         $$(".offer-option").forEach((node) => node.setAttribute("aria-pressed", String(node === btn)));
+        renderSkyeMeritPreview();
       });
     });
+    renderSkyeMeritPreview();
   }
 
   async function loadCatalog() {
@@ -232,7 +307,11 @@
       customer_name: form.customer_name.value,
       customer_email: form.customer_email.value,
       company_name: form.company_name.value || state.client?.company_name || "",
-      dry_run: state.dryRun
+      dry_run: state.dryRun,
+      skyemerit_code: $("#skyemeritCode")?.value === "none" ? "" : ($("#skyemeritCode")?.value || "SKYEMERIT-FIRST-BEST"),
+      skyemerit_pack_id: state.skyemerit?.first_time_pack_id || "SKYEMERIT-FIRST-PACK",
+      skyemerit_first_time: true,
+      skyemerit_apply: $("#skyemeritCode")?.value !== "none"
     };
     payload.idempotency_key = requestToken(payload);
 
@@ -285,7 +364,7 @@
         setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "syncing_unlock"}.`);
       }
     } catch (error) {
-      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the owner-approval state.");
+      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the workspace unlock state.");
     }
   }
 

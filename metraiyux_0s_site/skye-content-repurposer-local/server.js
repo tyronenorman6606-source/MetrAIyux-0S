@@ -701,9 +701,20 @@ function runtimeStatus() {
 }
 
 function getRequestToken(req, url) {
+  return getRequestTokens(req, url)[0] || '';
+}
+
+function getRequestTokens(req, url) {
   const auth = req.headers.authorization || '';
-  if (/^Bearer\s+/i.test(auth)) return auth.replace(/^Bearer\s+/i, '').trim();
-  return String(req.headers['x-app-token'] || req.headers['x-skye-gate-session'] || req.headers['x-scheduler-key'] || url.searchParams.get('token') || url.searchParams.get('key') || '').trim();
+  const candidates = [
+    /^Bearer\s+/i.test(auth) ? auth.replace(/^Bearer\s+/i, '').trim() : '',
+    req.headers['x-app-token'],
+    req.headers['x-skye-gate-session'],
+    req.headers['x-scheduler-key'],
+    url.searchParams.get('token'),
+    url.searchParams.get('key')
+  ];
+  return [...new Set(candidates.map((value) => String(value || '').trim()).filter(Boolean))];
 }
 
 function appAccessTokenState() {
@@ -726,16 +737,20 @@ function hasValidAppAccessToken(req, url) {
   const { required, token: expected } = appAccessTokenState();
   if (!required) return true;
   if (!expected) return false;
-  const incoming = getRequestToken(req, url);
-  return incoming && safeCompare(incoming, expected);
+  const incoming = getRequestTokens(req, url);
+  if (incoming.some((token) => safeCompare(token, expected))) return true;
+  if (url.pathname.startsWith('/api/automation/') || url.pathname.startsWith('/api/backup/')) {
+    const scheduler = schedulerTokenState().token;
+    return Boolean(scheduler && incoming.some((token) => safeCompare(token, scheduler)));
+  }
+  return false;
 }
 
 function hasValidSchedulerToken(req, url) {
   const { required, token: expected } = schedulerTokenState();
   if (!required) return true;
   if (!expected) return false;
-  const incoming = getRequestToken(req, url);
-  return incoming && safeCompare(incoming, expected);
+  return getRequestTokens(req, url).some((token) => safeCompare(token, expected));
 }
 
 function requiresAppAccessToken(req, url) {

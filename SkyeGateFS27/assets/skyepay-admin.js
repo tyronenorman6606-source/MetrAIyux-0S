@@ -38,6 +38,11 @@
   function totals(order) {
     const setup = Number(order.amount_setup_cents || 0);
     const recurring = Number(order.amount_recurring_cents || 0);
+    const merit = order.metadata || {};
+    const discount = Number(merit.skyemerit_discount_cents || 0);
+    const adjusted = Number(merit.skyemerit_adjusted_due_cents || 0);
+    const base = setup && recurring ? `${money(setup)} + ${money(recurring)}/mo` : recurring ? `${money(recurring)}/mo` : money(setup);
+    if (discount > 0) return `${base}<br><span>SkyeMerit ${escapeHtml(merit.skyemerit_code || "")}: -${money(discount)} (${money(adjusted)} due)</span>`;
     if (setup && recurring) return `${money(setup)} + ${money(recurring)}/mo`;
     if (recurring) return `${money(recurring)}/mo`;
     return money(setup);
@@ -60,7 +65,7 @@
         </td>
         <td>
           <strong>${escapeHtml(order.offer_snapshot?.title || order.offer_id)}</strong><br />
-          ${escapeHtml(totals(order))}
+          ${totals(order)}
         </td>
         <td>
           ${escapeHtml(order.payment_status)}<br />

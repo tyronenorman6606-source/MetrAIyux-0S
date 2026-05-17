@@ -348,7 +348,8 @@ label {
   font-size: 13px;
   font-weight: 700;
 }
-input {
+input,
+select {
   width: 100%;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(0,0,0,0.26);
@@ -357,9 +358,26 @@ input {
   font: inherit;
   outline: none;
 }
-input:focus {
+input:focus,
+select:focus {
   border-color: rgba(39, 242, 255, 0.68);
   box-shadow: 0 0 0 3px rgba(39, 242, 255, 0.12);
+}
+.skyemerit-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(246, 193, 75, 0.26);
+  background: rgba(246, 193, 75, 0.065);
+  padding: 12px;
+}
+.skyemerit-panel p {
+  margin: 0;
+  color: var(--sky-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.skyemerit-panel strong {
+  color: var(--sky-gold);
 }
 .offer-select {
   display: grid;
@@ -848,4 +866,3 @@ input:focus {
     background: linear-gradient(104deg, transparent .08em, var(--highlighter-color) .08em, var(--highlighter-color) calc(100% - .08em), transparent calc(100% - .08em));
   }
 }
-

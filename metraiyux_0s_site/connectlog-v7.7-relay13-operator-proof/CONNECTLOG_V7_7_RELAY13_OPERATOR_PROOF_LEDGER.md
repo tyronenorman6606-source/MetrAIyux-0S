@@ -1,7 +1,7 @@
 # ConnectLog v7.7 Relay13 Operator Proof Ledger
 
 ## Scope
-ConnectLog remains a standalone static/contact-card PWA. Relay13 remains a standalone messaging backend. This pass adds operator proof controls that make Relay13 setup easier without disabling local fallback.
+ConnectLog is a production relationship/contact-card app. Relay13 remains the standalone production messaging backend. This pass adds operator proof controls that make Relay13 setup easier while preserving protected delivery queue behavior.
 
 ## Added
 - Relay13 operator runbook generator inside the Deployment Command Center.

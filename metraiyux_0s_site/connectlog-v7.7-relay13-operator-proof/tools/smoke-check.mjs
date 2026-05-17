@@ -154,7 +154,7 @@ if (!app.includes('welcomeMessage')) throw new Error('Per-card welcome message m
 if (!app.includes('connectlog-menu-collapsed')) throw new Error('Collapsible menu persistence is missing.');
 if (!appHtml.includes('Relay13 bridge')) throw new Error('Relay13 bridge panel is missing.');
 if (!app.includes('META_RELAY_CONFIG')) throw new Error('Relay13 config persistence is missing.');
-if (!app.includes('Relay13 unavailable. Local fallback remains active.')) throw new Error('Relay13 fallback honesty path is missing.');
+if (!app.includes('Relay13 health check failed from this browser. Delivery queue remains protected.')) throw new Error('Relay13 delivery-integrity path is missing.');
 if (!landingHtml.includes('assets/connectlog-logo-512.png')) throw new Error('Hero logo asset is not wired into landing page.');
 if (!landingHtml.includes('assets/connectlog-og.png')) throw new Error('Open Graph logo image is not wired into landing page.');
 if (!manifest.icons?.some((icon) => icon.src === 'assets/connectlog-logo-512.png')) throw new Error('Manifest is not using the approved logo assets.');

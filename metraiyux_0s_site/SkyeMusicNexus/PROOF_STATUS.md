@@ -8,8 +8,8 @@
 
 This package is no longer just routed command pages or a generic admin surface. The deployed app in `public/` has been rebuilt into a NeoFront music operating stage:
 
-- `public/index.html` — artist-facing signal stage with Artist Nebula, Release Forge, Royalty River, Ops Sequencer, Live Constellation, and Proof Chain.
-- `public/admin.html` — operator stage with Review Chamber, Payout Gate, Analytics Prism, Capsule Wall, and live proof boundaries.
+- `public/index.html` — artist-facing signal stage with Artist Nebula, Release Forge, Content Request Exchange, Inbox Relay, Community Relay, Achievement Orbit, Release Campaign Forge, Royalty River, Ops Sequencer, Live Constellation, and Proof Chain.
+- `public/admin.html` — operator stage with Review Chamber, Exchange Console, Payout Gate, Analytics Prism, Capsule Wall, and live proof boundaries.
 - `public/neo-nexus.css` — custom display system: animated vinyl core, signal-map nodes, waveform reader, aurora field, record constellation, and operator modal.
 - `public/neo-nexus.js` — browser runtime for SkyGate sessions, artist creation, release submission, ledger credits, release operations queueing, review/publish/stream reporting, payout completion, analytics reads, and record rendering.
 
@@ -21,6 +21,7 @@ The original functional runtime remains intact:
 - `netlify/functions/music-releases.js`
 - `netlify/functions/music-payments.js`
 - `netlify/functions/music-analytics.js`
+- `netlify/functions/music-exchange.js`
 - `netlify/functions/skygate-session.js`
 - `public/skygate-auth.js`
 
@@ -42,15 +43,16 @@ node smoke/smoke-proof.mjs
 
 ## What The Proof Verifies
 
-- the NeoFront artist stage exists and exposes Artist Nebula, Release Forge, Royalty River, Ops Sequencer, Live Constellation, and Proof Chain
-- the NeoFront operator stage exists and exposes Review Chamber, Payout Gate, Analytics Prism, and Capsule Wall
-- the browser runtime is wired to the existing Netlify functions for artists, releases, payments, analytics, operations queueing, stream reporting, and SkyGate local proof sessions
+- the NeoFront artist stage exists and exposes Artist Nebula, Release Forge, Content Request Exchange, Inbox Relay, Community Relay, Achievement Orbit, Release Campaign Forge, Royalty River, Ops Sequencer, Live Constellation, and Proof Chain
+- the NeoFront operator stage exists and exposes Review Chamber, Exchange Console, Payout Gate, Analytics Prism, and Capsule Wall
+- the browser runtime is wired to the existing Netlify functions for artists, releases, payments, analytics, operations queueing, stream reporting, the music exchange, and SkyGate local proof sessions
 - the routed shell pages still pass the P2 promotion marker requirements
 - the local session endpoint reports bootstrap availability when environment variables are set
 - invalid local operator credentials are rejected
 - valid local operator credentials mint a revocable local admin session token
 - artist registration works in the handler layer
 - release submit, review, publish, stream reporting, operations queueing, and operations updating work
+- content request work packets, Relay13-ready inbox threads, community posts, release campaign packs, and achievement progression work
 - payment credit, ledger, payout request, and payout queue flows work
 - admin analytics accepts the locally bootstrapped token
 - public artist and release read endpoints return created records

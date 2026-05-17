@@ -53,7 +53,7 @@ export default wrap(async (req) => {
             offer_id, offer_snapshot, amount_setup_cents, amount_recurring_cents, currency,
             checkout_mode, stripe_session_id, stripe_customer_id, stripe_subscription_id,
             payment_status, approval_status, owner_status, provisioning_status,
-            paid_at, approved_at, provisioned_at, created_at, updated_at
+            metadata, paid_at, approved_at, provisioned_at, created_at, updated_at
      from skyepay_orders
      where ($1::text is not null and stripe_session_id=$1)
         or ($2::text is not null and id=$2)

@@ -714,7 +714,7 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
       actionLines,
       '',
       '## Source Note',
-      'Browser-local 0S mini-app record. Export before handing off to another machine.'
+      'Private 0S operator record. Export only through the approved handoff path.'
     ].join('\n');
   }
 
@@ -1092,7 +1092,7 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
           title: 'Start at the command surface',
           path: 'index.html',
           selector: '.hero-actions',
-          body: 'Use the first screen as the launch board. The primary buttons open the admin brain, neural map, customer signup, client preview, charter, and local brain.',
+          body: 'Use the first screen as the launch board. The primary buttons open the admin brain, neural map, customer signup, client preview, charter, and Cabinet Brain.',
           action: 'Study the highlighted launch controls, then press Next control.'
         },
         {
@@ -1100,14 +1100,14 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
           path: 'index.html',
           selector: '#live-surface-command-strip',
           body: 'This strip shows the live surfaces users should reach for first: public overview, brain wall, proof router, neural map, and FS27 gate proof.',
-          action: 'Review the proof routes, then press Next room to enter the Local Brain.'
+          action: 'Review the proof routes, then press Next room to enter the Cabinet Brain.'
         },
         {
-          title: 'Ask the Local Brain',
+          title: 'Ask the Cabinet Brain',
           path: 'local-brain.html',
           selector: '#brainQuestion',
-          body: 'The Local Brain teaches what brain owns a question, which reviewer checks it, and which live proof surface should be sent.',
-          action: 'Type a real business question and run it through the Local Brain.'
+          body: 'The Cabinet Brain teaches what brain owns a question, which reviewer checks it, and which live proof surface should be sent.',
+          action: 'Type a real business question and run it through the Cabinet Brain.'
         },
         {
           title: 'Learn the sales path',
@@ -1157,14 +1157,14 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
           title: 'Open the admin command room',
           path: 'admin/automation-brain.html',
           selector: '.admin-hero',
-          body: 'This room explains the difference between local receipt mode and deployed Cloudflare Worker mode.',
+          body: 'This room explains the difference between private operator receipt mode and deployed Cloudflare Worker mode.',
           action: 'Read the mode banner before sending commands.'
         },
         {
           title: 'Connect the Worker when available',
           path: 'admin/automation-brain.html',
           selector: '#endpointInput',
-          body: 'The Worker origin and admin token turn the brain from a browser-local receipt maker into shared operational automation.',
+          body: 'The Worker origin and admin token turn the brain from private operator receipts into shared operational automation.',
           action: 'Paste the Worker origin only when the deployed endpoint is ready.'
         },
         {
@@ -1440,7 +1440,7 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
     },
     {
       test: path => path === 'local-brain.html',
-      title: 'Local Brain room',
+      title: 'Cabinet Brain room',
       body: 'Use this room to ask where a question belongs, which cabinet owns it, which reviewer checks it, and what proof link to send.',
       journey: 'first-run'
     },
@@ -2063,3 +2063,340 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
 
   onReady(boot);
 })();
+
+// BEGIN quantumskyes:adaptive-neon-scrollbar-js
+(function(){
+  if(window.__mcpVisibleNeonScrollbars) return;
+  window.__mcpVisibleNeonScrollbars = true;
+
+  function onReady(fn){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }else{
+      fn();
+    }
+  }
+
+  function clamp(value, min, max){
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function verticalSource(){
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function horizontalSource(){
+    const doc = document.scrollingElement || document.documentElement;
+    if(doc.scrollWidth > doc.clientWidth + 4) return { node: doc, mode: 'horizontal' };
+    const selectors = [
+      '.site-header nav',
+      '.table-wrap',
+      '.topnav',
+      '.route-grid',
+      '.command-table',
+      '.saas-table'
+    ];
+    const node = selectors
+      .flatMap((selector) => [...document.querySelectorAll(selector)])
+      .find((element) => element.scrollWidth > element.clientWidth + 4);
+    return node ? { node, mode: 'horizontal' } : { node: doc, mode: 'page' };
+  }
+
+  onReady(() => {
+    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
+    document.querySelectorAll('.mcp-neon-scroll-rail,.mcp-neon-scroll-corner').forEach((node) => node.remove());
+
+    const yRail = document.createElement('div');
+    yRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-y';
+    yRail.setAttribute('aria-hidden', 'true');
+    yRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const xRail = document.createElement('div');
+    xRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-x';
+    xRail.setAttribute('aria-hidden', 'true');
+    xRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const corner = document.createElement('div');
+    corner.className = 'mcp-neon-scroll-corner';
+    corner.setAttribute('aria-hidden', 'true');
+
+    document.body.append(yRail, xRail, corner);
+
+    const yThumb = yRail.querySelector('.mcp-neon-scroll-thumb');
+    const xThumb = xRail.querySelector('.mcp-neon-scroll-thumb');
+    let activeHorizontal = horizontalSource();
+    let raf = 0;
+    let metrics = null;
+
+    function measure(){
+      const ySource = verticalSource();
+      const yTrack = Math.max(1, yRail.clientHeight);
+      const yMax = Math.max(1, ySource.scrollHeight - window.innerHeight);
+      const yRatio = clamp(window.scrollY / yMax, 0, 1);
+      const ySize = clamp((window.innerHeight / Math.max(ySource.scrollHeight, window.innerHeight)) * yTrack, 78, yTrack);
+
+      if(!activeHorizontal?.node || !document.documentElement.contains(activeHorizontal.node)){
+        activeHorizontal = horizontalSource();
+      }
+      const xTrack = Math.max(1, xRail.clientWidth);
+      const xSource = activeHorizontal.node;
+      const xMax = Math.max(0, xSource.scrollWidth - xSource.clientWidth);
+      const pageMode = activeHorizontal.mode === 'page' || xMax <= 1;
+      const xRatio = pageMode ? yRatio : clamp(xSource.scrollLeft / xMax, 0, 1);
+      const xSize = pageMode
+        ? clamp(xTrack * .24, 84, Math.max(84, xTrack * .38))
+        : clamp((xSource.clientWidth / Math.max(xSource.scrollWidth, xSource.clientWidth)) * xTrack, 84, xTrack);
+
+      return { ySource, yTrack, yMax, yRatio, ySize, xSource, xTrack, xMax, xRatio, xSize, pageMode };
+    }
+
+    function updateRails(){
+      raf = 0;
+      metrics = measure();
+      yThumb.style.height = `${Math.floor(metrics.ySize)}px`;
+      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(metrics.yRatio * Math.max(0, metrics.yTrack - metrics.ySize))}px`);
+      xThumb.style.width = `${Math.floor(metrics.xSize)}px`;
+      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(metrics.xRatio * Math.max(0, metrics.xTrack - metrics.xSize))}px`);
+      xRail.dataset.scrollMode = metrics.pageMode ? 'page' : 'horizontal';
+    }
+
+    function scheduleUpdate(){
+      if(raf) return;
+      raf = window.requestAnimationFrame(updateRails);
+    }
+
+    function setVerticalRatio(ratio){
+      const next = measure();
+      window.scrollTo({ top: clamp(ratio, 0, 1) * next.yMax, left: window.scrollX, behavior: 'auto' });
+      scheduleUpdate();
+    }
+
+    function setHorizontalRatio(ratio){
+      const next = measure();
+      if(next.pageMode){
+        setVerticalRatio(ratio);
+        return;
+      }
+      next.xSource.scrollLeft = clamp(ratio, 0, 1) * next.xMax;
+      scheduleUpdate();
+    }
+
+    function bindRail(rail, thumb, axis, setter){
+      let dragging = false;
+      let pointerOffset = 0;
+
+      function ratioFromEvent(event, keepOffset){
+        const latest = measure();
+        const railRect = rail.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        const track = axis === 'y' ? latest.yTrack : latest.xTrack;
+        const size = axis === 'y' ? latest.ySize : latest.xSize;
+        const start = axis === 'y' ? railRect.top : railRect.left;
+        const coordinate = axis === 'y' ? event.clientY : event.clientX;
+        const localOffset = keepOffset ? pointerOffset : size / 2;
+        return clamp((coordinate - start - localOffset) / Math.max(1, track - size), 0, 1);
+      }
+
+      rail.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        rail.classList.add('is-dragging');
+        rail.setPointerCapture?.(event.pointerId);
+        const thumbRect = thumb.getBoundingClientRect();
+        pointerOffset = event.target === thumb || thumb.contains(event.target)
+          ? (axis === 'y' ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
+          : (axis === 'y' ? thumbRect.height / 2 : thumbRect.width / 2);
+        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)));
+      });
+
+      rail.addEventListener('pointermove', (event) => {
+        if(!dragging) return;
+        event.preventDefault();
+        setter(ratioFromEvent(event, true));
+      });
+
+      function endDrag(event){
+        if(!dragging) return;
+        dragging = false;
+        rail.classList.remove('is-dragging');
+        rail.releasePointerCapture?.(event.pointerId);
+      }
+
+      rail.addEventListener('pointerup', endDrag);
+      rail.addEventListener('pointercancel', endDrag);
+    }
+
+    bindRail(yRail, yThumb, 'y', setVerticalRatio);
+    bindRail(xRail, xThumb, 'x', setHorizontalRatio);
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      activeHorizontal = horizontalSource();
+      scheduleUpdate();
+    }, { passive: true });
+    document.addEventListener('scroll', (event) => {
+      if(event.target && event.target === activeHorizontal.node) scheduleUpdate();
+    }, true);
+    document.addEventListener('pointerover', (event) => {
+      const candidate = event.target && event.target.closest && event.target.closest('.site-header nav,.table-wrap,.topnav,.route-grid');
+      if(candidate && candidate.scrollWidth > candidate.clientWidth + 4){
+        activeHorizontal = { node: candidate, mode: 'horizontal' };
+        scheduleUpdate();
+      }
+    }, { passive: true });
+
+    scheduleUpdate();
+    window.setTimeout(scheduleUpdate, 350);
+    window.setTimeout(scheduleUpdate, 1200);
+  });
+})();
+// END quantumskyes:adaptive-neon-scrollbar-js
+
+// BEGIN quantumskyes:skyesol-living-background-js
+function mountSkyeSolLivingBackground({
+  canvasSelector = '.skyesol-living-field',
+  particleDensity = 16000,
+  maxParticles = 120,
+  minParticles = 58
+} = {}) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.querySelector(canvasSelector);
+  if (!canvas || !canvas.getContext || reduceMotion) return () => {};
+
+  const ctx = canvas.getContext('2d');
+  const palette = [
+    'rgba(201,168,76,',
+    'rgba(138,99,255,',
+    'rgba(39,242,255,'
+  ];
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let raf = 0;
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(maxParticles, Math.max(minParticles, Math.floor(width * height / particleDensity)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.8 + .4,
+      a: Math.random() * .34 + .12,
+      s: Math.random() * .34 + .08,
+      phase: Math.random() * Math.PI * 2,
+      color: palette[index % palette.length]
+    }));
+  }
+
+  function drawWave(time, yOffset, colorA, colorB, amp, speed) {
+    const gradient = ctx.createLinearGradient(0, yOffset - amp * 2, width, yOffset + amp * 2);
+    gradient.addColorStop(0, colorA);
+    gradient.addColorStop(.5, colorB);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (let x = 0; x <= width; x += 18) {
+      const n = Math.sin((x * .006) + time * speed) * amp;
+      const n2 = Math.cos((x * .011) - time * speed * .7) * amp * .46;
+      ctx.lineTo(x, yOffset + n + n2);
+    }
+    ctx.lineTo(width, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  function animate(now) {
+    if (document.body.classList.contains('motion-paused')) {
+      raf = requestAnimationFrame(animate);
+      return;
+    }
+    const t = now * .001;
+    pointer.x += (pointer.tx - pointer.x) * .035;
+    pointer.y += (pointer.ty - pointer.y) * .035;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'screen';
+    drawWave(t, height * .28 + pointer.y * 12, 'rgba(138,99,255,0)', 'rgba(138,99,255,.10)', 36, .34);
+    drawWave(t, height * .54 - pointer.y * 10, 'rgba(39,242,255,0)', 'rgba(39,242,255,.08)', 42, .24);
+    drawWave(t, height * .82, 'rgba(201,168,76,0)', 'rgba(201,168,76,.07)', 28, .28);
+    particles.forEach((particle) => {
+      const px = particle.x + Math.sin(t * particle.s + particle.phase) * 28 + pointer.x * 10;
+      const py = particle.y + Math.cos(t * particle.s * .8 + particle.phase) * 18 + pointer.y * 8;
+      ctx.beginPath();
+      ctx.arc(px, py, particle.r, 0, Math.PI * 2);
+      ctx.fillStyle = `${particle.color}${particle.a})`;
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    raf = requestAnimationFrame(animate);
+  }
+
+  function onPointerMove(event) {
+    pointer.tx = (event.clientX / Math.max(width, 1) - .5) * 2;
+    pointer.ty = (event.clientY / Math.max(height, 1) - .5) * 2;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onPointerMove, { passive: true });
+  raf = requestAnimationFrame(animate);
+
+  return () => {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('mousemove', onPointerMove);
+  };
+}
+
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();
+// END quantumskyes:skyesol-living-background-js
+
+// BEGIN quantumskyes:neon-motion-chrome-vanilla-js
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();
+// END quantumskyes:neon-motion-chrome-vanilla-js

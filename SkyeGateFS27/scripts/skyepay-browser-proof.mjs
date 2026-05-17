@@ -128,7 +128,7 @@ function writeProofReel({ videoPath, posterPath }) {
 <body>
   <main>
     <h1>SkyePay Browser Action Proof</h1>
-    <p>Recorded path: open the RouteX owner-approved SkyePay lane, fill checkout, submit dry-run checkout, return to the FS27 pending-owner-approval state.</p>
+    <p>Recorded path: open the RouteX auto-unlock SkyePay lane, fill checkout, submit dry-run checkout, and return to the FS27 preview-recorded state.</p>
     <video id="proofVideo" src="${videoSrc}" poster="${posterSrc}" controls autoplay muted playsinline preload="auto"></video>
   </main>
 </body>
@@ -229,7 +229,7 @@ async function verifyApiContract(origin, browser) {
         statusOk: status.ok === true &&
           status.order?.approval_status === "demo_pending_owner_approval" &&
           status.order?.provisioning_status === "waiting_for_owner_approval",
-        client: offers.client?.client_slug || null,
+        client: offers.client?.client_slug || offers.client?.slug || null,
         offerCount: offers.offers.length,
         repoImported: offers.repo_stripe_catalog?.imported_checkout_offers || 0,
         checkoutId: checkout.id || null
@@ -262,7 +262,9 @@ async function verifyApiContract(origin, browser) {
 
 async function main() {
   process.env.SKYPAY_ALLOW_PUBLIC_DRY_RUN = "true";
-  process.env.SKYGATE_SKIP_SCHEMA_BOOTSTRAP = "true";
+  if (!process.env.NETLIFY_DATABASE_URL && !process.env.DATABASE_URL) {
+    process.env.SKYGATE_SKIP_SCHEMA_BOOTSTRAP = "true";
+  }
   const origin = await startServer();
   process.env.SKYPAY_PUBLIC_ORIGIN = origin;
   const browser = await chromium.launch({ headless: true });

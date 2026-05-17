@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="16-brain local command router for the MetrAIyux 0S Executive Office website.">
-  <title>Local Brain Router · MetrAIyux 0S Executive Office</title>
+  <meta name="description" content="16-brain command intelligence router for the MetrAIyux 0S Executive Office website.">
+  <meta name="production-sync" content="2026-05-17-cabinet-brain-router">
+  <title>Cabinet Brain Router · MetrAIyux 0S Executive Office</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="brain/local-brain.css">
 <link rel='icon' type='image/png' href='favicon-32.png'></head>
@@ -14,7 +15,7 @@
   <nav>
     <a href="index.html#leaders">Leaders</a>
     <a href="index.html#governance">Governance</a>
-    <a href="local-brain.html">Local Brain</a>
+    <a href="local-brain.html">Cabinet Brain</a>
     <a href="person-brains.html">16 Brains</a>
     <a href="deployment-command-center.html">Deploy</a>
   </nav>
@@ -22,14 +23,14 @@
 <main>
 <section class="hero brain-hero">
   <div class="hero-copy">
-    <p class="eyebrow">16-brain local command router</p>
-    <h1><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Local Brain</span> Router</h1>
+    <p class="eyebrow">16-brain command intelligence router</p>
+    <h1><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cabinet Brain</span> Router</h1>
     <p class="hero-lede">Ask it like an operator. It routes the question to the right <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span> owner brain, adds the secondary reviewer, pulls live proof surfaces, and keeps private admin setup out of public answers.</p>
     <div class="hero-actions">
       <a class="button primary" href="#ask">Ask the Brain</a>
       <a class="button" href="brain/LOCAL_BRAIN_README.md">Open Brain README</a>
     </div>
-    <div class="stat-strip"><span><strong>16</strong> brains</span><span><strong>FS27</strong> gate aware</span><span><strong>Live</strong> surfaces</span><span><strong>Static</strong> fallback</span></div>
+    <div class="stat-strip"><span><strong>16</strong> brains</span><span><strong>FS27</strong> gate aware</span><span><strong>Live</strong> surfaces</span><span><strong>Private</strong> retrieval</span></div>
   </div>
   <div class="panel brain-status-panel">
     <h3>Brain mode</h3>
@@ -50,7 +51,7 @@
       <label for="brainQuestion">Question</label>
       <textarea id="brainQuestion" rows="5" placeholder="Example: A buyer asks how this is more than a website and wants auth/proof. Which brain handles it and what link do I send?"></textarea>
       <div class="brain-controls">
-        <button id="askBrain" class="button primary">Ask local brain</button>
+        <button id="askBrain" class="button primary">Ask brain</button>
         <button id="exampleBrain" class="button">Load example</button>
       </div>
       <div id="brainAnswer" class="brain-answer"></div>
@@ -63,15 +64,15 @@
 </section>
 <section class="section split">
   <div>
-    <p class="eyebrow">Optional local model bridge</p>
-    <h2>Keep it light: Ollama or llama.cpp can be plugged in later.</h2>
-    <p>This site does not require a model to work. The optional bridge is for when you want answers rewritten by a small local model through an OpenAI-compatible endpoint after the browser router has already picked the owner lane.</p>
-    <p>Ollama supports OpenAI-compatible APIs, while llama.cpp and llama-cpp-python can also expose OpenAI-compatible local servers. This means the brain can later point at <code>localhost</code> instead of a paid cloud provider.</p>
+    <p class="eyebrow">Private model bridge</p>
+    <h2>Attach the private inference lane when the operator wants generated language.</h2>
+    <p>The command router can answer from the MetrAIyux corpus first, then hand the selected owner lane to an operator-controlled OpenAI-compatible endpoint when rewritten language is useful.</p>
+    <p>Ollama, llama.cpp, and other compatible runtimes can sit behind that private endpoint without exposing owner setup, keys, or admin-only routing to public visitors.</p>
   </div>
   <div class="panel endpoint-panel">
     <h3>Endpoint test</h3>
     <label>Base URL</label>
-    <input id="endpointUrl" value="http://localhost:11434/v1/chat/completions">
+    <input id="endpointUrl" value="" placeholder="https://operator-inference.example/v1/chat/completions">
     <label>Model</label>
     <input id="endpointModel" value="llama3.2:3b">
     <button id="testEndpoint" class="button">Test optional endpoint</button>
@@ -81,10 +82,10 @@
 <section class="section">
   <p class="eyebrow">Internal limits</p>
   <h2>This is a company knowledge brain, not an unauthorized legal filing engine.</h2>
-  <p class="wide">The router can explain the cabinet structure, live surfaces, public profiles, governance language, AE positioning, FS27 gate relationship, pricing source of truth, and deployment steps. It should not expose tokens, submit filings, invent licenses, publish unsupported claims, or treat a local answer as legal, financial, tax, HR, or security advice.</p>
+  <p class="wide">The router can explain the cabinet structure, live surfaces, public profiles, governance language, AE positioning, FS27 gate relationship, pricing source of truth, and deployment steps. It should not expose tokens, submit filings, invent licenses, publish unsupported claims, or treat a router answer as legal, financial, tax, HR, or security advice.</p>
 </section>
 </main>
-<footer><p>Local Brain Router · Private static command layer for the MetrAIyux 0S Executive Office.</p></footer>
+<footer><p>Cabinet Brain Router · Private command intelligence layer for the MetrAIyux 0S Executive Office.</p></footer>
 <script src="brain/local-brain.js"></script>
 <script src="./script.js"></script></body>
 </html>

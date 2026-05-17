@@ -9,11 +9,11 @@
 ✅ Added ConnectLog request refresh from Relay13 `/api/v1/connectlog/requests`.
 ✅ Added copyable Relay13 active-card payload for manual inspection and API testing.
 ✅ Added remote request cache/list UI inside ConnectLog.
-✅ Local fallback remains available and remote failure is queued/not claimed as delivered.
+✅ Delivery queue remains available and remote failure is queued/not claimed as delivered.
 
 ## Still not claimed
 
 ☐ Live Cloudflare Worker deploy proof.
 ☐ Remote D1 migration proof.
 ☐ Real browser-to-browser WebSocket proof.
-☐ Production auth/user identity beyond browser-local operator API key storage.
+☐ Managed customer identity is handled by the gate/Relay13 policy layer; public source must never expose operator API keys.

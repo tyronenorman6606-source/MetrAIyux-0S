@@ -5,6 +5,13 @@
     releases: [],
     payouts: [],
     workflows: [],
+    exchange: {
+      contentRequests: [],
+      threads: [],
+      communityPosts: [],
+      campaigns: [],
+      progress: null,
+    },
     analytics: null,
     lastArtistId: sessionStorage.getItem('skye-music-nexus:lastArtistId') || '',
     lastReleaseId: sessionStorage.getItem('skye-music-nexus:lastReleaseId') || '',
@@ -20,6 +27,21 @@
       micro: 'Royalty River',
       title: 'Money movement should feel visible before it becomes finance work.',
       text: 'Credits, payout requests, and pending movement are rendered as a river of proof so the operator can see value forming in real time.',
+    },
+    content: {
+      micro: 'Content Request Exchange',
+      title: 'Artists should be able to ask for content at the exact moment the release needs it.',
+      text: 'The exchange captures cover, canvas, short-form, caption, EPK, and rollout requests, then creates a Relay13-ready inbox thread for handoff.',
+    },
+    community: {
+      micro: 'Community Relay',
+      title: 'The platform should create motion between artists, not isolate them in forms.',
+      text: 'Artists can post collab calls, feedback asks, producer needs, show-slot signals, and milestones into a gated community lane.',
+    },
+    progression: {
+      micro: 'Achievement Orbit',
+      title: 'Progress needs to be visible enough to pull artists forward.',
+      text: 'Artist actions unlock signal points, mission completion, release runway milestones, and campaign readiness without removing the gate boundary.',
     },
     proof: {
       micro: 'Proof Chain',
@@ -109,6 +131,40 @@
     if (name === 'music-releases' && action === 'operations-board') return { ok: true, workflows: [] };
     if (name === 'music-releases') return { ok: true, releases: [] };
     if (name === 'music-payments') return { ok: true, payouts: [] };
+    if (name === 'music-exchange') {
+      return {
+        ok: true,
+        gateSessionRequired: true,
+        contentRequests: [],
+        threads: [],
+        communityPosts: [],
+        campaigns: [],
+        progress: {
+          points: 50,
+          level: 1,
+          nextLevelAt: 300,
+          percentToNext: 17,
+          counts: { contentRequests: 0, communityPosts: 0, inboxThreads: 0, campaigns: 0 },
+          achievements: [
+            {
+              id: 'gate-session-lit',
+              name: 'Gate Session Lit',
+              points: 50,
+              unlocked: true,
+              detail: 'The artist lane is operating behind SkyGate.',
+            },
+            {
+              id: 'content-request-opened',
+              name: 'Content Request Opened',
+              points: 120,
+              unlocked: false,
+              detail: 'Open the Netlify runtime to request release content.',
+            },
+          ],
+          missions: [],
+        },
+      };
+    }
     if (name === 'music-analytics') {
       return { ok: true, totalArtists: 0, activeArtists: 0, totalReleases: 0, liveReleases: 0, totalStreams: 0, pendingPayouts: 0 };
     }
@@ -208,6 +264,82 @@
     prism.innerHTML = rows.map(([label, value]) => `<div class="prism-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
   }
 
+  function renderExchange() {
+    const exchange = state.exchange || {};
+    const progress = exchange.progress || {};
+    const requests = Array.isArray(exchange.contentRequests) ? exchange.contentRequests : [];
+    const threads = Array.isArray(exchange.threads) ? exchange.threads : [];
+    const posts = Array.isArray(exchange.communityPosts) ? exchange.communityPosts : [];
+    const campaigns = Array.isArray(exchange.campaigns) ? exchange.campaigns : [];
+
+    const progressRail = $('#progressRail');
+    if (progressRail) {
+      const counts = progress.counts || {};
+      progressRail.innerHTML = `
+        <div class="progress-score">
+          <strong>Level ${escapeHtml(progress.level || 1)}</strong>
+          <span>${escapeHtml(progress.points || 0)} signal points</span>
+        </div>
+        <div class="progress-bar" aria-label="progress to next level"><i style="width:${Math.max(0, Math.min(100, Number(progress.percentToNext || 0)))}%"></i></div>
+        <div class="record-meta">
+          <span class="pill">${escapeHtml(counts.contentRequests || 0)} requests</span>
+          <span class="pill">${escapeHtml(counts.communityPosts || 0)} posts</span>
+          <span class="pill">${escapeHtml(counts.inboxThreads || 0)} inbox threads</span>
+          <span class="pill">${escapeHtml(counts.campaigns || 0)} campaigns</span>
+        </div>`;
+    }
+
+    const achievements = $('#achievementOrbit');
+    if (achievements) {
+      const list = Array.isArray(progress.achievements) ? progress.achievements : [];
+      achievements.innerHTML = list.length ? list.map((item) => `
+        <article class="achievement ${item.unlocked ? 'unlocked' : ''}">
+          <span>${item.unlocked ? 'Unlocked' : 'Locked'}</span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <small>${escapeHtml(item.points)} pts · ${escapeHtml(item.detail)}</small>
+        </article>`).join('') : '<article class="achievement"><strong>No achievements yet</strong><small>Start with an artist node, release capsule, or content request.</small></article>';
+    }
+
+    const requestList = $('#contentRequestList');
+    if (requestList) {
+      requestList.innerHTML = requests.length ? requests.slice(0, 8).map((item) => recordCard('content', item.title || 'Content request', `${item.requestType || 'request'} · ${item.budgetLane || 'lane pending'}`, [item.status || 'open', item.id, item.threadId || 'no thread'])).join('') : '<article class="record-card"><h4>No content requests yet</h4><p>Ask for cover art, captions, short clips, EPK copy, or a rollout pack from the exchange.</p></article>';
+    }
+
+    const inbox = $('#inboxList');
+    if (inbox) {
+      inbox.innerHTML = threads.length ? threads.slice(0, 8).map((thread) => {
+        const messages = Array.isArray(thread.messages) ? thread.messages : [];
+        const last = messages[messages.length - 1] || {};
+        return recordCard('inbox', thread.topic || 'Artist inbox', last.body || 'Thread created for ConnectLog + Relay13 bridge handoff.', [thread.kind || 'thread', `${messages.length} messages`, thread.relay && thread.relay.status ? thread.relay.status : 'relay-ready']);
+      }).join('') : '<article class="record-card"><h4>Inbox is ready</h4><p>Send a message or open a content request to create the first ConnectLog + Relay13-ready thread.</p></article>';
+    }
+
+    const community = $('#communityWall');
+    if (community) {
+      community.innerHTML = posts.length ? posts.slice(0, 8).map((post) => recordCard('community', post.category || 'community signal', post.body || 'Community post', [post.status || 'open', post.artistId || 'artist', post.linkedReleaseId || 'no release'])).join('') : '<article class="record-card"><h4>No community posts yet</h4><p>Post a collab call, feedback ask, producer request, show-slot request, or release milestone.</p></article>';
+    }
+
+    const campaign = $('#campaignPack');
+    if (campaign) {
+      const latest = campaigns[0];
+      if (!latest) {
+        campaign.innerHTML = '<article class="record-card"><h4>No campaign pack yet</h4><p>Generate a release pack to get captions, short-form hooks, rollout tasks, and asset requests.</p></article>';
+      } else {
+        const pack = latest.contentPack || {};
+        campaign.innerHTML = `
+          <article class="record-card campaign-card">
+            <header><h4>${escapeHtml(latest.releaseTitle || 'Release campaign')}</h4><span class="pill gold">${escapeHtml(latest.offerLane || 'Lite brief')}</span></header>
+            <p>${escapeHtml(latest.mood || 'Release momentum')}</p>
+            <div class="campaign-columns">
+              <div><strong>Captions</strong>${(pack.captions || []).map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+              <div><strong>Hooks</strong>${(pack.shortFormHooks || []).map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+              <div><strong>Runway</strong>${(pack.rolloutTasks || []).map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+            </div>
+          </article>`;
+      }
+    }
+  }
+
   async function refreshSession() {
     if (staticPreview) return updateSessionChip(null);
     if (!auth) return updateSessionChip(null);
@@ -253,11 +385,24 @@
       } catch {
         state.workflows = [];
       }
+      try {
+        const exchange = await callFunction('music-exchange', { query: { action: 'hub', artistId: state.lastArtistId } });
+        state.exchange = {
+          contentRequests: Array.isArray(exchange.contentRequests) ? exchange.contentRequests : [],
+          threads: Array.isArray(exchange.threads) ? exchange.threads : [],
+          communityPosts: Array.isArray(exchange.communityPosts) ? exchange.communityPosts : [],
+          campaigns: Array.isArray(exchange.campaigns) ? exchange.campaigns : [],
+          progress: exchange.progress || null,
+        };
+      } catch {
+        state.exchange = { contentRequests: [], threads: [], communityPosts: [], campaigns: [], progress: null };
+      }
     }
 
     setMeters();
     renderRecords();
     renderAnalytics();
+    renderExchange();
     fillLastIds();
     if (!quiet) toast('Nexus records refreshed.');
   }
@@ -520,6 +665,146 @@
     });
   }
 
+  function wireContentRequestForm() {
+    const form = $('#contentRequestForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const created = await callFunction('music-exchange', {
+          method: 'POST',
+          body: {
+            action: 'request-content',
+            artistId: data.artistId,
+            releaseId: data.releaseId,
+            requestType: data.requestType,
+            title: data.title,
+            brief: data.brief,
+            budgetLane: data.budgetLane,
+            dueAt: data.dueAt,
+          },
+        });
+        state.lastArtistId = data.artistId;
+        if (data.releaseId) state.lastReleaseId = data.releaseId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        if (state.lastReleaseId) sessionStorage.setItem('skye-music-nexus:lastReleaseId', state.lastReleaseId);
+        renderResult('#contentRequestResult', 'Content request opened', { id: created.request && created.request.id, thread: created.request && created.request.threadId, lane: created.request && created.request.budgetLane });
+        toast('Content request opened in the artist exchange.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#contentRequestResult', 'Content request failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireMessageForm() {
+    const form = $('#messageForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const sent = await callFunction('music-exchange', {
+          method: 'POST',
+          body: {
+            action: 'send-message',
+            artistId: data.artistId,
+            recipientId: data.recipientId,
+            topic: data.topic,
+            body: data.body,
+            kind: 'artist-inbox',
+          },
+        });
+        state.lastArtistId = data.artistId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        renderResult('#messageResult', 'Inbox message sent', { thread: sent.thread && sent.thread.id, relay: sent.thread && sent.thread.relay && sent.thread.relay.status });
+        toast('Inbox message persisted for the Relay13-ready thread.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#messageResult', 'Inbox message failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireCommunityPostForm() {
+    const form = $('#communityPostForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const posted = await callFunction('music-exchange', {
+          method: 'POST',
+          body: {
+            action: 'publish-community',
+            artistId: data.artistId,
+            linkedReleaseId: data.linkedReleaseId,
+            category: data.category,
+            body: data.body,
+          },
+        });
+        state.lastArtistId = data.artistId;
+        if (data.linkedReleaseId) state.lastReleaseId = data.linkedReleaseId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        if (state.lastReleaseId) sessionStorage.setItem('skye-music-nexus:lastReleaseId', state.lastReleaseId);
+        renderResult('#communityPostResult', 'Community signal posted', { id: posted.post && posted.post.id, category: posted.post && posted.post.category, status: posted.post && posted.post.status });
+        toast('Community signal posted.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#communityPostResult', 'Community signal failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireReleaseCampaignForm() {
+    const form = $('#releaseCampaignForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const built = await callFunction('music-exchange', {
+          method: 'POST',
+          body: {
+            action: 'build-release-campaign',
+            artistId: data.artistId,
+            releaseId: data.releaseId,
+            releaseTitle: data.releaseTitle,
+            mood: data.mood,
+            platforms: data.platforms,
+            offerLane: data.offerLane,
+          },
+        });
+        state.lastArtistId = data.artistId;
+        if (data.releaseId) state.lastReleaseId = data.releaseId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        if (state.lastReleaseId) sessionStorage.setItem('skye-music-nexus:lastReleaseId', state.lastReleaseId);
+        renderResult('#campaignResult', 'Release campaign built', { id: built.campaign && built.campaign.id, release: built.campaign && built.campaign.releaseTitle, lane: built.campaign && built.campaign.offerLane });
+        toast('Release campaign pack generated.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#campaignResult', 'Release campaign failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
   function wireForms() {
     wireArtistForm();
     wireReleaseForm();
@@ -527,6 +812,10 @@
     wireOpsForm();
     wireReviewForm();
     wirePayoutForm();
+    wireContentRequestForm();
+    wireMessageForm();
+    wireCommunityPostForm();
+    wireReleaseCampaignForm();
   }
 
   function initCanvas() {
@@ -610,6 +899,7 @@
     setMeters();
     renderRecords();
     renderAnalytics();
+    renderExchange();
     await refreshSession();
     await refreshRecords({ quiet: true });
   }

@@ -18,7 +18,7 @@ let failed = false;
 for (const item of cases) {
   const result = spawnSync(process.execPath, ['src/server.js'], {
     cwd: process.cwd(),
-    env: { ...process.env, ...LOCAL_PROOF_ENV, PORT: '5997', ...item.env },
+    env: { ...process.env, ...LOCAL_PROOF_ENV, SKYEROUTEX_DISABLE_ROOT_ENV: '1', PORT: '5997', ...item.env },
     encoding: 'utf8',
     timeout: 3000
   });

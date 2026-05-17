@@ -2427,3 +2427,35 @@ $("#queueLocalPlatformDispatch")?.addEventListener("click", () => queueLatestLoc
 
 
 })();
+
+// BEGIN quantumskyes:neon-motion-chrome-vanilla-js
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();
+// END quantumskyes:neon-motion-chrome-vanilla-js

@@ -3,15 +3,15 @@
 
   Optional MCP part. Add data-mcp-neon-scrollbar to html, body, or a scroll
   container when a site explicitly asks for visible neon scrollbars.
-  The colors inherit common brand tokens first, then fall back to Skye gold,
-  cyan, mint, and violet.
+  This hides basic native scrollbars and replaces them with always-visible,
+  draggable neon rails on the exact viewport edges.
 */
 
 :root{
-  --mcp-neon-scrollbar-size:16px;
-  --mcp-neon-scrollbar-bg:rgba(3,7,11,.58);
-  --mcp-neon-scrollbar-track:rgba(7,16,23,.46);
-  --mcp-neon-scrollbar-rail:rgba(53,183,255,.28);
+  --mcp-neon-scrollbar-size:18px;
+  --mcp-neon-scrollbar-bg:rgba(3,7,11,.62);
+  --mcp-neon-scrollbar-track:rgba(7,16,23,.52);
+  --mcp-neon-scrollbar-rail:rgba(53,183,255,.34);
   --mcp-neon-scrollbar-a:var(--gold2,var(--gold,var(--brand-gold,var(--accent,#f3d483))));
   --mcp-neon-scrollbar-b:var(--cyan,var(--brand-cyan,var(--accent-2,#35b7ff)));
   --mcp-neon-scrollbar-c:var(--mint,var(--brand-mint,var(--success,#6ff2c7)));
@@ -19,93 +19,135 @@
 }
 
 html[data-mcp-neon-scrollbar],
+html[data-mcp-neon-scrollbar] body,
 [data-mcp-neon-scrollbar]{
-  scrollbar-gutter:stable;
-  scrollbar-width:auto;
-  scrollbar-color:color-mix(in srgb,var(--mcp-neon-scrollbar-b) 78%,transparent) var(--mcp-neon-scrollbar-bg);
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
 }
 
 html[data-mcp-neon-scrollbar] *,
 [data-mcp-neon-scrollbar] *{
-  scrollbar-width:auto;
-  scrollbar-color:color-mix(in srgb,var(--mcp-neon-scrollbar-b) 78%,transparent) var(--mcp-neon-scrollbar-track);
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
 }
 
 html[data-mcp-neon-scrollbar]::-webkit-scrollbar,
+html[data-mcp-neon-scrollbar] body::-webkit-scrollbar,
 html[data-mcp-neon-scrollbar] *::-webkit-scrollbar,
 [data-mcp-neon-scrollbar]::-webkit-scrollbar,
 [data-mcp-neon-scrollbar] *::-webkit-scrollbar{
-  width:16px;
-  height:16px;
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+  background:transparent !important;
 }
 
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-track,
-html[data-mcp-neon-scrollbar] *::-webkit-scrollbar-track,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-track,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-track{
+.mcp-neon-scroll-rail{
+  position:fixed;
+  z-index:9999;
+  pointer-events:auto;
+  opacity:.94;
   border:1px solid var(--mcp-neon-scrollbar-rail);
   border-radius:999px;
   background:
-    linear-gradient(180deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 44%,rgba(168,140,255,.13) 76%,rgba(111,242,199,.10)),
+    linear-gradient(180deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 45%,rgba(168,140,255,.12) 76%,rgba(111,242,199,.10)),
     var(--mcp-neon-scrollbar-track);
   box-shadow:
-    inset 0 0 14px rgba(53,183,255,.26),
-    inset 0 0 24px rgba(243,212,131,.13),
-    0 0 18px rgba(53,183,255,.12);
+    inset 0 0 15px rgba(53,183,255,.28),
+    inset 0 0 26px rgba(243,212,131,.12),
+    0 0 18px rgba(53,183,255,.25),
+    0 0 32px rgba(243,212,131,.13);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  touch-action:none;
+  user-select:none;
 }
 
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-track:horizontal,
-html[data-mcp-neon-scrollbar] *::-webkit-scrollbar-track:horizontal,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-track:horizontal,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-track:horizontal{
+.mcp-neon-scroll-rail-y{
+  top:0;
+  right:0;
+  bottom:var(--mcp-neon-scrollbar-size);
+  width:var(--mcp-neon-scrollbar-size);
+  cursor:ns-resize;
+}
+
+.mcp-neon-scroll-rail-x{
+  left:0;
+  right:var(--mcp-neon-scrollbar-size);
+  bottom:0;
+  height:var(--mcp-neon-scrollbar-size);
+  cursor:ew-resize;
   background:
-    linear-gradient(90deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 44%,rgba(168,140,255,.13) 76%,rgba(111,242,199,.10)),
+    linear-gradient(90deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 45%,rgba(168,140,255,.12) 76%,rgba(111,242,199,.10)),
     var(--mcp-neon-scrollbar-track);
 }
 
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb,
-html[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb{
-  min-width:72px;
-  min-height:72px;
-  border:4px solid transparent;
-  border-radius:999px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,255,255,.18)) padding-box,
-    linear-gradient(180deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
-  box-shadow:
-    0 0 12px rgba(53,183,255,.78),
-    0 0 24px rgba(243,212,131,.38),
-    0 0 36px rgba(111,242,199,.20),
-    inset 0 0 12px rgba(255,255,255,.34);
-}
-
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb:horizontal,
-html[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb:horizontal,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb:horizontal,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb:horizontal{
-  background:
-    linear-gradient(90deg,rgba(255,255,255,.74),rgba(255,255,255,.18)) padding-box,
-    linear-gradient(90deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
-}
-
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb:hover,
-html[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb:hover,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb:hover,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-thumb:hover{
-  border-width:3px;
-  box-shadow:
-    0 0 16px rgba(53,183,255,.92),
-    0 0 34px rgba(243,212,131,.50),
-    0 0 48px rgba(168,140,255,.25),
-    inset 0 0 14px rgba(255,255,255,.42);
-}
-
-html[data-mcp-neon-scrollbar]::-webkit-scrollbar-corner,
-[data-mcp-neon-scrollbar]::-webkit-scrollbar-corner,
-[data-mcp-neon-scrollbar] *::-webkit-scrollbar-corner{
+.mcp-neon-scroll-corner{
+  position:fixed;
+  right:0;
+  bottom:0;
+  z-index:9999;
+  width:var(--mcp-neon-scrollbar-size);
+  height:var(--mcp-neon-scrollbar-size);
+  border:1px solid var(--mcp-neon-scrollbar-rail);
+  border-radius:12px 0 0 0;
   background:
     radial-gradient(circle,var(--mcp-neon-scrollbar-b),transparent 64%),
     var(--mcp-neon-scrollbar-bg);
+  box-shadow:0 0 22px rgba(53,183,255,.30);
+  pointer-events:none;
+}
+
+.mcp-neon-scroll-thumb{
+  position:absolute;
+  border:3px solid transparent;
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.76),rgba(255,255,255,.20)) padding-box,
+    linear-gradient(180deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
+  box-shadow:
+    0 0 14px rgba(53,183,255,.88),
+    0 0 30px rgba(243,212,131,.45),
+    0 0 46px rgba(111,242,199,.24),
+    inset 0 0 12px rgba(255,255,255,.36);
+  cursor:grab;
+  pointer-events:auto;
+  touch-action:none;
+  will-change:transform,width,height;
+}
+
+.mcp-neon-scroll-thumb:active,
+.mcp-neon-scroll-rail.is-dragging .mcp-neon-scroll-thumb{
+  cursor:grabbing;
+  box-shadow:
+    0 0 18px rgba(53,183,255,.96),
+    0 0 38px rgba(243,212,131,.54),
+    0 0 54px rgba(168,140,255,.28),
+    inset 0 0 15px rgba(255,255,255,.44);
+}
+
+.mcp-neon-scroll-rail-y .mcp-neon-scroll-thumb{
+  top:0;
+  left:0;
+  width:100%;
+  min-height:78px;
+  transform:translate3d(0,var(--mcp-scroll-y,0px),0);
+}
+
+.mcp-neon-scroll-rail-x .mcp-neon-scroll-thumb{
+  top:0;
+  left:0;
+  height:100%;
+  min-width:84px;
+  transform:translate3d(var(--mcp-scroll-x,0px),0,0);
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.76),rgba(255,255,255,.20)) padding-box,
+    linear-gradient(90deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
+}
+
+@media(max-width:680px){
+  :root{--mcp-neon-scrollbar-size:15px}
+  .mcp-neon-scroll-thumb{border-width:2px}
+  .mcp-neon-scroll-rail-y .mcp-neon-scroll-thumb{min-height:72px}
+  .mcp-neon-scroll-rail-x .mcp-neon-scroll-thumb{min-width:78px}
 }

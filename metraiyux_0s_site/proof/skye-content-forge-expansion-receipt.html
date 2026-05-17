@@ -41,6 +41,9 @@
             <tr><td>Gate session</td><td>Passed</td><td>The app loads <code>public/gate-session.js</code>, labels Free99 as no charge, and requires a 0S/FS27/SkyGate/local admin gate session before boot.</td></tr>
             <tr><td>API auth boundary</td><td>Passed</td><td>The server rejects ungated <code>/api/health</code> requests with 401 when the gate is enabled and accepts the configured gate token.</td></tr>
             <tr><td>Smoke test</td><td>Passed</td><td><code>npm run smoke</code> starts the local server, checks protected API routes, source registry, export, queue, scheduler tick, static rebuild, app HTML, storage, and Free99 wording.</td></tr>
+            <tr><td>Browser gate proof</td><td>Passed</td><td><code>test-artifacts/skye-content-forge-e2e/browser-qa.json</code> records desktop gate copy, local admin unlock, mobile gate rendering, no horizontal overflow, authenticated runtime, scheduler token proof, and nonblank living-background pixels.</td></tr>
+            <tr><td>Action recording</td><td>Passed</td><td><code>test-artifacts/skye-content-forge-e2e/content-forge-gate-unlock-workflow.webm</code> records the browser opening the gate, unlocking the Free99 session, checking the engine, and scrolling the dashboard. Playback is verified through <code>video-proof.html</code>.</td></tr>
+            <tr><td>MCP audit pass</td><td>Passed</td><td>The local MCP receipts were regenerated. The app keeps MCP browser effects in <code>public/mcp-effects.js</code> while the Cloudflare scheduler worker remains worker-safe.</td></tr>
             <tr><td>Commercial posture</td><td>Passed</td><td>The rate card says Free99, $0/month, $0 setup, no paid checkout, no charge, and gate session required.</td></tr>
             <tr><td>Provider boundary</td><td>Passed</td><td>Generation, Drive, GitHub, Netlify, Cloudflare, and social publishing require real credentials, platform permissions, and provider rules.</td></tr>
           </tbody>

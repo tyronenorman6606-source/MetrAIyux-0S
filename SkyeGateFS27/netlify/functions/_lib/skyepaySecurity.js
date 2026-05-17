@@ -81,6 +81,18 @@ export function maskEmail(value) {
 export function publicSkyePayOrder(row) {
   if (!row) return null;
   const offer = row.offer_snapshot && typeof row.offer_snapshot === "object" ? row.offer_snapshot : {};
+  const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+  const skyemerit = metadata.skyemerit_code ? {
+    applied: String(metadata.skyemerit_applied || "").toLowerCase() === "true",
+    code: metadata.skyemerit_code || null,
+    pack_id: metadata.skyemerit_pack_id || null,
+    title: metadata.skyemerit_title || null,
+    eligible_cents: Number(metadata.skyemerit_eligible_cents || 0),
+    discount_cents: Number(metadata.skyemerit_discount_cents || 0),
+    adjusted_due_cents: Number(metadata.skyemerit_adjusted_due_cents || 0),
+    kaixu_credit_cents: Number(metadata.skyemerit_kaixu_credit_cents || 0),
+    gate_required: String(metadata.skyemerit_gate_required || "").toLowerCase() === "true"
+  } : null;
   return {
     id: row.id,
     client_slug: row.client_slug,
@@ -99,6 +111,7 @@ export function publicSkyePayOrder(row) {
     approval_status: row.approval_status,
     owner_status: row.owner_status,
     provisioning_status: row.provisioning_status,
+    skyemerit,
     customer_hint: maskEmail(row.customer_email),
     paid_at: row.paid_at,
     approved_at: row.approved_at,

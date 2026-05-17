@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SkyePay is the MetrAIyux 0S payment gateway for private previews, owner approval, and workspace activation.">
+  <meta name="description" content="SkyePay is the MetrAIyux 0S payment gateway for private previews, automatic paid unlock, and workspace activation.">
   <title>SkyePay Gateway - MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
@@ -37,13 +37,16 @@
       <p class="eyebrow">House payment gateway</p>
       <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
       <h1>SkyePay is how clients continue after preview.</h1>
-      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and activation moves to paid-pending owner approval after Stripe confirms the SkyePay transaction. SkyeProfitConsole is Free99, meaning no charge, so it is shown here as gated access instead of a checkout offer.</p>
+      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and paid workspaces unlock automatically after Stripe confirms the SkyePay transaction. SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are Free99 gated access. SkyeMusicNexus Lite is Free99, while Studio, Label Command, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid SkyePay offers.</p>
       <div class="button-row">
         <a class="button primary" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command">Open SkyePay</a>
         <a class="button" href="billing.html">Use Billing Form</a>
         <a class="button" href="https://skyesol.netlify.app/skyepay-api.html">API Docs</a>
         <a class="button" href="../operator/skye-crawler.html">Scanner Proof</a>
         <a class="button" href="../live/skyeprofitconsole-profit-console.html">Free99 Profit Console</a>
+        <a class="button" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Single Song Drop</a>
+        <a class="button" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Release Content Kit</a>
+        <a class="button" href="../live/skye-content-forge-publisher.html">Free99 Content Forge</a>
       </div>
     </section>
 
@@ -56,8 +59,8 @@
           <p>After a private preview, clients continue through a named offer with visible setup, monthly price, included usage, request limits, and activation terms.</p>
         </article>
         <article class="saas-card">
-          <h3>Owner approval gate</h3>
-          <p>Confirmed Stripe payment records the managed workspace as paid pending owner approval. FS27 writes the order, plan policy, and approval state onto the customer record.</p>
+          <h3>Automatic unlock gate</h3>
+          <p>Confirmed Stripe payment records the managed workspace as paid and unlocks it. FS27 writes the order, plan policy, and workspace state onto the customer record.</p>
         </article>
         <article class="saas-card">
           <h3>Stripe backed</h3>
@@ -69,7 +72,7 @@
         </article>
         <article class="saas-card">
           <h3>Free99 boundary</h3>
-          <p>SkyeProfitConsole is no charge and does not create a paid SkyePay product. It still requires a 0S or FS27 gate session before app boot and runtime actions.</p>
+          <p>SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are no charge and do not create paid SkyePay products. SkyeMusicNexus Lite also stays $0. Studio, Label Command, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid. Free and paid music lanes still require a 0S, FS27, SkyGate, or local admin gate session before app boot and runtime actions.</p>
         </article>
       </div>
     </section>
@@ -91,8 +94,56 @@
       <article class="saas-card">
         <p class="eyebrow">SkyeProfitConsole Free99</p>
         <h3>$0 setup + $0/mo</h3>
-        <p>No charge profit console access for gated 0S users. Free99 means no charge, no paid checkout, and gate session required.</p>
+        <p>No charge profit console access for gated 0S users, now with money moves, close briefs, and runtime proof. Free99 means no charge, no paid checkout, and gate session required.</p>
         <a class="saas-btn" href="../live/skyeprofitconsole-profit-console.html">Open Free99 hub</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMediaCenter Free99</p>
+        <h3>$0 setup + $0/mo</h3>
+        <p>No charge media center access for gated 0S users. Free99 means no charge, no paid checkout, and gate session required.</p>
+        <a class="saas-btn" href="../live/skye-media-center-operator-proof.html">Open Free99 hub</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Skye Content Forge Free99</p>
+        <h3>$0 setup + $0/mo</h3>
+        <p>No charge content publisher access for gated 0S users. Free99 means no charge, no paid checkout, and gate session required.</p>
+        <a class="saas-btn" href="../live/skye-content-forge-publisher.html">Open Free99 hub</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus Lite</p>
+        <h3>Free99 / $0</h3>
+        <p>No charge Lite music access for gated 0S users. Free99 applies only to Lite; paid music work uses the SkyePay offers below.</p>
+        <a class="saas-btn" href="../live/skyemusicnexus-neofront.html">Open music hub</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Single Song Drop</p>
+        <h3>$199 once</h3>
+        <p>One song release capsule, metadata checklist, gated handoff, and proof receipt.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Buy Single Song Drop</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus Studio</p>
+        <h3>$1,500 setup + $497/mo</h3>
+        <p>Paid music ops room for up to 5 artists, 25 active releases, release workflow, royalty ledger tracking, payout review, and proof exports.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-studio">Start Studio</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus Label Command</p>
+        <h3>$6,500 setup + $1,497/mo</h3>
+        <p>Label-grade release operations for up to 25 artists, 150 releases, approval workflows, payout review controls, analytics, and custom proof receipts.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-label-command">Start Label Command</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Release Content Kit</p>
+        <h3>$499 once</h3>
+        <p>Captions, short-form hooks, asset requests, and release runway tasks from the gated artist exchange.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Buy Content Kit</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Community Campaign Sprint</p>
+        <h3>$899 once</h3>
+        <p>Exchange-led campaign sprint with community prompts, inbox coordination, content runway, and proof receipt.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-community-campaign-sprint">Buy Campaign Sprint</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Starter Command</p>
@@ -121,8 +172,8 @@
       <article class="saas-card">
         <p class="eyebrow">RouteX Workforce Command</p>
         <h3>$6,500 setup + $1,497/mo</h3>
-        <p>Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 job boards, applicant pools, assignments, route stops, proof vaults, market reports, export packets, 100,000 AI credits, 120 rpm, and V83 local runtime receipt review.</p>
-        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command">Open owner-approved SkyePay lane</a>
+        <p>Auto-unlock workforce command lane with SkyeRoutexFlow v0.4.0 job boards, applicant pools, assignments, route stops, proof vaults, market reports, export packets, 100,000 AI credits, 120 rpm, and V83 local runtime receipt review.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command">Open auto-unlock SkyePay lane</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Autonomous Office</p>
