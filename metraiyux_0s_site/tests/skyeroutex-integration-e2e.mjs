@@ -83,13 +83,18 @@ async function main() {
     await assertNoHorizontalScroll(page, 'RouteX hub desktop');
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'routex-hub-desktop.png'), fullPage: true });
 
-    await page.goto(`${baseUrl}/skyeroutex-workforce-command-v0.4.0/index.html`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/SkyeRouteX/workforce-command-v0.4.0/index.html`, { waitUntil: 'domcontentloaded' });
     await expectText(page, 'SkyeRoutex Workforce Command');
     await expectText(page, 'v0.4.0');
     await assertNoHorizontalScroll(page, 'RouteX v0.4.0 hub desktop');
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'routex-v040-hub-desktop.png'), fullPage: true });
 
-    await page.goto(`${baseUrl}/skyeroutex-workforce-command-v0.4.0/public/index.html`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/skyeroutex-workforce-command-v0.4.0/index.html`, { waitUntil: 'domcontentloaded' });
+    await expectText(page, 'SkyeRoutex Workforce Command');
+    await expectText(page, 'v0.4.0');
+    await assertNoHorizontalScroll(page, 'RouteX legacy v0.4.0 compatibility path');
+
+    await page.goto(`${baseUrl}/SkyeRouteX/workforce-command-v0.4.0/public/index.html`, { waitUntil: 'domcontentloaded' });
     await expectText(page, 'City/state job boards');
     await expectText(page, 'Provider Panel');
     await expectText(page, 'Contractor Panel');
@@ -136,7 +141,8 @@ async function main() {
       assertions: [
         '0S home links SkyeRouteX',
         'RouteX hub renders with runtime boundary copy',
-        'RouteX v0.4.0 static hub and API UI render inside 0S',
+        'RouteX v0.4.0 static hub and API UI render inside the SkyeRouteX folder',
+        'Legacy v0.4.0 path resolves through the compatibility pointer',
         'RouteX app shell opens and controls respond',
         'RouteX static contract endpoints return content',
         'Sales proof router recommends SkyeRouteX for field-route pain',

@@ -58,14 +58,14 @@ const htmlRequiredTokens = {
     "metraiyux-routex-workforce-command",
     "metraiyux-autonomous-office",
     "metraiyux-enterprise-command",
-    "Automatic unlock gate"
+    "Controlled activation gate"
   ],
   "saas/billing.html": [
     "30 rpm",
     "90 rpm",
     "120 rpm",
     "180 rpm",
-    "Confirmed Stripe payment unlocks the paid workspace automatically"
+    "Confirmed Stripe payment records paid status"
   ],
   "saas/signup.html": [
     "$1,500 setup",
@@ -96,7 +96,7 @@ function monthlyCents(offer) {
 }
 
 function normalizeCheckout(planId, offerId) {
-  return `https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=${offerId}`;
+  return `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=${offerId}`;
 }
 
 function assertEqual(label, actual, expected) {
@@ -152,8 +152,8 @@ for (const [planId, offerId] of Object.entries(planOfferMap)) {
   assertEqual(`${planId}.checkout_url`, plan.checkout_url, checkoutUrl);
   assertEqual(`${planId}.owner_approval_required`, plan.owner_approval_required, offer.owner_approval_required);
   assertEqual(`${planId}.activation_path`, plan.activation_path, offer.activation_path);
-  assertEqual(`skyepay-gateway owner_approval_required`, gateway.owner_approval_required, false);
-  assertEqual(`skyepay-gateway activation_path`, gateway.activation_path, "auto_unlock_after_confirmed_payment");
+  assertEqual(`skyepay-gateway owner_approval_required`, gateway.owner_approval_required, true);
+  assertEqual(`skyepay-gateway activation_path`, gateway.activation_path, "paid_status_then_plan_policy_activation");
   assertEqual(`${planId}.price_monthly`, plan.price_monthly, monthlyCents(offer) / 100);
   assertEqual(`${planId}.setup_fee`, plan.setup_fee, setupCents(offer) / 100);
   if (policy) {
@@ -187,16 +187,19 @@ for (const token of [
   "customer.subscription.updated",
   "workspace_unlocked"
 ]) {
-  if (!stripeWebhookSource.includes(token)) fail(`stripe webhook missing automatic unlock token: ${token}`);
+  if (!stripeWebhookSource.includes(token)) fail(`stripe webhook missing SkyePay payment transition token: ${token}`);
 }
 
 for (const token of [
+  "SKYEPAY_OWNER_APPROVAL_REQUIRED",
+  "paid_pending_owner_approval",
+  "owner_approved_offer_cannot_auto_unlock",
   "SKYEPAY_AUTO_WORKSPACE_UNLOCKED",
   "findOrCreateSkyePayCustomer",
   "stripe_confirmed_skyepay_transaction",
   "provisioning_status='workspace_unlocked'"
 ]) {
-  if (!activationSource.includes(token)) fail(`activation helper missing token: ${token}`);
+  if (!activationSource.includes(token)) fail(`activation helper missing owner-gated SkyePay transition token: ${token}`);
 }
 
 for (const [relativePath, tokens] of Object.entries(htmlRequiredTokens)) {

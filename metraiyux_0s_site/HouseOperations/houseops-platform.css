@@ -959,3 +959,1593 @@ textarea:focus {
     justify-content: center;
   }
 }
+
+/* HouseOperations command v2: MCP app-first command center layer. */
+body.houseops-command-v2 {
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --bg: #070806;
+  --panel: rgba(17, 18, 15, 0.9);
+  --panel-2: rgba(29, 29, 24, 0.82);
+  --line: rgba(244, 213, 139, 0.18);
+  --line-strong: rgba(119, 230, 241, 0.4);
+  --text: #fbf3e4;
+  --muted: #a7aaa2;
+  --soft: #dfddcf;
+  --cyan: #77e6f1;
+  --green: #80d991;
+  --amber: #f4d58b;
+  --red: #ff7f75;
+  --blue: #9db7ff;
+  --ink: #070806;
+  --shadow: 0 28px 92px rgba(0, 0, 0, 0.46);
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.024) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 56px),
+    linear-gradient(135deg, #070806 0%, #11130f 48%, #17100d 100%);
+  color: var(--text);
+  overflow-x: clip;
+}
+
+body.houseops-command-v2 > .neon-motion-chrome {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+body.houseops-command-v2 .skyesol-living-field {
+  z-index: 0;
+  opacity: 0.38;
+  mix-blend-mode: screen;
+}
+
+body.houseops-command-v2 .skyesol-grain {
+  z-index: 1;
+  opacity: 0.075;
+}
+
+body.houseops-command-v2 .skyesol-scanline {
+  z-index: 3;
+  opacity: 0.032;
+}
+
+.houseops-command-v2 .mcp-neon-scroll-rail-y {
+  width: 18px;
+}
+
+.houseops-command-v2 .mcp-neon-scroll-rail-x {
+  height: 18px;
+}
+
+.houseops-command-v2 .platform {
+  position: relative;
+  z-index: 2;
+  grid-template-columns: 306px minmax(0, 1fr);
+  background:
+    linear-gradient(90deg, rgba(244, 213, 139, 0.05), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 28%);
+  isolation: isolate;
+}
+
+.houseops-command-v2 .rail {
+  padding: 22px 18px 18px;
+  border-right: 1px solid rgba(244, 213, 139, 0.22);
+  background:
+    linear-gradient(180deg, rgba(7, 8, 6, 0.96), rgba(13, 14, 12, 0.9)),
+    linear-gradient(90deg, rgba(119, 230, 241, 0.08), transparent 48%);
+  box-shadow: 22px 0 70px rgba(0, 0, 0, 0.38);
+}
+
+.houseops-command-v2 .brand {
+  gap: 12px;
+  min-height: 78px;
+  padding: 6px 0 20px;
+  border-bottom-color: rgba(244, 213, 139, 0.22);
+}
+
+.houseops-command-v2 .brandMark {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 18px rgba(244, 213, 139, 0.22));
+}
+
+.houseops-command-v2 .brandText b {
+  color: #fff7e6;
+  font-size: 17px;
+  line-height: 1.05;
+}
+
+.houseops-command-v2 .brandText span,
+.houseops-command-v2 .small-copy {
+  color: rgba(223, 221, 207, 0.68);
+}
+
+.houseops-command-v2 .nav {
+  gap: 8px;
+}
+
+.houseops-command-v2 .nav a {
+  grid-template-columns: 40px 1fr;
+  min-height: 54px;
+  border-color: rgba(255, 255, 255, 0.065);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+  transition: transform 0.46s var(--ease-expo-out), border-color 0.46s var(--ease-expo-out), background 0.46s var(--ease-expo-out);
+}
+
+.houseops-command-v2 .nav a span:first-child {
+  width: 31px;
+  height: 31px;
+  border-color: rgba(119, 230, 241, 0.18);
+  background: rgba(119, 230, 241, 0.075);
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 800;
+}
+
+.houseops-command-v2 .nav a.active,
+.houseops-command-v2 .nav a:hover {
+  transform: translateX(2px);
+  border-color: rgba(119, 230, 241, 0.34);
+  background: linear-gradient(90deg, rgba(119, 230, 241, 0.1), rgba(244, 213, 139, 0.045));
+}
+
+.houseops-command-v2 .railFooter {
+  gap: 9px;
+}
+
+.houseops-command-v2 .railFooter .btn {
+  justify-content: center;
+  width: 100%;
+}
+
+.houseops-command-v2 .main {
+  position: relative;
+  min-width: 0;
+  padding: 22px clamp(18px, 3vw, 38px) 52px;
+}
+
+.houseops-command-v2 .topbar {
+  position: relative;
+  top: auto;
+  z-index: 24;
+  min-height: 76px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(244, 213, 139, 0.17);
+  border-radius: 8px;
+  background: rgba(7, 8, 6, 0.78);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.houseops-command-v2 .crumb {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.houseops-command-v2 .title h1 {
+  font-size: 2.5rem;
+  font-weight: 850;
+}
+
+.houseops-command-v2 .title p {
+  max-width: 900px;
+  color: rgba(223, 221, 207, 0.78);
+}
+
+.houseops-command-v2 .neon-gradient-text {
+  background: linear-gradient(92deg, #fff7e6 0%, #f4d58b 32%, #77e6f1 68%, #80d991 100%);
+  background-size: 180% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 22px rgba(119, 230, 241, 0.11);
+}
+
+.houseops-command-v2 .btn {
+  min-height: 40px;
+  border-color: rgba(244, 213, 139, 0.18);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: transform 0.46s var(--ease-expo-out), border-color 0.46s var(--ease-expo-out), background 0.46s var(--ease-expo-out);
+}
+
+.houseops-command-v2 .btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(119, 230, 241, 0.42);
+  background: rgba(119, 230, 241, 0.1);
+}
+
+.houseops-command-v2 .btn.primary {
+  border-color: rgba(244, 213, 139, 0.58);
+  background: linear-gradient(135deg, #f4d58b, #77e6f1);
+  color: #080906;
+  box-shadow: 0 12px 34px rgba(119, 230, 241, 0.14);
+}
+
+.houseops-command-v2 .grid {
+  gap: 16px;
+}
+
+.houseops-command-v2 .heroBand {
+  position: relative;
+  min-height: 310px;
+  padding: clamp(18px, 3vw, 28px);
+  border-color: rgba(244, 213, 139, 0.22);
+  background:
+    linear-gradient(135deg, rgba(244, 213, 139, 0.12), rgba(119, 230, 241, 0.06) 38%, rgba(8, 9, 6, 0.72)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.032) 0 1px, transparent 1px 38px),
+    rgba(8, 9, 6, 0.78);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.38);
+}
+
+.houseops-command-v2 .heroBand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(244, 213, 139, 0.18), transparent 16%, transparent 84%, rgba(119, 230, 241, 0.12));
+  opacity: 0.48;
+}
+
+.houseops-command-v2 .heroCopy {
+  position: relative;
+  z-index: 1;
+}
+
+.houseops-command-v2 .heroCopy h2 {
+  max-width: 940px;
+  font-size: 4.5rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+  background: linear-gradient(100deg, #fff7e6, #f4d58b 42%, #77e6f1 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.houseops-command-v2 .heroCopy p {
+  max-width: 780px;
+  color: rgba(251, 243, 228, 0.78);
+  font-size: 15px;
+}
+
+.houseops-command-v2 .opsMap {
+  z-index: 1;
+  min-height: 260px;
+  border-color: rgba(119, 230, 241, 0.22);
+  background:
+    linear-gradient(90deg, rgba(119,230,241,0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(244,213,139,0.06) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255,255,255,0.035), rgba(0,0,0,0.18));
+  background-size: 34px 34px, 34px 34px, auto;
+}
+
+.houseops-command-v2 .opsMap::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(244, 213, 139, 0.18);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.houseops-command-v2 .routeLine {
+  height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--cyan), var(--green));
+  box-shadow: 0 0 16px rgba(119, 230, 241, 0.32);
+}
+
+.houseops-command-v2 .pin {
+  border-color: #fff7e6;
+  background: var(--cyan);
+  box-shadow: 0 0 0 6px rgba(119, 230, 241, 0.13), 0 0 18px rgba(119, 230, 241, 0.32);
+}
+
+.houseops-command-v2 .kpis {
+  gap: 12px;
+}
+
+.houseops-command-v2 .kpi {
+  position: relative;
+  overflow: hidden;
+  min-height: 116px;
+  padding: 18px;
+  border-color: rgba(244, 213, 139, 0.17);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.072), rgba(255,255,255,0.022)),
+    rgba(10, 11, 8, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.houseops-command-v2 .kpi::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(var(--amber), var(--cyan), var(--green));
+}
+
+.houseops-command-v2 .kpi .num {
+  color: #fff7e6;
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.houseops-command-v2 .kpi .label {
+  margin-top: 12px;
+  color: rgba(223, 221, 207, 0.7);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+}
+
+.houseops-command-v2 .panel,
+.houseops-command-v2 .planCard,
+.houseops-command-v2 .lessonCard,
+.houseops-command-v2 .bridgeCard,
+.houseops-command-v2 .lane,
+.houseops-command-v2 .workColumn,
+.houseops-command-v2 .workCard,
+.houseops-command-v2 .runtimeRow,
+.houseops-command-v2 .event,
+.houseops-command-v2 .alertItem,
+.houseops-command-v2 .emptyPanel {
+  border-color: rgba(244, 213, 139, 0.16);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+    rgba(9, 10, 7, 0.74);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.26);
+}
+
+.houseops-command-v2 .panel {
+  backdrop-filter: blur(14px);
+}
+
+.houseops-command-v2 .panelHead {
+  min-height: 62px;
+  padding: 16px 18px;
+  border-bottom-color: rgba(244, 213, 139, 0.14);
+  background: linear-gradient(90deg, rgba(244, 213, 139, 0.08), rgba(119, 230, 241, 0.035), transparent);
+}
+
+.houseops-command-v2 .panelHead h2,
+.houseops-command-v2 .panelHead h3 {
+  color: #fff7e6;
+  font-size: 16px;
+}
+
+.houseops-command-v2 .panelHead p {
+  color: rgba(223, 221, 207, 0.62);
+}
+
+.houseops-command-v2 .panelBody {
+  padding: 18px;
+}
+
+.houseops-command-v2 .commandDeck,
+.houseops-command-v2 .workBoard,
+.houseops-command-v2 .planGrid,
+.houseops-command-v2 .tutorialGrid,
+.houseops-command-v2 .bridgeGrid {
+  gap: 14px;
+}
+
+.houseops-command-v2 .intakeForm {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(244, 213, 139, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.028);
+}
+
+.houseops-command-v2 .intakeForm h3 {
+  margin: 0 0 2px;
+  color: #fff7e6;
+}
+
+.houseops-command-v2 .intakeForm label,
+.houseops-command-v2 .field label {
+  color: rgba(223, 221, 207, 0.72);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.houseops-command-v2 input,
+.houseops-command-v2 select,
+.houseops-command-v2 textarea {
+  min-height: 42px;
+  border-color: rgba(244, 213, 139, 0.17);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff7e6;
+}
+
+.houseops-command-v2 input:focus,
+.houseops-command-v2 select:focus,
+.houseops-command-v2 textarea:focus {
+  border-color: rgba(119, 230, 241, 0.62);
+  box-shadow: 0 0 0 3px rgba(119, 230, 241, 0.1);
+}
+
+.houseops-command-v2 .workColumn {
+  padding: 13px;
+}
+
+.houseops-command-v2 .workColumn h3 {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+}
+
+.houseops-command-v2 .workCard {
+  padding: 13px;
+}
+
+.houseops-command-v2 .workCard b,
+.houseops-command-v2 .lane h3,
+.houseops-command-v2 .lessonCard h3,
+.houseops-command-v2 .planCard h3 {
+  color: #fff7e6;
+}
+
+.houseops-command-v2 .lane {
+  min-height: 132px;
+  transition: transform 0.46s var(--ease-expo-out), border-color 0.46s var(--ease-expo-out), background 0.46s var(--ease-expo-out);
+}
+
+.houseops-command-v2 a.lane:hover,
+.houseops-command-v2 .lessonCard:hover,
+.houseops-command-v2 .planCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(119, 230, 241, 0.35);
+  background:
+    linear-gradient(180deg, rgba(119,230,241,0.08), rgba(244,213,139,0.035)),
+    rgba(9, 10, 7, 0.8);
+}
+
+.houseops-command-v2 .planCard.active {
+  border-color: rgba(244, 213, 139, 0.54);
+  background:
+    linear-gradient(180deg, rgba(244,213,139,0.12), rgba(119,230,241,0.045)),
+    rgba(9, 10, 7, 0.84);
+}
+
+.houseops-command-v2 .planCard strong {
+  color: var(--amber);
+}
+
+.houseops-command-v2 .lessonCard > span {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.houseops-command-v2 .lessonCard.done {
+  border-color: rgba(128, 217, 145, 0.34);
+}
+
+.houseops-command-v2 .runtimeRow,
+.houseops-command-v2 .event,
+.houseops-command-v2 .alertItem {
+  box-shadow: none;
+}
+
+.houseops-command-v2 code {
+  color: #a9f5ff;
+}
+
+.houseops-command-v2 table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.houseops-command-v2 th {
+  color: var(--amber);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+
+.houseops-command-v2 td {
+  border-bottom-color: rgba(244, 213, 139, 0.09);
+}
+
+.houseops-command-v2 tbody tr:hover td {
+  background: rgba(119, 230, 241, 0.035);
+}
+
+.houseops-command-v2 .badge {
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.houseops-command-v2 .meter {
+  background: rgba(255,255,255,0.06);
+}
+
+.houseops-command-v2 .meter i {
+  background: linear-gradient(90deg, var(--amber), var(--cyan), var(--green));
+}
+
+.houseops-command-v2 .toast {
+  border: 1px solid rgba(244, 213, 139, 0.38);
+  border-radius: 8px;
+  background: rgba(7, 8, 6, 0.92);
+  color: #fff7e6;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.42), 0 0 26px rgba(119,230,241,0.14);
+}
+
+@media (max-width: 1050px) {
+  .houseops-command-v2 .platform {
+    grid-template-columns: 1fr;
+  }
+
+  .houseops-command-v2 .rail {
+    position: relative;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(244, 213, 139, 0.18);
+  }
+
+  .houseops-command-v2 .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .houseops-command-v2 .main {
+    padding: 14px 12px 40px;
+  }
+
+  .houseops-command-v2 .topbar {
+    position: relative;
+    top: auto;
+    padding: 14px;
+  }
+
+  .houseops-command-v2 .heroBand {
+    min-height: 0;
+    padding: 16px;
+  }
+
+  .houseops-command-v2 .heroCopy h2 {
+    font-size: 2.35rem;
+    line-height: 1;
+  }
+
+  .houseops-command-v2 .nav,
+  .houseops-command-v2 .kpis,
+  .houseops-command-v2 .laneGrid,
+  .houseops-command-v2 .commandDeck,
+  .houseops-command-v2 .workBoard,
+  .houseops-command-v2 .planGrid,
+  .houseops-command-v2 .tutorialGrid,
+  .houseops-command-v2 .bridgeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .houseops-command-v2 .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* HouseOperations radical v3: top command floor, not the previous sidebar app. */
+body.houseops-command-v3 {
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --bg: #f6f7ef;
+  --panel: rgba(255, 255, 251, 0.92);
+  --panel-2: rgba(10, 11, 10, 0.94);
+  --line: rgba(13, 14, 12, 0.16);
+  --line-strong: rgba(13, 14, 12, 0.34);
+  --text: #10110f;
+  --muted: #62675d;
+  --soft: #262a24;
+  --cyan: #00a6d6;
+  --green: #9bdc28;
+  --amber: #f4b23d;
+  --red: #ff4f68;
+  --blue: #355cff;
+  --ink: #080908;
+  --shadow: 0 30px 90px rgba(8, 9, 8, 0.14);
+  color: var(--text);
+  overflow-x: clip;
+  background:
+    linear-gradient(90deg, rgba(8, 9, 8, 0.055) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(8, 9, 8, 0.045) 1px, transparent 1px),
+    linear-gradient(135deg, #f7f8ef 0%, #e7f1f1 44%, #f7f0ec 100%);
+  background-size: 64px 64px, 64px 64px, auto;
+}
+
+body.houseops-command-v3::before {
+  content: "HOUSEOPS RADICAL V3";
+  position: fixed;
+  right: 18px;
+  bottom: 20px;
+  z-index: 18;
+  pointer-events: none;
+  padding: 7px 9px;
+  border: 1px solid rgba(8, 9, 8, 0.14);
+  background: rgba(246, 247, 239, 0.72);
+  color: rgba(8, 9, 8, 0.52);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+  backdrop-filter: blur(14px);
+}
+
+body.houseops-command-v3 > .neon-motion-chrome,
+body.houseops-command-v3 .skyesol-living-field,
+body.houseops-command-v3 .skyesol-grain,
+body.houseops-command-v3 .skyesol-scanline {
+  pointer-events: none;
+}
+
+body.houseops-command-v3 .skyesol-living-field {
+  z-index: 0;
+  opacity: 0.2;
+  filter: saturate(1.15) contrast(1.08);
+  mix-blend-mode: multiply;
+}
+
+body.houseops-command-v3 .skyesol-grain {
+  z-index: 1;
+  opacity: 0.08;
+}
+
+body.houseops-command-v3 .skyesol-scanline {
+  z-index: 3;
+  opacity: 0.025;
+}
+
+.houseops-command-v3 .mcp-neon-scroll-rail-y {
+  width: 18px;
+}
+
+.houseops-command-v3 .mcp-neon-scroll-rail-x {
+  height: 18px;
+}
+
+.houseops-command-v3 .platform {
+  position: relative;
+  z-index: 2;
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.houseops-command-v3 .rail {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  width: 100%;
+  height: auto;
+  min-height: 96px;
+  padding: 12px 18px;
+  display: grid;
+  grid-template-columns: 286px minmax(0, 1fr) minmax(320px, 0.7fr);
+  gap: 14px;
+  align-items: center;
+  border-right: 0;
+  border-bottom: 3px solid #080908;
+  background:
+    linear-gradient(90deg, rgba(155, 220, 40, 0.16), transparent 28%, rgba(0, 166, 214, 0.14)),
+    rgba(246, 247, 239, 0.92);
+  box-shadow: 0 18px 48px rgba(8, 9, 8, 0.13);
+  backdrop-filter: blur(22px);
+}
+
+.houseops-command-v3 .brand {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+  min-height: 70px;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+}
+
+.houseops-command-v3 .brandMark {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(8, 9, 8, 0.18));
+}
+
+.houseops-command-v3 .brandText b {
+  display: block;
+  color: #080908;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.houseops-command-v3 .brandText span {
+  display: block;
+  margin-top: 5px;
+  color: #555b50;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .nav {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 6px;
+  border: 1px solid rgba(8, 9, 8, 0.14);
+  background: rgba(255, 255, 251, 0.6);
+  scrollbar-width: thin;
+}
+
+.houseops-command-v3 .nav a {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  flex: 0 0 132px;
+  min-height: 58px;
+  padding: 8px;
+  border: 1px solid rgba(8, 9, 8, 0.12);
+  border-radius: 0;
+  background: rgba(255, 255, 251, 0.72);
+  color: #10110f;
+  box-shadow: none;
+  transition: transform 0.34s var(--ease-expo-out), background 0.34s var(--ease-expo-out), color 0.34s var(--ease-expo-out);
+}
+
+.houseops-command-v3 .nav a span:first-child {
+  width: 28px;
+  height: 42px;
+  border: 0;
+  border-right: 2px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: #080908;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .nav a strong,
+.houseops-command-v3 .nav a small {
+  display: block;
+  letter-spacing: 0;
+}
+
+.houseops-command-v3 .nav a strong {
+  color: inherit;
+  font-size: 13px;
+}
+
+.houseops-command-v3 .nav a small {
+  margin-top: 3px;
+  color: rgba(16, 17, 15, 0.62);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .nav a.active,
+.houseops-command-v3 .nav a:hover {
+  transform: translateY(-2px);
+  background: #080908;
+  color: #f6f7ef;
+}
+
+.houseops-command-v3 .nav a.active small,
+.houseops-command-v3 .nav a:hover small {
+  color: rgba(246, 247, 239, 0.68);
+}
+
+.houseops-command-v3 .railFooter {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.houseops-command-v3 .railFooter .small-copy {
+  flex-basis: 100%;
+  color: rgba(8, 9, 8, 0.56);
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.houseops-command-v3 .main {
+  position: relative;
+  z-index: 2;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 26px 24px 64px;
+}
+
+.houseops-command-v3 .topbar {
+  min-height: 124px;
+  margin: 0 0 18px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 18px;
+  border: 3px solid #080908;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, #080908 0 12px, transparent 12px),
+    linear-gradient(135deg, rgba(255, 79, 104, 0.12), rgba(155, 220, 40, 0.12) 48%, rgba(0, 166, 214, 0.12)),
+    rgba(255, 255, 251, 0.88);
+  box-shadow: 14px 14px 0 rgba(8, 9, 8, 0.13);
+}
+
+.houseops-command-v3 .crumb {
+  color: #080908;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .title h1 {
+  margin-top: 8px;
+  color: #080908;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  font-size: 4rem;
+  font-weight: 950;
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .title p {
+  max-width: 940px;
+  margin-top: 10px;
+  color: #454a43;
+  font-size: 15px;
+}
+
+.houseops-command-v3 .actions {
+  align-content: start;
+  align-items: start;
+  gap: 8px;
+}
+
+.houseops-command-v3 .btn {
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: rgba(255, 255, 251, 0.86);
+  color: #080908;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 rgba(8, 9, 8, 0.18);
+  transition: transform 0.28s var(--ease-expo-out), box-shadow 0.28s var(--ease-expo-out), background 0.28s var(--ease-expo-out);
+}
+
+.houseops-command-v3 .btn:hover {
+  transform: translate(-1px, -1px);
+  background: #f4b23d;
+  box-shadow: 6px 6px 0 rgba(8, 9, 8, 0.26);
+}
+
+.houseops-command-v3 .btn.primary {
+  border-color: #080908;
+  background: #9bdc28;
+  color: #080908;
+}
+
+.houseops-command-v3 .btn.danger {
+  background: #ff4f68;
+  color: #fff;
+}
+
+.houseops-command-v3 .grid,
+.houseops-command-v3 .opsFloor {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.houseops-command-v3 .span12 { grid-column: span 12; }
+.houseops-command-v3 .span8 { grid-column: span 8; }
+.houseops-command-v3 .span7 { grid-column: span 7; }
+.houseops-command-v3 .span6 { grid-column: span 6; }
+.houseops-command-v3 .span5 { grid-column: span 5; }
+.houseops-command-v3 .span4 { grid-column: span 4; }
+
+.houseops-command-v3 .commandMarquee {
+  min-height: 430px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 18px;
+  padding: 18px;
+  border: 3px solid #080908;
+  background:
+    linear-gradient(90deg, rgba(255, 79, 104, 0.18) 0 18px, transparent 18px),
+    repeating-linear-gradient(90deg, rgba(8, 9, 8, 0.08) 0 1px, transparent 1px 38px),
+    #fcfcf5;
+  box-shadow: 18px 18px 0 rgba(8, 9, 8, 0.13);
+}
+
+.houseops-command-v3 .marqueeCopy {
+  min-width: 0;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  background: #080908;
+  color: #f6f7ef;
+}
+
+.houseops-command-v3 .marqueeCopy .crumb {
+  color: #9bdc28;
+}
+
+.houseops-command-v3 .marqueeCopy h2 {
+  margin: 0;
+  max-width: 980px;
+  color: transparent;
+  background: linear-gradient(92deg, #f6f7ef 0%, #9bdc28 34%, #f4b23d 64%, #00a6d6 100%);
+  background-size: 180% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: 5rem;
+  line-height: 0.92;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.houseops-command-v3 .marqueeCopy p {
+  max-width: 860px;
+  margin: 0;
+  color: rgba(246, 247, 239, 0.78);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.houseops-command-v3 .commandActions {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.houseops-command-v3 .missionStack {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.houseops-command-v3 .missionPlate {
+  position: relative;
+  min-height: 178px;
+  padding: 16px;
+  display: grid;
+  align-content: space-between;
+  border: 3px solid #080908;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 251, 0.92), rgba(231, 241, 241, 0.84));
+  color: #080908;
+  overflow: hidden;
+}
+
+.houseops-command-v3 .missionPlate::after {
+  content: "";
+  position: absolute;
+  inset: auto -20px 12px auto;
+  width: 120px;
+  height: 18px;
+  transform: rotate(-25deg);
+  background: #00a6d6;
+}
+
+.houseops-command-v3 .missionPlate.mainPlate {
+  grid-row: span 2;
+  min-height: 100%;
+  background: #f4b23d;
+}
+
+.houseops-command-v3 .missionPlate.accent {
+  background: #9bdc28;
+}
+
+.houseops-command-v3 .missionPlate span,
+.houseops-command-v3 .missionPlate small {
+  position: relative;
+  z-index: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .missionPlate strong {
+  position: relative;
+  z-index: 1;
+  font-size: 3.25rem;
+  line-height: 0.9;
+  overflow-wrap: normal;
+}
+
+.houseops-command-v3 .missionPlate.mainPlate strong {
+  font-size: 4.1rem;
+}
+
+.houseops-command-v3 .panel,
+.houseops-command-v3 .planCard,
+.houseops-command-v3 .lessonCard,
+.houseops-command-v3 .bridgeCard,
+.houseops-command-v3 .lane,
+.houseops-command-v3 .workColumn,
+.houseops-command-v3 .workCard,
+.houseops-command-v3 .runtimeRow,
+.houseops-command-v3 .event,
+.houseops-command-v3 .alertItem,
+.houseops-command-v3 .emptyPanel,
+.houseops-command-v3 .runwayTile,
+.houseops-command-v3 .spineNode {
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: rgba(255, 255, 251, 0.9);
+  color: #10110f;
+  box-shadow: 8px 8px 0 rgba(8, 9, 8, 0.1);
+}
+
+.houseops-command-v3 .panel {
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.houseops-command-v3 .panelHead {
+  min-height: 66px;
+  padding: 14px 16px;
+  border-bottom: 2px solid #080908;
+  background:
+    linear-gradient(90deg, #080908 0 10px, transparent 10px),
+    linear-gradient(90deg, rgba(155, 220, 40, 0.22), rgba(0, 166, 214, 0.14));
+}
+
+.houseops-command-v3 .panelHead h2,
+.houseops-command-v3 .panelHead h3 {
+  color: #080908;
+  font-size: 18px;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .panelHead p,
+.houseops-command-v3 .small-copy {
+  color: #555b50;
+}
+
+.houseops-command-v3 .panelBody {
+  padding: 16px;
+}
+
+.houseops-command-v3 .commandTicker .kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.houseops-command-v3 .kpi {
+  min-height: 112px;
+  padding: 14px;
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: #fffef5;
+  box-shadow: 6px 6px 0 rgba(8, 9, 8, 0.12);
+}
+
+.houseops-command-v3 .kpi:nth-child(2) { background: #ffe6e9; }
+.houseops-command-v3 .kpi:nth-child(3) { background: #e3f8ff; }
+.houseops-command-v3 .kpi:nth-child(4) { background: #ecffd3; }
+
+.houseops-command-v3 .kpi .num {
+  color: #080908;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.houseops-command-v3 .kpi .label {
+  margin-top: 10px;
+  color: #555b50;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .securityRunway .panelBody,
+.houseops-command-v3 .runwayGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.houseops-command-v3 .runwayTile {
+  min-height: 190px;
+  padding: 14px;
+  display: grid;
+  align-content: space-between;
+  transition: transform 0.28s var(--ease-expo-out), background 0.28s var(--ease-expo-out);
+}
+
+.houseops-command-v3 .runwayTile:hover {
+  transform: translateY(-3px);
+  background: #080908;
+  color: #f6f7ef;
+}
+
+.houseops-command-v3 .runwayTile span,
+.houseops-command-v3 .spineNode > span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  color: #ff4f68;
+}
+
+.houseops-command-v3 .runwayTile h3,
+.houseops-command-v3 .lane h3,
+.houseops-command-v3 .workCard b,
+.houseops-command-v3 .lessonCard h3,
+.houseops-command-v3 .planCard h3,
+.houseops-command-v3 .spineNode h3 {
+  margin-top: 0;
+  color: inherit;
+}
+
+.houseops-command-v3 .runwayTile p,
+.houseops-command-v3 .lane p,
+.houseops-command-v3 .lessonCard p,
+.houseops-command-v3 .workCard p,
+.houseops-command-v3 .spineNode p {
+  color: inherit;
+  opacity: 0.72;
+}
+
+.houseops-command-v3 .proofSpine .panelBody {
+  display: grid;
+  gap: 10px;
+}
+
+.houseops-command-v3 .spineNode {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  box-shadow: none;
+}
+
+.houseops-command-v3 .commandDeck {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.houseops-command-v3 .intakeForm {
+  padding: 14px;
+  border: 2px solid #080908;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 251, 0.92), rgba(231, 241, 241, 0.82));
+  box-shadow: none;
+}
+
+.houseops-command-v3 .intakeForm h3 {
+  margin: 0;
+  color: #080908;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 label,
+.houseops-command-v3 .intakeForm label {
+  color: #353932;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.houseops-command-v3 input,
+.houseops-command-v3 select,
+.houseops-command-v3 textarea {
+  min-height: 42px;
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: #fffef5;
+  color: #080908;
+  box-shadow: inset 0 0 0 1px rgba(8, 9, 8, 0.05);
+}
+
+.houseops-command-v3 input:focus,
+.houseops-command-v3 select:focus,
+.houseops-command-v3 textarea:focus {
+  outline: 3px solid rgba(0, 166, 214, 0.34);
+  outline-offset: 1px;
+}
+
+.houseops-command-v3 .tableWrap {
+  overflow-x: auto;
+}
+
+.houseops-command-v3 table {
+  min-width: 720px;
+  border-collapse: collapse;
+}
+
+.houseops-command-v3 th {
+  color: #080908;
+  background: #f4b23d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 th,
+.houseops-command-v3 td {
+  border-bottom: 2px solid rgba(8, 9, 8, 0.12);
+}
+
+.houseops-command-v3 tbody tr:hover td {
+  background: rgba(155, 220, 40, 0.16);
+}
+
+.houseops-command-v3 .workBoard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.houseops-command-v3 .workColumn {
+  min-width: 220px;
+  padding: 12px;
+  background: #fffef5;
+}
+
+.houseops-command-v3 .workColumn h3 {
+  margin-top: 0;
+  color: #080908;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .workCard,
+.houseops-command-v3 .lane,
+.houseops-command-v3 .lessonCard,
+.houseops-command-v3 .planCard,
+.houseops-command-v3 .bridgeCard,
+.houseops-command-v3 .runtimeRow,
+.houseops-command-v3 .event,
+.houseops-command-v3 .alertItem {
+  box-shadow: none;
+}
+
+.houseops-command-v3 .workCard {
+  padding: 12px;
+  background: #e3f8ff;
+}
+
+.houseops-command-v3 .alertItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px;
+  background: #ffe6e9;
+}
+
+.houseops-command-v3 .laneGrid,
+.houseops-command-v3 .planGrid,
+.houseops-command-v3 .tutorialGrid,
+.houseops-command-v3 .bridgeGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.houseops-command-v3 .laneGrid,
+.houseops-command-v3 .planGrid,
+.houseops-command-v3 .bridgeGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.houseops-command-v3 .tutorialGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.houseops-command-v3 .lane,
+.houseops-command-v3 .lessonCard,
+.houseops-command-v3 .planCard,
+.houseops-command-v3 .bridgeCard {
+  padding: 14px;
+}
+
+.houseops-command-v3 .planCard {
+  background: #fffef5;
+}
+
+.houseops-command-v3 .planCard.active {
+  background: #9bdc28;
+}
+
+.houseops-command-v3 .planCard strong {
+  display: block;
+  color: #080908;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.houseops-command-v3 .planCard strong span {
+  font-size: 1rem;
+}
+
+.houseops-command-v3 .lessonCard.done {
+  background: #ecffd3;
+}
+
+.houseops-command-v3 .lessonCard > span {
+  color: #ff4f68;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 950;
+}
+
+.houseops-command-v3 .runtimeList,
+.houseops-command-v3 .timeline,
+.houseops-command-v3 .alertList {
+  display: grid;
+  gap: 10px;
+}
+
+.houseops-command-v3 .runtimeRow,
+.houseops-command-v3 .event {
+  padding: 12px;
+  background: #fffef5;
+}
+
+.houseops-command-v3 code {
+  color: #005f7d;
+  overflow-wrap: anywhere;
+}
+
+.houseops-command-v3 .badge {
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: #fffef5;
+  color: #080908;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.houseops-command-v3 .badge.good { background: #9bdc28; }
+.houseops-command-v3 .badge.warn { background: #f4b23d; }
+.houseops-command-v3 .badge.bad { background: #ff4f68; color: #fff; }
+.houseops-command-v3 .badge.info { background: #e3f8ff; }
+
+.houseops-command-v3 .meter {
+  height: 14px;
+  border: 2px solid #080908;
+  border-radius: 0;
+  background: #fffef5;
+}
+
+.houseops-command-v3 .meter i {
+  background: linear-gradient(90deg, #9bdc28, #f4b23d, #ff4f68);
+}
+
+.houseops-command-v3 .toast {
+  border: 3px solid #080908;
+  border-radius: 0;
+  background: #9bdc28;
+  color: #080908;
+  font-weight: 950;
+  box-shadow: 10px 10px 0 rgba(8, 9, 8, 0.2);
+}
+
+@media (max-width: 1220px) {
+  .houseops-command-v3 .rail {
+    grid-template-columns: 1fr;
+  }
+
+  .houseops-command-v3 .railFooter {
+    justify-content: flex-start;
+  }
+
+  .houseops-command-v3 .railFooter .small-copy {
+    text-align: left;
+  }
+
+  .houseops-command-v3 .commandMarquee {
+    grid-template-columns: 1fr;
+  }
+
+  .houseops-command-v3 .missionStack {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .houseops-command-v3 .missionPlate.mainPlate {
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .houseops-command-v3 .main {
+    padding: 16px 12px 56px;
+  }
+
+  .houseops-command-v3 .topbar {
+    grid-template-columns: 1fr;
+    box-shadow: 8px 8px 0 rgba(8, 9, 8, 0.13);
+  }
+
+  .houseops-command-v3 .title h1 {
+    font-size: 2.8rem;
+  }
+
+  .houseops-command-v3 .marqueeCopy h2 {
+    font-size: 3.3rem;
+  }
+
+  .houseops-command-v3 .missionStack,
+  .houseops-command-v3 .commandTicker .kpis,
+  .houseops-command-v3 .runwayGrid,
+  .houseops-command-v3 .laneGrid,
+  .houseops-command-v3 .planGrid,
+  .houseops-command-v3 .tutorialGrid,
+  .houseops-command-v3 .bridgeGrid,
+  .houseops-command-v3 .commandDeck {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .houseops-command-v3 .span8,
+  .houseops-command-v3 .span7,
+  .houseops-command-v3 .span6,
+  .houseops-command-v3 .span5,
+  .houseops-command-v3 .span4 {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 560px) {
+  body.houseops-command-v3::before {
+    display: none;
+  }
+
+  .houseops-command-v3 .rail {
+    padding: 10px;
+  }
+
+  .houseops-command-v3 .brand {
+    grid-template-columns: 46px 1fr;
+  }
+
+  .houseops-command-v3 .brandMark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .houseops-command-v3 .brandText b {
+    font-size: 16px;
+  }
+
+  .houseops-command-v3 .nav a {
+    flex-basis: 124px;
+  }
+
+  .houseops-command-v3 .railFooter {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .houseops-command-v3 .railFooter .btn {
+    width: auto;
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+
+  .houseops-command-v3 .railFooter .small-copy {
+    display: none;
+  }
+
+  .houseops-command-v3 .topbar,
+  .houseops-command-v3 .commandMarquee {
+    border-width: 2px;
+    box-shadow: 6px 6px 0 rgba(8, 9, 8, 0.13);
+  }
+
+  .houseops-command-v3 .topbar {
+    display: none;
+  }
+
+  .houseops-command-v3 .title h1 {
+    font-size: 2.2rem;
+  }
+
+  .houseops-command-v3 .marqueeCopy {
+    padding: 16px;
+  }
+
+  .houseops-command-v3 .marqueeCopy h2 {
+    font-size: 2.2rem;
+  }
+
+  .houseops-command-v3 .marqueeCopy p {
+    font-size: 14px;
+  }
+
+  .houseops-command-v3 .missionStack,
+  .houseops-command-v3 .commandTicker .kpis,
+  .houseops-command-v3 .runwayGrid,
+  .houseops-command-v3 .laneGrid,
+  .houseops-command-v3 .planGrid,
+  .houseops-command-v3 .tutorialGrid,
+  .houseops-command-v3 .bridgeGrid,
+  .houseops-command-v3 .commandDeck {
+    grid-template-columns: 1fr;
+  }
+
+  .houseops-command-v3 .missionPlate {
+    min-height: 132px;
+  }
+
+  .houseops-command-v3 .missionPlate strong {
+    font-size: 2.7rem;
+  }
+
+  .houseops-command-v3 .missionPlate.mainPlate strong {
+    font-size: 3rem;
+  }
+
+  .houseops-command-v3 .actions,
+  .houseops-command-v3 .commandActions {
+    width: 100%;
+  }
+
+  .houseops-command-v3 .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .houseops-command-v3 .alertItem,
+  .houseops-command-v3 .spineNode {
+    grid-template-columns: 1fr;
+  }
+}

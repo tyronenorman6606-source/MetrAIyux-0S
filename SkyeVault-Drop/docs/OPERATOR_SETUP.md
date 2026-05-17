@@ -60,7 +60,7 @@ npm run vault:dry-run
 npm run vault:push
 ```
 
-The dry run creates a sanitized zip and reports how many files were included and how many secret-looking files were excluded. The push command uploads the zip through the deployed vault, finalizes the R2 multipart upload, and writes a local `.skyevault-out/skyevault-receipt-*.json` file.
+The dry run creates a sanitized zip and reports how many files were included and how many secret-looking files were excluded. The push command uploads the zip through the deployed vault, finalizes the R2 multipart upload, prints a short-lived download link for the archived package, and writes a local `.skyevault-out/skyevault-receipt-*.json` file with the same recovery metadata.
 
 ## Developer Workspace Vaults
 

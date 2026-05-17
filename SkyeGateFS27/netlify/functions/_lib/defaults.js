@@ -53,7 +53,7 @@ const DEFAULTS = {
 
   // ── Stripe defaults ─────────────────────────────────────
   STRIPE_CURRENCY:                   "usd",
-  PUBLIC_APP_ORIGIN:                 "https://skyesol.netlify.app",
+  PUBLIC_APP_ORIGIN:                 "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
 
   // ── Voice / Twilio pricing ──────────────────────────────
   VOICE_AI_RELAY_USD_PER_MIN:        "0.07",

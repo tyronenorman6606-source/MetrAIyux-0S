@@ -128,7 +128,7 @@ function writeProofReel({ videoPath, posterPath }) {
 <body>
   <main>
     <h1>SkyePay Browser Action Proof</h1>
-    <p>Recorded path: open the RouteX auto-unlock SkyePay lane, fill checkout, submit dry-run checkout, and return to the FS27 preview-recorded state.</p>
+    <p>Recorded path: open the RouteX owner-approved SkyePay lane, fill checkout, submit dry-run checkout, and return to the FS27 preview-recorded state.</p>
     <video id="proofVideo" src="${videoSrc}" poster="${posterSrc}" controls autoplay muted playsinline preload="auto"></video>
   </main>
 </body>

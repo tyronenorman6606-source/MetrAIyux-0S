@@ -6,9 +6,11 @@
   "source": "SkyeHands-main/AbovetheSkye-Platforms/SkyeMusicNexus",
   "target": "QuantumSkyes/Vanta13/standalone-platforms/SkyeMusicNexus",
   "sourceDependency": false,
-  "platformState": "neofront-experiential-music-operating-stage-with-artist-exchange",
-  "note": "Rebuilt into an experiential NeoFront app surface while preserving the local SkyGate, artist, release, payment, analytics, exchange, and smoke-proof runtime. Free99 applies only to Lite; paid checkout does not create live distributor, DSP, payment, legal, label, identity-provider, Relay13 worker bridge, or deployed persistence claims until separate provider proof exists.",
+  "platformState": "roomed-neofront-music-platform-with-gated-upload-player-exchange-and-rights-vault",
+  "note": "Rebuilt into a roomed NeoFront music platform while preserving the local SkyGate, artist, release, asset upload, payment, analytics, exchange, playback, rights-vault, takedown-hold, and smoke-proof runtime. Free99 applies only to Lite; paid checkout does not create live distributor, DSP, payment, legal, label, identity-provider, Relay13 worker bridge, transcoding, or deployed provider claims until separate provider proof exists.",
   "commercial_state": "SkyeMusicNexus Lite is Free99/no charge and gate-session required; Studio, Label Command, Managed Music Ops, drop add-ons, content request add-ons, and community campaign add-ons are paid and still gate-session required.",
-  "exchange_state": "Content requests, Relay13-ready inbox threads, community posts, achievement progression, and release campaign packs are local gated proof features.",
+  "upload_state": "Gated upload/list/stream/delete actions exist in netlify/functions/music-assets.js. The browser Upload Studio can attach returned stream URLs to release tracks, and the Music Player fetches uploaded audio through authenticated SkyGate fetch before playback. The asset handler defaults to local proof storage and can use SkyeVault/Cloudflare R2 when MUSIC_NEXUS_STORAGE_BACKEND=r2 or MUSIC_NEXUS_USE_R2=1 is configured.",
+  "exchange_state": "Content requests, Relay13-ready inbox threads, community posts, achievement progression, release campaign packs, and playback stream telemetry are local gated proof features.",
+  "legal_safe_state": "Linked preview playback requires ownership and preview-use attestation; release publish, stream reporting, and operations queueing require the distribution rights gate; takedown requests place a playback hold. This is product control proof, not formal legal advice or a production DMCA-agent operation.",
   "pricing_catalog": "../data/skyemusicnexus-pricing.json"
 }

@@ -13,7 +13,9 @@
     "limits": [
       "1 artist profile",
       "1 draft release preview",
+      "1 small gated proof audio upload in the local/runtime lane",
       "sample royalty and analytics view",
+      "rights vault preview",
       "proof receipt export",
       "no payout actions",
       "no live publishing or distributor claims"
@@ -33,7 +35,10 @@
       "includes": [
         "up to 5 artists",
         "25 active releases",
+        "gated upload studio",
+        "uploaded audio vault for proof playback",
         "release workflow board",
+        "rights vault and takedown hold",
         "royalty ledger tracking",
         "payout review queue",
         "proof exports",
@@ -53,8 +58,12 @@
       "includes": [
         "up to 25 artists",
         "150 active releases",
+        "gated upload studio",
+        "uploaded audio vault for proof playback",
+        "SkyeVault/R2 storage scoping for larger catalogs",
         "operator/admin stage",
         "approval workflows",
+        "rights audit trail",
         "payout review controls",
         "analytics and reporting",
         "custom proof receipts",
@@ -73,6 +82,8 @@
       "summary": "A managed music operations room with custom limits and proof-led integrations.",
       "includes": [
         "custom artist and release limits",
+        "custom upload and storage limits",
+        "SkyeVault/R2 storage scoping for larger catalogs",
         "managed onboarding",
         "team roles",
         "client-facing music ops room",
@@ -204,6 +215,14 @@
       "summary": "Add 25 active release slots to a paid SkyeMusicNexus plan."
     },
     {
+      "id": "skyemusicnexus-gated-audio-vault-pack",
+      "name": "Gated Audio Vault Pack",
+      "amount": 79,
+      "billing": "monthly",
+      "lookup_key": "skyemusicnexus_gated_audio_vault_pack_monthly",
+      "summary": "Add a music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing."
+    },
+    {
       "id": "skyemusicnexus-white-label-artist-portal",
       "name": "White-Label Artist Portal",
       "setup": 997,
@@ -227,6 +246,11 @@
   "truth_rules": [
     "Free99 applies only to SkyeMusicNexus Lite.",
     "Every tier and add-on still requires a gate session.",
+    "Audio upload/list/stream actions remain gated even when the plan is Free99.",
+    "The local upload lane proves end-to-end upload and playback; the same asset handler can use SkyeVault/R2 when MUSIC_NEXUS_STORAGE_BACKEND=r2 or MUSIC_NEXUS_USE_R2=1 is configured.",
+    "Linked preview playback requires ownership and preview-use attestation.",
+    "Release publish, stream reporting, and operations queueing require the distribution rights gate.",
+    "Takedown requests place playback holds until operator rights review clears them.",
     "Paid checkout does not automatically activate live distributor, DSP, payment, legal, or label authority.",
     "Provider integrations require separate owner-approved proof before public claims."
   ]

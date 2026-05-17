@@ -22,9 +22,9 @@
       "id": "skyepay",
       "title": "SkyePay",
       "category": "payments",
-      "customer_choice": "Stripe-backed transaction lane with automatic unlock after confirmed payment.",
-      "replaces": ["manual_unlock_after_checkout"],
-      "fs27_tracking": ["checkout_created", "stripe_confirmed", "workspace_unlocked", "plan_policy_written"]
+      "customer_choice": "Stripe-backed transaction lane with paid status, SkyeMerit metadata, and controlled activation after confirmed payment.",
+      "replaces": ["loose_payment_links"],
+      "fs27_tracking": ["checkout_created", "stripe_confirmed", "paid_status_recorded", "owner_approval_status", "plan_policy_written"]
     },
     {
       "id": "citadeldb",

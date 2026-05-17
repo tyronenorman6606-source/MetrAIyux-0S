@@ -388,6 +388,7 @@ function renderPublishLog() {
 function labelTarget(value) {
   return {
     local: 'Local Export',
+    'skyevault-r2': 'SkyeVault/R2',
     'google-drive': 'Google Drive',
     github: 'GitHub',
     'netlify-hook': 'Netlify Hook',
@@ -397,6 +398,7 @@ function labelTarget(value) {
     facebook: 'Facebook Page',
     instagram: 'Instagram',
     linkedin: 'LinkedIn',
+    skyeVaultR2: 'SkyeVault/R2',
     googleDrive: 'Google Drive',
     netlifyHook: 'Netlify Hook',
     netlifyCli: 'Netlify CLI',
@@ -472,13 +474,14 @@ async function checkHealth(showToast = false) {
     state.health = data;
     els.engineStatus.textContent = data.keyConfigured ? 'AI ready' : 'Key missing';
     els.engineStatus.classList.toggle('danger', !data.keyConfigured);
-    els.exportStatus.textContent = data.googleDrive?.configured ? 'Drive ready' : 'Local only';
-    els.exportStatus.classList.toggle('danger', !data.googleDrive?.configured);
+    const vaultReady = Boolean(data.skyeVaultR2?.configured);
+    els.exportStatus.textContent = vaultReady ? 'Vault/R2 configured' : 'Local only';
+    els.exportStatus.classList.toggle('danger', !vaultReady);
     await loadPipelineStatus();
     await loadRuntimeStatus();
     if (showToast) {
-      const drive = data.googleDrive?.configured ? 'Google Drive ready.' : `Drive local-only. Missing: ${(data.googleDrive?.missing || []).join(', ') || 'none'}.`;
-      toast(data.keyConfigured ? `Local engine ready. Model: ${data.model}. ${drive}` : `Server running, but OPENAI_API_KEY is missing. ${drive}`);
+      const vault = vaultReady ? `SkyeVault/R2 configured: ${data.skyeVaultR2.bucket || 'bucket'} / ${data.skyeVaultR2.prefix || 'content-forge-exports'}.` : `Vault local-only. Missing: ${(data.skyeVaultR2?.missing || []).join(', ') || 'none'}.`;
+      toast(data.keyConfigured ? `Local engine ready. Model: ${data.model}. ${vault}` : `Server running, but OPENAI_API_KEY is missing. ${vault}`);
     }
   } catch (error) {
     els.engineStatus.textContent = 'Offline';
@@ -833,17 +836,16 @@ async function uploadToDrive() {
   if (!state.output.trim()) return toast('There is no output to upload.', true);
   setBusy(els.driveUploadBtn, true, 'Uploading…');
   try {
-    const data = await api('/api/export/google-drive', {
+    const data = await api('/api/export/skyevault-r2', {
       method: 'POST',
       body: { title: currentOutputTitle(), output: state.output }
     });
-    const link = data.driveFile.webViewLink ? ` Open link: ${data.driveFile.webViewLink}` : '';
-    toast(`Uploaded to Google Drive as ${data.driveFile.name}.${link}`);
+    toast(`Uploaded to SkyeVault/R2 as ${data.skyeVaultFile.objectKey}.`);
     await checkHealth();
   } catch (error) {
     toast(error.message, true);
   } finally {
-    setBusy(els.driveUploadBtn, false, 'Upload to Google Drive');
+    setBusy(els.driveUploadBtn, false, 'Upload to SkyeVault/R2');
   }
 }
 

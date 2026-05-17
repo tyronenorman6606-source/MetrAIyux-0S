@@ -38,6 +38,20 @@ const LIVE_SURFACES = [
     route_when: ['metraiyux','16 brains','command deck','autonomous business','client website','owner admin','sales deck']
   },
   {
+    id: 'valley-verified-insights',
+    name: 'Valley Verified Insights',
+    url: 'https://phx-verified-network.pages.dev/insights/',
+    purpose: 'Public business operating guide library with manual methods, 0S system handoffs, and major platform backlinks.',
+    route_when: ['valley verified','insights','blog','content','company operations','business guides','local growth']
+  },
+  {
+    id: 'valley-verified-content-scheduler',
+    name: 'Valley Verified 0S Content Scheduler',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley/content-schedule',
+    purpose: '0S Worker endpoint that reads the Valley editorial calendar, detects due guides, stores receipts, and queues publish tasks.',
+    route_when: ['content schedule','editorial calendar','publish queue','cron','scheduled articles','valley publisher']
+  },
+  {
     id: 'metraiyux-public-spectacle',
     name: 'MetrAIyux 0S Public Spectacle',
     url: 'https://metraiyux-0s-public-spectacle.pages.dev/',
@@ -193,6 +207,13 @@ function siteOperatorStatus(env) {
       queue: Boolean(env.SITE_TASK_QUEUE),
       site_operator_service: Boolean(env.SITE_OPERATOR_WORKER || env.SITE_OPERATOR_WORKER_ORIGIN),
       skygate_origin: Boolean(skygateOrigin(env))
+    },
+    valley_content_publisher: {
+      enabled: true,
+      calendar_url: valleyCalendarUrl(env),
+      schedule_cron: VALLEY_SCHEDULE_CRON,
+      queue_configured: Boolean(env.SITE_TASK_QUEUE),
+      receipt_storage_configured: Boolean(env.SITE_EVENTS_KV)
     }
   };
 }
@@ -208,6 +229,135 @@ async function readKVLedger(env, limit = 50) {
     if (item) rows.push(item);
   }
   return rows.sort((a,b)=>String(b.created_at || b.event_ts || '').localeCompare(String(a.created_at || a.event_ts || '')));
+}
+
+const VALLEY_CALENDAR_DEFAULT_URL = 'https://phx-verified-network.pages.dev/api/insights-editorial-calendar.json';
+const VALLEY_SCHEDULE_CRON = '17 13 * * 1,3,5';
+function valleyCalendarUrl(env) {
+  return String(env.VALLEY_CONTENT_CALENDAR_URL || VALLEY_CALENDAR_DEFAULT_URL).trim();
+}
+function valleyDate(value) {
+  const time = new Date(value || Date.now());
+  if (Number.isNaN(time.getTime())) return new Date().toISOString().slice(0, 10);
+  return time.toISOString().slice(0, 10);
+}
+function valleyCalendarArticles(calendar) {
+  if (Array.isArray(calendar?.all)) return calendar.all;
+  return [...(calendar?.published || []), ...(calendar?.upcoming || [])];
+}
+function valleyDueArticles(calendar, at = new Date()) {
+  const today = valleyDate(at);
+  return valleyCalendarArticles(calendar)
+    .filter(article => String(article.status || '').toLowerCase() === 'scheduled')
+    .filter(article => String(article.publish_at || article.publishAt || '') <= today)
+    .sort((a,b)=>String(a.publish_at || a.publishAt || '').localeCompare(String(b.publish_at || b.publishAt || '')));
+}
+function valleyNextArticles(calendar, at = new Date(), limit = 8) {
+  const today = valleyDate(at);
+  return valleyCalendarArticles(calendar)
+    .filter(article => String(article.status || '').toLowerCase() === 'scheduled')
+    .filter(article => String(article.publish_at || article.publishAt || '') > today)
+    .sort((a,b)=>String(a.publish_at || a.publishAt || '').localeCompare(String(b.publish_at || b.publishAt || '')))
+    .slice(0, limit);
+}
+async function fetchValleyCalendar(env) {
+  const url = valleyCalendarUrl(env);
+  const res = await fetch(url, {headers:{accept:'application/json'}});
+  const calendar = await res.json().catch(()=>null);
+  if (!res.ok || !calendar) return {ok:false, status:res.status, url, error:'Valley editorial calendar feed could not be read.'};
+  return {ok:true, status:res.status, url, calendar};
+}
+function compactValleyArticle(article) {
+  return {
+    slug: article.slug,
+    title: article.title,
+    category: article.category_name || article.category || null,
+    publish_at: article.publish_at || article.publishAt || null,
+    status: article.status || null,
+    url: article.url || (article.slug ? `https://phx-verified-network.pages.dev/insights/${article.slug}/` : null)
+  };
+}
+function valleyTickAuthorized(request, env) {
+  const expected = String(env.VALLEY_PUBLISH_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
+  if (!expected) return false;
+  const bearerToken = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  const headerToken = String(request.headers.get('x-valley-publish-token') || request.headers.get('x-admin-token') || '').trim();
+  return bearerToken === expected || headerToken === expected;
+}
+async function runValleyContentScheduleTick(env, ctx, options = {}) {
+  const now = options.now ? new Date(options.now) : new Date();
+  const execute = Boolean(options.execute);
+  const source = options.source || 'manual';
+  const fetched = await fetchValleyCalendar(env);
+  if (!fetched.ok) return {ok:false, source, dry_run:!execute, calendar_url:fetched.url, error:fetched.error, status:fetched.status};
+  const due = valleyDueArticles(fetched.calendar, now);
+  const next = valleyNextArticles(fetched.calendar, now, 8);
+  const receipt = {
+    id: `valley_publish_tick_${Date.now()}`,
+    type: 'valley.insights.schedule_tick',
+    created_at: now.toISOString(),
+    source,
+    cron: options.cron || null,
+    dry_run: !execute,
+    calendar_url: fetched.url,
+    calendar_version: fetched.calendar.version || null,
+    counts: fetched.calendar.counts || {},
+    due_count: due.length,
+    next_count: next.length,
+    due: due.map(compactValleyArticle),
+    next: next.map(compactValleyArticle),
+    destination: env.VALLEY_CONTENT_DESTINATION || 'phx-verified-network'
+  };
+  const taskResults = [];
+  if (execute) {
+    for (const article of due) {
+      const publishAt = article.publish_at || article.publishAt || valleyDate(now);
+      const task = {
+        id: `valley_publish_${String(article.slug || 'article').replace(/[^a-z0-9-]/gi, '_')}_${publishAt}`,
+        type: 'valley.insight.publish',
+        status: 'queued_for_operator_review',
+        created_at: now.toISOString(),
+        source: 'metraiyux-0s-worker-scheduler',
+        calendar_url: fetched.url,
+        destination: env.VALLEY_CONTENT_DESTINATION || 'phx-verified-network',
+        title: `Publish Valley guide: ${article.title || article.slug}`,
+        article: compactValleyArticle(article),
+        operator_instruction: 'Rebuild and redeploy Valley Verified so this guide moves from scheduled calendar state into a public /insights/{slug}/ route, then attach production browser proof.'
+      };
+      if (env.SITE_TASK_QUEUE) await env.SITE_TASK_QUEUE.send(task);
+      await saveKV(env, task.id, task);
+      taskResults.push({id:task.id, slug:article.slug, queued:Boolean(env.SITE_TASK_QUEUE), stored:Boolean(env.SITE_EVENTS_KV)});
+    }
+    await saveKV(env, receipt.id, {...receipt, queued_tasks:taskResults});
+    if (env.VALLEY_PUBLISH_WEBHOOK_URL && due.length) {
+      const webhookRequest = fetch(env.VALLEY_PUBLISH_WEBHOOK_URL, {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({...receipt, queued_tasks:taskResults})
+      }).catch(()=>null);
+      if (ctx?.waitUntil) ctx.waitUntil(webhookRequest);
+    }
+    if (ctx?.waitUntil) ctx.waitUntil(mirrorSkygateEvent(env, {type:'valley.insights.schedule_tick', meta:{receipt_id:receipt.id, due_count:due.length, queued:taskResults.length, source}}));
+  }
+  return {
+    ok:true,
+    source,
+    dry_run:!execute,
+    calendar_url:fetched.url,
+    cron: VALLEY_SCHEDULE_CRON,
+    worker_clock: now.toISOString(),
+    counts:fetched.calendar.counts || {},
+    due_count:due.length,
+    next_count:next.length,
+    due:due.map(compactValleyArticle),
+    next:next.map(compactValleyArticle),
+    queued_tasks:taskResults,
+    queued: taskResults.filter(task => task.queued).length,
+    stored: Boolean(env.SITE_EVENTS_KV),
+    queue_configured: Boolean(env.SITE_TASK_QUEUE),
+    webhook_configured: Boolean(env.VALLEY_PUBLISH_WEBHOOK_URL),
+    receipt_id: receipt.id
+  };
 }
 
 const MEDIA_ASSETS_KEY = 'skyemediacenter:v1:assets';
@@ -873,6 +1023,27 @@ export default {
       return json({ok:mirrored.ok, mirrored, skygate:{active:true, sub:gate.data?.sub, email:gate.data?.email || gate.data?.username || null}});
     }
     if (url.pathname === '/api/site-operator/status') return json(siteOperatorStatus(env));
+    if (url.pathname === '/api/valley/content-schedule') {
+      const result = await runValleyContentScheduleTick(env, ctx, {source:'status', execute:false});
+      return json(result, result.ok ? 200 : 502);
+    }
+    if (url.pathname === '/api/valley/content-schedule/tick') {
+      if (!['GET','POST'].includes(request.method)) return json({ok:false, error:'Method not allowed'}, 405);
+      let body = {};
+      if (request.method === 'POST') body = await readJson(request);
+      const requestedExecute = url.searchParams.get('execute') === '1' || body.execute === true;
+      const explicitDryRun = url.searchParams.get('dry_run') === '1' || body.dry_run === true;
+      const execute = requestedExecute && !explicitDryRun;
+      if (execute && !valleyTickAuthorized(request, env)) {
+        return json({
+          ok:false,
+          error:'Manual Valley publish ticks require VALLEY_PUBLISH_ADMIN_TOKEN or ADMIN_TOKEN. Use dry_run=1 for a public status check.',
+          dry_run_available:true
+        }, 401);
+      }
+      const result = await runValleyContentScheduleTick(env, ctx, {source:'manual', execute, now:body.now || null});
+      return json(result, result.ok ? 200 : 502);
+    }
     if (url.pathname === '/api/site-operator/live-surfaces') return json({ok:true, surfaces: LIVE_SURFACES});
     if (url.pathname === '/api/site-operator/route' && request.method === 'POST') {
       const body = await readJson(request);
@@ -904,5 +1075,13 @@ export default {
     if (proxied) return proxied;
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response('Site Operator Brain Worker is running. Static asset binding not configured.', {status: 200});
+  },
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(runValleyContentScheduleTick(env, ctx, {
+      source:'cron',
+      execute:true,
+      cron:controller.cron,
+      now: controller.scheduledTime ? new Date(controller.scheduledTime).toISOString() : null
+    }));
   }
 };

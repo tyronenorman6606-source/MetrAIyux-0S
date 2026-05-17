@@ -1,3 +1,17 @@
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+
+gsap.registerPlugin(ScrollTrigger);
+globalThis.gsap = gsap;
+globalThis.ScrollTrigger = ScrollTrigger;
+globalThis.Lenis = Lenis;
+globalThis.SkyePayMotionStack = { gsap, ScrollTrigger, Lenis };
+
+function createLenisRuntime(options) {
+  return new Lenis(options);
+}
+
 (function () {
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -221,6 +235,30 @@
     }
   }
 
+  async function loadMotionStack() {
+    if (globalThis.SkyePayMotionStack?.gsap || globalThis.gsap || globalThis.Lenis || globalThis.SkyePayLenisPreload) {
+      return {
+        gsapApi: globalThis.SkyePayMotionStack?.gsap || globalThis.gsap,
+        ScrollTriggerApi: globalThis.SkyePayMotionStack?.ScrollTrigger || globalThis.ScrollTrigger,
+        LenisApi: globalThis.SkyePayMotionStack?.Lenis || globalThis.Lenis || globalThis.SkyePayLenisPreload
+      };
+    }
+    const [
+      { default: gsapApi },
+      { ScrollTrigger: ScrollTriggerApi },
+      { default: LenisApi }
+    ] = await Promise.all([
+      import("gsap"),
+      import("gsap/ScrollTrigger"),
+      import("lenis")
+    ]);
+    globalThis.SkyePayMotionStack = { gsap: gsapApi, ScrollTrigger: ScrollTriggerApi, Lenis: LenisApi };
+    globalThis.gsap = gsapApi;
+    globalThis.ScrollTrigger = ScrollTriggerApi;
+    globalThis.Lenis = LenisApi;
+    return { gsapApi, ScrollTriggerApi, LenisApi };
+  }
+
   function offerPrice(offer) {
     const setup = Number(offer.setup_cents || 0);
     const monthly = Number(offer.recurring_cents || 0);
@@ -363,10 +401,10 @@
       } else if (data.dry_run) {
         setStatus("Preview recorded", `Payment state: ${order.payment_status || "demo_not_charged"}. Workspace state: ${order.provisioning_status || "demo_not_unlocked"}.`);
       } else {
-        setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "syncing_unlock"}.`);
+        setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.`);
       }
     } catch (error) {
-      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the workspace unlock state.");
+      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the paid status and owner approval state.");
     }
   }
 
@@ -399,16 +437,39 @@
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let advancedMounted = false;
-    function mountAdvancedMotion() {
+    let advancedLoading = false;
+
+    async function ensureAdvancedMotionStack() {
+      if (globalThis.SkyePayMotionStack) return globalThis.SkyePayMotionStack;
+      const [gsapModule, scrollModule, lenisModule] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+        import("lenis")
+      ]);
+      const gsapApi = gsapModule?.default || gsapModule?.gsap || gsapModule;
+      const ScrollTriggerApi = scrollModule?.ScrollTrigger || scrollModule?.default;
+      const LenisApi = lenisModule?.default || lenisModule?.Lenis || lenisModule;
+      if (gsapApi && ScrollTriggerApi) gsapApi.registerPlugin(ScrollTriggerApi);
+      globalThis.gsap = gsapApi;
+      globalThis.ScrollTrigger = ScrollTriggerApi;
+      globalThis.Lenis = LenisApi;
+      globalThis.SkyePayMotionStack = { gsap: gsapApi, ScrollTrigger: ScrollTriggerApi, Lenis: LenisApi };
+      return globalThis.SkyePayMotionStack;
+    }
+
+    async function mountAdvancedMotion() {
       if (advancedMounted) return;
-      const gsapApi = globalThis.SkyePayMotionStack?.gsap || globalThis.gsap;
-      const ScrollTriggerApi = globalThis.SkyePayMotionStack?.ScrollTrigger || globalThis.ScrollTrigger;
-      const LenisApi = globalThis.SkyePayMotionStack?.Lenis || globalThis.Lenis;
+      const stack = await loadMotionStack().catch(() => null);
+      const gsapApi = stack?.gsapApi;
+      const ScrollTriggerApi = stack?.ScrollTriggerApi;
+      const LenisApi = stack?.LenisApi;
       if (!gsapApi && !LenisApi) return;
       advancedMounted = true;
 
       if (LenisApi) {
-        const lenis = new LenisApi({ lerp: 0.16, wheelMultiplier: 0.85 });
+        const lenis = LenisApi === Lenis
+          ? createLenisRuntime({ lerp: 0.16, wheelMultiplier: 0.85 })
+          : new LenisApi({ lerp: 0.16, wheelMultiplier: 0.85 });
         function raf(time) {
           lenis.raf(time);
           if (ScrollTriggerApi) ScrollTriggerApi.update();
@@ -464,9 +525,21 @@
       }
     }
 
-    mountAdvancedMotion();
-    globalThis.addEventListener("skyepay:motion-stack-ready", mountAdvancedMotion, { once: true });
-    setTimeout(mountAdvancedMotion, 900);
+    function requestAdvancedMotion() {
+      mountAdvancedMotion();
+      if (advancedMounted || advancedLoading) return;
+      advancedLoading = true;
+      ensureAdvancedMotionStack()
+        .then(mountAdvancedMotion)
+        .catch(() => {})
+        .finally(() => {
+          advancedLoading = false;
+        });
+    }
+
+    requestAdvancedMotion();
+    globalThis.addEventListener("skyepay:motion-stack-ready", requestAdvancedMotion, { once: true });
+    setTimeout(requestAdvancedMotion, 900);
   }
 
   async function init() {

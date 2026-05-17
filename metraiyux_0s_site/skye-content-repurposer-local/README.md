@@ -4,6 +4,8 @@ A live/local Skyes Over London AI content command center for scanning approved i
 
 This app is imported into MetrAIyux 0S as a Free99 feature. Free99 means no charge. It does not mean anonymous access: the browser shell waits for a gate session, and every `/api/*` route requires a 0S, FS27, SkyGate, or local admin gate token before it will run.
 
+See `CHANGELOG.md` for the 2026-05-17 SkyeVault/R2 storage cutover that replaced Google Drive as the primary cloud export lane.
+
 ## What this does
 
 - Scans approved sources: Animalz, OpenAI, Google Research, Google DeepMind, NVIDIA, MIT Technology Review AI, Scale AI, and UiPath AI.
@@ -11,7 +13,8 @@ This app is imported into MetrAIyux 0S as a Free99 feature. Free99 means no char
 - Generates original Skyes Over London content through OpenAI.
 - Saves drafts in `data/drafts.json`.
 - Exports Markdown to `/exports` or browser download.
-- Uploads Markdown to Google Drive when Drive vars are present.
+- Uploads Markdown to SkyeVault/R2 when Cloudflare R2 vars are present.
+- Keeps Google Drive as an optional legacy target for user OAuth or Shared Drive setups.
 - Queues scheduled publish items.
 - Publishes to local static blog output, GitHub content commits, Netlify deploy hooks/CLI, Cloudflare Pages deploy hooks/Wrangler, Facebook, Instagram, and LinkedIn when the relevant tokens are present.
 - Runs an internal scheduler while the process is alive.
@@ -78,6 +81,16 @@ PUBLISHER_POLL_SECONDS=300
 BACKUP_TO_GITHUB_ON_TICK=1
 ```
 
+SkyeVault/R2 export:
+
+```env
+CLOUDFLARE_R2_ACCOUNT_ID=<cloudflare-account-id>
+CLOUDFLARE_R2_ACCESS_KEY=<r2-access-key>
+CLOUDFLARE_R2_SECRET_KEY=<r2-secret-key>
+S3_BUCKET=client-drop-vault
+SKYE_CONTENT_FORGE_R2_PREFIX=content-forge-exports
+```
+
 GitHub backup/recovery:
 
 ```env
@@ -127,4 +140,4 @@ X-App-Token: SCHEDULER_API_KEY
 
 ## Honest boundary
 
-The app is serious as a deployable personal operator. It does not bypass provider requirements. GitHub, Netlify, Cloudflare, Google Drive, Meta, Instagram, LinkedIn, and OpenAI all require real credentials, permissions, and platform rules. Social posting is wired through official API flows only.
+The app is serious as a deployable personal operator. It does not bypass provider requirements. OpenAI generation and SkyeVault/R2 export can run from the root 0S env when those keys are present. GitHub, Netlify, Cloudflare deploys, optional Google Drive, Meta, Instagram, and LinkedIn still require real credentials, permissions, and platform rules. Social posting is wired through official API flows only.

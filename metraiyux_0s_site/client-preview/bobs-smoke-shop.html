@@ -7,8 +7,15 @@
   <title>Bob's Smoke Shop Workspace | MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    body.workspace-password-pending > header,
+    body.workspace-password-pending > main,
+    body.workspace-password-pending > footer {
+      visibility: hidden;
+    }
+  </style>
 </head>
-<body>
+<body class="workspace-password-pending">
   <header class="site-header">
     <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">Bob's Workspace</span></a>
     <nav><a href="../index.html">Home</a><a href="index.html">Client Preview</a><a href="../saas/index.html">SaaS</a><a href="../admin/automation-brain.html">Admin Brain</a></nav>
@@ -37,7 +44,7 @@
       <p class="wide">Use this preview access when Bob is ready to get into the workspace and test the platform during the free week.</p>
       <div class="saas-grid">
         <article class="saas-card"><h3>Login email</h3><p>bob@bobs-smoke-shop-preview.com</p></article>
-        <article class="saas-card"><h3>Access code</h3><p>BOBS-FREE-WEEK-2026</p></article>
+        <article class="saas-card"><h3>Access code</h3><p>Sent through the workspace chat widget after Bob requests access.</p></article>
         <article class="saas-card"><h3>Workspace name</h3><p>Bob's Smoke Shop Private Preview</p></article>
       </div>
     </section>
@@ -83,6 +90,31 @@
       </div>
     </section>
   </main>
+  <script>
+    window.MetrAIyuxWorkspaceChatConfig = {
+      workspaceId: "bob-smoke-shop-preview-001",
+      workspaceSlug: "bobs-smoke-shop",
+      clientName: "Bob's Smoke Shop",
+      appName: "Bob's MetrAIyux 0S Workspace",
+      launcherText: "Bob's workspace chat",
+      operatorName: "MetrAIyux Operator",
+      accent: "#64d6ff",
+      apiBase: "https://relay13-core.graylondonskyes.workers.dev/",
+      accountDisclaimer: "Messages are tied to Bob's workspace account and may be used for support, proof receipts, QA, and follow-up inside this client build lane.",
+      accessReply: "Bob, your workspace popup password is bobs27.",
+      accessTriggers: ["password", "access", "code", "unlock", "bobs27", "workspace"],
+      passwordGate: {
+        enabled: true,
+        password: "bobs27",
+        storageKey: "metraiyux.workspaceGate.bob-smoke-shop-preview-001",
+        storage: "session",
+        title: "Bob's private workspace",
+        prompt: "Enter the workspace password to unlock Bob's preview room.",
+        chatButtonText: "Send password through chat"
+      }
+    };
+  </script>
+  <script src="../assets/js/workspace-chat-widget.js"></script>
   <script src="../script.js"></script>
   <script src="../assets/js/client-preview-tools.js"></script>
 </body>

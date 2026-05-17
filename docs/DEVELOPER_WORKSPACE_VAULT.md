@@ -52,6 +52,8 @@ Each object uploaded with that key is stored under:
 
 Receipts, session manifests, audit events, R2 metadata, and status responses include `workspaceId` and `developerId`.
 
+Successful repo helper pushes also return a short-lived signed download link and the client-vault recovery URL. The immediate link is minted only after the portal/workspace key has completed the upload, expires quickly, and is not written into the remote vault receipt; longer recovery still requires the upload email plus the scoped portal/workspace key.
+
 ## Skyepay Automation
 
 SkyeGateFS27 needs these environment values:

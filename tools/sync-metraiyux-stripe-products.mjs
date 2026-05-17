@@ -79,6 +79,7 @@ const offers = [
     description: "Starter company operating room with ConnectLog relationship capture, Relay13 bridge readiness, proof routing, and owner-approved workspace activation.",
     sourceFolder: "metraiyux_0s_site",
     brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
     prices: [
       { kind: "setup", nickname: "Starter Command setup", lookupKey: "metraiyux_starter_command_setup", amount: 150000 },
       { kind: "monthly", nickname: "Starter Command monthly", lookupKey: "metraiyux_starter_command_monthly", amount: 39700, interval: "month" }
@@ -88,9 +89,10 @@ const offers = [
   {
     planId: "growth-cabinet",
     productName: "MetrAIyux 0S - Growth Cabinet",
-    description: "Growth operating room with ConnectLog workflows, Relay13 workspace bridge, proof exports, and weekly operating rhythm.",
+    description: "Growth operating room with ConnectLog workflows, Relay13 workspace bridge, proof exports, weekly operating rhythm, and owner-approved activation.",
     sourceFolder: "metraiyux_0s_site",
     brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
     prices: [
       { kind: "setup", nickname: "Growth Cabinet setup", lookupKey: "metraiyux_growth_cabinet_setup", amount: 350000 },
       { kind: "monthly", nickname: "Growth Cabinet monthly", lookupKey: "metraiyux_growth_cabinet_monthly", amount: 99700, interval: "month" }
@@ -126,7 +128,7 @@ const offers = [
     planId: "routex-workforce-command",
     productName: "MetrAIyux 0S - RouteX Workforce Command",
     description: "Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, jobs, assignments, proof, payments, stops, and reports.",
-    sourceFolder: "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+    sourceFolder: "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0",
     brainOwner: "marcus-vale-brain",
     ownerApprovalRequired: true,
     prices: [
@@ -138,9 +140,10 @@ const offers = [
   {
     planId: "autonomous-office",
     productName: "MetrAIyux 0S - Autonomous Office",
-    description: "Full managed office lane with stronger gate persistence, approval inboxes, ConnectLog operator proof, Relay13 live handoff, and connector readiness.",
+    description: "Full managed office lane with stronger gate persistence, approval inboxes, ConnectLog operator proof, Relay13 live handoff, connector readiness, and owner-approved sovereign stack activation.",
     sourceFolder: "metraiyux_0s_site",
     brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
     prices: [
       { kind: "setup", nickname: "Autonomous Office setup", lookupKey: "metraiyux_autonomous_office_setup", amount: 750000 },
       { kind: "monthly", nickname: "Autonomous Office monthly", lookupKey: "metraiyux_autonomous_office_monthly", amount: 249700, interval: "month" }

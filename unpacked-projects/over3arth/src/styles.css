@@ -3309,7 +3309,7 @@ html {
   min-height: 100vh;
   cursor: grab;
   touch-action: none;
-  transform-origin: center;
+  transform-origin: center bottom;
   will-change: transform, opacity, filter;
 }
 
@@ -5438,3 +5438,816 @@ html {
   text-shadow:0 0 28px rgba(53,183,255,.18),0 0 34px rgba(243,212,131,.12);
 }
 /* END quantumskyes:premium-text-effects-css */
+
+/* Overearth zero scene: laptop core, emitted globe, projected Auren channel */
+.overearth-zero-scene {
+  --worldskin-cyan: 179, 93, 255;
+  --worldskin-gold: 255, 211, 102;
+  --worldskin-violet: 200, 89, 255;
+  --entity-neon-a: 186, 74, 255;
+  --entity-neon-b: 255, 208, 92;
+  --entity-neon-c: 255, 83, 214;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 208, 92, 0.08), transparent 31%),
+    radial-gradient(circle at 50% 26%, rgba(180, 74, 255, 0.12), transparent 38%),
+    linear-gradient(180deg, #030104 0%, #06030a 46%, #010102 100%);
+  isolation: isolate;
+}
+
+.overearth-zero-scene .neuralspace-field {
+  opacity: 0.24;
+  filter: saturate(1.26) hue-rotate(28deg);
+}
+
+.overearth-boot-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 78%, rgba(255, 208, 92, 0.13), transparent 38%),
+    radial-gradient(ellipse at 50% 28%, rgba(186, 74, 255, 0.16), transparent 42%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.72), transparent 24% 76%, rgba(0, 0, 0, 0.72));
+}
+
+.overearth-boot-stage {
+  position: relative;
+  z-index: 4;
+  width: min(1180px, 94vw);
+  height: min(780px, 88vh);
+  display: grid;
+  place-items: end center;
+  pointer-events: none;
+}
+
+.overearth-map-viewport {
+  --map-size: clamp(520px, 48vw, 700px);
+  --map-half: calc(var(--map-size) / 2);
+  position: absolute;
+  left: calc(50% - var(--map-half));
+  top: calc(47% - var(--map-half));
+  z-index: 15;
+  width: var(--map-size);
+  height: var(--map-size);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+}
+
+.overearth-map-viewport.dragging {
+  cursor: grabbing;
+}
+
+.overearth-map-viewport[data-open="true"] {
+  opacity: 1;
+  animation: overearthGlobeEmergence 1050ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.overearth-node-globe.worldskin-orbit {
+  --globe-size: clamp(520px, 48vw, 700px);
+  width: var(--globe-size);
+  height: var(--globe-size);
+}
+
+.overearth-zero-scene .spectacle-globe {
+  width: min(100%, 700px);
+  transform: none;
+  filter:
+    drop-shadow(0 0 52px rgba(186, 74, 255, 0.34))
+    drop-shadow(0 0 34px rgba(255, 208, 92, 0.18));
+}
+
+.auren-energy-being {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 5;
+  width: 40%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.72;
+  transform: translateY(4%) scale(0.9);
+  transform-origin: 50% 58%;
+  transition:
+    top 760ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 760ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 760ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter:
+    saturate(1.18)
+    drop-shadow(0 0 18px rgba(186, 74, 255, 0.26))
+    drop-shadow(0 0 20px rgba(255, 208, 92, 0.12));
+}
+
+.auren-energy-being canvas,
+.auren-energy-being__field,
+.auren-energy-being__signal {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.auren-energy-being canvas {
+  z-index: 2;
+}
+
+.auren-energy-being__field {
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 18%),
+    radial-gradient(circle at 50% 58%, rgba(186, 74, 255, 0.18), transparent 58%),
+    radial-gradient(circle at 50% 50%, rgba(255, 208, 92, 0.12), transparent 68%);
+  filter: blur(10px);
+  opacity: 0.64;
+}
+
+.auren-energy-being__signal {
+  z-index: 3;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 208, 92, 0.18);
+  box-shadow:
+    inset 0 0 34px rgba(186, 74, 255, 0.12),
+    0 0 28px rgba(255, 208, 92, 0.08);
+  animation: aurenEnergySignal 4.6s ease-in-out infinite;
+}
+
+.auren-energy-being[data-presence="inside"] {
+  top: 53%;
+  width: 38%;
+  opacity: 0.58;
+  transform: translateY(10%) scale(0.84);
+}
+
+.auren-energy-being[data-presence="awake"] {
+  top: 48%;
+  width: 44%;
+  opacity: 0.82;
+  transform: translateY(0) scale(0.96);
+}
+
+.auren-energy-being[data-presence="emerged"] {
+  top: 34%;
+  width: 58%;
+  opacity: 0.98;
+  transform: translateY(-16%) scale(1.06);
+  filter:
+    saturate(1.35)
+    drop-shadow(0 0 30px rgba(186, 74, 255, 0.34))
+    drop-shadow(0 0 34px rgba(255, 208, 92, 0.2));
+}
+
+.auren-energy-being[data-state="listening"] {
+  filter:
+    hue-rotate(34deg)
+    saturate(1.42)
+    drop-shadow(0 0 28px rgba(35, 231, 255, 0.3));
+}
+
+.auren-energy-being[data-state="thinking"] {
+  filter:
+    hue-rotate(74deg)
+    saturate(1.58)
+    drop-shadow(0 0 34px rgba(186, 74, 255, 0.42));
+}
+
+.auren-energy-being[data-state="speaking"] {
+  filter:
+    hue-rotate(-28deg)
+    saturate(1.72)
+    drop-shadow(0 0 34px rgba(255, 208, 92, 0.36))
+    drop-shadow(0 0 26px rgba(35, 231, 255, 0.24));
+}
+
+.auren-energy-being[data-state="checkin"] {
+  filter:
+    hue-rotate(112deg)
+    saturate(1.7)
+    drop-shadow(0 0 34px rgba(255, 66, 214, 0.36))
+    drop-shadow(0 0 28px rgba(255, 208, 92, 0.18));
+}
+
+.overearth-zero-scene .magic-globe__core,
+.overearth-zero-scene .magic-globe__scanline,
+.overearth-zero-scene .overearth-node-map::before,
+.overearth-zero-scene .overearth-node-map::after,
+.overearth-zero-scene .worldskin-pulse-field,
+.overearth-zero-scene .worldskin-orbit::before,
+.overearth-zero-scene .worldskin-orbit::after {
+  display: none;
+}
+
+.overearth-zero-scene .worldskin-gate-field {
+  transform: translateY(0);
+}
+
+.overearth-zero-scene .worldskin-gate,
+.overearth-zero-scene .worldskin-realm-node {
+  filter: drop-shadow(0 0 16px rgba(var(--worldskin-gold), 0.18));
+}
+
+.overearth-node-map::before,
+.overearth-node-map::after {
+  content: "";
+  position: absolute;
+  inset: 11%;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.overearth-node-map::before {
+  border: 1px solid rgba(255, 208, 92, 0.16);
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(255, 208, 92, 0.18) 50%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, rgba(186, 74, 255, 0.2) 50%, transparent 51%);
+  opacity: 0.46;
+  animation: overearthNodeFilament 11s linear infinite;
+}
+
+.overearth-node-map::after {
+  inset: 20%;
+  border: 1px solid rgba(186, 74, 255, 0.16);
+  opacity: 0.38;
+  transform: rotate(45deg);
+}
+
+.overearth-active-node {
+  position: absolute;
+  left: 50%;
+  top: 72%;
+  z-index: 7;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  translate: -50% -50%;
+  max-width: 22ch;
+  padding: 9px 12px;
+  text-align: center;
+  pointer-events: none;
+  background: rgba(3, 1, 6, 0.52);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 208, 92, 0.2),
+    0 0 28px rgba(186, 74, 255, 0.12),
+    0 18px 42px rgba(0, 0, 0, 0.22);
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+}
+
+.overearth-active-node strong,
+.overearth-active-node span {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overearth-active-node strong {
+  color: rgba(255, 231, 156, 0.95);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.overearth-active-node span {
+  color: rgba(241, 220, 255, 0.68);
+  font-size: 0.68rem;
+}
+
+.auren-projection.worldskin-brain-dock {
+  z-index: 16;
+  right: clamp(14px, 3vw, 42px);
+  bottom: clamp(18px, 4vh, 42px);
+  width: min(390px, calc(100vw - 28px));
+  max-height: min(430px, calc(100vh - 70px));
+  overflow: auto;
+  background:
+    linear-gradient(135deg, rgba(12, 3, 18, 0.18), rgba(4, 2, 7, 0.56)),
+    radial-gradient(circle at 10% 0, rgba(186, 74, 255, 0.24), transparent 54%),
+    radial-gradient(circle at 100% 92%, rgba(255, 208, 92, 0.14), transparent 48%);
+  border: 1px solid rgba(255, 208, 92, 0.16);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 42px rgba(186, 74, 255, 0.08),
+    0 0 52px rgba(186, 74, 255, 0.16),
+    -26px -18px 90px rgba(255, 208, 92, 0.08);
+  backdrop-filter: blur(16px) saturate(1.34);
+}
+
+.auren-projection__beam {
+  position: absolute;
+  right: 78%;
+  bottom: 12px;
+  z-index: 0;
+  width: min(38vw, 520px);
+  height: min(30vh, 260px);
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(186, 74, 255, 0.09) 46%, rgba(255, 208, 92, 0.18) 100%),
+    repeating-linear-gradient(90deg, transparent 0 20px, rgba(255, 208, 92, 0.035) 20px 21px);
+  clip-path: polygon(0 8%, 100% 36%, 100% 78%, 0 100%);
+  filter: blur(0.3px);
+  opacity: 0.72;
+  mix-blend-mode: screen;
+}
+
+.auren-projection .brain-dock-worldline,
+.auren-projection .brain-dock-controls,
+.auren-projection > small {
+  display: flex;
+}
+
+.auren-projection > small {
+  display: block;
+}
+
+.auren-projection .brain-log {
+  max-height: 188px;
+}
+
+.auren-projection .brain-command-line {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.32), rgba(23, 7, 32, 0.42)),
+    rgba(0, 0, 0, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 208, 92, 0.12),
+    0 0 24px rgba(186, 74, 255, 0.1);
+}
+
+@keyframes overearthScreenPulse {
+  0%, 100% {
+    opacity: 0.48;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 0.82;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes overearthGlobeEmergence {
+  0% {
+    opacity: 0;
+    transform: translateY(260px) scale(0.16) rotateX(16deg);
+    filter: blur(16px) saturate(0.72);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.02) rotateX(0deg);
+    filter: blur(0) saturate(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+    filter: blur(0) saturate(1.18);
+  }
+}
+
+@keyframes aurenRiseFromLaptop {
+  0% {
+    opacity: 0;
+    transform: translateY(74px) scale(0.24);
+    filter: blur(9px);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translateY(-12px) scale(0.72);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0.96;
+    transform: translateY(0) scale(0.68);
+    filter: blur(0);
+  }
+}
+
+@keyframes overearthNodeFilament {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aurenEnergySignal {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: scale(0.92) rotate(0deg);
+  }
+
+  48% {
+    opacity: 0.74;
+    transform: scale(1.08) rotate(12deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .overearth-boot-stage {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .overearth-map-viewport {
+    --map-size: min(390px, 90vw);
+    --map-half: min(195px, 45vw);
+    top: 27%;
+  }
+
+  .overearth-node-globe.worldskin-orbit {
+    --globe-size: min(360px, 88vw);
+  }
+
+  .auren-energy-being[data-presence="emerged"] {
+    width: 62%;
+    top: 36%;
+  }
+
+  .overearth-active-node {
+    max-width: 18ch;
+    padding: 7px 10px;
+  }
+
+  .overearth-active-node strong {
+    font-size: 0.64rem;
+  }
+
+  .overearth-active-node span {
+    font-size: 0.6rem;
+  }
+
+  .auren-projection.worldskin-brain-dock {
+    right: 10px;
+    bottom: 12px;
+    width: min(370px, calc(100vw - 20px));
+    max-height: 248px;
+    padding: 13px;
+  }
+
+  .auren-projection .brain-log {
+    max-height: 86px;
+  }
+
+  .auren-projection .brain-dock-worldline,
+  .auren-projection .brain-dock-controls,
+  .auren-projection > small {
+    display: none;
+  }
+
+  .auren-projection__beam {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcp-macbook-scroll__lid,
+  .overearth-map-viewport[data-open="true"],
+  .mcp-macbook-scroll__screen::before,
+  .overearth-node-map::before {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* MCP macbook-animation: first frame is only the local mcp-macbook-scroll laptop. */
+.overearth-zero-scene[data-boot="sealed"] {
+  background: #010102;
+}
+
+.overearth-zero-scene[data-boot="sealed"] .overearth-boot-stage {
+  width: 100vw;
+  height: 100vh;
+  place-items: center;
+}
+
+.mcp-macbook-scroll {
+  --macbook-progress: 0;
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  z-index: 5;
+  width: min(900px, 78vw);
+  margin: 0;
+  color: rgba(255, 248, 226, 0.96);
+  translate: -50% -50%;
+  perspective: 1600px;
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  backface-visibility: hidden;
+}
+
+.mcp-macbook-scroll[data-open="true"] {
+  top: 58%;
+  width: min(940px, 78vw);
+}
+
+.mcp-macbook-scroll[data-open="false"] {
+  top: 50%;
+  width: min(760px, 72vw);
+}
+
+.mcp-macbook-scroll__aura {
+  position: absolute;
+  inset: -18% -12% -26%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 62%, rgba(255, 211, 92, 0.18), transparent 45%),
+    radial-gradient(ellipse at 50% 38%, rgba(184, 92, 255, 0.24), transparent 58%);
+  opacity: 0.7;
+  filter: blur(18px);
+}
+
+.mcp-macbook-scroll__lid {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  padding: 13px;
+  border: 1px solid rgba(245, 231, 255, 0.22);
+  border-radius: 8px 8px 5px 5px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 20%, rgba(0, 0, 0, 0.54) 100%),
+    linear-gradient(145deg, rgba(7, 4, 10, 0.98), rgba(18, 8, 28, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 -24px 44px rgba(0, 0, 0, 0.54),
+    0 30px 70px rgba(0, 0, 0, 0.58),
+    0 0 38px rgba(184, 92, 255, 0.28),
+    0 0 26px rgba(255, 211, 92, 0.14);
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+}
+
+.mcp-macbook-scroll[data-open="false"] .mcp-macbook-scroll__screen {
+  opacity: 0;
+}
+
+.mcp-macbook-scroll[data-open="false"] .mcp-macbook-scroll__aura {
+  animation: mcpMacbookPulse 2.8s ease-in-out infinite;
+}
+
+.mcp-macbook-scroll__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(184, 92, 255, 0.22);
+  border-radius: 5px;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(184, 92, 255, 0.24), transparent 46%),
+    linear-gradient(135deg, rgba(2, 2, 6, 0.98), rgba(13, 7, 18, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 58px rgba(0, 0, 0, 0.7);
+  transition: opacity 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mcp-macbook-scroll__screen-universe {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+}
+
+.mcp-macbook-scroll .macbook-camera {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  z-index: 3;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 211, 92, 0.62);
+  box-shadow: 0 0 10px rgba(184, 92, 255, 0.48);
+  translate: -50% 0;
+}
+
+.mcp-macbook-scroll .macbook-screen-gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(250deg, rgba(184, 92, 255, 0.11), transparent 34%);
+  opacity: 0.32;
+}
+
+.mcp-macbook-scroll__hinge {
+  width: 90%;
+  height: 18px;
+  display: flex;
+  gap: 14px;
+  margin: -1px auto 0;
+  transform: perspective(700px) rotateX(58deg);
+  transform-origin: center top;
+}
+
+.mcp-macbook-scroll__hinge span {
+  flex: 1;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 211, 92, 0.34), rgba(184, 92, 255, 0.28), transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.64));
+  box-shadow: 0 0 20px rgba(184, 92, 255, 0.2);
+}
+
+.mcp-macbook-scroll__base {
+  position: relative;
+  width: 108%;
+  min-height: clamp(116px, 14vw, 148px);
+  margin: -1px -4% 0;
+  padding: 14px 18px 18px;
+  border-radius: 0 0 18px 18px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.28), transparent 17%),
+    linear-gradient(180deg, #d8dde1, #777f88 52%, #252a30);
+  transform-origin: top;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    0 18px 42px rgba(0, 0, 0, 0.5);
+  will-change: transform;
+}
+
+.mcp-macbook-scroll[data-open="false"] .mcp-macbook-scroll__base {
+  min-height: 34px;
+  padding: 0;
+}
+
+.mcp-macbook-scroll[data-open="false"] .mcp-macbook-scroll__base::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 112px;
+  height: 9px;
+  border-radius: 0 0 999px 999px;
+  background: rgba(40, 46, 52, 0.68);
+  translate: -50% 0;
+}
+
+.mcp-macbook-scroll__status {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.4fr) repeat(2, minmax(80px, 0.8fr));
+  gap: 7px;
+}
+
+.mcp-macbook-scroll__status span {
+  min-width: 0;
+  overflow: hidden;
+  padding: 7px 8px;
+  color: rgba(13, 9, 18, 0.78);
+  font-size: 0.64rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(45, 28, 70, 0.08);
+}
+
+.mcp-macbook-scroll__status span:first-child {
+  color: rgba(38, 19, 10, 0.94);
+}
+
+.mcp-macbook-scroll__keys {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.mcp-macbook-scroll__keys button {
+  min-width: 0;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: rgba(246, 238, 255, 0.72);
+  background: rgba(0, 0, 0, 0.26);
+  cursor: pointer;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.18);
+}
+
+.mcp-macbook-scroll__keys button.active,
+.mcp-macbook-scroll__keys button:hover,
+.mcp-macbook-scroll__keys button:focus-visible {
+  color: rgba(4, 2, 5, 0.95);
+  outline: 0;
+  background: linear-gradient(135deg, var(--key-color, var(--macbook-gold)), rgba(184, 92, 255, 0.74));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 20px rgba(255, 211, 92, 0.22);
+}
+
+.mcp-macbook-scroll__palm {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: min(190px, 42%);
+  height: 32px;
+  display: grid;
+  grid-template-columns: 1fr 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px 0 12px;
+  color: rgba(255, 226, 142, 0.88);
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 211, 92, 0.16), transparent 72%),
+    rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(255, 211, 92, 0.13);
+  clip-path: polygon(9% 0, 100% 0, 91% 100%, 0 100%);
+  translate: -50% 0;
+}
+
+.mcp-macbook-scroll__palm span {
+  overflow: hidden;
+  font-size: 0.58rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcp-macbook-scroll__palm button {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(255, 226, 142, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.mcp-macbook-scroll__palm button.listening {
+  animation: voiceAperture 1.4s ease-in-out infinite;
+}
+
+.mcp-macbook-scroll__wake {
+  position: absolute;
+  inset: -12% -8% -18%;
+  z-index: 7;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mcp-macbook-scroll__wake:focus-visible {
+  outline: 2px solid rgba(255, 211, 92, 0.9);
+  outline-offset: 14px;
+}
+
+@keyframes mcpMacbookPulse {
+  0%,
+  100% {
+    opacity: 0.54;
+    filter: blur(18px);
+  }
+
+  50% {
+    opacity: 0.84;
+    filter: blur(22px);
+  }
+}
+
+@media (max-width: 900px) {
+  .mcp-macbook-scroll,
+  .mcp-macbook-scroll[data-open="true"] {
+    top: 53%;
+    width: min(620px, 92vw);
+  }
+
+  .mcp-macbook-scroll__base {
+    min-height: 108px;
+    padding: 11px 12px 14px;
+  }
+
+  .mcp-macbook-scroll__status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mcp-macbook-scroll__status span:nth-child(n+2) {
+    display: none;
+  }
+
+  .mcp-macbook-scroll__keys {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

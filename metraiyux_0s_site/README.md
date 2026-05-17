@@ -5,6 +5,39 @@
 
 This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 16-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
 
+## SkyeMerit Protected Merit System
+
+This build includes SkyeMerit as a no-charge first-time merit lane inside the 0S SaaS and SkyePay system. SkyeMerit gives first-time users a `$6` premium kAIxu credit and protected discount rules that lower only eligible SkyePay spend bands. It does not remove FS27, owner approval, checkout policy, or gate-session requirements.
+
+Start points:
+
+- `saas/skyemerit.html` — customer wallet and capped discount calculator.
+- `operator/skyemerit-admin.html` — owner/operator issue control.
+- `proof/skyemerit-expansion-receipt.html` — proof receipt and commercial boundary.
+
+Local proof command:
+
+```bash
+npm run 0s:skyemerit:proof
+```
+
+## Platform Integration Accounting
+
+This build accounts for the changelog additions as first-class 0S platform lanes: SkyePay Store, SkyeVault access, SkyeCard usage offers, SkyeMail, SkyeMerit, SkyeRouteX, and the Free99 gated expansions. The operator ledger maps each lane to system surfaces, buyer routes, advertising angles, integration boundaries, and proof commands.
+
+Start points:
+
+- `operator/platform-integration-ledger.html` — operator-readable platform accounting and campaign matrix.
+- `data/platform-integration-ledger.json` — machine-readable source for the same accounting.
+- `sales/live-proof-router.html` — buyer-signal router for store, vault, mailbox, merit, RouteX, Free99, and proof conversations.
+- `brain/sales-offer-registry.json` — approved catalog groups and public routes for SkyePay, SkyeVault, SkyeCard, and SkyeMail.
+
+Local proof command:
+
+```bash
+npm run 0s:platform-accounting
+```
+
 ## ConnectLog + Relay13 Expansion
 
 This build adds `connectlog-v7.7-relay13-operator-proof/` and `relay13-core-v1.7-connectlog-operator-proof/` inside the 0S site. ConnectLog is the local-first relationship command app. Relay13 is the Cloudflare Worker messaging core and operator console package.
@@ -33,15 +66,15 @@ The base public 0S rates are held in this pass. Plan scope now includes HouseOpe
 
 ## SkyeRouteX Workforce Command Expansion
 
-This build also adds `SkyeRouteX/` and `skyeroutex-workforce-command-v0.4.0/` inside the 0S site. SkyeRouteX is the workforce command lane for dispatch, provider job posting, contractor job boards, applicant pools, assignments, route stops, workforce readiness, proof vaults, payment-state ledgers, market reports, export packets, analytics, local runtime checks, and a manifest-only 0S mount.
+This build also adds `SkyeRouteX/` and `SkyeRouteX/workforce-command-v0.4.0/` inside the 0S site. SkyeRouteX is the workforce command lane for dispatch, provider job posting, contractor job boards, applicant pools, assignments, route stops, workforce readiness, proof vaults, payment-state ledgers, market reports, export packets, analytics, local runtime checks, and a manifest-only 0S mount.
 
 Start points:
 
 - `live/skyeroutex-workforce-command.html` — 0S expansion hub.
 - `SkyeRouteX/index.html` — routed workforce command shell.
 - `SkyeRouteX/runtime.html` — runtime lane and static contract link path.
-- `skyeroutex-workforce-command-v0.4.0/index.html` — static-safe v0.4.0 platform hub.
-- `skyeroutex-workforce-command-v0.4.0/public/index.html` — API-backed browser command UI when the Node runtime is running.
+- `SkyeRouteX/workforce-command-v0.4.0/index.html` — static-safe v0.4.0 platform hub.
+- `SkyeRouteX/workforce-command-v0.4.0/public/index.html` — API-backed browser command UI when the Node runtime is running.
 - `proof/skyeroutex-expansion-receipt.html` — proof receipt and production boundary.
 
 Local proof command:
@@ -126,17 +159,22 @@ npm run smoke
 
 ## SkyeMusicNexus Lite + Paid Music Ops
 
-This build adds `SkyeMusicNexus/` inside the 0S site. SkyeMusicNexus Lite is the Free99 music preview lane for a gated artist/release proof path. Studio, Label Command, Managed Music Ops, Single Song Drop, release drops, catalog import, royalty ledger setup, payout review, artist profile, seat, and release-pack add-ons are paid routes.
+This build adds `SkyeMusicNexus/` inside the 0S site. SkyeMusicNexus Lite is the Free99 music preview lane for a gated artist/release/upload proof path. Studio, Label Command, Managed Music Ops, Single Song Drop, release drops, Gated Audio Vault Pack, catalog import, royalty ledger setup, payout review, artist profile, seat, and release-pack add-ons are paid routes.
 
 Start points:
 
 - `live/skyemusicnexus-neofront.html` - 0S expansion hub.
 - `SkyeMusicNexus/index.html` - gated app shell.
-- `SkyeMusicNexus/public/index.html` - Artist Stage.
+- `SkyeMusicNexus/public/index.html` - Platform Dashboard.
+- `SkyeMusicNexus/public/upload.html` - Upload Studio.
+- `SkyeMusicNexus/public/player.html` - Music Player.
+- `SkyeMusicNexus/public/releases.html` - Releases.
+- `SkyeMusicNexus/public/rights.html` - Rights Vault.
+- `SkyeMusicNexus/public/exchange.html` - Creator Exchange.
 - `SkyeMusicNexus/public/admin.html` - Operator Stage.
 - `proof/skyemusicnexus-expansion-receipt.html` - proof receipt and auth boundary.
 
-Free99 means no charge for Lite only. It does not mean anonymous access. The app shell, public stages, paid tiers, and paid add-ons require a 0S, FS27, or SkyGate session before use, and the music artist/release/workflow read endpoints reject ungated requests with 401. Paid checkout does not claim live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until separate provider proof exists.
+Free99 means no charge for Lite only. It does not mean anonymous access. The app shell, public rooms, paid tiers, and paid add-ons require a 0S, FS27, or SkyGate session before use, and the music artist/release/audio-asset/workflow read endpoints reject ungated requests with 401. Paid checkout does not claim live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, public streaming licensing, or durable large-catalog storage until SkyeVault/R2 and separate provider proof exists.
 
 Local proof command:
 

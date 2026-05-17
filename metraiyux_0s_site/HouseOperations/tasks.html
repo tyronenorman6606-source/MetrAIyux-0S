@@ -1,30 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="HouseOperations standalone 0s platform for tasks, vendors, alerts, schedule, assignments, proof, runtime, and owner closeout.">
-  <title>HouseOperations Standalone 0s Platform</title>
+  <meta name="description" content="HouseOperations command room for tasks, vendors, schedules, owner alerts, proof, billing, SkyeBox, and FS27 PIN gate handoff.">
+  <title>HouseOperations Command Room | MetrAIyux 0S</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./houseops-platform.css">
-  <link rel="stylesheet" href="./src/styles.css">
+  <link rel="stylesheet" href="./houseops-platform.css?v=houseops-radical-v3">
+  <link rel="stylesheet" href="./src/styles.css?v=houseops-radical-v3">
 </head>
-<body data-view="tasks">
+<body data-view="tasks" class="skyesol-living-page houseops-command-v3" data-surface-version="houseops-radical-v3-20260517">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+<div class="skyesol-grain" aria-hidden="true"></div>
+<div class="skyesol-scanline" aria-hidden="true"></div>
   <div class="motion-chrome-rail" aria-hidden="true"></div>
   <div class="platform surfaceScreenshots" data-surface-screenshots="houseoperations-desktop houseoperations-mobile">
     <aside class="rail">
       <a class="brand" href="./index.html" aria-label="HouseOperations dashboard">
-        <span style="display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;color:var(--cyan);font-weight:800">HO</span>
-        <span><b>HouseOperations</b><span>Standalone 0s platform</span></span>
+        <img class="brandMark" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <span class="brandText"><b>HouseOperations</b><span>0S command room</span></span>
       </a>
       <nav class="nav" id="nav" aria-label="HouseOperations sections"></nav>
-      <div class="railFooter"><a class="btn primary" href="./runtime.html">Runtime Proof</a><a class="btn" href="./tutorial.html">Tutorial</a><a class="btn" href="./billing.html">Billing</a><a class="btn" href="./skye-box-authenticator-vault/index.html">SkyeBox Vault</a><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">FS27 PIN Gate</a><a class="btn" href="./_legacy_shell/index.html">Legacy Copy</a><span class="small-copy">Live app is local to this folder. The old generated platform copy is retained only for closure comparison.</span></div>
+      <div class="railFooter"><a class="btn primary" href="./runtime.html">Runtime Proof</a><a class="btn" href="./tutorial.html">Tutorial</a><a class="btn" href="./billing.html">Billing</a><a class="btn" href="./skye-box-authenticator-vault/index.html">SkyeBox Vault</a><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">FS27 PIN Gate</a><a class="btn" href="../proof/houseoperations-skyebox-expansion-receipt.html">Proof Hub</a><span class="small-copy">Radical v3 HouseOperations floor with SkyeBox vault custody, SkyePay paid-plan handoff, and FS27 Gate handoff wired into the 0S expansion.</span></div>
     </aside>
     <main class="main">
-      <header class="topbar"><div class="title"><div class="crumb" id="viewCrumb">HouseOperations</div><h1 id="viewTitle">Dashboard</h1><p id="viewSub"></p></div><div class="actions"><button class="btn" type="button" data-action="fullscreen">Fullscreen</button><button class="btn" type="button" data-action="export">Export</button><button class="btn primary" type="button" data-action="save-proof">Save Proof</button></div></header>
+      <header class="topbar"><div class="title"><div class="crumb" id="viewCrumb">HouseOperations</div><h1 id="viewTitle" class="neon-gradient-text premium-text-effects-lab">Dashboard</h1><p id="viewSub"></p></div><div class="actions"><button class="btn" type="button" data-action="fullscreen">Fullscreen</button><button class="btn" type="button" data-action="export">Export</button><button class="btn primary" type="button" data-action="save-proof">Save Proof</button></div></header>
       <div id="app"></div>
     </main>
   </div>
-  <script src="./houseops-platform.js"></script>
+  <script type="module" src="./src/houseops-mcp-runtime.js?v=houseops-radical-v3"></script>
+  <script src="./houseops-platform.js?v=houseops-radical-v3"></script>
 </body>
 </html>

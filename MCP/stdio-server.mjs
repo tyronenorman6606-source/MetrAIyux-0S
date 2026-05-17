@@ -766,6 +766,7 @@ function inferComponentUseCases(text) {
   if (/\bintro|opening|loader|loading|gate|splash|age gate|launch\b/.test(lower)) inferred.push('intro-opening-sequence');
   if (/\bsite|website|landing|homepage|home page|public|hero|service page|product launch\b/.test(lower)) inferred.push('public-landing-hero');
   if (/\bapp|dashboard|admin|tool|console|control plane|editor|quote|scan|portal|crm|workspace\b/.test(lower)) inferred.push('app-tool-surface');
+  if (/\bchat|widget|message lane|conversation|relay13|password gate|account-tied|support lane\b/.test(lower)) inferred.push('workspace-chat-lane');
   if (/\bscroll|funnel|process|journey|stage|route|handoff|scrub|pin|pinned\b/.test(lower)) inferred.push('scroll-story');
   if (/\bthree|r3f|webgl|3d|shader|spatial|canvas product|product object\b/.test(lower)) inferred.push('webgl-product-scene');
   if (/\bproof|screenshot|video|reel|receipt|case study|browser recording|workflow\b/.test(lower)) inferred.push('proof-surface');
@@ -1107,9 +1108,11 @@ function applyMcpParts({
   const dryRun = mode === 'dryRun';
   const requestedEffects = [...new Set([...(effects || []), ...inferRequestedEffects(`${componentIds.join(' ')} ${patternIds.join(' ')}`)])];
   const requestedPatterns = new Set(patternIds || []);
+  const requestedComponentText = `${componentIds.join(' ')} ${patternIds.join(' ')}`;
   if (requestedEffects.includes('neonScrollbar')) requestedPatterns.add('adaptive-neon-scrollbar');
   if (requestedEffects.includes('livingBackground')) requestedPatterns.add('skyesol-living-background');
   if (requestedEffects.includes('motionChrome') || requestedEffects.includes('cursorTrail')) requestedPatterns.add('neon-motion-chrome');
+  if (/\b(workspace-chat-widget|workspace-chat|chat-widget|relay13-widget|password-gate)\b/i.test(requestedComponentText)) requestedPatterns.add('workspace-chat-widget');
 
   const paths = targetImplementationPaths(targetFolder);
   const changedFiles = [];
@@ -1193,6 +1196,26 @@ ${livingJs}
 })();`
     });
     if (html) html = injectAfterBodyOpen(html, 'neon-motion-chrome', '<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>');
+  }
+
+  if (requestedPatterns.has('workspace-chat-widget')) {
+    const pack = patternPack('workspace-chat-widget');
+    const widgetJs = pack.files['workspace-chat-widget/workspace-chat-widget.js'] || '';
+    jsBlocks.push({ id: 'workspace-chat-widget-js', body: widgetJs });
+    if (html) {
+      html = injectAfterBodyOpen(html, 'MetrAIyuxWorkspaceChatConfig', `<script>
+window.MetrAIyuxWorkspaceChatConfig = window.MetrAIyuxWorkspaceChatConfig || {
+  workspaceId: (document.documentElement.dataset.workspaceId || location.hostname || 'workspace').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'workspace',
+  workspaceSlug: (document.documentElement.dataset.workspaceSlug || location.hostname || 'workspace').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'workspace',
+  clientName: document.title || 'Workspace',
+  appName: document.title || 'Workspace App',
+  launcherText: 'Workspace chat',
+  operatorName: 'MetrAIyux Operator',
+  accent: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#64d6ff',
+  accountDisclaimer: 'Messages are tied to this workspace account and may be used for support, proof receipts, QA, and follow-up inside the client build lane.'
+};
+</script>`);
+    }
   }
 
   if (requestedEffects.includes('textEffects')) {

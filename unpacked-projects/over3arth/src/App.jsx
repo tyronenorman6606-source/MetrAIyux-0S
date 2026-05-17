@@ -7,10 +7,8 @@ import {
   BookOpen,
   Brain,
   CalendarDays,
-  CheckCircle2,
   ChevronRight,
   CircleDot,
-  Crown,
   Download,
   Flame,
   Gamepad2,
@@ -20,7 +18,6 @@ import {
   Layers3,
   Map,
   MessageCircle,
-  Mic,
   NotebookPen,
   Play,
   Plus,
@@ -39,14 +36,14 @@ import {
 } from 'lucide-react';
 
 import Meter from './components/Meter.jsx';
-import GrayScapeChromebook from './components/GrayScapeChromebook.jsx';
+import McpMacbookScrollLaptop from './components/McpMacbookScrollLaptop.jsx';
+import AurenEnergyBeing from './components/AurenEnergyBeing.jsx';
 import NeuralSpaceField from './components/NeuralSpaceField.jsx';
-import NeuralSpacePortal from './components/NeuralSpacePortal.jsx';
 import SigilButton from './components/SigilButton.jsx';
 import { Globe } from './registry/magicui/globe.jsx';
 import { allianceTemplates, anchorTemplates, archetypes, canonTemplates, epochTemplates, focusSessionTemplates, planLanes, realms, realityContractTemplates, researchPrinciples, ritualPrompts, worldBlueprints } from './data/over3arthContent.js';
 import { getGrayScapeModule } from './data/grayscapeSuperApp.js';
-import { getNeuralSpaceLane, neuralSpaceLanes } from './data/neuralSpacePro.js';
+import { getNeuralSpaceLane } from './data/neuralSpacePro.js';
 import {
   addLedgerEntry,
   calculateStats,
@@ -113,14 +110,14 @@ const worldGateCoordinates = [
   { x: 63, y: 33 }
 ];
 
-const realmCoordinates = [
-  { x: 48, y: 35 },
-  { x: 58, y: 45 },
-  { x: 44, y: 55 },
-  { x: 56, y: 63 },
-  { x: 38, y: 45 },
-  { x: 64, y: 56 }
-];
+function projectBottomArc(index, total, { centerY = 69, radiusX = 39, radiusY = 17, start = 160, end = 20 } = {}) {
+  const progress = total <= 1 ? 0.5 : index / (total - 1);
+  const angle = (start + (end - start) * progress) * (Math.PI / 180);
+  return {
+    x: clampValue(50 + Math.cos(angle) * radiusX, 8, 92),
+    y: clampValue(centerY + Math.sin(angle) * radiusY, 48, 92)
+  };
+}
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -194,28 +191,34 @@ function buildUniverseSectors(state) {
   });
 }
 
-function EnergyVesselShell() {
+function OverearthMcpLaptop({
+  open,
+  worldName,
+  activeGate,
+  selectedRealm,
+  gates,
+  voiceEnabled,
+  onWake,
+  onToggleVoice,
+  onTravelGate
+}) {
+  const accent = '#b85cff';
+  const gold = '#ffd35c';
+
   return (
-    <>
-      <span className="being-aura" />
-      <span className="being-sunburst" />
-      <span className="being-thread thread-one" />
-      <span className="being-thread thread-two" />
-      <span className="being-thread thread-three" />
-      <span className="being-rune-ring ring-outer" />
-      <span className="being-rune-ring ring-inner" />
-      <span className="being-crown" />
-      <span className="being-arm arm-left" />
-      <span className="being-arm arm-right" />
-      <span className="being-core" />
-      <span className="being-body" />
-      <span className="being-shadow" />
-      <span className="being-orbital-particles">
-        {Array.from({ length: 14 }, (_, index) => (
-          <i key={index} style={{ '--spark-angle': `${index * (360 / 14)}deg`, '--spark-delay': `${index * -0.17}s` }} />
-        ))}
-      </span>
-    </>
+    <McpMacbookScrollLaptop
+      open={open}
+      accent={accent}
+      gold={gold}
+      worldName={worldName}
+      activeGate={activeGate}
+      selectedRealm={selectedRealm}
+      gates={gates}
+      voiceEnabled={voiceEnabled}
+      onWake={onWake}
+      onToggleVoice={onToggleVoice}
+      onTravelGate={onTravelGate}
+    />
   );
 }
 
@@ -448,12 +451,7 @@ function Dashboard({ state, stats, archetype, setView, updateState, lowPower }) 
   }
 
   return (
-    <Page
-      eyebrow="Overearth Simulation"
-      title={`${state.profile.worldName} is live.`}
-      copy="Move through the sectors, launch proof missions, seal quests, and watch the realm model respond to the behavior you actually perform."
-      action={<SigilButton onClick={() => setView('quests')}><Gamepad2 size={18} /> Play quests</SigilButton>}
-    >
+    <motion.section className="page overearth-dashboard-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }}>
       <UniverseSimulation
         state={state}
         stats={stats}
@@ -618,7 +616,7 @@ function Dashboard({ state, stats, archetype, setView, updateState, lowPower }) 
         <p>Over3arth is a motivational productivity system. It helps you direct attention, plan behavior, record evidence, and build consistency. It does not replace medical, mental-health, legal, or financial support, and it does not guarantee external outcomes.</p>
       </section>
       </>) : null}
-    </Page>
+    </motion.section>
   );
 }
 
@@ -633,7 +631,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const [activeGateId, setActiveGateId] = useState('realms');
   const [brainTarget, setBrainTarget] = useState('vessel');
   const [brainMode, setBrainMode] = useState('idle');
-  const [brainLine, setBrainLine] = useState(() => `${DEFAULT_VESSEL_NAME} is awake above Overearth. Tap the voice sigil, say "Overearth" or "${DEFAULT_VESSEL_NAME}", then ask for a mission, realm jump, or status.`);
+  const [, setBrainLine] = useState(() => `${DEFAULT_VESSEL_NAME} is inside the laptop core. Tell her what to call you or spin Overearth and pick a node.`);
   const [lastTranscript, setLastTranscript] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [audioOutputEnabled, setAudioOutputEnabled] = useState(false);
@@ -641,13 +639,17 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const [chatInput, setChatInput] = useState('');
   const [neuralLaneId, setNeuralLaneId] = useState('chat');
   const [neuralRuntime, setNeuralRuntime] = useState({ online: false, checkedAt: null, summary: null });
-  const [neuralBusy, setNeuralBusy] = useState(false);
+  const [, setNeuralBusy] = useState(false);
   const [grayScapeModuleId, setGrayScapeModuleId] = useState('nexus');
   const [grayScapeSignal, setGrayScapeSignal] = useState(() => loadGrayScapeSignal());
   const [grayScapeOpen, setGrayScapeOpen] = useState(false);
-  const [grayScapeBusy, setGrayScapeBusy] = useState(false);
+  const [, setGrayScapeBusy] = useState(false);
   const [grayScapeTraveling, setGrayScapeTraveling] = useState(false);
-  const [grayScapeTraveler, setGrayScapeTraveler] = useState(null);
+  const [, setGrayScapeTraveler] = useState(null);
+  const [overearthBootOpen, setOverearthBootOpen] = useState(false);
+  const [overearthWorldVisible, setOverearthWorldVisible] = useState(false);
+  const [aurenCheckInActive, setAurenCheckInActive] = useState(false);
+  const [aurenConversationUntil, setAurenConversationUntil] = useState(0);
   const [mapDragging, setMapDragging] = useState(false);
   const [aurenBrainStatus, setAurenBrainStatus] = useState({
     ok: false,
@@ -663,7 +665,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
       id: 'boot_vessel',
       target: 'vessel',
       role: 'brain',
-      text: `${DEFAULT_VESSEL_NAME} online. I can take typed commands here while the mic listens from the sigil.`,
+      text: `${DEFAULT_VESSEL_NAME} is waiting inside the laptop core. When the globe opens, tell her what to call you.`,
       createdAt: new Date().toISOString()
     }
   ]);
@@ -680,6 +682,8 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const grayScapeTravelTimerRef = useRef(null);
   const grayScapeArriveTimerRef = useRef(null);
   const grayScapeRunnerClearTimerRef = useRef(null);
+  const bootGreetingRef = useRef(false);
+  const aurenPulseTimerRef = useRef(null);
   const mapPanRef = useRef({ x: 0, y: 0, scale: 1, rotate: 0 });
   const mapDragRef = useRef({ active: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originScale: 1, originRotate: 0 });
 
@@ -694,9 +698,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   }, [voiceEnabled]);
 
   useEffect(() => {
-    refreshNeuralRuntime({ silent: true });
     refreshAurenBrain({ silent: true });
-    refreshGrayScapeSignal({ silent: true });
   }, []);
 
   useEffect(() => () => {
@@ -708,6 +710,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     window.clearTimeout(grayScapeTravelTimerRef.current);
     window.clearTimeout(grayScapeArriveTimerRef.current);
     window.clearTimeout(grayScapeRunnerClearTimerRef.current);
+    window.clearTimeout(aurenPulseTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -723,121 +726,186 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const activeGate = gameGates[activeGateIndex] || gameGates[0];
   const avatarAngle = activeGateIndex * (360 / Math.max(1, gameGates.length));
   const vesselName = getVesselName(state);
+  const operatorName = state.profile.name?.trim() || '';
+  const hasPersonalOperatorName = Boolean(operatorName && operatorName.toLowerCase() !== 'world forger');
   const voiceSupported = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const worldskinCharge = clampPercent((stats.energy + selected.charge + (priorityQuest ? 18 : 0)) / 2);
   const activeGateCoord = activeGate.coordinate || { x: 50, y: 28 };
   const activeNeuralLane = getNeuralSpaceLane(neuralLaneId);
   const activeGrayScapeModule = getGrayScapeModule(grayScapeModuleId);
+  const aurenConversationPulse = aurenConversationUntil > Date.now();
+  const aurenEnergyMode = aurenBusy || brainMode === 'thinking'
+    ? 'thinking'
+    : brainMode === 'speaking'
+      ? 'speaking'
+      : aurenConversationPulse
+          ? 'speaking'
+          : voiceEnabled || brainMode === 'listening'
+            ? 'listening'
+            : aurenCheckInActive
+              ? 'checkin'
+              : 'idle';
+  const aurenEnergyPresence = aurenBusy || brainMode === 'speaking' || aurenConversationPulse || aurenCheckInActive
+    ? 'emerged'
+    : voiceEnabled
+      ? 'awake'
+      : 'inside';
 
   commandHandlerRef.current = (transcript) => handleBrainCommand(transcript, 'voice');
 
+  useEffect(() => {
+    if (!overearthBootOpen) {
+      setOverearthWorldVisible(false);
+      return undefined;
+    }
+
+    const revealTimer = window.setTimeout(() => {
+      setOverearthWorldVisible(true);
+    }, 1500);
+
+    return () => window.clearTimeout(revealTimer);
+  }, [overearthBootOpen]);
+
+  useEffect(() => {
+    if (!overearthWorldVisible || bootGreetingRef.current) return undefined;
+
+    const greeting = hasPersonalOperatorName
+      ? `Greetings, ${operatorName}. I am ${vesselName}. Overearth is online.`
+      : `Greetings, user. I am ${vesselName}. Tell me what I should call you.`;
+    const greetTimer = window.setTimeout(() => {
+      bootGreetingRef.current = true;
+      speakBrain(greeting, 'vessel', { audible: false });
+    }, prefersReducedMotion() ? 80 : 680);
+
+    return () => window.clearTimeout(greetTimer);
+  }, [hasPersonalOperatorName, operatorName, overearthWorldVisible, vesselName]);
+
+  useEffect(() => {
+    if (!overearthWorldVisible) {
+      setAurenCheckInActive(false);
+      return undefined;
+    }
+
+    const timers = new Set();
+    const scheduleCheckIn = () => {
+      const waitTimer = window.setTimeout(() => {
+        setAurenCheckInActive(true);
+        const holdTimer = window.setTimeout(() => {
+          setAurenCheckInActive(false);
+          scheduleCheckIn();
+        }, 5200);
+        timers.add(holdTimer);
+      }, 22000);
+      timers.add(waitTimer);
+    };
+
+    scheduleCheckIn();
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [overearthWorldVisible]);
+
   return (
-    <section className="spectacle-scene worldskin-scene" data-brain={brainTarget} data-voice={brainMode} data-thinking={aurenBusy ? 'true' : 'false'} data-neural-lane={neuralLaneId} data-grayscape={grayScapeOpen ? 'open' : 'closed'} data-grayscape-travel={grayScapeTraveling ? 'active' : 'idle'} aria-label="Playable Overearth universe">
-      <NeuralSpaceField activeLaneId={neuralLaneId} charge={worldskinCharge} brainTarget={brainTarget} travelPulse={travelPulse} />
-      <div
-        ref={viewportRef}
-        className={mapDragging ? 'worldskin-viewport dragging' : 'worldskin-viewport'}
-        onPointerDown={beginMapDrag}
-        onPointerMove={moveMapDrag}
-        onPointerUp={endMapDrag}
-        onPointerCancel={endMapDrag}
-        aria-label="Draggable Overearth universe viewport"
+    <section className="spectacle-scene worldskin-scene overearth-zero-scene" data-brain={brainTarget} data-voice={brainMode} data-thinking={aurenBusy ? 'true' : 'false'} data-neural-lane={neuralLaneId} data-boot={overearthWorldVisible ? 'open' : overearthBootOpen ? 'opening' : 'sealed'} aria-label="Playable Overearth universe">
+      {overearthWorldVisible ? <NeuralSpaceField activeLaneId={neuralLaneId} charge={worldskinCharge} brainTarget={brainTarget} travelPulse={travelPulse} /> : null}
+      {overearthWorldVisible ? <div className="overearth-boot-vignette" aria-hidden="true" /> : null}
+
+      <motion.div
+        className="overearth-boot-stage"
+        initial={{ opacity: 0, y: 24, scale: 0.94 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div
-          ref={avatarOrbitRef}
-          className="world-charge-orbit spectacle-orbit worldskin-orbit"
-          style={{
-            '--world-charge': `${Math.max(8, stats.energy)}%`,
-            '--avatar-angle': `${avatarAngle}deg`,
-            '--worldskin-charge': `${worldskinCharge}%`,
-            '--rift-x': `${activeGateCoord.x}%`,
-            '--rift-y': `${activeGateCoord.y}%`,
-            '--neural-color': activeNeuralLane.color
-          }}
-        >
-          <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
-          <div className="worldskin-pulse-field" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <div className="worldskin-interior-rift" key={`rift-${activeGateId}-${selectedRealmId}-${travelPulse}`} aria-hidden="true">
-            <span className="rift-core" />
-            <span className="rift-depth depth-one" />
-            <span className="rift-depth depth-two" />
-            <span className="rift-route route-one" />
-            <span className="rift-route route-two" />
-          </div>
-          <div className="worldskin-gate-field" aria-label="Overearth world gates">
-            {gameGates.map((gate, index) => {
-              const Icon = gate.icon;
-              return (
-                <button
-                  key={gate.id}
-                  type="button"
-                  className={activeGateId === gate.id ? 'worldskin-gate active' : 'worldskin-gate'}
-                  style={{ '--gate-x': `${gate.coordinate.x}%`, '--gate-y': `${gate.coordinate.y}%`, '--gate-delay': `${index * -0.24}s` }}
-                  onClick={() => travelToGate(gate, true)}
-                  title={gate.worldName}
-                  aria-label={`Travel to ${gate.worldName}`}
-                >
-                  <Icon size={15} />
-                </button>
-              );
-            })}
-            {sectors.map((sector, index) => {
-              const coord = realmCoordinates[index % realmCoordinates.length];
-              return (
-                <button
-                  key={sector.id}
-                  type="button"
-                  className={selectedRealmId === sector.id ? 'worldskin-realm-node active' : 'worldskin-realm-node'}
-                  style={{ '--realm-x': `${coord.x}%`, '--realm-y': `${coord.y}%`, '--realm-charge': `${Math.max(12, sector.charge)}%`, '--realm-delay': `${index * -0.34}s` }}
-                  onClick={() => travelToRealm(sector, true)}
-                  title={sector.name}
-                  aria-label={`Enter ${sector.name}`}
-                >
-                  {sector.sigil}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+        <OverearthMcpLaptop
+          open={overearthBootOpen}
+          worldName={state.profile.worldName}
+          activeGate={activeGate}
+          selectedRealm={selectedRealm}
+          gates={gameGates}
+          voiceEnabled={voiceEnabled}
+          onWake={() => setOverearthBootOpen(true)}
+          onToggleVoice={toggleListening}
+          onTravelGate={travelToGate}
+        />
 
-      {grayScapeTraveler ? (
-        <div
-          className="energy-being spectacle-being vessel-gate-runner"
-          data-arrived={grayScapeTraveler.arrived ? 'true' : 'false'}
-          style={{
-            '--vessel-start-x': `${grayScapeTraveler.startX}px`,
-            '--vessel-start-y': `${grayScapeTraveler.startY}px`,
-            '--vessel-target-x': `${grayScapeTraveler.targetX}px`,
-            '--vessel-target-y': `${grayScapeTraveler.targetY}px`,
-            left: `${grayScapeTraveler.arrived ? grayScapeTraveler.targetX : grayScapeTraveler.startX}px`,
-            top: `${grayScapeTraveler.arrived ? grayScapeTraveler.targetY : grayScapeTraveler.startY}px`,
-            opacity: grayScapeTraveler.arrived ? 0.2 : 1
-          }}
-          aria-hidden="true"
-        >
-          <EnergyVesselShell />
-        </div>
-      ) : null}
+        {overearthWorldVisible ? (
+          <div
+            ref={viewportRef}
+            className={mapDragging ? 'overearth-map-viewport dragging' : 'overearth-map-viewport'}
+            data-open="true"
+            onPointerDown={beginMapDrag}
+            onPointerMove={moveMapDrag}
+            onPointerUp={endMapDrag}
+            onPointerCancel={endMapDrag}
+            aria-label="Spinnable Overearth destination globe"
+          >
+            <div
+              ref={avatarOrbitRef}
+              className="world-charge-orbit spectacle-orbit worldskin-orbit overearth-node-globe"
+              style={{
+                '--world-charge': `${Math.max(8, stats.energy)}%`,
+                '--avatar-angle': `${avatarAngle}deg`,
+                '--worldskin-charge': `${worldskinCharge}%`,
+                '--rift-x': `${activeGateCoord.x}%`,
+                '--rift-y': `${activeGateCoord.y}%`,
+                '--neural-color': activeNeuralLane.color
+              }}
+            >
+              <Globe className="game-world-globe spectacle-globe" intensity={Math.max(1.05, stats.energy / 58)} tilt={0} radiusScale={0.48} label={`${state.profile.worldName} world charge globe`} />
+              <AurenEnergyBeing
+                className="auren-globe-being"
+                mode={aurenEnergyMode}
+                presence={aurenEnergyPresence}
+                target={brainTarget}
+                energy={worldskinCharge}
+                label={`${vesselName} energy being inside ${state.profile.worldName}`}
+              />
+              <div className="worldskin-gate-field overearth-node-map" aria-label="Overearth world gates">
+                <div className="overearth-active-node" aria-live="polite">
+                  <strong>{activeGate.worldName}</strong>
+                  <span>{selectedRealm.name}</span>
+                </div>
+                {gameGates.map((gate, index) => {
+                  const Icon = gate.icon;
+                  const coord = projectBottomArc(index, gameGates.length, { centerY: 72, radiusX: 39, radiusY: 14, start: 158, end: 22 });
+                  return (
+                    <button
+                      key={gate.id}
+                      type="button"
+                      className={activeGateId === gate.id ? 'worldskin-gate active' : 'worldskin-gate'}
+                      style={{ '--gate-x': `${coord.x}%`, '--gate-y': `${coord.y}%`, '--gate-delay': `${index * -0.24}s` }}
+                      onClick={() => travelToGate(gate, true)}
+                      title={gate.worldName}
+                      aria-label={`Travel to ${gate.worldName}`}
+                    >
+                      <Icon size={15} />
+                    </button>
+                  );
+                })}
+                {sectors.map((sector, index) => {
+                  const coord = projectBottomArc(index, sectors.length, { centerY: 82, radiusX: 28, radiusY: 8, start: 148, end: 32 });
+                  return (
+                    <button
+                      key={sector.id}
+                      type="button"
+                      className={selectedRealmId === sector.id ? 'worldskin-realm-node active' : 'worldskin-realm-node'}
+                      style={{ '--realm-x': `${coord.x}%`, '--realm-y': `${coord.y}%`, '--realm-charge': `${Math.max(12, sector.charge)}%`, '--realm-delay': `${index * -0.34}s` }}
+                      onClick={() => travelToRealm(sector, true)}
+                      title={sector.name}
+                      aria-label={`Enter ${sector.name}`}
+                    >
+                      {sector.sigil}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </motion.div>
 
-      <div className="worldskin-action-sigils" aria-label="Overearth game actions">
-        <button type="button" className={voiceEnabled ? 'voice-aperture listening' : 'voice-aperture'} onClick={toggleListening} title={voiceEnabled ? 'Stop local voice brains' : 'Start local voice brains'} aria-label={voiceEnabled ? 'Stop local voice brains' : 'Start local voice brains'}>
-          <Mic size={18} />
-        </button>
-        <button type="button" onClick={requestMission} title="Summon mission" aria-label="Summon mission"><Swords size={17} /></button>
-        <button type="button" onClick={requestProofSeal} title="Seal proof" aria-label="Seal proof"><CheckCircle2 size={17} /></button>
-        <button type="button" onClick={requestFocusPulse} title="Focus pulse" aria-label="Focus pulse"><Brain size={17} /></button>
-        <button type="button" onClick={requestRitualPulse} title="Ritual pulse" aria-label="Ritual pulse"><Flame size={17} /></button>
-        <button type="button" onClick={() => openGrayScapeModule(grayScapeModuleId, true)} title="Wake GrayScape Chromebook" aria-label="Wake GrayScape Chromebook"><Crown size={17} /></button>
-        <button type="button" onClick={() => handleBrainCommand('Overearth status', 'sigil')} title="World status" aria-label="World status"><Radar size={17} /></button>
-      </div>
-
-      <motion.div className="worldskin-brain-dock" data-target={brainTarget} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }} aria-live="polite">
+      {overearthWorldVisible ? (
+      <motion.div className="worldskin-brain-dock auren-projection" data-target={brainTarget} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1], delay: 0.38 }} aria-live="polite">
+        <div className="auren-projection__beam" aria-hidden="true" />
         <div className="brain-dock-head">
           <span className="voice-ribbon-speaker">
             {brainTarget === 'overearth' ? <Globe2 size={14} /> : <Volume2 size={14} />}
@@ -860,21 +928,13 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
             </div>
           ))}
         </div>
-        <NeuralSpacePortal
-          lanes={neuralSpaceLanes}
-          activeLaneId={neuralLaneId}
-          runtime={neuralRuntime}
-          busy={neuralBusy}
-          onSelectLane={(laneId) => selectNeuralLane(laneId, true)}
-          onRefresh={() => refreshNeuralRuntime()}
-        />
         <form className="brain-command-line" onSubmit={submitBrainChat}>
           <MessageCircle size={15} aria-hidden="true" />
           <input
             value={chatInput}
             onChange={(event) => setChatInput(event.target.value)}
-            placeholder={`Talk to Overearth, ${vesselName}, or NeuralSpacePro`}
-            aria-label={`Talk to Overearth, ${vesselName}, or NeuralSpacePro`}
+            placeholder={hasPersonalOperatorName ? `Talk to ${vesselName}` : `Tell ${vesselName} what to call you`}
+            aria-label={`Talk to ${vesselName}`}
           />
           <button type="submit" aria-label="Send brain command"><ChevronRight size={16} /></button>
         </form>
@@ -884,18 +944,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
         </div>
         <small>{lastTranscript ? `Heard: ${lastTranscript}` : aurenBrainStatus.ok ? `${aurenBrainStatus.gate?.label || 'MetrAIyux Gate / AurenBrain'} online. ${aurenBrainStatus.memory?.exchanges || 0} exchanges remembered.` : 'AurenBrain service is warming up; your gate is ready.'}</small>
       </motion.div>
-
-      <GrayScapeChromebook
-        activeModuleId={grayScapeModuleId}
-        signal={grayScapeSignal}
-        open={grayScapeOpen}
-        busy={grayScapeBusy}
-        onSelectModule={(moduleId) => selectGrayScapeModule(moduleId, false)}
-        onOpenModule={(moduleId) => openGrayScapeModule(moduleId, true)}
-        onClose={closeGrayScapeModule}
-        onRefresh={() => refreshGrayScapeSignal()}
-        onFrameLoad={() => refreshGrayScapeSignal({ silent: true })}
-      />
+      ) : null}
     </section>
   );
 
@@ -963,7 +1012,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   }
 
   function shouldIgnoreMapDrag(target) {
-    return Boolean(target?.closest?.('button, input, textarea, select, iframe, a, .worldskin-brain-dock, .worldskin-action-sigils, .grayscape-chromebook'));
+    return Boolean(target?.closest?.('button, input, textarea, select, iframe, a, .worldskin-brain-dock, .mcp-macbook-scroll__base'));
   }
 
   function beginMapDrag(event) {
@@ -987,16 +1036,27 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   function moveMapDrag(event) {
     const drag = mapDragRef.current;
     if (!drag.active || drag.pointerId !== event.pointerId || !viewportRef.current) return;
-    const boundsX = window.innerWidth * 0.45;
-    const boundsY = window.innerHeight * 0.34;
+    const boundsX = window.innerWidth * 0.08;
+    const boundsY = window.innerHeight * 0.05;
+    const dragX = event.clientX - drag.startX;
+    const dragY = event.clientY - drag.startY;
     const next = {
-      x: clampValue(drag.originX + event.clientX - drag.startX, -boundsX, boundsX),
-      y: clampValue(drag.originY + event.clientY - drag.startY, -boundsY, boundsY),
+      x: clampValue(drag.originX + dragX * 0.12, -boundsX, boundsX),
+      y: clampValue(drag.originY + dragY * 0.08, -boundsY, boundsY),
       scale: drag.originScale || 1,
-      rotate: drag.originRotate || 0
+      rotate: drag.originRotate + dragX * 0.22
     };
     mapPanRef.current = next;
-    gsap.set(viewportRef.current, { x: next.x, y: next.y, scale: next.scale, rotation: next.rotate, opacity: 1, filter: grayScapeOpen ? 'blur(0.7px)' : 'blur(0px)' });
+    gsap.set(viewportRef.current, { x: next.x, y: next.y, scale: next.scale, opacity: 1, filter: grayScapeOpen ? 'blur(0.7px)' : 'blur(0px)' });
+    if (avatarOrbitRef.current) {
+      gsap.set(avatarOrbitRef.current, { rotation: next.rotate });
+    }
+    if (gameGates.length) {
+      const normalized = ((next.rotate % 360) + 360) % 360;
+      const gateIndex = Math.round(normalized / (360 / gameGates.length)) % gameGates.length;
+      const spunGate = gameGates[gateIndex];
+      if (spunGate) setActiveGateId(spunGate.id);
+    }
   }
 
   function endMapDrag(event) {
@@ -1007,22 +1067,11 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     event.currentTarget.releasePointerCapture?.(event.pointerId);
   }
 
-  function closeGrayScapeModule() {
-    window.clearTimeout(grayScapeTravelTimerRef.current);
-    window.clearTimeout(grayScapeArriveTimerRef.current);
-    window.clearTimeout(grayScapeRunnerClearTimerRef.current);
-    resetMapDrag();
-    setGrayScapeTraveling(false);
-    setGrayScapeTraveler(null);
-    setGrayScapeOpen(false);
-    moveGrayScapeViewport(false);
-  }
-
   function createGrayScapeTravelFrame() {
     const vesselNode = avatarOrbitRef.current?.querySelector?.('.spectacle-being') || avatarOrbitRef.current;
     const laptopNode =
-      document.querySelector('.grayscape-chromebook[data-open="false"] .grayscape-chromebook__closed-lid') ||
-      document.querySelector('.grayscape-chromebook[data-open="false"]');
+      document.querySelector('.mcp-macbook-scroll[data-open="false"] .mcp-macbook-scroll__lid') ||
+      document.querySelector('.mcp-macbook-scroll[data-open="false"]');
     const vesselRect = vesselNode?.getBoundingClientRect?.();
     const laptopRect = laptopNode?.getBoundingClientRect?.();
     const width = window.innerWidth || 1440;
@@ -1171,6 +1220,18 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     handleBrainCommand(transcript, 'typed');
   }
 
+  function extractOperatorName(transcript) {
+    const match = String(transcript || '').trim().match(/^(?:hey\s+\w+,?\s*)?(?:please\s+)?(?:call me|my name is|you can call me)\s+([a-z0-9][a-z0-9 .'-]{1,42})/i);
+    if (!match) return '';
+    return match[1]
+      .replace(/\b(?:please|thanks|thank you)\b.*$/i, '')
+      .replace(/[.!?]+$/g, '')
+      .trim()
+      .split(/\s+/)
+      .slice(0, 4)
+      .join(' ');
+  }
+
   async function handleBrainCommand(transcript, source = 'typed') {
     const command = String(transcript || '').trim();
     if (!command) return;
@@ -1178,6 +1239,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     setLastTranscript(command);
     setBrainTarget(target);
     setBrainMode('thinking');
+    pulseAurenEmergence(5200);
     appendBrainLog([{
       id: uid('player'),
       role: 'player',
@@ -1185,6 +1247,37 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
       text: command,
       createdAt: new Date().toISOString()
     }]);
+
+    const requestedName = extractOperatorName(command);
+    if (requestedName) {
+      updateState((current) => ({
+        ...current,
+        profile: {
+          ...current.profile,
+          name: requestedName,
+          onboardingComplete: true
+        }
+      }), '', 'operator_name_set');
+      const response = `Got it. I will call you ${requestedName}. The globe is open; choose the first node and I will move with you.`;
+      const setupResult = normalizeClientBrainResult({
+        target: 'vessel',
+        response,
+        provider: 'MetrAIyux Gate / AurenBrain',
+        actions: [],
+        confidence: 1
+      }, 'vessel');
+      appendBrainLog([{
+        id: uid('brain'),
+        role: 'brain',
+        target: 'vessel',
+        provider: setupResult.provider,
+        text: setupResult.response,
+        createdAt: new Date().toISOString()
+      }]);
+      rememberBrainExchange(command, setupResult);
+      speakBrain(setupResult.response, 'vessel', { log: false });
+      return;
+    }
 
     const localBrainPlan = createBrainResponse({
       transcript: command,
@@ -1639,11 +1732,21 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     setBrainLog((current) => [...current, ...entries].slice(-18));
   }
 
+  function pulseAurenEmergence(duration = 4200) {
+    const pulseUntil = Date.now() + duration;
+    setAurenConversationUntil((current) => Math.max(current, pulseUntil));
+    window.clearTimeout(aurenPulseTimerRef.current);
+    aurenPulseTimerRef.current = window.setTimeout(() => {
+      setAurenConversationUntil((current) => (current <= pulseUntil ? 0 : current));
+    }, duration);
+  }
+
   async function speakBrain(text, target = 'vessel', options = {}) {
     const { log = true, audible = true } = options;
     setBrainTarget(target);
     setBrainLine(text);
     setBrainMode('speaking');
+    pulseAurenEmergence(audible && audioOutputEnabled ? 6200 : 4400);
     if (log) {
       appendBrainLog([{
         id: uid('brain'),
@@ -1744,30 +1847,6 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     setTravelPulse((value) => value + 1);
     trackEvent('realm_travel', { destination: realm.id, mode: 'worldskin' });
     if (shouldSpeak) speakBrain(`${vesselName} is standing in ${realm.name}. ${realm.promise}`, 'vessel');
-  }
-
-  function requestMission() {
-    launchSectorMission();
-    speakBrain(`Mission forged in ${selectedRealm.name}. I placed it in the Quest Wilds.`, 'overearth');
-  }
-
-  function requestProofSeal() {
-    if (!priorityQuest) {
-      speakBrain('No open proof thread is close enough to seal. Summon a mission first.', 'overearth');
-      return;
-    }
-    sealPriorityProof();
-    speakBrain(`Proof sealed: ${priorityQuest.title}. The globe remembers.`, 'overearth');
-  }
-
-  function requestRitualPulse() {
-    sealRitualPulse();
-    speakBrain(`Ritual flame sealed for ${selectedRealm.name}.`, 'overearth');
-  }
-
-  function requestFocusPulse() {
-    sealFocusPulse();
-    speakBrain(`${vesselName} logged a focus pulse in ${selectedRealm.name}.`, 'vessel');
   }
 
   function launchSectorMission() {

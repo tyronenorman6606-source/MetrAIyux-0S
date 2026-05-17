@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,10 +7,12 @@
   <meta name="description" content="Relay13 operator console for workspaces, API keys, widget publishing, and real messaging threads.">
   <link rel="stylesheet" href="../styles.css">
 </head>
-<body>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
   <main class="admin">
     <aside class="side">
-      <div class="brand"><img class="brand-logo" src="../assets/relay13-logo-transparent.png" alt="Relay13 logo"><div><h1><span class="gold">Relay13</span> <span class="grad">Console</span></h1><p>Owned universal messaging control.</p></div></div>
+      <div class="brand"><img class="brand-logo" src="../assets/relay13-logo-transparent.png" alt="Relay13 logo"><div><h1 class="neon-gradient-text"><span class="gold">Relay13</span> <span class="grad">Console</span></h1><p>Owned universal messaging control.</p></div></div>
       <section class="panel stack"><label>Platform admin token</label><input id="adminToken" class="input" type="password" placeholder="PLATFORM_ADMIN_TOKEN"><button id="saveToken" class="btn">Load platform</button><button id="bootstrap" class="btn ghost">Bootstrap default workspace</button><span class="micro">The inbox only fills from real widget/API conversations.</span></section>
       <section class="panel stack"><strong>Workspace</strong><select id="workspaceSelect" class="input"></select><div class="row"><input id="workspaceName" class="input" placeholder="New workspace name"><button id="createWorkspace" class="btn">Create</button></div></section>
       <section class="stats" id="stats"></section>

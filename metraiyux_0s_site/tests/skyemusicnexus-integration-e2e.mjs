@@ -141,15 +141,29 @@ async function main() {
 
     await page.goto(`${baseUrl}/SkyeMusicNexus/index.html`, { waitUntil: "domcontentloaded" });
     await expectText(page, "Command Field");
-    await expectText(page, "Artist Nebula");
-    await expectText(page, "Release Forge");
+    await expectText(page, "Upload Studio");
+    await expectText(page, "Music Player");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
     await assertNoHorizontalScroll(page, "SkyeMusicNexus app shell desktop");
     await page.screenshot({ path: path.join(ARTIFACT_DIR, "app-shell-gated-desktop.png"), fullPage: true });
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage desktop", ["Release music through a living artist exchange", "Creator Exchange", "Content Request Exchange", "Achievement Orbit", "Release Campaign Forge"], "artist-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault"], "artist-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Uploaded Audio Vault", "Release Forge"], "upload-studio-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/releases.html", "Releases desktop", ["Artist Nebula", "Release Forge", "Royalty River", "Ops Sequencer"], "releases-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/rights.html", "Rights desktop", ["Rights Vault", "Takedown Hold", "No rights, no linked playback"], "rights-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/exchange.html", "Exchange desktop", ["Creator Exchange", "Content Request Exchange", "Achievement Orbit", "Release Campaign Forge"], "exchange-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/player.html", "Music player desktop", ["Stream Deck", "Uploaded Audio Vault"], "player-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
+    await page.waitForFunction(() => window.__SKYE_MUSIC_PLAYBACK && window.__SKYE_MUSIC_PLAYBACK.queueLength > 0);
+    await page.locator('[data-player-action="play"]').click();
+    await page.waitForFunction(() => window.__SKYE_MUSIC_PLAYBACK && window.__SKYE_MUSIC_PLAYBACK.isPlaying === true);
+    await page.waitForTimeout(900);
+    const playback = await page.evaluate(() => window.__SKYE_MUSIC_PLAYBACK);
+    expect(playback.currentTime > 0, `Playback deck did not advance time: ${JSON.stringify(playback)}`);
+    expect(["generated-preview", "linked-audio"].includes(playback.mode), `Unexpected playback mode: ${playback.mode}`);
+    await page.locator('[data-player-action="stop"]').click();
+    assertions.push("Artist playback deck starts audio, advances time, and remains behind the seeded gate session plus rights vault surface.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/admin.html", "Operator stage desktop", ["Move releases, content requests", "Payout Gate", "Analytics Prism", "Exchange Console"], "operator-stage-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
     assertions.push("Artist and operator stages render end to end with the seeded gate session.");
@@ -158,8 +172,9 @@ async function main() {
     mobile.on("pageerror", (error) => pageErrors.push(`mobile: ${error.message}`));
     await mobile.setViewportSize({ width: 390, height: 844 });
     await checkPage(mobile, baseUrl, "live/skyemusicnexus-neofront.html", "SkyeMusicNexus hub mobile", ["SkyeMusicNexus Lite is Free99", "Single Song Drop"], "hub-mobile.png");
-    await checkPage(mobile, baseUrl, "SkyeMusicNexus/public/index.html", "Artist stage mobile", ["Release music through a living artist exchange", "Creator Exchange"], "artist-stage-mobile.png");
-    assertions.push("Mobile hub and artist stage render without horizontal overflow.");
+    await checkPage(mobile, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard mobile", ["Platform Dashboard", "Upload Studio"], "artist-stage-mobile.png");
+    await checkPage(mobile, baseUrl, "SkyeMusicNexus/public/player.html", "Music player mobile", ["Stream Deck"], "player-mobile.png");
+    assertions.push("Mobile hub, dashboard, and player render without horizontal overflow.");
 
     expect(pageErrors.length === 0, `Browser page errors:\n${pageErrors.join("\n")}`);
 
@@ -174,6 +189,8 @@ async function main() {
         social_exchange_available: true,
         content_requests_available: true,
         achievements_available: true,
+        rights_vault_available: true,
+        takedown_hold_available: true,
         gate_session_required: true,
         seeded_gate_token: GATE_TOKEN
       },
@@ -190,9 +207,15 @@ async function main() {
         "sales-router-desktop.png",
         "app-shell-gated-desktop.png",
         "artist-stage-desktop.png",
+        "upload-studio-desktop.png",
+        "releases-desktop.png",
+        "rights-desktop.png",
+        "exchange-desktop.png",
+        "player-desktop.png",
         "operator-stage-desktop.png",
         "hub-mobile.png",
-        "artist-stage-mobile.png"
+        "artist-stage-mobile.png",
+        "player-mobile.png"
       ]
     };
     await writeFile(path.join(ARTIFACT_DIR, "report.json"), JSON.stringify(report, null, 2));

@@ -37,7 +37,7 @@ function buildGlobePoints() {
   return points;
 }
 
-export function Globe({ className = '', intensity = 1, label = 'Over3arth active world' }) {
+export function Globe({ className = '', intensity = 1, label = 'Over3arth active world', tilt = -0.38, radiusScale = 0.35 }) {
   const canvasRef = useRef(null);
   const pointsRef = useRef(buildGlobePoints());
 
@@ -54,9 +54,10 @@ export function Globe({ className = '', intensity = 1, label = 'Over3arth active
     let startTime = performance.now();
 
     function resize() {
-      const rect = canvas.parentElement?.getBoundingClientRect();
-      width = Math.max(260, rect?.width || canvas.clientWidth || 420);
-      height = Math.max(260, rect?.height || canvas.clientHeight || 420);
+      const parent = canvas.parentElement;
+      const rect = parent?.getBoundingClientRect();
+      width = Math.max(260, parent?.clientWidth || parent?.offsetWidth || rect?.width || canvas.clientWidth || 420);
+      height = Math.max(260, parent?.clientHeight || parent?.offsetHeight || rect?.height || canvas.clientHeight || 420);
       pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
@@ -68,10 +69,9 @@ export function Globe({ className = '', intensity = 1, label = 'Over3arth active
     function draw(now) {
       const elapsed = (now - startTime) / 1000;
       const rotation = reduceMotion ? 0.78 : elapsed * 0.22;
-      const tilt = -0.38;
       const centerX = width / 2;
       const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.35;
+      const radius = Math.min(width, height) * radiusScale;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -148,7 +148,7 @@ export function Globe({ className = '', intensity = 1, label = 'Over3arth active
       observer.disconnect();
       startTime = 0;
     };
-  }, [intensity]);
+  }, [intensity, radiusScale, tilt]);
 
   return (
     <div className={classNames('magic-globe', className)} role="img" aria-label={label}>

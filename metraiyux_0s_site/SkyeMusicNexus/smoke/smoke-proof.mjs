@@ -28,6 +28,9 @@ async function call(handler, { method = "GET", query = {}, body, authToken } = {
 
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "skye-musicnexus-proof-"));
 process.env.MUSIC_NEXUS_DATA_DIR = tmpDir;
+delete process.env.MUSIC_NEXUS_STORAGE_BACKEND;
+delete process.env.SKYE_MUSIC_NEXUS_STORAGE_BACKEND;
+delete process.env.MUSIC_NEXUS_USE_R2;
 const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
 process.env.SKYGATE_PUBLIC_KEY_PEM = publicKey.export({ type: "spki", format: "pem" });
 process.env.SKYGATE_LOCAL_SESSION_PRIVATE_KEY_PEM = privateKey.export({ type: "pkcs8", format: "pem" });
@@ -37,26 +40,40 @@ process.env.SKYGATE_LOCAL_OPERATOR_PASSWORD = "proof-password";
 process.env.SKYGATE_LOCAL_OPERATOR_ROLE = "admin";
 const artists = require(path.join(root, "netlify/functions/music-artists.js"));
 const releases = require(path.join(root, "netlify/functions/music-releases.js"));
+const assets = require(path.join(root, "netlify/functions/music-assets.js"));
 const payments = require(path.join(root, "netlify/functions/music-payments.js"));
 const analytics = require(path.join(root, "netlify/functions/music-analytics.js"));
 const exchange = require(path.join(root, "netlify/functions/music-exchange.js"));
 const session = require(path.join(root, "netlify/functions/skygate-session.js"));
 
 const indexHtml = fs.readFileSync(path.join(root, "public/index.html"), "utf8");
+const uploadHtml = fs.readFileSync(path.join(root, "public/upload.html"), "utf8");
+const playerHtml = fs.readFileSync(path.join(root, "public/player.html"), "utf8");
+const releasesHtml = fs.readFileSync(path.join(root, "public/releases.html"), "utf8");
+const rightsHtml = fs.readFileSync(path.join(root, "public/rights.html"), "utf8");
+const exchangeHtml = fs.readFileSync(path.join(root, "public/exchange.html"), "utf8");
 const adminHtml = fs.readFileSync(path.join(root, "public/admin.html"), "utf8");
 const gateSession = fs.readFileSync(path.join(root, "gate-session.js"), "utf8");
 const authHelper = fs.readFileSync(path.join(root, "public/skygate-auth.js"), "utf8");
 const neoJs = fs.readFileSync(path.join(root, "public/neo-nexus.js"), "utf8");
 const neoCss = fs.readFileSync(path.join(root, "public/neo-nexus.css"), "utf8");
-assert(indexHtml.includes("NeoFront Artist Operating Stage"), "public/index.html is missing the NeoFront artist stage title");
-assert(indexHtml.includes("Artist Nebula"), "public/index.html is missing the artist nebula surface");
-assert(indexHtml.includes("Release Forge"), "public/index.html is missing the release forge surface");
-assert(indexHtml.includes("Royalty River"), "public/index.html is missing the royalty river surface");
-assert(indexHtml.includes("Ops Sequencer"), "public/index.html is missing the operations sequencer surface");
-assert(indexHtml.includes("Creator Exchange"), "public/index.html is missing the creator exchange surface");
-assert(indexHtml.includes("Content Request Exchange"), "public/index.html is missing the content request exchange language");
-assert(indexHtml.includes("Achievement Orbit"), "public/index.html is missing the achievement orbit surface");
-assert(indexHtml.includes("Release Campaign Forge"), "public/index.html is missing the release campaign forge");
+const assetsSource = fs.readFileSync(path.join(root, "netlify/functions/music-assets.js"), "utf8");
+assert(indexHtml.includes("Platform Dashboard"), "public/index.html is missing the platform dashboard title");
+const artistPages = [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml].join("\n");
+assert(uploadHtml.includes("Gated Audio Upload"), "public/upload.html is missing gated audio upload");
+assert(uploadHtml.includes("assetUploadForm"), "public/upload.html is missing the upload form");
+assert(playerHtml.includes("Stream Deck"), "public/player.html is missing the playback stream deck");
+assert(releasesHtml.includes("Artist Nebula"), "public/releases.html is missing the artist nebula surface");
+assert(releasesHtml.includes("Release Forge"), "public/releases.html is missing the release forge surface");
+assert(releasesHtml.includes("Royalty River"), "public/releases.html is missing the royalty river surface");
+assert(releasesHtml.includes("Ops Sequencer"), "public/releases.html is missing the operations sequencer surface");
+assert(exchangeHtml.includes("Creator Exchange"), "public/exchange.html is missing the creator exchange surface");
+assert(exchangeHtml.includes("Content Request Exchange"), "public/exchange.html is missing the content request exchange language");
+assert(exchangeHtml.includes("Achievement Orbit"), "public/exchange.html is missing the achievement orbit surface");
+assert(exchangeHtml.includes("Release Campaign Forge"), "public/exchange.html is missing the release campaign forge");
+assert(rightsHtml.includes("Rights Vault"), "public/rights.html is missing the rights vault");
+assert(rightsHtml.includes("Takedown Hold"), "public/rights.html is missing the takedown hold surface");
+assert(artistPages.includes("Upload Studio"), "public platform pages are missing Upload Studio");
 assert(indexHtml.includes("../gate-session.js"), "public/index.html is missing the SkyeMusicNexus gate-session overlay");
 assert(indexHtml.includes("skygate-auth.js"), "public/index.html is missing the shared SkyGate browser auth helper");
 assert(indexHtml.includes("neo-nexus.js"), "public/index.html is missing the NeoFront runtime script");
@@ -70,16 +87,26 @@ assert(adminHtml.includes("skygate-auth.js"), "public/admin.html is missing the 
 assert(neoJs.includes("/.netlify/functions/"), "neo-nexus.js is missing Netlify function API wiring");
 assert(neoJs.includes("music-artists"), "neo-nexus.js is missing music-artists wiring");
 assert(neoJs.includes("music-releases"), "neo-nexus.js is missing music-releases wiring");
+assert(neoJs.includes("music-assets"), "neo-nexus.js is missing music-assets upload wiring");
+assert(assetsSource.includes("MUSIC_NEXUS_STORAGE_BACKEND"), "music-assets.js is missing the durable storage backend switch");
+assert(assetsSource.includes("skyevault-r2-gated-audio"), "music-assets.js is missing the SkyeVault/R2 audio storage lane");
 assert(neoJs.includes("music-payments"), "neo-nexus.js is missing music-payments wiring");
 assert(neoJs.includes("music-analytics"), "neo-nexus.js is missing music-analytics wiring");
 assert(neoJs.includes("music-exchange"), "neo-nexus.js is missing music-exchange wiring");
 assert(neoJs.includes("queue-operations"), "neo-nexus.js is missing operations queue wiring");
 assert(neoJs.includes("report-streams"), "neo-nexus.js is missing stream reporting wiring");
+assert(neoJs.includes("playback-stream"), "neo-nexus.js is missing playback stream proof wiring");
+assert(neoJs.includes("update-rights"), "neo-nexus.js is missing rights update wiring");
+assert(neoJs.includes("takedown-request"), "neo-nexus.js is missing takedown hold wiring");
+assert(neoJs.includes("AudioContext"), "neo-nexus.js is missing Web Audio playback wiring");
 assert(neoJs.includes("request-content"), "neo-nexus.js is missing content request wiring");
 assert(neoJs.includes("publish-community"), "neo-nexus.js is missing community post wiring");
 assert(neoJs.includes("build-release-campaign"), "neo-nexus.js is missing release campaign wiring");
 assert(neoCss.includes("vinyl-core"), "neo-nexus.css is missing the vinyl core display system");
 assert(neoCss.includes("wave-reader"), "neo-nexus.css is missing the signal wave display system");
+assert(neoCss.includes("player-queue"), "neo-nexus.css is missing the playback queue display system");
+assert(neoCss.includes("rights-status"), "neo-nexus.css is missing the rights gate display system");
+assert(neoCss.includes("asset-card"), "neo-nexus.css is missing the upload asset card display system");
 assert(authHelper.includes("window.sessionStorage"), "skygate-auth.js is not using session-scoped token storage");
 assert(authHelper.includes("loginLocalOperator"), "skygate-auth.js is missing local operator login wiring");
 assert(authHelper.includes("logoutSession"), "skygate-auth.js is missing local session logout wiring");
@@ -94,6 +121,8 @@ const unauthOperationsRes = await call(releases, { method: "GET", query: { actio
 assert(unauthOperationsRes.statusCode === 401, `unauthenticated operations board escaped the gate: ${unauthOperationsRes.statusCode}`);
 const unauthExchangeRes = await call(exchange, { method: "GET", query: { action: "hub" } });
 assert(unauthExchangeRes.statusCode === 401, `unauthenticated music exchange escaped the gate: ${unauthExchangeRes.statusCode}`);
+const unauthAssetsRes = await call(assets, { method: "GET", query: { action: "list" } });
+assert(unauthAssetsRes.statusCode === 401, `unauthenticated music assets escaped the gate: ${unauthAssetsRes.statusCode}`);
 
 const sessionStatusRes = await call(session, { method: "GET" });
 assert(sessionStatusRes.statusCode === 200, `session status failed: ${sessionStatusRes.statusCode}`);
@@ -167,6 +196,38 @@ const approveRes = await call(artists, {
 });
 assert(approveRes.statusCode === 200, `artist approve failed: ${approveRes.statusCode}`);
 
+const uploadBuffer = Buffer.concat([
+  Buffer.from("RIFF$\u0000\u0000\u0000WAVEfmt \u0010\u0000\u0000\u0001\u0000\u0001\u0000D\u00ac\u0000\u0000\u0088X\u0001\u0000\u0002\u0000\u0010\u0000data\u0000\u0000\u0000\u0000", "binary"),
+  Buffer.alloc(128),
+]);
+const uploadRes = await call(assets, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "upload",
+    artistId,
+    title: "Proof Track",
+    fileName: "proof-track.wav",
+    contentType: "audio/wav",
+    dataBase64: uploadBuffer.toString("base64"),
+  },
+});
+assert(uploadRes.statusCode === 201, `audio upload failed: ${uploadRes.statusCode}`);
+const uploadData = parse(uploadRes);
+const uploadedAsset = uploadData.asset;
+assert(uploadedAsset?.streamUrl?.includes("music-assets"), "audio upload did not return a gated stream URL");
+assert(uploadedAsset?.storage === "music-nexus-local-gated-audio", "local proof upload did not use the expected gated local storage lane");
+
+const assetListRes = await call(assets, { method: "GET", authToken: token, query: { action: "list", artistId } });
+assert(assetListRes.statusCode === 200, `audio asset list failed: ${assetListRes.statusCode}`);
+const assetListData = parse(assetListRes);
+assert(assetListData.assets?.some((item) => item.id === uploadedAsset.id), "audio asset list did not include the uploaded file");
+assert(assetListData.storage?.mode === "local" && assetListData.storage?.durable === false, "local proof asset list did not report the storage boundary");
+
+const assetStreamRes = await call(assets, { method: "GET", authToken: token, query: { action: "stream", id: uploadedAsset.id } });
+assert(assetStreamRes.statusCode === 200, `audio asset stream failed: ${assetStreamRes.statusCode}`);
+assert(assetStreamRes.isBase64Encoded === true, "audio asset stream did not return a base64 function body");
+
 const submitRes = await call(releases, {
   method: "POST",
   authToken: token,
@@ -175,7 +236,7 @@ const submitRes = await call(releases, {
     artistId,
     title: "Proof Release",
     type: "single",
-    tracks: [{ title: "Proof Track", duration: 181 }],
+    tracks: [{ title: "Proof Track", duration: 181, previewUrl: uploadedAsset.streamUrl }],
     distributionTargets: ["Spotify", "Apple Music"],
   },
 });
@@ -183,13 +244,51 @@ assert(submitRes.statusCode === 201, `release submit failed: ${submitRes.statusC
 const submitData = parse(submitRes);
 const releaseId = submitData.release?.id;
 assert(releaseId, "release submit did not return a release id");
+assert(submitData.release?.tracks?.[0]?.previewUrl === uploadedAsset.streamUrl, "release submit did not preserve uploaded track preview URL");
+assert(submitData.release?.rights?.status === "needs-clearance", "release submit should default linked preview rights to needs-clearance");
+
+const blockedPlaybackRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: { action: "playback-stream", id: releaseId, trackIndex: 0, listenSeconds: 5, completed: false, source: "linked-audio" },
+});
+assert(blockedPlaybackRes.statusCode === 409, `linked audio playback escaped rights gate: ${blockedPlaybackRes.statusCode}`);
 
 const reviewRes = await call(releases, {
   method: "POST",
   authToken: token,
-  body: { action: "review", id: releaseId, decision: "approve", notes: "Ready for lane proof" },
+  body: { action: "review", id: releaseId, decision: "approve", notes: "Ready once rights gate clears" },
 });
 assert(reviewRes.statusCode === 200, `release review failed: ${reviewRes.statusCode}`);
+
+const blockedPublishRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: { action: "publish", id: releaseId },
+});
+assert(blockedPublishRes.statusCode === 409, `release publish escaped distribution rights gate: ${blockedPublishRes.statusCode}`);
+
+const rightsRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "update-rights",
+    id: releaseId,
+    rights: {
+      ownershipAttested: true,
+      previewUseAuthorized: true,
+      distributionAuthorized: true,
+      samplesCleared: true,
+      coverMechanicalLicense: true,
+      publisherClearance: true,
+      takedownContactEmail: "rights@internal.invalid",
+      notes: "Proof artist controls this test recording and preview use.",
+    },
+  },
+});
+assert(rightsRes.statusCode === 200, `rights update failed: ${rightsRes.statusCode}`);
+const rightsData = parse(rightsRes);
+assert(rightsData.rights?.status === "distribution-ready", "rights gate did not reach distribution-ready");
 
 const publishRes = await call(releases, {
   method: "POST",
@@ -204,6 +303,18 @@ const streamsRes = await call(releases, {
   body: { action: "report-streams", id: releaseId, streams: 2500, downloads: 80, saves: 120 },
 });
 assert(streamsRes.statusCode === 200, `stream report failed: ${streamsRes.statusCode}`);
+
+const playbackRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: { action: "playback-stream", id: releaseId, trackIndex: 0, listenSeconds: 19, completed: false, source: "smoke-proof-player" },
+});
+assert(playbackRes.statusCode === 200, `playback stream proof failed: ${playbackRes.statusCode}`);
+const playbackData = parse(playbackRes);
+assert(playbackData.playback?.trackTitle === "Proof Track", "playback stream proof did not identify the played track");
+assert(playbackData.playback?.playbackKind === "rights-cleared-linked-preview", "playback stream proof did not use the rights-cleared linked-preview lane");
+assert(playbackData.release?.analytics?.plays >= 1, "playback stream proof did not increment plays");
+assert(playbackData.release?.tracks?.[0]?.plays >= 1, "playback stream proof did not increment track plays");
 
 const queueOpsRes = await call(releases, {
   method: "POST",
@@ -320,6 +431,31 @@ const operationsBoard = parse(operationsBoardRes);
 assert(Array.isArray(operationsBoard.workflows) && operationsBoard.workflows.some((item) => item.releaseId === releaseId), "operations board did not include the queued release");
 assert(operationsBoard.scheduled >= 1, "operations board summary did not track the scheduled workflow");
 
+const rightsAuditRes = await call(releases, {
+  method: "GET",
+  authToken: token,
+  query: { action: "rights-audit", artistId },
+});
+assert(rightsAuditRes.statusCode === 200, `rights audit failed: ${rightsAuditRes.statusCode}`);
+const rightsAudit = parse(rightsAuditRes);
+assert(rightsAudit.summary?.ready >= 1, "rights audit did not count the ready release");
+
+const takedownRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: { action: "takedown-request", id: releaseId, requesterEmail: "claimant@internal.invalid", reason: "Proof takedown hold should block playback." },
+});
+assert(takedownRes.statusCode === 202, `takedown request failed: ${takedownRes.statusCode}`);
+const takedownData = parse(takedownRes);
+assert(takedownData.rights?.playbackBlocked === true, "takedown request did not block playback");
+
+const blockedAfterTakedownRes = await call(releases, {
+  method: "POST",
+  authToken: token,
+  body: { action: "playback-stream", id: releaseId, trackIndex: 0, listenSeconds: 2, completed: false, source: "generated-preview", generatedProof: true },
+});
+assert(blockedAfterTakedownRes.statusCode === 423, `playback escaped takedown hold: ${blockedAfterTakedownRes.statusCode}`);
+
 const creditRes = await call(payments, {
   method: "POST",
   authToken: token,
@@ -372,10 +508,17 @@ console.log(JSON.stringify({
     "local operator credentials can mint an admin session token",
     "session status can introspect the active local session",
     "local operator sessions can be revoked in-folder",
-    "browser auth storage is scoped to the active session",
-    "artist, release, and operations reads reject ungated requests",
-    "artist registration works in the local handler surface",
-    "release submit, review, publish, and stream reporting work",
+  "browser auth storage is scoped to the active session",
+  "artist, release, and operations reads reject ungated requests",
+  "audio asset upload, list, and gated stream require a gate session",
+  "audio asset storage defaults to local proof and exposes an opt-in SkyeVault/R2 durable backend",
+  "artist registration works in the local handler surface",
+  "release submit, review, publish, and stream reporting work",
+  "gated playback stream proof records plays and track-level listening telemetry",
+  "linked audio playback is blocked until rights are attested",
+  "release publishing is blocked until distribution rights are attested",
+  "rights audit reports clearance state",
+    "takedown hold blocks subsequent playback",
     "approved and live releases can be queued into a persisted release operations board",
     "release operations workflows can be updated and summarized in-folder",
     "payments credit, ledger, payout request, and payout queue work",
@@ -391,6 +534,7 @@ console.log(JSON.stringify({
   not_proven: [
     "real identity-provider handoff into SkyGate tokens",
     "deployed platform distribution integrations",
+    "formal legal review or production DMCA-agent operations",
   ],
   artistId,
   releaseId,

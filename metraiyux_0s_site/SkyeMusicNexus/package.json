@@ -2,9 +2,10 @@
   "name": "skye-music-nexus-neofront",
   "version": "3.0.0",
   "private": true,
-  "description": "SkyeMusicNexus NeoFront experiential music operating app with preserved Netlify function runtime.",
+  "description": "SkyeMusicNexus roomed NeoFront music platform with gated upload, player, exchange, rights, and preserved Netlify function runtime.",
   "type": "module",
   "scripts": {
+    "dev:local": "node scripts/local-dev-server.mjs",
     "smoke": "node smoke/neo-front-smoke.mjs && node smoke/skye-music-nexus-p2-smoke.mjs && node smoke/smoke-proof.mjs",
     "smoke:ui": "node smoke/neo-front-smoke.mjs && node smoke/skye-music-nexus-p2-smoke.mjs",
     "smoke:runtime": "node smoke/smoke-proof.mjs"

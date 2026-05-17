@@ -70,7 +70,7 @@ Signup and workspace onboarding now issue a first-time SkyeMerit pack. The pack 
 - `SKYEMERIT-FIRST-23`: 23% up to `$6,700`.
 - `SKYEMERIT-FIRST-28`: 28% up to `$9,400`.
 - `SKYEMERIT-FIRST-31`: 31% for purchases above `$9,400`, capped at the first `$9,400` of eligible spend.
-- `SKYEMERIT-SKYLINE-22`: owner-issued guardrail rule that discounts only the spend band between `$3,000` and `$10,000`.
+- `SKYEMERIT-SKYELINE-22`: owner-issued guardrail rule that discounts only the spend band between `$3,000` and `$10,000`.
 
 Delivery attempts are recorded for Resend, SkyeMail, Relay13, ConnectLog, and FS27 event mirror. SkyeMerit is Free99 as a feature, but every surfaced app and checkout still requires the normal gate session.
 

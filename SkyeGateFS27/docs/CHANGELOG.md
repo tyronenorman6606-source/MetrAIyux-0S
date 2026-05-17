@@ -1,5 +1,40 @@
 # SkyeGateFS27 Changelog
 
+## 2026-05-17 - SkyeMerit production checkout origin closeout
+
+- Made the Cloudflare FS27 Worker the customer checkout origin for MetrAIyux 0S SkyePay links.
+- Removed the customer-facing dependency on legacy `skyesol.netlify.app/skyepay` checkout URLs from 0S plan data, the SkyePay gateway JSON, SaaS Worker plan config, and customer buttons.
+- Added SkyeMerit support to the live SkyePay checkout path, including protected eligible-spend discount math, first-time pack metadata, kAIxu credit metadata, and Stripe promo stacking disablement when SkyeMerit applies.
+- Confirmed owner-gated paid app activation still returns `paid_pending_owner_approval` and RouteX remains `owner_approved_after_route_scope`.
+- Verified live FS27 offers include SkyeMerit and the RouteX owner-approval policy through the deployed `skyegatefs27-citadeldb` Worker.
+
+Verification target:
+
+- `npm run audit:commercial-limits`
+- `npm run 0s:skyemerit:proof`
+- `npm run mcp:mine -- SkyeGateFS27`
+- Live GET `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay/offers?client=metraiyux-0s`
+- Live GET `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet&skyemerit_code=SKYEMERIT-FIRST-BEST`
+
+## 2026-05-17 - RouteX owner-approval checkout and production env closeout
+
+- Added the SkyeRouteX Workforce Command offer to SkyePay with `$6,500` setup and `$1,497/mo` pricing.
+- Added Stripe lookup keys for the RouteX setup and monthly prices: `metraiyux_routex_workforce_command_setup` and `metraiyux_routex_workforce_command_monthly`.
+- Hardened app-lane activation so RouteX and owner-approved MetrAIyux app offers do not auto-unlock after payment.
+- Added the `paid_pending_owner_approval`, `pending_owner_approval`, and `waiting_for_owner_approval` path for paid orders that still need owner release.
+- Updated checkout, status, admin ledger, store, API docs, and browser copy so customer-facing state says pending owner approval instead of implying automatic unlock.
+- Added the SkyePay owner-approval regression and updated the SkyePay crawler to validate the RouteX approval lane.
+- Wired RouteX production env resolution to accept existing root `.env` aliases, including `mapbox_api_key` as `MAPBOX_ACCESS_TOKEN`.
+- Verified live env readiness with `PASS`, full live route ops enabled, and zero warnings.
+
+Verification target:
+
+- `npm run gateway:skyepay:owner-approval`
+- `npm run proof:skyepay`
+- `npm run gateway:skyepay:scan`
+- `npm run check:prod:root-env`
+- `npm run smoke:live-env`
+
 ## 2026-05-17 - SkyePay store, trials, and vault policy
 
 - Added public SkyePay ecosystem store: `skyepay-store.html`, `/store`, and `/skyepay/store`.

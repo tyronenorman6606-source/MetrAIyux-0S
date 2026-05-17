@@ -2,7 +2,7 @@
   const APP_VERSION = '1.1.0';
   const STORAGE_KEY = 'skye0s.houseops.truth.v2';
   const GATE_BRIDGE_KEY = 'skye0s.houseops.gate.bridge.v1';
-  const SKYPAY_ORIGIN = 'https://skyesol.netlify.app';
+  const SKYPAY_ORIGIN = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
   const PLAN_CATALOG = {
     'houseoperations-command': {
       id: 'houseoperations-command',
@@ -358,19 +358,63 @@
     return data.tutorialRuns.slice(0, 10).map((run) => `<div class="event"><time>${esc(run.at_display)}</time><div><b>${esc(run.label)}</b><span>${esc(run.result)}</span></div>${badge('done')}</div>`).join('');
   }
 
-  function dashboardView() {
-    return `<section class="grid">
-      <div class="span12 heroBand">
-        <div class="heroCopy"><div class="crumb">HouseOperations app surface</div><h2>Operate the house desk from intake to owner proof.</h2><p>Tasks, vendors, schedule pressure, owner alerts, assignments, proof, exports, and gate mirror packets now live in one local app surface.</p><div class="actions" style="justify-content:flex-start;margin-top:18px"><button class="btn primary" data-action="new-task">New Task</button><button class="btn" data-action="new-vendor">New Vendor</button><button class="btn" data-action="save-proof">Save Proof</button></div></div>
-        <div class="opsMap"><span class="routeLine" style="left:12%;top:30%;width:42%;transform:rotate(13deg)"></span><span class="routeLine" style="left:42%;top:58%;width:34%;transform:rotate(-18deg)"></span><span class="pin done" style="left:12%;top:27%"></span><span class="pin risk" style="left:53%;top:40%"></span><span class="pin" style="left:75%;top:47%"></span><span class="pin done" style="left:34%;top:68%"></span></div>
+  function commandHero(eyebrow, title, body, actions = '') {
+    const data = read();
+    const s = stats(data);
+    const plan = activePlan(data);
+    return `<section class="span12 commandMarquee" data-mcp-surface="radical-v3">
+      <div class="marqueeCopy">
+        <div class="crumb">${esc(eyebrow)}</div>
+        <h2 class="neon-gradient-text premium-text-effects-lab">${esc(title)}</h2>
+        <p>${esc(body)}</p>
+        <div class="actions commandActions">${actions}</div>
       </div>
-      <div class="span12">${kpis()}</div>
+      <div class="missionStack" aria-label="HouseOperations live status">
+        <div class="missionPlate mainPlate"><span>Open</span><strong>${s.open}</strong><small>work orders</small></div>
+        <div class="missionPlate"><span>Owner</span><strong>${s.blocked}</strong><small>escalations</small></div>
+        <div class="missionPlate"><span>Vendor</span><strong>${money(s.vendorValue)}</strong><small>tracked value</small></div>
+        <div class="missionPlate accent"><span>Plan</span><strong>${money(plan.monthly)}</strong><small>monthly lane</small></div>
+      </div>
+    </section>`;
+  }
+
+  function securityRunway() {
+    return `<section class="panel span12 securityRunway">
+      <div class="panelHead"><div><h2>SkyeBox Authenticator and Gate lane</h2><p>The vault and the FS27 PIN/recovery handoff are surfaced as working product controls, not sidebar afterthoughts.</p></div></div>
+      <div class="panelBody runwayGrid">
+        <a class="runwayTile" href="./skye-box-authenticator-vault/index.html"><span>01</span><h3>SkyeBox Authenticator</h3><p>Encrypted local TOTP vault, backup export, offline PWA assets, and proof scripts.</p></a>
+        <a class="runwayTile" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html"><span>02</span><h3>FS27 PIN Gate</h3><p>Generated Gate ID plus PIN unlock, recovery path, and owner-controlled activation boundary.</p></a>
+        <a class="runwayTile" href="./runtime.html"><span>03</span><h3>Runtime Proof</h3><p>Endpoint checks, claim contract, local proof ledger, and exportable mirror packets.</p></a>
+        <a class="runwayTile" href="./billing.html"><span>04</span><h3>Billing Intent</h3><p>Paid scope, setup/monthly pricing, SkyePay offer URL, and activation handoff receipt.</p></a>
+      </div>
+    </section>`;
+  }
+
+  function proofSpine(data = read()) {
+    const rows = data.proofs.slice(0, 4).map((proof, index) => `<article class="spineNode">
+      <span>${String(index + 1).padStart(2, '0')}</span>
+      <div><h3>${esc(proof.title)}</h3><p>${esc(proof.note)}</p></div>
+      ${badge(proof.status)}
+    </article>`).join('');
+    return `<section class="panel span4 proofSpine"><div class="panelHead"><div><h2>Proof spine</h2><p>Receipts tied to the running app.</p></div></div><div class="panelBody">${rows}</div></section>`;
+  }
+
+  function dashboardView() {
+    return `<section class="grid opsFloor">
+      ${commandHero(
+        'HouseOperations Command / radical v3',
+        'Run the house from a live operations floor.',
+        'Task intake, vendors, schedule pressure, owner decisions, proof, billing, vault custody, and Gate packets are now laid out as one working command surface.',
+        '<button class="btn primary" data-action="new-task">New Task</button><button class="btn" data-action="new-vendor">New Vendor</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn" data-action="export">Export</button>'
+      )}
+      <div class="span12 commandTicker">${kpis()}</div>
+      ${securityRunway()}
+      <div class="panel span8 intakeDock"><div class="panelHead"><div><h2>Operator intake dock</h2><p>Create real task and vendor records with owner, lane, value, contact, and notes.</p></div></div><div class="panelBody">${intakeForms()}</div></div>
+      ${proofSpine()}
       ${gatePanel()}
-      <div class="panel span12"><div class="panelHead"><div><h2>Connected security surfaces</h2><p>HouseOperations carries the local 2FA vault and points users into the real FS27 PIN/recovery gate.</p></div></div><div class="panelBody laneGrid"><a class="lane" href="./skye-box-authenticator-vault/index.html"><h3>SkyeBox Authenticator</h3><p>Open the local encrypted TOTP vault nested under this app surface.</p></a><a class="lane" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html"><h3>FS27 PIN Gate</h3><p>Generated Gate ID, PIN login, and one-time recovery-code session flow.</p></a><a class="lane" href="../proof/houseoperations-skyebox-expansion-receipt.html"><h3>Expansion Receipt</h3><p>Review the proof boundary for local vault custody and gate recovery.</p></a></div></div>
-      <div class="panel span12"><div class="panelHead"><div><h2>Operator intake</h2><p>Create real tasks and vendor records with owners, dates, lane, contact, and notes.</p></div></div><div class="panelBody">${intakeForms()}</div></div>
-      <div class="panel span8"><div class="panelHead"><div><h2>Workboard</h2><p>State movement across open, queued, review, and done.</p></div><a class="btn" href="./tasks.html">Tasks</a></div><div class="panelBody">${workBoard()}</div></div>
-      <div class="panel span4"><div class="panelHead"><div><h2>Owner Alerts</h2><p>High, blocked, and review items.</p></div></div><div class="panelBody alertList">${ownerAlertRows()}</div></div>
-      <div class="panel span8"><div class="panelHead"><div><h2>Task Command</h2><p>Owner, due date, priority, and state.</p></div></div><div class="panelBody tableWrap"><table><thead><tr><th>Task</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>${taskRows()}</tbody></table></div></div>
+      <div class="panel span8 commandSurface"><div class="panelHead"><div><h2>Task Command</h2><p>Owner, due date, priority, and state stay editable through the same app actions.</p></div><a class="btn" href="./tasks.html">Open workboard</a></div><div class="panelBody tableWrap"><table><thead><tr><th>Task</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>${taskRows()}</tbody></table></div></div>
+      <div class="panel span4 alertTower"><div class="panelHead"><div><h2>Owner alert tower</h2><p>High, blocked, and review items only.</p></div></div><div class="panelBody alertList">${ownerAlertRows()}</div></div>
+      <div class="panel span8 workFloor"><div class="panelHead"><div><h2>Workboard floor</h2><p>State movement across open, queued, review, and done.</p></div></div><div class="panelBody">${workBoard()}</div></div>
       <div class="panel span4"><div class="panelHead"><div><h2>Activity Trail</h2><p>Latest local operating events.</p></div></div><div class="panelBody timeline">${activityRows()}</div></div>
     </section>`;
   }
@@ -411,13 +455,15 @@
     const data = read();
     const active = activePlan(data);
     return `<section class="grid">
-      <div class="span12 heroBand">
-        <div class="heroCopy"><div class="crumb">Charge-ready app lane</div><h2>Bill HouseOperations without overstating what the app owns.</h2><p>HouseOperations records the plan intent, price, included scope, SkyePay offer URL, and activation boundary. Payment and entitlement enforcement belong to SkyePay/FS27.</p><div class="actions" style="justify-content:flex-start;margin-top:18px"><button class="btn primary" data-action="create-billing-intent">Create Billing Intent</button><button class="btn" data-action="export-billing-intent">Export Intent</button><a class="btn" href="${esc(skyePayUrl(active.offer))}">Open SkyePay</a></div></div>
-        <div class="opsMap"><span class="routeLine" style="left:10%;top:36%;width:40%;transform:rotate(8deg)"></span><span class="routeLine" style="left:45%;top:54%;width:36%;transform:rotate(-16deg)"></span><span class="pin done" style="left:10%;top:33%"></span><span class="pin risk" style="left:50%;top:42%"></span><span class="pin done" style="left:80%;top:43%"></span></div>
-      </div>
-      <div class="panel span7"><div class="panelHead"><div><h2>Billing Intent</h2><p>Create the receipt that tells the client what they are paying for before checkout.</p></div></div><div class="panelBody">${billingForm(data)}</div></div>
-      <div class="panel span5"><div class="panelHead"><div><h2>Latest Intents</h2><p>Stored locally for proof and handoff.</p></div><button class="btn" data-action="export-billing-intent">Export</button></div><div class="panelBody runtimeList">${billingIntentRows(data)}</div></div>
-      <div class="panel span12"><div class="panelHead"><div><h2>Paid Scope</h2><p>These are the only HouseOperations plans this app is allowed to sell today.</p></div></div><div class="panelBody planGrid">${Object.values(PLAN_CATALOG).map((plan) => planCard(plan, active.id)).join('')}</div></div>
+      ${commandHero(
+        'Charge-ready app lane',
+        'Create the client payment handoff from inside the product.',
+        'HouseOperations records the plan intent, price, included scope, SkyePay offer URL, and activation boundary. Payment and entitlement enforcement stay with SkyePay and FS27.',
+        `<button class="btn primary" data-action="create-billing-intent">Create Billing Intent</button><button class="btn" data-action="export-billing-intent">Export Intent</button><a class="btn" href="${esc(skyePayUrl(active.offer))}">Open SkyePay</a>`
+      )}
+      <div class="panel span5 billingConsole"><div class="panelHead"><div><h2>Billing Intent</h2><p>Create the receipt that tells the client what they are paying for before checkout.</p></div></div><div class="panelBody">${billingForm(data)}</div></div>
+      <div class="panel span7 intentLedger"><div class="panelHead"><div><h2>Latest Intents</h2><p>Stored locally for proof and handoff.</p></div><button class="btn" data-action="export-billing-intent">Export</button></div><div class="panelBody runtimeList">${billingIntentRows(data)}</div></div>
+      <div class="panel span12 pricingRunway"><div class="panelHead"><div><h2>Paid Scope</h2><p>These are the only HouseOperations plans this app is allowed to sell today.</p></div></div><div class="panelBody planGrid">${Object.values(PLAN_CATALOG).map((plan) => planCard(plan, active.id)).join('')}</div></div>
     </section>`;
   }
 
@@ -425,14 +471,16 @@
     const data = read();
     const completed = new Set(data.tutorialRuns.map((run) => run.step_id)).size;
     return `<section class="grid">
-      <div class="span12 heroBand">
-        <div class="heroCopy"><div class="crumb">Built-in operator training</div><h2>Run the app the way a paid operator will run it.</h2><p>This tutorial is not just documentation. Each step fires the same local app action used by the dashboard, billing lane, proof ledger, and Gate packet flow.</p><div class="actions" style="justify-content:flex-start;margin-top:18px"><button class="btn primary" data-action="run-full-tutorial">Run Full Tutorial</button><button class="btn" data-action="export-tutorial-receipt">Export Tutorial Receipt</button><a class="btn" href="./runtime.html">Runtime Proof</a></div></div>
-        <div class="opsMap"><span class="routeLine" style="left:14%;top:30%;width:48%;transform:rotate(12deg)"></span><span class="routeLine" style="left:38%;top:62%;width:38%;transform:rotate(-18deg)"></span><span class="pin done" style="left:14%;top:27%"></span><span class="pin done" style="left:48%;top:41%"></span><span class="pin risk" style="left:77%;top:49%"></span></div>
-      </div>
-      <div class="span12">${kpis()}</div>
-      <div class="panel span12"><div class="panelHead"><div><h2>Guided Run</h2><p>${completed}/${tutorialSteps.length} tutorial steps recorded in this browser.</p></div></div><div class="panelBody">${tutorialCards(data)}</div></div>
-      <div class="panel span7"><div class="panelHead"><div><h2>Tutorial Receipt</h2><p>Every completed step writes a local run row.</p></div></div><div class="panelBody timeline">${tutorialRunRows(data)}</div></div>
-      <div class="panel span5"><div class="panelHead"><div><h2>Operating Rule</h2><p>What paid users should understand before handoff.</p></div></div><div class="panelBody laneGrid"><div class="lane"><h3>Local state</h3><p>Tasks, vendors, proof, tutorial runs, and billing intents live in this browser until exported or mirrored.</p></div><div class="lane"><h3>SkyeBox custody</h3><p>TOTP secrets stay in the encrypted local vault; FS27 PIN recovery does not recover TOTP secrets.</p></div><div class="lane"><h3>Paid access</h3><p>SkyePay/FS27 own payment, approval, and entitlement enforcement.</p></div></div></div>
+      ${commandHero(
+        'Built-in operator training',
+        'A tutorial that presses the same controls a paid operator uses.',
+        'This is not loose documentation. Each step fires the dashboard, billing lane, proof ledger, and Gate packet flow through the same local app actions.',
+        '<button class="btn primary" data-action="run-full-tutorial">Run Full Tutorial</button><button class="btn" data-action="export-tutorial-receipt">Export Tutorial Receipt</button><a class="btn" href="./runtime.html">Runtime Proof</a>'
+      )}
+      <div class="span12 commandTicker">${kpis()}</div>
+      <div class="panel span12 tutorialDeck"><div class="panelHead"><div><h2>Guided Run</h2><p>${completed}/${tutorialSteps.length} tutorial steps recorded in this browser.</p></div></div><div class="panelBody">${tutorialCards(data)}</div></div>
+      <div class="panel span7 receiptConsole"><div class="panelHead"><div><h2>Tutorial Receipt</h2><p>Every completed step writes a local run row.</p></div></div><div class="panelBody timeline">${tutorialRunRows(data)}</div></div>
+      <div class="panel span5 ruleConsole"><div class="panelHead"><div><h2>Operating Rule</h2><p>What paid users should understand before handoff.</p></div></div><div class="panelBody laneGrid"><div class="lane"><h3>Local state</h3><p>Tasks, vendors, proof, tutorial runs, and billing intents live in this browser until exported or mirrored.</p></div><div class="lane"><h3>SkyeBox custody</h3><p>TOTP secrets stay in the encrypted local vault; FS27 PIN recovery does not recover TOTP secrets.</p></div><div class="lane"><h3>Paid access</h3><p>SkyePay/FS27 own payment, approval, and entitlement enforcement.</p></div></div></div>
     </section>`;
   }
 
@@ -468,7 +516,7 @@
       assignments: 'Team load, lane ownership, and handoff pressure.',
       runtime: 'Local runtime endpoints, SkyeBox, SkyeGate, and legacy shell closure.',
       billing: 'Charge-ready plan intent, SkyePay offer, and activation boundary.',
-      tutorial: 'Guided runbook that executes the real app workflow.',
+      tutorial: 'Training workflow that executes the real app workflow.',
       settings: 'Storage, bridge metadata, proof, fullscreen, and backup controls.'
     }[view];
   }
@@ -815,7 +863,381 @@
 
   window.HouseOperations = { read, saveProof, queueGateMirror, exportGatePacket, createBillingIntent, runTutorialStep, runFullTutorial, render };
   document.addEventListener('DOMContentLoaded', () => {
+    document.documentElement.dataset.houseopsSurfaceVersion = 'radical-v3-20260517';
     initMotionChrome();
     render();
   });
 })();
+
+// BEGIN quantumskyes:adaptive-neon-scrollbar-js
+(function(){
+  if(window.__mcpVisibleNeonScrollbars) return;
+  window.__mcpVisibleNeonScrollbars = true;
+
+  function onReady(fn){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }else{
+      fn();
+    }
+  }
+
+  function clamp(value, min, max){
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function verticalSource(){
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function horizontalSource(){
+    const doc = document.scrollingElement || document.documentElement;
+    if(doc.scrollWidth > doc.clientWidth + 4) return { node: doc, mode: 'horizontal' };
+    const selectors = [
+      '.site-header nav',
+      '.table-wrap',
+      '.topnav',
+      '.route-grid',
+      '.command-table',
+      '.saas-table'
+    ];
+    const node = selectors
+      .flatMap((selector) => [...document.querySelectorAll(selector)])
+      .find((element) => element.scrollWidth > element.clientWidth + 4);
+    return node ? { node, mode: 'horizontal' } : { node: doc, mode: 'page' };
+  }
+
+  onReady(() => {
+    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
+    document.querySelectorAll('.mcp-neon-scroll-rail,.mcp-neon-scroll-corner').forEach((node) => node.remove());
+
+    const yRail = document.createElement('div');
+    yRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-y';
+    yRail.setAttribute('aria-hidden', 'true');
+    yRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const xRail = document.createElement('div');
+    xRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-x';
+    xRail.setAttribute('aria-hidden', 'true');
+    xRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const corner = document.createElement('div');
+    corner.className = 'mcp-neon-scroll-corner';
+    corner.setAttribute('aria-hidden', 'true');
+
+    document.body.append(yRail, xRail, corner);
+
+    const yThumb = yRail.querySelector('.mcp-neon-scroll-thumb');
+    const xThumb = xRail.querySelector('.mcp-neon-scroll-thumb');
+    let activeHorizontal = horizontalSource();
+    let raf = 0;
+    let dragRaf = 0;
+    let pendingDrag = null;
+    let metrics = null;
+
+    function measure(){
+      const ySource = verticalSource();
+      const yTrack = Math.max(1, yRail.clientHeight);
+      const yMax = Math.max(1, ySource.scrollHeight - window.innerHeight);
+      const yRatio = clamp(window.scrollY / yMax, 0, 1);
+      const ySize = clamp((window.innerHeight / Math.max(ySource.scrollHeight, window.innerHeight)) * yTrack, 78, yTrack);
+
+      if(!activeHorizontal?.node || !document.documentElement.contains(activeHorizontal.node)){
+        activeHorizontal = horizontalSource();
+      }
+      const xTrack = Math.max(1, xRail.clientWidth);
+      const xSource = activeHorizontal.node;
+      const xMax = Math.max(0, xSource.scrollWidth - xSource.clientWidth);
+      const pageMode = activeHorizontal.mode === 'page' || xMax <= 1;
+      const xRatio = pageMode ? yRatio : clamp(xSource.scrollLeft / xMax, 0, 1);
+      const xSize = pageMode
+        ? clamp(xTrack * .24, 84, Math.max(84, xTrack * .38))
+        : clamp((xSource.clientWidth / Math.max(xSource.scrollWidth, xSource.clientWidth)) * xTrack, 84, xTrack);
+
+      return { ySource, yTrack, yMax, yRatio, ySize, xSource, xTrack, xMax, xRatio, xSize, pageMode };
+    }
+
+    function paintRails(view){
+      yThumb.style.height = `${Math.floor(view.ySize)}px`;
+      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(view.yRatio * Math.max(0, view.yTrack - view.ySize))}px`);
+      xThumb.style.width = `${Math.floor(view.xSize)}px`;
+      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(view.xRatio * Math.max(0, view.xTrack - view.xSize))}px`);
+      xRail.dataset.scrollMode = view.pageMode ? 'page' : 'horizontal';
+    }
+
+    function scheduleUpdate(){
+      if(raf) return;
+      raf = window.requestAnimationFrame(updateRails);
+    }
+
+    function updateRails(){
+      raf = 0;
+      metrics = measure();
+      paintRails(metrics);
+    }
+
+    function flushDrag(){
+      dragRaf = 0;
+      if(!pendingDrag) return;
+      const { axis, ratio, snapshot } = pendingDrag;
+      pendingDrag = null;
+      const next = snapshot || measure();
+      const bounded = clamp(ratio, 0, 1);
+
+      if(axis === 'y'){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: next.pageMode ? yRatio : next.xRatio
+        });
+      }else if(next.pageMode){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: yRatio
+        });
+      }else{
+        next.xSource.scrollLeft = bounded * next.xMax;
+        paintRails({
+          ...next,
+          xRatio: clamp(next.xSource.scrollLeft / Math.max(1, next.xMax), 0, 1)
+        });
+      }
+      scheduleUpdate();
+    }
+
+    function queueDrag(axis, ratio, snapshot){
+      pendingDrag = { axis, ratio, snapshot };
+      if(!dragRaf) dragRaf = window.requestAnimationFrame(flushDrag);
+    }
+
+    function bindRail(rail, thumb, axis, setter){
+      let dragging = false;
+      let pointerOffset = 0;
+      let dragSnapshot = null;
+      let railStart = 0;
+      let track = 1;
+      let size = 1;
+
+      function ratioFromEvent(event, keepOffset){
+        const coordinate = axis === 'y' ? event.clientY : event.clientX;
+        const localOffset = keepOffset ? pointerOffset : size / 2;
+        return clamp((coordinate - railStart - localOffset) / Math.max(1, track - size), 0, 1);
+      }
+
+      rail.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        dragSnapshot = measure();
+        const railRect = rail.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        railStart = axis === 'y' ? railRect.top : railRect.left;
+        track = axis === 'y' ? dragSnapshot.yTrack : dragSnapshot.xTrack;
+        size = axis === 'y' ? dragSnapshot.ySize : dragSnapshot.xSize;
+        document.documentElement.classList.add('mcp-neon-scroll-dragging');
+        rail.classList.add('is-dragging');
+        rail.setPointerCapture?.(event.pointerId);
+        pointerOffset = event.target === thumb || thumb.contains(event.target)
+          ? (axis === 'y' ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
+          : (axis === 'y' ? thumbRect.height / 2 : thumbRect.width / 2);
+        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)), dragSnapshot);
+      });
+
+      rail.addEventListener('pointermove', (event) => {
+        if(!dragging) return;
+        event.preventDefault();
+        setter(ratioFromEvent(event, true), dragSnapshot);
+      });
+
+      function endDrag(event){
+        if(!dragging) return;
+        dragging = false;
+        dragSnapshot = null;
+        document.documentElement.classList.remove('mcp-neon-scroll-dragging');
+        rail.classList.remove('is-dragging');
+        rail.releasePointerCapture?.(event.pointerId);
+        scheduleUpdate();
+      }
+
+      rail.addEventListener('pointerup', endDrag);
+      rail.addEventListener('pointercancel', endDrag);
+    }
+
+    bindRail(yRail, yThumb, 'y', (ratio, snapshot) => queueDrag('y', ratio, snapshot));
+    bindRail(xRail, xThumb, 'x', (ratio, snapshot) => queueDrag('x', ratio, snapshot));
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      activeHorizontal = horizontalSource();
+      scheduleUpdate();
+    }, { passive: true });
+    document.addEventListener('scroll', (event) => {
+      if(event.target && event.target === activeHorizontal.node) scheduleUpdate();
+    }, true);
+    document.addEventListener('pointerover', (event) => {
+      const candidate = event.target && event.target.closest && event.target.closest('.site-header nav,.table-wrap,.topnav,.route-grid');
+      if(candidate && candidate.scrollWidth > candidate.clientWidth + 4){
+        activeHorizontal = { node: candidate, mode: 'horizontal' };
+        scheduleUpdate();
+      }
+    }, { passive: true });
+
+    scheduleUpdate();
+    window.setTimeout(scheduleUpdate, 350);
+    window.setTimeout(scheduleUpdate, 1200);
+  });
+})();
+// END quantumskyes:adaptive-neon-scrollbar-js
+
+// BEGIN quantumskyes:skyesol-living-background-js
+function mountSkyeSolLivingBackground({
+  canvasSelector = '.skyesol-living-field',
+  particleDensity = 16000,
+  maxParticles = 120,
+  minParticles = 58
+} = {}) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.querySelector(canvasSelector);
+  if (!canvas || !canvas.getContext || reduceMotion) return () => {};
+
+  const ctx = canvas.getContext('2d');
+  const palette = [
+    'rgba(201,168,76,',
+    'rgba(138,99,255,',
+    'rgba(39,242,255,'
+  ];
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let raf = 0;
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(maxParticles, Math.max(minParticles, Math.floor(width * height / particleDensity)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.8 + .4,
+      a: Math.random() * .34 + .12,
+      s: Math.random() * .34 + .08,
+      phase: Math.random() * Math.PI * 2,
+      color: palette[index % palette.length]
+    }));
+  }
+
+  function drawWave(time, yOffset, colorA, colorB, amp, speed) {
+    const gradient = ctx.createLinearGradient(0, yOffset - amp * 2, width, yOffset + amp * 2);
+    gradient.addColorStop(0, colorA);
+    gradient.addColorStop(.5, colorB);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (let x = 0; x <= width; x += 18) {
+      const n = Math.sin((x * .006) + time * speed) * amp;
+      const n2 = Math.cos((x * .011) - time * speed * .7) * amp * .46;
+      ctx.lineTo(x, yOffset + n + n2);
+    }
+    ctx.lineTo(width, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  function animate(now) {
+    if (document.body.classList.contains('motion-paused')) {
+      raf = requestAnimationFrame(animate);
+      return;
+    }
+    const t = now * .001;
+    pointer.x += (pointer.tx - pointer.x) * .035;
+    pointer.y += (pointer.ty - pointer.y) * .035;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'screen';
+    drawWave(t, height * .28 + pointer.y * 12, 'rgba(138,99,255,0)', 'rgba(138,99,255,.10)', 36, .34);
+    drawWave(t, height * .54 - pointer.y * 10, 'rgba(39,242,255,0)', 'rgba(39,242,255,.08)', 42, .24);
+    drawWave(t, height * .82, 'rgba(201,168,76,0)', 'rgba(201,168,76,.07)', 28, .28);
+    particles.forEach((particle) => {
+      const px = particle.x + Math.sin(t * particle.s + particle.phase) * 28 + pointer.x * 10;
+      const py = particle.y + Math.cos(t * particle.s * .8 + particle.phase) * 18 + pointer.y * 8;
+      ctx.beginPath();
+      ctx.arc(px, py, particle.r, 0, Math.PI * 2);
+      ctx.fillStyle = `${particle.color}${particle.a})`;
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    raf = requestAnimationFrame(animate);
+  }
+
+  function onPointerMove(event) {
+    pointer.tx = (event.clientX / Math.max(width, 1) - .5) * 2;
+    pointer.ty = (event.clientY / Math.max(height, 1) - .5) * 2;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onPointerMove, { passive: true });
+  raf = requestAnimationFrame(animate);
+
+  return () => {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('mousemove', onPointerMove);
+  };
+}
+
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();
+// END quantumskyes:skyesol-living-background-js
+
+// BEGIN quantumskyes:neon-motion-chrome-vanilla-js
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();
+// END quantumskyes:neon-motion-chrome-vanilla-js

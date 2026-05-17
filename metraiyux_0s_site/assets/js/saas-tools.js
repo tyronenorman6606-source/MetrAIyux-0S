@@ -56,7 +56,7 @@
       'skyemusicnexus-extra-release-pack':'skyemusicnexus-extra-release-pack',
       'managed-gate':'skygatefs27-managed-control-plane'
     };
-    const url=new URL('https://skyesol.netlify.app/skyepay.html');
+    const url=new URL('https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html');
     url.searchParams.set('client', client || 'metraiyux-0s');
     url.searchParams.set('offer', offers[plan] || offers['starter-command']);
     url.searchParams.set('skyemerit_code', 'SKYEMERIT-FIRST-BEST');

@@ -781,6 +781,25 @@ function renderReceipts() {
     const fp = entry.fileFingerprint?.value ? ` · fp ${String(entry.fileFingerprint.value).slice(0, 12)}…` : '';
     receiptId.textContent = `${submission}Receipt ID: ${entry.id || item.session.sessionId}${entry.receiptSignature ? ` · signature ${String(entry.receiptSignature).slice(0, 16)}…` : ''}${fp}`;
     row.append(title, meta, receiptId);
+    const download = item.receipt?.download;
+    if (download?.downloadUrl) {
+      const actions = document.createElement('div');
+      actions.className = 'vault-file-actions';
+      const link = document.createElement('a');
+      link.className = 'secondary-btn compact';
+      link.href = download.downloadUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Download';
+      actions.append(link);
+      if (download.expiresAt) {
+        const expiry = document.createElement('p');
+        expiry.className = 'receipt-id';
+        expiry.textContent = `Link expires ${download.expiresAt}`;
+        actions.append(expiry);
+      }
+      row.append(actions);
+    }
     receiptList.append(row);
   }
   receiptPanel.classList.toggle('hidden', state.receipts.length === 0);

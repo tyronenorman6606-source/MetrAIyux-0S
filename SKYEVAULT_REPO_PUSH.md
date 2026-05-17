@@ -7,7 +7,7 @@ npm run vault:dry-run
 npm run vault:push
 ```
 
-The command builds the staging tree and zip archive under `/tmp/skyevault-repo-push` by default, scans the staged files for live-looking secrets, streams the zip through SkyeVault-Drop's existing `/api/upload-session` and `/api/upload-complete` flow, and writes a local receipt JSON under `.skyevault-out/`. If the workspace volume is full when writing the receipt, it falls back to `/tmp/skyevault-repo-push/receipts`.
+The command builds the staging tree and zip archive under `/tmp/skyevault-repo-push` by default, scans the staged files for live-looking secrets, streams the zip through SkyeVault-Drop's existing `/api/upload-session` and `/api/upload-complete` flow, and writes a local receipt JSON under `.skyevault-out/`. Successful pushes also print and save a short-lived download link plus the client-vault recovery URL, so the pusher can immediately pull the archived package back down without operator digging. If the workspace volume is full when writing the receipt, it falls back to `/tmp/skyevault-repo-push/receipts`.
 
 Successful uploads also append `.skyevault-out/vault-ledger.jsonl` so operators can audit local push history even when individual receipt files are moved later.
 
@@ -21,6 +21,7 @@ Required local env values:
 - Optional `SKYEVAULT_CLIENT_NAME`, `SKYEVAULT_CLIENT_EMAIL`, and `SKYEVAULT_PROJECT_NAME` to control receipt metadata.
 - Optional `SKYEVAULT_ARCHIVE_DIR` and `SKYEVAULT_STAGE_PARENT` to override the default temp staging location.
 - Optional `SKYEVAULT_UPLOAD_RETRIES` and `SKYEVAULT_UPLOAD_RETRY_BASE_MS` for multipart/API retry behavior.
+- Optional `SKYEVAULT_DOWNLOAD_LINK_SECONDS` to tune the returned signed download link lifetime between 300 and 3600 seconds. Set `SKYEVAULT_RETURN_DOWNLOAD_LINK=false` to suppress immediate link creation while keeping normal receipts.
 - Optional `--keep-archive` and `--keep-stage` when you need to inspect the generated zip or staging tree after a run. Successful uploads delete the temp archive and stage by default.
 
 Important local capacity note: SkyeVault can store large remote archives, but an IDE/CDE still has its own local scratch disk. This tool keeps bulky transient packaging work off the repo volume by default so a small Codespace disk does not limit vault storage.

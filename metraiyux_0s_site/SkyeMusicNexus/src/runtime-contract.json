@@ -14,8 +14,28 @@
   ],
   "launchTargets": [
     {
-      "label": "Artist Stage",
+      "label": "Platform Dashboard",
       "href": "./public/index.html"
+    },
+    {
+      "label": "Upload Studio",
+      "href": "./public/upload.html"
+    },
+    {
+      "label": "Music Player",
+      "href": "./public/player.html"
+    },
+    {
+      "label": "Releases",
+      "href": "./public/releases.html"
+    },
+    {
+      "label": "Rights",
+      "href": "./public/rights.html"
+    },
+    {
+      "label": "Creator Exchange",
+      "href": "./public/exchange.html"
     },
     {
       "label": "Operator Stage",
@@ -31,6 +51,10 @@
     }
   ],
   "modules": [
+    "Platform Dashboard",
+    "Upload Studio",
+    "Gated Audio Vault",
+    "Music Player",
     "Artist Nebula",
     "Release Forge",
     "Royalty River",
@@ -40,29 +64,46 @@
     "Community Relay",
     "Achievement Orbit",
     "Release Campaign Forge",
+    "Stream Deck",
+    "Rights Vault",
+    "Takedown Hold",
     "Live Constellation",
     "Analytics Prism",
     "SkyGate Session",
     "Proof Chain"
   ],
   "sourceDependency": false,
-  "platformState": "neofront-experiential-music-operating-stage-with-artist-exchange",
+  "platformState": "roomed-neofront-music-platform-with-gated-upload-player-exchange-and-rights-vault",
   "frontEndSystem": {
     "name": "NeoFront Music Nexus",
     "primaryFiles": [
       "public/index.html",
+      "public/upload.html",
+      "public/player.html",
+      "public/releases.html",
+      "public/rights.html",
+      "public/exchange.html",
       "public/admin.html",
       "public/neo-nexus.css",
       "public/neo-nexus.js"
     ],
-    "principle": "experiential app surface over generic dashboard/admin cards",
+    "principle": "roomed platform surface over crowded single-page app cards",
+    "assetFunction": "netlify/functions/music-assets.js",
+    "assetStorage": "local proof by default; SkyeVault/Cloudflare R2 when MUSIC_NEXUS_STORAGE_BACKEND=r2 or MUSIC_NEXUS_USE_R2=1 is configured",
     "exchangeFunction": "netlify/functions/music-exchange.js",
     "exchangeCapabilities": [
+      "gated audio upload",
+      "uploaded audio stream URLs",
       "content requests",
       "Relay13-ready inbox threads",
       "community posts",
       "achievement progression",
-      "release campaign packs"
+      "release campaign packs",
+      "track preview playback",
+      "gated playback stream telemetry",
+      "rights attestation gate",
+      "takedown playback hold",
+      "distribution publish gate"
     ]
   }
 }

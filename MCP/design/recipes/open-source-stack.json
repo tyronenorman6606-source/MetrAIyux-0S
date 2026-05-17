@@ -95,6 +95,16 @@
       "starter": "Use the approved logo asset path from design_logo_manifest. If there is no exact asset, use typography-only wordmark plus parent brand endorsement rather than inventing a permanent emblem."
     },
     {
+      "id": "workspace-chat-widget-dropin",
+      "tags": ["chat", "widget", "relay13", "conversation", "workspace", "password-gate", "account-ledger"],
+      "packages": ["vanilla JS", "Relay13 conversations API optional"],
+      "imports": ["Pull design_pattern_pack({ patternId: 'workspace-chat-widget' }) or call design_apply_mcp_parts with patternIds: ['workspace-chat-widget']."],
+      "useWhen": "A client app needs a reusable floating chat widget, local message/event tracking, account-tied disclaimer copy, optional Relay13 conversation sync, or a popup password gate handoff.",
+      "mustShow": ["workspaceId/workspaceSlug configured", "floating launcher and panel visible", "account disclaimer visible", "messages saved to localStorage ledger", "Relay13 API base configured or queued fallback recorded", "password gate only when explicitly enabled"],
+      "avoid": ["forcing chat onto every page without selection", "hardcoding one client's copy into the MCP default", "claiming production delivery when apiBase or workspace allowlist is missing", "showing private access codes as normal page copy"],
+      "starter": "Set window.MetrAIyuxWorkspaceChatConfig before loading workspace-chat-widget.js. Use passwordGate only for private preview pages. Configure apiBase to the Relay13 Worker when the workspace/domain is published; otherwise the widget queues locally and exposes exportLedger()."
+    },
+    {
       "id": "adaptive-neon-scrollbar",
       "tags": ["scrollbar", "neon", "chrome", "css", "theme-adaptive"],
       "packages": ["CSS scrollbar override", "small vanilla JS draggable rail controller"],

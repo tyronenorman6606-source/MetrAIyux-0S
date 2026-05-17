@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { request as playwrightRequest, chromium } from 'playwright';
 
@@ -68,6 +69,75 @@ function rel(file) {
 
 function urlFor(relativePath) {
   return new URL(relativePath, BASE_URL).href;
+}
+
+async function canReach(url, timeoutMs = 1500) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function ensureSkyePayDevServer() {
+  if (CRAWLER_PROFILE !== 'skyepay') return null;
+  if (process.env.SKYE_CRAWLER_SKYEPAY_AUTOSTART === '0') return null;
+
+  const healthUrl = urlFor('skyepay.html?client=bobs-smoke-shop&dry_run=1');
+  if (await canReach(healthUrl)) {
+    record('server:skyepay-dev-existing', true, { healthUrl });
+    return null;
+  }
+
+  let port = '4197';
+  try {
+    port = new URL(BASE_URL).port || port;
+  } catch {}
+
+  const logs = [];
+  const child = spawn(process.execPath, ['scripts/skyepay-dev-server.mjs'], {
+    cwd: SITE_DIR,
+    env: { ...process.env, SKYPAY_DEV_PORT: port },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const capture = (chunk) => {
+    logs.push(String(chunk).trim().slice(0, 500));
+    while (logs.length > 8) logs.shift();
+  };
+  child.stdout.on('data', capture);
+  child.stderr.on('data', capture);
+
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    if (child.exitCode != null) break;
+    if (await canReach(healthUrl)) {
+      record('server:skyepay-dev-autostart', true, { healthUrl, port });
+      return { child, logs };
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+
+  const details = { healthUrl, port, exitCode: child.exitCode, logs };
+  record('server:skyepay-dev-autostart', false, details);
+  child.kill('SIGTERM');
+  throw new Error(`SkyePay dev server did not start: ${JSON.stringify(details)}`);
+}
+
+async function stopSkyePayDevServer(server) {
+  if (!server?.child || server.child.killed) return;
+  server.child.kill('SIGTERM');
+  await new Promise((resolve) => {
+    const timeout = setTimeout(resolve, 1500);
+    server.child.once('exit', () => {
+      clearTimeout(timeout);
+      resolve();
+    });
+  });
 }
 
 function isIgnoredHref(value) {
@@ -623,42 +693,48 @@ async function mainSkyePayProfile() {
   });
   checkpoint('SkyePay profile selected');
 
-  const api = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
+  const devServer = await ensureSkyePayDevServer();
   try {
-    await checkSkyePayLinkedAssets(api);
-    checkpoint('SkyePay asset resolution complete');
-    await checkSkyePayHttp(api);
-    checkpoint('SkyePay HTTP and function checks complete');
-    await checkSkyePayPublicSource();
-    checkpoint('SkyePay public source checks complete');
+    const api = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
+    try {
+      await checkSkyePayLinkedAssets(api);
+      checkpoint('SkyePay asset resolution complete');
+      await checkSkyePayHttp(api);
+      checkpoint('SkyePay HTTP and function checks complete');
+      await checkSkyePayPublicSource();
+      checkpoint('SkyePay public source checks complete');
+    } finally {
+      await api.dispose();
+    }
+
+    const browser = await launchBrowser();
+    try {
+      await checkSkyePayBrowser(browser, { width: 1440, height: 1000 }, 'desktop');
+      checkpoint('SkyePay desktop browser checkout complete');
+      await checkSkyePayBrowser(browser, { width: 390, height: 844 }, 'mobile');
+      checkpoint('SkyePay mobile browser checkout complete');
+    } finally {
+      await browser.close().catch(() => {});
+    }
+
+    report.finished_at = new Date().toISOString();
+    report.ok = report.failures.length === 0;
+    writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
+    console.log(JSON.stringify({
+      crawler: CRAWLER_NAME,
+      version: CRAWLER_VERSION,
+      profile: CRAWLER_PROFILE,
+      ok: report.ok,
+      checks: report.checks.length,
+      failures: report.failures.length,
+      warnings: report.warnings.length,
+      report: REPORT_PATH,
+      artifacts: report.artifacts,
+    }, null, 2));
   } finally {
-    await api.dispose();
+    await stopSkyePayDevServer(devServer);
   }
 
-  const browser = await launchBrowser();
-  try {
-    await checkSkyePayBrowser(browser, { width: 1440, height: 1000 }, 'desktop');
-    checkpoint('SkyePay desktop browser checkout complete');
-    await checkSkyePayBrowser(browser, { width: 390, height: 844 }, 'mobile');
-    checkpoint('SkyePay mobile browser checkout complete');
-  } finally {
-    await browser.close().catch(() => {});
-  }
-
-  report.finished_at = new Date().toISOString();
-  report.ok = report.failures.length === 0;
-  writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
-  console.log(JSON.stringify({
-    crawler: CRAWLER_NAME,
-    version: CRAWLER_VERSION,
-    profile: CRAWLER_PROFILE,
-    ok: report.ok,
-    checks: report.checks.length,
-    failures: report.failures.length,
-    warnings: report.warnings.length,
-    report: REPORT_PATH,
-    artifacts: report.artifacts,
-  }, null, 2));
   if (!report.ok) process.exit(1);
 }
 

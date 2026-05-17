@@ -10,6 +10,39 @@ const STATUSES = new Set(['open', 'pending', 'closed']);
 const SYSTEM_JOB_TYPES = new Set(['release.widget_config.verify','widget.publish.verify','workspace.health.check','api_key.audit']);
 const MAX_JSON_BYTES = 32 * 1024;
 const DEFAULT_MAX_MESSAGE_CHARS = 4000;
+const CLIENT_WIDGET_WORKSPACES = {
+  'bobs-smoke-shop': {
+    id: 'ws_bobs_smoke_shop',
+    name: "Bob's Smoke Shop",
+    brandName: "Bob's Smoke Shop",
+    welcomeText: "Message Bob's Smoke Shop from this workspace lane. The thread stays tied to the Bob app account.",
+    launcherText: "Bob's workspace chat",
+    operatorName: "MetrAIyux Operator",
+    primaryColor: "#64d6ff",
+    accentColor: "#64d6ff",
+    domains: [
+      'bobs-smoke-shop.pages.dev',
+      'bobs-smoke-shop-metraiyux-preview.pages.dev',
+      'ef03902c.bobs-smoke-shop.pages.dev',
+      'metraiyux-0s-full-system.graylondonskyes.workers.dev'
+    ]
+  },
+  'empire-pallets': {
+    id: 'ws_empire_pallets',
+    name: "Empire Pallets",
+    brandName: "Empire Pallets",
+    welcomeText: "Message Empire Pallets from this workspace lane. The thread stays tied to the Empire Pallets app account.",
+    launcherText: "Empire workspace chat",
+    operatorName: "MetrAIyux Operator",
+    primaryColor: "#6bbf59",
+    accentColor: "#f0c35b",
+    domains: [
+      'empire-pallets.pages.dev',
+      'd29e4aa3.empire-pallets.pages.dev'
+    ]
+  }
+};
+const CLIENT_WIDGET_ORIGINS = new Set(Object.values(CLIENT_WIDGET_WORKSPACES).flatMap((workspace) => workspace.domains || []));
 
 function json(data, status = 200, extra = {}) { return new Response(JSON.stringify(data, null, 2), { status, headers: { ...JSON_HEADERS, ...SECURITY_HEADERS, ...extra } }); }
 function nowIso() { return new Date().toISOString(); }
@@ -24,6 +57,8 @@ function isPlatformAdmin(request, env) { const expected = env.PLATFORM_ADMIN_TOK
 function corsHeaders(env, request) {
   const origin = request.headers.get('origin') || '';
   const allowed = (env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const originHost = requestHost(origin);
+  if (originHost && CLIENT_WIDGET_ORIGINS.has(originHost)) return { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key', vary: 'Origin' };
   if (allowed.length === 0 || allowed.includes(origin)) return { 'access-control-allow-origin': origin || '*', 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key', vary: 'Origin' };
   return {};
 }
@@ -82,6 +117,23 @@ async function ensureBootstrapWorkspace(env) {
   await audit(env, { workspaceId: id, eventType: 'workspace.bootstrap', body: `Bootstrap workspace created: ${name}` });
   return await env.DB.prepare(`SELECT * FROM workspaces WHERE id = ?`).bind(id).first();
 }
+async function ensureClientWidgetWorkspace(env, slug) {
+  const config = CLIENT_WIDGET_WORKSPACES[normalizeSlug(slug)];
+  if (!config) return null;
+  const t = nowIso();
+  await env.DB.prepare(`INSERT INTO workspaces (id, slug, name, status, created_at, updated_at) VALUES (?, ?, ?, 'active', ?, ?) ON CONFLICT(slug) DO UPDATE SET name = excluded.name, status = 'active', updated_at = excluded.updated_at`)
+    .bind(config.id, slug, config.name, t, t).run();
+  const workspace = await env.DB.prepare(`SELECT * FROM workspaces WHERE slug = ? AND status = 'active' LIMIT 1`).bind(slug).first();
+  if (!workspace?.id) return null;
+  await env.DB.prepare(`INSERT INTO widget_configs (id, workspace_id, version, status, brand_name, welcome_text, launcher_text, operator_name, primary_color, accent_color, settings_json, created_at, published_at) VALUES (?, ?, 1, 'published', ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(workspace_id, version) DO UPDATE SET status = 'published', brand_name = excluded.brand_name, welcome_text = excluded.welcome_text, launcher_text = excluded.launcher_text, operator_name = excluded.operator_name, primary_color = excluded.primary_color, accent_color = excluded.accent_color, settings_json = excluded.settings_json, published_at = excluded.published_at`)
+    .bind(`cfg_${slug.replace(/-/g, '_')}_widget_v1`, workspace.id, config.brandName, config.welcomeText, config.launcherText, config.operatorName, config.primaryColor, config.accentColor, JSON.stringify({ source: 'known-client-widget-auto-provision', disclaimer: 'Messages are tied to this workspace account.' }), t, t).run();
+  for (const domain of config.domains || []) {
+    await env.DB.prepare(`INSERT INTO workspace_domains (id, workspace_id, domain, status, created_at) VALUES (?, ?, ?, 'active', ?) ON CONFLICT(workspace_id, domain) DO UPDATE SET status = 'active'`)
+      .bind(`dom_${workspace.id}_${domain.replace(/[^a-z0-9]+/g, '_')}`, workspace.id, domain, t).run();
+  }
+  await audit(env, { workspaceId: workspace.id, eventType: 'workspace.client_widget.ensure', body: slug, metadata: { domains: config.domains || [] } });
+  return workspace;
+}
 async function listWorkspaces(request, env) {
   const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
   const rows = await env.DB.prepare(`SELECT id, slug, name, status, monthly_conversation_limit, monthly_message_limit, max_message_chars, created_at, updated_at FROM workspaces ORDER BY created_at DESC LIMIT 100`).all();
@@ -120,7 +172,11 @@ async function getWidgetConfigBySlug(env, slug) {
 async function getWidgetConfig(request, env) {
   const slug = normalizeSlug(new URL(request.url).searchParams.get('workspace') || '');
   if (!slug) return json({ ok: false, error: 'workspace is required' }, 400, corsHeaders(env, request));
-  const row = await getWidgetConfigBySlug(env, slug);
+  let row = await getWidgetConfigBySlug(env, slug);
+  if (!row && CLIENT_WIDGET_WORKSPACES[slug]) {
+    await ensureClientWidgetWorkspace(env, slug);
+    row = await getWidgetConfigBySlug(env, slug);
+  }
   if (!row) return json({ ok: false, error: 'Workspace widget config not found' }, 404, corsHeaders(env, request));
   const domainCheck = await validateWorkspaceDomain(env, request, row.workspace_id);
   if (!domainCheck.ok) return json({ ok: false, error: domainCheck.error }, 403, corsHeaders(env, request));
@@ -460,9 +516,11 @@ async function createConversation(request, env) {
     auth = await verifyApiKey(request, env, 'conversations:create'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; source = 'api';
   } else {
     const slug = normalizeSlug(input.workspace || new URL(request.url).searchParams.get('workspace') || ''); const cfg = await getWidgetConfigBySlug(env, slug);
-    if (!cfg) return json({ ok: false, error: 'Valid workspace or API key required' }, 401, corsHeaders(env, request));
-    const domainCheck = await validateWorkspaceDomain(env, request, cfg.workspace_id); if (!domainCheck.ok) return json({ ok: false, error: domainCheck.error }, 403, corsHeaders(env, request));
-    workspaceId = cfg.workspace_id;
+    if (!cfg && CLIENT_WIDGET_WORKSPACES[slug]) await ensureClientWidgetWorkspace(env, slug);
+    const clientCfg = cfg || await getWidgetConfigBySlug(env, slug);
+    if (!clientCfg) return json({ ok: false, error: 'Valid workspace or API key required' }, 401, corsHeaders(env, request));
+    const domainCheck = await validateWorkspaceDomain(env, request, clientCfg.workspace_id); if (!domainCheck.ok) return json({ ok: false, error: domainCheck.error }, 403, corsHeaders(env, request));
+    workspaceId = clientCfg.workspace_id;
   }
   const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found or inactive' }, 404, corsHeaders(env, request));
   const limitCheck = await enforceWorkspaceLimits(env, workspace, 'conversation'); if (!limitCheck.ok) return json({ ok: false, error: limitCheck.error }, 429, corsHeaders(env, request));

@@ -1,7 +1,7 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { resolvePortalAccess, cleanText, safeFileName } from './_lib/security.js';
+import { resolvePortalAccess, cleanText, safeFileName, getHeader } from './_lib/security.js';
 import { appendLedger, loadConfig, receiptIdFor, loadSessionManifest, markSessionManifestComplete, updateSessionManifestStatus, writeAuditEventSafe } from './_lib/config.js';
-import { completeMultipartUpload, getDriveFileMetadata } from './_lib/google-drive.js';
+import { completeMultipartUpload, createDownloadUrl, getDriveFileMetadata } from './_lib/google-drive.js';
 import { notifyUploadComplete, sendClientReceiptEmail } from './_lib/notifications.js';
 import { scanUpload } from './_lib/scanner.js';
 
@@ -51,6 +51,48 @@ function verifyManifest(body, manifestRecord, verifiedFile) {
 
 function verifiedText(value, fallback = '', max = 180) {
   return cleanText(value || fallback || '', max);
+}
+
+function envEnabled(name, fallback = true) {
+  const value = String(process.env[name] || '').trim().toLowerCase();
+  if (!value) return fallback;
+  return !['0', 'false', 'no', 'off'].includes(value);
+}
+
+function boundedSeconds(value, fallback = 900) {
+  const seconds = Number(value || fallback);
+  if (!Number.isFinite(seconds) || seconds <= 0) return fallback;
+  return Math.min(3600, Math.max(300, seconds));
+}
+
+function publicBaseUrl(event) {
+  const configured = String(process.env.SKYEVAULT_PUBLIC_URL || process.env.URL || process.env.DEPLOY_URL || '').trim();
+  if (configured) return configured.replace(/\/$/, '');
+  const host = String(getHeader(event, 'host') || '').trim();
+  if (!host) return '';
+  const proto = String(getHeader(event, 'x-forwarded-proto') || 'https').split(',')[0].trim() || 'https';
+  return `${proto}://${host}`;
+}
+
+async function uploadRecoveryLink(event, entry, verifiedFile) {
+  if (!envEnabled('SKYEVAULT_RETURN_DOWNLOAD_LINK', true)) return null;
+  const expiresInSeconds = boundedSeconds(process.env.SKYEVAULT_DOWNLOAD_LINK_SECONDS || process.env.UPLOAD_COMPLETE_DOWNLOAD_LINK_SECONDS, 900);
+  const downloadUrl = createDownloadUrl(verifiedFile.id, {
+    fileName: entry.fileName || verifiedFile.name,
+    mimeType: entry.mimeType || verifiedFile.mimeType,
+    expires: expiresInSeconds
+  });
+  const baseUrl = publicBaseUrl(event);
+  return {
+    ok: true,
+    downloadUrl,
+    expiresAt: new Date(Date.now() + expiresInSeconds * 1000).toISOString(),
+    expiresInSeconds,
+    recoveryUrl: baseUrl ? `${baseUrl}/#client-vault` : '',
+    receiptId: entry.id,
+    clientEmail: entry.clientEmail,
+    access: 'Short-lived signed download URL minted only after gated upload completion. Recovery portal still requires the upload email and portal/workspace key.'
+  };
 }
 
 function verifyVaultObject(body, verifiedFile, config) {
@@ -263,6 +305,26 @@ export async function handler(event) {
       channels: notification?.results?.map((item) => ({ channel: item.channel, ok: item.ok, status: item.status || null, signed: item.signed || false })) || []
     });
 
+    let download = null;
+    try {
+      download = await uploadRecoveryLink(event, entry, verifiedFile);
+      if (download?.downloadUrl) {
+        await writeAuditEventSafe('upload-complete-download-link-created', {
+          receiptId: entry.id,
+          sessionId: entry.sessionId,
+          clientEmail: entry.clientEmail || '',
+          fileName: entry.fileName,
+          fileSize: entry.fileSize,
+          expiresInSeconds: download.expiresInSeconds
+        });
+      }
+    } catch (error) {
+      download = {
+        ok: false,
+        warning: `Upload completed, but the immediate download link could not be created: ${error.message}`
+      };
+    }
+
     const receiptEntry = ledger?.receiptCreated === false && ledger?.receiptSaved ? ledger.receiptSaved : null;
     return json(200, {
       ok: true,
@@ -282,6 +344,7 @@ export async function handler(event) {
       },
       notification,
       clientReceiptEmail,
+      download,
       audit
     }, noStoreCors(event));
   } catch (error) {

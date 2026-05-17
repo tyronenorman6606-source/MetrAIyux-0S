@@ -60,6 +60,101 @@ function normalizeTargets(value) {
     : [];
 }
 
+function normalizePreviewUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const parsed = new URL(raw);
+    if (!['https:', 'http:'].includes(parsed.protocol)) return '';
+    return parsed.toString().slice(0, 500);
+  } catch {
+    if (/^(\.\/|\.\.\/|\/)[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+$/.test(raw)) {
+      return raw.slice(0, 500);
+    }
+    return '';
+  }
+}
+
+function normalizeTracks(tracks) {
+  if (!Array.isArray(tracks)) return [];
+  return tracks.map((track, index) => ({
+    title: String(track?.title || `Track ${index + 1}`).trim() || `Track ${index + 1}`,
+    duration: track?.duration !== undefined && !Number.isNaN(Number(track.duration)) ? Number(track.duration) : null,
+    previewUrl: normalizePreviewUrl(track?.previewUrl || track?.audioUrl || track?.streamUrl || ''),
+    isrc: String(track?.isrc || '').trim().slice(0, 32),
+    plays: Number(track?.plays || 0) || 0,
+    listenSeconds: Number(track?.listenSeconds || 0) || 0,
+  }));
+}
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase().slice(0, 180);
+}
+
+function boolValue(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  if (typeof value === 'boolean') return value;
+  return ['1', 'true', 'yes', 'on'].includes(String(value).trim().toLowerCase());
+}
+
+function normalizeRights(input = {}, existing = {}) {
+  const next = {
+    ...existing,
+    ownershipAttested: boolValue(input.ownershipAttested, existing.ownershipAttested === true),
+    previewUseAuthorized: boolValue(input.previewUseAuthorized, existing.previewUseAuthorized === true),
+    distributionAuthorized: boolValue(input.distributionAuthorized, existing.distributionAuthorized === true),
+    samplesCleared: boolValue(input.samplesCleared, existing.samplesCleared === true),
+    coverMechanicalLicense: boolValue(input.coverMechanicalLicense, existing.coverMechanicalLicense === true),
+    publisherClearance: boolValue(input.publisherClearance, existing.publisherClearance === true),
+    explicitContent: boolValue(input.explicitContent, existing.explicitContent === true),
+    takedownContactEmail: normalizeEmail(input.takedownContactEmail || existing.takedownContactEmail || ''),
+    notes: String(input.notes ?? existing.notes ?? '').trim().slice(0, 1200),
+    updatedAt: nowIso(),
+  };
+  next.status = next.playbackBlocked || next.takedownHold
+    ? 'blocked'
+    : next.ownershipAttested && next.previewUseAuthorized && next.distributionAuthorized
+      ? 'distribution-ready'
+      : next.ownershipAttested && next.previewUseAuthorized
+        ? 'preview-ready'
+        : 'needs-clearance';
+  return next;
+}
+
+function linkedPreviewAllowed(release) {
+  const rights = release.rights || {};
+  return rights.ownershipAttested === true && rights.previewUseAuthorized === true && rights.playbackBlocked !== true && rights.takedownHold !== true;
+}
+
+function distributionGateAllowed(release) {
+  const rights = release.rights || {};
+  const tracks = normalizeTracks(release.tracks);
+  const hasLinkedPreview = tracks.some((track) => track.previewUrl);
+  return rights.ownershipAttested === true
+    && rights.distributionAuthorized === true
+    && rights.playbackBlocked !== true
+    && rights.takedownHold !== true
+    && (!hasLinkedPreview || rights.previewUseAuthorized === true);
+}
+
+function rightsSummary(release) {
+  const rights = release.rights || normalizeRights();
+  const tracks = normalizeTracks(release.tracks);
+  return {
+    releaseId: release.id,
+    title: release.title,
+    artistId: release.artistId,
+    status: rights.status || 'needs-clearance',
+    ownershipAttested: rights.ownershipAttested === true,
+    previewUseAuthorized: rights.previewUseAuthorized === true,
+    distributionAuthorized: rights.distributionAuthorized === true,
+    playbackBlocked: rights.playbackBlocked === true || rights.takedownHold === true,
+    takedownContactEmail: rights.takedownContactEmail || '',
+    linkedPreviewCount: tracks.filter((track) => track.previewUrl).length,
+    updatedAt: rights.updatedAt || release.submittedAt || '',
+  };
+}
+
 function inferWorkflowTargets(release) {
   const base = [];
   const targets = Array.isArray(release.distributionTargets) ? release.distributionTargets : [];
@@ -135,7 +230,7 @@ function summarizeOperationsBoard(releases) {
 
 function summarizeWorkflowEventType(event) {
   const category = String(event?.category || '').trim().toLowerCase();
-  if (['submission', 'review', 'publish', 'analytics', 'operations'].includes(category)) {
+  if (['submission', 'review', 'publish', 'analytics', 'operations', 'rights'].includes(category)) {
     return category;
   }
   return 'activity';
@@ -193,6 +288,7 @@ function handleWorkflowTimeline(params) {
     publish: events.filter((item) => item.category === 'publish').length,
     analytics: events.filter((item) => item.category === 'analytics').length,
     operations: events.filter((item) => item.category === 'operations').length,
+    rights: events.filter((item) => item.category === 'rights').length,
   };
 
   return respond(200, { ok: true, timeline, summary, generatedAt: nowIso() });
@@ -241,16 +337,12 @@ function handleSubmit(payload) {
     artistId: String(artistId).trim(),
     title: String(title).trim(),
     type,
-    tracks: Array.isArray(tracks)
-      ? tracks.map((t) => ({
-          title: String(t.title || '').trim(),
-          duration: t.duration !== undefined ? t.duration : null,
-        }))
-      : [],
+    tracks: normalizeTracks(tracks),
     releaseDate: releaseDate ? String(releaseDate) : null,
     distributionTargets: Array.isArray(distributionTargets) ? distributionTargets : [],
     status: 'submitted',
     analytics: { streams: 0, downloads: 0, saves: 0 },
+    rights: normalizeRights(payload.rights || {}),
     submittedAt: nowIso(),
     publishedAt: null,
     workflowTimeline: [],
@@ -346,6 +438,91 @@ function handleReview(payload, params) {
   return respond(200, { ok: true, release: releases[idx] });
 }
 
+function handleUpdateRights(payload, params) {
+  const id = (payload && payload.id) || (params && params.id);
+  if (!id) {
+    return respond(400, { ok: false, error: 'id is required' });
+  }
+
+  const releases = loadReleases();
+  const idx = releases.findIndex((r) => r.id === id);
+  if (idx === -1) {
+    return respond(404, { ok: false, error: 'Release not found' });
+  }
+
+  const release = releases[idx];
+  release.rights = normalizeRights(payload.rights || payload, release.rights || {});
+  appendWorkflowEvent(release, 'rights', {
+    outcome: 'rights-updated',
+    status: release.rights.status,
+    note: release.rights.status === 'needs-clearance'
+      ? 'Rights gate still needs ownership and preview authorization before linked audio playback.'
+      : `Rights gate updated to ${release.rights.status}`,
+    actor: release.artistId,
+  });
+  releases[idx] = release;
+  saveReleases(releases);
+
+  return respond(200, { ok: true, release, rights: release.rights, summary: rightsSummary(release) });
+}
+
+function handleTakedownRequest(payload, params) {
+  const id = (payload && payload.id) || (params && params.id);
+  if (!id) {
+    return respond(400, { ok: false, error: 'id is required' });
+  }
+
+  const releases = loadReleases();
+  const idx = releases.findIndex((r) => r.id === id);
+  if (idx === -1) {
+    return respond(404, { ok: false, error: 'Release not found' });
+  }
+
+  const release = releases[idx];
+  const request = {
+    id: `td_${makeId()}`,
+    requestedAt: nowIso(),
+    requesterEmail: normalizeEmail(payload.requesterEmail || payload.email || ''),
+    reason: String(payload.reason || '').trim().slice(0, 1200),
+    status: 'operator-review',
+  };
+  release.rights = normalizeRights({}, release.rights || {});
+  release.rights.playbackBlocked = true;
+  release.rights.takedownHold = true;
+  release.rights.status = 'blocked';
+  release.rights.takedownRequests = [...(Array.isArray(release.rights.takedownRequests) ? release.rights.takedownRequests : []), request].slice(-50);
+  release.status = release.status === 'live' ? 'takedown-review' : release.status;
+  appendWorkflowEvent(release, 'rights', {
+    outcome: 'takedown-hold',
+    status: release.rights.status,
+    note: request.reason || 'Playback blocked pending operator rights review.',
+    actor: request.requesterEmail || 'rights-gate',
+  });
+  releases[idx] = release;
+  saveReleases(releases);
+
+  return respond(202, { ok: true, release, request, rights: release.rights });
+}
+
+function handleRightsAudit(params) {
+  const releases = loadReleases();
+  const artistId = params.artistId ? String(params.artistId).trim() : '';
+  const summaries = releases
+    .filter((release) => !artistId || release.artistId === artistId)
+    .map(rightsSummary)
+    .sort((left, right) => String(right.updatedAt || '').localeCompare(String(left.updatedAt || '')));
+  return respond(200, {
+    ok: true,
+    rights: summaries,
+    summary: {
+      total: summaries.length,
+      ready: summaries.filter((item) => item.status === 'preview-ready' || item.status === 'distribution-ready').length,
+      blocked: summaries.filter((item) => item.playbackBlocked).length,
+      needsClearance: summaries.filter((item) => item.status === 'needs-clearance').length,
+    },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Action: publish release
 // ---------------------------------------------------------------------------
@@ -367,6 +544,13 @@ function handlePublish(payload, params) {
     return respond(409, {
       ok: false,
       error: `Release must be in "approved" status before publishing (current: "${releases[idx].status}")`,
+    });
+  }
+
+  if (!distributionGateAllowed(releases[idx])) {
+    return respond(409, {
+      ok: false,
+      error: 'Release publish requires ownership attestation, distribution authorization, and preview-use authorization for linked audio.',
     });
   }
 
@@ -404,6 +588,13 @@ function handleReportStreams(payload, params) {
 
   const analytics = releases[idx].analytics || { streams: 0, downloads: 0, saves: 0 };
 
+  if (releases[idx].rights?.playbackBlocked === true || releases[idx].rights?.takedownHold === true) {
+    return respond(423, { ok: false, error: 'Stream reporting is blocked pending rights/takedown review.' });
+  }
+  if (!distributionGateAllowed(releases[idx])) {
+    return respond(409, { ok: false, error: 'Stream reporting requires the release distribution rights gate.' });
+  }
+
   if (streams !== undefined && !isNaN(Number(streams))) {
     analytics.streams = (analytics.streams || 0) + Number(streams);
   }
@@ -425,6 +616,97 @@ function handleReportStreams(payload, params) {
   saveReleases(releases);
 
   return respond(200, { ok: true, release: releases[idx] });
+}
+
+function handlePlaybackStream(payload, params) {
+  const id = (payload && payload.id) || (params && params.id);
+  if (!id) {
+    return respond(400, { ok: false, error: 'id is required' });
+  }
+
+  const releases = loadReleases();
+  const idx = releases.findIndex((r) => r.id === id);
+  if (idx === -1) {
+    return respond(404, { ok: false, error: 'Release not found' });
+  }
+
+  const release = releases[idx];
+  const tracks = normalizeTracks(release.tracks);
+  const trackIndex = Math.max(0, Math.min(tracks.length - 1, Number.parseInt(String(payload?.trackIndex || 0), 10) || 0));
+  const track = tracks[trackIndex] || { title: release.title || 'Untitled Signal', duration: null, plays: 0, listenSeconds: 0 };
+  const listenSeconds = Math.max(0, Math.min(3600, Number(payload?.listenSeconds || 0) || 0));
+  const analytics = release.analytics || { streams: 0, downloads: 0, saves: 0 };
+  const source = String(payload?.source || 'nexus-player').trim().slice(0, 80);
+  const generatedProofOnly = payload?.generatedProof === true || source === 'generated-preview';
+  const linkedPreview = Boolean(track.previewUrl) && !generatedProofOnly;
+  const legalLinkedPreview = linkedPreview && linkedPreviewAllowed(release);
+
+  if ((release.rights?.playbackBlocked === true || release.rights?.takedownHold === true)) {
+    return respond(423, { ok: false, error: 'Playback is blocked pending rights/takedown review.' });
+  }
+  if (linkedPreview && !legalLinkedPreview) {
+    return respond(409, { ok: false, error: 'Linked audio playback requires ownership attestation and preview-use authorization.' });
+  }
+
+  const trackStats = analytics.trackStats && typeof analytics.trackStats === 'object' ? analytics.trackStats : {};
+  const key = String(trackIndex);
+  const stat = trackStats[key] || { title: track.title, plays: 0, listenSeconds: 0, completedPlays: 0 };
+
+  if (legalLinkedPreview) analytics.streams = (analytics.streams || 0) + 1;
+  else analytics.proofPlays = (analytics.proofPlays || 0) + 1;
+  analytics.plays = (analytics.plays || 0) + 1;
+  analytics.listenSeconds = (analytics.listenSeconds || 0) + listenSeconds;
+  stat.title = track.title;
+  stat.plays = (stat.plays || 0) + 1;
+  stat.listenSeconds = (stat.listenSeconds || 0) + listenSeconds;
+  if (payload?.completed === true) stat.completedPlays = (stat.completedPlays || 0) + 1;
+  stat.lastPlayedAt = nowIso();
+  trackStats[key] = stat;
+  analytics.trackStats = trackStats;
+
+  tracks[trackIndex] = {
+    ...track,
+    plays: (track.plays || 0) + 1,
+    listenSeconds: (track.listenSeconds || 0) + listenSeconds,
+    lastPlayedAt: stat.lastPlayedAt,
+  };
+
+  const playback = {
+    id: `play_${makeId()}`,
+    releaseId: release.id,
+    trackIndex,
+    trackTitle: track.title,
+    listenSeconds,
+    completed: payload?.completed === true,
+    source,
+    playbackKind: legalLinkedPreview ? 'rights-cleared-linked-preview' : 'generated-proof-preview',
+    at: stat.lastPlayedAt,
+  };
+
+  release.tracks = tracks;
+  release.analytics = analytics;
+  release.lastPlaybackAt = playback.at;
+  release.playbackEvents = [...(Array.isArray(release.playbackEvents) ? release.playbackEvents : []), playback].slice(-100);
+  appendWorkflowEvent(release, 'analytics', {
+    outcome: 'playback-stream',
+    status: release.status,
+    note: `${playback.playbackKind} +1 for ${track.title} (${Math.round(listenSeconds)}s)`,
+  });
+
+  releases[idx] = release;
+  saveReleases(releases);
+
+  return respond(200, {
+    ok: true,
+    release,
+    playback: {
+      ...playback,
+      streams: analytics.streams,
+      proofPlays: analytics.proofPlays || 0,
+      plays: analytics.plays,
+      trackPlays: stat.plays,
+    },
+  });
 }
 
 function handleOperationsBoard(params) {
@@ -456,6 +738,9 @@ function handleQueueOperations(payload, params) {
   const release = releases[idx];
   if (!['approved', 'live'].includes(release.status)) {
     return respond(409, { ok: false, error: 'Release must be approved or live before queueing operations' });
+  }
+  if (!distributionGateAllowed(release)) {
+    return respond(409, { ok: false, error: 'Operations queue requires the release distribution rights gate.' });
   }
 
   if (release.operationsWorkflow) {
@@ -540,6 +825,7 @@ module.exports.handler = async (event) => {
       if (action === 'get') return handleGet(params);
       if (action === 'operations-board') return handleOperationsBoard(params);
       if (action === 'workflow-timeline') return handleWorkflowTimeline(params);
+      if (action === 'rights-audit') return handleRightsAudit(params);
       return respond(400, { ok: false, error: `Unknown GET action: ${action}` });
     }
 
@@ -555,6 +841,9 @@ module.exports.handler = async (event) => {
       if (action === 'review') return handleReview(payload, params);
       if (action === 'publish') return handlePublish(payload, params);
       if (action === 'report-streams') return handleReportStreams(payload, params);
+      if (action === 'playback-stream') return handlePlaybackStream(payload, params);
+      if (action === 'update-rights') return handleUpdateRights(payload, params);
+      if (action === 'takedown-request') return handleTakedownRequest(payload, params);
       if (action === 'queue-operations') return handleQueueOperations(payload, params);
       if (action === 'update-operations') return handleUpdateOperations(payload, params);
       return respond(400, { ok: false, error: `Unknown POST action: ${action}` });

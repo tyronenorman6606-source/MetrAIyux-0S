@@ -18,7 +18,17 @@ OPENAI_API_KEY=<openai-api-key>
 OPENAI_MODEL=gpt-5.4-mini
 ```
 
-## 3. Google Drive upload
+## 3. SkyeVault/R2 upload
+
+Preferred inside the 0S: use the live SkyeVault Cloudflare R2 lane. The app reads the root 0S env aliases for R2, including `CLOUDFLARE_R2_ACCOUNT_ID`, `CLOUDFLARE_R2_ACCESS_KEY`, `CLOUDFLARE_R2_SECRET_KEY`, and `S3_BUCKET`.
+
+```env
+SKYE_CONTENT_FORGE_R2_PREFIX=content-forge-exports
+SKYE_CONTENT_FORGE_R2_CHUNK_MB=8
+SKYE_CONTENT_FORGE_R2_DOWNLOAD_SECONDS=3600
+```
+
+## 4. Optional Google Drive upload
 
 Create a Google Cloud service account, enable Google Drive API, share your target Drive folder with the service-account email, and set:
 
@@ -28,7 +38,9 @@ GOOGLE_SERVICE_ACCOUNT_EMAIL=
 GOOGLE_PRIVATE_KEY="<escaped-google-service-account-private-key>"
 ```
 
-## 4. GitHub publishing
+Service accounts cannot write into normal My Drive storage as the storage owner. Use a writable Shared Drive folder, delegated OAuth, or prefer SkyeVault/R2.
+
+## 5. GitHub publishing
 
 Create a fine-grained GitHub token with contents read/write access for the target repo.
 
@@ -40,7 +52,7 @@ GITHUB_BRANCH=main
 GITHUB_CONTENT_DIR=content/blog
 ```
 
-## 5. Netlify
+## 6. Netlify
 
 Preferred: connect Netlify to the same GitHub repo.
 
@@ -57,7 +69,7 @@ NETLIFY_AUTH_TOKEN=
 NETLIFY_SITE_ID=
 ```
 
-## 6. Cloudflare Pages
+## 7. Cloudflare Pages
 
 Preferred: connect Cloudflare Pages to the same GitHub repo.
 
@@ -75,7 +87,7 @@ CLOUDFLARE_PAGES_PROJECT_NAME=
 CLOUDFLARE_PAGES_BRANCH=main
 ```
 
-## 7. Social APIs
+## 8. Social APIs
 
 Facebook Pages:
 
@@ -100,7 +112,7 @@ LINKEDIN_AUTHOR_URN=urn:li:organization:123456789
 LINKEDIN_VISIBILITY=PUBLIC
 ```
 
-## 8. Live dashboard security
+## 9. Live dashboard security
 
 For live deployment, protect write/generation endpoints:
 
@@ -112,7 +124,7 @@ APP_BASE_URL=https://your-live-app.example.com
 
 Paste `APP_ACCESS_TOKEN` into the dashboard token field. External schedulers use `SCHEDULER_API_KEY`.
 
-## 9. Scheduler
+## 10. Scheduler
 
 Automated internal scheduler:
 
@@ -135,7 +147,7 @@ Use one or more of the included scheduler templates:
 - `cloudflare/scheduler-worker.mjs`
 - server cron calling `node scripts/run-scheduler-once.mjs`
 
-## 10. GitHub backup and recovery
+## 11. GitHub backup and recovery
 
 ```env
 BACKUP_TO_GITHUB_ON_TICK=1

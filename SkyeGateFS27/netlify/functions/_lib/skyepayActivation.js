@@ -60,6 +60,7 @@ export function gatePolicyFromOrder(order) {
   const offer = order.offer_snapshot && typeof order.offer_snapshot === "object" ? order.offer_snapshot : {};
   const policy = offer.gate_policy && typeof offer.gate_policy === "object" ? offer.gate_policy : {};
   const rateLimits = offer.rate_limits && typeof offer.rate_limits === "object" ? offer.rate_limits : {};
+  const ownerApprovalRequired = skyePayOfferRequiresOwnerApproval(order);
   return {
     plan_name: clean(offer.plan_name || order.offer_id || "skypay-client", 40),
     monthly_cap_cents: numberOrNull(policy.monthly_cap_cents ?? rateLimits.monthly_cap_cents) ?? parseInt(process.env.DEFAULT_CUSTOMER_CAP_CENTS || "2000", 10),
@@ -80,8 +81,8 @@ export function gatePolicyFromOrder(order) {
       trial_days: numberOrNull(offer.trial_days) || 0,
       deferred_one_time_cents: numberOrNull(offer.deferred_one_time_cents) || 0,
       credits: Array.isArray(offer.credits) ? offer.credits : [],
-      owner_approval_required: skyePayOfferRequiresOwnerApproval(order),
-      activation_path: clean(offer.activation_path, 180) || "auto_unlock_after_confirmed_payment",
+      owner_approval_required: ownerApprovalRequired,
+      activation_path: clean(offer.activation_path, 180) || (ownerApprovalRequired ? "paid_pending_owner_approval" : "auto_unlock_after_confirmed_payment"),
       gate_policy: policy
     }
   };

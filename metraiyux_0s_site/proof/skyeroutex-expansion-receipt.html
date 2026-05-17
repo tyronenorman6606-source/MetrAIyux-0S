@@ -19,7 +19,7 @@
       <p class="eyebrow">Proof receipt</p>
       <h1>SkyeRouteX is wired into 0S with a clear runtime boundary.</h1>
       <p class="hero-copy">This receipt records the older V83 shell, the newly added SkyeRoutexFlow Workforce Command v0.4.0 local proof platform, what passed locally, where the buyer/operator should go, and what the public copy must not claim yet.</p>
-      <div class="hero-actions"><a class="button primary" href="../live/skyeroutex-workforce-command.html">Open expansion hub</a><a class="button" href="../skyeroutex-workforce-command-v0.4.0/index.html">Open v0.4.0</a><a class="button" href="../SkyeRouteX/runtime.html">Open V83 runtime lane</a></div>
+      <div class="hero-actions"><a class="button primary" href="../live/skyeroutex-workforce-command.html">Open expansion hub</a><a class="button" href="../SkyeRouteX/workforce-command-v0.4.0/index.html">Open v0.4.0</a><a class="button" href="../SkyeRouteX/runtime.html">Open V83 runtime lane</a></div>
     </section>
 
     <section class="section">
@@ -28,7 +28,8 @@
         <table class="commercial-table">
           <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
           <tbody>
-            <tr><td>Folders present inside 0S</td><td>Passed</td><td>`metraiyux_0s_site/SkyeRouteX` contains the V83 static shell; `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0` contains the local Node/API workforce command platform.</td></tr>
+            <tr><td>Folders present inside 0S</td><td>Passed</td><td>`metraiyux_0s_site/SkyeRouteX` contains the V83 static shell; `metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0` contains the local Node/API workforce command platform.</td></tr>
+            <tr><td>Folder separation guard</td><td>Passed</td><td>`npm run 0s:skyeroutex:layout` verifies v0.4.0 stays nested inside `SkyeRouteX` and the old top-level path remains only a symlink compatibility pointer.</td></tr>
             <tr><td>V83 runtime harness</td><td>Passed</td><td>`npm run verify:runtime` passed 16/16 V83 checks and regenerated `WHITE_GLOVE_V83/smoke_output_v83.json`.</td></tr>
             <tr><td>v0.4.0 local API/browser harness</td><td>Passed</td><td>`npm run smoke:all` passed again on May 17, 2026 using the workspace Playwright Chromium cache. The suite covered browser panels, browser clicks, provider/contractor route flows, storage, S3-compatible signing, integrations, webhooks, native provider contracts, provider callback reconciliation, runtime bus, provider guards, security, integrity, audit chain, auth controls, admin invites, migrations, reset, deploy readiness, and SkyeHands mount.</td></tr>
             <tr><td>Concurrency stress</td><td>Passed with boundary</td><td>`npm run 0s:skyeroutex:stress` passed at 608 requests with 8 providers, 48 contractors, 24 jobs, 96 applications, 32 assignments, 32 proof media writes, 32 export packets, and audit-chain validation. The fresh default runs had no 500s and returned only 200/201 plus expected 409 assignment-lock conflicts, with p99 in the 6.2s to 12.2s local range. A heavier run passed at 1,192 requests with 12 providers, 96 contractors, 48 jobs, 192 applications, 64 assignments, and 128 expected slot-lock conflicts after the local JSON adapter was cached/atomically compacted and mutating routes were serialized to prevent stale async writes. Heavy local JSON p99 was about 10.5s, so production throughput still requires Postgres/object storage/provider infrastructure.</td></tr>
@@ -46,8 +47,8 @@
       <h2>Added public routes</h2>
       <div class="route-grid">
         <a class="route-card" href="../live/skyeroutex-workforce-command.html"><h3>RouteX Expansion Hub</h3><p>Buyer-safe 0S entry point for the workforce command lane.</p></a>
-        <a class="route-card" href="../skyeroutex-workforce-command-v0.4.0/index.html"><h3>v0.4.0 Platform Hub</h3><p>Static-safe wrapper for the new local proof platform.</p></a>
-        <a class="route-card" href="../skyeroutex-workforce-command-v0.4.0/public/index.html"><h3>v0.4.0 API UI</h3><p>Browser panels for markets, provider jobs, contractor feeds, assignments, proof, payments, exports, and audits when the API runtime is running.</p></a>
+        <a class="route-card" href="../SkyeRouteX/workforce-command-v0.4.0/index.html"><h3>v0.4.0 Platform Hub</h3><p>Static-safe wrapper for the new local proof platform.</p></a>
+        <a class="route-card" href="../SkyeRouteX/workforce-command-v0.4.0/public/index.html"><h3>v0.4.0 API UI</h3><p>Browser panels for markets, provider jobs, contractor feeds, assignments, proof, payments, exports, and audits when the API runtime is running.</p></a>
         <a class="route-card" href="../SkyeRouteX/index.html"><h3>SkyeRouteX App</h3><p>The routed platform shell with dashboard, routes, stops, proof, analytics, and runtime views.</p></a>
         <a class="route-card" href="../SkyeRouteX/apps/audit-ready-console/index.html"><h3>Audit Ready Console</h3><p>Embedded audit-ready console carried with the RouteX package.</p></a>
       </div>

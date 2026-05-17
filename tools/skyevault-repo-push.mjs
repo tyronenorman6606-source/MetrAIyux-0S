@@ -399,11 +399,38 @@ async function uploadArchive(archive, archiveHash, summary) {
     driveFileId: driveFile.id,
     driveFile
   });
+  const receiptId = completion.receipt?.id || completion.entry?.id;
+  let download = completion.download || null;
+  const returnDownloadLink = !['0', 'false', 'no', 'off'].includes(String(env.SKYEVAULT_RETURN_DOWNLOAD_LINK || '1').trim().toLowerCase());
+  if (receiptId && returnDownloadLink && !download?.downloadUrl) {
+    const expiresInSeconds = Math.min(3600, Math.max(300, numberEnv(env, 'SKYEVAULT_DOWNLOAD_LINK_SECONDS', 900)));
+    try {
+      download = await api('/api/client-vault', {
+        action: 'download',
+        receiptId,
+        clientEmail: body.clientEmail,
+        expiresInSeconds,
+        portalKey
+      });
+    } catch (error) {
+      download = {
+        ok: false,
+        warning: `Upload completed, but the immediate download link could not be created: ${error.message}`
+      };
+    }
+  }
+  if (download?.downloadUrl) {
+    console.log(`Download link: ${download.downloadUrl}`);
+    console.log(`Download link expires: ${download.expiresAt || 'unknown'}`);
+    if (download.recoveryUrl) console.log(`Recovery portal: ${download.recoveryUrl}`);
+  } else if (download?.warning || download?.error) {
+    console.log(`Download link warning: ${download.warning || download.error}`);
+  }
   return {
     ok: true,
     vaultApi: baseUrl,
     origin,
-    receiptId: completion.receipt?.id || completion.entry?.id,
+    receiptId,
     sessionId: session.sessionId,
     destination: session.destination?.name,
     fileName,
@@ -427,6 +454,14 @@ async function uploadArchive(archive, archiveHash, summary) {
     completedParts: completedParts.length,
     retryCount: retryOptions.retries,
     quota: quotas,
+    download: download ? {
+      ok: download.ok !== false,
+      downloadUrl: download.downloadUrl || '',
+      expiresAt: download.expiresAt || '',
+      expiresInSeconds: download.expiresInSeconds || null,
+      recoveryUrl: download.recoveryUrl || `${baseUrl}/#client-vault`,
+      warning: download.warning || download.error || ''
+    } : null,
     archive: {
       fileCount: summary.fileCount,
       bytes: archiveSize,

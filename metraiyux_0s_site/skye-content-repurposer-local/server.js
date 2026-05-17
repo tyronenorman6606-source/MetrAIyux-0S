@@ -2,12 +2,19 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import crypto from 'node:crypto';
 import { spawn } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, '../..');
+const SHELL_ENV_KEYS = new Set(Object.keys(process.env));
+
+loadDotEnv(path.join(REPO_ROOT, '.env'));
+loadDotEnv(path.join(__dirname, '.env'), { override: true, protectKeys: SHELL_ENV_KEYS });
+applyEnvAliases();
+
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_DIR = path.join(__dirname, 'data');
 const EXPORT_DIR = path.resolve(__dirname, process.env.EXPORT_DIR || 'exports');
@@ -17,8 +24,6 @@ const PUBLISH_QUEUE_FILE = path.join(DATA_DIR, 'publish-queue.json');
 const PUBLISH_LOG_FILE = path.join(DATA_DIR, 'publish-log.json');
 const STATIC_SITE_DIR = path.resolve(__dirname, process.env.STATIC_SITE_DIR || 'site-build');
 const MAX_BODY_BYTES = 8 * 1024 * 1024;
-
-loadDotEnv(path.join(__dirname, '.env'));
 
 const PORT = Number(process.env.PORT || 4313);
 const APP_NAME = process.env.APP_NAME || 'Skye Content Forge';
@@ -168,6 +173,7 @@ async function handleApi(req, res, url) {
         settingsFile: path.relative(__dirname, SETTINGS_FILE),
         exportDir: path.relative(__dirname, EXPORT_DIR)
       },
+      skyeVaultR2: skyeVaultStatus(),
       googleDrive: driveStatus(),
       publisher: publisherStatus(),
       runtime: runtimeStatus(),
@@ -329,6 +335,13 @@ async function handleApi(req, res, url) {
     const body = await readJsonBody(req);
     const result = await exportMarkdownLocal(body);
     sendJson(res, 200, { ok: true, export: result });
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/export/skyevault-r2') {
+    const body = await readJsonBody(req);
+    const result = await uploadMarkdownToSkyeVault(body);
+    sendJson(res, 200, { ok: true, skyeVaultFile: result });
     return;
   }
 
@@ -642,7 +655,7 @@ async function uploadMarkdownToDrive(input) {
   const output = String(input.output || '').trim();
   if (!output) throw new Error('There is no output to upload.');
   const fileName = `${slugify(title)}-${new Date().toISOString().slice(0, 10)}.md`;
-  const token = await getGoogleAccessToken();
+  const token = await getGoogleDriveAccessToken();
   const boundary = `skye_${crypto.randomBytes(12).toString('hex')}`;
   const metadata = {
     name: `${process.env.GOOGLE_DRIVE_EXPORT_PREFIX || 'Skye Content Forge - '}${fileName}`,
@@ -662,7 +675,12 @@ async function uploadMarkdownToDrive(input) {
     ''
   ].join('\r\n');
 
-  const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink,mimeType,size,parents', {
+  const uploadParams = new URLSearchParams({
+    uploadType: 'multipart',
+    fields: 'id,name,webViewLink,webContentLink,mimeType,size,parents,driveId'
+  });
+  if (process.env.GOOGLE_DRIVE_SUPPORTS_ALL_DRIVES !== '0') uploadParams.set('supportsAllDrives', 'true');
+  const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files?${uploadParams.toString()}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -672,9 +690,113 @@ async function uploadMarkdownToDrive(input) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data?.error?.message || `Google Drive upload failed with status ${response.status}.`);
+    const message = data?.error?.message || `Google Drive upload failed with status ${response.status}.`;
+    if (/Service Accounts do not have storage quota/i.test(message)) {
+      throw new Error(`${message} Set GOOGLE_DRIVE_FOLDER_ID to a writable Shared Drive folder, or use delegated OAuth for a user-owned Drive folder.`);
+    }
+    throw new Error(message);
   }
   return { ...data, uploadedAt: new Date().toISOString() };
+}
+
+let skyeVaultModulePromise = null;
+
+function skyeVaultStatus() {
+  const modulePath = path.join(REPO_ROOT, 'SkyeVault-Drop/netlify/functions/_lib/google-drive.js');
+  const required = {
+    R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID || process.env.CLOUDFLARE_R2_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || process.env.cloudflare_account_ID,
+    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID || process.env.CLOUDFLARE_R2_ACCESS_KEY || process.env.S3_ACCESS_KEY,
+    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY || process.env.CLOUDFLARE_R2_SECRET_KEY || process.env.S3_SECRET_KEY
+  };
+  const missing = Object.entries(required).filter(([, value]) => !value).map(([key]) => key);
+  if (!existsSync(modulePath)) missing.push('SkyeVault-Drop R2 adapter');
+  return {
+    configured: missing.length === 0,
+    missing,
+    provider: 'cloudflare-r2',
+    bucket: process.env.R2_BUCKET || process.env.S3_BUCKET || 'client-drop-vault',
+    prefix: skyeVaultContentPrefix(),
+    adapterPath: path.relative(REPO_ROOT, modulePath)
+  };
+}
+
+function skyeVaultContentPrefix() {
+  return String(process.env.SKYE_CONTENT_FORGE_R2_PREFIX || process.env.SKYEVAULT_CONTENT_FORGE_PREFIX || 'content-forge-exports')
+    .replace(/^\/+|\/+$/g, '')
+    .replace(/\\/g, '/')
+    .replace(/\/{2,}/g, '/') || 'content-forge-exports';
+}
+
+async function skyeVaultStorage() {
+  const modulePath = path.join(REPO_ROOT, 'SkyeVault-Drop/netlify/functions/_lib/google-drive.js');
+  if (!existsSync(modulePath)) throw new Error('SkyeVault R2 adapter was not found at SkyeVault-Drop/netlify/functions/_lib/google-drive.js.');
+  skyeVaultModulePromise ||= import(pathToFileURL(modulePath).href);
+  return skyeVaultModulePromise;
+}
+
+async function uploadMarkdownToSkyeVault(input) {
+  const status = skyeVaultStatus();
+  if (!status.configured) {
+    throw new Error(`SkyeVault/R2 is not configured. Missing: ${status.missing.join(', ')}`);
+  }
+  const title = input.title || 'skye-content-export';
+  const output = String(input.output || '').trim();
+  if (!output) throw new Error('There is no output to upload.');
+
+  const storage = await skyeVaultStorage();
+  const fileName = `${slugify(title)}-${new Date().toISOString().slice(0, 10)}.md`;
+  const body = Buffer.from(output, 'utf8');
+  const sessionId = `content-forge-${crypto.randomUUID()}`;
+  const session = await storage.createResumableSession({
+    id: 'skye-content-forge',
+    name: 'Skye Content Forge',
+    folderId: status.prefix,
+    role: 'content-forge',
+    priority: 1,
+    maxFileSizeGb: 5,
+    accept: 'text/markdown,text/plain'
+  }, {
+    sessionId,
+    fileName,
+    fileSize: body.length,
+    mimeType: 'text/markdown; charset=utf-8',
+    chunkSizeMb: Number(process.env.SKYE_CONTENT_FORGE_R2_CHUNK_MB || 8),
+    projectName: 'Skye Content Forge',
+    clientReference: 'metraiyux-0s-content-forge',
+    assetType: 'Content Forge Markdown Export',
+    usageRightsAccepted: true,
+    retentionAcknowledged: true
+  });
+
+  const parts = [];
+  for (const part of session.parts || []) {
+    const chunk = body.subarray(part.start, part.end + 1);
+    const response = await fetch(part.uploadUrl, { method: 'PUT', body: chunk });
+    const text = await response.text().catch(() => '');
+    if (!response.ok) throw new Error(`SkyeVault/R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 240)}`);
+    parts.push({ partNumber: part.partNumber, eTag: response.headers.get('etag') || response.headers.get('ETag') || '' });
+  }
+  if (!parts.every((part) => part.eTag)) throw new Error('SkyeVault/R2 upload completed without ETag proof for every part.');
+
+  await storage.completeMultipartUpload(session.objectKey, session.uploadId, parts);
+  const metadata = await storage.getDriveFileMetadata(session.objectKey);
+  const downloadUrl = storage.createDownloadUrl(session.objectKey, {
+    fileName,
+    mimeType: 'text/markdown; charset=utf-8',
+    expires: Number(process.env.SKYE_CONTENT_FORGE_R2_DOWNLOAD_SECONDS || 3600)
+  });
+  return {
+    provider: 'cloudflare-r2',
+    bucket: session.bucket || status.bucket,
+    prefix: status.prefix,
+    objectKey: session.objectKey,
+    fileName,
+    size: body.length,
+    mimeType: 'text/markdown; charset=utf-8',
+    downloadUrl,
+    uploadedAt: new Date().toISOString(),
+    metadata
+  };
 }
 
 
@@ -930,6 +1052,7 @@ function publisherStatus() {
     staticSiteDir: path.relative(__dirname, STATIC_SITE_DIR),
     targets: {
       local: { configured: true, kind: 'filesystem', detail: path.relative(__dirname, EXPORT_DIR) },
+      skyeVaultR2: skyeVaultStatus(),
       googleDrive: driveStatus(),
       github: { configured: githubMissing.length === 0, missing: githubMissing, repo: [process.env.GITHUB_OWNER, process.env.GITHUB_REPO].filter(Boolean).join('/'), branch: process.env.GITHUB_BRANCH || 'main', contentDir: process.env.GITHUB_CONTENT_DIR || 'content/blog' },
       netlifyHook: { configured: Boolean(netlifyHook), missing: netlifyHook ? [] : ['NETLIFY_DEPLOY_HOOK_URL'] },
@@ -980,7 +1103,7 @@ async function schedulePublishItem(body) {
 }
 
 function normalizeTargets(targets) {
-  const allowed = new Set(['local', 'google-drive', 'github', 'netlify-hook', 'netlify-cli', 'cloudflare-hook', 'cloudflare-wrangler', 'facebook', 'instagram', 'linkedin']);
+  const allowed = new Set(['local', 'skyevault-r2', 'google-drive', 'github', 'netlify-hook', 'netlify-cli', 'cloudflare-hook', 'cloudflare-wrangler', 'facebook', 'instagram', 'linkedin']);
   const list = Array.isArray(targets) ? targets : ['local'];
   const normalized = [...new Set(list.map((x) => String(x || '').trim()).filter((x) => allowed.has(x)))];
   return normalized.length ? normalized : ['local'];
@@ -1040,6 +1163,7 @@ async function publishToTarget(target, item) {
     const site = await rebuildStaticSite('include-queued', item);
     return { local, site };
   }
+  if (target === 'skyevault-r2') return uploadMarkdownToSkyeVault({ title: item.title, output: toPostMarkdown(item) });
   if (target === 'google-drive') return uploadMarkdownToDrive({ title: item.title, output: toPostMarkdown(item) });
   if (target === 'github') return pushPostToGitHub(item);
   if (target === 'netlify-hook') return triggerNetlifyHook();
@@ -1359,23 +1483,78 @@ function escapeXml(value) {
 }
 
 function driveStatus() {
+  const auth = googleDriveAuthStatus();
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL || '';
   const required = {
     GOOGLE_DRIVE_FOLDER_ID: process.env.GOOGLE_DRIVE_FOLDER_ID,
-    GOOGLE_SERVICE_ACCOUNT_EMAIL: email,
-    GOOGLE_PRIVATE_KEY: process.env.GOOGLE_PRIVATE_KEY
+    ...auth.required
   };
   const missing = Object.entries(required).filter(([, value]) => !value).map(([key]) => key);
   return {
     configured: missing.length === 0,
     missing,
+    authMode: auth.mode,
     folderIdConfigured: Boolean(process.env.GOOGLE_DRIVE_FOLDER_ID),
     serviceAccountEmail: email || '',
     exportPrefix: process.env.GOOGLE_DRIVE_EXPORT_PREFIX || 'Skye Content Forge - '
   };
 }
 
-async function getGoogleAccessToken() {
+function googleDriveAuthStatus() {
+  if (process.env.GOOGLE_OAUTH_ACCESS_TOKEN || process.env.GOOGLE_DRIVE_ACCESS_TOKEN || process.env.GOOGLE_ACCESS_TOKEN) {
+    return { mode: 'oauth-access-token', required: { GOOGLE_OAUTH_ACCESS_TOKEN: process.env.GOOGLE_OAUTH_ACCESS_TOKEN || process.env.GOOGLE_DRIVE_ACCESS_TOKEN || process.env.GOOGLE_ACCESS_TOKEN } };
+  }
+  if (process.env.GOOGLE_OAUTH_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN || process.env.GOOGLE_DRIVE_REFRESH_TOKEN) {
+    return {
+      mode: 'oauth-refresh-token',
+      required: {
+        GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID,
+        GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_DRIVE_CLIENT_SECRET,
+        GOOGLE_OAUTH_REFRESH_TOKEN: process.env.GOOGLE_OAUTH_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN || process.env.GOOGLE_DRIVE_REFRESH_TOKEN
+      }
+    };
+  }
+  return {
+    mode: 'service-account',
+    required: {
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL,
+      GOOGLE_PRIVATE_KEY: process.env.GOOGLE_PRIVATE_KEY
+    }
+  };
+}
+
+async function getGoogleDriveAccessToken() {
+  const oauthAccessToken = process.env.GOOGLE_OAUTH_ACCESS_TOKEN || process.env.GOOGLE_DRIVE_ACCESS_TOKEN || process.env.GOOGLE_ACCESS_TOKEN;
+  if (oauthAccessToken) return oauthAccessToken;
+
+  const refreshToken = process.env.GOOGLE_OAUTH_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN || process.env.GOOGLE_DRIVE_REFRESH_TOKEN;
+  if (refreshToken) return getGoogleOAuthAccessToken(refreshToken);
+
+  return getGoogleServiceAccountAccessToken();
+}
+
+async function getGoogleOAuthAccessToken(refreshToken) {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_DRIVE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) throw new Error('Google OAuth refresh token is present, but GOOGLE_OAUTH_CLIENT_ID/GOOGLE_OAUTH_CLIENT_SECRET are missing.');
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token'
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.error_description || data?.error || `Google OAuth refresh failed with status ${response.status}.`);
+  }
+  return data.access_token;
+}
+
+async function getGoogleServiceAccountAccessToken() {
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL;
   const privateKey = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY || '');
   const now = Math.floor(Date.now() / 1000);
@@ -1869,7 +2048,7 @@ function defaultSettings() {
   };
 }
 
-function loadDotEnv(filePath) {
+function loadDotEnv(filePath, options = {}) {
   if (!existsSync(filePath)) return;
   const raw = readFileSync(filePath, 'utf8');
   for (const line of raw.split(/\r?\n/)) {
@@ -1877,10 +2056,35 @@ function loadDotEnv(filePath) {
     if (!trimmed || trimmed.startsWith('#')) continue;
     const index = trimmed.indexOf('=');
     if (index === -1) continue;
-    const key = trimmed.slice(0, index).trim();
+    const key = trimmed.slice(0, index).trim().replace(/^export\s+/, '');
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+    if (options.protectKeys?.has(key)) continue;
     let value = trimmed.slice(index + 1).trim();
     value = value.replace(/^['"]|['"]$/g, '');
-    if (!process.env[key]) process.env[key] = value;
+    if (options.override || !process.env[key]) process.env[key] = value;
+  }
+}
+
+function applyEnvAliases() {
+  const aliases = {
+    OPENAI_API_KEY: ['SKYE_CONTENT_FORGE_OPENAI_API_KEY', 'SKYGATEFS13_OPENAI_API_KEY'],
+    OPENAI_MODEL: ['SKYE_CONTENT_FORGE_OPENAI_MODEL'],
+    GOOGLE_DRIVE_FOLDER_ID: ['SKYE_CONTENT_FORGE_GOOGLE_DRIVE_FOLDER_ID', 'CONTENT_FORGE_GOOGLE_DRIVE_FOLDER_ID', 'BACKUPS_FOLDER_ID'],
+    GOOGLE_SERVICE_ACCOUNT_EMAIL: ['GOOGLE_CLIENT_EMAIL', 'SKYE_CONTENT_FORGE_GOOGLE_CLIENT_EMAIL'],
+    GOOGLE_PRIVATE_KEY: ['GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY', 'SKYE_CONTENT_FORGE_GOOGLE_PRIVATE_KEY'],
+    GOOGLE_OAUTH_ACCESS_TOKEN: ['GOOGLE_DRIVE_ACCESS_TOKEN', 'GOOGLE_ACCESS_TOKEN', 'SKYE_CONTENT_FORGE_GOOGLE_OAUTH_ACCESS_TOKEN'],
+    GOOGLE_OAUTH_REFRESH_TOKEN: ['GOOGLE_REFRESH_TOKEN', 'GOOGLE_DRIVE_REFRESH_TOKEN', 'SKYE_CONTENT_FORGE_GOOGLE_OAUTH_REFRESH_TOKEN'],
+    GOOGLE_OAUTH_CLIENT_ID: ['GOOGLE_CLIENT_ID', 'GOOGLE_DRIVE_CLIENT_ID', 'SKYE_CONTENT_FORGE_GOOGLE_OAUTH_CLIENT_ID'],
+    GOOGLE_OAUTH_CLIENT_SECRET: ['GOOGLE_CLIENT_SECRET', 'GOOGLE_DRIVE_CLIENT_SECRET', 'SKYE_CONTENT_FORGE_GOOGLE_OAUTH_CLIENT_SECRET'],
+    GITHUB_TOKEN: ['GITHUB_PAT', 'PERSONAL_ACCESS_TOKEN', 'personal_access_token'],
+    NETLIFY_AUTH_TOKEN: ['netlify_personal_access_token', 'SkyeGateBAckup_netlify_token'],
+    CLOUDFLARE_API_TOKEN: ['cloudflare_api_token'],
+    CLOUDFLARE_ACCOUNT_ID: ['cloudflare_account_ID', 'METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID']
+  };
+  for (const [target, candidates] of Object.entries(aliases)) {
+    if (process.env[target]) continue;
+    const found = candidates.find((key) => process.env[key]);
+    if (found) process.env[target] = process.env[found];
   }
 }
 

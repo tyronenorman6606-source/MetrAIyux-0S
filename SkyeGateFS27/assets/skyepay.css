@@ -824,6 +824,496 @@ select:focus {
   }
 }
 
+/* SkyePay gateway redesign: scoped so Store/Admin/API pages keep their existing layout. */
+body.skypay-gateway-v2 {
+  --pay-ink: #f7f4ea;
+  --pay-muted: rgba(247, 244, 234, 0.72);
+  --pay-dim: rgba(247, 244, 234, 0.5);
+  --pay-line: rgba(247, 244, 234, 0.16);
+  --pay-black: #050507;
+  --pay-panel: rgba(10, 12, 13, 0.84);
+  --pay-panel-solid: #0b0d0e;
+  --pay-gold: #f1bd4a;
+  --pay-cyan: #3be7ff;
+  --pay-green: #80e5a2;
+  --pay-rose: #ff6f91;
+  --pay-graph: rgba(247, 244, 234, 0.055);
+  color: var(--pay-ink);
+  background:
+    linear-gradient(90deg, rgba(241, 189, 74, 0.12), transparent 18%, transparent 82%, rgba(59, 231, 255, 0.1)),
+    linear-gradient(180deg, rgba(5, 5, 7, 0.96), rgba(13, 12, 9, 0.98) 48%, rgba(4, 8, 8, 0.98)),
+    repeating-linear-gradient(90deg, var(--pay-graph) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(0deg, rgba(247, 244, 234, 0.038) 0 1px, transparent 1px 72px);
+}
+
+body.skypay-gateway-v2::before {
+  background:
+    linear-gradient(125deg, rgba(241, 189, 74, 0.1), transparent 24%, transparent 68%, rgba(255, 111, 145, 0.08)),
+    linear-gradient(8deg, transparent, rgba(59, 231, 255, 0.08) 46%, transparent 64%);
+}
+
+body.skypay-gateway-v2 .scanline {
+  opacity: 0.42;
+  background: linear-gradient(180deg, transparent, rgba(128, 229, 162, 0.08), transparent);
+}
+
+body.skypay-gateway-v2 .pay-nav {
+  width: min(1240px, calc(100% - 32px));
+  margin-top: 16px;
+  padding: 10px;
+  border-color: rgba(247, 244, 234, 0.18);
+  background: rgba(5, 5, 7, 0.82);
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.44);
+}
+
+body.skypay-gateway-v2 .pay-brand span {
+  font-size: 14px;
+  color: var(--pay-ink);
+}
+
+body.skypay-gateway-v2 .pay-nav nav a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border-color: rgba(247, 244, 234, 0.1);
+  background: rgba(247, 244, 234, 0.045);
+  color: var(--pay-muted);
+}
+
+body.skypay-gateway-v2 main {
+  width: min(1240px, calc(100% - 32px));
+}
+
+body.skypay-gateway-v2 .pay-hero {
+  min-height: calc(100vh - 76px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.78fr);
+  align-items: stretch;
+  gap: 16px;
+  padding: 20px 0 28px;
+}
+
+body.skypay-gateway-v2 .settlement-board,
+body.skypay-gateway-v2 .checkout-console {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(247, 244, 234, 0.16);
+  background:
+    linear-gradient(135deg, rgba(247, 244, 234, 0.08), rgba(247, 244, 234, 0.025) 32%, rgba(59, 231, 255, 0.055)),
+    rgba(6, 7, 8, 0.82);
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.5);
+}
+
+body.skypay-gateway-v2 .settlement-board::after,
+body.skypay-gateway-v2 .checkout-console::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(241, 189, 74, 0.16), transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(0deg, rgba(59, 231, 255, 0.1), transparent 1px) 0 0 / 72px 72px;
+  opacity: 0.22;
+  mask-image: linear-gradient(135deg, black, transparent 70%);
+}
+
+body.skypay-gateway-v2 .settlement-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 690px;
+  padding: 38px;
+}
+
+body.skypay-gateway-v2 .route-kicker,
+body.skypay-gateway-v2 .console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+body.skypay-gateway-v2 .route-kicker > span,
+body.skypay-gateway-v2 .live-badge {
+  border: 1px solid rgba(128, 229, 162, 0.34);
+  background: rgba(128, 229, 162, 0.08);
+  color: var(--pay-green);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body.skypay-gateway-v2 .eyebrow {
+  color: var(--pay-cyan);
+}
+
+body.skypay-gateway-v2 h1 {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+  margin-top: 118px;
+  color: var(--pay-ink);
+  font-size: 4.35rem;
+  line-height: 0.95;
+  font-weight: 950;
+}
+
+body.skypay-gateway-v2 h2,
+body.skypay-gateway-v2 h3,
+body.skypay-gateway-v2 strong {
+  color: var(--pay-ink);
+}
+
+body.skypay-gateway-v2 .lead {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  margin: 24px 0 0;
+  color: var(--pay-muted);
+  font-size: 1.08rem;
+  line-height: 1.65;
+}
+
+body.skypay-gateway-v2 .neon-gradient-text {
+  background: linear-gradient(90deg, var(--pay-gold), var(--pay-cyan) 54%, var(--pay-rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+body.skypay-gateway-v2 .proof-ticker {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 26px;
+}
+
+body.skypay-gateway-v2 .proof-ticker span,
+body.skypay-gateway-v2 .mini-label {
+  border-color: rgba(247, 244, 234, 0.14);
+  background: rgba(247, 244, 234, 0.052);
+  color: var(--pay-muted);
+}
+
+body.skypay-gateway-v2 .route-matrix {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 30px;
+  border: 1px solid rgba(247, 244, 234, 0.16);
+  background: rgba(247, 244, 234, 0.16);
+}
+
+body.skypay-gateway-v2 .route-matrix div {
+  min-height: 168px;
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(5, 5, 7, 0.74);
+}
+
+body.skypay-gateway-v2 .route-matrix span,
+body.skypay-gateway-v2 .path-rail article span {
+  color: var(--pay-gold);
+  font-weight: 950;
+}
+
+body.skypay-gateway-v2 .route-matrix strong {
+  font-size: 1.05rem;
+}
+
+body.skypay-gateway-v2 .route-matrix small {
+  color: var(--pay-muted);
+  line-height: 1.45;
+}
+
+body.skypay-gateway-v2 .checkout-console {
+  display: flex;
+  flex-direction: column;
+  min-height: 690px;
+  padding: 18px;
+}
+
+body.skypay-gateway-v2 .console-head {
+  padding: 6px 4px 10px;
+  margin-bottom: 10px;
+}
+
+body.skypay-gateway-v2 .console-head h2 {
+  font-size: 1.9rem;
+  line-height: 1.05;
+}
+
+body.skypay-gateway-v2 .client-strip {
+  position: relative;
+  z-index: 2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 6px 0 14px;
+  border: 1px solid rgba(247, 244, 234, 0.14);
+  background: rgba(247, 244, 234, 0.14);
+}
+
+body.skypay-gateway-v2 .client-strip > div {
+  border: 0;
+  background: rgba(5, 5, 7, 0.58);
+  min-height: 82px;
+}
+
+body.skypay-gateway-v2 .pay-form,
+body.skypay-gateway-v2 .client-contact,
+body.skypay-gateway-v2 .status-panel,
+body.skypay-gateway-v2 .settlement-note {
+  position: relative;
+  z-index: 2;
+}
+
+body.skypay-gateway-v2 .field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+body.skypay-gateway-v2 .field-wide {
+  grid-column: 1 / -1;
+}
+
+body.skypay-gateway-v2 label {
+  color: var(--pay-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+body.skypay-gateway-v2 input,
+body.skypay-gateway-v2 select {
+  min-height: 48px;
+  border-color: rgba(247, 244, 234, 0.16);
+  background: rgba(247, 244, 234, 0.06);
+  color: var(--pay-ink);
+}
+
+body.skypay-gateway-v2 input::placeholder {
+  color: rgba(247, 244, 234, 0.36);
+}
+
+body.skypay-gateway-v2 .skyemerit-panel {
+  border-color: rgba(241, 189, 74, 0.3);
+  background:
+    linear-gradient(90deg, rgba(241, 189, 74, 0.12), transparent),
+    rgba(241, 189, 74, 0.04);
+}
+
+body.skypay-gateway-v2 .offer-select {
+  max-height: 250px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+body.skypay-gateway-v2 .offer-option {
+  grid-template-columns: minmax(0, 1fr) minmax(116px, auto);
+  border-color: rgba(247, 244, 234, 0.14);
+  background: rgba(247, 244, 234, 0.054);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.skypay-gateway-v2 .offer-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(59, 231, 255, 0.45);
+  background: rgba(59, 231, 255, 0.07);
+}
+
+body.skypay-gateway-v2 .offer-option[aria-pressed="true"] {
+  border-color: rgba(241, 189, 74, 0.78);
+  background: rgba(241, 189, 74, 0.095);
+  box-shadow: inset 0 0 0 1px rgba(241, 189, 74, 0.24);
+}
+
+body.skypay-gateway-v2 .offer-price {
+  color: var(--pay-gold);
+  font-weight: 950;
+  text-align: right;
+}
+
+body.skypay-gateway-v2 .primary-action {
+  min-height: 58px;
+  border: 1px solid rgba(241, 189, 74, 0.82);
+  background:
+    linear-gradient(90deg, rgba(241, 189, 74, 0.96), rgba(59, 231, 255, 0.82));
+  color: #050507;
+  font-size: 1rem;
+  font-weight: 950;
+  box-shadow: 0 16px 42px rgba(241, 189, 74, 0.16);
+}
+
+body.skypay-gateway-v2 .fine-print {
+  color: var(--pay-dim);
+}
+
+body.skypay-gateway-v2 .status-panel {
+  margin-top: 14px;
+  border-color: rgba(128, 229, 162, 0.32);
+  background: rgba(128, 229, 162, 0.08);
+}
+
+body.skypay-gateway-v2 .settlement-note {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+body.skypay-gateway-v2 .settlement-note span {
+  border: 1px solid rgba(247, 244, 234, 0.12);
+  background: rgba(5, 5, 7, 0.38);
+  color: var(--pay-muted);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+body.skypay-gateway-v2 .usage-band,
+body.skypay-gateway-v2 .gate-path {
+  border-color: rgba(247, 244, 234, 0.16);
+  background:
+    linear-gradient(135deg, rgba(247, 244, 234, 0.075), rgba(59, 231, 255, 0.035)),
+    rgba(6, 7, 8, 0.76);
+  box-shadow: 0 20px 72px rgba(0, 0, 0, 0.44);
+}
+
+body.skypay-gateway-v2 .usage-band {
+  align-items: start;
+}
+
+body.skypay-gateway-v2 #includedUsage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+body.skypay-gateway-v2 #includedUsage li {
+  border: 1px solid rgba(247, 244, 234, 0.12);
+  background: rgba(247, 244, 234, 0.05);
+  padding: 14px;
+  list-style: none;
+}
+
+body.skypay-gateway-v2 .path-rail {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid rgba(247, 244, 234, 0.14);
+  background: rgba(247, 244, 234, 0.14);
+}
+
+body.skypay-gateway-v2 .path-rail article {
+  border: 0;
+  background: rgba(5, 5, 7, 0.68);
+  min-height: 210px;
+}
+
+body.skypay-gateway-v2 .bob-trial-card {
+  border-color: rgba(241, 189, 74, 0.34);
+  background: rgba(241, 189, 74, 0.07);
+}
+
+@media (max-width: 1120px) {
+  body.skypay-gateway-v2 .pay-hero {
+    grid-template-columns: 1fr;
+  }
+
+  body.skypay-gateway-v2 .settlement-board,
+  body.skypay-gateway-v2 .checkout-console {
+    min-height: auto;
+  }
+
+  body.skypay-gateway-v2 h1 {
+    font-size: 4rem;
+    margin-top: 72px;
+  }
+}
+
+@media (max-width: 760px) {
+  body.skypay-gateway-v2 .pay-nav,
+  body.skypay-gateway-v2 main {
+    width: min(100% - 20px, 1240px);
+  }
+
+  body.skypay-gateway-v2 .pay-nav {
+    position: relative;
+    top: auto;
+    align-items: flex-start;
+  }
+
+  body.skypay-gateway-v2 .pay-brand img {
+    width: 34px;
+    height: 34px;
+  }
+
+  body.skypay-gateway-v2 .pay-nav nav {
+    justify-content: flex-start;
+  }
+
+  body.skypay-gateway-v2 .pay-hero {
+    padding-top: 12px;
+  }
+
+  body.skypay-gateway-v2 .settlement-board,
+  body.skypay-gateway-v2 .checkout-console {
+    padding: 16px;
+  }
+
+  body.skypay-gateway-v2 h1 {
+    font-size: 3rem;
+    margin-top: 16px;
+  }
+
+  body.skypay-gateway-v2 .lead {
+    font-size: 1rem;
+  }
+
+  body.skypay-gateway-v2 .proof-ticker,
+  body.skypay-gateway-v2 .route-matrix,
+  body.skypay-gateway-v2 .client-strip,
+  body.skypay-gateway-v2 .field-grid,
+  body.skypay-gateway-v2 .settlement-note,
+  body.skypay-gateway-v2 #includedUsage,
+  body.skypay-gateway-v2 .path-rail {
+    grid-template-columns: 1fr;
+  }
+
+  body.skypay-gateway-v2 .route-matrix div,
+  body.skypay-gateway-v2 .path-rail article {
+    min-height: auto;
+  }
+
+  body.skypay-gateway-v2 .offer-option {
+    grid-template-columns: 1fr;
+  }
+
+  body.skypay-gateway-v2 .offer-price {
+    text-align: left;
+  }
+}
+
+@media (max-width: 430px) {
+  body.skypay-gateway-v2 h1 {
+    font-size: 2.45rem;
+  }
+
+  body.skypay-gateway-v2 .console-head,
+  body.skypay-gateway-v2 .route-kicker {
+    display: grid;
+  }
+}
+
 /* Magic UI text highlighter treatment */
 .magic-highlighter,
 .magic-highlight,

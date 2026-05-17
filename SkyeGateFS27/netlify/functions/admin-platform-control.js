@@ -18,7 +18,7 @@ const PLATFORM_CATALOG = [
   {
     app_id: "skyepay",
     title: "SkyePay",
-    description: "Stripe-backed closeout lane with payment ledger, confirmed-payment policy write, and automatic workspace unlock status.",
+    description: "Stripe-backed closeout lane with payment ledger, confirmed-payment policy write, and owner-approved workspace activation status.",
     visibility: "client-admin",
     storage_mode: "stripe-checkout-plus-gate-ledger",
     launch_url: "/skyepay.html"

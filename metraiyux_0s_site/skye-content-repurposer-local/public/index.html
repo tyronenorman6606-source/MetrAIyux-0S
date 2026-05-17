@@ -21,7 +21,7 @@
           <h1 class="neon-gradient-text"><span>Skye</span> Content Forge</h1>
         </div>
       </div>
-      <p class="hero-copy">Free99 means no charge. It does not mean anonymous access. This gated 0S app scans high-value AI, research, automation, and content-strategy blogs, extracts source ideas, and generates original Skyes Over London assets for SEO, GEO, AEO, social, email, local landing pages, and sales follow-up. Drafts auto-save, final assets can export to your computer, upload to Google Drive, commit to GitHub, trigger Netlify/Cloudflare, and queue legitimate social publishing through official APIs. V4 adds deployable runtime controls, external scheduler ticks, GitHub backup/restore, Docker/systemd/PM2 templates, and cloud cron workers so the system does not depend on one open terminal.</p>
+      <p class="hero-copy">Free99 means no charge. It does not mean anonymous access. This gated 0S app scans high-value AI, research, automation, and content-strategy blogs, extracts source ideas, and generates original Skyes Over London assets for SEO, GEO, AEO, social, email, local landing pages, and sales follow-up. Drafts auto-save, final assets can export to your computer, upload to SkyeVault/R2, commit to GitHub, trigger Netlify/Cloudflare, and queue legitimate social publishing through official APIs. V4 adds deployable runtime controls, external scheduler ticks, GitHub backup/restore, Docker/systemd/PM2 templates, and cloud cron workers so the system does not depend on one open terminal.</p>
       <div class="hero-actions">
         <button id="scanBtn" class="primary">Scan Selected Source</button>
         <button id="scanAllBtn" class="secondary">Scan All Sources</button>
@@ -43,7 +43,7 @@
         <strong id="draftCount">0</strong>
       </article>
       <article class="stat-card">
-        <span class="stat-label">Drive / Publish</span>
+        <span class="stat-label">Vault / Publish</span>
         <strong id="exportStatus">Checking…</strong>
       </article>
     </section>
@@ -144,13 +144,13 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">Export control</p>
-            <h2>Computer + Drive</h2>
+            <h2>Computer + SkyeVault</h2>
           </div>
         </div>
-        <p class="helper">Use “Choose Save Location” for Chrome’s file picker. “Save to App Exports” writes into the local app’s <code>/exports</code> folder. “Upload to Google Drive” uses the service-account variables in <code>.env</code>.</p>
+        <p class="helper">Use “Choose Save Location” for Chrome’s file picker. “Save to App Exports” writes into the local app’s <code>/exports</code> folder. “Upload to SkyeVault/R2” writes Markdown into the live Cloudflare R2 vault lane.</p>
         <div class="stack-actions">
           <button id="localExportBtn" class="secondary">Save to App Exports</button>
-          <button id="driveUploadBtn" class="secondary">Upload to Google Drive</button>
+          <button id="driveUploadBtn" class="secondary">Upload to SkyeVault/R2</button>
           <button id="refreshExportsBtn" class="ghost">Refresh Exports</button>
         </div>
         <div id="exportList" class="export-list empty-state">No exports listed yet.</div>
@@ -188,14 +188,14 @@
           </div>
           <button id="refreshQueueBtn" class="tiny">Refresh</button>
         </div>
-        <p class="helper">Generated drafts can be queued for local export, Google Drive, GitHub commits, Netlify deploy hooks, Cloudflare Pages hooks, CLI deploys, and API-gated social publishing. Social platforms require real app approval, OAuth tokens, and account/page IDs.</p>
+        <p class="helper">Generated drafts can be queued for local export, SkyeVault/R2, GitHub commits, Netlify deploy hooks, Cloudflare Pages hooks, CLI deploys, and API-gated social publishing. Social platforms require real app approval, OAuth tokens, and account/page IDs.</p>
 
         <label class="field-label" for="publishAt">Publish time</label>
         <input id="publishAt" type="datetime-local" />
 
         <div class="target-grid" aria-label="Publish targets">
           <label><input type="checkbox" data-publish-target="local" checked /> Local export + static site</label>
-          <label><input type="checkbox" data-publish-target="google-drive" /> Google Drive</label>
+          <label><input type="checkbox" data-publish-target="skyevault-r2" /> SkyeVault / Cloudflare R2</label>
           <label><input type="checkbox" data-publish-target="github" /> GitHub content commit</label>
           <label><input type="checkbox" data-publish-target="netlify-hook" /> Netlify deploy hook</label>
           <label><input type="checkbox" data-publish-target="cloudflare-hook" /> Cloudflare deploy hook</label>

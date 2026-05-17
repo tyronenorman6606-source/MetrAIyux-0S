@@ -7,6 +7,9 @@ directory = "./"
 binding = "ASSETS"
 run_worker_first = true
 
+[triggers]
+crons = [ "17 13 * * 1,3,5" ]
+
 [[kv_namespaces]]
 binding = "SITE_EVENTS_KV"
 id = "fbab175e2e8445adb627b55dc60f37f0"
@@ -25,6 +28,9 @@ SENTINEL_WORKER_ORIGIN = "https://sovereign-13-cabinet-sentinel-operator.graylon
 SITE_OPERATOR_WORKER_ORIGIN = "https://sovereign-13-site-operator-quantum.graylondonskyes.workers.dev"
 SKYGATEFS27_ORIGIN = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
 SKYGATE_SOURCE_APP = "metraiyux-0s"
+VALLEY_CONTENT_CALENDAR_URL = "https://phx-verified-network.pages.dev/api/insights-editorial-calendar.json"
+VALLEY_CONTENT_DESTINATION = "phx-verified-network"
+VALLEY_CONTENT_SCHEDULE = "monday-wednesday-friday-1317-utc"
 
 [[services]]
 binding = "SITE_OPERATOR_WORKER"

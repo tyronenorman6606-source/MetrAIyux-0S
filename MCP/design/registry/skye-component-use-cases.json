@@ -54,6 +54,17 @@
       "rejectIf": ["landing page instead of usable app", "card-only dashboard", "controls shift layout on hover"]
     },
     {
+      "id": "workspace-chat-lane",
+      "title": "Workspace Chat / Account-Tied Message Lane",
+      "bestFor": ["client app chat widget", "workspace support", "password handoff", "Relay13-ready message intake", "future app drop-in"],
+      "components": ["workspace-chat-widget", "password-gate", "workspace-message-ledger", "relay13-conversation-sync"],
+      "recipes": ["workspace-chat-widget-dropin"],
+      "effects": [],
+      "stack": [],
+      "browserEvidence": ["floating chat widget visible", "message send creates a local ledger event", "account disclaimer visible", "Relay13 post attempted or queued", "password gate unlock path works when enabled"],
+      "rejectIf": ["messages are not tied to a workspace id", "no visible account disclaimer", "widget claims live delivery without queued/error state", "password appears as plain page copy instead of chat/gate handoff"]
+    },
+    {
       "id": "scroll-story",
       "title": "Scroll Story / Process Funnel",
       "bestFor": ["workflow explanation", "signup journey", "deployment flow", "proof funnel", "handoff sequence"],
@@ -147,6 +158,11 @@
     "tabs": "app-tool-surface",
     "table": "content-sections",
     "form": "content-sections",
+    "workspace-chat": "workspace-chat-lane",
+    "workspace-chat-widget": "workspace-chat-lane",
+    "chat-widget": "workspace-chat-lane",
+    "password-gate": "workspace-chat-lane",
+    "relay13-widget": "workspace-chat-lane",
     "three": "webgl-product-scene",
     "gsap": "scroll-story",
     "video-proof": "proof-surface"

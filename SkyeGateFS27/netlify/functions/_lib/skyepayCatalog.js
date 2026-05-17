@@ -57,6 +57,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     setup_handling: "paid_pending_owner_approval",
     storefront: true,
     badge: "7-day trial",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
     includes: [
       "Client workspace",
       "Private app closeout",
@@ -87,6 +89,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     setup_handling: "owner_approved_after_route_scope",
     storefront: true,
     badge: "Growth lane",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope",
     includes: [
       "Recurring workflow routing",
       "Proof exports",
@@ -115,7 +119,7 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 22,
     trial_days: 0,
     zero_upfront_trial: false,
-    setup_handling: "owner_approved_after_houseops_payment",
+    setup_handling: "paid_pending_owner_approval",
     storefront: true,
     badge: "HouseOps lane",
     owner_approval_required: true,
@@ -190,6 +194,7 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       "V83 routed shell",
       "Provider jobs and applicant pools",
       "Contractor assignments and proof",
+      "Manual compliance proof vault",
       "Owner-approved activation"
     ],
     gate_policy: {
@@ -247,15 +252,17 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 40,
     trial_days: 0,
     zero_upfront_trial: false,
-    setup_handling: "owner_approved_after_scope_review",
+    setup_handling: "owner_approved_after_gate_scope",
     storefront: true,
     badge: "Managed enterprise",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_gate_scope",
     includes: [
       "Custom 0S deployment architecture",
       "Managed ConnectLog and Relay13 scope",
       "Custom SkyeRouteX workforce command deployment",
       "Advanced audit exports",
-      "Owner-approved written limits"
+      "Written limits attached after owner-approved activation"
     ]
   },
   "skygatefs27-managed-control-plane": {
@@ -337,7 +344,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-studio",
     title: "SkyeMusicNexus Studio",
     family: "skyemusicnexus",
-    description: "Paid music ops room for active creators and small teams that need release workflow, royalty ledger tracking, payout review, proof exports, and a basic operator dashboard.",
+    description: "Paid music ops room for active creators and small teams that need gated upload studio, proof playback, release workflow, royalty ledger tracking, payout review, proof exports, and a basic operator dashboard.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_studio_setup", "skyemusicnexus_studio_monthly"],
@@ -353,7 +360,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Up to 5 artists", "25 active releases", "Release workflow board", "Royalty ledger tracking", "Payout review queue", "Proof exports", "Gate session required"],
+    includes: ["Gate session required", "Up to 5 artists", "25 active releases", "Gated upload studio", "Uploaded audio proof playback", "Release workflow board", "Royalty ledger tracking", "Payout review queue", "Proof exports"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -362,7 +369,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-label-command",
     title: "SkyeMusicNexus Label Command",
     family: "skyemusicnexus",
-    description: "Label-grade music command lane for multi-artist release operations, approval workflows, payout review controls, analytics, reporting, and custom proof receipts.",
+    description: "Label-grade music command lane for multi-artist release operations, gated upload studio, SkyeVault/R2 storage scoping, approval workflows, payout review controls, analytics, reporting, and custom proof receipts.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_label_command_setup", "skyemusicnexus_label_command_monthly"],
@@ -378,7 +385,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Up to 25 artists", "150 active releases", "Operator/admin stage", "Approval workflows", "Payout review controls", "Custom proof receipts", "Gate session required"],
+    includes: ["Gate session required", "Up to 25 artists", "150 active releases", "Gated upload studio", "Uploaded audio proof playback", "SkyeVault/R2 storage scoping", "Operator/admin stage", "Approval workflows", "Payout review controls", "Custom proof receipts"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -387,7 +394,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-managed-music-ops",
     title: "SkyeMusicNexus Managed Music Ops",
     family: "skyemusicnexus",
-    description: "Managed music operations room with custom limits, managed onboarding, team roles, client-facing music ops, custom proof receipts, and owner-approved integration scoping.",
+    description: "Managed music operations room with custom artist, release, upload, and storage limits, managed onboarding, team roles, client-facing music ops, custom proof receipts, and owner-approved integration scoping.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_managed_music_ops_setup", "skyemusicnexus_managed_music_ops_monthly"],
@@ -403,7 +410,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Custom artist limits", "Custom release limits", "Managed onboarding", "Team roles", "Client-facing music ops room", "Integration scope quoted separately", "Gate session required"],
+    includes: ["Gate session required", "Custom artist limits", "Custom release limits", "Custom upload and storage limits", "SkyeVault/R2 storage scoping", "Managed onboarding", "Team roles", "Client-facing music ops room", "Integration scope quoted separately"],
     owner_approval_required: true,
     activation_path: "owner_approved_after_music_scope"
   },
@@ -712,6 +719,28 @@ const SKYEMUSICNEXUS_OFFERS = [
     activation_path: "paid_pending_owner_approval"
   },
   {
+    id: "skyemusicnexus-gated-audio-vault-pack",
+    plan_name: "skyemusicnexus-gated-audio-vault-pack",
+    title: "SkyeMusicNexus Gated Audio Vault Pack",
+    family: "skyemusicnexus",
+    description: "Music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["skyemusicnexus_gated_audio_vault_pack_monthly"],
+    line_items: [{ id: "gated-audio-vault-pack", name: "SkyeMusicNexus Gated Audio Vault Pack", amount_cents: cents(79), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_gated_audio_vault_pack_monthly" }],
+    trial_days: 0,
+    zero_upfront_trial: false,
+    store_category: "Music add-ons",
+    store_rank: 48,
+    badge: "Audio vault",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Music-specific vault lane", "Larger audio handoff", "Proof receipts", "Paid plan required", "Gate session required", "No public streaming license claim"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
     id: "skyemusicnexus-white-label-artist-portal",
     plan_name: "skyemusicnexus-white-label-artist-portal",
     title: "SkyeMusicNexus White-Label Artist Portal",
@@ -764,7 +793,7 @@ export const SKYPAY_OFFERS = [
     plan_name: "starter-command",
     title: "Starter Command",
     family: "metraiyux",
-    description: "A managed starter operating room for preview clients who are ready to keep the app after confirmed SkyePay checkout and owner-approved activation.",
+    description: "A managed starter operating room for preview clients who are ready to keep the app after confirmed SkyePay checkout and owner-approved workspace activation.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["metraiyux_starter_command_setup", "metraiyux_starter_command_monthly"],
@@ -844,7 +873,7 @@ export const SKYPAY_OFFERS = [
       }
     ],
     owner_approval_required: true,
-    activation_path: "owner_approved_after_route_scope"
+    activation_path: "paid_pending_owner_approval"
   },
   {
     id: "metraiyux-houseoperations-managed",
@@ -880,7 +909,7 @@ export const SKYPAY_OFFERS = [
     plan_name: "routex-workforce-command",
     title: "RouteX Workforce Command",
     family: "metraiyux",
-    description: "Paid workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, provider jobs, contractor assignments, proof, payments, route stops, and market reports.",
+    description: "Paid workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, provider jobs, contractor assignments, proof, payments, route stops, manual compliance vaults, and market reports.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["metraiyux_routex_workforce_command_setup", "metraiyux_routex_workforce_command_monthly"],
@@ -1237,11 +1266,11 @@ export const SKYPAY_CLIENTS = {
     free_trial_days: 7,
     included_usage: [
       "Private app preview closeout",
-      "Automatic workspace activation after confirmed Stripe payment",
+      "Paid status with controlled owner-approved activation",
       "Workspace handoff after SkyePay closeout",
       "FS27 order, usage, and activation ledger"
     ],
-    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 plan policy and unlocks the workspace automatically.",
+    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 plan policy, paid status, and owner approval state before activation.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -1260,9 +1289,9 @@ export const SKYPAY_CLIENTS = {
       "7 app scans",
       "25 SkyePay and MetrAIyux commands",
       "PWA, QR, SEO, media, link, and copy checks",
-      "Automatic workspace activation after confirmed Stripe payment"
+      "Paid status with owner-approved activation"
     ],
-    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order and unlocks the workspace automatically; discounts still require an approved quote.",
+    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order, paid status, and owner approval state; discounts still require an approved quote.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -1294,7 +1323,7 @@ export const SKYPAY_PLATFORM_ROUTES = [
     route: "/skyepay.html?client=bobs-smoke-shop",
     default_offer_id: "metraiyux-starter-command",
     wiring_status: "client_preview_ready",
-    note: "First client lane wired into SkyePay with free preview, automatic paid activation, and usage language."
+    note: "First client lane wired into SkyePay with free preview, paid status, owner approval state, and usage language."
   },
   {
     platform_id: "repo-platforms-next",
@@ -1302,7 +1331,7 @@ export const SKYPAY_PLATFORM_ROUTES = [
     route: "/admin/platform-control",
     default_offer_id: "metraiyux-growth-cabinet",
     wiring_status: "next_after_live_proof",
-    note: "The next lane maps each repo platform to an approved offer, Stripe-confirmed payment, and workspace unlock behavior."
+    note: "The next lane maps each repo platform to an approved offer, Stripe-confirmed payment, and controlled activation behavior."
   }
 ];
 
@@ -1333,10 +1362,10 @@ export function getSkyePayClient(slug) {
     free_trial_days: 7,
     included_usage: [
       "Private app preview",
-      "Automatic workspace activation after confirmed Stripe payment",
+      "Paid status with owner-approved activation",
       "Workspace handoff after closeout"
     ],
-    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then the workspace unlocks automatically after Stripe confirms the transaction.",
+    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then paid status and owner approval state are recorded after Stripe confirms the transaction.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
