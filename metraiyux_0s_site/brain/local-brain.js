@@ -441,7 +441,8 @@ function smartDirectAnswer(query, route, surfaces) {
   if (hasAny(q, ['skyevault git', 'git remote', 'git clone', 'git push', 'git fetch', 'repo vault', 'bundle export', 'restore repo', 'git diff', 'branch protection', 'vault neural map', 'workspace brain map'])) {
     const repoCount = SKYEVAULT_MAP?.repo_count ?? 0;
     const receiptCount = SKYEVAULT_MAP?.receipt_count ?? 0;
-    return `${primaryOwner} owns the Git/storage implementation, with ${secondaryOwner} checking access and tenant boundaries. The correct architecture is Gate for identity/roles/limits, SkyeVault for Git push/fetch/clone/export/restore, and 0S for the neural map that explains what changed. The current 0S vault map has ${repoCount} repos and ${receiptCount} upload receipts loaded from brain/skyevault-vault-map.json.`;
+    const workspaceCount = SKYEVAULT_MAP?.workspace_maps?.length ?? 0;
+    return `${primaryOwner} owns the Git/storage implementation, with ${secondaryOwner} checking access and tenant boundaries. The correct architecture is Gate for identity/roles/limits, SkyeVault for Git push/fetch/clone/export/restore, and 0S for the neural map that explains what changed. The current 0S vault map has ${repoCount} repos, ${receiptCount} upload receipts, and ${workspaceCount} separate workspace map files loaded from brain/skyevault-vault-map.json.`;
   }
 
   if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {

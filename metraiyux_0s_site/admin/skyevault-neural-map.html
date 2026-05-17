@@ -49,6 +49,14 @@
   </section>
 
   <section class="admin-panel">
+    <h2>Workspace Maps</h2>
+    <table class="vault-table">
+      <thead><tr><th>Workspace</th><th>Map File</th><th>Scope</th></tr></thead>
+      <tbody id="workspaceRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
     <h2>Repos</h2>
     <table class="vault-table">
       <thead><tr><th>Workspace / Repo</th><th>Activity</th><th>Latest Head</th></tr></thead>
@@ -123,6 +131,7 @@
     $('receiptCount').textContent = map.receipt_count || 0;
     $('nodeCount').textContent = (map.nodes || []).length;
     $('storedBytes').textContent = map.total_receipt_human || '0 B';
+    $('workspaceRows').innerHTML = (map.workspace_maps || []).map((workspace) => '<tr><td><strong>' + esc(workspace.workspace_id) + '</strong></td><td><code>' + esc(workspace.file) + '</code></td><td>' + esc((workspace.repo_count || 0) + ' repos, ' + (workspace.node_count || 0) + ' nodes') + '</td></tr>').join('') || '<tr><td colspan="3">No workspace maps generated yet.</td></tr>';
     $('repoRows').innerHTML = (map.repos || []).map((repo) => '<tr><td><strong>' + esc(repo.workspace_id + '/' + repo.repo_id) + '</strong></td><td>' + esc((repo.ref_updates || 0) + ' ref updates, ' + (repo.requests || 0) + ' requests, ' + (repo.exports || 0) + ' exports') + '</td><td><code>' + esc(repo.latest_head || 'empty') + '</code><br>' + esc(repo.latest_subject || '') + '</td></tr>').join('') || '<tr><td colspan="3">No repos yet.</td></tr>';
     $('uploadRows').innerHTML = (map.uploads || []).slice(-12).reverse().map((upload) => '<tr><td><code>' + esc(upload.receipt_ref) + '</code></td><td>' + esc(upload.fileName || 'vault upload') + '<br><code>' + esc(upload.sha256_prefix || '') + '</code></td><td>' + esc(upload.fileSize ? new Intl.NumberFormat().format(upload.fileSize) + ' bytes' : '0 B') + '</td></tr>').join('') || '<tr><td colspan="3">No uploads yet.</td></tr>';
     drawGraph(map);

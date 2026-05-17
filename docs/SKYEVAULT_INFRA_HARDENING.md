@@ -99,7 +99,7 @@ SkyeVault can also feed the existing MetrAIyux 0S neural map:
 npm run vault:0s:map
 ```
 
-That bridge writes `metraiyux_0s_site/brain/skyevault-vault-map.json`, which the 0S local brain loads as repo/change context. The direct admin view is `metraiyux_0s_site/admin/skyevault-neural-map.html`.
+That bridge writes the aggregate operator map at `metraiyux_0s_site/brain/skyevault-vault-map.json` and per-workspace maps under `metraiyux_0s_site/brain/skyevault-workspaces/`. The 0S local brain loads the aggregate as repo/change context; account-specific views should load the workspace file for the active Gate customer/workspace. The direct admin view is `metraiyux_0s_site/admin/skyevault-neural-map.html`.
 
 ## Audit
 

@@ -57,7 +57,7 @@ To attach SkyeVault activity to the existing MetrAIyux 0S brain map:
 npm run vault:0s:map
 ```
 
-Open `metraiyux_0s_site/admin/skyevault-neural-map.html` to inspect the generated repo/upload graph.
+Open `metraiyux_0s_site/admin/skyevault-neural-map.html` to inspect the generated repo/upload graph. The command writes one aggregate operator map plus per-workspace maps under `metraiyux_0s_site/brain/skyevault-workspaces/` so account/workspace views do not need to read every tenant's graph.
 
 See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
 
