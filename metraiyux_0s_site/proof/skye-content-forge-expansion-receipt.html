@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the MetrAIyux 0S Skye Content Forge Free99 gated expansion.">
+  <title>Skye Content Forge Expansion Receipt · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S Proof</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../live/skye-content-forge-publisher.html">Hub</a>
+      <a href="../skye-content-repurposer-local/public/index.html">App</a>
+      <a href="../saas/pricing.html#skyecontentforge-free99">Pricing</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero">
+      <p class="eyebrow">Free99 gated expansion receipt</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Skye Content Forge was imported as a Free99, gated content platform.</h1>
+      <p class="hero-copy">The no-charge content repurposer is now represented across the 0S, pricing, SaaS selector, admin, proof, and Stripe catalog surfaces. The app still requires a gate session before dashboard boot and API usage.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="../live/skye-content-forge-publisher.html">Open expansion hub</a>
+        <a class="button" href="../skye-content-repurposer-local/public/index.html">Open gated app shell</a>
+        <a class="button" href="../saas/pricing.html#skyecontentforge-free99">Open Free99 card</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Receipt checks</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>App inventory</td><td>Passed</td><td><code>skye-content-repurposer-local</code> includes server, public app, JSON state, scheduler, Docker, Netlify, Cloudflare, PM2, systemd, and docs.</td></tr>
+            <tr><td>Gate session</td><td>Passed</td><td>The app loads <code>public/gate-session.js</code>, labels Free99 as no charge, and requires a 0S/FS27/SkyGate/local admin gate session before boot.</td></tr>
+            <tr><td>API auth boundary</td><td>Passed</td><td>The server rejects ungated <code>/api/health</code> requests with 401 when the gate is enabled and accepts the configured gate token.</td></tr>
+            <tr><td>Smoke test</td><td>Passed</td><td><code>npm run smoke</code> starts the local server, checks protected API routes, source registry, export, queue, scheduler tick, static rebuild, app HTML, storage, and Free99 wording.</td></tr>
+            <tr><td>Commercial posture</td><td>Passed</td><td>The rate card says Free99, $0/month, $0 setup, no paid checkout, no charge, and gate session required.</td></tr>
+            <tr><td>Provider boundary</td><td>Passed</td><td>Generation, Drive, GitHub, Netlify, Cloudflare, and social publishing require real credentials, platform permissions, and provider rules.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Honest boundary</h2>
+      <p class="wide">Skye Content Forge proves local app wiring, gate-session enforcement, scheduler route shape, JSON persistence, local export, static rebuild, and backup/deploy/publishing control surfaces. It does not claim live OpenAI generation, Google Drive upload, GitHub backup, Netlify/Cloudflare deployment, or social posting until the matching provider credentials and account approvals are configured and verified.</p>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S · Skye Content Forge Free99 expansion receipt.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

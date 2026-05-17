@@ -40,7 +40,7 @@
         token: queryToken,
         source: "url-gate-session",
         workspace_id: query.get("workspace") || "",
-        client: query.get("client") || "MetrAIyux 0S Free99"
+        client: query.get("client") || "MetrAIyux 0S Free99 Lite"
       };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
       sessionStorage.setItem(AUTH_HELPER_KEY, session.token);
@@ -87,7 +87,7 @@
     const clean = {
       token: safeToken(session.token),
       source: session.source || "manual-gate-session",
-      client: session.client || "MetrAIyux 0S Free99",
+      client: session.client || "MetrAIyux 0S Free99 Lite",
       workspace_id: session.workspace_id || "",
       email: session.email || "",
       status: session.status || "free99_gate_session",
@@ -169,14 +169,14 @@
     overlay.innerHTML = `
       <div class="skyemusic-gate-card">
         <p class="micro">FS27 gate session required</p>
-        <h1 id="skyeMusicGateTitle">SkyeMusicNexus is Free99, not ungated.</h1>
-        <p>Free99 means no charge. It does not mean anonymous access. A valid 0S or SkyeGate session is required before the artist stage, operator stage, records, workflows, analytics, payouts, or proof lanes can run.</p>
+        <h1 id="skyeMusicGateTitle">SkyeMusicNexus Lite is Free99, not ungated.</h1>
+        <p>Free99 means the Lite lane has no charge. It does not mean anonymous access. A valid 0S or SkyeGate session is required before the artist stage, operator stage, records, workflows, analytics, payouts, paid drops, or proof lanes can run.</p>
         <label class="skyemusic-gate-field">
           <span>Gate session token</span>
           <input id="skyeMusicGateToken" type="password" autocomplete="off" placeholder="Paste 0S / FS27 session token">
         </label>
         <div class="skyemusic-gate-actions">
-          <button class="primary" id="skyeMusicGateUnlock" type="button">Unlock Free99 Session</button>
+          <button class="primary" id="skyeMusicGateUnlock" type="button">Unlock Free99 Lite Session</button>
           <button id="skyeMusicGateUseClient" type="button">Use 0S Client Session</button>
           <a href="${clientLoginHref()}">Open Client Login</a>
         </div>

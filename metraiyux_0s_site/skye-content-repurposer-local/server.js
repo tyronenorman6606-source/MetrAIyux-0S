@@ -24,6 +24,8 @@ const PORT = Number(process.env.PORT || 4313);
 const APP_NAME = process.env.APP_NAME || 'Skye Content Forge';
 const COMPANY_NAME = process.env.COMPANY_NAME || 'Skyes Over London';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.4-mini';
+const LOCAL_DEV_GATE_TOKEN = process.env.LOCAL_DEV_GATE_TOKEN || 'FREE99-CONTENT-LOCAL';
+const GATE_SESSION_REQUIRED = process.env.GATE_SESSION_REQUIRED !== '0';
 
 const SOURCE_REGISTRY = [
   {
@@ -139,7 +141,7 @@ async function handleApi(req, res, url) {
   setSecurityHeaders(res);
 
   if (requiresAppAccessToken(req, url) && !hasValidAppAccessToken(req, url)) {
-    sendJson(res, 401, { ok: false, error: 'Access token required. Set APP_ACCESS_TOKEN in .env and enter it in the dashboard.' });
+    sendJson(res, 401, { ok: false, error: gateAccessErrorMessage() });
     return;
   }
 
@@ -683,8 +685,10 @@ function runtimeStatus() {
     port: PORT,
     uptimeSeconds: Math.round(process.uptime()),
     startedAt: new Date(Date.now() - process.uptime() * 1000).toISOString(),
-    appAccessTokenConfigured: Boolean(process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN),
-    schedulerTokenConfigured: Boolean(process.env.SCHEDULER_API_KEY || process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN),
+    appAccessTokenConfigured: Boolean(appAccessTokenState().token),
+    gateSessionRequired: appAccessTokenState().required,
+    localDevGateEnabled: appAccessTokenState().localDev,
+    schedulerTokenConfigured: Boolean(schedulerTokenState().token),
     publisherAutorun: truthy(process.env.PUBLISHER_AUTORUN),
     pollSeconds: Number(process.env.PUBLISHER_POLL_SECONDS || 900),
     schedulerEndpoint: '/api/automation/tick',
@@ -699,30 +703,52 @@ function runtimeStatus() {
 function getRequestToken(req, url) {
   const auth = req.headers.authorization || '';
   if (/^Bearer\s+/i.test(auth)) return auth.replace(/^Bearer\s+/i, '').trim();
-  return String(req.headers['x-app-token'] || req.headers['x-scheduler-key'] || url.searchParams.get('token') || url.searchParams.get('key') || '').trim();
+  return String(req.headers['x-app-token'] || req.headers['x-skye-gate-session'] || req.headers['x-scheduler-key'] || url.searchParams.get('token') || url.searchParams.get('key') || '').trim();
+}
+
+function appAccessTokenState() {
+  const configured = process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
+  if (configured) return { required: true, token: configured, localDev: false };
+  if (!GATE_SESSION_REQUIRED) return { required: false, token: '', localDev: false };
+  if ((process.env.NODE_ENV || 'development') !== 'production') return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true };
+  return { required: true, token: '', localDev: false };
+}
+
+function schedulerTokenState() {
+  const configured = process.env.SCHEDULER_API_KEY || process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
+  if (configured) return { required: true, token: configured, localDev: false };
+  if (!GATE_SESSION_REQUIRED) return { required: false, token: '', localDev: false };
+  if ((process.env.NODE_ENV || 'development') !== 'production') return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true };
+  return { required: true, token: '', localDev: false };
 }
 
 function hasValidAppAccessToken(req, url) {
-  const expected = process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
-  if (!expected) return true;
+  const { required, token: expected } = appAccessTokenState();
+  if (!required) return true;
+  if (!expected) return false;
   const incoming = getRequestToken(req, url);
   return incoming && safeCompare(incoming, expected);
 }
 
 function hasValidSchedulerToken(req, url) {
-  const expected = process.env.SCHEDULER_API_KEY || process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
-  if (!expected) return true;
+  const { required, token: expected } = schedulerTokenState();
+  if (!required) return true;
+  if (!expected) return false;
   const incoming = getRequestToken(req, url);
   return incoming && safeCompare(incoming, expected);
 }
 
 function requiresAppAccessToken(req, url) {
-  if (!(process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN)) return false;
+  if (!appAccessTokenState().required) return false;
   if (!url.pathname.startsWith('/api/')) return false;
-  if (url.pathname === '/api/health') return false;
-  if (url.pathname === '/api/runtime/status') return false;
-  if (req.method === 'GET' && (url.pathname === '/api/sources' || url.pathname === '/api/pipeline/status' || url.pathname === '/api/export/status')) return false;
-  return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+  return true;
+}
+
+function gateAccessErrorMessage() {
+  const state = appAccessTokenState();
+  if (!state.token && state.required) return 'Gate session required. Set APP_ACCESS_TOKEN or ADMIN_ACCESS_TOKEN before exposing this Free99 app.';
+  if (state.localDev) return `Gate session required. Use the local admin gate token ${LOCAL_DEV_GATE_TOKEN} or set APP_ACCESS_TOKEN in .env.`;
+  return 'Gate session required. Free99 means no charge, not anonymous access.';
 }
 
 function safeCompare(a, b) {

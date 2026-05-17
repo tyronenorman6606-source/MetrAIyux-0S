@@ -13,7 +13,7 @@ const state = {
   pipeline: null,
   health: null,
   runtime: null,
-  accessToken: localStorage.getItem('skye-content-forge-access-token') || ''
+  accessToken: ''
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -79,6 +79,7 @@ boot();
 async function boot() {
   bindEvents();
   hydrateLocalSettings();
+  await requireGateSession();
   await checkHealth();
   await loadSources();
   await loadDrafts();
@@ -86,6 +87,18 @@ async function boot() {
   await loadPipelineStatus();
   await loadPublishQueue();
   await loadRuntimeStatus();
+}
+
+async function requireGateSession() {
+  if (!window.SkyeContentGate?.requireSession) {
+    const stored = localStorage.getItem('skye-content-forge-access-token') || sessionStorage.getItem('skye-content-forge-access-token') || '';
+    state.accessToken = stored.trim();
+    if (els.accessToken) els.accessToken.value = state.accessToken;
+    return;
+  }
+  const session = await window.SkyeContentGate.requireSession();
+  state.accessToken = session?.token || '';
+  if (els.accessToken) els.accessToken.value = state.accessToken;
 }
 
 
@@ -121,8 +134,20 @@ function bindEvents() {
 
 function saveAccessToken() {
   state.accessToken = (els.accessToken?.value || '').trim();
-  if (state.accessToken) localStorage.setItem('skye-content-forge-access-token', state.accessToken);
-  else localStorage.removeItem('skye-content-forge-access-token');
+  if (state.accessToken && window.SkyeContentGate?.persist) {
+    window.SkyeContentGate.persist({
+      token: state.accessToken,
+      source: 'manual-dashboard-token',
+      client: 'Skye Content Forge',
+      status: 'free99_gate_session'
+    });
+  } else if (state.accessToken) {
+    localStorage.setItem('skye-content-forge-access-token', state.accessToken);
+  } else {
+    localStorage.removeItem('skye-content-forge-access-token');
+    sessionStorage.removeItem('skye-content-forge-access-token');
+    window.SkyeContentGate?.clear?.();
+  }
   toast(state.accessToken ? 'Access token saved in this browser.' : 'Access token cleared.');
   checkHealth(true);
 }
@@ -861,7 +886,11 @@ function currentOutputTitle() {
 
 async function api(path, options = {}) {
   const headers = options.body ? { 'Content-Type': 'application/json' } : {};
-  if (state.accessToken) headers['X-App-Token'] = state.accessToken;
+  Object.assign(headers, window.SkyeContentGate?.headers?.() || {});
+  if (state.accessToken) {
+    headers['X-App-Token'] = state.accessToken;
+    headers.authorization = headers.authorization || `Bearer ${state.accessToken}`;
+  }
   const response = await fetch(path, {
     method: options.method || 'GET',
     headers,

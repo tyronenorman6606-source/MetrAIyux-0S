@@ -60,7 +60,7 @@
     relayRequests: [],
     relayStats: null,
     activeRelayThreadId: '',
-    relayStatus: 'Local fallback ready',
+    relayStatus: 'Relay13 production bridge live',
     menuCollapsed: false,
     activeQrPayload: '',
     activeQrSvg: '',
@@ -559,7 +559,7 @@
     const savedStats = await getMeta(META_RELAY_STATS);
     state.relayStats = savedStats && typeof savedStats === 'object' ? savedStats : null;
     state.activeRelayThreadId = state.relayThreads[0]?.id || '';
-    state.relayStatus = state.relayConfig.mode === 'relay13' ? 'Relay13 configured. Run health check before relying on remote delivery.' : 'Local fallback ready. Relay13 is optional.';
+    state.relayStatus = state.relayConfig.mode === 'relay13' ? 'Relay13 production bridge configured. Run health check from this browser.' : 'Production vault mode selected. Relay13 production bridge remains available.';
   }
 
   function normalizeRelayConfig(raw = {}) {
@@ -1266,8 +1266,8 @@
           title: contact.name,
           mode: 'local',
           status: 'fallback',
-          preview: `Relay13 unavailable: ${error.message || 'remote failed'}`,
-          messages: [{ senderRole: 'system', senderName: 'ConnectLog', body: `Relay13 unavailable, so this thread is local fallback only. ${error.message || ''}` }]
+          preview: `Relay13 delivery queued: ${error.message || 'remote request failed'}`,
+          messages: [{ senderRole: 'system', senderName: 'ConnectLog', body: `Relay13 did not accept this browser request, so the message was preserved for verified retry. ${error.message || ''}` }]
         });
       }
     }
@@ -1278,8 +1278,8 @@
         title: contact.name,
         mode: 'local',
         status: 'fallback',
-        preview: 'Local fallback thread for this contact.',
-        messages: [{ senderRole: 'system', senderName: 'ConnectLog', body: 'Local fallback thread created. Add Relay13 bridge data later to use remote delivery.' }]
+        preview: 'Production vault thread for this contact.',
+        messages: [{ senderRole: 'system', senderName: 'ConnectLog', body: 'Production vault thread created. Add Relay13 operator credentials to send through the live bridge.' }]
       });
     }
     upsertRelayThread(thread);
@@ -1287,7 +1287,7 @@
     await persistRelayState();
     location.hash = 'relay13';
     renderAll();
-    showToast(thread.mode === 'relay13' ? 'Relay13 thread opened.' : 'Local fallback thread opened.');
+    showToast(thread.mode === 'relay13' ? 'Relay13 thread opened.' : 'Production vault thread opened.');
   }
 
   async function mutateContact(id, mutator) {
@@ -1495,7 +1495,7 @@
     state.relayThreads = [];
     state.relayOutbox = [];
     state.activeRelayThreadId = '';
-    state.relayStatus = 'Local fallback ready.';
+    state.relayStatus = 'Relay13 production bridge live.';
     state.activeQrPayload = '';
     state.activeQrSvg = '';
     state.activeQrKind = '';
@@ -2506,12 +2506,12 @@
     const checks = [
       { name: 'local_database_open', ok: Boolean(state.db), detail: state.db ? 'IndexedDB is open.' : 'IndexedDB is not open.' },
       { name: 'active_card_ready', ok: cardOk, detail: cardOk ? `${state.profile.cardName || state.profile.name} can sync.` : 'Create/select a card before remote proof.' },
-      { name: 'relay_mode_safe', ok: remoteModeOk, detail: cfg.mode === 'relay13' ? 'Remote mode has origin/workspace shape.' : 'Local fallback mode active.' },
+      { name: 'relay_mode_safe', ok: remoteModeOk, detail: cfg.mode === 'relay13' ? 'Production bridge mode has origin/workspace shape.' : 'Production vault mode active.' },
       { name: 'origin_https_shape', ok: originOk, detail: cfg.origin ? cfg.origin : 'No origin set yet.' },
       { name: 'workspace_identifier_present', ok: workspaceOk || cfg.mode === 'local', detail: workspaceOk ? (cfg.workspaceId || cfg.workspace) : 'Workspace needed before live Relay13 proof.' },
       { name: 'operator_key_shape', ok: keyOk, detail: cfg.apiKey ? 'Key shape is acceptable for browser-local operator proof.' : 'No browser-local operator API key yet.' },
-      { name: 'fallback_queue_controlled', ok: state.relayOutbox.length < 50, detail: `${state.relayOutbox.length} queued fallback item(s).` },
-      { name: 'no_remote_claim_without_proof', ok: !state.relayStatus.toLowerCase().includes('delivered') || Boolean(state.relayStats), detail: state.relayStatus || 'Fallback honest state.' }
+      { name: 'delivery_queue_controlled', ok: state.relayOutbox.length < 50, detail: `${state.relayOutbox.length} queued delivery item(s).` },
+      { name: 'delivery_claim_controlled', ok: !state.relayStatus.toLowerCase().includes('delivered') || Boolean(state.relayStats), detail: state.relayStatus || 'Delivery proof state controlled.' }
     ];
     return { ok: checks.every((item) => item.ok), app_version: APP_VERSION, mode: cfg.mode, generated_at: new Date().toISOString(), checks };
   }
@@ -2536,18 +2536,18 @@
       '# ConnectLog v7.7 + Relay13 v1.7 operator runbook',
       '',
       'Boundary:',
-      '- ConnectLog remains a standalone static/contact-card PWA.',
-      '- Relay13 remains a standalone Cloudflare messaging backend.',
-      '- Local fallback remains active until Relay13 health, bridge, activation, message reload, and WebSocket proof pass.',
+      '- ConnectLog is the production relationship/card command app.',
+      '- Relay13 is the standalone Cloudflare messaging backend.',
+      '- Delivery claims stay tied to Relay13 health, bridge, activation, message reload, and WebSocket proof.',
       '',
       'Current browser config:',
       `- Mode: ${cfg.mode}`,
       `- Relay13 origin: ${cfg.origin || '<not set>'}`,
       `- Workspace slug: ${cfg.workspace || '<not set>'}`,
       `- Workspace ID: ${cfg.workspaceId || '<not set>'}`,
-      `- API key stored here: ${cfg.apiKey ? 'yes, browser-local only' : 'no'}`,
+      `- API key stored here: ${cfg.apiKey ? 'yes, operator browser/session only' : 'no'}`,
       `- Active card: ${state.profile?.cardName || state.profile?.name || '<not created>'}`,
-      `- Fallback queue: ${state.relayOutbox.length}`,
+      `- Delivery queue: ${state.relayOutbox.length}`,
       '',
       'Local preflight:',
       ...preflight.checks.map((item) => `- ${item.ok ? 'PASS' : 'FAIL'} ${item.name}: ${item.detail}`),
@@ -2734,12 +2734,12 @@
     if (!els.deploymentStatusDeck || !els.deploymentChecklist) return;
     const cfg = state.relayConfig || defaultRelayConfig();
     const statusItems = [
-      ['ConnectLog app', `v${APP_VERSION} · static PWA · local fallback stays active`],
-      ['Local vault', `${state.contacts.length} contacts · ${state.profileCards.length} card variants · IndexedDB ${state.db ? 'open' : 'not open'}`],
-      ['Relay13 mode', cfg.mode === 'relay13' ? `Remote enabled · ${cfg.origin || 'origin missing'}` : 'Local fallback only'],
+      ['ConnectLog app', `v${APP_VERSION} · production relationship command surface`],
+      ['Relationship vault', `${state.contacts.length} contacts · ${state.profileCards.length} card variants · IndexedDB ${state.db ? 'open' : 'not open'}`],
+      ['Relay13 mode', cfg.mode === 'relay13' ? `Production bridge enabled · ${cfg.origin || 'origin missing'}` : 'Production vault mode'],
       ['Outbox', state.relayOutbox.length ? `${state.relayOutbox.length} queued remote message(s)` : 'No queued remote messages'],
       ['Bridge stats', state.relayStats ? `${Number(state.relayStats.cards_active || 0)} active cards · checked ${new Date(state.relayStats.checked_at || Date.now()).toLocaleString()}` : 'No stats pull yet'],
-      ['Remote readiness', relayRemoteReady(cfg) ? 'Origin + workspace available; health check still required.' : 'Not remote-ready yet; no remote delivery claims.'],
+      ['Relay13 readiness', relayRemoteReady(cfg) ? 'Origin + workspace available for production bridge checks.' : 'Operator credentials needed before this browser can send through Relay13.'],
       ['Preflight', relayPreflightChecklist().ok ? 'Local preflight passes.' : 'Local preflight has setup gaps; run the preflight button.']
     ];
     replaceChildren(els.deploymentStatusDeck, ...statusItems.map(([title, body]) => deploymentInfoNode('deployment-status-item', title, body)));
@@ -2748,7 +2748,7 @@
       [cfg.origin ? '✅ Relay13 origin configured' : '☐ Relay13 origin configured', cfg.origin || 'Paste the deployed Worker origin after Relay13 is live.'],
       [cfg.workspace || cfg.workspaceId ? '✅ Workspace set' : '☐ Workspace set', 'Use public workspace slug for visitor/card creation and workspace ID/API key for operator reads/writes.'],
       [cfg.apiKey ? '✅ Operator API key stored locally' : '☐ Operator API key stored locally', 'Needed for operator refresh/send. Never embed this in QR payloads or public HTML.'],
-      [state.relayOutbox.length ? '☐ Queue needs sync' : '✅ Queue clean', state.relayOutbox.length ? 'Run Sync queued after Relay13 health passes.' : 'Fallback queue has no pending remote sends.'],
+      [state.relayOutbox.length ? '☐ Delivery queue needs sync' : '✅ Delivery queue clean', state.relayOutbox.length ? 'Run Sync queued after Relay13 health passes.' : 'Delivery queue has no pending Relay13 sends.'],
       [state.relayStats ? '✅ Relay13 stats endpoint proven in browser' : '☐ Relay13 stats endpoint proven in browser', state.relayStats ? 'Stats were pulled with the local operator API key.' : 'Run Bridge stats after deployment and API key setup.'],
       ['☐ Live Cloudflare proof', 'Deploy Relay13, apply D1 migrations, bootstrap workspace, create scoped API key, run activation proof, sync card, create thread, send message, reload history, run live-proof endpoint, then test WebSocket room.']
     ];
@@ -2829,7 +2829,7 @@
       shareBridge: els.relayShareBridgeInput.checked,
       updatedAt: new Date().toISOString()
     });
-    state.relayStatus = state.relayConfig.mode === 'relay13' ? 'Relay13 settings saved. Run health check.' : 'Local fallback saved. No backend required.';
+    state.relayStatus = state.relayConfig.mode === 'relay13' ? 'Relay13 production bridge settings saved. Run health check.' : 'Production vault mode saved. Relay13 bridge remains available when selected.';
     await persistRelayState();
     renderRelayPanel();
     showToast('Relay13 bridge settings saved.');
@@ -2852,7 +2852,7 @@
       }
       state.relayStatus = `Relay13 health OK: ${data.service || 'worker'} @ ${new Date().toLocaleTimeString()}.${bridgeStatus}`;
     } catch (error) {
-      state.relayStatus = `Relay13 unavailable. Local fallback remains active. ${error.message || ''}`.trim();
+      state.relayStatus = `Relay13 health check failed from this browser. Delivery queue remains protected. ${error.message || ''}`.trim();
     }
     renderRelayPanel();
     renderDeploymentCommandCenter();
@@ -2870,7 +2870,7 @@
       if (els.deploymentConfigOutput) els.deploymentConfigOutput.value = JSON.stringify(data, null, 2);
       showToast('Relay13 ConnectLog bridge route answered.');
     } catch (error) {
-      state.relayStatus = `ConnectLog bridge unavailable. Fallback remains active. ${error.message || ''}`.trim();
+      state.relayStatus = `ConnectLog bridge check failed from this browser. Delivery queue remains protected. ${error.message || ''}`.trim();
       showToast('ConnectLog bridge health failed.');
     }
     renderRelayPanel();
@@ -2962,7 +2962,7 @@
       await persistRelayState();
       showToast('Relay13 ConnectLog stats refreshed.');
     } catch (error) {
-      state.relayStatus = `Relay13 stats failed. Local fallback remains active. ${error.message || ''}`.trim();
+      state.relayStatus = `Relay13 stats check failed from this browser. Delivery queue remains protected. ${error.message || ''}`.trim();
       showToast('Relay13 stats failed.');
     }
     renderRelayPanel();
@@ -2973,7 +2973,7 @@
     const thread = getActiveRelayThread();
     const cfg = state.relayConfig || defaultRelayConfig();
     if (!thread) return showToast('Select a Relay13 thread first.');
-    if (thread.mode !== 'relay13' || !thread.conversationId) return showToast('Selected thread is local fallback only.');
+    if (thread.mode !== 'relay13' || !thread.conversationId) return showToast('Selected thread is in the production vault only.');
     if (!cfg.origin || !cfg.apiKey) return showToast('Message refresh needs Relay13 origin + operator API key.');
     try {
       const params = new URLSearchParams();
@@ -3074,7 +3074,7 @@
       proof: 'connectlog-relay13-activation',
       app_version: APP_VERSION,
       started_at: new Date().toISOString(),
-      boundary: 'This mutates Relay13 only when a remote origin, workspace, and API key are configured. Failures keep ConnectLog in fallback mode.',
+      boundary: 'This mutates Relay13 only when a production origin, workspace, and API key are configured. Failures keep delivery queued until proof passes.',
       checks: []
     };
     const push = (name, ok, detail = {}) => report.checks.push({ name, ok: Boolean(ok), ...detail, checked_at: new Date().toISOString() });
@@ -3116,7 +3116,7 @@
         headers: { 'content-type': 'application/json', 'x-relay13-api-key': cfg.apiKey },
         body: JSON.stringify({ ...report, summary: report.ok ? 'ConnectLog activation proof passed' : 'ConnectLog activation proof completed with failures' })
       }).catch(() => null);
-      state.relayStatus = report.ok ? 'Relay13 activation proof passed. Remote messaging source is responding.' : 'Relay13 activation proof found failures. Keep fallback active.';
+      state.relayStatus = report.ok ? 'Relay13 activation proof passed. Production messaging source is responding.' : 'Relay13 activation proof found failures. Keep delivery queued.';
       if (els.relayProofOutput) els.relayProofOutput.value = JSON.stringify(report, null, 2);
       await persistRelayState();
       renderAll();
@@ -3126,11 +3126,11 @@
       report.ok = false;
       report.error = error.message || 'Activation proof failed';
       report.finished_at = new Date().toISOString();
-      state.relayStatus = `Activation proof failed: ${report.error}. Local fallback remains active.`;
+      state.relayStatus = `Activation proof failed: ${report.error}. Delivery queue remains protected.`;
       if (els.relayProofOutput) els.relayProofOutput.value = JSON.stringify(report, null, 2);
       await persistRelayState();
       renderAll();
-      showToast('Activation proof failed. Fallback remains active.');
+      showToast('Activation proof failed. Delivery queue remains protected.');
       return report;
     }
   }
@@ -3220,13 +3220,13 @@
         return fallback;
       }
     }
-    const fallback = await createLocalRelayThread('Created in fallback mode. Add Relay13 settings later to sync new messages.', options);
+    const fallback = await createLocalRelayThread('Created in production vault mode. Add Relay13 operator credentials to sync new messages.', options);
     renderRelayPanel();
     return fallback;
   }
 
-  async function createLocalRelayThread(reason = 'Local fallback thread created.', options = {}) {
-    const profile = state.profile || normalizeProfile({ name: 'Local contact', cardName: 'Local fallback' });
+  async function createLocalRelayThread(reason = 'Production vault thread created.', options = {}) {
+    const profile = state.profile || normalizeProfile({ name: 'Vault contact', cardName: 'Production vault' });
     const now = new Date().toISOString();
     const thread = normalizeRelayThread({
       id: cryptoId(),
@@ -3247,7 +3247,7 @@
     upsertRelayThread(thread);
     state.activeRelayThreadId = thread.id;
     await persistRelayState();
-    if (!options.silent) showToast('Fallback inbox thread created.');
+    if (!options.silent) showToast('Production vault thread created.');
     return thread;
   }
 
@@ -3304,7 +3304,7 @@
         showToast('Relay13 send failed. Message queued locally.');
       }
     } else {
-      showToast('Message saved locally in fallback inbox.');
+      showToast('Message saved in the production vault.');
     }
     await persistRelayState();
     renderRelayPanel();
@@ -3420,7 +3420,7 @@
       button.type = 'button';
       button.className = `thread-row${thread.id === state.activeRelayThreadId ? ' active' : ''}`;
       button.dataset.id = thread.id;
-      button.innerHTML = `<strong>${escapeHtml(thread.title)}</strong><span>${escapeHtml(thread.mode === 'relay13' ? 'Relay13' : 'Local fallback')} · ${escapeHtml(thread.status || 'open')}</span><small>${escapeHtml(thread.preview || 'No preview yet')}</small>`;
+      button.innerHTML = `<strong>${escapeHtml(thread.title)}</strong><span>${escapeHtml(thread.mode === 'relay13' ? 'Relay13' : 'Production vault')} · ${escapeHtml(thread.status || 'open')}</span><small>${escapeHtml(thread.preview || 'No preview yet')}</small>`;
       return button;
     }));
   }
@@ -3437,7 +3437,7 @@
     }
     const header = document.createElement('div');
     header.className = 'message-thread-header';
-    header.innerHTML = `<strong>${escapeHtml(thread.title)}</strong><span>${escapeHtml(thread.mode === 'relay13' ? `Relay13 conversation ${thread.conversationId || ''}` : 'Local fallback conversation')}</span>`;
+    header.innerHTML = `<strong>${escapeHtml(thread.title)}</strong><span>${escapeHtml(thread.mode === 'relay13' ? `Relay13 conversation ${thread.conversationId || ''}` : 'Production vault conversation')}</span>`;
     const messages = thread.messages.length ? thread.messages : [{ senderRole: 'system', senderName: 'ConnectLog', body: 'No local messages cached yet. Remote Relay13 history can be pulled in the next backend pass.', createdAt: thread.createdAt }];
     replaceChildren(els.relayMessageLog, header, ...messages.map((message) => {
       const row = document.createElement('article');
@@ -3451,9 +3451,9 @@
   function renderRelayOutbox() {
     if (!els.relayFallbackLog) return;
     const lines = [];
-    lines.push(state.relayOutbox.length ? `☐ ${state.relayOutbox.length} queued remote message${state.relayOutbox.length === 1 ? '' : 's'} waiting for Relay13.` : '✅ No queued remote messages.');
+    lines.push(state.relayOutbox.length ? `☐ ${state.relayOutbox.length} queued Relay13 message${state.relayOutbox.length === 1 ? '' : 's'} waiting for verified delivery.` : '✅ No queued Relay13 messages.');
     const localCount = state.relayThreads.filter((thread) => thread.mode === 'local').length;
-    lines.push(localCount ? `✅ ${localCount} local fallback thread${localCount === 1 ? '' : 's'} preserved in this browser.` : '✅ Local fallback is ready.');
+    lines.push(localCount ? `✅ ${localCount} production vault thread${localCount === 1 ? '' : 's'} preserved in this browser.` : '✅ Production vault is ready.');
     replaceChildren(els.relayFallbackLog, ...lines.map((line) => {
       const p = document.createElement('p');
       p.textContent = line;

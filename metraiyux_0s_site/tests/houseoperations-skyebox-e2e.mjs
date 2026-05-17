@@ -40,7 +40,7 @@ async function withPage(context, id, viewportName, fn) {
     await fn(page, entry);
     const noHorizontalScroll = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 2);
     entry.checks.push({ name: 'no_horizontal_scroll', ok: noHorizontalScroll });
-    entry.ok = entry.checks.every((item) => item.ok) && jsErrors.length === 0 && failedRequests.length === 0;
+    entry.ok = !entry.error && entry.checks.every((item) => item.ok) && jsErrors.length === 0 && failedRequests.length === 0;
   } catch (error) {
     entry.ok = false;
     entry.error = failText(error);
@@ -200,7 +200,8 @@ async function checkHouseOperations(page, entry) {
   await page.locator('input[name="company"]').fill('Buyer House Ops');
   await page.locator('form[data-form="billing"] button[type="submit"]').click();
   await assertText(page, entry, 'Buyer House Ops');
-  await assertText(page, entry, 'HouseOperations Command');
+  await page.locator('.runtimeRow').filter({ hasText: 'HouseOperations Command' }).first().waitFor({ state: 'visible', timeout: 12000 });
+  entry.checks.push({ name: 'text:HouseOperations Command', ok: true });
 
   const billingDownloadPromise = page.waitForEvent('download', { timeout: 12000 });
   await page.locator('[data-action="export-billing-intent"]').first().click();

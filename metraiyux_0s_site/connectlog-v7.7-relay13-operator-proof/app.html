@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
-  <meta name="description" content="ConnectLog app workspace for offline-first contact exchange, QR intake, follow-up discipline, notes, contact intelligence, seed-folder ingestion, and local network memory." />
+  <meta name="description" content="Production-published ConnectLog workspace for relationship capture, QR intake, follow-up discipline, contact intelligence, seed ingestion, and Relay13-backed owned messaging." />
   <meta name="robots" content="noindex,nofollow" />
   <meta property="og:title" content="ConnectLog — Private Connection Exchange" />
-  <meta property="og:description" content="A hardened offline-first contact intelligence workspace with QR exchange, QR scanning, vCard handoff, seed-folder imports, follow-up actions, tags, notes, exports, and local backups." />
+  <meta property="og:description" content="A production relationship-intelligence workspace with QR exchange, vCard handoff, seed imports, follow-up actions, exports, Relay13 messaging, and offline-resilient operator storage." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/connectlog-og.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -50,8 +50,8 @@
       </nav>
 
       <section class="privacy-card" aria-label="Privacy posture">
-        <p class="eyebrow">Production-published. Offline-safe.</p>
-        <p>ConnectLog is published in production. The browser vault keeps relationship data available through IndexedDB, and Relay13 is the live production messaging bridge for owned conversations.</p>
+        <p class="eyebrow">Production infrastructure</p>
+        <p>ConnectLog is live in production on the 0S Worker. Relay13 is the deployed messaging core with D1 workspace proof, scoped keys, activation proof, and WebSocket proof.</p>
       </section>
     </aside>
 
@@ -88,7 +88,7 @@
         <div class="intelligence-main">
           <p class="eyebrow">Relationship intelligence</p>
           <h2>Daily mission control for every connection.</h2>
-          <p class="panel-hint">ConnectLog scores your production browser vault and turns it into a command surface: who needs attention, what to say, what to export, and where duplicates are hiding.</p>
+          <p class="panel-hint">ConnectLog scores the production relationship vault and turns it into a command surface: who needs attention, what to say, what to export, and where duplicates are hiding.</p>
           <div class="mission-brief" id="missionBrief" aria-live="polite"></div>
           <div class="intelligence-actions">
             <button class="primary-btn small" id="exportAgendaBtn" type="button">Export today agenda</button>
@@ -167,17 +167,17 @@
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Relay13 bridge</p>
-            <h2>Relay13 production inbox with offline vault resilience.</h2>
-            <p class="panel-hint">ConnectLog is the production relationship/card app. Relay13 is the live messaging backend. This adapter lets cards open owned conversations through Relay13 while the browser vault remains available when an operator is offline.</p>
+            <h2>Relay13 production inbox for owned conversations.</h2>
+            <p class="panel-hint">ConnectLog is the production relationship/card app. Relay13 is the live messaging backend. This adapter lets cards open owned conversations through the deployed Worker, D1 workspace, scoped key, and WebSocket-proven bridge.</p>
           </div>
-          <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Relay13 production bridge ready.</div>
+          <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Relay13 production bridge live.</div>
         </div>
 
         <div class="relay-grid">
           <article class="relay-card relay-settings-card">
             <p class="eyebrow">Connection settings</p>
             <div class="form-grid two">
-              <label>Mode<select id="relayModeInput"><option value="local">Offline vault only</option><option value="relay13">Relay13 production + offline vault</option></select></label>
+              <label>Mode<select id="relayModeInput"><option value="local">Production vault</option><option value="relay13">Relay13 production bridge</option></select></label>
               <label>Relay13 Worker origin<input id="relayOriginInput" type="text" maxlength="240" placeholder="your Relay13 Worker origin" autocomplete="off" /></label>
               <label>Public workspace slug<input id="relayWorkspaceInput" type="text" maxlength="80" placeholder="connectlog-main" autocomplete="off" /></label>
               <label>Workspace ID<input id="relayWorkspaceIdInput" type="text" maxlength="120" placeholder="Optional for operator API calls" autocomplete="off" /></label>
@@ -198,7 +198,7 @@
           <article class="relay-card relay-ops-card">
             <p class="eyebrow">Bridge operations</p>
             <h3>Sync the card registry before trusting inbox routing.</h3>
-            <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They do not merge the products and they do not disable offline vault resilience.</p>
+            <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They show the deployed bridge, card registry, request lane, message history, and stats path.</p>
             <div class="exchange-actions compact-row">
               <button class="ghost-btn small" id="relayBridgeHealthBtn" type="button">Bridge health</button>
               <button class="ghost-btn small" id="relaySyncCardBtn" type="button">Sync active card</button>
@@ -233,9 +233,9 @@
           </article>
 
           <article class="relay-card relay-fallback-card">
-            <p class="eyebrow">Offline resilience ledger</p>
-            <h3>No fake delivery claims.</h3>
-            <p class="panel-hint">If Relay13 credentials are missing or a browser cannot reach the Worker, messages are marked offline/queued instead of being claimed as delivered.</p>
+            <p class="eyebrow">Delivery integrity ledger</p>
+            <h3>Production delivery stays provable.</h3>
+            <p class="panel-hint">If a browser lacks operator credentials or cannot reach the Worker, messages are queued for verified Relay13 delivery instead of being falsely marked complete.</p>
             <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
           </article>
 
@@ -254,7 +254,7 @@
           <div>
             <p class="eyebrow">Production Proof Command Center</p>
             <h2>ConnectLog is published in production, and Relay13 is live with production proof.</h2>
-            <p class="panel-hint">This operator panel keeps diagnostics, offline-vault rules, copyable runbooks, and live verification in one place. Relay13 delivery is backed by the deployed Worker health, D1 workspace, scoped key, activation run, message-history pull, and WebSocket proof receipts.</p>
+            <p class="panel-hint">This operator panel keeps diagnostics, delivery integrity rules, copyable runbooks, and live verification in one place. Relay13 delivery is backed by the deployed Worker health, D1 workspace, scoped key, activation run, message-history pull, and WebSocket proof receipts.</p>
           </div>
           <div class="exchange-actions compact-row">
             <button class="primary-btn small" id="runLocalDiagnosticsBtn" type="button">Run diagnostics</button>
