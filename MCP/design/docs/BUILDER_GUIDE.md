@@ -166,6 +166,7 @@ The MCP is not allowed to act like a SkyeSol restyler. It must pull implementati
 - `actual-surface-screenshot-stage`
 - `actual-surface-video-reel`
 - `brand-logo-asset-discipline`
+- `adaptive-neon-scrollbar`
 - `neon-scrollbar-cursor-trail`
 - `premium-text-effects-lab`
 
@@ -210,7 +211,7 @@ Fail examples:
 Requested effects must leave source evidence:
 
 - Cursor trail: `cursor-trail`, `pointermove`, `useMotionValue`, or `useSpring`.
-- Neon scrollbar: `::-webkit-scrollbar`, `scrollbar-color`, 14px+ thumb/track styling, visible slightly opaque track, and neon thumb highlight.
+- Neon scrollbar: `::-webkit-scrollbar`, `scrollbar-color`, 14px+ thumb/track styling, visible slightly opaque track, horizontal and vertical coverage, and neon thumb highlight. Use `adaptive-neon-scrollbar` as an opt-in part unless the target explicitly wants global chrome.
 - Text effects: `text-shadow`, `background-clip: text`, glow/neon/split/shimmer classes.
 - SkyeSol living background: `skyesol-living-field`, `requestAnimationFrame`, aurora wave/shader bands, particles, pointer parallax, scanline/grain texture, capped DPR, reduced-motion fallback.
 - Surface screenshots: real image assets rendered in the page.

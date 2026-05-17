@@ -26,7 +26,7 @@ When the MCP brief requires advanced tools, generated work must prove it with so
 - Scroll funnels need real `gsap`, `ScrollTrigger`, and `lenis` imports.
 - Motion systems need real `motion` imports or a documented local equivalent.
 - Vector/canvas motion systems need real dotLottie, Rive, OGL, Pixi, or Theatre imports when those are selected.
-- Neon browser chrome needs a real custom scrollbar, scroll progress, pointer-reactive polish, and reduced-motion/mobile fallbacks. Pull `neon-motion-chrome` instead of only saying "neon".
+- Neon scrollbar is an optional part. Pull `adaptive-neon-scrollbar` when the user asks for the scrollbar alone; pull `neon-motion-chrome` only when the brief also needs progress, pointer-reactive polish, scanline chrome, and reduced-motion/mobile fallbacks.
 - The `design_stack_audit` tool must pass before the work is described as advanced.
 - The `design_runtime_stack_gate` tool must pass with browser runtime evidence before MCP-driven stack work is called done.
 - The `design_performance_audit` tool must pass before advanced motion/WebGL/screenshot-heavy work is shipped.
@@ -62,7 +62,7 @@ When the user asks for SkyeSol-style alive backgrounds, living pages, command fi
 13. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
 14. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
 15. Call `design_pattern_pack` for every required implementation pattern.
-16. Use `design_pattern_pack({ patternId: "neon-motion-chrome" })` when the brief asks for the Legal Skyes scrollbar, neon scroll chrome, cursor trail, scroll progress, shimmer text, or stronger page motion.
+16. Use `design_pattern_pack({ patternId: "adaptive-neon-scrollbar" })` when the brief asks only for the neon scrollbar. Use `design_pattern_pack({ patternId: "neon-motion-chrome" })` when it also asks for Legal Skyes-style full neon chrome, cursor trail, scroll progress, shimmer text, or stronger page motion.
 17. Use `design_pattern_pack({ patternId: "skyesol-living-background" })` when the brief asks for SkyeSol-style living/alive backgrounds or command-field atmosphere.
 18. Build from those real implementation patterns, not from a static lookalike.
 19. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.

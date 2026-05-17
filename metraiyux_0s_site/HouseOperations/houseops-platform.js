@@ -400,9 +400,40 @@
       ${['health','status','queue','handoff-packs','review-board','execution-board','dispatch-board','v1/runtime-summary','v1/sessions'].map((path) => `<div class="runtimeRow"><div><b>${path}</b><br><code>./${path}</code></div><a class="btn" href="./${path}">Open</a></div>`).join('')}
       <div class="runtimeRow"><div><b>SkyeBox Authenticator Vault</b><br><code>./skye-box-authenticator-vault/index.html</code></div><a class="btn" href="./skye-box-authenticator-vault/index.html">Open</a></div>
       <div class="runtimeRow"><div><b>SkyeGate PIN Gate</b><br><code>https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html</code></div><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">Open</a></div>
+      <div class="runtimeRow"><div><b>HouseOperations tutorial</b><br><code>./tutorial.html</code></div><a class="btn" href="./tutorial.html">Open</a></div>
+      <div class="runtimeRow"><div><b>HouseOperations billing</b><br><code>./billing.html</code></div><a class="btn" href="./billing.html">Open</a></div>
       <div class="runtimeRow"><div><b>0S expansion proof hub</b><br><code>../live/houseoperations-skyebox-operator-proof.html</code></div><a class="btn" href="../live/houseoperations-skyebox-operator-proof.html">Open</a></div>
       <div class="runtimeRow"><div><b>Legacy routed shell</b><br><code>./_legacy_shell/index.html</code></div><a class="btn" href="./_legacy_shell/index.html">Open</a></div>
-    </div></div><div class="panel span12"><div class="panelHead"><div><h2>Proof Ledger</h2><p>Local HouseOperations proof rows.</p></div></div><div class="panelBody tableWrap"><table><thead><tr><th>Proof</th><th>Status</th><th>At</th></tr></thead><tbody>${proofRows()}</tbody></table></div></div></section>`;
+    </div></div><div class="panel span12"><div class="panelHead"><div><h2>Truth Contract</h2><p>Every sellable claim maps to a working control, endpoint, export, or proof run.</p></div><button class="btn" data-action="export-claim-contract">Export Claim Contract</button></div><div class="panelBody tableWrap"><table><thead><tr><th>ID</th><th>Claim</th><th>Backing proof</th><th>Status</th></tr></thead><tbody>${claimRows()}</tbody></table></div></div><div class="panel span12"><div class="panelHead"><div><h2>Proof Ledger</h2><p>Local HouseOperations proof rows.</p></div></div><div class="panelBody tableWrap"><table><thead><tr><th>Proof</th><th>Status</th><th>At</th></tr></thead><tbody>${proofRows()}</tbody></table></div></div></section>`;
+  }
+
+  function billingView() {
+    const data = read();
+    const active = activePlan(data);
+    return `<section class="grid">
+      <div class="span12 heroBand">
+        <div class="heroCopy"><div class="crumb">Charge-ready app lane</div><h2>Bill HouseOperations without overstating what the app owns.</h2><p>HouseOperations records the plan intent, price, included scope, SkyePay offer URL, and activation boundary. Payment and entitlement enforcement belong to SkyePay/FS27.</p><div class="actions" style="justify-content:flex-start;margin-top:18px"><button class="btn primary" data-action="create-billing-intent">Create Billing Intent</button><button class="btn" data-action="export-billing-intent">Export Intent</button><a class="btn" href="${esc(skyePayUrl(active.offer))}">Open SkyePay</a></div></div>
+        <div class="opsMap"><span class="routeLine" style="left:10%;top:36%;width:40%;transform:rotate(8deg)"></span><span class="routeLine" style="left:45%;top:54%;width:36%;transform:rotate(-16deg)"></span><span class="pin done" style="left:10%;top:33%"></span><span class="pin risk" style="left:50%;top:42%"></span><span class="pin done" style="left:80%;top:43%"></span></div>
+      </div>
+      <div class="panel span7"><div class="panelHead"><div><h2>Billing Intent</h2><p>Create the receipt that tells the client what they are paying for before checkout.</p></div></div><div class="panelBody">${billingForm(data)}</div></div>
+      <div class="panel span5"><div class="panelHead"><div><h2>Latest Intents</h2><p>Stored locally for proof and handoff.</p></div><button class="btn" data-action="export-billing-intent">Export</button></div><div class="panelBody runtimeList">${billingIntentRows(data)}</div></div>
+      <div class="panel span12"><div class="panelHead"><div><h2>Paid Scope</h2><p>These are the only HouseOperations plans this app is allowed to sell today.</p></div></div><div class="panelBody planGrid">${Object.values(PLAN_CATALOG).map((plan) => planCard(plan, active.id)).join('')}</div></div>
+    </section>`;
+  }
+
+  function tutorialView() {
+    const data = read();
+    const completed = new Set(data.tutorialRuns.map((run) => run.step_id)).size;
+    return `<section class="grid">
+      <div class="span12 heroBand">
+        <div class="heroCopy"><div class="crumb">Built-in operator training</div><h2>Run the app the way a paid operator will run it.</h2><p>This tutorial is not just documentation. Each step fires the same local app action used by the dashboard, billing lane, proof ledger, and Gate packet flow.</p><div class="actions" style="justify-content:flex-start;margin-top:18px"><button class="btn primary" data-action="run-full-tutorial">Run Full Tutorial</button><button class="btn" data-action="export-tutorial-receipt">Export Tutorial Receipt</button><a class="btn" href="./runtime.html">Runtime Proof</a></div></div>
+        <div class="opsMap"><span class="routeLine" style="left:14%;top:30%;width:48%;transform:rotate(12deg)"></span><span class="routeLine" style="left:38%;top:62%;width:38%;transform:rotate(-18deg)"></span><span class="pin done" style="left:14%;top:27%"></span><span class="pin done" style="left:48%;top:41%"></span><span class="pin risk" style="left:77%;top:49%"></span></div>
+      </div>
+      <div class="span12">${kpis()}</div>
+      <div class="panel span12"><div class="panelHead"><div><h2>Guided Run</h2><p>${completed}/${tutorialSteps.length} tutorial steps recorded in this browser.</p></div></div><div class="panelBody">${tutorialCards(data)}</div></div>
+      <div class="panel span7"><div class="panelHead"><div><h2>Tutorial Receipt</h2><p>Every completed step writes a local run row.</p></div></div><div class="panelBody timeline">${tutorialRunRows(data)}</div></div>
+      <div class="panel span5"><div class="panelHead"><div><h2>Operating Rule</h2><p>What paid users should understand before handoff.</p></div></div><div class="panelBody laneGrid"><div class="lane"><h3>Local state</h3><p>Tasks, vendors, proof, tutorial runs, and billing intents live in this browser until exported or mirrored.</p></div><div class="lane"><h3>SkyeBox custody</h3><p>TOTP secrets stay in the encrypted local vault; FS27 PIN recovery does not recover TOTP secrets.</p></div><div class="lane"><h3>Paid access</h3><p>SkyePay/FS27 own payment, approval, and entitlement enforcement.</p></div></div></div>
+    </section>`;
   }
 
   function settingsView() {
@@ -410,7 +441,7 @@
     return `<section class="grid"><div class="panel span6"><div class="panelHead"><div><h2>Settings</h2><p>Local 0s-owned controls.</p></div></div><div class="panelBody formGrid"><button class="btn primary" data-action="fullscreen">Enter Fullscreen</button><button class="btn" data-action="export">Export Backup</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn danger" data-action="reset">Reset Local State</button></div></div><div class="panel span6"><div class="panelHead"><div><h2>SkyeGate bridge settings</h2><p>Store only public origin/app metadata here. Event mirror secrets belong in Worker/env, not the browser.</p></div></div><div class="panelBody"><form class="intakeForm" data-form="gate"><label>Gate origin<input name="origin" value="${esc(cfg.origin || '')}" placeholder="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"></label><label>App id<input name="appId" value="${esc(cfg.appId || 'metraiyux-houseoperations')}"></label><button class="btn primary" type="submit">Save Gate Bridge</button></form></div></div><div class="panel span12"><div class="panelHead"><div><h2>Storage</h2><p>Standalone namespace.</p></div></div><div class="panelBody runtimeList"><div class="runtimeRow"><div><b>State key</b><br><code>${STORAGE_KEY}</code></div>${badge('owned')}</div><div class="runtimeRow"><div><b>Legacy closure</b><br><code>_legacy_shell/</code></div>${badge('pass')}</div><div class="runtimeRow"><div><b>Runtime endpoints</b><br><code>health / status / queue / handoff-packs</code></div>${badge('local')}</div></div></div></section>`;
   }
 
-  const views = { dashboard: dashboardView, tasks: tasksView, schedule: scheduleView, vendors: vendorsView, alerts: alertsView, assignments: assignmentsView, runtime: runtimeView, settings: settingsView };
+  const views = { dashboard: dashboardView, tasks: tasksView, schedule: scheduleView, vendors: vendorsView, alerts: alertsView, assignments: assignmentsView, runtime: runtimeView, billing: billingView, tutorial: tutorialView, settings: settingsView };
 
   function currentView() {
     const fromBody = document.body.dataset.view;
@@ -436,6 +467,8 @@
       alerts: 'Owner-facing blocked, review, and high-priority items.',
       assignments: 'Team load, lane ownership, and handoff pressure.',
       runtime: 'Local runtime endpoints, SkyeBox, SkyeGate, and legacy shell closure.',
+      billing: 'Charge-ready plan intent, SkyePay offer, and activation boundary.',
+      tutorial: 'Guided runbook that executes the real app workflow.',
       settings: 'Storage, bridge metadata, proof, fullscreen, and backup controls.'
     }[view];
   }
@@ -555,6 +588,144 @@
     toast('Gate mirror packet queued.');
   }
 
+  function createBillingIntent(payload = {}) {
+    const data = read();
+    const plan = planById(payload.plan_id);
+    const clientSlug = payload.client_slug || 'metraiyux-0s';
+    const intent = {
+      id: uid('bill'),
+      type: 'houseoperations_billing_intent',
+      status: 'ready_for_skyepay_checkout',
+      created_at: new Date().toISOString(),
+      plan_id: plan.id,
+      plan_name: plan.name,
+      setup_usd: plan.setup,
+      monthly_usd: plan.monthly,
+      customer_email: payload.customer_email || 'preview-client@example.com',
+      company: payload.company || 'Preview Client',
+      client_slug: clientSlug,
+      payment_method: payload.payment_method || 'SkyePay card checkout',
+      checkout_url: skyePayUrl(plan.offer, clientSlug),
+      owner_approval_required: true,
+      activation_boundary: plan.activation,
+      included_scope: plan.includes,
+      proof_boundary: 'HouseOperations records the commercial intent locally; SkyePay/FS27 owns payment confirmation, plan policy write, and activation.'
+    };
+    data.billingIntents.unshift(intent);
+    pushActivity(data, 'Billing Desk', `created billing intent for ${plan.name}`, 'billing');
+    save(data);
+    toast('Billing intent created.');
+    return intent;
+  }
+
+  function exportBillingIntent() {
+    const data = read();
+    if (!data.billingIntents.length) createBillingIntent();
+    exportJson('houseoperations-billing-intent.json', { exportedAt: new Date().toISOString(), intents: read().billingIntents });
+  }
+
+  function exportClaimContract() {
+    exportJson('houseoperations-claim-contract.json', {
+      exportedAt: new Date().toISOString(),
+      app: 'HouseOperations',
+      version: APP_VERSION,
+      claims: claimContract.map(([id, claim, proof]) => ({ id, claim, proof }))
+    });
+  }
+
+  function recordTutorialRun(stepId, label, result) {
+    const data = read();
+    const stamp = new Date();
+    data.tutorialRuns.unshift({
+      id: uid('run'),
+      step_id: stepId,
+      label,
+      result,
+      at: stamp.toISOString(),
+      at_display: stamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+    pushActivity(data, 'Tutorial', `completed tutorial step: ${label}`, 'tutorial');
+    save(data);
+  }
+
+  function addOwnerAlert() {
+    const data = read();
+    const task = {
+      id: uid('task'),
+      title: 'Tutorial owner approval block',
+      owner: 'Owner',
+      due: 'Now',
+      priority: 'high',
+      status: 'blocked',
+      lane: 'owner',
+      note: 'Created by the HouseOperations tutorial to prove owner-alert routing.'
+    };
+    data.tasks.unshift(task);
+    pushActivity(data, 'Tutorial', `created owner alert: ${task.title}`, 'owner');
+    save(data);
+    toast('Owner alert created.');
+  }
+
+  function runTutorialStep(stepId) {
+    const step = tutorialSteps.find(([id]) => id === stepId);
+    const label = step?.[1] || stepId;
+    let result = 'No step matched.';
+    if (stepId === 'create-task') {
+      addTask({ title: 'Tutorial house task', owner: 'Tutorial Desk', due: 'Today 16:00', priority: 'medium', lane: 'proof', note: 'Created by guided run.' });
+      result = 'Task created.';
+    }
+    if (stepId === 'create-vendor') {
+      addVendor({ name: 'Tutorial Vendor', request: 'Guided invoice check', value: 640, status: 'open', contact: 'vendor@example.com' });
+      result = 'Vendor created.';
+    }
+    if (stepId === 'advance-task') {
+      const firstTask = read().tasks[0];
+      if (firstTask) {
+        advance('tasks', firstTask.id);
+        result = `Task advanced: ${firstTask.title}`;
+      }
+    }
+    if (stepId === 'create-alert') {
+      addOwnerAlert();
+      result = 'Owner alert created.';
+    }
+    if (stepId === 'resolve-alert') {
+      const alert = read().tasks.find((task) => task.status === 'blocked' || task.priority === 'high' || task.status === 'review');
+      if (alert) {
+        resolveAlert(alert.id);
+        result = `Owner alert resolved: ${alert.title}`;
+      }
+    }
+    if (stepId === 'save-proof') {
+      saveProof();
+      result = 'Proof snapshot saved.';
+    }
+    if (stepId === 'queue-gate') {
+      queueGateMirror();
+      result = 'Gate mirror packet queued.';
+    }
+    if (stepId === 'create-billing') {
+      const intent = createBillingIntent();
+      result = `Billing intent created: ${intent.plan_name}`;
+    }
+    recordTutorialRun(stepId, label, result);
+    toast(`Tutorial step complete: ${label}`);
+  }
+
+  function runFullTutorial() {
+    tutorialSteps.forEach(([stepId]) => runTutorialStep(stepId));
+  }
+
+  function exportTutorialReceipt() {
+    exportJson('houseoperations-tutorial-receipt.json', {
+      exportedAt: new Date().toISOString(),
+      app: 'HouseOperations',
+      version: APP_VERSION,
+      tutorial_steps: tutorialSteps.map(([id, label, proof]) => ({ id, label, proof })),
+      runs: read().tutorialRuns
+    });
+  }
+
   function exportJson(filename, payload) {
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
@@ -588,6 +759,7 @@
         const payload = formPayload(form);
         if (form.dataset.form === 'task') addTask(payload);
         if (form.dataset.form === 'vendor') addVendor(payload);
+        if (form.dataset.form === 'billing') createBillingIntent(payload);
         if (form.dataset.form === 'gate') {
           localStorage.setItem(GATE_BRIDGE_KEY, JSON.stringify(payload));
           toast('Gate bridge saved.');
@@ -613,6 +785,12 @@
         if (action === 'save-proof') saveProof();
         if (action === 'queue-gate-mirror') queueGateMirror();
         if (action === 'export-gate-packet') exportGatePacket();
+        if (action === 'create-billing-intent') createBillingIntent();
+        if (action === 'export-billing-intent') exportBillingIntent();
+        if (action === 'export-claim-contract') exportClaimContract();
+        if (action === 'run-tutorial-step') runTutorialStep(button.dataset.step);
+        if (action === 'run-full-tutorial') runFullTutorial();
+        if (action === 'export-tutorial-receipt') exportTutorialReceipt();
         if (action === 'export') exportBackup();
         if (action === 'fullscreen') document.documentElement.requestFullscreen?.();
         if (action === 'reset') {
@@ -635,7 +813,7 @@
     window.addEventListener('resize', update);
   }
 
-  window.HouseOperations = { read, saveProof, queueGateMirror, exportGatePacket, render };
+  window.HouseOperations = { read, saveProof, queueGateMirror, exportGatePacket, createBillingIntent, runTutorialStep, runFullTutorial, render };
   document.addEventListener('DOMContentLoaded', () => {
     initMotionChrome();
     render();

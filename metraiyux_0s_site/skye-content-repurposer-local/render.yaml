@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: skye-content-forge
+    runtime: node
+    plan: starter
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PROCESS_MANAGER
+        value: render-web-service
+      - key: PUBLISHER_AUTORUN
+        value: "1"
+      - key: PUBLISHER_POLL_SECONDS
+        value: "300"
+      - key: PORT
+        value: "4313"

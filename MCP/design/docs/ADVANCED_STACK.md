@@ -128,7 +128,7 @@ gsap.utils.toArray('.reveal').forEach((el, i) => {
 - Use actual product/app screenshots when they clarify the product better than illustration.
 - Use neon/glowing text, shimmer, split text, or chromatic text effects as purposeful visual hierarchy.
 - Use cursor trails or pointer-reactive glow for premium interactive pages, with mobile/reduced-motion fallbacks.
-- Use a thicker branded scrollbar with a visible slightly opaque track and neon thumb/track highlights on scroll-led spectacle pages.
-- Legal Skyes-style browser chrome should be a reusable system: neon scrollbar, top scroll progress rail, pointer-reactive glow, scanline/grid texture, shimmer title utility, and magnetic control utility.
+- Use a thicker branded scrollbar with a visible slightly opaque track and neon thumb/track highlights when the user asks for it or the surface is explicitly scroll-led.
+- Treat the scrollbar as the standalone optional `adaptive-neon-scrollbar` part. Legal Skyes-style browser chrome is the larger `neon-motion-chrome` system: neon scrollbar, top scroll progress rail, pointer-reactive glow, scanline/grid texture, shimmer title utility, and magnetic control utility.
 - Do not hide custom scrollbars, make them ultra-thin, or rely on hover-only visibility when the user asked for visible scrollbars.
 - Sticky scroll cues are allowed when they help users understand a long cinematic page.

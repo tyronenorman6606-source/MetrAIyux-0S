@@ -95,6 +95,17 @@
       "starter": "Use the approved logo asset path from design_logo_manifest. If there is no exact asset, use typography-only wordmark plus parent brand endorsement rather than inventing a permanent emblem."
     },
     {
+      "id": "adaptive-neon-scrollbar",
+      "tags": ["scrollbar", "neon", "chrome", "css", "theme-adaptive"],
+      "packages": ["CSS scrollbar selectors"],
+      "imports": ["Pull design_pattern_pack({ patternId: 'adaptive-neon-scrollbar' }) and add data-mcp-neon-scrollbar to the root or scroll container that should opt in."],
+      "useWhen": "The user explicitly asks for a visible neon/custom scrollbar, a scroll-led surface needs persistent position affordance, or a long horizontal rail/table needs branded scroll feedback.",
+      "mustShow": ["custom scrollbar CSS", "16px visible scrollbar width and height", "slightly transparent track", "glowing neon thumb", "vertical and horizontal thumb styling", "theme tokens or local brand variables"],
+      "avoid": ["forcing the scrollbar on unrelated sites", "cursor trail dependency when only scrollbar was requested", "thin invisible scrollbar", "hover-only visibility", "scrollbar-width: none"],
+      "starter": "Use the adaptive-neon-scrollbar pattern pack. Scope it with data-mcp-neon-scrollbar unless the target site explicitly wants global browser chrome. Map --mcp-neon-scrollbar-a/b/c/d to the local brand palette.",
+      "sourceUrls": ["https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar", "https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color"]
+    },
+    {
       "id": "neon-scrollbar-cursor-trail",
       "tags": ["scrollbar", "cursor-trail", "neon", "pointer", "chrome"],
       "packages": ["framer-motion for cursor trail", "CSS scrollbar selectors"],

@@ -94,6 +94,7 @@ const targetHasPublicSource = htmlFiles.length + cssFiles.length + jsFiles.lengt
 const relativeTarget = path.relative(repoRoot, targetFolder);
 const isSkyeGateFS27 = relativeTarget === 'SkyeGateFS27';
 const isSkyeSolTarget = relativeTarget === 'skyesol_current_public_site' || /(?:^|\/)SkyeSol(?:\/|$)/.test(relativeTarget);
+const isMetrAIyux0S = relativeTarget === 'metraiyux_0s_site' || /(?:^|\/)metraiyux_0s_site(?:\/|$)/.test(relativeTarget);
 const isDesignLab = relativeTarget === 'skye-design-lab' || relativeTarget === 'MCP/skye-design-lab';
 const isMcpServerTarget = relativeTarget === 'MCP';
 const templateTargetMatch = relativeTarget.match(/MCP\/magicuidesign-(changelog|blog|portfolio)-template-[^/]+/);
@@ -197,15 +198,21 @@ const requiredStackForTarget = relativeTarget === 'skyesol_current_public_site' 
   : isDesignLab
   ? ['framerMotion', 'gsap', 'lenis', 'three', 'r3f', 'drei', 'postprocessing']
   : [];
-const requestedEffectsForTarget = isSkyeGateFS27
-  ? ['neonScrollbar', 'textEffects', 'motionChrome', 'gsapScroll']
+const requestedEffectOverrides = (process.env.MCP_EFFECTS || '')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean);
+const requestedEffectsForTarget = [...new Set([...(isSkyeGateFS27
+  ? ['textEffects', 'motionChrome', 'gsapScroll']
   : isMcpServerTarget
   ? []
   : isDesignLab
-  ? ['neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'gsapScroll', 'threeCanvas', 'surfaceScreenshots']
-  : targetHasPublicSource
+  ? ['textEffects', 'motionChrome', 'livingBackground', 'gsapScroll', 'threeCanvas', 'surfaceScreenshots']
+  : isMetrAIyux0S
   ? ['neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground']
-  : [];
+  : targetHasPublicSource
+  ? ['textEffects', 'livingBackground']
+  : []), ...requestedEffectOverrides])];
 
 const legacyCssImportShims = cssFiles.filter((filePath) => {
   if (path.resolve(filePath) === path.resolve(canonicalCss)) return false;
@@ -264,17 +271,27 @@ for (const namespace of ['skye.core', 'skye.templates', 'skye.fx', 'skye.motion'
 for (const category of ['animation', 'scroll', '3d']) {
   toolCalls.push(await callTool('design_stack_catalog', { category }));
 }
-for (const recipeId of (!targetHasPublicSource
+const openSourceRecipeIdsForTarget = !targetHasPublicSource
   ? []
-  : isSkyeGateFS27
-  ? ['neon-motion-chrome-kit', 'premium-text-effects-lab', 'gsap-lenis-scroll-stage']
-  : ['neon-motion-chrome-kit', 'premium-text-effects-lab', 'skyesol-living-background'])) {
+  : [
+      requestedEffectsForTarget.includes('neonScrollbar') ? 'adaptive-neon-scrollbar' : null,
+      requestedEffectsForTarget.includes('motionChrome') ? 'neon-motion-chrome-kit' : null,
+      requestedEffectsForTarget.includes('textEffects') ? 'premium-text-effects-lab' : null,
+      requestedEffectsForTarget.includes('livingBackground') ? 'skyesol-living-background' : null,
+      requestedEffectsForTarget.includes('gsapScroll') ? 'gsap-lenis-scroll-stage' : null
+    ].filter(Boolean);
+for (const recipeId of openSourceRecipeIdsForTarget) {
   toolCalls.push(await callTool('design_open_source_stack', { recipeId }));
 }
 if (!isSkyeGateFS27 && targetHasPublicSource) {
-  for (const patternId of isDesignLab
+  const publicPatternIds = isDesignLab
     ? ['skyesol-living-background', 'neon-motion-chrome', 'editorial-proof-atlas', 'spatial-product-lab', 'kinetic-process-funnel']
-    : ['skyesol-living-background', 'neon-motion-chrome']) {
+    : [
+        requestedEffectsForTarget.includes('livingBackground') ? 'skyesol-living-background' : null,
+        requestedEffectsForTarget.includes('neonScrollbar') ? 'adaptive-neon-scrollbar' : null,
+        requestedEffectsForTarget.includes('motionChrome') ? 'neon-motion-chrome' : null
+      ].filter(Boolean);
+  for (const patternId of publicPatternIds) {
     toolCalls.push(await callTool('design_pattern_pack', { patternId }));
   }
 }

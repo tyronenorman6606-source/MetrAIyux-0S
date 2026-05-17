@@ -59,6 +59,31 @@ const offers = [
     includes: "connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map"
   },
   {
+    planId: "houseoperations-command",
+    productName: "MetrAIyux 0S - HouseOperations Command",
+    description: "Paid HouseOperations command room with task, vendor, owner-alert, proof, tutorial, local SkyeBox vault, and FS27 PIN Gate handoff boundaries.",
+    sourceFolder: "metraiyux_0s_site/HouseOperations",
+    brainOwner: "marcus-vale-brain",
+    prices: [
+      { kind: "setup", nickname: "HouseOperations Command setup", lookupKey: "metraiyux_houseoperations_command_setup", amount: 250000 },
+      { kind: "monthly", nickname: "HouseOperations Command monthly", lookupKey: "metraiyux_houseoperations_command_monthly", amount: 49700, interval: "month" }
+    ],
+    includes: "houseoperations_task_vendor_alert_proof_skyebox_pin_gate_tutorial"
+  },
+  {
+    planId: "houseoperations-managed",
+    productName: "MetrAIyux 0S - HouseOperations Managed",
+    description: "Managed HouseOperations rollout with weekly proof review, multiple local vault handoffs, event mirror policy, and operator handoff.",
+    sourceFolder: "metraiyux_0s_site/HouseOperations",
+    brainOwner: "marcus-vale-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "HouseOperations Managed setup", lookupKey: "metraiyux_houseoperations_managed_setup", amount: 500000 },
+      { kind: "monthly", nickname: "HouseOperations Managed monthly", lookupKey: "metraiyux_houseoperations_managed_monthly", amount: 99700, interval: "month" }
+    ],
+    includes: "managed_houseoperations_weekly_proof_multi_vault_event_mirror_policy"
+  },
+  {
     planId: "routex-workforce-command",
     productName: "MetrAIyux 0S - RouteX Workforce Command",
     description: "Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, jobs, assignments, proof, payments, stops, and reports.",

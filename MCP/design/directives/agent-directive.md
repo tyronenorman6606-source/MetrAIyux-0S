@@ -62,7 +62,7 @@ Required when applicable:
 - UI motion: real `motion` imports or a documented local equivalent.
 - Framer Motion requests: real `framer-motion` imports, or `motion/react` only when the project has standardized on the newer Motion package.
 - R3F spectacle scenes: real `@react-three/fiber`, `@react-three/drei`, and `@react-three/postprocessing` imports.
-- Legal Skyes-style neon chrome: pull `neon-motion-chrome`, not just a scrollbar snippet. The source must include visible custom scrollbar CSS, scroll progress, pointer-reactive polish, and mobile/reduced-motion fallbacks.
+- Neon scrollbar: pull `adaptive-neon-scrollbar` when the user asks for the scrollbar alone. Legal Skyes-style full neon chrome: pull `neon-motion-chrome` when the brief also needs scroll progress, pointer-reactive polish, scanline chrome, and mobile/reduced-motion fallbacks.
 
 Run `design_stack_audit` with the source and `package.json` before claiming the MCP produced advanced work. Run `design_runtime_stack_gate` with source, `package.json`, selected components/required stack, and browser runtime evidence before calling the app done. Run `design_performance_audit` before browser QA so premium motion stays fast, not draggy.
 
@@ -206,7 +206,7 @@ Use these when the art direction asks for a premium digital/product feel:
 - Existing approved logo assets or clean wordmarks; never generic initial badges by default.
 - Neon or glow text effects, shimmer lines, split-line reveals, and chromatic edge accents with restraint.
 - Cursor trail or pointer-reactive accent that does not block inputs.
-- Thicker branded scrollbar with visible slightly opaque track and neon thumb treatment for scroll-led experiences. Never hide it or make it only appear on hover when the user asked for visible scrollbars.
+- Optional thicker branded scrollbar with visible slightly opaque track and neon thumb treatment for requested scroll-led experiences. Never hide it or make it only appear on hover when the user asked for visible scrollbars.
 - Full neon motion chrome when requested: branded scrollbar, scroll progress rail, scanline/grid atmosphere, pointer glow, shimmer title utility, and magnetic hover utility.
 - SkyeSol living backgrounds when requested: fixed transparent canvas or WebGL behind content, aurora bands, gold/violet/cyan particles, pointer or scroll parallax, scanline/grain texture, capped DPR, compact/mobile particle reduction, and reduced-motion fallback. Pull `skyesol-living-background`; do not ship static radial gradients and call them alive.
 - Sticky/persistent scroll cues when the user needs to understand that the page keeps unfolding.

@@ -31,6 +31,8 @@
     const offers={
       'starter-command':'metraiyux-starter-command',
       'growth-cabinet':'metraiyux-growth-cabinet',
+      'houseoperations-command':'metraiyux-houseoperations-command',
+      'houseoperations-managed':'metraiyux-houseoperations-managed',
       'routex-workforce-command':'metraiyux-routex-workforce-command',
       'autonomous-office':'metraiyux-autonomous-office',
       'enterprise-command':'metraiyux-enterprise-command',

@@ -1,0 +1,18 @@
+services:
+  skye-content-forge:
+    build: .
+    container_name: skye-content-forge
+    restart: unless-stopped
+    ports:
+      - "4313:4313"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PROCESS_MANAGER: docker-compose
+      PUBLISHER_AUTORUN: "1"
+      PUBLISHER_POLL_SECONDS: "300"
+    volumes:
+      - ./data:/app/data
+      - ./exports:/app/exports
+      - ./site-build:/app/site-build

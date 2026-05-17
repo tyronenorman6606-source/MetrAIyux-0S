@@ -104,6 +104,69 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       vault_workspace_limit: 3
     }
   },
+  "metraiyux-houseoperations-command": {
+    store_category: "Client app subscriptions",
+    store_rank: 22,
+    trial_days: DEFAULT_TRIAL_DAYS,
+    zero_upfront_trial: true,
+    setup_handling: "deferred_owner_approval",
+    storefront: true,
+    badge: "HouseOps lane",
+    includes: [
+      "HouseOperations command room",
+      "Task/vendor/owner-alert/proof workflows",
+      "SkyeBox local authenticator-vault handoff",
+      "FS27 PIN Gate handoff",
+      "Tutorial and claim-contract proof"
+    ],
+    gate_policy: {
+      monthly_cap_cents: 50000,
+      default_rpm_limit: 60,
+      default_rpd_limit: 1200,
+      max_devices_per_key: 3,
+      require_install_id: true,
+      allowed_providers: ["openai", "gemini"],
+      allowed_models: {
+        openai: ["gpt-4o-mini", "gpt-4o"],
+        gemini: ["gemini-2.5-flash"]
+      },
+      vault_storage_mb: 2048,
+      vault_file_limit: 500,
+      vault_workspace_limit: 1
+    }
+  },
+  "metraiyux-houseoperations-managed": {
+    store_category: "Client app subscriptions",
+    store_rank: 23,
+    trial_days: 0,
+    zero_upfront_trial: false,
+    setup_handling: "owner_approved_after_houseops_scope_review",
+    storefront: true,
+    badge: "Managed HouseOps",
+    includes: [
+      "Up to 3 HouseOperations command rooms",
+      "Managed weekly proof review",
+      "3 SkyeBox vault handoffs",
+      "Custom FS27 event mirror policy",
+      "Operator handoff and billing receipts"
+    ],
+    gate_policy: {
+      monthly_cap_cents: 100000,
+      default_rpm_limit: 120,
+      default_rpd_limit: 3000,
+      max_devices_per_key: 8,
+      require_install_id: true,
+      allowed_providers: ["openai", "gemini", "anthropic"],
+      allowed_models: {
+        openai: ["gpt-4o-mini", "gpt-4o"],
+        gemini: ["gemini-2.5-flash"],
+        anthropic: ["claude-3-5-sonnet-20241022"]
+      },
+      vault_storage_mb: 10240,
+      vault_file_limit: 2500,
+      vault_workspace_limit: 3
+    }
+  },
   "metraiyux-routex-workforce-command": {
     store_category: "Client app subscriptions",
     store_rank: 25,
@@ -314,6 +377,64 @@ export const SKYPAY_OFFERS = [
     ],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "metraiyux-houseoperations-command",
+    plan_name: "houseoperations-command",
+    title: "HouseOperations Command",
+    family: "metraiyux",
+    description: "Paid HouseOperations command room with task, vendor, owner-alert, proof, tutorial, local SkyeBox vault, and FS27 PIN Gate handoff boundaries.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["metraiyux_houseoperations_command_setup", "metraiyux_houseoperations_command_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "MetrAIyux 0S - HouseOperations Command Setup",
+        amount_cents: cents(2500),
+        type: "one_time",
+        lookup_key: "metraiyux_houseoperations_command_setup"
+      },
+      {
+        id: "monthly",
+        name: "MetrAIyux 0S - HouseOperations Command",
+        amount_cents: cents(497),
+        type: "recurring",
+        interval: "month",
+        lookup_key: "metraiyux_houseoperations_command_monthly"
+      }
+    ],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "metraiyux-houseoperations-managed",
+    plan_name: "houseoperations-managed",
+    title: "HouseOperations Managed",
+    family: "metraiyux",
+    description: "Managed HouseOperations rollout with weekly proof review, multiple local vault handoffs, event mirror policy, and operator handoff.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["metraiyux_houseoperations_managed_setup", "metraiyux_houseoperations_managed_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "MetrAIyux 0S - HouseOperations Managed Setup",
+        amount_cents: cents(5000),
+        type: "one_time",
+        lookup_key: "metraiyux_houseoperations_managed_setup"
+      },
+      {
+        id: "monthly",
+        name: "MetrAIyux 0S - HouseOperations Managed",
+        amount_cents: cents(997),
+        type: "recurring",
+        interval: "month",
+        lookup_key: "metraiyux_houseoperations_managed_monthly"
+      }
+    ],
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_houseops_scope_review"
   },
   {
     id: "metraiyux-routex-workforce-command",

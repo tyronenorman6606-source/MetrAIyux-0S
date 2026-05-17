@@ -1,0 +1,26 @@
+name: Skye Content Forge Automation Tick
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+concurrency:
+  group: skye-content-forge-automation
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call live Skye Content Forge scheduler
+        env:
+          APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+          SCHEDULER_API_KEY: ${{ secrets.SCHEDULER_API_KEY }}
+        run: |
+          test -n "$APP_BASE_URL" || (echo "APP_BASE_URL secret is missing" && exit 1)
+          test -n "$SCHEDULER_API_KEY" || (echo "SCHEDULER_API_KEY secret is missing" && exit 1)
+          curl -fsS -X POST "$APP_BASE_URL/api/automation/tick" \
+            -H "Content-Type: application/json" \
+            -H "X-App-Token: $SCHEDULER_API_KEY" \
+            --data '{"source":"github-actions","backup":true}'

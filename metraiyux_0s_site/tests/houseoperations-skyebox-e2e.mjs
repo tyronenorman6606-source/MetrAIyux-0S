@@ -180,6 +180,34 @@ async function checkHouseOperations(page, entry) {
   await page.goto(routeUrl('HouseOperations/runtime.html'), { waitUntil: 'domcontentloaded', timeout: 20000 });
   await assertText(page, entry, 'Runtime Proof');
   await assertText(page, entry, 'SkyeBox Authenticator Vault');
+
+  await page.goto(routeUrl('HouseOperations/tutorial.html'), { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await assertText(page, entry, 'Guided Run');
+  await page.getByRole('button', { name: 'Run Full Tutorial' }).first().click();
+  await assertText(page, entry, 'Create billing intent');
+  await assertText(page, entry, 'Owner alert created.');
+
+  const tutorialDownloadPromise = page.waitForEvent('download', { timeout: 12000 });
+  await page.getByRole('button', { name: 'Export Tutorial Receipt' }).first().click();
+  const tutorialDownload = await tutorialDownloadPromise;
+  const tutorialPath = path.join(artifactDir, `houseoperations-tutorial-${entry.id}.json`);
+  await tutorialDownload.saveAs(tutorialPath);
+  entry.checks.push({ name: 'houseops_tutorial_receipt_download', ok: true, suggested: tutorialDownload.suggestedFilename(), path: tutorialPath });
+
+  await page.goto(routeUrl('HouseOperations/billing.html'), { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await assertText(page, entry, 'Billing Intent');
+  await page.locator('input[name="customer_email"]').fill('buyer@example.com');
+  await page.locator('input[name="company"]').fill('Buyer House Ops');
+  await page.locator('form[data-form="billing"] button[type="submit"]').click();
+  await assertText(page, entry, 'Buyer House Ops');
+  await assertText(page, entry, 'HouseOperations Command');
+
+  const billingDownloadPromise = page.waitForEvent('download', { timeout: 12000 });
+  await page.locator('[data-action="export-billing-intent"]').first().click();
+  const billingDownload = await billingDownloadPromise;
+  const billingPath = path.join(artifactDir, `houseoperations-billing-${entry.id}.json`);
+  await billingDownload.saveAs(billingPath);
+  entry.checks.push({ name: 'houseops_billing_intent_download', ok: true, suggested: billingDownload.suggestedFilename(), path: billingPath });
 }
 
 async function checkSkyeBox(page, entry) {
@@ -227,6 +255,16 @@ async function checkStaticEndpoints(api) {
       failed_requests: []
     });
   }
+
+  const claim = await api.get(routeUrl('HouseOperations/CLAIM_CONTRACT.json'), { timeout: 10000 });
+  const claimJson = await claim.json().catch(() => null);
+  checks.push({
+    id: 'houseoperations-claim-contract',
+    ok: claim.ok() && Array.isArray(claimJson?.claims) && claimJson.claims.length >= 10,
+    checks: [{ name: 'claim_contract_ok', ok: claim.ok() && Array.isArray(claimJson?.claims) && claimJson.claims.length >= 10, status: claim.status(), claims: claimJson?.claims?.length || 0 }],
+    console_errors: [],
+    failed_requests: []
+  });
 
   for (const asset of ['manifest.json', 'sw.js', 'qa_report.md', 'upgrade_notes.md']) {
     const res = await api.get(routeUrl(`HouseOperations/skye-box-authenticator-vault/${asset}`), { timeout: 10000 });

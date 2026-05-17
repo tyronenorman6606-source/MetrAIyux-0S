@@ -196,7 +196,7 @@ const performanceNumberPatterns = {
 };
 const effectToRecipes = {
   cursorTrail: ['framer-motion-interaction-system', 'neon-scrollbar-cursor-trail'],
-  neonScrollbar: ['neon-scrollbar-cursor-trail'],
+  neonScrollbar: ['adaptive-neon-scrollbar'],
   textEffects: ['premium-text-effects-lab'],
   motionChrome: ['neon-motion-chrome-kit', 'framer-motion-interaction-system', 'premium-text-effects-lab'],
   livingBackground: ['skyesol-living-background', 'neon-motion-chrome-kit'],
@@ -818,6 +818,12 @@ function componentPlan({
     ...selectedUseCases.flatMap((item) => item.recipes || []),
     ...selectedEffects.flatMap((effect) => effectToRecipes[effect] || [])
   ])];
+  const optionalRecipeIds = [...new Set([
+    ...selectedUseCases.flatMap((item) => item.optionalRecipes || [])
+  ])].filter((recipeId) => !selectedRecipeIds.includes(recipeId));
+  const optionalEffectIds = [...new Set([
+    ...selectedUseCases.flatMap((item) => item.optionalEffects || [])
+  ])].filter((effect) => !selectedEffects.includes(effect));
   const selectedStack = [...new Set([
     ...normalizeIdList(requiredStack),
     ...selectedUseCases.flatMap((item) => item.stack || []),
@@ -828,6 +834,9 @@ function componentPlan({
   const mandatoryStack = effectiveStackMode === 'full' ? fullStack : selectedStack;
   const recipes = openSourceRecipes();
   const selectedRecipes = selectedRecipeIds
+    .map((recipeId) => (recipes.recipes || []).find((recipe) => recipe.id === recipeId))
+    .filter(Boolean);
+  const optionalRecipes = optionalRecipeIds
     .map((recipeId) => (recipes.recipes || []).find((recipe) => recipe.id === recipeId))
     .filter(Boolean);
 
@@ -841,8 +850,11 @@ function componentPlan({
     missingUseCases,
     selectedComponentIds,
     requestedEffects: selectedEffects,
+    optionalEffects: optionalEffectIds,
     requiredOpenSourceRecipes: selectedRecipeIds,
     selectedRecipes,
+    optionalOpenSourceRecipes: optionalRecipeIds,
+    optionalRecipes,
     selectedStack,
     mandatoryStack,
     fullRuntimeStack: fullStack,
@@ -1506,6 +1518,9 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
       ? ['framerMotion', 'gsap', 'lenis']
       : ['framerMotion'];
   const plan = recipePlan({ product, surface, goal, audience });
+  const wantsNeonScrollbar = plan.requestedEffects.includes('neonScrollbar');
+  const wantsMotionChrome = plan.requestedEffects.includes('motionChrome');
+  const wantsCursorTrail = plan.requestedEffects.includes('cursorTrail');
   const mergedRequiredStack = [...new Set([...requiredStack, ...plan.requiredStack.filter((item) => item !== 'theatre')])];
   const isLuxury = /luxury|bespoke|fifty.?k|\$50k|premium.?agency|high.?end|editorial|flagship/i.test(text);
   const supporting = [
@@ -1517,7 +1532,19 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
   if (isLuxury) {
     supporting.unshift('skye.luxury.singular-visual-thesis', 'skye.luxury.editorial-headline-system', 'skye.luxury.strategic-whitespace', 'skye.motion.staggered-reveal-choreography', 'skye.luxury.custom-easing-signature', 'skye.luxury.bespoke-interaction-layer');
   }
-  supporting.push('skye.fx.text-effects', 'skye.fx.neon-scrollbar', 'skye.fx.neon-motion-chrome', 'skye.fx.cursor-trail', 'client.surface.actual-screenshot-stage', 'client.surface.actual-video-reel', 'skye.brand.existing-logo-system');
+  supporting.push('skye.fx.text-effects');
+  if (wantsNeonScrollbar) supporting.push('skye.fx.neon-scrollbar');
+  if (wantsMotionChrome) supporting.push('skye.fx.neon-motion-chrome');
+  if (wantsCursorTrail) supporting.push('skye.fx.cursor-trail');
+  supporting.push('client.surface.actual-screenshot-stage', 'client.surface.actual-video-reel', 'skye.brand.existing-logo-system');
+  const baseOpenSourceRecipes = isInfrastructure
+    ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'premium-text-effects-lab']
+    : isApp
+      ? ['framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage']
+      : ['framer-motion-interaction-system', 'premium-text-effects-lab'];
+  if (wantsNeonScrollbar) baseOpenSourceRecipes.push('adaptive-neon-scrollbar');
+  if (wantsMotionChrome) baseOpenSourceRecipes.push('neon-motion-chrome-kit');
+  if (wantsCursorTrail) baseOpenSourceRecipes.push('neon-scrollbar-cursor-trail');
   return {
     product,
     surface,
@@ -1533,11 +1560,7 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
     mustUseRecipePlanTool: true,
     advancedStackEnforcement: 'Call design_component_plan, call design_pattern_pack for every implementation pattern, wire the returned files/concepts into source code, then call design_stack_audit and design_runtime_stack_gate with source, package.json, and browser runtime evidence.',
     openSourceRecipeRule: 'Call design_open_source_stack and pick recipes by library/behavior before applying any brand styling.',
-    openSourceRecipes: [...new Set([...(isInfrastructure
-      ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit', 'premium-text-effects-lab']
-      : isApp
-        ? ['framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit']
-        : ['framer-motion-interaction-system', 'neon-motion-chrome-kit', 'premium-text-effects-lab']),
+    openSourceRecipes: [...new Set([...baseOpenSourceRecipes,
       ...(isLuxury ? ['fifty-k-typography-whitespace-system', 'framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'premium-text-effects-lab'] : []),
       ...plan.requiredOpenSourceRecipes])],
     templateSources: templateManifest().templates.map((template) => ({
@@ -1556,8 +1579,8 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
       'Use actual product/app screenshots when the surface itself matters more than illustration.',
       'When proof copy claims a workflow, record the actual browser performing that workflow and render the MP4/WebM proof.',
       'Use premium text effects with restraint: glow, shimmer, reveal, split-line, or chromatic edge only where it raises the composition.',
-      'Use a visible branded scrollbar treatment when the experience is scroll-led.',
-      'When the request references the Legal Skyes neon scrollbar or stronger motion chrome, pull the neon-motion-chrome pattern pack and audit neonScrollbar plus motionChrome.',
+      'Use adaptive-neon-scrollbar only when the user asks for a visible custom scrollbar or the experience is explicitly scroll-led.',
+      'When the request references the Legal Skyes neon scrollbar or stronger motion chrome, pull adaptive-neon-scrollbar for the rail; pull neon-motion-chrome only when cursor/progress/scanline chrome is also wanted.',
       'Use approved logo assets first; reject rounded-square initial badges unless the user explicitly approved that as the logo.',
       'Use first-person operator copy for founder-built products: I built, I route, I show, I keep.',
       'Use cursor trails or pointer-reactive accents only when they improve the premium feel and do not block usability.'

@@ -677,6 +677,67 @@ textarea:focus {
   grid-template-columns: 1fr;
 }
 
+.planGrid,
+.tutorialGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.planCard,
+.lessonCard {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.planCard.active,
+.lessonCard.done {
+  border-color: rgba(100, 214, 138, 0.42);
+  background: rgba(100, 214, 138, 0.08);
+}
+
+.planCard h3,
+.lessonCard h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.planCard strong {
+  font-size: 32px;
+}
+
+.planCard strong span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.planCard p,
+.lessonCard p {
+  margin: 0;
+  color: var(--soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.planCard ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.lessonCard > span {
+  color: var(--cyan);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
 .timeline {
   display: grid;
   gap: 10px;
@@ -820,6 +881,8 @@ textarea:focus {
   .laneGrid,
   .commandDeck,
   .workBoard,
+  .planGrid,
+  .tutorialGrid,
   .bridgeGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -848,6 +911,8 @@ textarea:focus {
   .formGrid,
   .commandDeck,
   .workBoard,
+  .planGrid,
+  .tutorialGrid,
   .bridgeGrid {
     grid-template-columns: 1fr;
   }

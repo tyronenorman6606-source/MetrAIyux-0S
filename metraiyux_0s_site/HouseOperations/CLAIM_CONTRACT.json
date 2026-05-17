@@ -1,0 +1,63 @@
+{
+  "app": "HouseOperations",
+  "version": "1.1.0",
+  "generatedAt": "2026-05-17T00:00:00.000Z",
+  "rule": "Every sellable claim must map to a working local control, export, endpoint, or FS27/SkyePay runtime boundary. If a capability requires deployed FS27 environment variables or database state, the UI must say so.",
+  "claims": [
+    {
+      "id": "task_intake",
+      "claim": "Create and store house tasks.",
+      "proof": "Task form and New Task button write to local HouseOperations state."
+    },
+    {
+      "id": "vendor_intake",
+      "claim": "Create and store vendor requests.",
+      "proof": "Vendor form writes name, request, value, contact, and status."
+    },
+    {
+      "id": "workboard",
+      "claim": "Move work through open, queued, review, and done states.",
+      "proof": "Advance buttons update task/vendor status."
+    },
+    {
+      "id": "owner_alerts",
+      "claim": "Show and resolve owner alerts.",
+      "proof": "Blocked, review, and high-priority tasks render in Alerts and Resolve marks them done."
+    },
+    {
+      "id": "proof_ledger",
+      "claim": "Save proof snapshots.",
+      "proof": "Save Proof writes a proof row with current counts."
+    },
+    {
+      "id": "backup_export",
+      "claim": "Export a HouseOperations backup.",
+      "proof": "Export downloads houseoperations-standalone-backup.json."
+    },
+    {
+      "id": "gate_packet_export",
+      "claim": "Queue and export FS27 mirror packets.",
+      "proof": "Queue Gate Mirror writes packets; export downloads houseoperations-gate-mirror-packet.json."
+    },
+    {
+      "id": "skyebox_vault",
+      "claim": "Open a local encrypted TOTP vault.",
+      "proof": "SkyeBox uses WebCrypto vault encryption, saves a TOTP account, displays codes, and exports encrypted backups."
+    },
+    {
+      "id": "pin_gate",
+      "claim": "Hand off to FS27 Gate ID, PIN, and one-time recovery code flow.",
+      "proof": "FS27 includes PIN setup/login/recovery/rotation functions, redirects, and PIN Gate UI; execution requires FS27 runtime database and email webhook environment."
+    },
+    {
+      "id": "billing_intent",
+      "claim": "Create charge-ready paid plan intent.",
+      "proof": "Billing page records plan, setup/monthly price, SkyePay offer URL, and activation boundary without pretending payment happened."
+    },
+    {
+      "id": "tutorial",
+      "claim": "Run a guided operator tutorial.",
+      "proof": "Tutorial buttons call the same app functions used by dashboard, billing, proof, and Gate-packet flows."
+    }
+  ]
+}
