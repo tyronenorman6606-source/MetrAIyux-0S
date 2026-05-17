@@ -50,17 +50,17 @@
       </nav>
 
       <section class="privacy-card" aria-label="Privacy posture">
-        <p class="eyebrow">No auth. No cloud.</p>
-        <p>Everything saves locally in this browser through IndexedDB. Relay13 can power real messaging when connected, but local fallback stays available when no backend is deployed.</p>
+        <p class="eyebrow">Production-published. Offline-safe.</p>
+        <p>ConnectLog is published in production. The browser vault keeps relationship data available through IndexedDB, and Relay13 is the live production messaging bridge for owned conversations.</p>
       </section>
     </aside>
 
     <main class="workspace" id="top">
       <header class="hero" id="dashboard">
         <div class="hero-copy-stack">
-          <p class="eyebrow">Offline-first connection exchange</p>
+          <p class="eyebrow">Production connection exchange</p>
           <h1>Exchange once. Remember forever. Move before the relationship goes cold.</h1>
-          <p class="hero-copy">A hardened personal relationship OS for contacts, context, tags, notes, timeline events, follow-up dates, contact health scoring, QR profile sharing, QR intake, phone-contact handoff, and seed-folder ingestion. Built to work as a static PWA without auth.</p>
+          <p class="hero-copy">A production-published relationship OS for contacts, context, tags, notes, timeline events, follow-up dates, contact health scoring, QR profile sharing, QR intake, phone-contact handoff, seed-folder ingestion, and Relay13-backed owned messaging.</p>
         </div>
         <figure class="hero-brand-stage" aria-label="ConnectLog visual identity">
           <span class="brand-orbit orbit-one"></span>
@@ -88,7 +88,7 @@
         <div class="intelligence-main">
           <p class="eyebrow">Relationship intelligence</p>
           <h2>Daily mission control for every connection.</h2>
-          <p class="panel-hint">ConnectLog now scores your local network and turns the vault into a command surface: who needs attention, what to say, what to export, and where duplicates are hiding.</p>
+          <p class="panel-hint">ConnectLog scores your production browser vault and turns it into a command surface: who needs attention, what to say, what to export, and where duplicates are hiding.</p>
           <div class="mission-brief" id="missionBrief" aria-live="polite"></div>
           <div class="intelligence-actions">
             <button class="primary-btn small" id="exportAgendaBtn" type="button">Export today agenda</button>
@@ -167,17 +167,17 @@
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Relay13 bridge</p>
-            <h2>Real inbox when Relay13 is live. Local fallback when it is not.</h2>
-            <p class="panel-hint">ConnectLog stays its own contact/card product. Relay13 stays its own messaging product. This adapter lets cards open conversations through Relay13 without removing the offline vault or fallback inbox.</p>
+            <h2>Relay13 production inbox with offline vault resilience.</h2>
+            <p class="panel-hint">ConnectLog is the production relationship/card app. Relay13 is the live messaging backend. This adapter lets cards open owned conversations through Relay13 while the browser vault remains available when an operator is offline.</p>
           </div>
-          <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Local fallback ready.</div>
+          <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Relay13 production bridge ready.</div>
         </div>
 
         <div class="relay-grid">
           <article class="relay-card relay-settings-card">
             <p class="eyebrow">Connection settings</p>
             <div class="form-grid two">
-              <label>Mode<select id="relayModeInput"><option value="local">Local fallback only</option><option value="relay13">Relay13 remote + local fallback</option></select></label>
+              <label>Mode<select id="relayModeInput"><option value="local">Offline vault only</option><option value="relay13">Relay13 production + offline vault</option></select></label>
               <label>Relay13 Worker origin<input id="relayOriginInput" type="text" maxlength="240" placeholder="your Relay13 Worker origin" autocomplete="off" /></label>
               <label>Public workspace slug<input id="relayWorkspaceInput" type="text" maxlength="80" placeholder="connectlog-main" autocomplete="off" /></label>
               <label>Workspace ID<input id="relayWorkspaceIdInput" type="text" maxlength="120" placeholder="Optional for operator API calls" autocomplete="off" /></label>
@@ -190,7 +190,7 @@
               <button class="ghost-btn small" id="relayHealthBtn" type="button">Health check</button>
               <button class="ghost-btn small" id="relayOpenAdminBtn" type="button">Open Relay13 admin</button>
             </div>
-            <p class="panel-hint">Use local mode until Relay13 is deployed. Once a Worker origin exists, health check proves the remote is reachable before any message is trusted.</p>
+            <p class="panel-hint">Relay13 is deployed in production. Use the health check to confirm the configured Worker origin from this browser before sending operator messages.</p>
           </article>
 
 
@@ -198,7 +198,7 @@
           <article class="relay-card relay-ops-card">
             <p class="eyebrow">Bridge operations</p>
             <h3>Sync the card registry before trusting inbox routing.</h3>
-            <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They do not merge the products and they do not disable local fallback.</p>
+            <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They do not merge the products and they do not disable offline vault resilience.</p>
             <div class="exchange-actions compact-row">
               <button class="ghost-btn small" id="relayBridgeHealthBtn" type="button">Bridge health</button>
               <button class="ghost-btn small" id="relaySyncCardBtn" type="button">Sync active card</button>
@@ -233,16 +233,16 @@
           </article>
 
           <article class="relay-card relay-fallback-card">
-            <p class="eyebrow">Fallback ledger</p>
+            <p class="eyebrow">Offline resilience ledger</p>
             <h3>No fake delivery claims.</h3>
-            <p class="panel-hint">If Relay13 is not deployed, unreachable, or missing credentials, messages are marked local/queued instead of being claimed as delivered.</p>
+            <p class="panel-hint">If Relay13 credentials are missing or a browser cannot reach the Worker, messages are marked offline/queued instead of being claimed as delivered.</p>
             <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
           </article>
 
           <article class="relay-card relay-proof-card wide">
             <p class="eyebrow">Live proof console</p>
             <h3>Activation proof, stats, message-history pull, and WebSocket proof commands.</h3>
-            <p class="panel-hint">This box fills with local diagnostics by default. Activation proof mutates Relay13 only when a real origin, workspace, and scoped key are present. WebSocket proof is still not a fake pass until the deployed Worker opens and echoes events.</p>
+            <p class="panel-hint">This box fills with browser diagnostics by default. Activation proof writes to Relay13 only when a real origin, workspace, and scoped key are present. WebSocket proof is not a pass until the deployed Worker opens and echoes events.</p>
             <div class="exchange-actions compact-row proof-actions"><button class="primary-btn small" id="relayRunActivationProofBtn" type="button">Run activation proof</button><button class="ghost-btn small" id="relayCopyActivationCurlBtn" type="button">Copy activation curl</button></div>
             <textarea id="relayProofOutput" readonly rows="11" spellcheck="false" aria-label="Relay13 proof output"></textarea>
           </article>
@@ -253,8 +253,8 @@
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Production Proof Command Center</p>
-            <h2>ConnectLog is local-first, and Relay13 is live with production proof.</h2>
-            <p class="panel-hint">This operator panel keeps diagnostics, fallback rules, copyable runbooks, and live verification in one place. Local mode stays available, while Relay13 delivery is backed by the deployed Worker health, D1 workspace, scoped key, activation run, message-history pull, and WebSocket proof receipts.</p>
+            <h2>ConnectLog is published in production, and Relay13 is live with production proof.</h2>
+            <p class="panel-hint">This operator panel keeps diagnostics, offline-vault rules, copyable runbooks, and live verification in one place. Relay13 delivery is backed by the deployed Worker health, D1 workspace, scoped key, activation run, message-history pull, and WebSocket proof receipts.</p>
           </div>
           <div class="exchange-actions compact-row">
             <button class="primary-btn small" id="runLocalDiagnosticsBtn" type="button">Run diagnostics</button>

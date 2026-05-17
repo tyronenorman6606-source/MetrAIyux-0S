@@ -103,11 +103,12 @@ const LIVE_SURFACES = [
 ];
 
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data, null, 2), {status, headers: {'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*', 'access-control-allow-methods':'GET,POST,OPTIONS', 'access-control-allow-headers':'content-type,authorization,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id'}});
+  return new Response(JSON.stringify(data, null, 2), {status, headers: {'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*', 'access-control-allow-methods':'GET,POST,PUT,DELETE,OPTIONS', 'access-control-allow-headers':'content-type,authorization,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-skye-gate-session,x-skye-gate-source,x-skye-media-center-free99'}});
 }
 async function readJson(request) { try { return await request.json(); } catch { return {}; } }
 function bearer(request){
-  return (request.headers.get('authorization') || '').replace(/^Bearer\s+/i,'').trim();
+  const raw = request.headers.get('authorization') || request.headers.get('x-skye-gate-session') || '';
+  return raw.replace(/^Bearer\s+/i,'').trim();
 }
 function skygateOrigin(env){
   return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || '').replace(/\/+$/,'');

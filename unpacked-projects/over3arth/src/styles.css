@@ -3265,11 +3265,38 @@ html {
   --worldskin-cyan: 97, 246, 255;
   --worldskin-gold: 244, 199, 91;
   --worldskin-violet: 154, 105, 255;
+  --entity-neon-a: 97, 246, 255;
+  --entity-neon-b: 244, 199, 91;
+  --entity-neon-c: 154, 105, 255;
   --vessel-gate-x: calc(-50vw + 118px);
   --vessel-gate-y: -10vh;
   position: relative;
   overflow: hidden;
   background: #020203;
+}
+
+.worldskin-scene[data-brain="overearth"] {
+  --entity-neon-a: 244, 199, 91;
+  --entity-neon-b: 97, 246, 255;
+  --entity-neon-c: 255, 66, 214;
+}
+
+.worldskin-scene[data-voice="listening"] {
+  --entity-neon-a: 0, 255, 204;
+  --entity-neon-b: 77, 171, 255;
+  --entity-neon-c: 209, 92, 255;
+}
+
+.worldskin-scene[data-voice="speaking"] {
+  --entity-neon-a: 255, 54, 210;
+  --entity-neon-b: 97, 246, 255;
+  --entity-neon-c: 244, 255, 120;
+}
+
+.worldskin-scene[data-thinking="true"] {
+  --entity-neon-a: 172, 94, 255;
+  --entity-neon-b: 0, 255, 214;
+  --entity-neon-c: 255, 208, 92;
 }
 
 .worldskin-viewport {
@@ -3339,14 +3366,12 @@ html {
 }
 
 .worldskin-entity-aura {
-  inset: -18%;
+  inset: -34%;
   z-index: 0;
   isolation: isolate;
   mix-blend-mode: screen;
-  opacity: 0.86;
-  filter:
-    drop-shadow(0 0 34px rgba(var(--worldskin-cyan), 0.2))
-    drop-shadow(0 0 22px rgba(var(--worldskin-gold), 0.14));
+  opacity: 0.52;
+  filter: saturate(1.18);
   animation: worldEntityAura 5.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
@@ -3355,41 +3380,42 @@ html {
 }
 
 .worldskin-entity-aura__shell {
+  inset: 5%;
   background:
-    radial-gradient(circle, transparent 54%, rgba(var(--worldskin-cyan), 0.2) 60%, rgba(var(--worldskin-gold), 0.14) 66%, transparent 74%),
-    conic-gradient(from 120deg, rgba(var(--worldskin-cyan), 0.02), rgba(var(--worldskin-gold), 0.28), rgba(var(--worldskin-violet), 0.16), rgba(var(--worldskin-cyan), 0.24), rgba(var(--worldskin-cyan), 0.02));
-  -webkit-mask-image: radial-gradient(circle, transparent 49%, #000 57%, #000 72%, transparent 80%);
-  mask-image: radial-gradient(circle, transparent 49%, #000 57%, #000 72%, transparent 80%);
+    radial-gradient(circle at 50% 50%, transparent 0 43%, rgba(var(--entity-neon-a), 0.08) 53%, transparent 72%),
+    radial-gradient(circle at 18% 42%, rgba(var(--entity-neon-a), 0.32), transparent 30%),
+    radial-gradient(circle at 82% 56%, rgba(var(--entity-neon-c), 0.28), transparent 31%),
+    radial-gradient(circle at 52% 15%, rgba(var(--entity-neon-b), 0.24), transparent 25%),
+    radial-gradient(circle at 50% 92%, rgba(var(--entity-neon-a), 0.18), transparent 28%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 37%, #000 48%, #000 84%, transparent 94%);
+  mask-image: radial-gradient(circle, transparent 0 37%, #000 48%, #000 84%, transparent 94%);
+  filter: blur(18px) saturate(1.22);
+  opacity: 0.92;
+  animation: worldEntityNeonShift 8.5s linear infinite;
 }
 
 .worldskin-entity-aura__voice {
-  inset: 8%;
-  border: 1px solid rgba(var(--worldskin-cyan), 0.18);
+  inset: 9%;
+  border: 1px solid rgba(var(--entity-neon-a), 0.1);
   background:
-    repeating-conic-gradient(from 0deg, rgba(var(--worldskin-cyan), 0.22) 0deg 1.6deg, transparent 1.6deg 10deg),
-    radial-gradient(circle, transparent 57%, rgba(255, 255, 255, 0.12) 61%, transparent 69%);
-  -webkit-mask-image: radial-gradient(circle, transparent 50%, #000 58%, #000 66%, transparent 73%);
-  mask-image: radial-gradient(circle, transparent 50%, #000 58%, #000 66%, transparent 73%);
-  opacity: 0.32;
-  animation: worldEntityVoice 9s linear infinite;
+    repeating-conic-gradient(from 0deg, rgba(var(--entity-neon-a), 0.18) 0deg 1deg, transparent 1deg 13deg),
+    radial-gradient(circle, transparent 0 62%, rgba(var(--entity-neon-b), 0.1) 66%, transparent 74%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 58%, #000 66%, #000 70%, transparent 76%);
+  mask-image: radial-gradient(circle, transparent 0 58%, #000 66%, #000 70%, transparent 76%);
+  opacity: 0.2;
+  filter: blur(0.3px);
+  animation: worldEntityVoice 11s linear infinite;
 }
 
 .worldskin-entity-aura__sweep {
-  inset: 3%;
-  background: conic-gradient(from -35deg, transparent 0 69%, rgba(255, 255, 255, 0.32) 73%, rgba(var(--worldskin-gold), 0.22) 77%, transparent 84% 100%);
-  -webkit-mask-image: radial-gradient(circle, transparent 42%, #000 56%, transparent 73%);
-  mask-image: radial-gradient(circle, transparent 42%, #000 56%, transparent 73%);
-  opacity: 0.34;
-  animation: worldEntitySweep 7.4s linear infinite;
-}
-
-.worldskin-entity-aura__core {
-  inset: 32%;
+  inset: 0;
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.22), rgba(var(--worldskin-cyan), 0.16) 38%, rgba(var(--worldskin-gold), 0.12) 58%, transparent 72%);
-  filter: blur(8px);
-  opacity: 0.42;
-  animation: worldEntityCore 3.8s ease-in-out infinite;
+    conic-gradient(from -35deg, transparent 0 70%, rgba(255, 255, 255, 0.2) 74%, rgba(var(--entity-neon-c), 0.2) 79%, transparent 86% 100%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 54%, #000 66%, transparent 82%);
+  mask-image: radial-gradient(circle, transparent 0 54%, #000 66%, transparent 82%);
+  opacity: 0.22;
+  filter: blur(1.4px);
+  animation: worldEntitySweep 7.4s linear infinite;
 }
 
 .worldskin-pulse-field {
@@ -3408,7 +3434,7 @@ html {
   height: calc(var(--globe-size) * 0.72);
   translate: -50% -50%;
   border-radius: 999px;
-  background: linear-gradient(180deg, transparent, rgba(var(--worldskin-cyan), 0.28), rgba(var(--worldskin-gold), 0.18), transparent);
+  background: linear-gradient(180deg, transparent, rgba(var(--entity-neon-a), 0.28), rgba(var(--entity-neon-b), 0.18), transparent);
   opacity: 0.1;
   rotate: var(--vein-tilt, 0deg);
   animation: worldskinVein 5.8s ease-in-out infinite;
@@ -3431,27 +3457,24 @@ html {
 }
 
 .worldskin-scene[data-brain="overearth"] .worldskin-entity-aura {
-  opacity: 1;
-  filter:
-    drop-shadow(0 0 44px rgba(var(--worldskin-gold), 0.24))
-    drop-shadow(0 0 36px rgba(var(--worldskin-cyan), 0.22));
+  opacity: 0.68;
 }
 
 .worldskin-scene[data-voice="listening"] .worldskin-entity-aura__voice,
 .worldskin-scene[data-thinking="true"] .worldskin-entity-aura__voice {
-  opacity: 0.7;
+  opacity: 0.48;
   animation-duration: 4.6s;
 }
 
 .worldskin-scene[data-voice="speaking"] .worldskin-entity-aura,
 .worldskin-scene[data-thinking="true"] .worldskin-entity-aura {
-  opacity: 1;
+  opacity: 0.78;
   animation-duration: 3.2s;
 }
 
 .worldskin-scene[data-voice="speaking"] .worldskin-entity-aura__sweep,
 .worldskin-scene[data-thinking="true"] .worldskin-entity-aura__sweep {
-  opacity: 0.74;
+  opacity: 0.56;
   animation-duration: 3.4s;
 }
 
@@ -4636,12 +4659,6 @@ html {
   line-height: 1.4;
 }
 
-.worldskin-scene[data-brain="overearth"] .spectacle-globe {
-  filter:
-    drop-shadow(0 0 54px rgba(97, 246, 255, 0.28))
-    drop-shadow(0 0 34px rgba(244, 199, 91, 0.16));
-}
-
 .worldskin-scene[data-brain="vessel"] .spectacle-being {
   filter:
     drop-shadow(0 0 38px rgba(97, 246, 255, 0.98))
@@ -4947,9 +4964,11 @@ html {
   to { rotate: 350deg; }
 }
 
-@keyframes worldEntityCore {
-  0%, 100% { scale: 0.9; opacity: 0.3; }
-  50% { scale: 1.16; opacity: 0.58; }
+@keyframes worldEntityNeonShift {
+  0% { filter: blur(18px) saturate(1.2) hue-rotate(0deg); }
+  33% { filter: blur(20px) saturate(1.36) hue-rotate(42deg); }
+  66% { filter: blur(18px) saturate(1.28) hue-rotate(-34deg); }
+  100% { filter: blur(18px) saturate(1.2) hue-rotate(0deg); }
 }
 
 @keyframes worldskinVein {

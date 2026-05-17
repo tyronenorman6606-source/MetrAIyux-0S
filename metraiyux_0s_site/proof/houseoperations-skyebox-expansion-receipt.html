@@ -15,6 +15,8 @@
       <a href="../live/houseoperations-skyebox-operator-proof.html">Expansion Hub</a>
       <a href="../HouseOperations/index.html">HouseOperations</a>
       <a href="../HouseOperations/skye-box-authenticator-vault/index.html">SkyeBox</a>
+      <a href="../HouseOperations/tutorial.html">Tutorial</a>
+      <a href="../HouseOperations/billing.html">Billing</a>
       <a href="../operator/index.html">Operator</a>
     </nav>
   </header>
@@ -27,6 +29,8 @@
       <div class="hero-actions">
         <a class="button primary" href="../HouseOperations/index.html">Open app</a>
         <a class="button" href="../HouseOperations/skye-box-authenticator-vault/index.html">Open vault</a>
+        <a class="button" href="../HouseOperations/tutorial.html">Run tutorial</a>
+        <a class="button" href="../HouseOperations/billing.html">Open billing</a>
       </div>
     </section>
 
@@ -38,7 +42,10 @@
           <tbody>
             <tr><td>Archive integrity</td><td>Passed</td><td><code>unzip -t</code> reported no errors before extraction.</td></tr>
             <tr><td>Archive removal</td><td>Passed</td><td>The original SkyeBox zip was removed after extraction.</td></tr>
-            <tr><td>HouseOperations shell</td><td>Passed</td><td>Eight app pages plus nine static runtime endpoints are present under <code>HouseOperations/</code>.</td></tr>
+            <tr><td>HouseOperations shell</td><td>Passed</td><td>Ten app pages plus nine static runtime endpoints are present under <code>HouseOperations/</code>.</td></tr>
+            <tr><td>Claim contract</td><td>Passed</td><td><code>CLAIM_CONTRACT.json</code> maps sellable claims to controls, exports, endpoints, or FS27/SkyePay boundaries.</td></tr>
+            <tr><td>Tutorial runbook</td><td>Passed</td><td><code>tutorial.html</code> executes the real task, vendor, alert, proof, gate-packet, and billing-intent workflows.</td></tr>
+            <tr><td>Billing intent</td><td>Passed</td><td><code>billing.html</code> records HouseOperations Command/Managed plan, setup/monthly price, SkyePay URL, and activation boundary.</td></tr>
             <tr><td>SkyeBox static validation</td><td>Passed</td><td><code>node proof/static_validation.mjs</code> passes inside the vault folder.</td></tr>
             <tr><td>TOTP crypto vectors</td><td>Passed</td><td><code>node proof/totp_crypto_vector_test.mjs</code> passes RFC-style TOTP and AES-GCM roundtrip checks.</td></tr>
             <tr><td>Service worker cache</td><td>Corrected</td><td>The cache manifest now references lowercase <code>qa_report.md</code> and <code>upgrade_notes.md</code>, matching the extracted files.</td></tr>
@@ -53,7 +60,8 @@
       <div class="route-grid">
         <a class="route-card" href="../live/houseoperations-skyebox-operator-proof.html"><h3>0S expansion hub</h3><p>Public/operator explanation, app links, commercial-scope decision, and boundary language.</p></a>
         <a class="route-card" href="../pricing/index.html"><h3>Pricing surface</h3><p>Held-rate plan cards now list HouseOperations and SkyeBox scope by tier.</p></a>
-        <a class="route-card" href="../saas/pricing.html"><h3>SaaS pricing surface</h3><p>Customer plan comparison now includes house operations workspace and operator vault limits.</p></a>
+        <a class="route-card" href="../saas/pricing.html"><h3>SaaS pricing surface</h3><p>Customer plan comparison now includes standalone HouseOperations Command and Managed SkyePay offers.</p></a>
+        <a class="route-card" href="../HouseOperations/CLAIM_CONTRACT.json"><h3>Claim contract</h3><p>Machine-readable truth map for every claim the app is allowed to make.</p></a>
         <a class="route-card" href="../operator/index.html"><h3>Operator surface</h3><p>Internal launch control routes to HouseOperations, SkyeBox, and this receipt.</p></a>
       </div>
     </section>
@@ -61,7 +69,7 @@
     <section class="section crown-band">
       <p class="eyebrow">No-overclaim boundary</p>
       <h2>This receipt proves local browser workflows, not managed custody.</h2>
-      <p class="wide">SkyeBox is an encrypted local PWA. It does not sync secrets to a server, recover a lost vault password, replace enterprise credential policy, or prove a deployed managed authenticator service. HouseOperations is a static local-state command app until a separate Worker/D1/KV persistence scope is approved and tested.</p>
+      <p class="wide">SkyeBox is an encrypted local PWA. It does not sync secrets to a server, recover a lost vault password, replace enterprise credential policy, or prove a deployed managed authenticator service. HouseOperations is a static local-state command app; SkyePay/FS27 owns paid checkout, owner approval, plan policy, and activation. Cloud persistence still requires a separate Worker/D1/KV persistence scope.</p>
     </section>
   </main>
   <footer><p>MetrAIyux 0S · HouseOperations + SkyeBox proof receipt</p></footer>
