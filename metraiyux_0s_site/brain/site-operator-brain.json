@@ -5,7 +5,7 @@
   "title": "MetrAIyux 0S business automation Conductor & Website Operations Brain",
   "cabinet": "Site Operations / Autonomous Command",
   "portrait": "assets/executive-team-poster.png",
-  "version": "1.0.0",
+  "version": "1.1.0-live-review-routing",
   "total_connected_brains": 16,
   "total_system_brains": 16,
   "mode": "lightweight-router-first",
@@ -41,7 +41,20 @@
     "worker",
     "queue",
     "durable object",
-    "kv"
+    "kv",
+    "obsidian",
+    "vault sync",
+    "command runner",
+    "0s command",
+    "review",
+    "reviews",
+    "testimonial",
+    "testimonials",
+    "feedback",
+    "customer experience",
+    "proof wall",
+    "review intake",
+    "0s review qa"
   ],
   "can_answer": [
     "Which cabinet brain should handle an incoming request",
@@ -51,13 +64,18 @@
     "Which live proof surface should be shown to a buyer",
     "How MetrAIyux 0S and SkyeGateFS27 connect for client deployments",
     "How to explain the system as sovereign web infrastructure without exposing private admin setup",
-    "How to operate the 16-brain system without pretending it is fully autonomous legal/business authority"
+    "How to operate the 17-brain system without pretending it is fully autonomous legal/business authority",
+    "Where to send a client who wants to leave a review or talk about their experience",
+    "Where to send a prospect who wants client proof, testimonials, or the Skyes Over London review wall",
+    "How the 0S review QA and five-review production batching rule works"
   ],
   "must_not_claim": [
     "That it can legally run the company without a human operator",
     "That fictional executives are real appointed officers",
     "That it can sign contracts, hire, fire, file incorporation documents, or provide legal advice by itself",
-    "That Cloudflare KV/Queues/Durable Objects are configured until the operator creates bindings and deploys"
+    "That Cloudflare KV/Queues/Durable Objects are configured until the operator creates bindings and deploys",
+    "That unapproved review submissions are public proof",
+    "That customer feedback can bypass 0S QA, consent review, or the five-review production batch rule"
   ],
   "routes": [
     {
@@ -103,6 +121,12 @@
       "create_task": "Technology, deployment, automation, or site operation review"
     },
     {
+      "intent": "operator_command_or_obsidian_sync",
+      "route_to": "orion-hayes-brain",
+      "secondary": "victor-saint-brain",
+      "create_task": "Choose the allowlisted local 0S operator command from repo-local docs, run it through the local command runner, and create validation/proof notes after completion"
+    },
+    {
       "intent": "marketing_or_content",
       "route_to": "valentina-reyes-brain",
       "secondary": "victor-saint-brain",
@@ -137,6 +161,38 @@
       "route_to": "gray-london-skyes-brain",
       "secondary": "central-company-command-brain",
       "create_task": "Founder strategy and executive command review"
+    },
+    {
+      "intent": "client_review_or_feedback",
+      "route_to": "adrian-cross-brain",
+      "secondary": "victor-saint-brain",
+      "create_task": "Route the client to the live review intake, capture consent/proof notes, and queue 0S QA before any public proof-wall publication",
+      "triggers": [
+        "review",
+        "reviews",
+        "testimonial",
+        "feedback",
+        "customer experience",
+        "client experience",
+        "leave a review",
+        "submit review",
+        "talk about experience"
+      ]
+    },
+    {
+      "intent": "review_wall_sales_proof",
+      "route_to": "celeste-monroe-brain",
+      "secondary": "valentina-reyes-brain",
+      "create_task": "Send proof-seeking buyers to the Skyes Over London Reviews Proof Wall and frame the wall as public social proof without inventing claims",
+      "triggers": [
+        "proof wall",
+        "client proof",
+        "social proof",
+        "testimonials",
+        "what do clients say",
+        "reviews wall",
+        "customer proof"
+      ]
     }
   ]
 }
