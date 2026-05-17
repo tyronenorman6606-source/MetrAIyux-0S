@@ -1,10 +1,16 @@
 # SkyeVault-Drop
 
-SkyeVault-Drop is the live Netlify-deployed intake platform for receiving client documents, website assets, images, zip packages, source files, and large video files directly into the private Cloudflare R2 vault.
+SkyeVault-Drop is the live Netlify-deployed intake platform for receiving client documents, website assets, images, zip packages, source files, large video files, workspace snapshots, and Git-level repo handoff material directly into the private Cloudflare R2 vault.
 
 This is not a SaaS product. It is an operator-owned upload portal for project intake.
 
-## What is stronger in v1.9
+## What is stronger in v2.3
+
+- v2.3 adds the Git-level SkyeVault remote lane beside the archive upload lane: smart HTTP push/fetch/clone against persistent bare repos, Gate-scoped workspace auth, role boundaries, branch policy, protected tag handling, quota APIs, verified snapshots, bundle exports, restore verification, CLI commands, Git credential helper, SSH forced-command wrapper, and per-workspace 0S neural maps.
+- A developer downloading from the Git remote gets a normal full clone of the pushed repository refs, not a loose folder dump.
+- SkyeVault can now represent each workspace as its own account graph: repos, ref changes, upload receipts, graph nodes, tracked bytes, and change timeline stay attached to that workspace instead of being merged into a single global customer blob.
+
+## What is stronger in v2.2
 
 - v2.2 adds a documented repository snapshot lane: source repos can include a `vault:dry-run` / `vault:push` helper that builds a sanitized zip, excludes secrets/generated junk, uploads through this vault, and stores a receipt JSON.
 - Protected operator entry at `/operator.html`; `/admin.html` and `/setup.html` are now served through Netlify Functions instead of shipped as public static HTML.
@@ -73,9 +79,9 @@ Flow:
 
 Do not link `/admin.html` or `/setup.html` from client-facing websites.
 
-## Repository snapshot lane
+## Repository snapshot and Git remote lanes
 
-SkyeVault-Drop can receive a whole source repository as one sanitized zip package. This is not a Git remote and it does not replace GitHub. It is a receipt-backed vault intake route for preserving a workspace snapshot, handoff package, deploy bundle, or client archive.
+SkyeVault-Drop can receive a whole source repository as one sanitized zip package, and the wider SkyeVault stack can also run as a Git smart HTTP remote. Use the archive lane for handoff packages, deploy bundles, client delivery zips, or recovery snapshots. Use the Git remote lane when developers need normal Git behavior: clone, fetch, push, branch policy, snapshots, bundle export, and restore.
 
 In a source repo that has the helper installed:
 
@@ -105,6 +111,16 @@ SKYEVAULT_PROJECT_NAME="Repository safe vault snapshot"
 ```
 
 `CLIENT_PORTAL_KEY` in the vault package `.env` also works for local operator machines. Keep portal keys out of committed files.
+
+For active repo remotes, run the Git remote service from the repo root:
+
+```bash
+SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
+node tools/skyevault-cli.mjs login --remote-url=http://127.0.0.1:8787 --token="$SKYEVAULT_GIT_REMOTE_TOKEN" --workspace=acme
+node tools/skyevault-cli.mjs clone app ./app
+```
+
+The Git remote stores persistent bare repositories, so a developer download is a full clone of the repo refs that were pushed into the vault. The archive lane remains the safer choice for one-off sanitized source packages.
 
 ## Required environment variables
 

@@ -56,7 +56,7 @@ I want to be upfront about something because I've seen too many "AI-powered" too
 
 The brain routing layer in MetrAIyux 0S is not a large language model.
 
-It's a structured command classifier. It routes inputs to functional domains — CEO/Ops, Sales, Legal, Finance, HR, Technology, and the rest of the 16-brain cabinet — based on deterministic pattern matching. Same command in, same routing outcome, every time.
+It's a structured command classifier. It routes inputs to functional domains — CEO/Ops, Sales, Legal, Finance, HR, Technology, and the rest of the 17-brain cabinet — based on deterministic pattern matching. Same command in, same routing outcome, every time.
 
 That's intentional.
 
@@ -121,7 +121,7 @@ Things MetrAIyux 0S will never do automatically, regardless of what the brain re
 
 I noticed [Company] is in [industry/city]. I run a company in a similar space and I've been talking to operators who have the same problem we had: everything lands on one person, there's no documented routing, and when you need to show enterprise buyers or a government agency how you run — you don't have much to show.
 
-I built an operating system for this. It's called MetrAIyux 0S. It routes every company command through a named functional layer, gates anything risky behind approval, and logs a proof receipt for everything that happens. It runs on Cloudflare, deploys without a dev team, and the full thing — 522 pages, 6 Workers, brain routing, security gateway — is in one package.
+I built an operating system for this. It's called MetrAIyux 0S. It routes every company command through a named functional layer, gates anything risky behind approval, and logs a proof receipt for everything that happens. It runs on Cloudflare, deploys without a dev team, and the full thing — 522 pages, 9 Workers, brain routing, security gateway — is in one package.
 
 I'm not pitching you on a SaaS subscription. I'm asking if this is a problem you're actually dealing with and whether you'd want to take 20 minutes to look at what we built.
 
@@ -186,7 +186,7 @@ Let me walk you through how it actually works."
 
 ### Short body copy variants
 - "MetrAIyux 0S routes every company command through a named functional brain, blocks risky actions behind approval, and logs a receipt for everything. Cloudflare-hosted. No build step."
-- "Built for service companies that need enterprise operating credibility without enterprise headcount. 522 pages. 6 Workers. 16 brains. One deployment."
+- "Built for service companies that need enterprise operating credibility without enterprise headcount. 522 pages. 9 Workers. 17 brains. One deployment."
 - "If you build for business clients, you can resell MetrAIyux 0S as your own product. White-label licensing on Autonomous Office tier. Deploy once. Bill monthly."
 
 ### CTA variants

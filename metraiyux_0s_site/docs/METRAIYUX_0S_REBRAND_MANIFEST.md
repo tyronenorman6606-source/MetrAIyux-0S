@@ -24,7 +24,7 @@ This package has been rebranded so the overall platform identity is now **MetrAI
 - Security/QA assistant: 0meg4kAI
 - Customer side: tenant-isolated SaaS workspaces
 - Operating model: 13-cabinet office structure
-- Brain count: 16 operating brains
+- Brain count: 17 operating brains
 - Deployment path: static site + Cloudflare Workers + D1 + KV + Queues + Resend approval emails
 
 ## Safety and deployment boundary
