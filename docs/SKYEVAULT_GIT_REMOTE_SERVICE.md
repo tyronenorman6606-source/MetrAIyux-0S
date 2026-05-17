@@ -130,6 +130,20 @@ Inspect local operator state:
 npm run vault:ledger
 ```
 
+Feed SkyeVault state into the MetrAIyux 0S brain map:
+
+```bash
+npm run vault:0s:map
+```
+
+That writes `metraiyux_0s_site/brain/skyevault-vault-map.json`. The 0S local brain loads that file alongside the Obsidian sync, live-surface registry, persona registry, and sales registry. The direct admin surface is:
+
+```text
+metraiyux_0s_site/admin/skyevault-neural-map.html
+```
+
+The generated map is public-safe by default: it keeps counts, repo refs, commit heads, event shape, receipt fingerprints, and graph nodes, but does not emit raw tokens, raw session IDs, full receipt IDs, author emails, absolute storage paths, or file bodies.
+
 ## Proof
 
 Run an end-to-end proof:

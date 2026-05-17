@@ -51,6 +51,14 @@ npm run vault:git:remote:proof
 
 The remote service gives developers normal `git push`, `git fetch`, and `git clone` behavior against a vault URL, plus an authenticated operator console at `/__skyevault/ui`. Operators can inspect refs/events/neural maps and export a cloneable Git bundle from the API when a portable download is needed.
 
+To attach SkyeVault activity to the existing MetrAIyux 0S brain map:
+
+```bash
+npm run vault:0s:map
+```
+
+Open `metraiyux_0s_site/admin/skyevault-neural-map.html` to inspect the generated repo/upload graph.
+
 See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
 
 For a client-owned vault, set these in that client's repo or shell:

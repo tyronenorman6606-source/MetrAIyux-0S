@@ -93,6 +93,14 @@ The same service exposes an authenticated operator console and API:
 
 The end-to-end proof verifies push, clone, fetch, protected-branch force-push rejection, UI rendering, API access, bundle export, and clone-from-bundle restore.
 
+SkyeVault can also feed the existing MetrAIyux 0S neural map:
+
+```bash
+npm run vault:0s:map
+```
+
+That bridge writes `metraiyux_0s_site/brain/skyevault-vault-map.json`, which the 0S local brain loads as repo/change context. The direct admin view is `metraiyux_0s_site/admin/skyevault-neural-map.html`.
+
 ## Audit
 
 Read local operator state:
