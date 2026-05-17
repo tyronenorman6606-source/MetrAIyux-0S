@@ -67,6 +67,24 @@ Operators can force exact sanitized overlay only when intended:
 npm run vault:git:restore -- --restore=/path/to/pack.zip --to=/workspace/repo --delete-missing
 ```
 
+## Git Remote Service
+
+For true Git push/fetch behavior, run the smart HTTP remote service:
+
+```bash
+SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
+```
+
+Then developers can use:
+
+```bash
+git remote add vault http://x-token:${SKYEVAULT_GIT_REMOTE_TOKEN}@127.0.0.1:8787/acme/repo.git
+git push vault main
+git fetch vault
+```
+
+The remote service stores bare repos, writes ref-update ledgers, and emits neural-map JSON from `post-receive` hooks. See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
+
 ## Audit
 
 Read local operator state:

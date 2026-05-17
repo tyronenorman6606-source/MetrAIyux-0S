@@ -4,14 +4,15 @@ import path from 'node:path';
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const outDir = path.join(root, '.skyevault-out');
 const ledgerPath = path.join(outDir, 'vault-ledger.jsonl');
+const gitRemoteLedgerPath = path.join(outDir, 'git-remote-ledger.jsonl');
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-function readLedger() {
-  if (!fs.existsSync(ledgerPath)) return [];
-  return fs.readFileSync(ledgerPath, 'utf8')
+function readLedger(file = ledgerPath) {
+  if (!fs.existsSync(file)) return [];
+  return fs.readFileSync(file, 'utf8')
     .split(/\r?\n/)
     .filter(Boolean)
     .map((line, index) => {
@@ -50,6 +51,7 @@ function bytes(value) {
 
 const receipts = readReceipts();
 const ledger = readLedger();
+const gitRemoteLedger = readLedger(gitRemoteLedgerPath);
 const validReceipts = receipts.filter((item) => item.ok !== false && item.receiptId);
 const invalidReceipts = receipts.filter((item) => item.ok === false);
 const totalUploaded = validReceipts.reduce((sum, item) => sum + Number(item.fileSize || 0), 0);
@@ -63,10 +65,14 @@ const report = {
   schema: 'skyevault.ledger-report.v1',
   generatedAt: new Date().toISOString(),
   ledgerPath,
+  gitRemoteLedgerPath,
   receiptCount: receipts.length,
   validReceiptCount: validReceipts.length,
   invalidReceiptCount: invalidReceipts.length,
   ledgerEventCount: ledger.length,
+  gitRemoteLedgerEventCount: gitRemoteLedger.length,
+  gitRemoteRefUpdateCount: gitRemoteLedger.filter((item) => item.event === 'git.ref-update').length,
+  gitRemoteRequestCount: gitRemoteLedger.filter((item) => item.event === 'git.remote-request').length,
   totalUploadedBytes: totalUploaded,
   totalUploadedHuman: bytes(totalUploaded),
   uploadsByAssetType: Object.fromEntries([...byAssetType.entries()].sort((a, b) => a[0].localeCompare(b[0]))),
@@ -82,6 +88,17 @@ const report = {
     fileName: item.fileName,
     bytes: item.bytes,
     error: item.error
+  })),
+  latestGitRemoteEvents: gitRemoteLedger.slice(-8).map((item) => ({
+    event: item.event,
+    recordedAt: item.recordedAt,
+    workspaceId: item.workspaceId,
+    repoId: item.repoId,
+    ref: item.ref,
+    action: item.action,
+    method: item.method,
+    service: item.service,
+    code: item.code
   })),
   parseErrors: ledger.filter((item) => item.event === 'ledger.parse-error')
 };

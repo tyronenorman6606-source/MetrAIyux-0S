@@ -42,6 +42,15 @@ Audit local vault activity:
 npm run vault:ledger
 ```
 
+For true Git remote push/fetch behavior, run the smart HTTP remote service:
+
+```bash
+SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
+npm run vault:git:remote:proof
+```
+
+See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
+
 For a client-owned vault, set these in that client's repo or shell:
 
 ```bash
