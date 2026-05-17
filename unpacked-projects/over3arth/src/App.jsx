@@ -759,7 +759,6 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
             <span className="worldskin-entity-aura__shell" />
             <span className="worldskin-entity-aura__voice" />
             <span className="worldskin-entity-aura__sweep" />
-            <span className="worldskin-entity-aura__core" />
           </div>
           <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
           <div className="worldskin-pulse-field" aria-hidden="true">

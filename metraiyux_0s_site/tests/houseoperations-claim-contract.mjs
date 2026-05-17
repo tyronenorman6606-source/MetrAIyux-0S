@@ -9,6 +9,10 @@ const indexHtml = fs.readFileSync(path.join(appDir, 'index.html'), 'utf8');
 const tutorialHtml = fs.readFileSync(path.join(appDir, 'tutorial.html'), 'utf8');
 const billingHtml = fs.readFileSync(path.join(appDir, 'billing.html'), 'utf8');
 const runtimeSummary = JSON.parse(fs.readFileSync(path.join(appDir, 'v1', 'runtime-summary'), 'utf8'));
+const skyepayCatalog = fs.readFileSync(path.join(root, 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js'), 'utf8');
+const stripeSync = fs.readFileSync(path.join(root, 'tools', 'sync-metraiyux-stripe-products.mjs'), 'utf8');
+const saasTools = fs.readFileSync(path.join(root, 'metraiyux_0s_site', 'assets', 'js', 'saas-tools.js'), 'utf8');
+const pricingPage = fs.readFileSync(path.join(root, 'metraiyux_0s_site', 'saas', 'pricing.html'), 'utf8');
 
 const requiredClaims = [
   'task_intake',
@@ -54,5 +58,19 @@ for (const [claimId, ...tokens] of sourceChecks) {
 assert(runtimeSummary.version === '1.1.0', 'runtime summary version must be 1.1.0');
 assert(runtimeSummary.claimContract === './CLAIM_CONTRACT.json', 'runtime summary must point to CLAIM_CONTRACT.json');
 assert(runtimeSummary.billing?.payment === 'SkyePay/FS27', 'runtime summary must preserve billing boundary');
+
+const commerceSource = [skyepayCatalog, stripeSync, saasTools, pricingPage, billingHtml].join('\n');
+for (const token of [
+  'metraiyux-houseoperations-command',
+  'metraiyux-houseoperations-managed',
+  'metraiyux_houseoperations_command_setup',
+  'metraiyux_houseoperations_command_monthly',
+  'metraiyux_houseoperations_managed_setup',
+  'metraiyux_houseoperations_managed_monthly',
+  'HouseOperations Command',
+  'HouseOperations Managed'
+]) {
+  assert(commerceSource.includes(token), `Commercial wiring missing token: ${token}`);
+}
 
 console.log('houseoperations-claim-contract: ok');
