@@ -15,6 +15,8 @@ const noOverlay = args.has('--no-overlay');
 const deleteMissing = args.has('--delete-missing');
 const restoreSymlinks = args.has('--restore-symlinks');
 const skipHashCheck = args.has('--skip-hash-check');
+const requireSignature = args.has('--require-signature');
+const verifyArchive = argValue('--verify');
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 const schema = 'skyevault.git-vault-pack.v1';
 
@@ -189,6 +191,24 @@ async function hashFile(file) {
   });
 }
 
+function stableValue(value) {
+  if (Array.isArray(value)) return value.map((item) => stableValue(item));
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stableValue(value[key])]));
+}
+
+function stableJson(value) {
+  return JSON.stringify(stableValue(value));
+}
+
+function sha256Text(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
+function hmacText(key, text) {
+  return crypto.createHmac('sha256', key).update(text).digest('hex');
+}
+
 function safeRemoteUrl(value) {
   return String(value || '')
     .replace(/\/\/([^/@]+)@/g, '//***@')
@@ -350,6 +370,93 @@ Safety boundary: files excluded as envs, private keys, dumps, archives, dependen
 `;
 }
 
+async function buildIntegrity(packDir, manifest) {
+  const manifestPath = path.join(packDir, 'manifest.json');
+  const neuralPath = path.join(packDir, 'neural-map.json');
+  const restorePath = path.join(packDir, 'RESTORE.md');
+  const statusPath = path.join(packDir, 'status.txt');
+  const refsPath = path.join(packDir, 'refs.txt');
+  const payload = {
+    schema: 'skyevault.pack-integrity.v1',
+    generatedAt: new Date().toISOString(),
+    packId: manifest.pack.id,
+    manifest: {
+      path: 'manifest.json',
+      sha256: await hashFile(manifestPath)
+    },
+    gitBundle: {
+      path: manifest.git.bundle.path,
+      bytes: manifest.git.bundle.bytes,
+      sha256: manifest.git.bundle.sha256
+    },
+    sourceManifest: {
+      path: manifest.source.path,
+      entryCount: manifest.source.entryCount,
+      fileCount: manifest.source.fileCount,
+      totalBytes: manifest.source.totalBytes,
+      sha256: sha256Text(stableJson(manifest.source.files))
+    },
+    neuralMap: {
+      path: 'neural-map.json',
+      sha256: await hashFile(neuralPath)
+    },
+    restoreReadme: {
+      path: 'RESTORE.md',
+      sha256: await hashFile(restorePath)
+    },
+    status: {
+      path: 'status.txt',
+      sha256: await hashFile(statusPath)
+    },
+    refs: {
+      path: 'refs.txt',
+      sha256: await hashFile(refsPath)
+    }
+  };
+  const signingKey = String(process.env.SKYEVAULT_PACK_SIGNING_KEY || '').trim();
+  if (signingKey) {
+    payload.signature = {
+      algorithm: 'HMAC-SHA256',
+      keyId: String(process.env.SKYEVAULT_PACK_SIGNING_KEY_ID || 'env:SKYEVAULT_PACK_SIGNING_KEY').trim(),
+      value: hmacText(signingKey, stableJson(payload))
+    };
+  }
+  return payload;
+}
+
+async function verifyIntegrity(packDir, manifest, integrity) {
+  if (!integrity) {
+    if (requireSignature) throw new Error('Pack is missing integrity.json and --require-signature was set.');
+    console.warn('Pack is missing integrity.json; falling back to manifest file hash verification only.');
+    return { ok: true, signature: 'missing' };
+  }
+  if (integrity.schema !== 'skyevault.pack-integrity.v1') throw new Error(`Unsupported integrity schema: ${integrity.schema}`);
+  const manifestHash = await hashFile(path.join(packDir, integrity.manifest.path));
+  if (manifestHash !== integrity.manifest.sha256) throw new Error(`Manifest SHA mismatch: ${manifestHash} !== ${integrity.manifest.sha256}`);
+  const sourceHash = sha256Text(stableJson(manifest.source.files));
+  if (sourceHash !== integrity.sourceManifest.sha256) throw new Error(`Source manifest SHA mismatch: ${sourceHash} !== ${integrity.sourceManifest.sha256}`);
+  for (const item of [integrity.gitBundle, integrity.neuralMap, integrity.restoreReadme, integrity.status, integrity.refs].filter(Boolean)) {
+    const file = path.join(packDir, item.path);
+    if (!fs.existsSync(file)) throw new Error(`Integrity file missing: ${item.path}`);
+    const hash = await hashFile(file);
+    if (hash !== item.sha256) throw new Error(`Integrity SHA mismatch for ${item.path}: ${hash} !== ${item.sha256}`);
+  }
+  if (!integrity.signature) {
+    if (requireSignature) throw new Error('Pack integrity has no signature and --require-signature was set.');
+    return { ok: true, signature: 'unsigned' };
+  }
+  const signingKey = String(process.env.SKYEVAULT_PACK_SIGNING_KEY || '').trim();
+  if (!signingKey) {
+    if (requireSignature) throw new Error('Pack is signed, but SKYEVAULT_PACK_SIGNING_KEY is missing and --require-signature was set.');
+    return { ok: true, signature: 'not-checked' };
+  }
+  const unsigned = { ...integrity };
+  delete unsigned.signature;
+  const expected = hmacText(signingKey, stableJson(unsigned));
+  if (expected !== integrity.signature.value) throw new Error('Pack signature verification failed.');
+  return { ok: true, signature: 'verified', keyId: integrity.signature.keyId };
+}
+
 async function createPack() {
   const now = stamp();
   const scratchRoot = resolveWorkspacePath(argValue('--scratch-dir'), path.join(os.tmpdir(), 'skyevault-git-vault'));
@@ -385,6 +492,7 @@ async function createPack() {
   const source = await sourceFiles(sourceDir);
   const branch = git(['branch', '--show-current'], 'HEAD');
   const head = git(['rev-parse', 'HEAD'], 'unknown');
+  const shortHead = git(['rev-parse', '--short', 'HEAD'], 'unknown');
   const statusShort = git(['status', '--short'], '').split(/\r?\n/).filter(Boolean);
   const account = {
     workspaceId: String(process.env.SKYEVAULT_WORKSPACE_ID || process.env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim(),
@@ -403,7 +511,7 @@ async function createPack() {
     git: {
       branch,
       head,
-      shortHead: git(['rev-parse', '--short', 'HEAD'], 'unknown'),
+      shortHead,
       upstream: git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], ''),
       statusShort,
       dirtyCount: statusShort.length,
@@ -437,7 +545,12 @@ async function createPack() {
       defaultMode: 'clone bundle, then overlay sanitized source tree',
       secretsBoundary: 'Secret-looking and explicitly excluded files are not present in source/. Restore them from the client secret manager, not from the vault pack.'
     },
+    integrity: {
+      path: 'integrity.json',
+      signature: 'Optional HMAC-SHA256 when SKYEVAULT_PACK_SIGNING_KEY is set at pack creation time.'
+    },
     pack: {
+      id: `git-vault:${repoName}:${branch}:${shortHead}:${now}`,
       archiveName: path.basename(archivePath),
       archivePath,
       archiveFingerprintNote: 'Archive SHA-256 is emitted after zip creation and recorded by the vault receipt; it is not embedded in manifest.json because embedding it would change the archive.'
@@ -448,21 +561,23 @@ async function createPack() {
   writeText(path.join(packDir, 'status.txt'), git(['status', '--short', '--branch'], ''));
   writeText(path.join(packDir, 'refs.txt'), manifest.git.refs.map((ref) => `${ref.name}\t${ref.object}\t${ref.date}`).join('\n'));
   writeText(path.join(packDir, 'RESTORE.md'), restoreReadme(manifest));
+  writeJson(path.join(packDir, 'integrity.json'), await buildIntegrity(packDir, manifest));
 
   console.log('Creating Git vault pack archive...');
   run('zip', ['-qr', archivePath, '.'], { cwd: packDir, stdio: 'inherit' });
-  manifest.pack.archiveBytes = fs.statSync(archivePath).size;
-  manifest.pack.archiveSha256 = await hashFile(archivePath);
-  writeJson(path.join(packDir, 'manifest.json'), manifest);
+  const archiveInfo = {
+    bytes: fs.statSync(archivePath).size,
+    sha256: await hashFile(archivePath)
+  };
 
   console.log(`Archive: ${archivePath}`);
-  console.log(`Archive bytes: ${manifest.pack.archiveBytes}`);
-  console.log(`Archive SHA-256: ${manifest.pack.archiveSha256}`);
+  console.log(`Archive bytes: ${archiveInfo.bytes}`);
+  console.log(`Archive SHA-256: ${archiveInfo.sha256}`);
   console.log(`Bundle bytes: ${manifest.git.bundle.bytes}`);
   console.log(`Source files: ${manifest.source.fileCount}`);
   console.log(`Secret-looking files excluded: ${excludes.length}`);
 
-  return { packDir, archivePath, manifest };
+  return { packDir, archivePath, manifest, archiveInfo };
 }
 
 async function verifyPackFiles(packDir, manifest) {
@@ -478,27 +593,69 @@ async function verifyPackFiles(packDir, manifest) {
   }
 }
 
+function extractArchive(archive, label = 'restore') {
+  const packRoot = path.join(os.tmpdir(), `skyevault-git-${label}-${stamp()}`);
+  fs.mkdirSync(packRoot, { recursive: true });
+  console.log(`Extracting pack to ${packRoot}`);
+  run('unzip', ['-q', archive, '-d', packRoot], { cwd: root, stdio: 'inherit' });
+  return packRoot;
+}
+
+function readPackMetadata(packDir) {
+  const manifestPath = path.join(packDir, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) throw new Error('Pack is missing manifest.json.');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (manifest.schema !== schema) throw new Error(`Unsupported pack schema: ${manifest.schema}`);
+  const integrityPath = path.join(packDir, manifest.integrity?.path || 'integrity.json');
+  const integrity = fs.existsSync(integrityPath) ? JSON.parse(fs.readFileSync(integrityPath, 'utf8')) : null;
+  return { manifest, integrity };
+}
+
+async function verifyLoadedPack(packDir, manifest, integrity) {
+  const integrityReport = await verifyIntegrity(packDir, manifest, integrity);
+  await verifyPackFiles(packDir, manifest);
+  const bundlePath = path.join(packDir, manifest.git.bundle.path);
+  console.log('Verifying Git bundle...');
+  const verifyOutput = verifyBundle(bundlePath);
+  writeText(path.join(packDir, 'verify-bundle.verify.txt'), verifyOutput);
+  return { integrityReport, bundleVerify: verifyOutput };
+}
+
+async function verifyPackArchive() {
+  const archive = resolveWorkspacePath(verifyArchive, '');
+  if (!archive || !fs.existsSync(archive)) throw new Error(`Use --verify=/path/to/git-vault.zip. Not found: ${archive}`);
+  const packDir = extractArchive(archive, 'verify');
+  const { manifest, integrity } = readPackMetadata(packDir);
+  const verification = skipHashCheck ? null : await verifyLoadedPack(packDir, manifest, integrity);
+  const report = {
+    schema: 'skyevault.git-vault-verify-report.v1',
+    verifiedAt: new Date().toISOString(),
+    archive,
+    archiveSha256: await hashFile(archive),
+    packId: manifest.pack.id,
+    repo: manifest.repo.name,
+    branch: manifest.git.branch,
+    head: manifest.git.head,
+    sourceFileCount: manifest.source.fileCount,
+    excludedSecretLikeFiles: manifest.security.excludedSecretLikeFiles.length,
+    integrity: {
+      state: integrity ? 'present' : 'missing',
+      signature: verification?.integrityReport?.signature || (skipHashCheck ? 'not-checked' : 'missing'),
+      keyId: verification?.integrityReport?.keyId
+    }
+  };
+  console.log(JSON.stringify(report, null, 2));
+}
+
 async function restorePack() {
   const archive = resolveWorkspacePath(argValue('--restore'), '');
   if (!archive || !fs.existsSync(archive)) throw new Error(`Use --restore=/path/to/git-vault.zip. Not found: ${archive}`);
   const target = resolveWorkspacePath(argValue('--to'), '');
   if (!target) throw new Error('Use --to=/path/to/restored-repo.');
-  const restoreRoot = path.join(os.tmpdir(), `skyevault-git-restore-${stamp()}`);
-  fs.mkdirSync(restoreRoot, { recursive: true });
-  console.log(`Extracting pack to ${restoreRoot}`);
-  run('unzip', ['-q', archive, '-d', restoreRoot], { cwd: root, stdio: 'inherit' });
-  const manifestPath = path.join(restoreRoot, 'manifest.json');
-  if (!fs.existsSync(manifestPath)) throw new Error('Pack is missing manifest.json.');
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  if (manifest.schema !== schema) throw new Error(`Unsupported pack schema: ${manifest.schema}`);
-  if (!skipHashCheck) {
-    console.log('Verifying pack hashes...');
-    await verifyPackFiles(restoreRoot, manifest);
-  }
+  const restoreRoot = extractArchive(archive, 'restore');
+  const { manifest, integrity } = readPackMetadata(restoreRoot);
+  const verification = skipHashCheck ? null : await verifyLoadedPack(restoreRoot, manifest, integrity);
   const bundlePath = path.join(restoreRoot, manifest.git.bundle.path);
-  console.log('Verifying Git bundle...');
-  const verifyOutput = verifyBundle(bundlePath);
-  writeText(path.join(restoreRoot, 'restore-bundle.verify.txt'), verifyOutput);
   if (fs.existsSync(target) && fs.readdirSync(target).length) {
     if (!force) throw new Error(`Restore target is not empty: ${target}. Re-run with --force to replace it.`);
     fs.rmSync(target, { recursive: true, force: true });
@@ -532,12 +689,23 @@ async function restorePack() {
     overlayApplied: !noOverlay,
     deleteMissing,
     restoreSymlinks,
+    packId: manifest.pack.id,
+    integrity: {
+      state: integrity ? 'present' : 'missing',
+      signature: verification?.integrityReport?.signature || (skipHashCheck ? 'not-checked' : 'missing'),
+      keyId: verification?.integrityReport?.keyId
+    },
     sourceFileCount: manifest.source.fileCount,
     excludedSecretLikeFiles: manifest.security.excludedSecretLikeFiles.length,
     statusAfterRestore: git(['-C', target, 'status', '--short'], '').split(/\r?\n/).filter(Boolean)
   };
   writeJson(path.join(target, '.skyevault-restore-report.json'), restoreReport);
   console.log(JSON.stringify(restoreReport, null, 2));
+}
+
+if (verifyArchive) {
+  await verifyPackArchive();
+  process.exit(0);
 }
 
 if (argValue('--restore')) {

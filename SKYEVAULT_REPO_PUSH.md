@@ -9,6 +9,8 @@ npm run vault:push
 
 The command builds the staging tree and zip archive under `/tmp/skyevault-repo-push` by default, scans the staged files for live-looking secrets, streams the zip through SkyeVault-Drop's existing `/api/upload-session` and `/api/upload-complete` flow, and writes a local receipt JSON under `.skyevault-out/`. If the workspace volume is full when writing the receipt, it falls back to `/tmp/skyevault-repo-push/receipts`.
 
+Successful uploads also append `.skyevault-out/vault-ledger.jsonl` so operators can audit local push history even when individual receipt files are moved later.
+
 It excludes `.env*`, `.git`, `node_modules`, `.netlify`, `.wrangler`, backups, WAL archives, database dumps/files, private keys, existing archive bundles, generated test artifacts, and any text file that matches the credential scanner.
 
 Required local env values:
@@ -18,6 +20,7 @@ Required local env values:
 - Optional `SKYEVAULT_UPLOAD_ORIGIN` if the deployed vault allows a different origin than `https://client-drop-vault-r2.netlify.app`.
 - Optional `SKYEVAULT_CLIENT_NAME`, `SKYEVAULT_CLIENT_EMAIL`, and `SKYEVAULT_PROJECT_NAME` to control receipt metadata.
 - Optional `SKYEVAULT_ARCHIVE_DIR` and `SKYEVAULT_STAGE_PARENT` to override the default temp staging location.
+- Optional `SKYEVAULT_UPLOAD_RETRIES` and `SKYEVAULT_UPLOAD_RETRY_BASE_MS` for multipart/API retry behavior.
 - Optional `--keep-archive` and `--keep-stage` when you need to inspect the generated zip or staging tree after a run. Successful uploads delete the temp archive and stage by default.
 
 Important local capacity note: SkyeVault can store large remote archives, but an IDE/CDE still has its own local scratch disk. This tool keeps bulky transient packaging work off the repo volume by default so a small Codespace disk does not limit vault storage.
@@ -27,10 +30,17 @@ For a clone-capable repo restore pack, use the Git vault lane:
 ```bash
 npm run vault:git:dry-run
 npm run vault:git:push
+npm run vault:git:verify -- --verify=/path/to/MetrAIyux-0S-git-vault.zip
 npm run vault:git:restore -- --restore=/path/to/MetrAIyux-0S-git-vault.zip --to=/path/to/restored-repo
 ```
 
-That pack includes a `git bundle` for history/branches/tags, a sanitized working tree overlay for safe dirty workspace state, `manifest.json`, and `neural-map.json`. See `docs/SKYEVAULT_GIT_VAULT_LANE.md`.
+That pack includes a `git bundle` for history/branches/tags, a sanitized working tree overlay for safe dirty workspace state, `manifest.json`, `integrity.json`, and `neural-map.json`. See `docs/SKYEVAULT_GIT_VAULT_LANE.md`.
+
+Audit local vault activity:
+
+```bash
+npm run vault:ledger
+```
 
 For a client-owned vault, set these in that client's repo or shell:
 

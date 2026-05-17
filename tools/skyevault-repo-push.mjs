@@ -191,6 +191,41 @@ async function hashFile(file) {
   });
 }
 
+function numberEnv(env, name, fallback) {
+  const value = Number(env[name]);
+  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : fallback;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+async function fetchTextWithRetry(url, options, retryOptions) {
+  const retries = retryOptions.retries;
+  const baseDelayMs = retryOptions.baseDelayMs;
+  const label = retryOptions.label;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      const text = await response.text();
+      if (!isRetryableStatus(response.status) || attempt === retries) return { response, text };
+      const waitMs = baseDelayMs * 2 ** attempt;
+      console.warn(`${label} returned ${response.status}; retrying in ${waitMs}ms (${attempt + 1}/${retries})`);
+      await sleep(waitMs);
+    } catch (error) {
+      if (attempt === retries) throw error;
+      const waitMs = baseDelayMs * 2 ** attempt;
+      console.warn(`${label} failed: ${error.message}; retrying in ${waitMs}ms (${attempt + 1}/${retries})`);
+      await sleep(waitMs);
+    }
+  }
+  throw new Error(`${label} failed after ${retries} retries.`);
+}
+
 function gitValue(args, fallback = 'unknown') {
   try {
     return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim() || fallback;
@@ -218,6 +253,10 @@ async function uploadArchive(archive, archiveHash, summary) {
   const developerId = String(env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
   const developerName = String(env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
   const destinationId = String(env.SKYEVAULT_DESTINATION_ID || '').trim();
+  const retryOptions = {
+    retries: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRIES', 3),
+    baseDelayMs: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRY_BASE_MS', 750)
+  };
 
   const archiveSize = fs.statSync(archive).size;
   const fileName = path.basename(archive);
@@ -258,19 +297,24 @@ async function uploadArchive(archive, archiveHash, summary) {
   };
 
   const api = async (apiPath, payload) => {
-    const response = await fetch(`${baseUrl}${apiPath}`, {
+    const { response, text } = await fetchTextWithRetry(`${baseUrl}${apiPath}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-portal-key': portalKey, origin },
       body: JSON.stringify(payload)
-    });
-    const text = await response.text();
-    const data = JSON.parse(text || '{}');
+    }, { ...retryOptions, label: apiPath });
+    let data = {};
+    try {
+      data = JSON.parse(text || '{}');
+    } catch {
+      throw new Error(`${apiPath} returned non-JSON ${response.status}: ${text.slice(0, 300)}`);
+    }
     if (!response.ok || data.ok === false) throw new Error(`${apiPath} failed ${response.status}: ${data.error || text.slice(0, 300)}`);
     return data;
   };
 
   console.log(`Vault API: ${baseUrl}`);
   console.log(`Upload origin: ${origin}`);
+  console.log(`Upload retries: ${retryOptions.retries}`);
   const session = await api('/api/upload-session', body);
   console.log(`Upload session: ${session.sessionId} (${session.parts?.length || 0} parts)`);
 
@@ -287,8 +331,10 @@ async function uploadArchive(archive, archiveHash, summary) {
         offset += bytesRead;
       }
       if (offset !== length) throw new Error(`Could not read archive part ${part.partNumber}: expected ${length} bytes, got ${offset}.`);
-      const response = await fetch(part.uploadUrl, { method: 'PUT', body: chunk });
-      const text = await response.text();
+      const { response, text } = await fetchTextWithRetry(part.uploadUrl, { method: 'PUT', body: chunk }, {
+        ...retryOptions,
+        label: `R2 part ${part.partNumber}`
+      });
       if (!response.ok) throw new Error(`R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 300)}`);
       completedParts.push({
         partNumber: part.partNumber,
@@ -330,7 +376,17 @@ async function uploadArchive(archive, archiveHash, summary) {
     fileSize: archiveSize,
     sha256: archiveHash,
     manifestUpdated: completion.manifest?.updated,
-    notificationOk: completion.notification?.ok ?? null
+    notificationOk: completion.notification?.ok ?? null,
+    assetType: body.assetType,
+    projectName: body.projectName,
+    clientReference: body.clientReference,
+    workspaceId,
+    developerId,
+    gitBranch: branch,
+    gitCommit: commit,
+    dirtyCount,
+    completedParts: completedParts.length,
+    retryCount: retryOptions.retries
   };
 }
 
@@ -351,6 +407,49 @@ function writeReceipt(receipt, outDir, stamp) {
     }
   }
   throw firstError;
+}
+
+function appendLedger(event) {
+  const fallbackDir = path.join(os.tmpdir(), 'skyevault-repo-push', 'receipts');
+  const line = `${JSON.stringify(event)}\n`;
+  let firstError = null;
+  for (const file of [path.join(root, '.skyevault-out', 'vault-ledger.jsonl'), path.join(fallbackDir, 'vault-ledger.jsonl')]) {
+    try {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.appendFileSync(file, line);
+      return file;
+    } catch (error) {
+      firstError ||= error;
+      if (!['ENOSPC', 'EROFS'].includes(error.code)) throw error;
+    }
+  }
+  throw firstError;
+}
+
+function uploadLedgerEvent(receipt, summary, receiptPath) {
+  return {
+    schema: 'skyevault.local-ledger.v1',
+    event: 'upload.complete',
+    recordedAt: new Date().toISOString(),
+    receiptId: receipt.receiptId,
+    sessionId: receipt.sessionId,
+    destination: receipt.destination,
+    assetType: receipt.assetType,
+    projectName: receipt.projectName,
+    clientReference: receipt.clientReference,
+    workspaceId: receipt.workspaceId,
+    developerId: receipt.developerId,
+    gitBranch: receipt.gitBranch,
+    gitCommit: receipt.gitCommit,
+    dirtyCount: receipt.dirtyCount,
+    fileName: receipt.fileName,
+    fileSize: receipt.fileSize,
+    sha256: receipt.sha256,
+    completedParts: receipt.completedParts,
+    retryCount: receipt.retryCount,
+    excludedSecretLikeFiles: summary.excludedSecretLikeFiles,
+    receiptPath
+  };
 }
 
 if (existingArchive) {
@@ -375,8 +474,10 @@ if (existingArchive) {
   const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
   const outDir = path.join(root, '.skyevault-out');
   const receiptPath = writeReceipt(receipt, outDir, stamp);
+  const ledgerPath = appendLedger(uploadLedgerEvent(receipt, summary, receiptPath));
   console.log(JSON.stringify(receipt, null, 2));
   console.log(`Receipt written: ${receiptPath}`);
+  console.log(`Ledger appended: ${ledgerPath}`);
   process.exit(0);
 }
 
@@ -422,8 +523,10 @@ if (dryRun) {
 
 const receipt = await uploadArchive(archive, archiveHash, summary);
 const receiptPath = writeReceipt(receipt, outDir, stamp);
+const ledgerPath = appendLedger(uploadLedgerEvent(receipt, summary, receiptPath));
 console.log(JSON.stringify(receipt, null, 2));
 console.log(`Receipt written: ${receiptPath}`);
+console.log(`Ledger appended: ${ledgerPath}`);
 
 if (!keepStage) fs.rmSync(stage, { recursive: true, force: true });
 if (!keepArchive) fs.rmSync(archive, { force: true });
