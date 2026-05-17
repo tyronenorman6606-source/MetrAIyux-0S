@@ -112,6 +112,232 @@ function tokenFromRequest(req) {
   return '';
 }
 
+function numberFromValues(...values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number) && number > 0) return Math.floor(number);
+  }
+  return 0;
+}
+
+function envFlag(name, fallback = false) {
+  const value = process.env[name];
+  if (value === undefined || value === '') return fallback;
+  return !['0', 'false', 'no', 'off'].includes(String(value).toLowerCase());
+}
+
+const ROLE_ORDER = ['viewer', 'deployer', 'admin', 'owner', 'founder'];
+
+function roleAtLeast(actual, required) {
+  const actualIndex = ROLE_ORDER.indexOf(String(actual || 'viewer').toLowerCase());
+  const requiredIndex = ROLE_ORDER.indexOf(String(required || 'viewer').toLowerCase());
+  return actualIndex !== -1 && requiredIndex !== -1 && actualIndex >= requiredIndex;
+}
+
+function authLedgerFields(auth) {
+  return {
+    authMode: auth.mode,
+    remoteUser: auth.remoteUser,
+    remoteRole: auth.role,
+    customerId: auth.customerId || null,
+    apiKeyId: auth.apiKeyId || null,
+    gateCardId: auth.gateCardId || null
+  };
+}
+
+function workspaceAliases(value) {
+  const clean = sanitizePart(value);
+  if (!clean) return [];
+  const aliases = [clean];
+  if (!clean.startsWith('customer-')) aliases.push(`customer-${clean}`);
+  return aliases;
+}
+
+function workspaceClaimValues(data) {
+  const gateCard = data?.gate_card || {};
+  const metadata = data?.metadata || gateCard.metadata || {};
+  const values = [
+    data?.workspace_id,
+    data?.workspaceId,
+    data?.org,
+    data?.customer_id,
+    data?.customerId,
+    gateCard.customer_id,
+    gateCard.customerId,
+    metadata.workspace_id,
+    metadata.workspaceId,
+    metadata.customer_id,
+    metadata.customerId
+  ];
+  for (const list of [data?.workspace_ids, data?.workspaceIds, metadata.workspace_ids, metadata.workspaceIds, gateCard.workspace_ids, gateCard.workspaceIds]) {
+    if (Array.isArray(list)) values.push(...list);
+    else if (typeof list === 'string') values.push(...list.split(/[,\s]+/).filter(Boolean));
+  }
+  return values;
+}
+
+function quotaFromGate(data) {
+  const gateCard = data?.gate_card || {};
+  const metadata = data?.metadata || gateCard.metadata || {};
+  const limits = data?.limits || data?.vault_limits || metadata.limits || {};
+  return {
+    storageMb: numberFromValues(
+      data?.vault_storage_mb,
+      data?.customer_vault_storage_mb,
+      limits.vault_storage_mb,
+      limits.storage_mb,
+      metadata.vault_storage_mb,
+      gateCard.vault_storage_mb
+    ),
+    fileLimit: numberFromValues(
+      data?.vault_file_limit,
+      data?.customer_vault_file_limit,
+      limits.vault_file_limit,
+      limits.file_limit,
+      metadata.vault_file_limit,
+      gateCard.vault_file_limit
+    ),
+    workspaceLimit: numberFromValues(
+      data?.vault_workspace_limit,
+      data?.customer_vault_workspace_limit,
+      limits.vault_workspace_limit,
+      limits.workspace_limit,
+      metadata.vault_workspace_limit,
+      gateCard.vault_workspace_limit
+    )
+  };
+}
+
+function quotaFromEnv(env = process.env) {
+  return {
+    storageMb: numberFromValues(env.SKYEVAULT_VAULT_STORAGE_MB, env.SKYEVAULT_GATE_VAULT_STORAGE_MB),
+    fileLimit: numberFromValues(env.SKYEVAULT_VAULT_FILE_LIMIT, env.SKYEVAULT_GATE_VAULT_FILE_LIMIT),
+    workspaceLimit: numberFromValues(env.SKYEVAULT_VAULT_WORKSPACE_LIMIT, env.SKYEVAULT_GATE_VAULT_WORKSPACE_LIMIT)
+  };
+}
+
+function authContextFromGate(data) {
+  const gateCard = data.gate_card || {};
+  const role = String(data.role || gateCard.role || 'viewer').toLowerCase();
+  const customerId = data.customer_id ?? data.customerId ?? gateCard.customer_id ?? gateCard.customerId ?? null;
+  const apiKeyId = data.api_key_id ?? data.apiKeyId ?? null;
+  const gateCardId = data.gate_card_id ?? gateCard.id ?? null;
+  const workspaceIds = new Set();
+  for (const value of workspaceClaimValues(data)) {
+    for (const alias of workspaceAliases(value)) workspaceIds.add(alias);
+  }
+  const remoteUser = String(data.username || data.email || data.sub || apiKeyId || gateCardId || 'gate-user');
+  return {
+    mode: 'gate',
+    active: true,
+    remoteUser,
+    role,
+    customerId: customerId == null ? null : String(customerId),
+    apiKeyId: apiKeyId == null ? null : String(apiKeyId),
+    gateCardId: gateCardId == null ? null : String(gateCardId),
+    workspaceIds,
+    quotas: quotaFromGate(data)
+  };
+}
+
+async function introspectGateToken(tokenValue) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), gateTimeoutMs);
+  try {
+    const response = await fetch(gateIntrospectUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token: `Bearer ${tokenValue}` }),
+      signal: controller.signal
+    });
+    const textBody = await response.text();
+    let data = {};
+    try {
+      data = JSON.parse(textBody || '{}');
+    } catch {
+      throw new Error(`Gate introspection returned non-JSON ${response.status}.`);
+    }
+    if (!response.ok) throw new Error(data.error || `Gate introspection failed ${response.status}.`);
+    return data;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function resolveAuth(req) {
+  const suppliedToken = tokenFromRequest(req);
+  if (devNoAuth) {
+    return {
+      mode: 'dev',
+      active: true,
+      remoteUser: 'dev-no-auth',
+      role: 'founder',
+      customerId: null,
+      apiKeyId: null,
+      gateCardId: null,
+      workspaceIds: new Set(['*']),
+      quotas: quotaFromEnv()
+    };
+  }
+
+  if (gateIntrospectUrl) {
+    if (!suppliedToken) return { mode: 'gate', active: false, reason: 'Missing bearer/basic token.' };
+    const data = await introspectGateToken(suppliedToken);
+    if (!data?.active) return { mode: 'gate', active: false, reason: 'Gate token is inactive.' };
+    return authContextFromGate(data);
+  }
+
+  if (!timingSafeEqualString(suppliedToken, token)) {
+    return { mode: 'static-token', active: false, reason: 'Invalid static remote token.' };
+  }
+
+  return {
+    mode: 'static-token',
+    active: true,
+    remoteUser: 'token-user',
+    role: 'founder',
+    customerId: process.env.SKYEVAULT_CUSTOMER_ID || null,
+    apiKeyId: null,
+    gateCardId: null,
+    workspaceIds: new Set(['*']),
+    quotas: quotaFromEnv()
+  };
+}
+
+function requireRole(auth, requiredRole) {
+  if (!roleAtLeast(auth.role, requiredRole)) {
+    const error = new Error(`Requires ${requiredRole} role; token role is ${auth.role || 'viewer'}.`);
+    error.status = 403;
+    throw error;
+  }
+}
+
+function workspaceAllowed(auth, workspaceId) {
+  if (!gateEnforceWorkspace || auth.mode !== 'gate') return true;
+  if (gateAdminAllWorkspaces && roleAtLeast(auth.role, 'admin')) return true;
+  const clean = sanitizePart(workspaceId);
+  return auth.workspaceIds.has(clean) || auth.workspaceIds.has('*');
+}
+
+function requireWorkspace(auth, workspaceId) {
+  if (workspaceAllowed(auth, workspaceId)) return;
+  const error = new Error(`Workspace denied by Gate scope: ${workspaceId}`);
+  error.status = 403;
+  throw error;
+}
+
+function gitServiceName(req, url) {
+  const queryService = url.searchParams.get('service') || '';
+  if (queryService) return queryService;
+  if (url.pathname.endsWith('/git-receive-pack')) return 'git-receive-pack';
+  if (url.pathname.endsWith('/git-upload-pack')) return 'git-upload-pack';
+  return path.basename(url.pathname);
+}
+
+function requiredGitRole(req, url) {
+  return gitServiceName(req, url) === 'git-receive-pack' ? requiredPushRole : requiredViewRole;
+}
+
 function appendJsonl(file, event) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.appendFileSync(file, `${JSON.stringify(event)}\n`);
@@ -225,6 +451,10 @@ const input = fs.readFileSync(0, 'utf8').trim().split(/\\r?\\n/).filter(Boolean)
 const workspaceId = process.env.SKYEVAULT_WORKSPACE_ID || 'default';
 const repoId = process.env.SKYEVAULT_REPO_ID || path.basename(process.cwd()).replace(/\\.git$/, '');
 const remoteUser = process.env.REMOTE_USER || process.env.SKYEVAULT_REMOTE_USER || 'unknown';
+const remoteRole = process.env.SKYEVAULT_GATE_ROLE || process.env.SKYEVAULT_REMOTE_ROLE || null;
+const customerId = process.env.SKYEVAULT_GATE_CUSTOMER_ID || process.env.SKYEVAULT_CUSTOMER_ID || null;
+const apiKeyId = process.env.SKYEVAULT_GATE_API_KEY_ID || null;
+const gateCardId = process.env.SKYEVAULT_GATE_CARD_ID || null;
 const ledger = process.env.SKYEVAULT_REMOTE_LEDGER || '';
 const workspaceLedger = process.env.SKYEVAULT_REMOTE_WORKSPACE_LEDGER || '';
 const neuralDir = process.env.SKYEVAULT_REMOTE_NEURAL_DIR || '';
@@ -239,6 +469,10 @@ for (const line of input) {
     workspaceId,
     repoId,
     remoteUser,
+    remoteRole,
+    customerId,
+    apiKeyId,
+    gateCardId,
     ref,
     oldRev,
     newRev,
@@ -254,11 +488,12 @@ if (neuralDir) {
   fs.mkdirSync(neuralDir, { recursive: true });
   const safeName = [workspaceId, repoId].join('__').replace(/[^A-Za-z0-9._-]+/g, '-');
   const file = path.join(neuralDir, safeName + '.json');
-  let graph = { schema: 'skyevault.git-remote-neural-map.v1', workspaceId, repoId, refs: {}, events: [] };
+  let graph = { schema: 'skyevault.git-remote-neural-map.v1', workspaceId, repoId, customerId, refs: {}, events: [] };
   if (fs.existsSync(file)) {
     try { graph = JSON.parse(fs.readFileSync(file, 'utf8')); } catch {}
   }
   graph.updatedAt = new Date().toISOString();
+  graph.customerId = customerId || graph.customerId || null;
   graph.refs = {};
   for (const refLine of git(['for-each-ref', '--format=%(refname)%09%(objectname)']).split(/\\r?\\n/).filter(Boolean)) {
     const [ref, object] = refLine.split('\\t');
@@ -348,9 +583,13 @@ function parseCgiHeaders(buffer) {
   return { status, headers, bodyStart };
 }
 
-function handleGit(req, res, repo, remoteUser) {
-  ensureRepo(repo.repoPath, repo.workspaceId, repo.repoId);
+function handleGit(req, res, repo, auth) {
   const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
+  requireRole(auth, requiredGitRole(req, url));
+  requireWorkspace(auth, repo.workspaceId);
+  if (gitServiceName(req, url) === 'git-receive-pack') enforceGitQuota(auth, repo);
+  ensureRepo(repo.repoPath, repo.workspaceId, repo.repoId);
+  const remoteUser = auth.remoteUser;
   const env = {
     ...process.env,
     GIT_PROJECT_ROOT: repoRoot,
@@ -362,6 +601,12 @@ function handleGit(req, res, repo, remoteUser) {
     CONTENT_LENGTH: req.headers['content-length'] || '',
     REMOTE_USER: remoteUser,
     SKYEVAULT_REMOTE_USER: remoteUser,
+    SKYEVAULT_REMOTE_ROLE: auth.role || '',
+    SKYEVAULT_GATE_ROLE: auth.role || '',
+    SKYEVAULT_GATE_CUSTOMER_ID: auth.customerId || '',
+    SKYEVAULT_CUSTOMER_ID: auth.customerId || '',
+    SKYEVAULT_GATE_API_KEY_ID: auth.apiKeyId || '',
+    SKYEVAULT_GATE_CARD_ID: auth.gateCardId || '',
     SKYEVAULT_WORKSPACE_ID: repo.workspaceId,
     SKYEVAULT_REPO_ID: repo.repoId,
     SKYEVAULT_REMOTE_LEDGER: ledgerPath,
@@ -411,7 +656,7 @@ function handleGit(req, res, repo, remoteUser) {
       recordedAt: nowIso(),
       workspaceId: repo.workspaceId,
       repoId: repo.repoId,
-      remoteUser,
+      ...authLedgerFields(auth),
       method: req.method,
       path: url.pathname,
       service: url.searchParams.get('service') || path.basename(url.pathname),
@@ -422,7 +667,7 @@ function handleGit(req, res, repo, remoteUser) {
   });
 }
 
-function listRepos() {
+function listRepos(auth = null) {
   if (!fs.existsSync(repoRoot)) return [];
   const repos = [];
   const visit = (dir) => {
@@ -445,7 +690,10 @@ function listRepos() {
     }
   };
   visit(repoRoot);
-  return repos.map((repo) => repoSummary(repo)).sort((a, b) => a.id.localeCompare(b.id));
+  return repos
+    .filter((repo) => !auth || workspaceAllowed(auth, repo.workspaceId))
+    .map((repo) => repoSummary(repo))
+    .sort((a, b) => a.id.localeCompare(b.id));
 }
 
 function refsForRepo(repoPath) {
@@ -472,6 +720,52 @@ function repoDiskBytes(repoPath) {
   };
   visit(repoPath);
   return total;
+}
+
+function workspaceDiskBytes(workspaceId) {
+  const workspacePath = path.join(repoRoot, sanitizePart(workspaceId));
+  return repoDiskBytes(workspacePath);
+}
+
+function workspaceRepoCount(workspaceId) {
+  const workspacePath = path.join(repoRoot, sanitizePart(workspaceId));
+  if (!fs.existsSync(workspacePath)) return 0;
+  return fs.readdirSync(workspacePath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.endsWith('.git'))
+    .length;
+}
+
+function repoObjectCount(repoPath) {
+  if (!fs.existsSync(repoPath)) return 0;
+  const output = git(['count-objects', '-v'], { cwd: repoPath });
+  const values = Object.fromEntries(output.split(/\r?\n/).map((line) => line.split(/:\s+/)).filter((parts) => parts.length === 2));
+  return Number(values.count || 0) + Number(values['in-pack'] || 0);
+}
+
+function enforceGitQuota(auth, repo) {
+  const quotas = auth.quotas || {};
+  if (quotas.workspaceLimit && !fs.existsSync(repo.repoPath) && workspaceRepoCount(repo.workspaceId) >= quotas.workspaceLimit) {
+    const error = new Error(`Workspace ${repo.workspaceId} is at its repo quota (${quotas.workspaceLimit}).`);
+    error.status = 507;
+    throw error;
+  }
+  if (quotas.storageMb) {
+    const usedBytes = workspaceDiskBytes(repo.workspaceId);
+    const limitBytes = quotas.storageMb * 1024 * 1024;
+    if (usedBytes >= limitBytes) {
+      const error = new Error(`Workspace ${repo.workspaceId} is at its vault storage quota (${quotas.storageMb} MB).`);
+      error.status = 507;
+      throw error;
+    }
+  }
+  if (quotas.fileLimit && fs.existsSync(repo.repoPath)) {
+    const objectCount = repoObjectCount(repo.repoPath);
+    if (objectCount >= quotas.fileLimit) {
+      const error = new Error(`Repo ${repo.workspaceId}/${repo.repoId} is at its vault object quota (${quotas.fileLimit}).`);
+      error.status = 507;
+      throw error;
+    }
+  }
 }
 
 function repoEvents(workspaceId, repoId) {
@@ -530,9 +824,10 @@ function repoDetail(workspaceId, repoId) {
   });
 }
 
-async function exportRepoBundle(workspaceId, repoId) {
+async function exportRepoBundle(workspaceId, repoId, auth) {
   const detail = repoDetail(workspaceId, repoId);
   if (!detail) throw new Error(`Repo not found: ${workspaceId}/${repoId}`);
+  requireWorkspace(auth, detail.workspaceId);
   const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
   const exportDir = path.join(storageRoot, 'exports', detail.workspaceId, detail.repoId);
   fs.mkdirSync(exportDir, { recursive: true });
@@ -554,20 +849,30 @@ async function exportRepoBundle(workspaceId, repoId) {
   appendLedgers({
     schema: 'skyevault.git-remote-export.v1',
     event: 'git.remote-export',
+    ...authLedgerFields(auth),
     ...result
   });
   return result;
 }
 
-async function handleAdminApi(req, res, url) {
+async function handleAdminApi(req, res, url, auth) {
   if (url.pathname === '/__skyevault/repos' && req.method === 'GET') {
-    json(res, 200, { ok: true, repos: listRepos() });
+    requireRole(auth, requiredViewRole);
+    json(res, 200, { ok: true, repos: listRepos(auth) });
     return true;
   }
 
   if (url.pathname === '/__skyevault/repos' && req.method === 'POST') {
+    requireRole(auth, requiredPushRole);
     const body = await readJsonBody(req);
     const repo = repoFromParts(body.workspaceId || 'default', body.repoId || body.name || '');
+    requireWorkspace(auth, repo.workspaceId);
+    const workspaceLimit = auth.quotas?.workspaceLimit || 0;
+    if (workspaceLimit && !fs.existsSync(repo.repoPath) && workspaceRepoCount(repo.workspaceId) >= workspaceLimit) {
+      const error = new Error(`Workspace ${repo.workspaceId} is at its repo quota (${workspaceLimit}).`);
+      error.status = 507;
+      throw error;
+    }
     ensureRepo(repo.repoPath, repo.workspaceId, repo.repoId);
     json(res, 201, { ok: true, repo: repoDetail(repo.workspaceId, repo.repoId) });
     return true;
@@ -576,6 +881,8 @@ async function handleAdminApi(req, res, url) {
   const repoRoute = url.pathname.match(/^\/__skyevault\/repos\/([^/]+)\/([^/]+)(?:\/(refs|events|neural-map|export))?$/);
   if (repoRoute) {
     const [, workspaceId, repoId, action] = repoRoute;
+    requireRole(auth, requiredViewRole);
+    requireWorkspace(auth, workspaceId);
     const detail = repoDetail(workspaceId, repoId);
     if (!detail && action !== undefined) {
       json(res, 404, { ok: false, error: `Repo not found: ${workspaceId}/${repoId}` });
@@ -599,13 +906,16 @@ async function handleAdminApi(req, res, url) {
       return true;
     }
     if (action === 'export' && req.method === 'POST') {
-      json(res, 201, { ok: true, export: await exportRepoBundle(workspaceId, repoId) });
+      json(res, 201, { ok: true, export: await exportRepoBundle(workspaceId, repoId, auth) });
       return true;
     }
   }
 
   if (url.pathname === '/__skyevault/ledger' && req.method === 'GET') {
-    const events = readJsonl(ledgerPath).slice(-500);
+    requireRole(auth, url.searchParams.get('all') === '1' ? requiredAdminRole : requiredViewRole);
+    const events = readJsonl(ledgerPath)
+      .filter((event) => !event.workspaceId || workspaceAllowed(auth, event.workspaceId))
+      .slice(-500);
     json(res, 200, {
       ok: true,
       ledgerPath,
@@ -857,14 +1167,21 @@ const repoRoot = path.join(storageRoot, 'repos');
 const ledgerPath = path.join(storageRoot, 'remote-ledger.jsonl');
 const workspaceLedgerPath = path.join(root, '.skyevault-out', 'git-remote-ledger.jsonl');
 const neuralDir = path.join(storageRoot, 'neural-map');
+const gateIntrospectUrl = String(argValue('--gate-introspect-url') || process.env.SKYEVAULT_GATE_INTROSPECT_URL || '').trim();
+const requiredViewRole = String(process.env.SKYEVAULT_GATE_REQUIRED_VIEW_ROLE || 'viewer').toLowerCase();
+const requiredPushRole = String(process.env.SKYEVAULT_GATE_REQUIRED_PUSH_ROLE || 'deployer').toLowerCase();
+const requiredAdminRole = String(process.env.SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE || 'admin').toLowerCase();
+const gateTimeoutMs = Math.max(500, Number(process.env.SKYEVAULT_GATE_TIMEOUT_MS || 5000));
+const gateEnforceWorkspace = envFlag('SKYEVAULT_GATE_ENFORCE_WORKSPACE', true);
+const gateAdminAllWorkspaces = envFlag('SKYEVAULT_GATE_ADMIN_ALL_WORKSPACES', false);
 let token = argValue('--token') || process.env.SKYEVAULT_GIT_REMOTE_TOKEN || '';
-if (!token && !devNoAuth) token = crypto.randomBytes(24).toString('hex');
+if (!token && !devNoAuth && !gateIntrospectUrl) token = crypto.randomBytes(24).toString('hex');
 
 fs.mkdirSync(repoRoot, { recursive: true });
 fs.mkdirSync(path.dirname(workspaceLedgerPath), { recursive: true });
 fs.mkdirSync(neuralDir, { recursive: true });
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || `${host}:${port}`}`);
   if (url.pathname === '/health') {
     json(res, 200, {
@@ -872,19 +1189,33 @@ const server = http.createServer((req, res) => {
       service: 'skyevault-git-remote',
       storageRoot,
       repoRoot,
-      auth: devNoAuth ? 'disabled' : 'token',
-      autoCreate
+      auth: devNoAuth ? 'disabled' : gateIntrospectUrl ? 'gate-introspection' : 'static-token',
+      autoCreate,
+      gateEnforceWorkspace,
+      requiredRoles: {
+        view: requiredViewRole,
+        push: requiredPushRole,
+        admin: requiredAdminRole
+      }
     });
     return;
   }
 
-  const suppliedToken = tokenFromRequest(req);
-  if (!devNoAuth && !timingSafeEqualString(suppliedToken, token)) {
+  let auth;
+  try {
+    auth = await resolveAuth(req);
+  } catch (error) {
+    console.warn(`Gate authentication unavailable for ${url.pathname}: ${error.message}`);
+    json(res, 503, { ok: false, error: `Gate authentication unavailable: ${error.message}` });
+    return;
+  }
+
+  if (!auth.active) {
     res.writeHead(401, {
       'www-authenticate': 'Basic realm="SkyeVault Git Remote"',
       'content-type': 'text/plain; charset=utf-8'
     });
-    res.end('Unauthorized\n');
+    res.end(`${auth.reason || 'Unauthorized'}\n`);
     return;
   }
 
@@ -895,12 +1226,18 @@ const server = http.createServer((req, res) => {
   }
 
   if (url.pathname === '/__skyevault/ui' && req.method === 'GET') {
+    try {
+      requireRole(auth, requiredViewRole);
+    } catch (error) {
+      json(res, error.status || 403, { ok: false, error: error.message });
+      return;
+    }
     html(res, 200, adminConsoleHtml());
     return;
   }
 
   if (url.pathname.startsWith('/__skyevault/')) {
-    void handleAdminApi(req, res, url)
+    void handleAdminApi(req, res, url, auth)
       .then((handled) => {
         if (!handled && !res.headersSent) json(res, 404, { ok: false, error: 'Unknown SkyeVault admin endpoint.' });
       })
@@ -910,9 +1247,10 @@ const server = http.createServer((req, res) => {
           event: 'git.remote-admin-error',
           recordedAt: nowIso(),
           path: url.pathname,
+          ...authLedgerFields(auth),
           error: error.message
         });
-        if (!res.headersSent) json(res, 400, { ok: false, error: error.message });
+        if (!res.headersSent) json(res, error.status || 400, { ok: false, error: error.message });
       });
     return;
   }
@@ -924,16 +1262,17 @@ const server = http.createServer((req, res) => {
   }
 
   try {
-    handleGit(req, res, repo, suppliedToken ? 'token-user' : 'dev-no-auth');
+    handleGit(req, res, repo, auth);
   } catch (error) {
     appendLedgers({
       schema: 'skyevault.git-remote-request.v1',
       event: 'git.remote-error',
       recordedAt: nowIso(),
       path: url.pathname,
+      ...authLedgerFields(auth),
       error: error.message
     });
-    text(res, 500, error.message);
+    text(res, error.status || 500, error.message);
   }
 });
 
@@ -946,8 +1285,10 @@ server.listen(port, host, () => {
     baseUrl: `http://${host}:${actualPort}`,
     storageRoot,
     repoRoot,
-    token: devNoAuth ? null : token,
-    auth: devNoAuth ? 'disabled' : 'token',
+    token: devNoAuth || gateIntrospectUrl ? null : token,
+    auth: devNoAuth ? 'disabled' : gateIntrospectUrl ? 'gate-introspection' : 'static-token',
+    gateIntrospectUrl: gateIntrospectUrl ? 'configured' : null,
+    gateEnforceWorkspace,
     autoCreate,
     ledgerPath,
     workspaceLedgerPath,

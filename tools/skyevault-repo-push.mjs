@@ -196,6 +196,26 @@ function numberEnv(env, name, fallback) {
   return Number.isFinite(value) && value >= 0 ? Math.floor(value) : fallback;
 }
 
+function quotaFromEnv(env) {
+  return {
+    storageMb: numberEnv(env, 'SKYEVAULT_VAULT_STORAGE_MB', numberEnv(env, 'SKYEVAULT_GATE_VAULT_STORAGE_MB', 0)),
+    fileLimit: numberEnv(env, 'SKYEVAULT_VAULT_FILE_LIMIT', numberEnv(env, 'SKYEVAULT_GATE_VAULT_FILE_LIMIT', 0)),
+    workspaceLimit: numberEnv(env, 'SKYEVAULT_VAULT_WORKSPACE_LIMIT', numberEnv(env, 'SKYEVAULT_GATE_VAULT_WORKSPACE_LIMIT', 0))
+  };
+}
+
+function enforceUploadQuota(quotas, archiveSize, summary) {
+  if (quotas.fileLimit && summary.fileCount && summary.fileCount > quotas.fileLimit) {
+    throw new Error(`Vault upload file count ${summary.fileCount} exceeds workspace file limit ${quotas.fileLimit}.`);
+  }
+  if (quotas.storageMb) {
+    const limitBytes = quotas.storageMb * 1024 * 1024;
+    if (archiveSize > limitBytes) {
+      throw new Error(`Vault archive size ${archiveSize} bytes exceeds workspace storage limit ${quotas.storageMb} MB.`);
+    }
+  }
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -250,15 +270,22 @@ async function uploadArchive(archive, archiveHash, summary) {
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   if (!portalKey) throw new Error('Missing CLIENT_PORTAL_KEY or SKYEVAULT_PORTAL_KEY.');
   const workspaceId = String(env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim();
+  const customerId = String(env.SKYEVAULT_CUSTOMER_ID || env.SKYEVAULT_GATE_CUSTOMER_ID || env.SKYEVAULT_ACCOUNT_ID || '').trim();
+  const repoId = String(env.SKYEVAULT_REPO_ID || repoName).trim();
+  const gateCardId = String(env.SKYEVAULT_GATE_CARD_ID || '').trim();
+  const apiKeyId = String(env.SKYEVAULT_API_KEY_ID || env.SKYEVAULT_GATE_API_KEY_ID || '').trim();
+  const gateRole = String(env.SKYEVAULT_GATE_ROLE || env.SKYEVAULT_ROLE || '').trim();
   const developerId = String(env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
   const developerName = String(env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
   const destinationId = String(env.SKYEVAULT_DESTINATION_ID || '').trim();
+  const quotas = quotaFromEnv(env);
   const retryOptions = {
     retries: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRIES', 3),
     baseDelayMs: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRY_BASE_MS', 750)
   };
 
   const archiveSize = fs.statSync(archive).size;
+  enforceUploadQuota(quotas, archiveSize, summary);
   const fileName = path.basename(archive);
   const now = Date.now();
   const branch = gitValue(['branch', '--show-current']);
@@ -274,6 +301,11 @@ async function uploadArchive(archive, archiveHash, summary) {
     clientRequestId: `metraiyux-repo-safe-${now}`,
     submissionId: `metraiyux-repo-vault-${now}`,
     workspaceId,
+    customerId,
+    repoId,
+    gateCardId,
+    apiKeyId,
+    gateRole,
     developerId,
     developerName,
     destinationId,
@@ -293,6 +325,8 @@ async function uploadArchive(archive, archiveHash, summary) {
     },
     submissionFileCount: 1,
     submissionTotalBytes: archiveSize,
+    archiveFileCount: summary.fileCount,
+    quota: quotas,
     failedDestinationIds: []
   };
 
@@ -381,12 +415,24 @@ async function uploadArchive(archive, archiveHash, summary) {
     projectName: body.projectName,
     clientReference: body.clientReference,
     workspaceId,
+    customerId,
+    repoId,
+    gateCardId,
+    apiKeyId,
+    gateRole,
     developerId,
     gitBranch: branch,
     gitCommit: commit,
     dirtyCount,
     completedParts: completedParts.length,
-    retryCount: retryOptions.retries
+    retryCount: retryOptions.retries,
+    quota: quotas,
+    archive: {
+      fileCount: summary.fileCount,
+      bytes: archiveSize,
+      sha256: archiveHash,
+      secretLookingFilesExcluded: summary.excludedSecretLikeFiles
+    }
   };
 }
 
@@ -438,6 +484,11 @@ function uploadLedgerEvent(receipt, summary, receiptPath) {
     projectName: receipt.projectName,
     clientReference: receipt.clientReference,
     workspaceId: receipt.workspaceId,
+    customerId: receipt.customerId,
+    repoId: receipt.repoId,
+    gateCardId: receipt.gateCardId,
+    apiKeyId: receipt.apiKeyId,
+    gateRole: receipt.gateRole,
     developerId: receipt.developerId,
     gitBranch: receipt.gitBranch,
     gitCommit: receipt.gitCommit,
@@ -447,6 +498,8 @@ function uploadLedgerEvent(receipt, summary, receiptPath) {
     sha256: receipt.sha256,
     completedParts: receipt.completedParts,
     retryCount: receipt.retryCount,
+    quota: receipt.quota,
+    archive: receipt.archive,
     excludedSecretLikeFiles: summary.excludedSecretLikeFiles,
     receiptPath
   };

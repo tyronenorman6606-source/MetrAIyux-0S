@@ -1,0 +1,33 @@
+services:
+  skyevault-git-remote:
+    build:
+      context: ../..
+      dockerfile: deploy/skyevault-git-remote/Dockerfile
+    image: metraiyux/skyevault-git-remote:local
+    restart: unless-stopped
+    ports:
+      - "${SKYEVAULT_GIT_REMOTE_PUBLIC_PORT:-8787}:8787"
+    environment:
+      SKYEVAULT_GIT_REMOTE_HOST: 0.0.0.0
+      SKYEVAULT_GIT_REMOTE_PORT: 8787
+      SKYEVAULT_GIT_REMOTE_ROOT: /var/lib/skyevault/git-remote
+      SKYEVAULT_GATE_INTROSPECT_URL: ${SKYEVAULT_GATE_INTROSPECT_URL:?set SKYEVAULT_GATE_INTROSPECT_URL to the deployed SkyeGateFS27 auth-introspect endpoint}
+      SKYEVAULT_GATE_ENFORCE_WORKSPACE: "${SKYEVAULT_GATE_ENFORCE_WORKSPACE:-1}"
+      SKYEVAULT_GATE_REQUIRED_VIEW_ROLE: "${SKYEVAULT_GATE_REQUIRED_VIEW_ROLE:-viewer}"
+      SKYEVAULT_GATE_REQUIRED_PUSH_ROLE: "${SKYEVAULT_GATE_REQUIRED_PUSH_ROLE:-deployer}"
+      SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE: "${SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE:-admin}"
+      SKYEVAULT_GATE_TIMEOUT_MS: "${SKYEVAULT_GATE_TIMEOUT_MS:-5000}"
+      SKYEVAULT_PROTECTED_REFS: "${SKYEVAULT_PROTECTED_REFS:-refs/heads/main,refs/heads/master}"
+      SKYEVAULT_ALLOW_DELETE_REFS: "${SKYEVAULT_ALLOW_DELETE_REFS:-0}"
+      SKYEVAULT_ALLOW_FORCE_PUSH: "${SKYEVAULT_ALLOW_FORCE_PUSH:-0}"
+    volumes:
+      - skyevault_git_remote_data:/var/lib/skyevault/git-remote
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  skyevault_git_remote_data:

@@ -1,0 +1,36 @@
+[Unit]
+Description=SkyeVault Git Remote
+Documentation=/opt/metraiyux-0s/deploy/skyevault-git-remote/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=skyevault
+Group=skyevault
+WorkingDirectory=/opt/metraiyux-0s
+Environment=SKYEVAULT_GIT_REMOTE_HOST=0.0.0.0
+Environment=SKYEVAULT_GIT_REMOTE_PORT=8787
+Environment=SKYEVAULT_GIT_REMOTE_ROOT=/var/lib/skyevault-git-remote
+Environment=SKYEVAULT_GATE_ENFORCE_WORKSPACE=1
+Environment=SKYEVAULT_GATE_REQUIRED_VIEW_ROLE=viewer
+Environment=SKYEVAULT_GATE_REQUIRED_PUSH_ROLE=deployer
+Environment=SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE=admin
+Environment=SKYEVAULT_GATE_TIMEOUT_MS=5000
+Environment=SKYEVAULT_PROTECTED_REFS=refs/heads/main,refs/heads/master
+Environment=SKYEVAULT_ALLOW_DELETE_REFS=0
+Environment=SKYEVAULT_ALLOW_FORCE_PUSH=0
+EnvironmentFile=/etc/skyevault/git-remote.env
+StateDirectory=skyevault-git-remote
+RuntimeDirectory=skyevault-git-remote
+ExecStart=/usr/bin/node /opt/metraiyux-0s/tools/skyevault-git-remote-server.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/skyevault-git-remote /opt/metraiyux-0s/.skyevault-out
+
+[Install]
+WantedBy=multi-user.target

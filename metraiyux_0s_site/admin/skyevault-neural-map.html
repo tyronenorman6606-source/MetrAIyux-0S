@@ -19,6 +19,8 @@
     .vault-table th, .vault-table td { border-bottom: 1px solid rgba(255,255,255,.12); padding: .75rem; text-align: left; vertical-align: top; }
     .vault-table th { color: rgba(255,255,255,.68); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
     .vault-table code { overflow-wrap: anywhere; }
+    .workspace-map-button { border: 1px solid rgba(125,220,138,.32); background: rgba(125,220,138,.08); color: #f7fff5; border-radius: .45rem; padding: .45rem .65rem; cursor: pointer; }
+    .workspace-map-button:hover { border-color: rgba(125,220,138,.72); }
     @media (max-width: 900px) { .vault-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 560px) { .vault-map-grid { grid-template-columns: 1fr; } }
   </style>
@@ -76,10 +78,29 @@
 <script>
   const $ = (id) => document.getElementById(id);
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  let activeMap = null;
 
   function setStatus(text, ok = true) {
     $('vaultMapStatus').innerHTML = '<span class="status-pill">' + esc(text) + '</span>';
     $('vaultMapStatus').style.borderColor = ok ? 'rgba(125,220,138,.45)' : 'rgba(255,140,122,.45)';
+  }
+
+  function safeFilePart(value) {
+    return String(value || 'default').trim().replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100) || 'default';
+  }
+
+  function bytes(value) {
+    const size = Number(value || 0);
+    if (!size) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const index = Math.min(Math.floor(Math.log(size) / Math.log(1024)), units.length - 1);
+    return (size / 1024 ** index).toFixed(index ? 2 : 0) + ' ' + units[index];
+  }
+
+  function initialMapPath() {
+    const workspace = new URLSearchParams(location.search).get('workspace');
+    if (!workspace) return '../brain/skyevault-vault-map.json';
+    return '../brain/skyevault-workspaces/' + safeFilePart(workspace) + '.json';
   }
 
   function drawGraph(map) {
@@ -126,28 +147,49 @@
     });
   }
 
+  function selectWorkspace(workspaceId) {
+    const safe = safeFilePart(workspaceId);
+    const url = new URL(location.href);
+    url.searchParams.set('workspace', safe);
+    history.pushState({}, '', url);
+    loadMap('../brain/skyevault-workspaces/' + safe + '.json');
+  }
+
   function render(map) {
+    activeMap = map;
     $('repoCount').textContent = map.repo_count || 0;
-    $('receiptCount').textContent = map.receipt_count || 0;
+    $('receiptCount').textContent = map.receipt_count ?? map.upload_count ?? ((map.uploads || []).length);
     $('nodeCount').textContent = (map.nodes || []).length;
-    $('storedBytes').textContent = map.total_receipt_human || '0 B';
-    $('workspaceRows').innerHTML = (map.workspace_maps || []).map((workspace) => '<tr><td><strong>' + esc(workspace.workspace_id) + '</strong></td><td><code>' + esc(workspace.file) + '</code></td><td>' + esc((workspace.repo_count || 0) + ' repos, ' + (workspace.node_count || 0) + ' nodes') + '</td></tr>').join('') || '<tr><td colspan="3">No workspace maps generated yet.</td></tr>';
+    $('storedBytes').textContent = map.total_receipt_human || bytes((map.uploads || []).reduce((sum, upload) => sum + Number(upload.fileSize || 0), 0));
+    if (map.workspace_maps && map.workspace_maps.length) {
+      $('workspaceRows').innerHTML = map.workspace_maps.map((workspace) => '<tr><td><strong>' + esc(workspace.workspace_id) + '</strong></td><td><button class="workspace-map-button" type="button" data-workspace="' + esc(workspace.workspace_id) + '">' + esc(workspace.file) + '</button></td><td>' + esc((workspace.repo_count || 0) + ' repos, ' + (workspace.node_count || 0) + ' nodes') + '</td></tr>').join('');
+      document.querySelectorAll('.workspace-map-button').forEach((button) => button.addEventListener('click', () => selectWorkspace(button.dataset.workspace)));
+    } else if (map.workspace_id) {
+      $('workspaceRows').innerHTML = '<tr><td><strong>' + esc(map.workspace_id) + '</strong></td><td><code>brain/skyevault-workspaces/' + esc(safeFilePart(map.workspace_id)) + '.json</code></td><td>' + esc((map.repo_count || 0) + ' repos, ' + ((map.nodes || []).length) + ' nodes') + '</td></tr>';
+    } else {
+      $('workspaceRows').innerHTML = '<tr><td colspan="3">No workspace maps generated yet.</td></tr>';
+    }
     $('repoRows').innerHTML = (map.repos || []).map((repo) => '<tr><td><strong>' + esc(repo.workspace_id + '/' + repo.repo_id) + '</strong></td><td>' + esc((repo.ref_updates || 0) + ' ref updates, ' + (repo.requests || 0) + ' requests, ' + (repo.exports || 0) + ' exports') + '</td><td><code>' + esc(repo.latest_head || 'empty') + '</code><br>' + esc(repo.latest_subject || '') + '</td></tr>').join('') || '<tr><td colspan="3">No repos yet.</td></tr>';
     $('uploadRows').innerHTML = (map.uploads || []).slice(-12).reverse().map((upload) => '<tr><td><code>' + esc(upload.receipt_ref) + '</code></td><td>' + esc(upload.fileName || 'vault upload') + '<br><code>' + esc(upload.sha256_prefix || '') + '</code></td><td>' + esc(upload.fileSize ? new Intl.NumberFormat().format(upload.fileSize) + ' bytes' : '0 B') + '</td></tr>').join('') || '<tr><td colspan="3">No uploads yet.</td></tr>';
     drawGraph(map);
-    setStatus('Ready - ' + (map.safety || 'map loaded'));
+    setStatus('Ready - ' + (map.workspace_id ? 'workspace ' + map.workspace_id : (map.safety || 'map loaded')));
   }
 
-  fetch('../brain/skyevault-vault-map.json')
+  function loadMap(path) {
+    setStatus('Loading vault map');
+    return fetch(path)
     .then((res) => {
       if (!res.ok) throw new Error('Map not generated');
       return res.json();
     })
     .then(render)
     .catch((error) => setStatus(error.message, false));
+  }
+
+  loadMap(initialMapPath());
 
   window.addEventListener('resize', () => {
-    fetch('../brain/skyevault-vault-map.json').then((res) => res.ok ? res.json() : null).then((map) => { if (map) drawGraph(map); });
+    if (activeMap) drawGraph(activeMap);
   });
 </script>
 <script src="../script.js"></script>
