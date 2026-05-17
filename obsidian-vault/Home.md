@@ -14,6 +14,7 @@ This vault is the human command center for MetrAIyux 0S, SkyeGateFS27, proof sys
 ## Start Here
 
 - [[00-command-center/Current Production State]]
+- [[00-command-center/ChatGPT Project Handoff]]
 - [[00-command-center/Next Operator Actions]]
 - [[10-production/Production Blockers]]
 - [[10-production/Live Surface Registry]]

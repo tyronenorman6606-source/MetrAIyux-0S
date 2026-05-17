@@ -1,3 +1,5 @@
+import { findNeuralSpaceLane } from '../data/neuralSpacePro.js';
+
 export const DEFAULT_VESSEL_NAME = 'Auren';
 
 export const gateWorldNames = {
@@ -22,6 +24,7 @@ export function detectBrainTarget(transcript, vesselName = DEFAULT_VESSEL_NAME, 
   const text = normalizeTranscript(transcript);
   if (!text) return fallback;
   if (text.includes('overearth') || text.includes('over earth') || text.includes('world brain') || text.includes('new earth')) return 'overearth';
+  if (text.includes('neural space') || text.includes('neuralspace') || text.includes('assistant dimension') || text.includes('local brain')) return 'vessel';
   if (text.includes(normalizeTranscript(vesselName)) || text.includes('energy vessel') || text.includes('vessel') || text.includes('avatar')) return 'vessel';
   return fallback;
 }
@@ -39,6 +42,21 @@ export function createBrainResponse({ transcript, target, state, stats, selected
       action: 'rename_vessel',
       payload: { name: rename },
       response: `Name accepted. I am ${rename}. Say my name and I will surface.`
+    };
+  }
+
+  const neuralLane = findNeuralSpaceLane(text);
+  if (neuralLane) {
+    const action = includesAny(text, ['build website', 'build pipeline', 'build forge', 'generate website', 'project archive'])
+      ? 'neural_build'
+      : includesAny(text, ['research', 'session', 'archive chat', 'study this', 'think with me', 'investigate'])
+        ? 'neural_research'
+        : 'open_neural_lane';
+    return {
+      target: 'vessel',
+      action,
+      payload: { laneId: neuralLane.id },
+      response: `${neuralLane.label} is folding into Overearth. ${neuralLane.response}`
     };
   }
 

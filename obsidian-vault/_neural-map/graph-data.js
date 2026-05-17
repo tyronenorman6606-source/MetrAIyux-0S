@@ -1,9 +1,9 @@
 window.METRAIYUX_OBSIDIAN_GRAPH = {
-  "generated_at": "2026-05-17T00:40:48.219Z",
+  "generated_at": "2026-05-17T14:47:07.494Z",
   "vault": "obsidian-vault",
-  "node_count": 58,
-  "link_count": 87,
-  "notes": 13,
+  "node_count": 74,
+  "link_count": 113,
+  "notes": 15,
   "nodes": [
     {
       "id": "note:00-command-center/0S Command Runner.md",
@@ -18,6 +18,22 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
         "commands",
         "operator",
         "obsidian"
+      ]
+    },
+    {
+      "id": "note:00-command-center/ChatGPT Project Handoff.md",
+      "label": "ChatGPT Project Handoff",
+      "type": "note",
+      "group": "command",
+      "brain": true,
+      "path": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "size": 16,
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
       ]
     },
     {
@@ -117,6 +133,21 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
         "proof",
         "receipts",
         "qa"
+      ]
+    },
+    {
+      "id": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "label": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "type": "note",
+      "group": "proof",
+      "brain": true,
+      "path": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "size": 16,
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
       ]
     },
     {
@@ -257,6 +288,109 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
+      "id": "tag:handoff",
+      "label": "#handoff",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "handoff"
+      ]
+    },
+    {
+      "id": "tag:architecture",
+      "label": "#architecture",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "architecture"
+      ]
+    },
+    {
+      "id": "tag:live-proof",
+      "label": "#live-proof",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "live-proof"
+      ]
+    },
+    {
+      "id": "tag:chatgpt",
+      "label": "#chatgpt",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "chatgpt"
+      ]
+    },
+    {
+      "id": "source:metraiyux-0s-site-brain",
+      "label": "brain/",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/brain/",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-brain-obsidian-sync-json",
+      "label": "brain/obsidian-sync.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/brain/obsidian-sync.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:obsidian-vault-neural-map",
+      "label": "_neural-map/",
+      "type": "source",
+      "group": "source",
+      "path": "obsidian-vault/_neural-map/",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-live",
+      "label": "live/",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/live/",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-brain-persona-brains-json",
+      "label": "brain/persona-brains.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/brain/persona-brains.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-live-e2e-metraiyux",
+      "label": "live-e2e-metraiyux/",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/live-e2e-metraiyux/",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-brain-live-surface-registry-json",
+      "label": "brain/live-surface-registry.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/brain/live-surface-registry.json",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "tag:production",
       "label": "#production",
       "type": "tag",
@@ -275,15 +409,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": [
         "current-state"
       ]
-    },
-    {
-      "id": "source:test-artifacts-live-e2e-metraiyux",
-      "label": "live-e2e-metraiyux/",
-      "type": "source",
-      "group": "source",
-      "path": "test-artifacts/live-e2e-metraiyux/",
-      "size": 10,
-      "tags": []
     },
     {
       "id": "source:test-artifacts-live-deployment-ledger",
@@ -320,15 +445,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "type": "source",
       "group": "source",
       "path": "obsidian-vault/_neural-map/index.html",
-      "size": 10,
-      "tags": []
-    },
-    {
-      "id": "source:obsidian-vault-neural-map",
-      "label": "_neural-map/",
-      "type": "source",
-      "group": "source",
-      "path": "obsidian-vault/_neural-map/",
       "size": 10,
       "tags": []
     },
@@ -418,15 +534,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       ]
     },
     {
-      "id": "source:metraiyux-0s-site-brain-live-surface-registry-json",
-      "label": "brain/live-surface-registry.json",
-      "type": "source",
-      "group": "source",
-      "path": "metraiyux_0s_site/brain/live-surface-registry.json",
-      "size": 10,
-      "tags": []
-    },
-    {
       "id": "source:obsidian-vault-10-production-ceo",
       "label": "10-production/CEO",
       "type": "source",
@@ -503,6 +610,81 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
+      "id": "tag:skyes-over-london",
+      "label": "#skyes-over-london",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "skyes-over-london"
+      ]
+    },
+    {
+      "id": "tag:mcp",
+      "label": "#mcp",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "mcp"
+      ]
+    },
+    {
+      "id": "tag:vault",
+      "label": "#vault",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "vault"
+      ]
+    },
+    {
+      "id": "source:test-artifacts-direct-mcp-skyes-over-london-lc-mcp-tooling-receipt-json",
+      "label": "direct-mcp/skyes-over-london-lc-mcp-tooling-receipt.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/direct-mcp/skyes-over-london-lc-mcp-tooling-receipt.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyes-over-london-lc-desktop-home-png",
+      "label": "skyes-over-london-lc/desktop-home.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyes-over-london-lc/desktop-home.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyes-over-london-lc-mobile-home-png",
+      "label": "skyes-over-london-lc/mobile-home.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyes-over-london-lc/mobile-home.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyes-over-london-lc-desktop-contact-png",
+      "label": "skyes-over-london-lc/desktop-contact.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyes-over-london-lc/desktop-contact.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyes-over-london-lc-mobile-contact-png",
+      "label": "skyes-over-london-lc/mobile-contact.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyes-over-london-lc/mobile-contact.png",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "folder:sales",
       "label": "sales",
       "type": "folder",
@@ -518,16 +700,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "size": 13,
       "tags": [
         "sales"
-      ]
-    },
-    {
-      "id": "tag:handoff",
-      "label": "#handoff",
-      "type": "tag",
-      "group": "tag",
-      "size": 13,
-      "tags": [
-        "handoff"
       ]
     },
     {
@@ -605,15 +777,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": [
         "source-of-truth"
       ]
-    },
-    {
-      "id": "source:metraiyux-0s-site-brain-obsidian-sync-json",
-      "label": "brain/obsidian-sync.json",
-      "type": "source",
-      "group": "source",
-      "path": "metraiyux_0s_site/brain/obsidian-sync.json",
-      "size": 10,
-      "tags": []
     }
   ],
   "links": [
@@ -656,6 +819,90 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:00-command-center/0S Command Runner.md",
       "target": "source:ops-0s-command-registry-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:command",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:metraiyux",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:handoff",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:architecture",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:live-proof",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:chatgpt",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-brain",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-brain-obsidian-sync-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:obsidian-vault-neural-map",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-live",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-brain-persona-brains-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:test-artifacts-live-e2e-metraiyux",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-brain-live-surface-registry-json",
       "type": "source",
       "strength": 0.8
     },
@@ -949,6 +1196,72 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "hub:metraiyux",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:proof",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:proof",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyes-over-london",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:mcp",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:vault",
+      "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:test-artifacts-direct-mcp-skyes-over-london-lc-mcp-tooling-receipt-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:test-artifacts-skyes-over-london-lc-desktop-home-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:test-artifacts-skyes-over-london-lc-mobile-home-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:test-artifacts-skyes-over-london-lc-desktop-contact-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:test-artifacts-skyes-over-london-lc-mobile-contact-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
       "target": "note:30-sales/Sales And Handoff Map.md",
       "type": "vault",
       "strength": 1.8
@@ -1082,6 +1395,12 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:Home.md",
       "target": "note:00-command-center/Current Production State.md",
+      "type": "wikilink",
+      "strength": 2
+    },
+    {
+      "source": "note:Home.md",
+      "target": "note:00-command-center/ChatGPT Project Handoff.md",
       "type": "wikilink",
       "strength": 2
     },

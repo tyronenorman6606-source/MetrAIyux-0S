@@ -1,9 +1,21 @@
 {
-  "generated_at": "2026-05-17T08:26:48.461Z",
+  "generated_at": "2026-05-17T14:46:22.038Z",
   "source_vault": "obsidian-vault",
-  "note_count": 8,
-  "chunk_count": 34,
+  "note_count": 10,
+  "chunk_count": 58,
   "notes": [
+    {
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "chunk_count": 18
+    },
     {
       "source": "obsidian-vault/00-command-center/Current Production State.md",
       "title": "Current Production State",
@@ -66,6 +78,17 @@
       "chunk_count": 4
     },
     {
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "chunk_count": 6
+    },
+    {
       "source": "obsidian-vault/30-sales/Sales And Handoff Map.md",
       "title": "Sales And Handoff Map",
       "tags": [
@@ -87,6 +110,258 @@
     }
   ],
   "chunks": [
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-1-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "ChatGPT Project Handoff",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "Use this note as the compact project brain for ChatGPT. It is proof-first, public-safe, and current as of 2026-05-17T14:44:28Z UTC."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-2-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Operator Instruction For ChatGPT",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "You are helping with the MetrAIyux 0S repo at /workspaces/MetrAIyux-0S. Treat this handoff as the current map of the project. Keep all claims tied to source files, live URLs, proof receipts, or explicit blockers. Do not invent client outcomes, credentials, legal status, payment status, or autonomous authority. When building or auditing frontend surfaces in this repo, use the repo-local QuantumSkyes MCP flow from . mcp. json with npm run mcp:mine -- <target-folder and read the generated MCPTOOLINGRECEIPT. json."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-3-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "What The Project Is",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "MetrAIyux 0S is a protected autonomous company operating system and client-deployable command deck. It combines a public website, buyer proof router, owner/admin command surfaces, customer SaaS workspaces, local browser brain, named operating-brain routing, Cloudflare Worker kits, SkyeGateFS27 identity/event gating, SkyePay storefront proof, proof ledgers, and Obsidian vault memory. SkyeGateFS27 is the gate layer: identity, user/dashboard actions, event proof, key control, Skyes/SkyePay storefront routing, and bridge proof for MetrAIyux. MetrAIyux 0S is the operating deck that consumes those proof/gate surfaces and routes business work into cabinet brains, approval gates, client surfaces, and receipts."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-4-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Source Architecture",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- metraiyux0ssite/ is the main deployable 0S site and command deck. It contains static public pages, admin pages, SaaS/customer portal pages, local brain assets, Cloudflare Worker kits, CROWN/NEXUS/Sentinel/autonomous business layers, proof pages, calculators, sales enablement, governance, pricing, client OS, and brain JSON registries. - metraiyux0ssite/brain/ is the browser-local knowledge layer. It includes knowledge-base. json, obsidian-sync. json, live-surface-registry. json, persona-brains. json, site-operator-brain. json, automation-brain. json, sales-offer-registry. json, legal sync, marketplace sync, and local-brain UI/runtime files. - SkyeGateFS27/ is the gate and SkyePay system. It contains the live gate pages, proof pages, Cloudflare Worker, SkyePay store/admin/client assets, pricing registry, runtime store, openapi spec, SQL migrations, smoke tests, and deployment scripts."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-4-2",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Source Architecture",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- MCP/ is the local QuantumSkyes/Skye design MCP server and design tooling. It exposes pattern packs, recipes, audits, quality gates, stack gates, logo/design manifests, browser proof expectations, and production-ledger access. - obsidian-vault/ is the private operator memory layer. Notes with brain: true export into metraiyux0ssite/brain/obsidian-sync. json and into the public-safe neural map. The private graph lives in obsidian-vault/neural-map/. - client-app-factory/ is the client deployment engine for generated apps. It includes the factory server, scan engine, app generation, proof ledger, browser proof, service worker, manifest, storage records, and API/browser smoke tests. - marketing/ holds public spectacle/marketing surfaces, MetrAIyux marketing, review wall assets, and related deployable buyer-facing pages."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-4-3",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Source Architecture",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- metraiyux-portal/, SkyeVault-Drop/, unpacked-projects/, and metraiyux0ssite/live/ hold ecosystem portals, vault/drop systems, imported product packages, live surface source packages, and proof-heavy product work."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-5-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Brain Architecture",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "The hard source of truth currently enumerates 16 brain profiles in metraiyux0ssite/brain/persona-brains. json. Some copy is versioned as 17-brain-live-review-routing or says \"17-brain\"; for public claims, use \"16 enumerated/connected brain profiles\" until the data contract is normalized."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-5-2",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Brain Architecture",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "Current enumerated profiles: - Site Operator Brain - 0meg4kAI Security / QA Assistant Brain - Central Company Command Brain - Gray London Skyes Brain - Marcus Vale Brain - Celeste Monroe Brain - Adrian Cross Brain - Naomi Sterling Brain - Julian Mercer Brain - Sienna Brooks Brain - Orion Hayes Brain - Valentina Reyes Brain - Donovan Pierce Brain - Helena Ward Brain - Victor Saint Brain - Amara Voss Brain Routing standard: Site Operator classifies incoming work, selects primary and secondary brains, applies human approval gates, creates local task/event/proof receipts, and routes risky work through 0meg4kAI/security or the relevant cabinet brain. Money movement, contracts, hiring, regulated advice, public claims, external sends, and production publishing require human approval."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-6-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Live Production Proof",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "Canonical live deployment ledger: LIVEDEPLOYMENTLEDGER. md. As of the 2026-05-16 ledger, Cloudflare production had 24 live deployment surfaces: 13 Pages projects and 11 Workers. The ledger recorded 36 live HTTP checks with 0 failures. In this session on 2026-05-17T14:44:28Z UTC, 24 core URLs were rechecked with curl -L and all returned HTTP 200. Key live Pages surfaces: - Skyes Over London Reviews: https://skyes-over-london-reviews. pages. dev/ - Bob's Smoke Shop preview: https://bobs-smoke-shop-metraiyux-preview. pages. dev/ - MetrAIyux Ecosystem Portal: https://metraiyux-ecosystem-portal. pages. dev/ - SOL Staffing agency site: https://sol-staffing-agency-site. pages. dev/ - Neon Rift Blocks Mobile: https://neon-rift-blocks-mobile. pages. dev/ - SOL Staffing marketing: https://sol-staffing-marketing. pages. dev/ - MetrAIyux 0S client preview: https://metraiyux-0s-client-preview. pages."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-6-2",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Live Production Proof",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "dev/ - MetrAIyux 0S public spectacle: https://metraiyux-0s-public-spectacle. pages. dev/ - Skyes Over London Legal: https://skyes-over-london-legal. pages. dev/ - CitadelDB Ultimate: https://citadeldb-ultimate. pages. dev/ - Skye Design MCP: https://skye-design-mcp. pages. dev/ - MetrAIyux 0S marketing: https://metraiyux-0s-marketing. pages. dev/ - MetrAIyux 0S logo rollout: https://metraiyux-0s-logo-rollout. pages. dev/ Key live Workers: - MetrAIyux 0S full system: https://metraiyux-0s-full-system. graylondonskyes. workers. dev/ - Sovereign SaaS provisioning worker: https://sovereign-saas-provisioning-worker. graylondonskyes. workers. dev/ - SkyeVault drop: https://skyevault-drop. graylondonskyes. workers. dev/ - SkyeMail platform: https://skyemail-platform. graylondonskyes. workers. dev/ - SkyeGateFS27 / CitadelDB: https://skyegatefs27-citadeldb. graylondonskyes. workers."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-6-3",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Live Production Proof",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "dev/ - Sovereign 13 Site Operator Quantum: https://sovereign-13-site-operator-quantum. graylondonskyes. workers. dev/ - Admin Automation Brain: https://admin-automation-brain. graylondonskyes. workers. dev/ - CROWN Site Operator: https://crown-site-operator. graylondonskyes. workers. dev/ - Sovereign 13 Cabinet NEXUS Operator: https://sovereign-13-cabinet-nexus-operator. graylondonskyes. workers. dev/ - Sovereign 13 Cabinet Sentinel Operator: https://sovereign-13-cabinet-sentinel-operator. graylondonskyes. workers. dev/ - 0meg4kAI Security Gateway: https://omeg4kai-security-gateway. graylondonskyes. workers. dev/"
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-7-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Consistent Proof Signals",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- MetrAIyux production E2E was previously recorded at 71 checks, 0 failures, and 0 warnings, with screenshots under test-artifacts/live-e2e-metraiyux/ when present in the working copy. - The live proof router is at https://metraiyux-0s-full-system. graylondonskyes. workers. dev/sales/live-proof-router. html. - The live surface registry is metraiyux0ssite/brain/live-surface-registry. json; current version is 2026-05-17-live-review-intake-routing. - SkyeGateFS27 proof routes are https://skyegatefs27-citadeldb. graylondonskyes. workers. dev/gate-proofx. html, https://skyegatefs27-citadeldb. graylondonskyes. workers. dev/gate-map. html, and https://skyegatefs27-citadeldb. graylondonskyes. workers. dev/store. - SkyePay production proof in the ledger says the store returned 61 offers, 50 repo-registry checkout imports, no horizontal overflow, and a live Stripe Checkout cslive handoff."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-7-2",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Consistent Proof Signals",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "Bob's client lane was intentionally simplified to one free tester-week handoff without public store/ledger/catalog language. - Skyes Over London Reviews proof says the production page returned HTTP 200, had no console errors, no horizontal overflow, no fake Approved text, no Name Withheld text, no synthetic/placeholder/client-approval status text, 115 review cards, 115 full detail pages, a live desktop/mobile Three. js atlas, 6 infrastructure links on the first detail page, and window. skyeReviewAtlas. active === true. - Review routing rule: prospects asking for reviews/social proof go to the public review wall; clients who want to leave feedback go to submit-review. html; publication is not proof until 0S QA confirms consent, public-name preference, category fit, and proof safety, then five approved unpublished reviews are batched for production."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-7-3",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Consistent Proof Signals",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- MCP design/proof receipts are present for recent work including marketing/metraiyux-0s/, unpacked-projects/over3arth/, metraiyux0ssite/, MCP/, empire-pallets-v3-app/, bobs-smoke-shop-mcp-redo/, MCP/skye-design-lab/, unpacked-projects/skyes-over-london-lc/, SkyeGateFS27/, and client-app-factory/. - Skyes Over London LC proof atlas receipt on 2026-05-17 records MCP audit success, desktop/mobile browser QA, a SkyeVault package receipt, and a scanner exclusion for login. html because it matched a Google API key pattern."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-8-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Known Boundaries And Blockers",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- The system routes, drafts, stores receipts, and proves surfaces; it does not autonomously sign contracts, move money, hire/fire, file legal documents, provide regulated advice, publish public claims, or bypass human approval. - Do not expose admin tokens, database URLs, mirror secrets, API keys, private setup instructions, reviewer emails, or owner-only admin playbooks in public outputs. - Node OS local prep is done, but full ISO build and boot proof need a larger build host and hardware profile. - Citadel Forge local stack is healthy, but production domains, DNS, auth policy, real Stripe price IDs, runner registration, and backup/restore proof are external-account gates. - Client Drop Vault local app checks pass, but live Drive destination proof needs a Shared Drive/user-owned folders or domain-wide delegation because service-account quota blocked destination writes."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-8-2",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Known Boundaries And Blockers",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- Some ledger artifact paths may not exist in a partial checkout; treat LIVEDEPLOYMENTLEDGER. md, metraiyux0ssite/brain/live-surface-registry. json, current MCP receipts, and fresh HTTP checks as the current proof anchors available in this workspace."
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-9-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "Commands ChatGPT Should Know",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "- Sync Obsidian brain export: npm run brain:sync:obsidian - Generate private Obsidian neural map: npm run obsidian:graph - Generate public-safe neural map: npm run obsidian:web-graph - Serve MetrAIyux site locally: npm run skye:serve:site - Static crawl QA: npm run skye:crawl:static - Live crawl QA: npm run skye:crawl:live - Repo health: npm run repo:health - MCP mining for a target folder: npm run mcp:mine -- <target-folder - SkyeSol current public site MCP default: npm run mcp:skyesol"
+    },
+    {
+      "id": "obsidian-00-command-center-chatgpt-project-handoff-md-10-1",
+      "source": "obsidian-vault/00-command-center/ChatGPT Project Handoff.md",
+      "title": "ChatGPT Project Handoff",
+      "heading": "How To Answer Future Questions",
+      "tags": [
+        "metraiyux",
+        "handoff",
+        "architecture",
+        "live-proof",
+        "chatgpt"
+      ],
+      "text": "Use proof-first language. Start with what is live, what is local-only, what is blocked, and what evidence exists. When describing architecture, separate MetrAIyux 0S, SkyeGateFS27, MCP, Obsidian/local brain, client-app-factory, and Cloudflare Workers/Pages. When the user asks for public copy, keep it buyer-safe and do not overclaim autonomy, legal authority, payments, client results, or review approval."
+    },
     {
       "id": "obsidian-00-command-center-current-production-state-md-1-1",
       "source": "obsidian-vault/00-command-center/Current Production State.md",
@@ -405,6 +680,84 @@
       "text": "If a note contains a useful claim without proof, create an operator action instead of treating it as sales language. Review submissions are proof candidates, not proof, until the 0S QA queue confirms consent, public-name preference, category fit, and claims safety. Five approved unpublished reviews are required before a production batch should be pushed into the wall."
     },
     {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-1-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "Summary",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "Skyes Over London LC public site was unpacked from the deployment archive, deep-scanned, renamed back to the company identity, redesigned as an editorial proof atlas, audited through the local QuantumSkyes MCP, and browser-checked on desktop/mobile."
+    },
+    {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-2-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "Local Surface",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "- Site folder: unpacked-projects/skyes-over-london-lc/ - Homepage: unpacked-projects/skyes-over-london-lc/index. html - Contact route: unpacked-projects/skyes-over-london-lc/pages/contact. html - MCP receipt: unpacked-projects/skyes-over-london-lc/MCPTOOLINGRECEIPT. json - Direct MCP receipt artifact: test-artifacts/direct-mcp/skyes-over-london-lc-mcp-tooling-receipt. json"
+    },
+    {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-3-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "Browser QA",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "- Desktop homepage: test-artifacts/skyes-over-london-lc/desktop-home. png - Mobile homepage: test-artifacts/skyes-over-london-lc/mobile-home. png - Desktop contact: test-artifacts/skyes-over-london-lc/desktop-contact. png - Mobile contact: test-artifacts/skyes-over-london-lc/mobile-contact. png"
+    },
+    {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-4-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "MCP Result",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "- Command: npm run mcp:mine -- unpacked-projects/skyes-over-london-lc - Result: ok: true - Failed MCP calls: [] - Design direction: editorial-proof-atlas with company-attached public proof language."
+    },
+    {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-5-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "Vault Package",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "- Stage folder: . skyevault-out/stage-skyes-over-london-lc-20260517/ - Archive: . skyevault-out/skyes-over-london-lc-proof-atlas-20260517T092216Z. zip - SHA-256: b608894ced56388c87ad174c5c38551e431e353ea6d6ed9d6af3e777bdf8b615 - SkyeVault receipt: cdv3beaaa13277b546bf509f73b - SkyeVault session: cdvffa2057639caef4cbced83bb991b0e9ae61d - SkyeVault destination: Primary Production Intake - Note: login. html was excluded from the vault package because the SkyeVault scanner flagged it as containing a Google API key pattern."
+    },
+    {
+      "id": "obsidian-20-proof-skyes-over-london-lc-proof-atlas-receipt-2026-05-17-md-6-1",
+      "source": "obsidian-vault/20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "title": "Skyes Over London LC Proof Atlas Receipt - 2026-05-17",
+      "heading": "Git Base",
+      "tags": [
+        "proof",
+        "skyes-over-london",
+        "mcp",
+        "vault"
+      ],
+      "text": "- Base commit before this receipt: bd6ebb3"
+    },
+    {
       "id": "obsidian-30-sales-sales-and-handoff-map-md-1-1",
       "source": "obsidian-vault/30-sales/Sales And Handoff Map.md",
       "title": "Sales And Handoff Map",
@@ -474,7 +827,7 @@
         "command-center",
         "source-of-truth"
       ],
-      "text": "- 00-command-center/Current Production State - 00-command-center/Next Operator Actions - 10-production/Production Blockers - 10-production/Live Surface Registry - 20-proof/Proof Ledger - 30-sales/Sales And Handoff Map"
+      "text": "- 00-command-center/Current Production State - 00-command-center/ChatGPT Project Handoff - 00-command-center/Next Operator Actions - 10-production/Production Blockers - 10-production/Live Surface Registry - 20-proof/Proof Ledger - 30-sales/Sales And Handoff Map"
     },
     {
       "id": "obsidian-home-md-3-1",

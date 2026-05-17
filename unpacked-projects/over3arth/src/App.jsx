@@ -37,10 +37,12 @@ import {
 } from 'lucide-react';
 
 import Meter from './components/Meter.jsx';
+import NeuralSpaceField from './components/NeuralSpaceField.jsx';
+import NeuralSpacePortal from './components/NeuralSpacePortal.jsx';
 import SigilButton from './components/SigilButton.jsx';
-import WorldskinVeil from './components/WorldskinVeil.jsx';
 import { Globe } from './registry/magicui/globe.jsx';
 import { allianceTemplates, anchorTemplates, archetypes, canonTemplates, epochTemplates, focusSessionTemplates, planLanes, realms, realityContractTemplates, researchPrinciples, ritualPrompts, worldBlueprints } from './data/over3arthContent.js';
+import { getNeuralSpaceLane, neuralSpaceLanes } from './data/neuralSpacePro.js';
 import {
   addLedgerEntry,
   calculateStats,
@@ -73,6 +75,7 @@ import {
 } from './lib/engine.js';
 import { clearSnapshots, downloadTextFile, exportState, getSnapshotVault, loadState, parseImportedState, resetState, restoreSnapshot, saveSnapshot, saveState } from './lib/storage.js';
 import { trackEvent } from './lib/analytics.js';
+import { archiveNeuralSpaceExchange, loadNeuralRuntimeSignal, triggerNeuralSpaceBuild } from './lib/neuralSpaceRuntime.js';
 import { DEFAULT_VESSEL_NAME, createBrainResponse, detectBrainTarget, gateWorldNames, getVesselName } from './lib/voiceBrains.js';
 
 const navItems = [
@@ -598,6 +601,21 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const [brainLine, setBrainLine] = useState(() => `${DEFAULT_VESSEL_NAME} is awake above Overearth. Tap the voice sigil, say "Overearth" or "${DEFAULT_VESSEL_NAME}", then ask for a mission, realm jump, or status.`);
   const [lastTranscript, setLastTranscript] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [audioOutputEnabled, setAudioOutputEnabled] = useState(false);
+  const [travelPulse, setTravelPulse] = useState(0);
+  const [chatInput, setChatInput] = useState('');
+  const [neuralLaneId, setNeuralLaneId] = useState('chat');
+  const [neuralRuntime, setNeuralRuntime] = useState({ online: false, checkedAt: null, summary: null });
+  const [neuralBusy, setNeuralBusy] = useState(false);
+  const [brainLog, setBrainLog] = useState(() => [
+    {
+      id: 'boot_vessel',
+      target: 'vessel',
+      role: 'brain',
+      text: `${DEFAULT_VESSEL_NAME} online. I can take typed commands here while the mic listens from the sigil.`,
+      createdAt: new Date().toISOString()
+    }
+  ]);
   const recognitionRef = useRef(null);
   const commandHandlerRef = useRef(null);
   const voiceEnabledRef = useRef(false);
@@ -612,6 +630,10 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     voiceEnabledRef.current = voiceEnabled;
   }, [voiceEnabled]);
 
+  useEffect(() => {
+    refreshNeuralRuntime({ silent: true });
+  }, []);
+
   const selected = sectors.find((sector) => sector.id === selectedRealmId) || sectors[0];
   const selectedRealm = getRealm(selected?.id || 'craft');
   const selectedQuests = state.quests.filter((quest) => quest.realm === selectedRealm.id);
@@ -624,21 +646,37 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const voiceSupported = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const worldskinCharge = clampPercent((stats.energy + selected.charge + (priorityQuest ? 18 : 0)) / 2);
+  const activeGateCoord = activeGate.coordinate || { x: 50, y: 28 };
+  const activeNeuralLane = getNeuralSpaceLane(neuralLaneId);
 
-  commandHandlerRef.current = handleVoiceCommand;
+  commandHandlerRef.current = (transcript) => handleBrainCommand(transcript, 'voice');
 
   return (
-    <section className="spectacle-scene worldskin-scene" data-brain={brainTarget} data-voice={brainMode} aria-label="Playable Overearth universe">
-      <WorldskinVeil charge={worldskinCharge} brainTarget={brainTarget} />
+    <section className="spectacle-scene worldskin-scene" data-brain={brainTarget} data-voice={brainMode} data-neural-lane={neuralLaneId} aria-label="Playable Overearth universe">
+      <NeuralSpaceField activeLaneId={neuralLaneId} charge={worldskinCharge} brainTarget={brainTarget} travelPulse={travelPulse} />
       <div
         className="world-charge-orbit spectacle-orbit worldskin-orbit"
-        style={{ '--world-charge': `${Math.max(8, stats.energy)}%`, '--avatar-angle': `${avatarAngle}deg`, '--worldskin-charge': `${worldskinCharge}%` }}
+        style={{
+          '--world-charge': `${Math.max(8, stats.energy)}%`,
+          '--avatar-angle': `${avatarAngle}deg`,
+          '--worldskin-charge': `${worldskinCharge}%`,
+          '--rift-x': `${activeGateCoord.x}%`,
+          '--rift-y': `${activeGateCoord.y}%`,
+          '--neural-color': activeNeuralLane.color
+        }}
       >
         <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
         <div className="worldskin-pulse-field" aria-hidden="true">
           <span />
           <span />
           <span />
+        </div>
+        <div className="worldskin-interior-rift" key={`rift-${activeGateId}-${selectedRealmId}-${travelPulse}`} aria-hidden="true">
+          <span className="rift-core" />
+          <span className="rift-depth depth-one" />
+          <span className="rift-depth depth-two" />
+          <span className="rift-route route-one" />
+          <span className="rift-route route-two" />
         </div>
         <div className="worldskin-gate-field" aria-label="Overearth world gates">
           {gameGates.map((gate, index) => {
@@ -713,13 +751,52 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
         <button type="button" onClick={() => speakBrain(createBrainResponse({ transcript: 'status', target: 'overearth', state, stats, selectedRealm, activeGate, gates: gameGates, realms, vesselName }).response, 'overearth')} title="World status" aria-label="World status"><Radar size={17} /></button>
       </div>
 
-      <motion.div className="worldskin-voice-ribbon" data-target={brainTarget} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }} aria-live="polite">
-        <span className="voice-ribbon-speaker">
-          {brainTarget === 'overearth' ? <Globe2 size={14} /> : <Volume2 size={14} />}
-          {brainTarget === 'overearth' ? 'Overearth' : vesselName}
-        </span>
-        <p>{brainLine}</p>
-        <small>{lastTranscript ? `Heard: ${lastTranscript}` : voiceSupported ? 'Say “Overearth” or the vessel name after tapping the mic.' : 'Voice recognition is not available in this browser. The sigils still run the local brains.'}</small>
+      <motion.div className="worldskin-brain-dock" data-target={brainTarget} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }} aria-live="polite">
+        <div className="brain-dock-head">
+          <span className="voice-ribbon-speaker">
+            {brainTarget === 'overearth' ? <Globe2 size={14} /> : <Volume2 size={14} />}
+            {brainTarget === 'overearth' ? 'Overearth' : vesselName}
+          </span>
+          <div className="brain-dock-status">
+            <span className={voiceEnabled ? 'listening-dot active' : 'listening-dot'} />
+            {voiceEnabled ? 'Listening' : voiceSupported ? 'Mic ready' : 'Typed mode'}
+          </div>
+        </div>
+        <div className="brain-dock-worldline">
+          <strong>{activeGate.worldName}</strong>
+          <span>{selectedRealm.name} / {activeNeuralLane.shortLabel}</span>
+        </div>
+        <div className="brain-log" aria-label="Overearth brain chat log">
+          {brainLog.slice(-4).map((item) => (
+            <div key={item.id} className={`brain-log-entry ${item.role} ${item.target || 'player'}`}>
+              <span>{item.role === 'player' ? 'You' : item.target === 'overearth' ? 'Overearth' : vesselName}</span>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
+        <NeuralSpacePortal
+          lanes={neuralSpaceLanes}
+          activeLaneId={neuralLaneId}
+          runtime={neuralRuntime}
+          busy={neuralBusy}
+          onSelectLane={(laneId) => selectNeuralLane(laneId, true)}
+          onRefresh={() => refreshNeuralRuntime()}
+        />
+        <form className="brain-command-line" onSubmit={submitBrainChat}>
+          <MessageCircle size={15} aria-hidden="true" />
+          <input
+            value={chatInput}
+            onChange={(event) => setChatInput(event.target.value)}
+            placeholder={`Talk to Overearth, ${vesselName}, or NeuralSpacePro`}
+            aria-label={`Talk to Overearth, ${vesselName}, or NeuralSpacePro`}
+          />
+          <button type="submit" aria-label="Send brain command"><ChevronRight size={16} /></button>
+        </form>
+        <div className="brain-dock-controls">
+          <button type="button" onClick={toggleListening}>{voiceEnabled ? 'Stop mic' : 'Start mic'}</button>
+          <button type="button" onClick={() => setAudioOutputEnabled((value) => !value)}>{audioOutputEnabled ? 'Mute voice' : 'Enable voice'}</button>
+        </div>
+        <small>{lastTranscript ? `Heard: ${lastTranscript}` : neuralRuntime.online ? 'NeuralSpace runtime linked through the local worker.' : 'Type here anytime. Start the NeuralSpace runtime to archive sessions and build proofs.'}</small>
       </motion.div>
     </section>
   );
@@ -779,17 +856,42 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     }
   }
 
-  function handleVoiceCommand(transcript) {
+  function submitBrainChat(event) {
+    event.preventDefault();
+    const transcript = chatInput.trim();
+    if (!transcript) return;
+    setChatInput('');
+    handleBrainCommand(transcript, 'typed');
+  }
+
+  function handleBrainCommand(transcript, source = 'typed') {
     const target = detectBrainTarget(transcript, vesselName, brainTarget);
     const result = createBrainResponse({ transcript, target, state, stats, selectedRealm, activeGate, gates: gameGates, realms, vesselName });
     setLastTranscript(transcript);
     setBrainTarget(result.target);
+    appendBrainLog([
+      {
+        id: uid('player'),
+        role: 'player',
+        source,
+        text: transcript,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: uid('brain'),
+        role: 'brain',
+        target: result.target,
+        text: result.response,
+        createdAt: new Date().toISOString()
+      }
+    ]);
     applyBrainAction(result, transcript);
     rememberBrainExchange(transcript, result);
-    speakBrain(result.response, result.target);
+    bridgeNeuralSpace(result, transcript);
+    speakBrain(result.response, result.target, { log: false });
   }
 
-  function applyBrainAction(result) {
+  function applyBrainAction(result, transcript) {
     if (result.action === 'travel_realm') {
       const realm = sectors.find((sector) => sector.id === result.payload.realmId);
       if (realm) travelToRealm(realm, false);
@@ -808,23 +910,166 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
         profile: { ...current.profile, vesselName: result.payload.name }
       }), '', 'vessel_renamed');
     }
+    if (['open_neural_lane', 'neural_research', 'neural_build'].includes(result.action)) {
+      selectNeuralLane(result.payload?.laneId || 'chat', false);
+    }
+    if (result.action === 'neural_build') {
+      launchNeuralSpaceBuild(transcript, result);
+    }
   }
 
-  function speakBrain(text, target = 'vessel') {
+  function selectNeuralLane(laneId, shouldSpeak = false) {
+    const lane = getNeuralSpaceLane(laneId);
+    setNeuralLaneId(lane.id);
+    setTravelPulse((value) => value + 1);
+    const linkedGate = gameGates.find((item) => item.id === lane.gateId);
+    if (linkedGate) setActiveGateId(linkedGate.id);
+    if (shouldSpeak) {
+      speakBrain(`${lane.label} is now the active assistant dimension. ${lane.response}`, 'vessel');
+    }
+  }
+
+  async function refreshNeuralRuntime(options = {}) {
+    const { silent = false } = options;
+    setNeuralBusy(true);
+    try {
+      const signal = await loadNeuralRuntimeSignal();
+      setNeuralRuntime(signal);
+      if (!silent) {
+        appendBrainLog([{
+          id: uid('neural_sync'),
+          role: 'brain',
+          target: 'vessel',
+          text: signal.online
+            ? `NeuralSpace runtime linked: ${signal.summary.sessionCount} sessions, ${signal.summary.projectCount} projects, ${signal.summary.queueDepth} queued events.`
+            : 'NeuralSpace runtime is staged, but the local worker is not responding yet.',
+          createdAt: new Date().toISOString()
+        }]);
+      }
+      return signal;
+    } catch {
+      const offline = { online: false, checkedAt: new Date().toISOString(), summary: null };
+      setNeuralRuntime(offline);
+      if (!silent) {
+        appendBrainLog([{
+          id: uid('neural_sync'),
+          role: 'brain',
+          target: 'vessel',
+          text: 'NeuralSpace runtime is waiting. Start the local runtime and I can archive chats, builds, queues, and handoffs from here.',
+          createdAt: new Date().toISOString()
+        }]);
+      }
+      return offline;
+    } finally {
+      setNeuralBusy(false);
+    }
+  }
+
+  async function bridgeNeuralSpace(result, transcript) {
+    if (!['open_neural_lane', 'neural_research'].includes(result.action)) return;
+    setNeuralBusy(true);
+    try {
+      const laneId = result.payload?.laneId || neuralLaneId;
+      const payload = await archiveNeuralSpaceExchange({
+        transcript,
+        response: result.response,
+        laneId,
+        context: {
+          worldName: state.profile.worldName,
+          realmName: selectedRealm.name,
+          gateName: activeGate.worldName
+        }
+      });
+      appendBrainLog([{
+        id: uid('neural_session'),
+        role: 'brain',
+        target: 'vessel',
+        text: `NeuralSpace archived this as ${payload.sessionId}.`,
+        createdAt: new Date().toISOString()
+      }]);
+      await refreshNeuralRuntime({ silent: true });
+    } catch {
+      appendBrainLog([{
+        id: uid('neural_session'),
+        role: 'brain',
+        target: 'vessel',
+        text: 'NeuralSpace lane is open visually. The local runtime will start archiving once its worker is running.',
+        createdAt: new Date().toISOString()
+      }]);
+    } finally {
+      setNeuralBusy(false);
+    }
+  }
+
+  async function launchNeuralSpaceBuild(transcript, result) {
+    setNeuralBusy(true);
+    try {
+      const laneId = result.payload?.laneId || 'build';
+      const payload = await triggerNeuralSpaceBuild({
+        laneId,
+        brief: [
+          transcript,
+          '',
+          `Overearth context: ${state.profile.worldName} / ${selectedRealm.name} / ${activeGate.worldName}.`,
+          'Generate only local proof artifacts for this assistant-universe build lane.'
+        ].join('\n'),
+        context: {
+          worldName: state.profile.worldName
+        }
+      });
+      appendBrainLog([{
+        id: uid('neural_build'),
+        role: 'brain',
+        target: 'vessel',
+        text: `Build Forge generated ${payload.projectId} with quality ${payload.qualityScore}. The queue now has a proof event.`,
+        createdAt: new Date().toISOString()
+      }]);
+      await refreshNeuralRuntime({ silent: true });
+    } catch {
+      appendBrainLog([{
+        id: uid('neural_build'),
+        role: 'brain',
+        target: 'vessel',
+        text: 'Build Forge is staged, but the NeuralSpace local runtime is not answering yet. The lane will fire once the worker is up.',
+        createdAt: new Date().toISOString()
+      }]);
+    } finally {
+      setNeuralBusy(false);
+    }
+  }
+
+  function appendBrainLog(entries) {
+    setBrainLog((current) => [...current, ...entries].slice(-18));
+  }
+
+  function speakBrain(text, target = 'vessel', options = {}) {
+    const { log = true } = options;
     setBrainTarget(target);
     setBrainLine(text);
     setBrainMode('speaking');
+    if (log) {
+      appendBrainLog([{
+        id: uid('brain'),
+        role: 'brain',
+        target,
+        text,
+        createdAt: new Date().toISOString()
+      }]);
+    }
 
-    if (!speechSupported) {
+    if (!speechSupported || !audioOutputEnabled) {
       window.setTimeout(() => setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle'), 900);
       return;
     }
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = target === 'overearth' ? 0.88 : 1;
-    utterance.pitch = target === 'overearth' ? 0.72 : 1.22;
-    utterance.volume = 0.92;
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const preferredVoice = voices.find((voice) => /natural|samantha|aria|jenny|guy|zira|daniel|google us english/i.test(voice.name));
+    if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.rate = target === 'overearth' ? 0.78 : 0.92;
+    utterance.pitch = target === 'overearth' ? 0.62 : 1.04;
+    utterance.volume = 0.86;
     utterance.onend = () => setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle');
     window.speechSynthesis.speak(utterance);
   }
@@ -850,6 +1095,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   function travelToGate(gate, shouldSpeak = false) {
     if (!gate) return;
     setActiveGateId(gate.id);
+    setTravelPulse((value) => value + 1);
     trackEvent('avatar_travel', { destination: gate.id, mode: 'worldskin' });
     if (shouldSpeak) speakBrain(`${vesselName} crossed into ${gate.worldName}.`, 'vessel');
   }
@@ -858,6 +1104,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     if (!realm) return;
     setSelectedRealmId(realm.id);
     setActiveGateId('realms');
+    setTravelPulse((value) => value + 1);
     trackEvent('realm_travel', { destination: realm.id, mode: 'worldskin' });
     if (shouldSpeak) speakBrain(`${vesselName} is standing in ${realm.name}. ${realm.promise}`, 'vessel');
   }
@@ -1550,990 +1797,4 @@ function Ritual({ state, stats, updateState }) {
   function saveReminder(event) {
     event.preventDefault();
     updateState((current) => {
-      let next = { ...current, settings: { ...(current.settings || {}), reminderHour } };
-      next = addLedgerEntry(next, 'settings', 'Ritual reminder time updated', `Daily ritual reminder target: ${reminderHour}.`);
-      return next;
-    }, 'Reminder preference saved.', 'reminder_saved');
-  }
-
-  async function requestNotificationPermission() {
-    if (typeof window === 'undefined' || !('Notification' in window)) {
-      alert('This browser does not support notification permission for this PWA.');
-      return;
-    }
-    const permission = await window.Notification.requestPermission();
-    updateState((current) => {
-      let next = { ...current, settings: { ...(current.settings || {}), notificationPermission: permission } };
-      next = addLedgerEntry(next, 'settings', 'Notification permission updated', `Browser permission is ${permission}.`);
-      return next;
-    }, `Notification permission: ${permission}.`, 'notification_permission_changed');
-  }
-
-  return (
-    <Page eyebrow="Daily Power Ritual" title="Prime your energy before the world programs it for you." copy="Name the signal, release the leak, choose the proof. Keep it short enough to repeat and strong enough to matter.">
-      <div className="ritual-layout">
-        <form className="glass-panel ritual-form" onSubmit={submit}>
-          <div className="prompt-card">
-            <Brain size={22} />
-            <strong>{form.prompt}</strong>
-          </div>
-          <label>Energy level: {form.energy}<input type="range" min="1" max="10" value={form.energy} onChange={(e) => setForm({ ...form, energy: e.target.value })} /></label>
-          <label>Focus realm<select value={form.focusRealm} onChange={(e) => setForm({ ...form, focusRealm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-          <label>Today’s intention<textarea value={form.intention} onChange={(e) => setForm({ ...form, intention: e.target.value })} placeholder="Today I am feeding..." /></label>
-          <label>What I release<textarea value={form.release} onChange={(e) => setForm({ ...form, release: e.target.value })} placeholder="I release the loop of..." /></label>
-          <label>Next proof action<textarea value={form.nextAction} onChange={(e) => setForm({ ...form, nextAction: e.target.value })} placeholder="Before the day ends, I will..." /></label>
-          <label>Gratitude / evidence<textarea value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })} placeholder="Evidence I am already becoming..." /></label>
-          <SigilButton><Flame size={18} /> Seal ritual</SigilButton>
-        </form>
-
-        <section className="glass-panel ritual-side">
-          <span className="eyebrow">Charge Readout</span>
-          <h2>{stats.energy}%</h2>
-          <p>Reality Charge is a practical signal: ritual, proof, notes, and active goals. It keeps the mythic layer tied to behavior.</p>
-          <Meter value={stats.energy} label="Charge" />
-
-          <form className="reminder-panel" onSubmit={saveReminder}>
-            <div>
-              <span className="eyebrow">Return Signal</span>
-              <h3><BellRing size={18} /> Ritual reminder</h3>
-              <p>Stores the preferred daily return time locally. Browser notification permission is prepared for a future push backend or installable PWA enhancement.</p>
-            </div>
-            <label>Daily target time<input type="time" value={reminderHour} onChange={(e) => setReminderHour(e.target.value)} /></label>
-            <div className="stacked-actions horizontal">
-              <SigilButton><CheckCircle2 size={18} /> Save time</SigilButton>
-              <SigilButton type="button" variant="secondary" onClick={requestNotificationPermission}><BellRing size={18} /> Enable browser</SigilButton>
-            </div>
-            <small>Permission: {settings.notificationPermission || 'default'}</small>
-          </form>
-
-          <div className="ritual-recap">
-            {state.rituals.slice(0, 5).map((ritual) => (
-              <article key={ritual.id}>
-                <strong>{ritual.date}</strong>
-                <p>{ritual.nextAction || ritual.intention}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-    </Page>
-  );
-}
-
-
-function FocusChamber({ state, stats, updateState }) {
-  const defaultMinutes = Number(state.settings?.focusDuration || 25);
-  const [session, setSession] = useState({
-    title: '',
-    realm: 'craft',
-    minutes: defaultMinutes,
-    intent: focusSessionTemplates.find((template) => template.minutes === defaultMinutes)?.intent || 'Build one visible proof block with no input switching.',
-    output: '',
-    distraction: ''
-  });
-  const [secondsLeft, setSecondsLeft] = useState(defaultMinutes * 60);
-  const [running, setRunning] = useState(false);
-  const progress = Math.max(0, Math.min(100, Math.round((1 - secondsLeft / Math.max(60, Number(session.minutes || 1) * 60)) * 100)));
-  const minuteLabel = `${Math.floor(secondsLeft / 60).toString().padStart(2, '0')}:${(secondsLeft % 60).toString().padStart(2, '0')}`;
-
-  useEffect(() => {
-    if (!running) return undefined;
-    const timer = window.setInterval(() => {
-      setSecondsLeft((current) => {
-        if (current <= 1) {
-          window.clearInterval(timer);
-          setRunning(false);
-          return 0;
-        }
-        return current - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [running]);
-
-  useEffect(() => {
-    if (!running) setSecondsLeft(Number(session.minutes || 25) * 60);
-  }, [session.minutes, running]);
-
-  function applyTemplate(template) {
-    setRunning(false);
-    setSession({
-      ...session,
-      title: template.name,
-      realm: template.realm,
-      minutes: template.minutes,
-      intent: template.intent
-    });
-    setSecondsLeft(template.minutes * 60);
-  }
-
-  function completeSession(createQuest = false) {
-    if (!session.intent.trim() && !session.title.trim()) return;
-    updateState((current) => {
-      const focusSession = {
-        id: uid('focus'),
-        ...session,
-        title: session.title || `${session.minutes}-minute focus block`,
-        minutes: Number(session.minutes || 25),
-        completedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString()
-      };
-      let next = {
-        ...current,
-        focusSessions: [focusSession, ...(current.focusSessions || [])].slice(0, 250),
-        settings: { ...(current.settings || {}), focusDuration: Number(session.minutes || 25) }
-      };
-      if (createQuest) next = { ...next, quests: [createFocusQuest(focusSession), ...(next.quests || [])] };
-      next = addLedgerEntry(next, 'focus', 'Focus session completed', `${focusSession.minutes} minutes · ${focusSession.title}`);
-      return next;
-    }, createQuest ? 'Focus sealed and proof quest created.' : 'Focus sealed.', 'focus_session_completed');
-    setRunning(false);
-    setSecondsLeft(Number(session.minutes || 25) * 60);
-    setSession({ ...session, output: '', distraction: '' });
-  }
-
-  function resetTimer() {
-    setRunning(false);
-    setSecondsLeft(Number(session.minutes || 25) * 60);
-  }
-
-  return (
-    <Page eyebrow="Focus Chamber" title="Lock attention long enough to bend the day." copy="The chamber turns intention into protected minutes. Finish the block, name the output, then convert it into proof if it needs follow-through.">
-      <div className="focus-layout">
-        <section className="glass-panel focus-stage">
-          <span className="eyebrow">Active Focus Block</span>
-          <div className="focus-timer" style={{ '--progress': `${progress}%` }}>
-            <span>{minuteLabel}</span>
-            <small>{progress}% complete</small>
-          </div>
-          <Meter value={progress} label="Focus charge" detail={`${session.minutes || 25} minute chamber · ${getRealm(session.realm).name}`} />
-          <div className="stacked-actions horizontal">
-            <SigilButton onClick={() => setRunning((value) => !value)}><Zap size={18} /> {running ? 'Pause chamber' : 'Start chamber'}</SigilButton>
-            <SigilButton variant="secondary" onClick={resetTimer}><RotateCcw size={18} /> Reset</SigilButton>
-          </div>
-          <div className="focus-proof-actions">
-            <SigilButton onClick={() => completeSession(false)}><CheckCircle2 size={18} /> Seal focus</SigilButton>
-            <SigilButton variant="secondary" onClick={() => completeSession(true)}><Swords size={18} /> Seal + quest</SigilButton>
-          </div>
-        </section>
-
-        <form className="glass-panel focus-form" onSubmit={(event) => { event.preventDefault(); completeSession(false); }}>
-          <h2>Command parameters</h2>
-          <label>Focus title<input value={session.title} onChange={(e) => setSession({ ...session, title: e.target.value })} placeholder="Build the proposal, train, write, ship..." /></label>
-          <label>Realm<select value={session.realm} onChange={(e) => setSession({ ...session, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-          <div className="two-field-grid">
-            <label>Minutes<input type="number" min="5" max="180" value={session.minutes} onChange={(e) => setSession({ ...session, minutes: e.target.value })} /></label>
-            <label>Output target<input value={session.output} onChange={(e) => setSession({ ...session, output: e.target.value })} placeholder="What must exist after?" /></label>
-          </div>
-          <label>Intent<textarea value={session.intent} onChange={(e) => setSession({ ...session, intent: e.target.value })} placeholder="During this chamber, I will..." /></label>
-          <label>Distraction boundary<textarea value={session.distraction} onChange={(e) => setSession({ ...session, distraction: e.target.value })} placeholder="If distraction hits, I will..." /></label>
-        </form>
-      </div>
-
-      <section className="glass-panel focus-template-panel">
-        <span className="eyebrow">Focus Protocols</span>
-        <h2>Fast chamber templates</h2>
-        <div className="contract-template-grid">
-          {focusSessionTemplates.map((template) => (
-            <button type="button" key={template.id} onClick={() => applyTemplate(template)}>
-              <strong>{template.name}</strong>
-              <small>{template.minutes} minutes · {getRealm(template.realm).name}</small>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="glass-panel past-focus-panel">
-        <span className="eyebrow">Deep Work Ledger</span>
-        <h2>{stats.focusMinutes} total focus minutes · {stats.focusMinutesThisWeek} this week</h2>
-        <div className="focus-history-list">
-          {(state.focusSessions || []).length ? (state.focusSessions || []).slice(0, 10).map((item) => (
-            <article key={item.id}>
-              <span>{getRealm(item.realm).sigil}</span>
-              <div>
-                <strong>{item.title}</strong>
-                <p>{item.intent}</p>
-                <small>{item.minutes} minutes · {item.completedAt ? new Date(item.completedAt).toLocaleString() : 'Complete'}</small>
-              </div>
-            </article>
-          )) : <EmptyLine text="No focus sessions sealed yet. Start the first chamber." />}
-        </div>
-      </section>
-    </Page>
-  );
-}
-
-function Affirm({ state, updateState }) {
-  const [focusRealm, setFocusRealm] = useState('craft');
-  const [text, setText] = useState(() => forgeAffirmation(state, 'craft'));
-
-  function generate() {
-    setText(forgeAffirmation(state, focusRealm));
-  }
-
-  function save() {
-    updateState((current) => {
-      const affirmation = { id: uid('affirm'), text, realm: focusRealm, createdAt: new Date().toISOString() };
-      let next = { ...current, affirmations: [affirmation, ...current.affirmations] };
-      next = addLedgerEntry(next, 'affirmation', 'Affirmation saved', text);
-      return next;
-    }, 'Affirmation saved to the vault.', 'affirmation_saved');
-  }
-
-  return (
-    <Page eyebrow="Affirmation Forge" title="Language is a steering wheel for attention." copy="Use affirmations as identity commands, not empty comfort. Say what you are practicing, then prove it with behavior.">
-      <div className="affirm-layout">
-        <section className="glass-panel affirmation-stage">
-          <label>Focus realm<select value={focusRealm} onChange={(e) => setFocusRealm(e.target.value)}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-          <motion.div key={text} className="affirmation-text" initial={{ opacity: 0, filter: 'blur(12px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }}>
-            {text}
-          </motion.div>
-          <div className="stacked-actions horizontal">
-            <SigilButton onClick={generate}><Wand2 size={18} /> Generate</SigilButton>
-            <SigilButton variant="secondary" onClick={save}><Gem size={18} /> Save</SigilButton>
-          </div>
-        </section>
-
-        <section className="glass-panel affirm-vault">
-          <h2>Saved affirmations</h2>
-          {state.affirmations.length ? state.affirmations.map((item) => (
-            <article key={item.id}>
-              <span>{getRealm(item.realm).sigil}</span>
-              <p>{item.text}</p>
-              <small>{new Date(item.createdAt).toLocaleString()}</small>
-            </article>
-          )) : <EmptyLine text="Your saved identity commands will appear here." />}
-        </section>
-      </div>
-    </Page>
-  );
-}
-
-function Notes({ state, updateState }) {
-  const [form, setForm] = useState({ title: '', body: '', realm: 'mind', tag: 'signal', energy: 5 });
-
-  function submit(event) {
-    event.preventDefault();
-    if (!form.body.trim() && !form.title.trim()) return;
-    updateState((current) => {
-      const note = { id: uid('note'), ...form, createdAt: new Date().toISOString() };
-      let next = { ...current, notes: [note, ...current.notes] };
-      next = addLedgerEntry(next, 'note', 'Reality signal captured', note.title || note.body.slice(0, 70));
-      return next;
-    }, 'Signal captured.', 'note_created');
-    setForm({ title: '', body: '', realm: form.realm, tag: 'signal', energy: 5 });
-  }
-
-  return (
-    <Page eyebrow="Reality Ledger" title="Capture the signals before they dissolve." copy="Use notes for ideas, dreams, lessons, emotions, downloads, plans, and evidence. The app turns reflection into searchable power.">
-      <div className="notes-layout">
-        <form className="glass-panel forge-form" onSubmit={submit}>
-          <h2>New note</h2>
-          <label>Title<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Signal from today" /></label>
-          <label>Realm<select value={form.realm} onChange={(e) => setForm({ ...form, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-          <label>Tag<input value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="signal, lesson, dream, idea" /></label>
-          <label>Intensity: {form.energy}<input type="range" min="1" max="10" value={form.energy} onChange={(e) => setForm({ ...form, energy: e.target.value })} /></label>
-          <label>Body<textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} placeholder="Write what needs to be remembered, released, or acted on..." rows="8" /></label>
-          <SigilButton><BookOpen size={18} /> Save note</SigilButton>
-        </form>
-
-        <section className="note-grid">
-          {state.notes.length ? state.notes.map((note) => (
-            <article className="glass-panel note-card" key={note.id}>
-              <div><span>{getRealm(note.realm).sigil}</span><small>{note.tag}</small></div>
-              <h3>{note.title || 'Untitled signal'}</h3>
-              <p>{note.body}</p>
-              <footer><small>{new Date(note.createdAt).toLocaleString()}</small><strong>{note.energy}/10</strong></footer>
-            </article>
-          )) : <div className="glass-panel"><EmptyLine text="No notes yet. Capture the first signal." /></div>}
-        </section>
-      </div>
-    </Page>
-  );
-}
-
-function Review({ state, stats, updateState }) {
-  const weekKey = getWeekKey();
-  const existing = state.reviews?.find((review) => review.weekKey === weekKey);
-  const realmScores = calculateRealmScores(state);
-  const completedThisWeek = state.quests.filter((quest) => quest.done && dateWithinDays(quest.doneAt, 7)).length;
-  const ritualsThisWeek = state.rituals.filter((ritual) => dateWithinDays(ritual.createdAt || ritual.date, 7)).length;
-  const notesThisWeek = state.notes.filter((note) => dateWithinDays(note.createdAt, 7)).length;
-  const score = Math.min(100, completedThisWeek * 12 + ritualsThisWeek * 10 + notesThisWeek * 6 + stats.activeGoals * 3);
-  const [form, setForm] = useState(existing || {
-    weekKey,
-    wins: '',
-    proof: '',
-    drag: '',
-    lesson: '',
-    nextFocus: '',
-    ifThenPlan: '',
-    promise: ''
-  });
-
-  function saveReview(event) {
-    event.preventDefault();
-    updateState((current) => {
-      const review = {
-        ...form,
-        id: existing?.id || uid('review'),
-        weekKey,
-        score,
-        completedThisWeek,
-        ritualsThisWeek,
-        notesThisWeek,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      let next = {
-        ...current,
-        reviews: [review, ...(current.reviews || []).filter((item) => item.weekKey !== weekKey)]
-      };
-      next = addLedgerEntry(next, 'review', 'Weekly ascension review saved', `Week ${weekKey} scored ${score}/100.`);
-      return next;
-    }, 'Weekly review sealed.', 'weekly_review_saved');
-  }
-
-  return (
-    <Page eyebrow="Ascension Review" title="Close the loop before the next loop starts." copy="A weekly review turns scattered effort into intelligence. Capture wins, drag, lessons, and the next command.">
-      <div className="review-layout">
-        <section className="glass-panel insight-panel">
-          <span className="eyebrow">This Week</span>
-          <h2>{score}%</h2>
-          <p>Momentum score from completed proof, rituals, notes, and active realms. It is a signal, not a moral judgment.</p>
-          <Meter value={score} label="Weekly momentum" detail={`${completedThisWeek} proofs · ${ritualsThisWeek} rituals · ${notesThisWeek} notes`} />
-          <div className="stat-row compact">
-            <Stat icon={ShieldCheck} label="Proofs" value={completedThisWeek} />
-            <Stat icon={Flame} label="Rituals" value={ritualsThisWeek} />
-            <Stat icon={BookOpen} label="Notes" value={notesThisWeek} />
-          </div>
-        </section>
-
-        <form className="glass-panel review-form" onSubmit={saveReview}>
-          <h2>Weekly command log</h2>
-          <label>Wins<textarea value={form.wins} onChange={(e) => setForm({ ...form, wins: e.target.value })} placeholder="What moved? What did I complete?" /></label>
-          <label>Visible proof<textarea value={form.proof} onChange={(e) => setForm({ ...form, proof: e.target.value })} placeholder="Links, screenshots, completed actions, messages sent, reps logged..." /></label>
-          <label>Drag / resistance<textarea value={form.drag} onChange={(e) => setForm({ ...form, drag: e.target.value })} placeholder="What kept trying to pull me back?" /></label>
-          <label>Lesson<textarea value={form.lesson} onChange={(e) => setForm({ ...form, lesson: e.target.value })} placeholder="What is the signal inside this week?" /></label>
-          <label>Next week focus<textarea value={form.nextFocus} onChange={(e) => setForm({ ...form, nextFocus: e.target.value })} placeholder="The next reality I am feeding is..." /></label>
-          <label>If–then plan<textarea value={form.ifThenPlan} onChange={(e) => setForm({ ...form, ifThenPlan: e.target.value })} placeholder="If the predictable obstacle appears, then I will..." /></label>
-          <label>Promise to self<textarea value={form.promise} onChange={(e) => setForm({ ...form, promise: e.target.value })} placeholder="This week I will prove..." /></label>
-          <SigilButton><CalendarDays size={18} /> Seal weekly review</SigilButton>
-        </form>
-
-        <section className="glass-panel realm-score-panel">
-          <span className="eyebrow">Realm Intelligence</span>
-          <h2>Where energy is moving</h2>
-          <div className="realm-score-list">
-            {realmScores.map((realm) => (
-              <article key={realm.id}>
-                <span>{realm.sigil}</span>
-                <div>
-                  <strong>{realm.name}</strong>
-                  <Meter value={realm.score} label={`${realm.score}% charged`} />
-                  <small>{realm.activeGoals} active · {realm.completedQuests} proofs · {realm.recentNotes} notes this week</small>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className="glass-panel past-reviews">
-        <span className="eyebrow">Review Archive</span>
-        <h2>Previous command logs</h2>
-        {(state.reviews || []).length ? (state.reviews || []).slice(0, 8).map((review) => (
-          <article key={review.id}>
-            <strong>Week of {review.weekKey} · {review.score ?? 0}%</strong>
-            <p>{review.nextFocus || review.lesson || review.wins || 'Review saved.'}</p>
-          </article>
-        )) : <EmptyLine text="No weekly reviews saved yet. Seal the first one." />}
-      </section>
-    </Page>
-  );
-}
-
-
-
-function Codex({ state, stats, updateState }) {
-  const epochStats = calculateEpochStats(state);
-  const canonStats = calculateCanonStats(state);
-  const activeEpochs = (state.epochs || []).filter((epoch) => epoch.status !== 'complete');
-  const activeAllies = (state.allies || []).filter((ally) => ally.status !== 'archived');
-  const activeCanon = (state.canon || []).filter((rule) => rule.status !== 'archived');
-  const [epochForm, setEpochForm] = useState({ title: '', realm: 'craft', days: 30, northStar: '', milestones: '', evidence: '', startDate: todayKey() });
-  const [allyForm, setAllyForm] = useState({ name: '', role: 'Witness', realm: 'heart', contact: '', cadence: 'Weekly', ask: '', nextCheckIn: todayKey() });
-  const [canonForm, setCanonForm] = useState({ realm: 'mind', law: '', evidence: '', status: 'active' });
-  const [scriptText, setScriptText] = useState('');
-
-  function applyEpochTemplate(template) {
-    setEpochForm({
-      title: template.name,
-      realm: template.realm,
-      days: template.days,
-      northStar: template.northStar,
-      milestones: template.milestones.join('\n'),
-      evidence: 'Completed proof quests, notes, links, screenshots, metrics, or real-world outputs.',
-      startDate: todayKey()
-    });
-  }
-
-  function createEpoch(event) {
-    event.preventDefault();
-    if (!epochForm.title.trim()) return;
-    updateState((current) => {
-      const epoch = {
-        id: uid('epoch'),
-        ...epochForm,
-        title: epochForm.title.trim(),
-        days: Number(epochForm.days || 30),
-        milestones: epochForm.milestones.split('\n').map((item) => item.trim()).filter(Boolean),
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-      const quests = createEpochQuestWave(epoch);
-      let next = { ...current, epochs: [epoch, ...(current.epochs || [])], quests: [...quests, ...(current.quests || [])] };
-      next = addLedgerEntry(next, 'epoch', 'Epoch created', `${epoch.title} opened with ${quests.length} phase quests.`);
-      return next;
-    }, 'Epoch opened and phase quests forged.', 'epoch_created');
-    setEpochForm({ ...epochForm, title: '', northStar: '', milestones: '', evidence: '' });
-  }
-
-  function completeEpoch(epochId) {
-    updateState((current) => {
-      const epoch = (current.epochs || []).find((item) => item.id === epochId);
-      let next = {
-        ...current,
-        epochs: (current.epochs || []).map((item) => item.id === epochId ? { ...item, status: 'complete', completedAt: new Date().toISOString() } : item)
-      };
-      next = addLedgerEntry(next, 'epoch', 'Epoch sealed', epoch?.title || 'Epoch completed');
-      return next;
-    }, '+90 XP. Epoch sealed into the world archive.', 'epoch_completed');
-  }
-
-  function applyAllyTemplate(template) {
-    setAllyForm({ ...allyForm, name: template.name, role: template.role, cadence: template.cadence, ask: template.ask });
-  }
-
-  function createAlly(event) {
-    event.preventDefault();
-    if (!allyForm.name.trim()) return;
-    updateState((current) => {
-      const ally = { id: uid('ally'), ...allyForm, status: 'active', createdAt: new Date().toISOString() };
-      const quest = createAllianceQuest(ally);
-      let next = { ...current, allies: [ally, ...(current.allies || [])], quests: [quest, ...(current.quests || [])] };
-      next = addLedgerEntry(next, 'alliance', 'Alliance ally added', `${ally.name} added as ${ally.role}.`);
-      return next;
-    }, 'Ally added and check-in quest created.', 'ally_created');
-    setAllyForm({ ...allyForm, name: '', contact: '', ask: '' });
-  }
-
-  function generateScript(ally) {
-    const script = createAllianceScript(ally, state);
-    setScriptText(script);
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(script).catch(() => {});
-    trackEvent('alliance_script_generated', { ally: ally.role });
-  }
-
-  function archiveAlly(allyId) {
-    updateState((current) => {
-      let next = { ...current, allies: (current.allies || []).map((ally) => ally.id === allyId ? { ...ally, status: 'archived', archivedAt: new Date().toISOString() } : ally) };
-      next = addLedgerEntry(next, 'alliance', 'Ally archived', 'The accountability ally was moved out of the active circle.');
-      return next;
-    }, 'Ally archived.', 'ally_archived');
-  }
-
-  function applyCanonTemplate(template) {
-    setCanonForm({ realm: template.realm, law: template.law, evidence: 'This law is proven through repeated behavior, not belief alone.', status: 'active' });
-  }
-
-  function createCanonRule(event) {
-    event.preventDefault();
-    if (!canonForm.law.trim()) return;
-    updateState((current) => {
-      const rule = { id: uid('law'), ...canonForm, status: 'active', createdAt: new Date().toISOString() };
-      let next = { ...current, canon: [rule, ...(current.canon || [])] };
-      next = addLedgerEntry(next, 'canon', 'World law installed', rule.law);
-      return next;
-    }, 'World law installed.', 'canon_created');
-    setCanonForm({ ...canonForm, law: '', evidence: '' });
-  }
-
-  function archiveCanon(ruleId) {
-    updateState((current) => {
-      let next = { ...current, canon: (current.canon || []).map((rule) => rule.id === ruleId ? { ...rule, status: 'archived', archivedAt: new Date().toISOString() } : rule) };
-      next = addLedgerEntry(next, 'canon', 'World law archived', 'A law was removed from the active codex.');
-      return next;
-    }, 'World law archived.', 'canon_archived');
-  }
-
-  return (
-    <Page eyebrow="World Codex" title="Turn the intended reality into doctrine, allies, and time horizons." copy="Codex gives Over3arth a long-range operating system: epochs for transformation arcs, allies for accountability, and laws for identity-level consistency.">
-      <section className="glass-panel codex-command-panel">
-        <div>
-          <span className="eyebrow">Codex Intelligence</span>
-          <h2>Level {stats.level} · {epochStats.strength}% epoch field · {canonStats.strength}% law field</h2>
-          <p>Strong worlds have structure. Use this page to decide the arc, name the support circle, and write the laws your actions must obey.</p>
-        </div>
-        <div className="stat-row compact">
-          <Stat icon={Layers3} label="Active Epochs" value={epochStats.active} />
-          <Stat icon={ShieldCheck} label="Allies" value={activeAllies.length} />
-          <Stat icon={ScrollText} label="World Laws" value={canonStats.total} />
-        </div>
-      </section>
-
-      <div className="codex-layout">
-        <section className="glass-panel codex-form-panel">
-          <span className="eyebrow">Epoch Planner</span>
-          <h2>Open a transformation arc.</h2>
-          <div className="contract-template-grid">
-            {epochTemplates.map((template) => (
-              <button type="button" key={template.id} onClick={() => applyEpochTemplate(template)}>
-                <strong>{template.name}</strong>
-                <small>{template.days} days · {getRealm(template.realm).name}</small>
-              </button>
-            ))}
-          </div>
-          <form className="codex-inner-form" onSubmit={createEpoch}>
-            <label>Epoch title<input value={epochForm.title} onChange={(e) => setEpochForm({ ...epochForm, title: e.target.value })} placeholder="30-Day Wealth Dominion" /></label>
-            <div className="two-field-grid">
-              <label>Realm<select value={epochForm.realm} onChange={(e) => setEpochForm({ ...epochForm, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-              <label>Days<input type="number" min="3" max="180" value={epochForm.days} onChange={(e) => setEpochForm({ ...epochForm, days: e.target.value })} /></label>
-            </div>
-            <label>North star<textarea value={epochForm.northStar} onChange={(e) => setEpochForm({ ...epochForm, northStar: e.target.value })} placeholder="By the end of this arc, what must be visibly different?" /></label>
-            <label>Milestones<textarea value={epochForm.milestones} onChange={(e) => setEpochForm({ ...epochForm, milestones: e.target.value })} placeholder="One milestone per line" /></label>
-            <label>Evidence standard<input value={epochForm.evidence} onChange={(e) => setEpochForm({ ...epochForm, evidence: e.target.value })} placeholder="What counts as proof of the epoch?" /></label>
-            <SigilButton><Layers3 size={18} /> Open epoch</SigilButton>
-          </form>
-        </section>
-
-        <section className="glass-panel codex-list-panel">
-          <span className="eyebrow">Active Epochs</span>
-          <h2>{activeEpochs.length} arc{activeEpochs.length === 1 ? '' : 's'} commanding the horizon</h2>
-          {activeEpochs.length ? activeEpochs.map((epoch) => (
-            <article className="codex-card epoch-card" key={epoch.id}>
-              <div><span>{getRealm(epoch.realm).sigil}</span><strong>{epoch.title}</strong></div>
-              <p>{epoch.northStar}</p>
-              <small>{epoch.days} days · started {epoch.startDate || epoch.createdAt?.slice(0, 10) || 'now'}</small>
-              {epoch.milestones?.length ? <ul>{epoch.milestones.map((item) => <li key={item}>{item}</li>)}</ul> : null}
-              <SigilButton variant="secondary" onClick={() => completeEpoch(epoch.id)}><CheckCircle2 size={16} /> Seal epoch</SigilButton>
-            </article>
-          )) : <EmptyLine text="No active epochs yet. Open one arc so the world has a horizon." />}
-          {(state.epochs || []).filter((epoch) => epoch.status === 'complete').length ? <p className="archive-line">{(state.epochs || []).filter((epoch) => epoch.status === 'complete').length} completed epoch{(state.epochs || []).filter((epoch) => epoch.status === 'complete').length === 1 ? '' : 's'} archived.</p> : null}
-        </section>
-      </div>
-
-      <div className="codex-layout secondary">
-        <section className="glass-panel codex-form-panel">
-          <span className="eyebrow">Alliance Circle</span>
-          <h2>Build accountability without fake messaging APIs.</h2>
-          <p>Contacts are local records. Over3arth creates check-in scripts and quests; it does not send messages unless you add a real backend/provider later.</p>
-          <div className="contract-template-grid">
-            {allianceTemplates.map((template) => (
-              <button type="button" key={template.id} onClick={() => applyAllyTemplate(template)}>
-                <strong>{template.name}</strong>
-                <small>{template.role} · {template.cadence}</small>
-              </button>
-            ))}
-          </div>
-          <form className="codex-inner-form" onSubmit={createAlly}>
-            <label>Name<input value={allyForm.name} onChange={(e) => setAllyForm({ ...allyForm, name: e.target.value })} placeholder="Accountability ally" /></label>
-            <div className="two-field-grid">
-              <label>Role<input value={allyForm.role} onChange={(e) => setAllyForm({ ...allyForm, role: e.target.value })} placeholder="Witness, Builder, Coach..." /></label>
-              <label>Realm<select value={allyForm.realm} onChange={(e) => setAllyForm({ ...allyForm, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-            </div>
-            <label>Contact note<input value={allyForm.contact} onChange={(e) => setAllyForm({ ...allyForm, contact: e.target.value })} placeholder="Phone, handle, email, or where to reach them" /></label>
-            <div className="two-field-grid">
-              <label>Cadence<input value={allyForm.cadence} onChange={(e) => setAllyForm({ ...allyForm, cadence: e.target.value })} placeholder="Weekly" /></label>
-              <label>Next check-in<input type="date" value={allyForm.nextCheckIn} onChange={(e) => setAllyForm({ ...allyForm, nextCheckIn: e.target.value })} /></label>
-            </div>
-            <label>Support ask<textarea value={allyForm.ask} onChange={(e) => setAllyForm({ ...allyForm, ask: e.target.value })} placeholder="What should they ask you or hold you to?" /></label>
-            <SigilButton><ShieldCheck size={18} /> Add ally</SigilButton>
-          </form>
-        </section>
-
-        <section className="glass-panel codex-list-panel">
-          <span className="eyebrow">Active Allies</span>
-          <h2>{activeAllies.length} support signal{activeAllies.length === 1 ? '' : 's'} online</h2>
-          {activeAllies.length ? activeAllies.map((ally) => (
-            <article className="codex-card ally-card" key={ally.id}>
-              <div><span>{getRealm(ally.realm).sigil}</span><strong>{ally.name}</strong></div>
-              <p>{ally.ask || 'Ask me what proof I created and what comes next.'}</p>
-              <small>{ally.role} · {ally.cadence} · next {ally.nextCheckIn || 'unscheduled'}</small>
-              {ally.contact ? <blockquote>{ally.contact}</blockquote> : null}
-              <div className="stacked-actions horizontal">
-                <SigilButton variant="secondary" onClick={() => generateScript(ally)}><ScrollText size={16} /> Copy script</SigilButton>
-                <SigilButton variant="ghost" onClick={() => archiveAlly(ally.id)}><RotateCcw size={16} /> Archive</SigilButton>
-              </div>
-            </article>
-          )) : <EmptyLine text="No allies added yet. Add one witness so proof has a mirror." />}
-          {scriptText ? <textarea className="script-preview" readOnly value={scriptText} aria-label="Latest alliance check-in script" /> : null}
-        </section>
-      </div>
-
-      <div className="codex-layout secondary">
-        <section className="glass-panel codex-form-panel">
-          <span className="eyebrow">World Laws</span>
-          <h2>Install identity doctrine.</h2>
-          <p>World laws are not magic claims. They are operating rules that shape attention, environment, language, and behavior.</p>
-          <div className="contract-template-grid">
-            {canonTemplates.map((template) => (
-              <button type="button" key={template.id} onClick={() => applyCanonTemplate(template)}>
-                <strong>{getRealm(template.realm).sigil} {getRealm(template.realm).name}</strong>
-                <small>{template.law}</small>
-              </button>
-            ))}
-          </div>
-          <form className="codex-inner-form" onSubmit={createCanonRule}>
-            <label>Realm<select value={canonForm.realm} onChange={(e) => setCanonForm({ ...canonForm, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-            <label>Law<textarea value={canonForm.law} onChange={(e) => setCanonForm({ ...canonForm, law: e.target.value })} placeholder="In this world, I..." /></label>
-            <label>Evidence standard<input value={canonForm.evidence} onChange={(e) => setCanonForm({ ...canonForm, evidence: e.target.value })} placeholder="How will this law show up in behavior?" /></label>
-            <SigilButton><ScrollText size={18} /> Install law</SigilButton>
-          </form>
-        </section>
-
-        <section className="glass-panel codex-list-panel">
-          <span className="eyebrow">Active Canon</span>
-          <h2>{activeCanon.length} world law{activeCanon.length === 1 ? '' : 's'} installed</h2>
-          <Meter value={canonStats.strength} label="Canon strength" detail={`${canonStats.realmsCovered} realms covered · ${canonStats.recentRules} recent laws`} />
-          {activeCanon.length ? activeCanon.map((rule) => (
-            <article className="codex-card law-card" key={rule.id}>
-              <div><span>{getRealm(rule.realm).sigil}</span><strong>{getRealm(rule.realm).name}</strong></div>
-              <p>{rule.law}</p>
-              {rule.evidence ? <small>{rule.evidence}</small> : null}
-              <SigilButton variant="ghost" onClick={() => archiveCanon(rule.id)}><RotateCcw size={16} /> Archive law</SigilButton>
-            </article>
-          )) : <EmptyLine text="No world laws yet. Install one rule your next actions must obey." />}
-        </section>
-      </div>
-    </Page>
-  );
-}
-
-function Ascend({ state, stats, updateState }) {
-  const activeContracts = (state.contracts || []).filter((contract) => contract.status !== 'complete');
-  const sealedContracts = (state.contracts || []).filter((contract) => contract.status === 'complete');
-  const [contractForm, setContractForm] = useState({
-    title: '',
-    realm: 'craft',
-    vow: '',
-    dailyProof: '',
-    evidence: '',
-    boundary: '',
-    reward: '',
-    reviewDate: ''
-  });
-
-  function applyContractTemplate(template) {
-    const reviewDate = new Date();
-    reviewDate.setDate(reviewDate.getDate() + template.days);
-    setContractForm({
-      title: template.name,
-      realm: contractForm.realm,
-      vow: `For ${template.days} days, I will protect one clear command and prove it with action.`,
-      dailyProof: template.dailyProof,
-      evidence: 'A completed quest, saved note, link, screenshot, or visible proof record.',
-      boundary: template.boundary,
-      reward: 'I acknowledge the proof, recover cleanly, and increase the standard by one step.',
-      reviewDate: reviewDate.toISOString().slice(0, 10)
-    });
-  }
-
-  function createContract(event) {
-    event.preventDefault();
-    if (!contractForm.title.trim()) return;
-    updateState((current) => {
-      const contract = {
-        id: uid('contract'),
-        ...contractForm,
-        title: contractForm.title.trim(),
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-      const quest = generateContractQuest(contract);
-      let next = {
-        ...current,
-        contracts: [contract, ...(current.contracts || [])],
-        quests: [quest, ...(current.quests || [])]
-      };
-      next = addLedgerEntry(next, 'contract', 'Reality contract sealed', `${contract.title} entered ${getRealm(contract.realm).name}.`);
-      return next;
-    }, 'Reality contract sealed and first proof quest created.', 'contract_created');
-    setContractForm({ title: '', realm: contractForm.realm, vow: '', dailyProof: '', evidence: '', boundary: '', reward: '', reviewDate: '' });
-  }
-
-  function completeContract(contractId) {
-    updateState((current) => {
-      const contract = (current.contracts || []).find((item) => item.id === contractId);
-      let next = {
-        ...current,
-        contracts: (current.contracts || []).map((item) => item.id === contractId ? { ...item, status: 'complete', completedAt: new Date().toISOString() } : item)
-      };
-      next = addLedgerEntry(next, 'contract', 'Reality contract completed', contract?.title || 'Contract completed.');
-      return next;
-    }, '+75 XP. Contract archived as proof.', 'contract_completed');
-  }
-
-  function forgeCard() {
-    const card = createAscensionCard(state, stats);
-    updateState((current) => {
-      let next = { ...current, shareCards: [card, ...(current.shareCards || [])].slice(0, 24) };
-      next = addLedgerEntry(next, 'share', 'Ascension card forged', `${card.worldName} level ${card.level} card created.`);
-      return next;
-    }, 'Ascension card forged.', 'ascension_card_created');
-    downloadTextFile(`over3arth-ascension-card-${todayKey()}.txt`, card.text);
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(card.text).catch(() => {});
-  }
-
-  function choosePlan(plan) {
-    updateState((current) => {
-      let next = {
-        ...current,
-        settings: { ...(current.settings || {}), selectedPlan: plan.id },
-        launchSignals: [
-          { id: uid('signal'), planId: plan.id, planName: plan.name, createdAt: new Date().toISOString() },
-          ...(current.launchSignals || [])
-        ].slice(0, 50)
-      };
-      next = addLedgerEntry(next, 'launch', `${plan.name} plan interest saved`, 'Local signal only. No payment is collected in this build.');
-      return next;
-    }, `${plan.name} lane saved locally.`, 'plan_lane_selected');
-  }
-
-  return (
-    <Page eyebrow="Ascension Layer" title="Contracts, share cards, and launch-ready monetization lanes." copy="This page adds retention and business infrastructure without pretending to charge users or sync data before those systems exist.">
-      <div className="ascend-layout">
-        <section className="glass-panel contract-forge">
-          <span className="eyebrow">Reality Contracts</span>
-          <h2>Turn a goal into a signed command.</h2>
-          <p>A contract is a short arc with a vow, daily proof, boundary, reward, and review date.</p>
-          <div className="contract-template-grid">
-            {realityContractTemplates.map((template) => (
-              <button type="button" key={template.id} onClick={() => applyContractTemplate(template)}>
-                <strong>{template.name}</strong>
-                <small>{template.days} days · {template.dailyProof}</small>
-              </button>
-            ))}
-          </div>
-          <form className="contract-form" onSubmit={createContract}>
-            <label>Contract title<input value={contractForm.title} onChange={(e) => setContractForm({ ...contractForm, title: e.target.value })} placeholder="30-Day Wealth Forge" /></label>
-            <label>Realm<select value={contractForm.realm} onChange={(e) => setContractForm({ ...contractForm, realm: e.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
-            <label>Vow<textarea value={contractForm.vow} onChange={(e) => setContractForm({ ...contractForm, vow: e.target.value })} placeholder="I commit to..." /></label>
-            <label>Daily proof<textarea value={contractForm.dailyProof} onChange={(e) => setContractForm({ ...contractForm, dailyProof: e.target.value })} placeholder="Every day I will prove this by..." /></label>
-            <label>Evidence standard<input value={contractForm.evidence} onChange={(e) => setContractForm({ ...contractForm, evidence: e.target.value })} placeholder="What counts as proof?" /></label>
-            <label>Boundary<textarea value={contractForm.boundary} onChange={(e) => setContractForm({ ...contractForm, boundary: e.target.value })} placeholder="What behavior protects the contract?" /></label>
-            <div className="two-field-grid">
-              <label>Reward<input value={contractForm.reward} onChange={(e) => setContractForm({ ...contractForm, reward: e.target.value })} placeholder="How will I acknowledge completion?" /></label>
-              <label>Review date<input type="date" value={contractForm.reviewDate} onChange={(e) => setContractForm({ ...contractForm, reviewDate: e.target.value })} /></label>
-            </div>
-            <SigilButton><CheckCircle2 size={18} /> Seal contract</SigilButton>
-          </form>
-        </section>
-
-        <section className="glass-panel contract-board">
-          <span className="eyebrow">Active Contracts</span>
-          <h2>{activeContracts.length} command arc{activeContracts.length === 1 ? '' : 's'} online</h2>
-          {activeContracts.length ? activeContracts.map((contract) => (
-            <article className="contract-card" key={contract.id}>
-              <div><span>{getRealm(contract.realm).sigil}</span><strong>{contract.title}</strong></div>
-              <p>{contract.vow}</p>
-              <small>Daily proof: {contract.dailyProof || 'Visible action'}{contract.reviewDate ? ` · Review ${contract.reviewDate}` : ''}</small>
-              {contract.boundary ? <blockquote>{contract.boundary}</blockquote> : null}
-              <SigilButton variant="secondary" onClick={() => completeContract(contract.id)}><ShieldCheck size={16} /> Complete contract</SigilButton>
-            </article>
-          )) : <EmptyLine text="No active contracts yet. Seal one command arc." />}
-          {sealedContracts.length ? <p className="archive-line">{sealedContracts.length} sealed contract{sealedContracts.length === 1 ? '' : 's'} archived as proof.</p> : null}
-        </section>
-      </div>
-
-      <div className="ascend-layout secondary">
-        <section className="glass-panel share-card-panel">
-          <span className="eyebrow">Share / Export</span>
-          <h2>Forge an Ascension Card.</h2>
-          <p>Create a clean text card users can copy, download, post, or save. This avoids fake social APIs while giving the app a viral artifact layer.</p>
-          <div className="ascension-card-preview">
-            <strong>{state.profile.worldName}</strong>
-            <span>Level {stats.level} · {stats.energy}% charge · {stats.completedQuests} proofs</span>
-            <p>{state.profile.primeIntention}</p>
-          </div>
-          <SigilButton onClick={forgeCard}><Download size={18} /> Download card</SigilButton>
-          {(state.shareCards || []).length ? <small>{state.shareCards.length} card{state.shareCards.length === 1 ? '' : 's'} forged locally.</small> : null}
-        </section>
-
-        <section className="glass-panel plan-panel">
-          <span className="eyebrow">Monetization Readiness</span>
-          <h2>Pricing lanes without fake billing.</h2>
-          <p>These cards are local launch signals. They do not process payments. Add Stripe, Lemon Squeezy, Polar, or your own billing gateway when backend auth is ready.</p>
-          <div className="plan-grid">
-            {planLanes.map((plan) => (
-              <article className={state.settings?.selectedPlan === plan.id ? 'plan-card selected' : 'plan-card'} key={plan.id}>
-                <strong>{plan.name}</strong>
-                <span>{plan.price}</span>
-                <p>{plan.promise}</p>
-                <ul>{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
-                <SigilButton variant="secondary" onClick={() => choosePlan(plan)}>Save lane</SigilButton>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-    </Page>
-  );
-}
-
-function Ledger({ state, updateState }) {
-  const fileId = 'over3arth-import';
-  const [snapshots, setSnapshots] = useState(() => getSnapshotVault());
-
-  function refreshSnapshots() {
-    setSnapshots(getSnapshotVault());
-  }
-
-  function importLedger(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const importedState = parseImportedState(reader.result, state);
-        updateState(importedState, 'Ledger imported safely.', 'ledger_imported');
-        refreshSnapshots();
-      } catch (error) {
-        alert(`Import failed: ${error.message}`);
-      } finally {
-        event.target.value = '';
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  function createManualSnapshot() {
-    saveSnapshot(state, 'Manual operator snapshot');
-    refreshSnapshots();
-    updateState((current) => addLedgerEntry(current, 'backup', 'Manual snapshot saved', 'A local restore point was written to this browser.'), 'Snapshot saved.', 'snapshot_saved');
-  }
-
-  function restoreLocalSnapshot(snapshotId) {
-    const confirmed = window.confirm('Restore this Over3arth snapshot on this device? Export your current world first if you need it.');
-    if (!confirmed) return;
-    try {
-      const restored = restoreSnapshot(snapshotId, state);
-      updateState(addLedgerEntry(restored, 'backup', 'Snapshot restored', 'The world state was restored from the local snapshot vault.'), 'Snapshot restored.', 'snapshot_restored');
-      refreshSnapshots();
-    } catch (error) {
-      alert(`Restore failed: ${error.message}`);
-    }
-  }
-
-  function wipeSnapshots() {
-    const confirmed = window.confirm('Clear all local snapshots? This does not reset the active world.');
-    if (!confirmed) return;
-    clearSnapshots();
-    refreshSnapshots();
-    updateState((current) => addLedgerEntry(current, 'backup', 'Snapshot vault cleared', 'Local restore points were removed from this browser.'), 'Snapshot vault cleared.', 'snapshot_vault_cleared');
-  }
-
-  return (
-    <Page eyebrow="System Ledger" title="Proof, rituals, notes, backups, and world changes." copy="The ledger makes your momentum visible. Data is stored locally on this device unless you export or add a backend sync layer later.">
-      <div className="ledger-actions glass-panel">
-        <SigilButton onClick={() => { exportState(state); trackEvent('export_ledger'); }}><Download size={18} /> Export JSON</SigilButton>
-        <label className="sigil-button secondary" htmlFor={fileId}><Upload size={18} /> Import JSON</label>
-        <input id={fileId} type="file" accept="application/json" onChange={importLedger} hidden />
-        <SigilButton variant="secondary" onClick={createManualSnapshot}><ShieldCheck size={18} /> Save snapshot</SigilButton>
-        <SigilButton variant="danger" onClick={resetState}><RotateCcw size={18} /> Reset world</SigilButton>
-      </div>
-
-      <section className="glass-panel snapshot-vault">
-        <div className="section-title-row">
-          <div>
-            <span className="eyebrow">Restore Vault</span>
-            <h2>{snapshots.length} local restore point{snapshots.length === 1 ? '' : 's'}</h2>
-            <p>Over3arth now keeps a local snapshot vault. It is still browser-local, so JSON export remains the safest cross-device backup.</p>
-          </div>
-          {snapshots.length ? <SigilButton variant="ghost" onClick={wipeSnapshots}><RotateCcw size={16} /> Clear vault</SigilButton> : null}
-        </div>
-        <div className="snapshot-grid">
-          {snapshots.length ? snapshots.map((snapshot) => (
-            <article key={snapshot.id} className="snapshot-card">
-              <strong>{snapshot.reason}</strong>
-              <small>{snapshot.createdAt ? new Date(snapshot.createdAt).toLocaleString() : 'No timestamp'} · schema v{snapshot.schemaVersion}</small>
-              <p>{snapshot.goals} goals · {snapshot.quests} quests · {snapshot.notes} notes · {snapshot.rituals} rituals · {snapshot.focusSessions} focus sessions · {snapshot.anchors || 0} anchors · {snapshot.epochs || 0} epochs · {snapshot.allies || 0} allies · {snapshot.canon || 0} laws</p>
-              <SigilButton variant="secondary" onClick={() => restoreLocalSnapshot(snapshot.id)}>Restore</SigilButton>
-            </article>
-          )) : <EmptyLine text="No snapshots yet. Save one before major edits or imports." />}
-        </div>
-      </section>
-
-      <section className="glass-panel ledger-list">
-        {state.ledger.length ? state.ledger.map((entry) => (
-          <article key={entry.id}>
-            <span>{entry.type}</span>
-            <div>
-              <strong>{entry.title}</strong>
-              {entry.detail ? <p>{entry.detail}</p> : null}
-              <small>{new Date(entry.createdAt).toLocaleString()}</small>
-            </div>
-          </article>
-        )) : <EmptyLine text="No ledger entries yet." />}
-      </section>
-    </Page>
-  );
-}
-
-function Stat({ icon: Icon, label, value }) {
-  return (
-    <div className="stat-card">
-      <Icon size={18} />
-      <small>{label}</small>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function QuestMini({ quest, updateState }) {
-  function complete() {
-    updateState((current) => {
-      let next = {
-        ...current,
-        quests: current.quests.map((item) => item.id === quest.id ? { ...item, done: true, doneAt: new Date().toISOString() } : item)
-      };
-      next = addLedgerEntry(next, 'proof', 'Quest completed', quest.title);
-      return next;
-    }, '+40 XP. Proof logged.', 'quest_completed');
-  }
-
-  return (
-    <article className="mini-item">
-      <span>{getRealm(quest.realm).sigil}</span>
-      <div><strong>{quest.title}</strong><small>{quest.detail}</small></div>
-      <button onClick={complete}>Done</button>
-    </article>
-  );
-}
-
-function NoteMini({ note }) {
-  return (
-    <article className="mini-item note-mini">
-      <span>{getRealm(note.realm).sigil}</span>
-      <div><strong>{note.title || 'Untitled'}</strong><small>{note.body.slice(0, 82)}</small></div>
-    </article>
-  );
-}
-
-function QuestDone({ quest }) {
-  return (
-    <article className="done-item">
-      <span>{getRealm(quest.realm).sigil}</span>
-      <div>
-        <strong>{quest.title}</strong>
-        <small>{quest.doneAt ? new Date(quest.doneAt).toLocaleString() : 'Complete'}</small>
-      </div>
-    </article>
-  );
-}
-
-function EmptyLine({ text }) {
-  return <p className="empty-line">{text}</p>;
-}
-
-export default App;
+      let next = { ...current, settings: { ...(c

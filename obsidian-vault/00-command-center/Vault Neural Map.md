@@ -23,6 +23,8 @@ obsidian-vault/_neural-map/index.html
 
 Run the repo-local graph command after changing note links, tags, folders, or source references.
 
+Latest refresh source update: `2026-05-17T14:44:28Z`, after adding the ChatGPT Project Handoff note and rechecking 24 core live URLs with HTTP 200 results.
+
 ## What The Map Shows
 
 - Hub node for the whole MetrAIyux 0S vault.

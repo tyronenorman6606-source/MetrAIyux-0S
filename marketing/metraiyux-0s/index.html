@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas class="command-canvas" aria-hidden="true"></canvas>
+  <canvas class="command-canvas living-background" data-living-background aria-hidden="true"></canvas>
+  <div class="motion-chrome scroll-progress" data-motion-chrome aria-hidden="true"><span></span></div>
 
   <!-- Ticker -->
   <div class="ticker-strip" aria-hidden="true">
@@ -398,6 +399,7 @@
             <li>SkyeVault: 1 GB · 250 files</li>
             <li>1 workspace · 2 API keys</li>
             <li>Proof receipt + D1 audit trail</li>
+            <li>PHX Verified launch audit + static marketplace module</li>
             <li><span class="coming-soon-badge">Soon</span>SkyeMail: 1 inbox</li>
             <li><span class="coming-soon-badge">Soon</span>CitadelDB access</li>
           </ul>
@@ -419,6 +421,7 @@
             <li>3 workspaces · 5 API keys</li>
             <li>Stripe billing + multi-tenant workspace manager</li>
             <li>FS27 Gate auth + 0meg4kAI security layer</li>
+            <li>PHX Verified city/category marketplace generator</li>
             <li><span class="coming-soon-badge">Soon</span>SkyeMail: 3 inboxes</li>
             <li><span class="coming-soon-badge">Soon</span>CitadelDB: full access</li>
           </ul>
@@ -439,6 +442,7 @@
             <li>8 workspaces · 12 API keys</li>
             <li>White-label licensing included</li>
             <li>AE command center + APEX diligence layer</li>
+            <li>PHX Verified operator pack: claims, AE queues, exposure ladder</li>
             <li>Government readiness package</li>
             <li>Dedicated account support</li>
             <li><span class="coming-soon-badge">Soon</span>SkyeMail: 10 inboxes</li>
@@ -460,6 +464,7 @@
             <li>Dedicated Cloudflare Worker infrastructure</li>
             <li>Custom brain personas + cabinet structure</li>
             <li>Multi-brand white-label deployment</li>
+            <li>Dedicated local marketplace deployment with upstream-auth gating</li>
             <li>Custom vault + DB allocation</li>
             <li>SLA-backed uptime agreement</li>
             <li>On-site implementation support</li>
@@ -596,9 +601,31 @@
       items.forEach(el => observer.observe(el));
     })();
 
-    // Canvas particles (exact from spectacle site)
+    // Motion chrome progress rail
     (function() {
-      const canvas = document.querySelector('.command-canvas');
+      const rail = document.querySelector('.motion-chrome.scroll-progress span');
+      if (!rail) return;
+      let ticking = false;
+      function update() {
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const progress = Math.min(1, Math.max(0, window.scrollY / max));
+        rail.style.transform = `scaleX(${progress})`;
+        ticking = false;
+      }
+      function requestUpdate() {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      }
+      update();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+
+    // Living background canvas particles
+    (function() {
+      const canvas = document.querySelector('.command-canvas.living-background');
       if (!canvas || !canvas.getContext) return;
       const ctx = canvas.getContext('2d');
       const particles = Array.from({ length: 72 }, (_, i) => ({
@@ -693,24 +720,8 @@
       var hl = document.querySelector('.hero-headline');
       if (hl) SkyeUI.TextBlurIn(hl, { stagger: 90, delay: 100 });
 
-      // Meteors on pricing section background
-      var pricingGrid = document.getElementById('pricing-grid');
-      if (pricingGrid) SkyeUI.Meteors(pricingGrid, { count: 10, color: 'rgba(168,140,255,0.3)' });
-
-      // Shine border on pricing plan cards
-      document.querySelectorAll('.plan-card, .pricing-card').forEach(function (el, i) {
-        var colors = [
-          { c1: '#a88cff', c2: '#64d9ff', c3: '#f8cb5e' },
-          { c1: '#f8cb5e', c2: '#6ff2c7', c3: '#a88cff' },
-          { c1: '#64d9ff', c2: '#a88cff', c3: '#6ff2c7' },
-          { c1: '#6ff2c7', c2: '#f8cb5e', c3: '#64d9ff' },
-        ];
-        SkyeUI.ShineBorder(el, colors[i % 4]);
-      });
-
-      // BorderBeam on the featured Growth Cabinet card
-      var featuredCard = document.querySelector('.pricing-card.featured');
-      if (featuredCard) SkyeUI.BorderBeam(featuredCard, { color: '#6ff2c7', size: 80, duration: 3200 });
+      // Keep pricing cards static so the featured plan ribbon does not get
+      // replaced by animated border pseudo-elements.
 
       // Border beam on proof metrics
       document.querySelectorAll('.metric').forEach(function (el, i) {
