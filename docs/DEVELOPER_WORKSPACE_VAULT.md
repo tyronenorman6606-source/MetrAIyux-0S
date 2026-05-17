@@ -87,9 +87,9 @@ npm run vault:dry-run
 npm run vault:push
 ```
 
-The helper packages a sanitized zip, excludes secret-looking files, uploads through the multipart API, and writes `.skyevault-out/skyevault-receipt-*.json`.
+The helper packages a sanitized zip, excludes secret-looking files, streams the archive through the multipart API, and writes `.skyevault-out/skyevault-receipt-*.json`.
 
-For tight IDE/CDE disks, set `SKYEVAULT_ARCHIVE_DIR=/tmp/skyevault-out` and `SKYEVAULT_STAGE_PARENT=/tmp` so the large staging tree and zip are built outside the repo volume while the small receipt stays in `.skyevault-out/`.
+For tight IDE/CDE disks, the large staging tree and zip now default to `/tmp/skyevault-repo-push`, successful uploads delete those temp files, and only the small receipt stays in `.skyevault-out/`. Set `SKYEVAULT_ARCHIVE_DIR` or `SKYEVAULT_STAGE_PARENT` only when a workspace needs a different scratch volume.
 
 ## Rate Limits
 

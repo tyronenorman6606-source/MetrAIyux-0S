@@ -8,6 +8,7 @@ const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has('--dry-run');
 const keepStage = args.has('--keep-stage');
+const keepArchive = args.has('--keep-archive');
 const argValue = (name) => {
   const prefix = `${name}=`;
   return process.argv.slice(2).find((arg) => arg.startsWith(prefix))?.slice(prefix.length) || '';
@@ -176,8 +177,14 @@ function zipStage(stage, archive) {
   execFileSync('zip', ['-qr', archive, '.'], { cwd: stage, stdio: 'inherit' });
 }
 
-function hashFile(file) {
-  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+async function hashFile(file) {
+  return await new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(file);
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
 }
 
 function gitValue(args, fallback = 'unknown') {
@@ -208,7 +215,7 @@ async function uploadArchive(archive, archiveHash, summary) {
   const developerName = String(env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
   const destinationId = String(env.SKYEVAULT_DESTINATION_ID || '').trim();
 
-  const fileBuffer = fs.readFileSync(archive);
+  const archiveSize = fs.statSync(archive).size;
   const fileName = path.basename(archive);
   const now = Date.now();
   const branch = gitValue(['branch', '--show-current']);
@@ -231,18 +238,18 @@ async function uploadArchive(archive, archiveHash, summary) {
     retentionAcknowledged: true,
     portalKey,
     fileName,
-    fileSize: fileBuffer.length,
+    fileSize: archiveSize,
     mimeType: 'application/zip',
     fileFingerprint: {
       algorithm: 'SHA-256',
       mode: 'full',
       value: archiveHash,
-      bytesHashed: fileBuffer.length,
+      bytesHashed: archiveSize,
       generatedAt: new Date().toISOString(),
       note: 'Full SHA-256 of sanitized repository zip before vault upload.'
     },
     submissionFileCount: 1,
-    submissionTotalBytes: fileBuffer.length,
+    submissionTotalBytes: archiveSize,
     failedDestinationIds: []
   };
 
@@ -264,16 +271,29 @@ async function uploadArchive(archive, archiveHash, summary) {
   console.log(`Upload session: ${session.sessionId} (${session.parts?.length || 0} parts)`);
 
   const completedParts = [];
-  for (const part of session.parts || []) {
-    const chunk = fileBuffer.subarray(part.start, part.end + 1);
-    const response = await fetch(part.uploadUrl, { method: 'PUT', body: chunk });
-    const text = await response.text();
-    if (!response.ok) throw new Error(`R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 300)}`);
-    completedParts.push({
-      partNumber: part.partNumber,
-      eTag: (response.headers.get('etag') || response.headers.get('ETag') || '').replace(/^"|"$/g, '')
-    });
-    console.log(`Uploaded part ${part.partNumber}/${session.parts.length}`);
+  const archiveHandle = await fs.promises.open(archive, 'r');
+  try {
+    for (const part of session.parts || []) {
+      const length = part.end - part.start + 1;
+      const chunk = Buffer.allocUnsafe(length);
+      let offset = 0;
+      while (offset < length) {
+        const { bytesRead } = await archiveHandle.read(chunk, offset, length - offset, part.start + offset);
+        if (!bytesRead) break;
+        offset += bytesRead;
+      }
+      if (offset !== length) throw new Error(`Could not read archive part ${part.partNumber}: expected ${length} bytes, got ${offset}.`);
+      const response = await fetch(part.uploadUrl, { method: 'PUT', body: chunk });
+      const text = await response.text();
+      if (!response.ok) throw new Error(`R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 300)}`);
+      completedParts.push({
+        partNumber: part.partNumber,
+        eTag: (response.headers.get('etag') || response.headers.get('ETag') || '').replace(/^"|"$/g, '')
+      });
+      console.log(`Uploaded part ${part.partNumber}/${session.parts.length}`);
+    }
+  } finally {
+    await archiveHandle.close();
   }
 
   const driveFile = {
@@ -284,7 +304,7 @@ async function uploadArchive(archive, archiveHash, summary) {
     uploadId: session.uploadId,
     parts: completedParts,
     name: fileName,
-    size: String(fileBuffer.length),
+    size: String(archiveSize),
     mimeType: 'application/zip'
   };
   const completion = await api('/api/upload-complete', {
@@ -303,17 +323,36 @@ async function uploadArchive(archive, archiveHash, summary) {
     sessionId: session.sessionId,
     destination: session.destination?.name,
     fileName,
-    fileSize: fileBuffer.length,
+    fileSize: archiveSize,
     sha256: archiveHash,
     manifestUpdated: completion.manifest?.updated,
     notificationOk: completion.notification?.ok ?? null
   };
 }
 
+function writeReceipt(receipt, outDir, stamp) {
+  const name = `skyevault-receipt-${receipt.receiptId || stamp}.json`;
+  const text = `${JSON.stringify(receipt, null, 2)}\n`;
+  const fallbackDir = path.join(os.tmpdir(), 'skyevault-repo-push', 'receipts');
+  let firstError = null;
+  for (const dir of [outDir, fallbackDir]) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      const receiptPath = path.join(dir, name);
+      fs.writeFileSync(receiptPath, text);
+      return receiptPath;
+    } catch (error) {
+      firstError ||= error;
+      if (!['ENOSPC', 'EROFS'].includes(error.code)) throw error;
+    }
+  }
+  throw firstError;
+}
+
 if (existingArchive) {
   const archive = path.resolve(root, existingArchive);
   if (!fs.existsSync(archive)) throw new Error(`Archive not found: ${archive}`);
-  const archiveHash = hashFile(archive);
+  const archiveHash = await hashFile(archive);
   const summary = {
     fileCount: existingFileCount,
     bytes: fs.statSync(archive).size,
@@ -331,9 +370,7 @@ if (existingArchive) {
   const receipt = await uploadArchive(archive, archiveHash, summary);
   const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
   const outDir = path.join(root, '.skyevault-out');
-  fs.mkdirSync(outDir, { recursive: true });
-  const receiptPath = path.join(outDir, `skyevault-receipt-${receipt.receiptId || stamp}.json`);
-  fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const receiptPath = writeReceipt(receipt, outDir, stamp);
   console.log(JSON.stringify(receipt, null, 2));
   console.log(`Receipt written: ${receiptPath}`);
   process.exit(0);
@@ -341,11 +378,11 @@ if (existingArchive) {
 
 const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
 const outDir = path.join(root, '.skyevault-out');
-const stageParent = resolveWorkspacePath(envValue('SKYEVAULT_STAGE_PARENT'), os.tmpdir());
-const archiveDir = resolveWorkspacePath(envValue('SKYEVAULT_ARCHIVE_DIR'), outDir);
+const scratchRoot = path.join(os.tmpdir(), 'skyevault-repo-push');
+const stageParent = resolveWorkspacePath(envValue('SKYEVAULT_STAGE_PARENT'), scratchRoot);
+const archiveDir = resolveWorkspacePath(envValue('SKYEVAULT_ARCHIVE_DIR'), path.join(scratchRoot, 'archives'));
 const stage = path.join(stageParent, `skyevault-repo-stage-${stamp}`);
 const archive = path.join(archiveDir, `${repoName}-repo-safe-${stamp}.zip`);
-fs.mkdirSync(outDir, { recursive: true });
 fs.mkdirSync(archiveDir, { recursive: true });
 
 console.log('Scanning repo for secret-looking files...');
@@ -364,7 +401,7 @@ if (stageFindings.length) {
 
 console.log('Creating zip archive...');
 zipStage(stage, archive);
-const archiveHash = hashFile(archive);
+const archiveHash = await hashFile(archive);
 const summary = outputSummary(stage, archive, excludes);
 console.log(`Archive: ${archive}`);
 console.log(`Files: ${summary.fileCount}`);
@@ -374,13 +411,15 @@ console.log(`Secret-looking files excluded: ${summary.excludedSecretLikeFiles}`)
 
 if (dryRun) {
   console.log('Dry run complete. Upload skipped.');
+  if (!keepStage) fs.rmSync(stage, { recursive: true, force: true });
+  if (!keepArchive) fs.rmSync(archive, { force: true });
   process.exit(0);
 }
 
 const receipt = await uploadArchive(archive, archiveHash, summary);
-const receiptPath = path.join(outDir, `skyevault-receipt-${receipt.receiptId || stamp}.json`);
-fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+const receiptPath = writeReceipt(receipt, outDir, stamp);
 console.log(JSON.stringify(receipt, null, 2));
 console.log(`Receipt written: ${receiptPath}`);
 
 if (!keepStage) fs.rmSync(stage, { recursive: true, force: true });
+if (!keepArchive) fs.rmSync(archive, { force: true });
