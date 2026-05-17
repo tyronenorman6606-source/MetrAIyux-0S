@@ -1,4 +1,5 @@
 import { wrap } from "./_lib/wrap.js";
+import crypto from "crypto";
 import { buildCors, json, badRequest } from "./_lib/http.js";
 import { getSessionById, verifySessionToken } from "./_lib/sessions.js";
 import { lookupKey } from "./_lib/authz.js";
@@ -69,7 +70,17 @@ export default wrap(async (req) => {
       api_key_id: claims.api_key_id,
       email: claims.email,
       email_verified: claims.email_verified,
-      org: claims.customer_id
+      org: claims.customer_id,
+      gate_card_id: gateCardId(claims.sub, claims.email, claims.customer_id),
+      gate_card: gateCard({
+        sub: claims.sub,
+        email: claims.email,
+        customerId: claims.customer_id,
+        role: claims.role || session.user?.role || null,
+        sessionId: claims.sid,
+        scope: scopeArr(claims.scope),
+        principal: "session"
+      })
     }, cors);
   }
 
@@ -103,7 +114,17 @@ export default wrap(async (req) => {
       api_key_id: claims.api_key_id,
       email: claims.email,
       email_verified: claims.email_verified,
-      org: claims.customer_id
+      org: claims.customer_id,
+      gate_card_id: gateCardId(claims.sub, claims.email, claims.customer_id),
+      gate_card: gateCard({
+        sub: claims.sub,
+        email: claims.email,
+        customerId: claims.customer_id,
+        role: claims.role || null,
+        sessionId: claims.sid,
+        scope: scopeArr(claims.scope),
+        principal: "oauth"
+      })
     }, cors);
   }
 
@@ -121,7 +142,16 @@ export default wrap(async (req) => {
       customer_id: keyRow.customer_id,
       api_key_id: keyRow.api_key_id,
       org: keyRow.customer_id,
-      role: keyRow.role || "deployer"
+      role: keyRow.role || "deployer",
+      gate_card_id: gateCardId(`api_key:${keyRow.api_key_id}`, keyRow.customer_email, keyRow.customer_id),
+      gate_card: gateCard({
+        sub: `api_key:${keyRow.api_key_id}`,
+        email: keyRow.customer_email || null,
+        customerId: keyRow.customer_id,
+        role: keyRow.role || "deployer",
+        scope: keyScopeString(keyRow).split(/\s+/).filter(Boolean),
+        principal: "api_key"
+      })
     }, cors);
   }
 
@@ -141,4 +171,32 @@ function keyScopeString(keyRow) {
     base.push("keys.read", "keys.write", "admin.read", "admin.write");
   }
   return base.join(" ");
+}
+
+function scopeArr(scope) {
+  if (!scope) return [];
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope).split(/\s+/).filter(Boolean);
+}
+
+function gateCardId(sub, email, customerId) {
+  const seed = [sub, email, customerId].filter(Boolean).join("|") || "skyegatefs27";
+  return `gate_basic_${crypto.createHash("sha256").update(seed).digest("hex").slice(0, 20)}`;
+}
+
+function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], principal = "session" }) {
+  return {
+    id: gateCardId(sub, email, customerId),
+    type: "basic_gate_card",
+    status: "active",
+    principal,
+    sub,
+    email: email || null,
+    customer_id: customerId || null,
+    role: role || "user",
+    session_id: sessionId,
+    scope,
+    usage_required: false,
+    reloadable: true
+  };
 }

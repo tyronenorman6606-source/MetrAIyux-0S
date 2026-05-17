@@ -30,6 +30,7 @@ Update this file any time you change policies on the legal site — new terms, u
 | legalskyes-010 | Full Legal Hub Index | https://solenterprises.org/legal/ |
 | legalskyes-011 | Cookie Policy and Security | https://solenterprises.org/legal/cookie-policy/ |
 | legalskyes-012 | Sync Instructions (meta) | — |
+| legalskyes-013 | MetrAIyux Registered Company, Contract, and IP Readiness | /legal-readiness/index.html |
 
 ## Adding a new policy page
 
@@ -47,6 +48,6 @@ Add a new object to the `chunks` array in `legal-sync.json`:
 
 ## Brain routing
 
-Legal queries automatically route a +5 boost in the brain scorer for terms: `legal`, `privacy`, `terms`, `dmca`, `sms`, `cookie`, `refund`, `enterprise msa`, `acceptable use`, `ai terms`, `solenterprises`, `legal center`, `skyes over london`.
+Legal queries automatically route a +5 boost in the brain scorer for terms: `legal`, `privacy`, `terms`, `dmca`, `sms`, `cookie`, `refund`, `enterprise msa`, `acceptable use`, `ai terms`, `solenterprises`, `legal center`, `skyes over london`, `legal readiness`, `platform contract`, `ip assignment`.
 
 All compliance decisions should still route through **Julian Mercer (Legal & Compliance Cabinet)** — the brain informs, it does not replace counsel.

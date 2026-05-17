@@ -1,0 +1,96 @@
+{
+  "id": "metraiyux-0s-operator-command-registry",
+  "name": "MetrAIyux 0S Operator Command Registry",
+  "generated_at": "2026-05-16T00:00:00Z",
+  "purpose": "Allowlisted local operator commands that the 0S command runner can execute from the repo workspace.",
+  "exposure": "repo-local-only",
+  "safety_model": [
+    "Commands run only from the local repo operator environment.",
+    "Public browser surfaces can describe the existence of the operator sync lane, but should not publish the command allowlist.",
+    "Only IDs in this registry are executable by tools/0s-command-runner.mjs.",
+    "Secrets, destructive commands, and production publishing are intentionally excluded unless a future approval gate is added."
+  ],
+  "commands": [
+    {
+      "id": "obsidian:sync",
+      "title": "Sync Obsidian Vault Into Local Brain",
+      "command": "npm run brain:sync:obsidian",
+      "cwd": ".",
+      "category": "obsidian",
+      "risk": "low",
+      "when_to_run": "After editing curated notes in obsidian-vault that have brain: true frontmatter.",
+      "result": "Writes metraiyux_0s_site/brain/obsidian-sync.json."
+    },
+    {
+      "id": "obsidian:inspect",
+      "title": "Inspect Obsidian Brain Export",
+      "command": "node -e \"const fs=require('fs'); const j=JSON.parse(fs.readFileSync('metraiyux_0s_site/brain/obsidian-sync.json','utf8')); console.log(JSON.stringify({notes:j.note_count,chunks:j.chunk_count,generated_at:j.generated_at}, null, 2))\"",
+      "cwd": ".",
+      "category": "obsidian",
+      "risk": "low",
+      "when_to_run": "After syncing the vault to confirm how many notes and chunks entered the local brain.",
+      "result": "Prints note count, chunk count, and generation timestamp."
+    },
+    {
+      "id": "obsidian:graph",
+      "title": "Generate Obsidian Neural Map",
+      "command": "npm run obsidian:graph",
+      "cwd": ".",
+      "category": "obsidian",
+      "risk": "low",
+      "when_to_run": "After adding, linking, retagging, or reorganizing Obsidian notes.",
+      "result": "Writes obsidian-vault/_neural-map/graph-data.js for the private neural map page."
+    },
+    {
+      "id": "obsidian:web-graph",
+      "title": "Generate Public Neural Map",
+      "command": "npm run obsidian:web-graph",
+      "cwd": ".",
+      "category": "obsidian",
+      "risk": "low",
+      "when_to_run": "After syncing curated Obsidian notes and before deploying the public web neural map.",
+      "result": "Writes metraiyux_0s_site/assets/public-neural-map-data.js for neural-map.html."
+    },
+    {
+      "id": "brain:validate",
+      "title": "Validate Brain Scripts And JSON",
+      "command": "node --check metraiyux_0s_site/brain/local-brain.js && node --check tools/sync-obsidian-brain.mjs && node --check tools/generate-obsidian-neural-map.mjs && node --check tools/generate-public-neural-map.mjs && node --check metraiyux_0s_site/assets/public-neural-map.js && node -e \"JSON.parse(require('fs').readFileSync('metraiyux_0s_site/brain/obsidian-sync.json','utf8')); JSON.parse(require('fs').readFileSync('ops/0s-command-registry.json','utf8')); console.log('brain files ok')\"",
+      "cwd": ".",
+      "category": "validation",
+      "risk": "low",
+      "when_to_run": "After changing the local brain loader, Obsidian sync script, command registry, or exported brain data.",
+      "result": "Confirms JavaScript syntax and JSON parsing."
+    },
+    {
+      "id": "site:serve",
+      "title": "Serve MetrAIyux 0S Site Locally",
+      "command": "npm run skye:serve:site",
+      "cwd": ".",
+      "category": "local-server",
+      "risk": "low",
+      "long_running": true,
+      "when_to_run": "When testing local-brain.html or operator pages in a browser.",
+      "result": "Starts a local static server at http://127.0.0.1:4173/."
+    },
+    {
+      "id": "qa:crawl-static",
+      "title": "Run Static SkyeCrawler QA",
+      "command": "npm run skye:crawl:static",
+      "cwd": ".",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "After content, navigation, vault-brain export, or static site changes.",
+      "result": "Runs static crawler QA using the configured local site target."
+    },
+    {
+      "id": "repo:health",
+      "title": "Run Repo Health Check",
+      "command": "npm run repo:health",
+      "cwd": ".",
+      "category": "repo",
+      "risk": "low",
+      "when_to_run": "Before packaging, handoff, or repo backup.",
+      "result": "Runs the repo health check script."
+    }
+  ]
+}

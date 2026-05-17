@@ -63,6 +63,30 @@ Then open:
 http://localhost:8787/local-brain.html
 ```
 
+## Obsidian vault sync
+
+The repo includes `obsidian-vault/` as the project command center. Notes with `brain: true` in frontmatter can be exported into the local brain:
+
+```bash
+npm run brain:sync:obsidian
+```
+
+The export writes:
+
+```text
+metraiyux_0s_site/brain/obsidian-sync.json
+```
+
+The browser brain loads that file when present, alongside the main knowledge base, live surface registry, legal sync, marketplace sync, persona registry, site-operator routes, and sales offer registry.
+
+## 0S command runner
+
+Operator commands are repo-local and intentionally kept outside the deployable static site.
+
+Detailed command IDs are documented in `docs/OBSIDIAN_0S_OPERATOR_SYNC.md` and are available through the repo-local CLI help. Actual shell execution stays local through the command runner.
+
+Public deployment note: do not place the detailed command registry under `metraiyux_0s_site/` unless the host protects it with real auth.
+
 ## Safety limits
 
 This brain is a company knowledge assistant. It should not claim sample planning roles are legally appointed officers. Use real verified people for actual incorporation filings.

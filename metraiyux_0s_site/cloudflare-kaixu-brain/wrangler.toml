@@ -1,0 +1,39 @@
+name = "kaixu-6-7-brain"
+main = "kaixu-worker.js"
+compatibility_date = "2026-05-17"
+
+# ── Service bindings ───────────────────────────────────────────────────────────
+# Links kAIxu back to the site-operator for event forwarding (optional).
+# Comment out if deploying kAIxu standalone before the site-operator is live.
+[[services]]
+binding = "SITE_OPERATOR"
+service = "sovereign-13-site-operator-quantum"
+
+# ── Public vars ────────────────────────────────────────────────────────────────
+[vars]
+# Set to "false" only during local dev/testing. Always "true" in production.
+KAIXU_AUTH_REQUIRED = "true"
+
+# ── Secrets — NEVER put real values here. Set via wrangler CLI: ────────────────
+#
+#   wrangler secret put OPENAI_API_KEY
+#   wrangler secret put ANTHROPIC_API_KEY
+#   wrangler secret put GEMINI_API_KEY
+#   wrangler secret put KAIXU_ADMIN_KEY          ← founder/ops master key
+#   wrangler secret put KAIXU_ALLOWED_KEYS       ← comma-separated customer bearer keys
+#
+# KAIXU_ALLOWED_KEYS format:  "key-abc123,key-def456,key-xyz789"
+# For production, rotate individual keys by removing them from this list.
+# Long-term: replace KAIXU_ALLOWED_KEYS with KV-backed key store (see notes below).
+
+# ── Optional future bindings (uncomment when ready) ──────────────────────────
+# [[kv_namespaces]]
+# binding = "KAIXU_KEYS_KV"
+# id = "YOUR_KV_NAMESPACE_ID"
+# # Enables per-key auth, spend limits, and revocation via KV instead of env var.
+#
+# [[d1_databases]]
+# binding = "KAIXU_DB"
+# database_name = "kaixu-usage-db"
+# database_id   = "YOUR_D1_DATABASE_ID"
+# # Enables per-key usage ledger, cap enforcement, and monthly rollup.

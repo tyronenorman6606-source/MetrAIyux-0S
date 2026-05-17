@@ -63,6 +63,29 @@ export function applyRateLimit(event, options = {}) {
   };
 }
 
+export function applyNamedRateLimit(key, options = {}) {
+  const limit = Math.max(1, Number(options.limit || 60));
+  const windowMs = Math.max(1000, Number(options.windowMs || 60000));
+  const cleanKey = String(key || options.bucket || 'default').slice(0, 240);
+  cleanExpired(RATE_STATE.buckets);
+  const current = RATE_STATE.buckets.get(cleanKey) || { count: 0, resetAt: now() + windowMs };
+  current.count += 1;
+  RATE_STATE.buckets.set(cleanKey, current);
+  if (current.count > limit) {
+    const error = new Error(options.message || 'Too many requests. Try again after the rate-limit window resets.');
+    error.statusCode = 429;
+    error.retryAfterSeconds = Math.max(1, Math.ceil((current.resetAt - now()) / 1000));
+    throw error;
+  }
+  return {
+    key: cleanKey,
+    count: current.count,
+    limit,
+    resetAt: new Date(current.resetAt).toISOString(),
+    remaining: Math.max(0, limit - current.count)
+  };
+}
+
 function portalLockKey(event) {
   return requestFingerprint(event, 'portal-key');
 }

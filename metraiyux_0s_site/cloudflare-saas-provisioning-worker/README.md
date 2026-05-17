@@ -39,10 +39,10 @@ wrangler deploy
 
 Required 0S Worker env:
 
-- `SKYMAIL_API_URL=https://skymail-platform.graylondonskyes.workers.dev`
-- `SKYMAIL_PUBLIC_URL=https://skymail-platform.graylondonskyes.workers.dev`
+- `SKYMAIL_API_URL=https://skyemail-platform.graylondonskyes.workers.dev`
+- `SKYMAIL_PUBLIC_URL=https://skyemail-platform.graylondonskyes.workers.dev`
 - `SKYMAIL_SERVICE_TOKEN` must match the secret on the SkyeMail Worker.
-- `SKYMAIL_WORKER` is bound in `wrangler.toml` as a Cloudflare service binding to `skymail-platform`, so production 0S-to-SkyeMail calls stay private and do not depend on public `workers.dev` routing.
+- `SKYMAIL_WORKER` is bound in `wrangler.toml` as a Cloudflare service binding to `skyemail-platform`, so production 0S-to-SkyeMail calls stay private and do not depend on public `workers.dev` routing.
 
 The 0S worker stores the result in `workspace_mailboxes` and records a `skymail.workspace_mailbox` provisioning event. A workspace can be created even when mailbox provider credentials are not ready; the response marks `provider_ready`, `inbox_ready`, and vault `key_state` explicitly so onboarding can finish the remaining setup instead of pretending email is live.
 

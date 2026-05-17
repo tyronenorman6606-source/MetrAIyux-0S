@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requirePortalKey, cleanText, safeFileName } from './_lib/security.js';
+import { resolvePortalAccess, cleanText, safeFileName } from './_lib/security.js';
 import { appendLedger, loadConfig, receiptIdFor, loadSessionManifest, markSessionManifestComplete, updateSessionManifestStatus, writeAuditEventSafe } from './_lib/config.js';
 import { completeMultipartUpload, getDriveFileMetadata } from './_lib/google-drive.js';
 import { notifyUploadComplete, sendClientReceiptEmail } from './_lib/notifications.js';
@@ -65,6 +65,9 @@ function verifyVaultObject(body, verifiedFile, config) {
   if (appProperties.source !== 'client-drop-vault') fail('Vault object was not created by SkyeVault-Drop.', 403);
   if (appProperties.sessionId !== sessionId) fail('Vault object session does not match this completion request.', 403);
   if (appProperties.destinationId !== destinationId) fail('Vault object destination does not match this completion request.', 403);
+  if (body.workspaceId && appProperties.workspaceId && appProperties.workspaceId !== cleanText(body.workspaceId, 120)) {
+    fail('Vault object workspace does not match this completion request.', 403);
+  }
   if (clientRequestId && appProperties.clientRequestId && appProperties.clientRequestId !== clientRequestId) {
     fail('Vault object request ID does not match this completion request.', 403);
   }
@@ -89,6 +92,19 @@ function verifyVaultObject(body, verifiedFile, config) {
   return { sessionId, destinationId, destination, appProperties };
 }
 
+function enforcePortalAccess(portalAccess = {}, manifest = null, appProperties = {}) {
+  if (portalAccess.type !== 'developer-workspace') return;
+  const expectedWorkspace = portalAccess.workspaceId || '';
+  const manifestWorkspace = manifest?.intake?.workspaceId || manifest?.access?.workspaceId || '';
+  const objectWorkspace = appProperties.workspaceId || '';
+  if (!expectedWorkspace) fail('Developer workspace access is misconfigured.', 500);
+  if (manifestWorkspace !== expectedWorkspace) fail('This upload session belongs to a different developer workspace.', 403);
+  if (objectWorkspace !== expectedWorkspace) fail('This vault object belongs to a different developer workspace.', 403);
+  if (portalAccess.destinationId && manifest?.destination?.id && manifest.destination.id !== portalAccess.destinationId) {
+    fail('This upload session belongs to a destination outside this developer workspace.', 403);
+  }
+}
+
 async function finalizeUploadedObject(body, objectKey) {
   const upload = body.driveFile || body.r2Object || {};
   if (upload.uploadId && Array.isArray(upload.parts) && upload.parts.length) {
@@ -109,7 +125,7 @@ export async function handler(event) {
 
   try {
     const body = await readJson(event);
-    requirePortalKey(event, body);
+    const portalAccess = await resolvePortalAccess(event, body);
 
     const driveFileId = cleanText(body.driveFileId || body.driveFile?.id, 160);
     if (!driveFileId) fail('driveFileId is required.');
@@ -122,6 +138,7 @@ export async function handler(event) {
     const verified = verifyVaultObject(body, verifiedFile, config);
     const manifestRecord = await loadSessionManifest(verified.sessionId);
     const manifest = verifyManifest(body, manifestRecord, verifiedFile);
+    enforcePortalAccess(portalAccess, manifest, verified.appProperties);
     const verifiedFingerprint = verifyFingerprint(body, verified.appProperties, manifest);
     const receiptId = receiptIdFor(verified.sessionId, verifiedFile.id);
     const props = verified.appProperties || {};
@@ -132,6 +149,10 @@ export async function handler(event) {
       sessionId: verified.sessionId,
       clientRequestId: verifiedText(manifestIntake.clientRequestId, props.clientRequestId || body.clientRequestId, 160),
       submissionId: verifiedText(manifestIntake.submissionId, props.submissionId || body.submissionId, 160),
+      workspaceId: verifiedText(manifestIntake.workspaceId, props.workspaceId || body.workspaceId, 120),
+      developerId: verifiedText(manifestIntake.developerId, props.developerId || body.developerId, 120),
+      developerName: verifiedText(manifestIntake.developerName, body.developerName, 120),
+      accessType: verifiedText(manifestIntake.accessType, portalAccess.type || body.accessType, 40),
       destinationId: verified.destinationId,
       destinationName: cleanText(body.destinationName || verified.destination.name, 180),
       clientName: verifiedText(manifestIntake.clientName, props.clientName || body.clientName, 180),
@@ -166,6 +187,8 @@ export async function handler(event) {
         destinationId: entry.destinationId,
         fileName: entry.fileName,
         driveFileId: verifiedFile.id,
+        workspaceId: entry.workspaceId || null,
+        developerId: entry.developerId || null,
         scan
       });
       fail('Upload was received but flagged by scanner policy. Operator review is required.', 409);
@@ -191,7 +214,11 @@ export async function handler(event) {
           assetType: entry.assetType,
           deadline: entry.deadline,
           clientRequestId: entry.clientRequestId,
-          submissionId: entry.submissionId
+          submissionId: entry.submissionId,
+          workspaceId: entry.workspaceId,
+          developerId: entry.developerId,
+          developerName: entry.developerName,
+          accessType: entry.accessType
         },
         policy: { scan }
       });
@@ -205,6 +232,8 @@ export async function handler(event) {
       clientRequestId: entry.clientRequestId || null,
       destinationId: entry.destinationId,
       destinationName: entry.destinationName,
+      workspaceId: entry.workspaceId || null,
+      developerId: entry.developerId || null,
       fileName: entry.fileName,
       fileSize: entry.fileSize,
       driveFileId: verifiedFile.id,

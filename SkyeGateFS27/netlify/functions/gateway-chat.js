@@ -3,13 +3,14 @@ import { buildCors, json, badRequest, getBearer, monthKeyUTC, getInstallId, getC
 import { q } from "./_lib/db.js";
 import { costCents } from "./_lib/pricing.js";
 import { callOpenAI, callAnthropic, callGemini, resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
-import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents } from "./_lib/authz.js";
+import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents, effectiveRpmLimit } from "./_lib/authz.js";
 import { enforceRpm } from "./_lib/ratelimit.js";
 import { hmacSha256Hex } from "./_lib/crypto.js";
 import { maybeCapAlerts } from "./_lib/alerts.js";
 import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceKaixuMessages } from "./_lib/kaixu.js";
+import { enforceUsagePreflight } from "./_lib/usageGates.js";
 
 const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
 
@@ -60,49 +61,14 @@ export default wrap(async (req) => {
 
 
   // Rate limit (DB-backed, fixed 60s window)
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: keyRow.rpm_limit });
+  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: effectiveRpmLimit(keyRow) });
   if (!rl.ok) {
     return json(429, { error: "Rate limit exceeded", ratelimit: { remaining: rl.remaining, reset: rl.reset } }, cors);
   }
 
   const month = monthKeyUTC();
-  const custRoll = await getMonthRollup(keyRow.customer_id, month);
-  const keyRoll = await getKeyMonthRollup(keyRow.api_key_id, month);
-
-  const customer_cap_cents = customerCapCents(keyRow, custRoll);
-  const key_cap_cents = keyCapCents(keyRow, custRoll);
-
-  if ((custRoll.spent_cents || 0) >= customer_cap_cents) {
-    return json(402, {
-      error: "Monthly cap reached",
-      scope: "customer",
-      month: {
-        month,
-        cap_cents: customer_cap_cents,
-        spent_cents: custRoll.spent_cents || 0,
-        customer_cap_cents,
-        customer_spent_cents: custRoll.spent_cents || 0,
-        key_cap_cents,
-        key_spent_cents: keyRoll.spent_cents || 0
-      }
-    }, cors);
-  }
-
-  if ((keyRoll.spent_cents || 0) >= key_cap_cents) {
-    return json(402, {
-      error: "Monthly cap reached",
-      scope: "key",
-      month: {
-        month,
-        cap_cents: customer_cap_cents,
-        spent_cents: custRoll.spent_cents || 0,
-        customer_cap_cents,
-        customer_spent_cents: custRoll.spent_cents || 0,
-        key_cap_cents,
-        key_spent_cents: keyRoll.spent_cents || 0
-      }
-    }, cors);
-  }
+  const preflight = await enforceUsagePreflight({ keyRow, month });
+  if (!preflight.ok) return json(preflight.status, preflight.payload, cors);
 
   let result;
   try {
@@ -115,7 +81,7 @@ export default wrap(async (req) => {
       error: "Provider error",
       provider: public_provider,
       model: public_model,
-      requested_provider: requested_provider || public_provider,
+      requested_provider: public_provider,
       requested_model: public_model
     }, cors);
   }
@@ -183,10 +149,11 @@ export default wrap(async (req) => {
   return json(200, {
     provider: public_provider,
     model: public_model,
-    requested_provider: requested_provider || public_provider,
+    requested_provider: public_provider,
     requested_model: public_model,
     output_text: result.output_text || "",
     usage: { input_tokens, output_tokens, cost_cents },
+    usage_limits: preflight.snapshot,
     month: {
       month,
       cap_cents: customer_cap_cents_after,

@@ -25,7 +25,7 @@
     <section class="page-hero reveal">
       <p class="eyebrow">⚙️ Technical architecture</p>
       <h1>I built it on the edge so the business does not need a server room.</h1>
-      <p class="lead">I use static frontends on Cloudflare Pages, eight ES-module Workers for command routing and state, eight D1 SQL databases for queryable records, SkyeGateFS27 for auth, Resend for approval email, Stripe for billing, KV for fast configuration, and Queues for async work. The stack stays boring where it should be and powerful where it has to be. ⚡</p>
+      <p class="lead">I use static frontends on Cloudflare Pages, eight ES-module Workers for command routing and state, eight D1 SQL databases for queryable records, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeGateFS27</span> for auth, Resend for approval email, Stripe for billing, KV for fast configuration, and Queues for async work. The stack stays boring where it should be and powerful where it has to be. ⚡</p>
       <div class="cta-row">
         <a class="button" href="platform.html">Open Platform Map</a>
         <a class="button secondary" href="security.html">Review Security</a>
@@ -41,7 +41,7 @@
         </div>
         <div class="tech-row">
           <strong>8 Cloudflare Workers — ES module format</strong>
-          <p>Admin automation Worker (brain routing, D1 receipt logging), SaaS provisioning Worker (signup, Stripe billing, workspace isolation), 0meg4kAI security gateway Worker (two-layer scan, quarantine logging), CROWN operating ledger Worker, NEXUS CRM Worker, QUANTUM task ledger Worker, site operator Worker, sentinel audit Worker.</p>
+          <p>Admin automation Worker (brain routing, D1 receipt logging), SaaS provisioning Worker (signup, Stripe billing, workspace isolation), <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">0meg4kAI</span> security gateway Worker (two-layer scan, quarantine logging), CROWN operating ledger Worker, NEXUS CRM Worker, QUANTUM task ledger Worker, site operator Worker, sentinel audit Worker.</p>
           <p>I deploy the Workers under separate routes with scoped D1 bindings. Each Worker only touches the databases assigned to its job.</p>
         </div>
         <div class="tech-row">
@@ -65,7 +65,7 @@
           <p>Both primitives are optional layer components. The core system runs on Workers and D1; KV and Queues add throughput and async capability at scale.</p>
         </div>
         <div class="tech-row">
-          <strong>16 local brain files — JSON and markdown</strong>
+          <strong>16 <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">local brain</span> files — JSON and markdown</strong>
           <p>Each of the 16 brains has a JSON persona definition and a markdown doctrine file. The persona file carries routing keywords, domain scope boundaries, hard gate flags, and approval escalation paths. The doctrine file carries company context, operating standards, and brain-specific decision logic.</p>
           <p>The brain layer runs deterministic keyword classification — not LLM inference on every command. LLM providers can be wired in as optional connectors behind private server-side Workers for enhanced language understanding, but the routing logic is local and does not depend on an active model provider.</p>
         </div>
@@ -86,7 +86,7 @@
           <article class="card">
             <span class="tag">Builder note</span>
           <h3>I chose primitives I can deploy for clients.</h3>
-          <p>I can launch the public site, protected command deck, proof records, approval route, and client workspace layer without making the buyer learn the setup stack first.</p>
+          <p>I can launch the public site, protected command deck, proof records, approval route, and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">client workspace</span> layer without making the buyer learn the setup stack first.</p>
           </article>
         </div>
       </div>

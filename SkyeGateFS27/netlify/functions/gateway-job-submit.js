@@ -2,7 +2,7 @@ import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest, getBearer, monthKeyUTC, getInstallId, getClientIp, getUserAgent } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { enforceKaixuMessages, KAIXU_SYSTEM_HASH, SCHEMA_VERSION, BUILD_ID } from "./_lib/kaixu.js";
-import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents } from "./_lib/authz.js";
+import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents, effectiveRpmLimit } from "./_lib/authz.js";
 import { enforceRpm } from "./_lib/ratelimit.js";
 import { resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
 import { randomUUID } from "crypto";
@@ -63,7 +63,8 @@ export default wrap(async (req) => {
   if (!dev.ok) return json(dev.status || 403, { error: dev.error }, cors);
 
   // Light rate-limit on submit (prevents enqueue spam)
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: Math.min(keyRow.rpm_limit || 60, 60) });
+  const inheritedRpm = effectiveRpmLimit(keyRow, 60);
+  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: Math.min(inheritedRpm || 60, 60) });
   if (!rl.ok) {
     return json(429, { error: "Rate limit exceeded", ratelimit: { remaining: rl.remaining, reset: rl.reset } }, cors);
   }

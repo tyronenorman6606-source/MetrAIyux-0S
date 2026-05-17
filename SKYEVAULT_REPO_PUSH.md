@@ -17,6 +17,7 @@ Required local env values:
 - `CLIENT_PORTAL_KEY` in `SkyeVault-Drop/.env`, or `SKYEVAULT_PORTAL_KEY` in root `.env`.
 - Optional `SKYEVAULT_UPLOAD_ORIGIN` if the deployed vault allows a different origin than `https://client-drop-vault-r2.netlify.app`.
 - Optional `SKYEVAULT_CLIENT_NAME`, `SKYEVAULT_CLIENT_EMAIL`, and `SKYEVAULT_PROJECT_NAME` to control receipt metadata.
+- Optional `SKYEVAULT_ARCHIVE_DIR` and `SKYEVAULT_STAGE_PARENT` for low-disk IDE/CDE workspaces that need staging and zip output on a larger temp volume.
 
 For a client-owned vault, set these in that client's repo or shell:
 

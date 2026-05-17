@@ -9,6 +9,12 @@ function baseSelect() {
                  k.monthly_cap_cents as key_cap_cents, k.rpm_limit, k.rpd_limit,
                  k.max_devices, k.require_install_id, k.allowed_providers, k.allowed_models,
                  c.monthly_cap_cents as customer_cap_cents, c.is_active,
+                 c.default_rpm_limit as customer_default_rpm_limit,
+                 c.default_rpd_limit as customer_default_rpd_limit,
+                 c.vault_storage_mb as customer_vault_storage_mb,
+                 c.vault_file_limit as customer_vault_file_limit,
+                 c.vault_workspace_limit as customer_vault_workspace_limit,
+                 c.skypay_policy as customer_skypay_policy,
                  c.max_devices_per_key as customer_max_devices_per_key, c.require_install_id as customer_require_install_id,
                  c.allowed_providers as customer_allowed_providers, c.allowed_models as customer_allowed_models,
                  c.plan_name as customer_plan_name, c.email as customer_email
@@ -171,6 +177,14 @@ export function keyCapCents(keyRow, customerRollup) {
   // If a key override exists, it's a hard cap for that key. Otherwise it inherits the customer cap.
   if (keyRow.key_cap_cents != null) return keyRow.key_cap_cents;
   return customerCapCents(keyRow, customerRollup);
+}
+
+export function effectiveRpmLimit(keyRow, fallback = null) {
+  return keyRow?.rpm_limit ?? keyRow?.customer_default_rpm_limit ?? fallback;
+}
+
+export function effectiveRpdLimit(keyRow, fallback = null) {
+  return keyRow?.rpd_limit ?? keyRow?.customer_default_rpd_limit ?? fallback;
 }
 
 

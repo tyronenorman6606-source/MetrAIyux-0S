@@ -2,9 +2,10 @@ import { q } from "./_lib/db.js";
 import { callOpenAI, callAnthropic, callGemini, resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
 import { costCents } from "./_lib/pricing.js";
 import { getBearer, monthKeyUTC } from "./_lib/http.js";
-import { resolveAuth, lookupKeyById, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents } from "./_lib/authz.js";
+import { resolveAuth, lookupKeyById } from "./_lib/authz.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceDevice } from "./_lib/devices.js";
+import { enforceUsagePreflight } from "./_lib/usageGates.js";
 
 // NOTE: This is a Netlify Background Function.
 // Naming rule: must include "-background" in filename (Netlify docs).
@@ -120,25 +121,13 @@ export default async (req) => {
     return;
   }
 
-  // Cap gate (best-effort; cost is unknown until after completion)
+  // Usage gate (cost is unknown until after completion; daily calls and current caps are hard-blocked here)
   const month = monthKeyUTC();
-  const custRoll = await getMonthRollup(keyRow.customer_id, month);
-  const keyRoll = await getKeyMonthRollup(keyRow.api_key_id, month);
-  const customer_cap_cents = customerCapCents(keyRow, custRoll);
-  const key_cap_cents = keyCapCents(keyRow, custRoll);
-
-  if ((custRoll.spent_cents || 0) >= customer_cap_cents) {
+  const preflight = await enforceUsagePreflight({ keyRow, month });
+  if (!preflight.ok) {
     await q(
       `update async_jobs set status='failed', completed_at=now(), heartbeat_at=now(), error=$2 where id=$1`,
-      [id, `Monthly cap reached (customer)`]
-    );
-    return;
-  }
-
-  if ((keyRoll.spent_cents || 0) >= key_cap_cents) {
-    await q(
-      `update async_jobs set status='failed', completed_at=now(), heartbeat_at=now(), error=$2 where id=$1`,
-      [id, `Monthly cap reached (key)`]
+      [id, `${preflight.payload?.error || "Usage limit reached"} (${preflight.payload?.scope || "key"})`]
     );
     return;
   }

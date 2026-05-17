@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
-const appRoot = path.join(repoRoot, 'unpacked-projects', 'sol_staffing_agency_site');
+const appRoot = path.join(repoRoot, 'metraiyux_0s_site', 'live', 'sol_staffing_agency_site');
 const artifactRoot = path.join(repoRoot, 'test-artifacts', 'sol-real-e2e-proof');
 const recordingDir = path.join(artifactRoot, 'recording');
 const proofReportPath = path.join(artifactRoot, 'sol-staffing-real-workflow-proof.json');
@@ -159,7 +159,7 @@ async function main() {
   const consoleMessages = [];
   const receipts = {
     generated_at: null,
-    source_app: 'unpacked-projects/sol_staffing_agency_site',
+    source_app: 'metraiyux_0s_site/live/sol_staffing_agency_site',
     base_url: baseUrl,
     operator: {
       email: process.env.SOL_STAFFING_DEV_EMAIL,
@@ -396,7 +396,7 @@ async function main() {
 
   const proof = {
     generated_at: generatedAt,
-    source_app: 'unpacked-projects/sol_staffing_agency_site',
+    source_app: 'metraiyux_0s_site/live/sol_staffing_agency_site',
     source_video: path.relative(repoRoot, sourceVideoPath),
     output_video: path.relative(repoRoot, outputMp4Path),
     poster: path.relative(repoRoot, posterPath),

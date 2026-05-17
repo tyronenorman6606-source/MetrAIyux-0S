@@ -2,7 +2,7 @@ import { wrap } from "./_lib/wrap.js";
 import { buildCors, badRequest, getBearer, monthKeyUTC, getInstallId, getClientIp, getUserAgent } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { costCents } from "./_lib/pricing.js";
-import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents } from "./_lib/authz.js";
+import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents, effectiveRpmLimit } from "./_lib/authz.js";
 import { enforceRpm } from "./_lib/ratelimit.js";
 import { streamOpenAI, streamAnthropic, streamGemini, resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
 import { hmacSha256Hex } from "./_lib/crypto.js";
@@ -10,6 +10,7 @@ import { maybeCapAlerts } from "./_lib/alerts.js";
 import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceKaixuMessages } from "./_lib/kaixu.js";
+import { enforceUsagePreflight } from "./_lib/usageGates.js";
 
 const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
 
@@ -66,46 +67,21 @@ export default wrap(async (req) => {
 
 
   // Rate limit
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: keyRow.rpm_limit });
+  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: effectiveRpmLimit(keyRow) });
   if (!rl.ok) return new Response(JSON.stringify({ error: "Rate limit exceeded" }), { status: 429, headers: { ...cors, "content-type": "application/json" } });
 
   const month = monthKeyUTC();
-  const custRoll = await getMonthRollup(keyRow.customer_id, month);
-  const keyRoll = await getKeyMonthRollup(keyRow.api_key_id, month);
+  const preflight = await enforceUsagePreflight({ keyRow, month });
+  if (!preflight.ok) {
+    return new Response(JSON.stringify(preflight.payload), {
+      status: preflight.status,
+      headers: { ...cors, "content-type": "application/json" }
+    });
+  }
+  const custRoll = preflight.customerRoll;
+  const keyRoll = preflight.keyRoll;
   const customer_cap_cents = customerCapCents(keyRow, custRoll);
   const key_cap_cents = keyCapCents(keyRow, custRoll);
-
-  if ((custRoll.spent_cents || 0) >= customer_cap_cents) {
-    return new Response(JSON.stringify({
-      error: "Monthly cap reached",
-      scope: "customer",
-      month: {
-        month,
-        cap_cents: customer_cap_cents,
-        spent_cents: custRoll.spent_cents || 0,
-        customer_cap_cents,
-        customer_spent_cents: custRoll.spent_cents || 0,
-        key_cap_cents,
-        key_spent_cents: keyRoll.spent_cents || 0
-      }
-    }), { status: 402, headers: { ...cors, "content-type": "application/json" } });
-  }
-
-  if ((keyRoll.spent_cents || 0) >= key_cap_cents) {
-    return new Response(JSON.stringify({
-      error: "Monthly cap reached",
-      scope: "key",
-      month: {
-        month,
-        cap_cents: customer_cap_cents,
-        spent_cents: custRoll.spent_cents || 0,
-        customer_cap_cents,
-        customer_spent_cents: custRoll.spent_cents || 0,
-        key_cap_cents,
-        key_spent_cents: keyRoll.spent_cents || 0
-      }
-    }), { status: 402, headers: { ...cors, "content-type": "application/json" } });
-  }
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -124,9 +100,10 @@ export default wrap(async (req) => {
       send("meta", {
         provider: public_provider,
         model: public_model,
-        requested_provider: requested_provider || public_provider,
+        requested_provider: public_provider,
         requested_model: public_model,
         telemetry: { install_id: install_id || null },
+        usage_limits: preflight.snapshot,
         month: {
           month,
           cap_cents: customer_cap_cents,
@@ -157,7 +134,7 @@ export default wrap(async (req) => {
             error: "Unknown provider",
             provider: public_provider,
             model: public_model,
-            requested_provider: requested_provider || public_provider,
+            requested_provider: public_provider,
             requested_model: public_model
           });
           clearInterval(ping);
@@ -169,7 +146,7 @@ controller.close();
           error: "Provider error",
           provider: public_provider,
           model: public_model,
-          requested_provider: requested_provider || public_provider,
+          requested_provider: public_provider,
           requested_model: public_model
         });
         clearInterval(ping);
@@ -267,7 +244,7 @@ controller.close();
         send("done", {
           provider: public_provider,
           model: public_model,
-          requested_provider: requested_provider || public_provider,
+          requested_provider: public_provider,
           requested_model: public_model,
           usage: { input_tokens, output_tokens, cost_cents },
           month: {
@@ -285,7 +262,7 @@ controller.close();
       } catch (err) {
         clearInterval(ping);
         controller.enqueue(encoder.encode(`event: error\n`));
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Stream error", provider: public_provider, model: public_model, requested_provider: requested_provider || public_provider, requested_model: public_model })}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Stream error", provider: public_provider, model: public_model, requested_provider: public_provider, requested_model: public_model })}\n\n`));
         clearInterval(ping);
         controller.close();
       }

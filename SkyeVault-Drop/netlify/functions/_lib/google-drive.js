@@ -386,6 +386,8 @@ function metadataHeaders(upload, destination) {
     'x-amz-meta-source': 'client-drop-vault',
     'x-amz-meta-session-id': appPropertyValue(upload.sessionId),
     'x-amz-meta-destination-id': appPropertyValue(destination.id),
+    'x-amz-meta-workspace-id': appPropertyValue(upload.workspaceId),
+    'x-amz-meta-developer-id': appPropertyValue(upload.developerId),
     'x-amz-meta-client-request-id': appPropertyValue(upload.clientRequestId),
     'x-amz-meta-submission-id': appPropertyValue(upload.submissionId),
     'x-amz-meta-file-fingerprint-algorithm': appPropertyValue(upload.fileFingerprint?.algorithm),
@@ -410,7 +412,8 @@ function partPlan(fileSize, chunkSizeBytes) {
 
 export async function createResumableSession(destination, upload) {
   const prefix = normalizePrefix(destination.folderId || destination.prefix || DEFAULT_UPLOAD_PREFIX, DEFAULT_UPLOAD_PREFIX);
-  const key = objectKey(prefix, `${upload.sessionId}/${objectName(upload.fileName)}`);
+  const workspacePrefix = upload.workspaceId ? `workspaces/${upload.workspaceId}` : '';
+  const key = objectKey(prefix, [workspacePrefix, upload.sessionId, objectName(upload.fileName)].filter(Boolean).join('/'));
   const query = new URLSearchParams({ uploads: '' });
   const headers = {
     'content-type': upload.mimeType || 'application/octet-stream',
@@ -494,6 +497,8 @@ function appPropertiesFromHeaders(headers) {
     source: headers.get('x-amz-meta-source') || '',
     sessionId: headers.get('x-amz-meta-session-id') || '',
     destinationId: headers.get('x-amz-meta-destination-id') || '',
+    workspaceId: headers.get('x-amz-meta-workspace-id') || '',
+    developerId: headers.get('x-amz-meta-developer-id') || '',
     clientRequestId: headers.get('x-amz-meta-client-request-id') || '',
     submissionId: headers.get('x-amz-meta-submission-id') || '',
     fileFingerprintAlgorithm: headers.get('x-amz-meta-file-fingerprint-algorithm') || '',
@@ -519,6 +524,11 @@ export async function getDriveFileMetadata(fileId) {
     error.statusCode = response.status;
     throw error;
   }
+  const parts = key.split('/');
+  const parentPrefixes = [];
+  for (let index = 1; index < parts.length; index += 1) {
+    parentPrefixes.push(parts.slice(0, index).join('/'));
+  }
   return {
     id: key,
     key,
@@ -526,7 +536,7 @@ export async function getDriveFileMetadata(fileId) {
     name: key.split('/').pop() || key,
     size: response.headers.get('content-length') || '0',
     mimeType: response.headers.get('content-type') || 'application/octet-stream',
-    parents: [key.split('/').slice(0, -2).join('/') || key.split('/')[0] || ''],
+    parents: parentPrefixes,
     appProperties: appPropertiesFromHeaders(response.headers),
     webViewLink: '',
     webContentLink: '',

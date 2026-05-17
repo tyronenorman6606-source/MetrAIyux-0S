@@ -9,23 +9,45 @@
   <meta property="og:title" content="Bob's Smoke Shop | Vape Shop & Smoke Shop in Litchfield Park, AZ">
   <meta property="og:description" content="Bob's Smoke Shop in Litchfield Park, AZ carries glass, vapes, cigars, pipes, electronic devices, CBD products, tobacco, hookah, and exotic snacks. 21+ only.">
   <meta property="og:image" content="assets/banners/interior-showcase-banner.png">
+  <link rel="preload" as="image" href="assets/logo/bobs-smoke-shop-3d-logo.png">
+  <link rel="preload" as="image" href="assets/videos/bobs-live-homepage-poster.jpg">
+  <link rel="preload" as="video" href="assets/videos/bobs-live-homepage-loop.mp4" type="video/mp4">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="icon" href="favicon.png">
   <link rel="stylesheet" href="styles.css">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LocalBusiness", "name": "Bob's Smoke Shop", "alternateName": "Bob's Vape & Cigars & Smoke Shop", "address": {"@type": "PostalAddress", "streetAddress": "5115 N Dysart Rd", "addressLocality": "Litchfield Park", "addressRegion": "AZ", "postalCode": "85340", "addressCountry": "US"}, "telephone": "+1-623-935-0786", "openingHours": "Mo-Su 08:00-24:00"}</script>
 </head>
-<body>
+<body class="app-locked">
+<canvas class="living-background" data-living-background aria-hidden="true"></canvas>
 <div class="age-gate">
   <div class="age-card">
     <img src="assets/live-site/bobs-live-logo.png" alt="Bob's Smoke Shop logo">
     <div class="kicker">Adults Only</div>
     <h1>21+ Entry</h1>
-    <p>This website contains tobacco, vape, smoke-shop, hookah, and CBD-related retail content. Confirm that you are 21 or older to enter.</p>
+    <p>This app contains tobacco, vape, smoke-shop, hookah, and CBD-related retail content. Confirm that you are 21 or older to enter.</p>
     <div class="age-buttons"><button data-age-yes>I am 21+</button><button class="secondary" data-age-no>Exit</button></div>
   </div>
 </div>
+<div class="site-intro is-hidden" data-site-intro aria-label="Bob's Smoke Shop intro">
+  <div class="intro-vignette" aria-hidden="true"></div>
+  <div class="intro-door" aria-hidden="true"><span></span><span></span></div>
+  <div class="intro-shop-depth" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="intro-smoke-field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro-grid" aria-hidden="true"></div>
+  <div class="intro-beam" aria-hidden="true"></div>
+  <div class="intro-rings" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="intro-card">
+    <div class="intro-logo-wrap"><img src="assets/logo/bobs-smoke-shop-3d-logo.png" alt=""></div>
+    <b>Step Inside</b>
+    <span class="intro-brand-name">Bob's Smoke Shop</span>
+    <small>Blue-lit smoke shop app</small>
+  </div>
+  <div class="intro-status" aria-hidden="true"><span>Glass</span><span>Vapes</span><span>Cigars</span><span>Snacks</span></div>
+</div>
 <div class="site-shell">
+<div class="scroll-progress" aria-hidden="true"></div>
 <header class="topbar">
   <nav class="nav">
     <a href="/" class="brand"><img src="assets/live-site/bobs-live-logo.png" alt="Bob's Smoke Shop logo"><span>BOB'S SMOKE SHOP</span></a>
@@ -36,15 +58,19 @@
 
 <main>
   <section class="hero">
+    <div class="hero-video-bg" aria-hidden="true">
+      <video class="hero-video-loop" data-hero-video src="assets/videos/bobs-live-homepage-loop.mp4" poster="assets/videos/bobs-live-homepage-poster.jpg" autoplay muted loop playsinline preload="auto"></video>
+      <iframe id="hero-youtube-live" class="hero-youtube-live" data-hero-youtube data-youtube-src="https://www.youtube.com/embed/AalAtT_Mx5k?autoplay=1&mute=1&loop=1&playlist=AalAtT_Mx5k&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1" title="Bob's Smoke Shop live homepage video background" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div class="hero-video-scrim" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="hero-minimal">
-        <span class="notice">21+ only • Litchfield Park, Arizona</span>
+        <span class="notice">21+ only • <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Litchfield Park</span>, Arizona</span>
         <div class="kicker">Bob's private app preview</div>
-        <h1>Bob's Smoke Shop</h1>
+        <h1 class="text-effect-shimmer neon-gradient-text split-text premium-text-effects-lab">Bob's Smoke Shop</h1>
         <p>New app preview, live media upgrade, free tester workspace, and QR handoff in one place.</p>
-        <button class="btn preview-hero-open" type="button" data-preview-open>Open Preview Window</button>
       </div>
-      <aside class="preview-window is-minimized" data-preview-window aria-label="Bob's preview walkthrough window">
+      <aside class="preview-window is-hidden" data-preview-window aria-label="Bob's preview walkthrough window">
         <button class="preview-tab" type="button" data-preview-open aria-expanded="false">
           <span>Preview Window</span>
           <strong>Open walkthrough + free trial</strong>
@@ -53,31 +79,22 @@
           <div class="preview-panel-head">
             <div>
               <span class="kicker">Bob's private app preview</span>
-              <h2>Walk the new site first.</h2>
+              <h2>Walk the new app first.</h2>
             </div>
             <button class="preview-minimize" type="button" data-preview-minimize aria-label="Minimize preview window">Minimize</button>
           </div>
-          <p>Bob, this is your smoke shop app preview: website walkthrough up front, your free MetrAIyux 0S workspace one tap away, and the in-store QR route built around your shop.</p>
+          <p>Bob, this is your smoke shop app preview: app walkthrough up front, your free <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span> workspace one tap away, and the in-store QR route built around your shop.</p>
           <div class="hero-actions"><a class="btn" href="/workspace-preview/">Open Your Free Workspace</a><a class="btn secondary" href="/inventory">Browse Shop</a></div>
-          <figure class="live-video-frame">
-            <div class="live-video-embed">
-              <iframe src="https://www.youtube.com/embed/AalAtT_Mx5k?autoplay=1&mute=1&loop=1&playlist=AalAtT_Mx5k&controls=1&rel=0&playsinline=1" title="Bob's live homepage video" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <figcaption>
-              <strong>Live Homepage Video</strong>
-              <span>Actual video embedded on BobSmokeShop.com.</span>
-            </figcaption>
-          </figure>
           <figure class="hero-walkthrough preview-walkthrough">
             <video src="assets/videos/bobs-storefront-tour.mp4" poster="assets/videos/bobs-storefront-tour-poster.jpg" autoplay muted loop playsinline controls></video>
             <figcaption>
-              <strong>Website Walkthrough</strong>
-              <span>Recorded from the actual preview site: home, inventory, gallery, specials, and workspace.</span>
+              <strong>App Walkthrough</strong>
+              <span>Recorded from the actual preview app: home, inventory, gallery, specials, and workspace.</span>
             </figcaption>
           </figure>
           <div class="offer-ribbon preview-offer-ribbon">
             <div><strong>Free 7-Day Trial</strong><span>No payment first. Try the workspace during preview.</span></div>
-            <div><strong>7 Scans</strong><span>Website, QR, PWA, SEO, links, images, and copy checks.</span></div>
+            <div><strong>7 Scans</strong><span>App, QR, PWA, SEO, links, images, and copy checks.</span></div>
             <div><strong>25 Commands</strong><span>Ask for specials, content updates, proof, and fixes.</span></div>
             <div><strong>6-Month Discount</strong><span>Keep it only if it earns the spot.</span></div>
           </div>
@@ -96,7 +113,7 @@
   <div class="hero-black-divider" aria-hidden="true"></div>
 <section class="section post-hero-section">
     <div class="wrap divider-caption">
-      <p>Bob's Smoke Shop carries glass, vapes, cigars, pipes, electronic devices, CBD products, tobacco, hookah, and exotic snacks in a bold, blue-lit retail experience.</p>
+      <p>Bob's Smoke Shop carries glass, vapes, cigars, pipes, electronic devices, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">CBD products</span>, tobacco, hookah, and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">exotic snacks</span> in a bold, blue-lit retail experience.</p>
     </div>
     <div class="wrap split">
       <div class="panel">
@@ -114,7 +131,7 @@
       <div class="live-copy">
         <div class="kicker">Media Upgrade Pass</div>
         <h2>Bob, we pulled the pictures first.</h2>
-        <p>This section is only the media lift: real logo files, product photos, wraps, cigars, glass, and lightweight videos rebuilt from the pulled visual assets. The source site stays a picture source only, not this location's contact info.</p>
+        <p>This section is only the media lift: real logo files, product photos, wraps, cigars, glass, and lightweight videos rebuilt from the pulled visual assets. The source media set stays a picture source only, not this location's contact info.</p>
         <div class="live-facts">
           <div><strong>48 assets</strong><span>Downloaded into the upgrade folder</span></div>
           <div><strong>10 selects</strong><span>Copied into production media</span></div>
@@ -204,25 +221,16 @@
       <div class="wrap">
       <div class="kicker">Showcase Reels</div>
       <h2>See the shop before you visit.</h2>
-      <p>The live homepage video from BobSmokeShop.com is included, and the walkthrough shows the actual preview site we built.</p>
+      <p>The live BobSmokeShop.com homepage video now runs as the first-screen background, while these short reels show the upgraded preview app and product media.</p>
       <div class="reel-grid">
-        <figure class="reel-stage live-video-frame">
-          <div class="live-video-embed">
-            <iframe src="https://www.youtube.com/embed/AalAtT_Mx5k?autoplay=0&mute=1&loop=1&playlist=AalAtT_Mx5k&controls=1&rel=0&playsinline=1" title="Bob's live homepage video" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-          </div>
+        <figure class="reel-stage">
+          <video src="assets/videos/bobs-storefront-tour.mp4" poster="assets/videos/bobs-storefront-tour-poster.jpg" autoplay muted loop playsinline controls></video>
           <figcaption class="reel-caption">
-            <h3>Live Homepage Video</h3>
-            <p>The actual video already running on BobSmokeShop.com.</p>
+            <h3>App Walkthrough</h3>
+            <p>A recorded pass through the actual app experience built for Bob.</p>
           </figcaption>
         </figure>
         <div class="reel-stack">
-          <figure>
-            <video src="assets/videos/bobs-storefront-tour.mp4" poster="assets/videos/bobs-storefront-tour-poster.jpg" autoplay muted loop playsinline controls></video>
-            <figcaption>
-              <h3>Website Walkthrough</h3>
-              <p>A recorded pass through the actual website built for Bob.</p>
-            </figcaption>
-          </figure>
           <figure>
             <video src="assets/videos/bobs-inventory-sizzle.mp4" poster="assets/videos/bobs-inventory-sizzle-poster.jpg" autoplay muted loop playsinline controls></video>
             <figcaption>
@@ -247,9 +255,16 @@
       <div>
         <div class="kicker">Bob's offer</div>
         <h2>Your free workspace is included with this preview.</h2>
-        <p>Scan the site, queue small updates, and export proof receipts for one free week. Bob gets 7 scans, 25 commands, 5 proof exports, and 2 tester seats. If you keep it, the first six months are discounted.</p>
+        <p>Scan the app, queue small updates, and export <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span> for one free week. Bob gets 7 scans, 25 commands, 5 proof exports, and 2 tester seats. If you keep it, the first six months are discounted.</p>
       </div>
-      <a class="btn" href="/workspace-preview/">Open Trial Page</a>
+      <div class="workspace-actions">
+        <div class="home-qr-card">
+          <img src="assets/qr/bobs-smoke-shop-preview-qr.png" alt="QR code to open Bob's Smoke Shop app preview">
+          <span>In-store QR</span>
+          <strong>Open Bob's app preview</strong>
+        </div>
+        <a class="btn" href="/workspace-preview/">Open Trial Page</a>
+      </div>
     </div>
   </section>
 
@@ -294,6 +309,17 @@
   </div>
 </footer>
 </div>
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script type="importmap">{"imports":{"gsap":"https://esm.sh/gsap@3.12.5","gsap/ScrollTrigger":"https://esm.sh/gsap@3.12.5/ScrollTrigger","lenis":"https://unpkg.com/lenis@1.1.20/dist/lenis.mjs"}}</script>
+<script type="module">
+  import { gsap } from 'gsap';
+  import Lenis from 'lenis';
+  window.__bobsMcpImportedStack = { gsap, Lenis };
+  window.__bobsCreateLenis = window.__bobsCreateLenis || ((options) => new Lenis(options));
+  window.Lenis = window.Lenis || Lenis;
+</script>
+<script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

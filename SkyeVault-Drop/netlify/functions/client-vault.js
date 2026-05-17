@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { cleanText, requirePortalKey, safeFileName } from './_lib/security.js';
+import { cleanText, resolvePortalAccess, safeFileName } from './_lib/security.js';
 import { loadLedger, writeAuditEventSafe } from './_lib/config.js';
 import { createDownloadUrl, getDriveFileMetadata } from './_lib/google-drive.js';
 
@@ -21,6 +21,8 @@ function safeEntry(entry) {
     sessionId: entry.sessionId || '',
     submissionId: entry.submissionId || '',
     clientRequestId: entry.clientRequestId || '',
+    workspaceId: entry.workspaceId || '',
+    developerId: entry.developerId || '',
     destinationName: entry.destinationName || entry.destinationId || 'Vault storage',
     clientName: entry.clientName || '',
     clientEmail: entry.clientEmail || '',
@@ -44,11 +46,12 @@ function entryFileId(entry) {
   return cleanText(entry.driveFile?.id || entry.driveFile?.key || '', 500);
 }
 
-async function clientEntries(email, receiptId = '') {
+async function clientEntries(email, receiptId = '', portalAccess = {}) {
   const ledger = await loadLedger(2500);
   const wantedReceipt = cleanText(receiptId, 120);
   return ledger.entries
     .filter((entry) => normalizeEmail(entry.clientEmail) === email)
+    .filter((entry) => portalAccess.type !== 'developer-workspace' || entry.workspaceId === portalAccess.workspaceId)
     .filter((entry) => !wantedReceipt || entry.id === wantedReceipt)
     .sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')));
 }
@@ -60,14 +63,14 @@ export async function handler(event) {
 
   try {
     const body = await readJson(event);
-    requirePortalKey(event, body);
+    const portalAccess = await resolvePortalAccess(event, body);
 
     const email = normalizeEmail(body.clientEmail || body.email);
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('Enter the email used for the vault upload.');
 
     const action = cleanText(body.action || 'list', 40).toLowerCase();
     const receiptId = cleanText(body.receiptId, 120);
-    const entries = await clientEntries(email, receiptId);
+    const entries = await clientEntries(email, receiptId, portalAccess);
 
     if (action === 'download') {
       if (!receiptId) fail('Receipt ID is required to download a vault file.');

@@ -1,9 +1,9 @@
 import crypto from 'node:crypto';
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requirePortalKey, safeFileName, cleanText } from './_lib/security.js';
+import { resolvePortalAccess, safeFileName, cleanText, safeId } from './_lib/security.js';
 import { loadConfig, chooseDestinations, assertFileAllowed, newSessionId, saveSessionManifest, writeAuditEventSafe } from './_lib/config.js';
 import { createResumableSession } from './_lib/google-drive.js';
-import { applyRateLimit, assertHoneypot, verifyTurnstile } from './_lib/rate-limit.js';
+import { applyNamedRateLimit, applyRateLimit, assertHoneypot, verifyTurnstile } from './_lib/rate-limit.js';
 
 function fail(message, statusCode = 400) {
   const error = new Error(message);
@@ -46,13 +46,15 @@ function validateDate(value) {
   return date;
 }
 
-function intakeFields(config, body) {
+function intakeFields(config, body, portalAccess = {}) {
+  const workspaceId = safeId(portalAccess.workspaceId || body.workspaceId || '');
+  const developerId = safeId(portalAccess.developerId || body.developerId || '');
   const fields = {
-    clientName: cleanText(body.clientName, 180),
-    clientEmail: validateEmail(body.clientEmail),
+    clientName: cleanText(body.clientName || portalAccess.clientName, 180),
+    clientEmail: validateEmail(body.clientEmail || portalAccess.clientEmail),
     clientPhone: cleanText(body.clientPhone, 80),
     websiteUrl: validateUrl(body.websiteUrl),
-    projectName: cleanText(body.projectName, 180),
+    projectName: cleanText(body.projectName || portalAccess.projectName || workspaceId, 180),
     clientReference: cleanText(body.clientReference, 120),
     assetType: cleanText(body.assetType || 'General project package', 120),
     deadline: validateDate(body.deadline),
@@ -60,7 +62,11 @@ function intakeFields(config, body) {
     usageRightsAccepted: body.usageRightsAccepted === true,
     retentionAcknowledged: body.retentionAcknowledged === true,
     clientRequestId: cleanText(body.clientRequestId, 160),
-    submissionId: cleanText(body.submissionId, 160)
+    submissionId: cleanText(body.submissionId, 160),
+    workspaceId,
+    developerId,
+    developerName: cleanText(body.developerName || portalAccess.developerName, 120),
+    accessType: cleanText(portalAccess.type || 'portal', 40)
   };
 
   if (config.requireClientName !== false && !fields.clientName) fail('Client name is required.');
@@ -71,15 +77,24 @@ function intakeFields(config, body) {
 
 
 
-function validateSubmissionPolicy(config, body, fallbackFileSize) {
+function scopedLimit(configValue, accessValue) {
+  const configNumber = Number(configValue);
+  const accessNumber = Number(accessValue);
+  if (Number.isFinite(configNumber) && Number.isFinite(accessNumber) && accessNumber > 0) return Math.min(configNumber, accessNumber);
+  if (Number.isFinite(accessNumber) && accessNumber > 0) return accessNumber;
+  return configNumber;
+}
+
+function validateSubmissionPolicy(config, body, fallbackFileSize, portalAccess = {}) {
   const fileCount = Number(body.submissionFileCount || 1);
   const totalBytes = Number(body.submissionTotalBytes || fallbackFileSize || 0);
-  const maxFiles = Number(config.maxFilesPerSubmission || 25);
-  const maxTotalBytes = Number(config.maxTotalSubmissionGb || 5000) * 1024 * 1024 * 1024;
+  const maxFiles = Number(scopedLimit(config.maxFilesPerSubmission || 25, portalAccess.maxFilesPerSubmission));
+  const maxTotalGb = Number(scopedLimit(config.maxTotalSubmissionGb || 5000, portalAccess.maxTotalSubmissionGb));
+  const maxTotalBytes = maxTotalGb * 1024 * 1024 * 1024;
   if (!Number.isFinite(fileCount) || fileCount < 1) fail('Submission file count is invalid.');
   if (!Number.isFinite(totalBytes) || totalBytes <= 0) fail('Submission total size is invalid.');
   if (maxFiles && fileCount > maxFiles) fail(`This portal allows ${maxFiles} files per submission.`, 413);
-  if (maxTotalBytes && totalBytes > maxTotalBytes) fail(`This portal allows up to ${config.maxTotalSubmissionGb} GB per submission.`, 413);
+  if (maxTotalBytes && totalBytes > maxTotalBytes) fail(`This portal allows up to ${maxTotalGb} GB per submission.`, 413);
   return { fileCount: Math.floor(fileCount), totalBytes: Math.floor(totalBytes) };
 }
 
@@ -114,6 +129,8 @@ function descriptionForIntake(fields) {
     fields.clientPhone ? `Phone: ${fields.clientPhone}` : '',
     fields.websiteUrl ? `Website/URL: ${fields.websiteUrl}` : '',
     fields.projectName ? `Project: ${fields.projectName}` : '',
+    fields.workspaceId ? `Workspace: ${fields.workspaceId}` : '',
+    fields.developerId ? `Developer: ${fields.developerName || fields.developerId}` : '',
     fields.clientReference ? `Reference: ${fields.clientReference}` : '',
     fields.assetType ? `Asset type: ${fields.assetType}` : '',
     fields.deadline ? `Needed by: ${fields.deadline}` : '',
@@ -139,7 +156,14 @@ export async function handler(event) {
       message: 'Too many upload-session attempts from this requester. Wait and try again.'
     });
     assertHoneypot(body);
-    requirePortalKey(event, body);
+    const portalAccess = await resolvePortalAccess(event, body);
+    if (portalAccess.workspaceId) {
+      applyNamedRateLimit(`workspace:${portalAccess.workspaceId}:upload-session`, {
+        limit: Number(portalAccess.rateLimitUploadSessionsPerWindow || process.env.WORKSPACE_UPLOAD_SESSION_RATE_LIMIT || 20),
+        windowMs: Number(portalAccess.rateLimitWindowMs || process.env.WORKSPACE_RATE_WINDOW_MS || 60 * 60 * 1000),
+        message: 'This vault workspace has reached its upload-session rate limit. Wait for the workspace window to reset.'
+      });
+    }
     const humanGate = await verifyTurnstile(event, body);
 
     const { config } = await loadConfig();
@@ -149,11 +173,11 @@ export async function handler(event) {
     const fileSize = Number(body.fileSize);
     const mimeType = cleanText(body.mimeType || 'application/octet-stream', 160) || 'application/octet-stream';
     const sessionId = newSessionId();
-    const submissionPolicy = validateSubmissionPolicy(config, body, fileSize);
-    const fields = intakeFields(config, body);
+    const submissionPolicy = validateSubmissionPolicy(config, body, fileSize, portalAccess);
+    const fields = intakeFields(config, body, portalAccess);
     const fileFingerprint = normalizeFingerprint(body.fileFingerprint);
 
-    const destinations = chooseDestinations(config, body.destinationId, body.failedDestinationIds || []);
+    const destinations = chooseDestinations(config, portalAccess.destinationId || body.destinationId, body.failedDestinationIds || []);
     if (!destinations.length) {
       return json(400, { ok: false, error: 'No enabled vault destination is available for this upload.' }, noStoreCors(event));
     }
@@ -161,7 +185,10 @@ export async function handler(event) {
     const attempts = [];
     for (const destination of destinations) {
       try {
-        assertFileAllowed(destination, fileSize, mimeType, fileName, config);
+        const scopedDestination = portalAccess.maxFileSizeGb
+          ? { ...destination, maxFileSizeGb: Math.min(Number(destination.maxFileSizeGb || portalAccess.maxFileSizeGb), Number(portalAccess.maxFileSizeGb)) }
+          : destination;
+        assertFileAllowed(scopedDestination, fileSize, mimeType, fileName, config);
         const session = await createResumableSession(destination, {
           sessionId,
           fileName,
@@ -182,6 +209,12 @@ export async function handler(event) {
           destination,
           file: { name: fileName, size: fileSize, mimeType, fingerprint: fileFingerprint },
           intake: fields,
+          access: {
+            type: portalAccess.type || 'portal',
+            workspaceId: fields.workspaceId,
+            developerId: fields.developerId,
+            developerName: fields.developerName
+          },
           policy: {
             chunkSizeMb: config.chunkSizeMb,
             maxFilesPerSubmission: config.maxFilesPerSubmission,
@@ -202,6 +235,8 @@ export async function handler(event) {
           clientRequestId: fields.clientRequestId || null,
           destinationId: destination.id,
           destinationName: destination.name,
+          workspaceId: fields.workspaceId || null,
+          developerId: fields.developerId || null,
           fileName,
           fileSize,
           mimeType,
@@ -228,6 +263,12 @@ export async function handler(event) {
             role: destination.role,
             priority: destination.priority
           },
+          workspace: fields.workspaceId ? {
+            id: fields.workspaceId,
+            developerId: fields.developerId,
+            developerName: fields.developerName,
+            accessType: fields.accessType
+          } : null,
           file: {
             name: fileName,
             size: fileSize,

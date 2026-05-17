@@ -1,6 +1,6 @@
 {
   "name": "skye-advanced-pattern-pack",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "purpose": "Production-minded implementation patterns that actually use Motion, GSAP, Lenis, Three.js, React Three Fiber, Drei, and postprocessing.",
   "rule": "Agents must pull open-source recipes first, then one of these implementation patterns before building a premium public surface. Do not merely describe motion or 3D; use a pattern, wire real imports into source, and pass design_stack_audit.",
   "auditRule": "Package installs, prose, static canvas substitutes, and repeated dark card templates fail. Required open-source stack must be imported and visibly used in runtime source.",
@@ -46,6 +46,17 @@
       "bestFor": ["scroll-led page chrome", "legal hub polish", "premium SaaS surface", "AI platform", "command center", "portfolio or agency showcase"]
     },
     {
+      "id": "skyesol-living-background",
+      "title": "SkyeSol Living Background",
+      "files": [
+        "skyesol-living-background/skyesol-living-background.css",
+        "skyesol-living-background/skyesol-living-background.js"
+      ],
+      "uses": ["canvas", "requestAnimationFrame", "pointer parallax", "grain", "scanline"],
+      "quality": "SkyeSol-style alive backdrop: fixed transparent canvas, aurora wave bands, gold/violet/cyan particles, pointer parallax, grain, scanline, capped DPR, mobile particle reduction, and reduced-motion fallback.",
+      "bestFor": ["Skyes Over London", "MetrAIyux", "command chamber", "operator portfolio", "proof ecosystem", "premium public OS surface"]
+    },
+    {
       "id": "app-first-command-center",
       "title": "App-First Command Center",
       "files": [
@@ -55,6 +66,67 @@
       "uses": ["motion", "lucide-react"],
       "quality": "The first viewport is the tool surface itself: tabs, status, controls, proof, and action density.",
       "bestFor": ["dashboard", "control plane", "admin console", "operator app", "database command center"]
+    },
+    {
+      "id": "editorial-proof-atlas",
+      "title": "Editorial Proof Atlas",
+      "files": [
+        "editorial-proof-atlas/EditorialProofAtlas.tsx",
+        "editorial-proof-atlas/editorial-proof-atlas.css"
+      ],
+      "uses": ["framer-motion", "lucide-react", "actual screenshots", "proof receipts"],
+      "quality": "Magazine-like proof story with one dominant media surface, sparse evidence, and warm editorial palette. Built to avoid dark dashboard repetition.",
+      "bestFor": ["case study", "proof-heavy marketing", "founder-built system", "service proof", "before-after conversion page"]
+    },
+    {
+      "id": "spatial-product-lab",
+      "title": "Spatial Product Lab",
+      "files": [
+        "spatial-product-lab/SpatialProductLab.tsx",
+        "spatial-product-lab/spatial-product-lab.css"
+      ],
+      "uses": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "framer-motion", "lucide-react"],
+      "quality": "Interactive product inspection stage with green/gold spatial palette, live WebGL object, control chips, and product-lab posture instead of SaaS cards.",
+      "bestFor": ["technical product", "AI brain", "infrastructure system", "hardware-like software", "developer platform"]
+    },
+    {
+      "id": "kinetic-process-funnel",
+      "title": "Kinetic Process Funnel",
+      "files": [
+        "kinetic-process-funnel/KineticProcessFunnel.tsx",
+        "kinetic-process-funnel/kinetic-process-funnel.css"
+      ],
+      "uses": ["gsap", "ScrollTrigger", "lenis", "framer-motion"],
+      "quality": "Large scroll-led stages that make a workflow feel like a system turning on. Uses fewer cards and more movement, rhythm, and one-stage-at-a-time comprehension.",
+      "bestFor": ["signup journey", "auth/provisioning flow", "staffing funnel", "mail onboarding", "deployment workflow"]
+    },
+    {
+      "id": "luxury-editorial-command",
+      "title": "Luxury Editorial Command",
+      "description": "$50K-grade bespoke editorial layout: full-bleed composition, architectural headline typography, strategic whitespace, staggered choreographed reveals, custom easing, and singular visual thesis. No card grids. No feature lists. One dominant idea per section.",
+      "files": [],
+      "uses": ["motion", "gsap", "lenis", "framer-motion"],
+      "quality": "Architectural headline scale (clamp 3.5rem–9rem), letter-spacing -0.02em to -0.04em, line-height 0.9–1.05, weight contrast between display and body, ≥30% negative space in first viewport, staggered entrance with expo-out easing, at least one bespoke interaction treatment. Cannot be rebranded by logo swap.",
+      "fiftyKChecks": [
+        "Display typeface at architectural scale — not system font",
+        "Intentional tracking and line-height on headline",
+        "Weight contrast between display and body",
+        "First viewport ≥30% negative space",
+        "Staggered entrance: headline → subtext → CTA → visual",
+        "Custom cubic-bezier easing signature",
+        "Scroll stagger on reveal elements",
+        "At least one bespoke hover/cursor/interaction treatment",
+        "design_luxury_audit passes",
+        "Cannot be rebranded by logo swap"
+      ],
+      "implementationNotes": [
+        "Start with --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1) in :root CSS",
+        "Hero headline: font-size clamp(3.5rem, 8vw, 9rem); letter-spacing: -0.03em; line-height: 0.95;",
+        "Section padding: padding-block: clamp(6rem, 12vw, 10rem);",
+        "Entrance variants: { hidden: { opacity: 0, y: 24 }, visible: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] } }) }",
+        "Scroll stagger: gsap.utils.toArray('.reveal').forEach((el, i) => { gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 85%' }, opacity: 0, y: 32, duration: 0.7, delay: (i % 3) * 0.1, ease: 'expo.out' }); })"
+      ],
+      "bestFor": ["agency showcase", "founder portfolio", "premium service", "luxury brand digital", "high-end product launch", "bespoke operator system", "investment-grade web presence"]
     }
   ]
 }

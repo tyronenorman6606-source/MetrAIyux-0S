@@ -18,7 +18,73 @@ const repoRoot = process.env.REPO_ROOT
 
 const designRoot = path.join(mcpRoot, 'design');
 const referenceRoot = path.join(repoRoot, 'skyesol_spectacle_reference');
-const labRoot = path.join(repoRoot, 'skye-design-lab');
+const repoLabRoot = path.join(repoRoot, 'skye-design-lab');
+const mcpLabRoot = path.join(mcpRoot, 'skye-design-lab');
+const labRoot = fs.existsSync(mcpLabRoot) ? mcpLabRoot : repoLabRoot;
+
+const magicTemplateDefinitions = [
+  {
+    id: 'changelog',
+    title: 'Skye Production Changelog Template',
+    folder: 'magicuidesign-changelog-template-2ad04a0',
+    kind: 'release notes and production changelog surface',
+    source: 'Magic UI changelog template, revised with Skye MCP chrome and production-ledger content',
+    bestFor: ['changelog', 'release receipt', 'production ledger', 'public proof timeline'],
+    requiredPatterns: ['skyesol-living-background', 'neon-motion-chrome', 'editorial-proof-atlas'],
+    keyFiles: [
+      'README.md',
+      'package.json',
+      'app/page.tsx',
+      'app/layout.tsx',
+      'app/globals.css',
+      'components/skye-mcp-chrome.tsx',
+      'changelog/content/2026-05-17-skyepay.mdx',
+      'changelog/content/2026-05-16-reviews.mdx',
+      'changelog/content/2026-05-16-ledger.mdx'
+    ]
+  },
+  {
+    id: 'blog',
+    title: 'Skye MCP Field Notes Blog Template',
+    folder: 'magicuidesign-blog-template-bc0cb81',
+    kind: 'field notes, article library, and proof-backed editorial surface',
+    source: 'Magic UI blog template, revised with Skye MCP chrome and production-ledger article content',
+    bestFor: ['blog', 'field notes', 'technical writing', 'proof narrative', 'content engine'],
+    requiredPatterns: ['skyesol-living-background', 'neon-motion-chrome', 'luxury-editorial-command'],
+    keyFiles: [
+      'README.md',
+      'package.json',
+      'app/page.tsx',
+      'app/layout.tsx',
+      'app/globals.css',
+      'components/blog-card.tsx',
+      'components/skye-mcp-chrome.tsx',
+      'blog/content/skye-production-ledger.mdx',
+      'lib/site.ts'
+    ]
+  },
+  {
+    id: 'portfolio',
+    title: 'Skye Production Operator Portfolio Template',
+    folder: 'magicuidesign-portfolio-5ef12e4',
+    kind: 'operator portfolio, resume, and proof-of-work surface',
+    source: 'Magic UI portfolio template, revised with Skye MCP chrome and production-ledger proof section',
+    bestFor: ['portfolio', 'operator profile', 'resume', 'proof-of-work', 'case-study index'],
+    requiredPatterns: ['skyesol-living-background', 'neon-motion-chrome', 'founder-authority'],
+    keyFiles: [
+      'README.md',
+      'package.json',
+      'src/app/page.tsx',
+      'src/app/layout.tsx',
+      'src/app/globals.css',
+      'src/components/skye-mcp-chrome.tsx',
+      'src/data/resume.tsx'
+    ]
+  }
+].map((template) => ({
+  ...template,
+  root: path.join(mcpRoot, template.folder)
+}));
 
 const textExtensions = new Set(['.md', '.json', '.txt', '.css', '.html', '.js', '.mjs', '.ts', '.tsx']);
 const forbiddenPublicTerms = [
@@ -149,6 +215,21 @@ const effectToStack = {
   theatre: ['theatre'],
   gsapScroll: ['gsap', 'lenis'],
   threeCanvas: ['three', 'r3f']
+};
+const runtimeBrowserEvidencePatterns = {
+  framerMotion: [/framer[-_\s]?motion[\s\S]{0,80}true/i, /motionReady["'\s:]*true/i, /animated(?:Element|Motion|Runtime)?["'\s:]*true/i, /<motion\./i],
+  motion: [/motion(?:Ready|Runtime|Active)["'\s:]*true/i, /motionReady["'\s:]*true/i, /from\s+['"]motion\/react['"]/i],
+  gsap: [/gsap(?:Ready|Global|Runtime|Active)?["'\s:]*true/i, /ScrollTrigger(?:Ready|Global|Runtime|Active)?["'\s:]*true/i, /mcp-scroll-stage/i, /motionReady["'\s:]*true/i],
+  lenis: [/lenis(?:Ready|Global|Runtime|Active)?["'\s:]*true/i, /htmlClass["'\s:]*[^{}\n]*\blenis\b/i, /\blenis\b[\s\S]{0,80}(?:true|running|ready)/i],
+  three: [/three(?:Ready|Runtime|Active)?["'\s:]*true/i, /webgl(?:Ready|Runtime|Active)?["'\s:]*true/i, /canvas(?:Nonblank|Pixels|Ready)["'\s:]*true/i, /canvasPixels["'\s:]*[1-9]/i],
+  r3f: [/r3f(?:Ready|Runtime|Active)?["'\s:]*true/i, /react[-_\s]?three[\s\S]{0,80}true/i, /canvas(?:Nonblank|Pixels|Ready)["'\s:]*true/i],
+  drei: [/drei(?:Ready|Runtime|Active)?["'\s:]*true/i, /Float|PerspectiveCamera|Stars/i],
+  postprocessing: [/postprocessing(?:Ready|Runtime|Active)?["'\s:]*true/i, /EffectComposer|Bloom|Vignette/i],
+  theatre: [/theatre(?:Ready|Runtime|Active)?["'\s:]*true/i, /sheet(?:Ready|Runtime|Active)?["'\s:]*true/i, /theatreScene|onValuesChange/i],
+  dotlottie: [/dotlottie(?:Ready|Runtime|Active)?["'\s:]*true/i, /lottie(?:Ready|Runtime|Active)?["'\s:]*true/i, /\.(?:lottie|json)\b/i],
+  rive: [/rive(?:Ready|Runtime|Active)?["'\s:]*true/i, /stateMachine(?:Ready|Runtime|Active)?["'\s:]*true/i, /\.riv\b/i],
+  ogl: [/ogl(?:Ready|Runtime|Active)?["'\s:]*true/i, /canvas(?:Nonblank|Pixels|Ready)["'\s:]*true/i],
+  pixi: [/pixi(?:Ready|Runtime|Active)?["'\s:]*true/i, /canvas(?:Nonblank|Pixels|Ready)["'\s:]*true/i]
 };
 const stackCatalogData = {
   name: 'skye-advanced-frontend-stack-catalog',
@@ -341,7 +422,101 @@ function textResource(uri, text, mimeType = 'text/markdown') {
 }
 
 function readIfExists(filePath, fallback = '') {
-  return fs.existsSync(filePath) ? readText(filePath) : fallback;
+  if (!fs.existsSync(filePath)) return fallback;
+  try {
+    return readText(filePath);
+  } catch {
+    return fallback;
+  }
+}
+
+function templateDefinition(templateId) {
+  return magicTemplateDefinitions.find((template) => template.id === templateId || template.folder === templateId);
+}
+
+function templateReceiptSummary(root) {
+  const receiptPath = path.join(root, 'MCP_TOOLING_RECEIPT.json');
+  if (!fs.existsSync(receiptPath)) return null;
+  const receipt = readJson(receiptPath, {});
+  const toolCalls = Array.isArray(receipt.toolCalls) ? receipt.toolCalls : [];
+  const failedCalls = toolCalls.filter((call) => call && (call.ok === false || call.error || call.status === 'error'));
+  return {
+    path: path.relative(repoRoot, receiptPath),
+    generatedAt: receipt.generatedAt || null,
+    listedTools: Array.isArray(receipt.listedTools) ? receipt.listedTools.length : null,
+    resourcesRead: Array.isArray(receipt.resourcesRead) ? receipt.resourcesRead.length : null,
+    toolCalls: toolCalls.length,
+    failedCalls: failedCalls.length,
+    inventory: receipt.inventory || null
+  };
+}
+
+function templateManifest() {
+  return {
+    generatedAt: new Date().toISOString(),
+    rule: 'These are first-class design templates inside the local QuantumSkyes MCP. Use them as design/source packs with Skye MCP pattern packs and audits; do not treat them as unrelated extracted folders.',
+    sourceFoldersStayIntact: true,
+    templates: magicTemplateDefinitions.map((template) => ({
+      id: template.id,
+      title: template.title,
+      kind: template.kind,
+      source: template.source,
+      folder: template.folder,
+      path: path.relative(repoRoot, template.root),
+      exists: fs.existsSync(template.root),
+      bestFor: template.bestFor,
+      requiredPatterns: template.requiredPatterns,
+      keyFiles: template.keyFiles,
+      mcpReceipt: templateReceiptSummary(template.root)
+    }))
+  };
+}
+
+function templatePack(templateId, includeFiles = []) {
+  const template = templateDefinition(templateId);
+  if (!template) {
+    return {
+      ok: false,
+      error: `Unknown template: ${templateId}`,
+      available: magicTemplateDefinitions.map((item) => item.id)
+    };
+  }
+  if (!fs.existsSync(template.root)) {
+    return {
+      ok: false,
+      error: `Template folder is missing: ${path.relative(repoRoot, template.root)}`,
+      template: { id: template.id, title: template.title, folder: template.folder }
+    };
+  }
+
+  const requestedFiles = [...new Set([...(template.keyFiles || []), ...(includeFiles || [])])];
+  const files = {};
+  const missing = [];
+  for (const relativePath of requestedFiles) {
+    const filePath = safeJoin(template.root, relativePath);
+    if (!fs.existsSync(filePath)) {
+      missing.push(relativePath);
+      continue;
+    }
+    files[relativePath] = readText(filePath, 180_000);
+  }
+
+  return {
+    ok: true,
+    template: {
+      id: template.id,
+      title: template.title,
+      kind: template.kind,
+      source: template.source,
+      path: path.relative(repoRoot, template.root),
+      bestFor: template.bestFor,
+      requiredPatterns: template.requiredPatterns,
+      mcpReceipt: templateReceiptSummary(template.root)
+    },
+    files,
+    missing,
+    implementationRule: 'Use this template pack as a base or reference, then run design_variety_plan, design_pattern_pack, design_effect_audit, design_performance_audit, and browser QA before shipping.'
+  };
 }
 
 function walkFiles(root, options = {}) {
@@ -353,6 +528,7 @@ function walkFiles(root, options = {}) {
     const current = stack.pop();
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') continue;
+      if (entry.name === 'MCP_TOOLING_RECEIPT.json' || entry.name === 'package-lock.json' || entry.name === '.package-lock.json') continue;
       const full = path.join(current, entry.name);
       if (entry.isDirectory()) stack.push(full);
       if (entry.isFile() && textExtensions.has(path.extname(entry.name))) out.push(full);
@@ -383,6 +559,12 @@ function designFilePath(requestedPath) {
   const raw = String(requestedPath || '').replace(/^\/+/, '');
   if (raw.startsWith('reference/')) return safeJoin(referenceRoot, raw.slice('reference/'.length));
   if (raw.startsWith('lab/')) return safeJoin(labRoot, raw.slice('lab/'.length));
+  if (raw.startsWith('template/')) {
+    const parts = raw.slice('template/'.length).split('/').filter(Boolean);
+    const template = templateDefinition(parts.shift());
+    if (!template) throw new Error(`Unknown design template: ${raw}`);
+    return safeJoin(template.root, parts.join('/'));
+  }
   return safeJoin(designRoot, raw);
 }
 
@@ -398,6 +580,7 @@ This MCP is design-only. It exposes rules, patterns, reference notes, and QA too
 
 - quantumskyes://design/registry
 - quantumskyes://design/elements
+- quantumskyes://design/component-use-cases
 - quantumskyes://design/fifty-k-standard
 - quantumskyes://design/no-frankenstein-policy
 - quantumskyes://design/perfection-checklist
@@ -411,10 +594,25 @@ This MCP is design-only. It exposes rules, patterns, reference notes, and QA too
 - quantumskyes://content/first-person-operator-voice
 - quantumskyes://design/assets-manifest
 - quantumskyes://design/pattern-manifest
+- quantumskyes://design/templates
+- quantumskyes://design/template/{templateId}
+- quantumskyes://design/lab/registry
+- quantumskyes://design/lab/directive
+- quantumskyes://design/lab/user-guide
+- quantumskyes://design/lab/builder-guide
+- quantumskyes://design/lab/mcp-integration
 - quantumskyes://directives/index
 - quantumskyes://design/user-guide
 - quantumskyes://design/builder-guide
 - quantumskyes://design/reference/style-system
+
+## Design Template Packs
+
+${templateManifest().templates.map((template) => `- ${template.id}: ${template.title} (${template.path})`).join('\n')}
+
+## Skye Design Lab Root
+
+${path.relative(repoRoot, labRoot) || '.'}
 
 ## Forbidden Public Copy
 
@@ -437,7 +635,8 @@ ${styleNotes.split('\n').slice(0, 34).join('\n')}
 function assetManifest() {
   const roots = [
     ['skyesol.reference', path.join(referenceRoot, 'assets')],
-    ['skye-design-lab', path.join(labRoot, 'public', 'assets')],
+    ['skye-design-lab.public', path.join(labRoot, 'public', 'assets')],
+    ['skye-design-lab.dist', path.join(labRoot, 'dist', 'assets')],
     ['metraiyux.brand', path.join(repoRoot, 'metraiyux_0s_site', 'assets')],
     ['legal-skyes.brand', path.join(repoRoot, 'legalskyes-website', 'assets')],
     ['skyevault.brand', path.join(repoRoot, 'SkyeVault-Drop', 'public', 'assets')]
@@ -546,6 +745,224 @@ function elementsFiltered({ type, namespace, tier } = {}) {
     policy: registry.compositionPolicy,
     namespaces: registry.namespaces,
     elements
+  };
+}
+
+function componentUseCaseCatalog() {
+  return readJson(path.join(designRoot, 'registry', 'skye-component-use-cases.json'), {
+    useCases: [],
+    fullRuntimeStack: []
+  });
+}
+
+function normalizeIdList(value = []) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map((item) => String(item || '').trim()).filter(Boolean))];
+}
+
+function inferComponentUseCases(text) {
+  const lower = String(text || '').toLowerCase();
+  const inferred = [];
+  if (/\bintro|opening|loader|loading|gate|splash|age gate|launch\b/.test(lower)) inferred.push('intro-opening-sequence');
+  if (/\bsite|website|landing|homepage|home page|public|hero|service page|product launch\b/.test(lower)) inferred.push('public-landing-hero');
+  if (/\bapp|dashboard|admin|tool|console|control plane|editor|quote|scan|portal|crm|workspace\b/.test(lower)) inferred.push('app-tool-surface');
+  if (/\bscroll|funnel|process|journey|stage|route|handoff|scrub|pin|pinned\b/.test(lower)) inferred.push('scroll-story');
+  if (/\bthree|r3f|webgl|3d|shader|spatial|canvas product|product object\b/.test(lower)) inferred.push('webgl-product-scene');
+  if (/\bproof|screenshot|video|reel|receipt|case study|browser recording|workflow\b/.test(lower)) inferred.push('proof-surface');
+  if (/\bchrome|neon|scrollbar|cursor|magnetic|shine|beam|meteor|highlighter|text effect|brand polish\b/.test(lower)) inferred.push('brand-motion-chrome');
+  if (/\bform|table|faq|pricing|inventory|accordion|card|metric|content|details\b/.test(lower)) inferred.push('content-sections');
+  if (/\blottie|dotlottie|rive|vector motion|state machine\b/.test(lower)) inferred.push('vector-motion-asset');
+  if (/\bogl|pixi|sprite|2d canvas|particles|generative background\b/.test(lower)) inferred.push('canvas-special-effect');
+  return [...new Set(inferred)];
+}
+
+function componentPlan({
+  product = 'the product',
+  surface = 'public page',
+  goal = 'premium design',
+  audience = 'buyers and users',
+  useCases = [],
+  componentIds = [],
+  effects = [],
+  requiredStack = [],
+  stackMode = 'full'
+} = {}) {
+  const catalog = componentUseCaseCatalog();
+  const aliases = catalog.componentAliases || {};
+  const requestedUseCases = normalizeIdList(useCases);
+  const requestedComponents = normalizeIdList(componentIds);
+  const aliasUseCases = requestedComponents.map((id) => aliases[id] || aliases[id.toLowerCase()] || null).filter(Boolean);
+  const inferred = inferComponentUseCases(`${product} ${surface} ${goal} ${audience} ${requestedComponents.join(' ')}`);
+  const selectedIds = [...new Set([
+    ...requestedUseCases,
+    ...aliasUseCases,
+    ...inferred
+  ])];
+  if (selectedIds.length === 0) selectedIds.push('public-landing-hero', 'brand-motion-chrome');
+
+  const allUseCases = Array.isArray(catalog.useCases) ? catalog.useCases : [];
+  const selectedUseCases = selectedIds
+    .map((id) => allUseCases.find((item) => item.id === id))
+    .filter(Boolean);
+  const missingUseCases = selectedIds.filter((id) => !selectedUseCases.some((item) => item.id === id));
+  const selectedComponentIds = [...new Set([
+    ...requestedComponents,
+    ...selectedUseCases.flatMap((item) => item.components || [])
+  ])];
+  const selectedEffects = [...new Set([
+    ...normalizeIdList(effects),
+    ...selectedUseCases.flatMap((item) => item.effects || []),
+    ...inferRequestedEffects(`${product} ${surface} ${goal} ${audience} ${selectedComponentIds.join(' ')}`)
+  ])];
+  const selectedRecipeIds = [...new Set([
+    ...selectedUseCases.flatMap((item) => item.recipes || []),
+    ...selectedEffects.flatMap((effect) => effectToRecipes[effect] || [])
+  ])];
+  const selectedStack = [...new Set([
+    ...normalizeIdList(requiredStack),
+    ...selectedUseCases.flatMap((item) => item.stack || []),
+    ...selectedEffects.flatMap((effect) => effectToStack[effect] || [])
+  ])];
+  const fullStack = Array.isArray(catalog.fullRuntimeStack) ? catalog.fullRuntimeStack : [];
+  const effectiveStackMode = stackMode === 'selected' ? 'selected' : 'full';
+  const mandatoryStack = effectiveStackMode === 'full' ? fullStack : selectedStack;
+  const recipes = openSourceRecipes();
+  const selectedRecipes = selectedRecipeIds
+    .map((recipeId) => (recipes.recipes || []).find((recipe) => recipe.id === recipeId))
+    .filter(Boolean);
+
+  return {
+    product,
+    surface,
+    goal,
+    audience,
+    stackMode: effectiveStackMode,
+    selectedUseCases,
+    missingUseCases,
+    selectedComponentIds,
+    requestedEffects: selectedEffects,
+    requiredOpenSourceRecipes: selectedRecipeIds,
+    selectedRecipes,
+    selectedStack,
+    mandatoryStack,
+    fullRuntimeStack: fullStack,
+    implementationContract: [
+      'Choose components from selected use cases only, unless the user explicitly changes the use-case plan.',
+      'Every selected component/use case must map to visible UI or visible runtime behavior in the target app.',
+      'Every selected stack item must be installed, imported, and used at runtime.',
+      'Package availability is not enough. Source runtime and browser runtime evidence are required.',
+      'If stackMode is full, every fullRuntimeStack item is mandatory. If the user explicitly narrows scope, use stackMode selected and record why.',
+      'Run design_runtime_stack_gate with source, packageJson, mandatoryStack, and browserReport before calling the implementation done.'
+    ],
+    requiredAudits: [
+      'design_validate',
+      'design_component_plan',
+      'design_stack_audit',
+      'design_runtime_stack_gate',
+      'design_effect_audit',
+      'design_performance_audit',
+      'design_quality_gate',
+      'browser QA: 1440x1000 and 390x844 screenshots, no horizontal scroll, no JS errors'
+    ],
+    browserEvidenceRequired: [...new Set(selectedUseCases.flatMap((item) => item.browserEvidence || []))],
+    rejectIf: [...new Set(selectedUseCases.flatMap((item) => item.rejectIf || []))],
+    availableUseCases: allUseCases.map(({ id, title, bestFor }) => ({ id, title, bestFor })),
+    rule: 'This plan is flexible by component/use case, but strict about runtime proof. Do not ship merely available stack packages or decorative pasted components.'
+  };
+}
+
+function runtimeStackGate({
+  source = '',
+  packageJson = '',
+  required = [],
+  selectedComponents = [],
+  product = 'the product',
+  surface = 'public page',
+  goal = 'premium design',
+  audience = 'buyers and users',
+  browserReport = '',
+  stackMode = 'full',
+  requireBrowserEvidence = true
+} = {}) {
+  const effectiveStackMode = stackMode === 'selected' ? 'selected' : 'full';
+  const requestedStack = normalizeIdList(required);
+  const requestedComponents = normalizeIdList(selectedComponents);
+  const catalog = componentUseCaseCatalog();
+  const knownUseCaseIds = new Set((catalog.useCases || []).map((item) => item.id));
+  const selectedUseCaseIds = requestedComponents.filter((id) => knownUseCaseIds.has(id));
+  const selectedComponentIds = requestedComponents.filter((id) => !knownUseCaseIds.has(id));
+  const plan = requestedComponents.length
+    ? componentPlan({
+        product,
+        surface,
+        goal,
+        audience,
+        useCases: selectedUseCaseIds,
+        componentIds: selectedComponentIds,
+        requiredStack: requestedStack,
+        stackMode: effectiveStackMode
+      })
+    : null;
+  const requiredStack = [...new Set([
+    ...(effectiveStackMode === 'full' ? catalog.fullRuntimeStack || [] : []),
+    ...requestedStack,
+    ...(plan?.mandatoryStack || [])
+  ])];
+  const sourceAudit = stackAudit({ source, packageJson, required: requiredStack });
+  const reportText = String(browserReport || '');
+  const missingBrowserEvidence = [];
+  if (reportText.trim()) {
+    for (const stackName of requiredStack) {
+      const patterns = runtimeBrowserEvidencePatterns[stackName] || [];
+      const proved = patterns.some((pattern) => pattern.test(reportText));
+      if (!proved) missingBrowserEvidence.push(stackName);
+    }
+  }
+
+  const issues = [];
+  if (sourceAudit.missingDependencies.length) {
+    issues.push(`Missing package dependencies: ${sourceAudit.missingDependencies.join(', ')}`);
+  }
+  if (sourceAudit.missingImports.length) {
+    issues.push(`Missing source imports: ${sourceAudit.missingImports.join(', ')}`);
+  }
+  if (sourceAudit.missingRuntime.length) {
+    issues.push(`Imported but not visibly used at runtime in source: ${sourceAudit.missingRuntime.join(', ')}`);
+  }
+  if (requiredStack.length && requireBrowserEvidence && !reportText.trim()) {
+    issues.push('Browser runtime report is required. Include Playwright/browser notes proving each required stack item is active in the rendered app.');
+  }
+  if (requiredStack.length && requireBrowserEvidence && reportText.trim() && missingBrowserEvidence.length) {
+    issues.push(`Browser runtime evidence missing for: ${missingBrowserEvidence.join(', ')}`);
+  }
+
+  return {
+    ok: issues.length === 0,
+    stackMode: effectiveStackMode,
+    requiredStack,
+    selectedComponents: requestedComponents,
+    componentPlan: plan || {
+      stackMode: effectiveStackMode,
+      selectedUseCases: [],
+      selectedComponentIds: [],
+      mandatoryStack: requiredStack,
+      rule: 'No components were selected, so this gate enforces the explicit required stack or the full runtime stack.'
+    },
+    sourceAudit,
+    browserEvidence: {
+      required: Boolean(requireBrowserEvidence && requiredStack.length),
+      provided: Boolean(reportText.trim()),
+      missingBrowserEvidence,
+      acceptedEvidenceExamples: {
+        motion: 'motionReady true, visible animated element, transform changed after wait',
+        gsap: 'gsapReady true, ScrollTrigger active, timeline progressed in browser',
+        lenis: 'lenisReady true, html/body lenis class present, scroll RAF active',
+        webgl: 'canvasNonblank true, canvasPixels > 0, WebGL context acquired',
+        vector: 'dotlottie/rive ready true with .lottie/.json/.riv asset loaded'
+      }
+    },
+    issues,
+    rule: 'The selected or full MCP stack must be installed, imported, used in source, and proven active in browser. Package availability alone fails.'
   };
 }
 
@@ -727,7 +1144,7 @@ function contentComponentLabel(component) {
 function contentGenerate({ product = 'the system', audience = 'serious operators', offer = 'a business command layer', components = [], format = 'hero' } = {}) {
   const namedComponents = (components.length
     ? components
-    : ['public front door', 'client workspace', 'founder command deck', 'SkyeGateFS27 access', 'proof receipts', 'operating brains']).map(contentComponentLabel);
+    : ['public front door', 'client workspace', 'founder control room', 'SkyeGateFS27 access', 'proof receipts', 'operating brains']).map(contentComponentLabel);
   const componentPhrase = namedComponents.length > 1
     ? `${namedComponents.slice(0, -1).join(', ')}, and ${namedComponents[namedComponents.length - 1]}`
     : namedComponents[0];
@@ -1114,7 +1531,7 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
     requiredStack: mergedRequiredStack,
     mustUsePatternPackTool: true,
     mustUseRecipePlanTool: true,
-    advancedStackEnforcement: 'Call design_pattern_pack for every implementation pattern, wire the returned files/concepts into source code, then call design_stack_audit with source and package.json.',
+    advancedStackEnforcement: 'Call design_component_plan, call design_pattern_pack for every implementation pattern, wire the returned files/concepts into source code, then call design_stack_audit and design_runtime_stack_gate with source, package.json, and browser runtime evidence.',
     openSourceRecipeRule: 'Call design_open_source_stack and pick recipes by library/behavior before applying any brand styling.',
     openSourceRecipes: [...new Set([...(isInfrastructure
       ? ['framer-motion-interaction-system', 'three-r3f-shader-scene', 'drei-postprocessing-cinema', 'gsap-lenis-scroll-stage', 'actual-surface-screenshot-stage', 'neon-scrollbar-cursor-trail', 'neon-motion-chrome-kit', 'premium-text-effects-lab']
@@ -1123,9 +1540,16 @@ function composeBrief({ product = 'the product', surface = 'public page', goal =
         : ['framer-motion-interaction-system', 'neon-motion-chrome-kit', 'premium-text-effects-lab']),
       ...(isLuxury ? ['fifty-k-typography-whitespace-system', 'framer-motion-interaction-system', 'gsap-lenis-scroll-stage', 'premium-text-effects-lab'] : []),
       ...plan.requiredOpenSourceRecipes])],
+    templateSources: templateManifest().templates.map((template) => ({
+      id: template.id,
+      title: template.title,
+      bestFor: template.bestFor,
+      resource: `quantumskyes://design/template/${template.id}`
+    })),
     requestedEffects: plan.requestedEffects,
     noveltyRules: [
       'Do not reuse the previous dark command-card page shape.',
+      'Do not turn a design, changelog, blog, portfolio, proof-note, or editorial surface into a command dashboard by default.',
       'Choose a distinct first viewport composition before coding: vault, orbital scene, proof tunnel, founder authority, or product object.',
       'The primary visual subject must be browser-visible in the first viewport.',
       'A page fails if it could be mistaken for a generic SaaS template after changing the logo.',
@@ -1172,6 +1596,8 @@ Use local design references first:
 
 - quantumskyes://design/index
 - quantumskyes://design/registry
+- quantumskyes://design/templates
+- quantumskyes://design/lab/registry
 - quantumskyes://directives/index
 - quantumskyes://design/reference/style-system
 
@@ -1180,6 +1606,8 @@ Design MCP purpose:
 - Stop ugly default landing pages.
 - Prevent giant left-column hero text.
 - Keep public pages free of internal MCP/database proof junk.
+- Use design/template packs when the user asks for changelog, blog, portfolio, proof notes, release receipts, or operator profile surfaces.
+- Do not default to an app-first command surface unless the user explicitly asks for an app, dashboard, admin console, command center, or control plane.
 - Require browser QA before deploy.
 `;
 }
@@ -1187,7 +1615,10 @@ Design MCP purpose:
 function runtimeApps() {
   const candidates = [
     'SkyeWebCreatorMax',
-    'skye-design-lab',
+    'MCP/skye-design-lab',
+    'MCP/magicuidesign-changelog-template-2ad04a0',
+    'MCP/magicuidesign-blog-template-bc0cb81',
+    'MCP/magicuidesign-portfolio-5ef12e4',
     'skyesol_spectacle_reference',
     'metraiyux_0s_public_spectacle_site',
     'skye-business-command-center'
@@ -1249,7 +1680,9 @@ function validateDesignText(input) {
       'Main subject visible',
       'CTA visible',
       'No internal proof/debug copy',
+      'design_component_plan recorded selected use cases/components before coding',
       'design_stack_audit passes when advanced stack is required',
+      'design_runtime_stack_gate passes with browser evidence for required stack',
       'design_effect_audit passes when cursor/screenshot/scrollbar/text/Theatre/scroll/3D effects are requested',
       'design_performance_audit passes for Lenis/WebGL/screenshots/motion fallbacks',
       'Screenshot proves the output is not the repeated dark SaaS/card template'
@@ -1390,7 +1823,7 @@ function luxuryAudit({ source = '', level = 'full' } = {}) {
 
 const server = new McpServer({
   name: 'quantumskyes-design-mcp',
-  version: '0.3.0'
+  version: '0.5.0'
 });
 
 server.registerResource('workspace-overview', 'quantumskyes://workspace/overview', {
@@ -1428,6 +1861,12 @@ server.registerResource('design-elements', 'quantumskyes://design/elements', {
   description: 'Composable namespaced elements for MCP design generation.',
   mimeType: 'application/json'
 }, (uri) => textResource(uri, readText(path.join(designRoot, 'registry', 'skye-elements-registry.json')), 'application/json'));
+
+server.registerResource('design-component-use-cases', 'quantumskyes://design/component-use-cases', {
+  title: 'Skye Component Use Case Registry',
+  description: 'Use-case groups for choosing UI components while enforcing selected/full runtime stack gates.',
+  mimeType: 'application/json'
+}, (uri) => textResource(uri, readText(path.join(designRoot, 'registry', 'skye-component-use-cases.json')), 'application/json'));
 
 server.registerResource('design-user-guide', 'quantumskyes://design/user-guide', {
   title: 'User Guide',
@@ -1513,6 +1952,52 @@ server.registerResource('pattern-manifest', 'quantumskyes://design/pattern-manif
   mimeType: 'application/json'
 }, (uri) => textResource(uri, readText(path.join(designRoot, 'patterns', 'pattern-manifest.json')), 'application/json'));
 
+server.registerResource('design-templates', 'quantumskyes://design/templates', {
+  title: 'Skye MCP Template Manifest',
+  description: 'Extracted and revised changelog, blog, and portfolio design template packs available to MCP generation.',
+  mimeType: 'application/json'
+}, (uri) => textResource(uri, JSON.stringify(templateManifest(), null, 2), 'application/json'));
+
+server.registerResource('design-template', new ResourceTemplate('quantumskyes://design/template/{templateId}', {
+  list: undefined
+}), {
+  title: 'Skye MCP Template Pack',
+  description: 'Read one revised template pack by id: changelog, blog, or portfolio.',
+  mimeType: 'application/json'
+}, (uri, variables) => {
+  return textResource(uri, JSON.stringify(templatePack(variables.templateId), null, 2), 'application/json');
+});
+
+server.registerResource('design-lab-registry', 'quantumskyes://design/lab/registry', {
+  title: 'Skye Design Lab Registry',
+  description: 'Pattern metadata from the actual MCP/skye-design-lab package.',
+  mimeType: 'application/json'
+}, (uri) => textResource(uri, readIfExists(path.join(labRoot, 'registry', 'skye-spectacle-registry.json'), '{}'), 'application/json'));
+
+server.registerResource('design-lab-directive', 'quantumskyes://design/lab/directive', {
+  title: 'Skye Design Lab Agent Directive',
+  description: 'Hard design-generation rules from MCP/skye-design-lab.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readIfExists(path.join(labRoot, 'registry', 'agent-directive.md'), 'Skye Design Lab directive not found.')));
+
+server.registerResource('design-lab-user-guide', 'quantumskyes://design/lab/user-guide', {
+  title: 'Skye Design Lab User Guide',
+  description: 'User documentation from MCP/skye-design-lab.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readIfExists(path.join(labRoot, 'docs', 'USER_GUIDE.md'), 'Skye Design Lab user guide not found.')));
+
+server.registerResource('design-lab-builder-guide', 'quantumskyes://design/lab/builder-guide', {
+  title: 'Skye Design Lab Builder Guide',
+  description: 'Builder documentation from MCP/skye-design-lab.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readIfExists(path.join(labRoot, 'docs', 'BUILDER_GUIDE.md'), 'Skye Design Lab builder guide not found.')));
+
+server.registerResource('design-lab-mcp-integration', 'quantumskyes://design/lab/mcp-integration', {
+  title: 'Skye Design Lab MCP Integration Notes',
+  description: 'Integration notes explaining how the lab should be exposed to MCP agents.',
+  mimeType: 'text/markdown'
+}, (uri) => textResource(uri, readIfExists(path.join(labRoot, 'docs', 'MCP_INTEGRATION.md'), 'Skye Design Lab MCP integration notes not found.')));
+
 server.registerResource('reference-style-system', 'quantumskyes://design/reference/style-system', {
   title: 'SkyeSol Spectacle Style System',
   description: 'Local style reference extracted from SkyeSol.',
@@ -1566,7 +2051,14 @@ server.registerTool('design_find', {
     limit: z.number().int().positive().max(50).optional()
   }
 }, async ({ query, limit = 12 }) => {
-  const roots = [designRoot, referenceRoot, path.join(labRoot, 'registry'), path.join(labRoot, 'docs')];
+  const roots = [
+    designRoot,
+    referenceRoot,
+    path.join(labRoot, 'registry'),
+    path.join(labRoot, 'docs'),
+    path.join(labRoot, 'src'),
+    ...magicTemplateDefinitions.map((template) => template.root)
+  ];
   const needle = query.toLowerCase();
   const matches = [];
   for (const root of roots) {
@@ -1620,6 +2112,26 @@ server.registerTool('design_stack_audit', {
   return { content: [{ type: 'text', text: JSON.stringify(stackAudit(args), null, 2) }] };
 });
 
+server.registerTool('design_runtime_stack_gate', {
+  title: 'Audit Runtime Stack Evidence',
+  description: 'Fail MCP-driven work unless the selected or full stack is installed, imported, used in source, and proven active in browser QA.',
+  inputSchema: {
+    source: z.string().optional().describe('Concatenated relevant source files: TS/TSX/JS/JSX/CSS/HTML'),
+    packageJson: z.string().optional().describe('package.json text'),
+    required: z.array(z.enum(['framerMotion', 'three', 'gsap', 'lenis', 'motion', 'r3f', 'drei', 'postprocessing', 'theatre', 'dotlottie', 'rive', 'ogl', 'pixi'])).optional().describe('Required stack items to enforce'),
+    selectedComponents: z.array(z.string()).optional().describe('Use-case ids or component ids selected from quantumskyes://design/component-use-cases'),
+    product: z.string().optional(),
+    surface: z.string().optional(),
+    goal: z.string().optional(),
+    audience: z.string().optional(),
+    browserReport: z.string().optional().describe('Browser QA report proving required libraries are active in the rendered app'),
+    stackMode: z.enum(['selected', 'full']).optional().describe('full enforces every MCP runtime stack item; selected enforces only chosen use cases/components'),
+    requireBrowserEvidence: z.boolean().optional().describe('Require browser runtime evidence; defaults to true')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(runtimeStackGate(args), null, 2) }] };
+});
+
 server.registerTool('design_effect_audit', {
   title: 'Audit Requested Visual Effects',
   description: 'Fail generated work that claims cursor trails, neon scrollbars, motion chrome, screenshots, text effects, Theatre direction, GSAP scroll, or Three/R3F scenes without source signals.',
@@ -1665,6 +2177,24 @@ server.registerTool('design_elements', {
   return { content: [{ type: 'text', text: JSON.stringify(elementsFiltered(args), null, 2) }] };
 });
 
+server.registerTool('design_component_plan', {
+  title: 'Compose Component Use Case Plan',
+  description: 'Choose Skye UI/component use cases flexibly while forcing selected/full stack, runtime proof, quality gates, and browser evidence.',
+  inputSchema: {
+    product: z.string().optional(),
+    surface: z.string().optional(),
+    goal: z.string().optional(),
+    audience: z.string().optional(),
+    useCases: z.array(z.string()).optional().describe('Use-case ids from quantumskyes://design/component-use-cases'),
+    componentIds: z.array(z.string()).optional().describe('Component ids or aliases such as highlighter, tabs, orbiting-circles, gsap-scroll-stage'),
+    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional(),
+    requiredStack: z.array(z.enum(['framerMotion', 'three', 'gsap', 'lenis', 'motion', 'r3f', 'drei', 'postprocessing', 'theatre', 'dotlottie', 'rive', 'ogl', 'pixi'])).optional(),
+    stackMode: z.enum(['selected', 'full']).optional().describe('full is the default MCP contract; selected is for explicitly narrowed scope')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(componentPlan(args), null, 2) }] };
+});
+
 server.registerTool('design_compose_brief', {
   title: 'Compose Design Brief',
   description: 'Create a no-frankenstein design brief using approved MCP elements and QA rules.',
@@ -1685,6 +2215,25 @@ server.registerTool('design_asset_manifest', {
   inputSchema: {}
 }, async () => {
   return { content: [{ type: 'text', text: JSON.stringify(assetManifest(), null, 2) }] };
+});
+
+server.registerTool('design_template_manifest', {
+  title: 'List Skye MCP Templates',
+  description: 'Return extracted/revised changelog, blog, and portfolio template packs now wired into the local MCP.',
+  inputSchema: {}
+}, async () => {
+  return { content: [{ type: 'text', text: JSON.stringify(templateManifest(), null, 2) }] };
+});
+
+server.registerTool('design_template_pack', {
+  title: 'Get Skye MCP Template Pack',
+  description: 'Return key files from one revised template pack: changelog, blog, or portfolio.',
+  inputSchema: {
+    templateId: z.string().describe('Template id: changelog, blog, portfolio, or the full magicuidesign folder name'),
+    includeFiles: z.array(z.string()).optional().describe('Optional additional template-relative files to include')
+  }
+}, async ({ templateId, includeFiles = [] }) => {
+  return { content: [{ type: 'text', text: JSON.stringify(templatePack(templateId, includeFiles), null, 2) }] };
 });
 
 server.registerTool('design_logo_manifest', {
@@ -1795,24 +2344,31 @@ server.registerTool('design_quality_gate', {
     required: [
       'Read quantumskyes://directives/index',
       'Read quantumskyes://design/registry',
+      'Read quantumskyes://design/component-use-cases',
       'Read quantumskyes://design/variety-system',
+      'Read quantumskyes://design/templates when the user asks for changelog, blog, portfolio, release receipt, field notes, or operator-profile work',
+      'Read quantumskyes://design/lab/registry for Skye Design Lab patterns and do not ignore MCP/skye-design-lab',
       'Call design_variety_plan and record the chosen design DNA before coding',
       'Read quantumskyes://design/logo-standards before creating or replacing any logo/mark',
       'Pick an approved first-viewport pattern',
+      'Call design_component_plan and record selected use cases/components before coding',
       'Call design_recipe_plan for the requested product/effects',
       'Call design_open_source_stack and select concrete open-source recipes before applying brand styling',
       'Call design_logo_manifest and use existing logo assets before inventing a new mark',
+      'Call design_template_manifest or design_template_pack when a revised template can serve the requested surface',
       'Call design_logo_audit when a logo, brand mark, wordmark, or nav identity appears in source',
       'Read quantumskyes://design/surface-video-reel when app surfaces, workflows, screenshots, or proof video are requested',
       'Read quantumskyes://content/first-person-operator-voice for founder/operator public copy',
       'Run design_content_generate or design_content_audit when writing public copy',
       'Run design_validate on public copy/markup',
       'Run design_stack_audit when the brief requires Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing',
+      'Run design_runtime_stack_gate with source, packageJson, selected components/required stack, and browserReport proving the stack is active in the rendered app',
       'Run design_effect_audit when screenshots, cursor trail, neon scrollbar, motion chrome, text effects, Theatre, scroll stage, or Three/R3F canvas are requested',
       'Run design_e2e_proof_audit whenever copy says the app routes, logs in, signs up, restores, monitors, filters, deploys, or does another workflow',
       'Run design_performance_audit before browser QA; reject lazy Lenis, high DPR, high particles, eager screenshots, and missing reduced-motion/mobile fallbacks',
       'Capture browser screenshot at 1440x1000',
       'Capture browser screenshot at 390x844',
+      'Include runtime evidence in browser QA: motion transforms changed, GSAP/ScrollTrigger progressed, Lenis is active, WebGL canvas has nonblank pixels, and vector/scene assets reported ready when selected',
       'For workflow proof, record the browser doing the workflow and verify video readyState, currentTime, paused === false, and visibility',
       'Verify no mobile horizontal scroll',
       'Verify main subject and CTA are visible',
@@ -1838,7 +2394,7 @@ server.registerPrompt('premium_page_repair', {
         type: 'text',
         text: `Use the Skye Design MCP to repair ${product}. Problem: ${problem}.
 
-Read the directive, registry, elements registry, open-source stack recipes, pattern manifest, advanced stack guide, and no-frankenstein policy first. Avoid long left-column hero text, disconnected images, internal MCP/proof copy, negative letter spacing, and repeated dark SaaS templates. Choose one primary visual subject, call design_open_source_stack for concrete recipes, call design_pattern_pack for the required implementation patterns, run design_stack_audit if advanced stack is required, run design_e2e_proof_audit when workflow claims appear, then verify desktop/mobile screenshots and video playback before completion.`
+Read the directive, registry, component use-case registry, elements registry, open-source stack recipes, pattern manifest, advanced stack guide, and no-frankenstein policy first. Avoid long left-column hero text, disconnected images, internal MCP/proof copy, negative letter spacing, and repeated dark SaaS templates. Choose one primary visual subject, call design_component_plan, call design_open_source_stack for concrete recipes, call design_pattern_pack for the required implementation patterns, run design_stack_audit and design_runtime_stack_gate if advanced stack is required, run design_e2e_proof_audit when workflow claims appear, then verify desktop/mobile screenshots, runtime evidence, and video playback before completion.`
       }
     }
   ]

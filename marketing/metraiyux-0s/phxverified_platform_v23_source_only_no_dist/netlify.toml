@@ -1,0 +1,193 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), payment=(), usb=()"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+  from = "/directory"
+  to = "/directory/"
+  status = 301
+
+
+[[redirects]]
+  from = "/business"
+  to = "/business/"
+  status = 301
+
+[[redirects]]
+  from = "/category"
+  to = "/category/"
+  status = 301
+
+[[redirects]]
+  from = "/city"
+  to = "/city/"
+  status = 301
+
+[[redirects]]
+  from = "/business/:id"
+  to = "/business/:id/"
+  status = 301
+
+[[redirects]]
+  from = "/category/:id"
+  to = "/category/:id/"
+  status = 301
+
+[[redirects]]
+  from = "/city/:id"
+  to = "/city/:id/"
+  status = 301
+
+[[redirects]]
+  from = "/offers"
+  to = "/offers/"
+  status = 301
+
+[[redirects]]
+  from = "/map"
+  to = "/map/"
+  status = 301
+
+[[redirects]]
+  from = "/submit"
+  to = "/submit/"
+  status = 301
+
+[[redirects]]
+  from = "/request"
+  to = "/request/"
+  status = 301
+
+[[redirects]]
+  from = "/claim"
+  to = "/claim/"
+  status = 301
+
+[[redirects]]
+  from = "/insights"
+  to = "/insights/"
+  status = 301
+
+[[redirects]]
+  from = "/collection"
+  to = "/collection/"
+  status = 301
+
+[[redirects]]
+  from = "/collection/:id"
+  to = "/collection/:id/"
+  status = 301
+
+[[redirects]]
+  from = "/shortlist"
+  to = "/shortlist/"
+  status = 301
+
+[[redirects]]
+  from = "/compare"
+  to = "/compare/"
+  status = 301
+
+[[redirects]]
+  from = "/deal-desk"
+  to = "/deal-desk/"
+  status = 301
+
+[[redirects]]
+  from = "/audit"
+  to = "/audit/"
+  status = 301
+
+[[redirects]]
+  from = "/embed"
+  to = "/embed/"
+  status = 301
+
+[[redirects]]
+  from = "/market"
+  to = "/market/"
+  status = 301
+
+[[redirects]]
+  from = "/market/:city/:category"
+  to = "/market/:city/:category/"
+  status = 301
+
+[[redirects]]
+  from = "/match"
+  to = "/match/"
+  status = 301
+
+[[redirects]]
+  from = "/coverage"
+  to = "/coverage/"
+  status = 301
+
+[[redirects]]
+  from = "/outreach"
+  to = "/outreach/"
+  status = 301
+
+[[redirects]]
+  from = "/sponsor"
+  to = "/sponsor/"
+  status = 301
+
+[[redirects]]
+  from = "/exports"
+  to = "/exports/"
+  status = 301
+
+# Large-seed profile fallback. Existing generated profile files win first; missing
+# /business/:id/ routes render from /data/businesses.json through the scalable profile renderer.
+[[redirects]]
+  from = "/business/*"
+  to = "/business-profile/"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/quote-router"
+  to = "/quote-router/"
+  status = 301
+
+[[redirects]]
+  from = "/lead-routing-service"
+  to = "/lead-routing-service/"
+  status = 301
+
+[[redirects]]
+  from = "/ae-assignments"
+  to = "/ae-assignments/"
+  status = 301
+
+[[redirects]]
+  from = "/owner-messaging"
+  to = "/owner-messaging/"
+  status = 301
+
+[[redirects]]
+  from = "/revenue-attribution"
+  to = "/revenue-attribution/"
+  status = 301

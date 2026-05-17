@@ -1,0 +1,26 @@
+
+> phx-verified-network-platform@19.0.0 v19-smoke
+> node scripts/v19-smoke.mjs
+
+✅ Payment service page exists
+✅ Admin console page exists
+✅ Admin console browser asset exists
+✅ Payment service model export exists
+✅ Payment service API export exists
+✅ Dry-run checkout session is created but unpaid
+✅ Checkout creation does not fake paid status
+✅ Checkout links to sponsor_intent action
+✅ Stripe webhook signature verifier accepts valid signature
+✅ Stripe webhook signature verifier rejects invalid signature
+✅ PHX payment signature verifier accepts valid signature
+✅ PHX payment signature verifier rejects invalid signature
+✅ Payment webhook creates payment_event action
+✅ Payment event action stores in payment-events queue
+✅ State projector records payment event
+✅ Payment event marks sponsor intent paid pending admin activation
+✅ Exposure activation action projects active placement state
+✅ Admin API create_checkout_session returns accepted
+✅ Payment Netlify function exposes service model
+✅ Payment checkout endpoint rejects missing upstream identity
+✅ Payment webhook endpoint accepts dry-run provider event for proof
+✅ v19 smoke passed: 21 checks passed

@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agent Authority — Employer-Sponsored 3D Web Building Program</title>
+  <meta name="description" content="Agent Authority is an employer-sponsored program that equips agents with premium 3D websites, ongoing local SEO/geo content, and built-in revenue boosters. Employers earn monthly revenue share that can increase via referrals." />
+  <style>
+    :root{
+      --bg0:#08040f;
+      --bg1:#120727;
+      --bg2:#1c0a3a;
+      --card:#120a22cc;
+      --card2:#160b2ae6;
+      --text:#f4f1ff;
+      --muted:#c8bfe6;
+      --muted2:#a79acb;
+      --border:#2a1a4a;
+      --purple:#8a46ff;
+      --purple2:#5a2aa8;
+      --gold:#d7b64a;
+      --good:#62ffb0;
+      --warn:#ffcc66;
+      --bad:#ff6d6d;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 700px at 15% 10%, rgba(138,70,255,.22), transparent 60%),
+                  radial-gradient(900px 520px at 80% 30%, rgba(215,182,74,.18), transparent 60%),
+                  radial-gradient(1200px 900px at 45% 120%, rgba(90,42,168,.22), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1160px;margin:0 auto;padding:28px 18px 70px}
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(8,4,15,.75), rgba(8,4,15,.35));
+      border-bottom: 1px solid rgba(215,182,74,.12);
+    }
+    .topbar .inner{max-width:1160px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .sigil{
+      width:34px;height:34px;border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(215,182,74,.95), rgba(138,70,255,.55) 60%, rgba(18,7,39,.2));
+      box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    .brand h1{font-size:14px;letter-spacing:.16em;text-transform:uppercase;margin:0;color:var(--muted)}
+    .brand p{margin:2px 0 0 0;font-size:12px;color:var(--muted2)}
+    .ctaRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      color:var(--text);
+      padding:10px 12px;border-radius:14px;
+      font-size:12.5px;letter-spacing:.02em;
+      box-shadow: var(--shadow2);
+      cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(215,182,74,.35)}
+    .btn.primary{
+      border-color: rgba(215,182,74,.35);
+      background: linear-gradient(180deg, rgba(215,182,74,.22), rgba(138,70,255,.14));
+    }
+    .btn .dot{width:8px;height:8px;border-radius:99px;background:var(--gold);box-shadow:0 0 0 4px rgba(215,182,74,.12)}
+    .hero{
+      padding:40px 0 20px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr}
+    }
+    .panel{
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(400px 200px at var(--mx, 30%) var(--my, 20%), rgba(215,182,74,.14), transparent 60%),
+                  radial-gradient(360px 220px at 80% 0%, rgba(138,70,255,.16), transparent 70%);
+      pointer-events:none;
+    }
+    .panel .pad{padding:20px 20px 18px; position:relative}
+    .kicker{
+      display:inline-flex;align-items:center;gap:10px;
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .kicker .bar{width:34px;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+    .title{font-size:44px;line-height:1.03;margin:12px 0 8px}
+    @media (max-width: 520px){.title{font-size:36px}}
+    .subtitle{margin:0;color:var(--muted);font-size:15px;line-height:1.45;max-width:62ch}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .chip{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(18,10,34,.55);
+      padding:9px 10px;border-radius:999px;
+      font-size:12px;color:var(--muted);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+    .card{
+      grid-column: span 6;
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(18,10,34,.75), rgba(18,10,34,.40));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      position:relative; overflow:hidden;
+    }
+    .card .pad{padding:16px}
+    @media (max-width: 980px){.card{grid-column: span 12}}
+    .card h3{margin:0 0 6px;font-size:15px;letter-spacing:.01em}
+    .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .card .tag{
+      display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+      font-size:12px;color:var(--muted2)
+    }
+    .tag .pill{
+      padding:6px 8px;border-radius:999px;
+      border:1px solid rgba(215,182,74,.25);
+      background: rgba(215,182,74,.10);
+      color: #f4e6b3;
+      font-weight:600;
+    }
+    .sectionTitle{
+      margin:26px 0 10px;
+      font-size:18px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      display:flex;align-items:center;gap:12px;
+    }
+    .sectionTitle:after{
+      content:"";
+      height:1px;flex:1;
+      background: linear-gradient(90deg, rgba(215,182,74,.28), rgba(255,255,255,.06), transparent);
+    }
+    .tiers{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+    .tier{
+      grid-column: span 6;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(18,10,34,.82), rgba(18,10,34,.40));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+      transform-style: preserve-3d;
+    }
+    @media (max-width: 980px){.tier{grid-column: span 12}}
+    .tier .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+    }
+    .tier .name{font-size:16px;margin:0}
+    .tier .price{font-size:22px;margin:0;color:#fff}
+    .tier .price small{font-size:12px;color:var(--muted);font-weight:500}
+    .tier .body{padding:14px 16px 16px}
+    .tier ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.55}
+    .tier li{margin:6px 0}
+    .tier .accent{
+      position:absolute; inset:-2px;
+      background: radial-gradient(380px 180px at var(--tx, 20%) var(--ty, 10%), rgba(138,70,255,.18), transparent 60%),
+                  radial-gradient(420px 220px at 90% 0%, rgba(215,182,74,.14), transparent 70%);
+      pointer-events:none;
+      transform: translateZ(-1px);
+    }
+    .tier .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;color:var(--muted2);
+      margin-top:10px;
+    }
+    .badge b{color:#fff}
+    .calc{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){.calc{grid-template-columns:1fr}}
+    .formRow{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;margin:10px 0}
+    .formRow label{font-size:13px;color:var(--muted);line-height:1.3}
+    input[type="number"]{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+    }
+    input[type="number"]:focus{border-color: rgba(215,182,74,.35)}
+    .results{
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(18,10,34,.72), rgba(18,10,34,.40));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding:16px;
+    }
+    .results h3{margin:0 0 10px;font-size:15px}
+    .metric{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .metric:last-child{border-bottom:none}
+    .metric .k{color:var(--muted);font-size:13px}
+    .metric .v{font-size:13px}
+    .metric .v b{font-size:16px}
+    .hint{margin-top:10px;color:var(--muted2);font-size:12.5px;line-height:1.55}
+    .miniTable{
+      width:100%;
+      border-collapse: collapse;
+      margin-top:10px;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .miniTable th, .miniTable td{
+      padding:10px 10px;
+      font-size:12.5px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+    }
+    .miniTable th{
+      color:var(--muted);
+      background: rgba(0,0,0,.18);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      font-size:11px;
+    }
+    .miniTable tr:last-child td{border-bottom:none}
+    .footer{
+      margin-top:28px;
+      color: rgba(200,191,230,.70);
+      font-size:12px;
+      display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:16px;
+    }
+    /* subtle floating particles */
+    .particles{
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(215,182,74,.9), transparent 60%),
+        radial-gradient(2px 2px at 80% 35%, rgba(138,70,255,.9), transparent 60%),
+        radial-gradient(2px 2px at 35% 70%, rgba(215,182,74,.7), transparent 60%),
+        radial-gradient(1.5px 1.5px at 60% 80%, rgba(255,255,255,.8), transparent 60%),
+        radial-gradient(1.5px 1.5px at 90% 78%, rgba(255,255,255,.7), transparent 60%);
+      animation: drift 18s linear infinite;
+    }
+    @keyframes drift{
+      0%{transform: translate3d(0,0,0)}
+      50%{transform: translate3d(-8px, 10px, 0)}
+      100%{transform: translate3d(0,0,0)}
+    }
+    /* selection */
+    ::selection{background: rgba(215,182,74,.25)}
+  </style>
+</head>
+<body>
+  <!-- Folder menu assets -->
+  <link rel="stylesheet" href="../../../assets/menu.css">
+  <script src="../../../assets/menu.js" defer></script>
+
+  <div class="particles" aria-hidden="true"></div>
+
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="sigil" aria-hidden="true"></div>
+        <div>
+          <h1>Agent Authority</h1>
+          <p>Employer-Sponsored 3D Web Building Program</p>
+        </div>
+      </div>
+      <div class="ctaRow">
+        <a class="btn" href="#calculator"><span class="dot"></span>Run the Earnings Calculator</a>
+        <a class="btn primary" href="#tiers"><span class="dot"></span>View Tier Options</a>
+        <a class="btn" href="Agent_Authority_Partner_Kit_v2.pdf" download>Download Partner PDF</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="panel" data-tilt>
+        <div class="pad">
+          <div class="kicker"><span class="bar"></span><span>Built for agent-heavy orgs</span></div>
+          <h2 class="title">Employer-Sponsored 3D Web Builds — $167 Month 1, then premium 3D tiers</h2>
+          <p class="subtitle">
+            Agent Authority equips every agent with a credibility-building 3D website while employed/contracted.
+            Retail builds typically start at $6,700 — but this employer-sponsored program starts at <b>$167 for the first month</b>.
+            After the Intro Month, agents upgrade into a tier with a <b>6-month minimum term</b> so we can deliver enterprise-level work (hosting + SEO/geo included).
+          </p>
+          
+
+          <div class="chips">
+            <div class="chip"><b>Month 1 Intro: $167</b> (one month only)</div>
+            <div class="chip">After Intro: Tier pricing applies (6-month minimum)</div>
+            <div class="chip">Employer share: 13% base</div>
+            <div class="chip">Referral accelerator: +4% per business</div>
+            <div class="chip">Cap: 31% share</div>
+            <div class="chip">Setup: typically &lt; 30 minutes (Zoom-friendly)</div>
+            <div class="chip"><a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Questions? Contact Hub</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" data-tilt>
+        <div class="pad">
+          <div class="kicker"><span class="bar"></span><span>What’s built in</span></div>
+          <div class="grid">
+            <div class="card">
+              <div class="pad">
+                <h3>SOLE Rep (Revenue Booster)</h3>
+                <p>
+                  Every build includes access to SOLE Rep — a simple library of commission-ready scripts
+                  for approved vendor offers you can pitch to your audience.
+                </p>
+                <div class="tag"><span class="pill">Extra commission paths</span><span>without rebuilding your site</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="pad">
+                <h3>Operator Resource Pool</h3>
+                <p>
+                  Every subscribing agent gets access to a pool of resources, including the Apex Operator Playbook —
+                  the same execution framework used inside the $11K SkyeWays to Success Cohort.
+                </p>
+                <div class="tag"><span class="pill">Included free</span><span>while subscribed</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="pad">
+                <h3>Conversion Infrastructure</h3>
+                <p>
+                  Built to look premium and convert: trust tiles, proof walls, lead capture, and clean funnel flow.
+                  The website becomes a sales tool, not a brochure.
+                </p>
+                <div class="tag"><span class="pill">Credibility up</span><span>close rates up</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="pad">
+                <h3>Ongoing SEO/Geo Content</h3>
+                <p>
+                  Blog posts are published monthly based on tier. Local intent + service intent + targeted geo phrasing —
+                  designed to compound visibility over time.
+                </p>
+                <div class="tag"><span class="pill">Compounding traffic</span><span>not one-time hype</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="pad">
+                <h3>Credibility Boosters</h3>
+                <p>
+                  We don’t ask partners to “trust the pitch.” We point to working assets: our public editorial credibility layer
+                  and the WageCenter app product ecosystem. These are examples of how we build real funnels, not just pretty pages.
+                </p>
+                <div class="tag">
+                  <span class="pill"><a href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener" style="color:#f4e6b3;text-decoration:none">Editorial</a></span>
+                  <span class="pill"><a href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener" style="color:#f4e6b3;text-decoration:none">App</a></span>
+                  <span class="pill"><a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener" style="color:#f4e6b3;text-decoration:none">Contact</a></span>
+                  <span>live proof</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="sectionTitle" id="tiers">Tier Options</div>
+
+    <section class="tiers">
+      <article class="tier" data-tier data-tilt>
+        <div class="accent" aria-hidden="true"></div>
+        <div class="head">
+          <div>
+            <h3 class="name">Starter</h3>
+            <div class="badge"><b>Fast authority</b> • premium 3D presence</div>
+          </div>
+          <p class="price">$972 <small>/mo</small></p>
+        </div>
+        <div class="body">
+          <ul>
+            <li>1-page 3D homepage (premium motion + identity)</li>
+            <li>Hosting included</li>
+            <li>1 SEO/geo blog post per month</li>
+            <li>Core on-page SEO + lead capture CTA</li>
+            <li>SOLE Rep access + resource pool (included)</li>
+            <li><b>Minimum term:</b> 6 months after Intro Month</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tier" data-tier data-tilt>
+        <div class="accent" aria-hidden="true"></div>
+        <div class="head">
+          <div>
+            <h3 class="name">Elite</h3>
+            <div class="badge"><b>Conversion ecosystem</b> • more pages + more content</div>
+          </div>
+          <p class="price">$1,322 <small>/mo</small></p>
+        </div>
+        <div class="body">
+          <ul>
+            <li>4 total 3D pages (Home + 3 supporting pages)</li>
+            <li>2 SEO/geo blog posts per month</li>
+            <li>Proof wall + trust ribbon + stronger funnel flow</li>
+            <li>Hosting included + maintenance</li>
+            <li>SOLE Rep access + resource pool (included)</li>
+            <li><b>Minimum term:</b> 6 months after Intro Month</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tier" data-tier data-tilt>
+        <div class="accent" aria-hidden="true"></div>
+        <div class="head">
+          <div>
+            <h3 class="name">Emergence</h3>
+            <div class="badge"><b>Immersive premium</b> • cinematic + heavy content</div>
+          </div>
+          <p class="price">$1,882 <small>/mo</small></p>
+        </div>
+        <div class="body">
+          <ul>
+            <li>5 total 3D pages (expanded architecture)</li>
+            <li>6 SEO/geo blog posts per month</li>
+            <li>3D logo + cinematic opening sequence</li>
+            <li>Immersive transitions + higher-end motion system</li>
+            <li>SOLE Rep access + resource pool (included)</li>
+            <li><b>Minimum term:</b> 6 months after Intro Month</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tier" data-tier data-tilt>
+        <div class="accent" aria-hidden="true"></div>
+        <div class="head">
+          <div>
+            <h3 class="name">Kaixu Build</h3>
+            <div class="badge"><b>Immersive + AI console</b> • enterprise deployment</div>
+          </div>
+          <p class="price">$2,999–$6,700 <small>/mo</small></p>
+        </div>
+        <div class="body">
+          <ul>
+            <li>Everything in Emergence (as the base layer)</li>
+            <li>Personalized AI sales console for pipeline execution</li>
+            <li>Lead intake + tagging, follow-up cadence, scripts, deal-stage tracking</li>
+            <li>Daily “next actions” dashboard + content prompts</li>
+            <li>SOLE Rep access + resource pool (included)</li>
+            <li><b>Discount:</b> $8,888 credit with annual term (Kaixu requires yearly)</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <div class="sectionTitle">Referral Accelerator</div>
+
+    <section class="panel" data-tilt>
+      <div class="pad">
+        <p class="subtitle" style="margin-top:0">
+          Employer share starts at <b>13%</b> of active employee subscriptions monthly.
+          When an employer refers another business and that business completes intake and onboards agents,
+          the referring employer’s share increases by <b>+4%</b> per onboarded business.
+          This caps at <b>31%</b> so delivery stays sustainable.
+        </p>
+
+        <table class="miniTable" aria-label="Referral share table">
+          <thead>
+            <tr><th>Businesses Referred (Onboarded)</th><th>Employer Share%</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td><b>13%</b></td><td>Base share</td></tr>
+            <tr><td>1</td><td><b>17%</b></td><td>+4%</td></tr>
+            <tr><td>2</td><td><b>21%</b></td><td>+8%</td></tr>
+            <tr><td>3</td><td><b>25%</b></td><td>+12%</td></tr>
+            <tr><td>4</td><td><b>29%</b></td><td>+16%</td></tr>
+            <tr><td>5+</td><td><b>31%</b></td><td>Cap</td></tr>
+          </tbody>
+        </table>
+
+        <div class="hint">
+          Referral boost applies to the employer’s share of active employee subscription payments.
+          When an employee leaves, that employee’s subscription (and employer share on it) stops unless converted to a separate plan.
+        </div>
+      </div>
+    </section>
+
+    <div class="sectionTitle">Credibility Boosters</div>
+
+    <section class="panel" data-tilt>
+      <div class="pad">
+        <p class="subtitle" style="margin-top:0">
+          This program closes faster when your partners and agents can point to real proof. Use these links in your pitch, onboarding email, and agent announcements.
+        </p>
+        <ul style="margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.55">
+          <li><b>Editorial credibility layer:</b> <a href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener" style="color:#f4e6b3">Read the editorial</a></li>
+          <li><b>Working app ecosystem:</b> <a href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener" style="color:#f4e6b3">Open the WageCenter app</a></li>
+          <li><b>Direct intake & questions:</b> <a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener" style="color:#f4e6b3">Message our Contact Hub</a></li>
+        </ul>
+        <div class="hint" style="margin-top:12px">
+          The website is the front door; the editorial + app layer is the proof that the door leads somewhere real.
+        </div>
+      </div>
+    </section>
+
+    <div class="sectionTitle" id="calculator">Employer Earnings Calculator</div>
+
+    <section class="calc">
+      <div class="panel" data-tilt>
+        <div class="pad">
+          <p class="subtitle" style="margin-top:0">
+            Enter your active agents by tier and the number of onboarded business referrals.
+            The calculator outputs monthly/annual earnings and the boosted share percent.
+          </p>
+
+          <div class="formRow">
+            <label for="starterCount">Starter agents ($972/mo)</label>
+            <input id="starter

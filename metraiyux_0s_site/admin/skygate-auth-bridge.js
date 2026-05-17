@@ -1,6 +1,7 @@
 const SkygateAuthBridge = (() => {
   const tokenKey = 'adminBrainToken';
   const endpointKey = 'adminBrainEndpoint';
+  const adminSessionKey = 'adminSecuritySession';
   const claimsKey = 'metraiyux.skygate.claims.v1';
   const defaultWorkerOrigin = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 
@@ -16,9 +17,11 @@ const SkygateAuthBridge = (() => {
   }
 
   function authHeaders(extra = {}) {
+    const adminSession = sessionStorage.getItem(adminSessionKey) || '';
     return {
       ...extra,
-      ...(token() ? { authorization: `Bearer ${token()}` } : {})
+      ...(token() ? { authorization: `Bearer ${token()}` } : {}),
+      ...(adminSession ? { 'x-admin-session': adminSession } : {})
     };
   }
 
@@ -121,7 +124,16 @@ const SkygateAuthBridge = (() => {
     return res.json().catch(() => ({ ok: res.ok, status: res.status }));
   }
 
-  return { endpoint, token, authHeaders, claims, actor, introspect, saveTokenFromInput, mirrorEvent };
+  function saveAdminSession(sessionToken) {
+    if (sessionToken) sessionStorage.setItem(adminSessionKey, sessionToken);
+    else sessionStorage.removeItem(adminSessionKey);
+  }
+
+  function adminSession() {
+    return sessionStorage.getItem(adminSessionKey) || '';
+  }
+
+  return { endpoint, token, authHeaders, claims, actor, introspect, saveTokenFromInput, mirrorEvent, saveAdminSession, adminSession };
 })();
 
 window.SkygateAuthBridge = SkygateAuthBridge;

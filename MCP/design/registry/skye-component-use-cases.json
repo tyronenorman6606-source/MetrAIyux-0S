@@ -1,0 +1,150 @@
+{
+  "name": "skye-component-use-case-registry",
+  "version": "0.1.0",
+  "purpose": "Break Skye/Magic UI/MCP components into selectable use cases while preserving hard runtime stack and QA obligations.",
+  "rule": "Choose components by use case, not by novelty. Every selected use case creates implementation obligations: source imports, visible runtime behavior, reduced-motion/mobile fallback, browser QA, and the relevant MCP audits.",
+  "stackModes": {
+    "selected": "Only the stack required by selected use cases/components is mandatory.",
+    "full": "The full approved spectacle stack is mandatory unless the user explicitly asks for a lightweight pass."
+  },
+  "qualityGates": [
+    "design_component_plan must name selected use cases and components before coding.",
+    "design_recipe_plan must translate requested effects into open-source recipes.",
+    "design_stack_audit must pass for every required stack library.",
+    "design_runtime_stack_gate must pass with browser evidence that the selected stack is running, not merely installed or imported.",
+    "design_effect_audit must pass for requested effects.",
+    "design_performance_audit must pass for advanced motion, WebGL, screenshots, or scroll effects.",
+    "design_luxury_audit must pass for flagship or $50K-grade pages.",
+    "Browser QA must include 1440x1000 and 390x844, no mobile horizontal scroll, visible main subject, visible CTA, and no JS page errors."
+  ],
+  "useCases": [
+    {
+      "id": "intro-opening-sequence",
+      "title": "Intro / Opening Sequence",
+      "bestFor": ["client preview intro", "app launch sequence", "loading gate", "brand reveal", "age gate handoff"],
+      "components": ["brand-logo-reveal", "yard-door-curtain", "orbiting-circles", "meteors", "loading-meter", "status-rail"],
+      "recipes": ["framer-motion-interaction-system", "gsap-lenis-scroll-stage", "premium-text-effects-lab"],
+      "effects": ["textEffects", "motionChrome"],
+      "stack": ["framerMotion", "gsap"],
+      "browserEvidence": ["intro visible before app shell", "app shell hidden until release", "release path verified", "company name readable"],
+      "rejectIf": ["app surface visible before intro release", "intro button can release before ready state", "text effect makes logo/company name unreadable"]
+    },
+    {
+      "id": "public-landing-hero",
+      "title": "Public Landing / Hero",
+      "bestFor": ["home page", "public website", "brand landing", "service page", "product launch"],
+      "components": ["full-width-design-hero", "headline-stack", "primary-cta", "proof-strip", "shine-border", "text-highlighter"],
+      "recipes": ["fifty-k-typography-whitespace-system", "premium-text-effects-lab", "neon-motion-chrome-kit"],
+      "effects": ["textEffects", "motionChrome"],
+      "stack": ["framerMotion"],
+      "browserEvidence": ["main subject visible", "CTA visible", "headline fits desktop and mobile"],
+      "rejectIf": ["left-column text wall", "generic SaaS card hero", "headline or CTA hidden by effects"]
+    },
+    {
+      "id": "app-tool-surface",
+      "title": "App / Tool Surface",
+      "bestFor": ["dashboard", "admin app", "operator console", "editor", "CRM", "quote tool", "scan route"],
+      "components": ["app-first-command-center", "tabs", "status-strip", "quick-actions", "forms", "tables", "command-rail"],
+      "recipes": ["framer-motion-interaction-system", "actual-surface-screenshot-stage", "brand-logo-asset-discipline"],
+      "effects": ["motionChrome", "surfaceScreenshots"],
+      "stack": ["motion"],
+      "browserEvidence": ["real controls visible", "forms/buttons usable", "no marketing-only shell"],
+      "rejectIf": ["landing page instead of usable app", "card-only dashboard", "controls shift layout on hover"]
+    },
+    {
+      "id": "scroll-story",
+      "title": "Scroll Story / Process Funnel",
+      "bestFor": ["workflow explanation", "signup journey", "deployment flow", "proof funnel", "handoff sequence"],
+      "components": ["scroll-proof-funnel", "progress-rail", "pinned-stage", "route-line", "stage-receipts"],
+      "recipes": ["gsap-lenis-scroll-stage", "neon-scrollbar-cursor-trail", "neon-motion-chrome-kit"],
+      "effects": ["gsapScroll", "neonScrollbar", "motionChrome"],
+      "stack": ["gsap", "lenis"],
+      "browserEvidence": ["ScrollTrigger running", "Lenis running", "scroll progress changes", "pinned/scrubbed stage visible"],
+      "rejectIf": ["anchor scroll called GSAP", "Lenis installed but no raf loop", "scroll animation blocks forms"]
+    },
+    {
+      "id": "webgl-product-scene",
+      "title": "WebGL / 3D Product Scene",
+      "bestFor": ["spatial product lab", "AI brain", "infrastructure object", "technical hero", "living system scene"],
+      "components": ["three-canvas", "r3f-canvas", "drei-camera", "postprocessing-bloom", "pointer-parallax"],
+      "recipes": ["three-r3f-shader-scene", "drei-postprocessing-cinema", "framer-motion-interaction-system"],
+      "effects": ["threeCanvas", "motionChrome"],
+      "stack": ["three", "r3f", "drei", "postprocessing"],
+      "browserEvidence": ["canvas exists", "canvas nonblank pixels", "useFrame or animation loop active", "mobile framing checked"],
+      "rejectIf": ["CSS glow called 3D", "blank canvas", "uncapped DPR", "3D object hidden below fold"]
+    },
+    {
+      "id": "proof-surface",
+      "title": "Proof Surface / Screenshot or Video Reel",
+      "bestFor": ["app proof", "workflow proof", "case study", "before-after", "client receipt"],
+      "components": ["actual-screenshot-stage", "actual-video-reel", "proof-card", "receipt-timeline", "browser-qa-caption"],
+      "recipes": ["actual-surface-screenshot-stage", "actual-surface-video-reel", "brand-logo-asset-discipline"],
+      "effects": ["surfaceScreenshots"],
+      "stack": [],
+      "browserEvidence": ["real screenshot rendered", "video playback verified when workflow is claimed", "proof media visible"],
+      "rejectIf": ["static screenshot proves an action claim", "fake UI", "missing poster or playback verification"]
+    },
+    {
+      "id": "brand-motion-chrome",
+      "title": "Brand Motion Chrome",
+      "bestFor": ["neon polish", "cursor trail", "custom scrollbar", "motion chrome", "brand atmosphere"],
+      "components": ["neon-scrollbar", "scroll-progress", "cursor-glow", "magnetic-controls", "shine-border", "border-beam", "meteors", "text-highlighter"],
+      "recipes": ["neon-motion-chrome-kit", "neon-scrollbar-cursor-trail", "premium-text-effects-lab", "brand-logo-asset-discipline"],
+      "effects": ["cursorTrail", "neonScrollbar", "motionChrome", "textEffects"],
+      "stack": ["framerMotion"],
+      "browserEvidence": ["custom scrollbar visible", "pointer effect does not block inputs", "magnetic controls remain usable", "highlighted text remains readable"],
+      "rejectIf": ["scrollbar hidden", "cursor overlay blocks clicks", "effects applied to every heading", "logo replaced by generated initials"]
+    },
+    {
+      "id": "content-sections",
+      "title": "Content Sections / Dense Information",
+      "bestFor": ["services", "FAQ", "pricing", "inventory", "tables", "forms", "quote flows", "support pages"],
+      "components": ["accordion", "table", "form", "compact-card", "metric-row", "segmented-control", "tooltip"],
+      "recipes": ["framer-motion-interaction-system", "brand-logo-asset-discipline"],
+      "effects": ["motionChrome"],
+      "stack": ["motion"],
+      "browserEvidence": ["fields usable", "long text fits", "no layout shift", "keyboard focus visible"],
+      "rejectIf": ["hero-scale type in compact controls", "cards inside cards", "text overlap", "form hidden by decorative motion"]
+    },
+    {
+      "id": "vector-motion-asset",
+      "title": "Vector Motion Asset",
+      "bestFor": ["animated logo support", "workflow illustration", "state-machine diagram", "loading animation"],
+      "components": ["dotlottie-player", "rive-state-machine", "static-poster-fallback"],
+      "recipes": ["dotlottie-web-motion-asset", "rive-interactive-motion-asset"],
+      "effects": ["surfaceScreenshots"],
+      "stack": ["dotlottie", "rive"],
+      "browserEvidence": ["real .lottie/.json or .riv loaded", "playback/state machine visible", "reduced-motion fallback visible"],
+      "rejectIf": ["dependency with no asset", "random stock animation", "animation dominates form or core workflow"]
+    },
+    {
+      "id": "canvas-special-effect",
+      "title": "Canvas Special Effect",
+      "bestFor": ["shader backdrop", "sprite scene", "game-like UI", "2D particles", "generative background"],
+      "components": ["ogl-shader-backdrop", "pixi-sprite-stage", "canvas-fallback"],
+      "recipes": ["ogl-shader-backdrop", "pixi-sprite-stage"],
+      "effects": ["livingBackground"],
+      "stack": ["ogl", "pixi"],
+      "browserEvidence": ["canvas nonblank pixels", "animation loop active", "DPR capped", "mobile particle reduction"],
+      "rejectIf": ["canvas blocks UI", "uncapped DPR", "thousands of mobile particles", "effect hides the product"]
+    }
+  ],
+  "fullRuntimeStack": ["framerMotion", "motion", "gsap", "lenis", "three", "r3f", "drei", "postprocessing", "theatre", "dotlottie", "rive", "ogl", "pixi"],
+  "componentAliases": {
+    "highlighter": "brand-motion-chrome",
+    "text-highlighter": "brand-motion-chrome",
+    "orbiting-circles": "intro-opening-sequence",
+    "animated-beam": "brand-motion-chrome",
+    "border-beam": "brand-motion-chrome",
+    "shine-border": "brand-motion-chrome",
+    "meteors": "brand-motion-chrome",
+    "typing-animation": "public-landing-hero",
+    "text-animate": "public-landing-hero",
+    "tabs": "app-tool-surface",
+    "table": "content-sections",
+    "form": "content-sections",
+    "three": "webgl-product-scene",
+    "gsap": "scroll-story",
+    "video-proof": "proof-surface"
+  }
+}

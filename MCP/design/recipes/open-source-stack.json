@@ -2,7 +2,7 @@
   "name": "skye-open-source-spectacle-recipes",
   "version": "0.1.0",
   "purpose": "Concrete open-source frontend recipes agents must pull when the user asks for advanced effects. These recipes are not SkyeSol styling; they are implementation primitives.",
-  "rule": "Pick recipes by behavior first, then apply brand taste. Do not make everything look like SkyeSol.",
+  "rule": "Pick recipes by behavior first, then apply brand taste. Do not make everything look like SkyeSol. Reading this file or calling audits is not implementation: selected recipes must be installed/imported/used in the target app source unless the user explicitly narrows scope.",
   "recipes": [
     {
       "id": "framer-motion-interaction-system",
@@ -73,6 +73,16 @@
       "mustShow": ["real browser action path", "generated MP4 or WebM asset", "video first in the proof stage", "poster image", "browser check that video is visible and playing", "design_e2e_proof_audit passes for workflow claims"],
       "avoid": ["CSS-only video claims", "fake UI reels", "static landing screenshots called workflow proof", "headline-first hero when actual surface proof was requested"],
       "starter": "Use Playwright to goto/click/fill/scroll/submit through the claimed flow, record video or dense frames, encode H.264 with -movflags +faststart, render MP4/WebM, then verify readyState/currentTime/paused/visible in browser E2E."
+    },
+    {
+      "id": "skyesol-living-background",
+      "tags": ["skyesol", "living-background", "alive-background", "canvas", "aurora", "particles", "parallax", "scanline", "grain"],
+      "packages": ["vanilla canvas or Three.js/OGL when selected"],
+      "imports": ["Use the skyesol-living-background pattern pack for vanilla pages, or adapt the same behavior into Three/OGL when the target app already uses WebGL."],
+      "useWhen": "The user asks for Skyes/SOL backgrounds that feel alive, moving command fields, aurora particles, living OS ambience, or pages that should not look like static gradients.",
+      "mustShow": ["fixed transparent canvas behind content", "runtime requestAnimationFrame animation", "aurora wave or shader bands", "gold/violet/cyan particle palette", "pointer or scroll parallax", "scanline/grain texture", "reduced-motion and mobile particle fallback", "browser screenshot/video check"],
+      "avoid": ["static radial gradients only", "decorative orbs pretending to be motion", "uncapped particle counts", "canvas blocking clicks", "heavy animation over forms", "one-color purple/blue wash"],
+      "starter": "Pull design_pattern_pack({ patternId: 'skyesol-living-background' }). Mount the canvas once at body level, keep it behind content, cap DPR to 2 or below, reduce particles on compact screens, and verify it is visible but not covering text."
     },
     {
       "id": "brand-logo-asset-discipline",
@@ -167,6 +177,38 @@
       "mustShow": ["one deliberate display text effect", "no negative letter spacing", "mobile text fit verified"],
       "avoid": ["every heading glowing", "illegible bloom", "text columns dragging down mobile"],
       "starter": "Use one hero-scale glow/shimmer effect; animate reveal with Framer Motion or GSAP split-line timing."
+    },
+    {
+      "id": "fifty-k-typography-whitespace-system",
+      "tags": ["typography", "whitespace", "luxury", "editorial", "fifty-k", "bespoke"],
+      "packages": ["framer-motion", "motion"],
+      "imports": ["import { motion } from 'framer-motion';"],
+      "useWhen": "The brief targets $50K-grade design quality, a luxury brand, a premium agency showcase, or any surface where design_luxury_audit must pass.",
+      "mustShow": [
+        "hero headline at clamp(3.5rem, 8vw, 9rem) or larger",
+        "letter-spacing -0.02em to -0.04em on display headline",
+        "line-height 0.9–1.05 on display headline",
+        "font-weight contrast between display (700+) and body (300–400)",
+        "section padding-block ≥ clamp(6rem, 12vw, 10rem)",
+        "hero inner padding ≥ clamp(8rem, 15vw, 14rem)",
+        "content-container padding-inline ≥ clamp(2rem, 6vw, 6rem)",
+        "custom cubic-bezier easing in :root CSS custom property",
+        "staggered entrance: headline delay 0ms, subtext delay 80ms, CTA delay 160ms, visual delay 240ms",
+        "at least one bespoke interaction not from a UI kit"
+      ],
+      "avoid": [
+        "system font in the hero headline",
+        "uniform font weights across headline and body",
+        "letter-spacing: 0 or positive on display headings",
+        "section padding below 5rem on desktop",
+        "all elements revealing simultaneously",
+        "default ease on any transition",
+        "hero body copy longer than 2 lines on first load"
+      ],
+      "cssStarter": ":root { --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-circ-out: cubic-bezier(0, 0.55, 0.45, 1); } .hero-headline { font-size: clamp(3.5rem, 8vw, 9rem); line-height: 0.95; letter-spacing: -0.03em; font-weight: 900; } .hero-sub { font-size: clamp(1rem, 2vw, 1.375rem); line-height: 1.6; font-weight: 400; } .section { padding-block: clamp(6rem, 12vw, 10rem); } .hero-inner { padding-block: clamp(8rem, 15vw, 14rem); } .content-container { padding-inline: clamp(2rem, 6vw, 6rem); }",
+      "motionStarter": "const revealVariants = { hidden: { opacity: 0, y: 24 }, visible: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] } }) }; // Use custom={0} on headline, custom={1} on subtext, custom={2} on CTA, custom={3} on visual",
+      "scrollStagger": "gsap.utils.toArray('.reveal').forEach((el, i) => { gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 85%' }, opacity: 0, y: 32, duration: 0.7, delay: (i % 3) * 0.1, ease: 'expo.out' }); });",
+      "auditRequired": "design_luxury_audit"
     }
   ]
 }

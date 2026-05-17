@@ -6,6 +6,7 @@ Important MCP resources:
 
 - `quantumskyes://design/index`
 - `quantumskyes://design/registry`
+- `quantumskyes://design/component-use-cases`
 - `quantumskyes://design/user-guide`
 - `quantumskyes://design/builder-guide`
 - `quantumskyes://design/reference/style-system`
@@ -20,11 +21,13 @@ Important MCP resources:
 - `design_content_generate` creates first-person operator/company copy from product, audience, offer, and concrete system components.
 - `design_content_audit` rejects generic agency/platform copy and checks for immersive first-person singular/plural builder language.
 - `design_stack_audit` verifies advanced-stack claims against real source imports/runtime usage.
+- `design_runtime_stack_gate` verifies the selected/full stack is installed, imported, used in source, and proven active in browser QA.
 - `design_effect_audit` verifies requested effects against real source signals.
 - `design_performance_audit` rejects lazy Lenis, uncapped WebGL, heavy particles, eager screenshots, and missing motion/mobile fallbacks.
 - `design_stack_catalog` returns the approved package catalog for GSAP, Framer Motion, Motion, Lenis, Three/R3F/Drei/postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, React Bits, and Animata.
 - `design_open_source_stack` returns concrete open-source recipes so output is not just SkyeSol styling.
 - `design_recipe_plan` converts product/effect asks into required recipes, imports, and audits.
+- `design_component_plan` chooses components by use case while returning mandatory stack, recipes, audits, and browser evidence requirements.
 - `design_logo_manifest` lists approved logo, mark, emblem, and icon assets.
 - `design_logo_audit` rejects generic generated logo badges and missing existing logo assets.
 - `design_quality_gate` returns the required browser QA checklist.
@@ -56,27 +59,30 @@ Not allowed:
 
 1. Read `quantumskyes://directives/index`.
 2. Read `quantumskyes://design/registry`.
-3. Read `quantumskyes://design/open-source-stack`.
-4. Read `quantumskyes://design/stack-catalog`.
-5. Read `quantumskyes://design/pattern-manifest`.
-6. Read `quantumskyes://design/logo-standards` when the page has any logo or brand mark.
-7. Read `quantumskyes://design/surface-video-reel` when screenshot animation, app workflow proof, or video proof is requested.
-8. Call `design_compose_brief`.
-9. Call `design_recipe_plan` for the product and requested effects.
-10. Call `design_stack_catalog` for package selection.
-11. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
-12. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
-13. Call `design_pattern_pack` for every required implementation pattern.
-14. Build from those real implementation patterns, not from a static lookalike.
-15. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
-16. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
-17. Call `design_validate` on the public copy/markup/source.
-18. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
-19. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, or Pixi.
-20. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, text effects, Theatre, scroll, or 3D are requested.
-21. Call `design_performance_audit` before browser QA.
-22. Run browser screenshots.
-23. Fix before deploy.
+3. Read `quantumskyes://design/component-use-cases`.
+4. Read `quantumskyes://design/open-source-stack`.
+5. Read `quantumskyes://design/stack-catalog`.
+6. Read `quantumskyes://design/pattern-manifest`.
+7. Read `quantumskyes://design/logo-standards` when the page has any logo or brand mark.
+8. Read `quantumskyes://design/surface-video-reel` when screenshot animation, app workflow proof, or video proof is requested.
+9. Call `design_compose_brief`.
+10. Call `design_component_plan` for selected use cases/components and record whether stack mode is `full` or `selected`.
+11. Call `design_recipe_plan` for the product and requested effects.
+12. Call `design_stack_catalog` for package selection.
+13. Call `design_open_source_stack` for recipes that match the requested libraries/effects.
+14. Call `design_logo_manifest` before drawing, replacing, or styling any logo.
+15. Call `design_pattern_pack` for every required implementation pattern.
+16. Build from those real implementation patterns, not from a static lookalike.
+17. Read `quantumskyes://content/first-person-operator-voice` when writing public copy.
+18. Call `design_content_generate` for first-pass hero/section/CTA/proof copy, or `design_content_audit` on hand-written copy.
+19. Call `design_validate` on the public copy/markup/source.
+20. Call `design_logo_audit` when a logo, brand mark, wordmark, or nav identity appears.
+21. Call `design_stack_audit` when the brief requires Framer Motion, GSAP, Lenis, Three, R3F, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, or Pixi.
+22. Call `design_runtime_stack_gate` with source, package JSON, selected components/required stack, and browser runtime notes.
+23. Call `design_effect_audit` when screenshots, cursor trail, scrollbar, text effects, Theatre, scroll, or 3D are requested.
+24. Call `design_performance_audit` before browser QA.
+25. Run browser screenshots and runtime checks.
+26. Fix before deploy.
 
 ## Content Voice Rule
 
@@ -120,6 +126,7 @@ Fail examples:
 
 - Package installed but never imported.
 - Copy says "Three.js" but source has no Three/R3F import.
+- Browser QA has no evidence that the selected stack is active at runtime.
 - Static cards pretending to be a command scene.
 - Same dark dashboard/card layout reused with a new logo.
 
@@ -205,6 +212,7 @@ Requested effects must leave source evidence:
 - Cursor trail: `cursor-trail`, `pointermove`, `useMotionValue`, or `useSpring`.
 - Neon scrollbar: `::-webkit-scrollbar`, `scrollbar-color`, 14px+ thumb/track styling, visible slightly opaque track, and neon thumb highlight.
 - Text effects: `text-shadow`, `background-clip: text`, glow/neon/split/shimmer classes.
+- SkyeSol living background: `skyesol-living-field`, `requestAnimationFrame`, aurora wave/shader bands, particles, pointer parallax, scanline/grain texture, capped DPR, reduced-motion fallback.
 - Surface screenshots: real image assets rendered in the page.
 - Theatre: `@theatre/core`, `getProject`, or wired sheet state.
 - GSAP scroll: `ScrollTrigger`, `gsap.registerPlugin`, `scrub`, or `pin`.

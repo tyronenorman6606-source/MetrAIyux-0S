@@ -2,7 +2,7 @@
   "id": "site-operator-main-automation-brain",
   "name": "Main Automation Brain",
   "display_name": "CROWN Site Operator / Main Automation Brain",
-  "version": "admin-automation-0meg4kai-1.1",
+  "version": "admin-automation-live-review-routing",
   "created_at": "2026-05-15T09:29:26Z",
   "purpose": "Logged-in admin command brain that chats with the operator, routes work to all cabinet/person brains, drafts tasks, drafts social posts, records proof receipts, and hands commands to Cloudflare Workers for persistence and automation.",
   "total_connected_brains": 16,
@@ -241,6 +241,21 @@
     },
     {
       "trigger": [
+        "obsidian",
+        "vault",
+        "brain sync",
+        "sync notes",
+        "command runner",
+        "0s command",
+        "operator command"
+      ],
+      "primary": "Orion Hayes",
+      "primary_brain_id": "orion-hayes-technology-systems-brain",
+      "secondary": "Victor Saint",
+      "task": "Select an allowlisted local operator command from repo-local docs, run it through the local command runner, then validate the result and record proof."
+    },
+    {
+      "trigger": [
         "finance",
         "invoice",
         "budget",
@@ -306,6 +321,23 @@
       "primary_brain_id": "amara-voss-expansion-innovation-brain",
       "secondary": "Orion Hayes",
       "task": "Create innovation pilot brief and risk/cost review."
+    },
+    {
+      "trigger": [
+        "review",
+        "reviews",
+        "testimonial",
+        "feedback",
+        "customer experience",
+        "client experience",
+        "proof wall",
+        "submit review",
+        "leave a review"
+      ],
+      "primary": "Adrian Cross",
+      "primary_brain_id": "adrian-cross-client-success-brain",
+      "secondary": "Victor Saint",
+      "task": "Route customer review signals into the live review intake, run 0S QA, and batch five approved reviews before production publication."
     }
   ],
   "security_assistant_brain": {

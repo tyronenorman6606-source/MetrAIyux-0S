@@ -33,6 +33,20 @@ const localRouteRules = [
     triggers: ['how many brains', 'brain count', '16 brains', 'local brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
   },
   {
+    intent: 'client_review_or_feedback',
+    route_to: 'adrian-cross-brain',
+    secondary: 'victor-saint-brain',
+    create_task: 'Send the client to the live review intake, capture consent/proof notes, and hold publication for 0S QA plus the five-review batch rule',
+    triggers: ['review', 'reviews', 'testimonial', 'testimonials', 'feedback', 'customer experience', 'client experience', 'leave a review', 'submit review', 'write testimonial', 'talk about experience']
+  },
+  {
+    intent: 'review_wall_sales_proof',
+    route_to: 'celeste-monroe-brain',
+    secondary: 'valentina-reyes-brain',
+    create_task: 'Send proof-seeking buyers to the Skyes Over London Reviews Proof Wall and keep the framing proof-safe',
+    triggers: ['proof wall', 'review wall', 'client proof', 'customer proof', 'social proof', 'what do clients say', 'show reviews', 'see testimonials']
+  },
+  {
     intent: 'buyer_sales_proof',
     route_to: 'celeste-monroe-brain',
     secondary: 'gray-london-skyes-brain',
@@ -161,7 +175,13 @@ function scoreText(query, haystack) {
     'empire',
     'embed',
     'upload',
-    'source tag'
+    'source tag',
+    'review wall',
+    'leave a review',
+    'submit review',
+    'customer experience',
+    'client feedback',
+    'social proof'
   ].forEach(phrase => {
     if ((query || '').toLowerCase().includes(phrase) && hay.includes(phrase)) score += 7;
   });
@@ -272,6 +292,24 @@ function chooseRoute(query) {
       score: 99
     };
   }
+  if (hasAny(q, ['leave a review', 'submit review', 'write testimonial', 'send testimonial', 'give feedback', 'customer feedback', 'client feedback', 'talk about their experience', 'talk about our experience', 'share experience'])) {
+    return {
+      intent: 'client_review_or_feedback',
+      primary: profileById('adrian-cross-brain'),
+      secondary: profileById('victor-saint-brain'),
+      createTask: 'Send the customer to the live review intake and queue 0S QA before public proof-wall publication',
+      score: 99
+    };
+  }
+  if (hasAny(q, ['proof wall', 'review wall', 'testimonials', 'client proof', 'customer proof', 'social proof', 'what do clients say', 'show reviews'])) {
+    return {
+      intent: 'review_wall_sales_proof',
+      primary: profileById('celeste-monroe-brain'),
+      secondary: profileById('valentina-reyes-brain'),
+      createTask: 'Route the buyer to the public reviews proof wall and keep the claims proof-safe',
+      score: 99
+    };
+  }
   const routeCandidates = routePool().map(route => {
     let score = scoreText(query, routeHay(route));
     (route.triggers || []).forEach(trigger => {
@@ -356,6 +394,14 @@ function smartDirectAnswer(query, route, surfaces) {
 
   if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
     return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
+  }
+
+  if (hasAny(q, ['leave a review', 'submit review', 'write testimonial', 'send testimonial', 'give feedback', 'customer feedback', 'client feedback', 'talk about their experience', 'talk about our experience', 'share experience'])) {
+    return `${primaryOwner} owns the client-success side of this, with ${secondaryOwner} checking publication safety. Send the customer to the live review intake at https://skyes-over-london-reviews.pages.dev/submit-review.html. Tell them their submission goes to 0S QA first; it does not become public until consent and claims are checked, five approved unpublished reviews are batched, and the proof wall is pushed to production.`;
+  }
+
+  if (hasAny(q, ['proof wall', 'review wall', 'testimonials', 'client proof', 'customer proof', 'social proof', 'what do clients say', 'show reviews'])) {
+    return `${primaryOwner} owns the buyer conversation, with ${secondaryOwner} keeping the public framing clean. Send proof-seeking prospects to the Skyes Over London Reviews Proof Wall at https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded. Use it when they ask for reviews, testimonials, client experience, or social proof, and avoid inventing client names, outcomes, or approval status.`;
   }
 
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {

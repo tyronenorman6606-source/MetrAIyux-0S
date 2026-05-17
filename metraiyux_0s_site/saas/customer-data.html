@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S customer data visuals for workspace usage, plan limits, events, vault, mail, and sovereign stack state.">
+  <title>Customer Data Visuals - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">0S Customer Data</span></a>
+    <nav><a href="index.html">SaaS</a><a href="customer-dashboard.html">Dashboard</a><a href="pricing.html">Pricing</a><a href="billing.html">Billing</a><a href="skyepay.html">SkyePay</a></nav>
+  </header>
+  <main class="portal-shell">
+    <div class="topnav"><a href="../index.html">Home</a><a href="index.html">SaaS Hub</a><a href="customer-dashboard.html"><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Command Room</span></a><a href="customer-data.html">Data Visuals</a><a href="billing.html">Billing</a><a href="tenant-provisioning.html">Provisioning</a></div>
+
+    <section class="hero slim">
+      <p class="eyebrow">Customer visual ledger</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Customer data should be visible before it becomes a problem.</h1>
+      <p class="hero-copy">Workspace usage, plan caps, command status, sovereign stack choices, and mirrored FS27 events render as visual state instead of buried JSON.</p>
+      <div class="button-row"><a class="button primary" href="customer-dashboard.html">Open command room</a><a class="button" href="billing.html">Review usage limits</a></div>
+    </section>
+
+    <section
+      class="visual-dashboard"
+      data-visual-dashboard
+      data-api="/api/saas/customer-visuals?workspace_id={workspace_id}"
+      data-source="../data/customer-visuals-demo.json"
+      data-fallback="../data/customer-visuals-demo.json">
+      <div class="visual-board-head" data-visual-workspace></div>
+      <p class="visual-status-line" data-visual-status>Waiting for visual data...</p>
+
+      <div class="visual-kpi-grid" data-visual-kpis></div>
+
+      <div class="visual-panel-grid">
+        <article class="visual-panel">
+          <h2>Plan usage</h2>
+          <div data-visual-progress></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Usage shape</h2>
+          <div data-visual-bars></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Workflow mix</h2>
+          <div data-visual-donut></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Event mix</h2>
+          <div class="visual-mini-bars" data-visual-event-mix></div>
+        </article>
+      </div>
+
+      <section class="visual-panel">
+        <h2>Sovereign stack state</h2>
+        <div class="visual-stack-grid" data-visual-stack></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>Recent customer-visible events</h2>
+        <div class="visual-timeline" data-visual-timeline></div>
+      </section>
+    </section>
+  </main>
+  <script src="../assets/js/saas-tools.js"></script>
+  <script src="../assets/js/visual-data-kit.js"></script>
+<script src="../script.js"></script></body>
+</html>

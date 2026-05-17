@@ -1,0 +1,38 @@
+{
+  "id": "skyepay-house-gateway",
+  "name": "SkyePay",
+  "owner": "Skyes Over London LC",
+  "purpose": "House payment gateway for private previews, client app continuation, setup fees, monthly retainers, workspace unlock approval, and repo-platform billing routes.",
+  "canonical_public_url": "https://skyesol.netlify.app/skyepay.html",
+  "local_preview_url": "http://127.0.0.1:4197/skyepay.html?client=bobs-smoke-shop&dry_run=1",
+  "fs27_root": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
+  "endpoints": {
+    "api_manifest": "/skyepay-api.json",
+    "openapi": "/openapi/skyepay.openapi.json",
+    "sdk": "/assets/skyepay-client.js",
+    "docs": "/skyepay-api.html",
+    "offers": "/skyepay/offers",
+    "checkout": "/skyepay/checkout",
+    "status": "/skyepay/status",
+    "admin_ledger": "/admin/skyepay-ledger"
+  },
+  "public_surfaces": [
+    "/workspaces/MetrAIyux-0S/SkyeGateFS27/skyepay.html",
+    "/workspaces/MetrAIyux-0S/metraiyux_0s_site/saas/skyepay.html"
+  ],
+  "offer_map": {
+    "starter-command": "metraiyux-starter-command",
+    "growth-cabinet": "metraiyux-growth-cabinet",
+    "autonomous-office": "metraiyux-autonomous-office",
+    "enterprise-command": "skygatefs27-managed-control-plane",
+    "kaixu-starter": "skygatefs27-managed-control-plane",
+    "kaixu-team": "skygatefs27-managed-control-plane",
+    "kaixu-scale": "skygatefs27-managed-control-plane"
+  },
+  "rules": [
+    "Public customer payment routes should point to SkyePay instead of loose external payment links.",
+    "Stripe card data stays inside Stripe Checkout.",
+    "FS27 owns order metadata, owner approval, and workspace unlock state.",
+    "Paid activation must remain pending until owner approval."
+  ]
+}

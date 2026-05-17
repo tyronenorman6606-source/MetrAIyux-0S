@@ -21,8 +21,8 @@ Marketing assets for the SOL Staffing OS package. Built in the same dark editori
 
 The homepage proof stage now uses the unpacked site's proof video first:
 
-- `../unpacked-projects/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4`
-- `../unpacked-projects/sol_staffing_agency_site/assets/proof/workflow-proof-manifest.json`
+- `../metraiyux_0s_site/live/sol_staffing_agency_site/assets/proof/sol-staffing-real-workflow.mp4`
+- `../metraiyux_0s_site/live/sol_staffing_agency_site/assets/proof/workflow-proof-manifest.json`
 
 The older local `assets/screenshots/sol-surface-reel.mp4` remains as a fallback asset, but the primary proof source is the main unpacked site package.
 
@@ -49,11 +49,11 @@ Hashes:
 
 ## Product Being Marketed
 
-`../unpacked-projects/sol_staffing_agency_site`
+`../metraiyux_0s_site/live/sol_staffing_agency_site`
 
 Absolute workspace path:
 
-`/workspaces/MetrAIyux-0S/unpacked-projects/sol_staffing_agency_site`
+`/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/sol_staffing_agency_site`
 
 That package now includes Skyegate FS27 auth, Netlify Functions, records, secure uploads, admin dashboard, and live brain endpoint wiring.
 

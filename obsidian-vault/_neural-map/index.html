@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>MetrAIyux 0S Vault Neural Map</title>
+  <link rel="stylesheet" href="neural-map.css">
+</head>
+<body>
+  <main class="map-shell">
+    <canvas id="neuralCanvas" aria-label="Interactive neural map of the MetrAIyux 0S Obsidian vault"></canvas>
+    <aside class="control-panel" aria-label="Neural map controls">
+      <div class="brand-lockup">
+        <span class="signal-dot"></span>
+        <div>
+          <p class="eyebrow">Repo-local vault map</p>
+          <h1>MetrAIyux 0S Neural Map</h1>
+        </div>
+      </div>
+      <p class="summary" id="graphSummary">Loading graph...</p>
+      <label class="field">
+        <span>Search</span>
+        <input id="searchInput" type="search" placeholder="production, proof, sales, command...">
+      </label>
+      <div class="button-row" role="group" aria-label="Graph filters">
+        <button class="filter-button is-active" data-filter="all">All</button>
+        <button class="filter-button" data-filter="brain">Brain</button>
+        <button class="filter-button" data-filter="proof">Proof</button>
+        <button class="filter-button" data-filter="production">Prod</button>
+        <button class="filter-button" data-filter="commands">Ops</button>
+      </div>
+      <div class="legend">
+        <span><i class="swatch hub"></i>Hub</span>
+        <span><i class="swatch note"></i>Note</span>
+        <span><i class="swatch tag"></i>Tag</span>
+        <span><i class="swatch source"></i>Source</span>
+      </div>
+      <section class="detail-panel" id="detailPanel">
+        <p class="eyebrow">Selected node</p>
+        <h2>Hover or click a node</h2>
+        <p>The map is generated from Obsidian links, tags, folders, and brain-export status.</p>
+      </section>
+      <p class="boundary">Private operator visualization. Keep this outside public deployment unless an auth gate protects it.</p>
+    </aside>
+  </main>
+  <script src="graph-data.js"></script>
+  <script src="neural-map.js"></script>
+</body>
+</html>

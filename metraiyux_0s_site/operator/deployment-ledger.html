@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CEO Live Deployment Ledger — real-time production surface inventory for MetrAIyux 0S Cloudflare infrastructure.">
+  <title>CEO Deployment Ledger · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    /* ── MCP pattern: skyesol-living-background ── */
+    .skyesol-living-field{position:fixed;inset:0;z-index:-3;width:100%;height:100%;pointer-events:none}
+    .skyesol-grain{position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.09;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E")}
+    .skyesol-scanline{position:fixed;inset:0;z-index:10;pointer-events:none;opacity:.032;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.22),rgba(255,255,255,.22) 1px,transparent 1px,transparent 6px)}
+    body{background:linear-gradient(180deg,rgba(5,5,11,.96),rgba(3,3,7,.99)),radial-gradient(1200px 760px at 14% 4%,rgba(138,99,255,.18),transparent 58%),radial-gradient(1100px 760px at 82% 16%,rgba(39,242,255,.11),transparent 58%),radial-gradient(900px 660px at 55% 92%,rgba(201,168,76,.11),transparent 60%)}
+
+    /* ── MCP pattern: neon-motion-chrome ── */
+    :root{--neon-gold:#ffd76a;--neon-cyan:#61f6ff;--neon-pink:#ff4fd8;--neon-violet:#9b5cff}
+    html{scrollbar-width:thin;scrollbar-color:var(--neon-cyan) rgba(255,255,255,.06);scroll-behavior:smooth}
+    ::-webkit-scrollbar{width:14px;height:14px}
+    ::-webkit-scrollbar-track{background:rgba(255,255,255,.1);border-left:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 8px rgba(97,246,255,.06)}
+    ::-webkit-scrollbar-thumb{min-height:70px;border:3px solid rgba(5,3,11,.92);border-radius:999px;background:linear-gradient(180deg,var(--neon-gold),var(--neon-cyan),var(--neon-pink));box-shadow:0 0 18px rgba(97,246,255,.32),inset 0 0 14px rgba(255,255,255,.16)}
+    ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--neon-cyan),var(--neon-gold),var(--neon-pink));box-shadow:0 0 26px rgba(255,215,106,.42)}
+    .neon-scroll-progress{position:fixed;top:0;left:0;z-index:90;width:100%;height:3px;transform-origin:left center;transform:scaleX(0);background:linear-gradient(90deg,var(--neon-gold),var(--neon-cyan),var(--neon-pink));box-shadow:0 0 18px rgba(97,246,255,.42)}
+    .neon-grid-chrome{position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 72%)}
+    .neon-cursor-trail{position:fixed;left:-150px;top:-150px;z-index:70;width:320px;height:320px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,215,106,.15),rgba(97,246,255,.09) 38%,rgba(255,79,216,.07) 56%,transparent 72%);filter:blur(12px);mix-blend-mode:screen;transition:opacity .22s}
+    @media(pointer:coarse),(max-width:760px){.neon-cursor-trail{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.neon-cursor-trail,.skyesol-scanline{display:none}}
+
+    /* ── Ledger page styles ── */
+    .ledger-hero{padding:90px 6vw 52px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .ledger-hero h1{font-size:clamp(38px,6vw,80px);letter-spacing:-.055em;margin:14px 0 18px;line-height:1}
+    .neon-title{background:linear-gradient(92deg,#fff8e7 0%,var(--neon-gold) 28%,var(--neon-cyan) 60%,var(--neon-pink) 88%,#fff8e7 100%);background-size:240% auto;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;animation:titleShimmer 8s linear infinite}
+    @keyframes titleShimmer{from{background-position:0% center}to{background-position:240% center}}
+    .ledger-hero .capture{color:var(--muted);font-size:.88rem;margin-top:8px;opacity:.8}
+    .live-pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:#52ffc1;box-shadow:0 0 12px #52ffc1;margin-right:7px;vertical-align:middle;animation:pulse 2.2s infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 12px #52ffc1}50%{box-shadow:0 0 24px #52ffc1,0 0 36px rgba(82,255,193,.4)}}
+
+    .stat-band{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:36px 0}
+    .stat-tile{border:1px solid rgba(215,170,67,.28);border-radius:22px;padding:26px 20px;background:radial-gradient(circle at 20% 0%,rgba(215,170,67,.12),transparent 55%),rgba(255,255,255,.04);text-align:center;transition:transform .22s,border-color .22s,box-shadow .22s;cursor:default}
+    .stat-tile:hover{transform:translateY(-3px) scale(1.015);border-color:rgba(97,246,255,.55);box-shadow:0 18px 54px rgba(97,246,255,.12),0 0 28px rgba(255,215,106,.14)}
+    .stat-tile .num{font-size:3rem;font-weight:900;line-height:1;display:block;background:linear-gradient(135deg,var(--neon-gold),var(--neon-cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .stat-tile .lbl{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-top:8px;display:block}
+
+    .neon-glow-panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 24px 80px rgba(0,0,0,.42),0 0 28px rgba(97,246,255,.08)}
+    .neon-glow-panel::before{content:"";position:absolute;inset:-80% -20%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transform:rotate(18deg);animation:neonSweep 8s ease-in-out infinite}
+    @keyframes neonSweep{0%,62%{translate:-120% 0}100%{translate:120% 0}}
+    .newly-pushed{border:1px solid rgba(82,255,193,.32);border-radius:22px;padding:22px;background:rgba(82,255,193,.05)}
+    .newly-pushed h3{margin:0 0 14px;color:#52ffc1;font-size:1rem;text-transform:uppercase;letter-spacing:.14em;font-weight:900}
+    .rule-panel{border:1px solid rgba(215,170,67,.28);border-left:4px solid var(--gold);border-radius:18px;padding:18px 22px;background:rgba(215,170,67,.05);max-width:860px}
+    .rule-panel p{margin:0;color:#ebdcc0;line-height:1.75}
+    .evidence-panel{border:1px solid rgba(53,183,255,.24);border-radius:22px;padding:22px;background:rgba(53,183,255,.05);max-width:860px}
+    .evidence-panel ul{margin:10px 0 0;padding-left:20px;line-height:2.1}
+    .evidence-panel li{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86rem;color:var(--muted)}
+
+    .contrib-table{width:100%;border-collapse:collapse}
+    .contrib-table th{color:var(--gold2);font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;padding:14px 16px;border-bottom:1px solid rgba(215,170,67,.22);background:rgba(215,170,67,.05);text-align:left}
+    .contrib-table td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;font-size:.92rem}
+    .contrib-table tr:last-child td{border-bottom:none}
+    .contrib-table td:first-child{color:var(--gold2);font-weight:800}
+    .contrib-table tbody tr{transition:background .18s}
+    .contrib-table tbody tr:hover{background:rgba(255,255,255,.03)}
+
+    .prod-table{width:100%;border-collapse:collapse;min-width:720px}
+    .prod-table th{color:var(--cyan);font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;padding:13px 14px;border-bottom:1px solid rgba(53,183,255,.18);background:rgba(53,183,255,.05);text-align:left;white-space:nowrap}
+    .prod-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;font-size:.87rem}
+    .prod-table tr:last-child td{border-bottom:none}
+    .prod-table td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--gold2);font-size:.82rem}
+    .prod-table tbody tr{transition:background .16s}
+    .prod-table tbody tr:hover{background:rgba(53,183,255,.04)}
+
+    .workers-table{width:100%;border-collapse:collapse;min-width:680px}
+    .workers-table th{color:var(--violet);font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;padding:13px 14px;border-bottom:1px solid rgba(168,140,255,.18);background:rgba(168,140,255,.05);text-align:left;white-space:nowrap}
+    .workers-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;font-size:.87rem}
+    .workers-table tr:last-child td{border-bottom:none}
+    .workers-table td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--violet);font-size:.82rem}
+    .workers-table tbody tr{transition:background .16s}
+    .workers-table tbody tr:hover{background:rgba(168,140,255,.04)}
+
+    .live-url{color:var(--cyan);text-decoration:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.79rem;word-break:break-all}
+    .live-url:hover{color:var(--gold2)}
+    .deploy-id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;color:var(--muted);word-break:break-all}
+    .status-live-green{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(82,255,193,.32);border-radius:999px;padding:4px 9px;background:rgba(82,255,193,.09);color:#c8ffef;font-weight:900;font-size:.73rem;white-space:nowrap}
+    .status-live-violet{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(168,140,255,.32);border-radius:999px;padding:4px 9px;background:rgba(168,140,255,.09);color:#e4deff;font-weight:900;font-size:.73rem;white-space:nowrap}
+    .dot-g{width:7px;height:7px;border-radius:50%;background:#52ffc1;box-shadow:0 0 10px #52ffc1;flex-shrink:0}
+    .dot-v{width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--violet);flex-shrink:0}
+
+    .verification-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+    .verification-list li{border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:12px 16px;background:rgba(255,255,255,.03);font-size:.9rem;color:var(--muted);transition:border-color .18s}
+    .verification-list li:hover{border-color:rgba(97,246,255,.3)}
+    .verification-list li::before{content:"✓  ";color:#52ffc1;font-weight:900}
+
+    .section-head-h2{font-size:1.45rem;margin:0 0 20px;letter-spacing:-.03em}
+    .section-head-h2 span{color:var(--muted);font-size:.88rem;font-weight:400;margin-left:8px;letter-spacing:0}
+
+    @media(max-width:900px){.stat-band{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:540px){.stat-band{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <!-- MCP pattern: skyesol-living-background -->
+  <canvas class="skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="skyesol-scanline" aria-hidden="true"></div>
+
+  <!-- MCP pattern: neon-motion-chrome -->
+  <div class="neon-scroll-progress" id="scrollRail" aria-hidden="true"></div>
+  <div class="neon-grid-chrome" aria-hidden="true"></div>
+  <div class="neon-cursor-trail" id="cursorTrail" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../proof/proof-center.html">Proof</a>
+      <a href="index.html">Operator</a>
+      <a href="../local-brain.html">Brain</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="ledger-hero">
+      <p class="eyebrow"><span class="live-pulse"></span>Live production ledger</p>
+      <h1 class="neon-title">CEO Deployment Ledger</h1>
+      <p class="wide">I keep the canonical record of every deployed surface — Pages projects, Worker gates, and proof routing. Every entry is pulled from the API — not from memory or estimates.</p>
+      <p class="capture">Capture: 2026-05-16 UTC &nbsp;·&nbsp; MCP: <code>quantumskyes://production/ledger</code></p>
+    </section>
+
+    <section class="section">
+      <div class="stat-band">
+        <div class="stat-tile">
+          <span class="num" data-target="24">0</span>
+          <span class="lbl">Live surfaces</span>
+        </div>
+        <div class="stat-tile">
+          <span class="num" data-target="13">0</span>
+          <span class="lbl">Pages projects</span>
+        </div>
+        <div class="stat-tile">
+          <span class="num" data-target="11">0</span>
+          <span class="lbl">Worker services</span>
+        </div>
+        <div class="stat-tile">
+          <span class="num" data-target="36">0</span>
+          <span class="lbl">HTTP checks passed</span>
+        </div>
+      </div>
+
+      <div class="newly-pushed">
+        <h3>Newly pushed this run</h3>
+        <div class="table-wrap" style="border-color:rgba(82,255,193,.2)">
+          <table class="prod-table" style="min-width:auto">
+            <thead><tr><th>Surface</th><th>Production URL</th><th>Deployment ID</th><th>What Changed</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>skyes-over-london-reviews</td>
+                <td><a class="live-url" href="https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded" target="_blank" rel="noopener">skyes-over-london-reviews.pages.dev</a></td>
+                <td><span class="deploy-id">604ab197-5a94-4cab-8e09-ce699d9d145a</span></td>
+                <td style="color:var(--muted)">New Pages project · 3D Three.js Review Atlas · WebGL cards · neon chrome · fake Approved language removed.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin:12px 0 0;color:var(--muted);font-size:.86rem">Verified: HTTP <code>200</code> · no console errors · no overflow · no Approved text · <code>window.__skyeReviewAtlas.active === true</code></p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">CEO Contribution Map</h2>
+      <div class="table-wrap neon-glow-panel">
+        <table class="contrib-table">
+          <thead><tr><th>Contribution Lane</th><th>Live Evidence</th><th>Business Value</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Public sales &amp; proof surfaces</td>
+              <td style="color:var(--muted)"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span> full system, public spectacle, marketing, legal, reviews, staffing, logo rollout, ecosystem portal</td>
+              <td style="color:var(--muted)">I give prospects real links — not screenshots, not verbal claims. My routing surfaces the proof instantly.</td>
+            </tr>
+            <tr>
+              <td>Edge platform infrastructure</td>
+              <td style="color:var(--muted)">11 Workers including full system, admin automation, SaaS provisioning, security gateway, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeGateFS27</span>, SkyeVault, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span></td>
+              <td style="color:var(--muted)">I ship real backend capability — SkyeGateFS27, the automation brain, and the SaaS provisioning worker are all live gates.</td>
+            </tr>
+            <tr>
+              <td>Proof &amp; governance system</td>
+              <td style="color:var(--muted)">Live proof router, FS27 gate proof, deployment ledgers, browser QA artifacts</td>
+              <td style="color:var(--muted)">My <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span> make every company claim auditable — safe to put in front of any client.</td>
+            </tr>
+            <tr>
+              <td>Client/demo deployment engine</td>
+              <td style="color:var(--muted)"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Bob's Smoke Shop</span> preview, MetrAIyux client preview, SOL Staffing site, Skyes Reviews</td>
+              <td style="color:var(--muted)">I deploy client workspaces repeatedly — same gates, same system, different audience every time.</td>
+            </tr>
+            <tr>
+              <td>Productized design/MCP capability</td>
+              <td style="color:var(--muted)">Skye Design MCP, 3D reviews page, neon legal chrome, advanced motion stack</td>
+              <td style="color:var(--muted)">I built my MCP design system as reusable infrastructure. I route every pattern through it on demand.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">Cloudflare Pages <span>— 13 production projects</span></h2>
+      <div class="table-wrap">
+        <table class="prod-table">
+          <thead><tr><th>Project</th><th>Production Domain</th><th>Deployment ID</th><th>Branch</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>skyes-over-london-reviews</td>
+              <td><a class="live-url" href="https://skyes-over-london-reviews.pages.dev/" target="_blank" rel="noopener">skyes-over-london-reviews.pages.dev</a></td>
+              <td><span class="deploy-id">604ab197-5a94-4cab-8e09-ce699d9d145a</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>bobs-smoke-shop-metraiyux-preview</td>
+              <td><a class="live-url" href="https://bobs-smoke-shop-metraiyux-preview.pages.dev/" target="_blank" rel="noopener">bobs-smoke-shop-metraiyux-preview.pages.dev</a></td>
+              <td><span class="deploy-id">fb68f9f2-29c8-426b-ac63-6ea073319f22</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sol-staffing-agency-site</td>
+              <td><a class="live-url" href="https://sol-staffing-agency-site.pages.dev/" target="_blank" rel="noopener">sol-staffing-agency-site.pages.dev</a></td>
+              <td><span class="deploy-id">55b53c2c-7667-4488-ab21-7a32b87a9a4a</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>neon-rift-blocks-mobile</td>
+              <td><a class="live-url" href="https://neon-rift-blocks-mobile.pages.dev/" target="_blank" rel="noopener">neon-rift-blocks-mobile.pages.dev</a></td>
+              <td><span class="deploy-id">cb809b0b-be5b-4941-87f1-2be5aa670014</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sol-staffing-marketing</td>
+              <td><a class="live-url" href="https://sol-staffing-marketing.pages.dev/" target="_blank" rel="noopener">sol-staffing-marketing.pages.dev</a></td>
+              <td><span class="deploy-id">867c39b1-725c-494a-92ee-60bd6bcb4a4d</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>metraiyux-0s-client-preview</td>
+              <td><a class="live-url" href="https://metraiyux-0s-client-preview.pages.dev/" target="_blank" rel="noopener">metraiyux-0s-client-preview.pages.dev</a></td>
+              <td><span class="deploy-id">a4fdba0a-a00d-42be-ae90-adad8de8cb5a</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>metraiyux-0s-public-spectacle</td>
+              <td><a class="live-url" href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener">metraiyux-0s-public-spectacle.pages.dev</a></td>
+              <td><span class="deploy-id">a1bac2de-b398-4121-97ec-9479d1a1aa53</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>metraiyux-ecosystem-portal</td>
+              <td><a class="live-url" href="https://metraiyux-ecosystem-portal.pages.dev/" target="_blank" rel="noopener">metraiyux-ecosystem-portal.pages.dev</a></td>
+              <td><span class="deploy-id">caf24186-b87e-4dfe-b648-62b4b7cd5b5b</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>skyes-over-london-legal</td>
+              <td><a class="live-url" href="https://skyes-over-london-legal.pages.dev/" target="_blank" rel="noopener">skyes-over-london-legal.pages.dev</a></td>
+              <td><span class="deploy-id">1555a3d6-a010-4b82-ad12-53963694a19d</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>citadeldb-ultimate</td>
+              <td><a class="live-url" href="https://citadeldb-ultimate.pages.dev/" target="_blank" rel="noopener">citadeldb-ultimate.pages.dev</a></td>
+              <td><span class="deploy-id">5b80966b-c4ba-4ef8-b831-f53a97b33f55</span></td>
+              <td>production</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>skye-design-mcp</td>
+              <td><a class="live-url" href="https://skye-design-mcp.pages.dev/" target="_blank" rel="noopener">skye-design-mcp.pages.dev</a></td>
+              <td><span class="deploy-id">3ae07fc4-c644-4941-bc7a-c998820f51de</span></td>
+              <td>production</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>metraiyux-0s-marketing</td>
+              <td><a class="live-url" href="https://metraiyux-0s-marketing.pages.dev/" target="_blank" rel="noopener">metraiyux-0s-marketing.pages.dev</a></td>
+              <td><span class="deploy-id">930794f3-c821-4ebe-8d65-eca326671a2b</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>metraiyux-0s-logo-rollout</td>
+              <td><a class="live-url" href="https://metraiyux-0s-logo-rollout.pages.dev/" target="_blank" rel="noopener">metraiyux-0s-logo-rollout.pages.dev</a></td>
+              <td><span class="deploy-id">23bc183c-9fb2-4061-8be0-229a3f1c19d5</span></td>
+              <td>main</td>
+              <td><span class="status-live-green"><span class="dot-g"></span>Live</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">Cloudflare Workers <span>— 11 production services</span></h2>
+      <div class="table-wrap">
+        <table class="workers-table">
+          <thead><tr><th>Worker</th><th>Production URL</th><th>Latest Deploy</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>metraiyux-0s-full-system</td>
+              <td><a class="live-url" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">metraiyux-0s-full-system.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T22:02Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sovereign-saas-provisioning-worker</td>
+              <td><a class="live-url" href="https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/" target="_blank" rel="noopener">sovereign-saas-provisioning-worker.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T22:01Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">skyevault-drop</span></td>
+              <td><a class="live-url" href="https://skyevault-drop.graylondonskyes.workers.dev/" target="_blank" rel="noopener">skyevault-drop.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T18:05Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>skyemail-platform</td>
+              <td><a class="live-url" href="https://skyemail-platform.graylondonskyes.workers.dev/" target="_blank" rel="noopener">skyemail-platform.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T22:06Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>skyegatefs27-citadeldb</td>
+              <td><a class="live-url" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noopener">skyegatefs27-citadeldb.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T22:06Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sovereign-13-site-operator-quantum</td>
+              <td><a class="live-url" href="https://sovereign-13-site-operator-quantum.graylondonskyes.workers.dev/" target="_blank" rel="noopener">sovereign-13-site-operator-quantum.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T00:00Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>admin-automation-brain</td>
+              <td><a class="live-url" href="https://admin-automation-brain.graylondonskyes.workers.dev/" target="_blank" rel="noopener">admin-automation-brain.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-16T00:00Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>crown-site-operator</td>
+              <td><a class="live-url" href="https://crown-site-operator.graylondonskyes.workers.dev/" target="_blank" rel="noopener">crown-site-operator.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-15T23:59Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sovereign-<span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">13-cabinet</span>-nexus-operator</td>
+              <td><a class="live-url" href="https://sovereign-13-cabinet-nexus-operator.graylondonskyes.workers.dev/" target="_blank" rel="noopener">sovereign-13-cabinet-nexus-operator.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-15T23:59Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>sovereign-13-cabinet-sentinel-operator</td>
+              <td><a class="live-url" href="https://sovereign-13-cabinet-sentinel-operator.graylondonskyes.workers.dev/" target="_blank" rel="noopener">sovereign-13-cabinet-sentinel-operator.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-15T23:59Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+            <tr>
+              <td>omeg4kai-security-gateway</td>
+              <td><a class="live-url" href="https://omeg4kai-security-gateway.graylondonskyes.workers.dev/" target="_blank" rel="noopener">omeg4kai-security-gateway.workers.dev</a></td>
+              <td style="color:var(--muted);font-size:.81rem">2026-05-15T23:59Z</td>
+              <td><span class="status-live-violet"><span class="dot-v"></span>Live</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">Verification Standard</h2>
+      <ul class="verification-list">
+        <li>Pages project list captured via <code>npx wrangler pages project list --json</code></li>
+        <li>Latest production Pages deployments via <code>npx wrangler pages deployment list --environment=production --json</code></li>
+        <li>Worker deployments via <code>npx wrangler deployments list --json</code></li>
+        <li>36 live HTTP checks against Pages roots, Worker roots, Worker health routes, and the new review atlas route — zero failures</li>
+        <li><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London</span> Reviews browser check: Three.js atlas canvas rendered live, <code>window.__skyeReviewAtlas.active === true</code></li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">Evidence Files</h2>
+      <div class="evidence-panel">
+        <ul>
+          <li>test-artifacts/live-deployment-ledger/cloudflare-inventory.json</li>
+          <li>test-artifacts/live-deployment-ledger/live-http-checks.json</li>
+          <li>test-artifacts/skyes-over-london-reviews-three-atlas/cloudflare-production-atlas.png</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-head-h2">Operating Rule</h2>
+      <div class="rule-panel">
+        <p>I keep this ledger as production evidence — not sales exaggeration. If a route fails, I keep the row and change the status instead of deleting history. My production source JSON is in <code>test-artifacts/live-deployment-ledger/cloudflare-inventory.json</code>. My smoke-check evidence is in <code>test-artifacts/live-deployment-ledger/live-http-checks.json</code>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer><p>MetrAIyux 0S · CEO Live Deployment Ledger · 24 surfaces · 36 checks passed · 2026-05-16 UTC</p></footer>
+
+  <script src="../script.js"></script>
+  <script>
+    /* ── MCP pattern: skyesol-living-background (adapted for static HTML) ── */
+    (function () {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const canvas = document.querySelector('.skyesol-living-field');
+      if (!canvas || !canvas.getContext || reduceMotion) return;
+      const ctx = canvas.getContext('2d');
+      const palette = ['rgba(201,168,76,', 'rgba(138,99,255,', 'rgba(39,242,255,'];
+      let width = 0, height = 0, particles = [], raf = 0;
+      const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+
+      function resize() {
+        const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * ratio);
+        canvas.height = Math.floor(height * ratio);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        const count = Math.min(100, Math.max(48, Math.floor(width * height / 18000)));
+        particles = Array.from({ length: count }, (_, i) => ({
+          x: Math.random() * width, y: Math.random() * height,
+          r: Math.random() * 1.6 + .4, a: Math.random() * .3 + .1,
+          s: Math.random() * .3 + .08, phase: Math.random() * Math.PI * 2,
+          color: palette[i % palette.length]
+        }));
+      }
+
+      function drawWave(t, yOff, cA, cB, amp, spd) {
+        const g = ctx.createLinearGradient(0, yOff - amp * 2, width, yOff + amp * 2);
+        g.addColorStop(0, cA); g.addColorStop(.5, cB); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.moveTo(0, height);
+        for (let x = 0; x <= width; x += 18) {
+          const n = Math.sin(x * .006 + t * spd) * amp + Math.cos(x * .011 - t * spd * .7) * amp * .44;
+          ctx.lineTo(x, yOff + n);
+        }
+        ctx.lineTo(width, height); ctx.closePath();
+        ctx.fillStyle = g; ctx.fill();
+      }
+
+      function animate(now) {
+        const t = now * .001;
+        pointer.x += (pointer.tx - pointer.x) * .032;
+        pointer.y += (pointer.ty - pointer.y) * .032;
+        ctx.clearRect(0, 0, width, height);
+        ctx.globalCompositeOperation = 'screen';
+        drawWave(t, height * .28 + pointer.y * 10, 'rgba(138,99,255,0)', 'rgba(138,99,255,.09)', 34, .32);
+        drawWave(t, height * .56 - pointer.y * 9, 'rgba(39,242,255,0)', 'rgba(39,242,255,.07)', 40, .22);
+        drawWave(t, height * .82, 'rgba(201,168,76,0)', 'rgba(201,168,76,.06)', 26, .26);
+        particles.forEach(p => {
+          const px = p.x + Math.sin(t * p.s + p.phase) * 26 + pointer.x * 9;
+          const py = p.y + Math.cos(t * p.s * .8 + p.phase) * 16 + pointer.y * 7;
+          ctx.beginPath(); ctx.arc(px, py, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + p.a + ')'; ctx.fill();
+        });
+        ctx.globalCompositeOperation = 'source-over';
+        raf = requestAnimationFrame(animate);
+      }
+
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('mousemove', e => {
+        pointer.tx = (e.clientX / Math.max(width, 1) - .5) * 2;
+        pointer.ty = (e.clientY / Math.max(height, 1) - .5) * 2;
+      }, { passive: true });
+      raf = requestAnimationFrame(animate);
+    })();
+
+    /* ── MCP pattern: neon-motion-chrome scroll rail + cursor glow ── */
+    (function () {
+      const rail = document.getElementById('scrollRail');
+      const glow = document.getElementById('cursorTrail');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) { if (rail) rail.style.display = 'none'; return; }
+
+      function updateRail() {
+        const scrolled = window.scrollY;
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        if (rail && total > 0) rail.style.transform = 'scaleX(' + Math.min(scrolled / total, 1) + ')';
+      }
+      window.addEventListener('scroll', updateRail, { passive: true });
+      updateRail();
+
+      if (glow) {
+        let gx = -200, gy = -200, tx = -200, ty = -200;
+        window.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, { passive: true });
+        function animateGlow() {
+          gx += (tx - gx) * .1; gy += (ty - gy) * .1;
+          glow.style.transform = 'translate(' + (gx - 160) + 'px,' + (gy - 160) + 'px)';
+          requestAnimationFrame(animateGlow);
+        }
+        animateGlow();
+      }
+    })();
+
+    /* ── Count-up animation for stat tiles ── */
+    (function () {
+      const els = document.querySelectorAll('.num[data-target]');
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(el => { el.textContent = el.dataset.target; });
+        return;
+      }
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          obs.unobserve(entry.target);
+          const el = entry.target;
+          const target = parseInt(el.dataset.target, 10);
+          let start = 0;
+          const dur = 900;
+          const t0 = performance.now();
+          function step(now) {
+            const p = Math.min((now - t0) / dur, 1);
+            el.textContent = Math.round(p * p * target);
+            if (p < 1) requestAnimationFrame(step);
+            else el.textContent = target;
+          }
+          requestAnimationFrame(step);
+        });
+      }, { threshold: .3 });
+      els.forEach(el => obs.observe(el));
+    })();
+  </script>
+</body>
+</html>

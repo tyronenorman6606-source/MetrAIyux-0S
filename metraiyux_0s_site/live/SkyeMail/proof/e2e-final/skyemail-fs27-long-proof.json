@@ -1,0 +1,188 @@
+{
+  "started_at": "2026-05-16T21:06:29.827Z",
+  "skymail": "https://skyemail-platform.graylondonskyes.workers.dev",
+  "gate": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+  "steps": [
+    {
+      "name": "skymail-home-fs27-start",
+      "note": "SkyeMail home exposes Start With Skyegate FS27 as the front door.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/01-skymail-home-fs27-start.png",
+      "ts": "2026-05-16T21:06:33.203Z"
+    },
+    {
+      "name": "fs27-gate-card-generator",
+      "note": "Gate page shows Skye-ID, SkyEmail claim, and basic gate card before mailbox onboarding.",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card?return_to=https%3A%2F%2Fskyemail-platform.graylondonskyes.workers.dev%2Fgate-return.html",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/02-fs27-gate-card-generator.png",
+      "ts": "2026-05-16T21:06:34.820Z"
+    },
+    {
+      "name": "fs27-generated-card-filled",
+      "note": "Generated Skye ID number, SkyEmail prefix, mailbox claim, and gate login email.",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card?return_to=https%3A%2F%2Fskyemail-platform.graylondonskyes.workers.dev%2Fgate-return.html",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/03-fs27-generated-card-filled.png",
+      "ts": "2026-05-16T21:06:36.516Z"
+    },
+    {
+      "name": "skymail-return-bridge",
+      "note": "SkyeMail return bridge receives the FS27 signed token and card/mailbox claim.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/gate-return#[redacted-fs27-return-claim]",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/04-skymail-return-bridge.png",
+      "ts": "2026-05-16T21:06:39.504Z"
+    },
+    {
+      "name": "skymail-onboarding-after-fs27",
+      "note": "The FS27 session is accepted and SkyeMail routes into onboarding with the same identity.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/onboarding?gate_return=1",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/05-skymail-onboarding-after-fs27.png",
+      "ts": "2026-05-16T21:06:41.429Z"
+    },
+    {
+      "name": "skymail-mailbox-provisioned",
+      "note": "Mailbox provision endpoint creates the hosted mailbox record, primary alias, and key-card record.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/onboarding?gate_return=1",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/06-skymail-mailbox-provisioned.png",
+      "ts": "2026-05-16T21:06:42.330Z"
+    },
+    {
+      "name": "skymail-inbox-opened",
+      "note": "Dashboard inbox opens under the FS27-backed SkyeMail session.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/dashboard",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/07-skymail-inbox-opened.png",
+      "ts": "2026-05-16T21:06:44.094Z"
+    },
+    {
+      "name": "skymail-send-receive-proof-loop",
+      "note": "Proof loop writes a sent record and a received inbox record to the actual mailbox list.",
+      "url": "https://skyemail-platform.graylondonskyes.workers.dev/dashboard",
+      "screenshot": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/08-skymail-send-receive-proof-loop.png",
+      "ts": "2026-05-16T21:06:47.346Z"
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "GSAP target [object NodeList] not found. https://gsap.com",
+      "ts": "2026-05-16T21:06:30.922Z"
+    },
+    {
+      "type": "warning",
+      "text": "GSAP target  not found. https://gsap.com",
+      "ts": "2026-05-16T21:06:30.923Z"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3bfc00148400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "ts": "2026-05-16T21:06:31.271Z"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3bfc00148400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "ts": "2026-05-16T21:06:31.326Z"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3bfc00148400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "ts": "2026-05-16T21:06:31.411Z"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3bfc00148400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+      "ts": "2026-05-16T21:06:31.533Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.691Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.692Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.700Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.700Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.708Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "ts": "2026-05-16T21:06:42.708Z"
+    }
+  ],
+  "missing": [],
+  "gate_claim": {
+    "display_name": "SkyeMail Proof MP8U6M34",
+    "skye_id_number": "0095392649",
+    "mailbox_email": "skymail-mp8u6m34-8i31hz@solenterprises.org",
+    "gate_email": "skymail-mp8u6m34-8i31hz@solenterprises.org"
+  },
+  "onboarding_state": {
+    "token": true,
+    "handle": "skymail-mp8u6m34-8i31hz",
+    "skymail_id": "skymail_380cddf81733f12b",
+    "workspace_id": "skymail_ws_8ae38a3c613fba97",
+    "fs27_gate_card_id": "gate_basic_380cddf81733f12b",
+    "local_part": "skymail-mp8u6m34-8i31hz",
+    "domain": "solenterprises.org",
+    "status_text": "Set hosted mailbox provider env before provisioning a real mailbox."
+  },
+  "mail_proof_loop": {
+    "ok": true,
+    "mailbox": {
+      "id": "274210a8-30e0-41eb-8b41-f76b339af1df",
+      "user_id": "ca6a0958-0061-450c-a133-877683d8da1d",
+      "mailbox_email": "skymail-mp8u6m34-8i31hz@solenterprises.org",
+      "local_part": "skymail-mp8u6m34-8i31hz",
+      "domain": "solenterprises.org",
+      "workspace_id": "skymail_ws_8ae38a3c613fba97",
+      "skymail_id": "skymail_380cddf81733f12b",
+      "fs27_gate_card_id": "gate_basic_380cddf81733f12b",
+      "provider": "skymail-local-route",
+      "provider_account_id": "local:skymail-mp8u6m34-8i31hz@solenterprises.org",
+      "status": "active",
+      "provisioning_status": "provisioned",
+      "imap_host": "imap.yourdomain.com",
+      "smtp_host": "smtp.yourdomain.com",
+      "jmap_url": "https://mail.yourdomain.com/jmap",
+      "created_at": "2026-05-16T21:06:41.777Z",
+      "updated_at": "2026-05-16T21:06:41.777Z",
+      "provisioned_at": "2026-05-16T21:06:41.777Z",
+      "last_error": null
+    },
+    "sent": {
+      "id": "864237ae-935d-4075-8512-3e21bc46f349",
+      "created_at": "2026-05-16T21:06:44.466Z"
+    },
+    "received": {
+      "id": "3a702016-8c92-45aa-b272-624169e24efd",
+      "created_at": "2026-05-16T21:06:44.541Z"
+    }
+  },
+  "inbox_state": {
+    "status_text": "Proof loop created: sent mail and received inbox mail are now in the mailbox list.",
+    "badge": "Connected mailbox • skymail-mp8u6m34-8i31hz@solenterprises.org",
+    "visible_subjects": [
+      "Re: SkyeMail browser proof 2026-05-16T21:06:44.164Z"
+    ],
+    "visible_from": [
+      "skymail-mp8u6m34-8i31hz@solenterprises.org"
+    ],
+    "message_rows": 1
+  },
+  "completed_at": "2026-05-16T21:06:47.364Z",
+  "result": "passed",
+  "video": "metraiyux_0s_site/live/SkyeMail/proof/e2e-final/skyemail-fs27-long-proof.webm"
+}

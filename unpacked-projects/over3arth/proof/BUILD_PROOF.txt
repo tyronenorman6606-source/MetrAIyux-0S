@@ -1,0 +1,35 @@
+# Over3arth v1.6.0 Build Proof
+
+Date: 2026-05-17
+Package: over3arth-v1.6.0-world-codex-upgrade.zip
+
+Commands run:
+
+1. npm install
+   Result: passed
+   Security audit: found 0 vulnerabilities
+
+2. npm run lint
+   Result: passed
+   Command: eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0
+
+3. npm run build
+   Result: passed
+   Output: dist/ generated successfully
+   Note: Vite still reports the expected >500 KB lazy visual chunk warning for Three.js visuals. This is not a failed build.
+
+4. npm run preview -- --port 4177 + curl smoke
+   Result: passed
+   / returned HTTP/1.1 200 OK
+   /manifest.webmanifest returned Over3arth v1.6 metadata
+   /sw.js returned CACHE_VERSION = over3arth-v1.6.0
+
+Major v1.6 additions:
+
+- World Codex navigation surface.
+- Epoch Planner with templates and automatic phase quest generation.
+- Alliance Circle with local accountability records and check-in script generation.
+- World Laws / Canon system for identity doctrine.
+- Codex intelligence scoring for epoch field and canon strength.
+- Schema v7 migration for epochs, allies, and canon.
+- Snapshot/export metadata expanded for Codex objects.

@@ -60,8 +60,11 @@ npm run skye:control</pre>
       </div>
       <aside class="panel">
         <h3>Runner status</h3>
-        <p id="skyeRunnerState">Checking local runner...</p>
-        <pre id="skyeCrawlerConsole" class="receipt-box">SkyeCrawler Control listens on http://127.0.0.1:4175.</pre>
+      <p id="skyeRunnerState">Runner status has not been checked in this browser session.</p>
+      <pre id="skyeCrawlerConsole" class="receipt-box">Start the local control bridge, then use Refresh Status or Run Static Crawl.
+
+cd /workspaces/MetrAIyux-0S
+npm run skye:control</pre>
       </aside>
     </section>
 
@@ -90,7 +93,7 @@ npm run skye:crawl:static</pre>
         </article>
         <article class="route-card">
           <h3>Worker Crawl</h3>
-          <p>Run the Cloudflare Worker locally with persistence outside the served site folder.</p>
+          <p>Run the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> locally with persistence outside the served site folder.</p>
           <pre class="receipt-box">cd /workspaces/MetrAIyux-0S/metraiyux_0s_site
 npx wrangler dev --ip 127.0.0.1 --port 4174 --persist-to /tmp/metraiyux-wrangler-state
 
@@ -105,7 +108,7 @@ npm run skye:crawl:worker</pre>
       <div class="process-grid">
         <article class="process-step"><h3>Inventory</h3><p>Counts site HTML, loads every page, and checks local links/assets.</p></article>
         <article class="process-step"><h3>Runtime</h3><p>Runs Chromium sweeps on desktop and mobile viewports, capturing console errors, page errors, failed local requests, blank pages, and overflow.</p></article>
-        <article class="process-step"><h3>User Flows</h3><p>Clicks through Local Brain, Persona Brain, Live Proof Router, calculator, admin save/clear, SaaS signup, and client onboarding.</p></article>
+        <article class="process-step"><h3>User Flows</h3><p>Clicks through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Local Brain</span>, Persona Brain, Live Proof Router, calculator, admin save/clear, SaaS signup, and client onboarding.</p></article>
         <article class="process-step"><h3>Proof</h3><p>Writes JSON reports and screenshot artifacts into `test-artifacts/` for release review and customer-safe evidence.</p></article>
       </div>
     </section>
@@ -183,8 +186,7 @@ npm run skye:crawl:worker</pre>
       document.querySelectorAll('[data-skye-status]').forEach(button => {
         button.addEventListener('click', refreshStatus);
       });
-      refreshStatus();
     })();
   </script>
-</body>
+<script src="../script.js"></script></body>
 </html>

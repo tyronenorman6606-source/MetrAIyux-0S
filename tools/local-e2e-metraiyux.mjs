@@ -36,7 +36,7 @@ function failText(error) {
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
-    if (['.git', '.wrangler', 'node_modules'].includes(entry)) continue;
+    if (['.git', '.wrangler', 'node_modules', 'coming-soon', 'live'].includes(entry)) continue;
     const full = path.join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) out.push(...walk(full));

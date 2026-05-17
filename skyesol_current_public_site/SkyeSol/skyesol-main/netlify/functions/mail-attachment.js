@@ -1,1 +1,0 @@
-exports.handler = require("../../Platforms-Apps-Infrastructure/2026/FounderTechPro /Full-EMAIL-Service-Database-Gmail+Neon-Replacements/skymail-mega-build/apps/skymail-web/netlify/functions/mail-attachment.js").handler;

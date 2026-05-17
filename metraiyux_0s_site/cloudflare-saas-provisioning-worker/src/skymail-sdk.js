@@ -1,4 +1,4 @@
-const DEFAULT_SKYMAIL_URL = "https://skymail-platform.graylondonskyes.workers.dev";
+const DEFAULT_SKYMAIL_URL = "https://skyemail-platform.graylondonskyes.workers.dev";
 
 function clean(value) {
   return String(value || "").trim();

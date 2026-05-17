@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { assertPortalKeyNotLocked, recordPortalKeyFailure, recordPortalKeySuccess } from './rate-limit.js';
+import { hashWorkspaceKey, loadDeveloperWorkspaces } from './workspace-registry.js';
 
 export function constantTimeEqual(a, b) {
   const left = String(a || '');
@@ -135,11 +136,60 @@ export function requireAdmin(event) {
 }
 
 export function requirePortalKey(event, body = {}) {
+  return resolvePortalAccess(event, body);
+}
+
+function publicWorkspaceAccess(item) {
+  if (!item) return null;
+  return {
+    type: 'developer-workspace',
+    workspaceId: item.workspaceId,
+    developerId: item.developerId,
+    developerName: item.developerName,
+    clientName: item.clientName,
+    clientEmail: item.clientEmail,
+    projectName: item.projectName,
+    destinationId: item.destinationId,
+    maxFilesPerSubmission: item.maxFilesPerSubmission,
+    maxTotalSubmissionGb: item.maxTotalSubmissionGb,
+    maxFileSizeGb: item.maxFileSizeGb,
+    rateLimitUploadSessionsPerWindow: item.rateLimitUploadSessionsPerWindow,
+    rateLimitStatusPerWindow: item.rateLimitStatusPerWindow,
+    rateLimitWindowMs: item.rateLimitWindowMs,
+    subscriptionStatus: item.subscriptionStatus,
+    planName: item.planName
+  };
+}
+
+function workspaceKeyMatches(provided, workspace) {
+  if (!provided || workspace.active === false) return false;
+  if (workspace.key && constantTimeEqual(provided, workspace.key)) return true;
+  if (workspace.keyHash && constantTimeEqual(hashWorkspaceKey(provided), workspace.keyHash)) return true;
+  return false;
+}
+
+export async function resolvePortalAccess(event, body = {}) {
   assertAllowedOrigin(event);
   const configured = process.env.CLIENT_PORTAL_KEY;
-  if (!configured) return;
+  const developerWorkspaces = await loadDeveloperWorkspaces();
+  if (!configured && !developerWorkspaces.length) return { type: 'open' };
   assertPortalKeyNotLocked(event);
   const provided = getHeader(event, 'x-portal-key') || body.portalKey;
+  for (const workspace of developerWorkspaces) {
+    if (workspaceKeyMatches(provided, workspace)) {
+      recordPortalKeySuccess(event);
+      return publicWorkspaceAccess(workspace);
+    }
+  }
+  if (configured && constantTimeEqual(provided, configured)) {
+    recordPortalKeySuccess(event);
+    return {
+      type: 'portal',
+      workspaceId: safeId(body.workspaceId || ''),
+      developerId: safeId(body.developerId || ''),
+      developerName: cleanText(body.developerName || '', 120)
+    };
+  }
   if (!constantTimeEqual(provided, configured)) {
     const failure = recordPortalKeyFailure(event);
     const error = new Error(failure.lockedUntil
@@ -148,7 +198,6 @@ export function requirePortalKey(event, body = {}) {
     error.statusCode = failure.lockedUntil ? 429 : 401;
     throw error;
   }
-  recordPortalKeySuccess(event);
 }
 
 export function safeFileName(name) {

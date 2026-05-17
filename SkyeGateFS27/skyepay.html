@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyePay | SkyeGateFS27</title>
+  <meta name="description" content="SkyePay is the SkyeGateFS27 free trial, Stripe checkout, and automatic workspace activation route." />
+  <link rel="canonical" href="https://skyesol.netlify.app/skyepay.html" />
+  <link rel="stylesheet" href="assets/skyepay.css" />
+  <script type="importmap">
+  {"imports":{"gsap":"https://esm.sh/gsap@3.15.0","gsap/ScrollTrigger":"https://esm.sh/gsap@3.15.0/ScrollTrigger","lenis":"https://esm.sh/lenis@1.3.23"}}
+  </script>
+  <script src="assets/skyepay.js" defer></script>
+  <script type="module" src="assets/skyepay-motion.mjs" async></script>
+</head>
+<body>
+  <div class="motion-progress" aria-hidden="true"><span id="skypayProgress"></span></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="pay-nav">
+    <a class="pay-brand neon-magnetic" href="index.html" aria-label="Back to SkyeGateFS27">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
+      <span>SkyePay</span>
+    </a>
+    <nav>
+      <a href="#checkout">Checkout</a>
+      <a href="skyepay-store.html">Store</a>
+      <a href="#gate-path">Gate Path</a>
+      <a href="skyepay-admin.html">Ledger</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="pay-hero" id="checkout">
+      <div class="hero-copy">
+        <p class="eyebrow" id="clientEyebrow">Private preview closeout</p>
+        <h1 id="heroTitle"><span class="neon-gradient-text text-effects"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span></span> turns confirmed payment into an automatic workspace unlock.</h1>
+        <p class="lead" id="heroLead">I do not sell brochure pages. I build sovereign technology: full stack apps, integrated artificial intelligence, Stripe-backed checkout, vault limits, and the gate record that keeps each client route controlled.</p>
+        <div class="hero-points" id="heroPoints" aria-label="SkyePay route">
+          <span>$0 today trials</span>
+          <span><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe Checkout</span></span>
+          <span>Vault access limits</span>
+          <span>Workspace unlock</span>
+        </div>
+      </div>
+
+      <section class="checkout-console" aria-labelledby="checkoutTitle">
+        <div class="console-head">
+          <div>
+            <p class="eyebrow">Client lane</p>
+            <h2 id="checkoutTitle">Continue the private app preview</h2>
+          </div>
+          <span class="live-badge" id="proofModeBadge">Stripe backed</span>
+        </div>
+
+        <div class="client-strip">
+          <div>
+            <span class="mini-label">Client</span>
+            <strong id="clientName">Loading...</strong>
+          </div>
+          <div>
+            <span class="mini-label">Free tester access</span>
+            <strong id="trialDays">7 days</strong>
+          </div>
+          <div>
+            <span class="mini-label">Approval</span>
+            <strong>Owner gated</strong>
+          </div>
+        </div>
+
+        <form id="skypayForm" class="pay-form">
+          <label>
+            Your name
+            <input name="customer_name" autocomplete="name" placeholder="Bob" required />
+          </label>
+          <label>
+            Email for receipt
+            <input name="customer_email" type="email" autocomplete="email" placeholder="owner@company.com" required />
+          </label>
+          <label>
+            Company
+            <input name="company_name" autocomplete="organization" placeholder="Bob's Smoke Shop" />
+          </label>
+
+          <div class="offer-select" id="offerSelect" aria-label="SkyePay offers"></div>
+
+          <button class="primary-action neon-magnetic" type="submit" id="checkoutBtn">
+            Start secure trial
+          </button>
+          <p class="fine-print" id="clientSpecial">Free preview first. Confirmed Stripe payment unlocks the workspace automatically.</p>
+        </form>
+        <div class="client-contact" id="clientContact" hidden></div>
+
+        <div class="status-panel" id="statusPanel" hidden>
+          <p class="eyebrow">Payment status</p>
+          <h3 id="statusTitle">Pending</h3>
+          <p id="statusText">SkyePay is checking the gate ledger.</p>
+        </div>
+      </section>
+    </section>
+
+    <section class="usage-band skypay-reveal" id="included">
+      <div>
+        <p class="eyebrow">Included during preview</p>
+        <h2 id="includedTitle">The client gets to feel included before they pay.</h2>
+      </div>
+      <ul id="includedUsage">
+        <li>Private app preview</li>
+        <li>Owner approval before paid activation</li>
+        <li>Workspace handoff after closeout</li>
+      </ul>
+    </section>
+
+    <section class="gate-path skypay-reveal" id="gate-path">
+      <p class="eyebrow" id="gateEyebrow"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeGateFS27</span> route</p>
+      <h2 id="gateTitle">Payment is not the end. It is the gate event that starts controlled activation.</h2>
+      <div class="path-rail" id="pathRail">
+        <article>
+          <span>01</span>
+          <h3>Preview accepted</h3>
+        <p>The client chooses to continue from the private app preview through a controlled app lane instead of a loose external payment link.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Stripe Checkout</h3>
+          <p>SkyePay creates a Checkout Session with approved catalog metadata, zero-up-front trial terms, and no card data touching the app.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Gate ledger</h3>
+          <p>The webhook writes the confirmed payment or trial state into FS27 and unlocks the workspace automatically.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Owner approval</h3>
+          <p>You can still void, audit, or manually correct the workspace from the SkyePay ledger.</p>
+        </article>
+        <article>
+          <span>05</span>
+          <h3>Repo platforms</h3>
+          <p>After live proof, the last lane is wiring the repo platforms into SkyePay as billable app routes.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyePay Ledger | SkyeGateFS27</title>
+  <meta name="description" content="Admin ledger for SkyePay payments, automatic unlocks, exceptions, and workspace status inside SkyeGateFS27." />
+  <link rel="stylesheet" href="assets/skyepay.css" />
+  <script type="importmap">
+  {"imports":{"gsap":"https://esm.sh/gsap@3.15.0","gsap/ScrollTrigger":"https://esm.sh/gsap@3.15.0/ScrollTrigger","lenis":"https://esm.sh/lenis@1.3.23"}}
+  </script>
+  <script src="assets/skyepay-admin.js" defer></script>
+  <script type="module" src="assets/skyepay-motion.mjs" async></script>
+</head>
+<body class="admin-body">
+  <div class="motion-progress" aria-hidden="true"><span id="skypayProgress"></span></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <header class="pay-nav">
+    <a class="pay-brand neon-magnetic" href="index.html">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
+      <span>SkyePay Ledger</span>
+    </a>
+    <nav>
+      <a href="skyepay.html?client=bobs-smoke-shop">Client lane</a>
+      <a href="index.html">FS27</a>
+    </nav>
+  </header>
+
+  <main class="admin-shell">
+    <section class="admin-hero skypay-reveal">
+      <p class="eyebrow">Owner approval console</p>
+      <h1>Confirmed <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> payments unlock workspaces automatically; this ledger handles exceptions.</h1>
+      <p class="lead">SkyePay keeps Stripe, the client decision, the FS27 customer record, and the workspace status in one owner-controlled lane.</p>
+    </section>
+
+    <section class="ledger-login" id="loginPanel">
+      <label>
+        Admin password
+        <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Admin password" />
+      </label>
+      <button class="primary-action neon-magnetic" id="loginBtn" type="button">Open ledger</button>
+      <p class="fine-print">The password is held in memory for this tab only.</p>
+    </section>
+
+    <section class="ledger-panel" id="ledgerPanel" hidden>
+      <div class="console-head">
+        <div>
+          <p class="eyebrow">SkyePay orders</p>
+          <h2>Payment and approval ledger</h2>
+        </div>
+        <button class="secondary-action neon-magnetic" id="refreshLedger" type="button">Refresh</button>
+      </div>
+      <div class="ledger-stats">
+        <div><span>Total</span><strong id="statTotal">0</strong></div>
+        <div><span>Pending</span><strong id="statPending">0</strong></div>
+        <div><span>Approved</span><strong id="statApproved">0</strong></div>
+        <div><span>Unlocked</span><strong id="statUnlocked">0</strong></div>
+      </div>
+      <div class="table-wrap">
+        <table class="ledger-table" id="ledgerTable">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Offer</th>
+              <th>Payment</th>
+              <th>Approval</th>
+              <th>Workspace</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="fine-print" id="ledgerToast">Ready.</p>
+    </section>
+  </main>
+</body>
+</html>

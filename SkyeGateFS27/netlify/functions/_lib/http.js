@@ -3,7 +3,7 @@ export function buildCors(req) {
   const reqOrigin = req.headers.get("origin") || req.headers.get("Origin");
 
   // IMPORTANT: keep this list aligned with whatever headers your apps send.
-  const allowHeaders = "authorization, content-type, x-kaixu-install-id, x-kaixu-request-id, x-kaixu-app, x-kaixu-build, x-admin-password, x-kaixu-error-token, x-kaixu-mode, x-content-sha1, x-setup-secret, x-kaixu-job-secret, x-job-worker-secret";
+  const allowHeaders = "authorization, content-type, x-kaixu-install-id, x-kaixu-request-id, x-kaixu-app, x-kaixu-build, x-admin-password, x-kaixu-error-token, x-kaixu-mode, x-content-sha1, x-setup-secret, x-kaixu-job-secret, x-job-worker-secret, x-fs27-event-secret, x-platform-event-secret";
   const allowMethods = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
 
   const base = {

@@ -1,0 +1,26 @@
+---
+title: "Production ledger captured from Cloudflare source APIs"
+description: "The MCP production record now summarizes Cloudflare Pages, Workers, HTTP checks, and browser proof artifacts."
+date: "2026-05-16"
+tags: ["Ledger", "Cloudflare", "Proof"]
+version: "24"
+---
+
+- **24 live production surfaces** are recorded in the MCP ledger.
+- **13 Cloudflare Pages projects** and **11 Workers** are listed with deployment evidence.
+- **36 HTTP routes** were verified with no failures at capture time.
+- **Proof artifacts** were saved under `test-artifacts/live-deployment-ledger`.
+
+<Accordion type="multiple" collapsible className="w-full not-prose">
+  <AccordionItem value="evidence">
+    <AccordionTrigger>Evidence captured</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>Cloudflare Pages project inventory JSON</li>
+        <li>Cloudflare Workers deployment inventory JSON</li>
+        <li>Live HTTP check receipts</li>
+        <li>CEO contribution map for public sales, edge infrastructure, proof governance, and MCP design capability</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>

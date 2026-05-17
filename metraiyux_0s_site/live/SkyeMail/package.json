@@ -1,0 +1,34 @@
+{
+  "name": "skye-mail-vault",
+  "private": true,
+  "version": "2.3.0",
+  "description": "Skye Mail Vault Command Center \u2014 Gmail-backed dashboard with left rail navigation, drafts, bulk actions, contacts, settings, and thread view",
+  "type": "commonjs",
+  "scripts": {
+    "build:suite": "node tools/build-suite-dist.mjs",
+    "build:cloudflare-routes": "node tools/build-cloudflare-route-indexes.mjs",
+    "build:cloudflare-assets": "node tools/build-cloudflare-assets.mjs",
+    "db:apply": "node tools/apply-neon-schema.mjs",
+    "cloudflare:deploy": "npm run build:cloudflare-assets && node tools/deploy-cloudflare.mjs",
+    "cloudflare:secrets:check": "node tools/sync-cloudflare-secrets.mjs --dry-run",
+    "cloudflare:secrets:push": "node tools/sync-cloudflare-secrets.mjs --apply",
+    "proof:mcp": "node tools/run-mcp-upgrade-proof.mjs",
+    "proof:live-email": "node tools/run-live-proof-demo.mjs",
+    "smoke:standalone-proof": "node smoke/smoke-standalone-proof.mjs",
+    "smoke:proof": "node smoke/smoke-proof.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "bcryptjs": "^2.4.3",
+    "gsap": "^3.12.5",
+    "jsonwebtoken": "^9.0.2",
+    "lenis": "^1.1.18",
+    "motion": "^11.18.2",
+    "pg": "^8.13.0",
+    "svix": "^1.58.0",
+    "three": "^0.164.1"
+  }
+}

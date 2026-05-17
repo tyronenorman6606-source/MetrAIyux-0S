@@ -1,36 +1,31 @@
 # Longform Blog Expansion Manifest
 
-Generated: 2026-05-15T06:56:47.257723Z
+Generated: 2026-05-17T00:00:00.000Z
 
-## Added
+## What Changed
 
-- `blog/index.html` public blog library
-- `blog/blog.css` blog styling
-- `blog/blog-index.json` article metadata
-- `blog/posts/*.html` longform article pages
-- `blog/markdown/*.md` markdown source posts
-- Blog links in homepage, local brain page, persona brains page, and deployment command center where available
-- Blog chunks added into `brain/knowledge-base.json`
+- Rebuilt the MetrAIyux 0S blog as a 28-article content engine.
+- Rebuilt the Skyes Over London Staffing insight hub as a 20-article content engine.
+- Added direct app-room links to every 0S article.
+- Added direct staffing workflow links to every SOL Staffing article.
+- Regenerated markdown sources, HTML pages, blog indexes, and JSON content-engine maps.
+- Added marketing-side content-engine maps for MetrAIyux 0S and SOL Staffing.
 
-## Article Count
+## 0S Collections
 
-12 longform articles.
+- Cabinet Doctrine: 12 articles.
+- APEX Growth: 8 articles.
+- NEXUS Automation: 8 articles.
 
-## Articles
+## Content Engine Rule
 
-- Why a 13-Cabinet Office Gives a Modern Staffing Company More Control — Marcus Vale (Operations Strategy)
-- The Executive Command Cabinet: Founder Vision Without Operational Drift — Gray London Skyes (Founder Doctrine)
-- Account Executives Need More Than Scripts: They Need an Operating System Behind Them — Celeste Monroe (Revenue Operations)
-- Client Success as the Retention Engine of a Cabinet-Led Company — Adrian Cross (Client Success)
-- Finance Discipline for a Service Company That Wants to Scale — Naomi Sterling (Finance Operations)
-- Compliance Routing Without Pretending to Be a Law Firm — Julian Mercer (Compliance & Risk)
-- Building a Workforce Engine Instead of a Resume Pile — Sienna Brooks (Staffing Operations)
-- Technology Should Serve Operations, Not Distract From Them — Orion Hayes (Technology Systems)
-- Marketing a Serious Operations Company Without Overclaiming — Valentina Reyes (Brand Strategy)
-- Government and Enterprise Readiness Starts Before the First Bid — Donovan Pierce (Contract Readiness)
-- Quality Assurance Is the Anti-Theater Layer of the Company — Victor Saint (Quality Assurance)
-- Innovation That Does Not Break the Company — Amara Voss (Expansion & Innovation)
+Every public article should do four jobs:
+
+1. Teach a real operating problem.
+2. Route the reader into direct app surfaces.
+3. State the proof or boundary rule.
+4. Feed sales, local brain retrieval, social, campaigns, and website copy.
 
 ## Use Warning
 
-These articles are demonstrative thought leadership assets. Replace fictional personnel references and verify all public claims before production/legal/government use.
+These articles are operating and marketing assets. Verify public claims before legal, regulated, investor, certification, or government use.

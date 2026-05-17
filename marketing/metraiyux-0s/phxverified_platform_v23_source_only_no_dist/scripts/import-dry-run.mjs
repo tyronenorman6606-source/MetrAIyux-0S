@@ -1,0 +1,24 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const ROOT = path.resolve(path.dirname(__filename), '..');
+const result = spawnSync(process.execPath, ['scripts/build.mjs', '--data-only'], { cwd:ROOT, stdio:'inherit' });
+if(result.status !== 0) process.exit(result.status || 1);
+const readJson = async rel => JSON.parse(await fs.readFile(path.join(ROOT, 'dist', rel), 'utf8'));
+const dry = await readJson('data/import-dry-run.json');
+const report = await readJson('seed-report.json');
+console.log('\nPHX Verified import dry-run summary');
+console.log(`Raw records: ${dry.raw_records}`);
+console.log(`Would publish: ${dry.would_publish}`);
+console.log(`Exact duplicate collisions: ${dry.exact_duplicate_collisions}`);
+console.log(`Possible duplicate pairs: ${dry.possible_duplicate_pairs}`);
+console.log(`Suppressed records: ${dry.suppressed_records}`);
+console.log(`Rejection candidates: ${dry.rejection_candidates}`);
+console.log(`Poster risk records: ${dry.poster_risk_records}`);
+console.log(`Safe to publish: ${dry.safe_to_publish ? 'yes' : 'review required'}`);
+console.log(`Seed files loaded: ${report.files.loaded}`);
+console.log('Review dist/data/import-dry-run.json, dist/data/import-rejections.json, dist/data/duplicate-report.json, and dist/data/poster-risk-index.json before deploy.');
+if(!dry.safe_to_publish) process.exitCode = 2;

@@ -1,0 +1,267 @@
+.skyesol-living-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.skyesol-grain,
+.skyesol-scanline {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.skyesol-grain {
+  z-index: 1;
+  opacity: .1;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E");
+}
+
+.skyesol-scanline {
+  z-index: 10;
+  opacity: .045;
+  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.22), rgba(255,255,255,.22) 1px, transparent 1px, transparent 6px);
+}
+
+.skyesol-living-page {
+  --ink: rgba(255,248,231,.94);
+  --text: rgba(255,248,231,.94);
+  --muted: rgba(255,248,231,.68);
+  --paper: rgba(5,5,11,.94);
+  --wash: rgba(8,10,18,.82);
+  --glass: rgba(8,10,18,.76);
+  --glass-strong: rgba(6,8,14,.92);
+  --panel: rgba(8,10,18,.76);
+  --stroke: rgba(97,246,255,.2);
+  --line: rgba(97,246,255,.2);
+  --shadow: 0 24px 80px rgba(0,0,0,.46), 0 0 34px rgba(97,246,255,.08);
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(5,5,11,.94), rgba(3,3,7,.98)),
+    radial-gradient(1200px 760px at 14% 4%, rgba(138,99,255,.2), transparent 58%),
+    radial-gradient(1100px 760px at 82% 16%, rgba(39,242,255,.12), transparent 58%),
+    radial-gradient(900px 660px at 55% 92%, rgba(201,168,76,.12), transparent 60%);
+}
+
+.skyesol-living-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.028) 0 1px, transparent 1px 120px),
+    linear-gradient(30deg, rgba(39,242,255,.035), transparent 38%, rgba(201,168,76,.026));
+  opacity: .8;
+}
+
+.skyesol-living-page > :not(.skyesol-living-field):not(.skyesol-grain):not(.skyesol-scanline):not(.scroll-progress):not(.cursor-trail):not(.scanline):not(.site-nav) {
+  position: relative;
+  z-index: 2;
+}
+
+.skyesol-living-page .site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.skyesol-living-page .scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+}
+
+.skyesol-living-page .cursor-trail,
+.skyesol-living-page .scanline {
+  position: fixed;
+}
+
+.skyesol-living-page.motion-paused *,
+.skyesol-living-page.motion-paused *::before,
+.skyesol-living-page.motion-paused *::after {
+  animation-play-state: paused !important;
+  transition-duration: .01ms !important;
+}
+
+.skyesol-living-page .topbar,
+.skyesol-living-page .site-nav,
+.skyesol-living-page .topbar .nav,
+.skyesol-living-page .rail,
+.skyesol-living-page .card,
+.skyesol-living-page .surface,
+.skyesol-living-page .price-card,
+.skyesol-living-page .release-card,
+.skyesol-living-page .proof-item,
+.skyesol-living-page .step,
+.skyesol-living-page .stat,
+.skyesol-living-page .rail-card {
+  backdrop-filter: blur(18px);
+}
+
+.skyesol-living-page h1,
+.skyesol-living-page h2,
+.skyesol-living-page h3,
+.skyesol-living-page .brand,
+.skyesol-living-page .brand span,
+.skyesol-living-page .surface-bar strong,
+.skyesol-living-page .mail-row b,
+.skyesol-living-page .proof-item b,
+.skyesol-living-page .step b,
+.skyesol-living-page .price-card b,
+.skyesol-living-page .release-card b,
+.skyesol-living-page .stat b,
+.skyesol-living-page .rail-title {
+  color: var(--text);
+}
+
+.skyesol-living-page h1,
+.skyesol-living-page .hero h1,
+.skyesol-living-page .brand span {
+  color: transparent;
+  background:
+    linear-gradient(100deg, rgba(255,248,231,.98) 0%, rgba(201,168,76,.95) 28%, rgba(97,246,255,.96) 50%, rgba(255,248,231,.98) 72%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 0 34px rgba(97,246,255,.12), 0 0 28px rgba(201,168,76,.1);
+  animation: skyesolTextSweep 10s ease-in-out infinite;
+}
+
+.skyesol-living-page .lead,
+.skyesol-living-page .sub,
+.skyesol-living-page .mini,
+.skyesol-living-page .mail-row span,
+.skyesol-living-page .proof-item span,
+.skyesol-living-page .step span,
+.skyesol-living-page .feature-list li,
+.skyesol-living-page .notice-strip,
+.skyesol-living-page .footer,
+.skyesol-living-page .footer a,
+.skyesol-living-page label,
+.skyesol-living-page small {
+  color: var(--muted);
+}
+
+.skyesol-living-page .site-nav,
+.skyesol-living-page .topbar,
+.skyesol-living-page .footer {
+  background: rgba(5,3,11,.76);
+  border-color: rgba(97,246,255,.18);
+}
+
+.skyesol-living-page .nav-links a,
+.skyesol-living-page .pill,
+.skyesol-living-page .btn,
+.skyesol-living-page .button,
+.skyesol-living-page .linkbtn {
+  background: rgba(8,10,18,.74);
+  border-color: rgba(97,246,255,.28);
+  color: var(--text);
+}
+
+.skyesol-living-page .card,
+.skyesol-living-page .surface,
+.skyesol-living-page .price-card,
+.skyesol-living-page .release-card,
+.skyesol-living-page .proof-item,
+.skyesol-living-page .step,
+.skyesol-living-page .stat,
+.skyesol-living-page .rail-card,
+.skyesol-living-page .mail-row,
+.skyesol-living-page .notice {
+  background: linear-gradient(180deg, rgba(8,10,18,.78), rgba(6,8,14,.92));
+  border-color: rgba(97,246,255,.2);
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+.skyesol-living-page .price-card.active,
+.skyesol-living-page .release-card.current {
+  border-color: rgba(201,168,76,.6);
+  background: linear-gradient(180deg, rgba(14,16,24,.86), rgba(6,8,14,.94));
+}
+
+.skyesol-living-page input,
+.skyesol-living-page textarea,
+.skyesol-living-page select {
+  color: var(--text);
+  background: rgba(3,5,10,.76);
+  border-color: rgba(97,246,255,.22);
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 760px) {
+  .skyesol-scanline {
+    opacity: .028;
+  }
+
+  .skyesol-grain {
+    opacity: .065;
+  }
+
+  .skyesol-living-page h1,
+  .skyesol-living-page .hero h1,
+  .skyesol-living-page .brand span {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+@keyframes skyesolTextSweep {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Magic UI text highlighter treatment */
+.magic-highlighter,
+.magic-highlight,
+.magic-underline,
+[data-highlight] {
+  --highlighter-color: #87cefa;
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.magic-highlighter[data-highlight="highlight"],
+.magic-highlight,
+[data-highlight="highlight"] {
+  border-radius: .18em;
+  padding: 0 .12em;
+  background:
+    linear-gradient(104deg,
+      transparent .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) calc(100% - .08em),
+      transparent calc(100% - .08em));
+  text-shadow: 0 .08em .22em rgba(0, 0, 0, .16);
+}
+
+.magic-highlighter[data-highlight="underline"],
+.magic-underline,
+[data-highlight="underline"] {
+  text-decoration-line: underline;
+  text-decoration-color: var(--highlighter-color);
+  text-decoration-thickness: .16em;
+  text-underline-offset: .13em;
+  text-decoration-skip-ink: none;
+}
+
+@supports not (color: color-mix(in srgb, white 50%, transparent)) {
+  .magic-highlighter[data-highlight="highlight"],
+  .magic-highlight,
+  [data-highlight="highlight"] {
+    background: linear-gradient(104deg, transparent .08em, var(--highlighter-color) .08em, var(--highlighter-color) calc(100% - .08em), transparent calc(100% - .08em));
+  }
+}
+

@@ -1,0 +1,26 @@
+---
+title: "SkyeGateFS27 / SkyePay store deployed with live Stripe handoff"
+description: "SkyePay production now exposes Stripe-backed offers and a simplified private tester lane."
+date: "2026-05-17"
+tags: ["SkyePay", "Stripe", "Gateway"]
+version: "61"
+---
+
+- **61 Stripe-backed offers** are exposed by the public store.
+- **Live Stripe Checkout** handoff was verified with a `cs_live` session.
+- **Bob's private tester lane** is simplified to a free tester-week handoff.
+- **Owner approval and payment state** stay inside the FS27 production flow.
+
+<Accordion type="multiple" collapsible className="w-full not-prose">
+  <AccordionItem value="handoff">
+    <AccordionTrigger>Production handoff</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>Checkout prefers live Stripe Price lookup keys.</li>
+        <li>Metadata-preserving fallback remains available.</li>
+        <li>Desktop, mobile, store, and Stripe screenshots were saved.</li>
+        <li>Verified proof JSON lives under `test-artifacts/skyepay-live-production`.</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>

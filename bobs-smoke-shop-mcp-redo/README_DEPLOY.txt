@@ -1,4 +1,4 @@
-Bob's Smoke Shop Website v6
+Bob's Smoke Shop App v6
 
 Deploy the contents of this folder to Netlify or any static host.
 Keep index.html at the root.

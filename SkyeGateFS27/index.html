@@ -233,7 +233,7 @@
     <div class="intro-scanner"></div>
     <div class="intro-terminal" id="kAIxU-intro-terminal">
       &gt; SECURE CONNECTION ESTABLISHED<br />
-      &gt; ROUTING TO SKYEGATEFS27... [OK]<br />
+      &gt; ROUTING TO <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SKYEGATEFS27</span>... [OK]<br />
       &gt; INITIALIZING SOVEREIGN CONTROL PLANE... [OK]<br />
       &gt; LOADING DELUXE GATEWAY FABRIC v13.0<br />
       &gt; DECRYPTING VENDOR LEDGER... [OK]<br />
@@ -294,6 +294,7 @@
             <option value="focus">Focus</option>
           </select>
         </div>
+        <a class="btn ghost" href="skyepay.html?client=bobs-smoke-shop">SkyePay</a>
         <button id="gatewayBaseBtn" class="btn ghost" type="button" title="Switch which gateway this dashboard calls" style="display:none;">Gateway Base</button>
         <button id="logoutBtn" class="btn danger" style="display:none;">Logout</button>
       </div>
@@ -313,6 +314,7 @@
         <p class="muted small">Looking for access? <a href="/kAIxu/RequestKaixuAPIKey.html" style="color:#ffd36a;">Request a gate key →</a></p>
         <p class="muted small">Already have a key? <a href="/gateway/dashboard.html" style="color:#27f2ff;">Open User Dashboard →</a></p>
         <p class="muted small">Need the public fuel-and-asset hub? <a href="/skyefuelstation/" style="color:#8fffd1;">Open SkyeFuelStation →</a></p>
+        <p class="muted small">Closing a private preview? <a href="skyepay.html?client=bobs-smoke-shop" style="color:#f6c14b;">Open <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> →</a></p>
       </div>
     </section>
 
@@ -325,6 +327,7 @@
         <button class="tab" data-tab="pricing">Pricing Catalog</button>
         <button class="tab" data-tab="station">Fuel Station</button>
         <button class="tab" data-tab="platforms">Platform Control</button>
+        <a class="tab" href="skyepay-admin.html">SkyePay Ledger</a>
         <button class="tab" data-tab="vendors">Vendors &amp; Vault</button>
         <button class="tab" data-tab="repoenv">Ultimate Env Contract</button>
         <button class="tab" data-tab="billing">Billing &amp; Controls</button>
@@ -587,10 +590,13 @@
             <div class="metric"><div class="muted small">Priced models</div><div id="pricingModelCount" style="font-size:24px;font-weight:800;">—</div></div>
             <div class="metric"><div class="muted small">Used this month</div><div id="pricingUsedCount" style="font-size:24px;font-weight:800;">—</div></div>
             <div class="metric"><div class="muted small">Unpriced usage rows</div><div id="pricingUnpricedCount" style="font-size:24px;font-weight:800;">—</div></div>
+            <div class="metric"><div class="muted small">Month bill</div><div id="pricingMonthBill" style="font-size:24px;font-weight:800;">—</div></div>
+            <div class="metric"><div class="muted small">Upstream est.</div><div id="pricingUpstreamCost" style="font-size:24px;font-weight:800;">—</div></div>
+            <div class="metric"><div class="muted small">Gross margin</div><div id="pricingGrossMargin" style="font-size:24px;font-weight:800;">—</div></div>
           </div>
           <div class="tablewrap" style="margin-top:14px;">
-            <table class="table" id="pricingCatalogTable" style="min-width:1100px;">
-              <thead><tr><th>Provider</th><th>Model</th><th>Input / 1M</th><th>Output / 1M</th><th>Calls</th><th>Month cost</th></tr></thead>
+            <table class="table" id="pricingCatalogTable" style="min-width:1650px;">
+              <thead><tr><th>Provider</th><th>Model</th><th>Bill input / 1M</th><th>Bill output / 1M</th><th>Upstream input / 1M</th><th>Upstream output / 1M</th><th>Margin</th><th>Calls</th><th>Month bill</th><th>Upstream est.</th><th>Gross margin</th><th>Status</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -727,8 +733,24 @@
               <div class="value" id="pcCohortSeats">0</div>
             </div>
             <div class="stat">
-              <div class="label">Mail desk threads</div>
+              <div class="label">Mirror rows</div>
               <div class="value" id="pcMailThreads">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Mirrored actions</div>
+              <div class="value" id="pcMirroredActions">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Billable actions</div>
+              <div class="value" id="pcBillableActions">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">AI usage events</div>
+              <div class="value" id="pcAiUsageEvents">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">AI metered</div>
+              <div class="value" id="pcAiMetered">$0.00</div>
             </div>
             <div class="stat">
               <div class="label">Attention lanes</div>
@@ -746,6 +768,15 @@
               <div class="label">Backup brain</div>
               <div class="value" id="pcBackupBrain">off</div>
             </div>
+          </div>
+
+          <div class="card fs27-visual-card" style="margin-top:16px;">
+            <div class="cardhead">
+              <h3 style="margin:0;">0S Visual Mirror</h3>
+              <span id="pcVisualState" class="pill">waiting</span>
+            </div>
+            <p class="muted small">FS27 turns mirrored 0S events into visible operating state: customer actions, billable usage, sovereign stack lanes, AI metering, and active accounts.</p>
+            <div class="fs27-visual-bars" id="pcVisualBars" aria-label="FS27 visual mirror bars"></div>
           </div>
 
           <p class="muted small" id="pcStorageState" style="margin-top:10px;">Load platform control to inspect which separate surfaces are connected to SkyeGateFS27 and which ones are only linked by route.</p>
@@ -1083,7 +1114,7 @@
 
             <div class="card">
               <h3 style="margin-top:0;">Top-ups</h3>
-              <p class="muted small">Manual top-ups credit <code>extra_cents</code>. Stripe checkout requires Stripe env vars + webhook.</p>
+              <p class="muted small">Manual top-ups credit <code>extra_cents</code>. <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe checkout</span> requires Stripe env vars + webhook.</p>
               <div class="row" style="flex-wrap:wrap;">
                 <input id="topupCents" placeholder="amount_cents" style="max-width:180px;" />
                 <button id="manualTopupBtn" class="btn ghost">Manual top-up</button>
@@ -1792,6 +1823,7 @@ data: {"usage":{"input_tokens":12,"output_tokens":18,"cost_cents":1},"month":{"m
             </div>
 
             <p class="muted small" id="platformEventSummary" style="margin-top:10px;">Load platform history to inspect mirrored auth, AI, push, billing, voice, workspace, and org-level gate events.</p>
+            <div class="fs27-visual-bars" id="platformEventLaneVisual" aria-label="Platform event lane visual"></div>
 
             <div class="tablewrap" style="margin-top:10px;">
               <table class="table" id="platformEventsTable">
@@ -1812,7 +1844,7 @@ data: {"usage":{"input_tokens":12,"output_tokens":18,"cost_cents":1},"month":{"m
           </div>
 
           <p class="muted small" style="margin-top:10px;">
-            Tip: tag your apps with headers <span style="font-family:var(--mono);">x-kaixu-app</span> and <span style="font-family:var(--mono);">x-kaixu-build</span>. For client-side errors (before the request hits the gateway), POST to <span style="font-family:var(--mono);">/.netlify/functions/client-error-report</span>.
+            Tip: tag your apps with headers <span style="font-family:var(--mono);">x-<span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">kaixu</span>-app</span> and <span style="font-family:var(--mono);">x-kaixu-build</span>. For client-side errors (before the request hits the gateway), POST to <span style="font-family:var(--mono);">/.netlify/functions/client-error-report</span>.
           </p>
         </div>
 

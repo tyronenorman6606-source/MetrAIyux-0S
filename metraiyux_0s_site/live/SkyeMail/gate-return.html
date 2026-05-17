@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Returning From SkyeGate - SkyeMail</title>
+  <script src="assets/app.js"></script>
+  <style>
+    :root { --gold:#d4af37; --ok:#0a7a3d; --danger:#b00020; --muted:rgba(18,18,18,.68); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: rgba(18,18,18,.94);
+      background:
+        radial-gradient(900px 520px at 20% 10%, rgba(212,175,55,.24), transparent 60%),
+        radial-gradient(800px 520px at 80% 20%, rgba(52,212,255,.13), transparent 58%),
+        linear-gradient(160deg, #fffaf0, #fff2cc);
+    }
+    .card {
+      width: min(720px, calc(100vw - 32px));
+      border: 1px solid rgba(120,90,20,.2);
+      background: rgba(255,255,255,.78);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 22px 70px rgba(0,0,0,.12);
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 56px); line-height: 1; letter-spacing: 0; }
+    p { color: var(--muted); line-height: 1.6; }
+    .badge { display:inline-flex; padding:8px 10px; border-radius:999px; border:1px solid rgba(212,175,55,.45); background:rgba(212,175,55,.14); font-weight:800; font-size:12px; margin-bottom:12px; }
+    .status { margin-top: 14px; font-weight: 800; color: var(--muted); }
+    .ok { color: var(--ok); }
+    .bad { color: var(--danger); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="badge">SkyeGate FS27 return bridge</div>
+    <h1>Linking the gate card to <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span>.</h1>
+    <p>The FS27 card is being introspected by SkyeMail. Once accepted, the mailbox claim moves into onboarding and the inbox opens under the same identity.</p>
+    <p class="mono" id="claimText"></p>
+    <div class="status" id="status">Reading gate card claim...</div>
+  </main>
+  <script>
+  (async function(){
+    const status = document.getElementById("status");
+    const claimText = document.getElementById("claimText");
+    function set(msg, cls) { status.textContent = msg; status.className = `status ${cls || ""}`; }
+    function readHash() {
+      const raw = location.hash.startsWith("#") ? location.hash.slice(1) : location.hash;
+      return new URLSearchParams(raw);
+    }
+    try {
+      const h = readHash();
+      const token = String(h.get("fs27_token") || "").trim();
+      if (!token) throw new Error("Missing FS27 token from the gate.");
+      const claim = {
+        source: "skyegatefs27",
+        gate_card_id: h.get("gate_card_id") || "",
+        skye_id_number: h.get("skye_id_number") || "",
+        email: h.get("mailbox_email") || "",
+        mailbox: {
+          requested_email: h.get("mailbox_email") || "",
+          local_part: h.get("mailbox_local_part") || "",
+          domain: h.get("mailbox_domain") || ""
+        },
+        profile: {
+          display_name: h.get("display_name") || "",
+          gate_email: h.get("gate_email") || ""
+        }
+      };
+      claimText.textContent = `${claim.profile.display_name || "Gate user"} -> ${claim.mailbox.requested_email || "mailbox pending"}`;
+      localStorage.setItem("SMV_ONBOARDING_CLAIM", JSON.stringify(claim));
+      localStorage.setItem("skye0s.skyemail.claim.v1", JSON.stringify(claim));
+      set("Asking SkyeMail to accept the FS27 session...", "");
+      const data = await apiFetch("/auth-fs27-session", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ claim })
+      });
+      setToken(data.token);
+      setHandle(data.handle);
+      localStorage.setItem("SMV_SKYEMAIL_ID", data.skymail_id || "");
+      localStorage.setItem("SMV_WORKSPACE_ID", data.workspace_id || "");
+      localStorage.setItem("SMV_FS27_GATE_CARD_ID", data.fs27?.gate_card_id || claim.gate_card_id || "");
+      set("FS27 accepted. Opening SkyeMail onboarding...", "ok");
+      setTimeout(() => window.SMVRuntime.redirect("onboarding.html", { gate_return: "1" }), 700);
+    } catch (err) {
+      set(err.message || "Gate return failed.", "bad");
+    }
+  })();
+  </script>
+</body>
+</html>

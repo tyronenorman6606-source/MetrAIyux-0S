@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest } from "./_lib/http.js";
 import { audit } from "./_lib/audit.js";
@@ -73,6 +74,14 @@ export default wrap(async (req) => {
       expires_at: session.expires_at,
       session_id: session.session_id
     },
+    gate_card: gateCard({
+      sub: user.id,
+      email: user.email,
+      customerId: customer.id,
+      role: user.role || "user",
+      sessionId: session.session_id,
+      scope: session.scope
+    }),
     refresh_token: refresh.token,
     verification: {
       required: true,
@@ -81,3 +90,22 @@ export default wrap(async (req) => {
     }
   }, cors);
 });
+
+function gateCard({ sub, email, customerId, role, sessionId, scope = [] }) {
+  const seed = [sub, email, customerId].filter(Boolean).join("|") || crypto.randomUUID();
+  const digest = crypto.createHash("sha256").update(seed).digest("hex").slice(0, 20);
+  return {
+    id: `gate_basic_${digest}`,
+    type: "basic_gate_card",
+    status: "active",
+    principal: "session",
+    sub,
+    email,
+    customer_id: customerId,
+    role,
+    session_id: sessionId,
+    scope,
+    usage_required: false,
+    reloadable: true
+  };
+}

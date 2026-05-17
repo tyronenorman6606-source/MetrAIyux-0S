@@ -1,1 +1,0 @@
-export { default } from "../../Platforms-Apps-Infrastructure/2026/FounderTechPro /AE-ContractorNetwork/AE Contractor Network/contractor income verification drop in/netlify/functions/contractor-income-export.mjs";

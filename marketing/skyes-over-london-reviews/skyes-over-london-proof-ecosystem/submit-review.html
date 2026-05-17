@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leave a Review - Skyes Over London Reviews</title>
+  <meta name="description" content="Submit a Skyes Over London review into the 0S QA queue for proof-wall publishing." />
+  <link rel="stylesheet" href="assets/proof-ecosystem.css" />
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="Skyes Over London review intake navigation">
+      <a href="index.html">Proof Hub</a>
+      <a href="skyes-over-london-reviews-expanded.html">Review Wall</a>
+      <a href="submit-review.html" class="active">Leave a Review</a>
+    </nav>
+
+    <section class="hero">
+      <p class="eyebrow">Live Review Intake</p>
+      <h2><span>Leave a <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London</span> Review</span></h2>
+      <p class="hero-copy">
+        Your review goes into the 0S QA queue first. Once it is reviewed and grouped with five approved new reviews, it can be published into the public proof wall.
+      </p>
+      <div class="metrics">
+        <div class="metric"><b>1</b><span>client submission recorded.</span></div>
+        <div class="metric"><b>0S</b><span>operator QA before public use.</span></div>
+        <div class="metric"><b>5</b><span>approved reviews required for a production batch.</span></div>
+        <div class="metric"><b>Live</b><span>Cloudflare queue when KV is bound.</span></div>
+      </div>
+    </section>
+
+    <section class="section live-review-layout">
+      <div>
+        <p class="eyebrow">Review Form</p>
+        <h2>Send real proof into the wall.</h2>
+        <p class="section-lede">
+          Two to four sentences is enough. The review will not be added to the public wall until it has passed 0S QA.
+        </p>
+      </div>
+
+      <form class="live-review-form" data-live-review-form>
+        <input class="hidden" name="website" tabindex="-1" autocomplete="off" />
+        <label>
+          Name
+          <input name="reviewerName" autocomplete="name" required />
+        </label>
+        <label>
+          Email
+          <input name="reviewerEmail" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          Role / title
+          <input name="role" placeholder="Business owner, operator, founder..." />
+        </label>
+        <label>
+          Company
+          <input name="company" autocomplete="organization" />
+        </label>
+        <label>
+          Service lane
+          <select name="service" required>
+            <option>Website Development</option>
+            <option>Staffing Solutions / AE Network</option>
+            <option>Automation</option>
+            <option>AI Systems / Local Brain</option>
+            <option>Deployment Support</option>
+            <option>Client Portals / Upload Flow</option>
+            <option>Government Contracting Readiness</option>
+            <option>Business Operations</option>
+            <option>Local SEO</option>
+            <option>Sales Funnels / Pitch Engines</option>
+            <option>Brand Strategy</option>
+          </select>
+        </label>
+        <label>
+          Rating
+          <select name="rating">
+            <option value="5">5 stars</option>
+            <option value="4">4 stars</option>
+            <option value="3">3 stars</option>
+            <option value="2">2 stars</option>
+            <option value="1">1 star</option>
+          </select>
+        </label>
+        <label class="wide-field">
+          Review
+          <textarea name="reviewText" rows="7" minlength="40" required placeholder="What problem did Skyes Over London help with? What changed after the work?"></textarea>
+        </label>
+        <label class="wide-field">
+          Proof notes for 0S QA
+          <textarea name="proofNotes" rows="3" placeholder="Optional: project name, service date, what can be verified, or anything that should stay private."></textarea>
+        </label>
+        <label class="check-field wide-field">
+          <input name="publicNameConsent" type="checkbox" />
+          My name may appear publicly with the review after QA.
+        </label>
+        <label class="check-field wide-field">
+          <input name="publicCompanyConsent" type="checkbox" />
+          My company may appear publicly with the review after QA.
+        </label>
+        <label class="check-field wide-field">
+          <input name="consent" type="checkbox" required />
+          I confirm this is my review and Skyes Over London may review it for possible public proof-wall use.
+        </label>
+        <div class="submission-controls wide-field">
+          <button type="submit">Submit to 0S QA</button>
+          <button type="button" data-export-offline-reviews>Export Local Queue</button>
+        </div>
+        <p class="submission-status wide-field" data-review-submit-status aria-live="polite">Ready for review submission.</p>
+        <p class="local-queue-note wide-field">Local unsynced reviews on this device: <b data-offline-review-count>0</b></p>
+      </form>
+    </section>
+  </main>
+  <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
+  <script type="module" src="assets/proof-three-scene.js"></script>
+  <script src="assets/proof-ecosystem.js"></script>
+  <script src="assets/review-submissions.js"></script>
+</body>
+</html>

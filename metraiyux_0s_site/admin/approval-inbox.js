@@ -10,6 +10,7 @@ const ApprovalInbox = (() => {
   const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function endpoint(){return localStorage.getItem('adminBrainEndpoint')||defaultWorkerOrigin;}
   function token(){return sessionStorage.getItem('adminBrainToken')||'';}
+  function authHeaders(extra={}){return window.SkygateAuthBridge?.authHeaders ? window.SkygateAuthBridge.authHeaders(extra) : {...extra, ...(token()?{'authorization':`Bearer ${token()}`}: {})};}
   function renderStatus(){
     const gateReady = window.SkygateAuthBridge?.token?.() ? 'FS27 token loaded' : 'FS27 token not loaded';
     if($('approvalStatus')) $('approvalStatus').innerHTML=`<span class="status-pill">${endpoint()?'Cloudflare Worker mode':'Browser-local mode'}</span><span class="status-pill">${gateReady}</span><span class="status-pill">Resend notifications supported</span><span class="status-pill">Approval gates active</span>`;
@@ -31,20 +32,20 @@ const ApprovalInbox = (() => {
     const approval={id:'approval_'+Date.now(),item_id,decision,approver:'admin',notes,created_at:now()};
     const arr=get(approvalKey); arr.unshift(approval); set(approvalKey,arr.slice(0,500));
     if(endpoint()){
-      try{await fetch(endpoint().replace(/\/$/,'')+'/api/admin/approval',{method:'POST',headers:{'content-type':'application/json','authorization':token()?`Bearer ${token()}`:''},body:JSON.stringify(approval)});}catch(e){console.warn(e)}
+      try{await fetch(endpoint().replace(/\/$/,'')+'/api/admin/approval',{method:'POST',headers:authHeaders({'content-type':'application/json'}),body:JSON.stringify(approval)});}catch(e){console.warn(e)}
     }
     render();
   }
   async function loadLedger(){
     if(!endpoint()) return alert('Set Worker endpoint first.');
-    const res=await fetch(endpoint().replace(/\/$/,'')+'/api/admin/ledger',{headers:{'authorization':token()?`Bearer ${token()}`:''}}); const json=await res.json();
+    const res=await fetch(endpoint().replace(/\/$/,'')+'/api/admin/ledger',{headers:authHeaders()}); const json=await res.json();
     if(!res.ok || json.error) throw new Error(json.error || `Worker returned ${res.status}`);
     const rows=(json.ledger||[]).map(r=>{try{return {...JSON.parse(r.payload), id:JSON.parse(r.payload).id||r.id, created_at:r.created_at, type:r.type}}catch(e){return r}});
     set(ledgerKey, rows.concat(get(ledgerKey)).slice(0,500)); render();
   }
   async function sendTestEmail(){
     const box=$('emailTestResult'); if(!endpoint()) {box.innerHTML='<p class="warning">Set Worker endpoint first.</p>'; return;}
-    try{const res=await fetch(endpoint().replace(/\/$/,'')+'/api/admin/approval-email/test',{method:'POST',headers:{'content-type':'application/json','authorization':token()?`Bearer ${token()}`:''},body:JSON.stringify({message:'Test approval email from Admin Approval Inbox.'})}); const j=await res.json(); box.innerHTML=`<pre>${esc(JSON.stringify(j,null,2))}</pre>`;}catch(e){box.innerHTML=`<p class="warning">${esc(e.message)}</p>`;}
+    try{const res=await fetch(endpoint().replace(/\/$/,'')+'/api/admin/approval-email/test',{method:'POST',headers:authHeaders({'content-type':'application/json'}),body:JSON.stringify({message:'Test approval email from Admin Approval Inbox.'})}); const j=await res.json(); box.innerHTML=`<pre>${esc(JSON.stringify(j,null,2))}</pre>`;}catch(e){box.innerHTML=`<p class="warning">${esc(e.message)}</p>`;}
   }
   function exportAll(){const data={exported_at:now(),approvals:get(approvalKey),pending:queueItems()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='admin-approval-inbox-export-'+Date.now()+'.json';a.click();URL.revokeObjectURL(a.href)}
   function boot(){renderStatus();render();$('saveEndpoint')?.addEventListener('click',()=>{const v=$('endpointInput').value.trim(); if(v)localStorage.setItem('adminBrainEndpoint',v); else localStorage.removeItem('adminBrainEndpoint'); renderStatus();});$('saveToken')?.addEventListener('click',async()=>{if(window.SkygateAuthBridge){await window.SkygateAuthBridge.saveTokenFromInput('tokenInput','skygateAuthStatus');}else{sessionStorage.setItem('adminBrainToken',$('tokenInput').value.trim());} renderStatus();});$('submitApproval')?.addEventListener('click',()=>record($('manualItem').value.trim(),$('manualDecision').value,$('manualNotes').value));$('loadLedger')?.addEventListener('click',()=>loadLedger().catch(e=>alert(e.message)));$('sendTestEmail')?.addEventListener('click',sendTestEmail);$('exportApprovals')?.addEventListener('click',exportAll);$('clearLocalApprovals')?.addEventListener('click',()=>{localStorage.removeItem(approvalKey);render();});}

@@ -44,7 +44,7 @@ Latest repair:
 - Encoded the real browser-action recording to `assets/screenshots/sol-surface-reel.mp4`.
 - Added a poster frame from the recording at `assets/screenshots/sol-proof-workflow-poster.png`.
 - Saved the action-path proof report at `/workspaces/MetrAIyux-0S/test-artifacts/sol-real-e2e-proof/sol-staffing-real-workflow-proof.json`.
-- Added `assets/proof/sol-video-proof-manifest.json` so the marketing site carries its own receipt tying the video back to `/workspaces/MetrAIyux-0S/unpacked-projects/sol_staffing_agency_site`.
+- Added `assets/proof/sol-video-proof-manifest.json` so the marketing site carries its own receipt tying the video back to `/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/sol_staffing_agency_site`.
 - Linked the manifest to browser playback verification: `readyState >= 2`, `currentTime > 0`, `paused === false`, and visible in viewport on desktop and mobile.
 
 ## Recorded Action Path

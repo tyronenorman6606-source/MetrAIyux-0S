@@ -187,6 +187,7 @@ const PRIVATE_SOURCE_PATHS = [
   /(^|\/)\.env(?:\.[^/]+)?$/i,
   /^\/cloudflare(?:\/|$)/i,
   /^\/cloudflare-[^/]+(?:\/|$)/i,
+  /^\/MCP_TOOLING_RECEIPT\.(?:json|md)$/i,
   /^\/wrangler(?:\.[^/]+)?\.toml$/i,
   /^\/_(?:headers|redirects)$/i,
   /\/wrangler(?:\.[^/]+)?\.toml$/i,
@@ -194,7 +195,12 @@ const PRIVATE_SOURCE_PATHS = [
   /\/schema\.sql$/i,
   /\/README(?:_[^/]+)?\.md$/i
 ];
+function isPublicCloudflareDocPath(pathname) {
+  return /^\/cloudflare\/?$/i.test(pathname) ||
+    /^\/cloudflare\/(?:index|crown-worker|nexus-worker)(?:\.html)?$/i.test(pathname);
+}
 function isPrivateSourcePath(pathname) {
+  if (isPublicCloudflareDocPath(pathname)) return false;
   return PRIVATE_SOURCE_PATHS.some(pattern => pattern.test(pathname));
 }
 function privateSourceResponse() {

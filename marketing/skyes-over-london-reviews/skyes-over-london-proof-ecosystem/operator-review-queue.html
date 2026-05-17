@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0S Review QA Queue - Skyes Over London Reviews</title>
+  <meta name="description" content="0S QA queue for Skyes Over London live review submissions." />
+  <link rel="stylesheet" href="assets/proof-ecosystem.css" />
+</head>
+<body>
+  <main class="page" data-review-qa-shell>
+    <nav class="nav" aria-label="0S review QA navigation">
+      <a href="index.html">Proof Hub</a>
+      <a href="skyes-over-london-reviews-expanded.html">Review Wall</a>
+      <a href="submit-review.html">Client Intake</a>
+      <a href="operator-review-queue.html" class="active">0S QA Queue</a>
+    </nav>
+
+    <section class="hero">
+      <p class="eyebrow">0S Review QA</p>
+      <h2><span>Moderate before the wall speaks.</span></h2>
+      <p class="hero-copy">
+        Approve real client reviews here. When five approved reviews are ready, mark the batch for production and export it for the static wall publish script.
+      </p>
+      <div class="actions">
+        <button type="button" data-load-review-queue>Load Queue</button>
+        <button type="button" data-mark-review-batch-ready>Mark Five-Review Batch Ready</button>
+        <button type="button" data-export-review-queue>Export Ready Batch</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Operator Token</p>
+      <h2>Connect to the live queue.</h2>
+      <div class="operator-token-row">
+        <label>
+          0S review admin token
+          <input data-review-admin-token type="password" autocomplete="off" placeholder="SOL_REVIEW_ADMIN_TOKEN" />
+        </label>
+      </div>
+      <p class="submission-status" data-review-qa-status aria-live="polite">Waiting for the operator token.</p>
+      <p class="section-lede" data-review-queue-stats>Queue stats will appear after load.</p>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Live Submissions</p>
+      <h2>Pending, approved, and publish-ready reviews.</h2>
+      <div class="submission-list" data-review-queue-list>
+        <div class="submission-card">
+          <b>Load the queue to begin.</b>
+          <p>Submissions are stored in the Cloudflare KV namespace bound as SOL_REVIEW_QUEUE.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
+  <script type="module" src="assets/proof-three-scene.js"></script>
+  <script src="assets/proof-ecosystem.js"></script>
+  <script src="assets/review-submissions.js"></script>
+</body>
+</html>

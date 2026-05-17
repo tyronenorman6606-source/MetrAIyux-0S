@@ -1,0 +1,196 @@
+name: ${PROJECT_NAME:-skye-business-command-center}
+
+services:
+  hub:
+    build: ./apps/hub
+    container_name: skye_hub
+    depends_on:
+      - brain-service
+    ports:
+      - "${HUB_BIND_ADDRESS:-0.0.0.0}:${HUB_PORT:-8080}:80"
+    environment:
+      PUBLIC_BRAND_NAME: ${PUBLIC_BRAND_NAME:-Skye Business Command Center}
+      PUBLIC_COMPANY_NAME: ${PUBLIC_COMPANY_NAME:-Skyes Over London}
+      PUBLIC_SUPPORT_EMAIL: ${PUBLIC_SUPPORT_EMAIL:-support@example.com}
+    restart: unless-stopped
+
+  brain-service:
+    build: ./apps/brain-service
+    container_name: skye_brain_service
+    ports:
+      - "${INTERNAL_BIND_ADDRESS:-127.0.0.1}:${BRAIN_SERVICE_PORT:-8099}:8099"
+    environment:
+      BRAIN_SERVICE_PORT: ${BRAIN_SERVICE_PORT:-8099}
+      LOCAL_BRAIN_ENABLED: ${LOCAL_BRAIN_ENABLED:-true}
+      LOCAL_LLM_PROVIDER: ${LOCAL_LLM_PROVIDER:-none}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5-coder:7b-instruct}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  freescout-db:
+    image: mariadb:10.11
+    container_name: skye_freescout_db
+    environment:
+      MYSQL_DATABASE: freescout
+      MYSQL_USER: freescout
+      MYSQL_PASSWORD: ${FREESCOUT_DB_PASSWORD:-change-me-freescout}
+      MYSQL_ROOT_PASSWORD: ${FREESCOUT_DB_PASSWORD:-change-me-freescout-root}
+    volumes:
+      - freescout_db:/var/lib/mysql
+    restart: unless-stopped
+
+  freescout:
+    build:
+      context: .
+      dockerfile: apps/freescout/Dockerfile
+    image: skye-freescout:trusted-hosts
+    container_name: skye_freescout
+    depends_on:
+      - freescout-db
+    ports:
+      - "${INTERNAL_BIND_ADDRESS:-127.0.0.1}:${FREESCOUT_PORT:-8081}:80"
+    environment:
+      DB_HOST: freescout-db
+      DB_NAME: freescout
+      DB_USER: freescout
+      DB_PASS: ${FREESCOUT_DB_PASSWORD:-change-me-freescout}
+      SITE_URL: ${FREESCOUT_PUBLIC_URL:-http://${PUBLIC_DOMAIN:-localhost}:${FREESCOUT_PORT:-8081}}
+      APP_TRUSTED_HOSTS: ${APP_TRUSTED_HOSTS:-localhost,127.0.0.1}
+      ADMIN_EMAIL: ${PUBLIC_SUPPORT_EMAIL:-support@example.com}
+      ADMIN_PASS: ${FREESCOUT_ADMIN_PASSWORD:-change-me-admin}
+      ENABLE_SSL_PROXY: "FALSE"
+      TIMEZONE: ${TZ:-America/Los_Angeles}
+    volumes:
+      - freescout_data:/data
+    restart: unless-stopped
+
+  espocrm-db:
+    image: mariadb:10.11
+    container_name: skye_espocrm_db
+    environment:
+      MYSQL_DATABASE: espocrm
+      MYSQL_USER: espocrm
+      MYSQL_PASSWORD: ${ESPOCRM_DB_PASSWORD:-change-me-espocrm}
+      MYSQL_ROOT_PASSWORD: ${ESPOCRM_DB_PASSWORD:-change-me-espocrm-root}
+    volumes:
+      - espocrm_db:/var/lib/mysql
+    restart: unless-stopped
+
+  espocrm:
+    image: espocrm/espocrm:latest
+    container_name: skye_espocrm
+    depends_on:
+      - espocrm-db
+    ports:
+      - "${INTERNAL_BIND_ADDRESS:-127.0.0.1}:${ESPOCRM_PORT:-8082}:80"
+    environment:
+      ESPOCRM_DATABASE_HOST: espocrm-db
+      ESPOCRM_DATABASE_USER: espocrm
+      ESPOCRM_DATABASE_PASSWORD: ${ESPOCRM_DB_PASSWORD:-change-me-espocrm}
+      ESPOCRM_DATABASE_NAME: espocrm
+      ESPOCRM_SITE_URL: ${ESPOCRM_PUBLIC_URL:-http://${PUBLIC_DOMAIN:-localhost}:${ESPOCRM_PORT:-8082}}
+      ESPOCRM_ADMIN_USERNAME: ${ESPOCRM_ADMIN_USERNAME:-admin}
+      ESPOCRM_ADMIN_PASSWORD: ${ESPOCRM_ADMIN_PASSWORD:-change-me-admin}
+    volumes:
+      - espocrm_data:/var/www/html
+    restart: unless-stopped
+
+  invoiceshelf-db:
+    image: mariadb:10.11
+    container_name: skye_invoiceshelf_db
+    environment:
+      MYSQL_DATABASE: invoiceshelf
+      MYSQL_USER: invoiceshelf
+      MYSQL_PASSWORD: ${INVOICESHELF_DB_PASSWORD:-change-me-invoiceshelf}
+      MYSQL_ROOT_PASSWORD: ${INVOICESHELF_DB_PASSWORD:-change-me-invoiceshelf-root}
+    volumes:
+      - invoiceshelf_db:/var/lib/mysql
+    restart: unless-stopped
+
+  invoiceshelf:
+    image: invoiceshelf/invoiceshelf:latest
+    container_name: skye_invoiceshelf
+    depends_on:
+      - invoiceshelf-db
+    ports:
+      - "${INTERNAL_BIND_ADDRESS:-127.0.0.1}:${INVOICESHELF_PORT:-8083}:8080"
+    environment:
+      APP_NAME: ${INVOICESHELF_APP_NAME:-Skye_Billing}
+      APP_URL: ${INVOICESHELF_PUBLIC_URL:-http://${PUBLIC_DOMAIN:-localhost}:${INVOICESHELF_PORT:-8083}}
+      APP_KEY: ${INVOICESHELF_APP_KEY:-base64:REPLACE_ME_WITH_INVOICESHELF_KEY}
+      DB_CONNECTION: mysql
+      DB_HOST: invoiceshelf-db
+      DB_PORT: 3306
+      DB_DATABASE: invoiceshelf
+      DB_USERNAME: invoiceshelf
+      DB_PASSWORD: ${INVOICESHELF_DB_PASSWORD:-change-me-invoiceshelf}
+      MAIL_MAILER: smtp
+      MAIL_HOST: ${SMTP_HOST:-smtp.example.com}
+      MAIL_PORT: ${SMTP_PORT:-587}
+      MAIL_USERNAME: ${SMTP_USER:-}
+      MAIL_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_ENCRYPTION: ${SMTP_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${SMTP_FROM:-support@example.com}
+    volumes:
+      - invoiceshelf_data:/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: skye_redis
+    command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-change-me-redis}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  formbricks-db:
+    image: pgvector/pgvector:pg15
+    container_name: skye_formbricks_db
+    environment:
+      POSTGRES_DB: formbricks
+      POSTGRES_USER: formbricks
+      POSTGRES_PASSWORD: ${FORMBRICKS_DB_PASSWORD:-change-me-formbricks}
+    volumes:
+      - formbricks_db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  formbricks:
+    image: ghcr.io/formbricks/formbricks:latest
+    container_name: skye_formbricks
+    depends_on:
+      - formbricks-db
+      - redis
+    ports:
+      - "${INTERNAL_BIND_ADDRESS:-127.0.0.1}:${FORMBRICKS_PORT:-8084}:3000"
+    environment:
+      DATABASE_URL: postgresql://formbricks:${FORMBRICKS_DB_PASSWORD:-change-me-formbricks}@formbricks-db:5432/formbricks?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me-redis}@redis:6379
+      WEBAPP_URL: ${FORMBRICKS_PUBLIC_URL:-http://${PUBLIC_DOMAIN:-localhost}:${FORMBRICKS_PORT:-8084}}
+      NEXTAUTH_URL: ${FORMBRICKS_PUBLIC_URL:-http://${PUBLIC_DOMAIN:-localhost}:${FORMBRICKS_PORT:-8084}}
+      APP_TRUSTED_HOSTS: ${APP_TRUSTED_HOSTS:-localhost,127.0.0.1}
+      NEXTAUTH_SECRET: ${FORMBRICKS_NEXTAUTH_SECRET:-REPLACE_ME_LONG_RANDOM_SECRET}
+      ENCRYPTION_KEY: ${FORMBRICKS_ENCRYPTION_KEY:-REPLACE_ME_32_CHAR_MINIMUM_SECRET}
+      CRON_SECRET: ${FORMBRICKS_CRON_SECRET:-REPLACE_ME_LONG_RANDOM_SECRET}
+      MAIL_FROM: ${SMTP_FROM:-support@example.com}
+      SMTP_HOST: ${SMTP_HOST:-smtp.example.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    restart: unless-stopped
+
+volumes:
+  freescout_db:
+  freescout_data:
+  espocrm_db:
+  espocrm_data:
+  invoiceshelf_db:
+  invoiceshelf_data:
+  redis_data:
+  formbricks_db:

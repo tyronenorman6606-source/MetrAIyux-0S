@@ -1,0 +1,93 @@
+{
+  "effective_date": "2026-05-17",
+  "currency": "usd",
+  "unit": "per_1m_tokens",
+  "business_rule": "Plan AI caps are FS27 billable spend ceilings, not unlimited upstream provider usage. FS27 billable rates include gateway, metering, policy, audit, support, and margin.",
+  "default_markup_multiplier": 1.4493,
+  "default_gross_margin_pct": 31,
+  "sources": {
+    "openai": "https://platform.openai.com/docs/pricing/",
+    "google_gemini": "https://ai.google.dev/gemini-api/docs/pricing",
+    "anthropic": "https://www.anthropic.com/pricing"
+  },
+  "fs27_billable_rate_card": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "lane": "general_reasoning",
+      "upstream_input_per_1m_usd": 2.5,
+      "upstream_output_per_1m_usd": 10,
+      "billable_input_per_1m_usd": 3.6232,
+      "billable_output_per_1m_usd": 14.4928,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "configured_fs27_openai_lane"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "lane": "starter_low_cost_reasoning",
+      "upstream_input_per_1m_usd": 0.15,
+      "upstream_output_per_1m_usd": 0.6,
+      "billable_input_per_1m_usd": 0.2174,
+      "billable_output_per_1m_usd": 0.8696,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "configured_fs27_openai_lane"
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "lane": "fast_multimodal_reasoning",
+      "upstream_input_per_1m_usd": 0.3,
+      "upstream_output_per_1m_usd": 2.5,
+      "billable_input_per_1m_usd": 0.4348,
+      "billable_output_per_1m_usd": 3.6232,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "verified_current_provider_pricing"
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-embedding-001",
+      "lane": "embeddings",
+      "upstream_input_per_1m_usd": 0.15,
+      "upstream_output_per_1m_usd": 0,
+      "billable_input_per_1m_usd": 0.2174,
+      "billable_output_per_1m_usd": 0,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "verified_current_provider_pricing"
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "lane": "sonnet_class_reasoning",
+      "upstream_input_per_1m_usd": 3,
+      "upstream_output_per_1m_usd": 15,
+      "billable_input_per_1m_usd": 4.3478,
+      "billable_output_per_1m_usd": 21.7391,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "fs27_sonnet_class_reference"
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "lane": "opus_class_reasoning",
+      "upstream_input_per_1m_usd": 5,
+      "upstream_output_per_1m_usd": 25,
+      "billable_input_per_1m_usd": 7.2464,
+      "billable_output_per_1m_usd": 36.2319,
+      "markup_multiplier": 1.4493,
+      "gross_margin_pct": 31,
+      "source_status": "fs27_opus_4_6_reference"
+    }
+  ],
+  "plan_disclosure": {
+    "starter-command": "OpenAI/Gemini starter lane, capped at $250/mo FS27 billable spend.",
+    "growth-cabinet": "OpenAI/Gemini/Anthropic growth lane, capped at $750/mo FS27 billable spend.",
+    "autonomous-office": "Expanded OpenAI/Gemini/Anthropic lane, capped at $1,500/mo FS27 billable spend.",
+    "enterprise-command": "Custom written model allowlist and cap; reference managed gate cap is $1,250/mo."
+  }
+}

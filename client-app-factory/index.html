@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Sovereign Client App Factory</title>
+  <meta name="description" content="Operating app for client intake, asset scanning, MCP design lab workflows, app generation, workspace provisioning, SkyePay lanes, proof, and deployment handoff.">
+  <meta name="theme-color" content="#080907">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <canvas class="skyesol-living-field living-field" aria-hidden="true"></canvas>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <header class="factory-top">
+    <a class="brand" href="/" aria-label="Client App Factory home">
+      <span class="wordmark">Sovereign Client App Factory</span>
+    </a>
+    <nav class="top-actions" aria-label="Factory actions">
+      <span class="backend-status" data-backend-status>Factory API checking</span>
+      <button class="btn ghost" type="button" data-load-empire>Load Empire Record</button>
+      <button class="btn primary" type="button" data-run-factory>Run Factory Pass</button>
+      <button class="btn" type="button" data-export-record>Export Record</button>
+    </nav>
+  </header>
+
+  <main class="factory-shell">
+    <aside class="room-rail" aria-label="Factory rooms">
+      <button class="room-tab active" type="button" data-room-target="overview">Overview</button>
+      <button class="room-tab" type="button" data-room-target="intake">Client Intake</button>
+      <button class="room-tab" type="button" data-room-target="scanner">Source Scanner</button>
+      <button class="room-tab" type="button" data-room-target="assets">Asset Vault</button>
+      <button class="room-tab" type="button" data-room-target="design">Design Lab</button>
+      <button class="room-tab" type="button" data-room-target="builder">App Builder</button>
+      <button class="room-tab" type="button" data-room-target="workspace">AI Workspace</button>
+      <button class="room-tab" type="button" data-room-target="skyepay"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span></button>
+      <button class="room-tab" type="button" data-room-target="proof">Proof Room</button>
+      <button class="room-tab" type="button" data-room-target="deploy">Deployment Console</button>
+      <button class="room-tab" type="button" data-room-target="wiring">Repo Wiring</button>
+    </aside>
+
+    <section class="workspace">
+      <section class="hero-panel room active" data-room="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Operating app for every client app</p>
+          <h1><span class="text-shimmer premium-text-effect text-effect-shimmer neon-gradient-text">Client packets become deployable app systems.</span></h1>
+          <p class="lead">This factory turns intake, folders, assets, MCP recipes, proof, workspace setup, SkyePay continuation, and deployment records into one repeatable operating surface.</p>
+          <div class="hero-actions">
+            <button class="btn primary" type="button" data-load-empire>Seed with <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Empire Pallets</span></button>
+            <a class="btn" href="#proof-room" data-room-link="proof">Open Proof Room</a>
+            <a class="btn ghost" href="client-apps/empire-pallets/index.html">Open Empire App</a>
+          </div>
+        </div>
+        <div class="surface-card">
+          <div class="surface-header">
+            <strong data-client-name>Empire Pallets</strong>
+            <span data-client-status>preview-ready</span>
+          </div>
+          <div class="state-grid" data-state-grid></div>
+        </div>
+        <div class="ledger-strip panel">
+          <div>
+            <p class="eyebrow">Factory ledger</p>
+            <h3>Backend events written by the local service.</h3>
+          </div>
+          <div class="ledger-list" data-ledger-list></div>
+        </div>
+      </section>
+
+      <section class="room" data-room="intake">
+        <div class="section-head">
+          <p class="eyebrow">Client Intake</p>
+          <h2>Source-of-truth record before generation.</h2>
+        </div>
+        <form class="factory-form" data-intake-form>
+          <label>Client name<input name="displayName" required></label>
+          <label>Industry<input name="industry"></label>
+          <label>Primary contact<input name="primaryContact"></label>
+          <label>Phone<input name="phone"></label>
+          <label>Email<input name="email" type="email"></label>
+          <label>Live URL<input name="liveUrl" type="url"></label>
+          <label class="wide">Services<textarea name="services"></textarea></label>
+          <label class="wide">Special notes<textarea name="notes"></textarea></label>
+          <button class="btn primary" type="submit">Save Intake Record</button>
+        </form>
+      </section>
+
+      <section class="room" data-room="scanner">
+        <div class="section-head">
+          <p class="eyebrow">Source Scanner</p>
+          <h2>Scan folders, media, routes, and path risk.</h2>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>Empire seed scan</h3>
+            <p>The Node scanner inventories the Empire packet, upgraded app, media, app routes, PWA files, and source preservation checks.</p>
+            <button class="btn primary" type="button" data-load-scan>Load Latest Scan Report</button>
+          </div>
+          <pre class="console" data-scan-output>Run scripts/factory-scan.mjs or load the bundled report.</pre>
+        </div>
+      </section>
+
+      <section class="room" data-room="assets">
+        <div class="section-head">
+          <p class="eyebrow">Asset Vault</p>
+          <h2>Every logo, media file, zip, and provenance note stays attached.</h2>
+        </div>
+        <form class="asset-upload panel" data-asset-upload>
+          <label>Attach asset<input name="assetFile" type="file"></label>
+          <label>Provenance note<input name="provenance" aria-label="Asset provenance note"></label>
+          <button class="btn primary" type="submit">Catalog Asset</button>
+        </form>
+        <div class="asset-grid" data-asset-grid></div>
+      </section>
+
+      <section class="room" data-room="design">
+        <div class="section-head">
+          <p class="eyebrow">MCP Design Lab</p>
+          <h2>Design is selected as DNA, not reused as one style.</h2>
+        </div>
+        <div class="engine-grid" data-design-engines></div>
+      </section>
+
+      <section class="room" data-room="builder">
+        <div class="section-head">
+          <p class="eyebrow">App Builder</p>
+          <h2>Route map, PWA shell, QR lane, preview lane, quote lane.</h2>
+        </div>
+        <div class="route-map" data-route-map></div>
+        <div class="panel">
+          <h3>Generated path manifest</h3>
+          <pre class="console" data-path-manifest></pre>
+        </div>
+      </section>
+
+      <section class="room" data-room="workspace">
+        <div class="section-head">
+          <p class="eyebrow">AI Workspace</p>
+          <h2>Tester access, scans, commands, and continuation status.</h2>
+        </div>
+        <div class="metric-grid" data-workspace-grid></div>
+      </section>
+
+      <section class="room" data-room="skyepay">
+        <div class="section-head">
+          <p class="eyebrow">SkyePay</p>
+          <h2>Preview-to-paid continuation lane.</h2>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>Payment lane</h3>
+            <p>Free preview first. Owner approval, subscription, vault access, discount, invoice, and cancellation state are tracked before live payment connection.</p>
+            <a class="btn primary" href="../SkyeGateFS27/skyepay.html?client=empire-pallets">Open SkyePay Client Lane</a>
+          </div>
+          <div class="panel">
+            <h3>Continuation offer</h3>
+            <ul class="check-list">
+              <li>7-day tester workspace</li>
+              <li>7 scans included</li>
+              <li>25 workspace commands included</li>
+              <li>Six-month continuation discount ready</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="room" id="proof-room" data-room="proof">
+        <div class="section-head">
+          <p class="eyebrow">Proof Room</p>
+          <h2><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Browser proof</span>, scanner proof, MCP receipts, and client-ready summaries.</h2>
+        </div>
+        <div class="proof-reel panel">
+          <div>
+            <h3>Factory workflow recording</h3>
+            <p>The proof reel is created by Playwright while the browser runs the factory flow: scanner, factory pass, proof room, route map, and intake save.</p>
+          </div>
+          <video data-proof-video src="assets/proof/client-app-factory-workflow.webm" poster="assets/proof/client-app-factory-workflow-poster.png" controls muted playsinline preload="none"></video>
+        </div>
+        <div class="screenshot-stage panel" data-surface-screenshot-stage>
+          <div>
+            <h3>Actual surface screenshots</h3>
+            <p>Desktop and mobile captures are written by the browser proof run from this exact served factory surface.</p>
+          </div>
+          <div class="screenshot-grid">
+            <figure>
+              <img data-surface-screenshot src="assets/proof/client-app-factory-desktop.png" alt="Desktop screenshot of the Client App Factory operating surface" loading="lazy" decoding="async">
+              <figcaption>1440 by 1000 browser surface</figcaption>
+            </figure>
+            <figure>
+              <img data-surface-screenshot src="assets/proof/client-app-factory-mobile.png" alt="Mobile screenshot of the Client App Factory operating surface" loading="lazy" decoding="async">
+              <figcaption>390 by 844 browser surface</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="proof-grid" data-proof-grid></div>
+        <div class="panel">
+          <h3>Persisted proof ledger</h3>
+          <div class="ledger-list tall" data-proof-ledger></div>
+        </div>
+      </section>
+
+      <section class="room" data-room="deploy">
+        <div class="section-head">
+          <p class="eyebrow">Deployment Console</p>
+          <h2>Netlify, Cloudflare, QR regeneration, rollback, live verification.</h2>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>Publish target</h3>
+            <pre class="console" data-deploy-console></pre>
+          </div>
+          <div class="panel">
+            <h3>Completion gate</h3>
+            <div class="gate-list" data-gate-list></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="room" data-room="wiring">
+        <div class="section-head">
+          <p class="eyebrow">Repo Platform Wiring</p>
+          <h2>Where the app came from, where it deploys, and which integrations are ready.</h2>
+        </div>
+        <div class="wiring-grid" data-wiring-grid></div>
+      </section>
+    </section>
+  </main>
+
+  <template id="download-template"></template>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requirePortalKey, cleanText } from './_lib/security.js';
+import { resolvePortalAccess, cleanText } from './_lib/security.js';
 import { loadSessionManifest, loadReceipt } from './_lib/config.js';
-import { applyRateLimit } from './_lib/rate-limit.js';
+import { applyNamedRateLimit, applyRateLimit } from './_lib/rate-limit.js';
 
 function publicManifest(manifest) {
   if (!manifest) return null;
@@ -17,6 +17,10 @@ function publicManifest(manifest) {
       id: manifest.destination.id,
       name: manifest.destination.name,
       role: manifest.destination.role
+    } : null,
+    workspace: manifest.intake?.workspaceId ? {
+      id: manifest.intake.workspaceId,
+      developerId: manifest.intake.developerId || ''
     } : null,
     file: manifest.file ? {
       name: manifest.file.name,
@@ -43,6 +47,8 @@ function publicReceipt(receipt) {
     sessionId: entry.sessionId || '',
     submissionId: entry.submissionId || '',
     clientRequestId: entry.clientRequestId || '',
+    workspaceId: entry.workspaceId || '',
+    developerId: entry.developerId || '',
     destinationName: entry.destinationName || entry.destinationId || '',
     fileName: entry.fileName || '',
     fileSize: entry.fileSize || 0,
@@ -71,7 +77,14 @@ export async function handler(event) {
       windowMs: Number(process.env.STATUS_RATE_WINDOW_MS || 10 * 60 * 1000),
       message: 'Too many status lookups from this requester. Wait and try again.'
     });
-    requirePortalKey(event, body);
+    const portalAccess = await resolvePortalAccess(event, body);
+    if (portalAccess.workspaceId) {
+      applyNamedRateLimit(`workspace:${portalAccess.workspaceId}:upload-status`, {
+        limit: Number(portalAccess.rateLimitStatusPerWindow || process.env.WORKSPACE_STATUS_RATE_LIMIT || 120),
+        windowMs: Number(portalAccess.rateLimitWindowMs || process.env.WORKSPACE_RATE_WINDOW_MS || 60 * 60 * 1000),
+        message: 'This vault workspace has reached its status lookup rate limit. Wait for the workspace window to reset.'
+      });
+    }
     const sessionId = cleanText(body.sessionId, 160);
     const receiptId = cleanText(body.receiptId, 160);
     if (!sessionId && !receiptId) {
@@ -82,6 +95,14 @@ export async function handler(event) {
       sessionId ? loadSessionManifest(sessionId) : Promise.resolve(null),
       receiptId ? loadReceipt(receiptId) : Promise.resolve(null)
     ]);
+    const manifestWorkspace = manifestRecord?.manifest?.intake?.workspaceId || manifestRecord?.manifest?.access?.workspaceId || '';
+    const receiptWorkspace = (receiptRecord?.receipt?.entry || receiptRecord?.receipt)?.workspaceId || '';
+    if (portalAccess.type === 'developer-workspace') {
+      const requestedWorkspace = manifestWorkspace || receiptWorkspace;
+      if ((manifestRecord || receiptRecord) && requestedWorkspace !== portalAccess.workspaceId) {
+        return json(403, { ok: false, error: 'This status record belongs to a different developer workspace.' }, noStoreCors(event));
+      }
+    }
 
     return json(200, {
       ok: true,

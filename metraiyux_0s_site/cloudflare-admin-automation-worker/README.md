@@ -7,7 +7,10 @@ It supports:
 - Task creation for the 13 cabinet/person brains
 - Approval receipts
 - Social draft queueing
-- Optional social dispatch through a configured webhook/connector
+- Approval-aware connector dispatch for CRM, social, project management, payroll, content publishing, local-brain updates, and repository updates
+- Blog content engine runs that turn longform articles into social posts, email packages, website copy, local-brain chunks, and repo update files
+- Automated Cloudflare Worker secret rotation receipts
+- TOTP MFA setup, permanent authenticator QR reissue, and one-time backup override codes
 - Optional Cloudflare Workers AI response generation
 - D1/KV/Queue-backed audit trail
 
@@ -18,6 +21,22 @@ It supports:
 - `POST /api/admin/task`
 - `POST /api/admin/social/draft`
 - `POST /api/admin/social/publish`
+- `GET /api/admin/connectors/status`
+- `POST /api/admin/connectors/event`
+- `POST /api/admin/connectors/dispatch`
+- `GET /api/admin/connectors/events`
+- `POST /api/admin/content-engine/activate`
+- `POST /api/admin/content-engine/dispatch`
+- `GET /api/admin/content-engine/runs`
+- `GET /api/admin/content-engine/run?id=<run_id>`
+- `GET /api/admin/content-engine/local-brain-feed`
+- `GET /api/admin/security/status`
+- `POST /api/admin/security/mfa/setup`
+- `POST /api/admin/security/mfa/verify`
+- `POST /api/admin/security/backup-codes/issue`
+- `POST /api/admin/security/override-session`
+- `POST /api/admin/secrets/rotate`
+- `GET /api/admin/secrets/rotations`
 - `POST /api/admin/approval`
 - `GET /api/admin/ledger`
 
@@ -34,6 +53,85 @@ npx wrangler secret put SOCIAL_DISPATCH_TOKEN
 ```
 
 Set `SOCIAL_DISPATCH_WEBHOOK` as a Worker variable or secret if your connector needs secrecy. The Worker will not publish externally unless `approved: true` is sent and a connector is configured.
+
+## Content engine lane
+
+The content engine lane accepts an article record from `blog/content-engine.json`, builds a campaign package, stores it as a run, and creates approval-required connector events for each external action.
+
+One activation can create:
+
+- LinkedIn personal post and X thread for `social_dispatch`
+- Follow-up email package and website section HTML for `content_publish`
+- Approved local-brain knowledge chunk for `local_brain_update`
+- Markdown campaign file and brain JSON file for `repository_update`
+
+Activate a package:
+
+```bash
+curl -X POST "$WORKER/api/admin/content-engine/activate" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d @article-package.json
+```
+
+Approve and dispatch:
+
+```bash
+curl -X POST "$WORKER/api/admin/content-engine/dispatch" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"run_id":"<run_id>","approved":true}'
+```
+
+No connector silently succeeds. If a destination webhook or GitHub Contents API configuration is missing, the event is recorded as `blocked_missing_connector`.
+
+## Connector wiring
+
+Connector events are persisted, approval-checked, queued, dispatched, retried, and logged. Set bridge URLs as vars and tokens as secrets:
+
+```bash
+npx wrangler secret put CRM_CONNECTOR_TOKEN
+npx wrangler secret put SOCIAL_DISPATCH_TOKEN
+npx wrangler secret put PROJECT_MANAGEMENT_CONNECTOR_TOKEN
+npx wrangler secret put PAYROLL_CONNECTOR_TOKEN
+npx wrangler secret put CONTENT_PUBLISH_TOKEN
+npx wrangler secret put LOCAL_BRAIN_UPDATE_TOKEN
+npx wrangler secret put CONTENT_REPOSITORY_TOKEN
+# Optional direct GitHub repository adapter:
+npx wrangler secret put GITHUB_CONTENT_TOKEN
+```
+
+Supported bridge URL vars:
+
+- `CRM_CONNECTOR_URL`
+- `SOCIAL_DISPATCH_WEBHOOK`
+- `PROJECT_MANAGEMENT_CONNECTOR_URL`
+- `PAYROLL_CONNECTOR_URL`
+- `CONTENT_PUBLISH_WEBHOOK`, `PERSONAL_SITE_WEBHOOK`, or `MARKETING_SITE_WEBHOOK`
+- `LOCAL_BRAIN_UPDATE_WEBHOOK` or `LOCAL_BRAIN_WEBHOOK`
+- `CONTENT_REPOSITORY_WEBHOOK`
+- `GITHUB_CONTENT_REPO` plus optional `GITHUB_CONTENT_BRANCH` when using the GitHub Contents API adapter
+
+Each webhook bridge receives a JSON envelope with `schema`, `id`, `connector_type`, `action`, `actor`, and `payload`. Social, payroll, content publishing, local-brain updates, and repository updates are approval-required by default. The repository lane can either call `CONTENT_REPOSITORY_WEBHOOK` or commit files through the GitHub Contents API when `GITHUB_CONTENT_REPO` and `GITHUB_CONTENT_TOKEN` are configured.
+
+## MFA, backup override, and secret rotation
+
+MFA setup requires encrypted storage:
+
+```bash
+npx wrangler secret put ADMIN_MFA_ENCRYPTION_KEY
+npx wrangler secret put ADMIN_BACKUP_CODE_PEPPER
+```
+
+Backup codes are generated once, HMAC-hashed, emailed once, and consumed once. The admin UI lives at `/admin/security-automation.html`; the encrypted authenticator PWA lives at `/admin/skyebox-authenticator/index.html`.
+
+Cloudflare secret rotation requires:
+
+```bash
+npx wrangler secret put CLOUDFLARE_API_TOKEN
+```
+
+Set `CLOUDFLARE_ACCOUNT_ID` as a var. `ADMIN_TOKEN` can be generated by the Worker. Provider keys such as `RESEND_API_KEY`, `STRIPE_SECRET`, and `STRIPE_SECRET_KEY` must be created in the provider account first, then submitted as `new_value` so the Worker can install them into Cloudflare and record the rotation.
 
 ## Deploy
 

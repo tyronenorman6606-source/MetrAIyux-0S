@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S production changelog with Cloudflare deployment evidence, proof receipts, SkyePay, Skyes Reviews, and legacy release history.">
+  <title>Changelog · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --changelog-card: rgba(255, 255, 255, .055);
+      --changelog-card-strong: rgba(255, 255, 255, .09);
+      --changelog-line: rgba(243, 212, 131, .34);
+      --changelog-cyan: #35b7ff;
+      --changelog-gold: #f3d483;
+      --changelog-violet: #a88cff;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 0%, rgba(53, 183, 255, .18), transparent 30%),
+        radial-gradient(circle at 84% 8%, rgba(243, 212, 131, .14), transparent 34%),
+        radial-gradient(circle at 55% 100%, rgba(168, 140, 255, .13), transparent 36%),
+        var(--bg);
+    }
+
+    .changelog-shell {
+      position: relative;
+      z-index: 2;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 22px 86px;
+    }
+
+    .changelog-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+      gap: 20px;
+      align-items: stretch;
+      padding: 0 0 30px;
+    }
+
+    .changelog-title {
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.04;
+      margin-bottom: 12px;
+      letter-spacing: 0;
+      color: #f8fbff;
+      text-shadow: 0 0 24px rgba(53, 183, 255, .18), 0 0 30px rgba(243, 212, 131, .12);
+    }
+
+    .changelog-lede {
+      max-width: 780px;
+      color: #d9e4e7;
+      font-size: 18px;
+      line-height: 1.44;
+    }
+
+    .changelog-hero-logo {
+      width: min(390px, 100%);
+      height: auto;
+      max-height: none;
+      object-fit: contain;
+      margin: -18px 0 6px;
+      filter:
+        drop-shadow(0 0 34px rgba(53, 183, 255, .56))
+        drop-shadow(0 0 36px rgba(243, 212, 131, .26));
+    }
+
+    .changelog-hero .hero-actions {
+      margin: 16px 0 0;
+    }
+
+    .changelog-proof-panel,
+    .release-entry {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .025));
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .32), 0 0 34px rgba(53, 183, 255, .09);
+    }
+
+    .changelog-proof-panel::before,
+    .release-entry::before {
+      content: "";
+      position: absolute;
+      inset: -80% -20%;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .16), transparent);
+      transform: rotate(18deg);
+      animation: changelogSweep 8s ease-in-out infinite;
+    }
+
+    .changelog-proof-panel {
+      padding: 22px;
+      align-self: end;
+    }
+
+    .changelog-proof-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .proof-stat {
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .22);
+      padding: 14px;
+    }
+
+    .proof-stat strong {
+      display: block;
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .proof-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 7px;
+    }
+
+    .release-list {
+      display: grid;
+      gap: 22px;
+      margin-top: 18px;
+    }
+
+    .release-entry {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 0;
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+
+    .release-entry:hover {
+      transform: translateY(-3px);
+      border-color: rgba(53, 183, 255, .55);
+      box-shadow: 0 18px 54px rgba(53, 183, 255, .13), 0 0 28px rgba(243, 212, 131, .14);
+    }
+
+    .release-meta,
+    .release-body {
+      position: relative;
+      z-index: 1;
+      padding: 22px;
+    }
+
+    .release-meta {
+      border-right: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(0, 0, 0, .16);
+    }
+
+    .release-date,
+    .release-version {
+      display: block;
+    }
+
+    .release-date {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .release-version {
+      width: 54px;
+      height: 54px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid var(--changelog-line);
+      color: var(--changelog-gold);
+      font-weight: 900;
+      background: rgba(243, 212, 131, .08);
+    }
+
+    .release-body h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      margin-bottom: 8px;
+    }
+
+    .release-body p {
+      color: #d9e4e7;
+    }
+
+    .tag-row,
+    .receipt-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .tag-row span,
+    .receipt-row span {
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .2);
+      color: #d9e4e7;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .release-points {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .release-points li {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr);
+      gap: 10px;
+      color: #d9e4e7;
+    }
+
+    .release-points li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--changelog-gold), var(--changelog-cyan));
+      box-shadow: 0 0 16px rgba(53, 183, 255, .5);
+    }
+
+    .legacy-note {
+      margin-top: 18px;
+      border-left: 4px solid var(--changelog-gold);
+      padding: 14px 16px;
+      background: rgba(243, 212, 131, .08);
+      color: #e9ddc4;
+    }
+
+    .skyesol-living-field.changelog-field {
+      opacity: .45;
+    }
+
+    @keyframes changelogTextShimmer {
+      from { background-position: 0% center; }
+      to { background-position: 220% center; }
+    }
+
+    @keyframes changelogSweep {
+      0%, 62% { translate: -120% 0; }
+      100% { translate: 120% 0; }
+    }
+
+    @media (max-width: 880px) {
+      .changelog-hero,
+      .release-entry {
+        grid-template-columns: 1fr;
+      }
+
+      .changelog-hero-logo {
+        width: min(340px, 88vw);
+        margin: -8px auto 6px;
+      }
+
+      .release-meta {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .changelog-shell {
+        padding: 24px 16px 72px;
+      }
+
+      .changelog-hero {
+        padding-bottom: 24px;
+      }
+
+      .changelog-hero-logo {
+        width: min(260px, 72vw);
+        margin: -4px auto 6px;
+      }
+
+      .changelog-title {
+        font-size: clamp(34px, 9.3vw, 38px);
+        line-height: 1.04;
+        margin-bottom: 10px;
+      }
+
+      .changelog-lede {
+        font-size: 16px;
+        line-height: 1.38;
+      }
+
+      .changelog-hero .hero-actions {
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .changelog-hero .button {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .changelog-title,
+      .changelog-proof-panel::before,
+      .release-entry::before {
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="living-background skyesol-living-field changelog-field" aria-hidden="true"></canvas>
+  <div class="motion-progress scroll-progress motion-chrome" aria-hidden="true"><i></i></div>
+  <div class="motion-cursor-glow pointer-reactive motion-chrome" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../proof/index.html">Proof</a>
+      <a href="../operator/deployment-ledger.html">Deployment Ledger</a>
+      <a href="../sales/live-proof-router.html">Live Router</a>
+      <a href="../local-brain.html">Brain</a>
+    </nav>
+  </header>
+  <main class="changelog-shell">
+    <section class="changelog-hero">
+      <div>
+        <p class="eyebrow">Public release record</p>
+        <img class="hero-platform-logo changelog-hero-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1 class="changelog-title">Skye Production Changelog</h1>
+        <p class="changelog-lede">I route the 0S release record through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, live Cloudflare surfaces, browser QA, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> handoff evidence, and the legacy release history that used to sit in the old receipt page.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="../proof/index.html">Open Proof Routes</a>
+          <a class="button" href="../operator/deployment-ledger.html">Deployment Ledger</a>
+          <a class="button" href="../sales/live-proof-router.html">Live Proof Router</a>
+        </div>
+      </div>
+      <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
+        <p class="eyebrow">Generated May 16 2026 UTC</p>
+        <h2>Full production in the changelog.</h2>
+        <p>The current MCP production ledger records live surfaces, Cloudflare routes, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, and public-safe receipts without exposing private controls.</p>
+        <div class="proof-grid">
+          <div class="proof-stat"><strong>24</strong><span>Live production surfaces</span></div>
+          <div class="proof-stat"><strong>13</strong><span>Cloudflare Pages projects</span></div>
+          <div class="proof-stat"><strong>11</strong><span>Cloudflare Workers</span></div>
+          <div class="proof-stat"><strong>36</strong><span>HTTP checks verified</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section aria-label="Release timeline">
+      <p class="eyebrow">Timeline</p>
+      <div class="release-list">
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">61</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyePay</span><span>Stripe</span><span>Gateway</span></div>
+            <h2><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeGateFS27</span> / SkyePay store deployed with live Stripe handoff.</h2>
+            <p>SkyePay production exposes Stripe-backed offers while the private tester lane stays clean and owner-controlled.</p>
+            <ul class="release-points">
+              <li>61 Stripe-backed offers are exposed by the public store.</li>
+              <li>Live <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe Checkout</span> handoff was verified with a cs_live session.</li>
+              <li>Bob's private tester lane is simplified to a free tester-week handoff.</li>
+              <li>Owner approval and payment state stay inside the FS27 production flow.</li>
+            </ul>
+            <div class="receipt-row"><span>Desktop proof</span><span>Mobile proof</span><span>Stripe screenshot</span><span>Proof JSON</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-16">May 16, 2026</time>
+            <span class="release-version">115</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Reviews</span><span>Three.js</span><span>Browser Proof</span></div>
+            <h2><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London</span> Reviews shipped with a Three.js proof atlas.</h2>
+            <p>The reviews production page was re-verified with interactive review cards, detail pages, and browser proof recordings.</p>
+            <ul class="release-points">
+              <li>115 clickable review cards render in production.</li>
+              <li>115 full review detail pages are available from the atlas workflow.</li>
+              <li>Three.js review atlas is active on desktop and mobile.</li>
+              <li>Client-name cleanup removed placeholder and synthetic status language from public pages.</li>
+            </ul>
+            <div class="receipt-row"><span>HTTP 200</span><span>No console errors</span><span>No horizontal overflow</span><span>WebM workflow</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-16">May 16, 2026</time>
+            <span class="release-version">24</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Ledger</span><span>Cloudflare</span><span>Proof</span></div>
+            <h2>Production ledger captured from Cloudflare source APIs.</h2>
+            <p>The MCP production record now summarizes Cloudflare Pages, Workers, HTTP checks, and browser proof artifacts.</p>
+            <ul class="release-points">
+              <li>24 live production surfaces are recorded in the MCP ledger.</li>
+              <li>13 Cloudflare Pages projects and 11 Workers are listed with deployment evidence.</li>
+              <li>36 HTTP routes were verified with no failures at capture time.</li>
+              <li>Proof artifacts were saved under test-artifacts/live-deployment-ledger.</li>
+            </ul>
+            <div class="receipt-row"><span>Cloudflare inventory</span><span>Worker inventory</span><span>HTTP checks</span><span>CEO contribution map</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-15">May 15, 2026</time>
+            <span class="release-version">0S</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Legacy transfer</span><span>Governance</span><span><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Operator proof</span></span></div>
+            <h2>Legacy release receipt moved into the new changelog base.</h2>
+            <p>This entry transfers the old 0S release receipt so the previous public proof is still visible inside the upgraded changelog surface.</p>
+            <ul class="release-points">
+              <li>Governance Center added the resolution pack, authority matrix, appointment workflow, minutes, and delegation ledger.</li>
+              <li>Pricing Center added package pages and a browser-local package fit calculator.</li>
+              <li>SEO Library added Arizona service-area pages plus index coverage.</li>
+              <li>Smoke Check kept internal links checked after build.</li>
+            </ul>
+            <p class="legacy-note">This replaces the older one-page release receipt as the public release record while preserving the original proof claims.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S changelog. Public proof is shareable; private controls stay gated.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

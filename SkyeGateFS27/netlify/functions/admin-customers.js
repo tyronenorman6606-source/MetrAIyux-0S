@@ -32,6 +32,8 @@ export default wrap(async (req) => {
   if (req.method === "GET") {
     const res = await q(
       `select c.id, c.email, c.plan_name, c.monthly_cap_cents, c.is_active,
+              c.default_rpm_limit, c.default_rpd_limit,
+              c.vault_storage_mb, c.vault_file_limit, c.vault_workspace_limit, c.skypay_policy,
               c.max_devices_per_key, c.require_install_id, c.allowed_providers, c.allowed_models,
               c.stripe_customer_id, c.stripe_subscription_id, c.stripe_current_period_end,
               c.auto_topup_enabled, c.auto_topup_threshold_cents, c.auto_topup_amount_cents,
@@ -90,6 +92,11 @@ export default wrap(async (req) => {
     setIf("plan_name", v => (v || "").toString().slice(0, 40) || null);
     setIf("monthly_cap_cents", v => v === null ? null : parseInt(v, 10));
     setIf("is_active", v => !!v);
+    setIf("default_rpm_limit", v => v === null ? null : parseInt(v, 10));
+    setIf("default_rpd_limit", v => v === null ? null : parseInt(v, 10));
+    setIf("vault_storage_mb", v => v === null ? null : parseInt(v, 10));
+    setIf("vault_file_limit", v => v === null ? null : parseInt(v, 10));
+    setIf("vault_workspace_limit", v => v === null ? null : parseInt(v, 10));
 
     // device + allowlists
     setIf("max_devices_per_key", v => v === null ? null : parseInt(v, 10));
@@ -118,6 +125,7 @@ export default wrap(async (req) => {
 
     const out = await q(
       `select id, email, plan_name, monthly_cap_cents, is_active,
+              default_rpm_limit, default_rpd_limit, vault_storage_mb, vault_file_limit, vault_workspace_limit, skypay_policy,
               max_devices_per_key, require_install_id, allowed_providers, allowed_models,
               stripe_customer_id, auto_topup_enabled, auto_topup_threshold_cents, auto_topup_amount_cents
        from customers where id=$1`,

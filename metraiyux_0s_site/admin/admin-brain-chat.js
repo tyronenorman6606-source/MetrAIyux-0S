@@ -22,6 +22,7 @@ const AdminAutomationBrain = (() => {
   function endpoint(){ return sessionStorage.getItem('adminBrainEndpoint') || localStorage.getItem('adminBrainEndpoint') || defaultWorkerOrigin; }
   function token(){ return sessionStorage.getItem('adminBrainToken') || ''; }
   function isWorkerMode(){ return Boolean(endpoint()); }
+  function authHeaders(extra={}){ return window.SkygateAuthBridge?.authHeaders ? window.SkygateAuthBridge.authHeaders(extra) : {...extra, ...(token() ? {'authorization':`Bearer ${token()}`} : {})}; }
 
   function classify(message){
     const text = String(message||'').toLowerCase();
@@ -70,7 +71,7 @@ const AdminAutomationBrain = (() => {
 
   async function workerReply(message){
     const url = endpoint().replace(/\/$/,'') + '/api/admin/brain/chat';
-    const res = await fetch(url, {method:'POST', headers:{'content-type':'application/json','authorization': token() ? `Bearer ${token()}` : ''}, body:JSON.stringify({message})});
+    const res = await fetch(url, {method:'POST', headers:authHeaders({'content-type':'application/json'}), body:JSON.stringify({message})});
     const json = await res.json().catch(()=>({ok:false,error:'Invalid Worker response'}));
     if(!res.ok || json.error) throw new Error(json.error || `Worker returned ${res.status}`);
     return {text: (json.reply || 'Worker command recorded.') + (json.approval_email ? `\n\nApproval email: ${json.approval_email.ok ? 'sent through Resend' : (json.approval_email.reason || 'not sent')}.` : ''), receipt: json.receipt || json};

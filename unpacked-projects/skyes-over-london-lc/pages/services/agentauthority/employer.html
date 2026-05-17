@@ -1,0 +1,509 @@
+<!-- FILE: agent_authority_employer_page.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agent Authority for Employers — Partner Program + Earnings Calculator</title>
+  <meta name="description" content="Agent Authority is an employer-sponsored 3D web building program for agent-heavy companies. Run the employer earnings calculator, understand partner credits, and see how referral boosts raise your revenue share up to 31%." />
+  <meta property="og:title" content="Agent Authority for Employers" />
+  <meta property="og:description" content="Employer-sponsored 3D web builds for agents + partner credits + employer revenue share with referral acceleration." />
+  <meta property="og:type" content="website" />
+  <style>
+    :root{
+      --bg0:#08040f; --bg1:#120727; --bg2:#1c0a3a;
+      --text:#f4f1ff; --muted:#c8bfe6; --muted2:#a79acb; --gold:#d7b64a;
+      --shadow:0 18px 60px rgba(0,0,0,.45); --shadow2:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px; --ok:#6ee7b7; --warn:#fbbf24;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(138,70,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 80% 30%, rgba(215,182,74,.18), transparent 60%),
+        radial-gradient(1200px 900px at 45% 120%, rgba(90,42,168,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 76px}
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(8,4,15,.78), rgba(8,4,15,.35));
+      border-bottom: 1px solid rgba(215,182,74,.12);
+    }
+    .topbar .inner{max-width:1180px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .sigil{
+      width:34px;height:34px;border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(215,182,74,.95), rgba(138,70,255,.55) 60%, rgba(18,7,39,.2));
+      box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    .brand h1{font-size:14px;letter-spacing:.16em;text-transform:uppercase;margin:0;color:var(--muted)}
+    .brand p{margin:2px 0 0 0;font-size:12px;color:var(--muted2)}
+    .ctaRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      color:var(--text);
+      padding:10px 12px;border-radius:14px;
+      font-size:12.5px;letter-spacing:.02em;
+      box-shadow: var(--shadow2);
+      cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none; white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(215,182,74,.35)}
+    .btn.primary{
+      border-color: rgba(215,182,74,.35);
+      background: linear-gradient(180deg, rgba(215,182,74,.22), rgba(138,70,255,.14));
+    }
+    .btn .dot{width:8px;height:8px;border-radius:99px;background:var(--gold);box-shadow:0 0 0 4px rgba(215,182,74,.12)}
+    .particles{
+      position:fixed; inset:0; pointer-events:none; opacity:.18;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(215,182,74,.9), transparent 60%),
+        radial-gradient(2px 2px at 80% 35%, rgba(138,70,255,.9), transparent 60%),
+        radial-gradient(2px 2px at 35% 70%, rgba(215,182,74,.7), transparent 60%),
+        radial-gradient(1.5px 1.5px at 60% 80%, rgba(255,255,255,.8), transparent 60%),
+        radial-gradient(1.5px 1.5px at 90% 78%, rgba(255,255,255,.7), transparent 60%);
+      animation: drift 18s linear infinite;
+    }
+    @keyframes drift{
+      0%{transform: translate3d(0,0,0)}
+      50%{transform: translate3d(-8px, 10px, 0)}
+      100%{transform: translate3d(0,0,0)}
+    }
+
+    /* Cursor aura */
+    .aura{
+      position:fixed; left:0; top:0; width:320px; height:320px;
+      transform: translate(-9999px,-9999px);
+      border-radius:999px;
+      background: radial-gradient(circle at 35% 35%, rgba(215,182,74,.22), rgba(138,70,255,.14) 55%, transparent 70%);
+      filter: blur(10px);
+      pointer-events:none;
+      mix-blend-mode: screen;
+      opacity:.65;
+      z-index:2;
+      transition: opacity .2s ease;
+    }
+
+    .panel{
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden; position:relative;
+    }
+    .panel:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(420px 220px at var(--mx, 30%) var(--my, 20%), rgba(215,182,74,.14), transparent 60%),
+        radial-gradient(360px 220px at 80% 0%, rgba(138,70,255,.16), transparent 70%);
+      pointer-events:none;
+    }
+    .panel .pad{padding:20px 20px 18px; position:relative}
+
+    .kicker{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+    .kicker .bar{width:34px;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+    .title{font-size:44px;line-height:1.03;margin:12px 0 8px}
+    @media (max-width: 520px){.title{font-size:36px}}
+    .subtitle{margin:0;color:var(--muted);font-size:15px;line-height:1.45;max-width:72ch}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .chip{border:1px solid rgba(255,255,255,.10);background: rgba(18,10,34,.55);padding:9px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .sectionTitle{margin:26px 0 10px;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:12px}
+    .sectionTitle:after{content:"";height:1px;flex:1;background: linear-gradient(90deg, rgba(215,182,74,.28), rgba(255,255,255,.06), transparent)}
+    .grid{display:grid;grid-template-columns: repeat(12, 1fr);gap:14px;margin-top:16px}
+    .card{grid-column: span 6;border:1px solid rgba(255,255,255,.10);background: linear-gradient(180deg, rgba(18,10,34,.75), rgba(18,10,34,.40));border-radius: var(--radius);box-shadow: var(--shadow2);position:relative; overflow:hidden}
+    .card .pad{padding:16px}
+    @media (max-width: 980px){.card{grid-column: span 12}}
+    .card h3{margin:0 0 6px;font-size:15px}
+    .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .card .tag{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted2)}
+    .tag .pill{padding:6px 8px;border-radius:999px;border:1px solid rgba(215,182,74,.25);background: rgba(215,182,74,.10);color:#f4e6b3;font-weight:600}
+    .hero{padding:40px 0 14px;display:grid;grid-template-columns: 1.1fr .9fr;gap:18px;align-items:start}
+    @media (max-width: 980px){ .hero{grid-template-columns:1fr} }
+    .miniTable{width:100%;border-collapse: collapse;margin-top:10px;overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.10)}
+    .miniTable th, .miniTable td{padding:10px 10px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;vertical-align:top}
+    .miniTable th{color:var(--muted);background: rgba(0,0,0,.18);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+    .miniTable tr:last-child td{border-bottom:none}
+    .calc{display:grid;grid-template-columns: 1fr 1fr;gap:14px}
+    @media (max-width: 980px){.calc{grid-template-columns:1fr}}
+    .formRow{display:grid;grid-template-columns:1fr 190px;gap:10px;align-items:center;margin:10px 0}
+    .formRow label{font-size:13px;color:var(--muted);line-height:1.3}
+    input[type="number"], select{width:100%;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background: rgba(0,0,0,.22);color: var(--text);outline:none;box-shadow: inset 0 0 0 1px rgba(0,0,0,.25)}
+    input[type="number"]:focus, select:focus{border-color: rgba(215,182,74,.35)}
+    .toggleRow{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background: rgba(0,0,0,.18);color:var(--muted);font-size:13px}
+    .toggleRow input{transform: scale(1.1)}
+    .results{border:1px solid rgba(255,255,255,.10);background: linear-gradient(180deg, rgba(18,10,34,.72), rgba(18,10,34,.40));border-radius: var(--radius);box-shadow: var(--shadow2);padding:16px}
+    .results h3{margin:0 0 10px;font-size:15px}
+    .metric{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .metric:last-child{border-bottom:none}
+    .metric .k{color:var(--muted);font-size:13px}
+    .metric .v{font-size:13px;text-align:right}
+    .metric .v b{font-size:16px}
+    .hint{margin-top:10px;color:var(--muted2);font-size:12.5px;line-height:1.55}
+    .note{margin-top:12px;padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background: rgba(0,0,0,.16);color: var(--muted);font-size:13px;line-height:1.55}
+    .note b{color:#fff}
+    .note .ok{color:var(--ok);font-weight:700}
+    .note .warn{color:var(--warn);font-weight:700}
+    a:not(.btn){color:#f4e6b3;text-decoration:none;border-bottom:1px dashed rgba(215,182,74,.45)}
+    a:not(.btn):hover{border-bottom-color: rgba(215,182,74,.85)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .footer{margin-top:28px;color: rgba(200,191,230,.70);font-size:12px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;border-top:1px solid rgba(255,255,255,.08);padding-top:16px}
+
+    /* Reveal animations */
+    .reveal{opacity:0; transform: translateY(10px) scale(.995); transition: opacity .55s ease, transform .55s ease}
+    .reveal.in{opacity:1; transform: translateY(0) scale(1)}
+  </style>
+</head>
+<body>
+  <div class="particles" aria-hidden="true"></div>
+  <div class="aura" id="aura" aria-hidden="true"></div>
+
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="sigil" aria-hidden="true"></div>
+        <div>
+          <h1>Agent Authority</h1>
+          <p>Employer Partner Page • Program + Calculator</p>
+        </div>
+      </div>
+      <div class="ctaRow">
+        <a class="btn" href="agent_authority_employee_page.html"><span class="dot"></span>Employee Page</a>
+        <a class="btn" href="#how"><span class="dot"></span>How it works</a>
+        <a class="btn" href="#credits"><span class="dot"></span>Credits + Share</a>
+        <a class="btn primary" href="#calculator"><span class="dot"></span>Earnings Calculator</a>
+        <a class="btn" href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener"><span class="dot"></span>Credibility Editorial</a>
+        <a class="btn" href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener"><span class="dot"></span>Proof App</a>
+        <a class="btn" href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener"><span class="dot"></span>Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="panel reveal" data-tilt>
+        <div class="pad">
+          <div class="kicker"><span class="bar"></span><span>Employer-sponsored authority</span></div>
+          <h2 class="title">You sponsor credibility. Agents convert faster. You earn recurring share.</h2>
+          <p class="subtitle">
+            Agent Authority is built for companies with lots of agents/contractors where personal credibility matters.
+            You offer every agent a premium 3D web presence (plus ongoing SEO/geo content) as a benefits layer.
+            Agents pay monthly during employment/contract, and your company earns a share of those subscriptions.
+          </p>
+          <div class="chips">
+            <div class="chip"><b>Intro Pack:</b> $167 (1 month, optional, not counted toward term)</div>
+            <div class="chip"><b>Minimum commitment:</b> 6 months (term options 6/9/12)</div>
+            <div class="chip"><b>Employer share:</b> 13% base (+4% per referred business onboarded, cap 31%)</div>
+            <div class="chip"><b>Setup:</b> typically &lt; 30 minutes (Zoom-friendly)</div>
+          </div>
+
+          <div class="note">
+            <b>What this installs:</b> a consistent authority-grade footprint that makes your team look like a serious machine. 🧠
+          </div>
+        </div>
+      </div>
+
+      <div class="panel reveal" data-tilt>
+        <div class="pad">
+          <div class="kicker"><span class="bar"></span><span>Credibility boosters</span></div>
+          <div class="grid">
+            <div class="card"><div class="pad">
+              <h3>Editorial Proof</h3>
+              <p>Operator-grade breakdowns that show how we think and why our systems exist.</p>
+              <div class="tag"><span class="pill">Read</span><a href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener">Billions Stolen From American Workers</a></div>
+            </div></div>
+            <div class="card"><div class="pad">
+              <h3>Shipped Workflow App</h3>
+              <p>A live example of turning real-world processes into clean tools that build trust and convert users.</p>
+              <div class="tag"><span class="pill">Open</span><a href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener">Worker Contractor WageCenter</a></div>
+            </div></div>
+            <div class="card"><div class="pad">
+              <h3>SOLE Rep (Revenue Booster)</h3>
+              <p>Every build includes approved vendor scripts your agents can pitch for extra commission paths.</p>
+              <div class="tag"><span class="pill">Included</span><span>in every tier</span></div>
+            </div></div>
+            <div class="card"><div class="pad">
+              <h3>Apex Operator Resource Pool</h3>
+              <p>Agents get access to the Apex Operator Playbook (used in the $11K SkyeWays to Success Cohort) while active.</p>
+              <div class="tag"><span class="pill">Included</span><span>while active</span></div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="sectionTitle" id="how">How the employer program works</div>
+    <section class="panel reveal" data-tilt>
+      <div class="pad">
+        <table class="miniTable" aria-label="Employer workflow">
+          <thead><tr><th>Step</th><th>What happens</th><th>Time</th></tr></thead>
+          <tbody>
+            <tr><td><b>1) Partner setup</b></td><td>Align rollout, eligibility, internal announcement, and referral tracking.</td><td class="mono">~ 30 min</td></tr>
+            <tr><td><b>2) Agent intake</b></td><td>Intake per agent (virtual-friendly). We lock positioning, proof, CTA, and launch plan.</td><td class="mono">15–25 min/agent</td></tr>
+            <tr><td><b>3) Intro (optional)</b></td><td>$167 proof month. If continuing, the agent selects a 6/9/12 month package.</td><td class="mono">1 month</td></tr>
+            <tr><td><b>4) Monthly program</b></td><td>Sites live + hosting + tier-based content + SOLE Rep + resource pool.</td><td class="mono">6–12 months</td></tr>
+            <tr><td><b>5) Continuity</b></td><td>If an agent separates, they can retain services via account manager (we don’t rip away invested work).</td><td class="mono">as needed</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><b>Employer objective:</b> faster conversion, cleaner brand presence, and retention-friendly benefits without you building anything. ✅</div>
+      </div>
+    </section>
+
+    <div class="sectionTitle" id="credits">Credits + revenue share</div>
+    <section class="panel reveal" data-tilt>
+      <div class="pad">
+        <p class="subtitle" style="margin-top:0">
+          Agents enrolling through your company receive the <b>SOLE Partner Discount</b> as a credit applied across the selected term.
+          Your company earns revenue share from the resulting subscriptions. Your share increases when you refer other businesses that onboard agents.
+        </p>
+        <table class="miniTable" aria-label="Credits and share">
+          <thead><tr><th>Item</th><th>Value</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><b>Partner credit (6-month)</b></td><td><b>$2,222</b></td><td>Applied across 6 months</td></tr>
+            <tr><td><b>Partner credit (9-month)</b></td><td><b>$2,711</b></td><td>Applied across 9 months</td></tr>
+            <tr><td><b>Partner credit (12-month)</b></td><td><b>$4,444</b></td><td>Applied across 12 months</td></tr>
+            <tr><td><b>Employer share</b></td><td><b>13%</b> base</td><td>Paid from active agent subscriptions</td></tr>
+            <tr><td><b>Referral accelerator</b></td><td><b>+4%</b> per onboarded business</td><td>Cap at <b>31%</b></td></tr>
+            <tr><td><b>Kaixu credit</b></td><td><b>$8,888</b></td><td>Annual required for Kaixu builds</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><b class="warn">Important:</b> referral boost counts only when the referred business completes intake and onboards agents. 🧾</div>
+      </div>
+    </section>
+
+    <div class="sectionTitle" id="calculator">Employer earnings + agent cost calculator</div>
+    <section class="calc">
+      <div class="panel reveal" data-tilt>
+        <div class="pad">
+          <p class="subtitle" style="margin-top:0">
+            Model your rollout. This estimates employee spend after credits and your revenue share including referral boosts.
+          </p>
+
+          <div class="formRow">
+            <label for="termMonths">Term length (months)</label>
+            <select id="termMonths">
+              <option value="6">6 months</option>
+              <option value="9">9 months</option>
+              <option value="12" selected>12 months (annual)</option>
+            </select>
+          </div>
+
+          <div class="toggleRow">
+            <input id="applyCredit" type="checkbox" checked />
+            <label for="applyCredit" style="cursor:pointer">Apply SOLE Partner Discount credit (by term)</label>
+          </div>
+
+          <div class="formRow"><label for="starterCount">Starter agents (base $972/mo)</label><input id="starterCount" type="number" min="0" step="1" value="0" /></div>
+          <div class="formRow"><label for="eliteCount">Elite agents (base $1,322/mo)</label><input id="eliteCount" type="number" min="0" step="1" value="0" /></div>
+          <div class="formRow"><label for="emergenceCount">Emergence agents (base $1,882/mo)</label><input id="emergenceCount" type="number" min="0" step="1" value="0" /></div>
+
+          <div class="formRow"><label for="kaixuCount">Kaixu agents (annual required)</label><input id="kaixuCount" type="number" min="0" step="1" value="0" /></div>
+          <div class="formRow"><label for="kaixuMonthly">Kaixu monthly rate (2,999–6,700)</label><input id="kaixuMonthly" type="number" min="2999" max="6700" step="1" value="2999" /></div>
+
+          <div class="formRow"><label for="referrals">Onboarded business referrals</label><input id="referrals" type="number" min="0" step="1" value="0" /></div>
+
+          <div class="toggleRow">
+            <input id="includeIntro" type="checkbox" />
+            <label for="includeIntro" style="cursor:pointer">Include Intro Pack as one-time add-on ($167 per agent)</label>
+          </div>
+
+          <div class="note"><b>Tip:</b> use conservative values first, then adjust. Kaixu rate covers deeper automation + AI integration. ⚙️</div>
+
+          <div class="hint">Proof links: <a href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener">editorial</a> • <a href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener">app</a> • <a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener">contact</a></div>
+        </div>
+      </div>
+
+      <aside class="results reveal" aria-live="polite">
+        <h3>Results</h3>
+
+        <div class="metric"><div class="k">Total active agents</div><div class="v"><b id="totalAgents">0</b></div></div>
+        <div class="metric"><div class="k">Credit applied</div><div class="v"><b id="creditLabel">Yes</b></div></div>
+        <div class="metric"><div class="k">Credit value for term</div><div class="v"><b id="creditValue">$0</b></div></div>
+        <div class="metric"><div class="k">Employee spend / month (after credit)</div><div class="v"><b id="employeeSpend">$0</b></div></div>
+        <div class="metric"><div class="k">Employee spend / selected term</div><div class="v"><b id="employeeSpendTerm">$0</b></div></div>
+
+        <div class="metric" id="introRow" style="display:none"><div class="k">Intro Pack one-time total (optional)</div><div class="v"><b id="introTotal">$0</b></div></div>
+        <div class="metric" id="grandRow" style="display:none"><div class="k">Term total + Intro Pack (optional)</div><div class="v"><b id="grandTotal">$0</b></div></div>
+
+        <div class="metric"><div class="k">Employer share %</div><div class="v"><b id="sharePct">13%</b></div></div>
+        <div class="metric"><div class="k">Employer earns / month</div><div class="v"><b id="employerMonthly">$0</b></div></div>
+        <div class="metric"><div class="k">Employer earns / selected term</div><div class="v"><b id="employerTerm">$0</b></div></div>
+        <div class="metric"><div class="k">Boost vs 13% base (month)</div><div class="v"><b id="boostValue">$0</b></div></div>
+        <div class="metric"><div class="k">Avg cost / agent / month</div><div class="v"><b id="avgAgent">$0</b></div></div>
+
+        <div class="note"><b class="ok">Action step:</b> Want the rollout script + intake schedule? Message us: <a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a></div>
+      </aside>
+    </section>
+
+    <div class="footer">
+      <div>Skyes Over London LC • Agent Authority</div>
+      <div>Proof: <a href="https://13thsole.netlify.app/pages/blogs/editorials.html/billions_stolen_from_american_workers" target="_blank" rel="noopener">Editorial</a> • <a href="https://worker-contractor-wagecenter.netlify.app/" target="_blank" rel="noopener">App</a> • Contact: <a href="https://13thsole.netlify.app/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a></div>
+    </div>
+  </div>
+
+  <script>
+    // Cursor aura follow
+    (function(){
+      const aura = document.getElementById("aura");
+      let x = -9999, y = -9999;
+      let tx = x, ty = y;
+      const lerp = (a,b,t)=>a+(b-a)*t;
+
+      window.addEventListener("mousemove", (e)=>{ x = e.clientX; y = e.clientY; aura.style.opacity = ".75"; });
+      window.addEventListener("mouseleave", ()=>{ aura.style.opacity = "0"; });
+
+      function tick(){
+        tx = lerp(tx, x, 0.16);
+        ty = lerp(ty, y, 0.16);
+        aura.style.transform = `translate(${tx-160}px, ${ty-160}px)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    // Tilt + light tracking (no external libs)
+    function attachTilt(el){
+      const max = 8;
+      const onMove = (e)=>{
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (y - 0.5) * -max;
+        const ry = (x - 0.5) * max;
+        el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-1px)`;
+        el.style.setProperty("--mx", (x*100).toFixed(1) + "%");
+        el.style.setProperty("--my", (y*100).toFixed(1) + "%");
+      };
+      const onLeave = ()=>{ el.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)"; };
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+    }
+    document.querySelectorAll("[data-tilt]").forEach(attachTilt);
+
+    // Reveal on scroll
+    (function(){
+      const items = Array.from(document.querySelectorAll(".reveal"));
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(n=>io.observe(n));
+    })();
+
+    // Calculator
+    (function(){
+      const $ = (id)=>document.getElementById(id);
+      const money = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+
+      const BASE = { starter:972, elite:1322, emergence:1882 };
+      const INTRO_ONE_TIME = 167;
+
+      function termCredit(months){
+        if(months === 6) return 2222;
+        if(months === 9) return 2711;
+        if(months === 12) return 4444;
+        return 0;
+      }
+      function sharePercent(referrals){ return Math.min(13 + 4*referrals, 31); }
+
+      function clampInt(n){ n = Number.isFinite(n) ? n : 0; return Math.max(0, Math.floor(n)); }
+      function clampNum(n, min, max){ n = Number.isFinite(n) ? n : min; n = Math.max(min, n); if(max!==undefined) n = Math.min(max, n); return n; }
+
+      function netMonthly(baseMonthly, months, applyCredit){
+        if(!applyCredit) return baseMonthly;
+        const c = termCredit(months);
+        return Math.max(0, baseMonthly - (c / months));
+      }
+
+      function read(){
+        const months = clampInt(parseFloat($("termMonths").value));
+        const applyCredit = $("applyCredit").checked;
+
+        const starter = clampInt(parseFloat($("starterCount").value));
+        const elite = clampInt(parseFloat($("eliteCount").value));
+        const emergence = clampInt(parseFloat($("emergenceCount").value));
+        const kaixu = clampInt(parseFloat($("kaixuCount").value));
+        const kaixuMonthlyRaw = clampNum(parseFloat($("kaixuMonthly").value), 0, 6700);
+        const referrals = clampInt(parseFloat($("referrals").value));
+        const includeIntro = $("includeIntro").checked;
+
+        const totalAgents = starter + elite + emergence + kaixu;
+
+        const creditVal = applyCredit ? termCredit(months) : 0;
+
+        const starterMonthly = netMonthly(BASE.starter, months, applyCredit);
+        const eliteMonthly = netMonthly(BASE.elite, months, applyCredit);
+        const emergenceMonthly = netMonthly(BASE.emergence, months, applyCredit);
+
+        // Kaixu: extra annual credit, prorated monthly when applyCredit is on
+        const kaixuCreditMonthly = applyCredit ? (8888 / 12) : 0;
+        const kaixuMonthly = Math.max(0, kaixuMonthlyRaw - kaixuCreditMonthly);
+
+        const employeeSpend =
+          starter * starterMonthly +
+          elite * eliteMonthly +
+          emergence * emergenceMonthly +
+          kaixu * kaixuMonthly;
+
+        const pct = sharePercent(referrals);
+        const employerMonthly = employeeSpend * (pct/100);
+        const employerTerm = employerMonthly * months;
+
+        const employeeSpendTerm = employeeSpend * months;
+
+        const baseEmployerMonthly = employeeSpend * 0.13;
+        const boostValue = employerMonthly - baseEmployerMonthly;
+
+        const introTotal = includeIntro ? (totalAgents * INTRO_ONE_TIME) : 0;
+        const grandTotal = includeIntro ? (employeeSpendTerm + introTotal) : 0;
+
+        const avgAgent = totalAgents > 0 ? (employeeSpend / totalAgents) : 0;
+
+        $("totalAgents").textContent = String(totalAgents);
+        $("creditLabel").textContent = applyCredit ? "Yes" : "No";
+        $("creditValue").textContent = money.format(creditVal);
+
+        $("employeeSpend").textContent = money.format(employeeSpend);
+        $("employeeSpendTerm").textContent = money.format(employeeSpendTerm);
+
+        $("sharePct").textContent = pct.toFixed(0) + "%";
+        $("employerMonthly").textContent = money.format(employerMonthly);
+        $("employerTerm").textContent = money.format(employerTerm);
+        $("boostValue").textContent = money.format(boostValue);
+        $("avgAgent").textContent = money.format(avgAgent);
+
+        const introRow = $("introRow");
+        const grandRow = $("grandRow");
+        if(includeIntro && totalAgents > 0){
+          introRow.style.display = "";
+          grandRow.style.display = "";
+          $("introTotal").textContent = money.format(introTotal);
+          $("grandTotal").textContent = money.format(grandTotal);
+        } else {
+          introRow.style.display = "none";
+          grandRow.style.display = "none";
+        }
+      }
+
+      ["termMonths","applyCredit","starterCount","eliteCount","emergenceCount","kaixuCount","kaixuMonthly","referrals","includeIntro"].forEach(id=>{
+        $(id).addEventListener("input", read);
+        $(id).addEventListener("change", read);
+      });
+
+      read();
+    })();
+  </script>
+    <link rel="stylesheet" href="../../../assets/menu.css">
+    <script src="../../../assets/menu.js" defer></script>
+  </body>
+  </html>

@@ -2,6 +2,7 @@ import health from '../netlify/functions/health.js';
 import authIntrospect from '../netlify/functions/auth-introspect.js';
 import authSignup from '../netlify/functions/auth-signup.js';
 import authLogin from '../netlify/functions/auth-login.js';
+import authCard from '../netlify/functions/auth-card.js';
 import adminLogin from '../netlify/functions/admin-login.js';
 import adminPlatformEvents from '../netlify/functions/admin-platform-events.js';
 import platformEventIngest from '../netlify/functions/platform-event-ingest.js';
@@ -10,6 +11,10 @@ import authTokenIssue from '../netlify/functions/auth-token-issue.js';
 import oauthJwks from '../netlify/functions/oauth-jwks.js';
 import openidConfiguration from '../netlify/functions/openid-configuration.js';
 import oauthWellKnown from '../netlify/functions/oauth-well-known.js';
+import skyepayOffers from '../netlify/functions/skyepay-offers.js';
+import skyepayCheckout from '../netlify/functions/skyepay-checkout.js';
+import skyepayStatus from '../netlify/functions/skyepay-status.js';
+import adminSkyePayLedger from '../netlify/functions/admin-skyepay-ledger.js';
 
 const ROUTES = [
   ['GET', '/health', health],
@@ -18,6 +23,10 @@ const ROUTES = [
   ['POST', '/.netlify/functions/auth-signup', authSignup],
   ['POST', '/auth/login', authLogin],
   ['POST', '/.netlify/functions/auth-login', authLogin],
+  ['GET', '/auth-card', authCard],
+  ['POST', '/auth-card', authCard],
+  ['GET', '/.netlify/functions/auth-card', authCard],
+  ['POST', '/.netlify/functions/auth-card', authCard],
   ['POST', '/auth-introspect', authIntrospect],
   ['POST', '/auth/introspect', authIntrospect],
   ['POST', '/.netlify/functions/auth-introspect', authIntrospect],
@@ -37,7 +46,17 @@ const ROUTES = [
   ['GET', '/.well-known/openid-configuration', openidConfiguration],
   ['GET', '/.netlify/functions/openid-configuration', openidConfiguration],
   ['GET', '/oauth/.well-known/openid-configuration', oauthWellKnown],
-  ['GET', '/.netlify/functions/oauth-well-known', oauthWellKnown]
+  ['GET', '/.netlify/functions/oauth-well-known', oauthWellKnown],
+  ['GET', '/skyepay/offers', skyepayOffers],
+  ['GET', '/.netlify/functions/skyepay-offers', skyepayOffers],
+  ['POST', '/skyepay/checkout', skyepayCheckout],
+  ['POST', '/.netlify/functions/skyepay-checkout', skyepayCheckout],
+  ['GET', '/skyepay/status', skyepayStatus],
+  ['GET', '/.netlify/functions/skyepay-status', skyepayStatus],
+  ['GET', '/admin/skyepay-ledger', adminSkyePayLedger],
+  ['PATCH', '/admin/skyepay-ledger', adminSkyePayLedger],
+  ['GET', '/.netlify/functions/admin-skyepay-ledger', adminSkyePayLedger],
+  ['PATCH', '/.netlify/functions/admin-skyepay-ledger', adminSkyePayLedger]
 ];
 
 function routeKey(method, pathname) {
@@ -46,6 +65,15 @@ function routeKey(method, pathname) {
 }
 
 const routeMap = new Map(ROUTES.map(([method, path, handler]) => [routeKey(method, path), handler]));
+
+const ASSET_ALIASES = new Map([
+  ['/pay', '/skyepay.html'],
+  ['/store', '/skyepay-store.html'],
+  ['/gateway/skyepay', '/skyepay.html'],
+  ['/skyepay/store', '/skyepay-store.html'],
+  ['/skyepay/api', '/skyepay-api.html'],
+  ['/skyepay/api.json', '/skyepay-api.json']
+]);
 
 function hydrateProcessEnv(env) {
   if (!globalThis.process) globalThis.process = { env: {} };
@@ -62,10 +90,15 @@ function hydrateProcessEnv(env) {
 
 async function serveAsset(request, env) {
   if (!env.ASSETS) return new Response('Not found', { status: 404 });
-  const response = await env.ASSETS.fetch(request);
+  const url = new URL(request.url);
+  const normalizedPath = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, '') : url.pathname;
+  const alias = ASSET_ALIASES.get(normalizedPath);
+  const assetRequest = alias
+    ? new Request(new URL(`${alias}${url.search}`, url), request)
+    : request;
+  const response = await env.ASSETS.fetch(assetRequest);
   if (response.status !== 404) return response;
 
-  const url = new URL(request.url);
   if (!url.pathname.includes('.') && request.method === 'GET') {
     return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
   }

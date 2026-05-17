@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Setup Walkthrough | Skye Business Command Center</title>
+  <meta name="description" content="Step-by-step deployment walkthrough for Skye Business Command Center: server, DNS, environment variables, Docker launch, smoke tests, backups, app installers, and client handoff." />
+  <meta name="theme-color" content="#050711" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brandmark" href="/" aria-label="Skye Business Command Center home">
+      <span class="logo-orb" aria-hidden="true"></span>
+      <span>
+        <strong>Skye Setup Walkthrough</strong>
+        <small>internal operator deployment page</small>
+      </span>
+    </a>
+    <nav class="navlinks" aria-label="Primary navigation">
+      <a href="/index.html">Product</a>
+      <a href="/customer-portal.html">Customer Portal</a>
+      <a href="/setup.html">Setup Walkthrough</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/command-center.html">Command Center</a>
+      <a href="/pricing.html">Pricing</a><a href="/launch.html">Launch</a><a href="/demo.html">Demo</a><a href="/proof.html">Proof</a><a href="/client-onboarding.html">Onboarding</a><a href="/client-handoff.html">Handoff</a>
+    <a href="brain.html">Local Brain</a></nav>
+  </header>
+
+  <main class="shell">
+    <section class="hero compact setup-hero">
+      <p class="eyebrow">Operator-only deployment walkthrough</p>
+      <h1>Take the stack from ZIP file to sellable production instance.</h1>
+      <p class="lead">This page walks through server prep, environment setup, Docker launch, DNS/HTTPS, app installers, smoke testing, backups, and client handoff. Keep this page internal unless you intentionally publish it as a setup guide.</p>
+      <div class="actions">
+        <a class="btn primary" href="#runbook">Start Runbook</a>
+        <a class="btn" href="/command-center.html">Open <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Command Center</span></a>
+      </div>
+    </section>
+
+    <section class="split-panel cost-panel">
+      <div>
+        <p class="eyebrow">Expected monthly cost</p>
+        <h2>Budget before deploying.</h2>
+        <p>For one serious small-business production instance, budget a practical range of <strong>$60–$120/month</strong>. Ultra-lean testing can run closer to <strong>$30–$50/month</strong>. Multi-client agency hosting should budget <strong>$150–$400/month</strong> until client isolation and usage are measured.</p>
+      </div>
+      <div class="value-stack">
+        <div><strong>VPS</strong><span>$24–$75/month depending on provider and size.</span></div>
+        <div><strong>Email delivery</strong><span>$0–$20/month starting out.</span></div>
+        <div><strong>Backups</strong><span>$5–$15/month for snapshots and archive storage.</span></div>
+        <div><strong>Large files</strong><span>$0–$5/month early with object storage for modest usage.</span></div>
+      </div>
+    </section>
+
+    <section id="runbook" class="section-block">
+      <p class="eyebrow">Deployment runbook</p>
+      <h2>Follow this order. Do not skip proof checks.</h2>
+      <div class="runbook">
+        <article class="step-card">
+          <span class="step-number">01</span>
+          <h3>Prepare the server</h3>
+          <p>Use Ubuntu 22.04/24.04 on a VPS with at least 2 vCPU and 4 GB RAM. For serious production, use 4 vCPU and 8 GB RAM. Enable a firewall and allow SSH, HTTP, and HTTPS.</p>
+          <pre><code>sudo apt update
+sudo apt install -y ca-certificates curl git unzip ufw
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw --force enable</code></pre>
+          <label><input type="checkbox"> Server is online, patched, and firewall is active.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">02</span>
+          <h3>Install Docker</h3>
+          <p>The stack is Docker Compose based. Install Docker Engine and verify the daemon is running before touching app configuration.</p>
+          <pre><code>curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker
+docker --version
+docker compose version</code></pre>
+          <label><input type="checkbox"> Docker and Docker Compose respond successfully.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">03</span>
+          <h3>Unpack the build</h3>
+          <p>Upload the ZIP to the server, unzip it, enter the project directory, and create your live environment file.</p>
+          <pre><code>unzip skye-business-command-center.zip
+cd skye-business-command-center
+cp .env.example .env
+bash scripts/generate-secrets.sh</code></pre>
+          <label><input type="checkbox"> Project folder exists and .env has generated secrets.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">04</span>
+          <h3>Edit environment variables</h3>
+          <p>Open <code>.env</code> and set real passwords, app domains, SMTP values, URLs, and any provider keys. Do not use placeholder secrets in production.</p>
+          <pre><code>nano .env
+bash scripts/preflight.sh</code></pre>
+          <label><input type="checkbox"> Preflight passes without missing required values.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">05</span>
+          <h3>Launch the containers</h3>
+          <p>Pull images, build the branded hub, start the stack, and confirm every container is running.</p>
+          <pre><code>docker compose pull
+docker compose up -d --build
+docker compose ps</code></pre>
+          <label><input type="checkbox"> Hub, FreeScout, EspoCRM, InvoiceShelf, Formbricks, and databases are running.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">06</span>
+          <h3>Run smoke checks</h3>
+          <p>Smoke checks confirm that the public hub and service ports respond. This is not a substitute for full app installer completion, but it catches dead containers and broken routes.</p>
+          <pre><code>bash scripts/smoke.sh</code></pre>
+          <label><input type="checkbox"> Smoke script returns successful HTTP responses.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">07</span>
+          <h3>Configure DNS and HTTPS</h3>
+          <p>Point domains or subdomains to the VPS. Use the included Caddy template for automatic HTTPS, then replace local dashboard URLs with production URLs.</p>
+          <pre><code>cp deploy/caddy/Caddyfile.example Caddyfile
+nano Caddyfile
+# then run your chosen Caddy deployment method</code></pre>
+          <label><input type="checkbox"> Product page, dashboard, and app subdomains load over HTTPS.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">08</span>
+          <h3>Complete each app installer</h3>
+          <p>Open each internal module and finish its built-in setup. Create operator/admin users, confirm database connections, set business branding, and configure SMTP where required. These are not customer signup links.</p>
+          <div class="mini-grid">
+            <a class="mini-link" href="#" data-service="freescout">FreeScout -></a>
+            <a class="mini-link" href="#" data-service="espocrm">EspoCRM -></a>
+            <a class="mini-link" href="#" data-service="invoiceshelf">InvoiceShelf -></a>
+            <a class="mini-link" href="#" data-service="formbricks">Formbricks -></a>
+          </div>
+          <p><a class="btn ghost" href="/admin-tools.html">Open branded operator tools page</a></p>
+          <label><input type="checkbox"> Admin accounts and first business workspace are created.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">09</span>
+          <h3>Set up the sellable workflows</h3>
+          <p>This is where the package becomes worth money. Customize the CRM pipeline, support inbox, intake forms, invoice branding, staff permissions, and client handoff SOPs.</p>
+          <ul class="clean-list columns">
+            <li>Support mailbox connected</li>
+            <li>CRM stages renamed for the client</li>
+            <li>Quote request form published</li>
+            <li>Invoice and estimate templates branded</li>
+            <li>Owner and staff accounts created</li>
+            <li>Dashboard links changed to production domains</li>
+          </ul>
+          <label><input type="checkbox"> The instance looks like a client business portal, not a raw app bundle.</label>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">10</span>
+          <h3>Backups and handoff</h3>
+          <p>Run an initial backup, document restore notes, confirm credentials are stored safely, and give the client a clean walkthrough instead of technical noise.</p>
+          <pre><code>bash scripts/backup.sh
+ls -lah backups/</code></pre>
+          <label><input type="checkbox"> Backup exists and client handoff is complete.</label>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel legal-panel">
+      <p class="eyebrow">Do not skip this</p>
+      <h2>Production release checklist</h2>
+      <div class="check-grid">
+        <label><input type="checkbox"> No default passwords remain.</label>
+        <label><input type="checkbox"> HTTPS is active on every public route.</label>
+        <label><input type="checkbox"> SMTP sends and receives test messages.</label>
+        <label><input type="checkbox"> App installers are fully completed.</label>
+        <label><input type="checkbox"> Client-facing pages contain no internal notes.</label>
+        <label><input type="checkbox"> Open-source license disclosure remains in terms/contract language.</label>
+        <label><input type="checkbox"> Backups are enabled and restore notes exist.</label>
+        <label><input type="checkbox"> Support plan and monthly scope are written down.</label>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Skye Setup Walkthrough · Internal Operator Surface</span>
+    <span>Prove the deployment before selling the handoff.</span>
+  </footer>
+<script src="/assets/service-links.js"></script>
+</body>
+</html>

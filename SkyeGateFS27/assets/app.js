@@ -42,7 +42,7 @@
   const PRICED = {
     openai: new Set(["gpt-4o", "gpt-4o-mini"]),
     anthropic: new Set(["claude-3-5-sonnet-20241022", "claude-opus-4-6"]),
-    gemini: new Set(["gemini-2.5-flash"])
+    gemini: new Set(["gemini-2.5-flash", "gemini-embedding-001"])
   };
 
   // ------------------------------
@@ -103,6 +103,30 @@
 
   function numberFmt(value) {
     return new Intl.NumberFormat("en-US").format(Number(value || 0));
+  }
+
+  function renderFs27VisualBars(el, rows, emptyText = "No visual data loaded yet.") {
+    if (!el) return;
+    const safeRows = (rows || []).filter(Boolean);
+    if (!safeRows.length) {
+      el.innerHTML = `<div class="fs27-visual-empty">${escapeHtml(emptyText)}</div>`;
+      return;
+    }
+    const max = Math.max(1, ...safeRows.map((row) => Number(row.max ?? row.value ?? 0)));
+    el.innerHTML = safeRows.map((row) => {
+      const value = Math.max(0, Number(row.value || 0));
+      const amount = Math.max(0, Math.min(100, (value / max) * 100));
+      const detail = row.detail || numberFmt(value);
+      return `
+        <div class="fs27-visual-row">
+          <span>${escapeHtml(row.label || "Signal")}</span>
+          <div class="fs27-visual-track" role="progressbar" aria-valuenow="${amount.toFixed(1)}" aria-valuemin="0" aria-valuemax="100">
+            <i style="width:${amount.toFixed(2)}%"></i>
+          </div>
+          <strong>${escapeHtml(detail)}</strong>
+        </div>
+      `;
+    }).join("");
   }
 
   function monthKeyUTC() {
@@ -404,6 +428,66 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     } catch { }
   }
 
+  function mountPricedModelPicker(textareaSel, providersInputSel) {
+    const ta = $(textareaSel);
+    if (!ta || document.getElementById(`picker-${ta.id}`)) return;
+
+    const wrap = document.createElement("div");
+    wrap.id = `picker-${ta.id}`;
+    wrap.style.cssText = "margin-top:8px;padding:10px;border:1px solid rgba(255,255,255,.10);border-radius:12px;background:rgba(0,0,0,.20);display:flex;gap:8px;flex-wrap:wrap;align-items:center;";
+
+    const label = document.createElement("span");
+    label.className = "muted small";
+    label.textContent = "Allowlist builder:";
+
+    const providerSel = document.createElement("select");
+    providerSel.style.cssText = "padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:inherit;";
+    Object.keys(PRICED).sort().forEach((provider) => {
+      const opt = document.createElement("option");
+      opt.value = provider;
+      opt.textContent = provider;
+      providerSel.appendChild(opt);
+    });
+
+    const modeSel = document.createElement("select");
+    modeSel.style.cssText = providerSel.style.cssText;
+    [["priced", "Priced models"], ["wildcard", "Wildcard"]].forEach(([value, text]) => {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = text;
+      modeSel.appendChild(opt);
+    });
+
+    const applyBtn = document.createElement("button");
+    applyBtn.type = "button";
+    applyBtn.className = "btn";
+    applyBtn.textContent = "Apply";
+
+    applyBtn.addEventListener("click", () => {
+      const provider = providerSel.value;
+      let current = {};
+      try {
+        current = ta.value.trim() ? JSON.parse(ta.value) : {};
+      } catch {
+        return showToast("Allowed models JSON is invalid. Fix or clear it first.", false);
+      }
+      current[provider] = modeSel.value === "wildcard" ? ["*"] : Array.from(PRICED[provider]).sort();
+      ta.value = JSON.stringify(current, null, 2);
+
+      const providersInput = providersInputSel ? $(providersInputSel) : null;
+      if (providersInput) {
+        const providers = providersInput.value.split(",").map((item) => item.trim()).filter(Boolean);
+        if (!providers.includes(provider)) providers.push(provider);
+        providersInput.value = providers.join(",");
+      }
+      warnIfUnpriced(providersInput?.value.split(",").map((item) => item.trim()).filter(Boolean), current);
+      showToast("Allowlist JSON updated.", true);
+    });
+
+    wrap.append(label, providerSel, modeSel, applyBtn);
+    ta.insertAdjacentElement("afterend", wrap);
+  }
+
   // ------------------------------
   // Auth + API wrappers
   // ------------------------------
@@ -531,6 +615,9 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     $("#pricingModelCount").textContent = String(data?.summary?.model_count || 0);
     $("#pricingUsedCount").textContent = String(data?.summary?.used_catalog_models_this_month || 0);
     $("#pricingUnpricedCount").textContent = String(data?.summary?.unpriced_usage_rows || 0);
+    $("#pricingMonthBill") && ($("#pricingMonthBill").textContent = money(data?.summary?.billed_cents_this_month || 0));
+    $("#pricingUpstreamCost") && ($("#pricingUpstreamCost").textContent = money(data?.summary?.upstream_cost_cents_this_month || 0));
+    $("#pricingGrossMargin") && ($("#pricingGrossMargin").textContent = money(data?.summary?.gross_margin_cents_this_month || 0));
 
     const tbody = $("#pricingCatalogTable tbody");
     if (tbody) {
@@ -540,10 +627,16 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
           <td>${escapeHtml(row.model || "")}</td>
           <td>$${Number(row.input_per_1m_usd || 0).toFixed(4)}</td>
           <td>$${Number(row.output_per_1m_usd || 0).toFixed(4)}</td>
+          <td>$${Number(row.upstream_input_per_1m_usd || 0).toFixed(4)}</td>
+          <td>$${Number(row.upstream_output_per_1m_usd || 0).toFixed(4)}</td>
+          <td>${Number(row.gross_margin_pct || row.computed_gross_margin_pct || 0).toFixed(1)}%</td>
           <td>${escapeHtml(row.calls_this_month || 0)}</td>
           <td>${money(row.cost_cents_this_month || 0)}</td>
+          <td>${money(row.upstream_cost_cents_this_month || 0)}</td>
+          <td>${money(row.gross_margin_cents_this_month || 0)}</td>
+          <td>${escapeHtml(row.source_status || "unlabeled")}</td>
         </tr>
-      `).join("") || `<tr><td colspan="6" class="muted small">No pricing catalog rows found.</td></tr>`;
+      `).join("") || `<tr><td colspan="12" class="muted small">No pricing catalog rows found.</td></tr>`;
     }
 
     const pre = $("#pricingCatalogUnpriced");
@@ -983,15 +1076,28 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     $("#pcRemoteDocs") && ($("#pcRemoteDocs").textContent = numberFmt(counts.connected_remote_docs || 0));
     $("#pcCohortSeats") && ($("#pcCohortSeats").textContent = numberFmt(counts.cohort_seats || 0));
     $("#pcMailThreads") && ($("#pcMailThreads").textContent = numberFmt(counts.skymail_threads || 0));
+    $("#pcMirroredActions") && ($("#pcMirroredActions").textContent = numberFmt(counts.mirrored_platform_events || 0));
+    $("#pcBillableActions") && ($("#pcBillableActions").textContent = numberFmt(counts.billable_action_events || 0));
+    $("#pcAiUsageEvents") && ($("#pcAiUsageEvents").textContent = numberFmt(counts.ai_usage_events || 0));
+    $("#pcAiMetered") && ($("#pcAiMetered").textContent = money(counts.ai_metered_cents || 0));
     $("#pcAttentionCount") && ($("#pcAttentionCount").textContent = numberFmt(counts.attention_needed || 0));
     $("#pcOnboardingCount") && ($("#pcOnboardingCount").textContent = numberFmt(counts.onboarding_inflight || 0));
     $("#pcStationCustomers") && ($("#pcStationCustomers").textContent = numberFmt(counts.station_active_customers || 0));
     $("#pcBackupBrain") && ($("#pcBackupBrain").textContent = backupBrain.configured ? "ready" : "off");
+    $("#pcVisualState") && ($("#pcVisualState").textContent = counts.mirrored_platform_events ? "live" : "waiting");
+    renderFs27VisualBars($("#pcVisualBars"), [
+      { label: "0S mirrored events", value: counts.metraiyux_0s_events || 0, max: counts.mirrored_platform_events || 1, detail: numberFmt(counts.metraiyux_0s_events || 0) },
+      { label: "0S action events", value: counts.os_action_events || 0, max: counts.mirrored_platform_events || 1, detail: numberFmt(counts.os_action_events || 0) },
+      { label: "Billable actions", value: counts.billable_action_events || 0, max: counts.mirrored_platform_events || 1, detail: numberFmt(counts.billable_action_events || 0) },
+      { label: "AI metered", value: counts.ai_metered_cents || 0, max: Math.max(1, counts.ai_metered_cents || 0, 10000), detail: money(counts.ai_metered_cents || 0) },
+      { label: "Sovereign lanes", value: counts.sovereign_stack_surfaces || 0, max: counts.surfaces || 1, detail: `${numberFmt(counts.sovereign_stack_surfaces || 0)} / ${numberFmt(counts.surfaces || 0)}` },
+      { label: "Active customers", value: counts.station_active_customers || 0, max: Math.max(1, counts.station_active_customers || 0, counts.cohort_seats || 0), detail: numberFmt(counts.station_active_customers || 0) }
+    ], "Load platform control to render FS27 mirror bars.");
 
     const storageState = $("#pcStorageState");
     if (storageState) {
       storageState.textContent = data?.storage_ready
-        ? `Shared Neon platform-state storage is active. ${numberFmt(counts.reviewed_platforms || 0)} platform lanes have explicit operator review saved in SkyeGateFS27.`
+        ? `FS27 platform-state storage is active. ${numberFmt(counts.reviewed_platforms || 0)} platform lanes have explicit operator review saved, ${numberFmt(counts.mirrored_platform_events || 0)} mirrored events are visible, and ${numberFmt(counts.sovereign_stack_surfaces || 0)} sovereign stack lanes are tracked.`
         : "Shared Neon platform-state storage is not configured yet. Gateway can still see linked surfaces, but server-backed platform state will not persist.";
     }
 
@@ -1834,6 +1940,7 @@ async function generatePushInvoice() {
   function clearPlatformEventsTable() {
     const tbody = $("#platformEventsTable tbody");
     if (tbody) tbody.innerHTML = "";
+    renderFs27VisualBars($("#platformEventLaneVisual"), [], "Load platform history to render mirrored event lanes.");
   }
 
   function renderPlatformEventRow(event) {
@@ -1882,6 +1989,11 @@ async function generatePushInvoice() {
       events.length
         ? `Loaded ${summary.total || events.length} events. Billable: ${summary.billable || 0}. Privileged: ${summary.privileged || 0}. Lanes: ${laneParts.join(", ") || "n/a"}.`
         : "No platform events found for the selected filter."
+    );
+    renderFs27VisualBars(
+      $("#platformEventLaneVisual"),
+      Object.entries(summary.by_lane || {}).map(([lane, value]) => ({ label: lane, value, detail: numberFmt(value) })),
+      "Load platform history to render mirrored event lanes."
     );
     platformEventStatus(events.length ? `${events.length} loaded` : "idle");
     showToast("Loaded platform history.", true);

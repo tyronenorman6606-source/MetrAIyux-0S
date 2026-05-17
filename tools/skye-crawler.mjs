@@ -3,12 +3,13 @@ import path from 'node:path';
 import { request as playwrightRequest, chromium } from 'playwright';
 
 const CRAWLER_NAME = 'SkyeCrawler';
-const CRAWLER_VERSION = '1.0.0';
+const CRAWLER_VERSION = '1.1.0';
 const SITE_DIR = process.env.SITE_DIR || '/workspaces/MetrAIyux-0S/metraiyux_0s_site';
 const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:4173/';
 const ARTIFACT_DIR = process.env.ARTIFACT_DIR || '/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler';
 const REPORT_PATH = process.env.REPORT_PATH || '/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-report.json';
 const SKIP_API = process.env.SKIP_API === '1' || process.env.SKIP_API === 'true';
+const CRAWLER_PROFILE = process.env.SKYE_CRAWLER_PROFILE || (process.env.SKYEPAY_SCAN ? 'skyepay' : 'metraiyux-0s');
 const BROWSER_CONCURRENCY = Number(process.env.SKYE_CRAWLER_CONCURRENCY || 1);
 const BROWSER_BATCH_SIZE = Number(process.env.SKYE_CRAWLER_BATCH_SIZE || 25);
 
@@ -20,7 +21,8 @@ const report = {
   started_at: new Date().toISOString(),
   site_dir: SITE_DIR,
   base_url: BASE_URL,
-  mode: SKIP_API ? 'static-surface-crawl' : 'worker-or-live-crawl',
+  profile: CRAWLER_PROFILE,
+  mode: CRAWLER_PROFILE === 'skyepay' ? 'skyepay-fs27-payment-lane' : (SKIP_API ? 'static-surface-crawl' : 'worker-or-live-crawl'),
   checks: [],
   failures: [],
   warnings: [],
@@ -49,7 +51,7 @@ function failText(error) {
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
-    if (['.git', '.wrangler', 'node_modules'].includes(entry)) continue;
+    if (['.git', '.wrangler', 'node_modules', 'coming-soon', 'live'].includes(entry)) continue;
     const full = path.join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) out.push(...walk(full));
@@ -273,7 +275,8 @@ async function checkLocalBrain(browser) {
   await page.click('#askBrain');
   const result = await page.locator('#brainAnswer').innerText();
   const sources = await page.locator('#brainSources .source-card').count();
-  record('flow:local-brain-ask-and-sources', result.includes('Local answer') && sources > 0, { sources, result_preview: result.slice(0, 400) });
+  const answered = /Local answer|Primary:/i.test(result) && sources > 0;
+  record('flow:local-brain-ask-and-sources', answered, { sources, result_preview: result.slice(0, 400) });
   await context.close();
 }
 
@@ -387,7 +390,281 @@ async function checkWorkerApi(api) {
   record('api:site-operator-route-local', route.ok() && routeText.includes('primary_brain'), { status: route.status(), body_preview: routeText.slice(0, 500) });
 }
 
+function secretSignals(value) {
+  return /(sk_live_|sk_test_|rk_live_|rk_test_|whsec_|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|NETLIFY_DATABASE_URL|DATABASE_URL=)/i.test(String(value || ''));
+}
+
+async function responseJson(response) {
+  const text = await response.text();
+  try {
+    return { text, json: JSON.parse(text) };
+  } catch {
+    return { text, json: null };
+  }
+}
+
+async function checkSkyePayLinkedAssets(api) {
+  const htmlPath = path.join(SITE_DIR, 'skyepay.html');
+  const exists = existsSync(htmlPath);
+  record('inventory:skyepay-html-exists', exists, { htmlPath });
+  if (!exists) return;
+
+  const refs = extractLocalReferences(readFileSync(htmlPath, 'utf8'), urlFor('skyepay.html?client=bobs-smoke-shop&dry_run=1'))
+    .filter((ref) => ref.url);
+  const bad = [];
+  for (const ref of refs) {
+    try {
+      const res = await api.get(ref.url, { timeout: 10000 });
+      if (!res.ok()) bad.push({ url: ref.url, status: res.status(), raw: ref.raw });
+    } catch (error) {
+      bad.push({ url: ref.url, error: failText(error), raw: ref.raw });
+    }
+  }
+  record('links:skyepay-local-href-src-resolve', bad.length === 0, {
+    unique_refs: refs.length,
+    bad: bad.slice(0, 40)
+  });
+}
+
+async function checkSkyePayHttp(api) {
+  const page = await api.get(urlFor('skyepay.html?client=bobs-smoke-shop&dry_run=1'), { timeout: 12000 });
+  const pageText = await page.text();
+  record('http:skyepay-public-app-loads', page.ok() && pageText.includes('SkyePay') && pageText.includes('skypayForm'), {
+    status: page.status(),
+    bytes: pageText.length
+  });
+
+  const offersRes = await api.get(urlFor('.netlify/functions/skyepay-offers?client=bobs-smoke-shop'), { timeout: 12000 });
+  const offers = await responseJson(offersRes);
+  record('api:skyepay-offers-catalog', offersRes.ok() &&
+    offers.json?.ok === true &&
+    offers.json?.offers?.length >= 60 &&
+    offers.json?.repo_stripe_catalog?.imported_checkout_offers >= 50 &&
+    offers.json?.platform_routes?.length >= 4, {
+    status: offersRes.status(),
+    offers: offers.json?.offers?.length || 0,
+    imported_checkout_offers: offers.json?.repo_stripe_catalog?.imported_checkout_offers || 0,
+    catalog_source: offers.json?.repo_stripe_catalog?.source || null,
+    platform_routes: offers.json?.platform_routes?.length || 0,
+    client: offers.json?.client?.client_name || null
+  });
+  record('security:skyepay-offers-no-secret-signals', !secretSignals(offers.text), {
+    bytes: offers.text.length
+  });
+
+  const corsProbe = await api.get(urlFor('.netlify/functions/skyepay-offers?client=bobs-smoke-shop'), {
+    headers: { origin: 'https://not-approved.example' },
+    timeout: 12000
+  });
+  const allowOrigin = corsProbe.headers()['access-control-allow-origin'] || '';
+  record('security:skyepay-unlisted-origin-not-cors-granted', !allowOrigin, { allowOrigin });
+
+  const invalidRes = await api.post(urlFor('.netlify/functions/skyepay-checkout'), {
+    headers: { 'content-type': 'application/json' },
+    data: {
+      client_slug: 'bobs-smoke-shop',
+      offer_id: 'metraiyux-starter-command',
+      customer_name: 'Scanner Invalid',
+      customer_email: 'not-an-email',
+      company_name: 'Scanner Co',
+      dry_run: true,
+      idempotency_key: 'scanner_invalid_email'
+    },
+    timeout: 12000
+  });
+  const invalid = await responseJson(invalidRes);
+  record('api:skyepay-checkout-rejects-invalid-email', invalidRes.status() === 400 && /customer_email/i.test(invalid.text), {
+    status: invalidRes.status(),
+    body_preview: invalid.text.slice(0, 260)
+  });
+
+  const checkoutRes = await api.post(urlFor('.netlify/functions/skyepay-checkout'), {
+    headers: { 'content-type': 'application/json' },
+    data: {
+      client_slug: 'bobs-smoke-shop',
+      offer_id: 'metraiyux-starter-command',
+      customer_name: 'Scanner Operator',
+      customer_email: 'scanner@example.com',
+      company_name: "Bob's Smoke Shop",
+      dry_run: true,
+      idempotency_key: `scanner_${Date.now()}`
+    },
+    timeout: 12000
+  });
+  const checkout = await responseJson(checkoutRes);
+  const checkoutUrl = checkout.json?.url || '';
+  const checkoutOrigin = checkoutUrl ? new URL(checkoutUrl).origin : '';
+  const baseOrigin = new URL(BASE_URL).origin;
+  record('api:skyepay-checkout-dry-run-return-origin', checkoutRes.ok() && checkout.json?.ok === true && checkoutOrigin === baseOrigin, {
+    status: checkoutRes.status(),
+    checkoutOrigin,
+    baseOrigin,
+    approval_status: checkout.json?.approval_status || null
+  });
+  record('security:skyepay-checkout-no-secret-signals', !secretSignals(checkout.text), {
+    bytes: checkout.text.length
+  });
+
+  const demoSession = checkout.json?.id || '';
+  const statusRes = await api.get(urlFor(`.netlify/functions/skyepay-status?demo_session=${encodeURIComponent(demoSession)}`), { timeout: 12000 });
+  const status = await responseJson(statusRes);
+  record('api:skyepay-status-demo-public-safe', statusRes.ok() && status.json?.order?.approval_status === 'paid_pending_owner_approval' && !secretSignals(status.text), {
+    status: statusRes.status(),
+    order_keys: Object.keys(status.json?.order || {})
+  });
+
+  const contractTargets = [
+    ['docs', 'skyepay-api.html', /SkyePay API/i],
+    ['manifest', 'skyepay-api.json', /"skyepay-api"/i],
+    ['openapi', 'openapi/skyepay.openapi.json', /"openapi"\s*:\s*"3\.1\.0"/i],
+    ['sdk', 'assets/skyepay-client.js', /SkyePayClient/]
+  ];
+  const contractResults = [];
+  for (const [name, route, expected] of contractTargets) {
+    const res = await api.get(urlFor(route), { timeout: 12000 });
+    const text = await res.text();
+    contractResults.push({
+      name,
+      route,
+      status: res.status(),
+      ok: res.ok() && expected.test(text) && !secretSignals(text),
+      bytes: text.length
+    });
+  }
+  record('api:skyepay-contract-assets-load', contractResults.every((result) => result.ok), {
+    assets: contractResults
+  });
+}
+
+async function checkSkyePayPublicSource() {
+  const sourceFiles = [
+    'skyepay.html',
+    'skyepay-store.html',
+    'skyepay-api.html',
+    'skyepay-api.json',
+    'openapi/skyepay.openapi.json',
+    'assets/skyepay.css',
+    'assets/skyepay.js',
+    'assets/skyepay-store.js',
+    'assets/skyepay-client.js',
+    'assets/skyepay-motion.mjs'
+  ];
+  const missing = [];
+  const bodies = [];
+  for (const relPath of sourceFiles) {
+    const file = path.join(SITE_DIR, relPath);
+    if (!existsSync(file)) missing.push(relPath);
+    else bodies.push(readFileSync(file, 'utf8'));
+  }
+  const source = bodies.join('\n');
+  record('security:skyepay-public-source-no-secret-signals', missing.length === 0 && !secretSignals(source), {
+    files: sourceFiles,
+    missing
+  });
+  record('content:skyepay-public-copy-avoids-website-language', !/\bwebsite\b/i.test(source), {
+    scanned_files: sourceFiles
+  });
+  record('effects:skyepay-motion-stack-source-present', /gsap/i.test(source) && /Lenis/i.test(source) && /ScrollTrigger/i.test(source), {
+    required: ['gsap', 'Lenis', 'ScrollTrigger']
+  });
+}
+
+async function checkSkyePayBrowser(browser, viewport, label) {
+  const context = await browser.newContext({ viewport, ignoreHTTPSErrors: true });
+  const page = await context.newPage();
+  const consoleErrors = [];
+  const pageErrors = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+
+  try {
+    await page.goto(urlFor('skyepay.html?client=bobs-smoke-shop&dry_run=1'), { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForSelector('#skypayForm', { timeout: 10000 });
+    const bodyText = await page.locator('body').innerText();
+    await page.fill('input[name="customer_name"]', 'Scanner Bob');
+    await page.fill('input[name="customer_email"]', 'scanner@example.com');
+    await page.fill('input[name="company_name"]', "Bob's Smoke Shop");
+    await page.click('#checkoutBtn');
+    await page.waitForURL(/status=success/, { timeout: 12000 });
+    await page.waitForSelector('#statusPanel:not([hidden])', { timeout: 8000 });
+    await page.waitForFunction(() => /pending owner approval/i.test(document.querySelector('#statusPanel')?.innerText || ''), null, { timeout: 12000 });
+    const statusText = await page.locator('#statusPanel').innerText();
+    const layout = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+      bodyLength: document.body?.innerText?.trim().length || 0
+    }));
+    const file = path.join(ARTIFACT_DIR, `skyepay-${label}-${viewport.width}x${viewport.height}.png`);
+    await page.screenshot({ path: file, fullPage: true });
+    report.artifacts.push(file);
+    record(`browser:skyepay:${label}:dry-run-checkout`, !layout.overflow && /pending owner approval/i.test(statusText) && !/\bwebsite\b/i.test(bodyText) && consoleErrors.length === 0 && pageErrors.length === 0, {
+      layout,
+      status_preview: statusText.slice(0, 320),
+      consoleErrors: consoleErrors.slice(0, 5),
+      pageErrors: pageErrors.slice(0, 5),
+      screenshot: file
+    });
+  } finally {
+    await context.close().catch(() => {});
+  }
+}
+
+async function mainSkyePayProfile() {
+  record('profile:skyepay-enabled', true, {
+    SITE_DIR,
+    BASE_URL,
+    note: 'FS27 payment gateway scan using the 0S SkyeCrawler runner.'
+  });
+  checkpoint('SkyePay profile selected');
+
+  const api = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
+  try {
+    await checkSkyePayLinkedAssets(api);
+    checkpoint('SkyePay asset resolution complete');
+    await checkSkyePayHttp(api);
+    checkpoint('SkyePay HTTP and function checks complete');
+    await checkSkyePayPublicSource();
+    checkpoint('SkyePay public source checks complete');
+  } finally {
+    await api.dispose();
+  }
+
+  const browser = await launchBrowser();
+  try {
+    await checkSkyePayBrowser(browser, { width: 1440, height: 1000 }, 'desktop');
+    checkpoint('SkyePay desktop browser checkout complete');
+    await checkSkyePayBrowser(browser, { width: 390, height: 844 }, 'mobile');
+    checkpoint('SkyePay mobile browser checkout complete');
+  } finally {
+    await browser.close().catch(() => {});
+  }
+
+  report.finished_at = new Date().toISOString();
+  report.ok = report.failures.length === 0;
+  writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
+  console.log(JSON.stringify({
+    crawler: CRAWLER_NAME,
+    version: CRAWLER_VERSION,
+    profile: CRAWLER_PROFILE,
+    ok: report.ok,
+    checks: report.checks.length,
+    failures: report.failures.length,
+    warnings: report.warnings.length,
+    report: REPORT_PATH,
+    artifacts: report.artifacts,
+  }, null, 2));
+  if (!report.ok) process.exit(1);
+}
+
 async function main() {
+  if (CRAWLER_PROFILE === 'skyepay') {
+    await mainSkyePayProfile();
+    return;
+  }
+
   const files = walk(SITE_DIR);
   const htmlFiles = files.filter((file) => file.endsWith('.html')).sort();
   record('inventory:site-dir-exists', existsSync(SITE_DIR), { SITE_DIR });

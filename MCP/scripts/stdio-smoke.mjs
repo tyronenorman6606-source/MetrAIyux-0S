@@ -47,11 +47,16 @@ try {
   assert(resourceUris.includes('quantumskyes://content/first-person-operator-voice'), 'first-person content voice resource missing');
   assert(resourceUris.includes('quantumskyes://design/assets-manifest'), 'assets manifest resource missing');
   assert(resourceUris.includes('quantumskyes://design/pattern-manifest'), 'pattern manifest resource missing');
+  assert(resourceUris.includes('quantumskyes://design/templates'), 'design template manifest resource missing');
+  assert(resourceUris.includes('quantumskyes://design/lab/registry'), 'Skye Design Lab registry resource missing');
+  assert(resourceUris.includes('quantumskyes://design/lab/directive'), 'Skye Design Lab directive resource missing');
+  assert(resourceUris.includes('quantumskyes://design/lab/mcp-integration'), 'Skye Design Lab integration resource missing');
 
   const templates = await client.listResourceTemplates();
   const templateUris = templates.resourceTemplates.map((template) => template.uriTemplate);
   assert(templateUris.includes('quantumskyes://file/{path}'), 'repo file template missing');
   assert(templateUris.includes('quantumskyes://design/file/{path}'), 'design file template missing');
+  assert(templateUris.includes('quantumskyes://design/template/{templateId}'), 'design template pack resource template missing');
 
   const overview = await client.readResource({ uri: 'quantumskyes://workspace/overview' });
   const overviewText = overview.contents.map((item) => item.text || '').join('\n');
@@ -61,6 +66,22 @@ try {
   const apps = await client.readResource({ uri: 'quantumskyes://runtime/apps' });
   const appsText = apps.contents.map((item) => item.text || '').join('\n');
   assert(appsText.includes('SkyeWebCreatorMax'), 'runtime app index did not include SkyeWebCreatorMax');
+  assert(appsText.includes('MCP/skye-design-lab'), 'runtime app index did not include real Skye Design Lab path');
+
+  const templateManifest = await client.readResource({ uri: 'quantumskyes://design/templates' });
+  const templateManifestText = templateManifest.contents.map((item) => item.text || '').join('\n');
+  assert(templateManifestText.includes('Skye Production Changelog Template'), 'template manifest should expose revised changelog template');
+  assert(templateManifestText.includes('Skye MCP Field Notes Blog Template'), 'template manifest should expose revised blog template');
+  assert(templateManifestText.includes('Skye Production Operator Portfolio Template'), 'template manifest should expose revised portfolio template');
+
+  const changelogTemplateResource = await client.readResource({ uri: 'quantumskyes://design/template/changelog' });
+  const changelogTemplateResourceText = changelogTemplateResource.contents.map((item) => item.text || '').join('\n');
+  assert(changelogTemplateResourceText.includes('components/skye-mcp-chrome.tsx'), 'template resource should include Skye MCP chrome key file');
+  assert(changelogTemplateResourceText.includes('Skye Production Changelog'), 'template resource should include revised changelog content');
+
+  const labRegistry = await client.readResource({ uri: 'quantumskyes://design/lab/registry' });
+  const labRegistryText = labRegistry.contents.map((item) => item.text || '').join('\n');
+  assert(labRegistryText.includes('skye-spectacle'), 'Skye Design Lab registry should be read from MCP/skye-design-lab');
 
   const voice = await client.readResource({ uri: 'quantumskyes://content/first-person-operator-voice' });
   const voiceText = voice.contents.map((item) => item.text || '').join('\n');
@@ -90,6 +111,8 @@ try {
   assert(toolNames.includes('design_elements'), 'design_elements tool missing');
   assert(toolNames.includes('design_compose_brief'), 'design_compose_brief tool missing');
   assert(toolNames.includes('design_asset_manifest'), 'design_asset_manifest tool missing');
+  assert(toolNames.includes('design_template_manifest'), 'design_template_manifest tool missing');
+  assert(toolNames.includes('design_template_pack'), 'design_template_pack tool missing');
   assert(toolNames.includes('design_logo_manifest'), 'design_logo_manifest tool missing');
   assert(toolNames.includes('design_logo_audit'), 'design_logo_audit tool missing');
   assert(toolNames.includes('design_pattern_pack'), 'design_pattern_pack tool missing');
@@ -102,7 +125,23 @@ try {
     arguments: { namespace: 'skye.core', type: 'hero' }
   });
   const elementsText = elements.content.map((item) => item.text || '').join('\n');
-  assert(elementsText.includes('skye.core.full-width-command-hero'), 'elements tool did not return core hero');
+  assert(elementsText.includes('skye.core.full-width-design-hero'), 'elements tool did not return design-first core hero');
+  assert(elementsText.includes('Only use when the user explicitly asks'), 'command hero should be gated to explicit command/app requests');
+
+  const templateElements = await client.callTool({
+    name: 'design_elements',
+    arguments: { namespace: 'skye.templates' }
+  });
+  const templateElementsText = templateElements.content.map((item) => item.text || '').join('\n');
+  assert(templateElementsText.includes('skye.templates.changelog-shell'), 'elements tool did not expose changelog template element');
+
+  const templateTool = await client.callTool({
+    name: 'design_template_pack',
+    arguments: { templateId: 'changelog' }
+  });
+  const templateToolText = templateTool.content.map((item) => item.text || '').join('\n');
+  assert(templateToolText.includes('"ok": true'), 'template pack tool should return ok');
+  assert(templateToolText.includes('2026-05-17-skyepay.mdx'), 'template pack should include production changelog MDX');
 
   const brief = await client.callTool({
     name: 'design_compose_brief',
@@ -115,6 +154,7 @@ try {
   const briefText = brief.content.map((item) => item.text || '').join('\n');
   assert(briefText.includes('primaryPattern'), 'compose brief did not return primary pattern');
   assert(briefText.includes('requiredStack'), 'compose brief did not return required stack');
+  assert(briefText.includes('templateSources'), 'compose brief did not return wired template sources');
   assert(briefText.includes('openSourceRecipes'), 'compose brief did not return open-source recipes');
   assert(briefText.includes('design_stack_audit'), 'compose brief did not require stack audit');
   assert(briefText.includes('No left-column text wall'), 'compose brief did not include forbidden layout rule');
@@ -281,7 +321,7 @@ try {
     name: 'design_stack_audit',
     arguments: {
       packageJson: '{"dependencies":{"three":"latest","gsap":"latest","lenis":"latest","framer-motion":"latest","@react-three/fiber":"latest","@react-three/drei":"latest","@react-three/postprocessing":"latest","@theatre/core":"latest","@lottiefiles/dotlottie-web":"latest","@rive-app/react-canvas":"latest","ogl":"latest","pixi.js":"latest"}}',
-      source: "import * as THREE from 'three';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\nimport Lenis from 'lenis';\nimport { motion } from 'framer-motion';\nimport { Canvas } from '@react-three/fiber';\nimport { Float } from '@react-three/drei';\nimport { EffectComposer } from '@react-three/postprocessing';\nimport { getProject } from '@theatre/core';\nimport { DotLottie } from '@lottiefiles/dotlottie-web';\nimport { useRive } from '@rive-app/react-canvas';\nimport { Renderer } from 'ogl';\nimport { Application } from 'pixi.js';\ngsap.registerPlugin(ScrollTrigger); new Lenis(); new DotLottie({ canvas: document.createElement('canvas'), src: '/motion.lottie' }); useRive({ src: '/motion.riv' }); new Renderer(); new Application(); console.log(THREE.Scene, motion, Canvas, Float, EffectComposer, getProject);",
+      source: "import * as THREE from 'three';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\nimport Lenis from 'lenis';\nimport { motion, useMotionValue } from 'framer-motion';\nimport { Canvas, useFrame } from '@react-three/fiber';\nimport { Float } from '@react-three/drei';\nimport { EffectComposer } from '@react-three/postprocessing';\nimport { getProject } from '@theatre/core';\nimport { DotLottie } from '@lottiefiles/dotlottie-web';\nimport { useRive } from '@rive-app/react-canvas';\nimport { Renderer } from 'ogl';\nimport { Application } from 'pixi.js';\nconst sheet = getProject('p').sheet('s'); sheet.object('o', { spin: 1 }).onValuesChange(() => {});\ngsap.registerPlugin(ScrollTrigger); gsap.to('.x', { scrollTrigger: { scrub: true }}); new Lenis(); new DotLottie({ canvas: document.createElement('canvas'), src: '/motion.lottie' }); useRive({ src: '/motion.riv' }); new Renderer(); new Application(); useMotionValue(0); useFrame(() => THREE.MathUtils.randFloat(0, 1)); const view = <Canvas><Float /><EffectComposer /></Canvas>; const panel = <motion.div />; console.log(THREE.Scene, panel, view);",
       required: ['three', 'gsap', 'lenis', 'framerMotion', 'r3f', 'drei', 'postprocessing', 'theatre', 'dotlottie', 'rive', 'ogl', 'pixi']
     }
   });

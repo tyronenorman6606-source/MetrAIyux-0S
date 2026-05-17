@@ -8,7 +8,7 @@
   if (!canvas || typeof THREE === "undefined") return;
 
   /* ── Renderer ──────────────────────────────────────── */
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x07070f, 1);
@@ -69,7 +69,7 @@
 
   const ptGeo = new THREE.BufferGeometry();
   ptGeo.setAttribute("position", new THREE.BufferAttribute(nodePos, 3));
-  ptGeo.setAttribute("color",    new THREE.BufferAttribute(nodeColor, 3));
+  ptGeo.setAttribute("nodeColor", new THREE.BufferAttribute(nodeColor, 3));
   ptGeo.setAttribute("size",     new THREE.BufferAttribute(nodeSize, 1));
 
   const ptMat = new THREE.ShaderMaterial({
@@ -79,13 +79,13 @@
     },
     vertexShader: `
       attribute float size;
-      attribute vec3  color;
+      attribute vec3  nodeColor;
       uniform   float uTime;
       uniform   float uPixelRatio;
       varying   vec3  vColor;
       varying   float vAlpha;
       void main() {
-        vColor = color;
+        vColor = nodeColor;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dist = -mv.z;
         float pulse = 0.85 + sin(uTime * 1.2 + position.x * 0.6 + position.y * 0.4) * 0.15;
@@ -109,7 +109,7 @@
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-    vertexColors: true
+    vertexColors: false
   });
 
   const pointCloud = new THREE.Points(ptGeo, ptMat);

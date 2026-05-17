@@ -1,1 +1,0 @@
-(function(){window.addEventListener('load',()=>setTimeout(()=>document.body.classList.remove('locked'),5200));})();

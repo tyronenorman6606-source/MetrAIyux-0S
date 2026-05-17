@@ -56,6 +56,8 @@ The vault command creates a sanitized zip under `.skyevault-out/`, excludes secr
 
 Required local environment values are documented in [SKYEVAULT_REPO_PUSH.md](../SKYEVAULT_REPO_PUSH.md).
 
+For contributors or outside workspaces, use scoped developer workspace keys instead of the operator upload key. See [DEVELOPER_WORKSPACE_VAULT.md](./DEVELOPER_WORKSPACE_VAULT.md) for the shared-vault infrastructure model, required environment values, and workspace isolation rules.
+
 ## Recovery From GitHub
 
 From any new machine:

@@ -46,6 +46,7 @@
  * }
  */
 
+import crypto from "crypto";
 import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, monthKeyUTC } from "./_lib/http.js";
 import { verifySessionToken } from "./_lib/sessions.js";
@@ -90,6 +91,14 @@ export default wrap(async (req) => {
         key_last4:   keyRow.key_last4 || null,
         plan:        keyRow.customer_plan_name || null
       },
+      gate_card: gateCard({
+        sub: `api_key:${keyRow.api_key_id}`,
+        email: keyRow.customer_email || null,
+        customerId: keyRow.customer_id,
+        role,
+        scope,
+        principal: "api_key"
+      }),
       permissions: {
         scope,
         allowed_providers: keyRow.allowed_providers || null,
@@ -106,8 +115,13 @@ export default wrap(async (req) => {
         remaining_cents:   cap != null ? Math.max(0, cap + (usage.extra_cents||0) - spent) : null
       },
       limits: {
-        rpm: keyRow.rpm_limit || null,
-        rpd: keyRow.rpd_limit || null
+        rpm: keyRow.rpm_limit ?? keyRow.customer_default_rpm_limit ?? null,
+        rpd: keyRow.rpd_limit ?? keyRow.customer_default_rpd_limit ?? null
+      },
+      vault: {
+        storage_mb: keyRow.customer_vault_storage_mb || null,
+        file_limit: keyRow.customer_vault_file_limit || null,
+        workspace_limit: keyRow.customer_vault_workspace_limit || null
       },
       operations: ops
     }}, cors);
@@ -132,6 +146,15 @@ export default wrap(async (req) => {
         role,
         session_id:  c.sid || null
       },
+      gate_card: gateCard({
+        sub: c.sub,
+        email: c.email || null,
+        customerId: c.customer_id || null,
+        role,
+        sessionId: c.sid || null,
+        scope,
+        principal: "session"
+      }),
       permissions: {
         scope,
         allowed_providers: null,
@@ -164,6 +187,15 @@ export default wrap(async (req) => {
         role,
         client_id:   c.client_id || null
       },
+      gate_card: gateCard({
+        sub: c.sub,
+        email: c.email || null,
+        customerId: c.customer_id || null,
+        role,
+        sessionId: c.sid || null,
+        scope,
+        principal: "oauth"
+      }),
       permissions: {
         scope,
         allowed_providers: null,
@@ -231,4 +263,24 @@ function keyScopes(keyRow) {
   if (["owner","admin"].includes(role)) base.push("keys.read","keys.write","admin.read","admin.write","billing.read","billing.write");
   else if (role === "deployer") base.push("keys.read","billing.read");
   return base;
+}
+
+function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], principal = "session" }) {
+  const seed = [sub, email, customerId, principal].filter(Boolean).join("|") || crypto.randomUUID();
+  const digest = crypto.createHash("sha256").update(seed).digest("hex").slice(0, 20);
+  return {
+    id: `gate_basic_${digest}`,
+    type: "basic_gate_card",
+    status: "active",
+    principal,
+    sub,
+    email,
+    customer_id: customerId || null,
+    role: role || "user",
+    session_id: sessionId,
+    scope,
+    usage_required: false,
+    reloadable: true,
+    issued_at: new Date().toISOString()
+  };
 }

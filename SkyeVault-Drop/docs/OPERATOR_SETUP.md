@@ -62,6 +62,26 @@ npm run vault:push
 
 The dry run creates a sanitized zip and reports how many files were included and how many secret-looking files were excluded. The push command uploads the zip through the deployed vault, finalizes the R2 multipart upload, and writes a local `.skyevault-out/skyevault-receipt-*.json` file.
 
+## Developer Workspace Vaults
+
+For devs using this vault from their own repos, do not hand out the operator token or the general client portal key. Paid Skyepay subscriptions should call the signed `/.netlify/functions/provision-workspace` endpoint so the vault writes each dev workspace into `skye-upload-vault-workspaces.json` in R2.
+
+Required vault env:
+
+```bash
+SKYEVAULT_PROVISIONING_SECRET=long-shared-secret-used-by-skyepay
+```
+
+`SKYEVAULT_DEVELOPER_WORKSPACES` is now only a bootstrap/emergency fallback. Prefer the R2 registry created by the provisioning endpoint.
+
+Objects uploaded through a developer workspace key land under:
+
+```text
+<destination-prefix>/workspaces/<workspaceId>/<sessionId>/<archive-name>.zip
+```
+
+The receipt, session manifest, audit event, and object metadata all carry `workspaceId` and `developerId`, so the admin side can recover who pushed what while each dev stays inside their own workspace boundary.
+
 Before using it with client code, confirm:
 
 - `.env*`, private keys, database dumps, backup folders, WAL archives, `.git`, `node_modules`, and old archives are excluded.

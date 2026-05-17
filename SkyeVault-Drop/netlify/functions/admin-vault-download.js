@@ -19,6 +19,8 @@ function safeEntry(entry) {
     id: entry.id,
     completedAt: entry.completedAt || '',
     sessionId: entry.sessionId || '',
+    workspaceId: entry.workspaceId || '',
+    developerId: entry.developerId || '',
     destinationName: entry.destinationName || entry.destinationId || 'Vault storage',
     clientName: entry.clientName || '',
     clientEmail: entry.clientEmail || '',

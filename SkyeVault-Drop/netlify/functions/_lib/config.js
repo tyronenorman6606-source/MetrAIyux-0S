@@ -273,6 +273,8 @@ export function signReceipt(entry) {
   const payload = JSON.stringify({
     id: entry.id,
     sessionId: entry.sessionId,
+    workspaceId: entry.workspaceId || '',
+    developerId: entry.developerId || '',
     destinationId: entry.destinationId,
     driveFileId: entry.driveFile?.id || '',
     fileName: entry.fileName,
@@ -330,6 +332,12 @@ function redactSessionManifest(input = {}) {
       fingerprint: input.file.fingerprint || null
     } : null,
     intake: input.intake || {},
+    access: input.access ? {
+      type: input.access.type || '',
+      workspaceId: input.access.workspaceId || '',
+      developerId: input.access.developerId || '',
+      developerName: input.access.developerName || ''
+    } : null,
     policy: input.policy || {},
     attempts: input.attempts || [],
     uploadUrlHash: input.uploadUrlHash || null,

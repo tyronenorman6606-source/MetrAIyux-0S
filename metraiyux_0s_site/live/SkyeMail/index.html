@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMail Vault — Business Email Center</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.164.1",
+        "gsap": "https://esm.sh/gsap@3.12.5",
+        "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+        "lenis": "https://esm.sh/lenis@1.1.18",
+        "motion": "https://esm.sh/motion@11.18.2"
+      }
+    }
+  </script>
+
+  <style>
+:root{
+  --bg0:#fffaf0;
+  --bg1:#fff2cc;
+  --glass: rgba(255,255,255,.78);
+  --stroke: rgba(120,90,20,.20);
+  --text: rgba(18,18,18,.94);
+  --muted: rgba(18,18,18,.68);
+  --gold: #d4af37;
+  --gold2:#b8860b;
+  --danger: #b00020;
+  --ok: #0a7a3d;
+  --shadow: 0 18px 55px rgba(0,0,0,.12);
+  --radius: 18px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: var(--sans);
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(212,175,55,.22), transparent 60%),
+    radial-gradient(900px 500px at 90% 30%, rgba(184,134,11,.16), transparent 55%),
+    radial-gradient(1000px 600px at 50% 95%, rgba(212,175,55,.18), transparent 60%),
+    linear-gradient(160deg, var(--bg0), var(--bg1));
+  overflow-x:hidden;
+}
+
+
+a{ color: var(--gold2); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+
+.wrap{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,.65);
+  border-bottom: 1px solid rgba(120,90,20,.12);
+}
+
+.nav{
+  max-width:1150px;
+  margin:0 auto;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:220px;
+}
+.brand img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  filter: drop-shadow(0 0 16px rgba(212,175,55,.28)) drop-shadow(0 0 26px rgba(184,134,11,.18));
+  animation: floatPulse 3.4s ease-in-out infinite;
+}
+@keyframes floatPulse{
+  0%{ transform: translateY(0); filter: drop-shadow(0 0 12px rgba(212,175,55,.22)) drop-shadow(0 0 18px rgba(184,134,11,.16)); }
+  50%{ transform: translateY(-4px); filter: drop-shadow(0 0 18px rgba(212,175,55,.36)) drop-shadow(0 0 30px rgba(184,134,11,.22)); }
+  100%{ transform: translateY(0); filter: drop-shadow(0 0 12px rgba(212,175,55,.22)) drop-shadow(0 0 18px rgba(184,134,11,.16)); }
+}
+.brand .name{
+  display:flex; flex-direction:column; line-height:1.1;
+}
+.brand .name b{ letter-spacing:.2px; }
+.brand .name span{ font-size:12px; color:var(--muted); }
+
+.navlinks{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.pill{
+  padding:9px 12px;
+  border:1px solid rgba(120,90,20,.22);
+  background: rgba(255,255,255,.72);
+  border-radius: 999px;
+  color: var(--text);
+  font-size:13px;
+}
+.pill:hover{ background: rgba(212,175,55,.14); }
+
+.container{
+  width:100%;
+  max-width:1150px;
+  margin:0 auto;
+  padding:26px 16px 30px;
+  flex:1;
+}
+
+.hero{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap:18px;
+  align-items:stretch;
+}
+@media (max-width: 940px){
+  .hero{ grid-template-columns:1fr; }
+}
+
+.card{
+  background: var(--glass);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding:18px;
+}
+
+.h1{
+  font-size: 38px;
+  line-height:1.05;
+  margin:0 0 10px;
+  letter-spacing: .2px;
+}
+.sub{
+  margin:0 0 18px;
+  color: var(--muted);
+  font-size:15px;
+  line-height:1.6;
+}
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width: 720px){ .grid2{ grid-template-columns:1fr; } }
+
+.kpi{
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.70);
+  padding:12px;
+}
+.kpi b{ color: var(--gold); }
+.kpi div{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.45; }
+
+.btnrow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.btn{
+  cursor:pointer;
+  padding:11px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(120,90,20,.24);
+  background: rgba(255,255,255,.78);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing:.2px;
+}
+.btn:hover{ background: rgba(212,175,55,.12); }
+.btn.gold{
+  border-color: rgba(212,175,55,.55);
+  background: linear-gradient(135deg, rgba(212,175,55,.90), rgba(184,134,11,.78));
+  color: rgba(18,18,18,.94);
+}
+.btn.danger{
+  border-color: rgba(176,0,32,.40);
+  background: rgba(176,0,32,.08);
+}
+.btn.ok{
+  border-color: rgba(10,122,61,.40);
+  background: rgba(10,122,61,.08);
+}
+
+.hr{ height:1px; background: rgba(120,90,20,.12); margin:14px 0; }
+
+label{ font-size:12px; color: var(--muted); display:block; margin:10px 0 6px; }
+input, textarea, select{
+  width:100%;
+  padding:12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.76);
+  color: var(--text);
+  outline:none;
+  font-size:14px;
+}
+textarea{ min-height: 120px; resize: vertical; }
+small{ color: var(--muted); }
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(120,90,20,.22);
+  background: rgba(255,255,255,.70);
+  font-size:12px;
+  color: var(--muted);
+}
+
+.table{
+  width:100%;
+  border-collapse: collapse;
+  overflow:hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+}
+.table th, .table td{
+  padding:12px 12px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  text-align:left;
+  font-size:13px;
+}
+.table th{ color: var(--muted); font-weight:600; background: rgba(255,255,255,.72); }
+.table tr:hover td{ background: rgba(212,175,55,.10); }
+.table tr:last-child td{ border-bottom:none; }
+
+.footer{
+  border-top: 1px solid rgba(120,90,20,.12);
+  background: rgba(255,255,255,.70);
+}
+.footer .container{ padding:18px 16px; }
+.footer p{ margin:0; color: var(--muted); font-size:12px; line-height:1.6; }
+
+.split{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 940px){ .split{ grid-template-columns:1fr; } }
+
+.mono{ font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+.notice{
+  border:1px solid rgba(120,90,20,.18);
+  background: rgba(255,255,255,.72);
+  padding:12px;
+  border-radius: 14px;
+  color: var(--muted);
+  line-height:1.55;
+  font-size:13px;
+}
+
+.righthero{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.heroimg{
+  width:100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  overflow:hidden;
+  background: rgba(255,255,255,.70);
+}
+.heroimg img{
+  width:100%;
+  display:block;
+  object-fit:cover;
+}
+.tagline{
+  font-size:13px;
+  line-height:1.55;
+  color: var(--muted);
+}
+.linksbox a{ display:inline-block; margin:6px 10px 0 0; }
+
+.pane{
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.72);
+  padding:12px;
+}
+.pane h3{ margin:0 0 8px; font-size:14px; color: var(--gold2); }
+.pane .row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+.chatlog{
+  max-height: 360px;
+  overflow:auto;
+  padding:10px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.72);
+}
+.msg{
+  padding:10px 10px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.82);
+  margin-bottom:10px;
+}
+.msg .role{ font-size:11px; color: var(--muted); }
+.msg .content{ white-space:pre-wrap; font-size:13px; line-height:1.55; margin-top:4px; }
+
+/* Customer-facing motion pass shared with marketing/suite. */
+:root{
+  --neon-bg:#05030b;
+  --neon-ink:#fff8e7;
+  --neon-muted:rgba(255,248,231,.76);
+  --neon-line:rgba(97,246,255,.22);
+  --neon-gold:#ffd76a;
+  --neon-cyan:#61f6ff;
+  --neon-pink:#ff4fd8;
+}
+html{scrollbar-width:thin;scrollbar-color:var(--neon-cyan) rgba(255,255,255,.08);}
+::-webkit-scrollbar{width:14px;height:14px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-left:1px solid rgba(255,255,255,.1);}
+::-webkit-scrollbar-thumb{min-height:72px;border:3px solid rgba(5,3,11,.92);border-radius:999px;background:linear-gradient(180deg,var(--neon-gold),var(--neon-cyan),var(--neon-pink));box-shadow:0 0 18px rgba(97,246,255,.42),inset 0 0 14px rgba(255,255,255,.18);}
+body.motion-chrome{
+  color:var(--neon-ink);
+  background:
+    linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.026) 1px, transparent 1px),
+    linear-gradient(140deg,#05030b 0%,#0b1014 42%,#1c0b19 100%);
+  background-size:42px 42px,42px 42px,auto;
+}
+.scroll-progress{position:fixed;top:0;left:0;z-index:90;width:100%;height:4px;transform:scaleX(0);transform-origin:left center;background:linear-gradient(90deg,var(--neon-gold),var(--neon-cyan),var(--neon-pink));box-shadow:0 0 24px rgba(97,246,255,.48);}
+.cursor-trail{position:fixed;top:0;left:0;z-index:70;width:240px;height:240px;border-radius:999px;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(circle,rgba(97,246,255,.22),transparent 62%),radial-gradient(circle at 65% 38%,rgba(255,215,106,.18),transparent 58%),radial-gradient(circle at 34% 66%,rgba(255,79,216,.16),transparent 60%);filter:blur(3px);}
+.scanline{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.2;background:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 1px,transparent 1px 5px);mix-blend-mode:screen;}
+.topbar{background:rgba(5,3,11,.78);border-bottom-color:rgba(97,246,255,.18);}
+.wrap,.container,.footer,.topbar{position:relative;z-index:2;}
+.brand img{filter:drop-shadow(0 0 16px rgba(97,246,255,.28)) drop-shadow(0 0 22px rgba(255,215,106,.24));}
+.brand .name span,.sub,.notice,.tagline,.kpi div,.footer,.footer a{color:var(--neon-muted);}
+.pill,.btn,.card,.kpi,.badge,.notice,.table,input,textarea,select{border-color:var(--neon-line);background:linear-gradient(180deg,rgba(8,10,18,.78),rgba(6,8,14,.92));color:var(--neon-ink);box-shadow:0 18px 55px rgba(0,0,0,.28),0 0 26px rgba(97,246,255,.08);}
+.btn.gold{color:#120b02;background:linear-gradient(135deg,var(--neon-gold),var(--neon-cyan));box-shadow:0 0 24px rgba(97,246,255,.28);}
+.hero{position:relative;isolation:isolate;min-height:calc(100svh - 96px);align-items:center;}
+.skymail-webgl{position:absolute;inset:0;z-index:-1;width:100%;height:100%;display:block;opacity:.76;}
+.h1.glow-text{font-size:clamp(42px,6.2vw,82px);line-height:.96;color:var(--neon-ink);background:linear-gradient(90deg,#fff8e7 0%,var(--neon-gold) 28%,var(--neon-cyan) 58%,var(--neon-pink) 100%);-webkit-background-clip:text;background-clip:text;text-shadow:0 0 18px rgba(97,246,255,.18),0 0 30px rgba(255,215,106,.12);}
+.mail-command-preview{display:grid;gap:12px;}
+.mail-command-row{display:flex;justify-content:space-between;gap:14px;padding:13px;border:1px solid var(--neon-line);border-radius:12px;background:rgba(255,255,255,.055);}
+.mail-command-row b,.mail-command-row span{display:block;}
+.mail-command-row span{color:var(--neon-muted);font-size:13px;line-height:1.4;}
+.status-light{width:11px;height:11px;border-radius:999px;background:var(--neon-cyan);box-shadow:0 0 18px rgba(97,246,255,.72);flex:0 0 auto;margin-top:4px;}
+@media (pointer:coarse),(prefers-reduced-motion:reduce){.cursor-trail,.scanline{display:none}.skymail-webgl{opacity:.4}}
+  </style>
+<script src="assets/app.js"></script>
+<script src="assets/skye0s-onboard-bridge.js"></script>
+<script type="module" src="assets/spectacle-motion.js"></script>
+</head>
+<body class="motion-chrome">
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+<div class="cursor-trail" data-cursor-trail aria-hidden="true"></div>
+<div class="scanline" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="nav">
+      <div class="brand">
+        <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
+        <div class="name">
+          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Vault</b>
+          <span>Encrypted business message center • Cloudflare + Neon</span>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="marketing.html">Marketing</a>
+        <a class="pill" href="live-proof.html">Live Proof</a>
+        <a class="pill" href="changelog.html">Changelog</a>
+        <a class="pill" href="pricing.html">Pricing</a>
+        <a class="pill" href="suite/index.html">Platform</a>
+        <a class="pill" href="signup.html">Sign up</a>
+        <a class="pill" href="login.html">Login</a>
+        <a class="pill" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
+        <a class="pill" href="ai.html">AI</a>
+        <a class="pill" href="dashboard.html">Inbox</a>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+<div class="hero spectacle-hero" data-motion-section>
+  <canvas class="skymail-webgl" data-skymail-webgl aria-hidden="true"></canvas>
+  <div class="card">
+    <h1 class="h1 glow-text">A secure email workspace for every client room.</h1>
+    <p class="sub">
+      SkyeMail Vault is a secure “public inbox” for your brand: anyone can send you a message from your public page,
+      you get an instant email alert, and the full message content stays end-to-end encrypted in your vault.
+      Only the unlocked workspace can read it, unless recovery is explicitly enabled during setup.
+    </p>
+
+    <div class="grid2">
+      <div class="kpi"><b>End‑to‑end encrypted</b><div>Sender encrypts subject + body in their browser using your public key. Server stores ciphertext only.</div></div>
+      <div class="kpi"><b>Inbox + notification</b><div>Neon stores encrypted vault data while SkyeMail powers the hosted inbox, send lane, and delivery receipts.</div></div>
+      <div class="kpi"><b>Recovery is opt‑in</b><div>At signup you can allow admin recovery. If you don’t, nobody can recover the vault.</div></div>
+      <div class="kpi"><b>kAIxuGateway13 ready</b><div>Optional AI assistant panel uses only kAIxuGateway13 endpoints and fetch+ReadableStream SSE parsing.</div></div>
+    </div>
+
+    <div class="btnrow">
+      <a class="btn gold" id="skyegateStartLink" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card.html?return_to=https%3A%2F%2Fskyemail-platform.graylondonskyes.workers.dev%2Fgate-return.html">Start With Skyegate FS27</a>
+      <a class="btn" href="signup.html">Create local Vault</a>
+      <a class="btn" href="marketing.html">See SkyeMail</a>
+      <a class="btn" href="live-proof.html">Live Proof</a>
+      <a class="btn" href="changelog.html">Changelog</a>
+      <a class="btn" href="pricing.html">Pricing</a>
+      <a class="btn" href="suite/index.html">Open Platform</a>
+      <a class="btn" href="login.html">Login</a>
+      <a class="btn" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
+      <a class="btn" href="ai.html">AI Assistant</a>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="notice">
+      Public address format: <span class="mono">/u/&lt;handle&gt;</span><br/>
+      Example: <span class="mono">https://your-site.netlify.app/u/yourbrand</span><br/>
+      Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your Vault Passphrase.
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid2">
+      <div class="kpi"><b>What is the vault key?</b><div>Your workspace creates a public/private key pair. The public key receives encrypted mail. The private key is what opens it.</div></div>
+      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your Vault Passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
+      <div class="kpi"><b>What Resend does</b><div>Resend delivers inbound and outbound email events. SkyeMail then encrypts inbound content into the vault before saving the inbox record.</div></div>
+      <div class="kpi"><b>What recovery means</b><div>If recovery is off and you lose the passphrase, encrypted content may be unrecoverable. If recovery is on, a separate admin-recovery copy is stored encrypted.</div></div>
+    </div>
+  </div>
+
+  <div class="righthero">
+    <div class="card mail-command-preview">
+      <div class="badge">Powered by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London LC</span> • Execution-first systems</div>
+      <div class="tagline" style="margin-top:10px;">
+        Use this as your “public email front door” — without turning your inbox into a spam landfill.
+        Your vault becomes the place where messages are accountable, searchable, and private.
+      </div>
+      <div class="mail-command-row"><div><b>Inbox lane</b><span>Client replies land as encrypted workspace records.</span></div><i class="status-light"></i></div>
+      <div class="mail-command-row"><div><b>Compose lane</b><span>Outbound mail runs through the verified send path.</span></div><i class="status-light"></i></div>
+      <div class="mail-command-row"><div><b>Vault key card</b><span>Setup, recovery policy, and mailbox identity travel together.</span></div><i class="status-light"></i></div>
+      <div class="mail-command-row"><div><b>0S handoff</b><span>The workspace can connect back into the client <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span>.</span></div><i class="status-light"></i></div>
+      <div class="btnrow" style="margin-top:12px;">
+        <a class="btn" href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
+        <a class="btn" href="https://solenterprises.org/pages/leadership-hub" target="_blank" rel="noopener">Leadership Hub</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+  <div class="footer">
+    <div class="container">
+      <p>
+        <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London</span> LC • Phoenix, AZ • For contracts, partnerships, operations alignment, and high-integrity execution systems:
+        <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a> •
+        <a href="mailto:SkyesOverLondon@gmail.com">SkyesOverLondon@gmail.com</a> •
+        <a href="mailto:B2B@solenterprises.org">B2B@solenterprises.org</a> •
+        <a href="tel:+14804695416">(480) 469-5416</a>
+      </p>
+      <p class="linksbox">
+        <a href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
+        <a href="https://solenterprises.org/pages/leadership-hub" target="_blank" rel="noopener">Leadership Hub</a>
+        <a href="https://kaixugateway13ee.netlify.app/" target="_blank" rel="noopener">kAIxuGateway13EE</a>
+        <a href="https://solenterprisesnexusconnect.netlify.app/" target="_blank" rel="noopener">NexusConnect</a>
+        <a href="https://familycommand.netlify.app/" target="_blank" rel="noopener">FamilyCommand</a>
+        <a href="https://skyecode-nexus.netlify.app/" target="_blank" rel="noopener">SkyeCode Nexus</a>
+        <a href="https://skyesoverlondon.netlify.app/" target="_blank" rel="noopener">SkyesOverLondon</a>
+        <a href="https://solenterprises.org/pages/skyeweb" target="_blank" rel="noopener">SkyeWeb</a>
+        <a href="changelog.html">SkyeMail Changelog</a>
+        <a href="pricing.html">SkyeMail Pricing</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const link = document.getElementById('skyegateStartLink');
+  if(!link) return;
+  const returnTo = new URL('gate-return.html', location.href).toString();
+  const gate = new URL('https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card.html');
+  gate.searchParams.set('return_to', returnTo);
+  link.href = gate.toString();
+})();
+</script>
+</body>
+</html>

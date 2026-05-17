@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeMail Build Receipt | Internal Deployment Check</title>
+  <meta name="description" content="SkyeMail internal deployment receipt showing release status, logo status, and browser playback proof.">
+  <link rel="icon" href="/assets/skyes-over-london-deity-logo.png">
+  <link rel="stylesheet" href="assets/marketing.css">
+  <script type="module" src="assets/skyesol-living-background.js"></script>
+</head>
+<body>
+  <nav class="site-nav" aria-label="SkyeMail navigation">
+    <a class="brand" href="/"><img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo"><span>SkyeMail</span></a>
+    <div class="nav-links">
+      <a href="/marketing">Marketing</a>
+      <a href="/live-proof">Live Proof</a>
+      <a href="/suite">Platform</a>
+      <a href="/login">Login</a>
+      <a href="/dashboard">Inbox</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Internal build receipt</p>
+        <h1><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> has a deployment receipt for the current release.</h1>
+        <p class="lead">This page is an operator-facing release check. Customer pages focus on the email workspace, live proof, vault keys, and protected login experience.</p>
+        <div class="actions">
+          <a class="button primary" href="#receipt">View Receipt</a>
+          <a class="button" href="/marketing">Back To Marketing</a>
+        </div>
+      </div>
+      <div class="surface">
+        <div class="surface-bar">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <strong>SkyeMail Release</strong>
+          <span class="mini" data-mcp-status>Loading</span>
+        </div>
+        <div class="mail-stage">
+          <div class="mail-list">
+            <div class="mail-row active"><b>Logo asset</b><span data-mcp-logo>Waiting for receipt</span></div>
+            <div class="mail-row active"><b>Brand check</b><span data-mcp-audit>Waiting for receipt</span></div>
+            <div class="mail-row"><b>Release checks</b><span data-mcp-resources>Waiting for receipt</span></div>
+            <div class="mail-row"><b>Quality gate</b><span data-mcp-gate>Waiting for receipt</span></div>
+          </div>
+          <div class="reader">
+            <p class="eyebrow">Upgrade status</p>
+            <h2 data-mcp-title>Loading build receipt...</h2>
+            <p class="lead" data-mcp-summary>The release receipt is loading from SkyeMail.</p>
+            <div class="seal"><b>What this proves</b><span> The release has the right SkyeMail logo, app shell checks, browser playback proof, and no exposed secrets.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="receipt">
+      <div class="section-head">
+        <p class="eyebrow">Release checks</p>
+        <h2>What passed in this build.</h2>
+      </div>
+      <div class="grid two proof-run" data-mcp-calls>
+        <article class="proof-item"><b>Receipt not loaded yet</b><span>Run the release check to publish the latest receipt.</span></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="eyebrow"><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Browser proof</span> video</p>
+        <h2>The browser opens the release receipt.</h2>
+      </div>
+      <video class="proof-video" src="proof/videos/skymail-mcp-proof-browser.webm" poster="proof/screenshots/mcp-proof-desktop-mcp-logo.png" autoplay muted playsinline controls preload="metadata"></video>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="eyebrow">Raw receipt</p>
+        <h2>Internal JSON is published for operator inspection.</h2>
+      </div>
+      <pre class="json-panel" data-mcp-json hidden>{ "status": "loading" }</pre>
+    </section>
+  </main>
+
+  <footer class="footer">SkyeMail release receipt. It publishes build status and audit status, not secrets.</footer>
+  <script src="assets/mcp-proof.js"></script>
+</body>
+</html>

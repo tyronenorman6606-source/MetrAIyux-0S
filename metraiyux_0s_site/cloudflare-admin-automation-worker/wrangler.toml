@@ -23,6 +23,9 @@ queue = "admin-automation-brain-events"
 binding = "SKYGATE_WORKER"
 service = "skyegatefs27-citadeldb"
 
+[triggers]
+crons = ["17 9 * * *"]
+
 # Optional Workers AI binding. Enable in Cloudflare dashboard / wrangler config if used.
 # [ai]
 # binding = "AI"
@@ -32,9 +35,29 @@ WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 SKYGATEFS27_ORIGIN = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
 SKYGATE_SOURCE_APP = "metraiyux-0s"
 SKYGATE_ADMIN_EMAILS = "graylondonskyes@gmail.com"
+ADMIN_WORKER_SCRIPT_NAME = "admin-automation-brain"
+SAAS_WORKER_SCRIPT_NAME = "sovereign-saas-provisioning-worker"
 # SOCIAL_DISPATCH_WEBHOOK = "https://your-social-connector.example.com/post"
-# Never put ADMIN_TOKEN, RESEND_API_KEY, or SOCIAL_DISPATCH_TOKEN here. Use wrangler secret put.
+# CRM_CONNECTOR_URL = "https://your-crm-bridge.example.com/metraiyux-events"
+# PROJECT_MANAGEMENT_CONNECTOR_URL = "https://your-project-bridge.example.com/metraiyux-events"
+# PAYROLL_CONNECTOR_URL = "https://your-payroll-bridge.example.com/metraiyux-events"
+# CONTENT_PUBLISH_WEBHOOK = "https://your-site-or-marketing-bridge.example.com/metraiyux-content"
+# PERSONAL_SITE_WEBHOOK = "https://your-personal-site-bridge.example.com/content-engine"
+# MARKETING_SITE_WEBHOOK = "https://your-marketing-site-bridge.example.com/content-engine"
+# LOCAL_BRAIN_UPDATE_WEBHOOK = "https://your-local-brain-bridge.example.com/upsert"
+# CONTENT_REPOSITORY_WEBHOOK = "https://your-repo-bridge.example.com/content-update"
+# GitHub Contents API repository updates can be used instead of CONTENT_REPOSITORY_WEBHOOK:
+# GITHUB_CONTENT_REPO = "owner/repo"
+# GITHUB_CONTENT_BRANCH = "main"
+# Never put ADMIN_TOKEN, RESEND_API_KEY, SOCIAL_DISPATCH_TOKEN, CONTENT_PUBLISH_TOKEN,
+# LOCAL_BRAIN_UPDATE_TOKEN, CONTENT_REPOSITORY_TOKEN, or GITHUB_CONTENT_TOKEN here. Use wrangler secret put.
 # Never put SKYGATE_EVENT_MIRROR_SECRET here. Use wrangler secret put SKYGATE_EVENT_MIRROR_SECRET.
+# Secret rotation requires CLOUDFLARE_ACCOUNT_ID as a var and CLOUDFLARE_API_TOKEN as a Worker secret.
+# MFA and backup-code storage require ADMIN_MFA_ENCRYPTION_KEY as a Worker secret.
+# Backup-code hashing can use ADMIN_BACKUP_CODE_PEPPER as a Worker secret, or falls back to ADMIN_MFA_ENCRYPTION_KEY.
+# Connector tokens belong in Worker secrets: CRM_CONNECTOR_TOKEN, PROJECT_MANAGEMENT_CONNECTOR_TOKEN,
+# PAYROLL_CONNECTOR_TOKEN, CONTENT_PUBLISH_TOKEN, LOCAL_BRAIN_UPDATE_TOKEN, CONTENT_REPOSITORY_TOKEN,
+# and GITHUB_CONTENT_TOKEN when using the GitHub Contents API adapter.
 
 # Resend approval notifications. Use a verified Resend domain for production.
 RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@solenterprises.org>"

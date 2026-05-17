@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <title>Legal Readiness Cockpit</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">Legal Readiness</span></a>
+  <nav>
+    <a href="../index.html">Home</a>
+    <a href="index.html">Admin Hub</a>
+    <a href="../legal-readiness/index.html">Readiness Center</a>
+    <a href="../contracts/index.html">Contracts</a>
+    <a href="https://solenterprises.org/legal/">Legal Skyes Hub</a>
+  </nav>
+</header>
+<main class="site-shell admin-shell">
+  <section class="admin-hero">
+    <p class="eyebrow">Founder and counsel handoff</p>
+    <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+    <h1>Registered company, operating authority, contract, and IP readiness.</h1>
+    <p class="hero-lede">This cockpit tracks confirmed company records, private evidence attachments, counsel review, signer authority, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Legal Skyes</span> alignment, and IP handoff readiness for serious business talks.</p>
+    <div id="legalReadinessStatus" class="mode-banner"></div>
+  </section>
+
+  <section class="chat-layout">
+    <div class="chat-panel">
+      <h2>Readiness Ledger</h2>
+      <p class="warning">Not legal advice. This is an internal operating ledger for owner action, counsel review, and licensing diligence.</p>
+      <div class="table-wrap">
+        <table class="admin-table" id="legalReadinessTable">
+          <thead>
+            <tr><th>Lane</th><th>Status</th><th>Owner</th><th>Due</th><th>Evidence / blocker</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hero-actions">
+        <button class="admin-btn" id="saveLegalReadiness" type="button">Save Ledger</button>
+        <button class="admin-btn secondary" id="resetLegalReadiness" type="button">Reset Baseline</button>
+      </div>
+      <div id="legalSaveResult" class="receipt-box"></div>
+    </div>
+    <aside class="admin-panel">
+      <h2>Counsel Packet</h2>
+      <p>Export a plain-language packet for attorney review, buyer diligence, or internal proof records.</p>
+      <label>Preferred legal entity name<input id="entityNameInput" placeholder="MetrAIyux 0S LLC"></label>
+      <label>Jurisdiction<input id="jurisdictionInput" placeholder="Arizona, United States"></label>
+      <label>Primary product / system name<input id="markInput" placeholder="MetrAIyux 0S"></label>
+      <label>Commercial deal target<textarea id="dealTargetInput" placeholder="Enterprise deployment, acquisition diligence, reseller agreement, services agreement..."></textarea></label>
+      <button class="admin-btn" id="buildCounselPacket" type="button">Build Counsel Packet</button>
+      <button class="admin-btn secondary" id="downloadCounselPacket" type="button">Download Markdown</button>
+      <div id="counselPacketOutput" class="receipt-box"></div>
+    </aside>
+  </section>
+
+  <section class="admin-grid">
+    <article class="admin-card">
+      <h3>Legal Skyes Public Hub</h3>
+      <p>The existing Legal Skyes site is the public policy layer for terms, privacy, AI terms, SaaS terms, DMCA/IP, security, and enterprise MSA language.</p>
+      <a href="https://solenterprises.org/legal/">Open live hub</a>
+      <a href="../legal-readiness/index.html">Open MetrAIyux readiness center</a>
+    </article>
+    <article class="admin-card">
+      <h3>MetrAIyux Counsel Docs</h3>
+      <p>Open the MetrAIyux-specific counsel packet, contract template, operating agreement brief, and IP assignment draft.</p>
+      <a href="../contracts/METRAIYUX_LEGAL_READINESS_COVER.md">Open counsel cover</a>
+      <a href="../contracts/METRAIYUX_PLATFORM_LICENSE_TEMPLATE.md">Open contract template</a>
+    </article>
+    <article class="admin-card">
+      <h3>Official Filing Sources</h3>
+      <p>Use official systems for tax and state evidence checks. Keep EIN and formation receipts private; save diligence status back into this ledger.</p>
+      <a href="https://www.azcc.gov/corporations/forms/llc-forms">Arizona LLC Forms</a>
+      <a href="https://www.irs.gov/ein">IRS EIN</a>
+    </article>
+  </section>
+</main>
+<footer class="footer"><p>Company registration and EIN are treated as established. Keep private records private, and use this cockpit to organize authority, counsel review, and IP evidence.</p></footer>
+<script src="legal-readiness.js"></script>
+<script src="../script.js"></script></body>
+</html>

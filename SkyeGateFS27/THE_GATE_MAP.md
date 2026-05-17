@@ -14,6 +14,15 @@ The gate now has a public proof page that translates this architecture into a bu
 - Alias page: `gate-map.html`
 - Current public proof URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html`
 - Actual Netlify gate URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/`
+- SkyePay client closeout app: `skyepay.html`
+- SkyePay public aliases: `/pay`, `/gateway/skyepay`
+- SkyePay API docs: `skyepay-api.html`
+- SkyePay API manifest: `skyepay-api.json`
+- SkyePay OpenAPI contract: `openapi/skyepay.openapi.json`
+- SkyePay browser SDK: `assets/skyepay-client.js`
+- SkyePay owner approval ledger: `skyepay-admin.html`
+- Public SkyePay knowledge surfaces:
+  - MetrAIyux 0S: `/workspaces/MetrAIyux-0S/metraiyux_0s_site/saas/skyepay.html`
 - Connected MetrAIyux brain wall: `https://metraiyux-0s-public-spectacle.pages.dev/brain-system.html#operating-brain-rooms`
 - Connected ecosystem portal: `https://metraiyux-ecosystem-portal.pages.dev/`
 - Sitemap: `sitemap.xml`
@@ -83,6 +92,9 @@ Important files and directories:
 - `assets/`, `index.html`, `dashboard.html`, `gate-proofx.html`, `key-generator.html`
   - Static UI surfaces and client-side admin/user tools.
 
+- `skyepay.html`, `skyepay-admin.html`, `assets/skyepay.css`, `assets/skyepay.js`, `assets/skyepay-admin.js`
+  - Stripe-backed client closeout app, owner approval ledger, and MCP-guided public motion surface.
+
 ## Architecture In One Pass
 
 The gate has five big jobs.
@@ -99,6 +111,8 @@ The gate has five big jobs.
 
    Admin functions manage customers, keys, OAuth clients, JWKS rotation, consents, pricing, vendors, sovereign variables, platform controls, push projects, GitHub/Netlify tokens, voice usage, invoices, and monitor surfaces.
 
+   SkyePay extends this lane with `admin-skyepay-ledger`, letting the owner approve, void, or mark a paid workspace unlocked without bypassing FS27.
+
 4. Platform event parent ledger
 
    Consumer apps mirror important events into `POST /platform/events` using a server-side mirror secret. The gate classifies the event lane, marks whether it is billable or privileged, writes monitor events, and writes audit records.
@@ -106,6 +120,19 @@ The gate has five big jobs.
 5. Deployment and push tracking
 
    The gate tracks file push jobs, chunked uploads, Netlify deploy projects, GitHub repo/push jobs, file status, billing for push activity, cleanup schedules, and retry schedules.
+
+6. SkyePay closeout and activation
+
+   SkyePay turns a private app preview into a Stripe Checkout Session, writes the payment result into `skyepay_orders`, and holds the workspace at `paid_pending_owner_approval` until the owner approves activation.
+
+   Public surfaces now treat SkyePay as the house payment gateway. Pricing, billing, and get-started routes should send customers to SkyePay instead of unrelated payment links, while internal admin approval stays in the FS27 ledger.
+
+   App surfaces can also call SkyePay as infrastructure:
+   - `GET /skyepay/offers?client=metraiyux-0s`
+   - `POST /skyepay/checkout`
+   - `GET /skyepay/status?session_id=...`
+
+   Cross-origin browser callers must be added to `SKYPAY_ALLOWED_ORIGINS`; same-origin app calls work without opening global CORS.
 
 ## Runtime Lanes
 

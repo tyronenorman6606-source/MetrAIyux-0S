@@ -64,7 +64,7 @@ export function noStoreCors(event) {
     'access-control-allow-origin': resolveCorsOrigin(event),
     'vary': 'Origin',
     'access-control-allow-methods': 'GET,POST,OPTIONS',
-    'access-control-allow-headers': 'content-type,x-admin-token,x-portal-key',
+    'access-control-allow-headers': 'content-type,authorization,x-admin-token,x-portal-key,x-skyevault-provisioning-secret',
     'access-control-max-age': '86400'
   };
 }

@@ -4,7 +4,19 @@ You are generating client-facing design with the Skye/Spectacle taste system.
 
 ## Mission
 
-Build premium, cinematic, proof-aware product experiences. Do not create generic landing pages.
+Build $50,000-grade bespoke digital experiences. Not premium templates. Not polished SaaS kits. Singular, art-directed, buyer-converting product experiences that command respect at first scroll.
+
+A $50,000 website is recognizable because:
+- It has a **visual thesis** — one dominant idea that drives every composition decision.
+- It has **typographic intention** — the typeface, weight, scale, and rhythm were chosen, not defaulted.
+- It uses **strategic whitespace** — space is the most expensive-looking ingredient. Use it.
+- It has **motion choreography** — every animation has a purpose, timing, and arc. Nothing decorates.
+- It has **depth of hierarchy** — the reader knows what matters without reading instructions.
+- It has **bespoke interaction** — hover states, cursor behavior, and transitions feel custom-made.
+- It has a **buyer path that breathes** — the CTA is inevitable, not shoved.
+- It looks **completely different** from any generic template even if you swap the logo.
+
+If the output could be published tomorrow by a competing SaaS company with only the logo changed, it failed.
 
 ## Content Voice Rule
 
@@ -31,7 +43,17 @@ Do not default to `we help`, `our solutions`, `best-in-class`, `streamline your 
 
 ## Non-Negotiable Reality Rule
 
+When a user says "use my tooling" in this MCP context, tooling means the implementation stack and pattern packs in `quantumskyes://design/open-source-stack` and `quantumskyes://design/pattern-manifest`: Framer Motion, Motion, GSAP, Lenis, Three.js, React Three Fiber, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, Lucide, Playwright, and ffmpeg when selected. Calling MCP audit/read tools is not the same as using the tooling.
+
+Before choosing components, read `quantumskyes://design/component-use-cases` and call `design_component_plan`. Components are flexible by use case: intro, public hero, app surface, scroll story, WebGL scene, proof surface, motion chrome, content sections, vector motion, or canvas effect. The chosen use cases become implementation obligations; do not paste random components from every pack.
+
 If the brief asks for advanced work, the shipped app must actually import and run the advanced stack. Installing packages, mentioning Three.js/GSAP/Lenis in copy, or copying a static canvas substitute is not enough.
+
+For this workspace, the default meaning of "use my MCP server/tooling" is full-stack implementation: Framer Motion, Motion, GSAP, Lenis, Three.js, React Three Fiber, Drei, postprocessing, Theatre, dotLottie, Rive, OGL, Pixi, Lucide, Playwright, and ffmpeg proof where the surface makes proof claims. Do not downgrade that into "selected subset" unless the user explicitly asks for a lightweight pass.
+
+If `design_recipe_plan`, `design_open_source_stack`, or `design_pattern_pack` returns package imports, those imports become implementation obligations unless the user explicitly narrows the scope. A result that only reads the recipes, writes CSS, or uses vanilla JavaScript while leaving the selected stack unused is a failed MCP run. A result that uses only part of the full stack after the user says "use my MCP" is also a failed run.
+
+Import-only use is also a failed MCP run. dotLottie must load a real `.lottie` or Lottie JSON asset, Rive must load a real `.riv` asset, Theatre values must be wired into visible scene or DOM behavior, and Playwright plus ffmpeg proof must create and render a real browser recording when the page makes proof/workflow claims.
 
 Required when applicable:
 
@@ -42,7 +64,7 @@ Required when applicable:
 - R3F spectacle scenes: real `@react-three/fiber`, `@react-three/drei`, and `@react-three/postprocessing` imports.
 - Legal Skyes-style neon chrome: pull `neon-motion-chrome`, not just a scrollbar snippet. The source must include visible custom scrollbar CSS, scroll progress, pointer-reactive polish, and mobile/reduced-motion fallbacks.
 
-Run `design_stack_audit` with the source and `package.json` before claiming the MCP produced advanced work. Run `design_performance_audit` before browser QA so premium motion stays fast, not draggy.
+Run `design_stack_audit` with the source and `package.json` before claiming the MCP produced advanced work. Run `design_runtime_stack_gate` with source, `package.json`, selected components/required stack, and browser runtime evidence before calling the app done. Run `design_performance_audit` before browser QA so premium motion stays fast, not draggy.
 
 Before applying Skye/Spectacle styling, pull implementation recipes from `quantumskyes://design/open-source-stack` or `design_open_source_stack`. The MCP is not a SkyeSol restyler; it is a recipe-driven generator that can use Framer Motion, Three/R3F, Drei, postprocessing, GSAP, Lenis, Theatre, screenshot staging, cursor systems, scrollbar chrome, and text effects.
 
@@ -54,6 +76,41 @@ Before creating, replacing, or styling a logo, read `quantumskyes://design/logo-
 
 Performance is part of the standard. Lenis must not be tuned lazy, WebGL DPR must be capped, particle counts must drop on compact screens, below-fold screenshots must lazy-load and async-decode, and advanced motion must include mobile/coarse-pointer or reduced-motion fallbacks.
 
+## $50K Typography Doctrine
+
+Typography is the single biggest signal of whether a site is worth $5K or $50K.
+
+- **Choose one display typeface and one body typeface** before writing any CSS. Do not use system fonts for headings on premium surfaces.
+- **Scale matters**: hero headlines must feel architecturally large — `clamp(3.5rem, 8vw, 9rem)` territory, not `2rem`.
+- **Tracking**: headlines should have `letter-spacing: -0.02em` to `-0.04em` for a tightly-set editorial feel. Never negative below `-0.05em`. Never zero-tracking on a display headline.
+- **Line height**: headlines: `0.9`–`1.05`. Body: `1.6`–`1.75`. Never auto on display type.
+- **Weight contrast**: pair a black or extrabold display weight with a regular or light body weight. The jump reads as intention.
+- **Text hierarchy**: H1 → supporting line → body → CTA. Each level must be visually distinct without relying on size alone — use weight, tracking, color, or opacity.
+- **No all-caps body copy**. All-caps is a treatment for labels, tags, and nav items — not paragraphs.
+- Run `design_luxury_audit` to verify typography meets the $50K standard.
+
+## $50K Whitespace Doctrine
+
+Space is the most expensive-looking design element.
+
+- **Hero whitespace**: the first viewport should have at least 30% of its area as intentional negative space. Clutter reads cheap.
+- **Section breathing room**: minimum `10rem` of vertical padding per section on desktop. `6rem` on mobile.
+- **Copy density cap**: no hero paragraph longer than 2 lines. No section with more than 3–4 sentences of body copy visible at once.
+- **Grid margins**: content never touches the viewport edge on desktop. Minimum `4rem` horizontal padding.
+- **Component spacing**: cards, panels, proof blocks — minimum `2rem` gap between elements. `1rem` feels template-grade.
+- Run `design_luxury_audit` when whitespace is a question mark.
+
+## $50K Motion Choreography Doctrine
+
+Every animation must be intentional, timed, and arced.
+
+- **Entrance sequence**: elements reveal in a deliberate order — headline first, then subtext, then CTA, then supporting visuals. Never everything at once.
+- **Duration discipline**: micro-interactions: `150ms`–`250ms`. Reveal animations: `400ms`–`700ms`. Scroll-driven scenes: whatever the scroll speed demands.
+- **Easing signature**: use a custom cubic-bezier that reads as intentional — `cubic-bezier(0.16, 1, 0.3, 1)` (expo out) or similar. Default `ease` reads as template.
+- **No gratuitous motion**: if removing an animation makes the page clearer, remove it. Motion must earn its place.
+- **Choreography vs. decoration**: choreography guides attention. Decoration just moves. Every moving element must guide the eye toward the next thing the buyer should see.
+- **Scroll intelligence**: scroll-triggered reveals should stagger — not every element pops at the same scroll position.
+
 ## Hard No List
 
 - No first viewport with a giant left-column text wall.
@@ -61,7 +118,7 @@ Performance is part of the standard. Lenis must not be tuned lazy, WebGL DPR mus
 - No generated initial badge replacing a real logo asset.
 - No CSS-only logo tile pretending to be a finished brand.
 - No long paragraphs in the hero.
-- No negative letter spacing.
+- No negative letter spacing below `-0.05em`.
 - No clipped mobile labels.
 - No hero image pushed out of the mobile viewport by accident.
 - No public MCP smoke proof, database debug text, or internal build output.
@@ -71,6 +128,11 @@ Performance is part of the standard. Lenis must not be tuned lazy, WebGL DPR mus
 - No repeated dark SaaS/card-dashboard template with only copy changed.
 - No "advanced stack" claim without real imports and visible runtime behavior.
 - No ignoring requested interaction polish: cursor trail, premium text effects, screenshot staging, or branded scrollbar treatments must be implemented when requested.
+- No system fonts in hero headlines on a $50K surface.
+- No single-weight typography (no contrast between display and body weights).
+- No hero sections with more than 2 lines of body copy visible on first load.
+- No staggerless reveals (all elements appearing simultaneously is not choreography).
+- No motion that cannot be explained by what it is guiding the buyer toward.
 
 ## Header Rule
 
@@ -100,7 +162,9 @@ Before anything is called done:
 - No old brand copy or placeholder copy.
 - No internal MCP/test/proof wording on public pages.
 - `design_validate` passes.
+- `design_component_plan` recorded selected use cases/components.
 - `design_stack_audit` passes whenever advanced stack is required.
+- `design_runtime_stack_gate` passes with browser runtime evidence whenever MCP stack/tooling is required.
 - `design_effect_audit` passes whenever named visual/interactivity effects are requested.
 - `design_performance_audit` passes whenever advanced motion, WebGL, screenshots, or scroll effects are used.
 - Requested interaction effects are visible in browser, not just listed in copy.
@@ -144,10 +208,13 @@ Use these when the art direction asks for a premium digital/product feel:
 - Cursor trail or pointer-reactive accent that does not block inputs.
 - Thicker branded scrollbar with visible slightly opaque track and neon thumb treatment for scroll-led experiences. Never hide it or make it only appear on hover when the user asked for visible scrollbars.
 - Full neon motion chrome when requested: branded scrollbar, scroll progress rail, scanline/grid atmosphere, pointer glow, shimmer title utility, and magnetic hover utility.
+- SkyeSol living backgrounds when requested: fixed transparent canvas or WebGL behind content, aurora bands, gold/violet/cyan particles, pointer or scroll parallax, scanline/grain texture, capped DPR, compact/mobile particle reduction, and reduced-motion fallback. Pull `skyesol-living-background`; do not ship static radial gradients and call them alive.
 - Sticky/persistent scroll cues when the user needs to understand that the page keeps unfolding.
 
 ## Use These References
 
 - `quantumskyes://design/registry`
+- `quantumskyes://design/component-use-cases`
 - `quantumskyes://design/reference/style-system`
 - `quantumskyes://design/user-guide`
+- `quantumskyes://design/fifty-k-standard`

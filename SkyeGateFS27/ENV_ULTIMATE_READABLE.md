@@ -127,8 +127,17 @@ Use this table when deciding whether a vendor should live as a house credential 
 - `STRIPE_WEBHOOK_SECRET`
 - `STRIPE_SUCCESS_URL`
 - `STRIPE_CANCEL_URL`
+- `SKYPAY_PUBLIC_ORIGIN`
+- `SKYPAY_ALLOWED_ORIGINS`
+- `SKYPAY_TRUST_PUBLIC_APP_ORIGIN`
+- `SKYPAY_SUCCESS_URL`
+- `SKYPAY_CANCEL_URL`
+- `SKYPAY_ALLOW_PUBLIC_DRY_RUN`
+- `SKYPAY_ALLOW_PUBLIC_ORDER_LOOKUP`
 
 Use Stripe if the gate should own the payment lane. Customer-owned billing contexts can still be modeled in the sovereign vault, but the parent gate should keep the metering record.
+
+SkyePay uses the Stripe keys above for Checkout Sessions and webhooks, then keeps the client closeout in FS27 as `paid_pending_owner_approval` until the owner unlocks the workspace.
 
 ## QuantumSkyes MCP / AI Repo Write Bridge
 
