@@ -54,6 +54,8 @@ function readReceipts(outDir) {
       return {
         receiptId: receipt.receiptId,
         sessionId: receipt.sessionId || recovered.sessionId || recoveredReceipt.sessionId || null,
+        workspaceId: receipt.workspaceId || receipt.workspace_id || recovered.workspaceId || recovered.workspace_id || receipt.archive?.workspaceId || null,
+        customerId: receipt.customerId || receipt.customer_id || recovered.customerId || recovered.customer_id || null,
         completedAt: receipt.generatedAt || recovered.completedAt || recoveredReceipt.completedAt || null,
         destination: typeof receipt.destination === 'string' ? receipt.destination : receipt.destination?.name || recovered.destination?.name || recoveredReceipt.destinationName || null,
         fileName: receipt.fileName || receipt.name || recovered.file?.name || recoveredReceipt.fileName || null,
@@ -97,6 +99,14 @@ function safeSourcePath(file) {
   return relative;
 }
 
+function safeFilePart(value) {
+  return String(value || 'default')
+    .trim()
+    .replace(/[^A-Za-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100) || 'default';
+}
+
 function addNode(nodes, node) {
   if (!node?.id) return;
   const current = nodes.get(node.id) || {};
@@ -121,6 +131,7 @@ const outDir = resolvePath(argValue('--out-dir'), path.join(root, '.skyevault-ou
 const remoteLedgerPath = resolvePath(argValue('--remote-ledger'), path.join(outDir, 'git-remote-ledger.jsonl'));
 const uploadLedgerPath = resolvePath(argValue('--upload-ledger'), path.join(outDir, 'vault-ledger.jsonl'));
 const outputPath = resolvePath(argValue('--output'), path.join(root, 'metraiyux_0s_site', 'brain', 'skyevault-vault-map.json'));
+const workspaceDir = resolvePath(argValue('--workspace-dir'), path.join(root, 'metraiyux_0s_site', 'brain', 'skyevault-workspaces'));
 const maxEvents = Number.parseInt(argValue('--max-events') || '500', 10);
 
 const remoteEvents = sortByTime(readJsonl(remoteLedgerPath).filter((event) => event.event && event.event !== 'parse-error')).slice(-maxEvents);
@@ -129,6 +140,8 @@ const receipts = readReceipts(outDir).slice(-200);
 const safeUploads = receipts.map((receipt) => ({
   receipt_ref: safeRef('receipt', receipt.receiptId),
   session_ref: receipt.sessionId ? safeRef('session', receipt.sessionId) : null,
+  workspace_id: receipt.workspaceId ? safeFilePart(receipt.workspaceId) : null,
+  customer_ref: receipt.customerId ? safeRef('customer', receipt.customerId) : null,
   completedAt: receipt.completedAt,
   destination: receipt.destination,
   fileName: cleanText(receipt.fileName, 100),
@@ -302,12 +315,88 @@ const payload = {
   total_receipt_human: bytes(receipts.reduce((sum, item) => sum + Number(item.fileSize || 0), 0)),
   repos: repoList,
   uploads: safeUploads,
+  workspace_maps: [],
   nodes: [...nodes.values()],
   links: [...links.values()],
   chunks
 };
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.mkdirSync(workspaceDir, { recursive: true });
+
+const aggregateNodes = new Map(payload.nodes.map((node) => [node.id, node]));
+const repoChunkById = new Map(chunks.filter((chunk) => chunk.id.startsWith('skyevault-repo-')).map((chunk) => [chunk.heading, chunk]));
+const workspaces = [...new Set(repoList.map((repo) => repo.workspace_id))].sort((a, b) => a.localeCompare(b));
+const workspaceMaps = [];
+
+for (const workspaceId of workspaces) {
+  const workspaceRepos = repoList.filter((repo) => repo.workspace_id === workspaceId);
+  const workspaceUploads = safeUploads.filter((upload) => upload.workspace_id === workspaceId);
+  const workspaceNode = `workspace:${workspaceId}`;
+  const repoNodes = new Set(workspaceRepos.map((repo) => `repo:${repo.workspace_id}/${repo.repo_id}`));
+  const includeNodeIds = new Set(['skyevault:hub', workspaceNode, ...repoNodes]);
+  const workspaceLinks = [];
+
+  for (const link of payload.links) {
+    const touchesWorkspace = link.source === workspaceNode || link.target === workspaceNode || repoNodes.has(link.source) || repoNodes.has(link.target);
+    if (!touchesWorkspace) continue;
+    workspaceLinks.push(link);
+    includeNodeIds.add(link.source);
+    includeNodeIds.add(link.target);
+  }
+
+  const workspaceNodes = [...includeNodeIds]
+    .map((id) => aggregateNodes.get(id))
+    .filter(Boolean);
+  const workspaceChunks = [
+    {
+      id: `skyevault-workspace-${workspaceId}`,
+      title: 'SkyeVault Workspace Map',
+      heading: workspaceId,
+      text: `Workspace ${workspaceId} has ${workspaceRepos.length} repos, ${workspaceRepos.reduce((sum, repo) => sum + repo.ref_updates, 0)} ref updates, ${workspaceRepos.reduce((sum, repo) => sum + repo.requests, 0)} Git requests, and ${workspaceRepos.reduce((sum, repo) => sum + repo.exports, 0)} bundle exports. This is the per-workspace 0S map, separate from the aggregate operator overview.`,
+      source: `brain/skyevault-workspaces/${safeFilePart(workspaceId)}.json`,
+      tags: ['skyevault', 'workspace', 'git', workspaceId]
+    },
+    ...workspaceRepos.map((repo) => repoChunkById.get(`${repo.workspace_id}/${repo.repo_id}`)).filter(Boolean)
+  ];
+
+  const workspacePayload = {
+    schema: 'metraiyux.0s.skyevault-workspace-map.v1',
+    generated_at: payload.generated_at,
+    workspace_id: workspaceId,
+    safety: payload.safety,
+    repo_count: workspaceRepos.length,
+    upload_count: workspaceUploads.length,
+    uploads_attached: workspaceUploads.length,
+    upload_scope: 'Uploads are attached only when the receipt carries workspace metadata from Gate or the caller.',
+    repos: workspaceRepos,
+    uploads: workspaceUploads,
+    nodes: workspaceNodes,
+    links: workspaceLinks,
+    chunks: workspaceChunks
+  };
+  const fileName = `${safeFilePart(workspaceId)}.json`;
+  fs.writeFileSync(path.join(workspaceDir, fileName), `${JSON.stringify(workspacePayload, null, 2)}\n`);
+  workspaceMaps.push({
+    workspace_id: workspaceId,
+    file: `brain/skyevault-workspaces/${fileName}`,
+    repo_count: workspacePayload.repo_count,
+    upload_count: workspacePayload.upload_count,
+    node_count: workspacePayload.nodes.length,
+    link_count: workspacePayload.links.length
+  });
+}
+
+const workspaceIndex = {
+  schema: 'metraiyux.0s.skyevault-workspace-index.v1',
+  generated_at: payload.generated_at,
+  safety: payload.safety,
+  workspace_count: workspaceMaps.length,
+  workspaces: workspaceMaps
+};
+fs.writeFileSync(path.join(workspaceDir, 'index.json'), `${JSON.stringify(workspaceIndex, null, 2)}\n`);
+payload.workspace_maps = workspaceMaps;
 fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`);
-console.log(`Generated SkyeVault 0S neural bridge with ${payload.repo_count} repos, ${payload.receipt_count} receipts, ${payload.nodes.length} nodes, and ${payload.links.length} links.`);
+console.log(`Generated SkyeVault 0S neural bridge with ${payload.repo_count} repos, ${payload.receipt_count} receipts, ${payload.nodes.length} nodes, ${payload.links.length} links, and ${workspaceMaps.length} workspace maps.`);
 console.log(path.relative(root, outputPath));
+console.log(path.relative(root, path.join(workspaceDir, 'index.json')));

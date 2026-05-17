@@ -142,6 +142,14 @@ That writes `metraiyux_0s_site/brain/skyevault-vault-map.json`. The 0S local bra
 metraiyux_0s_site/admin/skyevault-neural-map.html
 ```
 
+It also writes per-workspace maps under:
+
+```text
+metraiyux_0s_site/brain/skyevault-workspaces/
+```
+
+The aggregate map is the operator overview. Each workspace map contains only that workspace's repos, ref/update graph, and repo chunks. Upload receipts attach to a workspace only when the receipt carries workspace metadata from Gate or the caller.
+
 The generated map is public-safe by default: it keeps counts, repo refs, commit heads, event shape, receipt fingerprints, and graph nodes, but does not emit raw tokens, raw session IDs, full receipt IDs, author emails, absolute storage paths, or file bodies.
 
 ## Proof

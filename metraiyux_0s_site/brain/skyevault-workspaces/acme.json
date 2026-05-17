@@ -1,0 +1,241 @@
+{
+  "schema": "metraiyux.0s.skyevault-workspace-map.v1",
+  "generated_at": "2026-05-17T16:02:33.987Z",
+  "workspace_id": "acme",
+  "safety": "public-safe summary: absolute paths, raw tokens, raw session IDs, full receipt IDs, author emails, and private file bodies are not emitted",
+  "repo_count": 1,
+  "upload_count": 0,
+  "uploads_attached": 0,
+  "upload_scope": "Uploads are attached only when the receipt carries workspace metadata from Gate or the caller.",
+  "repos": [
+    {
+      "id": "acme/demo",
+      "workspace_id": "acme",
+      "repo_id": "demo",
+      "ref_updates": 8,
+      "requests": 46,
+      "exports": 2,
+      "refs": {
+        "refs/heads/main": "aebd6a5866acccc43aaa15c1a015ace451efa5f4"
+      },
+      "service_summary": {
+        "git-receive-pack": 22,
+        "git-upload-pack": 24
+      },
+      "latest_subject": "Second proof commit",
+      "latest_head": "aebd6a5866acccc43aaa15c1a015ace451efa5f4",
+      "latest_author": "SkyeVault Proof",
+      "latest_event_at": "2026-05-17T15:22:18.943Z"
+    }
+  ],
+  "uploads": [],
+  "nodes": [
+    {
+      "id": "skyevault:hub",
+      "label": "SkyeVault",
+      "type": "vault-hub",
+      "group": "vault",
+      "size": 30,
+      "summary": "Git remote, vault upload, restore, export, and proof event lane for 0S."
+    },
+    {
+      "id": "workspace:acme",
+      "label": "acme",
+      "type": "workspace",
+      "group": "workspace",
+      "size": 20,
+      "summary": "Vault workspace acme"
+    },
+    {
+      "id": "repo:acme/demo",
+      "label": "acme/demo",
+      "type": "repo",
+      "group": "repo",
+      "size": 24,
+      "summary": "8 ref updates, 46 Git requests, 2 exports"
+    },
+    {
+      "id": "commit:b7cf4c7dc26b0bf4d6130b61b799cf04ef71c347",
+      "label": "Initial proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "create refs/heads/main at 2026-05-17T15:09:53Z"
+    },
+    {
+      "id": "commit:a63314f12c1f28f4366a388038dd78836025d611",
+      "label": "Second proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "update refs/heads/main at 2026-05-17T15:09:55Z"
+    },
+    {
+      "id": "commit:379d970502beeabe42406b3e3bed04a139cec161",
+      "label": "Initial proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "create refs/heads/main at 2026-05-17T15:11:15Z"
+    },
+    {
+      "id": "commit:6050bf0761df23fbfaefcf5aed8c76c81662eee1",
+      "label": "Second proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "update refs/heads/main at 2026-05-17T15:11:15Z"
+    },
+    {
+      "id": "commit:58c6266a33bfc71230291e29ed88028fbb6798c2",
+      "label": "Initial proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "create refs/heads/main at 2026-05-17T15:18:55Z"
+    },
+    {
+      "id": "commit:837fe58706ce04dad5a49b005fdbaee084f338f5",
+      "label": "Second proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "update refs/heads/main at 2026-05-17T15:18:56Z"
+    },
+    {
+      "id": "export:acme/demo:3f014582679c26699544e11e44fa6f535a9c92e444b108bc8e2c963643d0be49",
+      "label": "demo-20260517T151901Z.bundle",
+      "type": "bundle-export",
+      "group": "export",
+      "size": 11,
+      "summary": "Cloneable bundle, 693 B, sha256 3f014582679c26699544e11e44fa6f535a9c92e444b108bc8e2c963643d0be49"
+    },
+    {
+      "id": "commit:ea30dabd310f6e161228230ef68f0e741e3637e3",
+      "label": "Initial proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "create refs/heads/main at 2026-05-17T15:22:14Z"
+    },
+    {
+      "id": "commit:aebd6a5866acccc43aaa15c1a015ace451efa5f4",
+      "label": "Second proof commit",
+      "type": "commit",
+      "group": "commit",
+      "size": 10,
+      "summary": "update refs/heads/main at 2026-05-17T15:22:14Z"
+    },
+    {
+      "id": "export:acme/demo:a2bfac886c13f602c8a1315f45a34683352c0631b3f429f86f7b56021cb27413",
+      "label": "demo-20260517T152218Z.bundle",
+      "type": "bundle-export",
+      "group": "export",
+      "size": 11,
+      "summary": "Cloneable bundle, 643 B, sha256 a2bfac886c13f602c8a1315f45a34683352c0631b3f429f86f7b56021cb27413"
+    }
+  ],
+  "links": [
+    {
+      "source": "skyevault:hub",
+      "target": "workspace:acme",
+      "type": "workspace",
+      "strength": 1.8
+    },
+    {
+      "source": "workspace:acme",
+      "target": "repo:acme/demo",
+      "type": "repo",
+      "strength": 1.8
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:b7cf4c7dc26b0bf4d6130b61b799cf04ef71c347",
+      "type": "create",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:a63314f12c1f28f4366a388038dd78836025d611",
+      "type": "update",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:379d970502beeabe42406b3e3bed04a139cec161",
+      "type": "create",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:6050bf0761df23fbfaefcf5aed8c76c81662eee1",
+      "type": "update",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:58c6266a33bfc71230291e29ed88028fbb6798c2",
+      "type": "create",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:837fe58706ce04dad5a49b005fdbaee084f338f5",
+      "type": "update",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "export:acme/demo:3f014582679c26699544e11e44fa6f535a9c92e444b108bc8e2c963643d0be49",
+      "type": "export",
+      "strength": 1.4
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:ea30dabd310f6e161228230ef68f0e741e3637e3",
+      "type": "create",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "commit:aebd6a5866acccc43aaa15c1a015ace451efa5f4",
+      "type": "update",
+      "strength": 1.2
+    },
+    {
+      "source": "repo:acme/demo",
+      "target": "export:acme/demo:a2bfac886c13f602c8a1315f45a34683352c0631b3f429f86f7b56021cb27413",
+      "type": "export",
+      "strength": 1.4
+    }
+  ],
+  "chunks": [
+    {
+      "id": "skyevault-workspace-acme",
+      "title": "SkyeVault Workspace Map",
+      "heading": "acme",
+      "text": "Workspace acme has 1 repos, 8 ref updates, 46 Git requests, and 2 bundle exports. This is the per-workspace 0S map, separate from the aggregate operator overview.",
+      "source": "brain/skyevault-workspaces/acme.json",
+      "tags": [
+        "skyevault",
+        "workspace",
+        "git",
+        "acme"
+      ]
+    },
+    {
+      "id": "skyevault-repo-acme-demo",
+      "title": "SkyeVault Repo",
+      "heading": "acme/demo",
+      "text": "Workspace acme repo demo has 8 ref updates, 46 Git smart HTTP requests, 2 bundle exports, and latest commit Second proof commit aebd6a5866acccc43aaa15c1a015ace451efa5f4. Services: git-receive-pack 22, git-upload-pack 24.",
+      "source": "brain/skyevault-vault-map.json",
+      "tags": [
+        "skyevault",
+        "repo",
+        "git",
+        "acme",
+        "demo"
+      ]
+    }
+  ]
+}
