@@ -3,15 +3,15 @@ const VERSION = 'AUTONOMOUS_BUSINESS_SITE_OPERATOR_1.0.0';
 const ROUTES = [
   ['buyer_lead', /lead|buyer|sale|sell|prospect|proposal|close|ae|discovery|quote|pricing|website|white[- ]?label|client deployment|command deck/i, 'celeste-monroe-brain', 'adrian-cross-brain', 'AE discovery follow-up, buyer qualification, and live proof routing'],
   ['finance_or_pricing', /finance|invoice|billing|payroll|margin|commission|price|cost/i, 'naomi-sterling-brain', 'celeste-monroe-brain', 'Pricing, margin, billing, or commission review'],
-  ['compliance_or_contracting', /contract|legal|compliance|policy|filing|incorporation|insurance|risk/i, 'julian-mercer-brain', 'donovan-pierce-brain', 'Compliance routing and professional review flag'],
-  ['technology_or_site', /cloudflare|deploy|deployment|\bworker\b|automation|brain|\bapi\b|dashboard|system|skygate|fs27|\bgate\b|\bauth\b|introspect|platform event/i, 'orion-hayes-brain', 'site-operator-autonomous-business-brain', 'Technology, deployment, automation, gate, or site operation review'],
+  ['government_enterprise', /government|enterprise|sam|naics|procurement|\bbid\b|\bsubcontract\b/i, 'donovan-pierce-brain', 'julian-mercer-brain', 'Government/enterprise readiness review'],
+  ['vendor_partner', /\bvendor\b|\bpartner\b|subcontractor|referral|alliance/i, 'helena-ward-brain', 'julian-mercer-brain', 'Partner/vendor intake and risk review'],
+  ['client_onboarding', /\bclient\b|onboard|renewal|escalation|\blaunch\b|status/i, 'adrian-cross-brain', 'marcus-vale-brain', 'Client onboarding and delivery status setup'],
+  ['compliance_or_contracting', /\bcontract\b|legal|compliance|policy|filing|incorporation|insurance|\brisk\b/i, 'julian-mercer-brain', 'donovan-pierce-brain', 'Compliance routing and professional review flag'],
+  ['technology_or_site', /cloudflare|deploy|deployment|\bworker\b|automation|brain|\bapi\b|system|skygate|fs27|\bgate\b|\bauth\b|introspect|platform event/i, 'orion-hayes-brain', 'site-operator-autonomous-business-brain', 'Technology, deployment, automation, gate, or site operation review'],
   ['marketing_or_content', /marketing|brand|copy|seo|content|campaign|public claim/i, 'valentina-reyes-brain', 'victor-saint-brain', 'Marketing copy, content control, or public claim review'],
-  ['government_enterprise', /government|enterprise|sam|naics|procurement|bid|subcontract/i, 'donovan-pierce-brain', 'julian-mercer-brain', 'Government/enterprise readiness review'],
   ['quality_proof', /proof|qa|claim|audit|receipt|smoke|test|verify/i, 'victor-saint-brain', 'marcus-vale-brain', 'Proof receipt, QA review, or claims validation'],
   ['innovation_expansion', /innovation|expansion|new market|acquisition|branch/i, 'amara-voss-brain', 'gray-london-skyes-brain', 'Expansion, innovation, or new lane evaluation'],
   ['candidate_or_staffing', /candidate|recruit|job order|\bstaff\b|placement|resume/i, 'sienna-brooks-brain', 'adrian-cross-brain', 'Candidate screening or job order fulfillment'],
-  ['vendor_partner', /vendor|partner|subcontractor|referral|alliance/i, 'helena-ward-brain', 'julian-mercer-brain', 'Partner/vendor intake and risk review'],
-  ['client_onboarding', /\bclient\b|onboard|renewal|escalation|launch|status/i, 'adrian-cross-brain', 'marcus-vale-brain', 'Client onboarding and delivery status setup'],
   ['founder_strategy', /founder|gray|vision|strategy|ownership|doctrine|command/i, 'gray-london-skyes-brain', 'central-company-command-brain', 'Founder strategy and executive command review']
 ];
 const LIVE_SURFACES = [
