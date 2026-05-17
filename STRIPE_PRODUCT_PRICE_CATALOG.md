@@ -1,6 +1,6 @@
 # Stripe Product Price Catalog
 
-Updated: 2026-05-16
+Updated: 2026-05-17
 
 This is the repo-wide sales and Stripe source-of-truth. Use this file when creating products, prices, Payment Links, checkout sessions, quote templates, and brain sales guidance.
 
@@ -51,14 +51,16 @@ Role: canonical MetrAIyux 0S client subscription plans. These are ready to creat
 | MetrAIyux 0S - Starter Command Setup | Starter Command setup | One-time | $997.00 | Once | `metraiyux_starter_command_setup` | same as above, `setup_for=starter-command` |
 | MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $797.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
 | MetrAIyux 0S - Growth Cabinet Setup | Growth Cabinet setup | One-time | $2,500.00 | Once | `metraiyux_growth_cabinet_setup` | same as above, `setup_for=growth-cabinet` |
-| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $1,497.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
+| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $1,997.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
 | MetrAIyux 0S - Autonomous Office Setup | Autonomous Office setup | One-time | $5,000.00 | Once | `metraiyux_autonomous_office_setup` | same as above, `setup_for=autonomous-office` |
+| MetrAIyux 0S - Enterprise | Enterprise monthly | Recurring | $2,497.00 | Monthly | `metraiyux_enterprise_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=enterprise`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
+| MetrAIyux 0S - Enterprise Setup | Enterprise setup | One-time | $10,000.00 | Once | `metraiyux_enterprise_setup` | same as above, `setup_for=enterprise` |
 
 ### Quote Only
 
 | Offer | Stripe action | Reason |
 | --- | --- | --- |
-| Enterprise / Government Readiness | Do not create a fixed public price. Create custom Stripe quotes/invoices per deal. | The repo marks monthly and setup as `Custom`. |
+| Enterprise / Government Readiness | See table above — Enterprise now has a fixed base price at $2,497/mo. Custom quotes/invoices for scope beyond the base. | |
 | `metraiyux_0s_site/pricing/*.html` 13-cabinet package pages | Do not create Stripe products yet. | Files explicitly say pricing is demonstrative/placeholder and must be edited before client use. |
 
 ## Folder: `Metraiyux-Marketing`
@@ -328,11 +330,11 @@ Role: sales site and white-label offer for staffing operations.
 
 Valuation ranges and "suggested sales packages" in `valuation-brief.md` are guidance, not fixed checkout products.
 
-## Folder: `unpacked-projects/sol_staffing_agency_site`
+## Folder: `metraiyux_0s_site/live/sol_staffing_agency_site`
 
 Source files:
-- `unpacked-projects/sol_staffing_agency_site/pricing.html`
-- `unpacked-projects/sol_staffing_agency_site/bill-rate-calculator-notes.md`
+- `metraiyux_0s_site/live/sol_staffing_agency_site/pricing.html`
+- `metraiyux_0s_site/live/sol_staffing_agency_site/bill-rate-calculator-notes.md`
 
 Role: current staffing website. It intentionally avoids hardcoded staffing rates.
 
@@ -361,7 +363,7 @@ Treat these as non-checkout amounts unless a future edit explicitly promotes the
 | `SkyeGateFS27/env.ultimate.template` | Voice per-minute cost inputs | Internal metering until markup approved |
 | Lane Vault and SkyeCorp pages | 12/24/36 month example payments after down payment | Financing examples only |
 | `SOL-Staffing-Marketing/valuation-brief.md` | Suggested ranges | Quote guidance only |
-| `unpacked-projects/sol_staffing_agency_site` | Staffing engagement models and calculator outputs | Quote only |
+| `metraiyux_0s_site/live/sol_staffing_agency_site` | Staffing engagement models and calculator outputs | Quote only |
 
 ## Brain Sales Rules
 
