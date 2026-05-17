@@ -2305,6 +2305,20 @@ server.registerTool('repo_read', {
   return { content: [{ type: 'text', text: readText(filePath) }] };
 });
 
+server.registerTool('design_apply_mcp_parts', {
+  title: 'Apply MCP Parts To Target',
+  description: 'Write selected MCP design parts into a workspace target. This is the implementation side: it edits CSS/JS/HTML for supported effects instead of only producing a receipt.',
+  inputSchema: {
+    targetFolder: z.string().describe('Workspace-relative or absolute target folder to modify'),
+    effects: z.array(z.enum(['cursorTrail', 'neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground', 'surfaceScreenshots', 'theatre', 'gsapScroll', 'threeCanvas'])).optional().describe('Effects to apply when supported by static MCP parts'),
+    componentIds: z.array(z.string()).optional().describe('Component ids or aliases to infer effects/patterns'),
+    patternIds: z.array(z.string()).optional().describe('Pattern ids from quantumskyes://design/pattern-manifest to apply when supported'),
+    mode: z.enum(['apply', 'dryRun']).optional().describe('apply writes files; dryRun reports planned writes only')
+  }
+}, async (args) => {
+  return { content: [{ type: 'text', text: JSON.stringify(applyMcpParts(args), null, 2) }] };
+});
+
 server.registerTool('design_find', {
   title: 'Search Design References',
   description: 'Search MCP design resources and Skye reference notes for a query.',
