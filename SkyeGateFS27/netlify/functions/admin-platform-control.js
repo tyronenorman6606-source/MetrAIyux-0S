@@ -34,7 +34,7 @@ const PLATFORM_CATALOG = [
   {
     app_id: "metraiyux-houseoperations",
     title: "HouseOperations",
-    description: "0S house-command app surface for task intake, vendors, schedule pressure, owner alerts, assignments, proof snapshots, FS27 mirror packets, and PIN Gate handoff.",
+    description: "0S house-command app surface for task intake, vendors, schedule pressure, owner alerts, assignments, proof snapshots, tutorial runs, billing intents, FS27 mirror packets, and PIN Gate handoff.",
     visibility: "client-admin",
     storage_mode: "local-app-plus-fs27-event-mirror",
     launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/index.html"
