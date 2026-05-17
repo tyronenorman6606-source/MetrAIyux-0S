@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Public-safe visual knowledge map for MetrAIyux 0S production state, proof, sales, operator actions, and local-brain source of truth.">
+  <title>Neural Knowledge Map · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="favicon-32.png">
+  <style>
+    body{overflow:hidden}
+    .map-page{height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,390px);background:radial-gradient(circle at 18% 12%,rgba(111,242,199,.16),transparent 28rem),radial-gradient(circle at 74% 24%,rgba(243,212,131,.13),transparent 30rem),#03070b}
+    .map-canvas-wrap{position:relative;min-width:0;min-height:0}
+    #publicNeuralMap{width:100%;height:100%;display:block;cursor:grab}
+    #publicNeuralMap:active{cursor:grabbing}
+    .map-panel{border-left:1px solid rgba(255,255,255,.12);background:rgba(3,7,11,.82);backdrop-filter:blur(18px);padding:20px;overflow:auto}
+    .map-panel h1{font-size:clamp(30px,4vw,46px);letter-spacing:0;margin-bottom:12px}
+    .map-panel h2{font-size:1.05rem;letter-spacing:0}
+    .map-panel .summary{color:var(--muted);font-size:.94rem}
+    .map-search{display:grid;gap:8px;margin:18px 0;color:var(--muted);font-size:.86rem}
+    .map-search input{width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);padding:12px}
+    .map-filters{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:16px 0}
+    .map-filters button{min-height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:var(--text);cursor:pointer;font-weight:800}
+    .map-filters button.is-active{background:linear-gradient(135deg,var(--gold2),var(--mint));border-color:transparent;color:#061016}
+    .map-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;color:var(--muted);font-size:.84rem;margin:14px 0 18px}
+    .map-legend span{display:flex;align-items:center;gap:8px}.map-dot{width:10px;height:10px;border-radius:999px;display:inline-block}.hub{background:#f7d36e}.cluster{background:#64f1cf}.note{background:#8fc7ff}.signal{background:#d6a2ff}
+    .map-detail{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.055);padding:16px;margin:16px 0}.map-detail p{color:var(--muted)}.map-tags{color:#dff7ff!important;font-size:.85rem}
+    .map-boundary{border-left:4px solid var(--gold2);padding-left:12px;color:#d7e5ec;font-size:.88rem}.map-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.map-actions a{border-radius:999px}
+    @media(max-width:880px){body{overflow:auto}.map-page{height:auto;min-height:100vh;grid-template-columns:1fr}.map-canvas-wrap{height:68vh}.map-panel{border-left:0;border-top:1px solid rgba(255,255,255,.12)}}
+  </style>
+</head>
+<body>
+  <main class="map-page">
+    <section class="map-canvas-wrap" aria-label="Interactive MetrAIyux 0S neural knowledge map">
+      <canvas id="publicNeuralMap"></canvas>
+    </section>
+    <aside class="map-panel">
+      <p class="eyebrow">Public-safe neural map</p>
+      <h1>MetrAIyux 0S Knowledge Map</h1>
+      <p class="summary" id="mapSummary">Loading curated knowledge graph...</p>
+      <div class="map-actions">
+        <a class="button primary" href="local-brain.html">Ask Local Brain</a>
+        <button class="button" id="fitMapButton" type="button">Fit Map</button>
+        <a class="button" href="sales/live-proof-router.html">Proof Router</a>
+        <a class="button" href="index.html">Home</a>
+      </div>
+      <label class="map-search">
+        <span>Search the map</span>
+        <input id="mapSearch" type="search" placeholder="proof, production, sales, blockers...">
+      </label>
+      <div class="map-filters" role="group" aria-label="Map filters">
+        <button class="is-active" data-map-filter="all">All</button>
+        <button data-map-filter="production">Prod</button>
+        <button data-map-filter="proof">Proof</button>
+        <button data-map-filter="sales">Sales</button>
+        <button data-map-filter="operator">Ops</button>
+        <button data-map-filter="brain">Brain</button>
+      </div>
+      <div class="map-legend">
+        <span><i class="map-dot hub"></i>Hub</span>
+        <span><i class="map-dot cluster"></i>Lane</span>
+        <span><i class="map-dot note"></i>Note</span>
+        <span><i class="map-dot signal"></i>Signal</span>
+      </div>
+      <section class="map-detail" id="mapDetail">
+        <p class="eyebrow">Selected node</p>
+        <h2>Hover or click a node</h2>
+        <p>This web map is generated from approved Obsidian notes that are already safe for the local brain.</p>
+      </section>
+      <p class="map-boundary">This page shows curated production, proof, sales, and operating knowledge. Private command allowlists and vault-only operator notes stay outside the public graph.</p>
+    </aside>
+  </main>
+  <script src="assets/public-neural-map-data.js"></script>
+  <script src="assets/public-neural-map.js"></script>
+</body>
+</html>
