@@ -2,30 +2,30 @@
 
 ## Status
 
-ConnectLog remains an offline-first static PWA. Relay13 is optional. The app now has a real integration lane that can use Relay13 when deployed, while local fallback stays available when Relay13 is missing, offline, misconfigured, or not yet proven live.
+ConnectLog is a production relationship command app. Relay13 is the live production messaging core. The app has a real integration lane that uses Relay13 for owned messaging while preserving a delivery queue when an operator browser lacks credentials or cannot reach the Worker.
 
 ## Added
 
 ✅ Relay13 bridge settings panel under `#relay13`.
-✅ Local fallback / Relay13 remote mode selector.
+✅ Production vault / Relay13 production bridge mode selector.
 ✅ Relay13 Worker health check against `/api/health`.
 ✅ Public workspace slug, workspace ID, and operator API-key fields.
 ✅ Operator API key is stored only in the current browser IndexedDB metadata, not embedded into QR payloads.
 ✅ Active-card thread creation through Relay13 `POST /api/v1/conversations` when configured.
-✅ Local fallback thread creation when Relay13 is not configured or unavailable.
-✅ Message composer with remote send attempt and local queue fallback.
+✅ Delivery queue thread creation when Relay13 credentials are not configured or the Worker cannot be reached from this browser.
+✅ Message composer with Relay13 send attempt and protected delivery queue.
 ✅ Queued outbox sync button.
 ✅ Remote conversation list refresh using Relay13 API key.
-✅ Optional public Relay13 bridge payload inside ConnectLog QR cards.
+✅ Public Relay13 bridge payload inside ConnectLog QR cards.
 ✅ Imported contacts can preserve Relay13 bridge metadata.
-✅ Contact cards now expose a Message action that opens Relay13 or local fallback thread.
+✅ Contact cards now expose a Message action that opens Relay13 or a protected delivery-queue thread.
 ✅ JSON export now includes sanitized Relay13 bridge state without leaking API keys or visitor tokens.
 
 ## Not claimed
 
 ☐ No live Cloudflare deployment was performed in this workspace.
 ☐ No two-browser realtime WebSocket proof was performed here.
-☐ No production auth layer was added to ConnectLog; it remains local-first/no-auth by design.
+☐ Operator auth remains handled by FS27/Relay13/gate policy; API keys are never embedded in public QR payloads.
 ☐ Attachments are not wired through Relay13 yet.
 ☐ Push/email/SMS notifications are not wired yet.
 

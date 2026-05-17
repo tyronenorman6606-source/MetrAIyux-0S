@@ -59,7 +59,7 @@ function flowLanes(data){
 }
 function runtimeMap(){ return `<div class="runtime-map">${runtimeTiles.map(([name,url,desc])=>`<div class="runtime-tile"><span class="data-kicker">function lane</span><h3>${name}</h3><code>${url}</code><p>${desc}</p></div>`).join('')}</div>`; }
 function proofList(){
-  const proofs = ['Static surfaces are routed as real pages, not a single inert card stack.','Upload, search, publish, review, execution, dispatch, stats, and session functions are preserved.','Browser token storage remains session scoped through skygate-auth.js.','Smoke files were upgraded to verify the new surface plus runtime contracts.','Not proven here: deployed provider identity handoff or multi-operator hosted synchronization.'];
+  const proofs = ['Static surfaces are routed as real pages, not a single inert card stack.','Upload, search, publish, review, execution, dispatch, stats, and session functions are preserved.','Browser token storage remains session scoped through skygate-auth.js.','0S Cloudflare Worker production adapter serves the media API routes with KV storage.','Free99 means no charge, while FS27/SkyGate bearer introspection still gates every media action.'];
   return `<div class="proof-list">${proofs.map(p=>`<div class="proof-item"><span>✅</span><div>${p}</div></div>`).join('')}</div>`;
 }
 async function render(){

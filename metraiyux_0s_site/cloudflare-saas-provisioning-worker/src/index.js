@@ -12,8 +12,8 @@ const PLANS = {
     setup: 1500,
     skyepay_offer_id: "metraiyux-starter-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     // Customer-facing platform features — shown in marketing, portal, and SDK
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
@@ -53,8 +53,8 @@ const PLANS = {
     setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -92,8 +92,8 @@ const PLANS = {
     setup: 6500,
     skyepay_offer_id: "metraiyux-routex-workforce-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_route_scope_and_runtime_proof",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -136,8 +136,8 @@ const PLANS = {
     setup: 7500,
     skyepay_offer_id: "metraiyux-autonomous-office",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -290,7 +290,7 @@ const SOVEREIGN_STACK = {
     { id: "skyevault", title: "SkyeVault", replaces: ["google_drive", "github_repo_storage"], status: "owner_selectable_vault_lane" },
     { id: "skyemail", title: "SkyeMail", replaces: ["gmail_only_business_email"], status: "workspace_mailbox_lane" },
     { id: "skyepay", title: "SkyePay", replaces: ["manual_unlock_checkout"], status: "stripe_confirmed_auto_unlock_lane" },
-    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "owner_approved_workforce_command_lane" },
+    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "stripe_confirmed_auto_unlock_workforce_command_lane" },
     { id: "fs27", title: "SkyeGateFS27", replaces: ["loose_api_keys", "unmetered_ai"], status: "parent_gate_and_telemetry_lane" }
   ]
 };

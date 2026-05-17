@@ -25,6 +25,7 @@
     "0s:connectlog-relay13:e2e": "node metraiyux_0s_site/tests/connectlog-relay13-e2e.mjs",
     "0s:houseops-skyebox:e2e": "node metraiyux_0s_site/tests/houseoperations-skyebox-e2e.mjs",
     "0s:houseops:claims": "node metraiyux_0s_site/tests/houseoperations-claim-contract.mjs",
+    "0s:houseops:skyepay": "node metraiyux_0s_site/tests/houseoperations-skyepay-offer-proof.mjs",
     "0s:connectlog-relay13:prod-proof": "node metraiyux_0s_site/tests/connectlog-relay13-production-proof.mjs",
     "0s:skyeroutex:runtime": "cd metraiyux_0s_site/SkyeRouteX && npm run verify:runtime",
     "0s:skyeroutex:v04": "cd metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0 && npm run smoke:all",
@@ -64,7 +65,7 @@
     "vault:cli": "node tools/skyevault-cli.mjs",
     "vault:diff": "node tools/skyevault-vault-diff.mjs",
     "vault:ledger": "node tools/skyevault-ledger.mjs",
-    "0s:skyemediacenter:smoke": "cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs"
+    "0s:skyemediacenter:smoke": "cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs && node smoke/cloudflare-worker-production-smoke.mjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

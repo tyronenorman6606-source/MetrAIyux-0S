@@ -2,7 +2,7 @@
 
 ## Completed
 
-✅ No auth was added.
+✅ Public source does not embed operator API keys.
 
 ✅ Runtime CDN dependency remains removed. The app shell is local static HTML, CSS, JS, icons, manifest, service worker, and local QR engine.
 
@@ -52,7 +52,7 @@
 
 ## Important operational notes
 
-The app is static and local-first. If you want seed files to be auto-discovered after dropping them into `seed-data/`, run `npm run seed:manifest` before deploy. Static hosting generally cannot expose directory listing safely or consistently, so `manifest.json` is the controlled ingestion ledger.
+The app is production-published and keeps seed ingestion controlled. If you want seed files to be auto-discovered after dropping them into `seed-data/`, run `npm run seed:manifest` before deploy. Static hosting generally cannot expose directory listing safely or consistently, so `manifest.json` is the controlled ingestion ledger.
 
 Camera QR scanning depends on browser support for the `BarcodeDetector` API. Paste/manual intake remains available even when camera QR detection is unsupported.
 

@@ -1,6 +1,6 @@
 # SkyeMediaCenter Platform Status
 
-Status: P3 experiential front-end rebuild complete for the uploaded static/Netlify Functions package.
+Status: P3 experiential front-end rebuild complete and wired into the 0S Cloudflare production Worker.
 
 ## Implemented
 
@@ -10,6 +10,7 @@ Status: P3 experiential front-end rebuild complete for the uploaded static/Netli
 ✅ Existing Netlify Functions preserved.
 ✅ Floating transparent SVG mark refreshed.
 ✅ Runtime contract and smoke proof refreshed.
+✅ Cloudflare Worker production adapter added for client-facing 0S deployment.
 
 ## Preserved runtime
 
@@ -20,9 +21,10 @@ Status: P3 experiential front-end rebuild complete for the uploaded static/Netli
 ✅ `media-stats` protected stats.
 ✅ `skygate-session` local proof/bootstrap and operator login.
 
-## Not proven inside this zip
+## Production runtime
 
-☐ Hosted Netlify deployment behavior.
-☐ Real external SkyGate identity-provider handoff.
-☐ Durable production storage beyond the current file-backed local/runtime directory strategy.
-☐ Multi-operator hosted synchronization.
+✅ 0S Cloudflare Worker serves the same media function routes for production.
+✅ Production media routes require FS27/SkyGate bearer introspection.
+✅ Production local proof bootstrap is disabled.
+✅ Production media records, file bodies, publish queue, and workflow events persist in KV under SkyeMediaCenter namespaces.
+✅ Browser file opening now fetches through the active gate session before creating a Blob URL.

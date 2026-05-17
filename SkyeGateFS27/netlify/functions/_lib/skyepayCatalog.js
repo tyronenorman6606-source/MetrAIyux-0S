@@ -346,8 +346,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_starter_command_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   {
     id: "metraiyux-growth-cabinet",
@@ -375,8 +375,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_growth_cabinet_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   {
     id: "metraiyux-houseoperations-command",
@@ -404,8 +404,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_houseoperations_command_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   {
     id: "metraiyux-houseoperations-managed",
@@ -441,7 +441,7 @@ export const SKYPAY_OFFERS = [
     plan_name: "routex-workforce-command",
     title: "RouteX Workforce Command",
     family: "metraiyux",
-    description: "Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, provider jobs, contractor assignments, proof, payments, route stops, and market reports.",
+    description: "Paid workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, provider jobs, contractor assignments, proof, payments, route stops, and market reports.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["metraiyux_routex_workforce_command_setup", "metraiyux_routex_workforce_command_monthly"],
@@ -462,8 +462,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_routex_workforce_command_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_route_scope_and_runtime_proof"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   {
     id: "metraiyux-autonomous-office",
@@ -491,8 +491,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_autonomous_office_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "paid_pending_owner_approval"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   {
     id: "metraiyux-enterprise-command",

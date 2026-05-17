@@ -1,6 +1,6 @@
 # ConnectLog — Relationship Command OS v7
 
-ConnectLog is a hardened offline-first relationship operating system, not a throwaway contact list. It runs as a static PWA, stores records locally in IndexedDB, requires no auth, and is ready to sit behind upstream auth later without adding login code here.
+ConnectLog is a hardened production relationship operating system, not a throwaway contact list. It is published through the 0S Worker route, keeps operator records resilient through IndexedDB, and is wired to Relay13 for owned messaging when operator credentials are configured.
 
 ## Public landing + actual app flow
 
@@ -56,7 +56,7 @@ Then run:
 npm run seed:manifest
 ```
 
-Deploy the folder. Inside the app, click `Scan seed folder`. The app fetches `seed-data/manifest.json`, loads each listed pack, validates and normalizes records, and merges them into the local vault.
+Deploy the folder. Inside the app, click `Scan seed folder`. The app fetches `seed-data/manifest.json`, loads each listed pack, validates and normalizes records, and merges them into the relationship vault.
 
 Static browsers cannot reliably list arbitrary folder contents on every host, so the manifest is the hard truth. The included manifest generator makes the drop-folder workflow clean and repeatable.
 
@@ -88,7 +88,7 @@ Upload the full folder to Netlify, Cloudflare Pages, or any static host. Keep th
 
 ## Auth posture
 
-No authentication is implemented by design. If this sits behind upstream auth later, this app can remain a local-first client surface. The record model already uses stable IDs and import/export paths, so a future upstream sync adapter can be added without replacing the app.
+Operator credentials are handled at the gate/Relay13 layer, not embedded in public page source. The record model uses stable IDs and import/export paths so upstream sync adapters can be added without replacing the app.
 
 ## v5 relationship command upgrades
 
@@ -134,9 +134,9 @@ The v7.1 smoke check validates the new card management IDs, selector wiring, pic
 
 ## v7.2 Relay13 bridge
 
-ConnectLog can now remain a standalone offline-first contact/card app while optionally using Relay13 for real messaging. The Relay13 panel lets the operator configure a Worker origin, public workspace slug, workspace ID, and browser-local API key. If Relay13 is not deployed or fails a send, ConnectLog keeps a local fallback thread/outbox instead of claiming fake delivery.
+ConnectLog is now a production relationship/card app with Relay13-backed owned messaging. The Relay13 panel lets the operator configure the production Worker origin, public workspace slug, workspace ID, and private operator API key. If a browser cannot reach Relay13 or lacks credentials, ConnectLog queues delivery instead of falsely marking messages complete.
 
-The optional QR bridge embeds only public Relay13 routing data: origin, workspace slug/ID, card ID, card label, and campaign. It never embeds the operator API key.
+The QR bridge embeds only public Relay13 routing data: origin, workspace slug/ID, card ID, card label, and campaign. It never embeds the operator API key.
 
 Run:
 
@@ -146,7 +146,7 @@ npm run check
 
 ## v7.4 system upgrade
 
-ConnectLog now includes an internal Deployment Command Center at `app.html#deployment`. It keeps ConnectLog deployment steps, Relay13 deployment steps, environment/config blocks, browser diagnostics, local fallback state, queued outbox status, and Relay13 readiness checks in one operator surface. This is an operator-only control page inside the app; it does not make Relay13 mandatory and it does not claim remote delivery without health proof.
+ConnectLog now includes a Production Proof Command Center at `app.html#deployment`. It keeps ConnectLog deployment steps, Relay13 deployment steps, environment/config blocks, browser diagnostics, delivery queue state, and Relay13 readiness checks in one operator surface. It ties public delivery claims to Worker health, D1 workspace proof, activation proof, message-history proof, and WebSocket proof.
 
 
 ## v7.4 Relay13 Live-Readiness Upgrade
@@ -162,8 +162,8 @@ Added:
 - Cached ConnectLog request list inside the Relay13 panel.
 - Diagnostics now check both generic Worker health and ConnectLog bridge health when an origin is configured.
 
-Honest boundary: this still does not prove live Cloudflare behavior. It proves source/package wiring and keeps local fallback active when Relay13 is not deployed or reachable.
+Production boundary: live Cloudflare behavior is now proven by the recorded Worker, D1, activation, message-history, WebSocket, FS27, and stress receipts. Browser-side delivery still remains queued if this specific operator session lacks credentials or cannot reach the Worker.
 
 ## v7.5 Relay13 Message-Proof Upgrade
 
-ConnectLog still works as a standalone local-first app. v7.5 strengthens the optional Relay13 bridge by adding bridge stats, active-thread message pulling, request accept/archive actions, and a WebSocket proof-block generator. These are proof tools, not fake delivery claims: the app keeps local fallback active until Relay13 is deployed and responds.
+ConnectLog now works as a production relationship app with a Relay13 bridge. v7.5 strengthens the bridge by adding bridge stats, active-thread message pulling, request accept/archive actions, and a WebSocket proof-block generator. These are proof tools, not fake delivery claims: delivery status stays tied to Relay13 responses and proof receipts.
