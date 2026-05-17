@@ -8,13 +8,19 @@ const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has('--dry-run');
 const keepStage = args.has('--keep-stage');
+const keepArchive = args.has('--keep-archive');
 const argValue = (name) => {
   const prefix = `${name}=`;
   return process.argv.slice(2).find((arg) => arg.startsWith(prefix))?.slice(prefix.length) || '';
 };
+const envValue = (name) => String(process.env[name] || '').trim();
 const existingArchive = argValue('--upload-archive');
 const existingFileCount = Number(argValue('--file-count') || 0);
 const existingSecretExcludeCount = Number(argValue('--secret-excludes') || 0);
+const uploadAssetType = argValue('--asset-type');
+const uploadProjectName = argValue('--project-name');
+const uploadClientReference = argValue('--client-reference');
+const uploadNotes = argValue('--notes');
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
@@ -50,6 +56,12 @@ function parseEnv(file) {
 
 function rel(file) {
   return path.relative(root, file).split(path.sep).join('/');
+}
+
+function resolveWorkspacePath(value, fallback) {
+  const clean = String(value || '').trim();
+  if (!clean) return fallback;
+  return path.isAbsolute(clean) ? clean : path.resolve(root, clean);
 }
 
 function shouldAlwaysExclude(file) {
@@ -169,8 +181,49 @@ function zipStage(stage, archive) {
   execFileSync('zip', ['-qr', archive, '.'], { cwd: stage, stdio: 'inherit' });
 }
 
-function hashFile(file) {
-  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+async function hashFile(file) {
+  return await new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(file);
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
+}
+
+function numberEnv(env, name, fallback) {
+  const value = Number(env[name]);
+  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : fallback;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+async function fetchTextWithRetry(url, options, retryOptions) {
+  const retries = retryOptions.retries;
+  const baseDelayMs = retryOptions.baseDelayMs;
+  const label = retryOptions.label;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      const text = await response.text();
+      if (!isRetryableStatus(response.status) || attempt === retries) return { response, text };
+      const waitMs = baseDelayMs * 2 ** attempt;
+      console.warn(`${label} returned ${response.status}; retrying in ${waitMs}ms (${attempt + 1}/${retries})`);
+      await sleep(waitMs);
+    } catch (error) {
+      if (attempt === retries) throw error;
+      const waitMs = baseDelayMs * 2 ** attempt;
+      console.warn(`${label} failed: ${error.message}; retrying in ${waitMs}ms (${attempt + 1}/${retries})`);
+      await sleep(waitMs);
+    }
+  }
+  throw new Error(`${label} failed after ${retries} retries.`);
 }
 
 function gitValue(args, fallback = 'unknown') {
@@ -196,8 +249,16 @@ async function uploadArchive(archive, archiveHash, summary) {
   const origin = String(env.SKYEVAULT_UPLOAD_ORIGIN || 'https://client-drop-vault-r2.netlify.app').replace(/\/$/, '');
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   if (!portalKey) throw new Error('Missing CLIENT_PORTAL_KEY or SKYEVAULT_PORTAL_KEY.');
+  const workspaceId = String(env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim();
+  const developerId = String(env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
+  const developerName = String(env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
+  const destinationId = String(env.SKYEVAULT_DESTINATION_ID || '').trim();
+  const retryOptions = {
+    retries: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRIES', 3),
+    baseDelayMs: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRY_BASE_MS', 750)
+  };
 
-  const fileBuffer = fs.readFileSync(archive);
+  const archiveSize = fs.statSync(archive).size;
   const fileName = path.basename(archive);
   const now = Date.now();
   const branch = gitValue(['branch', '--show-current']);
@@ -206,59 +267,83 @@ async function uploadArchive(archive, archiveHash, summary) {
   const body = {
     clientName: env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
     clientEmail: env.SKYEVAULT_CLIENT_EMAIL || 'operator@example.com',
-    projectName: env.SKYEVAULT_PROJECT_NAME || `${repoName} repository safe vault snapshot`,
-    clientReference: `repo:${branch}@${commit}`,
-    assetType: 'Repository safe archive',
-    notes: `Sanitized repo archive generated by tools/skyevault-repo-push.mjs. Excluded ${summary.excludedSecretLikeFiles} secret-looking files plus envs, dependencies, backups, dumps, WAL archives, private keys, and old archive bundles. Worktree status at packaging: ${dirtyCount} dirty entries.`,
+    projectName: uploadProjectName || env.SKYEVAULT_PROJECT_NAME || `${repoName} repository safe vault snapshot`,
+    clientReference: uploadClientReference || `repo:${branch}@${commit}`,
+    assetType: uploadAssetType || env.SKYEVAULT_ASSET_TYPE || 'Repository safe archive',
+    notes: uploadNotes || `Sanitized repo archive generated by tools/skyevault-repo-push.mjs. Excluded ${summary.excludedSecretLikeFiles} secret-looking files plus envs, dependencies, backups, dumps, WAL archives, private keys, and old archive bundles. Worktree status at packaging: ${dirtyCount} dirty entries.`,
     clientRequestId: `metraiyux-repo-safe-${now}`,
     submissionId: `metraiyux-repo-vault-${now}`,
+    workspaceId,
+    developerId,
+    developerName,
+    destinationId,
     usageRightsAccepted: true,
     retentionAcknowledged: true,
     portalKey,
     fileName,
-    fileSize: fileBuffer.length,
+    fileSize: archiveSize,
     mimeType: 'application/zip',
     fileFingerprint: {
       algorithm: 'SHA-256',
       mode: 'full',
       value: archiveHash,
-      bytesHashed: fileBuffer.length,
+      bytesHashed: archiveSize,
       generatedAt: new Date().toISOString(),
       note: 'Full SHA-256 of sanitized repository zip before vault upload.'
     },
     submissionFileCount: 1,
-    submissionTotalBytes: fileBuffer.length,
+    submissionTotalBytes: archiveSize,
     failedDestinationIds: []
   };
 
   const api = async (apiPath, payload) => {
-    const response = await fetch(`${baseUrl}${apiPath}`, {
+    const { response, text } = await fetchTextWithRetry(`${baseUrl}${apiPath}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-portal-key': portalKey, origin },
       body: JSON.stringify(payload)
-    });
-    const text = await response.text();
-    const data = JSON.parse(text || '{}');
+    }, { ...retryOptions, label: apiPath });
+    let data = {};
+    try {
+      data = JSON.parse(text || '{}');
+    } catch {
+      throw new Error(`${apiPath} returned non-JSON ${response.status}: ${text.slice(0, 300)}`);
+    }
     if (!response.ok || data.ok === false) throw new Error(`${apiPath} failed ${response.status}: ${data.error || text.slice(0, 300)}`);
     return data;
   };
 
   console.log(`Vault API: ${baseUrl}`);
   console.log(`Upload origin: ${origin}`);
+  console.log(`Upload retries: ${retryOptions.retries}`);
   const session = await api('/api/upload-session', body);
   console.log(`Upload session: ${session.sessionId} (${session.parts?.length || 0} parts)`);
 
   const completedParts = [];
-  for (const part of session.parts || []) {
-    const chunk = fileBuffer.subarray(part.start, part.end + 1);
-    const response = await fetch(part.uploadUrl, { method: 'PUT', body: chunk });
-    const text = await response.text();
-    if (!response.ok) throw new Error(`R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 300)}`);
-    completedParts.push({
-      partNumber: part.partNumber,
-      eTag: (response.headers.get('etag') || response.headers.get('ETag') || '').replace(/^"|"$/g, '')
-    });
-    console.log(`Uploaded part ${part.partNumber}/${session.parts.length}`);
+  const archiveHandle = await fs.promises.open(archive, 'r');
+  try {
+    for (const part of session.parts || []) {
+      const length = part.end - part.start + 1;
+      const chunk = Buffer.allocUnsafe(length);
+      let offset = 0;
+      while (offset < length) {
+        const { bytesRead } = await archiveHandle.read(chunk, offset, length - offset, part.start + offset);
+        if (!bytesRead) break;
+        offset += bytesRead;
+      }
+      if (offset !== length) throw new Error(`Could not read archive part ${part.partNumber}: expected ${length} bytes, got ${offset}.`);
+      const { response, text } = await fetchTextWithRetry(part.uploadUrl, { method: 'PUT', body: chunk }, {
+        ...retryOptions,
+        label: `R2 part ${part.partNumber}`
+      });
+      if (!response.ok) throw new Error(`R2 part ${part.partNumber} failed ${response.status}: ${text.slice(0, 300)}`);
+      completedParts.push({
+        partNumber: part.partNumber,
+        eTag: (response.headers.get('etag') || response.headers.get('ETag') || '').replace(/^"|"$/g, '')
+      });
+      console.log(`Uploaded part ${part.partNumber}/${session.parts.length}`);
+    }
+  } finally {
+    await archiveHandle.close();
   }
 
   const driveFile = {
@@ -269,7 +354,7 @@ async function uploadArchive(archive, archiveHash, summary) {
     uploadId: session.uploadId,
     parts: completedParts,
     name: fileName,
-    size: String(fileBuffer.length),
+    size: String(archiveSize),
     mimeType: 'application/zip'
   };
   const completion = await api('/api/upload-complete', {
@@ -288,17 +373,89 @@ async function uploadArchive(archive, archiveHash, summary) {
     sessionId: session.sessionId,
     destination: session.destination?.name,
     fileName,
-    fileSize: fileBuffer.length,
+    fileSize: archiveSize,
     sha256: archiveHash,
     manifestUpdated: completion.manifest?.updated,
-    notificationOk: completion.notification?.ok ?? null
+    notificationOk: completion.notification?.ok ?? null,
+    assetType: body.assetType,
+    projectName: body.projectName,
+    clientReference: body.clientReference,
+    workspaceId,
+    developerId,
+    gitBranch: branch,
+    gitCommit: commit,
+    dirtyCount,
+    completedParts: completedParts.length,
+    retryCount: retryOptions.retries
+  };
+}
+
+function writeReceipt(receipt, outDir, stamp) {
+  const name = `skyevault-receipt-${receipt.receiptId || stamp}.json`;
+  const text = `${JSON.stringify(receipt, null, 2)}\n`;
+  const fallbackDir = path.join(os.tmpdir(), 'skyevault-repo-push', 'receipts');
+  let firstError = null;
+  for (const dir of [outDir, fallbackDir]) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      const receiptPath = path.join(dir, name);
+      fs.writeFileSync(receiptPath, text);
+      return receiptPath;
+    } catch (error) {
+      firstError ||= error;
+      if (!['ENOSPC', 'EROFS'].includes(error.code)) throw error;
+    }
+  }
+  throw firstError;
+}
+
+function appendLedger(event) {
+  const fallbackDir = path.join(os.tmpdir(), 'skyevault-repo-push', 'receipts');
+  const line = `${JSON.stringify(event)}\n`;
+  let firstError = null;
+  for (const file of [path.join(root, '.skyevault-out', 'vault-ledger.jsonl'), path.join(fallbackDir, 'vault-ledger.jsonl')]) {
+    try {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.appendFileSync(file, line);
+      return file;
+    } catch (error) {
+      firstError ||= error;
+      if (!['ENOSPC', 'EROFS'].includes(error.code)) throw error;
+    }
+  }
+  throw firstError;
+}
+
+function uploadLedgerEvent(receipt, summary, receiptPath) {
+  return {
+    schema: 'skyevault.local-ledger.v1',
+    event: 'upload.complete',
+    recordedAt: new Date().toISOString(),
+    receiptId: receipt.receiptId,
+    sessionId: receipt.sessionId,
+    destination: receipt.destination,
+    assetType: receipt.assetType,
+    projectName: receipt.projectName,
+    clientReference: receipt.clientReference,
+    workspaceId: receipt.workspaceId,
+    developerId: receipt.developerId,
+    gitBranch: receipt.gitBranch,
+    gitCommit: receipt.gitCommit,
+    dirtyCount: receipt.dirtyCount,
+    fileName: receipt.fileName,
+    fileSize: receipt.fileSize,
+    sha256: receipt.sha256,
+    completedParts: receipt.completedParts,
+    retryCount: receipt.retryCount,
+    excludedSecretLikeFiles: summary.excludedSecretLikeFiles,
+    receiptPath
   };
 }
 
 if (existingArchive) {
   const archive = path.resolve(root, existingArchive);
   if (!fs.existsSync(archive)) throw new Error(`Archive not found: ${archive}`);
-  const archiveHash = hashFile(archive);
+  const archiveHash = await hashFile(archive);
   const summary = {
     fileCount: existingFileCount,
     bytes: fs.statSync(archive).size,
@@ -316,19 +473,22 @@ if (existingArchive) {
   const receipt = await uploadArchive(archive, archiveHash, summary);
   const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
   const outDir = path.join(root, '.skyevault-out');
-  fs.mkdirSync(outDir, { recursive: true });
-  const receiptPath = path.join(outDir, `skyevault-receipt-${receipt.receiptId || stamp}.json`);
-  fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const receiptPath = writeReceipt(receipt, outDir, stamp);
+  const ledgerPath = appendLedger(uploadLedgerEvent(receipt, summary, receiptPath));
   console.log(JSON.stringify(receipt, null, 2));
   console.log(`Receipt written: ${receiptPath}`);
+  console.log(`Ledger appended: ${ledgerPath}`);
   process.exit(0);
 }
 
 const stamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
 const outDir = path.join(root, '.skyevault-out');
-const stage = path.join(os.tmpdir(), `skyevault-repo-stage-${stamp}`);
-const archive = path.join(outDir, `${repoName}-repo-safe-${stamp}.zip`);
-fs.mkdirSync(outDir, { recursive: true });
+const scratchRoot = path.join(os.tmpdir(), 'skyevault-repo-push');
+const stageParent = resolveWorkspacePath(envValue('SKYEVAULT_STAGE_PARENT'), scratchRoot);
+const archiveDir = resolveWorkspacePath(envValue('SKYEVAULT_ARCHIVE_DIR'), path.join(scratchRoot, 'archives'));
+const stage = path.join(stageParent, `skyevault-repo-stage-${stamp}`);
+const archive = path.join(archiveDir, `${repoName}-repo-safe-${stamp}.zip`);
+fs.mkdirSync(archiveDir, { recursive: true });
 
 console.log('Scanning repo for secret-looking files...');
 const excludes = secretExcludes();
@@ -346,7 +506,7 @@ if (stageFindings.length) {
 
 console.log('Creating zip archive...');
 zipStage(stage, archive);
-const archiveHash = hashFile(archive);
+const archiveHash = await hashFile(archive);
 const summary = outputSummary(stage, archive, excludes);
 console.log(`Archive: ${archive}`);
 console.log(`Files: ${summary.fileCount}`);
@@ -356,13 +516,17 @@ console.log(`Secret-looking files excluded: ${summary.excludedSecretLikeFiles}`)
 
 if (dryRun) {
   console.log('Dry run complete. Upload skipped.');
+  if (!keepStage) fs.rmSync(stage, { recursive: true, force: true });
+  if (!keepArchive) fs.rmSync(archive, { force: true });
   process.exit(0);
 }
 
 const receipt = await uploadArchive(archive, archiveHash, summary);
-const receiptPath = path.join(outDir, `skyevault-receipt-${receipt.receiptId || stamp}.json`);
-fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+const receiptPath = writeReceipt(receipt, outDir, stamp);
+const ledgerPath = appendLedger(uploadLedgerEvent(receipt, summary, receiptPath));
 console.log(JSON.stringify(receipt, null, 2));
 console.log(`Receipt written: ${receiptPath}`);
+console.log(`Ledger appended: ${ledgerPath}`);
 
 if (!keepStage) fs.rmSync(stage, { recursive: true, force: true });
+if (!keepArchive) fs.rmSync(archive, { force: true });
