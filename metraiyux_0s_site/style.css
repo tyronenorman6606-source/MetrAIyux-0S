@@ -1343,3 +1343,76 @@ main,footer{position:relative;z-index:2}
 @media(prefers-reduced-motion:reduce){
   .zero-mini-head h2{animation:none}
 }
+
+/* MCP optional part applied to 0S: adaptive neon scrollbar */
+:root{
+  --mcp-neon-scrollbar-size:16px;
+  --mcp-neon-scrollbar-bg:rgba(3,7,11,.58);
+  --mcp-neon-scrollbar-track:rgba(7,16,23,.46);
+  --mcp-neon-scrollbar-rail:rgba(53,183,255,.28);
+  --mcp-neon-scrollbar-a:var(--gold2,#f3d483);
+  --mcp-neon-scrollbar-b:var(--cyan,#35b7ff);
+  --mcp-neon-scrollbar-c:var(--mint,#6ff2c7);
+  --mcp-neon-scrollbar-d:var(--violet,#a88cff);
+}
+html{
+  scrollbar-gutter:stable;
+  scrollbar-width:auto;
+  scrollbar-color:color-mix(in srgb,var(--mcp-neon-scrollbar-b) 78%,transparent) var(--mcp-neon-scrollbar-bg);
+}
+*{
+  scrollbar-width:auto;
+  scrollbar-color:color-mix(in srgb,var(--mcp-neon-scrollbar-b) 78%,transparent) var(--mcp-neon-scrollbar-track);
+}
+*::-webkit-scrollbar{
+  width:16px;
+  height:16px;
+}
+*::-webkit-scrollbar-track{
+  border:1px solid var(--mcp-neon-scrollbar-rail);
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 44%,rgba(168,140,255,.13) 76%,rgba(111,242,199,.10)),
+    var(--mcp-neon-scrollbar-track);
+  box-shadow:
+    inset 0 0 14px rgba(53,183,255,.26),
+    inset 0 0 24px rgba(243,212,131,.13),
+    0 0 18px rgba(53,183,255,.12);
+}
+*::-webkit-scrollbar-track:horizontal{
+  background:
+    linear-gradient(90deg,rgba(243,212,131,.16),rgba(53,183,255,.12) 44%,rgba(168,140,255,.13) 76%,rgba(111,242,199,.10)),
+    var(--mcp-neon-scrollbar-track);
+}
+*::-webkit-scrollbar-thumb{
+  min-width:72px;
+  min-height:72px;
+  border:4px solid transparent;
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,255,255,.18)) padding-box,
+    linear-gradient(180deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
+  box-shadow:
+    0 0 12px rgba(53,183,255,.78),
+    0 0 24px rgba(243,212,131,.38),
+    0 0 36px rgba(111,242,199,.20),
+    inset 0 0 12px rgba(255,255,255,.34);
+}
+*::-webkit-scrollbar-thumb:horizontal{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.74),rgba(255,255,255,.18)) padding-box,
+    linear-gradient(90deg,var(--mcp-neon-scrollbar-a),var(--mcp-neon-scrollbar-b),var(--mcp-neon-scrollbar-d),var(--mcp-neon-scrollbar-c)) border-box;
+}
+*::-webkit-scrollbar-thumb:hover{
+  border-width:3px;
+  box-shadow:
+    0 0 16px rgba(53,183,255,.92),
+    0 0 34px rgba(243,212,131,.50),
+    0 0 48px rgba(168,140,255,.25),
+    inset 0 0 14px rgba(255,255,255,.42);
+}
+*::-webkit-scrollbar-corner{
+  background:
+    radial-gradient(circle,var(--mcp-neon-scrollbar-b),transparent 64%),
+    var(--mcp-neon-scrollbar-bg);
+}

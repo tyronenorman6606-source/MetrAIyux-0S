@@ -305,6 +305,59 @@
     </div></div>`;
   }
 
+  function planCard(plan, activeId) {
+    return `<article class="planCard ${plan.id === activeId ? 'active' : ''}">
+      <p class="crumb">${esc(plan.id)}</p>
+      <h3>${esc(plan.name)}</h3>
+      <strong>${money(plan.monthly)}<span>/mo</span></strong>
+      <p><b>Setup:</b> ${money(plan.setup)}</p>
+      <p>${esc(plan.activation)}</p>
+      <ul>${plan.includes.map((item) => `<li>${esc(item)}</li>`).join('')}</ul>
+      <a class="btn" href="${esc(skyePayUrl(plan.offer))}">Open SkyePay offer</a>
+    </article>`;
+  }
+
+  function billingIntentRows(data = read()) {
+    if (!data.billingIntents.length) return '<div class="emptyPanel"><h3>No billing intents yet</h3><p>Create one from the billing form before sending a client to SkyePay.</p></div>';
+    return data.billingIntents.slice(0, 6).map((intent) => `<div class="runtimeRow">
+      <div><b>${esc(intent.company || intent.customer_email || intent.plan_name)}</b><br><code>${esc(intent.id)}</code><span class="small-copy">${esc(intent.plan_name)} / ${money(intent.setup_usd)} setup / ${money(intent.monthly_usd)} monthly / ${esc(intent.status)}</span></div>
+      <a class="btn" href="${esc(intent.checkout_url)}">Checkout</a>
+    </div>`).join('');
+  }
+
+  function billingForm(data = read()) {
+    const latest = latestBillingIntent(data);
+    return `<form class="intakeForm" data-form="billing">
+      <h3>Create charge-ready intent</h3>
+      <label>Plan<select name="plan_id">${Object.values(PLAN_CATALOG).map((plan) => `<option value="${esc(plan.id)}" ${latest?.plan_id === plan.id ? 'selected' : ''}>${esc(plan.name)} - ${money(plan.setup)} setup + ${money(plan.monthly)}/mo</option>`).join('')}</select></label>
+      <label>Customer email<input name="customer_email" type="email" required placeholder="client@example.com" value="${esc(latest?.customer_email || '')}"></label>
+      <label>Company<input name="company" required placeholder="Client company" value="${esc(latest?.company || '')}"></label>
+      <label>Client slug<input name="client_slug" value="${esc(latest?.client_slug || 'metraiyux-0s')}"></label>
+      <label>Payment method<select name="payment_method"><option>SkyePay card checkout</option><option>Owner-approved invoice</option><option>ACH / bank transfer</option><option>Custom enterprise billing</option></select></label>
+      <p class="small-copy">This records the paid plan and opens the matching SkyePay offer. It does not fake payment; confirmed payment and activation live in SkyePay/FS27.</p>
+      <button class="btn primary" type="submit">Create Billing Intent</button>
+    </form>`;
+  }
+
+  function claimRows() {
+    return claimContract.map(([id, claim, proof]) => `<tr><td><code>${esc(id)}</code></td><td>${esc(claim)}</td><td>${esc(proof)}</td><td>${badge('backed')}</td></tr>`).join('');
+  }
+
+  function tutorialCards(data = read()) {
+    const done = new Set(data.tutorialRuns.map((run) => run.step_id));
+    return `<div class="tutorialGrid">${tutorialSteps.map(([id, label, proof], index) => `<article class="lessonCard ${done.has(id) ? 'done' : ''}">
+      <span>${String(index + 1).padStart(2, '0')}</span>
+      <h3>${esc(label)}</h3>
+      <p>${esc(proof)}</p>
+      <button class="btn ${done.has(id) ? '' : 'primary'}" data-action="run-tutorial-step" data-step="${esc(id)}">${done.has(id) ? 'Run Again' : 'Run Step'}</button>
+    </article>`).join('')}</div>`;
+  }
+
+  function tutorialRunRows(data = read()) {
+    if (!data.tutorialRuns.length) return '<div class="emptyPanel"><h3>No tutorial steps recorded</h3><p>Run a step or use Run Full Tutorial to produce a local handoff receipt.</p></div>';
+    return data.tutorialRuns.slice(0, 10).map((run) => `<div class="event"><time>${esc(run.at_display)}</time><div><b>${esc(run.label)}</b><span>${esc(run.result)}</span></div>${badge('done')}</div>`).join('');
+  }
+
   function dashboardView() {
     return `<section class="grid">
       <div class="span12 heroBand">

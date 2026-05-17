@@ -83,7 +83,7 @@ Latest capture: 2026-05-17 UTC.
 10. Use `test-artifacts/stripe-sync/metraiyux-stripe-live-checkout-proof.json` as the Stripe sync proof: current lookup keys, stale prices archived, SkyePay Starter monthly checkout, SaaS Growth setup checkout, and Growth monthly metadata all passed.
 11. Use `test-artifacts/stress/connectlog-relay13-skyepay-live/stress-report.json` as the controlled live stress proof for 0S, ConnectLog, Relay13, FS27 SkyePay, SaaS status, and the public ledger.
 12. Use `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json` as the SkyeRouteX lock/contention stress proof.
-13. Use `test-artifacts/valley-verified-business-insights-prod/production-browser-qa-report.json` as the Valley Verified insights proof: `/insights/`, the weekly operating article, and the renderer-backed Bob's Smoke Shop business URL all returned HTTP `200` on desktop/mobile with no browser 404s, no console errors, no horizontal overflow, seven major platform tiles, source notes, and no stale `SOL Enterprises` copy.
+13. Use `test-artifacts/valley-verified-business-insights-prod/production-browser-qa-report.json` as the Valley Verified insights proof: `/insights/`, the weekly operating article, and the renderer-backed Bob's Smoke Shop business URL all returned HTTP `200` on desktop/mobile with no browser 404s, no console errors, no horizontal overflow, seven major platform tiles, source notes, and canonical `SOLEnterprises` spelling verified.
 
 ## Rule
 
