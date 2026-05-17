@@ -1,6 +1,6 @@
 # NEXUS Cloudflare Worker Kit
 
-This Worker is the optional edge backend for the Site Operator Brain inside the 16-brain runtime.
+This Worker is the optional edge backend for the Site Operator Brain inside the 17-brain runtime.
 
 It provides:
 

@@ -105,8 +105,10 @@
         <div class="capture-badge"><strong>Round 3 (auth + queue):</strong> 2026-05-17T07:38:16Z</div>
         <div class="capture-badge"><strong>Round 4 (SDK):</strong> 2026-05-17T08:30Z</div>
         <div class="capture-badge"><strong>Round 5 (kAIxu 6.7 + billing):</strong> 2026-05-17T12:00Z</div>
+        <div class="capture-badge"><strong>Round 6 (SkyeVault Git):</strong> 2026-05-17T17:09Z</div>
         <div class="capture-badge"><strong>Workers tested:</strong> 9 / 9</div>
         <div class="capture-badge"><strong>Brain routes verified:</strong> 12 / 12</div>
+        <div class="capture-badge"><strong>Vault proof:</strong> clone · push · fetch · snapshot · restore · diff</div>
         <div class="capture-badge"><strong>Bugs found + fixed:</strong> 6</div>
         <div class="capture-badge"><strong>SDK endpoints live:</strong> 7</div>
         <div class="capture-badge"><strong>Pass rate:</strong> ✓ ALL PASSING</div>
@@ -124,7 +126,7 @@
         <div class="test-header">
           <div class="test-num">T01</div>
           <div class="test-header-text">
-            <h3>All 8 Workers — Health Sweep</h3>
+            <h3>All 9 Workers — Health Sweep</h3>
             <p>Every Worker was hit at its <code>/health</code> endpoint. All returned HTTP 200 with D1, KV, and Queue bindings confirmed live. This proves the deployed infrastructure is not a demo environment — it is production Cloudflare edge compute with active storage bindings.</p>
           </div>
           <span class="status-pill pill-pass">ALL LIVE</span>
@@ -175,7 +177,30 @@
         </div>
         <div class="test-verdict">
           <span class="verdict-icon">✅</span>
-          <span>All 8 Workers returned HTTP 200 with CF-Ray headers confirming Cloudflare edge routing. D1 databases active on all storage-bound Workers. System has been running continuously since 2026-05-15 based on Crown ledger timestamps.</span>
+          <span>All live Workers returned HTTP 200 with CF-Ray headers confirming Cloudflare edge routing. D1 databases active on all storage-bound Workers. System has been running continuously since 2026-05-15 based on Crown ledger timestamps.</span>
+        </div>
+      </div>
+
+      <div class="test-block reveal">
+        <div class="test-header">
+          <div class="test-num">T25</div>
+          <div class="test-header-text">
+            <h3>SkyeVault Git Remote — Clone, Push, Fetch, Snapshot, Restore</h3>
+            <p>The SkyeVault lane was promoted from sanitized archive uploads to Git-capable infrastructure. The proof ran in a clean worktree and verified smart HTTP clone/push/fetch, workspace isolation, protected refs/tags, policy, quota, snapshots, maintenance restore, CLI flow, vault archive diff, and browser UI checks.</p>
+          </div>
+          <span class="status-pill pill-pass">VAULT PASS</span>
+        </div>
+        <div class="test-body-single">
+          <div class="worker-grid">
+            <div class="worker-card"><div class="wname">Access controls</div><div class="wstatus">Force-push rejection, viewer push rejection, wrong-workspace rejection, protected tag rewrite rejection, and viewer snapshot rejection all passed.</div></div>
+            <div class="worker-card"><div class="wname">Recovery</div><div class="wstatus">API snapshot, maintenance snapshot, snapshot verification, bundle export, restored clone head, and archive diff all passed.</div></div>
+            <div class="worker-card"><div class="wname">Developer interface</div><div class="wstatus">CLI login/clone/status/snapshot/policy/quota/diff plus Git credential helper and SSH forced-command wrapper are documented and checked.</div></div>
+            <div class="worker-card"><div class="wname">0S neural maps</div><div class="wstatus">Aggregate operator map and per-workspace map files render without leaking raw tokens, raw session IDs, author emails, absolute paths, or file bodies.</div></div>
+          </div>
+        </div>
+        <div class="test-verdict">
+          <span class="verdict-icon">PASS</span>
+          <span>Remote <code>main</code> and <code>skyevault-git-remote-infra</code> were aligned at commit <code>86611c8</code> after the proof passed.</span>
         </div>
       </div>
 
@@ -184,7 +209,7 @@
         <div class="test-header">
           <div class="test-num">T02–T05</div>
           <div class="test-header-text">
-            <h3>Brain Routing — 16-Brain Keyword Classifier</h3>
+            <h3>Brain Routing — 17-Brain Keyword Classifier</h3>
             <p>Four distinct business commands routed live. Each command runs through the keyword classifier and returns a UUID receipt with primary brain, secondary brain, recommended task, and relevant live surfaces. Every receipt is written to D1 SQL in real time — <code>"stored": &#123;"kv": true, "d1": true&#125;</code> on every call.</p>
           </div>
           <span class="status-pill pill-pass">4/4 CORRECT</span>

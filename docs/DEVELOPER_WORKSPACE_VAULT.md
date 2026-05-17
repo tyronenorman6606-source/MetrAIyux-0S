@@ -1,14 +1,14 @@
 # Developer Workspace Vault
 
-SkyeVault-Drop can run as shared vault infrastructure for multiple developers. The operator owns the deployed vault, R2 bucket, admin dashboard, receipts, and recovery policy. Each developer gets a scoped upload code that writes repo snapshots into their own workspace prefix.
+SkyeVault-Drop can run as shared vault infrastructure for multiple developers. The operator owns the deployed vault, R2 bucket, Git remote service, admin dashboard, receipts, snapshots, and recovery policy. Each developer gets a scoped upload code for archive uploads and/or a Gate-scoped Git remote identity for clone/push/fetch.
 
 At scale this should be subscription-provisioned, not manually edited. SkyePay/SkyeGateFS27 calls SkyeVault-Drop after a paid SkyeVault subscription and the vault writes `skye-upload-vault-workspaces.json` into its R2 metadata prefix.
 
-This is different from a raw Git remote:
+There are now two repo lanes:
 
-- GitHub keeps code history.
-- SkyeVault stores sanitized workspace snapshots, proof bundles, handoff archives, and recovery zips.
-- Developer workspace keys let contributors use the same vault backend without sharing the operator key or mixing archives in one folder.
+- Archive lane: SkyeVault stores sanitized workspace snapshots, proof bundles, handoff archives, and recovery zips.
+- Git remote lane: SkyeVault stores persistent bare repos so developers can clone, fetch, and push through the vault.
+- Developer workspace keys and Gate-scoped identities let contributors use the same vault backend without sharing the operator key or mixing archives in one folder.
 
 ## Operator Setup
 
@@ -91,6 +91,23 @@ The helper packages a sanitized zip, excludes secret-looking files, streams the 
 
 For tight IDE/CDE disks, the large staging tree and zip now default to `/tmp/skyevault-repo-push`, successful uploads delete those temp files, and only the small receipt stays in `.skyevault-out/`. Set `SKYEVAULT_ARCHIVE_DIR` or `SKYEVAULT_STAGE_PARENT` only when a workspace needs a different scratch volume.
 
+## Developer Git Remote Setup
+
+For active source control, use the Git remote lane instead of the archive lane:
+
+```bash
+node tools/skyevault-cli.mjs login --remote-url=https://vault.example.com --token="$GATE_TOKEN" --workspace=acme
+node tools/skyevault-cli.mjs clone app ./app
+cd app
+node ../tools/skyevault-cli.mjs remote-add --repo=app --name=vault
+git push vault main
+git fetch vault
+```
+
+When a developer later downloads from the vault, the Git remote returns a normal Git clone with the refs and object graph that were pushed into that workspace repo. This is the lane to use when the dev expects their repository to come back as a working Git repository.
+
+Archive upload is still useful for release handoff, sanitized client packages, generated static exports, or one-off workspace capture. Git remote is the active repo lane.
+
 ## Rate Limits
 
 Each provisioned workspace can carry limits from its SkyePay plan:
@@ -112,6 +129,7 @@ Developer workspace keys can:
 - Complete uploads.
 - Check status for their own workspace sessions/receipts.
 - List/download client-vault items only for matching email and workspace.
+- Push/fetch/clone through the Git remote only when the Gate identity has the matching workspace and role.
 
 Developer workspace keys cannot:
 
@@ -119,5 +137,6 @@ Developer workspace keys cannot:
 - Change vault routing config.
 - Use another workspace key prefix.
 - Bypass destination or per-workspace size limits.
+- Rewrite protected refs/tags, delete refs, or exceed workspace quota when the Git remote policy denies it.
 
 The operator admin token still owns global export, download, config, and audit access.

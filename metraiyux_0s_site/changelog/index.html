@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S production changelog covering SkyeVault Git remote parity, per-workspace neural maps, Cloudflare proof receipts, SkyePay, brain upgrades, and release history.">
+  <title>Changelog · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../proof-vault/index.html">Proof Vault</a>
+      <a href="../neural-map.html">Neural Map</a>
+      <a href="../account/skyevault-workspace.html?workspace=acme">Workspace Vault</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero slim">
+      <div>
+        <p class="eyebrow">Public release record</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>Skye Production Changelog</h1>
+        <p class="hero-lede">This page turns the Git history into plain release language: what changed, what is proven, what is public-safe, and what remains gated behind operator controls.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">May 17, 2026</p>
+      <h2>SkyeVault moved from upload vault to Git-level developer infrastructure.</h2>
+      <p class="wide">Today’s SkyeVault lane now supports real developer workflows: clone, push, fetch, snapshot, restore, diff, inspect, and map by workspace without mixing company/account state.</p>
+      <div class="route-grid">
+        <article class="route-card"><h3>Git remote parity</h3><p>Smart HTTP Git hosting with per-workspace bare repositories, Gate-scoped auth, role boundaries, protected refs/tags, and rejected unsafe mutations.</p></article>
+        <article class="route-card"><h3>Policy and quota</h3><p>Branch policy and quota APIs now sit beside post-pack quota checks so repos can reject force-push, delete, protected-tag, and over-limit events.</p></article>
+        <article class="route-card"><h3>Snapshots and restore</h3><p>Verified snapshots, Git bundle exports, maintenance inventory/snapshot/verify/restore/diff commands, and clone-from-bundle recovery are part of the lane.</p></article>
+        <article class="route-card"><h3>Developer interface</h3><p>The CLI, Git credential helper, and SSH forced-command wrapper let devs work through vault remotes instead of copying archives by hand.</p></article>
+        <article class="route-card"><h3>Workspace neural maps</h3><p>The 0S brain map now has an aggregate operator graph and per-workspace graph files under <code>brain/skyevault-workspaces/</code>.</p></article>
+        <article class="route-card"><h3>Proof status</h3><p>Commit <code>86611c8</code> is on remote <code>main</code> and <code>skyevault-git-remote-infra</code>; proof passed for role rejection, wrong-workspace rejection, snapshot, restore, diff, CLI, and browser UI checks.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Full-day Git diff rollup</p>
+      <h2>Brain, proof, pricing, and public-copy upgrades are now recorded together.</h2>
+      <div class="cabinet-map">
+        <div><h3>Brain upgrades</h3><p>The public copy now reflects the 17-brain runtime: Site Operator, 0meg4kAI, Central Command, the 13 cabinet brains, and kAIxu 6.7 sovereign inference. Public neural map work, 0S brain routing fixes, 12-route audit proof, authenticated admin E2E proof, and per-workspace SkyeVault map persistence were captured as release evidence.</p></div>
+        <div><h3>Vault hardening</h3><p>Workspace archive, restore, scratch-space handling, Git bundle verification, differential archive inspection, and download/clone expectations were moved into the public story.</p></div>
+        <div><h3>Commercial copy</h3><p>Pricing, valuation, kAIxu 6.7, T25 proof, and current offer language were aligned with what the platform actually does now.</p></div>
+        <div><h3>Public safety</h3><p>Public copy is framed around proven routes, public-safe receipts, and gated controls without leaking raw tokens, raw session IDs, private paths, author emails, or file bodies.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Earlier May 17 release work</p>
+      <h2>SkyePay, FS27, and live-proof updates remain part of the day’s release history.</h2>
+      <div class="route-grid">
+        <article class="route-card"><h3>SkyeGateFS27 / SkyePay</h3><p>Stripe-backed offer surfaces, owner approval/payment state, and public store proof were folded into the same release record.</p></article>
+        <article class="route-card"><h3>Cloudflare live proof</h3><p>The deployed Worker audit, authenticated admin flow, approval email, queue, SaaS tenant, security gateway, and SDK proof stay visible as buyer-facing evidence.</p></article>
+        <article class="route-card"><h3>Public neural knowledge</h3><p>The public neural map and brain-system copy now point buyers toward the graph of production, proof, sales, and operating knowledge without exposing private command material.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S changelog. Public proof is shareable; private controls stay gated.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

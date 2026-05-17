@@ -83,15 +83,18 @@ git push vault main
 git fetch vault
 ```
 
-The remote service stores bare repos, writes ref-update ledgers, and emits neural-map JSON from `post-receive` hooks. See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
+The remote service stores bare repos, writes ref-update ledgers, emits neural-map JSON from `post-receive` hooks, enforces branch/tag policy, accounts for workspace quota, and can create verified Git bundle snapshots. See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.
 
 The same service exposes an authenticated operator console and API:
 
 - `GET /__skyevault/ui` for repo/refs/events/neural-map inspection.
 - `POST /__skyevault/repos` for explicit repo provisioning.
 - `POST /__skyevault/repos/:workspace/:repo/export` for cloneable Git bundle export.
+- `GET /__skyevault/quota` and `GET /__skyevault/workspaces/:workspace/quota` for storage accounting.
+- `GET /__skyevault/policy` and `PUT /__skyevault/policy` for branch/tag policy.
+- `GET /__skyevault/snapshots`, `POST /__skyevault/snapshots`, and `POST /__skyevault/snapshots/:id/verify` for verified snapshot operations.
 
-The end-to-end proof verifies push, clone, fetch, protected-branch force-push rejection, UI rendering, API access, bundle export, and clone-from-bundle restore.
+The end-to-end proof verifies push, clone, fetch, protected-branch force-push rejection, viewer rejection, wrong-workspace rejection, protected tag rejection, policy/quota access, snapshot creation, maintenance snapshot/restore, CLI flow, vault diff, UI rendering, API access, bundle export, and clone-from-bundle restore.
 
 SkyeVault can also feed the existing MetrAIyux 0S neural map:
 
@@ -111,12 +114,12 @@ npm run vault:ledger
 
 The ledger report includes receipt counts, invalid receipt files, total uploaded bytes, recent receipt IDs, and local upload events by asset type.
 
-## Remaining Platform Work
+## Platform Work Beyond Core Git Parity
 
-The repo-side lane is now clone-capable and verifiable. The platform should still add:
+The repo-side lane is now clone-capable, policy-gated, quota-aware, snapshot-backed, restorable, CLI-addressable, and neural-map aware. The platform should still add:
 
 - Server-side pack classification and receipt indexing by workspace/company/user.
 - Download endpoint that can stream the exact object by receipt ID with scoped auth.
 - Server-side integrity verification before marking a pack restorable.
-- Account neural-map ingestion from `neural-map.json` and `manifest.json`.
+- Production account neural-map ingestion from uploaded archive `neural-map.json` and `manifest.json`.
 - Differential pack mode for large repos where full bundle upload is not needed every time.

@@ -4,7 +4,7 @@ Generated: 2026-05-15T08:38:09.893724Z
 
 ## Upgrade Summary
 
-This release aligns the Site Operator Brain, 0meg4kAI, Central Command, and 13 cabinet brains into the 16-brain runtime.
+This release aligns the Site Operator Brain, 0meg4kAI, Central Command, and 13 cabinet brains into the 17-brain runtime.
 
 ## Brain Count
 

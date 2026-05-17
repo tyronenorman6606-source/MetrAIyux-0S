@@ -1,9 +1,9 @@
 # SkyeVault Git Remote Service
 
-This is the Git-hosting lane. It is separate from the Git vault pack lane.
+This is the Git-hosting lane. It is separate from the Git vault pack lane, but both now feed the same SkyeVault operator story.
 
 - Git vault pack lane: clone-capable backup/export/restore zip.
-- Git remote service lane: real Git smart HTTP push/fetch against bare repositories.
+- Git remote service lane: real Git smart HTTP push/fetch/clone against bare repositories, with policy, quota, snapshots, bundle exports, restore verification, and workspace neural-map output.
 
 ## Start A Local Remote
 
@@ -52,6 +52,9 @@ Supported Git smart HTTP behavior:
 - Bearer auth for API endpoints
 - Bare repo storage under `${SKYEVAULT_GIT_REMOTE_ROOT}/repos/<workspace>/<repo>.git`
 - Pre-receive policy hooks for protected refs
+- Branch-policy JSON persisted under the storage root
+- Quota checks after pack receive and before ref updates
+- Snapshot, verify, and restore maintenance commands
 
 ## Operator API
 
@@ -72,6 +75,14 @@ Routes:
 - `GET /__skyevault/repos/:workspace/:repo/neural-map` returns the repo brain map JSON.
 - `POST /__skyevault/repos/:workspace/:repo/export` writes a cloneable Git bundle under `${SKYEVAULT_GIT_REMOTE_ROOT}/exports`.
 - `GET /__skyevault/ledger` returns the recent remote ledger.
+- `GET /__skyevault/quota` returns repository/workspace quota totals.
+- `GET /__skyevault/workspaces/:workspace/quota` returns quota totals for one workspace.
+- `GET /__skyevault/policy` returns the active branch/tag policy.
+- `PUT /__skyevault/policy` updates the active branch/tag policy for admins.
+- `GET /__skyevault/snapshots` lists verified snapshot manifests.
+- `POST /__skyevault/snapshots` creates a verified Git bundle snapshot for repos.
+- `GET /__skyevault/snapshots/:id` returns a snapshot manifest.
+- `POST /__skyevault/snapshots/:id/verify` verifies snapshot bundles and checksums.
 
 ## Download And Restore
 
@@ -95,6 +106,7 @@ That bundle contains the full Git object graph for all refs in the bare repo. Th
 Default ref policy:
 
 - `refs/heads/main` and `refs/heads/master` reject non-fast-forward updates.
+- Protected release tags such as `refs/tags/v*` and `refs/tags/release-*` reject rewrites.
 - Ref deletion is denied.
 
 Policy knobs:
@@ -103,6 +115,29 @@ Policy knobs:
 SKYEVAULT_PROTECTED_REFS=refs/heads/main,refs/heads/master
 SKYEVAULT_ALLOW_FORCE_PUSH=0
 SKYEVAULT_ALLOW_DELETE_REFS=0
+```
+
+## CLI And Maintenance
+
+Developer CLI:
+
+```bash
+node tools/skyevault-cli.mjs login --remote-url=http://127.0.0.1:8787 --token="$SKYEVAULT_GIT_REMOTE_TOKEN" --workspace=acme
+node tools/skyevault-cli.mjs clone app ./app
+node tools/skyevault-cli.mjs remote-add --repo=app --name=vault
+node tools/skyevault-cli.mjs status --repo=app
+node tools/skyevault-cli.mjs snapshot
+node tools/skyevault-cli.mjs quota
+node tools/skyevault-cli.mjs policy
+```
+
+Operator maintenance:
+
+```bash
+npm run vault:git:remote:inventory -- --storage-root=/var/lib/skyevault-git-remote
+npm run vault:git:remote:snapshot -- --storage-root=/var/lib/skyevault-git-remote
+npm run vault:git:remote:verify-snapshot -- --storage-root=/var/lib/skyevault-git-remote --snapshot=latest
+npm run vault:git:remote:restore-snapshot -- --storage-root=/var/lib/skyevault-git-remote --target-storage-root=/var/lib/skyevault-git-remote-restored --snapshot=latest --repo=acme/app
 ```
 
 ## Audit And Neural Map
@@ -160,18 +195,17 @@ Run an end-to-end proof:
 npm run vault:git:remote:proof
 ```
 
-The proof starts a temporary remote service, creates a client repo, commits, pushes to `vault`, clones from `vault`, pushes a second commit, verifies protected-branch force-push rejection, fetches it, opens the operator UI, exercises the operator API, exports a Git bundle, clones from that bundle, then checks the remote ledger and neural map output.
+The proof starts a temporary remote service, creates a client repo, commits, pushes to `vault`, clones from `vault`, pushes a second commit, verifies protected-branch force-push rejection, rejects viewer and wrong-workspace writes, rejects protected tag rewrites, checks Gate auth, exercises policy/quota/snapshot APIs, verifies snapshot creation, runs local maintenance snapshot/restore, runs the CLI flow, compares archive diffs, opens the operator UI, clones from an exported bundle, then checks the remote ledger and neural map output.
 
 ## Current Boundary
 
-This is now Git-level for push/fetch/clone over smart HTTP, plus operator UI/API, ref ledger, neural-map output, and cloneable bundle export. It is not a GitHub-style collaboration suite.
+This is now Git-level for push/fetch/clone over smart HTTP, plus operator UI/API, policy, quota, verified snapshots, maintenance restore, CLI, SSH forced-command wrapper, ref ledger, neural-map output, and cloneable bundle export. It is not a GitHub-style collaboration suite, but the repo storage/recovery lane is real Git infrastructure.
 
 Commercial hosting still needs platform services around it:
 
-- Durable deployment target for the remote service.
-- Tenant/workspace key management UI.
-- Rich branch protection UI and per-tenant policy editing.
-- Object/quota enforcement per workspace.
+- Hosted deployment target and observability for the remote service.
+- Tenant/workspace key management UI around the existing Gate-scoped runtime.
+- Richer branch protection UI around the existing policy endpoint.
 - Webhooks and CI status APIs.
 - LFS support.
 - Review/PR layer.

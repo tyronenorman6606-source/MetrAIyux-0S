@@ -6,7 +6,7 @@ let LEGAL_DATA = null;
 let SALES_OFFERS = null;
 let SKYEVAULT_MAP = null;
 
-const TOTAL_BRAINS = 16;
+const TOTAL_BRAINS = 17;
 const BRAIN_ID_ALIASES = {
   'site-operator-autonomous-business-brain': 'site-operator-brain',
   'main-automation-brain': 'site-operator-brain',
@@ -37,8 +37,8 @@ const localRouteRules = [
     intent: 'brain_count_or_runtime',
     route_to: 'site-operator-brain',
     secondary: 'central-company-command-brain',
-    create_task: 'Explain the 16-brain runtime and route the question to the right owner',
-    triggers: ['how many brains', 'brain count', '16 brains', 'local brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
+    create_task: 'Explain the 17-brain runtime and route the question to the right owner',
+    triggers: ['how many brains', 'brain count', '17 brains', 'local brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
   },
   {
     intent: 'buyer_sales_proof',
@@ -271,12 +271,12 @@ function chooseRoute(query) {
       score: 99
     };
   }
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'local brains'])) {
     return {
       intent: 'brain_count_or_runtime',
       primary: profileById('site-operator-brain'),
       secondary: profileById('central-company-command-brain'),
-      createTask: 'Explain the 16-brain runtime accurately',
+      createTask: 'Explain the 17-brain runtime accurately',
       score: 99
     };
   }
@@ -362,8 +362,8 @@ function smartDirectAnswer(query, route, surfaces) {
   const secondaryOwner = ownerName(secondary);
   const firstSurface = surfaces[0];
 
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'local brains'])) {
-    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'local brains'])) {
+    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, 13 cabinet executive brains, and kAIxu 6.7 sovereign inference. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, the cabinet brains own their functional lanes, and kAIxu handles metered AI inference behind FS27 policy.`;
   }
 
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {
@@ -400,15 +400,15 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {
-    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOL Enterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
+    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (17 brains, 9 Workers, kAIxu 6.7, and Git-level SkyeVault), Skye BCC, SOL Enterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, vault, and enterprise deals through the correct cabinet brain.`;
   }
 
   if (hasAny(q, ['vault', 'upload', 'file drop', 'storage', 'send files', 'client upload'])) {
-    return `Skye Vault at https://skyevault-drop.netlify.app is the empire-wide client file drop and storage system. It accepts uploads via drag-drop, supports source routing with ?source= tags, and is embeddable on any site via iframe or the vault-widget.js script. Backend uses Cloudflare R2. ${primaryOwner} handles the vault conversation; for pricing, loop in ${secondaryOwner}.`;
+    return `Skye Vault at https://skyevault-drop.netlify.app is the empire-wide client file drop, storage, and developer repo recovery system. It accepts uploads via drag-drop, supports source routing with ?source= tags, and is embeddable on any site via iframe or the vault-widget.js script. The Git remote lane supports clone, push, fetch, protected refs/tags, quota checks, verified snapshots, bundle restore, CLI access, SSH wrapper, and per-workspace neural maps. ${primaryOwner} handles the vault conversation; for pricing, loop in ${secondaryOwner}.`;
   }
 
   if (hasAny(q, ['campaign', 'brain campaign', 'run campaign', 'autonomous', 'auto sell', 'ai campaign'])) {
-    return `Brain campaigns route sales and marketing tasks autonomously through the 16-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Celeste Monroe), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
+    return `Brain campaigns route sales and marketing tasks autonomously through the 17-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Adrian Cross + Celeste Monroe for file and Git vault adoption), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
   }
 
   if (hasAny(q, ['portal', 'ecosystem portal', 'empire hub', 'all sites', 'all properties'])) {
@@ -587,7 +587,7 @@ function registryToChunks(registry) {
 function personasToChunks(personas) {
   return (personas?.profiles || []).map(profile => ({
     id: `persona-${profile.id}`,
-    title: '16-Brain Persona Registry',
+    title: '17-Brain Persona Registry',
     heading: profile.name,
     text: profileHay(profile),
     source: 'brain/persona-brains.json'

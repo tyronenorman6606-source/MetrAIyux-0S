@@ -6,7 +6,7 @@
 
 ## Positioning
 
-MetrAIyux 0S is a protected autonomous business operating platform for founder-led companies. It combines owner-admin command, customer SaaS workspaces, tenant isolation, 13-cabinet workflows, approval-gated automation, Cloudflare deployment kits, Resend approval emails, and a 16-brain local/worker-ready operating model.
+MetrAIyux 0S is a protected autonomous business operating platform for founder-led companies. It combines owner-admin command, customer SaaS workspaces, tenant isolation, 13-cabinet workflows, approval-gated automation, Cloudflare deployment kits, Resend approval emails, and a 17-brain local/worker-ready operating model.
 
 ## Core tagline
 
@@ -33,4 +33,4 @@ The following are now release history / architecture references only, not the cu
 
 ## Correct architecture language
 
-Use **MetrAIyux 0S** as the product name. Use **13-cabinet model** as the internal governance architecture. Use **16-brain system** for the assistant/orchestration layer.
+Use **MetrAIyux 0S** as the product name. Use **13-cabinet model** as the internal governance architecture. Use **17-brain system** for the assistant/orchestration layer.

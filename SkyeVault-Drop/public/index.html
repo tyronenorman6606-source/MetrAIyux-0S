@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SkyeVault-Drop</title>
-    <meta name="description" content="SkyeVault-Drop is the private Skyes Over London vault for client assets, source packages, media, and receipt-backed delivery files." />
+    <meta name="description" content="SkyeVault-Drop is the private Skyes Over London vault for client assets, source packages, media, Git-level repo remotes, workspace snapshots, and receipt-backed delivery files." />
     <meta name="robots" content="noindex,nofollow" />
     <link rel="stylesheet" href="/assets/styles.css" />
   </head>
@@ -33,12 +33,12 @@
           <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
           <div>
             <strong>Vault Command</strong>
-            <span>Upload, receipts, retrieval</span>
+            <span>Upload, Git remotes, receipts</span>
           </div>
         </div>
         <a href="#upload"><span>01</span> Secure intake</a>
         <a href="#my-vault"><span>02</span> My vault files</a>
-        <a href="#repo-snapshots"><span>03</span> Repo snapshot</a>
+        <a href="#repo-snapshots"><span>03</span> Repo remote</a>
         <a href="#process"><span>04</span> Proof route</a>
         <div class="sidecar-proof">
           <strong>Live storage route</strong>
@@ -50,8 +50,8 @@
         <div class="hero-copy">
           <p class="eyebrow">SKYE-OPS // private client intake</p>
           <h1 id="brandName" class="neon-gradient-text">SkyeVault-Drop</h1>
-          <p id="publicHeadline" class="headline-kicker">A secure vault for every project package.</p>
-          <p id="publicSubheadline" class="lede">The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.</p>
+          <p id="publicHeadline" class="headline-kicker">A secure vault for every project package and developer workspace.</p>
+          <p id="publicSubheadline" class="lede">The surface beside this copy is the actual intake room: add context, send the package, keep the proof receipts clean, or use the Git remote lane when a dev needs real clone/push/fetch behavior. I route files through routing gates into Cloudflare R2, route repos through SkyeVault Git, write the ledger receipt, and review each workspace from the operator side.</p>
           <div class="hero-actions">
             <a class="primary-btn link-btn" href="#upload">Open secure intake</a>
             <a class="secondary-btn link-btn" href="#what-to-send">See what belongs here</a>
@@ -61,6 +61,7 @@
             <span>Multipart large-file handling</span>
             <span>Receipt-backed ledger</span>
             <span>Sanitized repo snapshots</span>
+            <span>Git remote clone/push/fetch</span>
             <span>Operator review route</span>
           </div>
         </div>
@@ -91,7 +92,7 @@
         <div><strong>R2</strong><span>direct storage route</span></div>
         <div><strong>Receipt</strong><span>proof after completion</span></div>
         <div><strong>Ledger</strong><span>operator review trail</span></div>
-        <div><strong>Zip</strong><span>safe repo snapshot lane</span></div>
+        <div><strong>Git</strong><span>clone/push/fetch lane</span></div>
       </section>
 
       <section id="what-to-send" class="section-grid">
@@ -134,21 +135,23 @@
 
       <section id="repo-snapshots" class="section-grid repo-snapshot-section">
         <article class="panel rich-panel">
-          <p class="eyebrow">Repo Snapshot Lane</p>
-          <h2>I can archive a whole codebase without dragging the wrong files with it.</h2>
-          <p class="muted big-copy">The repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger.</p>
+          <p class="eyebrow">Repo Vault Lane</p>
+          <h2>I can take a repo as a safe archive or as a Git remote.</h2>
+          <p class="muted big-copy">For handoff packages, the repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger. For active developers, the SkyeVault Git remote stores real bare repos so a download can be a full clone of the pushed repo, not a loose folder copy.</p>
           <div class="command-stack" aria-label="Repository snapshot commands">
             <span class="code-pill">npm run vault:dry-run</span>
             <span class="code-pill">npm run vault:push</span>
+            <span class="code-pill">npm run vault:cli clone app ./app</span>
           </div>
         </article>
         <article class="panel rich-panel accent-panel">
           <p class="eyebrow">Safety behavior</p>
-          <h2>The snapshot route refuses the usual leak paths.</h2>
-          <p class="muted big-copy">The package skips local secrets, generated dependency folders, backup data, database files, private keys, old archives, and text files flagged by the credential scanner.</p>
+          <h2>The vault keeps archive safety and Git-level recovery separate.</h2>
+          <p class="muted big-copy">The archive package skips local secrets, generated dependency folders, backup data, database files, private keys, old archives, and text files flagged by the credential scanner. The Git remote lane adds branch policy, protected refs/tags, quota checks, snapshots, bundle verification, and per-workspace neural maps.</p>
           <ul class="check-list">
             <li>Use dry run first to create and inspect the sanitized archive.</li>
             <li>Use push when the archive is ready for the vault ledger.</li>
+            <li>Use the Git remote when the dev needs full clone, fetch, and push behavior.</li>
             <li>Save the receipt ID with the project or release notes.</li>
           </ul>
         </article>

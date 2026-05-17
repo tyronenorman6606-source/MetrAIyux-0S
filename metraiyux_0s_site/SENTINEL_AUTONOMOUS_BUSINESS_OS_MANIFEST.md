@@ -8,7 +8,7 @@ This upgrade continues from the QUANTUM OPS package and adds a stronger autonomo
 
 - Sentinel OS hub and 20 operating pages.
 - Browser-local triage, receipt, export, and clear tools.
-- 16-brain routing matrix with primary/secondary brain review rules.
+- 17-brain routing matrix with primary/secondary brain review rules.
 - Human approval gate center.
 - Cloudflare Worker kit for `/api/sentinel/status`, `/api/sentinel/route`, `/api/sentinel/task`, and `/api/sentinel/ledger`.
 - D1 schema for events, tasks, approvals, and proof receipts.

@@ -18,7 +18,7 @@ Added:
 
 Operational doctrine:
 
-The Site Operator Brain coordinates the 16 operating brains. It may draft, classify, route, and create receipts. Human approval remains required for legal/compliance filings, contracts, hiring/firing, money movement, public claims, government submissions, and external commitments.
+The Site Operator Brain coordinates the 17 operating brains. It may draft, classify, route, and create receipts. Human approval remains required for legal/compliance filings, contracts, hiring/firing, money movement, public claims, government submissions, and external commitments.
 
 
 Smoke check: 384 HTML files, 591 local-brain chunks, 0 broken internal links under root-relative static-hosting rules.
