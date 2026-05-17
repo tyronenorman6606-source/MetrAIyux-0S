@@ -19,6 +19,10 @@ database_id = "4c43adac-171b-46ed-8e2c-61458479c3e2"
 binding = "ADMIN_QUEUE"
 queue = "admin-automation-brain-events"
 
+[[services]]
+binding = "SKYGATE_WORKER"
+service = "skyegatefs27-citadeldb"
+
 # Optional Workers AI binding. Enable in Cloudflare dashboard / wrangler config if used.
 # [ai]
 # binding = "AI"
@@ -33,7 +37,7 @@ SKYGATE_ADMIN_EMAILS = "graylondonskyes@gmail.com"
 # Never put SKYGATE_EVENT_MIRROR_SECRET here. Use wrangler secret put SKYGATE_EVENT_MIRROR_SECRET.
 
 # Resend approval notifications. Use a verified Resend domain for production.
-RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@skyesoverlondon.com>"
+RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@solenterprises.org>"
 ADMIN_APPROVAL_EMAIL = "graylondonskyes@gmail.com"
 PUBLIC_ADMIN_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
 # RESEND_REPLY_TO = "operator@your-domain.com"

@@ -46,16 +46,26 @@ function allowsAdminGate(claims, env){
 }
 async function introspectSkygate(token, env){
   const origin = skygateOrigin(env);
-  if (!origin) return {ok:false, error:'SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured on this Worker.'};
+  if (!origin && !env.SKYGATE_WORKER) return {ok:false, error:'SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured on this Worker.'};
   if (!token) return {ok:false, error:'Missing Authorization bearer token.'};
   const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
   let last = null;
   for (const path of paths) {
-    const res = await fetch(`${origin}${path}`, {
-      method:'POST',
-      headers:{'content-type':'application/json'},
-      body:JSON.stringify({token})
-    });
+    let res;
+    if (env.SKYGATE_WORKER) {
+      // Service binding avoids Worker-to-Worker URL routing issues with run_worker_first
+      res = await env.SKYGATE_WORKER.fetch(new Request(`https://skygate-internal${path}`, {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({token})
+      }));
+    } else {
+      res = await fetch(`${origin}${path}`, {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({token})
+      });
+    }
     const data = await res.json().catch(()=>({active:false, error:'Invalid Skyegate response'}));
     last = {res, data, path};
     if (res.status === 404) continue;
@@ -64,12 +74,12 @@ async function introspectSkygate(token, env){
     if (!allowsAdminGate(data, env)) return {ok:false, error:'Skyegate token is active but not admin-scoped for MetrAIyux 0S.', skygate:data, path};
     return {ok:true, via:'skygate', skygate:data, actor:data.email || data.username || data.sub || 'skygate-admin', path};
   }
-  return {ok:false, error:last ? `Skyegate introspection endpoint was not found at ${origin}.` : 'Skyegate introspection did not run.'};
+  return {ok:false, error:last ? `Skyegate introspection endpoint was not found at ${origin || 'service-binding'}.` : 'Skyegate introspection did not run.'};
 }
 async function auth(request, env){
   const token = bearer(request);
   if (env.ADMIN_TOKEN && token && token === env.ADMIN_TOKEN) return {ok:true, via:'legacy_admin_token', actor:'legacy-admin'};
-  if (skygateOrigin(env)) return introspectSkygate(token, env);
+  if (env.SKYGATE_WORKER || skygateOrigin(env)) return introspectSkygate(token, env);
   if (!env.ADMIN_TOKEN) return {ok:false, error:'Neither ADMIN_TOKEN nor SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is configured on this Worker.'};
   return {ok:false, error:'Unauthorized admin request.'};
 }
