@@ -89,6 +89,12 @@ try {
   await page.fill("#packCost", "2700");
   await page.click("button[type='submit']");
   await page.waitForFunction(() => document.querySelector("#proofFeed")?.textContent.includes("runtime_review_pack_archived"));
+  await page.click("#generateCloseBrief");
+  await page.waitForFunction(() => document.querySelector("#closeBriefCard")?.textContent.includes("Free99 E2E profit lane"));
+  await page.waitForFunction(() => document.querySelector("#proofFeed")?.textContent.includes("runtime_close_brief_archived"));
+
+  const closeBriefs = await fetch(`${base}/api/runtime/close-briefs`, { headers: { "x-skye-gate-session": gateToken } }).then((res) => res.json());
+  expect(closeBriefs.close_briefs?.some((brief) => brief.label === "Free99 E2E profit lane"), "Close brief was not archived in the runtime.");
 
   const canvasHasPixels = await page.evaluate(() => {
     const canvas = document.querySelector("#profitFieldCanvas");
@@ -159,6 +165,8 @@ try {
       local_admin_gate_verified: true,
       runtime_live_verified: true,
       workflow_created: true,
+      close_brief_generated: true,
+      close_brief_runtime_count: closeBriefs.close_brief_board?.total,
       canvas_nonblank: canvasHasPixels,
       screenshots: [
         path.join(artifactDir, "skyeprofitconsole-desktop.png"),

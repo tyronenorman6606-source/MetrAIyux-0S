@@ -1,13 +1,13 @@
-# Local Cabinet Brain
+# Cabinet Brain Router
 
-This package now includes a local command brain for the MetrAIyux 0S Executive Office.
+This package now includes a command intelligence brain for the MetrAIyux 0S Executive Office.
 
 ## What it does
 
 - Searches the included cabinet resumes, executive roster, governance charter, and company doctrine.
-- Answers questions inside the browser using local retrieval.
+- Answers questions inside the browser using private retrieval.
 - Requires no GPU, database, paid API, or server for the default mode.
-- Includes optional wiring for a local Ollama, llama.cpp, or OpenAI-compatible endpoint.
+- Includes optional wiring for a operator-controlled Ollama, llama.cpp, or OpenAI-compatible endpoint.
 
 ## Entry page
 
@@ -17,11 +17,11 @@ Open:
 local-brain.html
 ```
 
-For best local testing, serve the folder instead of double-clicking the file:
+For operator testing, serve the folder instead of double-clicking the file:
 
 ```bash
 python3 -m http.server 5173
-# then open http://localhost:5173/local-brain.html
+# then open https://metraiyux-0s-full-system.graylondonskyes.workers.dev/local-brain.html
 ```
 
 ## Optional Ollama setup
@@ -36,10 +36,10 @@ ollama serve
 The page includes an endpoint tester pointed at:
 
 ```text
-http://localhost:11434/v1/chat/completions
+https://operator-inference.example/v1/chat/completions
 ```
 
-If the browser blocks the request because of local CORS policy, keep the built-in retrieval mode or run the optional proxy below.
+If the browser blocks the request because of endpoint CORS policy, keep the built-in retrieval mode or run the optional proxy below.
 
 ## Optional tiny proxy
 
@@ -49,7 +49,7 @@ A tiny proxy is included at:
 brain/local-brain-proxy/server.js
 ```
 
-Run it only if you want the browser to talk to Ollama through a same-origin local server.
+Run it only if you want the browser to talk to Ollama through a same-origin operator server.
 
 ```bash
 cd brain/local-brain-proxy
@@ -60,12 +60,12 @@ npm start
 Then open:
 
 ```text
-http://localhost:8787/local-brain.html
+https://metraiyux-0s-full-system.graylondonskyes.workers.dev/local-brain.html
 ```
 
 ## Obsidian vault sync
 
-The repo includes `obsidian-vault/` as the project command center. Notes with `brain: true` in frontmatter can be exported into the local brain:
+The repo includes `obsidian-vault/` as the project command center. Notes with `brain: true` in frontmatter can be exported into the cabinet brain:
 
 ```bash
 npm run brain:sync:obsidian
@@ -81,9 +81,9 @@ The browser brain loads that file when present, alongside the main knowledge bas
 
 ## 0S command runner
 
-Operator commands are repo-local and intentionally kept outside the deployable static site.
+Operator commands are operator-repo and intentionally kept outside the deployable static site.
 
-Detailed command IDs are documented in `docs/OBSIDIAN_0S_OPERATOR_SYNC.md` and are available through the repo-local CLI help. Actual shell execution stays local through the command runner.
+Detailed command IDs are documented in `docs/OBSIDIAN_0S_OPERATOR_SYNC.md` and are available through the operator-repo CLI help. Actual shell execution stays inside the operator command runner.
 
 Public deployment note: do not place the detailed command registry under `metraiyux_0s_site/` unless the host protects it with real auth.
 

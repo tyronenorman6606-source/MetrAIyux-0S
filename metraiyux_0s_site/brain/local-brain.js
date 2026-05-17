@@ -6,7 +6,7 @@ let LEGAL_DATA = null;
 let SALES_OFFERS = null;
 let SKYEVAULT_MAP = null;
 
-const TOTAL_BRAINS = 17;
+const TOTAL_BRAINS = 16;
 const BRAIN_ID_ALIASES = {
   'site-operator-autonomous-business-brain': 'site-operator-brain',
   'main-automation-brain': 'site-operator-brain',
@@ -37,8 +37,8 @@ const localRouteRules = [
     intent: 'brain_count_or_runtime',
     route_to: 'site-operator-brain',
     secondary: 'central-company-command-brain',
-    create_task: 'Explain the 17-brain runtime and route the question to the right owner',
-    triggers: ['how many brains', 'brain count', '17 brains', 'local brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
+    create_task: 'Explain the 16-brain runtime and route the question to the right owner',
+    triggers: ['how many brains', 'brain count', '16 brains', 'cabinet brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
   },
   {
     intent: 'client_review_or_feedback',
@@ -291,12 +291,12 @@ function chooseRoute(query) {
       score: 99
     };
   }
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'local brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
     return {
       intent: 'brain_count_or_runtime',
       primary: profileById('site-operator-brain'),
       secondary: profileById('central-company-command-brain'),
-      createTask: 'Explain the 17-brain runtime accurately',
+      createTask: 'Explain the 16-brain runtime accurately',
       score: 99
     };
   }
@@ -400,8 +400,8 @@ function smartDirectAnswer(query, route, surfaces) {
   const secondaryOwner = ownerName(secondary);
   const firstSurface = surfaces[0];
 
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'local brains'])) {
-    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, 13 cabinet executive brains, and kAIxu 6.7 sovereign inference. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, the cabinet brains own their functional lanes, and kAIxu handles metered AI inference behind FS27 policy.`;
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
+    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
   }
 
   if (hasAny(q, ['leave a review', 'submit review', 'write testimonial', 'send testimonial', 'give feedback', 'customer feedback', 'client feedback', 'talk about their experience', 'talk about our experience', 'share experience'])) {
@@ -413,7 +413,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['houseoperations', 'house operations', 'house ops', 'owner alerts', 'vendor pressure', 'skye box', 'skyebox', 'authenticator vault', 'totp', '2fa vault'])) {
-    return `${primaryOwner} owns the operations answer, with ${secondaryOwner} checking the security boundary. Route the user to /live/houseoperations-skyebox-operator-proof.html for the 0S expansion hub. HouseOperations proves task, vendor, schedule, assignment, alert, proof-save, and export workflows. SkyeBox proves a local encrypted TOTP vault. Do not claim cloud sync, password recovery, managed secret custody, or enterprise credential compliance without a separate approved scope.`;
+    return `${primaryOwner} owns the operations answer, with ${secondaryOwner} checking the security boundary. Route the user to /live/houseoperations-skyebox-operator-proof.html for the 0S expansion hub. HouseOperations proves task, vendor, schedule, assignment, alert, proof-save, and export workflows. SkyeBox proves a private encrypted TOTP vault. Do not claim cloud sync, password recovery, managed secret custody, or enterprise credential compliance without a separate approved scope.`;
   }
 
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {
@@ -454,11 +454,11 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['vault', 'upload', 'file drop', 'storage', 'send files', 'client upload'])) {
-    return `Skye Vault at https://skyevault-drop.netlify.app is the empire-wide client file drop, storage, and developer repo recovery system. It accepts uploads via drag-drop, supports source routing with ?source= tags, and is embeddable on any site via iframe or the vault-widget.js script. The Git remote lane supports clone, push, fetch, protected refs/tags, quota checks, verified snapshots, bundle restore, CLI access, SSH wrapper, and per-workspace neural maps. ${primaryOwner} handles the vault conversation; for pricing, loop in ${secondaryOwner}.`;
+    return `Skye Vault at https://skyevault-drop.netlify.app is the empire-wide client file drop and storage system. It accepts uploads via drag-drop, supports source routing with ?source= tags, and is embeddable on any site via iframe or the vault-widget.js script. Backend uses Cloudflare R2. ${primaryOwner} handles the vault conversation; for pricing, loop in ${secondaryOwner}.`;
   }
 
   if (hasAny(q, ['campaign', 'brain campaign', 'run campaign', 'autonomous', 'auto sell', 'ai campaign'])) {
-    return `Brain campaigns route sales and marketing tasks autonomously through the 17-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Adrian Cross + Celeste Monroe for file and Git vault adoption), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
+    return `Brain campaigns route sales and marketing tasks autonomously through the 16-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Celeste Monroe), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
   }
 
   if (hasAny(q, ['portal', 'ecosystem portal', 'empire hub', 'all sites', 'all properties'])) {
@@ -608,10 +608,10 @@ async function loadKB() {
       skyevaultMap ? 'SkyeVault repo map' : null,
       obsidianData ? 'Obsidian vault sync' : null
     ].filter(Boolean);
-    if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} local knowledge chunks with ${extras.join(', ')}.`;
+    if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} private knowledge chunks with ${extras.join(', ')}.`;
     renderSources([]);
   } catch (e) {
-    if (status) status.textContent = 'Could not load the local brain data. Serve the site from a local/static server and confirm brain/knowledge-base.json is present.';
+    if (status) status.textContent = 'Could not load the cabinet brain data. Serve the site from the 0S Worker or an operator server and confirm brain/knowledge-base.json is present.';
   }
 }
 
@@ -637,7 +637,7 @@ function registryToChunks(registry) {
 function personasToChunks(personas) {
   return (personas?.profiles || []).map(profile => ({
     id: `persona-${profile.id}`,
-    title: '17-Brain Persona Registry',
+    title: '16-Brain Persona Registry',
     heading: profile.name,
     text: profileHay(profile),
     source: 'brain/persona-brains.json'
@@ -738,7 +738,7 @@ document.getElementById('testEndpoint')?.addEventListener('click', async () => {
         model,
         messages: [
           { role: 'system', content: 'You are a serious MetrAIyux 0S cabinet router. Answer with the owner brain, secondary brain, next action, and one guardrail.' },
-          { role: 'user', content: 'Reply with one sentence confirming the local brain endpoint works.' }
+          { role: 'user', content: 'Reply with one sentence confirming the private brain endpoint works.' }
         ],
         stream: false
       })

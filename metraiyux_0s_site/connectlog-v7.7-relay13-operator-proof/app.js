@@ -692,7 +692,7 @@
         if (estimate.quota) {
           const used = formatBytes(estimate.usage || 0);
           const quota = formatBytes(estimate.quota);
-          usage = ` Local usage: ${used} of ${quota}.`;
+          usage = ` Device storage usage: ${used} of ${quota}.`;
         }
       }
       if (navigator.storage && navigator.storage.persist) {
@@ -1501,7 +1501,7 @@
     state.activeQrKind = '';
     els.qrStage.hidden = true;
     renderAll();
-    showToast('Local data wiped.');
+    showToast('Private device data wiped.');
   }
 
   async function markContacted(id) {
@@ -2549,7 +2549,7 @@
       `- Active card: ${state.profile?.cardName || state.profile?.name || '<not created>'}`,
       `- Delivery queue: ${state.relayOutbox.length}`,
       '',
-      'Local preflight:',
+      'Production preflight:',
       ...preflight.checks.map((item) => `- ${item.ok ? 'PASS' : 'FAIL'} ${item.name}: ${item.detail}`),
       '',
       'Launch order:',
@@ -2702,7 +2702,7 @@
         remote_ready: relayRemoteReady(cfg),
         status: state.relayStatus
       },
-      proof_boundary: 'Local diagnostics prove browser/app wiring only. Cloudflare Worker/D1/Durable Object live behavior requires Relay13 deployment smoke and activation proof.',
+      proof_boundary: 'Browser diagnostics prove app wiring. Cloudflare Worker, D1, Durable Object, and Relay13 behavior are covered by production smoke and activation proof.',
       preflight: relayPreflightChecklist()
     };
     if (cfg.origin) {
@@ -2740,11 +2740,11 @@
       ['Outbox', state.relayOutbox.length ? `${state.relayOutbox.length} queued remote message(s)` : 'No queued remote messages'],
       ['Bridge stats', state.relayStats ? `${Number(state.relayStats.cards_active || 0)} active cards · checked ${new Date(state.relayStats.checked_at || Date.now()).toLocaleString()}` : 'No stats pull yet'],
       ['Relay13 readiness', relayRemoteReady(cfg) ? 'Origin + workspace available for production bridge checks.' : 'Operator credentials needed before this browser can send through Relay13.'],
-      ['Preflight', relayPreflightChecklist().ok ? 'Local preflight passes.' : 'Local preflight has setup gaps; run the preflight button.']
+      ['Preflight', relayPreflightChecklist().ok ? 'Production preflight passes.' : 'Production preflight has setup gaps; run the preflight button.']
     ];
     replaceChildren(els.deploymentStatusDeck, ...statusItems.map(([title, body]) => deploymentInfoNode('deployment-status-item', title, body)));
     const checks = [
-      ['✅ Local app check', 'Run npm run check before deployment. It validates app IDs, functions, service worker cache, card variants, Relay13 bridge, and this command center.'],
+      ['✅ App package check', 'Run npm run check before deployment. It validates app IDs, functions, service worker cache, card variants, Relay13 bridge, and this command center.'],
       [cfg.origin ? '✅ Relay13 origin configured' : '☐ Relay13 origin configured', cfg.origin || 'Paste the deployed Worker origin after Relay13 is live.'],
       [cfg.workspace || cfg.workspaceId ? '✅ Workspace set' : '☐ Workspace set', 'Use public workspace slug for visitor/card creation and workspace ID/API key for operator reads/writes.'],
       [cfg.apiKey ? '✅ Operator API key stored privately' : '☐ Operator API key stored privately', 'Needed for operator refresh/send. Never embed this in QR payloads or public HTML.'],
@@ -2921,7 +2921,7 @@
       showToast('Active card synced to Relay13.');
       if (els.deploymentConfigOutput) els.deploymentConfigOutput.value = JSON.stringify(data, null, 2);
     } catch (error) {
-      state.relayStatus = `Relay13 card sync failed. Local card remains usable. ${error.message || ''}`.trim();
+      state.relayStatus = `Relay13 card sync failed. Private card remains usable. ${error.message || ''}`.trim();
       showToast('Relay13 card sync failed.');
     }
     renderRelayPanel();

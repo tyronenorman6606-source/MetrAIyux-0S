@@ -180,7 +180,7 @@
           <button id="skyeMusicGateUseClient" type="button">Use 0S Client Session</button>
           <a href="${clientLoginHref()}">Open Client Login</a>
         </div>
-        <p class="skyemusic-gate-status" id="skyeMusicGateStatus">Free99 means no charge. Auth still stays on.</p>
+        <p class="skyemusic-gate-status" id="skyeMusicGateStatus">Free99 Lite means no charge for Lite. Auth still stays on.</p>
       </div>
     `;
     document.body.appendChild(overlay);

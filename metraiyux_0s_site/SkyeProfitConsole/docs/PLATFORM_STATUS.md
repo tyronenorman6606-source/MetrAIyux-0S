@@ -1,6 +1,6 @@
 # Platform Status
 
-SkyeProfitConsole is now packaged as a local-first profit operating app instead of a dashboard wrapper.
+SkyeProfitConsole is now packaged as a local-first profit operating app instead of a dashboard wrapper, with a Free99 money-move layer that still stays behind the gate.
 
 Inside MetrAIyux 0S it is a Free99 feature: no charge, no paid checkout, and still gate-session protected.
 
@@ -10,10 +10,11 @@ Inside MetrAIyux 0S it is a Free99 feature: no charge, no paid checkout, and sti
 - Clickable constellation nodes.
 - Profit pack forge.
 - Split furnace with configurable allocation lanes.
+- Money Moves panel with fastest-cash ranking, cash-now total, blocked-margin detection, payback multiple, and generated close briefs.
 - Signal loom grouped by workflow state.
 - Proof chain with local and runtime events.
 - JSON state export.
-- Optional same-folder Node runtime for persistent review/execution/dispatch workflows.
+- Optional same-folder Node runtime for persistent review, close-brief, execution, and dispatch workflows.
 
 ## Runtime boundary
 

@@ -285,7 +285,7 @@
         setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "syncing_unlock"}.`);
       }
     } catch (error) {
-      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the owner-approval state.");
+      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the workspace unlock state.");
     }
   }
 

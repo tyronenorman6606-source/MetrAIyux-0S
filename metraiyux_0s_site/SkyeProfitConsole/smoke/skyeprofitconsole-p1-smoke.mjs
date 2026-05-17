@@ -36,6 +36,8 @@ for (const route of routes) {
   if (!html.includes('./gate-session.js')) failures.push(`${route} missing gate session script`);
   if (!html.includes('id="profitFieldCanvas"')) failures.push(`${route} missing profit field canvas`);
   if (!html.includes('id="packForm"')) failures.push(`${route} missing pack forge form`);
+  if (!html.includes('id="moneyMoves"')) failures.push(`${route} missing money moves panel`);
+  if (!html.includes('id="generateCloseBrief"')) failures.push(`${route} missing close brief generator`);
   if (!html.includes('id="proofFeed"')) failures.push(`${route} missing proof chain`);
 }
 
@@ -61,6 +63,9 @@ for (const needle of [
   "function drawField",
   "async function syncRuntime",
   "async function pushPackToRuntime",
+  "function renderMoney",
+  "function generateCloseBrief",
+  "async function pushCloseBriefToRuntime",
   "function transitionPack",
   "function exportState"
 ]) {
@@ -75,6 +80,15 @@ for (const needle of [
   "saas_client_session"
 ]) {
   if (!gate.includes(needle)) failures.push(`gate-session.js missing ${needle}`);
+}
+
+const runtime = await read("runtime/local-runtime.mjs");
+for (const needle of [
+  "/api/runtime/close-briefs",
+  "function normalizeCloseBrief",
+  "function computeCloseBriefBoard"
+]) {
+  if (!runtime.includes(needle)) failures.push(`runtime/local-runtime.mjs missing ${needle}`);
 }
 
 if (failures.length) {

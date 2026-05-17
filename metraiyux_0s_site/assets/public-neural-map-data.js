@@ -878,12 +878,12 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "SkyeMediaCenter is now a Free99 no-charge 0S media surface with gated app boot, intake, operator theater, asset search, review, execution, dispatch, publish, stats, and file-delivery proof. Free99 does not bypass gate sessions."
     },
     {
-      "id": "signal:live-surface-registry-skyemusicnexus-free99",
-      "label": "SkyeMusicNexus Free99",
+      "id": "signal:live-surface-registry-skyemusicnexus-lite-paid-addons",
+      "label": "SkyeMusicNexus Lite + Paid Drops",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "SkyeMusicNexus is now a Free99 no-charge 0S music surface with gated app boot, Artist Stage, Operator Stage, artist records, release forge, royalty ledger motion, payout review, analytics, operations workflow, and proof boundary. Free99 does not bypass gate sessions."
+      "summary": "SkyeMusicNexus now has a Free99 Lite music lane plus paid Studio, Label Command, managed music ops, and drop add-ons. App boot, Artist Stage, Operator Stage, artist records, release forge, royalty ledger motion, payout review, analytics, paid drops, operations workflow, and proof boundary all require gate sessions."
     }
   ],
   "links": [

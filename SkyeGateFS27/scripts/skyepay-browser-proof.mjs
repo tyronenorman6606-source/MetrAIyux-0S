@@ -128,7 +128,7 @@ function writeProofReel({ videoPath, posterPath }) {
 <body>
   <main>
     <h1>SkyePay Browser Action Proof</h1>
-    <p>Recorded path: open the RouteX owner-approved SkyePay lane, fill checkout, submit dry-run checkout, return to the FS27 pending-owner-approval state.</p>
+    <p>Recorded path: open the RouteX auto-unlock SkyePay lane, fill checkout, submit dry-run checkout, and return to the FS27 preview-recorded state.</p>
     <video id="proofVideo" src="${videoSrc}" poster="${posterSrc}" controls autoplay muted playsinline preload="auto"></video>
   </main>
 </body>
@@ -222,13 +222,13 @@ async function verifyApiContract(origin, browser) {
         checkoutOk: checkout.ok === true && typeof checkout.url === "string",
         routexOfferOk: offers.offers.some((offer) => (
           offer.id === "metraiyux-routex-workforce-command" &&
-          offer.owner_approval_required === true &&
+          offer.owner_approval_required === false &&
           offer.setup_cents === 650000 &&
           offer.recurring_cents === 149700
         )),
         statusOk: status.ok === true &&
-          status.order?.approval_status === "demo_pending_owner_approval" &&
-          status.order?.provisioning_status === "waiting_for_owner_approval",
+          status.order?.approval_status === "demo_checkout" &&
+          status.order?.provisioning_status === "demo_not_unlocked",
         client: offers.client?.client_slug || null,
         offerCount: offers.offers.length,
         repoImported: offers.repo_stripe_catalog?.imported_checkout_offers || 0,
@@ -307,7 +307,7 @@ async function main() {
     console.error(JSON.stringify({ statusPanelDebug: debug, consoleLines }, null, 2));
     throw error;
   }
-  await page.waitForFunction(() => /pending owner approval/i.test(document.querySelector("#statusPanel")?.innerText || ""), null, { timeout: 12000 });
+  await page.waitForFunction(() => /preview recorded/i.test(document.querySelector("#statusPanel")?.innerText || ""), null, { timeout: 12000 });
   const statusText = await page.locator("#statusPanel").innerText();
   report.checks.checkoutDryRun = {
     actionPath: [
@@ -317,10 +317,10 @@ async function main() {
       "fill company_name",
       "click #checkoutBtn",
       "route returns with status=success",
-      "assert pending owner approval"
+      "assert preview recorded"
     ],
     returnedToSkyePay: page.url().includes("status=success"),
-    pendingApprovalShown: /pending owner approval/i.test(statusText),
+    previewRecordedShown: /preview recorded/i.test(statusText),
     statusText
   };
   const desktopShot = path.join(artifactDir, "skyepay-desktop.png");

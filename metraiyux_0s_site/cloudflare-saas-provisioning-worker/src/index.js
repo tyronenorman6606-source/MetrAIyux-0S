@@ -176,8 +176,8 @@ const PLANS = {
     setup: 15000,
     skyepay_offer_id: "metraiyux-enterprise-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_scope_review",
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment",
     features: {
       skyeprofitconsole_free99: "gate_session_required_no_charge",
       skyemediacenter_free99: "gate_session_required_no_charge",
@@ -1108,7 +1108,7 @@ export default {
 
       if (path === "/api/saas/billing/checkout-success") {
         const session_id = url.searchParams.get("session_id") || "";
-        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Your workspace is activating. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
+        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Your workspace unlocks automatically after Stripe confirms the payment webhook. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
       }
 
       if (path === "/api/saas/billing/checkout-cancel") {

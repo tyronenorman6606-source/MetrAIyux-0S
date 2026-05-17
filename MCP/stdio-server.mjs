@@ -1131,8 +1131,25 @@ function applyMcpParts({
 
   if (requestedPatterns.has('skyesol-living-background')) {
     const pack = patternPack('skyesol-living-background');
+    const livingJs = String(pack.files['skyesol-living-background/skyesol-living-background.js'] || '')
+      .replace(/^\s*export\s+function\s+mountSkyeSolLivingBackground/, 'function mountSkyeSolLivingBackground');
     cssBlocks.push({ id: 'skyesol-living-background-css', body: pack.files['skyesol-living-background/skyesol-living-background.css'] || '' });
-    jsBlocks.push({ id: 'skyesol-living-background-js', body: pack.files['skyesol-living-background/skyesol-living-background.js'] || '' });
+    jsBlocks.push({
+      id: 'skyesol-living-background-js',
+      body: `
+${livingJs}
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();`
+    });
     if (html) {
       html = addClassToTag(html, 'body', 'skyesol-living-page');
       html = injectAfterBodyOpen(html, 'skyesol-living-field', '<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>');

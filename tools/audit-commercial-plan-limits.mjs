@@ -58,14 +58,14 @@ const htmlRequiredTokens = {
     "metraiyux-routex-workforce-command",
     "metraiyux-autonomous-office",
     "metraiyux-enterprise-command",
-    "Owner approval gate"
+    "Automatic unlock gate"
   ],
   "saas/billing.html": [
     "30 rpm",
     "90 rpm",
     "120 rpm",
     "180 rpm",
-    "Confirmed Stripe payment moves every paid plan into owner approval"
+    "Confirmed Stripe payment unlocks the paid workspace automatically"
   ],
   "saas/signup.html": [
     "$1,500 setup",

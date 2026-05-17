@@ -3,7 +3,7 @@
 
 **MetrAIyux 0S** is the official product name for this package. It replaces prior working names such as Sovereign 13 Cabinet, 13-Cabinet Executive Office, CabinetOS, SovereignOffice OS, and generic Autonomous Business OS language.
 
-This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 17-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
+This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 16-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
 
 ## ConnectLog + Relay13 Expansion
 
@@ -64,7 +64,7 @@ Current pricing keeps RouteX Workforce Command at `$1,497/month` plus `$6,500 se
 
 ## SkyeProfitConsole Free99 Expansion
 
-This build adds `SkyeProfitConsole/` inside the 0S site. SkyeProfitConsole is the Free99 profit field for profit packs, split checks, margin pressure, signal loom lanes, proof events, local exports, and optional same-folder runtime persistence.
+This build adds `SkyeProfitConsole/` inside the 0S site. SkyeProfitConsole is the Free99 profit field for profit packs, split checks, money moves, close briefs, margin pressure, signal loom lanes, proof events, local exports, and optional same-folder runtime persistence.
 
 Start points:
 
@@ -104,9 +104,29 @@ node smoke/skye-media-center-p2-smoke.mjs
 node smoke/smoke-proof.mjs
 ```
 
-## SkyeMusicNexus Free99 Expansion
+## Skye Content Forge Free99 Expansion
 
-This build adds `SkyeMusicNexus/` inside the 0S site. SkyeMusicNexus is the Free99 music operating stage for artist records, release forge, royalty ledger motion, payout review, analytics, operations workflows, and proof-safe provider boundaries.
+This build adds `skye-content-repurposer-local/` inside the 0S site. Skye Content Forge is the Free99 content publisher for approved source scanning, source-note extraction, original content generation, draft archives, Markdown export, Google Drive upload when configured, scheduler ticks, publish queues, GitHub backup/restore, Netlify/Cloudflare hooks, and official social API boundaries.
+
+Start points:
+
+- `live/skye-content-forge-publisher.html` - 0S expansion hub.
+- `skye-content-repurposer-local/public/index.html` - gated app shell.
+- `skye-content-repurposer-local/README.md` - live/local runbook.
+- `proof/skye-content-forge-expansion-receipt.html` - proof receipt and auth boundary.
+
+Free99 means no charge. It does not mean anonymous access. The app waits for a 0S, FS27, SkyGate, or local admin gate session before booting, and every `/api/*` route rejects ungated requests with 401.
+
+Local proof command:
+
+```bash
+cd skye-content-repurposer-local
+npm run smoke
+```
+
+## SkyeMusicNexus Lite + Paid Music Ops
+
+This build adds `SkyeMusicNexus/` inside the 0S site. SkyeMusicNexus Lite is the Free99 music preview lane for a gated artist/release proof path. Studio, Label Command, Managed Music Ops, Single Song Drop, release drops, catalog import, royalty ledger setup, payout review, artist profile, seat, and release-pack add-ons are paid routes.
 
 Start points:
 
@@ -116,7 +136,7 @@ Start points:
 - `SkyeMusicNexus/public/admin.html` - Operator Stage.
 - `proof/skyemusicnexus-expansion-receipt.html` - proof receipt and auth boundary.
 
-Free99 means no charge. It does not mean anonymous access. The app shell and public stages require a 0S, FS27, or SkyGate session before use, and the music artist/release/workflow read endpoints reject ungated requests with 401.
+Free99 means no charge for Lite only. It does not mean anonymous access. The app shell, public stages, paid tiers, and paid add-ons require a 0S, FS27, or SkyGate session before use, and the music artist/release/workflow read endpoints reject ungated requests with 401. Paid checkout does not claim live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until separate provider proof exists.
 
 Local proof command:
 

@@ -152,4 +152,4 @@ export function summarizeLiveEnv(env = process.env) {
   };
 }
 
-loadRootEnv();
+export const ROOT_ENV_LOAD_RESULT = loadRootEnv();

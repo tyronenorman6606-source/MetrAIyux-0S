@@ -2,6 +2,8 @@
 
 A live/local Skyes Over London AI content command center for scanning approved industry blogs, extracting ideas, generating original Skye-branded assets, saving drafts, scheduling publishing, deploying static blog output, and backing up state so the tool survives file loss.
 
+This app is imported into MetrAIyux 0S as a Free99 feature. Free99 means no charge. It does not mean anonymous access: the browser shell waits for a gate session, and every `/api/*` route requires a 0S, FS27, SkyGate, or local admin gate token before it will run.
+
 ## What this does
 
 - Scans approved sources: Animalz, OpenAI, Google Research, Google DeepMind, NVIDIA, MIT Technology Review AI, Scale AI, and UiPath AI.
@@ -31,6 +33,14 @@ Open:
 ```text
 http://localhost:4313
 ```
+
+For local review, the gate overlay accepts the localhost-only admin token:
+
+```text
+FREE99-CONTENT-LOCAL
+```
+
+For production, set long random values for `APP_ACCESS_TOKEN` and `SCHEDULER_API_KEY`. Leave `GATE_SESSION_REQUIRED=1` unless the owner explicitly says this app should run without the gate.
 
 ## Smoke test
 

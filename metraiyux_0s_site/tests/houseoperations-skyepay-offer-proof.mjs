@@ -87,8 +87,9 @@ assertOffer(command, {
   setup_lookup: "metraiyux_houseoperations_command_setup",
   monthly_lookup: "metraiyux_houseoperations_command_monthly"
 });
-assert.equal(command.zero_upfront_trial, true, "command zero upfront trial");
-assert.equal(command.today_cents, 0, "command starts at zero during trial");
+assert.equal(command.zero_upfront_trial, false, "command no zero upfront trial");
+assert.equal(command.today_cents, 299700, "command first checkout total");
+assert.equal(command.owner_approval_required, true, "command requires owner approval");
 
 assertOffer(managed, {
   setup_cents: 500000,
@@ -100,7 +101,7 @@ assert.equal(managed.zero_upfront_trial, false, "managed no zero upfront trial")
 assert.equal(managed.today_cents, 599700, "managed first checkout total");
 assert.equal(managed.owner_approval_required, true, "managed requires owner approval");
 
-await dryRunCheckout(command.id, false);
+await dryRunCheckout(command.id, true);
 await dryRunCheckout(managed.id, true);
 
 console.log("houseoperations-skyepay-offer-proof: ok");

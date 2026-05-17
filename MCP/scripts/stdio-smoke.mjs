@@ -119,6 +119,7 @@ try {
   assert(toolNames.includes('design_open_source_stack'), 'design_open_source_stack tool missing');
   assert(toolNames.includes('design_stack_catalog'), 'design_stack_catalog tool missing');
   assert(toolNames.includes('design_recipe_plan'), 'design_recipe_plan tool missing');
+  assert(toolNames.includes('design_apply_mcp_parts'), 'design_apply_mcp_parts tool missing');
 
   const elements = await client.callTool({
     name: 'design_elements',
@@ -222,6 +223,18 @@ try {
   assert(recipePlanText.includes('neon-scrollbar-cursor-trail'), 'recipe plan should include cursor/scrollbar recipe');
   assert(recipePlanText.includes('neon-motion-chrome-kit'), 'recipe plan should include neon motion chrome recipe');
   assert(recipePlanText.includes('actual-surface-video-reel'), 'recipe plan should include screenshot video reel recipe');
+
+  const applyDryRun = await client.callTool({
+    name: 'design_apply_mcp_parts',
+    arguments: {
+      targetFolder: 'metraiyux_0s_site',
+      effects: ['neonScrollbar'],
+      mode: 'dryRun'
+    }
+  });
+  const applyDryRunText = applyDryRun.content.map((item) => item.text || '').join('\n');
+  assert(applyDryRunText.includes('"ok": true'), 'apply MCP parts dry run should return ok');
+  assert(applyDryRunText.includes('adaptive-neon-scrollbar'), 'apply MCP parts should map neonScrollbar to adaptive-neon-scrollbar');
 
   const logoManifest = await client.callTool({
     name: 'design_logo_manifest',

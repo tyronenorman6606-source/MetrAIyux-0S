@@ -1,6 +1,6 @@
 # SkyeProfitConsole Neo-Front Profit Field
 
-This build replaces the old dashboard-style shell with a real interactive app surface: a spatial profit field, split furnace, signal loom, proof chain, local state, export controls, and optional same-folder runtime persistence.
+This build replaces the old dashboard-style shell with a real interactive app surface: a spatial profit field, split furnace, money moves, close briefs, signal loom, proof chain, local state, export controls, and optional same-folder runtime persistence.
 
 ## 0S import boundary
 
@@ -22,7 +22,7 @@ Then open:
 http://127.0.0.1:4173/
 ```
 
-The runtime stores review packs, execution items, dispatch items, and workflow events in `runtime/store.json`.
+The runtime stores review packs, close briefs, execution items, dispatch items, and workflow events in `runtime/store.json`.
 
 Runtime API calls without `x-skye-gate-session` or a bearer token return `401 gate_session_required`.
 
@@ -39,8 +39,8 @@ node smoke/smoke-proof.mjs
 
 ✅ Added a canvas-based animated profit field and clickable constellation nodes.
 
-✅ Added pack creation, selection, updates, status transitions, local proof events, JSON export, and split simulation.
+✅ Added pack creation, selection, updates, status transitions, local proof events, JSON export, split simulation, money-move scoring, payback analysis, blocked-margin detection, and close brief generation.
 
-✅ Preserved and upgraded the same-folder runtime lane for review packs, execution queue, dispatch queue, and workflow timeline.
+✅ Preserved and upgraded the same-folder runtime lane for review packs, close briefs, execution queue, dispatch queue, and workflow timeline.
 
 ✅ Upgraded the Node runtime so linked static assets load when the app is launched through `runtime/local-runtime.mjs`.

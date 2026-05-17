@@ -142,7 +142,7 @@ The gate has five big jobs.
 
    ConnectLog and Relay13 are now a gate-owned expansion lane.
 
-   - ConnectLog owns local-first relationship capture, QR exchange, follow-up memory, and the browser-side relationship command workspace.
+   - ConnectLog owns production relationship capture, QR exchange, follow-up memory, and the private relationship command workspace.
    - Relay13 owns the deployed Cloudflare Worker messaging core, workspace bootstrap, scoped API keys, widgets, operator console, request ledgers, activation proof, and WebSocket live proof.
    - MetrAIyux 0S owns the public proof hub, proof receipt, pricing updates, and buyer-facing routing.
    - FS27 owns the gate boundary: public links, mirror-event receipts, admin visibility, and the rule that Relay13 API keys plus FS27 mirror secrets stay server-side or operator-only.
@@ -983,7 +983,7 @@ Public backlink update from 2026-05-16:
 
 - `gate-proofx.html` now links to the MetrAIyux public brain wall so a buyer can see portraits, resumes, operating-room screenshots, and proof-safe brain routing.
 - `gate-proofx.html` now links to the Skye Ecosystem Portal so qualified visitors can move from FS27 into the broader deployed surface map.
-- `metraiyux_0s_site/brain/live-surface-registry.json` now tracks the public brain wall and ecosystem portal as routeable sales/proof surfaces for the local brain runtime.
+- `metraiyux_0s_site/brain/live-surface-registry.json` now tracks the public brain wall and ecosystem portal as routeable sales/proof surfaces for the cabinet brain runtime.
 
 MetrAIyux live smoke result from 2026-05-15:
 

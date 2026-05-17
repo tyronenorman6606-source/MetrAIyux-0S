@@ -1,8 +1,8 @@
 {
-  "version": "2026-05-17-skyemusicnexus-free99-sales-registry",
+  "version": "skye-content-forge-free99-routing",
   "updated_at": "2026-05-17T00:00:00Z",
   "source_of_truth": "../STRIPE_PRODUCT_PRICE_CATALOG.md",
-  "positioning": "MetrAIyux 0S, SkyeGateFS27, kAIxU, Lane Vault, SkyeCorp, Skye Business Command Center, SkyeRouteX, SkyeMusicNexus, SkyeRoutexFlow Workforce Command v0.4.0, SkyeProfitConsole Free99, SkyeMediaCenter Free99, and SOL Staffing offers should be sold from approved catalog entries only. The system sells serious deployed business infrastructure: websites, command decks, workforce route command, managed gates, AI operating rooms, governance, billing visibility, proof surfaces, and support.",
+  "positioning": "MetrAIyux 0S, SkyeGateFS27, kAIxU, Lane Vault, SkyeCorp, Skye Business Command Center, SkyeRouteX, SkyeMusicNexus Lite and paid music ops, SkyeRoutexFlow Workforce Command v0.4.0, SkyeProfitConsole Free99, SkyeMediaCenter Free99, Skye Content Forge Free99, and SOL Staffing offers should be sold from approved catalog entries only. The system sells serious deployed business infrastructure: websites, command decks, workforce route command, managed gates, AI operating rooms, governance, billing visibility, proof surfaces, and support.",
   "sales_rule": "Use exact prices only when an offer status is approved. Use starts-at language for approved_floor. Use discovery and custom proposal language for quote_only. Never turn valuations, financing examples, default caps, internal model costs, or calculator outputs into checkout prices.",
   "guardrails": [
     "Do not invent Stripe links, discounts, guarantees, or payment terms.",
@@ -11,7 +11,9 @@
     "Do not present valuation ranges or ARR forecasts as product prices.",
     "Route managed gate, metering, billing, and margin questions to Naomi Sterling or Orion Hayes before close.",
     "SkyeProfitConsole is Free99, meaning no charge, but never describe it as ungated; a 0S or FS27 gate session remains required.",
-    "SkyeMediaCenter is Free99, meaning no charge, but never describe it as ungated; a 0S or FS27 gate session remains required for app boot, intake, admin, list/search, publish, stats, and file delivery."
+    "SkyeMediaCenter is Free99, meaning no charge, but never describe it as ungated; a 0S or FS27 gate session remains required for app boot, intake, admin, list/search, publish, stats, and file delivery.",
+    "Skye Content Forge is Free99, meaning no charge, but never describe it as ungated; a 0S, FS27, SkyGate, or local admin gate session remains required for app boot and every API route.",
+    "Do not claim Skye Content Forge provider publishing works without configured OpenAI, Drive, GitHub, Netlify, Cloudflare, Meta, Instagram, LinkedIn, or matching platform permissions."
   ],
   "public_routes": {
     "metraiyux_public": "https://metraiyux-0s-public-spectacle.pages.dev/",
@@ -29,7 +31,10 @@
     "metraiyux_skyemediacenter_intake": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMediaCenter/public/index.html",
     "metraiyux_skyemediacenter_operator": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMediaCenter/public/admin.html",
     "metraiyux_skyemusicnexus_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyemusicnexus-neofront.html",
-    "metraiyux_skyemusicnexus_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/index.html"
+    "metraiyux_skyemusicnexus_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/index.html",
+    "metraiyux_skyecontentforge_expansion": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-content-forge-publisher.html",
+    "metraiyux_skyecontentforge_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-content-repurposer-local/public/index.html",
+    "metraiyux_skyecontentforge_receipt": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skye-content-forge-expansion-receipt.html"
   },
   "folders": [
     {
@@ -54,13 +59,18 @@
     },
     {
       "folder": "metraiyux_0s_site/SkyeMusicNexus",
-      "role": "SkyeMusicNexus Free99 music operating stage: artist records, release forge, royalty ledger motion, payout queue, analytics prism, operations workflows, local SkyGate proof, and gated function boundary.",
-      "stripe_action": "Do not create a paid Stripe product for this import. Present as Free99/no charge feature access, with gate-session auth required."
+      "role": "SkyeMusicNexus Lite Free99 music preview plus paid Studio, Label Command, Managed Music Ops, drop add-ons, content request add-ons, artist exchange, artist records, release forge, content requests, Relay13-ready inbox, community signals, achievement progression, release campaigns, royalty ledger motion, payout queue, analytics prism, operations workflows, local SkyGate proof, and gated function boundary.",
+      "stripe_action": "Do not create a paid Stripe product for Lite. Create/sync paid SkyeMusicNexus products and add-ons only from data/skyemusicnexus-pricing.json and SkyePay catalog. Gate-session auth is required for free and paid lanes."
     },
     {
       "folder": "metraiyux_0s_site/SkyeMediaCenter",
       "role": "SkyeMediaCenter Free99 media field: gated media intake, asset list/search, review, execution, dispatch, publish, stats, file delivery, proof receipts, and browser/operator theater surfaces.",
       "stripe_action": "Do not create a paid Stripe product for this import. Present as Free99/no charge feature access, with gate-session auth required for every app and API surface."
+    },
+    {
+      "folder": "metraiyux_0s_site/skye-content-repurposer-local",
+      "role": "Skye Content Forge Free99 content publisher: approved source scanning, source-note extraction, original content generation, drafts, Markdown export, Drive upload when configured, scheduler ticks, publish queue, backup/restore, deployment hooks, official social API boundaries, and gated API proof.",
+      "stripe_action": "Do not create a paid Stripe product for this import. Present as Free99/no charge feature access, with gate-session auth required for app boot and every API surface."
     },
     {
       "folder": "SkyeGateFS27",
@@ -102,9 +112,9 @@
     {
       "id": "metraiyux-free99-gated-features",
       "folder": "metraiyux_0s_site",
-      "status": "do_not_create_paid_stripe_product",
+      "status": "mixed_free99_and_paid_upgrade_path",
       "brain_owner": "0meg4kai-security-brain",
-      "stripe_action": "Do not create paid Stripe products for these Free99 imports unless a later managed scope is approved. Free99 means no charge, not anonymous access.",
+      "stripe_action": "Do not create paid Stripe products for Free99 imports. Paid SkyeMusicNexus tiers and add-ons are approved separately in the SkyeMusicNexus paid music ops group. Free99 means no charge, not anonymous access.",
       "items": [
         {
           "product_name": "SkyeProfitConsole Free99 gated feature",
@@ -112,9 +122,19 @@
           "lookup_key": "do_not_create_skyeprofitconsole_free99"
         },
         {
-          "product_name": "SkyeMusicNexus Free99 gated feature",
+          "product_name": "SkyeMusicNexus Lite Free99 gated feature",
           "price_label": "Free99 / $0",
-          "lookup_key": "do_not_create_skyemusicnexus_free99"
+          "lookup_key": "do_not_create_skyemusicnexus_lite_free99"
+        },
+        {
+          "product_name": "SkyeMediaCenter Free99 gated feature",
+          "price_label": "Free99 / $0",
+          "lookup_key": "do_not_create_skyemediacenter_free99"
+        },
+        {
+          "product_name": "Skye Content Forge Free99 gated feature",
+          "price_label": "Free99 / $0",
+          "lookup_key": "do_not_create_skyecontentforge_free99"
         }
       ]
     },
@@ -408,6 +428,147 @@
           "lookup_key": "kaixu_67_crown_output_1m"
         }
       ]
+    },
+    {
+      "id": "skyemusicnexus-paid-music-ops",
+      "folder": "metraiyux_0s_site/SkyeMusicNexus",
+      "status": "approved_pending_stripe_sync",
+      "brain_owner": "naomi-sterling-brain",
+      "stripe_action": "Create/sync paid SkyeMusicNexus products and prices in Stripe, then route checkout through SkyePay. All paid access still requires owner approval and a gate session.",
+      "items": [
+        {
+          "product_name": "SkyeMusicNexus Studio",
+          "price_label": "$497/mo + $1,500 setup",
+          "lookup_key": "skyemusicnexus_studio_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Studio Setup",
+          "price_label": "$1,500 once",
+          "lookup_key": "skyemusicnexus_studio_setup",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Label Command",
+          "price_label": "$1,497/mo + $6,500 setup",
+          "lookup_key": "skyemusicnexus_label_command_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Label Command Setup",
+          "price_label": "$6,500 once",
+          "lookup_key": "skyemusicnexus_label_command_setup",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Managed Music Ops",
+          "price_label": "$3,997/mo + $15,000 setup",
+          "lookup_key": "skyemusicnexus_managed_music_ops_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Managed Music Ops Setup",
+          "price_label": "$15,000 once",
+          "lookup_key": "skyemusicnexus_managed_music_ops_setup",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Single Song Drop",
+          "price_label": "$199 once",
+          "lookup_key": "skyemusicnexus_single_song_drop",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Release Drop Plus",
+          "price_label": "$399 once",
+          "lookup_key": "skyemusicnexus_release_drop_plus",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "EP Drop",
+          "price_label": "$799 once",
+          "lookup_key": "skyemusicnexus_ep_drop",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Album Drop",
+          "price_label": "$1,497 once",
+          "lookup_key": "skyemusicnexus_album_drop",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Catalog Import Pack",
+          "price_label": "$299 once",
+          "lookup_key": "skyemusicnexus_catalog_import_pack",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Royalty Ledger Setup",
+          "price_label": "$249 once",
+          "lookup_key": "skyemusicnexus_royalty_ledger_setup",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Payout Review Pack",
+          "price_label": "$149 once",
+          "lookup_key": "skyemusicnexus_payout_review_pack",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Artist Profile Buildout",
+          "price_label": "$99 once",
+          "lookup_key": "skyemusicnexus_artist_profile_buildout",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Social Caption Pack",
+          "price_label": "$99 once",
+          "lookup_key": "skyemusicnexus_social_caption_pack",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Cover / Canvas Request",
+          "price_label": "$199 once",
+          "lookup_key": "skyemusicnexus_cover_canvas_request",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Short-Form Clip Brief",
+          "price_label": "$249 once",
+          "lookup_key": "skyemusicnexus_short_form_clip_brief",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Release Content Kit",
+          "price_label": "$499 once",
+          "lookup_key": "skyemusicnexus_release_content_kit",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Community Campaign Sprint",
+          "price_label": "$899 once",
+          "lookup_key": "skyemusicnexus_community_campaign_sprint",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Extra Artist Seat",
+          "price_label": "$29/mo",
+          "lookup_key": "skyemusicnexus_extra_artist_seat_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "Extra Release Pack",
+          "price_label": "$99/mo",
+          "lookup_key": "skyemusicnexus_extra_release_pack_monthly",
+          "gate_session_required": true
+        },
+        {
+          "product_name": "White-Label Artist Portal",
+          "price_label": "$197/mo + $997 setup",
+          "lookup_key": "skyemusicnexus_white_label_artist_portal_monthly",
+          "gate_session_required": true
+        }
+      ]
     }
   ],
   "offers": [
@@ -435,7 +596,8 @@
         "HouseOperations local preview lane",
         "SkyeBox encrypted authenticator vault handoff",
         "ConnectLog private relationship command app",
-        "Relay13 bridge setup guide"
+        "Relay13 bridge setup guide",
+        "Skye Content Forge Free99 gated content publisher"
       ],
       "setup_lookup_key": "metraiyux_starter_command_setup"
     },
@@ -460,7 +622,8 @@
         "HouseOperations preview handoff",
         "SkyeBox local vault handoff",
         "ConnectLog app handoff",
-        "Relay13 source package briefing"
+        "Relay13 source package briefing",
+        "Skye Content Forge Free99 gated content publisher"
       ]
     },
     {
@@ -488,7 +651,8 @@
         "HouseOperations task/vendor/owner-alert workspace",
         "SkyeBox operator vault instances",
         "ConnectLog card variants and follow-up workflows",
-        "Relay13 workspace bridge and operator console setup path"
+        "Relay13 workspace bridge and operator console setup path",
+        "Skye Content Forge Free99 gated content publisher"
       ],
       "setup_lookup_key": "metraiyux_growth_cabinet_setup"
     },
@@ -514,7 +678,8 @@
         "HouseOperations workspace setup",
         "SkyeBox vault instance handoff",
         "ConnectLog profile/card setup",
-        "Relay13 workspace configuration"
+        "Relay13 workspace configuration",
+        "Skye Content Forge Free99 gated content publisher"
       ]
     },
     {
@@ -594,7 +759,8 @@
         "managed HouseOperations command rooms",
         "SkyeBox encrypted authenticator vault rollout",
         "ConnectLog operator-proof deployment center",
-        "Relay13 Worker/D1 activation and live-proof handoff path"
+        "Relay13 Worker/D1 activation and live-proof handoff path",
+        "Skye Content Forge Free99 gated content publisher"
       ],
       "setup_lookup_key": "metraiyux_autonomous_office_setup"
     },
@@ -620,7 +786,8 @@
         "HouseOperations command room setup",
         "SkyeBox local vault backup handoff",
         "ConnectLog deployment command setup",
-        "Relay13 migration and proof runbook"
+        "Relay13 migration and proof runbook",
+        "Skye Content Forge Free99 gated content publisher"
       ]
     },
     {
@@ -646,7 +813,8 @@
         "custom HouseOperations scope and owner-alert policy",
         "custom SkyeBox custody and handoff policy",
         "custom ConnectLog/Relay13 deployment architecture",
-        "managed Relay13 workspace, domain, API-key, widget, and live-proof rollout"
+        "managed Relay13 workspace, domain, API-key, widget, and live-proof rollout",
+        "Skye Content Forge Free99 gated content publisher"
       ],
       "setup_lookup_key": "metraiyux_enterprise_setup"
     },
@@ -669,7 +837,8 @@
         "custom gate policy",
         "HouseOperations/SkyeBox policy",
         "ConnectLog/Relay13 architecture",
-        "live-proof handoff"
+        "live-proof handoff",
+        "Skye Content Forge Free99 gated content publisher"
       ]
     },
     {

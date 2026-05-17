@@ -204,7 +204,7 @@ async function main() {
     report.checks.productionStatus = {
       ok: statusResponse.ok() &&
         statusJson?.ok === true &&
-        ["checkout_created", "paid_pending_owner_approval"].includes(statusJson?.order?.approval_status),
+        ["checkout_created", "auto_unlock_after_confirmed_payment", "payment_confirmed", "approved"].includes(statusJson?.order?.approval_status),
       status: statusResponse.status(),
       approvalStatus: statusJson?.order?.approval_status || null,
       paymentStatus: statusJson?.order?.payment_status || null,

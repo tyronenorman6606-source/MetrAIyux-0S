@@ -3357,62 +3357,37 @@ html {
   z-index: 2;
 }
 
-.worldskin-entity-aura,
-.worldskin-entity-aura span {
+.worldskin-orbit::before,
+.worldskin-orbit::after {
+  content: "";
   position: absolute;
-  display: block;
+  inset: -11%;
+  z-index: 0;
   border-radius: 50%;
   pointer-events: none;
-}
-
-.worldskin-entity-aura {
-  inset: -34%;
-  z-index: 0;
-  isolation: isolate;
   mix-blend-mode: screen;
-  opacity: 0.62;
-  filter: saturate(1.18);
-  animation: worldEntityAura 5.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-.worldskin-entity-aura span {
-  inset: 0;
+.worldskin-orbit::before {
+  border: 1px solid rgba(var(--entity-neon-a), 0.24);
+  box-shadow:
+    0 0 32px rgba(var(--entity-neon-a), 0.26),
+    0 0 74px rgba(var(--entity-neon-c), 0.16),
+    inset 0 0 30px rgba(var(--entity-neon-b), 0.08);
+  opacity: 0.66;
+  filter: blur(0.2px) saturate(1.24);
+  animation: worldAuraBreath 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-.worldskin-entity-aura__shell {
-  inset: 0;
+.worldskin-orbit::after {
+  inset: -18%;
   background:
-    radial-gradient(circle at 18% 43%, rgba(var(--entity-neon-a), 0.52) 0 4%, rgba(var(--entity-neon-a), 0.18) 12%, transparent 26%),
-    radial-gradient(circle at 84% 57%, rgba(var(--entity-neon-c), 0.48) 0 4%, rgba(var(--entity-neon-c), 0.16) 13%, transparent 27%),
-    radial-gradient(circle at 52% 9%, rgba(var(--entity-neon-b), 0.4) 0 3%, rgba(var(--entity-neon-b), 0.14) 11%, transparent 24%),
-    radial-gradient(circle at 55% 94%, rgba(var(--entity-neon-a), 0.34) 0 3%, rgba(var(--entity-neon-a), 0.12) 12%, transparent 25%);
-  filter: blur(28px) saturate(1.48);
-  opacity: 0.8;
-  animation: worldEntityNeonShift 8.5s linear infinite;
-}
-
-.worldskin-entity-aura__voice {
-  inset: 9%;
-  border: 1px solid rgba(var(--entity-neon-a), 0.1);
-  background:
-    repeating-conic-gradient(from 0deg, rgba(var(--entity-neon-a), 0.2) 0deg 0.9deg, transparent 0.9deg 15deg),
-    radial-gradient(circle, transparent 0 68%, rgba(var(--entity-neon-b), 0.1) 72%, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle, transparent 0 68%, #000 74%, #000 77%, transparent 84%);
-  mask-image: radial-gradient(circle, transparent 0 68%, #000 74%, #000 77%, transparent 84%);
-  opacity: 0.1;
-  filter: blur(0.3px);
-  animation: worldEntityVoice 11s linear infinite;
-}
-
-.worldskin-entity-aura__sweep {
-  inset: 0;
-  background:
-    conic-gradient(from -35deg, transparent 0 70%, rgba(255, 255, 255, 0.2) 74%, rgba(var(--entity-neon-c), 0.2) 79%, transparent 86% 100%);
-  -webkit-mask-image: radial-gradient(circle, transparent 0 60%, #000 72%, transparent 88%);
-  mask-image: radial-gradient(circle, transparent 0 60%, #000 72%, transparent 88%);
-  opacity: 0.06;
-  filter: blur(1.4px);
-  animation: worldEntitySweep 7.4s linear infinite;
+    conic-gradient(from 90deg, transparent 0 12%, rgba(var(--entity-neon-a), 0.18) 18%, transparent 27% 54%, rgba(var(--entity-neon-c), 0.14) 66%, transparent 77% 100%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 65%, #000 73%, transparent 81%);
+  mask-image: radial-gradient(circle, transparent 0 65%, #000 73%, transparent 81%);
+  opacity: 0.38;
+  filter: blur(7px) saturate(1.36);
+  animation: worldAuraSweep 8.5s linear infinite;
 }
 
 .worldskin-pulse-field {
@@ -3431,7 +3406,7 @@ html {
   height: calc(var(--globe-size) * 0.72);
   translate: -50% -50%;
   border-radius: 999px;
-  background: linear-gradient(180deg, transparent, rgba(var(--entity-neon-a), 0.28), rgba(var(--entity-neon-b), 0.18), transparent);
+  background: linear-gradient(180deg, transparent, rgba(var(--worldskin-cyan), 0.28), rgba(var(--worldskin-gold), 0.18), transparent);
   opacity: 0.1;
   rotate: var(--vein-tilt, 0deg);
   animation: worldskinVein 5.8s ease-in-out infinite;
@@ -3453,26 +3428,26 @@ html {
   animation-duration: 3.8s;
 }
 
-.worldskin-scene[data-brain="overearth"] .worldskin-entity-aura {
-  opacity: 0.72;
-}
-
-.worldskin-scene[data-voice="listening"] .worldskin-entity-aura__voice,
-.worldskin-scene[data-thinking="true"] .worldskin-entity-aura__voice {
-  opacity: 0.36;
-  animation-duration: 4.6s;
-}
-
-.worldskin-scene[data-voice="speaking"] .worldskin-entity-aura,
-.worldskin-scene[data-thinking="true"] .worldskin-entity-aura {
+.worldskin-scene[data-brain="overearth"] .worldskin-orbit::before {
   opacity: 0.82;
-  animation-duration: 3.2s;
 }
 
-.worldskin-scene[data-voice="speaking"] .worldskin-entity-aura__sweep,
-.worldskin-scene[data-thinking="true"] .worldskin-entity-aura__sweep {
-  opacity: 0.26;
-  animation-duration: 3.4s;
+.worldskin-scene[data-voice="listening"] .worldskin-orbit::before,
+.worldskin-scene[data-voice="speaking"] .worldskin-orbit::before,
+.worldskin-scene[data-thinking="true"] .worldskin-orbit::before {
+  opacity: 0.94;
+  box-shadow:
+    0 0 42px rgba(var(--entity-neon-a), 0.34),
+    0 0 92px rgba(var(--entity-neon-c), 0.22),
+    inset 0 0 36px rgba(var(--entity-neon-b), 0.1);
+  animation-duration: 2.8s;
+}
+
+.worldskin-scene[data-voice="listening"] .worldskin-orbit::after,
+.worldskin-scene[data-voice="speaking"] .worldskin-orbit::after,
+.worldskin-scene[data-thinking="true"] .worldskin-orbit::after {
+  opacity: 0.58;
+  animation-duration: 4.2s;
 }
 
 .worldskin-scene[data-voice="speaking"] .worldskin-pulse-field span,
@@ -4945,27 +4920,14 @@ html {
   to { rotate: 360deg; opacity: 0.4; }
 }
 
-@keyframes worldEntityAura {
-  0%, 100% { scale: 0.96; opacity: 0.68; }
-  45% { scale: 1.045; opacity: 0.98; }
-  68% { scale: 1.015; opacity: 0.82; }
+@keyframes worldAuraBreath {
+  0%, 100% { scale: 0.98; opacity: 0.56; }
+  50% { scale: 1.04; opacity: 0.92; }
 }
 
-@keyframes worldEntityVoice {
+@keyframes worldAuraSweep {
   from { rotate: 0deg; }
   to { rotate: 360deg; }
-}
-
-@keyframes worldEntitySweep {
-  from { rotate: -10deg; }
-  to { rotate: 350deg; }
-}
-
-@keyframes worldEntityNeonShift {
-  0% { filter: blur(28px) saturate(1.42) hue-rotate(0deg); }
-  33% { filter: blur(31px) saturate(1.62) hue-rotate(42deg); }
-  66% { filter: blur(28px) saturate(1.5) hue-rotate(-34deg); }
-  100% { filter: blur(28px) saturate(1.42) hue-rotate(0deg); }
 }
 
 @keyframes worldskinVein {
@@ -5410,3 +5372,69 @@ html {
     display: none;
   }
 }
+
+/* BEGIN quantumskyes:skyesol-living-background-css */
+.skyesol-living-field {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.skyesol-grain,
+.skyesol-scanline {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.skyesol-grain {
+  z-index: -1;
+  opacity: .1;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E");
+}
+
+.skyesol-scanline {
+  z-index: 10;
+  opacity: .045;
+  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.22), rgba(255,255,255,.22) 1px, transparent 1px, transparent 6px);
+}
+
+.skyesol-living-page {
+  background:
+    linear-gradient(180deg, rgba(5,5,11,.94), rgba(3,3,7,.98)),
+    radial-gradient(1200px 760px at 14% 4%, rgba(138,99,255,.2), transparent 58%),
+    radial-gradient(1100px 760px at 82% 16%, rgba(39,242,255,.12), transparent 58%),
+    radial-gradient(900px 660px at 55% 92%, rgba(201,168,76,.12), transparent 60%);
+}
+
+.skyesol-living-page.motion-paused *,
+.skyesol-living-page.motion-paused *::before,
+.skyesol-living-page.motion-paused *::after {
+  animation-play-state: paused !important;
+  transition-duration: .01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 760px) {
+  .skyesol-scanline {
+    opacity: .028;
+  }
+
+  .skyesol-grain {
+    opacity: .065;
+  }
+}
+/* END quantumskyes:skyesol-living-background-css */
+
+/* BEGIN quantumskyes:premium-text-effects-css */
+.neon-gradient-text,.premium-text-effects-lab,.skye-gradient-text{
+  color:transparent;
+  background:linear-gradient(90deg,#fff 0%,var(--mcp-neon-scrollbar-a,#f3d483) 31%,var(--mcp-neon-scrollbar-b,#35b7ff) 63%,var(--mcp-neon-scrollbar-c,#6ff2c7) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  text-shadow:0 0 28px rgba(53,183,255,.18),0 0 34px rgba(243,212,131,.12);
+}
+/* END quantumskyes:premium-text-effects-css */

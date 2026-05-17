@@ -73,7 +73,8 @@
     ],
     proofEvents: [
       { id: "event-seed", type: "field_booted", category: "local", detail: "Neo-front profit field initialized with local starter packs.", createdAt: new Date().toISOString() }
-    ]
+    ],
+    closeBriefs: []
   });
 
   let state = loadState();
@@ -89,7 +90,8 @@
         ...parsed,
         splits: { ...Object.fromEntries(splitDefaults), ...(parsed.splits || {}) },
         packs: parsed.packs,
-        proofEvents: Array.isArray(parsed.proofEvents) ? parsed.proofEvents : []
+        proofEvents: Array.isArray(parsed.proofEvents) ? parsed.proofEvents : [],
+        closeBriefs: Array.isArray(parsed.closeBriefs) ? parsed.closeBriefs : []
       };
     } catch {
       return defaultState();
@@ -114,12 +116,72 @@
     return state.packs.find((pack) => pack.id === state.selectedId) || state.packs[0] || null;
   }
 
+  function grossProfit(pack) {
+    return Number(pack?.revenue || 0) - Number(pack?.cost || 0);
+  }
+
+  function expectedProfit(pack) {
+    return grossProfit(pack) * (Number(pack?.chance || 0) / 100);
+  }
+
+  function packMargin(pack) {
+    const revenue = Number(pack?.revenue || 0);
+    return revenue ? (grossProfit(pack) / revenue) * 100 : 0;
+  }
+
+  function paybackMultiple(pack) {
+    const cost = Number(pack?.cost || 0);
+    const revenue = Number(pack?.revenue || 0);
+    if (cost <= 0) return revenue > 0 ? 99 : 0;
+    return revenue / cost;
+  }
+
+  function packRiskFlags(pack) {
+    const flags = [];
+    const margin = packMargin(pack);
+    const chance = Number(pack?.chance || 0);
+    if (grossProfit(pack) <= 0) flags.push("direct cost is eating the offer");
+    if (margin < 40) flags.push("margin under 40%");
+    if (chance < 50) flags.push("close confidence under 50%");
+    if (pack?.status === "blocked") flags.push("blocked lane needs owner review");
+    if (!String(pack?.owner || "").trim()) flags.push("owner missing");
+    if (!String(pack?.notes || "").trim()) flags.push("next-step notes missing");
+    return flags.length ? flags.slice(0, 4) : ["clean enough to move"];
+  }
+
+  function nextMoneyMove(pack) {
+    const margin = packMargin(pack);
+    const chance = Number(pack?.chance || 0);
+    if (grossProfit(pack) <= 0 || margin < 25) return "reprice before close";
+    if (pack?.status === "blocked") return "clear blocker";
+    if (chance >= 70 && ["ready", "approved"].includes(pack?.status)) return "ask for the close";
+    if (chance < 50) return "tighten proof and decision criteria";
+    if (margin < 45) return "protect margin";
+    if (pack?.status === "draft") return "shape offer";
+    return "advance to execution";
+  }
+
+  function packScore(pack) {
+    const urgency = ["approved", "ready"].includes(pack?.status) ? 1.22 : pack?.status === "blocked" ? 0.58 : 1;
+    const marginBoost = clamp(packMargin(pack), -20, 90) / 100;
+    const heatBoost = clamp(Number(pack?.heat || 0), 0, 100) / 100;
+    return Math.max(0, expectedProfit(pack)) * urgency * (1 + marginBoost * 0.34 + heatBoost * 0.22);
+  }
+
   function metrics() {
     const totalRevenue = state.packs.reduce((sum, pack) => sum + Number(pack.revenue || 0), 0);
     const totalCost = state.packs.reduce((sum, pack) => sum + Number(pack.cost || 0), 0);
-    const expected = state.packs.reduce((sum, pack) => sum + ((Number(pack.revenue || 0) - Number(pack.cost || 0)) * (Number(pack.chance || 0) / 100)), 0);
+    const expected = state.packs.reduce((sum, pack) => sum + expectedProfit(pack), 0);
     const margin = totalRevenue ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0;
-    return { totalRevenue, totalCost, expected, margin };
+    const cashNow = state.packs
+      .filter((pack) => ["ready", "approved", "dispatched"].includes(pack.status) && grossProfit(pack) > 0)
+      .sort((a, b) => packScore(b) - packScore(a))
+      .slice(0, 3)
+      .reduce((sum, pack) => sum + expectedProfit(pack), 0);
+    const blockedMargin = state.packs
+      .filter((pack) => pack.status === "blocked" || grossProfit(pack) <= 0 || Number(pack.chance || 0) < 45)
+      .reduce((sum, pack) => sum + Math.max(grossProfit(pack), 0), 0);
+    return { totalRevenue, totalCost, expected, margin, cashNow, blockedMargin };
   }
 
   function renderMetrics() {
@@ -283,10 +345,81 @@
     orb.classList.toggle("offline", !state.runtime.online);
     label.textContent = state.runtime.online ? "Runtime live" : "Local app";
     if (state.runtime.counts) {
-      counts.textContent = `${state.runtime.counts.review_pack_count || 0} review · ${state.runtime.counts.execution_item_count || 0} execution · ${state.runtime.counts.dispatch_item_count || 0} dispatch`;
+      counts.textContent = `${state.runtime.counts.review_pack_count || 0} review · ${state.runtime.counts.close_brief_count || 0} brief · ${state.runtime.counts.execution_item_count || 0} execution · ${state.runtime.counts.dispatch_item_count || 0} dispatch`;
     } else {
       counts.textContent = state.runtime.online ? "runtime connected" : "runtime unchecked";
     }
+  }
+
+  function moneyBoard() {
+    const items = state.packs.map((pack) => ({
+      pack,
+      gross: grossProfit(pack),
+      expected: expectedProfit(pack),
+      margin: packMargin(pack),
+      multiple: paybackMultiple(pack),
+      move: nextMoneyMove(pack),
+      score: packScore(pack),
+      risks: packRiskFlags(pack)
+    })).sort((a, b) => b.score - a.score);
+    const selected = selectedPack();
+    const fastest = items.find((item) => ["ready", "approved"].includes(item.pack.status) && item.gross > 0) || items[0] || null;
+    return {
+      items,
+      selected,
+      fastest,
+      metrics: metrics(),
+      lastBrief: state.closeBriefs[0] || null
+    };
+  }
+
+  function renderMoney() {
+    const board = moneyBoard();
+    const fastest = board.fastest;
+    $("#moneyFastest").textContent = fastest ? money(fastest.expected) : "$0";
+    $("#moneyFastestLabel").textContent = fastest ? `${fastest.pack.label} · ${fastest.move}` : "Create a pack to rank fastest cash.";
+    $("#moneyCashNow").textContent = money(board.metrics.cashNow);
+    $("#moneyCashNowLabel").textContent = "Top ready or approved packs weighted by close odds.";
+    $("#moneyBlocked").textContent = money(board.metrics.blockedMargin);
+    $("#moneyBlockedLabel").textContent = "Gross margin trapped in blocked, weak, or underwater lanes.";
+    $("#moneyPayback").textContent = board.selected ? `${paybackMultiple(board.selected).toFixed(1)}x` : "0.0x";
+    $("#moneyPaybackLabel").textContent = board.selected ? `${board.selected.label} revenue over direct cost.` : "Select a pack to see payback.";
+
+    const moves = $("#moneyMoves");
+    if (!board.items.length) {
+      moves.innerHTML = `<div class="empty-state">No money moves yet.</div>`;
+    } else {
+      moves.innerHTML = board.items.slice(0, 4).map((item, index) => `
+        <button class="money-move${item.pack.id === state.selectedId ? " active" : ""}" type="button" data-id="${item.pack.id}">
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <b>${escapeHtml(item.pack.label)}</b>
+          <em>${escapeHtml(item.move)} · ${money(item.expected)} expected · ${Math.round(item.margin)}% margin</em>
+        </button>
+      `).join("");
+    }
+
+    const card = $("#closeBriefCard");
+    if (!board.lastBrief) {
+      card.innerHTML = `
+        <p class="microline">close brief</p>
+        <h3>No brief generated yet.</h3>
+        <p>Generate one from the selected pack to get the ask, next move, risk flags, split allocation, and runtime archive proof.</p>
+      `;
+      return;
+    }
+    const brief = board.lastBrief;
+    card.innerHTML = `
+      <p class="microline">latest close brief</p>
+      <h3>${escapeHtml(brief.label)}</h3>
+      <div class="brief-grid">
+        <div><span>Ask</span><b>${money(brief.ask)}</b></div>
+        <div><span>Expected</span><b>${money(brief.expectedProfit)}</b></div>
+        <div><span>Margin</span><b>${Math.round(Number(brief.margin || 0))}%</b></div>
+        <div><span>Payback</span><b>${Number(brief.paybackMultiple || 0).toFixed(1)}x</b></div>
+      </div>
+      <p>${escapeHtml(brief.action)} for ${escapeHtml(brief.target)}. Owner: ${escapeHtml(brief.owner)}. Decision deadline: ${escapeHtml(brief.deadline)}.</p>
+      <ul>${(brief.risks || []).map((risk) => `<li>${escapeHtml(risk)}</li>`).join("")}</ul>
+    `;
   }
 
   function renderAll() {
@@ -295,6 +428,7 @@
     renderConstellation();
     renderSplits();
     renderSelected();
+    renderMoney();
     renderLoom();
     renderProof();
     renderRuntime();
@@ -396,6 +530,50 @@
     renderAll();
   }
 
+  function buildCloseBrief(pack) {
+    const gross = grossProfit(pack);
+    const expected = expectedProfit(pack);
+    const margin = packMargin(pack);
+    const deadline = new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString().slice(0, 10);
+    const splitAllocation = Object.entries(state.splits).map(([name, percent]) => ({
+      name,
+      percent,
+      amount: Math.round(gross * (Number(percent || 0) / 100))
+    }));
+    return {
+      id: uid("brief"),
+      packId: pack.id,
+      label: pack.label,
+      target: pack.target,
+      owner: pack.owner || "profit-ops",
+      ask: Number(pack.revenue || 0),
+      directCost: Number(pack.cost || 0),
+      grossProfit: gross,
+      expectedProfit: expected,
+      margin,
+      paybackMultiple: paybackMultiple(pack),
+      confidence: Number(pack.chance || 0),
+      action: nextMoneyMove(pack),
+      deadline,
+      splitAllocation,
+      risks: packRiskFlags(pack),
+      notes: pack.notes || "",
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  function generateCloseBrief() {
+    const pack = selectedPack();
+    if (!pack) return;
+    const brief = buildCloseBrief(pack);
+    state.closeBriefs.unshift(brief);
+    state.closeBriefs = state.closeBriefs.slice(0, 24);
+    addProof("close_brief_generated", `${pack.label} close brief generated with ${money(brief.expectedProfit)} expected profit and ${Math.round(brief.margin)}% margin.`, "local");
+    saveState("brief generated");
+    renderAll();
+    pushCloseBriefToRuntime(brief);
+  }
+
   async function runtimeRequest(path, options = {}) {
     const response = await fetch(`${RUNTIME_BASE}${path}`, {
       headers: { "content-type": "application/json", ...(gate?.headers?.() || {}), ...(options.headers || {}) },
@@ -409,7 +587,7 @@
     try {
       const status = await runtimeRequest("/status");
       state.runtime = { online: true, counts: status, lastSync: new Date().toISOString() };
-      addProof("runtime_sync", `Runtime connected: ${status.review_pack_count} review packs, ${status.execution_item_count} execution items, ${status.dispatch_item_count} dispatch items.`, "runtime");
+      addProof("runtime_sync", `Runtime connected: ${status.review_pack_count} review packs, ${status.close_brief_count || 0} close briefs, ${status.execution_item_count} execution items, ${status.dispatch_item_count} dispatch items.`, "runtime");
       saveState("runtime synced");
     } catch (error) {
       state.runtime = { online: false, counts: null, lastSync: new Date().toISOString() };
@@ -417,6 +595,24 @@
       saveState("runtime offline");
     }
     renderAll();
+  }
+
+  async function pushCloseBriefToRuntime(brief) {
+    try {
+      const payload = await runtimeRequest("/close-briefs", {
+        method: "POST",
+        body: JSON.stringify(brief)
+      });
+      state.closeBriefs = state.closeBriefs.map((item) => item.id === brief.id ? { ...item, runtimeId: payload.close_brief?.id } : item);
+      state.runtime.online = true;
+      addProof("runtime_close_brief_archived", `${brief.label} close brief was archived into the same-folder runtime.`, "runtime");
+      saveState("brief archived");
+      await syncRuntime();
+    } catch (error) {
+      addProof("runtime_close_brief_skipped", `${brief.label} close brief stayed local because runtime was unavailable: ${error.message}.`, "runtime");
+      saveState("brief local");
+      renderAll();
+    }
   }
 
   async function pushPackToRuntime(pack) {
@@ -579,6 +775,7 @@
     $("#syncRuntime").addEventListener("click", syncRuntime);
     $("#normalizeSplits").addEventListener("click", normalizeSplits);
     $("#createReviewPack").addEventListener("click", () => $("#packForm").requestSubmit());
+    $("#generateCloseBrief").addEventListener("click", generateCloseBrief);
     $("#packChance").addEventListener("input", (event) => { $("#chanceValue").textContent = `${event.target.value}%`; });
 
     $("#constellationNodes").addEventListener("click", (event) => {
@@ -594,6 +791,14 @@
       if (!card) return;
       state.selectedId = card.dataset.id;
       saveState("selected");
+      renderAll();
+    });
+
+    $("#moneyMoves").addEventListener("click", (event) => {
+      const move = event.target.closest(".money-move");
+      if (!move) return;
+      state.selectedId = move.dataset.id;
+      saveState("money move selected");
       renderAll();
     });
 

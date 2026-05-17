@@ -48,14 +48,14 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 10,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "deferred_owner_approval",
+    setup_handling: "auto_unlock_after_confirmed_payment",
     storefront: true,
     badge: "7-day trial",
     includes: [
       "Client workspace",
       "Private app closeout",
       "Basic AI command routing",
-      "Owner-approved activation"
+      "Automatic activation after confirmed payment"
     ],
     gate_policy: {
       monthly_cap_cents: 25000,
@@ -78,14 +78,14 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 20,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "deferred_owner_approval",
+    setup_handling: "auto_unlock_after_confirmed_payment",
     storefront: true,
     badge: "Growth lane",
     includes: [
       "Recurring workflow routing",
       "Proof exports",
       "Weekly operating rhythm",
-      "Owner-approved activation"
+      "Automatic activation after confirmed payment"
     ],
     gate_policy: {
       monthly_cap_cents: 75000,
@@ -107,9 +107,9 @@ const SKYPAY_OFFER_ENRICHMENTS = {
   "metraiyux-houseoperations-command": {
     store_category: "Client app subscriptions",
     store_rank: 22,
-    trial_days: DEFAULT_TRIAL_DAYS,
-    zero_upfront_trial: true,
-    setup_handling: "deferred_owner_approval",
+    trial_days: 0,
+    zero_upfront_trial: false,
+    setup_handling: "owner_approved_after_houseops_payment",
     storefront: true,
     badge: "HouseOps lane",
     includes: [
@@ -172,7 +172,7 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 25,
     trial_days: 0,
     zero_upfront_trial: false,
-    setup_handling: "owner_approved_after_route_scope",
+    setup_handling: "auto_unlock_after_confirmed_payment",
     storefront: true,
     badge: "Workforce lane",
     includes: [
@@ -180,7 +180,7 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       "V83 routed shell",
       "Provider jobs and applicant pools",
       "Contractor assignments and proof",
-      "Owner-approved activation"
+      "Automatic activation after confirmed payment"
     ],
     gate_policy: {
       monthly_cap_cents: 100000,
@@ -204,7 +204,7 @@ const SKYPAY_OFFER_ENRICHMENTS = {
     store_rank: 30,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
-    setup_handling: "deferred_owner_approval",
+    setup_handling: "auto_unlock_after_confirmed_payment",
     storefront: true,
     badge: "Full office",
     includes: [
@@ -556,6 +556,106 @@ const SKYEMUSICNEXUS_OFFERS = [
     activation_path: "paid_pending_owner_approval"
   },
   {
+    id: "skyemusicnexus-social-caption-pack",
+    plan_name: "skyemusicnexus-social-caption-pack",
+    title: "SkyeMusicNexus Social Caption Pack",
+    family: "skyemusicnexus",
+    description: "Caption angles, posting prompts, and lightweight social copy for one release or artist milestone.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["skyemusicnexus_social_caption_pack"],
+    line_items: [{ id: "social-caption-pack", name: "SkyeMusicNexus Social Caption Pack", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_social_caption_pack" }],
+    store_category: "Music content",
+    store_rank: 42,
+    badge: "Captions",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Caption angles", "Posting prompts", "Release or milestone focus", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "skyemusicnexus-cover-canvas-request",
+    plan_name: "skyemusicnexus-cover-canvas-request",
+    title: "SkyeMusicNexus Cover / Canvas Request",
+    family: "skyemusicnexus",
+    description: "A gated creative request for cover direction, canvas notes, and proof-safe asset handoff.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["skyemusicnexus_cover_canvas_request"],
+    line_items: [{ id: "cover-canvas-request", name: "SkyeMusicNexus Cover / Canvas Request", amount_cents: cents(199), type: "one_time", lookup_key: "skyemusicnexus_cover_canvas_request" }],
+    store_category: "Music content",
+    store_rank: 43,
+    badge: "Cover canvas",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Cover direction", "Canvas notes", "Asset handoff", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "skyemusicnexus-short-form-clip-brief",
+    plan_name: "skyemusicnexus-short-form-clip-brief",
+    title: "SkyeMusicNexus Short-Form Clip Brief",
+    family: "skyemusicnexus",
+    description: "Hooks, shot list, caption angle, and creator handoff for a short-form release push.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["skyemusicnexus_short_form_clip_brief"],
+    line_items: [{ id: "short-form-clip-brief", name: "SkyeMusicNexus Short-Form Clip Brief", amount_cents: cents(249), type: "one_time", lookup_key: "skyemusicnexus_short_form_clip_brief" }],
+    store_category: "Music content",
+    store_rank: 44,
+    badge: "Short form",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Short-form hooks", "Shot list", "Caption angle", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "skyemusicnexus-release-content-kit",
+    plan_name: "skyemusicnexus-release-content-kit",
+    title: "SkyeMusicNexus Release Content Kit",
+    family: "skyemusicnexus",
+    description: "Captions, short-form hooks, asset requests, and release runway tasks generated from the gated exchange.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["skyemusicnexus_release_content_kit"],
+    line_items: [{ id: "release-content-kit", name: "SkyeMusicNexus Release Content Kit", amount_cents: cents(499), type: "one_time", lookup_key: "skyemusicnexus_release_content_kit" }],
+    store_category: "Music content",
+    store_rank: 45,
+    badge: "Content kit",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Captions", "Short-form hooks", "Asset requests", "Release runway tasks", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "skyemusicnexus-community-campaign-sprint",
+    plan_name: "skyemusicnexus-community-campaign-sprint",
+    title: "SkyeMusicNexus Community Campaign Sprint",
+    family: "skyemusicnexus",
+    description: "Exchange-led release campaign with community prompts, inbox coordination, content runway, and proof receipt.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["skyemusicnexus_community_campaign_sprint"],
+    line_items: [{ id: "community-campaign-sprint", name: "SkyeMusicNexus Community Campaign Sprint", amount_cents: cents(899), type: "one_time", lookup_key: "skyemusicnexus_community_campaign_sprint" }],
+    store_category: "Music content",
+    store_rank: 46,
+    badge: "Campaign",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Community prompts", "Inbox coordination", "Content runway", "Proof receipt", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
     id: "skyemusicnexus-extra-artist-seat",
     plan_name: "skyemusicnexus-extra-artist-seat",
     title: "SkyeMusicNexus Extra Artist Seat",
@@ -847,8 +947,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "metraiyux_enterprise_monthly"
       }
     ],
-    owner_approval_required: true,
-    activation_path: "owner_approved_after_scope_review"
+    owner_approval_required: false,
+    activation_path: "auto_unlock_after_confirmed_payment"
   },
   ...SKYEMUSICNEXUS_OFFERS,
   {
@@ -1125,11 +1225,11 @@ export const SKYPAY_CLIENTS = {
     free_trial_days: 7,
     included_usage: [
       "Private app preview closeout",
-      "Owner-approved workspace activation after confirmed Stripe payment",
+      "Automatic workspace activation after confirmed Stripe payment",
       "Workspace handoff after SkyePay closeout",
       "FS27 order, usage, and activation ledger"
     ],
-    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 plan policy and holds activation for owner approval.",
+    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 plan policy and unlocks the workspace automatically.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -1148,9 +1248,9 @@ export const SKYPAY_CLIENTS = {
       "7 app scans",
       "25 SkyePay and MetrAIyux commands",
       "PWA, QR, SEO, media, link, and copy checks",
-      "Owner-approved workspace activation after confirmed Stripe payment"
+      "Automatic workspace activation after confirmed Stripe payment"
     ],
-    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order and waits for owner-approved activation; discounts still require an approved quote.",
+    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order and unlocks the workspace automatically; discounts still require an approved quote.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -1182,7 +1282,7 @@ export const SKYPAY_PLATFORM_ROUTES = [
     route: "/skyepay.html?client=bobs-smoke-shop",
     default_offer_id: "metraiyux-starter-command",
     wiring_status: "client_preview_ready",
-    note: "First client lane wired into SkyePay with free preview, owner-approved paid activation, and usage language."
+    note: "First client lane wired into SkyePay with free preview, automatic paid activation, and usage language."
   },
   {
     platform_id: "repo-platforms-next",
@@ -1221,10 +1321,10 @@ export function getSkyePayClient(slug) {
     free_trial_days: 7,
     included_usage: [
       "Private app preview",
-      "Owner-approved workspace activation after confirmed Stripe payment",
+      "Automatic workspace activation after confirmed Stripe payment",
       "Workspace handoff after closeout"
     ],
-    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then the workspace waits for owner-approved activation after Stripe confirms the transaction.",
+    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then the workspace unlocks automatically after Stripe confirms the transaction.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",

@@ -143,7 +143,7 @@ h1 { margin: 0; max-width: 980px; font-size: clamp(2.5rem, 6vw, 6.8rem); line-he
 .shard-cell { background: linear-gradient(145deg, rgba(39,245,231,.1), rgba(255,255,255,.025)); }
 
 .neo-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(340px, .8fr); gap: 16px; align-items: start; }
-.profit-field-panel, .reactor-panel, .forge-panel, .selected-panel, .lane-loom, .proof-spine {
+.profit-field-panel, .reactor-panel, .forge-panel, .selected-panel, .money-panel, .lane-loom, .proof-spine {
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: var(--shadow);
@@ -151,7 +151,7 @@ h1 { margin: 0; max-width: 980px; font-size: clamp(2.5rem, 6vw, 6.8rem); line-he
   position: relative;
   overflow: hidden;
 }
-.profit-field-panel::before, .reactor-panel::before, .forge-panel::before, .selected-panel::before, .lane-loom::before, .proof-spine::before { content:""; position:absolute; inset:0; background: linear-gradient(135deg, rgba(255,255,255,.055), transparent 45%); pointer-events:none; }
+.profit-field-panel::before, .reactor-panel::before, .forge-panel::before, .selected-panel::before, .money-panel::before, .lane-loom::before, .proof-spine::before { content:""; position:absolute; inset:0; background: linear-gradient(135deg, rgba(255,255,255,.055), transparent 45%); pointer-events:none; }
 .panel-crown { display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 18px 18px 10px; position: relative; z-index: 2; }
 .panel-crown.compact { padding-bottom: 6px; }
 h2 { margin:0; font-size: clamp(1.45rem, 2vw, 2.6rem); text-transform: uppercase; letter-spacing: -.04em; }
@@ -208,6 +208,28 @@ h2 { margin:0; font-size: clamp(1.45rem, 2vw, 2.6rem); text-transform: uppercase
 .specimen-grid span { display:block; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.1em; }
 .specimen-grid b { display:block; margin-top:5px; color:var(--gold); font-size:18px; }
 .card-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+
+.money-panel { grid-column: 1 / -1; }
+.money-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:10px; padding: 0 14px 14px; position:relative; z-index:2; }
+.money-grid article { min-height: 118px; border:1px solid rgba(255,255,255,.12); background: linear-gradient(145deg, rgba(39,245,231,.075), rgba(255,255,255,.035)); padding:14px; clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%); }
+.money-grid span, .money-grid em { display:block; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.1em; font-style:normal; line-height:1.35; }
+.money-grid strong { display:block; margin:9px 0 7px; color:var(--gold); font-size: clamp(1.9rem, 3.2vw, 3.7rem); line-height:.92; letter-spacing:0; overflow-wrap:anywhere; }
+.money-workbench { display:grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap:12px; padding:0 14px 16px; position:relative; z-index:2; }
+.money-moves { display:grid; gap:10px; }
+.money-move { display:grid; grid-template-columns: 44px minmax(0, 1fr); gap:8px 12px; align-items:start; width:100%; min-height:76px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.22); color:var(--text); padding:12px; text-align:left; cursor:pointer; clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); transition:.18s ease; }
+.money-move:hover, .money-move.active { transform: translateY(-2px); border-color: rgba(255,216,94,.56); background: rgba(255,216,94,.075); }
+.money-move span { grid-row: span 2; display:grid; place-items:center; width:34px; height:34px; border:1px solid rgba(255,216,94,.32); color:var(--gold); font-size:12px; font-weight:900; }
+.money-move b { display:block; min-width:0; overflow-wrap:anywhere; }
+.money-move em { display:block; color:var(--muted); font-size:12px; line-height:1.35; font-style:normal; overflow-wrap:anywhere; }
+.close-brief-card { min-height: 100%; border:1px solid rgba(255,216,94,.2); background: radial-gradient(circle at 100% 0, rgba(255,216,94,.12), transparent 46%), rgba(0,0,0,.22); padding:16px; clip-path: var(--sharp); }
+.close-brief-card h3 { margin:0 0 8px; font-size: clamp(1.2rem, 1.8vw, 1.9rem); line-height:1.05; overflow-wrap:anywhere; }
+.close-brief-card p { color:var(--muted); line-height:1.5; }
+.close-brief-card ul { display:grid; gap:7px; margin:12px 0 0; padding:0; list-style:none; }
+.close-brief-card li { color:var(--text); border-left:3px solid var(--gold); padding-left:9px; font-size:13px; line-height:1.35; }
+.brief-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:8px; margin: 12px 0; }
+.brief-grid div { border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.055); padding:9px; }
+.brief-grid span { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.1em; }
+.brief-grid b { display:block; margin-top:4px; color:var(--gold); overflow-wrap:anywhere; }
 
 .lane-loom { grid-column: 1 / 2; }
 .loom-columns { display:grid; grid-template-columns: repeat(5, minmax(165px, 1fr)); gap:10px; padding:0 14px 16px; position:relative; z-index:2; }
@@ -330,6 +352,8 @@ body[data-page="dashboard.html"] .jump-ribbon::after { content:"dashboard name k
   .neo-grid { grid-template-columns: 1fr; }
   .forge-panel, .lane-loom { grid-column: auto; }
   .metric-storm { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .money-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .money-workbench { grid-template-columns: 1fr; }
   .reactor-panel, .selected-panel { min-height: auto; }
 }
 @media (max-width: 860px) {
@@ -340,9 +364,11 @@ body[data-page="dashboard.html"] .jump-ribbon::after { content:"dashboard name k
   .hero-fracture { grid-template-columns: 1fr; padding: 18px; }
   .hero-copy, .hero-actions, .lede { width: 100%; max-width: 100%; min-width: 0; }
   .metric-storm { grid-template-columns: 1fr; }
+  .money-grid { grid-template-columns: 1fr; }
   .forge-form { grid-template-columns: 1fr; }
   .wide-field { grid-column: auto; }
   .loom-columns { grid-template-columns: 1fr; }
+  .brief-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field-node { width: 98px; min-height: 70px; }
   .field-stage { height: clamp(430px, 110vw, 560px); }
   .field-core { width: 118px; height: 118px; }
