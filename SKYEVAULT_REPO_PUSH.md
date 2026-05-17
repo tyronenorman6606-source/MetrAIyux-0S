@@ -22,6 +22,16 @@ Required local env values:
 
 Important local capacity note: SkyeVault can store large remote archives, but an IDE/CDE still has its own local scratch disk. This tool keeps bulky transient packaging work off the repo volume by default so a small Codespace disk does not limit vault storage.
 
+For a clone-capable repo restore pack, use the Git vault lane:
+
+```bash
+npm run vault:git:dry-run
+npm run vault:git:push
+npm run vault:git:restore -- --restore=/path/to/MetrAIyux-0S-git-vault.zip --to=/path/to/restored-repo
+```
+
+That pack includes a `git bundle` for history/branches/tags, a sanitized working tree overlay for safe dirty workspace state, `manifest.json`, and `neural-map.json`. See `docs/SKYEVAULT_GIT_VAULT_LANE.md`.
+
 For a client-owned vault, set these in that client's repo or shell:
 
 ```bash
