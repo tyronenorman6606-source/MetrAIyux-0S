@@ -8,19 +8,19 @@ function stableId(value){ return crypto.createHash('sha256').update(JSON.stringi
 
 export const OWNER_MESSAGE_TEMPLATES = {
   claim_invite:{
-    subject:'Your business is listed on PHX Verified',
+    subject:'Your business is listed on Valley Verified',
     channel:'email',
-    body:`Hi {{owner_name}},\n\nWe built PHX Verified as a verified Arizona business/service network. Your listing for {{business_name}} is present from public business-license/marketplace seed data.\n\nYou can claim it, correct details, add your website/contact info, and choose whether you want exposure products or quote-routing later.\n\nNo account changes go live without review.\n\n— PHX Verified Network`
+    body:`Hi {{owner_name}},\n\nWe built Valley Verified as an Arizona business visibility network. Your free public landing for {{business_name}} is present from public business-license/marketplace seed data or a reviewed customer posting credit.\n\nYou can claim it, correct details, add your website/contact info, and choose whether you want paid verification, featured placement, exposure products, or quote-routing later.\n\nNo account changes go live without review.\n\n— Valley Verified Network`
   },
   quote_handoff:{
     subject:'Quote opportunity for {{business_name}}',
     channel:'email',
-    body:`Hi {{owner_name}},\n\nA buyer is looking for {{category}} help in {{city}}. Your listing matched the request because of city/category/contact signals.\n\nLead ID: {{lead_id}}\nNeed: {{details}}\nTimeline: {{timeline}}\n\nReply with availability or update your listing so we can route better opportunities.\n\n— PHX Verified Network`
+    body:`Hi {{owner_name}},\n\nA buyer is looking for {{category}} help in {{city}}. Your listing matched the request because of city/category/contact signals.\n\nLead ID: {{lead_id}}\nNeed: {{details}}\nTimeline: {{timeline}}\n\nReply with availability or update your listing so we can route better opportunities.\n\n— Valley Verified Network`
   },
   cleanup_request:{
-    subject:'Help us clean up your PHX Verified listing',
+    subject:'Help us clean up your Valley Verified listing',
     channel:'email',
-    body:`Hi {{owner_name}},\n\nWe found your PHX Verified listing could use better details. Send us your best website, service area, preferred phone/email, and category so the listing is useful to buyers.\n\nBusiness: {{business_name}}\nCurrent category: {{category}}\n\n— PHX Verified Network`
+    body:`Hi {{owner_name}},\n\nWe found your Valley Verified listing could use better details. Send us your best website, service area, preferred phone/email, and category so the listing is useful to buyers.\n\nBusiness: {{business_name}}\nCurrent category: {{category}}\n\n— Valley Verified Network`
   }
 };
 

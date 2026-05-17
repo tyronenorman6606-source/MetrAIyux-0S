@@ -1,0 +1,30 @@
+name = "relay13-core"
+main = "src/index.js"
+compatibility_date = "2026-05-08"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+[vars]
+ALLOWED_ORIGINS = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev,https://metraiyux-0s-marketing.pages.dev,https://metraiyux-0s-public-spectacle.pages.dev,http://localhost:4173,http://127.0.0.1:4173,http://127.0.0.1:4175"
+BOOTSTRAP_WORKSPACE_SLUG = "connectlog-main"
+BOOTSTRAP_WORKSPACE_NAME = "ConnectLog Main"
+
+[[durable_objects.bindings]]
+name = "THREAD_ROOM"
+class_name = "ThreadRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ThreadRoom"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "metraiyux-site-operator-db"
+database_id = "5fd86765-4564-4076-b747-976dcbe9b64a"
+migrations_dir = "migrations"

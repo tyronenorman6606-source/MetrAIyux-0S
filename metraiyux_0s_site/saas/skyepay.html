@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SkyePay is the MetrAIyux 0S payment gateway for private previews, automatic unlock, and workspace activation.">
+  <meta name="description" content="SkyePay is the MetrAIyux 0S payment gateway for private previews, owner approval, and workspace activation.">
   <title>SkyePay Gateway - MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
@@ -37,12 +37,13 @@
       <p class="eyebrow">House payment gateway</p>
       <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
       <h1>SkyePay is how clients continue after preview.</h1>
-      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and activation unlocks automatically after Stripe confirms the SkyePay transaction.</p>
+      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and activation moves to paid-pending owner approval after Stripe confirms the SkyePay transaction. SkyeProfitConsole is Free99, meaning no charge, so it is shown here as gated access instead of a checkout offer.</p>
       <div class="button-row">
         <a class="button primary" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command">Open SkyePay</a>
         <a class="button" href="billing.html">Use Billing Form</a>
         <a class="button" href="https://skyesol.netlify.app/skyepay-api.html">API Docs</a>
         <a class="button" href="../operator/skye-crawler.html">Scanner Proof</a>
+        <a class="button" href="../live/skyeprofitconsole-profit-console.html">Free99 Profit Console</a>
       </div>
     </section>
 
@@ -55,8 +56,8 @@
           <p>After a private preview, clients continue through a named offer with visible setup, monthly price, included usage, request limits, and activation terms.</p>
         </article>
         <article class="saas-card">
-          <h3>Automatic unlock</h3>
-          <p>Confirmed Stripe payment automatically unlocks the managed workspace. FS27 writes the order, plan policy, and unlocked state onto the customer record.</p>
+          <h3>Owner approval gate</h3>
+          <p>Confirmed Stripe payment records the managed workspace as paid pending owner approval. FS27 writes the order, plan policy, and approval state onto the customer record.</p>
         </article>
         <article class="saas-card">
           <h3>Stripe backed</h3>
@@ -65,6 +66,10 @@
         <article class="saas-card">
           <h3>Callable API</h3>
           <p>Apps can call offers, checkout, and status routes directly through the SkyePay API contract and browser SDK; customer access still routes through FS27 limits.</p>
+        </article>
+        <article class="saas-card">
+          <h3>Free99 boundary</h3>
+          <p>SkyeProfitConsole is no charge and does not create a paid SkyePay product. It still requires a 0S or FS27 gate session before app boot and runtime actions.</p>
         </article>
       </div>
     </section>
@@ -84,28 +89,40 @@
 
     <section class="saas-grid">
       <article class="saas-card">
+        <p class="eyebrow">SkyeProfitConsole Free99</p>
+        <h3>$0 setup + $0/mo</h3>
+        <p>No charge profit console access for gated 0S users. Free99 means no charge, no paid checkout, and gate session required.</p>
+        <a class="saas-btn" href="../live/skyeprofitconsole-profit-console.html">Open Free99 hub</a>
+      </article>
+      <article class="saas-card">
         <p class="eyebrow">Starter Command</p>
-        <h3>$997 setup + $297/mo</h3>
-        <p>$250 monthly AI cap, 30 rpm, 600 requests/day, 2 devices/key, 1 workspace, 1GB vault, 250 files.</p>
+        <h3>$1,500 setup + $397/mo</h3>
+        <p>$250 monthly AI cap, 30 rpm, 600 requests/day, one ConnectLog seat, Relay13 source readiness, 1 workspace, 1GB vault, 250 files.</p>
         <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command">Continue through SkyePay</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Growth Cabinet</p>
-        <h3>$2,500 setup + $797/mo</h3>
-        <p>$750 monthly AI cap, 90 rpm, 2,500 requests/day, 5 devices/key, 3 workspaces, 5GB vault, 1,200 files.</p>
+        <h3>$3,500 setup + $997/mo</h3>
+        <p>$750 monthly AI cap, 90 rpm, 2,500 requests/day, three ConnectLog seats, one Relay13 workspace, 3 workspaces, 5GB vault, 1,200 files.</p>
         <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet">Continue through SkyePay</a>
       </article>
       <article class="saas-card">
+        <p class="eyebrow">RouteX Workforce Command</p>
+        <h3>$6,500 setup + $1,497/mo</h3>
+        <p>Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 job boards, applicant pools, assignments, route stops, proof vaults, market reports, export packets, 100,000 AI credits, 120 rpm, and V83 local runtime receipt review.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command">Open owner-approved SkyePay lane</a>
+      </article>
+      <article class="saas-card">
         <p class="eyebrow">Autonomous Office</p>
-        <h3>$5,000 setup + $1,497/mo</h3>
-        <p>$1,500 monthly AI cap, 180 rpm, 6,000 requests/day, 12 devices/key, 8 workspaces, 20GB vault, 5,000 files.</p>
+        <h3>$7,500 setup + $2,497/mo</h3>
+        <p>$1,500 monthly AI cap, 180 rpm, 6,000 requests/day, eight ConnectLog seats, three Relay13 workspaces, 8 workspaces, 20GB vault, 5,000 files.</p>
         <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office">Continue through SkyePay</a>
       </article>
       <article class="saas-card">
-        <p class="eyebrow">Managed Gate</p>
-        <h3>$12,500 setup + $1,250/mo</h3>
-        <p>$1,250 monthly AI cap, 120 rpm, 5,000 requests/day, 8 devices/key, 5 workspaces, 10GB vault, 2,500 files.</p>
-        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skygatefs27-managed-control-plane">Continue through SkyePay</a>
+        <p class="eyebrow">Enterprise / Managed Gate</p>
+        <h3>$15,000 setup + $3,997/mo</h3>
+        <p>Custom AI cap, written limits, managed ConnectLog rollout, Relay13 workspaces, proof exports, custom SkyeRoutexFlow v0.4.0 deployment scope, and gate-owned control-plane policy.</p>
+        <a class="saas-btn" href="https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command">Continue through SkyePay</a>
       </article>
     </section>
   </main>

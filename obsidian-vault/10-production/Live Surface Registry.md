@@ -19,24 +19,44 @@ Public sales claims should route buyers to proof surfaces that are live, safe to
 
 - MetrAIyux 0S full system Worker.
 - Live proof router.
+- ConnectLog + Relay13 operator proof, app, proof receipt, and Relay13 Core Worker.
 - Public spectacle site.
 - Logo rollout mirror.
 - SkyeGateFS27 proof Worker.
 - SkyeGateFS27 gate-map alias.
+- SkyeGateFS27 ConnectLog + Relay13 gate lane and SkyePay live Stripe store.
 - Actual SkyeGate control plane linked from proof.
 
 ## Full Live Deployment Ledger
 
 The CEO-facing deployment ledger now lives at `LIVE_DEPLOYMENT_LEDGER.md`, with a vault pointer at `obsidian-vault/10-production/CEO Live Deployment Ledger.md`.
 
-Latest Cloudflare capture on 2026-05-16 found:
+Latest Cloudflare capture on 2026-05-17 found:
 
-- 13 Cloudflare Pages production projects.
-- 11 Cloudflare Workers production services.
-- 36 live HTTP checks passing.
-- New Skyes Over London Reviews production Pages project: `https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded`.
+- 17 Cloudflare Pages production projects.
+- 17 Cloudflare Workers production services across the Cloudflare API inventory and follow-up sweeps.
+- 36 earlier live HTTP checks passing, plus MetrAIyux 0S marketing pricing browser proof, ConnectLog + Relay13 production proof, Stripe live lookup-key sync proof, and public atlas Stripe-sync browser proof.
+- Follow-up Worker sweeps added `kaixu-6-7-brain`, `skyegatefs13-super-gate`, `vantacore`, `skydexia-cloudflare-adapter`, and `skydexia-ops-control`; SkyGateFS13 root 404 was patched and redeployed on 2026-05-17.
+- Expanded operator-provided Netlify/endpoint map captured 84 deployment rows, 17 endpoint checks, 63 verified-live deployments, 7 protected gates, and 19 attention items. API-level Netlify account inventory still requires Netlify auth. This expanded map is internal.
+- New MetrAIyux 0S marketing production deployment: `https://metraiyux-0s-marketing.pages.dev/#pricing`, deployment `3ffe0808-0457-4d77-b3c2-9851030744f7`.
+- Legacy MetrAIyux marketing compatibility mirror: `https://metraiyux-marketing.pages.dev/`, deployment `daccdf4e-4dd3-41d1-8f69-f10b33f842a7`; `/index.html` now redirects to `/` and returns HTTP `200`.
+- Live deployment ledger HTML: `https://metraiyux-ecosystem-portal.pages.dev/operator/deployment-ledger`, latest portal deployment `a198ea63-424f-4d8e-bc01-42d4dd52dedb`, rebuilt into a live-only Skye UI Deployment Atlas with measured orbit lane controls, search/filter controls, Three.js canvas runtime, GSAP/Lenis motion, 78 public surfaces, 7 live signal checks, ConnectLog + Relay13 rows, SkyePay live Stripe price evidence, SaaS billing status, corrected desktop hero framing, zero browser-detected orbit overlaps on desktop and mobile, an operator top Vault link that opens `/vault` with HTTP `200`, and visible portal copy cleaned to `SOLEnterprises`.
+- Latest synced production Workers: 0S full system deployment `46372521-ee57-4874-8776-b452acaa2d3a`, FS27 deployment `f2d73d31-b86d-4f56-bcd7-5c846cddf830`, and SaaS provisioning deployment `4b2c958d-9039-4f2d-8839-fc1519af483c`.
+- Stripe sync evidence: `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json` and `test-artifacts/stripe-sync/metraiyux-stripe-live-checkout-proof.json`; account `acct_1Seml2HEgCmnlKPJ`, 7 products, 13 live prices, 10 0S prices created or replaced, 8 stale prices archived, 3 SkyeGate prices reused, and SkyePay plus direct SaaS Checkout proof passed.
+- Stress evidence: `test-artifacts/stress/connectlog-relay13-skyepay-live/stress-report.json` passed with 220 live public/app reads, 51 Relay13 write/read calls, 20 WebSocket upgrades, and no failures; `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json` passed with 608 SkyeRouteX runtime requests and expected lock-contention `409` responses.
+- Public copy fix evidence: `test-artifacts/connectlog-public-copy-fix/browser-qa.json` confirms the live ConnectLog app no longer shows stale internal/backend-health language and now says Relay13 is live with production proof.
+- Skyes Over London Reviews production Pages project: `https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded`.
 
-This expanded ledger captures live surfaces that were not fully listed in the older core-route summary, including SkyeMail, SkyeVault, Bob's Smoke Shop preview, SOL Staffing, Neon Rift, Skyes Over London Legal, Skyes Over London Reviews, Skye Design MCP, and the internal MetrAIyux service Workers.
+This expanded ledger captures live surfaces that were not fully listed in the older core-route summary, including SkyeMail, SkyeVault, Bob's Smoke Shop preview, SOL Staffing, Neon Rift, Skyes Over London Legal, Skyes Over London Reviews, Skye Design MCP, Empire Pallets, the SkyeSol current public site, and the internal MetrAIyux service Workers.
+
+## Current Route-Fix Queue
+
+This queue is internal only. Do not expose these rows on the public deployment atlas until the URL opens or answers by design.
+
+- Netlify auth is missing in this workspace, so account-side Netlify fixes remain blocked until `NETLIFY_AUTH_TOKEN` is restored.
+- Confirmed 404 roots or aliases: `skyeletix.netlify.app`, `local-seo-booster.netlify.app`, `brand-assessmentx.netlify.app`, `industry-playbook-generator.netlify.app`, `skye-landing-page-generator.netlify.app`, `executive-summary-generator.netlify.app`, `skye-socialproof-kit.netlify.app`, `review-request-script-pack-generator.netlify.app`, `skye-valuations-mini-website-report.netlify.app`, `soleledgerconsole.netlify.app`, `skyegate-fs13.netlify.app`, and `getkaixu-api.netlify.app`.
+- Pretty-route fixes needed: `skygatefs13-quantumskyes.netlify.app/health` and `/auth-introspect` should route to their live Netlify functions. The repo config now includes `/health` and `/gateway-chat` redirects; it still needs an authenticated Netlify redeploy.
+- SkyeSol path fix needed: `skyesol.netlify.app/ae-contractor-network` currently redirects into a loop.
 
 ## Review Wall And Intake Routes
 

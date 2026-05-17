@@ -1,4 +1,8 @@
 import { q } from "./db.js";
+import {
+  skyePayOfferRequiresOwnerApproval,
+  skyePayOrderStatusesForPayment
+} from "./skyepayActivation.js";
 import { cleanRequestToken } from "./skyepaySecurity.js";
 import { SKYPAY_REPO_STRIPE_OFFERS } from "./skyepayRepoStripeOffers.js";
 
@@ -100,6 +104,38 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       vault_workspace_limit: 3
     }
   },
+  "metraiyux-routex-workforce-command": {
+    store_category: "Client app subscriptions",
+    store_rank: 25,
+    trial_days: 0,
+    zero_upfront_trial: false,
+    setup_handling: "owner_approved_after_route_scope",
+    storefront: true,
+    badge: "Workforce lane",
+    includes: [
+      "SkyeRoutexFlow v0.4.0 local proof platform",
+      "V83 routed shell",
+      "Provider jobs and applicant pools",
+      "Contractor assignments and proof",
+      "Owner-approved activation"
+    ],
+    gate_policy: {
+      monthly_cap_cents: 100000,
+      default_rpm_limit: 120,
+      default_rpd_limit: 3500,
+      max_devices_per_key: 8,
+      require_install_id: true,
+      allowed_providers: ["openai", "gemini", "anthropic"],
+      allowed_models: {
+        openai: ["gpt-4o-mini", "gpt-4o"],
+        gemini: ["gemini-2.5-flash"],
+        anthropic: ["claude-3-5-sonnet-20241022"]
+      },
+      vault_storage_mb: 10240,
+      vault_file_limit: 2500,
+      vault_workspace_limit: 3
+    }
+  },
   "metraiyux-autonomous-office": {
     store_category: "Client app subscriptions",
     store_rank: 30,
@@ -131,9 +167,25 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       vault_workspace_limit: 8
     }
   },
+  "metraiyux-enterprise-command": {
+    store_category: "Client app subscriptions",
+    store_rank: 40,
+    trial_days: 0,
+    zero_upfront_trial: false,
+    setup_handling: "owner_approved_after_scope_review",
+    storefront: true,
+    badge: "Managed enterprise",
+    includes: [
+      "Custom 0S deployment architecture",
+      "Managed ConnectLog and Relay13 scope",
+      "Custom SkyeRouteX workforce command deployment",
+      "Advanced audit exports",
+      "Owner-approved written limits"
+    ]
+  },
   "skygatefs27-managed-control-plane": {
     store_category: "SkyePay infrastructure",
-    store_rank: 40,
+    store_rank: 45,
     trial_days: DEFAULT_TRIAL_DAYS,
     zero_upfront_trial: true,
     setup_handling: "deferred_owner_approval",
@@ -218,21 +270,21 @@ export const SKYPAY_OFFERS = [
       {
         id: "setup",
         name: "MetrAIyux 0S - Starter Command Setup",
-        amount_cents: cents(997),
+        amount_cents: cents(1500),
         type: "one_time",
         lookup_key: "metraiyux_starter_command_setup"
       },
       {
         id: "monthly",
         name: "MetrAIyux 0S - Starter Command",
-        amount_cents: cents(297),
+        amount_cents: cents(397),
         type: "recurring",
         interval: "month",
         lookup_key: "metraiyux_starter_command_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
   },
   {
     id: "metraiyux-growth-cabinet",
@@ -247,21 +299,50 @@ export const SKYPAY_OFFERS = [
       {
         id: "setup",
         name: "MetrAIyux 0S - Growth Cabinet Setup",
-        amount_cents: cents(2500),
+        amount_cents: cents(3500),
         type: "one_time",
         lookup_key: "metraiyux_growth_cabinet_setup"
       },
       {
         id: "monthly",
         name: "MetrAIyux 0S - Growth Cabinet",
-        amount_cents: cents(797),
+        amount_cents: cents(997),
         type: "recurring",
         interval: "month",
         lookup_key: "metraiyux_growth_cabinet_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "metraiyux-routex-workforce-command",
+    plan_name: "routex-workforce-command",
+    title: "RouteX Workforce Command",
+    family: "metraiyux",
+    description: "Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 local proof, V83 routed shell, provider jobs, contractor assignments, proof, payments, route stops, and market reports.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["metraiyux_routex_workforce_command_setup", "metraiyux_routex_workforce_command_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "MetrAIyux 0S - RouteX Workforce Command Setup",
+        amount_cents: cents(6500),
+        type: "one_time",
+        lookup_key: "metraiyux_routex_workforce_command_setup"
+      },
+      {
+        id: "monthly",
+        name: "MetrAIyux 0S - RouteX Workforce Command",
+        amount_cents: cents(1497),
+        type: "recurring",
+        interval: "month",
+        lookup_key: "metraiyux_routex_workforce_command_monthly"
+      }
+    ],
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope_and_runtime_proof"
   },
   {
     id: "metraiyux-autonomous-office",
@@ -276,21 +357,50 @@ export const SKYPAY_OFFERS = [
       {
         id: "setup",
         name: "MetrAIyux 0S - Autonomous Office Setup",
-        amount_cents: cents(5000),
+        amount_cents: cents(7500),
         type: "one_time",
         lookup_key: "metraiyux_autonomous_office_setup"
       },
       {
         id: "monthly",
         name: "MetrAIyux 0S - Autonomous Office",
-        amount_cents: cents(1497),
+        amount_cents: cents(2497),
         type: "recurring",
         interval: "month",
         lookup_key: "metraiyux_autonomous_office_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
+  {
+    id: "metraiyux-enterprise-command",
+    plan_name: "enterprise-command",
+    title: "Enterprise / Managed Gate",
+    family: "metraiyux",
+    description: "Base enterprise 0S lane with custom written limits, managed deployment architecture, audit exports, ConnectLog/Relay13 scope, and custom SkyeRouteX workforce command deployment.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["metraiyux_enterprise_setup", "metraiyux_enterprise_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "MetrAIyux 0S - Enterprise Setup",
+        amount_cents: cents(15000),
+        type: "one_time",
+        lookup_key: "metraiyux_enterprise_setup"
+      },
+      {
+        id: "monthly",
+        name: "MetrAIyux 0S - Enterprise",
+        amount_cents: cents(3997),
+        type: "recurring",
+        interval: "month",
+        lookup_key: "metraiyux_enterprise_monthly"
+      }
+    ],
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_scope_review"
   },
   {
     id: "skygatefs27-managed-control-plane",
@@ -318,8 +428,8 @@ export const SKYPAY_OFFERS = [
         lookup_key: "skygatefs27_managed_control_plane_monthly"
       }
     ],
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment"
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_gate_scope"
   },
   {
     id: "skyevault-starter-access",
@@ -566,11 +676,11 @@ export const SKYPAY_CLIENTS = {
     free_trial_days: 7,
     included_usage: [
       "Private app preview closeout",
-      "Automatic workspace unlock after confirmed Stripe payment",
+      "Owner-approved workspace activation after confirmed Stripe payment",
       "Workspace handoff after SkyePay closeout",
       "FS27 order, usage, and activation ledger"
     ],
-    special_offer: "Free preview first. Confirmed SkyePay checkout unlocks the workspace automatically and writes the FS27 plan policy.",
+    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 plan policy and holds activation for owner approval.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -589,9 +699,9 @@ export const SKYPAY_CLIENTS = {
       "7 app scans",
       "25 SkyePay and MetrAIyux commands",
       "PWA, QR, SEO, media, link, and copy checks",
-      "Automatic workspace unlock after confirmed Stripe payment"
+      "Owner-approved workspace activation after confirmed Stripe payment"
     ],
-    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout unlocks the workspace automatically; discounts still require an approved quote.",
+    special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order and waits for owner-approved activation; discounts still require an approved quote.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -623,7 +733,7 @@ export const SKYPAY_PLATFORM_ROUTES = [
     route: "/skyepay.html?client=bobs-smoke-shop",
     default_offer_id: "metraiyux-starter-command",
     wiring_status: "client_preview_ready",
-    note: "First client lane wired into SkyePay with free preview, automatic paid unlock, and usage language."
+    note: "First client lane wired into SkyePay with free preview, owner-approved paid activation, and usage language."
   },
   {
     platform_id: "repo-platforms-next",
@@ -662,10 +772,10 @@ export function getSkyePayClient(slug) {
     free_trial_days: 7,
     included_usage: [
       "Private app preview",
-      "Automatic workspace unlock after confirmed Stripe payment",
+      "Owner-approved workspace activation after confirmed Stripe payment",
       "Workspace handoff after closeout"
     ],
-    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then the workspace unlocks automatically after Stripe confirms the transaction.",
+    special_offer: "Free preview first. Continued work is confirmed through SkyePay, then the workspace waits for owner-approved activation after Stripe confirms the transaction.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -841,7 +951,10 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
     customer_name: safeText(body.customer_name || body.name, 160),
     company_name: safeText(body.company_name || client.company_name, 180),
     checkout_request_id: cleanRequestToken(body.idempotency_key || body.request_id, 180),
-    approval_status: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: String(skyePayOfferRequiresOwnerApproval(offer)),
+    approval_status: skyePayOfferRequiresOwnerApproval(offer)
+      ? "paid_pending_owner_approval"
+      : "auto_unlock_after_confirmed_payment",
     activation_path: offer.activation_path,
     store_category: safeText(offer.store_category, 80),
     free_trial_days: String(activeTrialDays),
@@ -883,7 +996,11 @@ export function makeDemoSession({ client, offer, body = {}, origin }) {
     order_id: orderId,
     url: statusUrl.toString(),
     payment_status: "demo_not_charged",
-    approval_status: "demo_checkout",
+    approval_status: skyePayOfferRequiresOwnerApproval(offer)
+      ? "demo_pending_owner_approval"
+      : "demo_checkout",
+    owner_approval_required: skyePayOfferRequiresOwnerApproval(offer),
+    activation_path: offer.activation_path || null,
     client: {
       slug: client.slug,
       client_name: client.client_name,
@@ -935,6 +1052,14 @@ export async function upsertSkyePayOrderFromSession({ session, offer = null, cli
   const paymentIntentId = safeText(session.payment_intent, 160) || null;
   const paidAtExpr = paymentStatus === "paid" || session.status === "complete" ? "now()" : "null";
   const paymentConfirmed = ["paid", "complete", "no_payment_required"].includes(String(paymentStatus || "").toLowerCase());
+  const orderStatuses = skyePayOrderStatusesForPayment({
+    offer: resolvedOffer || {
+      metadata: md,
+      activation_path: md.activation_path,
+      owner_approval_required: String(md.owner_approval_required || "").toLowerCase() === "true"
+    },
+    paymentConfirmed
+  });
 
   const params = [
     orderId,
@@ -954,9 +1079,9 @@ export async function upsertSkyePayOrderFromSession({ session, offer = null, cli
     subscriptionId,
     paymentIntentId,
     paymentStatus || "created",
-    paymentConfirmed ? "payment_confirmed" : "checkout_created",
-    paymentConfirmed ? "auto_unlock_pending" : "waiting_for_checkout",
-    paymentConfirmed ? "auto_unlock_pending" : "waiting_for_payment",
+    orderStatuses.approval_status,
+    orderStatuses.owner_status,
+    orderStatuses.provisioning_status,
     safeText(source, 80),
     safeText(session.success_url, 1000) || null,
     safeText(session.cancel_url, 1000) || null,

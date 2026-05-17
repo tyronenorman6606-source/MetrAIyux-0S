@@ -74,7 +74,7 @@ export default wrap(async (req) => {
     const usage = await fetchKeyUsage(keyRow.api_key_id, keyRow.customer_id, month);
     const role  = (keyRow.role || "deployer").toLowerCase();
     const scope = keyScopes(keyRow);
-    const ops   = operationsForRole(role);
+    const ops   = operationsForKey(keyRow, role);
     const cap   = effectiveCap(keyRow);
     const spent = usage.spent_cents || 0;
 
@@ -89,7 +89,9 @@ export default wrap(async (req) => {
         role,
         label:       keyRow.label || null,
         key_last4:   keyRow.key_last4 || null,
-        plan:        keyRow.customer_plan_name || null
+        plan:        keyRow.customer_plan_name || null,
+        expires_at:  keyRow.expires_at || null,
+        card_type:   keyRow.key_metadata?.card_type || null
       },
       gate_card: gateCard({
         sub: `api_key:${keyRow.api_key_id}`,
@@ -97,7 +99,9 @@ export default wrap(async (req) => {
         customerId: keyRow.customer_id,
         role,
         scope,
-        principal: "api_key"
+        principal: "api_key",
+        expiresAt: keyRow.expires_at || null,
+        metadata: keyRow.key_metadata || {}
       }),
       permissions: {
         scope,
@@ -260,17 +264,34 @@ function scopeArr(scope) {
 function keyScopes(keyRow) {
   const base = ["gateway.invoke", "gateway.read"];
   const role = String(keyRow?.role || "").toLowerCase();
+  if (keyRow?.key_metadata?.card_type === "pentest_hour_key") return base;
   if (["owner","admin"].includes(role)) base.push("keys.read","keys.write","admin.read","admin.write","billing.read","billing.write");
   else if (role === "deployer") base.push("keys.read","billing.read");
   return base;
 }
 
-function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], principal = "session" }) {
+function operationsForKey(keyRow, role) {
+  if (keyRow?.key_metadata?.card_type === "pentest_hour_key") {
+    return {
+      can_invoke_gateway: true,
+      can_manage_keys: false,
+      can_admin: false,
+      can_bill: false,
+      can_read_usage: true,
+      can_write_content: false
+    };
+  }
+  return operationsForRole(role);
+}
+
+function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], principal = "session", expiresAt = null, metadata = {} }) {
   const seed = [sub, email, customerId, principal].filter(Boolean).join("|") || crypto.randomUUID();
   const digest = crypto.createHash("sha256").update(seed).digest("hex").slice(0, 20);
+  const cardType = metadata?.card_type === "pentest_hour_key" ? "pentest_gate_card" : "basic_gate_card";
+  const idPrefix = cardType === "pentest_gate_card" ? "gate_pentest" : "gate_basic";
   return {
-    id: `gate_basic_${digest}`,
-    type: "basic_gate_card",
+    id: `${idPrefix}_${digest}`,
+    type: cardType,
     status: "active",
     principal,
     sub,
@@ -279,6 +300,8 @@ function gateCard({ sub, email, customerId, role, sessionId = null, scope = [], 
     role: role || "user",
     session_id: sessionId,
     scope,
+    expires_at: expiresAt,
+    metadata,
     usage_required: false,
     reloadable: true,
     issued_at: new Date().toISOString()

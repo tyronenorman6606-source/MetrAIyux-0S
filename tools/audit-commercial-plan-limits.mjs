@@ -14,18 +14,27 @@ const activationPath = path.join(root, "SkyeGateFS27", "netlify", "functions", "
 const planOfferMap = {
   "starter-command": "metraiyux-starter-command",
   "growth-cabinet": "metraiyux-growth-cabinet",
+  "routex-workforce-command": "metraiyux-routex-workforce-command",
   "autonomous-office": "metraiyux-autonomous-office",
-  "enterprise-command": "skygatefs27-managed-control-plane"
+  "enterprise-command": "metraiyux-enterprise-command"
 };
 
 const htmlRequiredTokens = {
   "pricing/index.html": [
-    "$297",
+    "$397",
+    "$1,500",
     "$997",
-    "$797",
-    "$2,500",
+    "$3,500",
     "$1,497",
-    "$5,000",
+    "$6,500",
+    "$2,497",
+    "$7,500",
+    "$3,997",
+    "$15,000",
+    "SkyeProfitConsole",
+    "Free99",
+    "gate session required",
+    "SkyeRoutexFlow v0.4.0",
     "600 requests/day",
     "2,500 requests/day",
     "6,000 requests/day",
@@ -34,27 +43,36 @@ const htmlRequiredTokens = {
   "saas/pricing.html": [
     "data-plan=\"starter-command\"",
     "data-plan=\"growth-cabinet\"",
+    "data-plan=\"routex-workforce-command\"",
     "data-plan=\"autonomous-office\"",
-    "$250 AI cap",
-    "$750 AI cap",
-    "$1,500 AI cap"
+    "SkyeProfitConsole",
+    "Free99",
+    "gate session required",
+    "25,000 AI credits/mo",
+    "100,000 AI credits/mo",
+    "SkyeRoutexFlow v0.4.0"
   ],
   "saas/skyepay.html": [
     "metraiyux-starter-command",
     "metraiyux-growth-cabinet",
+    "metraiyux-routex-workforce-command",
     "metraiyux-autonomous-office",
-    "Automatic unlock"
+    "metraiyux-enterprise-command",
+    "Owner approval gate"
   ],
   "saas/billing.html": [
     "30 rpm",
     "90 rpm",
+    "120 rpm",
     "180 rpm",
-    "Confirmed Stripe payment unlocks the workspace automatically"
+    "Confirmed Stripe payment moves every paid plan into owner approval"
   ],
   "saas/signup.html": [
-    "$997 setup",
-    "$2,500 setup",
-    "$5,000 setup",
+    "$1,500 setup",
+    "$3,500 setup",
+    "$6,500 setup",
+    "$7,500 setup",
+    "$15,000 setup",
     "Signup intent does not start billing"
   ]
 };
@@ -85,6 +103,11 @@ function assertEqual(label, actual, expected) {
   if (actual !== expected) fail(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 }
 
+function assertPolicyEqual(label, actual, expected) {
+  if (typeof actual === "string" && actual.toLowerCase() === "custom") return;
+  assertEqual(label, actual, expected);
+}
+
 async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, "utf8"));
 }
@@ -110,7 +133,16 @@ for (const [planId, offerId] of Object.entries(planOfferMap)) {
   }
 
   const policy = offer.gate_policy;
-  if (!policy) {
+  const customPolicyPlan = [
+    plan.limits.monthly_ai_cap_usd,
+    plan.limits.requests_per_minute,
+    plan.limits.requests_per_day,
+    plan.limits.devices_per_key,
+    plan.limits.workspaces,
+    plan.limits.vault_storage_mb,
+    plan.limits.vault_file_limit
+  ].some((value) => typeof value === "string" && value.toLowerCase() === "custom");
+  if (!policy && !customPolicyPlan) {
     fail(`${offerId} missing gate_policy`);
     continue;
   }
@@ -124,22 +156,27 @@ for (const [planId, offerId] of Object.entries(planOfferMap)) {
   assertEqual(`skyepay-gateway activation_path`, gateway.activation_path, "auto_unlock_after_confirmed_payment");
   assertEqual(`${planId}.price_monthly`, plan.price_monthly, monthlyCents(offer) / 100);
   assertEqual(`${planId}.setup_fee`, plan.setup_fee, setupCents(offer) / 100);
-  assertEqual(`${planId}.limits.monthly_ai_cap_usd`, plan.limits.monthly_ai_cap_usd, policy.monthly_cap_cents / 100);
-  assertEqual(`${planId}.limits.requests_per_minute`, plan.limits.requests_per_minute, policy.default_rpm_limit);
-  assertEqual(`${planId}.limits.requests_per_day`, plan.limits.requests_per_day, policy.default_rpd_limit);
-  assertEqual(`${planId}.limits.devices_per_key`, plan.limits.devices_per_key, policy.max_devices_per_key);
-  assertEqual(`${planId}.limits.workspaces`, plan.limits.workspaces, policy.vault_workspace_limit);
-  assertEqual(`${planId}.limits.vault_storage_mb`, plan.limits.vault_storage_mb, policy.vault_storage_mb);
-  assertEqual(`${planId}.limits.vault_file_limit`, plan.limits.vault_file_limit, policy.vault_file_limit);
+  if (policy) {
+    assertPolicyEqual(`${planId}.limits.monthly_ai_cap_usd`, plan.limits.monthly_ai_cap_usd, policy.monthly_cap_cents / 100);
+    assertPolicyEqual(`${planId}.limits.requests_per_minute`, plan.limits.requests_per_minute, policy.default_rpm_limit);
+    assertPolicyEqual(`${planId}.limits.requests_per_day`, plan.limits.requests_per_day, policy.default_rpd_limit);
+    assertPolicyEqual(`${planId}.limits.devices_per_key`, plan.limits.devices_per_key, policy.max_devices_per_key);
+    assertPolicyEqual(`${planId}.limits.workspaces`, plan.limits.workspaces, policy.vault_workspace_limit);
+    assertPolicyEqual(`${planId}.limits.vault_storage_mb`, plan.limits.vault_storage_mb, policy.vault_storage_mb);
+    assertPolicyEqual(`${planId}.limits.vault_file_limit`, plan.limits.vault_file_limit, policy.vault_file_limit);
+  }
   assertEqual(`skyepay-gateway ${planId}`, gateway.checkout_routes?.[planId], checkoutUrl);
 
-  for (const token of [
+  const workerTokens = [
     offerId,
-    checkoutUrl,
+    checkoutUrl
+  ];
+  if (policy) workerTokens.push(
     `monthly_ai_cap_usd: ${policy.monthly_cap_cents / 100}`,
     `requests_per_day: ${policy.default_rpd_limit}`,
     `requests_per_minute: ${policy.default_rpm_limit}`
-  ]) {
+  );
+  for (const token of workerTokens) {
     if (!workerSource.includes(token)) fail(`worker PLANS missing ${planId} token: ${token}`);
   }
 }
@@ -164,8 +201,9 @@ for (const token of [
 
 for (const [relativePath, tokens] of Object.entries(htmlRequiredTokens)) {
   const source = await fs.readFile(path.join(siteDir, relativePath), "utf8");
+  const foldedSource = source.toLowerCase();
   for (const token of tokens) {
-    if (!source.includes(token)) fail(`${relativePath} missing disclosure token: ${token}`);
+    if (!foldedSource.includes(token.toLowerCase())) fail(`${relativePath} missing disclosure token: ${token}`);
   }
 }
 

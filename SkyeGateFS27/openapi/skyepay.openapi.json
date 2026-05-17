@@ -177,6 +177,8 @@
           "url": { "type": "string", "format": "uri" },
           "payment_status": { "type": "string" },
           "approval_status": { "type": "string" },
+          "owner_approval_required": { "type": "boolean" },
+          "activation_path": { "type": ["string", "null"] },
           "client": { "type": "object" }
         }
       },
@@ -197,6 +199,7 @@
               "approval_status": { "type": "string" },
               "owner_status": { "type": "string" },
               "provisioning_status": { "type": "string" },
+              "offer": { "type": ["object", "null"] },
               "customer_hint": { "type": "string" }
             }
           }

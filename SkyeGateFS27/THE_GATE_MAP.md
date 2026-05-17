@@ -14,6 +14,10 @@ The gate now has a public proof page that translates this architecture into a bu
 - Alias page: `gate-map.html`
 - Current public proof URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html`
 - Actual Netlify gate URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/`
+- ConnectLog + Relay13 gate lane: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13`
+- ConnectLog + Relay13 0S proof hub: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html`
+- ConnectLog + Relay13 proof receipt: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/connectlog-relay13-expansion-receipt.html`
+- Relay13 live Worker: `https://relay13-core.graylondonskyes.workers.dev/`
 - SkyePay client closeout app: `skyepay.html`
 - SkyePay public aliases: `/pay`, `/gateway/skyepay`
 - SkyePay API docs: `skyepay-api.html`
@@ -133,6 +137,25 @@ The gate has five big jobs.
    - `GET /skyepay/status?session_id=...`
 
    Cross-origin browser callers must be added to `SKYPAY_ALLOWED_ORIGINS`; same-origin app calls work without opening global CORS.
+
+7. ConnectLog + Relay13 relationship and messaging lane
+
+   ConnectLog and Relay13 are now a gate-owned expansion lane.
+
+   - ConnectLog owns local-first relationship capture, QR exchange, follow-up memory, and the browser-side relationship command workspace.
+   - Relay13 owns the deployed Cloudflare Worker messaging core, workspace bootstrap, scoped API keys, widgets, operator console, request ledgers, activation proof, and WebSocket live proof.
+   - MetrAIyux 0S owns the public proof hub, proof receipt, pricing updates, and buyer-facing routing.
+   - FS27 owns the gate boundary: public links, mirror-event receipts, admin visibility, and the rule that Relay13 API keys plus FS27 mirror secrets stay server-side or operator-only.
+
+   Current production proof was mirrored with:
+
+   ```json
+   {
+     "source_app": "connectlog-relay13",
+     "type": "connectlog.relay13.production_proof",
+     "ws_id": "ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7"
+   }
+   ```
 
 ## Runtime Lanes
 

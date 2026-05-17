@@ -8,21 +8,23 @@ const PLANS = {
   "starter-command": {
     name: "Starter Command",
     tagline: "Your first autonomous business OS",
-    monthly: 297,
-    setup: 997,
+    monthly: 397,
+    setup: 1500,
     skyepay_offer_id: "metraiyux-starter-command",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
     // Customer-facing platform features — shown in marketing, portal, and SDK
     features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
       ai_compute_credits_monthly: 25000,
       kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini"],
       workspaces: 1,
       api_keys: 2,
       vault_storage_gb: 1,
       vault_files: 250,
-      operating_lanes: ["NEXUS"],
+      operating_lanes: ["NEXUS", "SKYEROUTEX_V0_4_PREVIEW"],
       brains: 16,
       skyemail_inboxes: 1,      // launching with SkyeMail
       citadeldb: "read",        // launching with CitadelDB
@@ -47,20 +49,22 @@ const PLANS = {
   "growth-cabinet": {
     name: "Growth Cabinet",
     tagline: "All 5 operating lanes. Full multi-provider intelligence.",
-    monthly: 797,
-    setup: 2500,
+    monthly: 997,
+    setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
     features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
       ai_compute_credits_monthly: 75000,
       kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro"],
       workspaces: 3,
       api_keys: 5,
       vault_storage_gb: 5,
       vault_files: 1200,
-      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX"],
+      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX", "SKYEROUTEX_V0_4_FIT_CHECK"],
       brains: 16,
       skyemail_inboxes: 3,
       citadeldb: "full",
@@ -81,23 +85,69 @@ const PLANS = {
       allowed_models: { openai: ["gpt-4o-mini", "gpt-4o"], gemini: ["gemini-2.5-flash"], anthropic: ["claude-3-5-sonnet-20241022"] }
     }
   },
+  "routex-workforce-command": {
+    name: "RouteX Workforce Command",
+    tagline: "Dispatch, routes, stops, proof vaults, and workforce runtime proof.",
+    monthly: 1497,
+    setup: 6500,
+    skyepay_offer_id: "metraiyux-routex-workforce-command",
+    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope_and_runtime_proof",
+    features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
+      ai_compute_credits_monthly: 100000,
+      kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7"],
+      workspaces: 3,
+      api_keys: 8,
+      vault_storage_gb: 10,
+      vault_files: 2500,
+      operating_lanes: ["NEXUS", "SKYEROUTEX_V0_4", "SKYEROUTEX_V83_COMPAT", "PROOF-VAULT"],
+      brains: 16,
+      skyemail_inboxes: 5,
+      citadeldb: "full",
+      skyeroutex_workspaces: 1,
+      skyeroutex_operator_seats: 5,
+      skyeroutex_daily_routes: 50,
+      skyeroutex_monthly_stops: 2500,
+      skyeroutex_job_board: true,
+      skyeroutex_market_reports: true,
+      support: "priority_email",
+      rpm: 120,
+      rpd: 3500,
+    },
+    limits: {
+      monthly_ai_cap_usd: 1000,
+      requests_per_minute: 120,
+      requests_per_day: 3500,
+      devices_per_key: 8,
+      workspaces: 3,
+      vault_storage_mb: 10240,
+      vault_file_limit: 2500,
+      allowed_providers: ["openai", "gemini", "anthropic"],
+      allowed_models: { openai: ["gpt-4o-mini", "gpt-4o"], gemini: ["gemini-2.5-flash"], anthropic: ["claude-3-5-sonnet-20241022"] }
+    }
+  },
   "autonomous-office": {
     name: "Autonomous Office",
     tagline: "Full sovereign stack. kAIxu-max. Built to run without you.",
-    monthly: 1997,
-    setup: 5000,
+    monthly: 2497,
+    setup: 7500,
     skyepay_offer_id: "metraiyux-autonomous-office",
     checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
     features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
       ai_compute_credits_monthly: 150000,
       kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"],
       workspaces: 8,
       api_keys: 12,
       vault_storage_gb: 20,
       vault_files: 5000,
-      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX"],
+      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX", "SKYEROUTEX_V0_4"],
       brains: 16,
       skyemail_inboxes: 10,
       citadeldb: "full",
@@ -122,37 +172,39 @@ const PLANS = {
   "enterprise-command": {
     name: "Enterprise / Managed Gate",
     tagline: "Custom infrastructure. Custom brains. White-glove delivery.",
-    monthly: 2497,
-    setup: 12500,
-    skyepay_offer_id: "skygatefs27-managed-control-plane",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skygatefs27-managed-control-plane",
-    owner_approval_required: false,
-    activation_path: "auto_unlock_after_confirmed_payment",
+    monthly: 3997,
+    setup: 15000,
+    skyepay_offer_id: "metraiyux-enterprise-command",
+    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_scope_review",
     features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
       ai_compute_credits_monthly: "custom",
       kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"],
       workspaces: "custom",
       api_keys: "custom",
       vault_storage_gb: "custom",
       vault_files: "custom",
-      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX"],
+      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX", "SKYEROUTEX_V0_4_CUSTOM"],
       brains: 16,
       skyemail_inboxes: "custom",
       citadeldb: "custom",
       vps_instances: "custom",
       white_label: true,
       support: "sla_backed",
-      rpm: 120,
-      rpd: 5000,
+      rpm: "custom",
+      rpd: "custom",
     },
     limits: {
-      monthly_ai_cap_usd: 1250,
-      requests_per_minute: 120,
-      requests_per_day: 5000,
-      devices_per_key: 8,
-      workspaces: 5,
-      vault_storage_mb: 10240,
-      vault_file_limit: 2500,
+      monthly_ai_cap_usd: "custom",
+      requests_per_minute: "custom",
+      requests_per_day: "custom",
+      devices_per_key: "custom",
+      workspaces: "custom",
+      vault_storage_mb: "custom",
+      vault_file_limit: "custom",
       allowed_providers: ["openai", "gemini", "anthropic"],
       allowed_models: { openai: ["gpt-4o-mini", "gpt-4o"], gemini: ["gemini-2.5-flash"], anthropic: ["claude-3-5-sonnet-20241022"] }
     }
@@ -188,6 +240,8 @@ function publicPlans() {
       features: plan.features,
       checkout_url: plan.checkout_url,
       skyepay_offer_id: plan.skyepay_offer_id,
+      owner_approval_required: plan.owner_approval_required,
+      activation_path: plan.activation_path,
     };
   }
   return out;
@@ -219,13 +273,14 @@ function publicRateCard() {
   }
 })();
 
-// Live Stripe price IDs — account acct_1Seml2HEgCmnlKPJ
-// Run scripts/create-stripe-prices.sh to create updated prices and auto-patch this block.
+// Live Stripe price IDs — account acct_1Seml2HEgCmnlKPJ.
+// Synced by tools/sync-metraiyux-stripe-products.mjs on 2026-05-17.
 const STRIPE_PRICES = {
-  'starter-command':   { setup: 'price_1TXzMDHEgCmnlKPJMsMRU90l', monthly: 'price_1TXzMEHEgCmnlKPJEUMoCKLa' },
-  'growth-cabinet':    { setup: 'price_1TXzMEHEgCmnlKPJGrkoi2zC', monthly: 'price_1TXzMEHEgCmnlKPJ33nPgswZ' },
-  'autonomous-office': { setup: 'price_1TXzMFHEgCmnlKPJLlbhrjw4', monthly: 'price_1TY47dHEgCmnlKPJgmah6mnG' },
-  'enterprise':        { setup: 'price_1TY47qHEgCmnlKPJzX3aj2JQ', monthly: 'price_1TY47qHEgCmnlKPJz871JAmc' },
+  'starter-command': { setup: 'price_1TY9TxHEgCmnlKPJ0mBR8cwZ', monthly: 'price_1TY9TyHEgCmnlKPJTl703ekt' },
+  'growth-cabinet': { setup: 'price_1TY9TzHEgCmnlKPJqXBTbH5Y', monthly: 'price_1TY9TzHEgCmnlKPJqFm0FhAS' },
+  'routex-workforce-command': { setup: 'price_1TY9U1HEgCmnlKPJPNiPFacB', monthly: 'price_1TY9U1HEgCmnlKPJ8s3kF0eC' },
+  'autonomous-office': { setup: 'price_1TY9U2HEgCmnlKPJPqDe4Cqr', monthly: 'price_1TY9U2HEgCmnlKPJq5d7ccZs' },
+  'enterprise-command': { setup: 'price_1TY9U3HEgCmnlKPJ7ACUntvj', monthly: 'price_1TY9U4HEgCmnlKPJSWLllIxH' },
 };
 
 const SOVEREIGN_STACK = {
@@ -235,6 +290,7 @@ const SOVEREIGN_STACK = {
     { id: "skyevault", title: "SkyeVault", replaces: ["google_drive", "github_repo_storage"], status: "owner_selectable_vault_lane" },
     { id: "skyemail", title: "SkyeMail", replaces: ["gmail_only_business_email"], status: "workspace_mailbox_lane" },
     { id: "skyepay", title: "SkyePay", replaces: ["manual_unlock_checkout"], status: "stripe_confirmed_auto_unlock_lane" },
+    { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "owner_approved_workforce_command_lane" },
     { id: "fs27", title: "SkyeGateFS27", replaces: ["loose_api_keys", "unmetered_ai"], status: "parent_gate_and_telemetry_lane" }
   ]
 };
@@ -965,7 +1021,13 @@ export default {
         const b = await body(req);
         const plan_id = b.plan_id || "starter-command";
         const prices = STRIPE_PRICES[plan_id];
-        if (!prices) return json({ ok: false, error: `unknown_plan: ${plan_id}` }, 400);
+        if (!prices) {
+          const plan = PLANS[plan_id];
+          if (plan?.owner_approval_required) {
+            return json({ ok: false, error: "owner_approved_plan_requires_custom_checkout", plan_id, checkout_url: plan.checkout_url, activation_path: plan.activation_path }, 409);
+          }
+          return json({ ok: false, error: `unknown_plan: ${plan_id}` }, 400);
+        }
         const stripeSecret = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
         if (!stripeSecret) return json({ ok: false, error: "stripe_not_configured" }, 503);
 

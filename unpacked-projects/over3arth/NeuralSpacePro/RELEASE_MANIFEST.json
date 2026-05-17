@@ -1,0 +1,125 @@
+{
+  "product": "NeuralSpacePro",
+  "version": "2.3.0",
+  "buildDate": "2026-05-02T00:00:00.000Z",
+  "platform": "AbovetheSkye-Platforms/NeuralSpacePro",
+  "editions": {
+    "platformShell": {
+      "file": "index.html",
+      "label": "NeuralSpacePro — Platform Shell",
+      "features": [
+        "real routed platform pages for dashboard, knowledge, runtime, build, research, handoff, map, and settings",
+        "knowledge vault workspace",
+        "worker runtime console and local settings",
+        "build pipeline with remote runtime send and static fallback queue",
+        "research session archive",
+        "review, execution, and dispatch handoff boards",
+        "Three.js neural map",
+        "same-origin static JSON runtime contract for live production verification",
+        "legacy long-page editions preserved as explicit links"
+      ]
+    },
+    "skydexia": {
+      "file": "skydexia-royalty-legacy.html",
+      "label": "SkyeDexia Edition — Feminine Royalty",
+      "palette": {
+        "bg": "#070308",
+        "rosegold": "#c9836e",
+        "hotPink": "#ff2d78",
+        "neonYellow": "#f5e642",
+        "gold": "#d4af70",
+        "ink": "#fce8ee"
+      },
+      "features": [
+        "Rose gold + neon yellow + reddish pink feminine royalty palette",
+        "♛ crown brand identity",
+        "3D Mode toggle — full Three.js galaxy with knowledge spheres, orbit controls, click-to-copy",
+        "2D mode — 180-particle rose/gold/pink neural network canvas",
+        "Knowledge vault: 60 registered files across 8 categories with the 2026-05-02 knowledge pack surfaced",
+        "8-provider matrix with neon yellow live indicators",
+        "5-step pipeline build console with pink/gold gradient progress bars",
+        "Project archive with pink/yellow quality score bars",
+        "System handoff pack archive with downstream SkyeHands targets",
+        "Same-origin research lane with runtime summary and session archive",
+        "Memory Fabric v6.8.1 + 90GB brain drive + SkyDexia Knowledge Pack 2026-05-02 panels",
+        "Worker settings modal with rose gold styling",
+        "Footer link back to original version"
+      ]
+    },
+    "original": {
+      "file": "neural-space-pro.html",
+      "label": "Original Neural Space Pro — Standard Edition",
+      "palette": {
+        "bg": "#04040e",
+        "violet": "#8b5cf6",
+        "cyan": "#06b6d4",
+        "gold": "#f59e0b",
+        "green": "#10b981",
+        "ink": "#e8e8f4"
+      },
+      "features": [
+        "Standard violet/cyan/gold SkyeHands palette",
+        "200-particle neural network with per-category colored particles",
+        "7 glowing orbs with category color matching",
+        "Knowledge vault with category filtering",
+        "8-provider matrix",
+        "5-step pipeline build console",
+        "Project archive with quality score bars",
+        "Same-origin research lane with runtime summary and session archive",
+        "Memory Fabric + 90GB brain drive panels",
+        "Worker settings modal"
+      ]
+    }
+  },
+  "workerConnection": {
+    "defaultUrl": "http://<runtime-host>:4120",
+    "sameOriginLocalRuntime": true,
+    "envVar": "SKYDEXIA_WORKER_URL",
+    "secretEnvVar": "SKYDEXIA_WORKER_SECRET",
+    "routes": [
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/health",        "purpose": "liveness check"        },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/status",        "purpose": "project index"         },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/v1/runtime-summary", "purpose": "session and runtime summary" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/v1/sessions",   "purpose": "list archived local research sessions" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/handoff-packs", "purpose": "list local handoff packets" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/v1/handoff-packs", "purpose": "compatibility handoff packet listing" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/review-board",   "purpose": "static review board data" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/execution-board", "purpose": "static execution board data" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/dispatch-board",  "purpose": "static dispatch board data" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/workflow-timeline", "purpose": "static workflow timeline data" },
+      { "method": "GET",  "path": "/runtime/standalone-apps/NeuralSpacePro/queue",           "purpose": "static build queue state" },
+      { "method": "POST", "path": "/runtime/standalone-apps/NeuralSpacePro/.netlify/functions/gateway-chat", "purpose": "same-origin local research chat proof" },
+      { "method": "POST", "path": "/runtime/standalone-apps/NeuralSpacePro/build-website", "purpose": "trigger AI pipeline"   },
+      { "method": "POST", "path": "/runtime/standalone-apps/NeuralSpacePro/handoff-packs", "purpose": "archive local handoff packet" },
+      { "method": "POST", "path": "/runtime/standalone-apps/NeuralSpacePro/v1/handoff-packs", "purpose": "compatibility handoff packet archive" },
+      { "method": "POST", "path": "/runtime/standalone-apps/NeuralSpacePro/queue/drain",   "purpose": "drain bus queue events" }
+    ]
+  },
+  "knowledgeSources": {
+    "totalRegistered": 60,
+    "categories": ["core", "arch", "memory", "brain", "design", "ops", "webcreator", "pack"],
+    "wiringManifest": "SkyDexia-Additional-Knowledge/manifests/skydexia-knowledge-wiring.json",
+    "latestKnowledgePack": "SkyDexia-Additional-Knowledge/SkyDexia_Knowledge_Pack_2026-05-02/SkyDexia_Knowledge_Pack_2026-05-02"
+  },
+  "proofStatus": {
+    "status": "partial",
+    "proofCommand": "node smoke/smoke-proof.mjs",
+    "proves": [
+      "eight real platform page URLs exist",
+      "two local legacy HTML editions exist",
+      "worker connection routes and settings wiring are present",
+      "the release manifest documents the worker contract and edition split",
+      "static same-origin JSON endpoints respond in production for health, status, runtime summary, sessions, handoff packs, boards, workflow timeline, and queue",
+      "a local runtime in this folder can serve the UI and worker contract on one origin",
+      "same-origin research sessions can be archived and inspected through local runtime summary lanes",
+      "generated projects can be archived into local system handoff packets"
+    ],
+    "unproven": [
+      "remote worker liveness",
+      "live browser CDN execution",
+      "live provider-backed website generation outside the proof harness",
+      "write-through delivery into downstream SkyeHands services"
+    ]
+  },
+  "status": "partial"
+}

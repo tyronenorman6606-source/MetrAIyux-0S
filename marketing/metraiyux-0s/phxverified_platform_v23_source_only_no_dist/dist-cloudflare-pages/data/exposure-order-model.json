@@ -1,0 +1,45 @@
+{
+  "version": "18.0.0",
+  "generated_at": "2026-05-17T18:46:13.705Z",
+  "service": "exposure-service",
+  "catalog": [
+    {
+      "product": "verified_profile_upgrade",
+      "tier": "starter",
+      "monthly_price": 49,
+      "setup_price": 0,
+      "description": "Claim support, profile cleanup queue, verified-owner review packet."
+    },
+    {
+      "product": "category_boost",
+      "tier": "growth",
+      "monthly_price": 149,
+      "setup_price": 0,
+      "description": "Priority exposure in relevant category/city surfaces after approval."
+    },
+    {
+      "product": "lead_routing_lane",
+      "tier": "pro",
+      "monthly_price": 299,
+      "setup_price": 99,
+      "description": "Qualified buyer routing lane with AE follow-up support."
+    },
+    {
+      "product": "territory_sponsor",
+      "tier": "market",
+      "monthly_price": 799,
+      "setup_price": 199,
+      "description": "Limited city/category sponsorship inventory with placement controls."
+    }
+  ],
+  "workflow": [
+    "validate exposure product",
+    "create sponsor_intent action envelope",
+    "queue action for review",
+    "wait for payment provider checkout wiring",
+    "wait for payment webhook",
+    "reserve inventory",
+    "admin approve placement"
+  ],
+  "public_claim_limit": "Pricing/order intent code exists. It does not claim paid placement is active until billing provider and approval projection are wired."
+}

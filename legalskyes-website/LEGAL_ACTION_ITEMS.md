@@ -1,4 +1,4 @@
-# Legal Action Items for Skyes Over London / SOL Enterprises
+# Legal Action Items for Skyes Over London / SOLEnterprises
 
 This package is drop-ready, but legal protection also requires operational setup.
 

@@ -29,6 +29,7 @@ export async function routeRequest(request: Request, env: Env): Promise<Response
     const path = url.pathname
     const method = request.method.toUpperCase()
 
+    if ((path === '/' || path === '/health') && method === 'GET') return await handleHealth(request, env)
     if (path === '/v1/health' && method === 'GET') return await handleHealth(request, env)
     if (path === '/v1/models' && method === 'GET') return await handleModels(request, env)
     if (path === '/v1/chat' && method === 'POST') return await handleChat(request, env)

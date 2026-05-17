@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
+import gsap from 'gsap';
 import {
   Activity,
   BellRing,
@@ -9,6 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleDot,
+  Crown,
   Download,
   Flame,
   Gamepad2,
@@ -37,11 +39,13 @@ import {
 } from 'lucide-react';
 
 import Meter from './components/Meter.jsx';
+import GrayScapeChromebook from './components/GrayScapeChromebook.jsx';
 import NeuralSpaceField from './components/NeuralSpaceField.jsx';
 import NeuralSpacePortal from './components/NeuralSpacePortal.jsx';
 import SigilButton from './components/SigilButton.jsx';
 import { Globe } from './registry/magicui/globe.jsx';
 import { allianceTemplates, anchorTemplates, archetypes, canonTemplates, epochTemplates, focusSessionTemplates, planLanes, realms, realityContractTemplates, researchPrinciples, ritualPrompts, worldBlueprints } from './data/over3arthContent.js';
+import { getGrayScapeModule } from './data/grayscapeSuperApp.js';
 import { getNeuralSpaceLane, neuralSpaceLanes } from './data/neuralSpacePro.js';
 import {
   addLedgerEntry,
@@ -76,6 +80,8 @@ import {
 import { clearSnapshots, downloadTextFile, exportState, getSnapshotVault, loadState, parseImportedState, resetState, restoreSnapshot, saveSnapshot, saveState } from './lib/storage.js';
 import { trackEvent } from './lib/analytics.js';
 import { archiveNeuralSpaceExchange, loadNeuralRuntimeSignal, triggerNeuralSpaceBuild } from './lib/neuralSpaceRuntime.js';
+import { getAurenBrainStatus, requestAurenBrain, synthesizeAurenSpeech, transcribeAurenAudio } from './lib/aurenBrainClient.js';
+import { captureGrayScapeJournal, captureGrayScapeTask, loadGrayScapeSignal } from './lib/grayscapeBridge.js';
 import { DEFAULT_VESSEL_NAME, createBrainResponse, detectBrainTarget, gateWorldNames, getVesselName } from './lib/voiceBrains.js';
 
 const navItems = [
@@ -160,6 +166,10 @@ function clampPercent(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function clampValue(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function buildUniverseSectors(state) {
   return realms.map((realm, index) => {
     const goals = state.goals.filter((goal) => goal.realm === realm.id);
@@ -182,6 +192,31 @@ function buildUniverseSectors(state) {
       anchors: anchors.length
     };
   });
+}
+
+function EnergyVesselShell() {
+  return (
+    <>
+      <span className="being-aura" />
+      <span className="being-sunburst" />
+      <span className="being-thread thread-one" />
+      <span className="being-thread thread-two" />
+      <span className="being-thread thread-three" />
+      <span className="being-rune-ring ring-outer" />
+      <span className="being-rune-ring ring-inner" />
+      <span className="being-crown" />
+      <span className="being-arm arm-left" />
+      <span className="being-arm arm-right" />
+      <span className="being-core" />
+      <span className="being-body" />
+      <span className="being-shadow" />
+      <span className="being-orbital-particles">
+        {Array.from({ length: 14 }, (_, index) => (
+          <i key={index} style={{ '--spark-angle': `${index * (360 / 14)}deg`, '--spark-delay': `${index * -0.17}s` }} />
+        ))}
+      </span>
+    </>
+  );
 }
 
 function App() {
@@ -607,6 +642,22 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const [neuralLaneId, setNeuralLaneId] = useState('chat');
   const [neuralRuntime, setNeuralRuntime] = useState({ online: false, checkedAt: null, summary: null });
   const [neuralBusy, setNeuralBusy] = useState(false);
+  const [grayScapeModuleId, setGrayScapeModuleId] = useState('nexus');
+  const [grayScapeSignal, setGrayScapeSignal] = useState(() => loadGrayScapeSignal());
+  const [grayScapeOpen, setGrayScapeOpen] = useState(false);
+  const [grayScapeBusy, setGrayScapeBusy] = useState(false);
+  const [grayScapeTraveling, setGrayScapeTraveling] = useState(false);
+  const [grayScapeTraveler, setGrayScapeTraveler] = useState(null);
+  const [mapDragging, setMapDragging] = useState(false);
+  const [aurenBrainStatus, setAurenBrainStatus] = useState({
+    ok: false,
+    providerOrder: ['MetrAIyux Gate / AurenBrain'],
+    lastProvider: 'MetrAIyux Gate / AurenBrain',
+    gate: { label: 'MetrAIyux Gate / AurenBrain' },
+    voice: { tts: false, stt: false },
+    memory: { exchanges: 0, facts: 0 }
+  });
+  const [aurenBusy, setAurenBusy] = useState(false);
   const [brainLog, setBrainLog] = useState(() => [
     {
       id: 'boot_vessel',
@@ -619,6 +670,18 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const recognitionRef = useRef(null);
   const commandHandlerRef = useRef(null);
   const voiceEnabledRef = useRef(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const audioPlaybackRef = useRef(null);
+  const viewportRef = useRef(null);
+  const avatarOrbitRef = useRef(null);
+  const viewportTweenRef = useRef(null);
+  const viewportSettleRef = useRef(null);
+  const grayScapeTravelTimerRef = useRef(null);
+  const grayScapeArriveTimerRef = useRef(null);
+  const grayScapeRunnerClearTimerRef = useRef(null);
+  const mapPanRef = useRef({ x: 0, y: 0, scale: 1, rotate: 0 });
+  const mapDragRef = useRef({ active: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originScale: 1, originRotate: 0 });
 
   useEffect(() => {
     if (!sectors.some((sector) => sector.id === selectedRealmId)) {
@@ -632,7 +695,24 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
 
   useEffect(() => {
     refreshNeuralRuntime({ silent: true });
+    refreshAurenBrain({ silent: true });
+    refreshGrayScapeSignal({ silent: true });
   }, []);
+
+  useEffect(() => () => {
+    recognitionRef.current?.stop?.();
+    mediaRecorderRef.current?.stream?.getTracks?.().forEach((track) => track.stop());
+    audioPlaybackRef.current?.pause?.();
+    viewportTweenRef.current?.kill?.();
+    window.clearTimeout(viewportSettleRef.current);
+    window.clearTimeout(grayScapeTravelTimerRef.current);
+    window.clearTimeout(grayScapeArriveTimerRef.current);
+    window.clearTimeout(grayScapeRunnerClearTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    moveGrayScapeViewport(grayScapeOpen);
+  }, [grayScapeOpen]);
 
   const selected = sectors.find((sector) => sector.id === selectedRealmId) || sectors[0];
   const selectedRealm = getRealm(selected?.id || 'craft');
@@ -648,97 +728,107 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const worldskinCharge = clampPercent((stats.energy + selected.charge + (priorityQuest ? 18 : 0)) / 2);
   const activeGateCoord = activeGate.coordinate || { x: 50, y: 28 };
   const activeNeuralLane = getNeuralSpaceLane(neuralLaneId);
+  const activeGrayScapeModule = getGrayScapeModule(grayScapeModuleId);
 
   commandHandlerRef.current = (transcript) => handleBrainCommand(transcript, 'voice');
 
   return (
-    <section className="spectacle-scene worldskin-scene" data-brain={brainTarget} data-voice={brainMode} data-neural-lane={neuralLaneId} aria-label="Playable Overearth universe">
+    <section className="spectacle-scene worldskin-scene" data-brain={brainTarget} data-voice={brainMode} data-thinking={aurenBusy ? 'true' : 'false'} data-neural-lane={neuralLaneId} data-grayscape={grayScapeOpen ? 'open' : 'closed'} data-grayscape-travel={grayScapeTraveling ? 'active' : 'idle'} aria-label="Playable Overearth universe">
       <NeuralSpaceField activeLaneId={neuralLaneId} charge={worldskinCharge} brainTarget={brainTarget} travelPulse={travelPulse} />
       <div
-        className="world-charge-orbit spectacle-orbit worldskin-orbit"
-        style={{
-          '--world-charge': `${Math.max(8, stats.energy)}%`,
-          '--avatar-angle': `${avatarAngle}deg`,
-          '--worldskin-charge': `${worldskinCharge}%`,
-          '--rift-x': `${activeGateCoord.x}%`,
-          '--rift-y': `${activeGateCoord.y}%`,
-          '--neural-color': activeNeuralLane.color
-        }}
+        ref={viewportRef}
+        className={mapDragging ? 'worldskin-viewport dragging' : 'worldskin-viewport'}
+        onPointerDown={beginMapDrag}
+        onPointerMove={moveMapDrag}
+        onPointerUp={endMapDrag}
+        onPointerCancel={endMapDrag}
+        aria-label="Draggable Overearth universe viewport"
       >
-        <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
-        <div className="worldskin-pulse-field" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="worldskin-interior-rift" key={`rift-${activeGateId}-${selectedRealmId}-${travelPulse}`} aria-hidden="true">
-          <span className="rift-core" />
-          <span className="rift-depth depth-one" />
-          <span className="rift-depth depth-two" />
-          <span className="rift-route route-one" />
-          <span className="rift-route route-two" />
-        </div>
-        <div className="worldskin-gate-field" aria-label="Overearth world gates">
-          {gameGates.map((gate, index) => {
-            const Icon = gate.icon;
-            return (
-              <button
-                key={gate.id}
-                type="button"
-                className={activeGateId === gate.id ? 'worldskin-gate active' : 'worldskin-gate'}
-                style={{ '--gate-x': `${gate.coordinate.x}%`, '--gate-y': `${gate.coordinate.y}%`, '--gate-delay': `${index * -0.24}s` }}
-                onClick={() => travelToGate(gate, true)}
-                title={gate.worldName}
-                aria-label={`Travel to ${gate.worldName}`}
-              >
-                <Icon size={15} />
-              </button>
-            );
-          })}
-          {sectors.map((sector, index) => {
-            const coord = realmCoordinates[index % realmCoordinates.length];
-            return (
-              <button
-                key={sector.id}
-                type="button"
-                className={selectedRealmId === sector.id ? 'worldskin-realm-node active' : 'worldskin-realm-node'}
-                style={{ '--realm-x': `${coord.x}%`, '--realm-y': `${coord.y}%`, '--realm-charge': `${Math.max(12, sector.charge)}%`, '--realm-delay': `${index * -0.34}s` }}
-                onClick={() => travelToRealm(sector, true)}
-                title={sector.name}
-                aria-label={`Enter ${sector.name}`}
-              >
-                {sector.sigil}
-              </button>
-            );
-          })}
-        </div>
-        <div className="avatar-orbit spectacle-avatar-orbit" aria-hidden="true">
-          <motion.div
-            className="energy-being spectacle-being"
-            animate={{ y: [0, -10, 0], scale: [1, 1.035, 1] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <span className="being-aura" />
-            <span className="being-sunburst" />
-            <span className="being-thread thread-one" />
-            <span className="being-thread thread-two" />
-            <span className="being-thread thread-three" />
-            <span className="being-rune-ring ring-outer" />
-            <span className="being-rune-ring ring-inner" />
-            <span className="being-crown" />
-            <span className="being-arm arm-left" />
-            <span className="being-arm arm-right" />
-            <span className="being-core" />
-            <span className="being-body" />
-            <span className="being-shadow" />
-            <span className="being-orbital-particles">
-              {Array.from({ length: 14 }, (_, index) => (
-                <i key={index} style={{ '--spark-angle': `${index * (360 / 14)}deg`, '--spark-delay': `${index * -0.17}s` }} />
-              ))}
-            </span>
-          </motion.div>
+        <div
+          className="world-charge-orbit spectacle-orbit worldskin-orbit"
+          style={{
+            '--world-charge': `${Math.max(8, stats.energy)}%`,
+            '--avatar-angle': `${avatarAngle}deg`,
+            '--worldskin-charge': `${worldskinCharge}%`,
+            '--rift-x': `${activeGateCoord.x}%`,
+            '--rift-y': `${activeGateCoord.y}%`,
+            '--neural-color': activeNeuralLane.color
+          }}
+        >
+          <div ref={avatarOrbitRef} className="worldskin-entity-aura" aria-hidden="true">
+            <span className="worldskin-entity-aura__shell" />
+            <span className="worldskin-entity-aura__voice" />
+            <span className="worldskin-entity-aura__sweep" />
+            <span className="worldskin-entity-aura__core" />
+          </div>
+          <Globe className="game-world-globe spectacle-globe" intensity={Math.max(0.95, stats.energy / 60)} label={`${state.profile.worldName} world charge globe`} />
+          <div className="worldskin-pulse-field" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="worldskin-interior-rift" key={`rift-${activeGateId}-${selectedRealmId}-${travelPulse}`} aria-hidden="true">
+            <span className="rift-core" />
+            <span className="rift-depth depth-one" />
+            <span className="rift-depth depth-two" />
+            <span className="rift-route route-one" />
+            <span className="rift-route route-two" />
+          </div>
+          <div className="worldskin-gate-field" aria-label="Overearth world gates">
+            {gameGates.map((gate, index) => {
+              const Icon = gate.icon;
+              return (
+                <button
+                  key={gate.id}
+                  type="button"
+                  className={activeGateId === gate.id ? 'worldskin-gate active' : 'worldskin-gate'}
+                  style={{ '--gate-x': `${gate.coordinate.x}%`, '--gate-y': `${gate.coordinate.y}%`, '--gate-delay': `${index * -0.24}s` }}
+                  onClick={() => travelToGate(gate, true)}
+                  title={gate.worldName}
+                  aria-label={`Travel to ${gate.worldName}`}
+                >
+                  <Icon size={15} />
+                </button>
+              );
+            })}
+            {sectors.map((sector, index) => {
+              const coord = realmCoordinates[index % realmCoordinates.length];
+              return (
+                <button
+                  key={sector.id}
+                  type="button"
+                  className={selectedRealmId === sector.id ? 'worldskin-realm-node active' : 'worldskin-realm-node'}
+                  style={{ '--realm-x': `${coord.x}%`, '--realm-y': `${coord.y}%`, '--realm-charge': `${Math.max(12, sector.charge)}%`, '--realm-delay': `${index * -0.34}s` }}
+                  onClick={() => travelToRealm(sector, true)}
+                  title={sector.name}
+                  aria-label={`Enter ${sector.name}`}
+                >
+                  {sector.sigil}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {grayScapeTraveler ? (
+        <div
+          className="energy-being spectacle-being vessel-gate-runner"
+          data-arrived={grayScapeTraveler.arrived ? 'true' : 'false'}
+          style={{
+            '--vessel-start-x': `${grayScapeTraveler.startX}px`,
+            '--vessel-start-y': `${grayScapeTraveler.startY}px`,
+            '--vessel-target-x': `${grayScapeTraveler.targetX}px`,
+            '--vessel-target-y': `${grayScapeTraveler.targetY}px`,
+            left: `${grayScapeTraveler.arrived ? grayScapeTraveler.targetX : grayScapeTraveler.startX}px`,
+            top: `${grayScapeTraveler.arrived ? grayScapeTraveler.targetY : grayScapeTraveler.startY}px`,
+            opacity: grayScapeTraveler.arrived ? 0.2 : 1
+          }}
+          aria-hidden="true"
+        >
+          <EnergyVesselShell />
+        </div>
+      ) : null}
 
       <div className="worldskin-action-sigils" aria-label="Overearth game actions">
         <button type="button" className={voiceEnabled ? 'voice-aperture listening' : 'voice-aperture'} onClick={toggleListening} title={voiceEnabled ? 'Stop local voice brains' : 'Start local voice brains'} aria-label={voiceEnabled ? 'Stop local voice brains' : 'Start local voice brains'}>
@@ -748,7 +838,8 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
         <button type="button" onClick={requestProofSeal} title="Seal proof" aria-label="Seal proof"><CheckCircle2 size={17} /></button>
         <button type="button" onClick={requestFocusPulse} title="Focus pulse" aria-label="Focus pulse"><Brain size={17} /></button>
         <button type="button" onClick={requestRitualPulse} title="Ritual pulse" aria-label="Ritual pulse"><Flame size={17} /></button>
-        <button type="button" onClick={() => speakBrain(createBrainResponse({ transcript: 'status', target: 'overearth', state, stats, selectedRealm, activeGate, gates: gameGates, realms, vesselName }).response, 'overearth')} title="World status" aria-label="World status"><Radar size={17} /></button>
+        <button type="button" onClick={() => openGrayScapeModule(grayScapeModuleId, true)} title="Wake GrayScape Chromebook" aria-label="Wake GrayScape Chromebook"><Crown size={17} /></button>
+        <button type="button" onClick={() => handleBrainCommand('Overearth status', 'sigil')} title="World status" aria-label="World status"><Radar size={17} /></button>
       </div>
 
       <motion.div className="worldskin-brain-dock" data-target={brainTarget} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }} aria-live="polite">
@@ -759,12 +850,12 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
           </span>
           <div className="brain-dock-status">
             <span className={voiceEnabled ? 'listening-dot active' : 'listening-dot'} />
-            {voiceEnabled ? 'Listening' : voiceSupported ? 'Mic ready' : 'Typed mode'}
+            {aurenBusy ? 'Thinking' : voiceEnabled ? 'Listening' : voiceSupported || aurenBrainStatus.voice?.stt ? 'Mic ready' : 'Typed mode'}
           </div>
         </div>
         <div className="brain-dock-worldline">
           <strong>{activeGate.worldName}</strong>
-          <span>{selectedRealm.name} / {activeNeuralLane.shortLabel}</span>
+          <span>{selectedRealm.name} / {activeNeuralLane.shortLabel} / {aurenBrainStatus.gate?.label || aurenBrainStatus.lastProvider || 'MetrAIyux Gate / AurenBrain'}</span>
         </div>
         <div className="brain-log" aria-label="Overearth brain chat log">
           {brainLog.slice(-4).map((item) => (
@@ -796,23 +887,181 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
           <button type="button" onClick={toggleListening}>{voiceEnabled ? 'Stop mic' : 'Start mic'}</button>
           <button type="button" onClick={() => setAudioOutputEnabled((value) => !value)}>{audioOutputEnabled ? 'Mute voice' : 'Enable voice'}</button>
         </div>
-        <small>{lastTranscript ? `Heard: ${lastTranscript}` : neuralRuntime.online ? 'NeuralSpace runtime linked through the local worker.' : 'Type here anytime. Start the NeuralSpace runtime to archive sessions and build proofs.'}</small>
+        <small>{lastTranscript ? `Heard: ${lastTranscript}` : aurenBrainStatus.ok ? `${aurenBrainStatus.gate?.label || 'MetrAIyux Gate / AurenBrain'} online. ${aurenBrainStatus.memory?.exchanges || 0} exchanges remembered.` : 'AurenBrain service is warming up; your gate is ready.'}</small>
       </motion.div>
+
+      <GrayScapeChromebook
+        activeModuleId={grayScapeModuleId}
+        signal={grayScapeSignal}
+        open={grayScapeOpen}
+        busy={grayScapeBusy}
+        onSelectModule={(moduleId) => selectGrayScapeModule(moduleId, false)}
+        onOpenModule={(moduleId) => openGrayScapeModule(moduleId, true)}
+        onClose={closeGrayScapeModule}
+        onRefresh={() => refreshGrayScapeSignal()}
+        onFrameLoad={() => refreshGrayScapeSignal({ silent: true })}
+      />
     </section>
   );
+
+  function getGrayScapeViewportTarget(isOpen) {
+    const compact = window.innerWidth <= 900;
+    return isOpen
+      ? {
+          x: compact ? window.innerWidth * 0.12 : window.innerWidth * 0.52,
+          y: compact ? -window.innerHeight * 0.28 : -window.innerHeight * 0.1,
+          scale: compact ? 0.38 : 0.34,
+          rotate: compact ? 0 : 2.5,
+          opacity: compact ? 0.5 : 0.52,
+          filter: 'blur(0.7px)'
+        }
+      : { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1, filter: 'blur(0px)' };
+  }
+
+  function resetMapDrag() {
+    mapDragRef.current = { active: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originScale: 1, originRotate: 0 };
+    setMapDragging(false);
+  }
+
+  function moveGrayScapeViewport(isOpen) {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    viewportTweenRef.current?.kill?.();
+    gsap.killTweensOf(viewport);
+    window.clearTimeout(viewportSettleRef.current);
+    const reduced = prefersReducedMotion();
+    const target = getGrayScapeViewportTarget(isOpen);
+
+    viewportTweenRef.current = gsap.to(viewport, {
+      x: target.x,
+      y: target.y,
+      scale: target.scale,
+      rotation: target.rotate,
+      opacity: target.opacity,
+      filter: target.filter,
+      duration: reduced ? 0.01 : isOpen ? 0.72 : 0.58,
+      ease: isOpen ? 'expo.inOut' : 'power3.inOut',
+      onUpdate: () => {
+        mapPanRef.current = {
+          x: Number(gsap.getProperty(viewport, 'x')) || 0,
+          y: Number(gsap.getProperty(viewport, 'y')) || 0,
+          scale: Number(gsap.getProperty(viewport, 'scale')) || 1,
+          rotate: Number(gsap.getProperty(viewport, 'rotation')) || 0
+        };
+      },
+      onComplete: () => {
+        mapPanRef.current = { x: target.x, y: target.y, scale: target.scale, rotate: target.rotate };
+      }
+    });
+    viewportSettleRef.current = window.setTimeout(() => {
+      gsap.killTweensOf(viewport);
+      gsap.set(viewport, {
+        x: target.x,
+        y: target.y,
+        scale: target.scale,
+        rotation: target.rotate,
+        opacity: target.opacity,
+        filter: target.filter
+      });
+      mapPanRef.current = { x: target.x, y: target.y, scale: target.scale, rotate: target.rotate };
+    }, reduced ? 20 : isOpen ? 820 : 680);
+  }
+
+  function shouldIgnoreMapDrag(target) {
+    return Boolean(target?.closest?.('button, input, textarea, select, iframe, a, .worldskin-brain-dock, .worldskin-action-sigils, .grayscape-chromebook'));
+  }
+
+  function beginMapDrag(event) {
+    if (grayScapeTraveling || shouldIgnoreMapDrag(event.target)) return;
+    viewportTweenRef.current?.kill?.();
+    const origin = mapPanRef.current;
+    mapDragRef.current = {
+      active: true,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: origin.x || 0,
+      originY: origin.y || 0,
+      originScale: origin.scale || 1,
+      originRotate: origin.rotate || 0
+    };
+    setMapDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }
+
+  function moveMapDrag(event) {
+    const drag = mapDragRef.current;
+    if (!drag.active || drag.pointerId !== event.pointerId || !viewportRef.current) return;
+    const boundsX = window.innerWidth * 0.45;
+    const boundsY = window.innerHeight * 0.34;
+    const next = {
+      x: clampValue(drag.originX + event.clientX - drag.startX, -boundsX, boundsX),
+      y: clampValue(drag.originY + event.clientY - drag.startY, -boundsY, boundsY),
+      scale: drag.originScale || 1,
+      rotate: drag.originRotate || 0
+    };
+    mapPanRef.current = next;
+    gsap.set(viewportRef.current, { x: next.x, y: next.y, scale: next.scale, rotation: next.rotate, opacity: 1, filter: grayScapeOpen ? 'blur(0.7px)' : 'blur(0px)' });
+  }
+
+  function endMapDrag(event) {
+    const drag = mapDragRef.current;
+    if (!drag.active || drag.pointerId !== event.pointerId) return;
+    mapDragRef.current = { active: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originScale: 1, originRotate: 0 };
+    setMapDragging(false);
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }
+
+  function closeGrayScapeModule() {
+    window.clearTimeout(grayScapeTravelTimerRef.current);
+    window.clearTimeout(grayScapeArriveTimerRef.current);
+    window.clearTimeout(grayScapeRunnerClearTimerRef.current);
+    resetMapDrag();
+    setGrayScapeTraveling(false);
+    setGrayScapeTraveler(null);
+    setGrayScapeOpen(false);
+    moveGrayScapeViewport(false);
+  }
+
+  function createGrayScapeTravelFrame() {
+    const vesselNode = avatarOrbitRef.current?.querySelector?.('.spectacle-being') || avatarOrbitRef.current;
+    const laptopNode =
+      document.querySelector('.grayscape-chromebook[data-open="false"] .grayscape-chromebook__closed-lid') ||
+      document.querySelector('.grayscape-chromebook[data-open="false"]');
+    const vesselRect = vesselNode?.getBoundingClientRect?.();
+    const laptopRect = laptopNode?.getBoundingClientRect?.();
+    const width = window.innerWidth || 1440;
+    const height = window.innerHeight || 900;
+
+    return {
+      startX: vesselRect ? vesselRect.left + vesselRect.width / 2 : width * 0.5,
+      startY: vesselRect ? vesselRect.top + vesselRect.height / 2 : height * 0.44,
+      targetX: laptopRect ? laptopRect.left + laptopRect.width * 0.54 : 118,
+      targetY: laptopRect ? laptopRect.top + laptopRect.height * 0.42 : height * 0.42
+    };
+  }
 
   function toggleListening() {
     if (voiceEnabled) {
       voiceEnabledRef.current = false;
       setVoiceEnabled(false);
       setBrainMode('idle');
+      if (mediaRecorderRef.current?.state === 'recording') {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {
+          setBrainMode('idle');
+        }
+        speakBrain('Voice captured. I am reading it now.', brainTarget, { audible: false });
+        return;
+      }
       recognitionRef.current?.stop?.();
-      speakBrain('Local listening is paused. The world remains awake through the sigils.', brainTarget);
+      speakBrain('Listening is paused. The world remains awake through the sigils.', brainTarget);
       return;
     }
 
     if (!voiceSupported) {
-      speakBrain('This browser cannot open speech recognition here. The local brains are still available through the sigils.', 'overearth');
+      startServerVoiceCapture();
       return;
     }
 
@@ -848,11 +1097,74 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
       setVoiceEnabled(true);
       setBrainMode('listening');
       recognitionRef.current.start();
-      speakBrain(`Local voice channel open. Say Overearth for the world brain, or say ${vesselName} for the vessel brain.`, 'overearth');
+      speakBrain(`Voice channel open. Say Overearth for the world brain, or say ${vesselName} for the vessel brain.`, 'overearth', { audible: false });
     } catch {
       setBrainMode('idle');
       setVoiceEnabled(false);
       voiceEnabledRef.current = false;
+      startServerVoiceCapture();
+    }
+  }
+
+  async function startServerVoiceCapture() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      speakBrain('Microphone capture is blocked here. Type the command and I will still answer through AurenBrain.', 'overearth');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data?.size) audioChunksRef.current.push(event.data);
+      };
+      recorder.onstop = async () => {
+        const chunks = audioChunksRef.current;
+        let delegatedToBrain = false;
+        audioChunksRef.current = [];
+        stream.getTracks().forEach((track) => track.stop());
+        mediaRecorderRef.current = null;
+        if (!chunks.length) {
+          setBrainMode('idle');
+          return;
+        }
+        setAurenBusy(true);
+        setBrainMode('thinking');
+        try {
+          const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+          const result = await transcribeAurenAudio(blob);
+          const text = String(result.text || '').trim();
+          if (text) {
+            delegatedToBrain = true;
+            await handleBrainCommand(text, 'voice');
+          } else {
+            speakBrain('I caught audio, but no words came through cleanly.', 'overearth');
+          }
+        } catch {
+          speakBrain(
+            aurenBrainStatus.voice?.stt
+              ? 'The transcriber failed on that capture. Try one shorter line.'
+              : 'Server transcription needs a model-backed voice key. Type it here and I will answer through the same brain.',
+            'overearth'
+          );
+        } finally {
+          setAurenBusy(false);
+          if (!delegatedToBrain) setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle');
+        }
+      };
+
+      mediaRecorderRef.current = recorder;
+      voiceEnabledRef.current = true;
+      setVoiceEnabled(true);
+      setBrainMode('listening');
+      setBrainLine('Voice capture open. Tap the mic again to send.');
+      recorder.start();
+    } catch {
+      voiceEnabledRef.current = false;
+      setVoiceEnabled(false);
+      setBrainMode('idle');
+      speakBrain('Microphone permission did not open. The typed channel is active.', 'overearth');
     }
   }
 
@@ -864,58 +1176,232 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     handleBrainCommand(transcript, 'typed');
   }
 
-  function handleBrainCommand(transcript, source = 'typed') {
-    const target = detectBrainTarget(transcript, vesselName, brainTarget);
-    const result = createBrainResponse({ transcript, target, state, stats, selectedRealm, activeGate, gates: gameGates, realms, vesselName });
-    setLastTranscript(transcript);
+  async function handleBrainCommand(transcript, source = 'typed') {
+    const command = String(transcript || '').trim();
+    if (!command) return;
+    const target = detectBrainTarget(command, vesselName, brainTarget);
+    setLastTranscript(command);
+    setBrainTarget(target);
+    setBrainMode('thinking');
+    appendBrainLog([{
+      id: uid('player'),
+      role: 'player',
+      source,
+      text: command,
+      createdAt: new Date().toISOString()
+    }]);
+
+    const localBrainPlan = createBrainResponse({
+      transcript: command,
+      target,
+      state,
+      stats,
+      selectedRealm,
+      activeGate,
+      gates: gameGates,
+      realms,
+      vesselName,
+      activeNeuralLane,
+      neuralRuntime,
+      activeGrayScapeModule,
+      grayScapeSignal
+    });
+
+    setAurenBusy(true);
+    let result;
+    try {
+      const payload = await requestAurenBrain(buildBrainPayload(command, target, source));
+      result = normalizeClientBrainResult(payload, target);
+      result = reconcileLocalBrainResult(result, localBrainPlan, target);
+      setAurenBrainStatus((current) => ({
+        ...current,
+        ok: true,
+        lastProvider: result.provider || current.lastProvider || 'MetrAIyux Gate / AurenBrain',
+        lastError: '',
+        neuralStatus: result.neuralStatus || current.neuralStatus
+      }));
+    } catch (error) {
+      const fallback = localBrainPlan;
+      result = normalizeClientBrainResult({
+        ...fallback,
+        provider: 'MetrAIyux Gate / AurenBrain',
+        actions: fallback.action && fallback.action !== 'none'
+          ? [{ type: fallback.action, payload: fallback.payload || {}, reason: 'onboard gate action' }]
+          : [],
+        failures: [{ gate: 'MetrAIyux Gate / AurenBrain', error: error.message }]
+      }, fallback.target || target);
+      setAurenBrainStatus((current) => ({
+        ...current,
+        ok: false,
+        lastProvider: 'MetrAIyux Gate / AurenBrain',
+        gate: current.gate || { label: 'MetrAIyux Gate / AurenBrain' },
+        lastError: error.message,
+        providerOrder: current.providerOrder?.length ? current.providerOrder : ['MetrAIyux Gate / AurenBrain']
+      }));
+    } finally {
+      setAurenBusy(false);
+    }
+
     setBrainTarget(result.target);
-    appendBrainLog([
-      {
-        id: uid('player'),
-        role: 'player',
-        source,
-        text: transcript,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: uid('brain'),
-        role: 'brain',
-        target: result.target,
-        text: result.response,
-        createdAt: new Date().toISOString()
-      }
-    ]);
-    applyBrainAction(result, transcript);
-    rememberBrainExchange(transcript, result);
-    bridgeNeuralSpace(result, transcript);
+    appendBrainLog([{
+      id: uid('brain'),
+      role: 'brain',
+      target: result.target,
+      provider: result.provider,
+      text: result.response,
+      createdAt: new Date().toISOString()
+    }]);
+    applyBrainAction(result, command);
+    rememberBrainExchange(command, result);
+    bridgeNeuralSpace(result, command);
     speakBrain(result.response, result.target, { log: false });
   }
 
+  function reconcileLocalBrainResult(providerResult, localPlan, fallbackTarget) {
+    const localAction = localPlan?.action;
+    if (!localAction || localAction === 'none' || getBrainActions(providerResult).length) {
+      return providerResult;
+    }
+    return normalizeClientBrainResult({
+      ...providerResult,
+      target: localPlan.target || providerResult.target || fallbackTarget,
+      response: localPlan.response || providerResult.response,
+      actions: [{ type: localAction, payload: localPlan.payload || {}, reason: 'local Overearth command router' }],
+      action: localAction,
+      payload: localPlan.payload || {},
+      provider: providerResult.provider || 'MetrAIyux Gate / AurenBrain',
+      confidence: Math.max(Number(providerResult.confidence) || 0, Number(localPlan.confidence) || 0.72)
+    }, fallbackTarget);
+  }
+
   function applyBrainAction(result, transcript) {
-    if (result.action === 'travel_realm') {
-      const realm = sectors.find((sector) => sector.id === result.payload.realmId);
-      if (realm) travelToRealm(realm, false);
+    for (const action of getBrainActions(result)) {
+      const payload = action.payload || {};
+      if (action.type === 'travel_realm') {
+        const realm = sectors.find((sector) => sector.id === payload.realmId);
+        if (realm) travelToRealm(realm, false);
+      }
+      if (action.type === 'travel_gate') {
+        const gate = gameGates.find((item) => item.id === payload.gateId);
+        if (gate) travelToGate(gate, false);
+      }
+      if (action.type === 'generate_mission') launchSectorMission();
+      if (action.type === 'seal_quest') sealPriorityProof();
+      if (action.type === 'ritual_pulse') sealRitualPulse();
+      if (action.type === 'focus_pulse') sealFocusPulse();
+      if (action.type === 'capture_note') captureBrainNote(payload.note || transcript);
+      if (action.type === 'sync_neural_runtime') refreshNeuralRuntime();
+      if (action.type === 'rename_vessel' && payload.name) {
+        updateState((current) => ({
+          ...current,
+          profile: { ...current.profile, vesselName: payload.name }
+        }), '', 'vessel_renamed');
+      }
+      if (['open_neural_lane', 'neural_research', 'neural_build'].includes(action.type)) {
+        selectNeuralLane(payload.laneId || 'chat', false);
+      }
+      if (action.type === 'neural_build') {
+        launchNeuralSpaceBuild(transcript, { ...result, payload });
+      }
+      if (action.type === 'open_grayscape_module') {
+        openGrayScapeModule(payload.moduleId || 'nexus', false);
+      }
+      if (action.type === 'grayscape_task') {
+        const signal = captureGrayScapeTask(payload.title || transcript, payload.due || '');
+        setGrayScapeSignal(signal);
+        selectGrayScapeModule('tasks', false);
+      }
+      if (action.type === 'grayscape_journal') {
+        const signal = captureGrayScapeJournal(payload.content || transcript, payload.title || 'Overearth Capture');
+        setGrayScapeSignal(signal);
+        selectGrayScapeModule('journal', false);
+      }
+      if (action.type === 'grayscape_sync') {
+        refreshGrayScapeSignal();
+      }
     }
-    if (result.action === 'travel_gate') {
-      const gate = gameGates.find((item) => item.id === result.payload.gateId);
-      if (gate) travelToGate(gate, false);
-    }
-    if (result.action === 'generate_mission') launchSectorMission();
-    if (result.action === 'seal_quest') sealPriorityProof();
-    if (result.action === 'ritual_pulse') sealRitualPulse();
-    if (result.action === 'focus_pulse') sealFocusPulse();
-    if (result.action === 'rename_vessel') {
-      updateState((current) => ({
+  }
+
+  function buildBrainPayload(message, target, source) {
+    return {
+      message,
+      target,
+      source,
+      state,
+      stats,
+      selectedRealm,
+      activeGate: {
+        id: activeGate.id,
+        label: activeGate.label,
+        worldName: activeGate.worldName,
+        coordinate: activeGate.coordinate
+      },
+      activeNeuralLane,
+      neuralLaneId,
+      neuralRuntime,
+      activeGrayScapeModule,
+      grayScapeModuleId,
+      grayScapeSignal,
+      history: brainLog.slice(-10).map((item) => ({
+        role: item.role,
+        target: item.target || '',
+        text: item.text,
+        createdAt: item.createdAt
+      }))
+    };
+  }
+
+  function normalizeClientBrainResult(candidate, fallbackTarget = 'vessel') {
+    const target = candidate.target === 'overearth' || candidate.target === 'vessel' ? candidate.target : fallbackTarget;
+    const fallbackAction = candidate.action
+      ? [{ type: candidate.action, payload: candidate.payload || {}, reason: 'single action result' }]
+      : [];
+    const actions = (Array.isArray(candidate.actions) && candidate.actions.length ? candidate.actions : fallbackAction)
+      .map((action) => ({
+        type: action?.type || 'none',
+        payload: action?.payload && typeof action.payload === 'object' ? action.payload : {},
+        reason: action?.reason || ''
+      }));
+    const primary = actions[0] || { type: 'none', payload: {}, reason: '' };
+    return {
+      ...candidate,
+      target,
+      response: String(candidate.response || '').trim() || 'I am online, but that answer came back empty. Give me one clean command and I will reroute.',
+      actions,
+      action: primary.type,
+      payload: primary.payload,
+      provider: candidate.provider || candidate.gate?.label || 'MetrAIyux Gate / AurenBrain',
+      confidence: Number.isFinite(candidate.confidence) ? candidate.confidence : 0.5
+    };
+  }
+
+  function getBrainActions(result) {
+    const actions = Array.isArray(result.actions) && result.actions.length
+      ? result.actions
+      : result.action
+        ? [{ type: result.action, payload: result.payload || {}, reason: '' }]
+        : [];
+    return actions.filter((action) => action?.type && action.type !== 'none');
+  }
+
+  function captureBrainNote(note) {
+    const text = String(note || '').trim();
+    if (!text) return;
+    updateState((current) => {
+      const entry = {
+        id: uid('note'),
+        text,
+        realm: selectedRealm.id,
+        source: 'energy-vessel',
+        createdAt: new Date().toISOString()
+      };
+      let next = {
         ...current,
-        profile: { ...current.profile, vesselName: result.payload.name }
-      }), '', 'vessel_renamed');
-    }
-    if (['open_neural_lane', 'neural_research', 'neural_build'].includes(result.action)) {
-      selectNeuralLane(result.payload?.laneId || 'chat', false);
-    }
-    if (result.action === 'neural_build') {
-      launchNeuralSpaceBuild(transcript, result);
-    }
+        notes: [entry, ...(current.notes || [])].slice(0, 250)
+      };
+      next = addLedgerEntry(next, 'note', 'Energy vessel memory captured', text);
+      return next;
+    }, '', 'brain_note_captured');
   }
 
   function selectNeuralLane(laneId, shouldSpeak = false) {
@@ -926,6 +1412,77 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     if (linkedGate) setActiveGateId(linkedGate.id);
     if (shouldSpeak) {
       speakBrain(`${lane.label} is now the active assistant dimension. ${lane.response}`, 'vessel');
+    }
+  }
+
+  function selectGrayScapeModule(moduleId, shouldSpeak = false) {
+    const module = getGrayScapeModule(moduleId);
+    setGrayScapeModuleId(module.id);
+    setTravelPulse((value) => value + 1);
+    const linkedGate = gameGates.find((item) => item.id === module.gateId);
+    if (linkedGate) setActiveGateId(linkedGate.id);
+    const linkedRealm = sectors.find((sector) => sector.id === module.realmId);
+    if (linkedRealm) setSelectedRealmId(linkedRealm.id);
+    if (shouldSpeak) {
+      speakBrain(`${module.label} is selected in GrayScape. ${module.response}`, 'vessel');
+    }
+  }
+
+  function openGrayScapeModule(moduleId, shouldSpeak = false) {
+    const module = getGrayScapeModule(moduleId);
+    selectGrayScapeModule(module.id, false);
+    window.clearTimeout(grayScapeTravelTimerRef.current);
+    window.clearTimeout(grayScapeArriveTimerRef.current);
+    window.clearTimeout(grayScapeRunnerClearTimerRef.current);
+    resetMapDrag();
+    refreshGrayScapeSignal({ silent: true });
+    if (grayScapeOpen) {
+      setGrayScapeTraveling(false);
+      setGrayScapeTraveler(null);
+      if (shouldSpeak) {
+        speakBrain(`${module.label} is already open inside GrayScape.`, 'vessel');
+      }
+      return;
+    }
+
+    const travelFrame = { ...createGrayScapeTravelFrame(), arrived: false };
+    setGrayScapeTraveler(travelFrame);
+    setGrayScapeTraveling(true);
+    grayScapeArriveTimerRef.current = window.setTimeout(() => {
+      setGrayScapeTraveler((current) => current ? { ...current, arrived: true } : current);
+    }, 40);
+    if (shouldSpeak) {
+      speakBrain(`${vesselName} is crossing into ${module.label}. GrayScape opens when the vessel reaches the side gate.`, 'vessel');
+    }
+    grayScapeTravelTimerRef.current = window.setTimeout(() => {
+      setGrayScapeOpen(true);
+      moveGrayScapeViewport(true);
+      setGrayScapeTraveler((current) => current ? { ...current, arrived: true } : current);
+      grayScapeRunnerClearTimerRef.current = window.setTimeout(() => {
+        setGrayScapeTraveling(false);
+        setGrayScapeTraveler(null);
+      }, prefersReducedMotion() ? 140 : 1600);
+    }, prefersReducedMotion() ? 820 : 1120);
+  }
+
+  async function refreshGrayScapeSignal(options = {}) {
+    const { silent = false } = options;
+    setGrayScapeBusy(true);
+    try {
+      const signal = loadGrayScapeSignal();
+      setGrayScapeSignal(signal);
+      if (!silent) {
+        appendBrainLog([{
+          id: uid('grayscape_sync'),
+          role: 'brain',
+          target: 'vessel',
+          text: `GrayScape linked: ${signal.tasks.open} open tasks, ${signal.journal.entries} journal entries, ${signal.command.founderMessages} founder messages, vault ${signal.vault.locked ? 'locked' : 'open'}.`,
+          createdAt: new Date().toISOString()
+        }]);
+      }
+      return signal;
+    } finally {
+      setGrayScapeBusy(false);
     }
   }
 
@@ -965,11 +1522,56 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     }
   }
 
+  async function refreshAurenBrain(options = {}) {
+    const { silent = false } = options;
+    try {
+      const status = await getAurenBrainStatus();
+      const next = {
+        ...status,
+        gate: status.gate || { label: status.providerOrder?.[0] || 'MetrAIyux Gate / AurenBrain' },
+        lastProvider: status.gate?.label || status.providerOrder?.[0] || 'MetrAIyux Gate / AurenBrain'
+      };
+      setAurenBrainStatus(next);
+      if (!silent) {
+        appendBrainLog([{
+          id: uid('auren_status'),
+          role: 'brain',
+          target: 'vessel',
+          text: `AurenBrain is online through ${next.gate?.label || next.lastProvider}. Memory holds ${status.memory?.exchanges || 0} exchanges and ${status.memory?.facts || 0} facts.`,
+          createdAt: new Date().toISOString()
+        }]);
+      }
+      return next;
+    } catch (error) {
+      const offline = {
+        ok: false,
+        providerOrder: ['MetrAIyux Gate / AurenBrain'],
+        lastProvider: 'MetrAIyux Gate / AurenBrain',
+        gate: { label: 'MetrAIyux Gate / AurenBrain' },
+        lastError: error.message,
+        voice: { tts: false, stt: false },
+        memory: { exchanges: 0, facts: 0 }
+      };
+      setAurenBrainStatus(offline);
+      if (!silent) {
+        appendBrainLog([{
+          id: uid('auren_status'),
+          role: 'brain',
+          target: 'vessel',
+          text: 'AurenBrain service is not answering yet. I am using the onboard gate core until the local brain server is running.',
+          createdAt: new Date().toISOString()
+        }]);
+      }
+      return offline;
+    }
+  }
+
   async function bridgeNeuralSpace(result, transcript) {
-    if (!['open_neural_lane', 'neural_research'].includes(result.action)) return;
+    const action = getBrainActions(result).find((item) => ['open_neural_lane', 'neural_research'].includes(item.type));
+    if (!action) return;
     setNeuralBusy(true);
     try {
-      const laneId = result.payload?.laneId || neuralLaneId;
+      const laneId = action.payload?.laneId || neuralLaneId;
       const payload = await archiveNeuralSpaceExchange({
         transcript,
         response: result.response,
@@ -1042,8 +1644,8 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     setBrainLog((current) => [...current, ...entries].slice(-18));
   }
 
-  function speakBrain(text, target = 'vessel', options = {}) {
-    const { log = true } = options;
+  async function speakBrain(text, target = 'vessel', options = {}) {
+    const { log = true, audible = true } = options;
     setBrainTarget(target);
     setBrainLine(text);
     setBrainMode('speaking');
@@ -1057,8 +1659,40 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
       }]);
     }
 
-    if (!speechSupported || !audioOutputEnabled) {
+    const finishSpeaking = () => setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle');
+
+    if (!audible || !audioOutputEnabled) {
       window.setTimeout(() => setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle'), 900);
+      return;
+    }
+
+    try {
+      const audioBlob = await synthesizeAurenSpeech({
+        text,
+        target,
+        voice: target === 'overearth' ? 'onyx' : undefined
+      });
+      window.speechSynthesis?.cancel?.();
+      audioPlaybackRef.current?.pause?.();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioPlaybackRef.current = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        finishSpeaking();
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(audioUrl);
+        finishSpeaking();
+      };
+      await audio.play();
+      return;
+    } catch {
+      // Browser voices are the no-key onboard path; model speech takes over when the company gate has voice enabled.
+    }
+
+    if (!speechSupported) {
+      window.setTimeout(finishSpeaking, 900);
       return;
     }
 
@@ -1070,11 +1704,16 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     utterance.rate = target === 'overearth' ? 0.78 : 0.92;
     utterance.pitch = target === 'overearth' ? 0.62 : 1.04;
     utterance.volume = 0.86;
-    utterance.onend = () => setBrainMode(voiceEnabledRef.current ? 'listening' : 'idle');
+    utterance.onend = finishSpeaking;
+    utterance.onerror = finishSpeaking;
     window.speechSynthesis.speak(utterance);
   }
 
   function rememberBrainExchange(transcript, result) {
+    const actions = getBrainActions(result).map((action) => ({
+      type: action.type,
+      payload: action.payload || {}
+    }));
     updateState((current) => ({
       ...current,
       brainMemory: [
@@ -1083,6 +1722,9 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
           target: result.target,
           command: transcript,
           response: result.response,
+          provider: result.provider || result.gate?.label || 'MetrAIyux Gate / AurenBrain',
+          actions,
+          confidence: result.confidence,
           realm: selectedRealm.id,
           gate: activeGate.id,
           createdAt: new Date().toISOString()
@@ -1797,4 +2439,244 @@ function Ritual({ state, stats, updateState }) {
   function saveReminder(event) {
     event.preventDefault();
     updateState((current) => {
-      let next = { ...current, settings: { ...(c
+      let next = { ...current, settings: { ...(current.settings || {}), reminderHour } };
+      next = addLedgerEntry(next, 'ritual', 'Ritual reminder saved', `Daily ritual reminder set for ${reminderHour}.`);
+      return next;
+    }, 'Ritual reminder saved.', 'ritual_reminder_saved');
+  }
+
+  return (
+    <Page eyebrow="Daily Ritual" title="Feed the world before the day takes over." copy="Rituals prime the simulation with one intention, one release, and one proof move.">
+      <div className="two-column">
+        <form className="glass-panel form-card" onSubmit={submit}>
+          <label>Prompt<textarea value={form.prompt} onChange={(event) => setForm({ ...form, prompt: event.target.value })} rows="2" /></label>
+          <label>Realm<select value={form.focusRealm} onChange={(event) => setForm({ ...form, focusRealm: event.target.value })}>{realms.map((realm) => <option key={realm.id} value={realm.id}>{realm.name}</option>)}</select></label>
+          <label>Intention<textarea value={form.intention} onChange={(event) => setForm({ ...form, intention: event.target.value })} rows="2" /></label>
+          <label>Release<textarea value={form.release} onChange={(event) => setForm({ ...form, release: event.target.value })} rows="2" /></label>
+          <label>Next proof<input value={form.nextAction} onChange={(event) => setForm({ ...form, nextAction: event.target.value })} placeholder="One visible move today" /></label>
+          <SigilButton><Flame size={18} /> Seal ritual</SigilButton>
+        </form>
+
+        <section className="glass-panel form-card">
+          <span className="eyebrow"><BellRing size={14} /> Local Reminder</span>
+          <h2>{stats.streak} day streak</h2>
+          <form onSubmit={saveReminder}>
+            <label>Reminder time<input type="time" value={reminderHour} onChange={(event) => setReminderHour(event.target.value)} /></label>
+            <SigilButton variant="secondary"><CalendarDays size={16} /> Save reminder</SigilButton>
+          </form>
+          <Meter value={stats.energy} label="Reality charge" detail="Rituals raise the world when they lead into proof." />
+        </section>
+      </div>
+    </Page>
+  );
+}
+
+function Codex({ state, stats }) {
+  const activeEpochs = (state.epochs || []).filter((epoch) => epoch.status !== 'complete');
+  const activeAllies = (state.allies || []).filter((ally) => ally.status !== 'archived');
+  const activeCanon = (state.canon || []).filter((rule) => rule.status !== 'archived');
+
+  return (
+    <Page eyebrow="World Codex" title="Keep the universe coherent." copy="Epochs, allies, canon, and contracts are the long-range memory of the world.">
+      <div className="three-column">
+        <section className="glass-panel mini-panel"><span className="eyebrow">Epochs</span><h3>{activeEpochs.length} active arcs</h3><p>{epochTemplates[0]?.promise || 'Long-range arcs hold the bigger story.'}</p></section>
+        <section className="glass-panel mini-panel"><span className="eyebrow">Allies</span><h3>{activeAllies.length} allies</h3><p>{allianceTemplates[0]?.script || 'Allies make the world answerable to people, not just intention.'}</p></section>
+        <section className="glass-panel mini-panel"><span className="eyebrow">Canon</span><h3>{activeCanon.length} laws</h3><p>{canonTemplates[0]?.law || 'Personal law gives the simulation spine.'}</p></section>
+      </div>
+      <section className="glass-panel"><Meter value={stats.energy} label="Codex charge" detail={`${realityContractTemplates.length} contract templates are ready to turn intent into rules.`} /></section>
+    </Page>
+  );
+}
+
+function FocusChamber({ state, stats, updateState }) {
+  const [intent, setIntent] = useState(focusSessionTemplates[0]?.intent || 'Give the world thirteen clean minutes.');
+
+  function completeFocus() {
+    const realmId = state.profile?.focusRealm || 'craft';
+    updateState((current) => {
+      const session = {
+        id: uid('focus'),
+        title: 'Manual focus chamber pulse',
+        realm: realmId,
+        intent,
+        output: 'Logged from the focus chamber.',
+        minutes: 13,
+        completedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      let next = { ...current, focusSessions: [session, ...(current.focusSessions || [])].slice(0, 250) };
+      next = addLedgerEntry(next, 'focus', 'Focus chamber pulse completed', intent);
+      return next;
+    }, 'Focus pulse logged.', 'focus_session_saved');
+  }
+
+  return (
+    <Page eyebrow="Focus Chamber" title="Give the vessel a clean block of time." copy="A focus pulse is a small proof container. Pick the output and seal the minutes.">
+      <section className="glass-panel form-card">
+        <label>Focus intent<textarea value={intent} onChange={(event) => setIntent(event.target.value)} rows="3" /></label>
+        <SigilButton onClick={completeFocus}><Brain size={18} /> Complete 13 minute pulse</SigilButton>
+        <Meter value={stats.focusMinutes % 100} label="Focus memory" detail={`${stats.focusMinutes} total minutes logged.`} />
+      </section>
+    </Page>
+  );
+}
+
+function Affirm({ state, updateState }) {
+  const [text, setText] = useState(state.affirmations?.[0]?.text || '');
+
+  function saveAffirmation(event) {
+    event.preventDefault();
+    updateState((current) => {
+      const affirmation = text.trim()
+        ? { id: uid('affirm'), text: text.trim(), createdAt: new Date().toISOString() }
+        : forgeAffirmation(current);
+      let next = { ...current, affirmations: [affirmation, ...(current.affirmations || [])].slice(0, 120) };
+      next = addLedgerEntry(next, 'affirmation', 'Signal shrine updated', affirmation.text);
+      return next;
+    }, 'Affirmation saved.', 'affirmation_saved');
+    setText('');
+  }
+
+  return (
+    <Page eyebrow="Signal Shrine" title="Write the identity signal." copy="Affirmations work here only when they point back to behavior.">
+      <form className="glass-panel form-card" onSubmit={saveAffirmation}>
+        <label>Signal<input value={text} onChange={(event) => setText(event.target.value)} placeholder="I move like the version of me who ships proof." /></label>
+        <SigilButton><Sparkles size={18} /> Save signal</SigilButton>
+      </form>
+    </Page>
+  );
+}
+
+function Notes({ state, updateState }) {
+  const [note, setNote] = useState('');
+
+  function saveNote(event) {
+    event.preventDefault();
+    if (!note.trim()) return;
+    updateState((current) => {
+      const entry = { id: uid('note'), text: note.trim(), createdAt: new Date().toISOString() };
+      let next = { ...current, notes: [entry, ...(current.notes || [])].slice(0, 250) };
+      next = addLedgerEntry(next, 'note', 'Memory sea signal captured', entry.text);
+      return next;
+    }, 'Note captured.', 'note_saved');
+    setNote('');
+  }
+
+  return (
+    <Page eyebrow="Memory Sea" title="Capture signals before they disappear." copy="Notes are raw world memory: decisions, receipts, dreams, lessons, and patterns.">
+      <form className="glass-panel form-card" onSubmit={saveNote}>
+        <label>Signal<textarea value={note} onChange={(event) => setNote(event.target.value)} rows="5" /></label>
+        <SigilButton><NotebookPen size={18} /> Capture</SigilButton>
+      </form>
+      <div className="stack-list">{(state.notes || []).slice(0, 8).map((item) => <NoteMini key={item.id} note={item} />)}</div>
+    </Page>
+  );
+}
+
+function Review({ state, stats }) {
+  const completed = (state.quests || []).filter((quest) => quest.done).length;
+  return (
+    <Page eyebrow="Review Moon" title="Look at what the world actually did." copy="Review keeps the simulation honest by reading proof instead of mood.">
+      <div className="three-column">
+        <Stat icon={ShieldCheck} label="Proof" value={completed} />
+        <Stat icon={Flame} label="Streak" value={stats.streak} />
+        <Stat icon={Zap} label="Charge" value={`${stats.energy}%`} />
+      </div>
+    </Page>
+  );
+}
+
+function Ascend({ state, stats, updateState }) {
+  function createCard() {
+    updateState((current) => {
+      const card = createAscensionCard(current, calculateStats(current));
+      let next = { ...current, shareCards: [card, ...(current.shareCards || [])].slice(0, 24) };
+      next = addLedgerEntry(next, 'ascension', 'Ascension card created', card.nextCommand);
+      return next;
+    }, 'Ascension card created.', 'ascension_card_created');
+  }
+
+  return (
+    <Page eyebrow="Ascension Gate" title={`Level ${stats.level} is active.`} copy="Ascension cards turn progress into a visible artifact.">
+      <section className="glass-panel form-card">
+        <Meter value={stats.progressToLevel} label="Next level" detail={`${stats.nextLevelXp - stats.xp} XP until the next gate.`} />
+        <SigilButton onClick={createCard}><Gem size={18} /> Create ascension card</SigilButton>
+      </section>
+      <div className="stack-list">{(state.shareCards || []).slice(0, 4).map((card) => <article key={card.id} className="glass-panel"><strong>{card.worldName}</strong><p>{card.nextCommand}</p></article>)}</div>
+    </Page>
+  );
+}
+
+function Ledger({ state }) {
+  return (
+    <Page eyebrow="Proof Ledger" title="The world remembers receipts." copy="Every sealed action becomes part of the local world history.">
+      <div className="stack-list">
+        {(state.ledger || []).slice(0, 24).map((entry) => (
+          <article key={entry.id} className="glass-panel ledger-entry">
+            <span className="eyebrow">{entry.type}</span>
+            <strong>{entry.title}</strong>
+            <p>{entry.detail}</p>
+          </article>
+        ))}
+      </div>
+    </Page>
+  );
+}
+
+function Stat({ icon: Icon, label, value }) {
+  return (
+    <article className="stat-card glass-panel">
+      {Icon ? <Icon size={18} /> : null}
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
+}
+
+function EmptyLine({ text }) {
+  return <p className="empty-line">{text}</p>;
+}
+
+function QuestMini({ quest, updateState }) {
+  return (
+    <article className="mini-proof">
+      <strong>{quest.title}</strong>
+      <small>{quest.dueDate || 'No due date'}</small>
+      <button type="button" onClick={() => updateState((current) => ({ ...current, quests: current.quests.map((item) => item.id === quest.id ? { ...item, done: true, doneAt: new Date().toISOString() } : item) }), 'Proof sealed.', 'quest_completed')}>Seal</button>
+    </article>
+  );
+}
+
+function QuestDone({ quest }) {
+  return (
+    <article className="mini-proof done">
+      <strong>{quest.title}</strong>
+      <small>{quest.doneAt ? new Date(quest.doneAt).toLocaleDateString() : 'Complete'}</small>
+    </article>
+  );
+}
+
+function NoteMini({ note }) {
+  return (
+    <article className="mini-proof">
+      <p>{note.text}</p>
+      <small>{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Captured'}</small>
+    </article>
+  );
+}
+
+function LazyWorldGlobePanel({ worldName, energy, activeGoals, completedQuests }) {
+  return (
+    <section className="globe-demo-card glass-panel">
+      <span className="globe-title">{worldName}</span>
+      <Globe className="world-globe" intensity={Math.max(0.75, energy / 72)} />
+      <div className="globe-command-strip">
+        <span><strong>{energy}%</strong><small>Charge</small></span>
+        <span><strong>{activeGoals}</strong><small>Goals</small></span>
+        <span><strong>{completedQuests}</strong><small>Proofs</small></span>
+      </div>
+    </section>
+  );
+}
+
+export default App;

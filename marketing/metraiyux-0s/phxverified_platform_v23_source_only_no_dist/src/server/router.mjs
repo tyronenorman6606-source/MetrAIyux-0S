@@ -23,6 +23,10 @@ export function actorFromHeaders(headers = {}, env = process.env){
     id: header(headers, 'x-upstream-user-id'),
     email: header(headers, 'x-upstream-user-email'),
     roles: header(headers, 'x-upstream-roles'),
+    customer_id: header(headers, 'x-upstream-customer-id'),
+    workspace_id: header(headers, 'x-upstream-workspace-id'),
+    plan: header(headers, 'x-upstream-plan'),
+    upstream_source: header(headers, 'x-upstream-source'),
     allowLocal: env.ALLOW_LOCAL_ACTIONS === 'true'
   };
 }
@@ -53,9 +57,14 @@ async function assertBusinessReferences(payload, businessIndex){
 
 export async function handleActionRequest({ method = 'GET', headers = {}, body = '', query = {} }, { store = new FileActionStore(), stateStore = new FilePlatformStateStore(), businessIndex = new BusinessIndex(), eventLedger = new FileEventLedger(), webhookOutbox = new FileWebhookOutbox(), env = process.env } = {}){
   if(method === 'GET'){
-    if(query.state === 'summary') return json(200, { ok:true, state:await stateStore.summary() });
-    if(query.queue && typeof store.list === 'function') return json(200, { ok:true, queue:query.queue, records:await store.list(query.queue) });
-    return json(200, { ok:true, contracts:listContracts(), runtime:{ queues:true, state_projection:true, idempotency:'action_id', upstream_auth_headers:['x-upstream-user-id','x-upstream-user-email','x-upstream-roles'] } });
+    if(query.state === 'summary' || query.queue){
+      const actor = actorFromHeaders(headers, env);
+      requireUpstreamActor(actor);
+      requireAdmin(actor);
+      if(query.state === 'summary') return json(200, { ok:true, state:await stateStore.summary() });
+      if(query.queue && typeof store.list === 'function') return json(200, { ok:true, queue:query.queue, records:await store.list(query.queue) });
+    }
+    return json(200, { ok:true, contracts:listContracts(), runtime:{ queues:true, state_projection:true, idempotency:'action_id', upstream_auth_authority:'SkyeGateFS27', upstream_auth_headers:['x-upstream-user-id','x-upstream-user-email','x-upstream-roles','x-upstream-customer-id','x-upstream-workspace-id','x-upstream-plan'] } });
   }
   if(method !== 'POST') return json(405, { ok:false, error:'Method not allowed' });
   try{

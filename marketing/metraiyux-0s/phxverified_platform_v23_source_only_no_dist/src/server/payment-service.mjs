@@ -76,7 +76,7 @@ export class StripePaymentAdapter {
     params.set('line_items[0][price_data][currency]', order.currency.toLowerCase());
     params.set('line_items[0][price_data][recurring][interval]', 'month');
     params.set('line_items[0][price_data][unit_amount]', String(order.amounts.monthly_cents));
-    params.set('line_items[0][price_data][product_data][name]', `PHX Verified ${order.product} ${order.tier}`);
+    params.set('line_items[0][price_data][product_data][name]', `Valley Verified ${order.product} ${order.tier}`);
     for(const [key, value] of Object.entries(order.metadata || {})) params.set(`metadata[${key}]`, String(value));
     params.set('metadata[payment_order_id]', order.payment_order_id);
     params.set('metadata[exposure_order_id]', order.exposure_order_id);

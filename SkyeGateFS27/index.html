@@ -268,9 +268,12 @@
       <span style="color:rgba(255,255,255,0.30); font-weight:600;">GATEWAY:</span>
       <a href="/gateway" style="color:#a243ff; text-decoration:none; font-weight:500;">Admin</a>
       <a href="/kAIxu/RequestKaixuAPIKey.html" style="color:#ffd36a; text-decoration:none;">Get API Key</a>
+      <a href="pentest-gate-card.html" style="color:#8fffd1; text-decoration:none;">Request Pentest Card</a>
+      <a href="pin-gate.html" style="color:#ffe5a0; text-decoration:none;">PIN Gate</a>
       <a href="/gateway/dashboard.html" style="color:#27f2ff; text-decoration:none;">User Dashboard</a>
       <a href="smoketest.html" style="color:rgba(255,255,255,0.65); text-decoration:none;">Smoke Tests</a>
       <a href="gate-proofx.html" style="color:rgba(255,255,255,0.65); text-decoration:none;">Gate Proofx</a>
+      <a href="connectlog-relay13-gate.html" style="color:rgba(255,255,255,0.65); text-decoration:none;">ConnectLog + Relay13</a>
       <a href="/.netlify/functions/health" target="_blank" rel="noreferrer" style="color:rgba(255,255,255,0.65); text-decoration:none;">Health</a>
     </div>
   </nav>
@@ -294,6 +297,8 @@
             <option value="focus">Focus</option>
           </select>
         </div>
+        <a class="btn ghost" href="connectlog-relay13-gate.html">ConnectLog + Relay13</a>
+        <a class="btn ghost" href="pin-gate.html">PIN Gate</a>
         <a class="btn ghost" href="skyepay.html?client=bobs-smoke-shop">SkyePay</a>
         <button id="gatewayBaseBtn" class="btn ghost" type="button" title="Switch which gateway this dashboard calls" style="display:none;">Gateway Base</button>
         <button id="logoutBtn" class="btn danger" style="display:none;">Logout</button>
@@ -309,9 +314,10 @@
         <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="current-password" />
         <button id="loginBtn" class="btn primary">Login</button>
       </div>
-      <p class="muted small">This gate is the parent plane for auth, vendors, sovereign variables, usage metering, pushes, billing, and enterprise surface control.</p>
+        <p class="muted small">This gate is the parent plane for auth, vendors, sovereign variables, usage metering, pushes, billing, and enterprise surface control.</p>
       <div style="margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.10);">
         <p class="muted small">Looking for access? <a href="/kAIxu/RequestKaixuAPIKey.html" style="color:#ffd36a;">Request a gate key →</a></p>
+        <p class="muted small">Need authorized testing access? <a href="pentest-gate-card.html" style="color:#8fffd1;">Request a one-hour pentest gate card →</a></p>
         <p class="muted small">Already have a key? <a href="/gateway/dashboard.html" style="color:#27f2ff;">Open User Dashboard →</a></p>
         <p class="muted small">Need the public fuel-and-asset hub? <a href="/skyefuelstation/" style="color:#8fffd1;">Open SkyeFuelStation →</a></p>
         <p class="muted small">Closing a private preview? <a href="skyepay.html?client=bobs-smoke-shop" style="color:#f6c14b;">Open <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> →</a></p>
@@ -327,6 +333,7 @@
         <button class="tab" data-tab="pricing">Pricing Catalog</button>
         <button class="tab" data-tab="station">Fuel Station</button>
         <button class="tab" data-tab="platforms">Platform Control</button>
+        <a class="tab" href="pentest-admin.html">Pentest Cards</a>
         <a class="tab" href="skyepay-admin.html">SkyePay Ledger</a>
         <button class="tab" data-tab="vendors">Vendors &amp; Vault</button>
         <button class="tab" data-tab="repoenv">Ultimate Env Contract</button>

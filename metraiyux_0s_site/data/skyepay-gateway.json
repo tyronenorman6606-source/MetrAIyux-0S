@@ -7,10 +7,64 @@
   "checkout_routes": {
     "starter-command": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
     "growth-cabinet": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
+    "routex-workforce-command": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
     "autonomous-office": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    "enterprise-command": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skygatefs27-managed-control-plane"
+    "enterprise-command": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command"
+  },
+  "stripe_sync": {
+    "synced_at": "2026-05-17T18:32:17.194Z",
+    "stripe_account_id": "acct_1Seml2HEgCmnlKPJ",
+    "receipt": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
+    "live_price_ids": {
+      "starter-command": {
+        "setup": "price_1TY9TxHEgCmnlKPJ0mBR8cwZ",
+        "monthly": "price_1TY9TyHEgCmnlKPJTl703ekt"
+      },
+      "growth-cabinet": {
+        "setup": "price_1TY9TzHEgCmnlKPJqXBTbH5Y",
+        "monthly": "price_1TY9TzHEgCmnlKPJqFm0FhAS"
+      },
+      "routex-workforce-command": {
+        "setup": "price_1TY9U1HEgCmnlKPJPNiPFacB",
+        "monthly": "price_1TY9U1HEgCmnlKPJ8s3kF0eC"
+      },
+      "autonomous-office": {
+        "setup": "price_1TY9U2HEgCmnlKPJPqDe4Cqr",
+        "monthly": "price_1TY9U2HEgCmnlKPJq5d7ccZs"
+      },
+      "enterprise-command": {
+        "setup": "price_1TY9U3HEgCmnlKPJ7ACUntvj",
+        "monthly": "price_1TY9U4HEgCmnlKPJSWLllIxH"
+      }
+    }
   },
   "owner_approval_required": false,
   "activation_path": "auto_unlock_after_confirmed_payment",
-  "public_copy": "Clients can continue through SkyePay after preview. Confirmed Stripe payment writes the FS27 order, applies the plan policy, and unlocks the workspace automatically."
+  "public_copy": "Clients can continue through SkyePay after preview. Confirmed Stripe payment writes the FS27 order, applies the plan policy, and unlocks the workspace automatically. SkyeProfitConsole is Free99/no charge and is not a SkyePay checkout offer.",
+  "free99_non_checkout": {
+    "skyeprofitconsole": {
+      "label": "SkyeProfitConsole Free99",
+      "price": "$0 setup + $0/mo",
+      "url": "../live/skyeprofitconsole-profit-console.html",
+      "checkout": false,
+      "gate_session_required": true,
+      "copy": "Free99 means no charge. It still requires a 0S or FS27 gate session."
+    }
+  },
+  "free99_routes": {
+    "skyemusicnexus": {
+      "label": "SkyeMusicNexus Free99 gated feature",
+      "price": "Free99 / $0",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "../live/skyemusicnexus-neofront.html"
+    },
+    "skyeprofitconsole": {
+      "label": "SkyeProfitConsole Free99 gated feature",
+      "price": "Free99 / $0",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "../live/skyeprofitconsole-profit-console.html"
+    }
+  }
 }

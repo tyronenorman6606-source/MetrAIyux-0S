@@ -95,6 +95,7 @@ export function evaluateActionPolicy({ type, payload = {}, actor = {}, source = 
   if(type === 'lead_request' && !hasAnyRole(actor, ['buyer', 'ae', 'admin'])) violations.push('lead_request requires buyer, ae, or admin role.');
   if(type === 'owner_claim' && !hasAnyRole(actor, ['owner', 'ae', 'admin'])) violations.push('owner_claim requires owner, ae, or admin role.');
   if(type === 'sponsor_intent' && !hasAnyRole(actor, ['owner', 'ae', 'admin'])) violations.push('sponsor_intent requires owner, ae, or admin role.');
+  if(type === 'customer_business_posting' && !hasAnyRole(actor, ['owner', 'customer', 'ae', 'admin', 'system'])) violations.push('customer_business_posting requires owner, customer, ae, admin, or system role.');
   const forbiddenPatchFields = findForbiddenPatchFields(payload.patch || {});
   if(forbiddenPatchFields.length) violations.push(`Patch attempts to modify protected fields: ${forbiddenPatchFields.join(', ')}`);
   if(PUBLIC_INTAKE_TYPES.has(type) && payload.patch) warnings.push('Public intake action contains a patch. It must remain queued until admin review.');

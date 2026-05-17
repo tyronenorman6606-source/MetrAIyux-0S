@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="description" content="ConnectLog app workspace for offline-first contact exchange, QR intake, follow-up discipline, notes, contact intelligence, seed-folder ingestion, and local network memory." />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta property="og:title" content="ConnectLog — Private Connection Exchange" />
+  <meta property="og:description" content="A hardened offline-first contact intelligence workspace with QR exchange, QR scanning, vCard handoff, seed-folder imports, follow-up actions, tags, notes, exports, and local backups." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/connectlog-og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="application-name" content="ConnectLog" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="ConnectLog" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>ConnectLog App — Relationship Command OS</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="icon" href="assets/favicon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell" id="appShell">
+    <aside class="sidebar" aria-label="ConnectLog navigation">
+      <div class="sidebar-head">
+        <a class="brand" href="#top" aria-label="ConnectLog app home">
+          <img src="assets/connectlog-logo-192.png" alt="" class="brand-mark" width="54" height="54" />
+          <span class="brand-copy">
+            <strong>ConnectLog</strong>
+            <small>Connection OS</small>
+          </span>
+        </a>
+        <button class="menu-toggle" id="menuCollapseBtn" type="button" aria-expanded="true" aria-label="Minimize central menu">⇤</button>
+      </div>
+
+      <nav class="nav-stack" aria-label="App sections">
+        <a href="./index.html?landing=1" class="nav-pill landing-return"><span>◌</span><b class="nav-label">Landing</b></a>
+        <a href="#dashboard" class="nav-pill active" data-nav-target="dashboard"><span>◆</span><b class="nav-label">Dashboard</b></a>
+        <a href="#exchange" class="nav-pill" data-nav-target="exchange"><span>◇</span><b class="nav-label">Exchange</b></a>
+        <a href="#cards" class="nav-pill" data-nav-target="cards"><span>▣</span><b class="nav-label">Cards</b></a>
+        <a href="#relay13" class="nav-pill" data-nav-target="relay13"><span>✉</span><b class="nav-label">Relay13</b></a>
+        <a href="#deployment" class="nav-pill" data-nav-target="deployment"><span>⌁</span><b class="nav-label">Deploy</b></a>
+        <a href="#contacts" class="nav-pill" data-nav-target="contacts"><span>●</span><b class="nav-label">People</b></a>
+        <a href="#followups" class="nav-pill" data-nav-target="followups"><span>↗</span><b class="nav-label">Follow-ups</b></a>
+        <a href="#vault" class="nav-pill" data-nav-target="vault"><span>◈</span><b class="nav-label">Vault</b></a>
+        <a href="#seed" class="nav-pill" data-nav-target="seed"><span>✶</span><b class="nav-label">Seed</b></a>
+        <a href="#intelligence" class="nav-pill" data-nav-target="intelligence"><span>✦</span><b class="nav-label">Intelligence</b></a>
+      </nav>
+
+      <section class="privacy-card" aria-label="Privacy posture">
+        <p class="eyebrow">No auth. No cloud.</p>
+        <p>Everything saves locally in this browser through IndexedDB. Relay13 can power real messaging when connected, but local fallback stays available when no backend is deployed.</p>
+      </section>
+    </aside>
+
+    <main class="workspace" id="top">
+      <header class="hero" id="dashboard">
+        <div class="hero-copy-stack">
+          <p class="eyebrow">Offline-first connection exchange</p>
+          <h1>Exchange once. Remember forever. Move before the relationship goes cold.</h1>
+          <p class="hero-copy">A hardened personal relationship OS for contacts, context, tags, notes, timeline events, follow-up dates, contact health scoring, QR profile sharing, QR intake, phone-contact handoff, and seed-folder ingestion. Built to work as a static PWA without auth.</p>
+        </div>
+        <figure class="hero-brand-stage" aria-label="ConnectLog visual identity">
+          <span class="brand-orbit orbit-one"></span>
+          <span class="brand-orbit orbit-two"></span>
+          <img src="assets/connectlog-logo-512.png" alt="ConnectLog logo" width="260" height="260" />
+        </figure>
+        <div class="hero-actions">
+          <button class="primary-btn" id="addContactBtn" type="button">＋ Add person</button>
+          <button class="ghost-btn" id="quickLogBtn" type="button">✦ Quick log</button>
+          <button class="ghost-btn" id="heroShareBtn" type="button">◇ Share my card</button>
+          <button class="ghost-btn" id="heroScanBtn" type="button">⌗ Scan QR</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" aria-label="Summary statistics">
+        <article class="stat-card"><span>Total people</span><strong id="statTotal">0</strong></article>
+        <article class="stat-card urgent"><span>Due follow-ups</span><strong id="statDue">0</strong></article>
+        <article class="stat-card"><span>Pinned</span><strong id="statPinned">0</strong></article>
+        <article class="stat-card"><span>High priority</span><strong id="statHigh">0</strong></article>
+        <article class="stat-card"><span>At risk</span><strong id="statDormant">0</strong></article>
+        <article class="stat-card"><span>Next 7 days</span><strong id="statUpcoming">0</strong></article>
+      </section>
+
+      <section class="intelligence-panel" id="intelligence" aria-label="Relationship intelligence center">
+        <div class="intelligence-main">
+          <p class="eyebrow">Relationship intelligence</p>
+          <h2>Daily mission control for every connection.</h2>
+          <p class="panel-hint">ConnectLog now scores your local network and turns the vault into a command surface: who needs attention, what to say, what to export, and where duplicates are hiding.</p>
+          <div class="mission-brief" id="missionBrief" aria-live="polite"></div>
+          <div class="intelligence-actions">
+            <button class="primary-btn small" id="exportAgendaBtn" type="button">Export today agenda</button>
+            <button class="ghost-btn small" id="copyDailyBriefBtn" type="button">Copy daily brief</button>
+            <button class="ghost-btn small" id="exportWarmCsvBtn" type="button">Export warm list</button>
+            <button class="ghost-btn small" id="findDuplicatesBtn" type="button">Find duplicates</button>
+            <button class="ghost-btn small" id="requestPersistenceBtn" type="button">Lock storage</button>
+            <button class="ghost-btn small" id="copyIntroTemplateBtn" type="button">Copy intro template</button>
+          </div>
+        </div>
+        <div class="intelligence-side">
+          <div class="mini-stat"><span>Logged tasks</span><strong id="statTasks">0</strong></div>
+          <div class="mini-stat"><span>Actionable now</span><strong id="statActionable">0</strong></div>
+          <div class="relationship-queue" id="relationshipQueue" aria-live="polite"></div>
+        </div>
+      </section>
+
+
+      <section class="exchange-panel" id="exchange" aria-label="ConnectLog exchange center">
+        <div class="exchange-copy">
+          <p class="eyebrow">QR connection engine</p>
+          <h2>Your profile becomes a scannable connection packet.</h2>
+          <p>Set up multiple card variants for different rooms: dev conventions, investor meetups, client intros, vendor handoffs, or personal networking. Each card can carry its own photo, short context, and welcome message for the person who saves you from the QR.</p>
+          <div class="card-switcher" aria-label="Active exchange card selector">
+            <label>Active card<select id="profileCardSelect"></select></label>
+            <div class="exchange-actions compact-row">
+              <button class="primary-btn" id="setupProfileBtn" type="button">Edit active card</button>
+              <button class="ghost-btn" id="newProfileCardBtn" type="button">＋ New card</button>
+              <button class="ghost-btn" id="duplicateProfileCardBtn" type="button">Duplicate</button>
+              <button class="danger-btn" id="deleteProfileCardBtn" type="button">Delete</button>
+            </div>
+          </div>
+          <div class="exchange-actions">
+            <button class="ghost-btn" id="showShareBtn" type="button">ConnectLog QR</button>
+            <button class="ghost-btn" id="scanQrBtn" type="button">Scan/import QR</button>
+            <button class="ghost-btn" id="showVcardQrBtn" type="button">Phone contact QR</button>
+            <button class="ghost-btn" id="copyShareLinkBtn" type="button">Copy app link</button>
+            <button class="ghost-btn" id="installAppBtn" type="button" hidden>Install app</button>
+          </div>
+        </div>
+        <div class="profile-card branded-profile-card" id="profileSummary" aria-live="polite"></div>
+        <div class="qr-stage" id="qrStage" hidden>
+          <div class="qr-shell">
+            <div class="qr-output" id="qrOutput" aria-label="Generated QR code"></div>
+          </div>
+          <div class="qr-details">
+            <p class="eyebrow" id="qrModeLabel">Ready</p>
+            <h3 id="qrTitle">Generate a QR code</h3>
+            <p id="qrDescription">Set up your card first, then choose a sharing mode.</p>
+            <textarea id="shareLinkOutput" readonly rows="5" spellcheck="false" aria-label="Share payload output"></textarea>
+            <div class="exchange-actions compact-row">
+              <button class="ghost-btn small" id="downloadVcardBtn" type="button">Download .vcf</button>
+              <button class="ghost-btn small" id="downloadQrSvgBtn" type="button">Download QR SVG</button>
+              <button class="ghost-btn small" id="copyQrPayloadBtn" type="button">Copy payload</button>
+              <button class="ghost-btn small" id="downloadProfileQrCardBtn" type="button">Download card HTML</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-variant-panel" id="cards" aria-label="Exchange card variants">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Card variants</p>
+            <h2>Different room, different card, different welcome.</h2>
+            <p class="panel-hint">Build small targeted cards for every context. The active card controls the ConnectLog QR, phone-contact QR, downloaded .vcf, and shareable card HTML.</p>
+          </div>
+          <button class="primary-btn small" id="newProfileCardBtnAlt" type="button">＋ Create card</button>
+        </div>
+        <div class="card-variant-grid" id="profileCardGrid" aria-live="polite"></div>
+      </section>
+
+
+
+      <section class="relay-panel" id="relay13" aria-label="Relay13 messaging bridge">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Relay13 bridge</p>
+            <h2>Real inbox when Relay13 is live. Local fallback when it is not.</h2>
+            <p class="panel-hint">ConnectLog stays its own contact/card product. Relay13 stays its own messaging product. This adapter lets cards open conversations through Relay13 without removing the offline vault or fallback inbox.</p>
+          </div>
+          <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Local fallback ready.</div>
+        </div>
+
+        <div class="relay-grid">
+          <article class="relay-card relay-settings-card">
+            <p class="eyebrow">Connection settings</p>
+            <div class="form-grid two">
+              <label>Mode<select id="relayModeInput"><option value="local">Local fallback only</option><option value="relay13">Relay13 remote + local fallback</option></select></label>
+              <label>Relay13 Worker origin<input id="relayOriginInput" type="text" maxlength="240" placeholder="your Relay13 Worker origin" autocomplete="off" /></label>
+              <label>Public workspace slug<input id="relayWorkspaceInput" type="text" maxlength="80" placeholder="connectlog-main" autocomplete="off" /></label>
+              <label>Workspace ID<input id="relayWorkspaceIdInput" type="text" maxlength="120" placeholder="Optional for operator API calls" autocomplete="off" /></label>
+              <label>Operator API key<input id="relayApiKeyInput" type="password" maxlength="260" placeholder="Optional. Stored only in this browser." autocomplete="off" /></label>
+              <label>Operator display name<input id="relayOperatorNameInput" type="text" maxlength="140" placeholder="ConnectLog Operator" /></label>
+            </div>
+            <label class="relay-check"><input id="relayShareBridgeInput" type="checkbox" /> Embed public Relay13 bridge data in my ConnectLog QR cards. This never embeds the API key.</label>
+            <div class="exchange-actions compact-row">
+              <button class="primary-btn small" id="relaySaveSettingsBtn" type="button">Save bridge</button>
+              <button class="ghost-btn small" id="relayHealthBtn" type="button">Health check</button>
+              <button class="ghost-btn small" id="relayOpenAdminBtn" type="button">Open Relay13 admin</button>
+            </div>
+            <p class="panel-hint">Use local mode until Relay13 is deployed. Once a Worker origin exists, health check proves the remote is reachable before any message is trusted.</p>
+          </article>
+
+
+
+          <article class="relay-card relay-ops-card">
+            <p class="eyebrow">Bridge operations</p>
+            <h3>Sync the card registry before trusting inbox routing.</h3>
+            <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They do not merge the products and they do not disable local fallback.</p>
+            <div class="exchange-actions compact-row">
+              <button class="ghost-btn small" id="relayBridgeHealthBtn" type="button">Bridge health</button>
+              <button class="ghost-btn small" id="relaySyncCardBtn" type="button">Sync active card</button>
+              <button class="ghost-btn small" id="relayRefreshRequestsBtn" type="button">Refresh requests</button>
+              <button class="ghost-btn small" id="relayStatsBtn" type="button">Bridge stats</button>
+              <button class="ghost-btn small" id="relayCopyCardPayloadBtn" type="button">Copy card payload</button>
+            </div>
+            <div class="relay-request-list" id="relayRequestList" aria-live="polite"></div>
+          </article>
+
+          <article class="relay-card relay-inbox-card">
+            <div class="relay-toolbar">
+              <div><p class="eyebrow">Inbox adapter</p><h3>Threads</h3></div>
+              <div class="exchange-actions compact-row">
+                <button class="ghost-btn small" id="relayCreateThreadBtn" type="button">Thread from active card</button>
+                <button class="ghost-btn small" id="relayRefreshThreadsBtn" type="button">Refresh remote</button>
+                <button class="ghost-btn small" id="relayRefreshMessagesBtn" type="button">Pull messages</button>
+                <button class="ghost-btn small" id="relayCopyWebSocketProofBtn" type="button">Copy WS proof</button>
+              </div>
+            </div>
+            <div class="relay-inbox-layout">
+              <div class="relay-thread-list" id="relayThreadList" aria-live="polite"></div>
+              <div class="relay-message-pane">
+                <div class="relay-message-log" id="relayMessageLog" aria-live="polite"></div>
+                <label class="relay-compose">Message<textarea id="relayMessageInput" rows="4" maxlength="4000" placeholder="Write a note. Ctrl/⌘ + Enter sends."></textarea></label>
+                <div class="exchange-actions compact-row">
+                  <button class="primary-btn small" id="relaySendBtn" type="button">Send / save</button>
+                  <button class="ghost-btn small" id="relaySyncOutboxBtn" type="button">Sync queued</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="relay-card relay-fallback-card">
+            <p class="eyebrow">Fallback ledger</p>
+            <h3>No fake delivery claims.</h3>
+            <p class="panel-hint">If Relay13 is not deployed, unreachable, or missing credentials, messages are marked local/queued instead of being claimed as delivered.</p>
+            <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
+          </article>
+
+          <article class="relay-card relay-proof-card wide">
+            <p class="eyebrow">Live proof console</p>
+            <h3>Activation proof, stats, message-history pull, and WebSocket proof commands.</h3>
+            <p class="panel-hint">This box fills with local diagnostics by default. Activation proof mutates Relay13 only when a real origin, workspace, and scoped key are present. WebSocket proof is still not a fake pass until the deployed Worker opens and echoes events.</p>
+            <div class="exchange-actions compact-row proof-actions"><button class="primary-btn small" id="relayRunActivationProofBtn" type="button">Run activation proof</button><button class="ghost-btn small" id="relayCopyActivationCurlBtn" type="button">Copy activation curl</button></div>
+            <textarea id="relayProofOutput" readonly rows="11" spellcheck="false" aria-label="Relay13 proof output"></textarea>
+          </article>
+        </div>
+      </section>
+
+      <section class="deployment-panel" id="deployment" aria-label="Production proof command center">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Production Proof Command Center</p>
+            <h2>ConnectLog is local-first, and Relay13 is live with production proof.</h2>
+            <p class="panel-hint">This operator panel keeps diagnostics, fallback rules, copyable runbooks, and live verification in one place. Local mode stays available, while Relay13 delivery is backed by the deployed Worker health, D1 workspace, scoped key, activation run, message-history pull, and WebSocket proof receipts.</p>
+          </div>
+          <div class="exchange-actions compact-row">
+            <button class="primary-btn small" id="runLocalDiagnosticsBtn" type="button">Run diagnostics</button>
+            <button class="ghost-btn small" id="copyConnectLogDeployBtn" type="button">Copy ConnectLog deploy</button>
+            <button class="ghost-btn small" id="copyRelayDeployBtn" type="button">Copy Relay13 deploy</button>
+            <button class="ghost-btn small" id="copyRelayEnvBtn" type="button">Copy Relay13 env</button>
+          </div>
+        </div>
+        <div class="deployment-grid">
+          <article class="deployment-card">
+            <p class="eyebrow">System status</p>
+            <div class="deployment-status-deck" id="deploymentStatusDeck" aria-live="polite"></div>
+          </article>
+          <article class="deployment-card">
+            <p class="eyebrow">Proof checklist</p>
+            <div class="deployment-checklist" id="deploymentChecklist" aria-live="polite"></div>
+          </article>
+          <article class="deployment-card wide">
+            <p class="eyebrow">Copyable command block</p>
+            <textarea id="deploymentConfigOutput" readonly rows="13" spellcheck="false" aria-label="Deployment command output"></textarea>
+          </article>
+          <article class="deployment-card wide operator-runbook-card">
+            <p class="eyebrow">Relay13 operator runbook</p>
+            <h3>Copy the exact setup blocks instead of guessing deployment order.</h3>
+            <p class="panel-hint">Use this before and after Relay13 deploy. The exported bridge config redacts the browser API key so it can be stored safely with project notes.</p>
+            <div class="exchange-actions compact-row">
+              <button class="primary-btn small" id="relayRunPreflightBtn" type="button">Run preflight</button>
+              <button class="ghost-btn small" id="relayCopyOperatorRunbookBtn" type="button">Copy runbook</button>
+              <button class="ghost-btn small" id="relayCopyBootstrapCurlBtn" type="button">Copy bootstrap curl</button>
+              <button class="ghost-btn small" id="relayCopyApiKeyCurlBtn" type="button">Copy API-key curl</button>
+              <button class="ghost-btn small" id="relayCopyLiveProofBtn" type="button">Copy live proof</button>
+              <button class="ghost-btn small" id="relayExportBridgeConfigBtn" type="button">Export redacted config</button>
+              <label class="ghost-btn small file-chip" for="relayImportBridgeConfigInput">Import config<input id="relayImportBridgeConfigInput" type="file" accept="application/json,.json" hidden /></label>
+            </div>
+            <textarea id="relayOperatorRunbookOutput" readonly rows="14" spellcheck="false" aria-label="Relay13 operator runbook output"></textarea>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="control-deck" id="contacts" aria-label="Search and filters">
+        <label class="searchbox" for="searchInput">
+          <span>⌕</span>
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Search names, companies, tags, notes, details..." />
+        </label>
+        <div class="filter-row">
+          <label>
+            Lane
+            <select id="laneFilter">
+              <option value="all">All lanes</option>
+              <option value="lead">Leads</option>
+              <option value="client">Clients</option>
+              <option value="partner">Partners</option>
+              <option value="vendor">Vendors</option>
+              <option value="investor">Investors</option>
+              <option value="community">Community</option>
+              <option value="personal">Personal</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>
+            Status
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="active">Active</option>
+              <option value="warm">Warm</option>
+              <option value="follow-up">Follow-up</option>
+              <option value="archived">Archived</option>
+            </select>
+          </label>
+          <label>
+            Priority
+            <select id="priorityFilter">
+              <option value="all">All priorities</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="normal">Normal</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label>
+            Sort
+            <select id="sortSelect">
+              <option value="updated">Recently updated</option>
+              <option value="followup">Next follow-up</option>
+              <option value="created">Recently created</option>
+              <option value="name">Name A-Z</option>
+              <option value="priority">Priority</option>
+            </select>
+          </label>
+          <button class="chip-toggle" id="dueOnlyToggle" type="button" aria-pressed="false">Due only</button>
+          <button class="chip-toggle" id="pinnedOnlyToggle" type="button" aria-pressed="false">Pinned only</button>
+        </div>
+        <div class="tag-rail" id="tagRail" aria-label="Tag filters"></div>
+      </section>
+
+      <section class="split-layout">
+        <div>
+          <div class="section-title-row">
+            <div>
+              <p class="eyebrow">People index</p>
+              <h2 id="resultCount">No contacts yet</h2>
+            </div>
+            <button class="ghost-btn small" id="clearFiltersBtn" type="button">Clear filters</button>
+          </div>
+          <div id="emptyState" class="empty-state">
+            <div class="empty-orb">◆</div>
+            <h3>Start your private index.</h3>
+            <p>Add a person, tag the context, store notes, and set the next follow-up. The first local backup export is one click away.</p>
+            <button class="primary-btn" id="emptyAddBtn" type="button">Add first person</button>
+          </div>
+          <div class="contact-grid" id="contactGrid" aria-live="polite"></div>
+        </div>
+
+        <aside class="command-panel" id="followups" aria-label="Follow-up command panel">
+          <div class="panel-block">
+            <p class="eyebrow">Command panel</p>
+            <h2>Today’s pressure list</h2>
+            <div class="followup-list" id="followupList"></div>
+          </div>
+          <div class="panel-block" id="vault">
+            <p class="eyebrow">Vault controls</p>
+            <div class="vault-actions">
+              <button class="ghost-btn" id="exportJsonBtn" type="button">Export JSON</button>
+              <button class="ghost-btn" id="exportCsvBtn" type="button">Export CSV</button>
+              <button class="ghost-btn" id="exportVcardsBtn" type="button">Export vCards</button>
+              <label class="ghost-btn file-label" for="importInput">Import JSON<input id="importInput" type="file" accept="application/json,.json" /></label>
+              <label class="ghost-btn file-label" for="importCsvInput">Import CSV<input id="importCsvInput" type="file" accept="text/csv,.csv" /></label>
+              <button class="danger-btn" id="wipeBtn" type="button">Wipe local data</button>
+            </div>
+            <p class="panel-hint" id="storageHealth">Storage check pending...</p>
+          </div>
+          <div class="panel-block seed-panel" id="seed">
+            <p class="eyebrow">Seed folder</p>
+            <h2>Redeploy data intake</h2>
+            <p class="panel-hint">Drop contact JSON files into <code>seed-data/</code>, list them in <code>seed-data/manifest.json</code>, redeploy, then run this scanner to merge new records into ConnectLog.</p>
+            <div class="vault-actions">
+              <button class="ghost-btn" id="scanSeedBtn" type="button">Scan seed folder</button>
+              <button class="ghost-btn" id="downloadSeedTemplateBtn" type="button">Seed template</button>
+            </div>
+            <div class="seed-results" id="seedResults" aria-live="polite"></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="contactDialog" class="modal" aria-labelledby="dialogTitle">
+    <form method="dialog" class="modal-card" id="contactForm">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow" id="dialogMode">New record</p>
+          <h2 id="dialogTitle">Add person</h2>
+        </div>
+        <button class="icon-btn" id="closeDialogBtn" type="button" aria-label="Close dialog">×</button>
+      </header>
+
+      <div class="modal-body">
+        <input type="hidden" id="contactId" />
+        <div class="form-grid two">
+          <label>Name / identifier *<input id="nameInput" type="text" maxlength="120" required placeholder="Jane from the vendor call" /></label>
+          <label>Company / context<input id="companyInput" type="text" maxlength="140" placeholder="Company, event, client, neighborhood..." /></label>
+          <label>Role / title<input id="roleInput" type="text" maxlength="140" placeholder="Owner, manager, lead, founder..." /></label>
+          <label>Lane<select id="laneInput"><option value="lead">Lead</option><option value="client">Client</option><option value="partner">Partner</option><option value="vendor">Vendor</option><option value="investor">Investor</option><option value="community">Community</option><option value="personal">Personal</option><option value="other">Other</option></select></label>
+          <label>Status<select id="statusInput"><option value="new">New</option><option value="active">Active</option><option value="warm">Warm</option><option value="follow-up">Follow-up</option><option value="archived">Archived</option></select></label>
+          <label>Priority<select id="priorityInput"><option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option><option value="critical">Critical</option></select></label>
+          <label>Next follow-up<input id="nextFollowUpInput" type="date" /></label>
+        </div>
+
+        <section class="form-section">
+          <div class="label-row"><span>Tags</span><small>Press Enter or comma to add</small></div>
+          <div class="tag-editor" id="tagEditor"><input id="tagInput" type="text" maxlength="36" placeholder="client, investor, vendor..." /></div>
+        </section>
+
+        <section class="form-section">
+          <div class="label-row"><span>Contact details</span><button class="text-btn" id="addDetailBtn" type="button">＋ Add field</button></div>
+          <div class="detail-stack" id="detailsStack"></div>
+        </section>
+
+        <section class="form-section">
+          <label>Private notes<textarea id="notesInput" rows="5" maxlength="6000" placeholder="What happened, what they need, objections, promises, action items..."></textarea></label>
+        </section>
+
+        <section class="form-section">
+          <div class="label-row"><span>Timeline / interaction log</span><button class="text-btn" id="addTimelineBtn" type="button">＋ Add log</button></div>
+          <div class="timeline-composer" id="timelineComposer" hidden>
+            <select id="timelineTypeInput"><option value="note">Note</option><option value="call">Call</option><option value="meeting">Meeting</option><option value="email">Email</option><option value="task">Task</option></select>
+            <input id="timelineDateInput" type="date" />
+            <input id="timelineTextInput" type="text" maxlength="600" placeholder="Logged interaction or action item" />
+            <button class="primary-btn small" id="commitTimelineBtn" type="button">Add</button>
+          </div>
+          <div class="timeline-list" id="timelineList"></div>
+        </section>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="ghost-btn" id="cancelDialogBtn" type="button">Cancel</button>
+        <button class="primary-btn" id="saveContactBtn" type="submit">Save contact</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+  <dialog id="profileDialog" class="modal" aria-labelledby="profileDialogTitle">
+    <form method="dialog" class="modal-card" id="profileForm">
+      <header class="modal-header">
+        <div><p class="eyebrow">Connection onboarding</p><h2 id="profileDialogTitle">Set up my exchange card</h2></div>
+        <button class="icon-btn" id="closeProfileBtn" type="button" aria-label="Close profile setup">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-grid two">
+          <label>Card label *<input id="profileCardNameInput" type="text" maxlength="80" required placeholder="Dev convention, investor room, client intro..." /></label>
+          <label>Audience / room<input id="profileAudienceInput" type="text" maxlength="120" placeholder="Who is this version for?" /></label>
+          <label>Full name / brand *<input id="profileNameInput" type="text" maxlength="120" required placeholder="Your name or business identity" /></label>
+          <label>Company / organization<input id="profileCompanyInput" type="text" maxlength="140" placeholder="Company, project, studio, brand..." /></label>
+          <label>Role / title<input id="profileRoleInput" type="text" maxlength="140" placeholder="Founder, owner, consultant..." /></label>
+          <label>Email<input id="profileEmailInput" type="email" maxlength="160" placeholder="you@example.com" /></label>
+          <label>Phone<input id="profilePhoneInput" type="tel" maxlength="60" placeholder="+1 555 000 0000" /></label>
+          <label>Website<input id="profileWebsiteInput" type="url" maxlength="240" placeholder="https://example.com" /></label>
+          <label>LinkedIn<input id="profileLinkedinInput" type="text" maxlength="240" placeholder="linkedin.com/in/you" /></label>
+          <label>X / Twitter<input id="profileXInput" type="text" maxlength="160" placeholder="@handle" /></label>
+          <label>GitHub<input id="profileGithubInput" type="text" maxlength="160" placeholder="github.com/you" /></label>
+          <label>Location<input id="profileLocationInput" type="text" maxlength="240" placeholder="City, state, service area, mailing area..." /></label>
+        </div>
+        <section class="form-section photo-uploader">
+          <div class="label-row"><span>Card photo</span><small>Local only. Resized in-browser for cards and exports.</small></div>
+          <div class="photo-uploader-grid">
+            <div class="photo-preview" id="profilePhotoPreview" aria-label="Card photo preview">No photo</div>
+            <div class="photo-uploader-actions">
+              <label class="ghost-btn file-label" for="profilePhotoInput">Upload picture<input id="profilePhotoInput" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+              <button class="ghost-btn small" id="clearProfilePhotoBtn" type="button">Clear photo</button>
+              <p class="panel-hint">The visual card, .vcf export, ConnectLog import, and saved contact record can use this picture. Phone-camera QR may omit oversized photos to keep scanning reliable.</p>
+            </div>
+          </div>
+        </section>
+        <label>Welcome message<textarea id="profileWelcomeInput" rows="4" maxlength="900" placeholder="Example: Great meeting you at the dev convention. Here is the best way to reach me and what I can help with."></textarea></label>
+        <label>Short note / offer<textarea id="profileNoteInput" rows="4" maxlength="600" placeholder="What should someone remember about you after scanning?"></textarea></label>
+        <label>Tags<input id="profileTagsInput" type="text" maxlength="240" placeholder="comma separated: founder, vendor, ai, design" /></label>
+        <p class="panel-hint">Keep QR payloads tight. Every card can have its own message, audience, tags, and photo without needing auth or a backend.</p>
+      </div>
+      <footer class="modal-footer"><button class="ghost-btn" id="cancelProfileBtn" type="button">Cancel</button><button class="primary-btn" type="submit">Save exchange card</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="scanDialog" class="modal" aria-labelledby="scanDialogTitle">
+    <form method="dialog" class="modal-card" id="scanForm">
+      <header class="modal-header">
+        <div><p class="eyebrow">QR intake</p><h2 id="scanDialogTitle">Scan or paste a connection payload</h2></div>
+        <button class="icon-btn" id="closeScanBtn" type="button" aria-label="Close scanner">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="scanner-grid">
+          <div class="scanner-stage">
+            <video id="scanVideo" playsinline muted hidden></video>
+            <canvas id="scanCanvas" hidden></canvas>
+            <div class="scanner-placeholder" id="scannerPlaceholder">⌗<span>Camera scanner uses the browser BarcodeDetector API when available. Paste mode works everywhere.</span></div>
+          </div>
+          <div class="scanner-copy">
+            <p class="panel-hint" id="scanStatus">Ready. Start camera scanning or paste a ConnectLog link / vCard payload below.</p>
+            <div class="exchange-actions compact-row">
+              <button class="primary-btn small" id="startScannerBtn" type="button">Start camera</button>
+              <button class="ghost-btn small" id="stopScannerBtn" type="button">Stop</button>
+            </div>
+          </div>
+        </div>
+        <label>Manual QR payload<textarea id="scanPayloadInput" rows="6" placeholder="Paste a ConnectLog #connect= link, raw vCard, or copied exchange payload here."></textarea></label>
+      </div>
+      <footer class="modal-footer"><button class="ghost-btn" id="cancelScanBtn" type="button">Cancel</button><button class="primary-btn" id="importScannedPayloadBtn" type="submit">Import payload</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="quickLogDialog" class="modal" aria-labelledby="quickLogTitle">
+    <form method="dialog" class="modal-card compact" id="quickLogForm">
+      <header class="modal-header">
+        <div><p class="eyebrow">Fast capture</p><h2 id="quickLogTitle">Quick log</h2></div>
+        <button class="icon-btn" id="closeQuickLogBtn" type="button" aria-label="Close quick log">×</button>
+      </header>
+      <div class="modal-body">
+        <label>Name / identifier *<input id="quickNameInput" type="text" maxlength="120" required placeholder="Who is this about?" /></label>
+        <label>Context note<textarea id="quickNoteInput" rows="5" maxlength="1600" placeholder="Paste the memory, lead note, call recap, or reason this person matters."></textarea></label>
+        <label>Tags<input id="quickTagsInput" type="text" maxlength="240" placeholder="comma separated tags" /></label>
+        <label>Next follow-up<input id="quickFollowUpInput" type="date" /></label>
+      </div>
+      <footer class="modal-footer"><button class="ghost-btn" id="cancelQuickLogBtn" type="button">Cancel</button><button class="primary-btn" type="submit">Create quick record</button></footer>
+    </form>
+  </dialog>
+
+
+  <dialog id="dedupeDialog" class="modal" aria-labelledby="dedupeTitle">
+    <div class="modal-card">
+      <header class="modal-header">
+        <div><p class="eyebrow">Duplicate resolver</p><h2 id="dedupeTitle">Merge matching records</h2></div>
+        <button class="icon-btn" id="closeDedupeBtn" type="button" aria-label="Close duplicate resolver">×</button>
+      </header>
+      <div class="modal-body">
+        <p class="panel-hint">ConnectLog compares email, phone, and name/company fingerprints. Review each group before merging.</p>
+        <div class="dedupe-results" id="dedupeResults" aria-live="polite"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="qr-lite.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

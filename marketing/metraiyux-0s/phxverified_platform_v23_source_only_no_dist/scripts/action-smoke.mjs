@@ -13,6 +13,7 @@ function body(res){ try{ return JSON.parse(res.body); }catch{ return {}; } }
 ok(listContracts().length >= 14, 'action contracts expose platform mutation types');
 ok(validateActionPayload('lead_request', { buyer_name:'A', buyer_contact:'a@example.com', city:'Phoenix', category:'Home Services', details:'Need service' }, { roles:'buyer' }).ok, 'lead request payload validates');
 ok(!validateActionPayload('suppression_request', { business_id:'x', reason:'', evidence:'' }, { roles:'admin' }).ok, 'bad suppression request is rejected');
+ok(validateActionPayload('customer_business_posting', { customer_id:'cus_1', workspace_id:'ws_1', business_name:'Acme', owner_name:'Owner', owner_contact:'owner@example.com', city:'Phoenix', category:'Home Services', posting_reason:'first_month_customer_network_posting', subscription_started_at:'2026-04-01T00:00:00.000Z', first_paid_invoice_at:'2026-04-01T00:05:00.000Z', free_posting_credit:true }, { roles:'customer owner' }).ok, 'first-month customer posting contract validates');
 
 const mockIndex = { assert:async()=>{} };
 const missingAuth = await handleActionRequest({ method:'POST', headers:{}, body:JSON.stringify({ type:'ae_note', payload:{ business_id:'abc', note:'called', next_action:'follow up' } }) }, { store:new MemoryActionStore(), businessIndex:mockIndex, env:{} });
@@ -37,8 +38,8 @@ const stateStore = new MemoryPlatformStateStore();
 const applyRequest = { method:'POST', headers, body:JSON.stringify({ apply:true, type:'claim_status_update', payload:{ business_id:'abc-test', status:'owner_verified', reviewer:'admin@example.com', evidence_summary:'Proof reviewed' } }) };
 const applied = await handleActionRequest(applyRequest, { store:new MemoryActionStore(), stateStore, businessIndex:mockIndex, env:{} });
 ok(applied.statusCode === 202 && body(applied).projected?.counts?.claims === 1, 'admin action can project approved claim state');
-const stateSummary = await handleActionRequest({ method:'GET', query:{ state:'summary' } }, { stateStore, env:{} });
-ok(body(stateSummary).state?.counts?.claims === 1, 'GET state summary exposes projected runtime state');
+const stateSummary = await handleActionRequest({ method:'GET', headers, query:{ state:'summary' } }, { stateStore, env:{} });
+ok(body(stateSummary).state?.counts?.claims === 1, 'admin GET state summary exposes projected runtime state');
 
 if(fail){ console.error(`\n${fail} action check(s) failed, ${pass} passed.`); process.exit(1); }
 console.log(`\n${pass} action checks passed.`);

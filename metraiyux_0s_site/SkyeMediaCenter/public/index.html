@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyeMediaCenter · Intake Portal</title>
+<meta name="description" content="Experiential SkyeMediaCenter intake portal for asset upload, tagging, and media staging.">
+<link rel="stylesheet" href="media-experience.css">
+<script defer src="skygate-auth.js"></script>
+<script defer src="../gate-session.js"></script>
+<script defer src="media-experience.js"></script>
+</head>
+<body data-app-surface="intake">
+<div class="app-shell">
+  <header class="portal-top">
+    <div class="brand-orb">SMC</div>
+    <div class="portal-title"><span>SkyeMediaCenter / intake bay</span><h1>Asset Drop Reactor</h1></div>
+    <div class="portal-actions">
+      <div id="auth-state" class="auth-state">Upload Auth Missing</div>
+      <button class="portal-button" onclick="configureUploadAuth()">Operator Login</button>
+      <button class="portal-button" onclick="bootstrapUploadAuth()">Proof Session</button>
+      <button class="portal-button" onclick="disconnectUploadAuth()">Disconnect</button>
+      <a class="portal-button primary" href="admin.html">Operator Theater →</a>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="intake-hero">
+      <span class="micro">media intake is a ritual surface</span>
+      <h2>Drop matter into the Skye media field.</h2>
+      <p>Images, video, audio, documents, and campaign files enter the library with tags, status, and review state. The upload contract still sends <code>content_base64</code> to <code>/.netlify/functions/media-assets</code>.</p>
+      <div id="upload-zone" class="drop-bay" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave()">
+        <div class="drop-core"><b>⌁</b><strong>Drag files here</strong><small>or click to browse the machine</small></div>
+        <input id="file-input" type="file" multiple onchange="handleFiles(event)">
+      </div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="panel" id="upload-panel">
+        <span class="micro">payload manifest</span>
+        <h3>Queued Files</h3>
+        <div id="file-list" class="file-stack"><p class="muted">No files queued yet.</p></div>
+        <div id="upload-form" class="hidden">
+          <div class="field"><label>Title / Description</label><input id="up-title" type="text" placeholder="Describe this upload"></div>
+          <div class="field"><label>Tags</label><input id="up-tags" type="text" placeholder="brand, hero, campaign"></div>
+          <div class="field"><label>Visibility</label><select id="up-status"><option value="draft">Draft — protected until reviewed</option><option value="published">Published — live immediately</option></select></div>
+          <button class="primary" id="submit-btn" onclick="doUpload()">Upload Files →</button>
+        </div>
+        <div id="success-section" class="hidden"><div class="success-card"><h3 id="success-msg">Files uploaded successfully.</h3><p class="muted">Your files are inside the library field.</p></div><button onclick="resetUploader()">Upload More Files</button></div>
+      </section>
+      <section class="panel">
+        <span class="micro">recent signal</span>
+        <h3>Recently Uploaded</h3>
+        <div id="recent-grid" class="asset-grid"><p class="muted">Loading…</p></div>
+      </section>
+    </aside>
+  </main>
+</div>
+</body>
+</html>

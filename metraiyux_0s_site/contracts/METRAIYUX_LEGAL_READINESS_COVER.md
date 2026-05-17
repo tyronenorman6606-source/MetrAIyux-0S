@@ -9,7 +9,7 @@ This folder is a counsel-review and diligence-preparation pack. The company regi
 - MetrAIyux / MetrAIyux 0S is operationally live as platform infrastructure.
 - The operating company is a registered entity with an EIN, confirmed by founder instruction on 2026-05-17.
 - Exact legal name, jurisdiction, formation receipt, signer authority, and EIN confirmation should be stored privately for diligence; do not publish the full EIN in the public site.
-- The repo contains a Legal Skyes / SOL Enterprises legal website at `../../legalskyes-website/`.
+- The repo contains a Legal Skyes / SOLEnterprises legal website at `../../legalskyes-website/`.
 - `brain/legal-sync.json` points the local brain to the public Legal Skyes legal hub.
 - MetrAIyux ownership and commercial authority mapping should be confirmed in the diligence packet.
 - Operating agreement, platform contract, and IP assignment documents are prepared as drafts for licensed counsel review.

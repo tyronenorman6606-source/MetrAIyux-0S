@@ -1,0 +1,23 @@
+{
+  "status": "active-runtime-proof",
+  "checkedAt": "2026-05-10",
+  "fullSkyeRouteXHouseCircleRuntime": true,
+  "fullRuntime": true,
+  "mode": "V83 local operational smoke harness",
+  "smokeCommand": "npm run verify:runtime",
+  "proves": [
+    "auth-locked health and session handling",
+    "strict Neon-primary guard blocks local fallback writes when required env is missing",
+    "payment/refund ledgers avoid live-money claims without provider network",
+    "Stripe and PayPal webhook verification paths persist through the shared persistence layer",
+    "production readiness refuses plaintext/bootstrap-only production credential posture",
+    "deployment receipts and 0s mount are labeled local-readiness/manifest-only where appropriate"
+  ],
+  "doesNotClaim": [
+    "live payment movement",
+    "live provider callback proof",
+    "live Neon primary proof",
+    "deployed DNS/SSL proof",
+    "browser click automation proof"
+  ]
+}

@@ -62,6 +62,11 @@ export default wrap(async (req) => {
       expires_at: session.expires_at,
       session_id: session.session_id
     },
-    refresh_token: refresh.token
+    refresh_token: refresh.token,
+    pin_gate: {
+      setup_endpoint: "/auth/pin/setup",
+      login_endpoint: "/auth/pin/login",
+      recovery_endpoint: "/auth/recovery/login"
+    }
   }, cors);
 });

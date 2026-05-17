@@ -1,8 +1,8 @@
-# PHX Verified Network Platform v13
+# Valley Verified Network Platform v13
 
-PHX Verified is a multi-page, seed-driven Phoenix metro business and service marketplace. It starts with a large seeded supply of real businesses, then gives AEs and operators a path to activate owners into claims, corrected profiles, verification packets, exposure upgrades, lead routing, sponsor inventory, and managed growth products.
+Valley Verified is a multi-page, seed-driven Phoenix metro business and service marketplace. It starts with a large seeded supply of real businesses, then gives AEs and operators a path to activate owners into claims, corrected profiles, verification packets, exposure upgrades, lead routing, sponsor inventory, and managed growth products.
 
-No local auth is included. Admin/operator/revenue surfaces are upstream-auth-ready and now ship as `noindex,nofollow,noarchive` routes with robots disallow rules so public crawl energy stays on marketplace pages.
+No local username/password system is included. Admin/operator/revenue surfaces are wired to inherit identity from the MetrAIyux 0S / SkyeGateFS27 gate. The function layer can introspect an FS27 bearer token, strip public `x-upstream-*` spoofing headers, and inject trusted upstream identity before PHX policy code runs. Internal routes still ship as `noindex,nofollow,noarchive` with robots disallow rules so public crawl energy stays on marketplace pages.
 
 ## v14 money-path code upgrade
 
@@ -71,7 +71,14 @@ The platform is structured to monetize only after the seeded network has supply:
 
 ## Important auth note
 
-No auth is included. Gate operator/admin/revenue routes with the upstream auth layer when deployed. v13 also noindexes and robots-disallows those routes, but that is crawl protection, not access control.
+Production auth now expects the 0S/SkyeGateFS27 gate:
+
+- Set `SKYGATEFS27_ORIGIN` to the live FS27 gate origin.
+- Set `PHX_GATE_AUTH_REQUIRED=true`.
+- Send customer/operator requests with `Authorization: Bearer <FS27 session JWT or kx_live API key>`.
+- The PHX adapter strips public `x-upstream-*` headers, introspects the gate token, then injects trusted `x-upstream-user-id`, `x-upstream-user-email`, `x-upstream-roles`, `x-upstream-customer-id`, `x-upstream-workspace-id`, and `x-upstream-plan`.
+
+Only use `PHX_TRUST_UPSTREAM_HEADERS=true` when a trusted reverse proxy is already stripping and injecting those headers. Robots/noindex rules are crawl protection, not access control.
 
 ## Proof
 
@@ -200,8 +207,19 @@ Key proof files:
 
 ## v23 public website layer
 
-v23 upgrades the public website surface around the marketplace. The home page now sells PHX Verified as an Arizona verified business network instead of acting like an internal proof page. Public pages include `/about/`, `/how-it-works/`, `/for-businesses/`, `/advertise/`, `/network/`, and `/contact/`.
+v23 upgrades the public website surface around the marketplace. The home page now sells Valley Verified as an Arizona verified business network instead of acting like an internal proof page. Public pages include `/about/`, `/how-it-works/`, `/for-businesses/`, `/advertise/`, `/network/`, and `/contact/`.
 
 The public header is intentionally simplified. Internal operator and AE surfaces still exist, but they are no longer pushed into the main buyer/business-owner navigation. No local auth was added; protected operations remain upstream-auth driven.
 
 Run `npm run v23-smoke` for the website-specific proof and `npm run codecheck` for the full proof chain.
+
+## 0S gate + first-month customer landing add-on
+
+This 0S-wired package adds:
+
+- `src/server/gate-auth.mjs` for FS27 bearer-token introspection and trusted upstream identity injection.
+- `netlify/functions/phx-customer-posting.mjs` for the customer benefit endpoint.
+- `src/server/customer-posting-entitlement.mjs` for the first-month eligibility rule.
+- `customer_business_posting` action contract, queued to `customer-business-postings`.
+
+Every MetrAIyux 0S customer can receive one free Valley Verified public business landing/posting after the first paid month clears. The landing is queued behind gate auth and review; it does not auto-publish or bypass duplicate/quality controls.

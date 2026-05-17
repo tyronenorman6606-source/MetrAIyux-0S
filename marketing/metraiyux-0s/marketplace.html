@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Skye Ecosystem Marketplace — Every Product. One Command Hub.</title>
-  <meta name="description" content="The Skye Ecosystem Marketplace. MetrAIyux 0S, PHX Verified, Skye Business Command Center, SkyeDrive, the legal fortress, the vault — every sellable product from Skyes Over London / SOL Enterprises in one place. Ready to buy, deploy, or white-label.">
+  <meta name="description" content="The Skye Ecosystem Marketplace. MetrAIyux 0S, Valley Verified, Skye Business Command Center, SkyeDrive, the legal fortress, the vault, and live client builds in one place. Ready to buy, deploy, or white-label.">
   <meta property="og:title" content="Skye Ecosystem Marketplace">
   <meta property="og:description" content="Every product from the Skye empire. Buy, deploy, or white-label.">
   <link rel="icon" href="assets/favicon-32.png">
@@ -477,12 +477,187 @@
       align-items: center;
       gap: 8px;
     }
+    .client-build-proof,
+    .brain-fit-check {
+      padding: 90px clamp(20px,4vw,56px);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .client-build-proof .proof-head,
+    .brain-fit-check .proof-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 32px;
+    }
+    .proof-head h2 {
+      font-family: var(--font-display);
+      font-size: clamp(30px,4.4vw,56px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      margin: 0 0 12px;
+    }
+    .proof-head p {
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+    .proof-actions,
+    .share-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .social-share-strip {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 800;
+    }
+    .social-share-strip span {
+      text-transform: uppercase;
+      letter-spacing: 0;
+      color: rgba(255,255,255,.62);
+    }
+    .social-share-strip a {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .social-share-strip a:hover {
+      border-color: rgba(255,209,102,.55);
+      color: var(--accent-gold);
+    }
+    .client-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .live-build-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(10,14,19,.8);
+      box-shadow: 0 24px 80px rgba(0,0,0,.28);
+    }
+    .live-build-card video {
+      width: 100%;
+      min-height: 310px;
+      aspect-ratio: 16 / 10;
+      display: block;
+      object-fit: cover;
+      background: #020306;
+    }
+    .live-build-body {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+    .live-build-body h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.55rem,2.6vw,2.4rem);
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0;
+    }
+    .live-build-body p {
+      color: #c8c0b2;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .live-build-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .live-build-pills span {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+      font-size: .75rem;
+    }
+    .fit-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+      gap: 20px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(244,199,91,.08), transparent 38%),
+        rgba(10,14,19,.86);
+    }
+    .fit-form {
+      display: grid;
+      gap: 14px;
+    }
+    .fit-form label {
+      display: grid;
+      gap: 7px;
+      color: var(--soft);
+      font-size: .82rem;
+      font-family: var(--font-label);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .fit-form select,
+    .fit-form textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: var(--ink);
+      background: rgba(5,8,12,.92);
+      outline: none;
+    }
+    .fit-form textarea { min-height: 130px; resize: vertical; text-transform: none; letter-spacing: 0; font-family: var(--font-body); }
+    .fit-output {
+      border: 1px solid rgba(244,199,91,.18);
+      border-radius: 8px;
+      padding: 22px;
+      background: rgba(244,199,91,.05);
+      min-height: 100%;
+    }
+    .fit-output h3 {
+      font-family: var(--font-display);
+      margin: 0 0 12px;
+      letter-spacing: 0;
+    }
+    .fit-output p,
+    .fit-output li {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .fit-output ul {
+      margin: 14px 0 18px;
+      padding-left: 18px;
+    }
+    .fit-output .card-actions {
+      flex-wrap: wrap;
+    }
 
     @media (max-width: 900px) {
       .product-card.featured { grid-template-columns: 1fr; }
       .featured-side { display: none; }
       .brain-campaign-inner { grid-template-columns: 1fr; }
       .vault-embed-section { grid-template-columns: 1fr; }
+      .client-build-proof .proof-head,
+      .brain-fit-check .proof-head,
+      .fit-panel { grid-template-columns: 1fr; }
+      .proof-actions,
+      .share-row { justify-content: flex-start; }
+      .client-proof-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
       .product-grid { grid-template-columns: 1fr; }
@@ -511,6 +686,7 @@
         <a class="is-active" href="marketplace.html">Marketplace</a>
         <a href="proof.html">Live Proof</a>
         <a href="valuation.html">Valuation</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
         <a class="nav-cta" href="../metraiyux-portal/index.html">Ecosystem Portal</a>
       </div>
     </nav>
@@ -522,10 +698,11 @@
     <section class="mkt-hero">
       <div class="hero-tag"><span class="live-dot"></span>All products live and deployed</div>
       <h1>Every product.<br><em>One command hub.</em></h1>
-      <p class="sub"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span>. PHX Verified local marketplace. Skye Business <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Command Center</span>. SkyeDrive Vault. The legal fortress. The SOL flagship. Built, deployed, and backed by Cloudflare — ready to buy, white-label, or install for your clients.</p>
+      <p class="sub"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span>. Valley Verified local marketplace. Skye Business <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Command Center</span>. SkyeDrive Vault. Live client builds. The legal fortress. Built, deployed, and backed by Cloudflare — ready to buy, white-label, or install for your clients.</p>
       <div class="cta-row">
         <a href="#products" class="btn-primary">Browse Products</a>
-        <a href="#campaigns" class="btn-ghost">Run a Brain Campaign</a>
+        <a href="#fit-check" class="btn-ghost">Ask the Brains</a>
+        <a href="#client-builds" class="btn-ghost">See Live Client Builds</a>
         <a href="../metraiyux-portal/index.html" class="btn-ghost">Ecosystem Portal →</a>
       </div>
     </section>
@@ -584,22 +761,22 @@
           </div>
         </article>
 
-        <!-- PHX Verified Marketplace Platform -->
+        <!-- Valley Verified Marketplace Platform -->
         <article class="product-card">
           <div class="card-tier tier-marketplace">Marketplace Platform</div>
-          <h3>PHX Verified Local Marketplace</h3>
-          <p class="tagline">Seeded city/category marketplaces with claim, lead, and exposure paths.</p>
-          <p class="desc">A v23 source package now unpacked inside 0S: 26,413 deduped Arizona business profiles, 26,743 generated pages, full static profile pages, duplicate defense, owner claim packets, AE queues, exposure products, and upstream-auth-ready runtime contracts.</p>
+          <h3>Valley Verified Local Marketplace</h3>
+          <p class="tagline">Our gift to customers: a real public business landing with no obligation.</p>
+          <p class="desc">A v23 marketplace platform now wired inside 0S: 26,413+ deduped Arizona business profiles, generated public pages, duplicate defense, owner claim packets, AE queues, optional exposure products, FS27 gate auth, and one free customer business posting after the first paid month.</p>
           <div class="feature-pills">
-            <span>26,413 profiles</span><span>1,260 checks passed</span><span>338 MB deploy output</span><span>Stripe-ready exposure products</span><span>Gateway-gated admin</span>
+            <span>26,413+ profiles</span><span>Featured client pages</span><span>No-obligation posting</span><span>Optional exposure products</span><span>FS27-gated admin</span><span>Free landing after month one</span>
           </div>
           <div class="card-price">
-            <span class="price-main">$49-$799/mo</span>
-            <span class="price-period">/ business-facing offer ladder</span>
-            <span class="price-note">Run it as a gated 0S module, not a raw public admin backend.</span>
+            <span class="price-main">Included gift</span>
+            <span class="price-period">/ optional upgrades only if wanted</span>
+            <span class="price-note">The public page stays useful without any required add-on.</span>
           </div>
           <div class="card-actions">
-            <a href="phx-verified-platform.html" class="btn-buy">View Platform Audit</a>
+            <a href="https://valley-verified.pages.dev/featured/" target="_blank" rel="noopener" class="btn-buy">See Featured Pages</a>
             <a href="index.html#pricing" class="btn-learn">Add to 0S Offer</a>
           </div>
         </article>
@@ -624,10 +801,10 @@
           </div>
         </article>
 
-        <!-- SOL Enterprises / SkyeSol -->
+        <!-- SOLEnterprises / SkyeSol -->
         <article class="product-card">
           <div class="card-tier tier-flagship">Flagship Site</div>
-          <h3>SOL Enterprises Website</h3>
+          <h3>SOLEnterprises Website</h3>
           <p class="tagline">The full public-facing Skyes Over London presence.</p>
           <p class="desc">Complete service suite, SkyeSuite apps (Drive, Collab, Sheets, Docx, Flow, Archive, Ops, Ledger), kAIxU AI platform, NexusConnect, blog, credibility center, and client portals. The home of the empire.</p>
           <div class="feature-pills">
@@ -701,6 +878,110 @@
       </div>
     </section>
 
+    <!-- LIVE CLIENT BUILDS -->
+    <section id="client-builds" class="client-build-proof" aria-labelledby="client-builds-title">
+      <div class="proof-head">
+        <div>
+          <div class="eyebrow-tag">Live client builds</div>
+          <h2 id="client-builds-title">What we do for free. What we scale into full apps.</h2>
+          <p>Valley Verified gives the business a no-obligation public landing. Full client builds turn that visibility into branded pages, quote flows, media, QR routes, and two-way backlinks.</p>
+        </div>
+        <div class="proof-actions">
+          <a class="btn-primary" href="mailto:graylondonskyes@gmail.com?subject=Request%20a%20MetrAIyux%200S%20client%20build">Request a Build</a>
+          <button class="btn-ghost" type="button" data-share-link data-share-url="https://metraiyux-0s-marketing.pages.dev/marketplace.html#client-builds" data-share-title="MetrAIyux 0S live client builds">Share Builds</button>
+        </div>
+        <div class="social-share-strip" aria-label="Share live client build proof">
+          <span>Send proof:</span>
+          <a href="mailto:?subject=MetrAIyux%200S%20live%20client%20builds&body=MetrAIyux%200S%20live%20client%20builds%20https%3A%2F%2Fmetraiyux-0s-marketing.pages.dev%2Fmarketplace.html%23client-builds">Email</a>
+          <a href="sms:?&body=MetrAIyux%200S%20live%20client%20builds%20https%3A%2F%2Fmetraiyux-0s-marketing.pages.dev%2Fmarketplace.html%23client-builds">Text</a>
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fmetraiyux-0s-marketing.pages.dev%2Fmarketplace.html%23client-builds" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmetraiyux-0s-marketing.pages.dev%2Fmarketplace.html%23client-builds" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmetraiyux-0s-marketing.pages.dev%2Fmarketplace.html%23client-builds&text=MetrAIyux%200S%20live%20client%20builds" target="_blank" rel="noopener">X</a>
+        </div>
+      </div>
+      <div class="client-proof-grid">
+        <article class="live-build-card">
+          <video autoplay muted loop playsinline controls preload="metadata" poster="https://bobs-smoke-shop.pages.dev/assets/videos/bobs-live-homepage-poster.jpg">
+            <source src="https://bobs-smoke-shop.pages.dev/assets/videos/bobs-live-homepage-loop.mp4" type="video/mp4">
+          </video>
+          <div class="live-build-body">
+            <h3>Bob's Smoke Shop</h3>
+            <p>Retail app build with age gate, live media, inventory lanes, specials, gallery, workspace preview, QR handoff, and Valley Verified backlink.</p>
+            <div class="live-build-pills"><span>21+ gate</span><span>Inventory lanes</span><span>Workspace preview</span></div>
+            <div class="card-actions">
+              <a href="https://bobs-smoke-shop.pages.dev/" target="_blank" rel="noopener" class="btn-buy">Open Bob's Build</a>
+              <a href="https://valley-verified.pages.dev/business/bobs-smoke-shop-litchfield-park/" target="_blank" rel="noopener" class="btn-learn">Valley Post</a>
+            </div>
+          </div>
+        </article>
+        <article class="live-build-card">
+          <video autoplay muted loop playsinline controls preload="metadata" poster="https://empire-pallets.pages.dev/assets/media/empire-hero-poster.jpg">
+            <source src="https://empire-pallets.pages.dev/assets/media/empire-hero.mp4" type="video/mp4">
+          </video>
+          <div class="live-build-body">
+            <h3>Empire Pallets</h3>
+            <p>Operations app build with quote intake, service lanes, scan route, intro video, commercial proof, and Valley Verified backlink.</p>
+            <div class="live-build-pills"><span>Quote flow</span><span>Scan route</span><span>Service lanes</span></div>
+            <div class="card-actions">
+              <a href="https://empire-pallets.pages.dev/" target="_blank" rel="noopener" class="btn-buy">Open Empire Build</a>
+              <a href="https://valley-verified.pages.dev/business/empire-pallets-phoenix/" target="_blank" rel="noopener" class="btn-learn">Valley Post</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- BRAIN FIT CHECK -->
+    <section id="fit-check" class="brain-fit-check" aria-labelledby="fit-check-title">
+      <div class="proof-head">
+        <div>
+          <div class="eyebrow-tag">Ask the 0S brains</div>
+          <h2 id="fit-check-title">Tell the brains what you need. Get the right product path.</h2>
+          <p>This local fit check explains the offer, routes buyers to the right link, and keeps Valley Verified positioned as a no-obligation customer gift.</p>
+        </div>
+        <div class="share-row">
+          <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open the OS</a>
+          <button class="btn-ghost" type="button" data-share-link data-share-url="https://metraiyux-0s-marketing.pages.dev/marketplace.html#fit-check" data-share-title="Ask the MetrAIyux 0S brains">Share Fit Check</button>
+        </div>
+      </div>
+      <div class="fit-panel">
+        <div class="fit-form">
+          <label>Business stage
+            <select data-fit-stage>
+              <option value="service">Local service business</option>
+              <option value="ops">Growing operations team</option>
+              <option value="agency">Agency or consultant</option>
+              <option value="enterprise">Enterprise or public-sector buyer</option>
+            </select>
+          </label>
+          <label>Primary need
+            <select data-fit-need>
+              <option value="website">I need a real website/app built</option>
+              <option value="visibility">I need local visibility</option>
+              <option value="automation">I need my company run through brains/gates</option>
+              <option value="white-label">I want to resell or white-label this</option>
+              <option value="proof">I need proof, valuation, or investor docs</option>
+            </select>
+          </label>
+          <label>Budget feel
+            <select data-fit-budget>
+              <option value="starter">Start lean</option>
+              <option value="growth">Ready for a managed system</option>
+              <option value="scale">I need scale and custom infrastructure</option>
+            </select>
+          </label>
+          <label>Notes for the brains
+            <textarea data-fit-notes placeholder="Example: I run a pallet company and need a quote app plus local visibility."></textarea>
+          </label>
+          <button class="btn-primary" type="button" data-fit-run>Ask Brains</button>
+        </div>
+        <div class="fit-output" id="fitOutput" aria-live="polite">
+          <h3>Recommended path appears here.</h3>
+          <p>Choose a stage and need, then the brains will route you to the right offer, proof link, and next action.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- BRAIN CAMPAIGN SECTION -->
     <section id="campaigns" class="brain-campaign-section" aria-labelledby="campaign-title">
       <div class="brain-campaign-inner">
@@ -758,7 +1039,7 @@
               <div><span class="t-brain">&nbsp;&nbsp;Celeste Monroe</span><span class="t-dim"> → primary revenue brain assigned</span></div>
               <div><span class="t-brain">&nbsp;&nbsp;Orion Hayes</span><span class="t-dim"> → tech brief brain assigned</span></div>
               <div><span class="t-brain">&nbsp;&nbsp;Victor Saint</span><span class="t-dim"> → proof logging brain assigned</span></div>
-              <div><span class="t-dim">&nbsp;&nbsp;positioning: enterprise command structure, 17 brains, $150K deployed</span></div>
+              <div><span class="t-dim">&nbsp;&nbsp;positioning: enterprise command structure, 16 brains, $150K deployed</span></div>
               <div><span class="t-dim">&nbsp;&nbsp;channel: outbound · email · linkedin · AE calls</span></div>
               <div><span class="t-ok">&nbsp;&nbsp;[RECEIPT] campaign-2026-05-15-0001.json → D1</span></div>
               <div><span class="t-dim">&nbsp;&nbsp;approval gate: Gray London Skyes sign-off required before send</span></div>
@@ -867,7 +1148,7 @@
           '<span class="t-ok">&nbsp;&nbsp;[OK] Campaign cleared — no hard gates triggered</span>',
           '<span class="t-brain">&nbsp;&nbsp;Celeste Monroe</span><span class="t-dim"> → primary revenue brain</span>',
           '<span class="t-brain">&nbsp;&nbsp;Orion Hayes</span><span class="t-dim"> → tech brief brain</span>',
-          '<span class="t-dim">&nbsp;&nbsp;positioning: enterprise command, 17 brains, $150K deployed value</span>',
+          '<span class="t-dim">&nbsp;&nbsp;positioning: enterprise command, 16 brains, $150K deployed value</span>',
           '<span class="t-dim">&nbsp;&nbsp;channels: outbound · email · AE calls · LinkedIn</span>',
           '<span class="t-ok">&nbsp;&nbsp;[RECEIPT] campaign-os-2026.json → D1 ledger</span>',
           '<span class="t-dim">&nbsp;&nbsp;approval gate: owner sign-off required before send</span>',
@@ -932,6 +1213,108 @@
           renderCampaign(card.dataset.campaign);
         });
       });
+
+      function esc(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+      }
+
+      document.querySelectorAll('[data-share-link]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const url = button.dataset.shareUrl || window.location.href;
+          const title = button.dataset.shareTitle || document.title;
+          if (navigator.share) {
+            try {
+              await navigator.share({ title, url });
+              return;
+            } catch (err) {
+              if (err && err.name === 'AbortError') return;
+            }
+          }
+          try {
+            await navigator.clipboard.writeText(url);
+            button.textContent = 'Copied';
+            setTimeout(() => { button.textContent = button.dataset.shareTitle ? 'Share' : 'Share Link'; }, 1600);
+          } catch {
+            window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(url);
+          }
+        });
+      });
+
+      const fitOutput = document.getElementById('fitOutput');
+      const productPaths = {
+        website: {
+          title: 'Client build plus Valley Verified posting',
+          summary: 'Best fit: request a MetrAIyux client build, then use Valley Verified as the public visibility bridge. The Valley page is the gift; the full app is where the deeper buyer workflow lives.',
+          brains: ['Adrian Cross routes client success and intake.', 'Valentina Reyes shapes the buyer-facing page.', 'Orion Hayes handles build scope and deployment proof.'],
+          links: [
+            ['Request a build', 'mailto:graylondonskyes@gmail.com?subject=Request%20a%20MetrAIyux%200S%20client%20build'],
+            ["Bob's live build", 'https://bobs-smoke-shop.pages.dev/'],
+            ['Empire live build', 'https://empire-pallets.pages.dev/']
+          ]
+        },
+        visibility: {
+          title: 'Valley Verified visibility path',
+          summary: 'Best fit: start with the free public business posting after the first paid month. No obligation, no forced upgrade. Verification, featured placement, and lead routing are optional only if you want more reach.',
+          brains: ['Celeste Monroe explains the visibility offer.', 'Victor Saint keeps public proof honest.', 'Julian Mercer blocks unsupported claims.'],
+          links: [
+            ['Featured Valley pages', 'https://valley-verified.pages.dev/featured/'],
+            ['Bob Valley post', 'https://valley-verified.pages.dev/business/bobs-smoke-shop-litchfield-park/'],
+            ['Empire Valley post', 'https://valley-verified.pages.dev/business/empire-pallets-phoenix/']
+          ]
+        },
+        automation: {
+          title: 'MetrAIyux 0S operating system',
+          summary: 'Best fit: deploy 0S for command routing, approvals, receipts, vault, workspace gates, and product guidance. Valley Verified becomes part of the offer after month one.',
+          brains: ['Site Operator Brain routes commands.', '0meg4kAI scans risk.', 'Naomi Sterling and Julian Mercer gate money and compliance.'],
+          links: [
+            ['Open the OS', 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/'],
+            ['View pricing', 'index.html#pricing'],
+            ['Capabilities', 'capabilities.html']
+          ]
+        },
+        'white-label': {
+          title: 'White-label or reseller path',
+          summary: 'Best fit: license the OS, client build process, or marketplace module under your own brand. Use live builds as proof, then sell managed installs to your clients.',
+          brains: ['Helena Ward routes partner strategy.', 'Julian Mercer gates license terms.', 'Orion Hayes packages the deployment kit.'],
+          links: [
+            ['White-label program', 'white-label.html'],
+            ['Marketplace catalog', 'marketplace.html#products'],
+            ['Contact', 'mailto:graylondonskyes@gmail.com?subject=White-label%20MetrAIyux%200S']
+          ]
+        },
+        proof: {
+          title: 'Proof, valuation, and sales docs',
+          summary: 'Best fit: use the proof center, valuation page, and sell sheet to show deployed value, live surfaces, and buyer-ready language.',
+          brains: ['Victor Saint prepares proof receipts.', 'Celeste Monroe prepares the sales angle.', 'Marcus Vale keeps the operator view clean.'],
+          links: [
+            ['Live proof', 'proof.html'],
+            ['Valuation', 'valuation.html'],
+            ['Sell sheet', 'sell-sheet.html']
+          ]
+        }
+      };
+
+      function renderFit() {
+        if (!fitOutput) return;
+        const need = document.querySelector('[data-fit-need]')?.value || 'website';
+        const stage = document.querySelector('[data-fit-stage]')?.value || 'service';
+        const budget = document.querySelector('[data-fit-budget]')?.value || 'starter';
+        const notes = document.querySelector('[data-fit-notes]')?.value.trim();
+        const path = productPaths[need] || productPaths.website;
+        const budgetLine = budget === 'scale'
+          ? 'Budget read: custom infrastructure or enterprise scope is reasonable.'
+          : budget === 'growth'
+            ? 'Budget read: managed 0S or a full client build can make sense.'
+            : 'Budget read: start with the leanest useful surface, then scale after proof.';
+        fitOutput.innerHTML = `
+          <h3>${esc(path.title)}</h3>
+          <p>${esc(path.summary)}</p>
+          <ul>${path.brains.map(line => `<li>${esc(line)}</li>`).join('')}<li>${esc(budgetLine)}</li><li>Stage read: ${esc(stage.replace('-', ' '))}.${notes ? ' Notes received: ' + esc(notes) : ''}</li></ul>
+          <div class="card-actions">${path.links.map(([label, href], i) => `<a class="${i === 0 ? 'btn-buy' : 'btn-learn'}" href="${esc(href)}"${href.startsWith('http') || href.startsWith('mailto:') ? ' target="_blank" rel="noopener"' : ''}>${esc(label)}</a>`).join('')}</div>
+        `;
+      }
+
+      document.querySelector('[data-fit-run]')?.addEventListener('click', renderFit);
     })();
   </script>
 </body>

@@ -1,0 +1,29 @@
+{
+  "package": "relay13-core-v1.1-launch",
+  "checked_at": "2026-05-08T16:23:27Z",
+  "result": "passed",
+  "checks": [
+    "workspace-domain allowlisting endpoint present",
+    "public widget config validates workspace domain",
+    "public widget conversation creation validates workspace domain",
+    "admin token comparison uses timingSafeEqual",
+    "api key last_used_at writes are throttled",
+    "api key expiration supported",
+    "conversation counters stored on conversations",
+    "conversation list avoids per-row message count subquery",
+    "message write validates conversation/workspace match",
+    "operator websocket validates conversation/workspace match",
+    "payload size cap present",
+    "workspace monthly write limits present",
+    "job queue accepts approved types only",
+    "no migration INSERT statements or preloaded message content"
+  ],
+  "live_gates_remaining": [
+    "Cloudflare D1 database ID",
+    "PLATFORM_ADMIN_TOKEN secret",
+    "remote D1 migration",
+    "Cloudflare deploy",
+    "two-tab browser live messaging proof",
+    "blocked-domain browser proof after allowlisting domains"
+  ]
+}

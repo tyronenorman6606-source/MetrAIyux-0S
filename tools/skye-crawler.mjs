@@ -12,6 +12,8 @@ const SKIP_API = process.env.SKIP_API === '1' || process.env.SKIP_API === 'true'
 const CRAWLER_PROFILE = process.env.SKYE_CRAWLER_PROFILE || (process.env.SKYEPAY_SCAN ? 'skyepay' : 'metraiyux-0s');
 const BROWSER_CONCURRENCY = Number(process.env.SKYE_CRAWLER_CONCURRENCY || 1);
 const BROWSER_BATCH_SIZE = Number(process.env.SKYE_CRAWLER_BATCH_SIZE || 25);
+const BROWSER_ACTION_TIMEOUT = Number(process.env.SKYE_CRAWLER_ACTION_TIMEOUT || 12000);
+const BROWSER_NAVIGATION_TIMEOUT = Number(process.env.SKYE_CRAWLER_NAVIGATION_TIMEOUT || 30000);
 
 mkdirSync(ARTIFACT_DIR, { recursive: true });
 
@@ -170,8 +172,8 @@ async function browserSweep(browser, htmlFiles, viewport) {
 
     async function worker() {
       const page = await context.newPage();
-      page.setDefaultTimeout(9000);
-      page.setDefaultNavigationTimeout(12000);
+      page.setDefaultTimeout(BROWSER_ACTION_TIMEOUT);
+      page.setDefaultNavigationTimeout(BROWSER_NAVIGATION_TIMEOUT);
       while (index < batchFiles.length) {
         const file = batchFiles[index++];
         const pageUrl = urlFor(rel(file));
@@ -196,7 +198,7 @@ async function browserSweep(browser, htmlFiles, viewport) {
               if (!error.includes('ERR_ABORTED')) requestFailures.push({ url: request.url(), error });
             }
           });
-          const response = await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 12000 });
+          const response = await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: BROWSER_NAVIGATION_TIMEOUT });
           await page.waitForLoadState('load', { timeout: 5000 }).catch(() => {});
           await page.waitForTimeout(150);
           let layout;
@@ -335,10 +337,11 @@ async function checkLocalTool(browser) {
   await page.fill('input[name="owner"]', 'Operations');
   await page.fill('textarea[name="notes"]', 'Customer-facing proof needs one last review.');
   await page.click('[data-save]');
-  const saved = await page.locator('.tool-output').innerText();
+  const output = page.locator('.tool-output').first();
+  const saved = await output.innerText();
   const storage = await page.evaluate(() => localStorage.getItem('omega-tool:risk-register'));
   await page.click('[data-clear]');
-  const cleared = await page.locator('.tool-output').innerText();
+  const cleared = await output.innerText();
   record('flow:admin-local-tool-save-clear', saved.includes('Saved locally') && storage?.includes('E2E client readiness risk') && cleared.includes('Cleared'), {
     saved_preview: saved.slice(0, 300),
     cleared,
@@ -434,7 +437,7 @@ async function checkSkyePayHttp(api) {
     bytes: pageText.length
   });
 
-  const offersRes = await api.get(urlFor('.netlify/functions/skyepay-offers?client=bobs-smoke-shop'), { timeout: 12000 });
+  const offersRes = await api.get(urlFor('.netlify/functions/skyepay-offers?client=metraiyux-0s'), { timeout: 12000 });
   const offers = await responseJson(offersRes);
   record('api:skyepay-offers-catalog', offersRes.ok() &&
     offers.json?.ok === true &&
@@ -452,7 +455,7 @@ async function checkSkyePayHttp(api) {
     bytes: offers.text.length
   });
 
-  const corsProbe = await api.get(urlFor('.netlify/functions/skyepay-offers?client=bobs-smoke-shop'), {
+  const corsProbe = await api.get(urlFor('.netlify/functions/skyepay-offers?client=metraiyux-0s'), {
     headers: { origin: 'https://not-approved.example' },
     timeout: 12000
   });
@@ -462,8 +465,8 @@ async function checkSkyePayHttp(api) {
   const invalidRes = await api.post(urlFor('.netlify/functions/skyepay-checkout'), {
     headers: { 'content-type': 'application/json' },
     data: {
-      client_slug: 'bobs-smoke-shop',
-      offer_id: 'metraiyux-starter-command',
+      client_slug: 'metraiyux-0s',
+      offer_id: 'metraiyux-routex-workforce-command',
       customer_name: 'Scanner Invalid',
       customer_email: 'not-an-email',
       company_name: 'Scanner Co',
@@ -481,11 +484,11 @@ async function checkSkyePayHttp(api) {
   const checkoutRes = await api.post(urlFor('.netlify/functions/skyepay-checkout'), {
     headers: { 'content-type': 'application/json' },
     data: {
-      client_slug: 'bobs-smoke-shop',
-      offer_id: 'metraiyux-starter-command',
+      client_slug: 'metraiyux-0s',
+      offer_id: 'metraiyux-routex-workforce-command',
       customer_name: 'Scanner Operator',
       customer_email: 'scanner@example.com',
-      company_name: "Bob's Smoke Shop",
+      company_name: 'RouteX Scanner Co',
       dry_run: true,
       idempotency_key: `scanner_${Date.now()}`
     },
@@ -506,9 +509,9 @@ async function checkSkyePayHttp(api) {
   });
 
   const demoSession = checkout.json?.id || '';
-  const statusRes = await api.get(urlFor(`.netlify/functions/skyepay-status?demo_session=${encodeURIComponent(demoSession)}`), { timeout: 12000 });
+  const statusRes = await api.get(urlFor(`.netlify/functions/skyepay-status?demo_session=${encodeURIComponent(demoSession)}&offer=metraiyux-routex-workforce-command`), { timeout: 12000 });
   const status = await responseJson(statusRes);
-  record('api:skyepay-status-demo-public-safe', statusRes.ok() && status.json?.order?.approval_status === 'paid_pending_owner_approval' && !secretSignals(status.text), {
+  record('api:skyepay-status-demo-public-safe', statusRes.ok() && status.json?.order?.approval_status === 'demo_pending_owner_approval' && status.json?.order?.provisioning_status === 'waiting_for_owner_approval' && !secretSignals(status.text), {
     status: statusRes.status(),
     order_keys: Object.keys(status.json?.order || {})
   });
@@ -580,12 +583,12 @@ async function checkSkyePayBrowser(browser, viewport, label) {
   page.on('pageerror', (error) => pageErrors.push(error.message));
 
   try {
-    await page.goto(urlFor('skyepay.html?client=bobs-smoke-shop&dry_run=1'), { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.goto(urlFor('skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command&dry_run=1'), { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForSelector('#skypayForm', { timeout: 10000 });
     const bodyText = await page.locator('body').innerText();
-    await page.fill('input[name="customer_name"]', 'Scanner Bob');
+    await page.fill('input[name="customer_name"]', 'Scanner RouteX');
     await page.fill('input[name="customer_email"]', 'scanner@example.com');
-    await page.fill('input[name="company_name"]', "Bob's Smoke Shop");
+    await page.fill('input[name="company_name"]', 'RouteX Scanner Co');
     await page.click('#checkoutBtn');
     await page.waitForURL(/status=success/, { timeout: 12000 });
     await page.waitForSelector('#statusPanel:not([hidden])', { timeout: 8000 });

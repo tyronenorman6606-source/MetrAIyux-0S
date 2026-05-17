@@ -27,6 +27,7 @@ if (!databaseId) {
 
 const source = fs.readFileSync(sourcePath, 'utf8');
 const config = JSON.parse(source);
+if (config.main) config.main = path.resolve(config.main);
 config.d1_databases = [
   {
     binding: 'DB',

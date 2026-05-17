@@ -11,6 +11,16 @@
   NODE_VERSION = "20.12.2"
 
 [[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  from = "/gateway-chat"
+  to = "/.netlify/functions/gateway-chat"
+  status = 200
+
+[[redirects]]
   from = "/auth-introspect"
   to = "/.netlify/functions/auth-introspect"
   status = 200
@@ -93,6 +103,26 @@
 [[redirects]]
   from = "/auth/card"
   to = "/.netlify/functions/auth-card"
+  status = 200
+
+[[redirects]]
+  from = "/auth/pin/setup"
+  to = "/.netlify/functions/auth-pin-setup"
+  status = 200
+
+[[redirects]]
+  from = "/auth/pin/login"
+  to = "/.netlify/functions/auth-pin-login"
+  status = 200
+
+[[redirects]]
+  from = "/auth/recovery/login"
+  to = "/.netlify/functions/auth-recovery-login"
+  status = 200
+
+[[redirects]]
+  from = "/auth/recovery/rotate"
+  to = "/.netlify/functions/auth-recovery-rotate"
   status = 200
 
 [[redirects]]

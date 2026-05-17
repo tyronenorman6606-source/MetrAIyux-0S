@@ -66,3 +66,12 @@ export async function sendResetEmail(user, token, origin) {
   const reset_url = `${origin}/.netlify/functions/auth-reset-password?token=${encodeURIComponent(token)}`;
   return await sendEmail("reset_password", { to: user.email, reset_url, token_preview: token });
 }
+
+export async function sendRecoveryCodesEmail(user, { gateId, codes = [] }) {
+  return await sendEmail("recovery_codes", {
+    to: user.email,
+    gate_id: gateId,
+    recovery_codes: codes,
+    recovery_code_count: codes.length
+  });
+}

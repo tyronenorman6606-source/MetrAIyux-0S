@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Import Dry Run | Valley Verified</title>
+    <meta name="description" content="Dry-run publishing safety report for Valley Verified seed imports." />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <link rel="canonical" href="https://valley-verified.pages.dev/dry-run/" />
+    <meta name="theme-color" content="#f5efe3" />
+    <meta property="og:title" content="Import Dry Run | Valley Verified" />
+    <meta property="og:description" content="Dry-run publishing safety report for Valley Verified seed imports." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://valley-verified.pages.dev/dry-run/" />
+    <meta property="og:image" content="https://valley-verified.pages.dev/assets/valley-verified-logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/assets/valley-verified-logo.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    
+  </head><body class="dry-run-page"><canvas id="sky" class="skyesol-living-background living-background" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div><header class="topbar public-topbar">
+  <a class="brand" href="/" aria-label="Valley Verified home"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>real local business pages</small></span></a>
+  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a><a class="nav-operator" href="/protected-admin/" rel="nofollow">Operator</a></nav>
+</header><main id="main" class="site-main"><section class="hero glass subhero"><div><p class="eyebrow">Import dry run</p><h1>Know what a scrape batch will do before publishing.</h1><p class="hero-text">Run <code>npm run dry-run</code> after dropping new CSV/JSON files into <code>seed/businesses/inbox/</code>. The command generates data-only reports so you can catch duplicate abuse, bad rows, and suppressions before a full deploy.</p></div><aside class="hero-card"><div class="metric"><span>27,484</span><small>raw rows</small></div><div class="metric"><span>26,415</span><small>would publish</small></div><div class="metric"><span>0</span><small>review signals</small></div></aside></section><section class="section glass"><div class="section-head"><div><p class="eyebrow">Current dry-run summary</p><h2>No hard blocker found</h2></div><a class="btn small" href="/data/import-dry-run.json">Open JSON</a></div><pre class="code-output">{
+  &quot;updated_at&quot;: &quot;2026-05-17&quot;,
+  &quot;mode&quot;: &quot;build-time dry run summary&quot;,
+  &quot;raw_records&quot;: 27484,
+  &quot;would_publish&quot;: 26415,
+  &quot;exact_duplicate_collisions&quot;: 1069,
+  &quot;possible_duplicate_pairs&quot;: 0,
+  &quot;suppressed_records&quot;: 0,
+  &quot;rejection_candidates&quot;: 0,
+  &quot;poster_risk_records&quot;: 0,
+  &quot;blocker_count&quot;: 0,
+  &quot;needs_admin_review&quot;: 0,
+  &quot;safe_to_publish&quot;: true,
+  &quot;next_actions&quot;: [
+    &quot;Run npm run dry-run before deploying a new scrape batch.&quot;,
+    &quot;Review /data/import-rejections.json for broken rows before trusting new imports.&quot;,
+    &quot;Review /data/duplicate-report.json and /data/poster-risk-index.json for duplicate or abusive posting attempts.&quot;,
+    &quot;Add confirmed bad records to seed/businesses/suppressions.json, then rebuild.&quot;
+  ]
+}</pre></section></main><div id="toast" class="toast" role="status" aria-live="polite"></div><script type="module" src="/assets/app.js"></script></body></html>

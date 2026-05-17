@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-05-17T00:00:00.000Z",
+  "app_id": "metraiyux-houseoperations",
+  "title": "HouseOperations + SkyeBox",
+  "consumer_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/HouseOperations",
+  "gate_project_path": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
+  "gate_env_var": "SKYGATEFS27_ORIGIN",
+  "surfaces": [
+    {
+      "id": "houseoperations",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/index.html",
+      "role": "local app surface"
+    },
+    {
+      "id": "skyebox-authenticator",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/skye-box-authenticator-vault/index.html",
+      "role": "local encrypted TOTP vault"
+    },
+    {
+      "id": "pin-gate",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html",
+      "role": "Gate ID + PIN + recovery code lane"
+    }
+  ],
+  "gate_endpoints": [
+    "/auth/pin/setup",
+    "/auth/pin/login",
+    "/auth/recovery/login",
+    "/auth/recovery/rotate",
+    "/platform/events"
+  ],
+  "boundaries": [
+    "SkyeBox authenticator secrets remain local to the browser vault.",
+    "FS27 PIN/recovery controls unlock the gate session, not a managed TOTP custody service.",
+    "Recovery email delivery requires AUTH_EMAIL_WEBHOOK_URL; without it, the gate runs preview mode."
+  ],
+  "proof_requirements": [
+    "PIN setup stores only hashed PIN material.",
+    "Recovery codes are hashed and one-time consumed.",
+    "HouseOperations gate mirror packets are exported or posted only when a real FS27 event mirror secret exists.",
+    "Browser proof must show HouseOperations task/vendor/proof/export flow and SkyeBox vault/TOTP/export flow."
+  ]
+}

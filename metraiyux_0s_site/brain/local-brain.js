@@ -412,6 +412,10 @@ function smartDirectAnswer(query, route, surfaces) {
     return `${primaryOwner} owns the buyer conversation, with ${secondaryOwner} keeping the public framing clean. Send proof-seeking prospects to the Skyes Over London Reviews Proof Wall at https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded. Use it when they ask for reviews, testimonials, client experience, or social proof, and avoid inventing client names, outcomes, or approval status.`;
   }
 
+  if (hasAny(q, ['houseoperations', 'house operations', 'house ops', 'owner alerts', 'vendor pressure', 'skye box', 'skyebox', 'authenticator vault', 'totp', '2fa vault'])) {
+    return `${primaryOwner} owns the operations answer, with ${secondaryOwner} checking the security boundary. Route the user to /live/houseoperations-skyebox-operator-proof.html for the 0S expansion hub. HouseOperations proves task, vendor, schedule, assignment, alert, proof-save, and export workflows. SkyeBox proves a local encrypted TOTP vault. Do not claim cloud sync, password recovery, managed secret custody, or enterprise credential compliance without a separate approved scope.`;
+  }
+
   if (hasAny(q, ['buyer', 'prospect', 'lead', 'sell', 'ae', 'sales', 'proof router', 'what link', 'which link', 'client website', 'white label', 'command deck'])) {
     const linkLine = firstSurface ? ` The first surface I would send is ${firstSurface.name}, because ${firstSurface.sales_use || firstSurface.purpose}` : '';
     const proofLine = hasAny(q, ['auth', 'gate', 'skygate', 'fs27', 'proof', 'trust']) ? ` Keep ${secondaryOwner} in the review because the buyer is asking about gate/proof language, not just a pretty demo.` : '';
@@ -446,7 +450,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {
-    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOL Enterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
+    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOLEnterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
   }
 
   if (hasAny(q, ['vault', 'upload', 'file drop', 'storage', 'send files', 'client upload'])) {
@@ -458,7 +462,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['portal', 'ecosystem portal', 'empire hub', 'all sites', 'all properties'])) {
-    return `The Ecosystem Portal at https://metraiyux-ecosystem-portal.pages.dev/ links all 7+ empire properties: SOL Enterprises, MetrAIyux 0S, Public Spectacle, Marketing, Skye BCC, Legal Center (Legal Skyes), and Skye Vault. It includes a particle field canvas, property cards, vault upload spotlight, and a full legal policy strip.`;
+    return `The Ecosystem Portal at https://metraiyux-ecosystem-portal.pages.dev/ links all 7+ empire properties: SOLEnterprises, MetrAIyux 0S, Public Spectacle, Marketing, Skye BCC, Legal Center (Legal Skyes), and Skye Vault. It includes a particle field canvas, property cards, vault upload spotlight, and a full legal policy strip.`;
   }
 
   return `${primaryOwner} is the primary owner for this question through ${primary?.cabinet || 'the routed cabinet lane'}. ${secondaryOwner} is the secondary check. The practical answer is to keep the request inside that owner lane, use the live proof surface when one matches, and create a receipt or escalation if the answer touches money, legal claims, admin access, client commitments, or public promises.`;

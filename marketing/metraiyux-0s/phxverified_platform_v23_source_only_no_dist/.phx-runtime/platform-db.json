@@ -1,0 +1,152 @@
+{
+  "version": "22.0.0",
+  "created_at": "2026-05-17T16:45:38.666Z",
+  "updated_at": "2026-05-17T16:45:40.289Z",
+  "actions": {
+    "payment_event-5cfca620bd1764fb56bedb67": {
+      "action_id": "payment_event-5cfca620bd1764fb56bedb67",
+      "action_type": "payment_event",
+      "contract_version": "20.0.0",
+      "queue": "payment-events",
+      "status": "queued_for_review",
+      "created_at": "2026-05-17T16:45:38.666Z",
+      "source": "netlify:phx-payment",
+      "actor": {
+        "id": "payment-provider",
+        "email": "",
+        "roles": [
+          "system"
+        ],
+        "upstream": true
+      },
+      "payload": {
+        "provider": "dry-run",
+        "provider_event_id": "evt-local",
+        "provider_event_type": "checkout.session.completed",
+        "payment_order_id": "pay-order-2",
+        "exposure_order_id": "",
+        "business_id": "demo-business",
+        "product": "category_boost",
+        "tier": "growth",
+        "payment_status": "paid",
+        "amount_paid_cents": 14900,
+        "currency": "USD",
+        "raw_event_hash": "1b9bef73db35295052a8444858445dc7dd5925ca7ac076017a6112e47a63e824"
+      },
+      "review": {
+        "required": true,
+        "reason": "Static seed platform does not auto-mutate live listings. Upstream authenticated backend must approve and persist."
+      }
+    },
+    "quote_request-8e47b3767d91a3a2d515e9ae": {
+      "action_id": "quote_request-8e47b3767d91a3a2d515e9ae",
+      "action_type": "quote_request",
+      "contract_version": "20.0.0",
+      "queue": "quote-requests",
+      "status": "queued_for_review",
+      "created_at": "2026-05-17T16:45:39.226Z",
+      "source": "phx-lead:function",
+      "actor": {
+        "id": "",
+        "email": "",
+        "roles": [],
+        "upstream": true
+      },
+      "payload": {
+        "buyer_name": "Test Buyer",
+        "buyer_contact": "buyer@example.com",
+        "city": "Tempe",
+        "category": "Video Production",
+        "details": "Need Video Production services near Tempe with a verified provider and clean response path.",
+        "business_ids": [],
+        "budget": "open",
+        "timeline": "this week",
+        "service_lane": "Video Production",
+        "source_url": "",
+        "consent_to_contact": true
+      },
+      "review": {
+        "required": true,
+        "reason": "Static seed platform does not auto-mutate live listings. Upstream authenticated backend must approve and persist."
+      }
+    },
+    "lead_route_decision-b9e09b7d04fbf6ccc7d26efa": {
+      "action_id": "lead_route_decision-b9e09b7d04fbf6ccc7d26efa",
+      "action_type": "lead_route_decision",
+      "contract_version": "20.0.0",
+      "queue": "lead-route-decisions",
+      "status": "queued_for_review",
+      "created_at": "2026-05-17T16:45:39.226Z",
+      "source": "phx-lead:function",
+      "actor": {
+        "id": "",
+        "email": "",
+        "roles": [],
+        "upstream": true
+      },
+      "payload": {
+        "lead_id": "lead-e42cd5c1da7ba5151ea9e333",
+        "business_ids": [
+          "arclight-event-films-tempe-85281-04b822a",
+          "desert-frame-studio",
+          "arizona-state-university-tempe-education-childcare-d5b33c6",
+          "american-express-phoenix-legal-financial-services-accebed",
+          "avnet-phoenix-contractor-home-service-014d78b",
+          "empire-pallets-phoenix",
+          "republic-services-phoenix-business-professional-services-8a067e4",
+          "usaa-phoenix-legal-financial-services-7ae1e09"
+        ],
+        "route_reason": "Top 8 matches by city/category/contact readiness/verification signals.",
+        "assigned_to": "ae-tempe-video-production",
+        "city": "Tempe",
+        "category": "Video Production",
+        "score_summary": "arclight-event-films-tempe-85281-04b822a:99|desert-frame-studio:99|arizona-state-university-tempe-education-childcare-d5b33c6:95|american-express-phoenix-legal-financial-services-accebed:60|avnet-phoenix-contractor-home-service-014d78b:60|empire-pallets-phoenix:60|republic-services-phoenix-business-professional-services-8a067e4:60|usaa-phoenix-legal-financial-services-7ae1e09:60",
+        "sla": "next_business_day",
+        "notes": "Route candidates require AE/admin approval before owner delivery."
+      },
+      "review": {
+        "required": true,
+        "reason": "Static seed platform does not auto-mutate live listings. Upstream authenticated backend must approve and persist."
+      }
+    },
+    "owner_claim-336e293007fc7f8d7b620fe4": {
+      "action_id": "owner_claim-336e293007fc7f8d7b620fe4",
+      "action_type": "owner_claim",
+      "contract_version": "20.0.0",
+      "queue": "owner-claims",
+      "status": "queued_for_review",
+      "created_at": "2026-05-17T16:45:40.288Z",
+      "source": "api",
+      "actor": {
+        "id": "",
+        "email": "owner@example.com",
+        "roles": [
+          "owner"
+        ],
+        "upstream": true
+      },
+      "payload": {
+        "business_id": "arclight-event-films-tempe-85281-04b822a",
+        "owner_name": "Owner",
+        "owner_contact": "owner@example.com",
+        "claim_type": "correction",
+        "proof_summary": "proof",
+        "website": "",
+        "phone": "",
+        "email": "",
+        "documents": [],
+        "notes": ""
+      },
+      "review": {
+        "required": true,
+        "reason": "Static seed platform does not auto-mutate live listings. Upstream authenticated backend must approve and persist."
+      }
+    }
+  },
+  "events": [],
+  "state": null,
+  "leads": {},
+  "owner_contacts": {},
+  "suppression_drafts": {},
+  "delivery_receipts": []
+}

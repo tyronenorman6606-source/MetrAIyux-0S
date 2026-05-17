@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeProfitConsole Ledger Vault</title>
+  <meta name="description" content="A spatial profit operating app with deal constellations, split reactors, proof chains, and runtime-backed review packs.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="./assets/platform-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./platform.css">
+  <script defer src="./gate-session.js"></script>
+  <script defer src="./platform.js"></script>
+</head>
+<body data-platform-hardening="p1-routed" data-page="records.html" data-platform-id="skyeprofitconsole" data-mode="profit-field">
+  <div class="atmosphere" aria-hidden="true">
+    <span class="aurora aurora-a"></span>
+    <span class="aurora aurora-b"></span>
+    <span class="scanline"></span>
+  </div>
+
+  <header class="sovereign-strip" aria-label="Application status">
+    <a class="brand-sigil" href="./index.html" aria-label="SkyeProfitConsole home">
+      <img src="./assets/platform-mark.svg" alt="">
+      <span>
+        <b>SkyeProfitConsole</b>
+        <em>Neo-front profit field</em>
+      </span>
+    </a>
+    <nav class="jump-ribbon" aria-label="Mode navigation">
+      <a href="./index.html">Field</a>
+      <a href="./workflows.html">Loom</a>
+      <a href="./records.html">Vault</a>
+      <a href="./proof.html">Proof</a>
+      <a href="./runtime.html">Runtime</a>
+      <a href="./settings.html">Skin</a>
+    </nav>
+    <div class="runtime-orb" id="runtimeOrb" title="Runtime connection state">
+      <span></span>
+      <b id="runtimeStateLabel">Local app</b>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero-fracture" aria-labelledby="appTitle">
+      <div class="hero-copy">
+        <p class="microline">dashboard surface retired · profit field online</p>
+        <h1 id="appTitle">A front end that behaves like a revenue instrument, not a spreadsheet with makeup.</h1>
+        <p class="lede">Create profit packs, throw them into a live constellation, simulate margin pressure, push review packs into the local runtime, and watch proof events braid themselves into an execution spine.</p>
+      </div>
+      <div class="hero-actions" aria-label="Primary actions">
+        <button class="void-button primary" id="createReviewPack" type="button">Forge Profit Pack</button>
+        <button class="void-button" id="seedScenario" type="button">Seed New Scenario</button>
+        <button class="void-button ghost" id="exportState" type="button">Export State</button>
+      </div>
+    </section>
+
+    <section class="metric-storm" aria-label="Profit telemetry">
+      <article class="storm-cell tilt-left">
+        <span>Total booked</span>
+        <strong id="metricBooked">$0</strong>
+        <em>raw opportunity volume</em>
+      </article>
+      <article class="storm-cell tall-cell">
+        <span>Expected profit</span>
+        <strong id="metricExpected">$0</strong>
+        <em>weighted by close probability</em>
+      </article>
+      <article class="storm-cell tilt-right">
+        <span>Margin pressure</span>
+        <strong id="metricMargin">0%</strong>
+        <em>revenue after direct cost</em>
+      </article>
+      <article class="storm-cell shard-cell">
+        <span>Proof events</span>
+        <strong id="metricProof">0</strong>
+        <em>local and runtime transitions</em>
+      </article>
+    </section>
+
+    <section class="neo-grid" aria-label="Application workspace">
+      <article class="profit-field-panel" aria-labelledby="fieldTitle">
+        <div class="panel-crown">
+          <div>
+            <p class="microline">constellation display</p>
+            <h2 id="fieldTitle">Profit Field</h2>
+          </div>
+          <div class="field-legend" id="fieldLegend"></div>
+        </div>
+        <div class="field-stage" id="fieldStage">
+          <canvas id="profitFieldCanvas" width="900" height="620" aria-label="Animated profit field"></canvas>
+          <div class="field-core" aria-hidden="true">
+            <span>SKYE</span>
+            <b>PROFIT</b>
+          </div>
+          <div class="constellation-nodes" id="constellationNodes"></div>
+        </div>
+      </article>
+
+      <aside class="reactor-panel" aria-labelledby="reactorTitle">
+        <div class="panel-crown compact">
+          <div>
+            <p class="microline">math reactor</p>
+            <h2 id="reactorTitle">Split Furnace</h2>
+          </div>
+          <button class="micro-button" id="normalizeSplits" type="button">normalize</button>
+        </div>
+        <div class="furnace-readout">
+          <span>Preview take</span>
+          <strong id="reactorPreview">$0</strong>
+          <em id="reactorComment">No pack selected.</em>
+        </div>
+        <div class="split-stack" id="splitStack"></div>
+      </aside>
+
+      <section class="forge-panel" aria-labelledby="forgeTitle">
+        <div class="panel-crown">
+          <div>
+            <p class="microline">creation surface</p>
+            <h2 id="forgeTitle">Profit Pack Forge</h2>
+          </div>
+          <span class="status-pill" id="saveStatePill">autosaved</span>
+        </div>
+        <form class="forge-form" id="packForm">
+          <label>
+            <span>Pack name</span>
+            <input id="packLabel" name="label" type="text" autocomplete="off" placeholder="High-pressure close lane" required>
+          </label>
+          <label>
+            <span>Owner</span>
+            <input id="packOwner" name="owner" type="text" autocomplete="off" placeholder="profit-ops">
+          </label>
+          <label>
+            <span>Target lane</span>
+            <select id="packTarget" name="target">
+              <option value="AE-FlowPro">AE-FlowPro</option>
+              <option value="SkyeProofx">SkyeProofx</option>
+              <option value="Workforce Command">Workforce Command</option>
+              <option value="SkyeLeadVault">SkyeLeadVault</option>
+              <option value="MetrAIyux 0S">MetrAIyux 0S</option>
+            </select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="packStatus" name="status">
+              <option value="draft">draft</option>
+              <option value="ready">ready</option>
+              <option value="approved">approved</option>
+              <option value="blocked">blocked</option>
+              <option value="dispatched">dispatched</option>
+            </select>
+          </label>
+          <label>
+            <span>Revenue</span>
+            <input id="packRevenue" name="revenue" type="number" min="0" step="100" value="13000">
+          </label>
+          <label>
+            <span>Direct cost</span>
+            <input id="packCost" name="cost" type="number" min="0" step="100" value="3900">
+          </label>
+          <label>
+            <span>Close chance</span>
+            <input id="packChance" name="chance" type="range" min="1" max="100" value="67">
+            <b class="range-value" id="chanceValue">67%</b>
+          </label>
+          <label class="wide-field">
+            <span>Operator notes</span>
+            <textarea id="packNotes" name="notes" placeholder="What has to happen next for this money to become real?"></textarea>
+          </label>
+          <div class="form-actions">
+            <button class="void-button primary" type="submit">Inject Into Field</button>
+            <button class="void-button" id="updateSelected" type="button">Rewrite Selected</button>
+            <button class="void-button danger" id="clearState" type="button">Clear Local State</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="selected-panel" aria-labelledby="selectedTitle">
+        <div class="panel-crown compact">
+          <div>
+            <p class="microline">active specimen</p>
+            <h2 id="selectedTitle">Selected Pack</h2>
+          </div>
+          <span class="status-pill" id="selectedStatus">none</span>
+        </div>
+        <div class="specimen-card" id="selectedPackCard">
+          <p>Select a constellation node or create a new profit pack.</p>
+        </div>
+      </section>
+
+      <section class="lane-loom" aria-labelledby="loomTitle">
+        <div class="panel-crown">
+          <div>
+            <p class="microline">nonlinear work queue</p>
+            <h2 id="loomTitle">Signal Loom</h2>
+          </div>
+          <button class="micro-button" id="syncRuntime" type="button">sync runtime</button>
+        </div>
+        <div class="loom-columns" id="loomColumns"></div>
+      </section>
+
+      <section class="proof-spine" aria-labelledby="proofTitle">
+        <div class="panel-crown">
+          <div>
+            <p class="microline">audit braid</p>
+            <h2 id="proofTitle">Proof Chain</h2>
+          </div>
+          <span class="status-pill" id="runtimeCounts">runtime unchecked</span>
+        </div>
+        <div class="proof-feed" id="proofFeed"></div>
+      </section>
+    </section>
+  </main>
+
+  <template id="splitTemplate">
+    <label class="split-row">
+      <span></span>
+      <input type="range" min="0" max="100" step="1">
+      <b></b>
+    </label>
+  </template>
+</body>
+</html>

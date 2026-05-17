@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const neuralSpaceRuntimeTarget = process.env.NEURALSPACE_RUNTIME_TARGET || 'http://127.0.0.1:4121';
+const aurenBrainTarget = process.env.AUREN_BRAIN_TARGET || 'http://127.0.0.1:4130';
 
 export default defineConfig({
   plugins: [react()],
@@ -27,6 +28,11 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     proxy: {
+      '/api/auren': {
+        target: aurenBrainTarget,
+        changeOrigin: true,
+        secure: false
+      },
       '/runtime/standalone-apps/NeuralSpacePro': {
         target: neuralSpaceRuntimeTarget,
         changeOrigin: true,
@@ -37,6 +43,11 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     proxy: {
+      '/api/auren': {
+        target: aurenBrainTarget,
+        changeOrigin: true,
+        secure: false
+      },
       '/runtime/standalone-apps/NeuralSpacePro': {
         target: neuralSpaceRuntimeTarget,
         changeOrigin: true,

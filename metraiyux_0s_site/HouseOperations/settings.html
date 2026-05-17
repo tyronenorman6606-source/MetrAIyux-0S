@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HouseOperations standalone 0s platform for tasks, vendors, alerts, schedule, assignments, proof, runtime, and owner closeout.">
+  <title>HouseOperations Standalone 0s Platform</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./houseops-platform.css">
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body data-view="settings">
+  <div class="motion-chrome-rail" aria-hidden="true"></div>
+  <div class="platform surfaceScreenshots" data-surface-screenshots="houseoperations-desktop houseoperations-mobile">
+    <aside class="rail">
+      <a class="brand" href="./index.html" aria-label="HouseOperations dashboard">
+        <span style="display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;color:var(--cyan);font-weight:800">HO</span>
+        <span><b>HouseOperations</b><span>Standalone 0s platform</span></span>
+      </a>
+      <nav class="nav" id="nav" aria-label="HouseOperations sections"></nav>
+      <div class="railFooter"><a class="btn primary" href="./runtime.html">Runtime Proof</a><a class="btn" href="./skye-box-authenticator-vault/index.html">SkyeBox Vault</a><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">FS27 PIN Gate</a><a class="btn" href="./_legacy_shell/index.html">Legacy Copy</a><span class="small-copy">Live app is local to this folder. The old generated platform copy is retained only for closure comparison.</span></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="title"><div class="crumb" id="viewCrumb">HouseOperations</div><h1 id="viewTitle">Dashboard</h1><p id="viewSub"></p></div><div class="actions"><button class="btn" type="button" data-action="fullscreen">Fullscreen</button><button class="btn" type="button" data-action="export">Export</button><button class="btn primary" type="button" data-action="save-proof">Save Proof</button></div></header>
+      <div id="app"></div>
+    </main>
+  </div>
+  <script src="./houseops-platform.js"></script>
+</body>
+</html>

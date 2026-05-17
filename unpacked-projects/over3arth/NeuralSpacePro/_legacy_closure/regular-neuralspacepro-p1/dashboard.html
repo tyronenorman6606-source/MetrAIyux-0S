@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeuralSpacePro Dashboard</title>
+  <meta name="description" content="Signal metrics, open work, current run state, and operator decisions.">
+  <link rel="stylesheet" href="./platform.css">
+  <script defer src="./platform.js"></script>
+</head>
+<body data-platform-hardening="p1-routed" data-page="dashboard.html" data-platform-id="neuralspacepro">
+  <aside class="rail">
+    <a class="brand" href="./index.html">
+      <img src="./assets/platform-mark.svg" alt="">
+      <span>NeuralSpacePro</span>
+    </a>
+    <nav><a href="./index.html"><span>command</span><strong>Command</strong></a><a class="active" href="./dashboard.html"><span>dashboard</span><strong>Dashboard</strong></a><a href="./workflows.html"><span>flow</span><strong>Workflows</strong></a><a href="./records.html"><span>records</span><strong>Records</strong></a><a href="./proof.html"><span>proof</span><strong>Proof</strong></a><a href="./runtime.html"><span>runtime</span><strong>Runtime</strong></a><a href="./settings.html"><span>settings</span><strong>Settings</strong></a><a href="./app.html"><span>app</span><strong>Imported App</strong></a></nav>
+  </aside>
+  <main class="surface">
+    <header class="topbar">
+      <div>
+        <p class="kicker">dashboard lane</p>
+        <h1>Dashboard</h1>
+        <p>Signal metrics, open work, current run state, and operator decisions.</p>
+      </div>
+      <a class="primary" href="./app.html">Open Imported App</a>
+    </header>
+    <section class="hero">
+      <div>
+        <p class="kicker">standalone platform truth</p>
+        <h2>NeuralSpacePro now has routed surfaces, local proof, and same-folder runtime contracts.</h2>
+      </div>
+      <div class="metrics">
+        <strong>8</strong><span>routes</span>
+        <strong>6</strong><span>modules</span>
+        <strong>1</strong><span>truth folder</span>
+      </div>
+    </section>
+    <section class="grid"><article class="panel">
+      <span class="badge">Dashboard 01</span>
+      <h3>Neural map</h3>
+      <p>Neural map is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="queue-0">Queue</button>
+    </article><article class="panel">
+      <span class="badge">Dashboard 02</span>
+      <h3>3D surface</h3>
+      <p>3D surface is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="verify-1">Verify</button>
+    </article><article class="panel">
+      <span class="badge">Dashboard 03</span>
+      <h3>Knowledge lanes</h3>
+      <p>Knowledge lanes is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="queue-2">Queue</button>
+    </article><article class="panel">
+      <span class="badge">Dashboard 04</span>
+      <h3>Prompt board</h3>
+      <p>Prompt board is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="verify-3">Verify</button>
+    </article><article class="panel">
+      <span class="badge">Dashboard 05</span>
+      <h3>Proof rail</h3>
+      <p>Proof rail is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="queue-4">Queue</button>
+    </article><article class="panel">
+      <span class="badge">Dashboard 06</span>
+      <h3>Runtime</h3>
+      <p>Runtime is part of the imported NeuralSpacePro package now managed from this standalone folder.</p>
+      <button data-action="verify-5">Verify</button>
+    </article></section>
+    <section class="split">
+      <article class="panel">
+        <h3>Runtime Contract</h3>
+        <p>The local contract is kept under <code>src/runtime-contract.json</code> with the route map and endpoint boundary used by smoke proof.</p>
+        <a href="./src/runtime-contract.json">Open Contract</a>
+      </article>
+      <article class="panel">
+        <h3>Proof</h3>
+        <p>Smoke proof lives beside the platform and checks direct pages, truth metadata, assets, docs, and runtime files.</p>
+        <a href="./smoke/neuralspacepro-p1-smoke.mjs">Open Smoke</a>
+      </article>
+      <article class="panel">
+        <h3>Imported App</h3>
+        <p>The original advanced app entry is preserved as <code>app.html</code> so the functional surface stays inside the promoted folder.</p>
+        <a href="./app.html">Open App</a>
+      </article>
+      <article class="panel">
+        <h3>Operator State</h3>
+        <p>Queue and proof actions on this surface write to browser-local state so repeated checks do not need an external folder.</p>
+        <button data-action="proof-sync">Sync Local Proof</button>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

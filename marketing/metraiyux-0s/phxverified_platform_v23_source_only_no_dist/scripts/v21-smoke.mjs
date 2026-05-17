@@ -15,6 +15,16 @@ async function exists(rel){ try{ await fs.access(path.join(DIST, rel)); return t
 async function read(rel){ return fs.readFile(path.join(DIST, rel), 'utf8'); }
 async function json(rel){ return JSON.parse(await read(rel)); }
 async function size(rel=''){ const target = path.join(DIST, rel); const st = await fs.stat(target); if(st.isFile()) return st.size; let total=0; for(const e of await fs.readdir(target)) total += await size(path.join(rel,e)); return total; }
+async function countStaticProfiles(){
+  const dir = path.join(DIST, 'business');
+  const entries = await fs.readdir(dir, { withFileTypes:true });
+  let count = 0;
+  for(const entry of entries){
+    if(!entry.isDirectory() || entry.name === 'page') continue;
+    if(await exists(`business/${entry.name}/index.html`)) count++;
+  }
+  return count;
+}
 
 const data = await json('data/businesses.json');
 const report = await json('seed-report.json');
@@ -28,16 +38,27 @@ const last = data.businesses[data.businesses.length - 1];
 ok(['21.0.0','22.0.0','23.0.0'].includes(report.version), 'seed report is upgraded to v21 or later');
 ok(report.records.profile_mode === 'full-static', 'profile mode is full-static');
 ok(report.records.static_business_pages === data.businesses.length, 'static profile count equals business count');
+ok(await countStaticProfiles() === data.businesses.length, 'static profile HTML file count equals business count');
 ok(routing.mode === 'full-static', 'canonical routing declares full-static mode');
 ok(routing.records.length === data.businesses.length, 'canonical routing covers every business');
 ok(await exists(`business/${first.id}/index.html`), 'first business has static HTML');
 ok(await exists(`business/${last.id}/index.html`), 'last business has static HTML');
 const firstHtml = await read(`business/${first.id}/index.html`);
 const lastHtml = await read(`business/${last.id}/index.html`);
-ok(firstHtml.includes(`<link rel="canonical" href="https://phxverified.netlify.app/business/${first.id}/"`) || firstHtml.includes(`/business/${first.id}/`), 'first static profile has unique canonical URL');
+ok(firstHtml.includes(`<link rel="canonical" href="https://valley-verified.pages.dev/business/${first.id}/"`) || firstHtml.includes(`/business/${first.id}/`), 'first static profile has unique canonical URL');
 ok(lastHtml.includes(`/business/${last.id}/`), 'last static profile has unique canonical URL');
 ok(firstHtml.includes('application/ld+json'), 'static profile includes LocalBusiness structured data');
 ok(firstHtml.includes('Claim / update') && firstHtml.includes('Request quote'), 'static profile includes owner claim and quote actions');
+ok(firstHtml.includes('data-skye-component="app-first-command-center"'), 'static profile uses Skye MCP app-first command center component');
+ok(firstHtml.includes('/assets/valley-verified-logo.png'), 'static profile uses Valley Verified logo asset');
+ok(!firstHtml.includes('Skye UI component'), 'static profile hides internal component labels');
+ok(!firstHtml.includes('app-first-command-center / business-webpage'), 'static profile hides internal component ids');
+ok(firstHtml.includes('business-fx business-fx--'), 'static profile includes generated business FX layer');
+ok(/business-variant-(copper|teal|magenta|gold|blue)/.test(firstHtml), 'static profile has deterministic visual variant');
+const bobHtml = await read('business/bobs-smoke-shop-litchfield-park/index.html');
+const empireHtml = await read('business/empire-pallets-phoenix/index.html');
+ok(bobHtml.includes('Featured Valley Verified') && (bobHtml.includes("Open Bob's live app") || bobHtml.includes('Open Bob&#39;s live app')), 'Bob featured page links to live app');
+ok(empireHtml.includes('Featured Valley Verified') && (empireHtml.includes("Open Empire's quote app") || empireHtml.includes('Open Empire&#39;s quote app')), 'Empire featured page links to live app');
 ok(!(await exists('data/profiles')), 'old profile shard payload directory is removed');
 ok((await size('data/businesses.json')) < 15 * 1024 * 1024, 'business dataset is compacted below 15MB');
 ok((await size('api/businesses.json')) < 15 * 1024 * 1024, 'API business mirror is compacted below 15MB');

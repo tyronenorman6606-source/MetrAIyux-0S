@@ -1,4 +1,5 @@
 import { routeLeadForApi, buildQuoteRequestAction, buildLeadRouteDecisionAction, leadRoutingServiceForApi } from '../../src/server/lead-routing-service.mjs';
+import { prepareGateAuthenticatedEvent } from '../../src/server/gate-auth.mjs';
 import { actorFromHeaders, requireUpstreamActor } from '../../src/server/router.mjs';
 import { buildRuntimeContext } from '../../src/server/runtime-context.mjs';
 
@@ -9,9 +10,11 @@ export async function handler(event, context = {}){
   try{
     if(event.httpMethod === 'GET') return json(200, { ok:true, service:leadRoutingServiceForApi() });
     if(event.httpMethod !== 'POST') return json(405, { ok:false, error:'Method not allowed' });
-    const actor = actorFromHeaders(event.headers || {}, process.env);
+    const gated = await prepareGateAuthenticatedEvent(event, process.env);
+    if(!gated.ok) return gated.response;
+    const actor = actorFromHeaders(gated.event.headers || {}, process.env);
     requireUpstreamActor(actor);
-    const parsed = parseBody(event.body);
+    const parsed = parseBody(gated.event.body);
     const operation = parsed.operation || event.queryStringParameters?.operation || 'route_quote';
     const runtime = buildRuntimeContext(process.env, context);
     const store = runtime.store;

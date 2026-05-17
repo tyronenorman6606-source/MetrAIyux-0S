@@ -1,4 +1,5 @@
 import { createExposureCheckoutSession, handlePaymentWebhook, paymentServiceForApi } from '../../src/server/payment-service.mjs';
+import { prepareGateAuthenticatedEvent } from '../../src/server/gate-auth.mjs';
 import { actorFromHeaders, requireUpstreamActor } from '../../src/server/router.mjs';
 import { buildRuntimeContext } from '../../src/server/runtime-context.mjs';
 
@@ -16,9 +17,11 @@ export async function handler(event, context = {}){
       const provider = event.queryStringParameters?.provider || process.env.PHX_PAYMENT_PROVIDER || 'dry-run';
       return json(202, await handlePaymentWebhook({ provider, rawBody:event.body || '', headers:event.headers || {}, source:'netlify:phx-payment' }, { store, env:process.env }));
     }
-    const actor = actorFromHeaders(event.headers || {}, process.env);
+    const gated = await prepareGateAuthenticatedEvent(event, process.env);
+    if(!gated.ok) return gated.response;
+    const actor = actorFromHeaders(gated.event.headers || {}, process.env);
     requireUpstreamActor(actor);
-    const parsed = parseBody(event.body || '{}');
+    const parsed = parseBody(gated.event.body || '{}');
     if((parsed.operation || operation) === 'create_checkout_session'){
       const result = await createExposureCheckoutSession({ ...(parsed.payload || {}), actor, source:'netlify:phx-payment' }, { env:process.env });
       await store.put(result.exposure_order.action);

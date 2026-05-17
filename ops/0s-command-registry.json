@@ -1,7 +1,7 @@
 {
   "id": "metraiyux-0s-operator-command-registry",
   "name": "MetrAIyux 0S Operator Command Registry",
-  "generated_at": "2026-05-16T00:00:00Z",
+  "generated_at": "2026-05-17T00:00:00Z",
   "purpose": "Allowlisted local operator commands that the 0S command runner can execute from the repo workspace.",
   "exposure": "repo-local-only",
   "safety_model": [
@@ -81,6 +81,56 @@
       "risk": "low",
       "when_to_run": "After content, navigation, vault-brain export, or static site changes.",
       "result": "Runs static crawler QA using the configured local site target."
+    },
+    {
+      "id": "skyeroutex:smoke-quick",
+      "title": "Run SkyeRouteX Quick Smoke Checks",
+      "command": "npm run smoke:browser && npm run smoke:routex && npm run smoke:guards",
+      "cwd": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "After editing the SkyeRoutexFlow v0.4.0 platform, smoke harness, or 0S static wrapper links.",
+      "result": "Checks browser panels, provider/contractor route flow, and provider boot guards under local proof settings."
+    },
+    {
+      "id": "skyeroutex:smoke-all",
+      "title": "Run SkyeRouteX Full v0.4.0 Smoke Suite",
+      "command": "npm run smoke:all",
+      "cwd": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "Before claiming the v0.4.0 workforce command platform works end to end.",
+      "result": "Runs browser, API, storage, integration, webhook, provider, security, integrity, audit, migration, deployment, and SkyeHands mount smokes."
+    },
+    {
+      "id": "skyeroutex:v83-runtime",
+      "title": "Run SkyeRouteX V83 Runtime Verification",
+      "command": "npm run verify:runtime",
+      "cwd": "metraiyux_0s_site/SkyeRouteX",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "After editing the older SkyeRouteX static shell, V83 runtime contract, or proof receipt.",
+      "result": "Runs the V83 runtime smoke harness and updates local proof output."
+    },
+    {
+      "id": "skyeprofitconsole:proof",
+      "title": "Run SkyeProfitConsole Free99 Proof Suite",
+      "command": "npm run 0s:skyeprofitconsole:proof",
+      "cwd": ".",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "After editing the SkyeProfitConsole import, gate session boundary, runtime API, price card, or 0S route wiring.",
+      "result": "Runs static smoke, runtime gate checks, review/execution/dispatch flow proof, Playwright desktop/mobile screenshots, canvas pixel proof, and ungated API 401 verification."
+    },
+    {
+      "id": "skyemusicnexus:proof",
+      "title": "Run SkyeMusicNexus Free99 Proof Suite",
+      "command": "npm run 0s:skyemusicnexus:proof",
+      "cwd": ".",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "After editing the SkyeMusicNexus import, gate session boundary, music functions, price card, or 0S route wiring.",
+      "result": "Runs static UI smoke, top-level route gate checks, local SkyGate/function proof, ungated read 401 verification, 0S pricing/router integration, and Playwright desktop/mobile screenshots."
     },
     {
       "id": "repo:health",

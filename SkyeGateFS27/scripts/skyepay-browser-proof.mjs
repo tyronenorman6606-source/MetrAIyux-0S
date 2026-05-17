@@ -128,7 +128,7 @@ function writeProofReel({ videoPath, posterPath }) {
 <body>
   <main>
     <h1>SkyePay Browser Action Proof</h1>
-    <p>Recorded path: open Bob's SkyePay lane, fill checkout, submit dry-run checkout, return to the FS27 approval state.</p>
+    <p>Recorded path: open the RouteX owner-approved SkyePay lane, fill checkout, submit dry-run checkout, return to the FS27 pending-owner-approval state.</p>
     <video id="proofVideo" src="${videoSrc}" poster="${posterSrc}" controls autoplay muted playsinline preload="auto"></video>
   </main>
 </body>
@@ -208,18 +208,27 @@ async function verifyApiContract(origin, browser) {
       const offers = await client.offers();
       const checkout = await client.checkout({
         client_slug: "metraiyux-0s",
-        offer_id: "metraiyux-starter-command",
+        offer_id: "metraiyux-routex-workforce-command",
         customer_name: "SkyePay API Proof",
         customer_email: "proof@example.com",
         company_name: "MetrAIyux 0S",
         dry_run: true
       });
-      const status = await client.status({ demo_session: checkout.id });
+      const statusResponse = await fetch(`/skyepay/status?demo_session=${encodeURIComponent(checkout.id)}&offer=metraiyux-routex-workforce-command`);
+      const status = await statusResponse.json();
       return {
         offersOk: offers.ok === true && offers.offers.length >= 60,
         registryOk: offers.repo_stripe_catalog?.imported_checkout_offers >= 50,
         checkoutOk: checkout.ok === true && typeof checkout.url === "string",
-        statusOk: status.ok === true && status.order?.approval_status === "paid_pending_owner_approval",
+        routexOfferOk: offers.offers.some((offer) => (
+          offer.id === "metraiyux-routex-workforce-command" &&
+          offer.owner_approval_required === true &&
+          offer.setup_cents === 650000 &&
+          offer.recurring_cents === 149700
+        )),
+        statusOk: status.ok === true &&
+          status.order?.approval_status === "demo_pending_owner_approval" &&
+          status.order?.provisioning_status === "waiting_for_owner_approval",
         client: offers.client?.client_slug || null,
         offerCount: offers.offers.length,
         repoImported: offers.repo_stripe_catalog?.imported_checkout_offers || 0,
@@ -237,6 +246,7 @@ async function verifyApiContract(origin, browser) {
         /SkyePayClient/.test(sdkText) &&
         sdkResult.offersOk &&
         sdkResult.registryOk &&
+        sdkResult.routexOfferOk &&
         sdkResult.checkoutOk &&
         sdkResult.statusOk,
       docs: { status: docs.status, bytes: docsText.length },
@@ -272,7 +282,7 @@ async function main() {
   const consoleLines = [];
   page.on("console", (msg) => consoleLines.push(`${msg.type()}: ${msg.text()}`));
   page.on("pageerror", (err) => consoleLines.push(`pageerror: ${err.message}`));
-  await page.goto(`${origin}/skyepay.html?client=bobs-smoke-shop&dry_run=1`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${origin}/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command&dry_run=1`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#skypayForm");
   report.checks.desktopInitial = {
     title: await page.title(),
@@ -301,7 +311,7 @@ async function main() {
   const statusText = await page.locator("#statusPanel").innerText();
   report.checks.checkoutDryRun = {
     actionPath: [
-      "goto skyepay.html?client=bobs-smoke-shop&dry_run=1",
+      "goto skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command&dry_run=1",
       "fill customer_name",
       "fill customer_email",
       "fill company_name",

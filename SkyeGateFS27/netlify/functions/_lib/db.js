@@ -151,6 +151,31 @@ async function ensureSchema() {
         password_updated_at timestamptz not null default now(),
         created_at timestamptz not null default now()
       );`,
+      `create table if not exists user_pin_credentials (
+        id uuid primary key,
+        user_id uuid not null references users(id) on delete cascade,
+        gate_id text not null unique,
+        pin_hash text not null,
+        label text,
+        status text not null default 'active',
+        recovery_sent_at timestamptz,
+        last_used_at timestamptz,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );`,
+      `create index if not exists user_pin_credentials_user_idx on user_pin_credentials(user_id, created_at desc);`,
+      `create table if not exists user_recovery_codes (
+        id uuid primary key,
+        credential_id uuid not null references user_pin_credentials(id) on delete cascade,
+        user_id uuid not null references users(id) on delete cascade,
+        code_hash text not null unique,
+        code_label text not null,
+        sent_at timestamptz,
+        expires_at timestamptz,
+        used_at timestamptz,
+        created_at timestamptz not null default now()
+      );`,
+      `create index if not exists user_recovery_codes_user_idx on user_recovery_codes(user_id, created_at desc);`,
       `create table if not exists user_sessions (
         id uuid primary key,
         user_id uuid references users(id) on delete cascade,
@@ -313,6 +338,9 @@ async function ensureSchema() {
       `alter table api_keys add column if not exists require_install_id boolean;`,
       `alter table api_keys add column if not exists allowed_providers text[];`,
       `alter table api_keys add column if not exists allowed_models jsonb;`,
+      `alter table api_keys add column if not exists expires_at timestamptz;`,
+      `alter table api_keys add column if not exists metadata jsonb not null default '{}'::jsonb;`,
+      `create index if not exists api_keys_expires_idx on api_keys(expires_at) where expires_at is not null;`,
 
       `create table if not exists key_devices (
         api_key_id bigint not null references api_keys(id) on delete cascade,
@@ -449,6 +477,26 @@ async function ensureSchema() {
       `alter table api_keys add column if not exists role text not null default 'deployer';`,
       `alter table api_keys add column if not exists encrypted_key text;`,
       `create index if not exists api_keys_role_idx on api_keys(role);`,
+      `create table if not exists pentest_gate_card_requests (
+        id text primary key,
+        user_id uuid references users(id) on delete set null,
+        customer_id bigint references customers(id) on delete set null,
+        email text not null,
+        display_name text,
+        organization text,
+        purpose text,
+        requested_scope text,
+        target_surfaces text,
+        status text not null default 'pending',
+        source text not null default 'signed-in-request',
+        admin_notes text,
+        issued_api_key_id bigint references api_keys(id) on delete set null,
+        decision_at timestamptz,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );`,
+      `create index if not exists pentest_gate_card_requests_status_idx on pentest_gate_card_requests(status, created_at desc);`,
+      `create index if not exists pentest_gate_card_requests_user_idx on pentest_gate_card_requests(user_id, created_at desc);`,
       `create table if not exists customer_netlify_tokens (
         customer_id bigint primary key references customers(id) on delete cascade,
         token_enc text not null,

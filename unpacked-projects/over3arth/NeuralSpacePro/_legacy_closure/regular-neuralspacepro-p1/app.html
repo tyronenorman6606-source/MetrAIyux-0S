@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kAIxu Neural Space Pro</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Rendering Engines -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension@1.0.2/lib/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    
+    <!-- Document Processing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        :root { --sidebar-bg: #0a0a0a; --main-bg: #0f0f0f; --canvas-bg: #141414; --accent: #3b82f6; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--main-bg); color: #ececec; overflow: hidden; }
+        
+        .canvas-closed #canvas-panel { transform: translateX(100%); width: 0; opacity: 0; pointer-events: none; }
+        .canvas-open #canvas-panel { transform: translateX(0); width: 50%; opacity: 1; pointer-events: all; }
+        #canvas-panel { transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); border-left: 1px solid rgba(255,255,255,0.08); z-index: 60; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
+        
+        .prose { max-width: 100% !important; font-size: 15px; color: #d1d5db !important; }
+        .prose pre { background: #000 !important; border: 1px solid #222; padding: 0 !important; border-radius: 12px; }
+        
+        .glass-panel { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
+        .action-btn { @apply p-2.5 rounded-xl hover:bg-white/5 transition-all text-gray-500 hover:text-white cursor-pointer flex items-center justify-center; }
+        .active-tab { @apply border-b-2 border-blue-500 text-blue-400; }
+        
+        @keyframes pulse-ring { 0% { transform: scale(.33); opacity: 1; } 80%, 100% { opacity: 0; } }
+        .status-dot-active::before { content: ''; display: block; width: 300%; height: 300%; box-sizing: border-box; margin-left: -100%; margin-top: -100%; border-radius: 45px; background-color: #3b82f6; animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        .doc-chip { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); }
+        
+        .logo-img { width: 32px; height: 32px; object-fit: contain; }
+        .logo-img-large { width: 80px; height: 80px; object-fit: contain; }
+    </style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#3b82f6"><link rel="apple-touch-icon" href="icon-192.png"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));}</script></head>
+<body class="h-screen flex canvas-closed" id="app-body">
+
+    <!-- Knowledge Base Drawer -->
+    <div id="kb-drawer" class="fixed inset-y-0 left-0 w-80 bg-black/95 z-[100] transform -translate-x-full transition-transform duration-300 border-r border-white/10 p-6 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-sm font-black uppercase tracking-widest text-gray-400">Knowledge Base</h3>
+            <button onclick="toggleKB()" class="text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="pinned-items" class="flex-1 overflow-y-auto space-y-4"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[var(--sidebar-bg)] flex-shrink-0 flex flex-col border-r border-white/5 z-50">
+        <div class="p-6">
+            <button onclick="createNewChat()" class="w-full py-3.5 bg-white text-black rounded-2xl flex items-center justify-center gap-3 font-black text-sm hover:bg-gray-200 transition-all shadow-xl">
+                <i class="fa-solid fa-plus-circle"></i> New Session
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-4 space-y-2" id="history-list"></div>
+        <div class="p-4 mt-auto border-t border-white/5 space-y-2">
+            <button onclick="toggleKB()" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-gray-400 hover:bg-white/5 rounded-xl transition-all font-bold">
+                <i class="fa-solid fa-bookmark text-amber-500"></i> Knowledge Base
+            </button>
+            <button onclick="toggleSettings()" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-gray-400 hover:bg-white/5 rounded-xl transition-all font-bold">
+                <i class="fa-solid fa-microchip text-blue-500"></i> kAIxu Config
+            </button>
+            <div class="pt-4 flex items-center gap-3 px-2">
+                <img src="https://cdn1.sharemyimage.com/2026/02/15/Screenshot-2026-02-14-1.45.11-PM-3.png" alt="kAIxu Logo" class="w-8 h-8 object-contain rounded-lg">
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-[11px] font-black truncate" id="user-uid">Accessing...</div>
+                    <div class="text-[9px] text-gray-500 uppercase tracking-tighter">Neural Workspace Pro</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col relative bg-[var(--main-bg)] overflow-hidden">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-black/20 z-40">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://cdn1.sharemyimage.com/2026/02/15/Screenshot-2026-02-14-1.45.11-PM-3.png" alt="kAIxu Logo" class="logo-img">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-lg tracking-tighter" id="active-model">kAIxu Neural Space Pro</span>
+                            <div class="w-2.5 h-2.5 rounded-full bg-blue-500 status-dot-active ml-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="engine-status" class="hidden px-4 py-2 glass-panel rounded-full flex items-center gap-3 animate-pulse">
+                    <i class="fa-solid fa-brain text-blue-400 text-xs"></i>
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Processing...</span>
+                </div>
+                <button id="stop-btn" onclick="stopEngine()" class="hidden px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full text-[10px] font-black uppercase">Interrupt</button>
+            </div>
+        </header>
+
+        <div id="chat-window" class="flex-1 overflow-y-auto pt-10 pb-32">
+            <div id="welcome-view" class="h-full flex flex-col items-center justify-center text-center p-12 space-y-8 max-w-2xl mx-auto">
+                <img src="https://cdn1.sharemyimage.com/2026/02/15/Screenshot-2026-02-14-1.45.11-PM-3.png" alt="kAIxu Logo" class="logo-img-large shadow-2xl">
+                <div>
+                    <h2 class="text-5xl font-black tracking-tighter leading-tight">Neural Space Pro.</h2>
+                    <p class="text-gray-500 font-medium mt-4">Advanced neural intelligence for multi-modal analysis, documentation synthesis, and technical reasoning.</p>
+                </div>
+            </div>
+            <div id="messages-list" class="max-w-4xl mx-auto px-6 space-y-12"></div>
+        </div>
+
+        <footer class="p-6 md:p-10 relative bg-gradient-to-t from-[var(--main-bg)] to-transparent">
+            <div class="max-w-4xl mx-auto relative">
+                <div id="attachment-strip" class="hidden flex flex-wrap gap-2 mb-4 animate-fade"></div>
+                <div class="bg-[#1c1c1c] rounded-[2.5rem] shadow-2xl border border-white/5 flex flex-col overflow-hidden focus-within:border-white/15 transition-all">
+                    <textarea id="user-input" rows="1" placeholder="Consult kAIxu Neural Space..." class="w-full bg-transparent p-6 px-8 resize-none focus:outline-none max-h-[400px] text-[16px]" oninput="autoResize(this)"></textarea>
+                    <div class="flex items-center justify-between px-6 pb-6">
+                        <div class="flex gap-1">
+                            <input type="file" id="file-upload" class="hidden" accept="image/*,.pdf,.xlsx,.xls,.csv" multiple onchange="handleFiles(event)">
+                            <button onclick="document.getElementById('file-upload').click()" class="action-btn" title="Attach Data"><i class="fa-solid fa-paperclip text-sm"></i></button>
+                            <button onclick="toggleMode('edit')" id="edit-toggle" class="action-btn" title="Image Transform"><i class="fa-solid fa-wand-magic-sparkles text-sm"></i></button>
+                            <button onclick="toggleSearch()" id="search-btn" class="action-btn text-blue-400" title="Web Search"><i class="fa-solid fa-globe text-sm"></i></button>
+                        </div>
+                        <button id="send-btn" onclick="handleSend()" class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 shadow-xl disabled:opacity-20"><i class="fa-solid fa-arrow-up text-xl"></i></button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Canvas -->
+    <section id="canvas-panel" class="bg-[var(--canvas-bg)] flex flex-col shadow-2xl overflow-hidden relative">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-black/40">
+            <div class="flex gap-4" id="canvas-tabs">
+                <button onclick="setCanvasMode('edit')" class="text-xs font-black uppercase tracking-widest active-tab pb-1">Editor</button>
+                <button id="preview-tab" onclick="setCanvasMode('preview')" class="text-xs font-black uppercase tracking-widest text-gray-500 pb-1">Live Run</button>
+            </div>
+            <button onclick="toggleWorkspace(false)" class="action-btn"><i class="fa-solid fa-xmark text-xs"></i></button>
+        </header>
+        <div class="flex-1 flex flex-col overflow-hidden relative" id="canvas-body">
+            <textarea id="canvas-editor" class="flex-1 bg-transparent p-10 font-mono text-sm leading-relaxed text-gray-300 resize-none outline-none"></textarea>
+            <iframe id="canvas-preview" class="hidden w-full h-full bg-white"></iframe>
+        </div>
+    </section>
+
+    <!-- Settings -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
+        <div class="bg-[#1a1a1a] border border-white/10 w-full max-w-xl rounded-[3rem] p-10 animate-fade">
+            <div class="flex justify-between items-center mb-10">
+                <div class="flex items-center gap-4">
+                    <img src="https://cdn1.sharemyimage.com/2026/02/15/Screenshot-2026-02-14-1.45.11-PM-3.png" alt="kAIxu Logo" class="w-10 h-10 object-contain">
+                    <h3 class="text-3xl font-black tracking-tighter">kAIxu Config</h3>
+                </div>
+                <button onclick="toggleSettings()"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">Runtime Base URL</label>
+                    <input type="text" id="runtime-base-config" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Optional host, e.g. http://127.0.0.1:8787">
+                    <div class="mt-2 text-right">
+                        <span class="text-[10px] text-gray-500 font-bold">Leave blank to use same-origin server lanes.</span>
+                        <div class="text-[10px] text-gray-600 font-medium mt-1">The local proof runtime in this folder can serve the chat lane and keep a local session archive without browser-held provider keys.</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">System Instruction Blueprint</label>
+                    <textarea id="system-prompt" rows="3" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none" placeholder="Instruction to kAIxu..."></textarea>
+                </div>
+                <div class="border border-white/10 rounded-[2rem] p-5 bg-black/30 space-y-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">System Handoff Pack</div>
+                            <div class="text-xs text-gray-500 mt-1">Archive research into downstream lanes for SkyeLeadVault, SkyeWebCreatorMax, AE-FlowPro, or Workforce without leaving this folder.</div>
+                        </div>
+                        <button onclick="refreshHandoffArchive()" class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">Refresh</button>
+                    </div>
+                    <input type="text" id="handoff-pack-title" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Handoff title">
+                    <textarea id="handoff-pack-notes" rows="3" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none" placeholder="Operator notes, follow-up asks, or delivery context"></textarea>
+                    <div>
+                        <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Recommended Lanes</div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <label class="flex items-center gap-2"><input type="checkbox" data-handoff-target value="SkyeLeadVault" class="accent-blue-500"> SkyeLeadVault</label>
+                            <label class="flex items-center gap-2"><input type="checkbox" data-handoff-target value="SkyeWebCreatorMax" class="accent-blue-500"> SkyeWebCreatorMax</label>
+                            <label class="flex items-center gap-2"><input type="checkbox" data-handoff-target value="AE-FlowPro" class="accent-blue-500"> AE-FlowPro</label>
+                            <label class="flex items-center gap-2"><input type="checkbox" data-handoff-target value="skyeroutex-workforce-command-v0.4.0" class="accent-blue-500"> Workforce</label>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="createHandoffPack()" class="flex-1 py-4 bg-blue-500 text-white font-black rounded-3xl hover:bg-blue-400 transition-all">Archive Handoff Pack</button>
+                        <div id="handoff-pack-status" class="flex-1 text-[11px] text-gray-500 min-h-[2.5rem] flex items-center"></div>
+                    </div>
+                    <div class="border border-white/10 rounded-2xl p-4 bg-black/20 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Review Board</div>
+                                <div class="text-[10px] text-gray-600 mt-1">Move archived handoff packs through a same-folder operator workflow after research is packaged.</div>
+                            </div>
+                            <button onclick="refreshReviewBoard()" class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">Refresh Board</button>
+                        </div>
+                        <div id="review-board-counts" class="grid grid-cols-2 gap-2 text-[10px] text-gray-500"></div>
+                        <input type="text" id="handoff-review-owner" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Review owner">
+                        <input type="text" id="handoff-review-checkpoint" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Checkpoint">
+                        <select id="handoff-review-status" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all">
+                            <option value="draft">Draft</option>
+                            <option value="ready">Ready</option>
+                            <option value="approved">Approved</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="dispatched">Dispatched</option>
+                        </select>
+                        <textarea id="handoff-review-notes" rows="2" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none" placeholder="Review notes"></textarea>
+                        <div class="flex items-center gap-3">
+                            <button onclick="saveSelectedHandoffReview()" class="flex-1 py-4 bg-white/10 text-white font-black rounded-3xl hover:bg-white/15 transition-all">Update Selected Review</button>
+                            <div id="handoff-review-status-note" class="flex-1 text-[11px] text-gray-500 min-h-[2.5rem] flex items-center"></div>
+                        </div>
+                        <div id="handoff-review-selected" class="text-[10px] text-gray-600">Select an archived handoff pack below to review it.</div>
+                    </div>
+                    <div class="border border-white/10 rounded-2xl p-4 bg-black/20 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Execution Board</div>
+                                <div class="text-[10px] text-gray-600 mt-1">Promote reviewed handoff packs into a persisted same-folder execution queue for downstream delivery.</div>
+                            </div>
+                            <button onclick="refreshExecutionBoard()" class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">Refresh Board</button>
+                        </div>
+                        <div id="execution-board-counts" class="grid grid-cols-2 gap-2 text-[10px] text-gray-500"></div>
+                        <input type="text" id="handoff-execution-owner" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Execution owner">
+                        <input type="text" id="handoff-execution-checkpoint" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Checkpoint">
+                        <input type="text" id="handoff-execution-due-at" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Due at or timebox">
+                        <input type="text" id="handoff-execution-next-action" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Next action">
+                        <select id="handoff-execution-status" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all">
+                            <option value="queued">Queued</option>
+                            <option value="active">Active</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <textarea id="handoff-execution-notes" rows="2" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none" placeholder="Execution notes"></textarea>
+                        <div class="flex items-center gap-3">
+                            <button onclick="saveSelectedHandoffExecution()" class="flex-1 py-4 bg-white/10 text-white font-black rounded-3xl hover:bg-white/15 transition-all">Queue Selected Execution</button>
+                            <div id="handoff-execution-status-note" class="flex-1 text-[11px] text-gray-500 min-h-[2.5rem] flex items-center"></div>
+                        </div>
+                        <div id="handoff-execution-selected" class="text-[10px] text-gray-600">Select an archived handoff pack below to queue execution.</div>
+                        <div id="execution-board-list" class="space-y-2 max-h-32 overflow-y-auto"></div>
+                    </div>
+                    <div class="border border-white/10 rounded-2xl p-4 bg-black/20 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Dispatch Board</div>
+                                <div class="text-[10px] text-gray-600 mt-1">Push executed handoff packs into a same-folder downstream dispatch queue with visible ownership and routing.</div>
+                            </div>
+                            <button onclick="refreshDispatchBoard()" class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">Refresh Board</button>
+                        </div>
+                        <div id="dispatch-board-counts" class="grid grid-cols-2 gap-2 text-[10px] text-gray-500"></div>
+                        <input type="text" id="handoff-dispatch-owner" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Dispatch owner">
+                        <input type="text" id="handoff-dispatch-checkpoint" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Dispatch checkpoint">
+                        <input type="text" id="handoff-dispatch-target" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Dispatch target">
+                        <input type="text" id="handoff-dispatch-channel" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all" placeholder="Dispatch channel">
+                        <select id="handoff-dispatch-status" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-blue-500/50 transition-all">
+                            <option value="queued">Queued</option>
+                            <option value="ready">Ready</option>
+                            <option value="active">Active</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                        <textarea id="handoff-dispatch-notes" rows="2" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none" placeholder="Dispatch notes"></textarea>
+                        <div class="flex items-center gap-3">
+                            <button onclick="saveSelectedHandoffDispatch()" class="flex-1 py-4 bg-white/10 text-white font-black rounded-3xl hover:bg-white/15 transition-all">Queue Selected Dispatch</button>
+                            <div id="handoff-dispatch-status-note" class="flex-1 text-[11px] text-gray-500 min-h-[2.5rem] flex items-center"></div>
+                        </div>
+                        <div id="handoff-dispatch-selected" class="text-[10px] text-gray-600">Select an archived handoff pack below to queue dispatch.</div>
+                        <div id="dispatch-board-list" class="space-y-2 max-h-32 overflow-y-auto"></div>
+                    </div>
+                    <div class="border border-white/10 rounded-2xl p-4 bg-black/20 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Workflow Timeline</div>
+                                <div class="text-[10px] text-gray-600 mt-1">Inspect archive, review, execution, and dispatch events in one local operator trail.</div>
+                            </div>
+                            <button onclick="refreshWorkflowTimeline()" class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5">Refresh Timeline</button>
+                        </div>
+                        <div id="workflow-timeline-counts" class="grid grid-cols-2 gap-2 text-[10px] text-gray-500"></div>
+                        <div id="workflow-timeline-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                    </div>
+                    <div class="text-[10px] text-gray-600" id="handoff-pack-runtime">The local proof runtime in this folder can archive handoff packs and keep a local system-facing packet history.</div>
+                    <div id="handoff-pack-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                </div>
+                <button onclick="saveSettings()" class="w-full py-5 bg-white text-black font-black rounded-3xl hover:bg-gray-200 transition-all">Synchronize Neural Config</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Setup
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+        const appId = window.__app_id || 'kaixu-nexus-v1';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // App State
+        let user = null, currentChatId = null, activeMode = 'chat', isSearchOn = true, attachments = [], conversation = [], abortCtrl = null, latestRuntimeSessionId = null, selectedHandoffPackId = null;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const gatewayBaseKey = 'kaixu_gateway_base';
+
+        // --- ENGINE SETTINGS ---
+        function loadLocalStore() {
+            const systemPromptEl = document.getElementById('system-prompt');
+            const runtimeBaseEl = document.getElementById('runtime-base-config');
+            const handoffTitleEl = document.getElementById('handoff-pack-title');
+            const handoffNotesEl = document.getElementById('handoff-pack-notes');
+            const storedBase = localStorage.getItem(gatewayBaseKey) || "";
+            if (runtimeBaseEl) runtimeBaseEl.value = storedBase;
+            if (handoffTitleEl) handoffTitleEl.value = localStorage.getItem('kaixu_handoff_title') || "";
+            if (handoffNotesEl) handoffNotesEl.value = localStorage.getItem('kaixu_handoff_notes') || "";
+            
+            if (systemPromptEl) {
+                systemPromptEl.value = localStorage.getItem('kaixu_sys') || "";
+            }
+            refreshHandoffArchive();
+        }
+
+        window.saveSettings = () => {
+            const systemPromptEl = document.getElementById('system-prompt');
+            const runtimeBaseEl = document.getElementById('runtime-base-config');
+            const handoffTitleEl = document.getElementById('handoff-pack-title');
+            const handoffNotesEl = document.getElementById('handoff-pack-notes');
+            
+            if (runtimeBaseEl) {
+                const runtimeBase = runtimeBaseEl.value.trim().replace(/\/+$/, '');
+                localStorage.setItem(gatewayBaseKey, runtimeBase);
+            }
+            
+            if (systemPromptEl) {
+                localStorage.setItem('kaixu_sys', systemPromptEl.value);
+            }
+            if (handoffTitleEl) localStorage.setItem('kaixu_handoff_title', handoffTitleEl.value);
+            if (handoffNotesEl) localStorage.setItem('kaixu_handoff_notes', handoffNotesEl.value);
+            toggleSettings();
+        };
+
+        // --- UI HANDLERS ---
+        window.toggleWorkspace = (o) => { document.getElementById('app-body').classList.toggle('canvas-open', o); document.getElementById('app-body').classList.toggle('canvas-closed', !o); };
+        window.toggleSettings = () => document.getElementById('settings-modal').classList.toggle('hidden');
+        window.toggleKB = () => document.getElementById('kb-drawer').classList.toggle('-translate-x-full');
+        window.autoResize = (t) => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; };
+
+        // Authentication Observer
+        onAuthStateChanged(auth, (u) => { 
+            user = u; 
+            if (user) { 
+                const userUidEl = document.getElementById('user-uid');
+                if (userUidEl) userUidEl.textContent = user.uid.slice(0, 15); 
+                syncArchives(); 
+                loadLocalStore(); 
+            } else {
+                signInAnonymously(auth);
+            }
+        });
+
+        // File Processing
+        window.handleFiles = async (e) => {
+            const files = Array.from(e.target.files);
+            const strip = document.getElementById('attachment-strip');
+            if (strip) strip.classList.remove('hidden');
+
+            for (const file of files) {
+                const id = Math.random().toString(36).substring(2, 9);
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { attachments.push({ id, type: 'image', base64: ev.target.result.split(',')[1], full: ev.target.result, name: file.name }); renderStrip(); };
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    const content = await parsePDF(file);
+                    attachments.push({ id, type: 'pdf', name: file.name, content });
+                    renderStrip();
+                } else if (file.name.match(/\.(xlsx|xls|csv)$/)) {
+                    const content = await parseSpreadsheet(file);
+                    attachments.push({ id, type: 'spreadsheet', name: file.name, content });
+                    renderStrip();
+                }
+            }
+            e.target.value = '';
+        };
+
+        async function parsePDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                fullText += textContent.items.map(s => s.str).join(" ") + "\n";
+            }
+            return fullText;
+        }
+
+        async function parseSpreadsheet(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer);
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            return XLSX.utils.sheet_to_csv(firstSheet);
+        }
+
+        function renderStrip() {
+            const strip = document.getElementById('attachment-strip');
+            if (!strip) return;
+            strip.innerHTML = '';
+            attachments.forEach(a => {
+                const div = document.createElement('div');
+                div.className = `relative w-24 h-24 group flex flex-col items-center justify-center rounded-2xl border border-white/10 overflow-hidden ${a.type !== 'image' ? 'doc-chip' : ''}`;
+                if (a.type === 'image') {
+                    div.innerHTML = `<img src="${a.full}" class="w-full h-full object-cover">`;
+                } else {
+                    div.innerHTML = `<i class="fa-solid ${a.type === 'pdf' ? 'fa-file-pdf text-red-400' : 'fa-file-excel text-green-400'} text-2xl mb-1"></i><span class="text-[8px] truncate px-2 w-full text-center">${a.name}</span>`;
+                }
+                div.innerHTML += `<button onclick="removeFile('${a.id}')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark"></i></button>`;
+                strip.appendChild(div);
+            });
+            if (attachments.length === 0) strip.classList.add('hidden');
+        }
+
+        window.removeFile = (id) => { attachments = attachments.filter(a => a.id !== id); renderStrip(); };
+
+        // Communication
+        window.handleSend = async () => {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text && attachments.length === 0) return;
+
+            if (!currentChatId) {
+                const ref = await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'chats'), { title: text.slice(0, 30) || "Neural Stream", updatedAt: Timestamp.now() });
+                currentChatId = ref.id;
+            }
+
+            const welcomeView = document.getElementById('welcome-view');
+            if (welcomeView) welcomeView.classList.add('hidden');
+            
+            const currAtts = [...attachments];
+            addMessageUI('user', text, currAtts);
+            await saveMessage('user', text, currAtts);
+            
+            input.value = ''; attachments = []; renderStrip(); autoResize(input);
+            await runChat(text, currAtts);
+        };
+
+        const gatewayUrl = (path = '') => {
+            const raw = (localStorage.getItem(gatewayBaseKey) || '').trim().replace(/\/+$/, '');
+            return raw ? raw + path : path;
+        };
+
+        function collectHandoffTargets() {
+            return Array.from(document.querySelectorAll('[data-handoff-target]:checked')).map((input) => input.value);
+        }
+
+        function normalizeReviewState(review = {}) {
+            const status = String(review.status || 'draft').toLowerCase();
+            return {
+                status: ['draft', 'ready', 'approved', 'blocked', 'dispatched'].includes(status) ? status : 'draft',
+                owner: String(review.owner || '').trim(),
+                checkpoint: String(review.checkpoint || '').trim(),
+                notes: String(review.notes || '').trim(),
+                updatedAt: review.updatedAt || ''
+            };
+        }
+
+        function normalizeExecutionState(execution = {}) {
+            const status = String(execution.status || 'queued').toLowerCase();
+            return {
+                status: ['queued', 'active', 'blocked', 'completed'].includes(status) ? status : 'queued',
+                owner: String(execution.owner || '').trim(),
+                checkpoint: String(execution.checkpoint || '').trim(),
+                dueAt: String(execution.dueAt || '').trim(),
+                nextAction: String(execution.nextAction || '').trim(),
+                notes: String(execution.notes || '').trim(),
+                updatedAt: execution.updatedAt || ''
+            };
+        }
+
+        function normalizeDispatchState(dispatch = {}) {
+            const status = String(dispatch.status || 'queued').toLowerCase();
+            return {
+                status: ['queued', 'ready', 'active', 'blocked', 'delivered'].includes(status) ? status : 'queued',
+                owner: String(dispatch.owner || '').trim(),
+                checkpoint: String(dispatch.checkpoint || '').trim(),
+                target: String(dispatch.target || '').trim(),
+                channel: String(dispatch.channel || '').trim(),
+                notes: String(dispatch.notes || '').trim(),
+                updatedAt: dispatch.updatedAt || ''
+            };
+        }
+
+        function fillReviewForm(pack) {
+            const review = normalizeReviewState(pack?.review || {});
+            const execution = normalizeExecutionState(pack?.execution || {});
+            const dispatch = normalizeDispatchState(pack?.dispatch || {});
+            selectedHandoffPackId = pack?.handoffPackId || null;
+            const ownerEl = document.getElementById('handoff-review-owner');
+            const checkpointEl = document.getElementById('handoff-review-checkpoint');
+            const statusEl = document.getElementById('handoff-review-status');
+            const notesEl = document.getElementById('handoff-review-notes');
+            const selectedEl = document.getElementById('handoff-review-selected');
+            const execOwnerEl = document.getElementById('handoff-execution-owner');
+            const execCheckpointEl = document.getElementById('handoff-execution-checkpoint');
+            const execDueEl = document.getElementById('handoff-execution-due-at');
+            const execNextEl = document.getElementById('handoff-execution-next-action');
+            const execStatusEl = document.getElementById('handoff-execution-status');
+            const execNotesEl = document.getElementById('handoff-execution-notes');
+            const execSelectedEl = document.getElementById('handoff-execution-selected');
+            const dispatchOwnerEl = document.getElementById('handoff-dispatch-owner');
+            const dispatchCheckpointEl = document.getElementById('handoff-dispatch-checkpoint');
+            const dispatchTargetEl = document.getElementById('handoff-dispatch-target');
+            const dispatchChannelEl = document.getElementById('handoff-dispatch-channel');
+            const dispatchStatusEl = document.getElementById('handoff-dispatch-status');
+            const dispatchNotesEl = document.getElementById('handoff-dispatch-notes');
+            const dispatchSelectedEl = document.getElementById('handoff-dispatch-selected');
+            if (ownerEl) ownerEl.value = review.owner;
+            if (checkpointEl) checkpointEl.value = review.checkpoint;
+            if (statusEl) statusEl.value = review.status;
+            if (notesEl) notesEl.value = review.notes;
+            if (execOwnerEl) execOwnerEl.value = execution.owner;
+            if (execCheckpointEl) execCheckpointEl.value = execution.checkpoint;
+            if (execDueEl) execDueEl.value = execution.dueAt;
+            if (execNextEl) execNextEl.value = execution.nextAction;
+            if (execStatusEl) execStatusEl.value = execution.status;
+            if (execNotesEl) execNotesEl.value = execution.notes;
+            if (dispatchOwnerEl) dispatchOwnerEl.value = dispatch.owner;
+            if (dispatchCheckpointEl) dispatchCheckpointEl.value = dispatch.checkpoint;
+            if (dispatchTargetEl) dispatchTargetEl.value = dispatch.target || (pack?.handoffSummary?.targetPlatforms || [])[0] || '';
+            if (dispatchChannelEl) dispatchChannelEl.value = dispatch.channel;
+            if (dispatchStatusEl) dispatchStatusEl.value = dispatch.status;
+            if (dispatchNotesEl) dispatchNotesEl.value = dispatch.notes;
+            if (selectedEl) selectedEl.textContent = selectedHandoffPackId
+                ? `Selected ${pack.title || selectedHandoffPackId} for ${review.status}${review.owner ? ` • ${review.owner}` : ''}.`
+                : 'Select an archived handoff pack below to review it.';
+            if (execSelectedEl) execSelectedEl.textContent = selectedHandoffPackId
+                ? `Execution target ${pack.title || selectedHandoffPackId} is ${execution.status}${execution.owner ? ` • ${execution.owner}` : ''}.`
+                : 'Select an archived handoff pack below to queue execution.';
+            if (dispatchSelectedEl) dispatchSelectedEl.textContent = selectedHandoffPackId
+                ? `Dispatch target ${pack.title || selectedHandoffPackId} is ${dispatch.status}${dispatch.owner ? ` • ${dispatch.owner}` : ''}.`
+                : 'Select an archived handoff pack below to queue dispatch.';
+        }
+
+        function renderReviewBoard(counts = {}) {
+            const countsEl = document.getElementById('review-board-counts');
+            if (!countsEl) return;
+            const statuses = ['draft', 'ready', 'approved', 'blocked', 'dispatched'];
+            countsEl.innerHTML = statuses.map((status) => `
+                <div class="border border-white/10 rounded-xl px-3 py-2 bg-black/30 flex items-center justify-between">
+                    <span class="uppercase tracking-widest">${status}</span>
+                    <span class="font-black text-white">${Number(counts?.[status] || 0)}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderHandoffArchive(packs = []) {
+            const list = document.getElementById('handoff-pack-list');
+            if (!list) return;
+            if (!packs.length) {
+                list.innerHTML = '<div class="text-[11px] text-gray-600">No archived handoff packs yet.</div>';
+                fillReviewForm(null);
+                return;
+            }
+            list.innerHTML = packs.slice(0, 4).map((pack) => {
+                const review = normalizeReviewState(pack.review || {});
+                const execution = normalizeExecutionState(pack.execution || {});
+                const selected = pack.handoffPackId === selectedHandoffPackId;
+                return `
+                <button type="button" data-handoff-pack-id="${pack.handoffPackId}" class="w-full text-left border border-white/10 rounded-2xl p-3 bg-black/30 hover:bg-white/5 transition-all ${selected ? 'ring-1 ring-blue-500/60' : ''}">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="font-bold text-xs">${pack.title || 'Neural handoff pack'}</div>
+                        <div class="text-[9px] text-gray-500 uppercase">${pack.createdAt ? new Date(pack.createdAt).toLocaleDateString() : ''}</div>
+                    </div>
+                    <div class="text-[10px] text-gray-500 mt-2">${(pack.handoffSummary?.targetPlatforms || []).join(' • ') || 'manual-triage'}</div>
+                    <div class="text-[10px] text-gray-600 mt-2">Review: ${review.status}${review.owner ? ` • ${review.owner}` : ''}${review.checkpoint ? ` • ${review.checkpoint}` : ''}</div>
+                    <div class="text-[10px] text-gray-600 mt-1">Execution: ${execution.status}${execution.owner ? ` • ${execution.owner}` : ''}${execution.checkpoint ? ` • ${execution.checkpoint}` : ''}</div>
+                </button>
+            `;
+            }).join('');
+            list.querySelectorAll('[data-handoff-pack-id]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const pack = packs.find((entry) => entry.handoffPackId === button.getAttribute('data-handoff-pack-id'));
+                    fillReviewForm(pack || null);
+                    renderHandoffArchive(packs);
+                });
+            });
+            if (!selectedHandoffPackId && packs[0]) {
+                fillReviewForm(packs[0]);
+                renderHandoffArchive(packs);
+            }
+        }
+
+        function renderExecutionBoard(counts = {}, queue = []) {
+            const countsEl = document.getElementById('execution-board-counts');
+            if (countsEl) {
+                const statuses = ['queued', 'active', 'blocked', 'completed'];
+                countsEl.innerHTML = statuses.map((status) => `
+                    <div class="border border-white/10 rounded-xl px-3 py-2 bg-black/30 flex items-center justify-between">
+                        <span class="uppercase tracking-widest">${status}</span>
+                        <span class="font-black text-white">${Number(counts?.[status] || 0)}</span>
+                    </div>
+                `).join('');
+            }
+            const listEl = document.getElementById('execution-board-list');
+            if (!listEl) return;
+            if (!queue.length) {
+                listEl.innerHTML = '<div class="text-[11px] text-gray-600">No execution items queued yet.</div>';
+                return;
+            }
+            listEl.innerHTML = queue.slice(0, 4).map((item) => {
+                const execution = normalizeExecutionState(item.execution || {});
+                return `
+                    <div class="border border-white/10 rounded-2xl p-3 bg-black/30">
+                        <div class="flex items-center justify-between gap-3">
+                        <div class="font-bold text-xs">${item.title || 'Neural handoff pack'}</div>
+                        <div class="text-[9px] text-gray-500 uppercase">${execution.status}</div>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-2">${(item.targetPlatforms || []).join(' • ') || 'manual-triage'}</div>
+                        <div class="text-[10px] text-gray-600 mt-2">${execution.owner || 'unassigned'}${execution.checkpoint ? ` • ${execution.checkpoint}` : ''}${execution.nextAction ? ` • ${execution.nextAction}` : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDispatchBoard(counts = {}, queue = []) {
+            const countsEl = document.getElementById('dispatch-board-counts');
+            if (countsEl) {
+                const statuses = ['queued', 'ready', 'active', 'blocked', 'delivered'];
+                countsEl.innerHTML = statuses.map((status) => `
+                    <div class="border border-white/10 rounded-xl px-3 py-2 bg-black/30 flex items-center justify-between">
+                        <span class="uppercase tracking-widest">${status}</span>
+                        <span class="font-black text-white">${Number(counts?.[status] || 0)}</span>
+                    </div>
+                `).join('');
+            }
+            const listEl = document.getElementById('dispatch-board-list');
+            if (!listEl) return;
+            if (!queue.length) {
+                listEl.innerHTML = '<div class="text-[11px] text-gray-600">No dispatch items queued yet.</div>';
+                return;
+            }
+            listEl.innerHTML = queue.slice(0, 4).map((item) => {
+                const dispatch = normalizeDispatchState(item.dispatch || {});
+                return `
+                    <div class="border border-white/10 rounded-2xl p-3 bg-black/30">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="font-bold text-xs">${item.title || 'Neural handoff pack'}</div>
+                            <div class="text-[9px] text-gray-500 uppercase">${dispatch.status}</div>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-2">${dispatch.target || (item.targetPlatforms || []).join(' • ') || 'manual-triage'}</div>
+                        <div class="text-[10px] text-gray-600 mt-2">${dispatch.owner || 'unassigned'}${dispatch.checkpoint ? ` • ${dispatch.checkpoint}` : ''}${dispatch.channel ? ` • ${dispatch.channel}` : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderWorkflowTimeline(summary = {}, events = []) {
+            const countsEl = document.getElementById('workflow-timeline-counts');
+            if (countsEl) {
+                const categories = ['archive', 'review', 'execution', 'dispatch', 'other'];
+                countsEl.innerHTML = categories.map((category) => `
+                    <div class="border border-white/10 rounded-xl px-3 py-2 bg-black/30 flex items-center justify-between">
+                        <span class="uppercase tracking-widest">${category}</span>
+                        <span class="font-black text-white">${Number(summary?.[category] || 0)}</span>
+                    </div>
+                `).join('');
+            }
+            const listEl = document.getElementById('workflow-timeline-list');
+            if (!listEl) return;
+            if (!events.length) {
+                listEl.innerHTML = '<div class="text-[11px] text-gray-600">No workflow events captured yet.</div>';
+                return;
+            }
+            listEl.innerHTML = events.slice(0, 8).map((event) => `
+                <div class="border border-white/10 rounded-2xl p-3 bg-black/30">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="font-bold text-xs">${event.title || event.type || 'workflow event'}</div>
+                        <div class="text-[9px] text-gray-500 uppercase">${event.type || 'event'}</div>
+                    </div>
+                    <div class="text-[10px] text-gray-500 mt-2">${event.detail || ''}</div>
+                    <div class="text-[10px] text-gray-600 mt-2">${event.status || event.category || 'other'}${event.owner ? ` • ${event.owner}` : ''}${event.checkpoint ? ` • ${event.checkpoint}` : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        window.refreshHandoffArchive = async () => {
+            const status = document.getElementById('handoff-pack-runtime');
+            try {
+                const res = await fetch(gatewayUrl('/v1/handoff-packs'));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderHandoffArchive(data.handoffPacks || []);
+                await refreshReviewBoard();
+                await refreshExecutionBoard();
+                await refreshDispatchBoard();
+                await refreshWorkflowTimeline();
+                if (status) status.textContent = `Local handoff archive ready. ${data.totalHandoffPacks || 0} packet(s) archived in this folder.`;
+            } catch (error) {
+                renderHandoffArchive([]);
+                renderReviewBoard({});
+                renderExecutionBoard({}, []);
+                renderDispatchBoard({}, []);
+                renderWorkflowTimeline({}, []);
+                if (status) status.textContent = 'No local handoff runtime detected yet. Start the same-folder runtime or keep the packet details staged here.';
+            }
+        };
+
+        window.refreshReviewBoard = async () => {
+            const statusEl = document.getElementById('handoff-review-status-note');
+            try {
+                const res = await fetch(gatewayUrl('/v1/review-board'));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderReviewBoard(data.counts || {});
+                if (statusEl) statusEl.textContent = `Review board ready. ${data.totalHandoffPacks || 0} archived pack(s) tracked in this folder.`;
+            } catch (error) {
+                renderReviewBoard({});
+                if (statusEl) statusEl.textContent = `Review board unavailable: ${error.message}`;
+            }
+        };
+
+        window.refreshExecutionBoard = async () => {
+            const statusEl = document.getElementById('handoff-execution-status-note');
+            try {
+                const res = await fetch(gatewayUrl('/v1/execution-board'));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderExecutionBoard(data.counts || {}, data.queue || []);
+                if (statusEl) statusEl.textContent = `Execution board ready. ${data.totalExecutionItems || 0} queued item(s) in this folder.`;
+            } catch (error) {
+                renderExecutionBoard({}, []);
+                if (statusEl) statusEl.textContent = `Execution board unavailable: ${error.message}`;
+            }
+        };
+
+        window.refreshDispatchBoard = async () => {
+            const statusEl = document.getElementById('handoff-dispatch-status-note');
+            try {
+                const res = await fetch(gatewayUrl('/v1/dispatch-board'));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderDispatchBoard(data.counts || {}, data.queue || []);
+                if (statusEl) statusEl.textContent = `Dispatch board ready. ${data.totalDispatchItems || 0} queued item(s) in this folder.`;
+            } catch (error) {
+                renderDispatchBoard({}, []);
+                if (statusEl) statusEl.textContent = `Dispatch board unavailable: ${error.message}`;
+            }
+        };
+
+        window.refreshWorkflowTimeline = async () => {
+            try {
+                const res = await fetch(gatewayUrl('/v1/workflow-timeline'));
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderWorkflowTimeline(data.summary || {}, data.events || []);
+            } catch (error) {
+                renderWorkflowTimeline({}, []);
+            }
+        };
+
+        window.createHandoffPack = async () => {
+            const titleEl = document.getElementById('handoff-pack-title');
+            const notesEl = document.getElementById('handoff-pack-notes');
+            const statusEl = document.getElementById('handoff-pack-status');
+            const editorEl = document.getElementById('canvas-editor');
+            const payload = {
+                sessionId: latestRuntimeSessionId || null,
+                handoffPack: {
+                    title: (titleEl?.value || '').trim() || currentChatId || 'Neural handoff pack',
+                    notes: (notesEl?.value || '').trim(),
+                    canvasExcerpt: (editorEl?.value || '').trim().slice(0, 600),
+                    attachments: attachments.map((item) => ({ name: item.name, type: item.type })),
+                    requestedTargets: collectHandoffTargets()
+                }
+            };
+            if (titleEl) localStorage.setItem('kaixu_handoff_title', titleEl.value);
+            if (notesEl) localStorage.setItem('kaixu_handoff_notes', notesEl.value);
+            if (statusEl) statusEl.textContent = 'Archiving local handoff pack...';
+            try {
+                const res = await fetch(gatewayUrl('/v1/handoff-packs'), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+                if (statusEl) {
+                    const targets = (data.handoffPack?.handoffSummary?.targetPlatforms || []).join(', ') || 'manual-triage';
+                    statusEl.textContent = `Archived ${data.handoffPack?.handoffPackId || 'handoff pack'} for ${targets}.`;
+                }
+                selectedHandoffPackId = data.handoffPack?.handoffPackId || selectedHandoffPackId;
+                await refreshHandoffArchive();
+            } catch (error) {
+                if (statusEl) statusEl.textContent = `Archive failed: ${error.message}`;
+            }
+        };
+
+        window.saveSelectedHandoffReview = async () => {
+            const statusEl = document.getElementById('handoff-review-status-note');
+            if (!selectedHandoffPackId) {
+                if (statusEl) statusEl.textContent = 'Archive a handoff pack first, then select it for review.';
+                return;
+            }
+            const payload = {
+                review: {
+                    owner: document.getElementById('handoff-review-owner')?.value || '',
+                    checkpoint: document.getElementById('handoff-review-checkpoint')?.value || '',
+                    status: document.getElementById('handoff-review-status')?.value || 'draft',
+                    notes: document.getElementById('handoff-review-notes')?.value || ''
+                }
+            };
+            if (statusEl) statusEl.textContent = 'Saving review board update...';
+            try {
+                const res = await fetch(gatewayUrl(`/v1/handoff-packs/${encodeURIComponent(selectedHandoffPackId)}/review`), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+                if (statusEl) statusEl.textContent = `Updated ${data.handoffPack?.review?.status || 'draft'} review for ${data.handoffPack?.title || selectedHandoffPackId}.`;
+                await refreshHandoffArchive();
+            } catch (error) {
+                if (statusEl) statusEl.textContent = `Review update failed: ${error.message}`;
+            }
+        };
+
+        window.saveSelectedHandoffExecution = async () => {
+            const statusEl = document.getElementById('handoff-execution-status-note');
+            if (!selectedHandoffPackId) {
+                if (statusEl) statusEl.textContent = 'Archive a handoff pack first, then select it for execution.';
+                return;
+            }
+            const payload = {
+                execution: {
+                    owner: document.getElementById('handoff-execution-owner')?.value || '',
+                    checkpoint: document.getElementById('handoff-execution-checkpoint')?.value || '',
+                    dueAt: document.getElementById('handoff-execution-due-at')?.value || '',
+                    nextAction: document.getElementById('handoff-execution-next-action')?.value || '',
+                    status: document.getElementById('handoff-execution-status')?.value || 'queued',
+                    notes: document.getElementById('handoff-execution-notes')?.value || ''
+                }
+            };
+            if (statusEl) statusEl.textContent = 'Saving execution board update...';
+            try {
+                const res = await fetch(gatewayUrl(`/v1/handoff-packs/${encodeURIComponent(selectedHandoffPackId)}/execution`), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+                if (statusEl) statusEl.textContent = `Queued ${data.handoffPack?.title || selectedHandoffPackId} for ${data.handoffPack?.execution?.status || 'queued'} execution.`;
+                await refreshHandoffArchive();
+            } catch (error) {
+                if (statusEl) statusEl.textContent = `Execution update failed: ${error.message}`;
+            }
+        };
+
+        window.saveSelectedHandoffDispatch = async () => {
+            const statusEl = document.getElementById('handoff-dispatch-status-note');
+            if (!selectedHandoffPackId) {
+                if (statusEl) statusEl.textContent = 'Archive a handoff pack first, then select it for dispatch.';
+                return;
+            }
+            const payload = {
+                dispatch: {
+                    owner: document.getElementById('handoff-dispatch-owner')?.value || '',
+                    checkpoint: document.getElementById('handoff-dispatch-checkpoint')?.value || '',
+                    target: document.getElementById('handoff-dispatch-target')?.value || '',
+                    channel: document.getElementById('handoff-dispatch-channel')?.value || '',
+                    status: document.getElementById('handoff-dispatch-status')?.value || 'queued',
+                    notes: document.getElementById('handoff-dispatch-notes')?.value || ''
+                }
+            };
+            if (statusEl) statusEl.textContent = 'Saving dispatch board update...';
+            try {
+                const res = await fetch(gatewayUrl(`/v1/handoff-packs/${encodeURIComponent(selectedHandoffPackId)}/dispatch`), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+                if (statusEl) statusEl.textContent = `Queued ${data.handoffPack?.title || selectedHandoffPackId} for ${data.handoffPack?.dispatch?.status || 'queued'} dispatch.`;
+                await refreshHandoffArchive();
+            } catch (error) {
+                if (statusEl) statusEl.textContent = `Dispatch update failed: ${error.message}`;
+            }
+        };
+
+        function buildMessages(prompt, atts, sys) {
+            const msgs = [];
+            if (sys) msgs.push({ role: 'system', content: sys });
+
+            const history = Array.isArray(conversation) ? conversation : [];
+            for (const m of history) {
+                const content = Array.isArray(m.parts) ? m.parts.map(p => p.text || '').join('\n') : '';
+                msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content });
+            }
+
+            const attachmentText = atts.map(a => {
+                if (a.type === 'image') return `[image] ${a.name || 'asset'} (base64 length ${a.base64?.length || 0})`;
+                const snippet = (a.content || '').slice(0, 1200);
+                return `[${a.type || 'doc'}] ${a.name || 'file'}\n${snippet}`;
+            }).join('\n\n');
+
+            const content = attachmentText ? `${prompt}\n\nAttachments:\n${attachmentText}` : prompt;
+            msgs.push({ role: 'user', content });
+            return msgs;
+        }
+
+        async function runChat(prompt, atts) {
+            setLoading(true);
+            try {
+                const sys = localStorage.getItem('kaixu_sys') || "You are kAIxu, the core intelligence of the Neural Space Pro environment. You are optimized for research, data synthesis, and technical architecture.";
+                const messages = buildMessages(prompt || "Neural handshake.", atts, sys);
+
+                const body = {
+                    provider: 'gemini',
+                    model: 'gemini-2.5-flash',
+                    messages,
+                    temperature: 0.8
+                };
+
+                const res = await fetch(gatewayUrl('/.netlify/functions/gateway-chat'), {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(body),
+                    signal: abortCtrl?.signal
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data?.error || data?.message || (`HTTP ${res.status}`));
+
+                const text = data.output_text || data.text || data.answer || 'No response text.';
+                if (data.sessionId) {
+                    latestRuntimeSessionId = data.sessionId;
+                    console.info('Local proof session captured:', data.sessionId);
+                }
+                addMessageUI('model', text);
+                await saveMessage('model', text);
+                conversation.push({ role: "user", parts: [{ text: prompt }] }, { role: "model", parts: [{ text }] });
+            } catch (err) { 
+                if (err.name !== 'AbortError') addMessageUI('model', "Neural Exception: " + err.message); 
+            } finally { 
+                setLoading(false); 
+            }
+        }
+
+        function addMessageUI(role, text, atts = null) {
+            const list = document.getElementById('messages-list'), div = document.createElement('div');
+            div.className = `flex gap-6 py-10 animate-fade ${role === 'model' ? 'border-b border-white/[0.02]' : ''}`;
+            let html = `<div class="prose prose-invert prose-indigo prose-sm md:prose-base">${marked.parse(text)}</div>`;
+            div.innerHTML = `
+                <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center ${role === 'user' ? 'bg-white/5' : 'bg-white text-black'}">
+                    ${role === 'model' ? `<img src="https://cdn1.sharemyimage.com/2026/02/15/Screenshot-2026-02-14-1.45.11-PM-3.png" class="w-8 h-8 object-contain">` : `<i class="fa-solid fa-user"></i>`}
+                </div>
+                <div class="flex-1 min-w-0">
+                    ${atts ? `<div class="flex flex-wrap gap-4 mb-4">${atts.map(a => `<div class="p-2 border border-white/10 rounded-lg text-[10px] bg-white/5"><i class="fa-solid fa-paperclip mr-2"></i>${a.name}</div>`).join('')}</div>` : ''}
+                    ${html}
+                    ${role === 'model' ? `<div class="mt-8 flex gap-5 opacity-40 hover:opacity-100"><button onclick="toCanvas(this)" class="text-[10px] font-black uppercase tracking-widest">Focus in Workspace</button></div>` : ''}
+                </div>`;
+            list.appendChild(div);
+            Prism.highlightAllUnder(div);
+            const chatWin = document.getElementById('chat-window');
+            if (chatWin) chatWin.scrollTo({ top: chatWin.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.toCanvas = (btn) => {
+            const prose = btn.closest('.flex-1').querySelector('.prose');
+            if (prose) {
+                document.getElementById('canvas-editor').value = prose.innerText;
+                toggleWorkspace(true);
+            }
+        };
+
+        function setLoading(l) {
+            const status = document.getElementById('engine-status');
+            const stopBtn = document.getElementById('stop-btn');
+            const sendBtn = document.getElementById('send-btn');
+            if (status) status.classList.toggle('hidden', !l);
+            if (stopBtn) stopBtn.classList.toggle('hidden', !l);
+            if (sendBtn) sendBtn.disabled = l;
+            abortCtrl = l ? new AbortController() : null;
+        }
+
+        async function saveMessage(role, content, atts = null) {
+            if (!user || !currentChatId) return;
+            await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'chats', currentChatId, 'messages'), { role, content, attachments: atts ? atts.map(a => ({ name: a.name, type: a.type })) : null, timestamp: Date.now() });
+            await updateDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'chats', currentChatId), { updatedAt: Timestamp.now() });
+        }
+
+        async function syncArchives() {
+            if (!user) return;
+            onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'chats'), (snap) => {
+                const list = document.getElementById('history-list');
+                if (!list) return;
+                list.innerHTML = '';
+                snap.docs.forEach(chat => {
+                    const div = document.createElement('div');
+                    div.className = `p-3 text-xs cursor-pointer hover:bg-white/5 rounded-xl truncate text-gray-400 hover:text-white transition-colors`;
+                    div.textContent = chat.data().title || "Neural Session";
+                    div.onclick = () => loadSession(chat.id);
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        async function loadSession(id) {
+            currentChatId = id;
+            const welcomeView = document.getElementById('welcome-view');
+            const msgList = document.getElementById('messages-list');
+            if (welcomeView) welcomeView.classList.add('hidden');
+            if (msgList) msgList.innerHTML = '<div class="py-20 text-center text-gray-600 animate-pulse font-bold tracking-widest text-[10px]">RE-INITIALIZING kAIxu STREAM...</div>';
+            
+            const snap = await getDocs(collection(db, 'artifacts', appId, 'users', user.uid, 'chats', id, 'messages'));
+            const msgs = snap.docs.map(d => d.data()).sort((a, b) => a.timestamp - b.timestamp);
+            
+            if (msgList) msgList.innerHTML = '';
+            conversation = [];
+            msgs.forEach(m => {
+                addMessageUI(m.role, m.content, m.attachments);
+                conversation.push({ role: m.role, parts: [{ text: m.content }] });
+            });
+        }
+
+        window.createNewChat = () => { 
+            currentChatId = null; 
+            conversation = []; 
+            const msgList = document.getElementById('messages-list');
+            const welcomeView = document.getElementById('welcome-view');
+            if (msgList) msgList.innerHTML = ''; 
+            if (welcomeView) welcomeView.classList.remove('hidden'); 
+        };
+
+        window.stopEngine = () => { if (abortCtrl) abortCtrl.abort(); };
+
+        window.toggleSearch = () => {
+            isSearchOn = !isSearchOn;
+            const searchBtn = document.getElementById('search-btn');
+            if (searchBtn) searchBtn.classList.toggle('text-blue-400', isSearchOn);
+        };
+
+        window.toggleMode = (mode) => {
+            activeMode = (activeMode === mode) ? 'chat' : mode;
+            const editToggle = document.getElementById('edit-toggle');
+            if (editToggle) editToggle.classList.toggle('text-purple-400', activeMode === 'edit');
+        };
+
+        window.setCanvasMode = (m) => {
+            const editor = document.getElementById('canvas-editor');
+            const preview = document.getElementById('canvas-preview');
+            const tabs = document.querySelectorAll('#canvas-tabs button');
+            
+            tabs.forEach(t => {
+                const clickAttr = t.getAttribute('onclick');
+                t.classList.toggle('active-tab', clickAttr && clickAttr.includes(m));
+            });
+            
+            if (m === 'preview') {
+                if (editor) editor.classList.add('hidden');
+                if (preview) {
+                    preview.classList.remove('hidden');
+                    preview.srcdoc = editor.value;
+                }
+            } else {
+                if (editor) editor.classList.remove('hidden');
+                if (preview) preview.classList.add('hidden');
+            }
+        };
+
+        // Initialize marked with katex extension
+        marked.use(markedKatex({ throwOnError: false }));
+
+        // Event Listeners
+        const userInputEl = document.getElementById('user-input');
+        if (userInputEl) {
+            userInputEl.addEventListener('keydown', (e) => { 
+                if(e.key === 'Enter' && !e.shiftKey) { 
+                    e.preventDefault(); 
+                    handleSend(); 
+                }
+            });
+        }
+    </script></body>
+</html>

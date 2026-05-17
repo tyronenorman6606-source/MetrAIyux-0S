@@ -10,7 +10,7 @@ if(result.status !== 0) process.exit(result.status || 1);
 const readJson = async rel => JSON.parse(await fs.readFile(path.join(ROOT, 'dist', rel), 'utf8'));
 const dry = await readJson('data/import-dry-run.json');
 const report = await readJson('seed-report.json');
-console.log('\nPHX Verified import dry-run summary');
+console.log('\nValley Verified import dry-run summary');
 console.log(`Raw records: ${dry.raw_records}`);
 console.log(`Would publish: ${dry.would_publish}`);
 console.log(`Exact duplicate collisions: ${dry.exact_duplicate_collisions}`);

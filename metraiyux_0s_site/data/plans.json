@@ -2,14 +2,22 @@
   {
     "id": "starter-command",
     "name": "Starter Command",
-    "price_monthly": 297,
-    "setup_fee": 997,
+    "price_monthly": 397,
+    "setup_fee": 1500,
     "currency": "usd",
     "skyepay_offer_id": "metraiyux-starter-command",
     "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
-    "owner_approval_required": false,
-    "activation_path": "auto_unlock_after_confirmed_payment",
-    "best_for": "Solo founders and small operators who need a serious starter operating room with clear AI usage controls.",
+    "stripe_lookup_keys": {
+      "setup": "metraiyux_starter_command_setup",
+      "monthly": "metraiyux_starter_command_monthly"
+    },
+    "stripe_price_ids": {
+      "setup": "price_1TY9TxHEgCmnlKPJ0mBR8cwZ",
+      "monthly": "price_1TY9TyHEgCmnlKPJTl703ekt"
+    },
+    "owner_approval_required": true,
+    "activation_path": "paid_pending_owner_approval",
+    "best_for": "Solo founders and small operators who need a serious starter operating room with clear AI usage controls, relationship capture, and Relay13 deployment readiness.",
     "limits": {
       "workspaces": 1,
       "brains": "Central + selected cabinet routes",
@@ -22,11 +30,30 @@
       "vault_file_limit": 250,
       "social_channels": 1,
       "approval_emails": 250,
-      "kaixu_variants": ["kaixu-6.7-nano", "kaixu-6.7-mini"],
-      "allowed_providers": ["kaixu"],
+      "connectlog_operator_seats": 1,
+      "house_operations_workspaces": "local preview lane",
+      "skyebox_authenticator_vaults": 1,
+      "relay13_workspaces": "source package and deployment runbook",
+      "relay13_monthly_conversations": "100 after deployed Worker configuration",
+      "relay13_monthly_messages": "1000 after deployed Worker configuration",
+      "phx_verified_network_postings_after_first_paid_month": 1,
+      "skyeroutex_scope": "public preview, v0.4.0 static-safe app entry, and route-ops fit check",
+      "kaixu_variants": [
+        "kaixu-6.7-nano",
+        "kaixu-6.7-mini"
+      ],
+      "allowed_providers": [
+        "kaixu"
+      ],
       "allowed_models": {
-        "kaixu": ["kaixu-6.7-nano", "kaixu-6.7-mini"]
-      }
+        "kaixu": [
+          "kaixu-6.7-nano",
+          "kaixu-6.7-mini"
+        ]
+      },
+      "skyeprofitconsole_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemusicnexus_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required"
     },
     "includes": [
       "Customer workspace",
@@ -37,23 +64,40 @@
       "Local proof receipts",
       "Basic client/candidate/vendor routing",
       "Deployment command checklist",
-      "FS27 usage gate with automatic unlock after confirmed SkyePay payment"
+      "ConnectLog private relationship command app",
+      "HouseOperations local preview lane",
+      "SkyeBox encrypted authenticator vault handoff",
+      "Relay13 source package and bridge setup guide",
+      "SkyeRouteX public preview, v0.4.0 static-safe app entry, and route-operations fit check",
+      "One free PHX Verified public business landing after first paid month",
+      "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
+      "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "SkyeMusicNexus Free99 gated music operations access (no charge; gate session required)",
+      "FS27 usage gate with paid-pending owner approval after confirmed SkyePay payment"
     ]
   },
   {
     "id": "growth-cabinet",
     "name": "Growth Cabinet",
-    "price_monthly": 797,
-    "setup_fee": 2500,
+    "price_monthly": 997,
+    "setup_fee": 3500,
     "currency": "usd",
     "skyepay_offer_id": "metraiyux-growth-cabinet",
     "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
-    "owner_approval_required": false,
-    "activation_path": "auto_unlock_after_confirmed_payment",
-    "best_for": "Growing service companies, staffing teams, local operators, and agencies that need recurring workflow automation and a stronger operating rhythm.",
+    "stripe_lookup_keys": {
+      "setup": "metraiyux_growth_cabinet_setup",
+      "monthly": "metraiyux_growth_cabinet_monthly"
+    },
+    "stripe_price_ids": {
+      "setup": "price_1TY9TzHEgCmnlKPJqXBTbH5Y",
+      "monthly": "price_1TY9TzHEgCmnlKPJqFm0FhAS"
+    },
+    "owner_approval_required": true,
+    "activation_path": "paid_pending_owner_approval",
+    "best_for": "Growing service companies, staffing teams, local operators, and agencies that need recurring workflow automation, relationship capture, owned messaging, and a stronger operating rhythm.",
     "limits": {
       "workspaces": 3,
-      "brains": "17-brain mesh",
+      "brains": "16-brain mesh",
       "monthly_ai_credits": 75000,
       "monthly_ai_cap_usd": 750,
       "requests_per_minute": 90,
@@ -63,38 +107,151 @@
       "vault_file_limit": 1200,
       "social_channels": 3,
       "approval_emails": 1000,
-      "kaixu_variants": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7"],
-      "allowed_providers": ["kaixu"],
+      "connectlog_operator_seats": 3,
+      "house_operations_workspaces": 1,
+      "skyebox_authenticator_vaults": 3,
+      "relay13_workspaces": 1,
+      "relay13_monthly_conversations": 2500,
+      "relay13_monthly_messages": 10000,
+      "phx_verified_network_postings_after_first_paid_month": 1,
+      "skyeroutex_scope": "manifest mount preview plus one route-ops workflow map over the v0.4.0 workforce command proof platform",
+      "kaixu_variants": [
+        "kaixu-6.7-nano",
+        "kaixu-6.7-mini",
+        "kaixu-6.7"
+      ],
+      "allowed_providers": [
+        "kaixu"
+      ],
       "allowed_models": {
-        "kaixu": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7"]
-      }
+        "kaixu": [
+          "kaixu-6.7-nano",
+          "kaixu-6.7-mini",
+          "kaixu-6.7"
+        ]
+      },
+      "skyeprofitconsole_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemusicnexus_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required"
     },
     "includes": [
       "Everything in Starter",
-      "17-brain command routing",
+      "16-brain command routing",
       "Client success workflows",
       "Candidate/vendor routing",
       "Content/social draft queues",
       "Weekly cabinet review dashboard",
       "Proposal and scope builders",
       "Proof vault exports",
-      "FS27 usage gate with automatic unlock after confirmed SkyePay payment"
+      "ConnectLog card variants, QR exchange, and follow-up workflows",
+      "HouseOperations task, vendor, alert, and proof workspace",
+      "SkyeBox operator authenticator vault instances",
+      "Relay13 workspace bridge and operator console setup path",
+      "SkyeRouteX manifest mount preview, v0.4.0 workforce command proof review, and route-ops workflow map",
+      "One free PHX Verified public business landing after first paid month",
+      "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
+      "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "SkyeMusicNexus Free99 gated music operations access (no charge; gate session required)",
+      "FS27 usage gate with paid-pending owner approval after confirmed SkyePay payment"
+    ]
+  },
+  {
+    "id": "routex-workforce-command",
+    "name": "RouteX Workforce Command",
+    "price_monthly": 1497,
+    "setup_fee": 6500,
+    "currency": "usd",
+    "skyepay_offer_id": "metraiyux-routex-workforce-command",
+    "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
+    "stripe_lookup_keys": {
+      "setup": "metraiyux_routex_workforce_command_setup",
+      "monthly": "metraiyux_routex_workforce_command_monthly"
+    },
+    "stripe_price_ids": {
+      "setup": "price_1TY9U1HEgCmnlKPJPNiPFacB",
+      "monthly": "price_1TY9U1HEgCmnlKPJ8s3kF0eC"
+    },
+    "owner_approval_required": true,
+    "activation_path": "owner_approved_after_route_scope_and_runtime_proof",
+    "best_for": "Field-service, delivery, logistics, white-glove, hospitality, and mobile workforce operators who need dispatch, route planning, stops, proof vaults, analytics, and a manifest-only 0S mount boundary.",
+    "limits": {
+      "workspaces": 3,
+      "brains": "16-brain mesh + route operations lane",
+      "monthly_ai_credits": 100000,
+      "monthly_ai_cap_usd": 1000,
+      "requests_per_minute": 120,
+      "requests_per_day": 3500,
+      "devices_per_key": 8,
+      "vault_storage_mb": 10240,
+      "vault_file_limit": 2500,
+      "social_channels": 3,
+      "approval_emails": 1500,
+      "connectlog_operator_seats": 5,
+      "relay13_workspaces": 1,
+      "relay13_monthly_conversations": 5000,
+      "relay13_monthly_messages": 25000,
+      "skyeroutex_workspaces": 1,
+      "skyeroutex_operator_seats": 5,
+      "skyeroutex_daily_routes": 50,
+      "skyeroutex_monthly_stops": 2500,
+      "skyeroutex_runtime_mode": "SkyeRoutexFlow v0.4.0 local API/browser smoke harness plus V83 static shell; production provider proof requires deployed services, secrets, and live checks",
+      "phx_verified_network_postings_after_first_paid_month": 1,
+      "kaixu_variants": [
+        "kaixu-6.7-nano",
+        "kaixu-6.7-mini",
+        "kaixu-6.7"
+      ],
+      "allowed_providers": [
+        "kaixu"
+      ],
+      "allowed_models": {
+        "kaixu": [
+          "kaixu-6.7-nano",
+          "kaixu-6.7-mini",
+          "kaixu-6.7"
+        ]
+      },
+      "skyeprofitconsole_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemusicnexus_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required"
+    },
+    "includes": [
+      "Everything in Growth",
+      "SkyeRoutexFlow Workforce Command v0.4.0 local proof platform",
+      "Provider job posting, contractor job boards, applicant pools, assignments, proof, payment-state, disputes, market reports, and export packets",
+      "SkyeRouteX V83 routed shell for dashboard, routes, stops, workforce, proof, analytics, runtime, and settings views",
+      "v0.4.0 API/browser smoke suite plus V83 runtime smoke harness and receipt review",
+      "Static contract endpoint verification",
+      "Route-ops proof routing and operator handoff",
+      "0S live-surface registry and proof-router wiring",
+      "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
+      "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "SkyeMusicNexus Free99 gated music operations access (no charge; gate session required)",
+      "Owner-approved activation until live Stripe price IDs and production provider proof exist"
     ]
   },
   {
     "id": "autonomous-office",
     "name": "Autonomous Office",
-    "price_monthly": 1997,
-    "setup_fee": 5000,
+    "price_monthly": 2497,
+    "setup_fee": 7500,
     "currency": "usd",
     "skyepay_offer_id": "metraiyux-autonomous-office",
     "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
-    "owner_approval_required": false,
-    "activation_path": "auto_unlock_after_confirmed_payment",
-    "best_for": "Serious operators who want a Cloudflare-backed company OS with approval gates, persistent ledgers, social drafts, and connector-ready automation.",
+    "stripe_lookup_keys": {
+      "setup": "metraiyux_autonomous_office_setup",
+      "monthly": "metraiyux_autonomous_office_monthly"
+    },
+    "stripe_price_ids": {
+      "setup": "price_1TY9U2HEgCmnlKPJPqDe4Cqr",
+      "monthly": "price_1TY9U2HEgCmnlKPJq5d7ccZs"
+    },
+    "owner_approval_required": true,
+    "activation_path": "paid_pending_owner_approval",
+    "best_for": "Serious operators who want a Cloudflare-backed company OS with approval gates, persistent ledgers, social drafts, relationship intelligence, owned messaging, and connector-ready automation.",
     "limits": {
       "workspaces": 8,
-      "brains": "17-brain mesh + Site Operator",
+      "brains": "16-brain mesh + Site Operator",
       "monthly_ai_credits": 150000,
       "monthly_ai_cap_usd": 1500,
       "requests_per_minute": 180,
@@ -104,11 +261,36 @@
       "vault_file_limit": 5000,
       "social_channels": 6,
       "approval_emails": 5000,
-      "kaixu_variants": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"],
-      "allowed_providers": ["kaixu"],
+      "connectlog_operator_seats": 8,
+      "house_operations_workspaces": 3,
+      "skyebox_authenticator_vaults": 8,
+      "relay13_workspaces": 3,
+      "relay13_monthly_conversations": 10000,
+      "relay13_monthly_messages": 50000,
+      "phx_verified_network_postings_after_first_paid_month": 1,
+      "skyeroutex_scope": "SkyeRoutexFlow v0.4.0 local proof platform, V83 local runtime smoke, and 0S manifest mount for route-heavy operators",
+      "kaixu_variants": [
+        "kaixu-6.7-nano",
+        "kaixu-6.7-mini",
+        "kaixu-6.7",
+        "kaixu-6.7-pro",
+        "kaixu-6.7-max"
+      ],
+      "allowed_providers": [
+        "kaixu"
+      ],
       "allowed_models": {
-        "kaixu": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"]
-      }
+        "kaixu": [
+          "kaixu-6.7-nano",
+          "kaixu-6.7-mini",
+          "kaixu-6.7",
+          "kaixu-6.7-pro",
+          "kaixu-6.7-max"
+        ]
+      },
+      "skyeprofitconsole_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemusicnexus_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required"
     },
     "includes": [
       "Everything in Growth",
@@ -120,20 +302,37 @@
       "Business inbox triage",
       "Daily operator digest",
       "Connector readiness console",
-      "FS27 usage gate with automatic unlock after confirmed SkyePay payment"
+      "ConnectLog operator-proof deployment command center",
+      "Managed HouseOperations command rooms for task, vendor, schedule, and owner-alert execution",
+      "SkyeBox local encrypted authenticator vault rollout and backup handoff",
+      "Relay13 Worker, D1 migration, activation-proof, and live-proof handoff path",
+      "SkyeRoutexFlow v0.4.0 local proof platform, V83 local runtime smoke, static endpoints, and 0S manifest mount",
+      "One free PHX Verified public business landing after first paid month",
+      "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
+      "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "SkyeMusicNexus Free99 gated music operations access (no charge; gate session required)",
+      "FS27 usage gate with paid-pending owner approval after confirmed SkyePay payment"
     ]
   },
   {
     "id": "enterprise-command",
     "name": "Enterprise / Managed Gate",
-    "price_monthly": 2497,
-    "setup_fee": 10000,
+    "price_monthly": 3997,
+    "setup_fee": 15000,
     "currency": "usd",
-    "skyepay_offer_id": "skygatefs27-managed-control-plane",
-    "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=skygatefs27-managed-control-plane",
+    "skyepay_offer_id": "metraiyux-enterprise-command",
+    "checkout_url": "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
+    "stripe_lookup_keys": {
+      "setup": "metraiyux_enterprise_setup",
+      "monthly": "metraiyux_enterprise_monthly"
+    },
+    "stripe_price_ids": {
+      "setup": "price_1TY9U3HEgCmnlKPJ7ACUntvj",
+      "monthly": "price_1TY9U4HEgCmnlKPJSWLllIxH"
+    },
     "owner_approval_required": true,
     "activation_path": "owner_approved_after_scope_review",
-    "best_for": "Multi-branch companies, public-sector contractors, enterprise teams, and managed FS27 gate customers requiring custom rollout control.",
+    "best_for": "Multi-branch companies, public-sector contractors, enterprise teams, and managed FS27 gate customers requiring custom rollout control, relationship intelligence, and dedicated messaging infrastructure.",
     "limits": {
       "workspaces": "custom",
       "brains": "Custom routed mesh",
@@ -146,11 +345,36 @@
       "vault_file_limit": "custom",
       "social_channels": "custom",
       "approval_emails": "custom",
-      "kaixu_variants": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"],
-      "allowed_providers": ["kaixu"],
+      "connectlog_operator_seats": "custom",
+      "house_operations_workspaces": "custom",
+      "skyebox_authenticator_vaults": "custom",
+      "relay13_workspaces": "custom",
+      "relay13_monthly_conversations": "custom",
+      "relay13_monthly_messages": "custom",
+      "phx_verified_network_postings_after_first_paid_month": "1 per managed tenant",
+      "skyeroutex_scope": "custom SkyeRoutexFlow v0.4.0 deployment, V83 compatibility shell, operator training, provider proof, and live-routing policy",
+      "kaixu_variants": [
+        "kaixu-6.7-nano",
+        "kaixu-6.7-mini",
+        "kaixu-6.7",
+        "kaixu-6.7-pro",
+        "kaixu-6.7-max"
+      ],
+      "allowed_providers": [
+        "kaixu"
+      ],
       "allowed_models": {
-        "kaixu": ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"]
-      }
+        "kaixu": [
+          "kaixu-6.7-nano",
+          "kaixu-6.7-mini",
+          "kaixu-6.7",
+          "kaixu-6.7-pro",
+          "kaixu-6.7-max"
+        ]
+      },
+      "skyeprofitconsole_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyemusicnexus_access": "Free99 gated feature; $0/month, $0 setup, no paid checkout, gate session required"
     },
     "includes": [
       "Everything in Autonomous Office",
@@ -160,6 +384,15 @@
       "Auth clearance",
       "Platform mirroring",
       "Advanced reporting and audit exports",
+      "Custom ConnectLog/Relay13 deployment architecture",
+      "Custom HouseOperations scope and owner-alert policy",
+      "Custom SkyeBox authenticator-vault custody and handoff policy",
+      "Managed Relay13 workspace, domain, API-key, widget, and live-proof rollout",
+      "Custom SkyeRoutexFlow v0.4.0 workforce command deployment architecture",
+      "First-month PHX Verified public business landing workflow for each managed tenant",
+      "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
+      "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "SkyeMusicNexus Free99 gated music operations access (no charge; gate session required)",
       "Operator training packet"
     ]
   }

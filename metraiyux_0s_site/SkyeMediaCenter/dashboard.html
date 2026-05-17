@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeMediaCenter · Signal Atlas</title>
+  <meta name="description" content="A spatial asset command map that reads the media runtime as moving signal.">
+  <meta name="theme-color" content="#05030a">
+  <link rel="icon" href="./assets/platform-mark.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./platform.css">
+  <script defer src="./public/skygate-auth.js"></script>
+  <script defer src="./gate-session.js"></script>
+  <script defer src="./platform.js"></script>
+</head>
+<body data-platform-hardening="p3-experiential" data-platform-id="skye-media-center" data-page="dashboard.html" data-view="atlas">
+  <div class="ambient-field" aria-hidden="true"><span></span><span></span><span></span></div>
+  <aside class="skye-dock" aria-label="SkyeMediaCenter navigation">
+    <a class="sigil" href="./index.html" aria-label="SkyeMediaCenter home"><img src="./assets/platform-mark.svg" alt=""><em>SMC</em></a>
+    <nav class="dock-nav"><a data-nav="nerve" href="./index.html"><b>Nerve</b><span>The living intake cortex for ass</span></a><a data-nav="atlas" href="./dashboard.html"><b>Signal Atlas</b><span>A spatial asset command map that</span></a><a data-nav="flows" href="./workflows.html"><b>Flow Reactor</b><span>Review</span></a><a data-nav="vault" href="./records.html"><b>Vault Loom</b><span>Asset records</span></a><a data-nav="runtime" href="./runtime.html"><b>Runtime Spine</b><span>Function routes</span></a><a data-nav="proof" href="./proof.html"><b>Proof Forge</b><span>Smoke proof</span></a><a data-nav="control" href="./settings.html"><b>Control Core</b><span>Browser-local preferences</span></a></nav>
+    <div class="dock-proof">
+      <span>Runtime</span><strong id="dock-runtime-state">Scanning</strong>
+      <small>Functions preserved · surface rebuilt</small>
+    </div>
+  </aside>
+  <main class="experience-shell">
+    <header class="skye-hero">
+      <div class="hero-copy">
+        <p class="micro">SkyeMediaCenter / experiential build</p>
+        <h1 data-route-title>Signal Atlas</h1>
+        <p data-route-description>A spatial asset command map that reads the media runtime as moving signal.</p>
+        <div class="hero-actions">
+          <a class="primary-link" href="./public/index.html">Open Intake Portal</a>
+          <a class="ghost-link" href="./public/admin.html">Open Operator Theater</a>
+          <button type="button" data-command="sync-runtime">Sync Runtime Pulse</button>
+        </div>
+      </div>
+      <section class="orbital-core" aria-label="Media operating core">
+        <div class="orbit-ring ring-a"></div>
+        <div class="orbit-ring ring-b"></div>
+        <div class="orbit-ring ring-c"></div>
+        <div class="core-eye"><span id="core-total-assets">0</span><small>assets</small></div>
+        <i style="--n:0">review</i><i style="--n:1">publish</i><i style="--n:2">search</i><i style="--n:3">proof</i><i style="--n:4">files</i><i style="--n:5">auth</i>
+      </section>
+    </header>
+
+    <section class="signal-strip" aria-label="Live media center signals">
+      <article><span>Total Mass</span><strong id="signal-size">0 B</strong><small>stored payload</small></article>
+      <article><span>Drafts</span><strong id="signal-drafts">0</strong><small>protected until publish</small></article>
+      <article><span>Published</span><strong id="signal-published">0</strong><small>public delivery lane</small></article>
+      <article><span>Search Index</span><strong id="signal-search">idle</strong><small>query surface ready</small></article>
+    </section>
+
+    <section class="view-stage" id="view-stage" aria-live="polite"></section>
+
+    <section class="action-ribbon">
+      <button data-command="mark-check" data-action="media-assets">Check Asset Intake</button>
+      <button data-command="mark-check" data-action="media-search">Check Search</button>
+      <button data-command="mark-check" data-action="media-publishing">Check Publishing</button>
+      <button data-command="mark-check" data-action="file-delivery">Check Delivery</button>
+      <a href="./src/runtime-contract.json">Runtime Contract</a>
+      <a href="./PROOF_STATUS.md">Proof Status</a>
+    </section>
+  </main>
+</body>
+</html>

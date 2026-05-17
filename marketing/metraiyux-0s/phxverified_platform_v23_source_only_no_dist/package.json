@@ -1,18 +1,18 @@
 {
-  "name": "phx-verified-network-platform",
+  "name": "valley-verified-network-platform",
   "version": "23.0.0",
   "private": true,
   "type": "module",
-  "description": "PHX Verified Network platform v23: production-candidate seeded Arizona marketplace with public website layer, simplified marketplace navigation, full static business profiles, optimized artifacts, runtime persistence wiring, and upstream-auth-ready operations.",
+  "description": "Valley Verified Network platform v23: production-candidate seeded Arizona marketplace with public website layer, simplified marketplace navigation, full static business profiles, optimized artifacts, runtime persistence wiring, and upstream-auth-ready operations.",
   "scripts": {
     "build": "node scripts/build.mjs",
     "seed": "node scripts/build.mjs --data-only",
     "smoke": "node scripts/smoke.mjs",
-    "verify": "npm run build && npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke",
+    "verify": "npm run build && npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke && npm run gate-auth-smoke",
     "dry-run": "node scripts/import-dry-run.mjs",
     "production-check": "npm run dry-run && npm run verify",
     "action-smoke": "node scripts/action-smoke.mjs",
-    "codecheck": "npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke",
+    "codecheck": "npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke && npm run gate-auth-smoke",
     "state-smoke": "node scripts/state-smoke.mjs",
     "mutation-smoke": "node scripts/mutation-smoke.mjs",
     "v18-smoke": "node scripts/v18-smoke.mjs",
@@ -25,6 +25,7 @@
     "build:v22-enhance": "node scripts/v22-enhance.mjs",
     "v22-smoke": "node scripts/v22-smoke.mjs",
     "v23-smoke": "node scripts/v23-smoke.mjs",
+    "gate-auth-smoke": "node scripts/gate-auth-smoke.mjs",
     "build:v23-enhance": "node scripts/v23-enhance.mjs"
   },
   "engines": {

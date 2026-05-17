@@ -58,6 +58,7 @@
     if (offer.rate_limits?.rpd) chips.push(`${offer.rate_limits.rpd} daily calls`);
     if (offer.rate_limits?.monthly_cap_cents) chips.push(`${money(offer.rate_limits.monthly_cap_cents)} usage cap`);
     if (offer.rate_limits?.vault_storage_mb) chips.push(`${Math.round(offer.rate_limits.vault_storage_mb / 1024)}GB vault`);
+    if (offer.owner_approval_required) chips.push("owner approval");
     if (offer.credits?.length) chips.push("credit-backed");
     if (offer.catalog_source) chips.push("repo-approved");
     return chips.slice(0, 5).map((chip) => `<span>${escapeHtml(chip)}</span>`).join("");

@@ -82,7 +82,10 @@ export default wrap(async (req) => {
         customer_id: keyRow.customer_id,
         role:        keyRow.role || "deployer",
         label:       keyRow.label || null,
-        scope:       keyScopes(keyRow)
+        scope:       keyScopes(keyRow),
+        exp:         keyRow.expires_at ? Math.floor(new Date(keyRow.expires_at).getTime() / 1000) : null,
+        expires_at:  keyRow.expires_at || null,
+        card_type:   keyRow.key_metadata?.card_type || null
       }, cors);
     }
   }
@@ -114,6 +117,7 @@ function scopeArr(scope) {
 function keyScopes(keyRow) {
   const base = ["gateway.invoke", "gateway.read"];
   const role = String(keyRow?.role || "").toLowerCase();
+  if (keyRow?.key_metadata?.card_type === "pentest_hour_key") return base;
   if (["owner", "admin"].includes(role)) base.push("keys.read", "keys.write", "admin.read", "admin.write");
   return base;
 }

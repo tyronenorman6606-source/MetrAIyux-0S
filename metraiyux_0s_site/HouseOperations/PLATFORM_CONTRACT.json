@@ -1,0 +1,87 @@
+{
+  "title": "House Operations",
+  "slug": "house-operations",
+  "version": "1.0.0",
+  "expansion": {
+    "addedAt": "2026-05-17T00:00:00.000Z",
+    "proofHub": "../live/houseoperations-skyebox-operator-proof.html",
+    "gate": {
+      "provider": "SkyeGateFS27",
+      "pinGate": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html",
+      "dossier": "../../SkyeGateFS27/docs/integration-dossiers/houseoperations-skyebox.json",
+      "eventMirror": "configured by SKYGATEFS27_ORIGIN and FS27 event mirror secret",
+      "boundary": "Gate ID/PIN/recovery sessions do not recover local SkyeBox TOTP secrets."
+    },
+    "childPlatforms": [
+      {
+        "id": "skye-box-authenticator-vault",
+        "label": "SkyeBox Authenticator Vault",
+        "path": "skye-box-authenticator-vault/index.html",
+        "mode": "local-encrypted-pwa",
+        "proof": [
+          "proof/static_validation.mjs",
+          "proof/totp_crypto_vector_test.mjs"
+        ]
+      }
+    ]
+  },
+  "pages": [
+    {
+      "id": "dashboard",
+      "label": "Dashboard",
+      "path": "dashboard.html"
+    },
+    {
+      "id": "tasks",
+      "label": "Tasks",
+      "path": "tasks.html"
+    },
+    {
+      "id": "schedule",
+      "label": "Schedule",
+      "path": "schedule.html"
+    },
+    {
+      "id": "vendors",
+      "label": "Vendors",
+      "path": "vendors.html"
+    },
+    {
+      "id": "alerts",
+      "label": "Alerts",
+      "path": "alerts.html"
+    },
+    {
+      "id": "assignments",
+      "label": "Assignments",
+      "path": "assignments.html"
+    },
+    {
+      "id": "runtime",
+      "label": "Runtime",
+      "path": "runtime.html"
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "path": "settings.html"
+    }
+  ],
+  "endpoints": [
+    "health",
+    "status",
+    "v1/runtime-summary",
+    "v1/sessions",
+    "queue",
+    "handoff-packs",
+    "review-board",
+    "execution-board",
+    "dispatch-board"
+  ],
+  "legacy": [
+    [
+      "Vanta Dashboard Route",
+      "dashboard.html"
+    ]
+  ]
+}

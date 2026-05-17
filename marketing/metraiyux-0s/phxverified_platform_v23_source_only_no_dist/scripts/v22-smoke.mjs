@@ -76,6 +76,7 @@ const lite = await json('data/businesses-lite.json');
 ok(['22.0.0','23.0.0'].includes(seed.version), 'seed report upgraded to v22');
 ok(readiness.completed.includes('runtime_context_for_all_functions'), 'v22 readiness records runtime context wiring');
 ok(runtime.functions.includes('phx-claim'), 'runtime wiring covers phx-claim');
+ok(runtime.functions.includes('phx-customer-posting'), 'runtime wiring covers first-month customer posting');
 ok(artifact.api_policy.includes('manifests'), 'artifact manifest documents manifest API policy');
 ok(routeManifest.v22?.runtime_context === true, 'route manifest records v22 runtime context');
 ok(apiBusinesses.mode === 'manifest-only' && apiBusinesses.count === data.businesses.length, 'API business mirror is manifest-only with correct count');
@@ -88,7 +89,7 @@ ok(await exists('runtime-wiring/index.html'), 'runtime wiring page exists');
 ok(await exists('persistence-health/index.html'), 'persistence health page exists');
 ok(await exists('artifact-manifest/index.html'), 'artifact manifest page exists');
 
-for(const fn of ['phx-action.mjs','phx-admin.mjs','phx-payment.mjs','phx-lead.mjs','phx-claim.mjs']){
+for(const fn of ['phx-action.mjs','phx-admin.mjs','phx-payment.mjs','phx-lead.mjs','phx-claim.mjs','phx-customer-posting.mjs']){
   const body = await fs.readFile(path.join(ROOT, 'netlify/functions', fn), 'utf8');
   ok(body.includes('buildRuntimeContext'), `${fn} uses shared runtime context`);
 }

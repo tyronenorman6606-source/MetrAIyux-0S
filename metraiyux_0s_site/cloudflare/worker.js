@@ -8,6 +8,7 @@ const ROUTES = [
   ['client_onboarding', /\bclient\b|onboard|renewal|escalation|\blaunch\b|status/i, 'adrian-cross-brain', 'marcus-vale-brain', 'Client onboarding and delivery status setup'],
   ['compliance_or_contracting', /\bcontract\b|legal|compliance|policy|filing|incorporation|insurance|\brisk\b/i, 'julian-mercer-brain', 'donovan-pierce-brain', 'Compliance routing and professional review flag'],
   ['technology_or_site', /cloudflare|deploy|deployment|\bworker\b|automation|brain|\bapi\b|system|skygate|fs27|\bgate\b|\bauth\b|introspect|platform event/i, 'orion-hayes-brain', 'site-operator-autonomous-business-brain', 'Technology, deployment, automation, gate, or site operation review'],
+  ['media_center_free99', /skyemediacenter|skye media|media center|asset intake|asset search|file delivery|publish asset|media publish|review board|execution board|dispatch board/i, 'valentina-reyes-brain', 'victor-saint-brain', 'Free99 gated media intake, review, publish, and proof routing'],
   ['marketing_or_content', /marketing|brand|copy|seo|content|campaign|public claim/i, 'valentina-reyes-brain', 'victor-saint-brain', 'Marketing copy, content control, or public claim review'],
   ['quality_proof', /proof|qa|claim|audit|receipt|smoke|test|verify/i, 'victor-saint-brain', 'marcus-vale-brain', 'Proof receipt, QA review, or claims validation'],
   ['innovation_expansion', /innovation|expansion|new market|acquisition|branch/i, 'amara-voss-brain', 'gray-london-skyes-brain', 'Expansion, innovation, or new lane evaluation'],
@@ -70,6 +71,34 @@ const LIVE_SURFACES = [
     url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales/live-proof-router.html',
     purpose: 'Interactive sales router that matches buyer pain to live proof surfaces.',
     route_when: ['which link','route buyer','proof router','what should i show','live surfaces','sell']
+  },
+  {
+    id: 'skyemediacenter-free99-expansion',
+    name: 'SkyeMediaCenter Free99 Expansion Hub',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-media-center-operator-proof.html',
+    purpose: 'Public proof hub for the Free99 media center: no charge, still gate-session required for app boot and API actions.',
+    route_when: ['skyemediacenter','media center','free99','asset intake','asset search','review board','execution board','dispatch board','publish','file delivery','gate session']
+  },
+  {
+    id: 'skyemediacenter-gated-app',
+    name: 'SkyeMediaCenter Gated Media App',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMediaCenter/index.html',
+    purpose: 'Gated media command shell for intake, search, review, execution, dispatch, publish, stats, and file-delivery proof.',
+    route_when: ['open skyemediacenter','media app','media intake','asset library','publish','stats','free99']
+  },
+  {
+    id: 'connectlog-relay13-operator-proof',
+    name: 'ConnectLog + Relay13 Operator Proof',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html',
+    purpose: 'Public operator proof surface for the ConnectLog expansion, live Relay13 bridge, production D1 receipt, WebSocket proof, and updated pricing lanes.',
+    route_when: ['connectlog','relay13','operator proof','relationship command','messaging','websocket','production proof','live receipt']
+  },
+  {
+    id: 'relay13-core-live-worker',
+    name: 'Relay13 Core Live Worker',
+    url: 'https://relay13-core.graylondonskyes.workers.dev/',
+    purpose: 'Live Relay13 messaging Worker backed by the shared 0S D1 operator database and root environment deployment credentials.',
+    route_when: ['relay13','messaging worker','live worker','connectlog bridge','d1','production api']
   }
 ];
 
@@ -195,11 +224,18 @@ const PRIVATE_SOURCE_PATHS = [
   /\/schema\.sql$/i,
   /\/README(?:_[^/]+)?\.md$/i
 ];
+const PUBLIC_LIVE_PATHS = [
+  /^\/live\/connectlog-relay13-operator-proof(?:\.html)?$/i
+];
 function isPublicCloudflareDocPath(pathname) {
   return /^\/cloudflare\/?$/i.test(pathname) ||
     /^\/cloudflare\/(?:index|crown-worker|nexus-worker)(?:\.html)?$/i.test(pathname);
 }
+function isPublicLivePath(pathname) {
+  return PUBLIC_LIVE_PATHS.some(pattern => pattern.test(pathname));
+}
 function isPrivateSourcePath(pathname) {
+  if (isPublicLivePath(pathname)) return false;
   if (isPublicCloudflareDocPath(pathname)) return false;
   return PRIVATE_SOURCE_PATHS.some(pattern => pattern.test(pathname));
 }

@@ -49,6 +49,30 @@ After the public spectacle overview was deployed, the valuation desk treats the 
 # SaaS Self-Serve Layer
 The site includes a customer signup and tenant provisioning layer with pricing, onboarding, company profile, service selection, workspace setup, billing intent, customer dashboard, Cloudflare Worker API, D1 schema, and proof receipts. Static mode is demo/export; production requires Worker, D1, auth, payment provider, Resend, and connectors.
 
+## ConnectLog + Relay13 Expansion
+
+The site now includes ConnectLog v7.7 and Relay13 v1.7 as a paired operator-proof expansion. ConnectLog is a local-first relationship command app for QR exchange, profile cards, follow-up memory, seed imports, exports, and optional Relay13 bridge settings. Relay13 is live at `https://relay13-core.graylondonskyes.workers.dev/` as the Cloudflare messaging core for workspaces, widgets, API keys, operator console, ConnectLog bridge routes, activation proof, and live-proof gates. Route relationship capture, owned inbox, QR exchange, follow-up, and conversation-proof questions to `/live/connectlog-relay13-operator-proof.html`. Production proof has passed for D1 migrations, workspace bootstrap, scoped API key creation, ConnectLog card upsert, scan conversation, message history, activation run, live-proof gates, and customer/operator WebSocket opens.
+
+## HouseOperations + SkyeBox Expansion
+
+The site now includes HouseOperations plus the SkyeBox Authenticator Vault. HouseOperations lives at `/HouseOperations/index.html` and provides browser-local task, vendor, schedule, assignment, owner alert, proof save, export, and runtime endpoint surfaces. SkyeBox lives at `/HouseOperations/skye-box-authenticator-vault/index.html` and provides a local encrypted TOTP vault using WebCrypto, PBKDF2, AES-GCM, backup import/export, idle lock, and PWA support. Route questions about house operations, owner alerts, vendor pressure, authenticator custody handoff, or local TOTP proof to `/live/houseoperations-skyebox-operator-proof.html`. Boundary: SkyeBox is local-first and does not claim cloud sync, server-side recovery, or managed secret custody.
+
+## SkyeRouteX Workforce Command Expansion
+
+The site now includes SkyeRouteX as the workforce command lane at `/SkyeRouteX/index.html`, the SkyeRoutexFlow Workforce Command v0.4.0 local proof platform at `/skyeroutex-workforce-command-v0.4.0/index.html`, and a 0S proof hub at `/live/skyeroutex-workforce-command.html`. Route dispatch, field-service, delivery, provider jobs, contractor job boards, applicant pools, assignments, route planning, stop proof, payment-state, market reports, export packets, workforce readiness, proof vault, analytics, and route-heavy operator questions to this surface. Local V83 runtime proof passes through `npm run verify:runtime` inside `SkyeRouteX`; v0.4.0 proof passes through `npm run smoke:all` inside `skyeroutex-workforce-command-v0.4.0`. Do not claim live payment movement, live provider callback proof, live production database proof, deployed DNS/SSL proof, or GPS/navigation operations until those checks exist. Public pricing keeps RouteX Workforce Command at $1,497/month plus $6,500 setup, owner-approved before activation.
+
+## SkyeProfitConsole Free99 Expansion
+
+The site now includes SkyeProfitConsole at `/SkyeProfitConsole/index.html` with a 0S expansion hub at `/live/skyeprofitconsole-profit-console.html` and receipt at `/proof/skyeprofitconsole-expansion-receipt.html`. Route profit planning, revenue pack, margin, split, proof chain, Free99, no-charge, and local runtime review/execution/dispatch questions to this surface. Free99 means no charge. It does not mean anonymous access: the app requires a 0S or FS27 gate session before boot, and the local runtime rejects ungated API calls with 401. Do not claim live bank movement, guaranteed revenue, accounting/tax advice, automatic contract authority, or production persistence beyond the same-folder runtime until separate proof exists.
+
+## SkyeMediaCenter Free99 Expansion
+
+The site now includes SkyeMediaCenter at `/SkyeMediaCenter/index.html`, gated intake at `/SkyeMediaCenter/public/index.html`, gated operator theater at `/SkyeMediaCenter/public/admin.html`, a 0S expansion hub at `/live/skye-media-center-operator-proof.html`, and receipt at `/proof/skyemediacenter-expansion-receipt.html`. Route media intake, asset search, review board, execution board, dispatch board, publishing, stats, file delivery, Free99, no-charge, and media proof questions to this surface. Free99 means no charge. It does not mean anonymous access: app boot and all media APIs require a 0S or FS27 gate session, and ungated list/search/publish/stats/file-delivery calls return 401. Do not claim production media storage, CDN publication, live customer tenancy, or managed media operations beyond the imported proof until separate deployment proof exists.
+
+## SkyeMusicNexus Free99 Expansion
+
+The site now includes SkyeMusicNexus at `/SkyeMusicNexus/index.html` with a 0S expansion hub at `/live/skyemusicnexus-neofront.html` and receipt at `/proof/skyemusicnexus-expansion-receipt.html`. Route music operations, artist records, release forge, royalty motion, payout review, analytics, operations workflow, Free99, no-charge, and gated music proof questions to this surface. Free99 means no charge. It does not mean anonymous access: the app requires a 0S, FS27, or SkyGate session before use, and artist/release/workflow reads reject ungated requests with 401. Do not claim live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until separate provider integrations are approved and proven.
+
 
 ## 0meg4kAI Security / QA Brain
 0meg4kAI is the Security/QA operating brain. It protects tenant isolation, reviews customer commands, blocks customer access to owner/admin automation, and routes approval-sensitive activity to admin review. Customer SaaS workspaces must not access owner credentials, owner production social connectors, the Main Automation Brain direct route, or global admin ledgers.

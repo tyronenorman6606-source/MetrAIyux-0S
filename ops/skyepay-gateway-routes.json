@@ -23,8 +23,9 @@
   "offer_map": {
     "starter-command": "metraiyux-starter-command",
     "growth-cabinet": "metraiyux-growth-cabinet",
+    "routex-workforce-command": "metraiyux-routex-workforce-command",
     "autonomous-office": "metraiyux-autonomous-office",
-    "enterprise-command": "skygatefs27-managed-control-plane",
+    "enterprise-command": "metraiyux-enterprise-command",
     "kaixu-starter": "skygatefs27-managed-control-plane",
     "kaixu-team": "skygatefs27-managed-control-plane",
     "kaixu-scale": "skygatefs27-managed-control-plane"
@@ -33,6 +34,32 @@
     "Public customer payment routes should point to SkyePay instead of loose external payment links.",
     "Stripe card data stays inside Stripe Checkout.",
     "FS27 owns order metadata, owner approval, and workspace unlock state.",
-    "Paid activation must remain pending until owner approval."
-  ]
+    "Paid activation must remain pending until owner approval.",
+    "SkyeProfitConsole is Free99/no charge and must not be routed to a paid checkout offer."
+  ],
+  "free99_non_checkout_routes": {
+    "skyeprofitconsole": {
+      "name": "SkyeProfitConsole",
+      "public_hub": "/live/skyeprofitconsole-profit-console.html",
+      "app": "/SkyeProfitConsole/index.html",
+      "price": "$0 setup + $0/mo",
+      "rule": "Free99 means no charge. Do not create a paid SkyePay offer. App boot and runtime actions still require a 0S or FS27 gate session."
+    }
+  },
+  "free99_routes": {
+    "skyemusicnexus": {
+      "label": "SkyeMusicNexus Free99 gated feature",
+      "price": "Free99 / $0",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "metraiyux_0s_site/live/skyemusicnexus-neofront.html"
+    },
+    "skyeprofitconsole": {
+      "label": "SkyeProfitConsole Free99 gated feature",
+      "price": "Free99 / $0",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "metraiyux_0s_site/live/skyeprofitconsole-profit-console.html"
+    }
+  }
 }

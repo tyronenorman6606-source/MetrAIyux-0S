@@ -48,6 +48,8 @@ function gatePolicyFromOrder(order) {
       trial_days: numberOrNull(offer.trial_days) || 0,
       deferred_one_time_cents: numberOrNull(offer.deferred_one_time_cents) || 0,
       credits: Array.isArray(offer.credits) ? offer.credits : [],
+      owner_approval_required: offer.owner_approval_required === true,
+      activation_path: clean(offer.activation_path, 180) || "auto_unlock_after_confirmed_payment",
       gate_policy: policy
     }
   };

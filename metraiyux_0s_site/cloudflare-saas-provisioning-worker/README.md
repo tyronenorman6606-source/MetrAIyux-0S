@@ -33,6 +33,14 @@ wrangler secret put STRIPE_SECRET_KEY
 wrangler deploy
 ```
 
+Stripe price IDs are synced from the repo root with:
+
+```bash
+node tools/sync-metraiyux-stripe-products.mjs
+```
+
+The 2026-05-17 live sync receipt is `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`. It moved the 0S lookup keys to the current Starter, Growth, RouteX, Autonomous, and Enterprise prices and archived stale live prices.
+
 ## SkyeMail Integration
 
 `POST /api/saas/workspaces` now calls SkyeMail through `src/skymail-sdk.js`.

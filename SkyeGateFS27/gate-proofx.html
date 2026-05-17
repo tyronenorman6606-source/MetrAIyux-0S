@@ -160,6 +160,12 @@
           <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Full System</a>
         </article>
         <article class="surface-card">
+          <span class="tag">Relationship Gate</span>
+          <h3>ConnectLog + Relay13 lane</h3>
+          <p>FS27 now tracks the ConnectLog relationship OS and Relay13 messaging Worker as a gate-owned expansion lane with mirrored proof events, live Worker links, and a strict no-public-secret boundary.</p>
+          <a class="btn" href="connectlog-relay13-gate.html">Open Gate Lane</a>
+        </article>
+        <article class="surface-card">
           <span class="tag">Brains</span>
           <h3>Public brain wall</h3>
           <p>The buyer-safe brain roster shows portraits, resumes, operating-room screenshots, and direct proof routes without exposing private admin controls.</p>
@@ -190,6 +196,10 @@
         <article class="map-node" role="listitem">
           <b>SkyeGateFS27</b>
           <p>The gate validates tokens, accepts mirrored events, manages platform keys, tracks deploy/push work, and centralizes admin control.</p>
+        </article>
+        <article class="map-node" role="listitem">
+          <b>ConnectLog + Relay13</b>
+          <p>Relationship capture, scoped messaging workspaces, activation proof, and live WebSocket evidence report back to the gate through the platform event mirror.</p>
         </article>
         <article class="map-node" role="listitem">
           <b>Proof and revenue loop</b>
@@ -231,6 +241,7 @@
           <tbody>
             <tr><td>Auth introspection</td><td><code>/auth-introspect</code> or <code>/.netlify/functions/auth-introspect</code></td><td>Apps verify bearer tokens through the gate.</td><td>Requires server-side token handling.</td></tr>
             <tr><td>Platform events</td><td><code>/platform/events</code></td><td>Apps mirror proof, monitor, task, and activity receipts.</td><td>Requires a server-only mirror secret.</td></tr>
+            <tr><td>ConnectLog + Relay13</td><td><code>/connectlog-relay13</code> and <code>/platform/events</code></td><td>Gate-owned proof lane for relationship capture, Relay13 workspace messaging, activation proof, and live WebSocket receipts.</td><td>Relay13 API keys and FS27 mirror secrets stay operator-side.</td></tr>
             <tr><td>Admin events</td><td><code>/admin/platform-events</code></td><td>Operators inspect mirrored history and monitor activity.</td><td>Admin protected.</td></tr>
             <tr><td>App login/session</td><td><code>/auth/app-login</code>, <code>/session/token</code></td><td>Bridges users into downstream apps without sharing owner secrets.</td><td>Configuration and approval required.</td></tr>
             <tr><td>Push/project tracking</td><td>SkyeGate Push routes</td><td>Deployment work can be tracked as a gate-owned surface.</td><td>Provider credentials stay admin controlled.</td></tr>

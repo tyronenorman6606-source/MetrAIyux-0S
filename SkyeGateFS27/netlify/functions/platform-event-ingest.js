@@ -32,6 +32,7 @@ function normalizeMeta(value) {
 function inferLane(type, meta) {
   const t = normalizeText(type, 160).toLowerCase();
   const joined = `${t} ${JSON.stringify(meta || {})}`.toLowerCase();
+  if (joined.includes("connectlog") || joined.includes("relay13") || joined.includes("websocket") || joined.includes("messaging") || joined.includes("relationship")) return "messaging";
   if (joined.includes("auth")) return "auth";
   if (joined.includes("push") || joined.includes("deploy") || joined.includes("github")) return "push";
   if (joined.includes("invoice") || joined.includes("billing") || joined.includes("payment") || joined.includes("checkout")) return "billing";

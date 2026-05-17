@@ -28,6 +28,7 @@
         <a href="marketplace.html">Marketplace</a>
         <a href="proof.html">Live Proof</a>
         <a href="valuation.html">Valuation</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
         <a class="nav-cta" href="index.html#pricing">Pricing</a>
       </div>
     </nav>
@@ -52,7 +53,7 @@
       <div class="two-col">
         <div class="reveal editorial-prose">
           <h3>What's in the package.</h3>
-          <p>522 HTML pages, 8 <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> kits with D1/KV/Queue bindings, a 17-brain command routing layer, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">0meg4kAI</span> security gateway, SkyeGate auth bridge, Stripe billing integration, and complete deployment documentation.</p>
+          <p>522 HTML pages, 8 <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> kits with D1/KV/Queue bindings, a 16-brain command routing layer, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">0meg4kAI</span> security gateway, SkyeGate auth bridge, Stripe billing integration, and complete deployment documentation.</p>
           <p>The static site deploys to Cloudflare Pages in under 30 minutes. The Worker backend deploys via wrangler. No proprietary cloud lock-in — you deploy on your own Cloudflare account.</p>
 
           <table class="comp-table" style="margin-top:24px;">
@@ -66,7 +67,7 @@
               <tr><td>Auth</td><td>SkyeGate token introspection, Bearer header validation, role/scope checking</td></tr>
               <tr><td>Email</td><td>Resend HTML approval notifications — wired to every Worker approval event</td></tr>
               <tr><td>Billing</td><td><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe checkout</span>, customer signup, workspace provisioning, subscription management</td></tr>
-              <tr><td>Marketplace platform</td><td>PHX Verified v23 local marketplace source package: 26,413 deduped profiles, claim/update packets, AE queues, exposure products, payment intent code, and upstream-auth-ready runtime contracts</td></tr>
+              <tr><td>Marketplace platform</td><td>PHX Verified v23 local marketplace source package: 26,413 deduped profiles, free public business landing visibility, claim/update packets, AE queues, exposure products, payment intent code, FS27 gate-auth adapter, and a free first-month customer landing/posting workflow</td></tr>
               <tr><td>Sales tools</td><td>Discovery blueprint, objection matrix, AE <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span>, proposal builder, revenue ops</td></tr>
             </tbody>
           </table>
@@ -91,6 +92,7 @@
             <ul style="font-size:13px;color:var(--muted);margin:0;padding-left:18px;line-height:1.8;">
               <li>The gate card is issued by FS27 on signup — session JWT or <code>kx_live_…</code> API key</li>
               <li>The SDK validates the card against FS27, reads plan limits, and routes commands automatically</li>
+              <li>After the first paid month clears, the same gate identity unlocks one queued PHX Verified public business landing</li>
               <li>Billing, email, AI providers, and audit storage all run on the operator's infrastructure</li>
               <li>Enterprise / white-label deployments can point the SDK at their own FS27 + Worker URLs</li>
             </ul>
@@ -179,7 +181,7 @@ const result = await client.command('Review the Acme proposal');
             <tr><td>Monthly cost</td><td class="yes">$297–$1,997</td><td class="partial">$15–$25/user</td><td class="partial">$7–$19/user</td><td class="no">$40K–$150K build</td><td class="partial">$249–$299/mo</td></tr>
           </tbody>
         </table>
-        <p style="font-size:12px;color:var(--muted);margin-top:14px;">MetrAIyux 0S has two intelligence layers: (1) deterministic 17-brain keyword routing — zero LLM cost per command, fully predictable, auditable approval gates; (2) kAIxu 6.7 — a proprietary sovereign AI model by Skyes Over London LC, available on Growth tier and above. Third-party tools route through their vendor's models. kAIxu is ours.</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px;">MetrAIyux 0S has two intelligence layers: (1) deterministic 16-brain keyword routing — zero LLM cost per command, fully predictable, auditable approval gates; (2) kAIxu 6.7 — a proprietary sovereign AI model by Skyes Over London LC, available on Growth tier and above. Third-party tools route through their vendor's models. kAIxu is ours.</p>
       </div>
     </section>
 
@@ -195,7 +197,7 @@ const result = await client.command('Review the Acme proposal');
         </div>
         <div class="reveal">
           <div class="objection">
-            <div class="q">"You said 17 brains — but it's not actually AI, right? It's just keyword matching?"</div>
+            <div class="q">"You said 16 brains — but it's not actually AI, right? It's just keyword matching?"</div>
             <div class="a">The platform has two intelligence layers. The brain routing layer uses deterministic keyword classification — no LLM cost, same command in, same routing outcome every time. That predictability is what makes the approval gates and proof receipts meaningful. On top of that, Growth tier and above includes access to kAIxu 6.7 — a proprietary sovereign AI model built and operated by Skyes Over London LC. kAIxu runs through our own gated worker infrastructure. It is not a public model. Customers interact with kAIxu. They never touch OpenAI, Anthropic, or Gemini directly.</div>
           </div>
           <div class="objection">
@@ -226,7 +228,7 @@ const result = await client.command('Review the Acme proposal');
         <p style="color:var(--muted);max-width:540px;margin:16px auto 0;font-size:15px;line-height:1.7;">The fastest way to evaluate MetrAIyux 0S is to look at the live system and then talk through your specific use case — operator deployment, white-label resale, or enterprise internal tool.</p>
         <div class="cta-row" style="justify-content:center;margin-top:26px;">
           <a class="btn-primary" href="index.html#pricing">View Plans &amp; Pricing</a>
-          <a class="btn-ghost" href="/" target="_blank" rel="noopener">See the Live System &rarr;</a>
+          <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">See the Live System &rarr;</a>
         </div>
       </div>
     </section>

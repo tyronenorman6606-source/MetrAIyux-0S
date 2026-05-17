@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the MetrAIyux 0S HouseOperations and SkyeBox encrypted authenticator vault expansion.">
+  <title>HouseOperations + SkyeBox Proof Receipt · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S Proof</span></a>
+    <nav>
+      <a href="../live/houseoperations-skyebox-operator-proof.html">Expansion Hub</a>
+      <a href="../HouseOperations/index.html">HouseOperations</a>
+      <a href="../HouseOperations/skye-box-authenticator-vault/index.html">SkyeBox</a>
+      <a href="../operator/index.html">Operator</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero">
+      <p class="eyebrow">Expansion receipt</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>HouseOperations + SkyeBox integration proof.</h1>
+      <p class="hero-copy">This receipt records what was unpacked, what was wired into the 0S, what passed local proof, and what still remains a live-deployment boundary.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="../HouseOperations/index.html">Open app</a>
+        <a class="button" href="../HouseOperations/skye-box-authenticator-vault/index.html">Open vault</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Source receipt</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Archive integrity</td><td>Passed</td><td><code>unzip -t</code> reported no errors before extraction.</td></tr>
+            <tr><td>Archive removal</td><td>Passed</td><td>The original SkyeBox zip was removed after extraction.</td></tr>
+            <tr><td>HouseOperations shell</td><td>Passed</td><td>Eight app pages plus nine static runtime endpoints are present under <code>HouseOperations/</code>.</td></tr>
+            <tr><td>SkyeBox static validation</td><td>Passed</td><td><code>node proof/static_validation.mjs</code> passes inside the vault folder.</td></tr>
+            <tr><td>TOTP crypto vectors</td><td>Passed</td><td><code>node proof/totp_crypto_vector_test.mjs</code> passes RFC-style TOTP and AES-GCM roundtrip checks.</td></tr>
+            <tr><td>Service worker cache</td><td>Corrected</td><td>The cache manifest now references lowercase <code>qa_report.md</code> and <code>upgrade_notes.md</code>, matching the extracted files.</td></tr>
+            <tr><td>Browser workflow proof</td><td>Recorded by test</td><td><code>metraiyux_0s_site/tests/houseoperations-skyebox-e2e.mjs</code> exercises both apps at desktop and mobile sizes, records WebM browser videos, and verifies the videos play in-browser.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What is wired</h2>
+      <div class="route-grid">
+        <a class="route-card" href="../live/houseoperations-skyebox-operator-proof.html"><h3>0S expansion hub</h3><p>Public/operator explanation, app links, commercial-scope decision, and boundary language.</p></a>
+        <a class="route-card" href="../pricing/index.html"><h3>Pricing surface</h3><p>Held-rate plan cards now list HouseOperations and SkyeBox scope by tier.</p></a>
+        <a class="route-card" href="../saas/pricing.html"><h3>SaaS pricing surface</h3><p>Customer plan comparison now includes house operations workspace and operator vault limits.</p></a>
+        <a class="route-card" href="../operator/index.html"><h3>Operator surface</h3><p>Internal launch control routes to HouseOperations, SkyeBox, and this receipt.</p></a>
+      </div>
+    </section>
+
+    <section class="section crown-band">
+      <p class="eyebrow">No-overclaim boundary</p>
+      <h2>This receipt proves local browser workflows, not managed custody.</h2>
+      <p class="wide">SkyeBox is an encrypted local PWA. It does not sync secrets to a server, recover a lost vault password, replace enterprise credential policy, or prove a deployed managed authenticator service. HouseOperations is a static local-state command app until a separate Worker/D1/KV persistence scope is approved and tested.</p>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S · HouseOperations + SkyeBox proof receipt</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

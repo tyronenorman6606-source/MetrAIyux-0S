@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the SkyeRouteX Workforce Command expansion inside MetrAIyux 0S.">
+  <title>SkyeRouteX Expansion Receipt - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="../index.html">Home</a><a href="../live/skyeroutex-workforce-command.html">RouteX Hub</a><a href="../SkyeRouteX/index.html">RouteX App</a><a href="proof-center.html">Proof Center</a></nav>
+  </header>
+
+  <main class="portal-shell">
+    <section class="hero slim">
+      <p class="eyebrow">Proof receipt</p>
+      <h1>SkyeRouteX is wired into 0S with a clear runtime boundary.</h1>
+      <p class="hero-copy">This receipt records the older V83 shell, the newly added SkyeRoutexFlow Workforce Command v0.4.0 local proof platform, what passed locally, where the buyer/operator should go, and what the public copy must not claim yet.</p>
+      <div class="hero-actions"><a class="button primary" href="../live/skyeroutex-workforce-command.html">Open expansion hub</a><a class="button" href="../skyeroutex-workforce-command-v0.4.0/index.html">Open v0.4.0</a><a class="button" href="../SkyeRouteX/runtime.html">Open V83 runtime lane</a></div>
+    </section>
+
+    <section class="section">
+      <h2>Verification summary</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Folders present inside 0S</td><td>Passed</td><td>`metraiyux_0s_site/SkyeRouteX` contains the V83 static shell; `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0` contains the local Node/API workforce command platform.</td></tr>
+            <tr><td>V83 runtime harness</td><td>Passed</td><td>`npm run verify:runtime` passed 16/16 V83 checks and regenerated `WHITE_GLOVE_V83/smoke_output_v83.json`.</td></tr>
+            <tr><td>v0.4.0 local API/browser harness</td><td>Passed</td><td>`npm run smoke:all` passed again on May 17, 2026 using the workspace Playwright Chromium cache. The suite covered browser panels, browser clicks, provider/contractor route flows, storage, S3-compatible signing, integrations, webhooks, native provider contracts, provider callback reconciliation, runtime bus, provider guards, security, integrity, audit chain, auth controls, admin invites, migrations, reset, deploy readiness, and SkyeHands mount.</td></tr>
+            <tr><td>Concurrency stress</td><td>Passed with boundary</td><td>`npm run 0s:skyeroutex:stress` passed at 608 requests with 8 providers, 48 contractors, 24 jobs, 96 applications, 32 assignments, 32 proof media writes, 32 export packets, and audit-chain validation. The fresh default run had no 500s and returned only 200/201 plus expected 409 assignment-lock conflicts, with p99 around 6.2s. A heavier run passed at 1,192 requests with 12 providers, 96 contractors, 48 jobs, 192 applications, 64 assignments, and 128 expected slot-lock conflicts after the local JSON adapter was cached/atomically compacted and mutating routes were serialized to prevent stale async writes. Heavy local JSON p99 was about 10.5s, so production throughput still requires Postgres/object storage/provider infrastructure.</td></tr>
+            <tr><td>Static RouteX pages</td><td>Passed</td><td>Dashboard, routes, stops, workforce, proof, analytics, runtime, and settings pages render the SkyeRouteX shell and action controls.</td></tr>
+            <tr><td>Static contract endpoints</td><td>Passed</td><td>V83 `health`, `status`, `v1/runtime-summary`, `v1/sessions`, `queue`, `handoff-packs`, `review-board`, `execution-board`, and `dispatch-board` are present. v0.4.0 wrapper pages now have relative static assets and an `app.html` static entry.</td></tr>
+            <tr><td>0S public wiring</td><td>Passed</td><td>Home, proof, operator, sales router, pricing, SaaS, live-surface registry, LLM notes, and sitemap reference SkyeRouteX. The expansion hub now links directly to v0.4.0, V83, proof, runtime, and SkyePay lanes.</td></tr>
+            <tr><td>SkyePay gate auth and pricing</td><td>Passed</td><td>`npm run gateway:skyepay:owner-approval`, `npm run proof:skyepay`, and `npm run gateway:skyepay:scan` passed. RouteX is exposed as `metraiyux-routex-workforce-command` at $6,500 setup plus $1,497/month, with `owner_approval_required=true`, `paid_pending_owner_approval` after payment, and no automatic workspace unlock.</td></tr>
+            <tr><td>Production provider proof</td><td>Gate proven, live infra not claimed</td><td>Deploy readiness now rejects production boot with local JSON/local file storage and passes only with recorded Postgres plus S3-compatible configuration. No live payment movement, live provider callback proof, live production database instance proof, DNS/SSL deployment proof, or GPS/navigation operations proof is claimed here.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Added public routes</h2>
+      <div class="route-grid">
+        <a class="route-card" href="../live/skyeroutex-workforce-command.html"><h3>RouteX Expansion Hub</h3><p>Buyer-safe 0S entry point for the workforce command lane.</p></a>
+        <a class="route-card" href="../skyeroutex-workforce-command-v0.4.0/index.html"><h3>v0.4.0 Platform Hub</h3><p>Static-safe wrapper for the new local proof platform.</p></a>
+        <a class="route-card" href="../skyeroutex-workforce-command-v0.4.0/public/index.html"><h3>v0.4.0 API UI</h3><p>Browser panels for markets, provider jobs, contractor feeds, assignments, proof, payments, exports, and audits when the API runtime is running.</p></a>
+        <a class="route-card" href="../SkyeRouteX/index.html"><h3>SkyeRouteX App</h3><p>The routed platform shell with dashboard, routes, stops, proof, analytics, and runtime views.</p></a>
+        <a class="route-card" href="../SkyeRouteX/apps/audit-ready-console/index.html"><h3>Audit Ready Console</h3><p>Embedded audit-ready console carried with the RouteX package.</p></a>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Pricing posture</p>
+        <h2>RouteX is an owner-approved workforce command lane.</h2>
+        <p class="wide">The current public offer keeps `RouteX Workforce Command` at $1,497/month plus $6,500 setup, owner-approved before activation. The lane now includes SkyeRoutexFlow v0.4.0 local API/browser proof, the V83 routed shell, provider job posting, contractor job boards, applicant pools, assignments, proof media, payment-state ledgers, market reports, export packets, and a production-provider deployment boundary.</p>
+      </div>
+      <aside class="operator-warning">
+        <h3>Operator note</h3>
+        <p>RouteX now has a named SkyePay offer, but activation still requires owner scope approval. Production work needs selected database, storage, payment, notification, identity/compliance, route-intelligence, DNS/SSL, and operational policy proof before live customer claims.</p>
+      </aside>
+    </section>
+  </main>
+
+  <footer><p>SkyeRouteX expansion receipt generated for the MetrAIyux 0S repo integration pass.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

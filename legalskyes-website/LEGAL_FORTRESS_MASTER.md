@@ -1,4 +1,4 @@
-# Skyes Over London / SOL Enterprises Legal Fortress
+# Skyes Over London / SOLEnterprises Legal Fortress
 
 Effective date: May 3, 2026
 
@@ -15,7 +15,7 @@ Core terms governing the entire Skyes Over London ecosystem.
 
 ### Acceptance
 
-These Master Terms of Service govern access to and use of websites, applications, SaaS products, AI systems, automations, communication services, media services, commerce tools, developer tools, logistics workflows, and related services operated by Skyes Over London LC, including Skyes Over London, SOL Enterprises, kAIxU, VANTA13, VantaCore, SkyeHands, Routex-related tooling, media platforms, commerce surfaces, and any affiliated product names we publish or license. By accessing or using any service, you agree to these terms and any additional product-specific terms shown to you.
+These Master Terms of Service govern access to and use of websites, applications, SaaS products, AI systems, automations, communication services, media services, commerce tools, developer tools, logistics workflows, and related services operated by Skyes Over London LC, including Skyes Over London, SOLEnterprises, kAIxU, VANTA13, VantaCore, SkyeHands, Routex-related tooling, media platforms, commerce surfaces, and any affiliated product names we publish or license. By accessing or using any service, you agree to these terms and any additional product-specific terms shown to you.
 
 ### Entity and ecosystem
 

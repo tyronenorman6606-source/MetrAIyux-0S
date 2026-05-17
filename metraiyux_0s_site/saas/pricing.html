@@ -11,7 +11,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S SaaS</span></a>
-    <nav><a href="index.html">SaaS</a><a href="pricing.html">Pricing</a><a href="skyepay.html">SkyePay</a><a href="signup.html">Signup</a><a href="customer-dashboard.html">Dashboard</a></nav>
+    <nav><a href="index.html">SaaS</a><a href="pricing.html">Pricing</a><a href="skyepay.html">SkyePay</a><a href="../live/houseoperations-skyebox-operator-proof.html">HouseOps</a><a href="signup.html">Signup</a><a href="customer-dashboard.html">Dashboard</a></nav>
   </header>
   <main class="portal-shell">
     <div class="topnav"><a href="../index.html">Home</a><a href="index.html">SaaS Hub</a><a href="pricing.html">Pricing</a><a href="skyepay.html"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span></a><a href="billing.html">Billing</a><a href="customer-onboarding.html">Onboarding</a><a href="tenant-provisioning.html">Provisioning</a><a href="#sovereign-stack">Sovereign Stack</a></div>
@@ -20,50 +20,90 @@
       <p class="eyebrow">Customer SaaS plans</p>
       <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
       <h1>Choose a plan with the limits shown before checkout.</h1>
-      <p class="hero-copy">Each plan has a named SkyePay offer, setup fee, monthly subscription, included workspace scope, gateway usage cap, request limits, device policy, vault limit, allowed AI model lane, and automatic payment-confirmed activation path. Every paid card exposes the customer-facing terms before checkout.</p>
-      <div class="button-row"><a class="button primary" href="skyepay.html">Open SkyePay gateway</a><a class="button" href="../pricing/index.html">Commercial terms</a></div>
+      <p class="hero-copy">Each plan has a named SkyePay offer, setup fee, monthly subscription, included workspace scope, gateway usage cap, request limits, device policy, vault limit, HouseOperations scope, SkyeBox local authenticator-vault handoff, allowed AI model lane, and activation path. Standard plans move to paid-pending owner approval after confirmed payment; the RouteX workforce lane now includes SkyeRoutexFlow v0.4.0 local API/browser proof and remains owner-approved until production provider proof is created. SkyeProfitConsole, SkyeMediaCenter, and SkyeMusicNexus are Free99, meaning no charge, but still require a gate session.</p>
+      <div class="button-row"><a class="button primary" href="skyepay.html">Open SkyePay gateway</a><a class="button" href="../pricing/index.html">Commercial terms</a><a class="button" href="../live/skyeprofitconsole-profit-console.html">Free99 Profit Console</a><a class="button" href="../live/skye-media-center-operator-proof.html">Free99 Media Center</a><a class="button" href="../live/skyemusicnexus-neofront.html">Free99 Music Nexus</a><a class="button" href="../live/houseoperations-skyebox-operator-proof.html">HouseOps + SkyeBox</a></div>
     </section>
 
     <section class="commercial-grid">
+      <article class="commercial-card featured" id="skyeprofitconsole-free99">
+        <p class="eyebrow">skyeprofitconsole-free99</p>
+        <h3>SkyeProfitConsole</h3>
+        <div class="commercial-price">Free99 <small>($0)</small></div>
+        <p><strong>Setup:</strong> $0</p>
+        <p>No charge access for gated 0S users. Free99 means no charge; it does not remove the gate session requirement.</p>
+        <div class="commercial-meta"><span>Gate session required</span><span>Profit packs</span><span>Split furnace</span><span>Proof chain</span><span>Runtime optional</span></div>
+        <ul class="limit-list"><li>Spatial profit field, pack forge, margin/split checks, signal loom, proof feed, and JSON export.</li><li>Optional same-folder runtime for review, execution, dispatch, and workflow timeline proof.</li><li>No paid checkout, no Stripe product, and no anonymous access.</li><li>Use client login or FS27 session to open the app.</li></ul>
+        <a class="saas-btn" href="../live/skyeprofitconsole-profit-console.html">Open Free99 hub</a>
+      </article>
+      <article class="commercial-card featured" id="skyemediacenter-free99">
+        <p class="eyebrow">skyemediacenter-free99</p>
+        <h3>SkyeMediaCenter</h3>
+        <div class="commercial-price">Free99 <small>($0)</small></div>
+        <p><strong>Setup:</strong> $0</p>
+        <p>No charge access for gated 0S users. Free99 means no charge; it does not remove the gate session requirement.</p>
+        <div class="commercial-meta"><span>Gate session required</span><span>Asset intake</span><span>Review lanes</span><span>Search + publish</span><span>Function proof</span></div>
+        <ul class="limit-list"><li>Experiential media app, intake portal, operator theater, media records, runtime spine, and proof forge.</li><li>Authenticated upload, review, execution, dispatch, search, publish, file delivery, stats, archive, and workflow timeline.</li><li>No paid checkout, no Stripe product, and no anonymous access.</li><li>Use client login, FS27 session, or SkyGate session to open the app.</li></ul>
+        <a class="saas-btn" href="../live/skye-media-center-operator-proof.html">Open Free99 media hub</a>
+      </article>
+      <article class="commercial-card featured" id="skyemusicnexus-free99">
+        <p class="eyebrow">skyemusicnexus-free99</p>
+        <h3>SkyeMusicNexus</h3>
+        <div class="commercial-price">Free99 <small>($0)</small></div>
+        <p><strong>Setup:</strong> $0</p>
+        <p>No charge access for gated 0S users. Free99 means no charge; it does not remove the gate session requirement.</p>
+        <div class="commercial-meta"><span>Gate session required</span><span>Artist stage</span><span>Release forge</span><span>Royalty ledger</span><span>No paid checkout</span></div>
+        <ul class="limit-list"><li>Experiential music app, artist records, release forge, operations queue, analytics prism, payout gate, and proof boundary.</li><li>Authenticated artist, release, payment, analytics, and workflow function calls with local SkyGate proof smoke.</li><li>No paid checkout, no Stripe product, and no anonymous access.</li><li>Use client login, FS27 session, or SkyGate session to open the app.</li></ul>
+        <a class="saas-btn" href="../live/skyemusicnexus-neofront.html">Open Free99 music hub</a>
+      </article>
       <article class="commercial-card">
         <p class="eyebrow">starter-command</p>
         <h3>Starter Command</h3>
-        <div class="commercial-price">$297 <small>/mo</small></div>
-        <p><strong>Setup:</strong> $997</p>
-        <p>Simple company OS room for intake, admin command, approval emails, local proof, and basic routing.</p>
-        <div class="commercial-meta"><span>1 workspace</span><span>25,000 AI credits/mo</span><span>30 rpm</span><span>600/day</span><span>2 devices</span></div>
-        <ul class="limit-list"><li>1GB vault storage and 250 vault files.</li><li>kAIxu nano + mini variants (Skyes Over London sovereign AI).</li><li>7-day trial when configured through SkyePay subscription checkout.</li><li>Workspace unlocks automatically after confirmed SkyePay payment.</li></ul>
+        <div class="commercial-price">$397 <small>/mo</small></div>
+        <p><strong>Setup:</strong> $1,500</p>
+        <p>Simple company OS room for intake, admin command, approval emails, relationship capture, local proof, and basic routing.</p>
+        <div class="commercial-meta"><span>1 workspace</span><span>25,000 AI credits/mo</span><span>30 rpm</span><span>1 ConnectLog seat</span><span>HouseOps preview</span><span>1 SkyeBox vault</span><span>Relay13 ready</span></div>
+        <ul class="limit-list"><li>1GB vault storage and 250 vault files.</li><li>kAIxu nano + mini variants (Skyes Over London sovereign AI).</li><li>HouseOperations local preview lane and one SkyeBox encrypted authenticator-vault handoff.</li><li>ConnectLog app plus Relay13 bridge setup guide; live messaging requires deployed Worker proof.</li><li>7-day trial when configured through SkyePay subscription checkout.</li><li>Workspace moves to paid-pending owner approval after confirmed SkyePay payment.</li></ul>
         <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command" data-plan="starter-command">Start through SkyePay</a>
       </article>
       <article class="commercial-card featured">
         <p class="eyebrow">growth-cabinet</p>
         <h3>Growth Cabinet</h3>
-        <div class="commercial-price">$797 <small>/mo</small></div>
-        <p><strong>Setup:</strong> $2,500</p>
-        <p>Recurring operating rhythm for service teams that need routing, proof exports, proposal paths, and client success workflows.</p>
-        <div class="commercial-meta"><span>3 workspaces</span><span>75,000 AI credits/mo</span><span>90 rpm</span><span>2,500/day</span><span>5 devices</span></div>
-        <ul class="limit-list"><li>5GB vault storage and 1,200 vault files.</li><li>kAIxu nano, mini, and 6.7 variants (Skyes Over London sovereign AI).</li><li>Weekly cabinet review and proof vault exports.</li><li>Plan policy is written into FS27 customer config after confirmed payment.</li></ul>
+        <div class="commercial-price">$997 <small>/mo</small></div>
+        <p><strong>Setup:</strong> $3,500</p>
+        <p>Recurring operating rhythm for service teams that need routing, relationship memory, proof exports, proposal paths, and client success workflows.</p>
+        <div class="commercial-meta"><span>3 workspaces</span><span>75,000 AI credits/mo</span><span>90 rpm</span><span>3 ConnectLog seats</span><span>1 HouseOps workspace</span><span>3 SkyeBox vaults</span><span>1 Relay13 workspace</span></div>
+        <ul class="limit-list"><li>5GB vault storage and 1,200 vault files.</li><li>kAIxu nano, mini, and 6.7 variants (Skyes Over London sovereign AI).</li><li>HouseOperations task, vendor, owner-alert, and proof workspace with three SkyeBox vault instances.</li><li>ConnectLog card variants, QR exchange, follow-up workflows, and Relay13 operator console setup path.</li><li>Weekly cabinet review and proof vault exports.</li><li>Plan policy is written into FS27 customer config after confirmed payment.</li></ul>
         <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet" data-plan="growth-cabinet">Start through SkyePay</a>
+      </article>
+      <article class="commercial-card" id="routex-workforce-command">
+        <p class="eyebrow">routex-workforce-command</p>
+        <h3>RouteX Workforce Command</h3>
+        <div class="commercial-price">$1,497 <small>/mo</small></div>
+        <p><strong>Setup:</strong> $6,500</p>
+        <p>Workforce route lane for SkyeRoutexFlow v0.4.0 provider jobs, applicant pools, contractor boards, assignments, route stops, proof vaults, market reports, export packets, analytics, and V83 local runtime verification.</p>
+        <div class="commercial-meta"><span>3 workspaces</span><span>100,000 AI credits/mo</span><span>120 rpm</span><span>5 RouteX seats</span><span>Owner-approved</span></div>
+        <ul class="limit-list"><li>10GB vault storage and 2,500 vault files.</li><li>1 SkyeRouteX workspace, 50 daily routes, 2,500 monthly stops.</li><li>Includes the SkyeRoutexFlow v0.4.0 local proof platform, SkyeRouteX routed shell, and local smoke receipt review.</li><li>Owner-approved activation required until production database, storage, payment, identity, route, and notification provider proof exists.</li></ul>
+        <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command" data-plan="routex-workforce-command">Open owner-approved SkyePay lane</a>
       </article>
       <article class="commercial-card">
         <p class="eyebrow">autonomous-office</p>
         <h3>Autonomous Office</h3>
-        <div class="commercial-price">$1,997 <small>/mo</small></div>
-        <p><strong>Setup:</strong> $5,000</p>
-        <p>Managed office lane with Cloudflare persistence kit, approval inboxes, business triage, daily digests, and connector readiness.</p>
-        <div class="commercial-meta"><span>8 workspaces</span><span>150,000 AI credits/mo</span><span>180 rpm</span><span>6,000/day</span><span>12 devices</span></div>
-        <ul class="limit-list"><li>20GB vault storage and 5,000 vault files.</li><li>kAIxu 6.7, pro, and max variants — full sovereign AI capability stack.</li><li>D1/KV/Queue setup guidance and launch room handoff.</li><li>External sends still run through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">approval gates</span>.</li></ul>
+        <div class="commercial-price">$2,497 <small>/mo</small></div>
+        <p><strong>Setup:</strong> $7,500</p>
+        <p>Managed office lane with Cloudflare persistence kit, approval inboxes, business triage, daily digests, relationship intelligence, owned messaging, and connector readiness.</p>
+        <div class="commercial-meta"><span>8 workspaces</span><span>150,000 AI credits/mo</span><span>180 rpm</span><span>8 ConnectLog seats</span><span>3 HouseOps workspaces</span><span>8 SkyeBox vaults</span><span>3 Relay13 workspaces</span></div>
+        <ul class="limit-list"><li>20GB vault storage and 5,000 vault files.</li><li>kAIxu 6.7, pro, and max variants — full sovereign AI capability stack.</li><li>Managed HouseOperations command rooms and SkyeBox local vault rollout with backup handoff.</li><li>ConnectLog operator-proof deployment center plus Relay13 Worker, D1 migration, activation-proof, and live-proof handoff path.</li><li>D1/KV/Queue setup guidance and launch room handoff.</li><li>External sends still run through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">approval gates</span>.</li></ul>
         <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office" data-plan="autonomous-office">Start through SkyePay</a>
       </article>
       <article class="commercial-card">
         <p class="eyebrow">managed-gate</p>
         <h3>Enterprise / Managed Gate</h3>
-        <div class="commercial-price">$2,497 <small>/mo</small></div>
-        <p><strong>Setup:</strong> $10,000</p>
-        <p>Custom gate policy for enterprise, government readiness, multi-branch operations, or dedicated control-plane support.</p>
-        <div class="commercial-meta"><span>Custom workspaces</span><span>Custom cap</span><span>Custom RPD</span><span>Custom devices</span></div>
-        <ul class="limit-list"><li>Written scope controls workspace, storage, AI, push, and reporting limits.</li><li>Custom allowlists and audit exports.</li><li>Owner-approved contract or invoice path can replace card checkout.</li></ul>
-        <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=skygatefs27-managed-control-plane" data-plan="enterprise-command">Discuss managed gate</a>
+        <div class="commercial-price">$3,997 <small>/mo</small></div>
+        <p><strong>Setup:</strong> $15,000</p>
+        <p>Custom gate policy for enterprise, government readiness, multi-branch operations, relationship intelligence, or dedicated control-plane support.</p>
+        <div class="commercial-meta"><span>Custom workspaces</span><span>Custom cap</span><span>Custom HouseOps policy</span><span>Custom SkyeBox policy</span><span>Custom ConnectLog seats</span><span>Custom Relay13 policy</span></div>
+        <ul class="limit-list"><li>Written scope controls workspace, storage, AI, push, HouseOperations, SkyeBox, messaging, and reporting limits.</li><li>Managed Relay13 workspace, domain, API-key, widget, and live-proof rollout.</li><li>Custom allowlists and audit exports.</li><li>Owner-approved contract or invoice path can replace card checkout.</li></ul>
+        <a class="saas-btn" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command" data-plan="enterprise-command">Discuss managed gate</a>
       </article>
     </section>
 
@@ -91,6 +131,12 @@
         <article class="saas-card"><h3>CitadelDB</h3><p>Use the sovereign database lane instead of Neon when an owner wants stack ownership and a migration path.</p></article>
         <article class="saas-card"><h3>SkyeVault</h3><p>Use the Vault for customer files, proof exports, docs, repo/package storage, and handoff packs instead of <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Google Drive</span> or GitHub-only storage.</p></article>
         <article class="saas-card"><h3><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span></h3><p>Use the sovereign business email lane for workspace inboxes, mailbox keys, and approval-sensitive sends.</p></article>
+        <article class="saas-card"><h3>HouseOperations</h3><p>Use the house command lane for tasks, vendors, schedules, owner alerts, proof saves, and exportable closeout.</p></article>
+        <article class="saas-card"><h3>SkyeBox</h3><p>Use the local encrypted authenticator-vault handoff for operator TOTP custody without cloud-sync overclaiming.</p></article>
+        <article class="saas-card"><h3>ConnectLog</h3><p>Use the relationship command lane for QR exchange, card variants, follow-up memory, and portable local network proof.</p></article>
+        <article class="saas-card"><h3>Relay13</h3><p>Use the owned messaging lane for workspaces, widgets, API keys, operator inboxes, and deployment-gated live-proof routes.</p></article>
+        <article class="saas-card"><h3>SkyeRouteX</h3><p>Use the workforce command lane for dispatch, route planning, stops, proof vaults, analytics, and local runtime receipts.</p></article>
+        <article class="saas-card"><h3>SkyeMusicNexus</h3><p>Use the music operating lane for gated artist records, release forge, royalty ledger motion, payout review, analytics, and operations proof.</p></article>
         <article class="saas-card"><h3>FS27 telemetry</h3><p>The 0S mirrors customer, workspace, billing, command, and UI action events to FS27 when the event mirror is configured.</p></article>
       </div>
     </section>
@@ -99,7 +145,7 @@
       <h2>What happens after payment</h2>
       <div class="commercial-grid">
         <article class="saas-card"><h3>1. <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe Checkout</span></h3><p>SkyePay creates the Checkout Session and stores the order, offer, customer email, line items, and policy snapshot.</p></article>
-        <article class="saas-card"><h3>2. Automatic unlock</h3><p>When Stripe confirms the SkyePay transaction, FS27 marks the workspace unlocked without a manual owner step.</p></article>
+        <article class="saas-card"><h3>2. Owner approval gate</h3><p>When Stripe confirms the SkyePay transaction, FS27 marks the order paid pending owner approval before workspace activation.</p></article>
         <article class="saas-card"><h3>3. Gate policy</h3><p>The confirmed plan writes monthly cap, RPM, RPD, device, model, workspace, file, and storage rules onto the customer record.</p></article>
         <article class="saas-card"><h3>4. Enforcement</h3><p>FS27 checks those rules before AI, embedding, stream, job, vault, and protected command usage.</p></article>
       </div>

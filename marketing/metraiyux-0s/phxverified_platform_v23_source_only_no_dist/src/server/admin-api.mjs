@@ -11,6 +11,7 @@ import { createExposureCheckoutSession, paymentServiceForApi } from './payment-s
 import { routeLeadForApi, buildQuoteRequestAction, buildLeadRouteDecisionAction, leadRoutingServiceForApi } from './lead-routing-service.mjs';
 import { buildOwnerMessageAction, ownerMessagingServiceForApi } from './owner-messaging-service.mjs';
 import { revenueAttributionServiceForApi } from './revenue-attribution-service.mjs';
+import { buildFirstMonthBusinessPosting, customerPostingEntitlementForApi } from './customer-posting-entitlement.mjs';
 
 function json(statusCode, body){ return { statusCode, headers:{ 'content-type':'application/json' }, body:JSON.stringify(body) }; }
 function isAdmin(actor = {}){ return actor.allowLocal || String(actor.roles || '').toLowerCase().split(/[|,\s]+/).includes('admin'); }
@@ -28,11 +29,12 @@ export async function handleAdminRequest({ method = 'GET', headers = {}, body = 
       if(query.lead_routing_service) return json(200, { ok:true, service:leadRoutingServiceForApi() });
       if(query.owner_messaging_service) return json(200, { ok:true, service:ownerMessagingServiceForApi() });
       if(query.revenue_attribution_service) return json(200, { ok:true, service:revenueAttributionServiceForApi() });
+      if(query.customer_posting_entitlement) return json(200, { ok:true, service:customerPostingEntitlementForApi() });
       if(query.queue) return json(200, { ok:true, queue:query.queue, records:await store.list(query.queue) });
       if(query.state === 'summary') return json(200, { ok:true, state:await stateStore.summary() });
       if(query.outbox === 'summary') return json(200, { ok:true, jobs:await webhookOutbox.list() });
       requireAdmin(actor);
-      return json(200, { ok:true, queues:await service.queueSummary(), state:await stateStore.summary(), operations:['approve_action','reject_action','replay_actions','export_change_set','process_outbox','create_exposure_order','create_checkout_session','create_quote_request','route_lead','draft_owner_message'] });
+      return json(200, { ok:true, queues:await service.queueSummary(), state:await stateStore.summary(), operations:['approve_action','reject_action','replay_actions','export_change_set','process_outbox','create_exposure_order','create_checkout_session','create_quote_request','route_lead','draft_owner_message','create_first_month_business_posting'] });
     }
     if(method !== 'POST') return json(405, { ok:false, error:'Method not allowed' });
     const parsed = parseBody(body);
@@ -57,6 +59,11 @@ export async function handleAdminRequest({ method = 'GET', headers = {}, body = 
       const action = buildOwnerMessageAction({ ...parsed.payload, actor, source:parsed.source || 'admin-api:owner-message' });
       const stored = await service.submit({ type:'owner_message', payload:action.payload, actor, source:'admin-api:owner-message' });
       return json(202, { ok:true, message:action.payload, action:stored.envelope || stored.action });
+    }
+    if(operation === 'create_first_month_business_posting'){
+      const action = buildFirstMonthBusinessPosting({ ...parsed.payload, actor, now:parsed.now || undefined });
+      const stored = await service.submit({ type:'customer_business_posting', payload:action.payload, actor, source:'admin-api:first-month-posting' });
+      return json(202, { ok:true, entitlement:customerPostingEntitlementForApi(), action:stored.envelope || stored.action });
     }
     if(operation === 'create_exposure_order'){
       const result = buildExposureOrder({ ...parsed.payload, actor, source:parsed.source || 'admin-api' });

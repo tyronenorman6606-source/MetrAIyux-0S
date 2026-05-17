@@ -83,6 +83,12 @@ export default wrap(async (req) => {
       scope: session.scope
     }),
     refresh_token: refresh.token,
+    pin_gate: {
+      setup_endpoint: "/auth/pin/setup",
+      login_endpoint: "/auth/pin/login",
+      recovery_endpoint: "/auth/recovery/login",
+      note: "After signup/login, the user can set a generated Gate ID + PIN credential and receive one-time recovery codes."
+    },
     verification: {
       required: true,
       delivery: emailDelivery,

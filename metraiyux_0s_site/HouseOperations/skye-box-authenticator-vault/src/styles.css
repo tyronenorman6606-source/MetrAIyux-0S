@@ -1,0 +1,66 @@
+/* MCP-visible SkyeBox surface layer. The base app keeps its critical CSS inline for PWA/offline boot. */
+:root {
+  --skyebox-gate: #73ffd0;
+}
+
+body {
+  scrollbar-color: rgba(115, 255, 208, 0.68) rgba(255, 255, 255, 0.08);
+}
+
+body::-webkit-scrollbar {
+  width: 14px;
+}
+
+body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body::-webkit-scrollbar-thumb {
+  border: 3px solid rgba(8, 8, 16, 0.92);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f6c55c, #73ffd0);
+}
+
+.gate-card {
+  border-color: rgba(115, 255, 208, 0.28);
+  background:
+    linear-gradient(135deg, rgba(115, 255, 208, 0.1), rgba(142, 92, 255, 0.08)),
+    rgba(255, 255, 255, 0.045);
+}
+
+.gate-card .btn {
+  text-decoration: none;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(115, 255, 208, 0.75), transparent);
+  pointer-events: none;
+}
+
+.account-card,
+.info-card,
+.auth-card,
+.main-panel {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.account-card:hover,
+.info-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(115, 255, 208, 0.26);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-card,
+  .info-card,
+  .auth-card,
+  .main-panel {
+    transition: none;
+  }
+}

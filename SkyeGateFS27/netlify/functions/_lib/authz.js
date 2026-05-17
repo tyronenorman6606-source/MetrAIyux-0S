@@ -8,6 +8,7 @@ function baseSelect() {
   return `select k.id as api_key_id, k.customer_id, k.key_last4, k.label, k.role,
                  k.monthly_cap_cents as key_cap_cents, k.rpm_limit, k.rpd_limit,
                  k.max_devices, k.require_install_id, k.allowed_providers, k.allowed_models,
+                 k.expires_at, k.metadata as key_metadata,
                  c.monthly_cap_cents as customer_cap_cents, c.is_active,
                  c.default_rpm_limit as customer_default_rpm_limit,
                  c.default_rpd_limit as customer_default_rpd_limit,
@@ -27,7 +28,9 @@ export async function lookupKey(plainKey) {
   const preferred = keyHashHex(plainKey);
   let keyRes = await q(
     `${baseSelect()}
-     where k.key_hash=$1 and k.revoked_at is null
+     where k.key_hash=$1
+       and k.revoked_at is null
+       and (k.expires_at is null or k.expires_at > now())
      limit 1`,
     [preferred]
   );
@@ -38,7 +41,9 @@ export async function lookupKey(plainKey) {
     const legacy = legacyKeyHashHex(plainKey);
     keyRes = await q(
       `${baseSelect()}
-       where k.key_hash=$1 and k.revoked_at is null
+       where k.key_hash=$1
+         and k.revoked_at is null
+         and (k.expires_at is null or k.expires_at > now())
        limit 1`,
       [legacy]
     );
@@ -64,7 +69,9 @@ export async function lookupKey(plainKey) {
 export async function lookupKeyById(api_key_id) {
   const keyRes = await q(
     `${baseSelect()}
-     where k.id=$1 and k.revoked_at is null
+     where k.id=$1
+       and k.revoked_at is null
+       and (k.expires_at is null or k.expires_at > now())
      limit 1`,
     [api_key_id]
   );
@@ -198,6 +205,14 @@ export function roleAtLeast(actual, required) {
 
 export function requireKeyRole(keyRow, requiredRole) {
   const actual = (keyRow?.role || "deployer").toLowerCase();
+  const cardType = keyRow?.key_metadata?.card_type || keyRow?.key_metadata?.type || null;
+  if (cardType === "pentest_hour_key" && requiredRole !== "viewer") {
+    const err = new Error("Pentest cards cannot perform mutating deployment/admin operations");
+    err.status = 403;
+    err.code = "PENTEST_CARD_SCOPE_LIMIT";
+    err.hint = "This one-hour tester card is allowed for gateway/read testing only.";
+    throw err;
+  }
   if (!roleAtLeast(actual, requiredRole)) {
     const err = new Error("Forbidden");
     err.status = 403;

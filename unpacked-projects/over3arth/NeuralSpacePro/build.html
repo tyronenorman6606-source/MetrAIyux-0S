@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head><!-- QuantumSkyes mount: SkyeDexia Neural -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NeuralSpacePro Build Pipeline: Commission website builds and inspect queued drafts.">
+  <link rel="canonical" href="https://quantumskyes.netlify.app/runtime/standalone-apps/NeuralSpacePro/">
+  <title>NeuralSpacePro - Build Pipeline</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060811;
+      --panel: rgba(12, 17, 32, .92);
+      --panel-2: rgba(18, 27, 48, .78);
+      --line: rgba(255,255,255,.12);
+      --text: #edf7ff;
+      --muted: rgba(237,247,255,.66);
+      --cyan: #57d7ff;
+      --pink: #ff4f9a;
+      --gold: #f5cf6b;
+      --green: #66f2a5;
+      --red: #ff6b6b;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { overflow: hidden; }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    a { color: inherit; }
+    .app { height: 100vh; display: grid; grid-template-columns: 290px minmax(0, 1fr); background:
+      radial-gradient(circle at 12% 12%, rgba(87,215,255,.14), transparent 30%),
+      radial-gradient(circle at 80% 6%, rgba(255,79,154,.11), transparent 26%),
+      linear-gradient(135deg, #060811, #0a0d18 48%, #070912); }
+    .sidebar { border-right: 1px solid var(--line); background: rgba(5,8,18,.82); backdrop-filter: blur(20px); padding: 18px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 16px; min-height: 0; }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid rgba(87,215,255,.32); border-radius: var(--radius); background: linear-gradient(135deg, rgba(87,215,255,.16), rgba(255,79,154,.10)); color: var(--cyan); font-weight: 900; box-shadow: 0 0 24px rgba(87,215,255,.12); }
+    .brand h1 { margin: 0; font-size: 17px; line-height: 1.05; letter-spacing: 0; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .status-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .metric { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; background: rgba(255,255,255,.045); }
+    .metric strong { display: block; font-size: 18px; line-height: 1; }
+    .metric span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    .nav { display: grid; gap: 6px; align-content: start; overflow: auto; padding-right: 2px; }
+    .nav [data-view] { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; width: 100%; border: 1px solid transparent; border-radius: var(--radius); padding: 10px; background: transparent; color: rgba(237,247,255,.78); text-align: left; cursor: pointer; text-decoration: none; }
+    .nav [data-view]:hover, .nav [data-view].active { border-color: rgba(87,215,255,.24); background: rgba(87,215,255,.08); color: #fff; }
+    .nav em { color: var(--muted); font-style: normal; font-size: 11px; }
+    .sidebar-actions { display: grid; gap: 8px; }
+    .btn { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.06); padding: 10px 12px; cursor: pointer; font-weight: 800; }
+    .btn:hover { border-color: rgba(87,215,255,.42); background: rgba(87,215,255,.1); }
+    .btn.primary { border-color: transparent; background: linear-gradient(135deg, var(--cyan), var(--pink)); color: #02040b; }
+    .main { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto 1fr; }
+    .topbar { min-height: 70px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 22px; background: rgba(6,8,17,.62); backdrop-filter: blur(18px); }
+    .topbar h2 { margin: 0; font-size: clamp(22px, 3vw, 34px); line-height: 1; letter-spacing: 0; }
+    .topbar p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .content { overflow: auto; padding: 22px; }
+    .view { display: none; }
+    .view.active { display: block; animation: enter .18s ease-out; }
+    @keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .grid { display: grid; gap: 14px; }
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.22); }
+    .card h3 { margin: 0 0 8px; font-size: 15px; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 13px; }
+    .kicker { margin: 0 0 9px; color: var(--cyan); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 900; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 14px; margin-bottom: 14px; }
+    .hero-title { font-size: clamp(42px, 8vw, 92px); margin: 0; line-height: .88; letter-spacing: 0; }
+    .hero-title span { background: linear-gradient(135deg, var(--cyan), var(--pink), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .chip { border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; color: rgba(237,247,255,.72); background: rgba(255,255,255,.045); font-size: 11px; }
+    .list { display: grid; gap: 8px; }
+    .row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; background: rgba(255,255,255,.04); }
+    .row strong { font-size: 13px; }
+    .row small { display: block; margin-top: 3px; color: var(--muted); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 18px currentColor; color: var(--muted); }
+    .dot.live { background: var(--green); color: var(--green); }
+    .dot.warn { background: var(--gold); color: var(--gold); }
+    .dot.off { background: var(--red); color: var(--red); }
+    .badge { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--muted); font-size: 11px; }
+    .progress { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 10px; }
+    .progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), var(--pink), var(--gold)); }
+    .terminal { background: #03050a; border: 1px solid rgba(87,215,255,.16); border-radius: var(--radius); padding: 13px; color: #b8f4ff; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; min-height: 220px; overflow: auto; white-space: pre-wrap; }
+    .split { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 14px; }
+    textarea, input { width: 100%; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.055); padding: 11px 12px; outline: none; }
+    textarea { min-height: 160px; resize: vertical; }
+    textarea:focus, input:focus { border-color: rgba(87,215,255,.48); }
+    .canvas-wrap { position: relative; min-height: 520px; border: 1px solid var(--line); border-radius: var(--radius); background: radial-gradient(circle at center, rgba(87,215,255,.12), #03050a); overflow: hidden; }
+    #neuralMap { width: 100%; height: 520px; display: block; }
+    .canvas-overlay { position: absolute; left: 14px; top: 14px; right: 14px; display: flex; justify-content: space-between; gap: 12px; pointer-events: none; }
+    .canvas-overlay span { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(3,5,10,.72); padding: 8px 10px; color: var(--muted); font-size: 12px; }
+    .toast { position: fixed; right: 18px; bottom: 18px; max-width: 360px; border: 1px solid rgba(87,215,255,.25); border-radius: var(--radius); padding: 12px 14px; background: rgba(5,8,18,.95); color: #fff; box-shadow: 0 20px 70px rgba(0,0,0,.45); opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s ease; z-index: 20; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 920px) {
+      body { overflow: auto; }
+      .app { min-height: 100vh; height: auto; grid-template-columns: 1fr; }
+      .sidebar { position: static; min-height: auto; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .main { min-height: 100vh; }
+      .hero, .split, .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-route-page="build" data-route-label="Build Pipeline">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">♛</div>
+        <div>
+          <h1>NeuralSpacePro</h1>
+          <p>Real platform shell · v2.3.0</p>
+        </div>
+      </div>
+      <div class="status-strip">
+        <div class="metric"><strong id="metricKnowledge">60</strong><span>Knowledge</span></div>
+        <div class="metric"><strong id="metricQueue">0</strong><span>Queue</span></div>
+        <div class="metric"><strong id="metricSessions">0</strong><span>Sessions</span></div>
+        <div class="metric"><strong id="metricPacks">0</strong><span>Handoff</span></div>
+      </div>
+      <nav class="nav" id="nav">
+        <a href="/runtime/standalone-apps/NeuralSpacePro/dashboard.html" data-view="dashboard"><span>◈</span><strong>Dashboard</strong><em>live</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/knowledge.html" data-view="knowledge"><span>▤</span><strong>Knowledge Vault</strong><em>60</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/runtime.html" data-view="runtime"><span>↯</span><strong>Worker Runtime</strong><em id="runtimeNavState">static</em></a>
+        <a class="active" href="/runtime/standalone-apps/NeuralSpacePro/build.html" data-view="build"><span>⌁</span><strong>Build Pipeline</strong><em>site gen</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/research.html" data-view="research"><span>◎</span><strong>Research Sessions</strong><em>archive</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/handoff.html" data-view="handoff"><span>⇄</span><strong>Handoff Packs</strong><em>boards</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/map.html" data-view="map"><span>✦</span><strong>3D Neural Map</strong><em>canvas</em></a>
+        <a href="/runtime/standalone-apps/NeuralSpacePro/settings.html" data-view="settings"><span>⚙</span><strong>Settings</strong><em>local</em></a>
+      </nav>
+      <div class="sidebar-actions">
+        <button class="btn primary" id="quickPing">Ping Runtime</button>
+        <button class="btn" id="quickBuild">Commission Build</button>
+        <button class="btn" id="quickMap">Open Neural Map</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="viewTitle">Build Pipeline</h2>
+          <p id="viewSubtitle">Commission website builds and inspect queued drafts.</p>
+        </div>
+        <div class="toolbar">
+          <a class="btn" href="/runtime/standalone-apps/NeuralSpacePro/skydexia-royalty-legacy.html">Legacy Royalty View</a>
+          <a class="btn" href="/runtime/standalone-apps/NeuralSpacePro/neural-space-pro.html">Original View</a>
+        </div>
+      </header>
+
+      <section class="content">
+        <section class="view" id="view-dashboard">
+          <div class="hero">
+            <div class="card">
+              <p class="kicker">Sovereign Intelligence Runtime</p>
+              <h2 class="hero-title"><span>Neural Space</span><br>Platform</h2>
+              <p style="margin-top:16px;color:var(--muted);line-height:1.65">This is now a platform workspace, not a single-scroll landing page. Use the left rail to move through the knowledge vault, runtime contract, build pipeline, research archive, handoff boards, and 3D neural map.</p>
+              <div class="chip-row">
+                <span class="chip">same-origin static shell</span>
+                <span class="chip">local runtime aware</span>
+                <span class="chip">worker contract visible</span>
+                <span class="chip">SkyeHands handoff lanes</span>
+              </div>
+            </div>
+            <div class="card">
+              <p class="kicker">Runtime Health</p>
+              <div class="list" id="healthList"></div>
+            </div>
+          </div>
+          <div class="grid cols-3" id="dashboardCards"></div>
+        </section>
+
+        <section class="view" id="view-knowledge">
+          <div class="grid cols-2">
+            <div class="card">
+              <p class="kicker">Knowledge Categories</p>
+              <div class="list" id="knowledgeList"></div>
+            </div>
+            <div class="card">
+              <p class="kicker">Latest Pack</p>
+              <h3>SkyDexia Knowledge Pack 2026-05-02</h3>
+              <p>The release manifest registers the latest knowledge pack and 60 total files across core, architecture, memory, brain, design, operations, WebCreator, and pack lanes.</p>
+              <div class="progress"><span style="width:100%"></span></div>
+              <div class="chip-row">
+                <span class="chip">Memory Fabric v6.8.1</span>
+                <span class="chip">90GB brain drive</span>
+                <span class="chip">WebCreator bridge</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-runtime">
+          <div class="split">
+            <div class="card">
+              <p class="kicker">Worker Connection</p>
+              <div class="list">
+                <label>Runtime base URL<input id="runtimeUrl" autocomplete="off"></label>
+                <label>Worker secret<input id="runtimeSecret" autocomplete="off" placeholder="optional"></label>
+                <p class="chip">Secret is kept for this browser session only.</p>
+              </div>
+              <div class="chip-row">
+                <button class="btn primary" id="saveRuntime">Save Runtime</button>
+                <button class="btn" id="pingRuntime">Ping</button>
+                <button class="btn" id="loadRuntime">Load Summary</button>
+              </div>
+              <p class="chip">Same-origin local runtime: the worker can run on the same origin when this folder is served by its local runtime.</p>
+            </div>
+            <div class="card">
+              <p class="kicker">Runtime Console</p>
+              <div class="terminal" id="runtimeConsole"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view active" id="view-build">
+          <div class="split">
+            <div class="card">
+              <p class="kicker">Commission Site Build</p>
+              <label>Project name<input id="buildName" placeholder="Example: AI intake landing page"></label>
+              <div style="height:10px"></div>
+              <label>Brief<textarea id="buildBrief" placeholder="Describe the website, pages, style, target customer, data sources, and deliverables."></textarea></label>
+              <div class="chip-row">
+                <button class="btn primary" id="submitBuild">Send to Runtime</button>
+                <button class="btn" id="queueStaticBuild">Queue Static Draft</button>
+              </div>
+            </div>
+            <div class="card">
+              <p class="kicker">Build Queue</p>
+              <p>A connected worker can run the 5-step pipeline; static mode keeps drafts local until that worker is available.</p>
+              <div class="list" id="buildQueue"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-research">
+          <div class="grid cols-2">
+            <div class="card">
+              <p class="kicker">Session Archive</p>
+              <h3>Same-Origin Session Archive</h3>
+              <p>Sites reported by the connected worker and research sessions from the same-origin runtime appear here.</p>
+              <div class="list" id="sessionList"></div>
+            </div>
+            <div class="card">
+              <p class="kicker">Research Lane</p>
+              <p>When the local runtime is live, sessions are pulled from `/v1/sessions`. Without it, this panel keeps a local static proof trail so the platform still behaves as a platform in production.</p>
+              <div class="chip-row"><button class="btn" id="recordSession">Run Research Session</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-handoff">
+          <div class="card" style="margin-bottom:14px">
+            <p class="kicker">System Handoff Pack</p>
+            <h3>Work This Handoff</h3>
+            <p>Archive Handoff Pack targets: SkyeLeadVault, SkyeWebCreatorMax, AE-FlowPro, and SkyeProofx.</p>
+          </div>
+          <div class="grid cols-3">
+            <div class="card"><p class="kicker">Review Board</p><div class="list" id="reviewBoard"></div></div>
+            <div class="card"><p class="kicker">Execution Board</p><div class="list" id="executionBoard"></div></div>
+            <div class="card"><p class="kicker">Dispatch Board</p><div class="list" id="dispatchBoard"></div></div>
+            <div class="card"><p class="kicker">Workflow Timeline</p><p>The same-origin workflow timeline endpoint keeps review, execution, and dispatch movement visible.</p></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-map">
+          <div class="canvas-wrap">
+            <canvas id="neuralMap"></canvas>
+            <div class="canvas-overlay">
+              <span>Drag-free rotating knowledge graph</span>
+              <span id="mapLabel">SkyeDexia Neural</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-settings">
+          <div class="grid cols-2">
+            <div class="card">
+              <p class="kicker">Edition Links</p>
+              <div class="list">
+                <a class="row" href="/runtime/standalone-apps/NeuralSpacePro/skydexia-royalty-legacy.html"><span>♛</span><strong>SkyeDexia Royalty Legacy<small>The previous long landing page, preserved for reference.</small></strong><span class="badge">legacy</span></a>
+                <a class="row" href="/runtime/standalone-apps/NeuralSpacePro/neural-space-pro.html"><span>✦</span><strong>Original Neural Space Pro<small>Standard violet/cyan edition.</small></strong><span class="badge">legacy</span></a>
+              </div>
+            </div>
+            <div class="card">
+              <p class="kicker">Local State</p>
+              <p>This platform stores runtime URL, local build drafts, and local session notes in this browser.</p>
+              <p class="chip">Worker routes: /runtime/standalone-apps/NeuralSpacePro/health, /runtime/standalone-apps/NeuralSpacePro/status, /runtime/standalone-apps/NeuralSpacePro/v1/runtime-summary, /runtime/standalone-apps/NeuralSpacePro/v1/sessions, /runtime/standalone-apps/NeuralSpacePro/.netlify/functions/gateway-chat, /runtime/standalone-apps/NeuralSpacePro/build-website, /runtime/standalone-apps/NeuralSpacePro/projects, /runtime/standalone-apps/NeuralSpacePro/queue, /runtime/standalone-apps/NeuralSpacePro/project-artifacts/, /runtime/standalone-apps/NeuralSpacePro/artifacts/, /runtime/standalone-apps/NeuralSpacePro/handoff-packs, /runtime/standalone-apps/NeuralSpacePro/review-board, /runtime/standalone-apps/NeuralSpacePro/execution-board, /runtime/standalone-apps/NeuralSpacePro/dispatch-board, /runtime/standalone-apps/NeuralSpacePro/workflow-timeline.</p>
+              <p class="chip">Knowledge pack nodes: SKYDEXIA_AI_BOOT_PROMPT.md and skydexia_knowledge_chunks.jsonl.</p>
+              <div class="chip-row"><button class="btn" id="clearLocal">Clear Local Platform State</button></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="/runtime/standalone-apps/NeuralSpacePro/assets/vendor/three.min.js"></script>
+  <script>
+    const manifest = {
+      product: 'NeuralSpacePro',
+      version: '2.3.0',
+      knowledge: 60,
+      providers: ['OpenAI', 'Anthropic', 'Google', 'Mistral', 'Perplexity', 'Runware', 'Local Worker', 'SkyeHands'],
+      categories: ['core', 'architecture', 'memory', 'brain', 'design', 'operations', 'webcreator', 'knowledge pack'],
+      routes: ['/health', '/status', '/v1/runtime-summary', '/v1/sessions', '/handoff-packs', '/build-website', '/queue/drain'],
+      cards: [
+        ['Knowledge Vault', '60 registered files across 8 categories, with latest pack surfaced and categorized.', '100%'],
+        ['Provider Matrix', 'Eight provider lanes represented with live/static status indicators.', '87%'],
+        ['Build Pipeline', 'Website build contract, queue events, artifacts, and quality score flow.', '78%'],
+        ['Research Archive', 'Session recording and runtime summary lanes for local proof harness work.', '72%'],
+        ['Handoff Boards', 'Review, execution, and dispatch boards aligned to SkyeHands downstream work.', '81%'],
+        ['3D Neural Map', 'Interactive Three.js knowledge graph for category and platform structure.', '100%']
+      ]
+    };
+
+    const stateKey = 'skydexia.neural.platform.v2';
+    const workerUrlKey = 'sdx_worker_url';
+    const workerSecretKey = 'sdx_worker_secret';
+    const state = JSON.parse(localStorage.getItem(stateKey) || '{}');
+    state.queue ||= [];
+    state.sessions ||= [];
+    state.handoff ||= [
+      { lane: 'review', label: 'Artifact review', status: 'queued', owner: 'SkyeDexia' },
+      { lane: 'execution', label: 'Activation ready', status: 'mapped', owner: 'SkyeHands' },
+      { lane: 'dispatch', label: 'Platform delivery', status: 'standby', owner: 'QuantumSkyes' }
+    ];
+    state.runtimeUrl ||= localStorage.getItem(workerUrlKey) || location.origin + '/runtime/standalone-apps/NeuralSpacePro';
+    state.runtimeSecret = sessionStorage.getItem('sdx_worker_secret') || '';
+
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+    const views = new Set(['dashboard', 'knowledge', 'runtime', 'build', 'research', 'handoff', 'map', 'settings']);
+    const save = () => {
+      const { runtimeSecret, ...persistedState } = state;
+      localStorage.setItem(stateKey, JSON.stringify(persistedState));
+      localStorage.setItem(workerUrlKey, state.runtimeUrl);
+    };
+    const toast = msg => {
+      const el = $('#toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast.t);
+      toast.t = setTimeout(() => el.classList.remove('show'), 2600);
+    };
+    const log = msg => {
+      const el = $('#runtimeConsole');
+      el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n` + el.textContent;
+    };
+    const headers = () => {
+      const h = { 'content-type': 'application/json' };
+      const secret = sessionStorage.getItem('sdx_worker_secret') || state.runtimeSecret;
+      if (secret) h['x-worker-secret'] = secret;
+      return h;
+    };
+    async function api(path, options = {}) {
+      const base = state.runtimeUrl.replace(/\/$/, '');
+      const res = await fetch(base + path, { ...options, headers: { ...headers(), ...(options.headers || {}) } });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { ok: res.ok, raw: text.slice(0, 500) }; }
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      return data;
+    }
+
+    function render() {
+      $('#metricKnowledge').textContent = manifest.knowledge;
+      $('#metricQueue').textContent = state.queue.length;
+      $('#metricSessions').textContent = state.sessions.length;
+      $('#metricPacks').textContent = state.handoff.length;
+      $('#runtimeUrl').value = state.runtimeUrl;
+      $('#runtimeSecret').value = state.runtimeSecret;
+      renderHealth();
+      renderDashboardCards();
+      renderKnowledge();
+      renderQueue();
+      renderSessions();
+      renderBoards();
+    }
+
+    function renderHealth() {
+      $('#healthList').innerHTML = [
+        ['Platform shell', 'Live in browser, same-origin mounted under /runtime/standalone-apps/NeuralSpacePro/.', 'live'],
+        ['Local runtime', state.runtimeLive ? 'Runtime API responded during this session.' : 'Static mode until local/runtime API responds.', state.runtimeLive ? 'live' : 'warn'],
+        ['Worker secret', state.runtimeSecret ? 'Secret configured in this browser session.' : 'No secret set. Secret is kept for this browser session only.', state.runtimeSecret ? 'live' : 'warn'],
+        ['Legacy views', 'Royalty and original long-page editions preserved as explicit legacy links.', 'live']
+      ].map(([title, sub, dot]) => row(title, sub, dot)).join('');
+    }
+
+    function renderDashboardCards() {
+      $('#dashboardCards').innerHTML = manifest.cards.map(([title, desc, pct]) => `
+        <article class="card">
+          <h3>${title}</h3>
+          <p>${desc}</p>
+          <div class="progress"><span style="width:${pct}"></span></div>
+          <div class="chip-row"><span class="chip">${pct} readiness</span></div>
+        </article>
+      `).join('');
+    }
+
+    function renderKnowledge() {
+      $('#knowledgeList').innerHTML = manifest.categories.map((name, index) => row(name, `${index === 7 ? 'Latest pack surface' : 'Registered knowledge lane'} · ${index + 5} files mapped`, index > 5 ? 'warn' : 'live', `${index + 5}`)).join('');
+    }
+
+    function renderQueue() {
+      $('#buildQueue').innerHTML = state.queue.length ? state.queue.map(item => row(item.name, item.brief, item.remote ? 'live' : 'warn', item.status)).join('') : '<p>No build drafts queued yet.</p>';
+    }
+
+    function renderSessions() {
+      $('#sessionList').innerHTML = state.sessions.length ? state.sessions.map(item => row(item.title, item.note, 'live', item.at)).join('') : '<p>No research sessions recorded yet.</p>';
+    }
+
+    function renderBoards() {
+      for (const lane of ['review', 'execution', 'dispatch']) {
+        const el = $(`#${lane}Board`);
+        el.innerHTML = state.handoff.filter(item => item.lane === lane).map(item => row(item.label, `Owner: ${item.owner}`, item.status === 'queued' ? 'warn' : 'live', item.status)).join('') || '<p>No items.</p>';
+      }
+    }
+
+    function row(title, sub, dot = 'live', badge = '') {
+      return `<div class="row"><span class="dot ${dot}"></span><strong>${title}<small>${sub}</small></strong><span class="badge">${badge}</span></div>`;
+    }
+
+    function switchView(id) {
+      if (!views.has(id)) id = 'dashboard';
+      $$('.nav [data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === id));
+      $$('.view').forEach(view => view.classList.toggle('active', view.id === `view-${id}`));
+      const active = $(`.nav [data-view="${id}"] strong`)?.textContent || 'Dashboard';
+      $('#viewTitle').textContent = active;
+      $('#viewSubtitle').textContent = {
+        dashboard: 'Command surface for knowledge, worker state, build queue, research archive, and handoff flow.',
+        knowledge: 'Categorized knowledge files and latest pack state.',
+        runtime: 'Same-origin/local worker connection and API console.',
+        build: 'Commission website builds and inspect queued drafts.',
+        research: 'Runtime research sessions and local proof records.',
+        handoff: 'Review, execution, and dispatch boards for downstream delivery.',
+        map: 'Three.js neural graph of SkyeDexia knowledge and platform nodes.',
+        settings: 'Local settings, state controls, and legacy edition links.'
+      }[id] || '';
+      if (id === 'map') setTimeout(initMap, 60);
+    }
+
+    function viewFromPath() {
+      const page = location.pathname.split('/').pop().replace(/\.html$/, '');
+      if (!page || page === 'index') return 'dashboard';
+      return views.has(page) ? page : 'dashboard';
+    }
+
+    async function pingRuntime() {
+      log(`Pinging ${state.runtimeUrl}/health`);
+      try {
+        const data = await api('/health');
+        state.runtimeLive = true;
+        $('#runtimeNavState').textContent = 'live';
+        log(`Runtime OK: ${JSON.stringify(data).slice(0, 260)}`);
+        toast('SkyeDexia runtime responded.');
+      } catch (err) {
+        state.runtimeLive = false;
+        $('#runtimeNavState').textContent = 'static';
+        log(`Runtime unavailable: ${err.message}`);
+        toast('Runtime unavailable; static platform mode remains active.');
+      }
+      save();
+      renderHealth();
+    }
+
+    async function loadRuntime() {
+      try {
+        const data = await api('/v1/runtime-summary');
+        state.runtimeLive = true;
+        state.sessions = Array.from({ length: data.sessionCount || 0 }, (_, i) => ({ title: `Runtime session ${i + 1}`, note: `Loaded from runtime summary`, at: data.latestRecordedAt || 'runtime' }));
+        log(`Runtime summary loaded: ${JSON.stringify(data, null, 2)}`);
+        toast('Runtime summary loaded.');
+      } catch (err) {
+        log(`Summary failed: ${err.message}`);
+        toast('Runtime summary unavailable.');
+      }
+      save();
+      render();
+    }
+
+    async function submitBuild(remote = true) {
+      const name = $('#buildName').value.trim() || 'SkyeDexia Website Build';
+      const brief = $('#buildBrief').value.trim();
+      if (!brief) return toast('Add a build brief first.');
+      const item = { name, brief, status: remote ? 'sending' : 'static-draft', remote: false, at: new Date().toISOString() };
+      state.queue.unshift(item);
+      save();
+      renderQueue();
+      if (!remote) return toast('Static build draft queued.');
+      try {
+        const tenant = 'skydexia-neural-runtime';
+        const data = await api('/build-website', { method: 'POST', body: JSON.stringify({ siteName: name, brief, actorId:'skydexia-neural', tenantId:tenant }) });
+        item.status = 'runtime-accepted';
+        item.remote = true;
+        item.result = data;
+        log(`Build accepted: ${JSON.stringify(data).slice(0, 420)}`);
+        toast('Build sent to runtime.');
+      } catch (err) {
+        item.status = 'local-fallback';
+        log(`Build runtime unavailable, kept locally: ${err.message}`);
+        toast('Runtime unavailable; build kept as local draft.');
+      }
+      save();
+      render();
+    }
+
+    function recordSession() {
+      state.sessions.unshift({
+        title: 'Local research note',
+        note: 'Static production session recorded from Neural Space Pro platform shell.',
+        at: new Date().toLocaleString()
+      });
+      save();
+      render();
+      toast('Local research session recorded.');
+    }
+
+    function clearLocal() {
+      localStorage.removeItem(stateKey);
+      localStorage.removeItem(workerUrlKey);
+      sessionStorage.removeItem(workerSecretKey);
+      toast('Local state cleared. Reloading.');
+      setTimeout(() => location.reload(), 500);
+    }
+
+    let mapReady = false;
+    function initMap() {
+      const canvas = $('#neuralMap');
+      if (!window.THREE) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#03050a';
+          ctx.fillRect(0, 0, canvas.width || 900, canvas.height || 520);
+        }
+        return;
+      }
+      if (mapReady) return;
+      mapReady = true;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, 1, .1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      const nodes = [];
+      scene.add(new THREE.AmbientLight(0xffffff, .45));
+      const light = new THREE.PointLight(0x57d7ff, 3, 300);
+      light.position.set(0, 30, 80);
+      scene.add(light);
+      const colors = [0x57d7ff, 0xff4f9a, 0xf5cf6b, 0x66f2a5, 0xb48cff, 0xff8a5c, 0xe8c4a0, 0xffffff];
+      const center = sphere(0, 0, 0, 2.8, 0x57d7ff, 'SkyeDexia Core');
+      scene.add(center);
+      manifest.categories.forEach((name, i) => {
+        const a = i / manifest.categories.length * Math.PI * 2;
+        const mesh = sphere(Math.cos(a) * 13, Math.sin(i * 1.7) * 3, Math.sin(a) * 13, 1.3, colors[i], name);
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([center.position, mesh.position]), new THREE.LineBasicMaterial({ color: colors[i], transparent: true, opacity: .32 }));
+        scene.add(mesh, line);
+        nodes.push(mesh);
+      });
+      camera.position.set(0, 9, 28);
+      function sphere(x, y, z, r, color, label) {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 32), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .35, roughness: .28, metalness: .25 }));
+        mesh.position.set(x, y, z);
+        mesh.userData.label = label;
+        return mesh;
+      }
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+        renderer.setSize(rect.width, rect.height, false);
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+      }
+      function tick() {
+        requestAnimationFrame(tick);
+        scene.rotation.y += .0025;
+        nodes.forEach((node, i) => node.position.y += Math.sin(Date.now() * .001 + i) * .002);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      tick();
+    }
+
+    $('#nav').addEventListener('click', event => {
+      const link = event.target.closest('a[data-view]');
+      if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      history.pushState({}, '', link.href);
+      switchView(link.dataset.view);
+    });
+    window.addEventListener('popstate', () => switchView(viewFromPath()));
+    $('#quickPing').addEventListener('click', () => { history.pushState({}, '', './runtime.html'); switchView('runtime'); pingRuntime(); });
+    $('#quickBuild').addEventListener('click', () => { history.pushState({}, '', './build.html'); switchView('build'); });
+    $('#quickMap').addEventListener('click', () => { history.pushState({}, '', './map.html'); switchView('map'); });
+    $('#saveRuntime').addEventListener('click', () => {
+      state.runtimeUrl = $('#runtimeUrl').value.trim() || location.origin + '/runtime/standalone-apps/NeuralSpacePro';
+      state.runtimeSecret = $('#runtimeSecret').value.trim();
+      if (state.runtimeSecret) {
+        sessionStorage.setItem(workerSecretKey, state.runtimeSecret);
+      } else {
+        sessionStorage.removeItem(workerSecretKey);
+      }
+      save();
+      toast('Runtime settings saved.');
+      render();
+    });
+    $('#pingRuntime').addEventListener('click', pingRuntime);
+    $('#loadRuntime').addEventListener('click', loadRuntime);
+    $('#submitBuild').addEventListener('click', () => submitBuild(true));
+    $('#queueStaticBuild').addEventListener('click', () => submitBuild(false));
+    $('#recordSession').addEventListener('click', recordSession);
+    $('#clearLocal').addEventListener('click', clearLocal);
+
+    render();
+    switchView(viewFromPath());
+    log('NeuralSpacePro Build Pipeline route ready.');
+  </script>
+</body>
+</html>

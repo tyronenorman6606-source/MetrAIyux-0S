@@ -40,27 +40,69 @@ Source files:
 - `metraiyux_0s_site/data/plans.json`
 - `metraiyux_0s_site/saas/pricing.html`
 - `metraiyux_0s_site/saas/billing.html`
+- `metraiyux_0s_site/live/connectlog-relay13-operator-proof.html`
+- `metraiyux_0s_site/proof/connectlog-relay13-expansion-receipt.html`
+- `metraiyux_0s_site/live/skyeroutex-workforce-command.html`
+- `metraiyux_0s_site/proof/skyeroutex-expansion-receipt.html`
+- `metraiyux_0s_site/SkyeRouteX/PLATFORM_CONTRACT.json`
+- `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/package.json`
+- `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/README.md`
+- `metraiyux_0s_site/live/houseoperations-skyebox-operator-proof.html`
+- `metraiyux_0s_site/proof/houseoperations-skyebox-expansion-receipt.html`
+- `metraiyux_0s_site/HouseOperations/PLATFORM_CONTRACT.json`
+- `metraiyux_0s_site/live/skyeprofitconsole-profit-console.html`
+- `metraiyux_0s_site/proof/skyeprofitconsole-expansion-receipt.html`
+- `metraiyux_0s_site/SkyeProfitConsole/PLATFORM_TRUTH.json`
+- `metraiyux_0s_site/live/skyemusicnexus-neofront.html`
+- `metraiyux_0s_site/proof/skyemusicnexus-expansion-receipt.html`
+- `metraiyux_0s_site/SkyeMusicNexus/PLATFORM_TRUTH.json`
 
-Role: canonical MetrAIyux 0S client subscription plans. These are ready to create in Stripe.
+Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRouteX workforce command lane, the held-rate HouseOperations + SkyeBox scope expansion, and the Free99 SkyeProfitConsole and SkyeMusicNexus features. Standard plans are ready to create in Stripe. RouteX has a named SkyePay offer, but activation stays owner-approved until production provider proof is selected and verified. HouseOperations + SkyeBox does not create new Stripe products in this pass. SkyeProfitConsole and SkyeMusicNexus are Free99, meaning no charge, and still require a gate session.
 
 ### Create In Stripe
 
 | Product | Price nickname | Type | Amount | Billing | Lookup key | Metadata |
 | --- | --- | --- | ---: | --- | --- | --- |
-| MetrAIyux 0S - Starter Command | Starter Command monthly | Recurring | $297.00 | Monthly | `metraiyux_starter_command_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=starter-command`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
-| MetrAIyux 0S - Starter Command Setup | Starter Command setup | One-time | $997.00 | Once | `metraiyux_starter_command_setup` | same as above, `setup_for=starter-command` |
-| MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $797.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
-| MetrAIyux 0S - Growth Cabinet Setup | Growth Cabinet setup | One-time | $2,500.00 | Once | `metraiyux_growth_cabinet_setup` | same as above, `setup_for=growth-cabinet` |
-| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $1,997.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
-| MetrAIyux 0S - Autonomous Office Setup | Autonomous Office setup | One-time | $5,000.00 | Once | `metraiyux_autonomous_office_setup` | same as above, `setup_for=autonomous-office` |
-| MetrAIyux 0S - Enterprise | Enterprise monthly | Recurring | $2,497.00 | Monthly | `metraiyux_enterprise_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=enterprise`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain` |
-| MetrAIyux 0S - Enterprise Setup | Enterprise setup | One-time | $10,000.00 | Once | `metraiyux_enterprise_setup` | same as above, `setup_for=enterprise` |
+| MetrAIyux 0S - Starter Command | Starter Command monthly | Recurring | $397.00 | Monthly | `metraiyux_starter_command_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=starter-command`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_static_ready` |
+| MetrAIyux 0S - Starter Command Setup | Starter Command setup | One-time | $1,500.00 | Once | `metraiyux_starter_command_setup` | same as above, `setup_for=starter-command` |
+| MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $997.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map` |
+| MetrAIyux 0S - Growth Cabinet Setup | Growth Cabinet setup | One-time | $3,500.00 | Once | `metraiyux_growth_cabinet_setup` | same as above, `setup_for=growth-cabinet` |
+| MetrAIyux 0S - RouteX Workforce Command | RouteX Workforce Command monthly | Recurring | $1,497.00 | Monthly | `metraiyux_routex_workforce_command_monthly` | `source_folder=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0`, `plan_id=routex-workforce-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=marcus-vale-brain`, `includes=skyeroutex_v040_api_browser_proof_v83_local_runtime` |
+| MetrAIyux 0S - RouteX Workforce Command Setup | RouteX Workforce Command setup | One-time | $6,500.00 | Once | `metraiyux_routex_workforce_command_setup` | same as above, `setup_for=routex-workforce-command` |
+| MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $2,497.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_v040_handoff` |
+| MetrAIyux 0S - Autonomous Office Setup | Autonomous Office setup | One-time | $7,500.00 | Once | `metraiyux_autonomous_office_setup` | same as above, `setup_for=autonomous-office` |
+| MetrAIyux 0S - Enterprise | Enterprise monthly | Recurring | $3,997.00 | Monthly | `metraiyux_enterprise_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=enterprise-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=managed_connectlog_relay13_houseops_skyebox_custom_skyeroutex_v040` |
+| MetrAIyux 0S - Enterprise Setup | Enterprise setup | One-time | $15,000.00 | Once | `metraiyux_enterprise_setup` | same as above, `setup_for=enterprise` |
+
+### Live Stripe Sync Receipt
+
+Synced on 2026-05-17 from the root `.env` Stripe credentials into account `acct_1Seml2HEgCmnlKPJ`. Receipt: `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`.
+
+| Lookup key | Live Price ID | Amount | Status |
+| --- | --- | ---: | --- |
+| `metraiyux_starter_command_setup` | `price_1TY9TxHEgCmnlKPJ0mBR8cwZ` | $1,500.00 once | Replaced stale $997 setup price and archived the old price. |
+| `metraiyux_starter_command_monthly` | `price_1TY9TyHEgCmnlKPJTl703ekt` | $397.00/mo | Replaced stale $297/mo price and archived the old price. |
+| `metraiyux_growth_cabinet_setup` | `price_1TY9TzHEgCmnlKPJqXBTbH5Y` | $3,500.00 once | Replaced stale $2,500 setup price and archived the old price. |
+| `metraiyux_growth_cabinet_monthly` | `price_1TY9TzHEgCmnlKPJqFm0FhAS` | $997.00/mo | Replaced stale $797/mo price and archived the old price. |
+| `metraiyux_routex_workforce_command_setup` | `price_1TY9U1HEgCmnlKPJPNiPFacB` | $6,500.00 once | Created live price. |
+| `metraiyux_routex_workforce_command_monthly` | `price_1TY9U1HEgCmnlKPJ8s3kF0eC` | $1,497.00/mo | Created live price. |
+| `metraiyux_autonomous_office_setup` | `price_1TY9U2HEgCmnlKPJPqDe4Cqr` | $7,500.00 once | Replaced stale $5,000 setup price and archived the old price. |
+| `metraiyux_autonomous_office_monthly` | `price_1TY9U2HEgCmnlKPJq5d7ccZs` | $2,497.00/mo | Replaced stale $1,997/mo price and archived the old price. |
+| `metraiyux_enterprise_setup` | `price_1TY9U3HEgCmnlKPJ7ACUntvj` | $15,000.00 once | Replaced stale $10,000 setup price and archived the old price. |
+| `metraiyux_enterprise_monthly` | `price_1TY9U4HEgCmnlKPJSWLllIxH` | $3,997.00/mo | Replaced stale $2,497/mo price and archived the old price. |
+| `skygatefs27_managed_gate_onboarding` | `price_1TXzxUHEgCmnlKPJblNj18GS` | $12,500.00 once | Reused current live price. |
+| `skygatefs27_managed_control_plane_monthly` | `price_1TXzxTHEgCmnlKPJegZKYyZH` | $1,250.00/mo | Reused current live price. |
+| `skygatefs27_lane_maintenance_monthly` | `price_1TXzxVHEgCmnlKPJI2ByxaOg` | $249.00/mo | Reused current live price. |
 
 ### Quote Only
 
 | Offer | Stripe action | Reason |
 | --- | --- | --- |
-| Enterprise / Government Readiness | See table above — Enterprise now has a fixed base price at $2,497/mo. Custom quotes/invoices for scope beyond the base. | |
+| Enterprise / Government Readiness | See table above. Enterprise now has a fixed base price at $3,997/mo after the ConnectLog + Relay13, HouseOperations + SkyeBox, and SkyeRouteX expansion. Custom quotes/invoices for scope beyond the base. | |
+| HouseOperations + SkyeBox as standalone managed custody | Do not create new Stripe products yet. | Added to existing MetrAIyux plan scope at held rates. Standalone pricing requires a separate managed-security custody policy and live deployment proof. |
+| SkyeProfitConsole Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S or FS27 gate session, and runtime calls reject ungated requests. |
+| SkyeMusicNexus Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S, FS27, or SkyGate session, and music artist/release/workflow reads reject ungated requests. |
+| RouteX production deployment beyond local proof | Use custom scope before activation. | v0.4.0 proves local API/browser flows; production database, storage, payment, notification, identity/compliance, route-intelligence, DNS/SSL, and live operations must be selected and verified. |
 | `metraiyux_0s_site/pricing/*.html` 13-cabinet package pages | Do not create Stripe products yet. | Files explicitly say pricing is demonstrative/placeholder and must be edited before client use. |
 
 ## Folder: `Metraiyux-Marketing`

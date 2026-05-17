@@ -23,6 +23,35 @@ function parseModels(v) {
   return null;
 }
 
+function parseMetadata(v) {
+  if (v === null || v === undefined) return {};
+  if (typeof v === "object" && !Array.isArray(v)) return v;
+  if (typeof v === "string") {
+    const s = v.trim();
+    if (!s) return {};
+    try {
+      const parsed = JSON.parse(s);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+function parseExpiresAt(body = {}) {
+  if (body.expires_at === null) return null;
+  if (body.expires_at) {
+    const date = new Date(body.expires_at);
+    return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+  }
+  const ttl = Number.parseInt(body.ttl_minutes ?? body.ttlMinutes ?? "", 10);
+  if (Number.isFinite(ttl) && ttl > 0) {
+    return new Date(Date.now() + ttl * 60 * 1000).toISOString();
+  }
+  return null;
+}
+
 export default wrap(async (req) => {
   const cors = buildCors(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
@@ -38,7 +67,7 @@ export default wrap(async (req) => {
     const reveal_key_id = url.searchParams.get("reveal_key_id") ? parseInt(url.searchParams.get("reveal_key_id"), 10) : null;
     if (reveal_key_id) {
       const row = await q(
-        `select id, key_last4, label, encrypted_key, revoked_at from api_keys where id=$1 limit 1`,
+        `select id, key_last4, label, encrypted_key, revoked_at, expires_at from api_keys where id=$1 limit 1`,
         [reveal_key_id]
       );
       if (!row.rowCount) return json(404, { error: "Key not found" }, cors);
@@ -49,7 +78,7 @@ export default wrap(async (req) => {
       if (!plainKey) return json(500, { error: "Decryption returned empty — encryption key mismatch" }, cors);
 
       await audit("admin", "KEY_REVEAL", `key:${reveal_key_id}`);
-      return json(200, { id: k.id, key_last4: k.key_last4, label: k.label, key: plainKey }, cors);
+      return json(200, { id: k.id, key_last4: k.key_last4, label: k.label, expires_at: k.expires_at || null, key: plainKey }, cors);
     }
 
     // --- List all keys for a customer ---
@@ -57,6 +86,7 @@ export default wrap(async (req) => {
     const res = await q(
       `select id, key_last4, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
               max_devices, require_install_id, allowed_providers, allowed_models,
+              expires_at, metadata,
               created_at, revoked_at,
               (encrypted_key is not null) as can_reveal
        from api_keys
@@ -90,6 +120,8 @@ export default wrap(async (req) => {
     const require_install_id = Object.prototype.hasOwnProperty.call(body, "require_install_id") ? !!body.require_install_id : null;
     const allowed_providers = parseProviders(body.allowed_providers);
     const allowed_models = parseModels(body.allowed_models);
+    const expires_at = parseExpiresAt(body);
+    const metadata = parseMetadata(body.metadata);
 
     const key = randomKey("kx_live_");
     const key_hash = keyHashHex(key);
@@ -98,21 +130,23 @@ export default wrap(async (req) => {
 
     const ins = await q(
       `insert into api_keys(customer_id, key_hash, key_last4, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
-                           max_devices, require_install_id, allowed_providers, allowed_models, encrypted_key)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+                           max_devices, require_install_id, allowed_providers, allowed_models, encrypted_key, expires_at, metadata)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb)
        returning id, created_at`,
       [cid, key_hash, key_last4, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
        Number.isFinite(max_devices) ? max_devices : null,
        require_install_id,
        allowed_providers,
        allowed_models,
-       encrypted_key]
+       encrypted_key,
+       expires_at,
+       JSON.stringify(metadata)]
     );
 
     await audit("admin", "KEY_CREATE", `key:${ins.rows[0].id}`,
-      { customer_id: cid, label, role, monthly_cap_cents, rpm_limit, rpd_limit, max_devices, require_install_id, allowed_providers, allowed_models });
+      { customer_id: cid, label, role, monthly_cap_cents, rpm_limit, rpd_limit, max_devices, require_install_id, allowed_providers, allowed_models, expires_at, metadata });
 
-    return json(200, { api_key: { id: ins.rows[0].id, key_last4, label, created_at: ins.rows[0].created_at, key } }, cors);
+    return json(200, { api_key: { id: ins.rows[0].id, key_last4, label, created_at: ins.rows[0].created_at, expires_at, metadata, key } }, cors);
   }
 
   if (req.method === "DELETE") {
@@ -179,6 +213,14 @@ export default wrap(async (req) => {
       updates.push(`allowed_models=$${p++}`);
       params.push(parseModels(body.allowed_models));
     }
+    if (Object.prototype.hasOwnProperty.call(body, "expires_at") || Object.prototype.hasOwnProperty.call(body, "ttl_minutes") || Object.prototype.hasOwnProperty.call(body, "ttlMinutes")) {
+      updates.push(`expires_at=$${p++}`);
+      params.push(parseExpiresAt(body));
+    }
+    if (Object.prototype.hasOwnProperty.call(body, "metadata")) {
+      updates.push(`metadata=$${p++}::jsonb`);
+      params.push(JSON.stringify(parseMetadata(body.metadata)));
+    }
 
     if (updates.length) {
       params.push(key_id);
@@ -189,6 +231,7 @@ export default wrap(async (req) => {
     const out = await q(
       `select id, key_last4, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
               max_devices, require_install_id, allowed_providers, allowed_models,
+              expires_at, metadata,
               created_at, revoked_at
        from api_keys where id=$1`,
       [key_id]
@@ -203,7 +246,8 @@ export default wrap(async (req) => {
 
     const old = await q(
       `select customer_id, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
-              max_devices, require_install_id, allowed_providers, allowed_models
+              max_devices, require_install_id, allowed_providers, allowed_models,
+              expires_at, metadata
        from api_keys where id=$1`,
       [rotate_key_id]
     );
@@ -217,11 +261,11 @@ export default wrap(async (req) => {
 
     const ins = await q(
       `insert into api_keys(customer_id, key_hash, key_last4, label, role, monthly_cap_cents, rpm_limit, rpd_limit,
-                           max_devices, require_install_id, allowed_providers, allowed_models, encrypted_key)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+                           max_devices, require_install_id, allowed_providers, allowed_models, encrypted_key, expires_at, metadata)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb)
        returning id, created_at`,
       [o.customer_id, key_hash, key_last4, o.label, (o.role || 'deployer'), o.monthly_cap_cents, o.rpm_limit, o.rpd_limit,
-       o.max_devices, o.require_install_id, o.allowed_providers, o.allowed_models, encrypted_key]
+       o.max_devices, o.require_install_id, o.allowed_providers, o.allowed_models, encrypted_key, o.expires_at || null, JSON.stringify(o.metadata || {})]
     );
 
     await q(`update api_keys set revoked_at=now() where id=$1 and revoked_at is null`, [rotate_key_id]);

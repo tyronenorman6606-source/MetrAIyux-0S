@@ -20,10 +20,28 @@ async function sizeOf(target){
   return total;
 }
 function smallPage({ title, eyebrow, h1, text:body, dataHref, cards = [] }){
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>${html(title)} | PHX Verified</title><meta name="robots" content="noindex,nofollow,noarchive"/><link rel="stylesheet" href="/assets/styles.css"/></head><body><main class="page"><section class="hero glass subhero"><div><p class="eyebrow">${html(eyebrow)}</p><h1>${html(h1)}</h1><p class="hero-text">${html(body)}</p><div class="hero-actions">${dataHref ? `<a class="btn primary" href="${html(dataHref)}">Open model</a>` : ''}<a class="btn" href="/protected-admin/">Protected admin</a></div></div></section><section class="section glass"><div class="tile-grid">${cards.map(c=>`<article class="platform-tile"><span>${html(c.kicker || 'v22')}</span><h3>${html(c.title)}</h3><p>${html(c.body)}</p></article>`).join('')}</div></section></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>${html(title)} | Valley Verified</title><meta name="robots" content="noindex,nofollow,noarchive"/><link rel="stylesheet" href="/assets/styles.css"/></head><body><main class="page"><section class="hero glass subhero"><div><p class="eyebrow">${html(eyebrow)}</p><h1>${html(h1)}</h1><p class="hero-text">${html(body)}</p><div class="hero-actions">${dataHref ? `<a class="btn primary" href="${html(dataHref)}">Open model</a>` : ''}<a class="btn" href="/protected-admin/">Protected admin</a></div></div></section><section class="section glass"><div class="tile-grid">${cards.map(c=>`<article class="platform-tile"><span>${html(c.kicker || 'v22')}</span><h3>${html(c.title)}</h3><p>${html(c.body)}</p></article>`).join('')}</div></section></main></body></html>`;
 }
 function sample(list, count = 50){ return Array.isArray(list) ? list.slice(0, count) : []; }
-function minimalBusiness(b){ return { id:b.id, name:b.name, city:b.city, city_slug:b.city_slug, category:b.category, category_slug:b.category_slug, zip:b.zip, verification_score:b.verification_score, url:b.url }; }
+function minimalBusiness(b){
+  return {
+    id:b.id,
+    name:b.name,
+    city:b.city,
+    city_slug:b.city_slug,
+    category:b.category,
+    category_slug:b.category_slug,
+    niche:b.niche,
+    zip:b.zip,
+    verification_score:b.verification_score,
+    featured:Boolean(b.featured),
+    website:b.website || '',
+    booking_url:b.booking_url || '',
+    phone:b.phone || '',
+    email:b.email || '',
+    url:b.url
+  };
+}
 
 async function main(){
   const before = await sizeOf(DIST);
@@ -73,10 +91,10 @@ async function main(){
   const runtimeModel = {
     version:'22.0.0', updated_at:TODAY,
     runtime_context:'src/server/runtime-context.mjs',
-    functions:['phx-action','phx-admin','phx-payment','phx-lead','phx-claim'],
+    functions:['phx-action','phx-admin','phx-payment','phx-lead','phx-claim','phx-customer-posting'],
     storage_path:'All runtime functions now call buildRuntimeContext() and can use JSON/D1/Neon adapters instead of hardcoded file stores.',
-    upstream_auth:'required by router/admin handlers; no local login added.',
-    closure_fixes:['phx-claim requireUpstreamActor bug fixed','protected admin replay operation fixed from replay_state to replay_actions','D1 adapter listEvents/appendDeliveryReceipt/summary implemented','Neon adapter listEvents implemented']
+    upstream_auth:'SkyeGateFS27 gate adapter introspects bearer tokens, strips public x-upstream headers, and injects trusted identity.',
+    closure_fixes:['phx-claim requireUpstreamActor bug fixed','protected admin replay operation fixed from replay_state to replay_actions','D1 adapter listEvents/appendDeliveryReceipt/summary implemented','Neon adapter listEvents implemented','0S first-month customer posting entitlement queued behind gate auth']
   };
   await writeJson('data/runtime-wiring.json', runtimeModel);
   await writeJson('api/runtime-wiring.json', { updated_at:TODAY, href:'/data/runtime-wiring.json' });

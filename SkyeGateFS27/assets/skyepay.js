@@ -62,7 +62,7 @@
     $("#trialDays").textContent = `${state.client.free_trial_days || 7} days`;
     $("#clientSpecial").textContent = isBobLane()
       ? "No payment today. Try the preview for one week. If it feels useful, we can continue with a first-six-month discount; if not, no pressure."
-      : state.client.special_offer || "Free preview first. Confirmed Stripe payment unlocks the workspace automatically.";
+      : state.client.special_offer || "Free preview first. Confirmed Stripe payment waits for owner-approved activation.";
     $("#includedUsage").innerHTML = (state.client.included_usage || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
     renderContact();
     if (state.dryRun) $("#proofModeBadge").textContent = "Proof mode";
@@ -163,6 +163,7 @@
   function offerMeta(offer) {
     const parts = [];
     if (offer.badge) parts.push(offer.badge);
+    if (offer.owner_approval_required) parts.push("owner approval");
     if (offer.rate_limits?.rpm) parts.push(`${offer.rate_limits.rpm} rpm`);
     if (offer.rate_limits?.vault_workspace_limit) parts.push(`${offer.rate_limits.vault_workspace_limit} workspace${offer.rate_limits.vault_workspace_limit === 1 ? "" : "s"}`);
     if (offer.deferred_one_time_cents) parts.push(`${money(offer.deferred_one_time_cents)} deferred setup`);
@@ -183,7 +184,7 @@
         <div class="bob-trial-card">
           <span class="mini-label">Bob's preview plan</span>
           <strong>${escapeHtml(offer.title)}</strong>
-          <p>${escapeHtml(offerPrice(offer))}. After the free week, confirmed SkyePay checkout unlocks the workspace automatically.</p>
+          <p>${escapeHtml(offerPrice(offer))}. After the free week, confirmed SkyePay checkout waits for owner-approved activation.</p>
           <small class="offer-meta">${offerMeta(offer)}</small>
         </div>
       `;
@@ -261,18 +262,30 @@
     const demoSession = params.get("demo_session");
     if (!sessionId && !demoSession) return;
     setStatus("Reading gate ledger", "SkyePay is checking the FS27 order state.");
-    const query = demoSession
-      ? `demo_session=${encodeURIComponent(demoSession)}`
-      : `session_id=${encodeURIComponent(sessionId)}`;
+    const query = new URLSearchParams();
+    if (demoSession) {
+      query.set("demo_session", demoSession);
+      if (params.get("offer")) query.set("offer", params.get("offer"));
+      if (params.get("client")) query.set("client", params.get("client"));
+    } else {
+      query.set("session_id", sessionId);
+    }
     try {
-      const data = await fetchJson(`/.netlify/functions/skyepay-status?${query}`);
+      const data = await fetchJson(`/.netlify/functions/skyepay-status?${query.toString()}`);
       const order = data.order || {};
-      setStatus(
-        order.provisioning_status === "workspace_unlocked" ? "Workspace unlocked" : "Payment confirmed",
-        `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "syncing_unlock"}.`
-      );
+      const approvalState = String(order.approval_status || order.owner_status || order.provisioning_status || "").toLowerCase();
+      const waitingForOwner = approvalState.includes("owner_approval") || approvalState.includes("pending_owner");
+      if (order.provisioning_status === "workspace_unlocked") {
+        setStatus("Workspace unlocked", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status}.`);
+      } else if (waitingForOwner) {
+        setStatus("Pending owner approval", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.`);
+      } else if (data.dry_run) {
+        setStatus("Preview recorded", `Payment state: ${order.payment_status || "demo_not_charged"}. Workspace state: ${order.provisioning_status || "demo_not_unlocked"}.`);
+      } else {
+        setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "syncing_unlock"}.`);
+      }
     } catch (error) {
-      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the automatic workspace unlock.");
+      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the owner-approval state.");
     }
   }
 

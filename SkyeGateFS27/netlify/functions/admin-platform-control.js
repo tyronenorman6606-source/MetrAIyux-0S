@@ -32,6 +32,22 @@ const PLATFORM_CATALOG = [
     launch_url: null
   },
   {
+    app_id: "metraiyux-houseoperations",
+    title: "HouseOperations",
+    description: "0S house-command app surface for task intake, vendors, schedule pressure, owner alerts, assignments, proof snapshots, FS27 mirror packets, and PIN Gate handoff.",
+    visibility: "client-admin",
+    storage_mode: "local-app-plus-fs27-event-mirror",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/index.html"
+  },
+  {
+    app_id: "skyebox-authenticator",
+    title: "SkyeBox Authenticator",
+    description: "Local encrypted TOTP vault mounted under HouseOperations with WebCrypto vault encryption, PWA assets, backup export, and FS27 PIN Gate handoff boundaries.",
+    visibility: "client-admin",
+    storage_mode: "local-encrypted-vault-plus-gate-recovery",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/skye-box-authenticator-vault/index.html"
+  },
+  {
     app_id: "superidev3-8",
     title: "SuperIDEv3.8",
     description: "Primary app surface currently bridged into SkyeGateFS27 auth and parent audit.",
@@ -110,6 +126,8 @@ function summarizePlatform(platform, ops) {
   if (ops?.notes) return String(ops.notes).slice(0, 200);
   if (platform.app_id === "superidev3-8") return "Gate login bridge, parent audit mirror, and local app provisioning coexist here.";
   if (platform.app_id === "metraiyux-0s") return "0S mirrors signup, workspace, billing, command, provisioning, and client action events upward when FS27_EVENT_MIRROR_URL is configured.";
+  if (platform.app_id === "metraiyux-houseoperations") return "HouseOperations can export review/execution/dispatch packets and should mirror owner-alert and proof-save events into FS27 when the Worker secret is configured.";
+  if (platform.app_id === "skyebox-authenticator") return "SkyeBox stays local-first for authenticator secrets; FS27 owns PIN/recovery identity and should not claim managed TOTP custody until a separate custody service exists.";
   if (platform.app_id === "citadeldb-sovereign") return "Database lane selection, migration, verification, and cutover should be visible in FS27 as platform mirror events.";
   if (platform.app_id === "skyevault-sovereign") return "Vault storage, repo/package, proof export, file count, and key-card events should be visible in FS27.";
   if (platform.app_id === "skyehands-runtime-control") return "Runtime shell can target SkyeGateFS27 through aliased env vars and mirror audit events upward.";

@@ -1,0 +1,28 @@
+{
+  "version": "20.0.0",
+  "generated_at": "2026-05-17T18:46:21.196Z",
+  "service": {
+    "version": "20.0.0",
+    "actions": [
+      "revenue_attribution_event",
+      "payment_event",
+      "exposure_activation"
+    ],
+    "default_commission_rate": 0.13,
+    "rules": [
+      "Revenue attribution follows verified payment/admin events.",
+      "Commission estimates are not payout proof.",
+      "Refunds and credits reduce net attribution."
+    ]
+  },
+  "attribution_keys": [
+    "business_id",
+    "ae_id",
+    "lead_id",
+    "payment_order_id",
+    "product",
+    "tier",
+    "source"
+  ],
+  "payout_boundary": "revenue_attribution_event can estimate/account for revenue, but payout proof must come from payment/provider ledgers."
+}

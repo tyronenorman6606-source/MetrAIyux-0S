@@ -15,6 +15,7 @@ const DEFAULT_STATE = {
   sponsor_intents: {},
   payment_events: {},
   exposure_activations: {},
+  customer_business_postings: {},
   contact_logs: {},
   owner_messages: {},
   notification_deliveries: {},
@@ -298,6 +299,32 @@ export function projectEnvelope(state, envelope, event){
       state.sponsor_intents[id] = { business_id:id, product:p.product, tier:p.tier, buyer_contact:p.buyer_contact || p.owner_contact || '', budget:p.budget || '', status:'intent_received', action_id:envelope.action_id, created_at:event.created_at };
       break;
     }
+    case 'customer_business_posting': {
+      const id = key(`${p.customer_id}-${p.workspace_id}-${p.business_name}`);
+      state.customer_business_postings[id] = {
+        posting_id:id,
+        customer_id:p.customer_id,
+        workspace_id:p.workspace_id,
+        business_name:p.business_name,
+        owner_name:p.owner_name,
+        owner_contact:p.owner_contact,
+        city:p.city,
+        category:p.category,
+        website:p.website || '',
+        phone:p.phone || '',
+        email:p.email || '',
+        description:p.description || '',
+        posting_status:'approved_for_seed_review',
+        free_posting_credit:Boolean(p.free_posting_credit),
+        subscription_started_at:p.subscription_started_at,
+        first_paid_invoice_at:p.first_paid_invoice_at,
+        eligible_at:p.eligible_at || '',
+        action_id:envelope.action_id,
+        updated_at:event.created_at,
+        history:[...(state.customer_business_postings[id]?.history || []), event]
+      };
+      break;
+    }
     case 'payment_event': {
       const id = p.payment_order_id || envelope.action_id;
       state.payment_events[id] = {
@@ -377,6 +404,7 @@ export function summarizeState(state){
       sponsor_intents:Object.keys(state.sponsor_intents || {}).length,
       payment_events:Object.keys(state.payment_events || {}).length,
       exposure_activations:Object.keys(state.exposure_activations || {}).length,
+      customer_business_postings:Object.keys(state.customer_business_postings || {}).length,
       contact_log_businesses:Object.keys(state.contact_logs || {}).length,
       owner_message_businesses:Object.keys(state.owner_messages || {}).length,
       notification_deliveries:Object.keys(state.notification_deliveries || {}).length,

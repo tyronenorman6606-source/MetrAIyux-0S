@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valley Verified Gate-Wired Platform - MetrAIyux 0S</title>
+  <meta name="description" content="Valley Verified is now a SkyeGateFS27-authenticated MetrAIyux 0S marketplace module with first-month customer business postings, proof results, run-cost estimate, and optional exposure products.">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">Overview</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a class="is-active" href="marketplace.html">Marketplace</a>
+        <a href="proof.html">Live Proof</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <p class="eyebrow">Marketplace Platform Module</p>
+      <h1>Valley Verified is now an FS27-gated local-marketplace engine.</h1>
+      <p class="lead">I unpacked the source package into this 0S offer, scanned it as untrusted code, ran its proof suite from a scratch copy, then wired the runtime path to SkyeGateFS27 auth. Every qualified 0S customer also gets one free public business landing queued for review after the first paid month clears, with no obligation to upgrade.</p>
+      <div class="number-row" style="margin-top:32px;">
+        <div class="num-pill"><span class="n">26,413</span><span class="l">deduped business profiles</span></div>
+        <div class="num-pill"><span class="n">26,743</span><span class="l">generated pages</span></div>
+        <div class="num-pill"><span class="n">1,260</span><span class="l">local proof checks passed</span></div>
+        <div class="num-pill"><span class="n">338 MB</span><span class="l">compacted deploy output</span></div>
+        <div class="num-pill"><span class="n">FS27</span><span class="l">gate auth adapter wired</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Scan Verdict</p>
+          <h2>Go, now with the auth boundary wired.</h2>
+        </div>
+        <p>The public marketplace layer is legitimate. The admin/payment/runtime layer now expects FS27 bearer auth before PHX policy code accepts customer or operator actions.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel reveal">
+          <h3>What passed</h3>
+          <ul class="check-list">
+            <li>No npm dependency sprawl; package declares no runtime or dev dependencies.</li>
+            <li>No bundled env files or obvious live API keys matched the secret scan.</li>
+            <li>Zip path checks were clean before unpacking.</li>
+            <li>Build produced full static business profiles and public website routes.</li>
+            <li>Production-check passed: dry run, build, smoke, action, state, mutation, payment, lead, v21, v22, and v23 checks.</li>
+          </ul>
+        </div>
+        <div class="panel reveal">
+          <h3>What must be gated</h3>
+          <ul class="check-list">
+            <li>Runtime functions now call the FS27 gate adapter, which strips public <code>x-upstream-*</code> headers and injects trusted identity.</li>
+            <li><code>/admin-console/</code>, <code>/protected-admin/</code>, and Netlify function routes are internal operator surfaces.</li>
+            <li>Production payment mode should set <code>PHX_PAYMENT_PROVIDER=stripe</code> and require real webhook secrets.</li>
+            <li>Production gate mode should set <code>SKYGATEFS27_ORIGIN</code> and <code>PHX_GATE_AUTH_REQUIRED=true</code>.</li>
+            <li>Do not sell guaranteed leads or owner verification until the claims ledger and live evidence support it.</li>
+            <li>Run a live browser smoke after deployment before calling it production-certified.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">0S Customer Benefit</p>
+          <h2>Every customer earns one free public business landing after month one.</h2>
+        </div>
+        <p>The landing is not a loose promise. It is a queued Valley Verified action contract behind FS27 auth, so a paid 0S customer can enter their business details and the network can review it before publication.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel reveal">
+          <h3>What unlocks</h3>
+          <ul class="check-list">
+            <li>First paid month completed: 30 days after subscription start with a paid invoice recorded.</li>
+            <li>One free Valley Verified public landing/posting credit per customer workspace.</li>
+            <li>No upgrade is required to keep the account or the included public page.</li>
+            <li>Customer identity comes from FS27: customer id, workspace id, plan, user id, email, and roles.</li>
+            <li>Posting enters <code>customer-business-postings</code> for review instead of auto-publishing.</li>
+          </ul>
+        </div>
+        <div class="panel reveal">
+          <h3>Code path</h3>
+          <ul class="check-list">
+            <li><code>src/server/gate-auth.mjs</code> handles FS27 introspection and trusted header injection.</li>
+            <li><code>src/server/customer-posting-entitlement.mjs</code> enforces the first-month rule.</li>
+            <li><code>/.netlify/functions/phx-customer-posting</code> queues the posting action.</li>
+            <li><code>customer_business_posting</code> keeps the benefit auditable in the action ledger.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="band-inner" style="grid-template-columns:1fr 1fr;">
+        <div class="reveal">
+          <p class="eyebrow">Run Cost</p>
+          <h2>Expected infrastructure cost is small; abuse and auth mistakes are the expensive part.</h2>
+          <p class="lead" style="margin-top:16px;">As a static public marketplace, this should cost almost nothing on top of the existing 0S Cloudflare footprint. As a live runtime with claim, lead, admin, webhook, and email workflows, budget a small platform minimum plus usage.</p>
+        </div>
+        <div class="panel reveal">
+          <table class="comp-table">
+            <thead><tr><th>Mode</th><th>Monthly operator cost</th></tr></thead>
+            <tbody>
+              <tr><td>Static public directory only</td><td>$0 incremental if served as static 0S/Cloudflare assets.</td></tr>
+              <tr><td>Gated runtime pilot</td><td>About $5-$25/mo before payment fees: Workers Paid minimum plus optional email.</td></tr>
+              <tr><td>Real owner outreach</td><td>About $25-$125/mo: Workers, D1 included allowances, Resend Pro/Scale if email volume grows.</td></tr>
+              <tr><td>Payments</td><td>Stripe variable fees: domestic card baseline is 2.9% + 30 cents per successful transaction.</td></tr>
+              <tr><td>High-traffic overage</td><td>Worker requests beyond included allowance and D1 writes can add cost, but early marketplace volume should stay inside included limits.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Offer Ladder</p>
+          <h2>What people should pay to use it or be listed on it.</h2>
+        </div>
+        <p>The package already contains a sane exposure-product model. I would launch with the low-friction ladder below and only raise rates after real traffic, lead volume, and owner activation proof exist.</p>
+      </div>
+      <div class="reveal">
+        <table class="comp-table">
+          <thead><tr><th>Offer</th><th>Recommended price</th><th>Why it works</th></tr></thead>
+          <tbody>
+            <tr><td>Buyer access</td><td>Free</td><td>Traffic and requests create the marketplace value.</td></tr>
+            <tr><td>Free public business landing</td><td>Free</td><td>Supply and visibility layer; gives a real business a searchable profile without making paid claims.</td></tr>
+            <tr><td>0S customer landing/posting credit</td><td>Free after first paid month</td><td>Retention perk for every 0S customer; queued for review behind FS27 gate auth.</td></tr>
+            <tr><td>Fast correction / claim review</td><td>$99 one-time</td><td>Simple owner-funded cleanup without promising placement.</td></tr>
+            <tr><td>Verified Profile Upgrade</td><td>$49/mo + $99 setup</td><td>Low enough for local businesses; already modeled in source.</td></tr>
+            <tr><td>Featured Market Placement</td><td>$149/mo</td><td>Good first upsell when a category/city lane has real supply.</td></tr>
+            <tr><td>Lead Routing Member</td><td>$199/mo</td><td>Only sell when contact readiness and response process are confirmed.</td></tr>
+            <tr><td>Category Sponsor</td><td>$399/mo</td><td>Limited inventory; can climb higher once traffic is proven.</td></tr>
+            <tr><td>Managed Growth Pack</td><td>$799/mo + $299 setup</td><td>Best margin offer: done-for-them cleanup, activation, exposure planning.</td></tr>
+            <tr><td>White-label city marketplace</td><td>$2,500-$12,500 setup + $297-$1,997/mo</td><td>Sell as a 0S-powered local marketplace deployment for agencies, chambers, associations, and niche operators.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" style="padding-bottom:0">
+      <div class="cta-close reveal">
+        <p class="eyebrow">Decision</p>
+        <h2>Keep it in the offer. Gate the backend. Make the free landing the customer gift.</h2>
+        <p style="color:var(--muted);max-width:680px;margin:16px auto 0;font-size:15px;line-height:1.7;">Valley Verified gives 0S a concrete marketplace product: public business landings, owner claims, AE work, optional exposure products, and proof receipts. The runtime path now belongs behind FS27, and the first-month landing credit gives every customer something tangible without forcing an upgrade.</p>
+        <div class="cta-row" style="justify-content:center;margin-top:26px;">
+          <a class="btn-primary" href="marketplace.html">Back to Marketplace</a>
+          <a class="btn-ghost" href="index.html#pricing">See 0S Pricing</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>Valley Verified for MetrAIyux 0S</strong>
+        <p>Internal scan and offer positioning for the Valley Verified v23 marketplace platform module.</p>
+      </div>
+      <div class="footer-links">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="capabilities.html">Capabilities</a>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a>
+        <span class="tiny">Scan date: 2026-05-17</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const btn = document.querySelector('[data-menu-button]');
+      const links = document.querySelector('[data-nav-links]');
+      if (btn && links) btn.addEventListener('click', () => { const o = links.classList.toggle('is-open'); btn.setAttribute('aria-expanded', String(o)); });
+    })();
+    (function() {
+      const items = document.querySelectorAll('.reveal');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: 0.12 });
+      items.forEach(i => io.observe(i));
+    })();
+  </script>
+  <script src="skye-effects.js"></script>
+</body>
+</html>

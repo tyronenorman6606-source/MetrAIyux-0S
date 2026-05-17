@@ -177,6 +177,7 @@ const sitemapIndex = await read('sitemap-index.xml');
 const sitemapPages = await read('sitemap-pages.xml');
 const appJs = await read('assets/app.js');
 const operatorJs = await read('assets/operator.js');
+const stylesCss = await read('assets/styles.css');
 
 const requiredFiles = [
   ['index.html', 'home page exists'],
@@ -248,6 +249,7 @@ const requiredFiles = [
   ['data/index.html', 'data pipeline page exists'],
   ['operator/index.html', 'operator import console exists'],
   ['404.html', '404 page exists'],
+  ['assets/valley-verified-logo.png', 'Valley Verified logo asset exists'],
   ['data/businesses.json', 'published business data exists'],
   ['data/businesses.csv', 'published business CSV exists'],
   ['data/search-index.json', 'search index exists'],
@@ -416,7 +418,9 @@ ok(adminBatchActions.batches?.owner_claims && adminBatchActions.suppression_patc
 ok(Array.isArray(serviceLaneCatalog.lanes) && serviceLaneCatalog.lanes.length === categoriesData.categories.length, 'service lane catalog matches category count');
 ok(ownerFollowupCalendarCsv.startsWith('due_date,rank,business_id'), 'owner follow-up calendar CSV has expected header');
 
-ok(has(home, 'A seeded local discovery network'), 'home is a platform landing page, not bare directory');
+ok(has(home, 'A free public business page as our gift') && has(home, 'See live client builds'), 'home is a platform landing page, not bare directory');
+ok(has(home, '/assets/valley-verified-logo.png'), 'home uses supplied Valley Verified logo asset');
+ok(has(stylesCss, 'brand-logo'), 'stylesheet styles the supplied Valley Verified logo');
 ok(has(home, 'Buyer and operator workflows'), 'home links platform workflows');
 ok(has(directory, 'data-directory-page'), 'directory has interactive marketplace controls');
 ok(has(platform, 'Platform status and route inventory'), 'platform page has proof/status content');
@@ -445,8 +449,8 @@ ok(has(cityIndex, 'City hubs across the Phoenix market'), 'city index has hub co
 ok(has(nicheIndex, 'Service niches ready for live business seeding'), 'niche index has taxonomy lane content');
 ok(has(marketIndex, 'City + category pages for local intent'), 'market index has city/category matrix content');
 ok(has(collectionIndex, 'Curated buyer paths from seed signals'), 'collection index has generated collection content');
-ok(has(joinPage, 'Claim, correct, verify, and grow your listing'), 'join page has business-owner claim/upgrade path');
-ok(has(pricingPage, 'Turn the seeded marketplace into sellable business exposure'), 'pricing page has sellable exposure product model');
+ok(has(joinPage, 'Claim the free landing') && has(joinPage, 'Upgrade only if you want more reach'), 'join page has business-owner no-obligation claim path');
+ok(has(pricingPage, 'Our gift is the free landing') && has(pricingPage, 'Upgrades are optional'), 'pricing page has optional exposure product model');
 ok(has(aeCommandPage, 'Give sales reps a real activation queue'), 'AE command page has real rep queue content');
 ok(has(accountsPage, 'Ranked AE account targets'), 'account workbench has ranked AE account content');
 ok(has(pipelinePage, 'Stage-based sales board'), 'pipeline page has stage board content');
@@ -520,7 +524,11 @@ ok(has(duplicatesPage, 'Auto merge ledger'), 'duplicates page shows auto merge l
 ok(has(embedPage, 'Portable business widgets'), 'embed page has widget installation content');
 ok(has(profileRenderer, 'scalable profile renderer'), 'profile renderer explains scalable route rendering');
 ok(has(profileRenderer, '/data/profiles/'), 'profile renderer loads sharded generated business data');
-ok(has(redirects, '/business/* /business-profile/ 200'), 'redirects support business profile fallback routes');
+if(report.records?.profile_mode === 'full-static'){
+  ok(!has(redirects, '/business/* /business-profile/ 200'), 'full-static business pages are not shadowed by renderer redirects');
+} else {
+  ok(has(redirects, '/business/* /business-profile/ 200'), 'redirects support business profile fallback routes');
+}
 ok(has(embedJs, 'data-phx-verified-widget'), 'embed script targets widget mounts');
 try{ new vm.Script(embedJs); ok(true, 'embed widget JavaScript is syntactically valid'); }catch(error){ ok(false, `embed widget JavaScript is syntactically valid: ${error.message}`); }
 try{ new vm.Script(appJs); ok(true, 'app JavaScript is syntactically valid'); }catch(error){ ok(false, `app JavaScript is syntactically valid: ${error.message}`); }

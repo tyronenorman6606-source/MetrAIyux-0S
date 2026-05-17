@@ -6,7 +6,7 @@ This file separates completed package work from buyer/operator work.
 
 ✅ Branded public product landing page
 ✅ Branded setup walkthrough landing page
-✅ Internal Deployment Command Center page
+✅ Deployment command-center page
 ✅ Business dashboard page
 ✅ Docker Compose orchestration for Hub, FreeScout, EspoCRM, InvoiceShelf, Formbricks, MariaDB, PostgreSQL, and Redis
 ✅ Environment template

@@ -19,6 +19,43 @@ export function skyePayPaymentConfirmed(value) {
   return ["paid", "complete", "no_payment_required", "active", "trialing"].includes(status);
 }
 
+export function skyePayOfferRequiresOwnerApproval(source = {}) {
+  const offer = source.offer_snapshot && typeof source.offer_snapshot === "object"
+    ? source.offer_snapshot
+    : source;
+  const metadata = source.metadata && typeof source.metadata === "object" ? source.metadata : {};
+  const activationPath = String(offer.activation_path || metadata.activation_path || source.activation_path || "").toLowerCase();
+  return offer.owner_approval_required === true ||
+    metadata.owner_approval_required === true ||
+    String(metadata.owner_approval_required || "").toLowerCase() === "true" ||
+    activationPath.includes("owner_approval") ||
+    activationPath.includes("pending_owner");
+}
+
+export function skyePayOrderStatusesForPayment({ offer = {}, paymentConfirmed = false } = {}) {
+  if (!paymentConfirmed) {
+    return {
+      approval_status: "checkout_created",
+      owner_status: "waiting_for_checkout",
+      provisioning_status: "waiting_for_payment"
+    };
+  }
+
+  if (skyePayOfferRequiresOwnerApproval(offer)) {
+    return {
+      approval_status: "paid_pending_owner_approval",
+      owner_status: "pending_owner_approval",
+      provisioning_status: "waiting_for_owner_approval"
+    };
+  }
+
+  return {
+    approval_status: "payment_confirmed",
+    owner_status: "auto_unlock_pending",
+    provisioning_status: "auto_unlock_pending"
+  };
+}
+
 export function gatePolicyFromOrder(order) {
   const offer = order.offer_snapshot && typeof order.offer_snapshot === "object" ? order.offer_snapshot : {};
   const policy = offer.gate_policy && typeof offer.gate_policy === "object" ? offer.gate_policy : {};
@@ -43,7 +80,8 @@ export function gatePolicyFromOrder(order) {
       trial_days: numberOrNull(offer.trial_days) || 0,
       deferred_one_time_cents: numberOrNull(offer.deferred_one_time_cents) || 0,
       credits: Array.isArray(offer.credits) ? offer.credits : [],
-      activation_path: "auto_unlock_after_confirmed_payment",
+      owner_approval_required: skyePayOfferRequiresOwnerApproval(order),
+      activation_path: clean(offer.activation_path, 180) || "auto_unlock_after_confirmed_payment",
       gate_policy: policy
     }
   };
@@ -132,6 +170,43 @@ export async function findOrCreateSkyePayCustomer(order) {
 export async function autoUnlockSkyePayOrder(order, { source = "stripe_webhook", eventType = "" } = {}) {
   if (!order?.id) return null;
   if (!skyePayPaymentConfirmed(order.payment_status)) return null;
+  if (skyePayOfferRequiresOwnerApproval(order)) {
+    const result = await q(
+      `update skyepay_orders
+       set approval_status=case
+             when approval_status in ('approved','void','refunded') then approval_status
+             else 'paid_pending_owner_approval'
+           end,
+           owner_status=case
+             when owner_status in ('approved','void') then owner_status
+             else 'pending_owner_approval'
+           end,
+           provisioning_status=case
+             when provisioning_status in ('workspace_unlocked','void') then provisioning_status
+             else 'waiting_for_owner_approval'
+           end,
+           metadata=metadata || $2::jsonb,
+           updated_at=now()
+       where id=$1
+       returning *`,
+      [
+        order.id,
+        JSON.stringify({
+          owner_approval_gate: {
+            source,
+            event_type: eventType || null,
+            held_at: new Date().toISOString(),
+            rule: "owner_approved_offer_cannot_auto_unlock"
+          }
+        })
+      ]
+    );
+    await audit("system", "SKYEPAY_OWNER_APPROVAL_REQUIRED", `skyepay:${order.id}`, {
+      offer_id: order.offer_id,
+      event_type: eventType || null
+    });
+    return result.rows[0] || order;
+  }
 
   const customerId = await findOrCreateSkyePayCustomer(order);
   const result = await q(

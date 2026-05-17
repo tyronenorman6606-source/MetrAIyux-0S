@@ -1,0 +1,705 @@
+{
+  "packet_type": "job_proof_packet",
+  "version": "0.4.0",
+  "generated_at": "2026-05-17T18:30:15.448Z",
+  "generated_by": "usr_c36d99e4de44e67066",
+  "job": {
+    "id": "job_d2e917cf534fae1a94",
+    "provider_id": "usr_c36d99e4de44e67066",
+    "market_id": "mkt_361261544efb485327",
+    "title": "Stress route lane 20",
+    "category": "route",
+    "description": "Concurrency stress route with proof, payments, route stops, export packet, and audit checks.",
+    "city": "Phoenix",
+    "state": "Arizona",
+    "location": "Phoenix stress yard 20",
+    "starts_at": "2026-05-21T12:00:00.000Z",
+    "ends_at": null,
+    "pay_type": "fixed",
+    "pay_amount_cents": 12020,
+    "slots": 1,
+    "acceptance_mode": "single",
+    "status": "filled",
+    "proof_required": true,
+    "route_required": true,
+    "route_mode": "field_route",
+    "vehicle_type": "car_or_van",
+    "arrival_window": "30 minutes before start",
+    "created_at": "2026-05-17T18:29:54.883Z",
+    "updated_at": "2026-05-17T18:30:01.596Z"
+  },
+  "applications": [
+    {
+      "id": "app_25bd748817cb5a99f1",
+      "job_id": "job_d2e917cf534fae1a94",
+      "contractor_id": "usr_432cc465d0e3a0ba8c",
+      "note": "Stress applicant usr_432cc465d0e3a0ba8c for job_d2e917cf534fae1a94",
+      "status": "accepted",
+      "created_at": "2026-05-17T18:29:58.313Z",
+      "updated_at": "2026-05-17T18:30:01.596Z"
+    },
+    {
+      "id": "app_11229fc39905c918a5",
+      "job_id": "job_d2e917cf534fae1a94",
+      "contractor_id": "usr_4791e84f786b18fa7e",
+      "note": "Stress applicant usr_4791e84f786b18fa7e for job_d2e917cf534fae1a94",
+      "status": "applied",
+      "created_at": "2026-05-17T18:29:58.346Z",
+      "updated_at": "2026-05-17T18:29:58.346Z"
+    },
+    {
+      "id": "app_d997f30db05bf81c7b",
+      "job_id": "job_d2e917cf534fae1a94",
+      "contractor_id": "usr_7c7b9c2d3d84987f8b",
+      "note": "Stress applicant usr_7c7b9c2d3d84987f8b for job_d2e917cf534fae1a94",
+      "status": "applied",
+      "created_at": "2026-05-17T18:29:58.358Z",
+      "updated_at": "2026-05-17T18:29:58.358Z"
+    },
+    {
+      "id": "app_6f7af409e7464ae511",
+      "job_id": "job_d2e917cf534fae1a94",
+      "contractor_id": "usr_25793082e13aa12580",
+      "note": "Stress applicant usr_25793082e13aa12580 for job_d2e917cf534fae1a94",
+      "status": "applied",
+      "created_at": "2026-05-17T18:29:58.373Z",
+      "updated_at": "2026-05-17T18:29:58.373Z"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "asg_a769de0848255e533a",
+      "job_id": "job_d2e917cf534fae1a94",
+      "application_id": "app_25bd748817cb5a99f1",
+      "contractor_id": "usr_432cc465d0e3a0ba8c",
+      "status": "completed",
+      "confirmed_at": "2026-05-17T18:30:03.790Z",
+      "on_way_at": "2026-05-17T18:30:05.513Z",
+      "checked_in_at": "2026-05-17T18:30:06.383Z",
+      "checked_out_at": "2026-05-17T18:30:07.596Z",
+      "provider_approved_at": "2026-05-17T18:30:14.134Z",
+      "created_at": "2026-05-17T18:30:01.596Z",
+      "updated_at": "2026-05-17T18:30:14.134Z"
+    }
+  ],
+  "proof_items": [
+    {
+      "id": "prf_968cc5ac859edea5c9",
+      "assignment_id": "asg_a769de0848255e533a",
+      "proof_type": "stress_media",
+      "body": "Stress proof body 27",
+      "media_required": true,
+      "created_at": "2026-05-17T18:30:12.824Z",
+      "media_id": "med_8a3335af710774d484",
+      "media_size_bytes": 30
+    }
+  ],
+  "proof_media": [
+    {
+      "id": "med_8a3335af710774d484",
+      "proof_id": "prf_968cc5ac859edea5c9",
+      "storage_driver": "local-json",
+      "storage_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/proof-media/prf_968cc5ac859edea5c9.txt",
+      "byte_size": 30,
+      "sha256": "173af6f5e2c3dbdd82557b8662a0981f544593e1f6e8af511746fccb9309a8e2",
+      "mime_type": "text/plain",
+      "created_at": "2026-05-17T18:30:12.824Z"
+    }
+  ],
+  "route_jobs": [
+    {
+      "id": "rte_dbd538c6bb0a068171",
+      "job_id": "job_d2e917cf534fae1a94",
+      "mode": "field_route",
+      "vehicle_type": "car_or_van",
+      "arrival_window": "30 minutes before start",
+      "pickup_location": "Phoenix pickup 20",
+      "dropoff_location": "Phoenix dropoff 20",
+      "status": "completed",
+      "route_provider": "route-structure-only",
+      "late_risk": "unknown_without_live_eta",
+      "created_at": "2026-05-17T18:29:54.883Z",
+      "updated_at": "2026-05-17T18:30:09.280Z",
+      "stops": [
+        {
+          "id": "rst_b8c5f0f3240e6555db",
+          "route_job_id": "rte_dbd538c6bb0a068171",
+          "job_id": "job_d2e917cf534fae1a94",
+          "sequence": 1,
+          "label": "Pickup",
+          "address": "Pickup 20",
+          "proof_required": true,
+          "status": "completed",
+          "route_provider": "route-structure-only",
+          "planned_eta_minutes": 0,
+          "created_at": "2026-05-17T18:29:54.883Z",
+          "updated_at": "2026-05-17T18:30:08.449Z",
+          "proof_note": "Stress stop 1 complete.",
+          "completed_at": "2026-05-17T18:30:08.449Z"
+        },
+        {
+          "id": "rst_a1b6c195c87b7ce421",
+          "route_job_id": "rte_dbd538c6bb0a068171",
+          "job_id": "job_d2e917cf534fae1a94",
+          "sequence": 2,
+          "label": "Dropoff",
+          "address": "Dropoff 20",
+          "proof_required": true,
+          "status": "completed",
+          "route_provider": "route-structure-only",
+          "planned_eta_minutes": 15,
+          "created_at": "2026-05-17T18:29:54.883Z",
+          "updated_at": "2026-05-17T18:30:09.280Z",
+          "proof_note": "Stress stop 2 complete.",
+          "completed_at": "2026-05-17T18:30:09.280Z"
+        }
+      ]
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay_803275863f95c62d60",
+      "job_id": "job_d2e917cf534fae1a94",
+      "assignment_id": null,
+      "contractor_id": null,
+      "provider_id": "usr_c36d99e4de44e67066",
+      "amount_cents": 12020,
+      "status": "payment_authorized",
+      "reason": "Initial provider authorization state for job.",
+      "provider_driver": "ledger-only",
+      "created_at": "2026-05-17T18:29:54.883Z",
+      "updated_at": "2026-05-17T18:29:54.883Z"
+    },
+    {
+      "id": "pay_450970164fec59904a",
+      "job_id": "job_d2e917cf534fae1a94",
+      "assignment_id": "asg_a769de0848255e533a",
+      "contractor_id": "usr_432cc465d0e3a0ba8c",
+      "provider_id": "usr_c36d99e4de44e67066",
+      "amount_cents": 12020,
+      "status": "payout_eligible",
+      "reason": "Provider approved work; payout eligible.",
+      "provider_driver": "ledger-only",
+      "created_at": "2026-05-17T18:30:01.596Z",
+      "updated_at": "2026-05-17T18:30:14.134Z"
+    }
+  ],
+  "disputes": [],
+  "ratings": [],
+  "notifications": [
+    {
+      "id": "not_38d4b5ad8ca7711b0d",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 16 applied to Stress route lane 4.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:56.505Z"
+    },
+    {
+      "id": "not_73614f6ff58106b464",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 17 applied to Stress route lane 4.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:56.515Z"
+    },
+    {
+      "id": "not_510e01e084b990df0a",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 18 applied to Stress route lane 4.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:56.529Z"
+    },
+    {
+      "id": "not_7ff698a4fa3ab71510",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 19 applied to Stress route lane 4.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:56.553Z"
+    },
+    {
+      "id": "not_e1acaad7c187961ad8",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 0 applied to Stress route lane 12.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:57.291Z"
+    },
+    {
+      "id": "not_a279d1084a323d13cd",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 1 applied to Stress route lane 12.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:57.309Z"
+    },
+    {
+      "id": "not_d149ff91bcc1dc269f",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 2 applied to Stress route lane 12.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:57.320Z"
+    },
+    {
+      "id": "not_d52ccfcd6065ea309f",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 3 applied to Stress route lane 12.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:57.344Z"
+    },
+    {
+      "id": "not_bf0425b313f6d3af6f",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 32 applied to Stress route lane 20.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:58.313Z"
+    },
+    {
+      "id": "not_cc1e7cbc4a12df6acc",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 33 applied to Stress route lane 20.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:58.346Z"
+    },
+    {
+      "id": "not_a50db72e622dbec023",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 34 applied to Stress route lane 20.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:58.358Z"
+    },
+    {
+      "id": "not_1e7de376666e83aabd",
+      "user_id": "usr_c36d99e4de44e67066",
+      "title": "New applicant",
+      "body": "Stress Contractor 35 applied to Stress route lane 20.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:29:58.373Z"
+    },
+    {
+      "id": "not_d0c308ce5bcebdbd85",
+      "user_id": "usr_432cc465d0e3a0ba8c",
+      "title": "Application accepted",
+      "body": "You were accepted for Stress route lane 8. Confirm the assignment.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:30:00.035Z"
+    },
+    {
+      "id": "not_df09c2a4ee72b2fb1f",
+      "user_id": "usr_432cc465d0e3a0ba8c",
+      "title": "Application accepted",
+      "body": "You were accepted for Stress route lane 20. Confirm the assignment.",
+      "channel": "in_app",
+      "delivery_provider": "in-app-ledger",
+      "delivery_status": "stored",
+      "read_at": null,
+      "created_at": "2026-05-17T18:30:01.596Z"
+    }
+  ],
+  "compliance_checks": [
+    {
+      "id": "cmp_a0ca63a61dbd71462d",
+      "user_id": "usr_c36d99e4de44e67066",
+      "role": "provider",
+      "provider": "local-attestation-ledger",
+      "status": "attested_local_only",
+      "checks": [
+        "terms_attestation"
+      ],
+      "created_at": "2026-05-17T18:29:38.605Z"
+    },
+    {
+      "id": "cmp_8bfe706dd53c0948a3",
+      "user_id": "usr_432cc465d0e3a0ba8c",
+      "role": "contractor",
+      "provider": "local-attestation-ledger",
+      "status": "attested_local_only",
+      "checks": [
+        "terms_attestation"
+      ],
+      "created_at": "2026-05-17T18:29:47.519Z"
+    },
+    {
+      "id": "cmp_8a78efe23030923bb2",
+      "user_id": "usr_432cc465d0e3a0ba8c",
+      "assignment_id": "asg_4b77200f09be711947",
+      "provider": "local-attestation-ledger",
+      "status": "work_assignment_local_only",
+      "checks": [
+        "assignment_state_machine"
+      ],
+      "created_at": "2026-05-17T18:30:00.035Z"
+    },
+    {
+      "id": "cmp_f303f5612f6d3a571c",
+      "user_id": "usr_432cc465d0e3a0ba8c",
+      "assignment_id": "asg_a769de0848255e533a",
+      "provider": "local-attestation-ledger",
+      "status": "work_assignment_local_only",
+      "checks": [
+        "assignment_state_machine"
+      ],
+      "created_at": "2026-05-17T18:30:01.596Z"
+    }
+  ],
+  "audit_events": [
+    {
+      "id": "aud_9073a7e75255058dc8",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "event_type": "job_created",
+      "entity_type": "job",
+      "entity_id": "job_d2e917cf534fae1a94",
+      "metadata": {
+        "city": "Phoenix",
+        "state": "Arizona",
+        "slots": 1,
+        "acceptance_mode": "single"
+      },
+      "created_at": "2026-05-17T18:29:54.883Z",
+      "previous_hash": "7de83bc2798fe9f1b0809cb9b53145356666c6786b5feb404050b3b34a4f4224",
+      "event_hash": "2f133089253767834cdbd15335b8d9b6ddad77566b9ea37ffb4ed8f9e0023e12"
+    },
+    {
+      "id": "aud_eea5488208644b4da7",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_25bd748817cb5a99f1",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.313Z",
+      "previous_hash": "c61cb575f19978fbe9d5322cee8becfb888e05742d8e292db9e17188ffcf6fb2",
+      "event_hash": "82284be649a2c3dba5d4e0c2be550330c6d70e136dd8400155aee8c621733e41"
+    },
+    {
+      "id": "aud_66e568c48b38806b4e",
+      "actor_user_id": "usr_4791e84f786b18fa7e",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_11229fc39905c918a5",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.346Z",
+      "previous_hash": "82284be649a2c3dba5d4e0c2be550330c6d70e136dd8400155aee8c621733e41",
+      "event_hash": "2172cff99f213e2499be0cdb21dd786b1942075eac6e2e9c49f14a674e62235e"
+    },
+    {
+      "id": "aud_1c6f89c032c0638a85",
+      "actor_user_id": "usr_7c7b9c2d3d84987f8b",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_d997f30db05bf81c7b",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.358Z",
+      "previous_hash": "2172cff99f213e2499be0cdb21dd786b1942075eac6e2e9c49f14a674e62235e",
+      "event_hash": "5d49c6208b148f8c02c1d5b0b93ef70eaa6f4975b40ee78501a767e88dd920a5"
+    },
+    {
+      "id": "aud_1f2486be762f909ac2",
+      "actor_user_id": "usr_25793082e13aa12580",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_6f7af409e7464ae511",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.373Z",
+      "previous_hash": "5d49c6208b148f8c02c1d5b0b93ef70eaa6f4975b40ee78501a767e88dd920a5",
+      "event_hash": "458ec221609869a09a2d8aa039e36aac82786f34cc03a78b1f5e811698c53596"
+    },
+    {
+      "id": "aud_78e3054a61465d5e56",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "event_type": "applicant_accepted",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94",
+        "contractor_id": "usr_432cc465d0e3a0ba8c"
+      },
+      "created_at": "2026-05-17T18:30:01.596Z",
+      "previous_hash": "bb54c7cb93016d9c3f9ad01d26dce6644438e56733c5560dd878132f8d494240",
+      "event_hash": "734d60833da955495b57a87c24e6d6bcce569ae71b875d44b68afb56fbdebc76"
+    },
+    {
+      "id": "aud_1dcef4bfc197d60190",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "assignment_confirmed",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:03.790Z",
+      "previous_hash": "8a646d8fa7b2307f4db6672b236de2ef5a11ec0d7f2d63dbcd103c910ad26246",
+      "event_hash": "be9b165d7de3378a588f39d9eb02da9a0062ea26d8ce89f3f50b2591f1131cb1"
+    },
+    {
+      "id": "aud_68e96fc6babe5198ef",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "contractor_on_the_way",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:05.513Z",
+      "previous_hash": "4df4dfa93fe6fa86bb3ac1ca987fce9f40bbfdad452a05c563aff7203a08f4a5",
+      "event_hash": "91d555f1c7a67b48018cf1a8b235d2f08761930d08f08a1a8606bb4fb73c7a30"
+    },
+    {
+      "id": "aud_be5f7c37a876fdc6cf",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "contractor_checked_in",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:06.383Z",
+      "previous_hash": "3e278599363c1de8b9d1522e5fcbb77230c453dab0a79ea733034db554e4d918",
+      "event_hash": "91cf1db16bec23184142f3b0a41b332c1569a2c349e5e24a33d4a92e06eb9249"
+    },
+    {
+      "id": "aud_f565d83617e6797f65",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "contractor_checked_out",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:07.596Z",
+      "previous_hash": "57bc7e3d0b8a8283bdb30a36ec0c648d75bc65e791ec810d4b096fa81921032f",
+      "event_hash": "645ab12a39a91a21d01598c913f232067595804ee16131d00e67fc28eb1364fd"
+    },
+    {
+      "id": "aud_d9838eac32abd6126b",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "event_type": "proof_submitted",
+      "entity_type": "proof_item",
+      "entity_id": "prf_968cc5ac859edea5c9",
+      "metadata": {
+        "assignment_id": "asg_a769de0848255e533a",
+        "media_id": "med_8a3335af710774d484"
+      },
+      "created_at": "2026-05-17T18:30:12.824Z",
+      "previous_hash": "c45e5b0d946bb0e18d4378979cec7d194e2f5f29be26815155542d1d5e6ebc54",
+      "event_hash": "3fc9738ae38333f86476eb2bf4c10fa89bd731961b7185fe734b8ff3b8c7a989"
+    },
+    {
+      "id": "aud_b348deb43da99a62e9",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "event_type": "assignment_approved",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "metadata": {
+        "payment_status": "payout_eligible"
+      },
+      "created_at": "2026-05-17T18:30:14.134Z",
+      "previous_hash": "03b39b08c990eae5786cacd2d10544d1a1c1296cd0b71d046eb7dc829c2a3477",
+      "event_hash": "987d43b70120ab89ae260d009aa3c0547c1197aa9309a3cb4d08653528a25b9a"
+    }
+  ],
+  "runtime_events": [
+    {
+      "id": "rtevt_996a47aeb5601ddaee",
+      "provider": "standalone-local-events",
+      "event_type": "job_created",
+      "entity_type": "job",
+      "entity_id": "job_d2e917cf534fae1a94",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "metadata": {
+        "city": "Phoenix",
+        "state": "Arizona",
+        "slots": 1,
+        "acceptance_mode": "single"
+      },
+      "created_at": "2026-05-17T18:29:54.883Z"
+    },
+    {
+      "id": "rtevt_0a176fcc2b5968f32b",
+      "provider": "standalone-local-events",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_25bd748817cb5a99f1",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.313Z"
+    },
+    {
+      "id": "rtevt_3af5b2a154c7a6f47d",
+      "provider": "standalone-local-events",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_11229fc39905c918a5",
+      "actor_user_id": "usr_4791e84f786b18fa7e",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.347Z"
+    },
+    {
+      "id": "rtevt_e3301b4460c4224d25",
+      "provider": "standalone-local-events",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_d997f30db05bf81c7b",
+      "actor_user_id": "usr_7c7b9c2d3d84987f8b",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.358Z"
+    },
+    {
+      "id": "rtevt_27025ccfd25470d3a1",
+      "provider": "standalone-local-events",
+      "event_type": "job_applied",
+      "entity_type": "job_application",
+      "entity_id": "app_6f7af409e7464ae511",
+      "actor_user_id": "usr_25793082e13aa12580",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:29:58.373Z"
+    },
+    {
+      "id": "rtevt_ff93887278554ad16c",
+      "provider": "standalone-local-events",
+      "event_type": "applicant_accepted",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94",
+        "contractor_id": "usr_432cc465d0e3a0ba8c"
+      },
+      "created_at": "2026-05-17T18:30:01.596Z"
+    },
+    {
+      "id": "rtevt_890fa5393751cfdf79",
+      "provider": "standalone-local-events",
+      "event_type": "assignment_confirmed",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:03.790Z"
+    },
+    {
+      "id": "rtevt_5d7f1f36b4abcdb925",
+      "provider": "standalone-local-events",
+      "event_type": "contractor_on_the_way",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:05.513Z"
+    },
+    {
+      "id": "rtevt_b61b55cc42d729f3cd",
+      "provider": "standalone-local-events",
+      "event_type": "contractor_checked_in",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:06.383Z"
+    },
+    {
+      "id": "rtevt_6a608ad245a74ff552",
+      "provider": "standalone-local-events",
+      "event_type": "contractor_checked_out",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "job_id": "job_d2e917cf534fae1a94"
+      },
+      "created_at": "2026-05-17T18:30:07.596Z"
+    },
+    {
+      "id": "rtevt_4082d93a5ce5fb3946",
+      "provider": "standalone-local-events",
+      "event_type": "proof_submitted",
+      "entity_type": "proof_item",
+      "entity_id": "prf_968cc5ac859edea5c9",
+      "actor_user_id": "usr_432cc465d0e3a0ba8c",
+      "metadata": {
+        "assignment_id": "asg_a769de0848255e533a",
+        "media_id": "med_8a3335af710774d484"
+      },
+      "created_at": "2026-05-17T18:30:12.824Z"
+    },
+    {
+      "id": "rtevt_0edbdced5f76feb1b9",
+      "provider": "standalone-local-events",
+      "event_type": "assignment_approved",
+      "entity_type": "job_assignment",
+      "entity_id": "asg_a769de0848255e533a",
+      "actor_user_id": "usr_c36d99e4de44e67066",
+      "metadata": {
+        "payment_status": "payout_eligible"
+      },
+      "created_at": "2026-05-17T18:30:14.134Z"
+    }
+  ]
+}

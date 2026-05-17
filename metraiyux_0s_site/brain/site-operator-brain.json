@@ -5,7 +5,7 @@
   "title": "MetrAIyux 0S business automation Conductor & Website Operations Brain",
   "cabinet": "Site Operations / Autonomous Command",
   "portrait": "assets/executive-team-poster.png",
-  "version": "1.1.0-live-review-routing",
+  "version": "1.4.0-skyemusicnexus-free99-routing",
   "total_connected_brains": 16,
   "total_system_brains": 16,
   "mode": "lightweight-router-first",
@@ -54,7 +54,29 @@
     "customer experience",
     "proof wall",
     "review intake",
-    "0s review qa"
+    "0s review qa",
+    "skyeprofitconsole",
+    "profit console",
+    "free99",
+    "gate session",
+    "profit field",
+    "runtime review pack",
+    "skyemediacenter",
+    "media center",
+    "media intake",
+    "asset search",
+    "media publish",
+    "file delivery",
+    "operator theater",
+    "media proof",
+    "skyemusicnexus",
+    "music nexus",
+    "music operations",
+    "artist records",
+    "release forge",
+    "royalty ledger",
+    "payout review",
+    "music proof"
   ],
   "can_answer": [
     "Which cabinet brain should handle an incoming request",
@@ -64,10 +86,14 @@
     "Which live proof surface should be shown to a buyer",
     "How MetrAIyux 0S and SkyeGateFS27 connect for client deployments",
     "How to explain the system as sovereign web infrastructure without exposing private admin setup",
-    "How to operate the 17-brain system without pretending it is fully autonomous legal/business authority",
+    "How to operate the 16-brain system without pretending it is fully autonomous legal/business authority",
     "Where to send a client who wants to leave a review or talk about their experience",
     "Where to send a prospect who wants client proof, testimonials, or the Skyes Over London review wall",
-    "How the 0S review QA and five-review production batching rule works"
+    "How the 0S review QA and five-review production batching rule works",
+    "Where to route a user who asks for SkyeProfitConsole, profit packs, margin proof, or Free99 access",
+    "How to explain that Free99 means no charge while still requiring a 0S or FS27 gate session",
+    "Where to route a user who asks for SkyeMediaCenter, media intake, asset search, publishing, file delivery, or Free99 media access",
+    "Where to route a user who asks for SkyeMusicNexus, artist records, release forge, royalty motion, payout review, analytics, music workflow, or Free99 music access"
   ],
   "must_not_claim": [
     "That it can legally run the company without a human operator",
@@ -75,7 +101,8 @@
     "That it can sign contracts, hire, fire, file incorporation documents, or provide legal advice by itself",
     "That Cloudflare KV/Queues/Durable Objects are configured until the operator creates bindings and deploys",
     "That unapproved review submissions are public proof",
-    "That customer feedback can bypass 0S QA, consent review, or the five-review production batch rule"
+    "That customer feedback can bypass 0S QA, consent review, or the five-review production batch rule",
+    "That Free99 features bypass auth, gate sessions, customer isolation, or runtime authorization"
   ],
   "routes": [
     {
@@ -107,6 +134,38 @@
       "route_to": "naomi-sterling-brain",
       "secondary": "celeste-monroe-brain",
       "create_task": "Pricing, margin, billing, or commission review"
+    },
+    {
+      "intent": "skyeprofitconsole_free99_profit_access",
+      "route_to": "naomi-sterling-brain",
+      "secondary": "celeste-monroe-brain",
+      "create_task": "Explain SkyeProfitConsole Free99 access, confirm no charge, preserve gate-session requirement, and route to the profit hub or gated app",
+      "triggers": [
+        "skyeprofitconsole",
+        "profit console",
+        "free99 profit",
+        "profit pack",
+        "margin proof",
+        "split check"
+      ]
+    },
+    {
+      "intent": "skyemediacenter_free99_media_access",
+      "route_to": "valentina-reyes-brain",
+      "secondary": "victor-saint-brain",
+      "create_task": "Explain SkyeMediaCenter Free99 access, confirm no charge, preserve gate-session requirement, and route to the media hub, gated app, intake portal, or operator theater",
+      "triggers": [
+        "skyemediacenter",
+        "media center",
+        "free99 media",
+        "media intake",
+        "asset search",
+        "review board",
+        "execution board",
+        "dispatch board",
+        "publish media",
+        "file delivery"
+      ]
     },
     {
       "intent": "compliance_or_contracting",

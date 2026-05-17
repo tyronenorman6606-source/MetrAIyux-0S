@@ -3,833 +3,1384 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Deployment Ledger — MetrAIyux Empire</title>
-<meta name="description" content="Live deployment ledger for the Skyes Over London / MetrAIyux empire. Every Cloudflare Worker, Pages project, Netlify deploy, and internal surface with status, URL, and receipt.">
+<title>Live Deployment Atlas - MetrAIyux Empire</title>
+<meta name="description" content="Live-only deployment atlas for MetrAIyux, Skyes Over London, Cloudflare Pages, Cloudflare Workers, Netlify surfaces, and access-gated systems.">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#030a0f">
+<meta name="theme-color" content="#020509">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700;9..40,900&family=JetBrains+Mono:wght@400;700;800&family=Libre+Baskerville:wght@700&display=swap">
 <style>
 :root {
-  --bg: #030a0f;
-  --surface: #05131c;
-  --panel: #061724;
-  --line: rgba(126,231,255,0.11);
-  --line-bright: rgba(126,231,255,0.32);
-  --text: #e8f4ff;
-  --muted: #6a8fa8;
-  --soft: #b8d8ef;
-  --cyan: #7ee7ff;
-  --gold: #f4c75b;
-  --violet: #8b5cf6;
-  --green: #3dcc7a;
-  --amber: #f59e0b;
-  --fire: #e84c30;
-  --teal: #3dd6b5;
-  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  --radius: 12px;
-  --topbar-h: 52px;
+  --bg: #020509;
+  --ink: #fff8e8;
+  --text: #e9f8ff;
+  --muted: #8eb0bf;
+  --soft: #c6e6f2;
+  --cyan: #54f0ff;
+  --gold: #ffd66b;
+  --green: #62f2a4;
+  --pink: #ff58d2;
+  --violet: #9b78ff;
+  --coal: rgba(4, 10, 16, .76);
+  --panel: rgba(7, 16, 24, .84);
+  --panel-strong: rgba(10, 24, 34, .94);
+  --line: rgba(198, 230, 242, .16);
+  --line-bright: rgba(84, 240, 255, .42);
+  --shadow: 0 30px 95px rgba(0, 0, 0, .42);
+  --font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: "Libre Baskerville", Georgia, serif;
+  --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  --ease: cubic-bezier(.16, 1, .3, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
+* { box-sizing: border-box; }
+html {
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
-  font-size: 0.9rem;
-  min-height: 100vh;
-  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cyan) rgba(255, 255, 255, .08);
+  scroll-behavior: smooth;
 }
-
-/* scan overlay */
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  overflow-x: hidden;
+  background:
+    linear-gradient(180deg, rgba(2, 5, 9, .94), rgba(3, 8, 14, .98)),
+    radial-gradient(1100px 720px at 12% 6%, rgba(255, 214, 107, .13), transparent 60%),
+    radial-gradient(980px 720px at 88% 14%, rgba(84, 240, 255, .12), transparent 58%),
+    radial-gradient(940px 720px at 56% 96%, rgba(255, 88, 210, .1), transparent 62%);
+}
 body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: -4;
   pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(rgba(126,231,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(126,231,255,0.02) 1px, transparent 1px);
-  background-size: 36px 36px;
+  background:
+    linear-gradient(rgba(255, 255, 255, .028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .028) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .92), transparent 84%);
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  opacity: .045;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .38), rgba(255, 255, 255, .38) 1px, transparent 1px, transparent 7px);
+  mix-blend-mode: screen;
+}
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, .08);
+  border-left: 1px solid rgba(255, 255, 255, .08);
+}
+::-webkit-scrollbar-thumb {
+  min-height: 68px;
+  border: 3px solid rgba(2, 5, 9, .92);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold), var(--cyan), var(--pink));
+  box-shadow: 0 0 18px rgba(84, 240, 255, .32), inset 0 0 14px rgba(255, 255, 255, .16);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--cyan), var(--gold), var(--pink));
+}
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.skyesol-living-field,
+.webgl-field {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.webgl-field {
+  z-index: -3;
+  opacity: .72;
+}
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.62'/%3E%3C/svg%3E");
+}
+.scroll-progress {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 90;
+  width: 100%;
+  height: 4px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--gold), var(--cyan), var(--pink));
+  box-shadow: 0 0 24px rgba(84, 240, 255, .42);
+}
+.cursor-glow,
+.neon-cursor-trail {
+  position: fixed;
+  left: -150px;
+  top: -150px;
+  z-index: 70;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 214, 107, .16), rgba(84, 240, 255, .1) 38%, rgba(255, 88, 210, .08) 56%, transparent 72%);
+  filter: blur(10px);
+  mix-blend-mode: screen;
+  transform: translate3d(var(--cursor-x, -420px), var(--cursor-y, -420px), 0);
 }
 
-/* neon scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--cyan), var(--violet)); border-radius: 4px; }
-
-a { color: inherit; text-decoration: none; }
-
-.page {
+.shell {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  width: min(1520px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 14px 0 44px;
 }
-
-/* ───── TOPBAR ───── */
 .topbar {
-  background: rgba(5, 19, 28, 0.96);
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  height: var(--topbar-h);
   position: sticky;
-  top: 0;
-  z-index: 20;
+  top: 12px;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(240px, auto) minmax(220px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(3, 9, 14, .78);
+  box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
-  flex-shrink: 0;
 }
-
-.topbar-brand {
+.brand {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
-
-.ledger-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--gold), var(--amber));
-  display: grid;
-  place-items: center;
-  font-size: 0.7rem;
+.brand img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(255, 214, 107, .32));
+}
+.brand strong,
+.brand span {
+  display: block;
+  white-space: nowrap;
+}
+.brand strong {
+  color: var(--ink);
+  font-size: .92rem;
   font-weight: 900;
-  color: #030a0f;
-  box-shadow: 0 0 16px rgba(244,199,91,0.35);
 }
-
-.topbar-brand strong { font-size: 0.88rem; letter-spacing: 0.04em; }
-.topbar-brand span { color: var(--muted); font-size: 0.74rem; margin-left: 4px; }
-
-.topbar-stats {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.topbar-stat {
-  font-family: var(--mono);
-  font-size: 0.72rem;
+.brand span {
   color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-family: var(--mono);
+  font-size: .68rem;
 }
-
-.topbar-stat strong { color: var(--cyan); }
-.topbar-stat.gold strong { color: var(--gold); }
-.topbar-stat.green strong { color: var(--green); }
-
-.topbar-actions { display: flex; gap: 8px; }
-
-.topbar-btn {
-  padding: 6px 12px;
-  border-radius: 7px;
-  border: 1px solid var(--line);
-  font-size: 0.76rem;
-  font-family: var(--font);
-  background: rgba(126,231,255,0.06);
-  color: var(--soft);
-  cursor: pointer;
-  transition: 0.18s ease;
-  text-decoration: none;
+.search {
+  justify-self: center;
+  width: min(100%, 560px);
+  position: relative;
+}
+.search::before {
+  content: "/";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  color: var(--gold);
+  font-family: var(--mono);
+  font-weight: 900;
+  transform: translateY(-50%);
+}
+.search input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(84, 240, 255, .22);
+  border-radius: 8px;
+  padding: 0 14px 0 36px;
+  background: rgba(255, 255, 255, .055);
+  color: var(--text);
+  outline: none;
+}
+.search input:focus {
+  border-color: rgba(84, 240, 255, .66);
+  box-shadow: 0 0 0 3px rgba(84, 240, 255, .08);
+}
+.nav {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.nav a {
+  min-height: 38px;
   display: inline-flex;
   align-items: center;
-}
-
-.topbar-btn:hover { border-color: var(--line-bright); color: var(--text); }
-
-/* ───── MAIN CONTENT ───── */
-.main {
-  padding: 24px 20px 48px;
-  flex: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* ───── PAGE HEADER ───── */
-.page-header {
-  margin-bottom: 24px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.page-header .eyebrow {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  color: var(--gold);
-  margin-bottom: 8px;
-}
-
-.page-header h1 {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 4px;
-}
-
-.page-header p { color: var(--muted); font-size: 0.84rem; }
-
-.header-stamp {
-  text-align: right;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--muted);
-  flex-shrink: 0;
-}
-
-.header-stamp strong { display: block; color: var(--green); font-size: 0.8rem; margin-bottom: 4px; }
-
-/* ───── FILTER BAR ───── */
-.filter-bar {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.filter-btn {
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted);
-  font-family: var(--font);
-  font-size: 0.76rem;
-  cursor: pointer;
-  transition: 0.16s ease;
-}
-
-.filter-btn:hover { border-color: var(--line-bright); color: var(--text); }
-.filter-btn.active {
-  background: rgba(126,231,255,0.1);
-  border-color: rgba(126,231,255,0.3);
-  color: var(--cyan);
-}
-
-/* ───── LEDGER TABLE ───── */
-.ledger-wrap {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  overflow-x: auto;
-}
-
-.ledger-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 860px;
-}
-
-.ledger-table thead th {
-  background: var(--panel);
-  padding: 10px 14px;
-  text-align: left;
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--muted);
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-
-.ledger-table thead th:first-child { padding-left: 20px; }
-
-.ledger-row {
-  border-bottom: 1px solid var(--line);
-  transition: background 0.14s ease;
-  cursor: pointer;
-}
-
-.ledger-row:last-child { border-bottom: none; }
-
-.ledger-row:hover { background: rgba(126,231,255,0.03); }
-
-.ledger-row td {
-  padding: 12px 14px;
-  vertical-align: middle;
-}
-
-.ledger-row td:first-child { padding-left: 20px; }
-
-.row-name {
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.row-name .row-icon {
-  width: 28px;
-  height: 28px;
+  border: 1px solid rgba(255, 255, 255, .13);
   border-radius: 7px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, .06);
+  color: var(--soft);
+  font-size: .78rem;
+  font-weight: 900;
+  transition: transform .22s var(--ease), border-color .22s var(--ease), color .22s var(--ease);
+}
+.nav a:hover,
+.nav a:focus-visible {
+  color: var(--ink);
+  border-color: rgba(84, 240, 255, .5);
+  transform: translateY(-2px);
+}
+
+.atlas-hero {
+  min-height: min(760px, calc(100svh - 96px));
+  display: grid;
+  grid-template-columns: minmax(0, .94fr) minmax(420px, .86fr);
+  gap: clamp(22px, 3vw, 46px);
+  align-items: start;
+  padding: clamp(54px, 7vh, 78px) 0 clamp(28px, 5vw, 54px);
+}
+.hero-copy {
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  max-width: 680px;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: .76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+.eyebrow::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 22px rgba(98, 242, 164, .8);
+}
+h1 {
+  margin: 0;
+  max-width: 8.4ch;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: clamp(3.15rem, 6.1vw, 6.3rem);
+  font-weight: 700;
+  line-height: .96;
+  letter-spacing: 0;
+}
+.shimmer {
+  background: linear-gradient(95deg, #fff8e8 0%, var(--gold) 28%, var(--cyan) 58%, var(--pink) 86%, #fff8e8 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: titleSweep 8s linear infinite;
+}
+.hero-copy > p:not(.eyebrow) {
+  max-width: 34rem;
+  margin: 22px 0 0;
+  color: rgba(233, 248, 255, .76);
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  line-height: 1.65;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+.primary-action,
+.ghost-action,
+.lane-button {
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px;
+  padding: 0 15px;
+  background: rgba(255, 255, 255, .07);
+  color: var(--soft);
+  font-weight: 900;
+  transition: transform .22s var(--ease), border-color .22s var(--ease), background .22s var(--ease), color .22s var(--ease);
+}
+.primary-action {
+  border-color: rgba(255, 214, 107, .46);
+  background: linear-gradient(135deg, rgba(255, 214, 107, .22), rgba(84, 240, 255, .12));
+  color: var(--ink);
+  box-shadow: 0 18px 60px rgba(255, 214, 107, .12);
+}
+.primary-action:hover,
+.ghost-action:hover,
+.lane-button:hover,
+.lane-button.active {
+  color: var(--ink);
+  border-color: rgba(84, 240, 255, .62);
+  transform: translateY(-2px);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 28px;
+}
+.metric-tile {
+  min-height: 116px;
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, .055);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, .24);
+}
+.metric-tile b {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: clamp(2.4rem, 5vw, 4.3rem);
+  line-height: .9;
+}
+.metric-tile span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .7rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.orbit-stage {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  justify-self: end;
+  min-height: clamp(500px, 48vw, 640px);
   display: grid;
   place-items: center;
-  font-size: 0.7rem;
-  background: rgba(126,231,255,0.08);
-  border: 1px solid rgba(126,231,255,0.12);
-  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .025)),
+    rgba(4, 11, 17, .38);
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+.orbit-stage::before {
+  content: "";
+  position: absolute;
+  inset: 20px;
+  z-index: -1;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 8px;
+}
+.orbit-shell {
+  position: relative;
+  width: min(560px, 86%);
+  aspect-ratio: 1;
+}
+.orbit-ring {
+  position: absolute;
+  inset: var(--inset);
+  border: 1px solid rgba(84, 240, 255, .18);
+  border-radius: 50%;
+  box-shadow: inset 0 0 28px rgba(84, 240, 255, .05);
+}
+.orbit-ring.gold { border-color: rgba(255, 214, 107, .22); }
+.orbit-ring.pink { border-color: rgba(255, 88, 210, .16); }
+.core {
+  position: absolute;
+  inset: 50%;
+  width: clamp(150px, 23vw, 240px);
+  height: clamp(150px, 23vw, 240px);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 214, 107, .42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 42% 34%, rgba(255, 248, 232, .2), transparent 24%),
+    radial-gradient(circle at 50% 50%, rgba(84, 240, 255, .16), rgba(255, 214, 107, .08) 46%, rgba(3, 9, 14, .82) 72%);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 72px rgba(84, 240, 255, .18), inset 0 0 36px rgba(255, 214, 107, .14);
+  text-align: center;
+}
+.core b {
+  display: block;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: clamp(3rem, 7vw, 5.8rem);
+  line-height: .86;
+}
+.core span {
+  display: block;
+  margin-top: 10px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.orbit-node {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(74px, 6vw, 92px);
+  height: clamp(74px, 6vw, 92px);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 50%;
+  background: rgba(4, 11, 17, .82);
+  color: var(--ink);
+  box-shadow: 0 0 34px rgba(84, 240, 255, .1);
+  transform: translate(-50%, -50%);
+}
+.orbit-node span {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  text-align: center;
+}
+.orbit-node b {
+  font-family: var(--mono);
+  font-size: .82rem;
+}
+.orbit-node small {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .62rem;
+}
+.orbit-node[data-lane="cloudflare"] { border-color: rgba(84, 240, 255, .46); }
+.orbit-node[data-lane="worker"] { border-color: rgba(98, 242, 164, .46); }
+.orbit-node[data-lane="netlify"] { border-color: rgba(255, 214, 107, .46); }
+.orbit-node[data-lane="tools"] { border-color: rgba(255, 88, 210, .42); }
+.orbit-node[data-lane="custom"] { border-color: rgba(155, 120, 255, .46); }
+.orbit-node.active {
+  color: #031016;
+  background: linear-gradient(135deg, var(--gold), var(--cyan));
+  border-color: transparent;
+  box-shadow: 0 0 46px rgba(84, 240, 255, .32);
+}
+.stage-caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .68rem;
+  text-transform: uppercase;
 }
 
-.row-url {
+.filter-bank {
+  position: sticky;
+  top: 88px;
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(3, 9, 14, .8);
+  backdrop-filter: blur(16px);
+}
+.lane-button {
+  min-height: 38px;
+  border-radius: 7px;
+  padding: 0 12px;
+  font-size: .75rem;
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 14px;
+  align-items: start;
+}
+.panel {
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background: rgba(4, 11, 17, .76);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.panel-head {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  padding: 14px 16px;
+}
+.panel-head strong {
+  color: var(--ink);
+  font-size: .95rem;
+}
+.panel-head span {
+  color: var(--muted);
   font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--cyan);
-  opacity: 0.8;
-  max-width: 280px;
-  white-space: nowrap;
+  font-size: .68rem;
+  text-transform: uppercase;
+}
+.surface-stream {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, .08);
+}
+.atlas-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.05fr) minmax(160px, .55fr) minmax(240px, 1fr) minmax(210px, .8fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 74px;
+  padding: 12px 14px;
+  background: rgba(4, 11, 17, .94);
+}
+.atlas-row:hover {
+  background: rgba(9, 22, 31, .98);
+}
+.surface-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+}
+.sigil {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(84, 240, 255, .22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .055);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: .78rem;
+  font-weight: 900;
+}
+.surface-title strong,
+.surface-title span {
+  display: block;
+  min-width: 0;
+}
+.surface-title strong {
+  color: var(--ink);
+  line-height: 1.15;
+}
+.surface-title span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .68rem;
+  text-transform: uppercase;
+}
+.pill,
+.signal {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 28px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  padding: 0 10px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: .66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.pill.cloudflare { border-color: rgba(84, 240, 255, .42); color: var(--cyan); }
+.pill.worker { border-color: rgba(98, 242, 164, .42); color: var(--green); }
+.pill.netlify { border-color: rgba(255, 214, 107, .42); color: var(--gold); }
+.pill.tools { border-color: rgba(255, 88, 210, .42); color: var(--pink); }
+.pill.custom { border-color: rgba(155, 120, 255, .46); color: #cdbfff; }
+.signal {
+  border-color: rgba(98, 242, 164, .38);
+  color: var(--green);
+}
+.signal.access {
+  border-color: rgba(255, 214, 107, .42);
+  color: var(--gold);
+}
+.url-cell {
+  min-width: 0;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: .74rem;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.row-url a {
-  color: inherit;
-  transition: opacity 0.16s;
-}
-
-.row-url a:hover { opacity: 1; }
-
-/* platform pill */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   white-space: nowrap;
 }
-
-.pill-cf { background: rgba(244,199,91,0.12); border: 1px solid rgba(244,199,91,0.22); color: var(--gold); }
-.pill-netlify { background: rgba(61,214,181,0.12); border: 1px solid rgba(61,214,181,0.22); color: var(--teal); }
-.pill-local { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.22); color: var(--amber); }
-.pill-worker { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.22); color: var(--violet); }
-
-/* status badge */
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-}
-
-.status::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.status-live { color: var(--green); }
-.status-live::before { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-g 2s ease-in-out infinite; }
-.status-dev { color: var(--amber); }
-.status-dev::before { background: var(--amber); }
-.status-building { color: var(--cyan); }
-.status-building::before { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); animation: pulse-g 1.2s ease-in-out infinite; }
-
-@keyframes pulse-g { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-.row-date {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.row-env {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.row-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
+.url-cell a:hover {
   color: var(--cyan);
-  opacity: 0.6;
-  transition: 0.16s;
-  text-decoration: none;
 }
-
-.ledger-row:hover .row-open { opacity: 1; }
-
-/* ───── RECEIPT SECTION ───── */
-.receipt-head {
-  margin: 28px 0 14px;
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
+.proof-cell {
   color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.42;
+}
+.empty-state {
+  padding: 34px 16px;
+  color: var(--muted);
+  text-align: center;
+}
+.side-stack {
+  display: grid;
+  gap: 14px;
+}
+.lane-list,
+.check-list {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, .08);
+}
+.lane-item,
+.check-item {
+  min-height: 82px;
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  background: rgba(4, 11, 17, .94);
+}
+.lane-item button {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
 }
-
-.receipt-head::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
+.lane-item strong,
+.check-item strong {
+  color: var(--ink);
 }
-
-.receipt-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.lane-item b {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 1.55rem;
+}
+.lane-item p,
+.check-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.42;
+}
+.check-top {
+  display: flex;
+  justify-content: space-between;
   gap: 10px;
 }
-
-.receipt-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+.check-item a {
+  color: var(--soft);
   font-family: var(--mono);
-  font-size: 0.74rem;
-  color: var(--muted);
+  font-size: .68rem;
+  overflow-wrap: anywhere;
 }
+.check-item a:hover { color: var(--cyan); }
 
-.receipt-card .r-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
+.footer {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
-}
-
-.receipt-card .r-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 3px 0;
-  border-bottom: 1px solid rgba(126,231,255,0.05);
-}
-
-.receipt-card .r-line:last-child { border-bottom: none; }
-.receipt-card .r-key { color: var(--muted); }
-.receipt-card .r-val { color: var(--soft); text-align: right; }
-.receipt-card .r-val.ok { color: var(--green); }
-.receipt-card .r-val.warn { color: var(--amber); }
-
-/* ───── FOOTER ───── */
-.op-footer {
-  border-top: 1px solid var(--line);
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  padding: 28px 0 0;
+  color: rgba(233, 248, 255, .58);
   font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--muted);
-  flex-shrink: 0;
+  font-size: .68rem;
 }
 
-/* ───── MOBILE ───── */
-@media (max-width: 680px) {
-  .topbar-stats { display: none; }
-  .page-header { flex-direction: column; align-items: flex-start; }
-  .header-stamp { text-align: left; }
-  .main { padding: 16px 12px 40px; }
+@keyframes titleSweep {
+  from { background-position: 0% center; }
+  to { background-position: 220% center; }
+}
+@media (max-width: 1080px) {
+  .topbar { grid-template-columns: 1fr; }
+  .brand strong,
+  .brand span { white-space: normal; }
+  .search { justify-self: stretch; width: 100%; }
+  .nav { justify-content: flex-start; }
+  .atlas-hero,
+  .workbench { grid-template-columns: 1fr; }
+  .orbit-stage { min-height: 680px; }
+  .filter-bank { top: 12px; }
+  .atlas-row {
+    grid-template-columns: minmax(220px, 1fr) minmax(140px, auto);
+  }
+  .url-cell,
+  .proof-cell { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .shell { width: min(100% - 20px, 1520px); }
+  .nav a { flex: 1 1 auto; justify-content: center; }
+  .atlas-hero { padding-top: 34px; }
+  h1 { font-size: clamp(3rem, 14vw, 4.8rem); }
+  .metrics { grid-template-columns: 1fr; }
+  .orbit-stage { min-height: 560px; }
+  .orbit-shell { width: min(350px, 92%); }
+  .orbit-node {
+    width: 70px;
+    height: 70px;
+  }
+  .stage-caption {
+    flex-direction: column;
+    font-size: .62rem;
+  }
+  .atlas-row { grid-template-columns: 1fr; }
+  .pill,
+  .signal { white-space: normal; }
+  .cursor-glow { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .cursor-glow { display: none; }
 }
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;0,9..40,900&display=swap">
 </head>
 <body>
-<div class="page">
+<canvas id="skyeField" class="skyesol-living-field" aria-hidden="true"></canvas>
+<canvas id="atlasWebgl" class="webgl-field" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+<div class="cursor-glow neon-cursor-trail" aria-hidden="true"></div>
 
-  <!-- TOPBAR -->
+<div class="shell">
   <header class="topbar">
-    <div class="topbar-brand">
-      <div class="ledger-mark">≡</div>
-      <strong>Deployment Ledger</strong>
-      <span>MetrAIyux Empire</span>
-    </div>
-    <div class="topbar-stats">
-      <div class="topbar-stat green"><strong id="liveCount">9</strong>&nbsp;live</div>
-      <div class="topbar-stat"><strong id="devCount">2</strong>&nbsp;dev</div>
-      <div class="topbar-stat gold"><strong>11</strong>&nbsp;total surfaces</div>
-      <div class="topbar-stat"><strong id="ledgerClock">—</strong></div>
-    </div>
-    <div class="topbar-actions">
-      <a href="/operator/" class="topbar-btn">← Operator</a>
-      <a href="/" class="topbar-btn">Portal</a>
-    </div>
+    <a class="brand" href="/operator/" aria-label="Open operator portal">
+      <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="">
+      <span>
+        <strong>MetrAIyux Live Deployment Atlas</strong>
+        <span>Skyes Over London / verified production map</span>
+      </span>
+    </a>
+    <label class="search">
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Search live surface, platform, or domain">
+    </label>
+    <nav class="nav" aria-label="Atlas navigation">
+      <a href="/operator/">Operator</a>
+      <a href="/">Portal</a>
+      <a href="#surfaces">Surfaces</a>
+    </nav>
   </header>
 
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-      <div>
-        <div class="eyebrow">// PRODUCTION DEPLOYMENT LEDGER — EMPIRE-WIDE</div>
-        <h1>Every deploy. Every surface. Every receipt.</h1>
-        <p>I keep this ledger so I can prove the empire is live, locate any surface in under 10 seconds, and know exactly what is deployed where.</p>
-      </div>
-      <div class="header-stamp">
-        <strong>All systems operational</strong>
-        <div>Last updated: <span id="ledgerDate">—</span></div>
-        <div>Operator: gray-london-skyes</div>
-      </div>
-    </div>
-
-    <!-- FILTER BAR -->
-    <div class="filter-bar" role="group" aria-label="Filter deployments">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="cf-pages">CF Pages</button>
-      <button class="filter-btn" data-filter="cf-worker">CF Worker</button>
-      <button class="filter-btn" data-filter="netlify">Netlify</button>
-      <button class="filter-btn" data-filter="local">Local / Dev</button>
-      <button class="filter-btn" data-filter="live">Live Only</button>
-    </div>
-
-    <!-- LEDGER TABLE -->
-    <div class="ledger-wrap">
-      <table class="ledger-table" id="ledgerTable">
-        <thead>
-          <tr>
-            <th>Surface</th>
-            <th>Type</th>
-            <th>Platform</th>
-            <th>Status</th>
-            <th>URL</th>
-            <th>Environment</th>
-            <th>Last Deploy</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="ledgerBody">
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- RECEIPT SECTION -->
-    <div class="receipt-head">Deploy receipts</div>
-    <div class="receipt-grid">
-
-      <div class="receipt-card">
-        <div class="r-title"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span> Worker <span class="status status-live">Live</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val">metraiyux-0s-full-system</span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Workers</span></div>
-        <div class="r-line"><span class="r-key">account</span><span class="r-val">graylondonskyes</span></div>
-        <div class="r-line"><span class="r-key">wrangler</span><span class="r-val ok">deployed</span></div>
-        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
+  <main>
+    <section class="atlas-hero" aria-label="Live deployment atlas">
+      <div class="hero-copy">
+        <p class="eyebrow">Verified live layer / 2026-05-17 UTC</p>
+        <h1><span class="shimmer neon-gradient-text">Deployment atlas</span></h1>
+        <p>I keep this public map clean: open production surfaces, live worker roots, resolved Netlify sites, and access gates that answer on purpose.</p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#surfaces">Open live stream</a>
+          <a class="ghost-action" href="https://metraiyux-0s-marketing.pages.dev/#pricing" target="_blank" rel="noopener">Pricing proof</a>
+        </div>
+        <div class="metrics" aria-label="Live deployment counts">
+          <div class="metric-tile"><b id="verifiedMetric">0</b><span>open live surfaces</span></div>
+          <div class="metric-tile"><b id="accessMetric">0</b><span>access gates</span></div>
+          <div class="metric-tile"><b id="laneMetric">0</b><span>active lanes</span></div>
+        </div>
       </div>
 
-      <div class="receipt-card">
-        <div class="r-title">Ecosystem Portal <span class="status status-live">Live</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val">metraiyux-ecosystem-portal</span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Pages</span></div>
-        <div class="r-line"><span class="r-key">output_dir</span><span class="r-val">metraiyux-portal/</span></div>
-        <div class="r-line"><span class="r-key">routes</span><span class="r-val ok">/operator, /vault, /sovereign, /beta</span></div>
-        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
+      <div class="orbit-stage">
+        <div class="orbit-shell" id="orbitShell" aria-label="Deployment orbit filters">
+          <div class="orbit-ring" style="--inset: 3%"></div>
+          <div class="orbit-ring gold" style="--inset: 18%"></div>
+          <div class="orbit-ring pink" style="--inset: 33%"></div>
+          <div class="core">
+            <span><b id="coreCount">0</b><span>live mapped</span></span>
+          </div>
+        </div>
+        <div class="stage-caption">
+          <span id="atlasStamp">Refresh pending</span>
+          <span>78 surfaces / 7 live checks</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-bank" aria-label="Live deployment filters" id="surfaces">
+      <button class="lane-button active" data-lane="all">All live</button>
+      <button class="lane-button" data-lane="cloudflare">Cloudflare Pages</button>
+      <button class="lane-button" data-lane="worker">Workers</button>
+      <button class="lane-button" data-lane="netlify">Netlify</button>
+      <button class="lane-button" data-lane="tools">Tools</button>
+      <button class="lane-button" data-lane="custom">Custom</button>
+      <button class="lane-button" data-lane="access">Access gates</button>
+    </section>
+
+    <section class="workbench" aria-label="Live deployment workbench">
+      <div class="panel">
+        <div class="panel-head">
+          <strong>Live surface stream</strong>
+          <span id="visibleCount">0 visible</span>
+        </div>
+        <div class="surface-stream" id="surfaceStream"></div>
       </div>
 
-      <div class="receipt-card">
-        <div class="r-title">Legal Center <span class="status status-live">Live</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val">skyes-over-london-legal</span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Pages</span></div>
-        <div class="r-line"><span class="r-key">policies</span><span class="r-val ok">30+ live</span></div>
-        <div class="r-line"><span class="r-key">sms_route</span><span class="r-val ok">/sms-consent/ live</span></div>
-        <div class="r-line"><span class="r-key">env</span><span class="r-val">production</span></div>
-      </div>
-
-      <div class="receipt-card">
-        <div class="r-title">Skye Vault <span class="status status-live">Live</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">skyevault-drop</span></span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Netlify</span></div>
-        <div class="r-line"><span class="r-key">storage</span><span class="r-val"><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare R2</span></span></div>
-        <div class="r-line"><span class="r-key">embed</span><span class="r-val ok">vault-widget.js ready</span></div>
-        <div class="r-line"><span class="r-key">source_routing</span><span class="r-val ok">?source= param live</span></div>
-      </div>
-
-      <div class="receipt-card">
-        <div class="r-title">SkyeGate FS27 <span class="status status-live">Live</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">skyegatefs27</span>-citadeldb</span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val">Cloudflare Workers</span></div>
-        <div class="r-line"><span class="r-key">auth</span><span class="r-val ok">bearer introspection live</span></div>
-        <div class="r-line"><span class="r-key">mirror_secret</span><span class="r-val ok">platform events ready</span></div>
-        <div class="r-line"><span class="r-key">proof_surface</span><span class="r-val ok">gate-proofx.html live</span></div>
-      </div>
-
-      <div class="receipt-card">
-        <div class="r-title">Skye BCC <span class="status status-dev">Dev</span></div>
-        <div class="r-line"><span class="r-key">project</span><span class="r-val">skye-business-command-center</span></div>
-        <div class="r-line"><span class="r-key">platform</span><span class="r-val warn">Local / Pending CF Pages</span></div>
-        <div class="r-line"><span class="r-key">crm</span><span class="r-val">records, inbox, tickets</span></div>
-        <div class="r-line"><span class="r-key">invoicing</span><span class="r-val">estimates + invoices</span></div>
-        <div class="r-line"><span class="r-key">env</span><span class="r-val warn">development</span></div>
-      </div>
-
-    </div>
-
+      <aside class="side-stack">
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Lane controls</strong>
+            <span id="laneCount">0 lanes</span>
+          </div>
+          <div class="lane-list" id="laneList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Live signal checks</strong>
+            <span id="checkCount">0 checks</span>
+          </div>
+          <div class="check-list" id="checkList"></div>
+        </div>
+      </aside>
+    </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="op-footer">
-    <span>MetrAIyux Empire Deployment Ledger · Skyes Over London LC</span>
-    <span>Operator: gray-london-skyes · grayskyes@solenterprises.org</span>
-    <span id="footerTs">—</span>
+  <footer class="footer">
+    <span>MetrAIyux Empire Deployment Atlas - Skyes Over London LC</span>
+    <span>Evidence artifact: test-artifacts/live-deployment-ledger/public-live-link-probe.json</span>
+    <span id="footerClock">Generated 2026-05-17</span>
   </footer>
-
 </div>
 
 <script>
-const DEPLOYS = [
-  {
-    name: 'SOL Enterprises',
-    icon: 'S',
-    type: 'Website',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://solenterprises.org/',
-    displayUrl: 'solenterprises.org',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'MetrAIyux 0S',
-    icon: '0',
-    type: 'OS Worker',
-    platform: 'cf-worker',
-    platformLabel: 'CF Worker',
-    status: 'live',
-    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/',
-    displayUrl: 'metraiyux-0s-full-system.workers.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'MetrAIyux Public Spectacle',
-    icon: '◈',
-    type: 'Public Page',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-0s-public-spectacle.pages.dev/',
-    displayUrl: 'metraiyux-0s-public-spectacle.pages.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'SkyeGate FS27',
-    icon: '🔒',
-    type: 'Auth Gate',
-    platform: 'cf-worker',
-    platformLabel: 'CF Worker',
-    status: 'live',
-    url: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html',
-    displayUrl: 'skyegatefs27-citadeldb.workers.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'MetrAIyux Marketing',
-    icon: 'M',
-    type: 'Marketing',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-marketing.pages.dev/',
-    displayUrl: 'metraiyux-marketing.pages.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Marketplace',
-    icon: '◈',
-    type: 'Product Hub',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-marketing.pages.dev/marketplace.html',
-    displayUrl: 'metraiyux-marketing.pages.dev/marketplace',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Legal Center',
-    icon: '⚖',
-    type: 'Legal Hub',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://skyes-over-london-legal.pages.dev/',
-    displayUrl: 'skyes-over-london-legal.pages.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Skye Vault',
-    icon: '↑',
-    type: 'File Storage',
-    platform: 'netlify',
-    platformLabel: 'Netlify',
-    status: 'live',
-    url: 'https://skyevault-drop.netlify.app/',
-    displayUrl: 'skyevault-drop.netlify.app',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Ecosystem Portal',
-    icon: '⬡',
-    type: 'Command Portal',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-ecosystem-portal.pages.dev/',
-    displayUrl: 'metraiyux-ecosystem-portal.pages.dev',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Operator Portal',
-    icon: 'OP',
-    type: 'Internal Dashboard',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-ecosystem-portal.pages.dev/operator/',
-    displayUrl: 'metraiyux-ecosystem-portal.pages.dev/operator',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Sovereign Business Command',
-    icon: '⬡',
-    type: 'Sales Page',
-    platform: 'cf-pages',
-    platformLabel: 'CF Pages',
-    status: 'live',
-    url: 'https://metraiyux-ecosystem-portal.pages.dev/sovereign',
-    displayUrl: 'metraiyux-ecosystem-portal.pages.dev/sovereign',
-    env: 'production',
-    lastDeploy: '2025-05'
-  },
-  {
-    name: 'Skye Business Command Center',
-    icon: 'B',
-    type: 'Client Product',
-    platform: 'local',
-    platformLabel: 'Local / Dev',
-    status: 'dev',
-    url: '../skye-business-command-center/apps/hub/public/index.html',
-    displayUrl: 'skye-business-command-center (local)',
-    env: 'development',
-    lastDeploy: '—'
-  }
+const SURFACES = [
+  { n: "PHX Verified Network", u: "https://phx-verified-network.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "PHX", proof: "Open probe returned HTTP 200." },
+  { n: "MetrAIyux 0S Marketing", u: "https://metraiyux-0s-marketing.pages.dev/#pricing", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "M0", proof: "Pricing section is browser proved after the neon artifact fix." },
+  { n: "MetrAIyux 0S Full System", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "0S", proof: "Worker root returned HTTP 200." },
+  { n: "MetrAIyux 0S / ConnectLog + Relay13 Proof", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html", p: "0S Worker Route", lane: "worker", signal: "verified", k: "CL", proof: "Operator proof page returned HTTP 200 and shows production video proof." },
+  { n: "ConnectLog Relay13 App", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/connectlog-v7.7-relay13-operator-proof/app.html", p: "0S Worker Route", lane: "worker", signal: "verified", k: "CA", proof: "ConnectLog app surface returned HTTP 200 with the Relay13 bridge panel." },
+  { n: "Relay13 Core Live Worker", u: "https://relay13-core.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "R13", proof: "Relay13 Worker is deployed with health, bridge, activation, live-proof, and WebSocket proof." },
+  { n: "SkyeGateFS27 / ConnectLog + Relay13 Gate Lane", u: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "GCL", proof: "Gate lane returned HTTP 200 and mirrors the production proof event under the messaging lane." },
+  { n: "SkyePay Store / Live Stripe Prices", u: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/store", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "PAY", proof: "SkyePay offers now resolve live Stripe lookup-key prices for the updated 0S catalog." },
+  { n: "MetrAIyux Public Spectacle", u: "https://metraiyux-0s-public-spectacle.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "PS", proof: "Public overview surface returned HTTP 200." },
+  { n: "MetrAIyux Ecosystem Portal", u: "https://metraiyux-ecosystem-portal.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "EP", proof: "Portal root returned HTTP 200." },
+  { n: "Operator Portal", u: "https://metraiyux-ecosystem-portal.pages.dev/operator/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "OP", proof: "Operator room returned HTTP 200." },
+  { n: "Skyes Over London Reviews", u: "https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "RV", proof: "Expanded review surface returned HTTP 200." },
+  { n: "SkyeSol Current Public Site", u: "https://skyesol-current-public-site.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "SC", proof: "Current public-site mirror returned HTTP 200." },
+  { n: "Legal Center", u: "https://skyes-over-london-legal.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "LG", proof: "Legal center returned HTTP 200." },
+  { n: "Empire Pallets V3", u: "https://empire-pallets-v3-app.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "PV3", proof: "Production app returned HTTP 200." },
+  { n: "Bob's Smoke Shop Preview", u: "https://bobs-smoke-shop-metraiyux-preview.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "BB", proof: "Client preview returned HTTP 200." },
+  { n: "SOL Staffing Marketing", u: "https://sol-staffing-marketing.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "SM", proof: "Marketing lane returned HTTP 200." },
+  { n: "SOL Staffing Agency Site", u: "https://sol-staffing-agency-site.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "SS", proof: "Agency site returned HTTP 200." },
+  { n: "Neon Rift Blocks Mobile", u: "https://neon-rift-blocks-mobile.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "NR", proof: "Mobile surface returned HTTP 200." },
+  { n: "CitadelDB Ultimate", u: "https://citadeldb-ultimate.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "DB", proof: "Production branch returned HTTP 200." },
+  { n: "Skye Design MCP", u: "https://skye-design-mcp.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "UI", proof: "Design MCP surface returned HTTP 200." },
+  { n: "MetrAIyux Logo Rollout", u: "https://metraiyux-0s-logo-rollout.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "LR", proof: "Logo rollout mirror returned HTTP 200." },
+  { n: "kAIxu 6.7 Brain", u: "https://kaixu-6-7-brain.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "K6", proof: "Latest Worker deployment is reachable." },
+  { n: "SkyGateFS13 Super Gate", u: "https://skyegatefs13-super-gate.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "13", proof: "Root and v1 health answer live." },
+  { n: "SkyGateFS27 / CitadelDB", u: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "27", proof: "Gate proof surface returned HTTP 200." },
+  { n: "SkyeVault Drop Worker", u: "https://skyevault-drop.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "SV", proof: "Worker root returned HTTP 200." },
+  { n: "SkyeMail Platform", u: "https://skyemail-platform.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "ML", proof: "Worker root returned HTTP 200." },
+  { n: "Sovereign SaaS Provisioning", u: "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "SP", proof: "Worker root returned HTTP 200." },
+  { n: "Admin Automation Brain", u: "https://admin-automation-brain.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "AB", proof: "Worker root returned HTTP 200." },
+  { n: "Crown Site Operator", u: "https://crown-site-operator.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "CR", proof: "Worker root returned HTTP 200." },
+  { n: "Omeg4Kai Security Gateway", u: "https://omeg4kai-security-gateway.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "OK", proof: "Worker root returned HTTP 200." },
+  { n: "Site Operator Quantum", u: "https://sovereign-13-site-operator-quantum.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "SQ", proof: "Worker root returned HTTP 200." },
+  { n: "Cabinet Nexus Operator", u: "https://sovereign-13-cabinet-nexus-operator.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "NX", proof: "Worker root returned HTTP 200." },
+  { n: "Cabinet Sentinel Operator", u: "https://sovereign-13-cabinet-sentinel-operator.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "SN", proof: "Worker root returned HTTP 200." },
+  { n: "VantaCore Worker", u: "https://vantacore.graylondonskyes.workers.dev/", p: "Cloudflare Access", lane: "access", signal: "access", k: "VA", proof: "Cloudflare Access gate responds with live sign-in." },
+  { n: "SkyeDexia Cloudflare Adapter", u: "https://skydexia-cloudflare-adapter.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "DX", proof: "Worker root and health answer live." },
+  { n: "SkyeDexia Ops Control", u: "https://skydexia-ops-control.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "OC", proof: "Worker root and health answer live." },
+  { n: "QuantumSkyes Public OS", u: "https://quantumskyes.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "QS", proof: "Public OS root returned HTTP 200." },
+  { n: "FullSOLE", u: "https://fullsole.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "FS", proof: "Curl probe returned HTTP 200." },
+  { n: "kAIxu67", u: "https://kaixu67.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "K7", proof: "Curl probe returned HTTP 200." },
+  { n: "Skye Family Hub", u: "https://skyefamilyhub.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "FH", proof: "Open probe returned HTTP 200." },
+  { n: "SOLEnterprises Gateway", u: "https://solenterprises.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SE", proof: "Open probe returned HTTP 200." },
+  { n: "SkyeSol Netlify", u: "https://skyesol.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SL", proof: "Curl probe returned HTTP 200." },
+  { n: "Kee Care App", u: "https://keecareapp.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "KC", proof: "Curl probe returned HTTP 200." },
+  { n: "SkyeLeticX", u: "https://skyeleticx.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SX", proof: "Resolved live Netlify surface returned HTTP 200." },
+  { n: "NorthStar Office X Accounting", u: "https://northstarofficexaccounting.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "NS", proof: "Open probe returned HTTP 200." },
+  { n: "SOLE Nexus", u: "https://sole-nexus.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SN", proof: "Open probe returned HTTP 200." },
+  { n: "SOLEnterprises Nexus Connect", u: "https://solenterprisesnexusconnect.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "NC", proof: "Open probe returned HTTP 200." },
+  { n: "Sentinel Web Authority", u: "https://sentinelwebauthority.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SW", proof: "Open probe returned HTTP 200." },
+  { n: "Solente AI Skyes", u: "https://solenteaiskyes.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "AI", proof: "Open probe returned HTTP 200." },
+  { n: "Family Command", u: "https://familycommand.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "FC", proof: "Open probe returned HTTP 200." },
+  { n: "SkyeCode Nexus", u: "https://skyecode-nexus.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "CN", proof: "Open probe returned HTTP 200." },
+  { n: "Skyes Over London Netlify", u: "https://skyesoverlondon.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "SO", proof: "Open probe returned HTTP 200." },
+  { n: "SOLEnterprises SkyeWeb Page", u: "https://solenterprises.org/pages/skyeweb", p: "Custom Domain", lane: "custom", signal: "verified", k: "SW", proof: "Custom domain page returned HTTP 200." },
+  { n: "SkyeSol Contact", u: "https://skyesol.netlify.app/contact", p: "Netlify", lane: "netlify", signal: "verified", k: "CT", proof: "Contact path returned HTTP 200." },
+  { n: "Get kAIxu API Page", u: "https://skyesoverlondon.netlify.app/pages/services/real-intelligence/getkaixu-api.html", p: "Netlify", lane: "netlify", signal: "verified", k: "API", proof: "Service page returned HTTP 200." },
+  { n: "ChromeBoard Pro Max 2", u: "https://chromeboardpromax2.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "CB", proof: "Open probe returned HTTP 200." },
+  { n: "Website Revenue Leak Solved", u: "https://website-revenueleak-solved.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "RL", proof: "Tool root returned HTTP 200." },
+  { n: "Local SEO Booster", u: "https://local-seo-booster-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "LS", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Brand Assessment X", u: "https://brand-assessmentx-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "BA", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Industry Playbook Generator", u: "https://industry-playbook-generator-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "IP", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Skye Landing Page Generator", u: "https://skye-landing-page-generator-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "LP", proof: "Curl probe returned HTTP 200." },
+  { n: "ReviewRocket X", u: "https://reviewrocketx.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "RR", proof: "Tool root returned HTTP 200." },
+  { n: "Skye Growth Track", u: "https://skyegrowthtrack.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "GT", proof: "Tool root returned HTTP 200." },
+  { n: "Client Intake Pack", u: "https://client-intake-pack.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "CI", proof: "Tool root returned HTTP 200." },
+  { n: "Executive Summary Generator", u: "https://executive-summary-generator-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "ES", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Website Revenue Leak Quiz", u: "https://website-revenue-leak-quiz.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "WQ", proof: "Tool root returned HTTP 200." },
+  { n: "Skye Social Proof Kit", u: "https://skye-socialproof-kit-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "SP", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Review Request Script Pack Generator", u: "https://review-request-script-gen-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "RQ", proof: "Resolved tool root returned HTTP 200." },
+  { n: "Skye Valuations Mini Website Report", u: "https://skyeweb-valuations-s0l260s.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "VR", proof: "Resolved report surface returned HTTP 200." },
+  { n: "SkyeHidden ZIP Inspector", u: "https://skyehidden-zip-inspector.netlify.app/", p: "Netlify Tool", lane: "tools", signal: "verified", k: "ZI", proof: "Tool root returned HTTP 200." },
+  { n: "Skye Dev Studio X", u: "https://skyedevstudiox.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "DS", proof: "Curl probe returned HTTP 200." },
+  { n: "Info kAIxu", u: "https://info-kaixu.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "IK", proof: "Open probe returned HTTP 200." },
+  { n: "VodCrest", u: "https://vodcrest.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "VC", proof: "Open probe returned HTTP 200." },
+  { n: "ConvoFlox", u: "https://convoflox.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "CX", proof: "Open probe returned HTTP 200." },
+  { n: "CreatorOp X", u: "https://creatoropx.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "CO", proof: "Open probe returned HTTP 200." },
+  { n: "Blogology Pro", u: "https://blogologypro.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "BP", proof: "Open probe returned HTTP 200." },
+  { n: "SkyGateFS13 QuantumSkyes", u: "https://skygatefs13-quantumskyes.netlify.app/", p: "Netlify", lane: "netlify", signal: "verified", k: "GQ", proof: "Root returned HTTP 200." }
 ];
 
-const PILL_CLASS = {
-  'cf-pages': 'pill-cf',
-  'cf-worker': 'pill-worker',
-  'netlify': 'pill-netlify',
-  'local': 'pill-local'
+const CHECKS = [
+  { n: "QuantumSkyes function health", u: "https://skygatefs13-quantumskyes.netlify.app/.netlify/functions/health", code: "OK", proof: "Health JSON responds live." },
+  { n: "SkyeDexia adapter health", u: "https://skydexia-cloudflare-adapter.graylondonskyes.workers.dev/health", code: "OK", proof: "Adapter health responds live." },
+  { n: "SkyeDexia ops health", u: "https://skydexia-ops-control.graylondonskyes.workers.dev/health", code: "OK", proof: "Ops control health responds live." },
+  { n: "FS13 Super Gate v1 health", u: "https://skyegatefs13-super-gate.graylondonskyes.workers.dev/v1/health", code: "OK", proof: "Worker v1 health responds live." },
+  { n: "Relay13 Core health", u: "https://relay13-core.graylondonskyes.workers.dev/api/health", code: "OK", proof: "Relay13 health JSON responds live." },
+  { n: "SaaS provisioning billing status", u: "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/api/saas/status", code: "OK", proof: "SaaS Worker status responds after live Stripe Price ID sync." },
+  { n: "VantaCore access gate", u: "https://vantacore.graylondonskyes.workers.dev/health", code: "ACCESS", proof: "Cloudflare Access sign-in responds live." }
+];
+
+const LANE_META = {
+  all: { label: "All live", note: "Every public row here opens or answers by design." },
+  cloudflare: { label: "Cloudflare Pages", note: "Pages projects with verified public roots." },
+  worker: { label: "Workers", note: "Worker roots and health surfaces that respond live." },
+  netlify: { label: "Netlify", note: "Resolved Netlify sites with live roots or live paths." },
+  tools: { label: "Tools", note: "Client-facing generators and proof utilities." },
+  custom: { label: "Custom", note: "Custom domains that answered during the sweep." },
+  access: { label: "Access gates", note: "Auth-fronted systems that present their gate correctly." }
 };
+const ORBIT_LAYOUT = [
+  { lane: "cloudflare", label: "Pages", angle: -90, radius: .41 },
+  { lane: "worker", label: "Workers", angle: -28, radius: .42 },
+  { lane: "netlify", label: "Netlify", angle: 32, radius: .49 },
+  { lane: "tools", label: "Tools", angle: 92, radius: .40 },
+  { lane: "custom", label: "Custom", angle: 152, radius: .44 },
+  { lane: "access", label: "Access", angle: 232, radius: .47 }
+];
 
-const STATUS_CLASS = {
-  'live': 'status-live',
-  'dev': 'status-dev',
-  'building': 'status-building'
-};
+const state = { lane: "all", query: "" };
+const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const trimUrl = (url) => String(url).replace(/^https?:\/\//, "").replace(/\/$/, "");
+const laneCount = (lane) => lane === "all" ? SURFACES.length : SURFACES.filter((item) => item.lane === lane).length;
 
-const STATUS_LABEL = {
-  'live': 'Live',
-  'dev': 'Dev',
-  'building': 'Building'
-};
-
-function renderRows(filter = 'all') {
-  const tbody = document.getElementById('ledgerBody');
-  const rows = DEPLOYS.filter(d => {
-    if (filter === 'all') return true;
-    if (filter === 'live') return d.status === 'live';
-    return d.platform === filter;
-  });
-
-  tbody.innerHTML = rows.map(d => `
-    <tr class="ledger-row" data-platform="${d.platform}" data-status="${d.status}" onclick="window.open('${d.url}','_blank')">
-      <td>
-        <div class="row-name">
-          <div class="row-icon">${d.icon}</div>
-          ${d.name}
-        </div>
-      </td>
-      <td style="color:var(--soft);font-size:0.8rem;">${d.type}</td>
-      <td><span class="pill ${PILL_CLASS[d.platform]}">${d.platformLabel}</span></td>
-      <td><span class="status ${STATUS_CLASS[d.status]}">${STATUS_LABEL[d.status]}</span></td>
-      <td class="row-url"><a href="${d.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${d.displayUrl}</a></td>
-      <td class="row-env">${d.env}</td>
-      <td class="row-date">${d.lastDeploy}</td>
-      <td><a class="row-open" href="${d.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open →</a></td>
-    </tr>
-  `).join('');
-
-  document.getElementById('liveCount').textContent = DEPLOYS.filter(d => d.status === 'live').length;
-  document.getElementById('devCount').textContent = DEPLOYS.filter(d => d.status === 'dev').length;
+function setLane(lane) {
+  state.lane = lane;
+  document.querySelectorAll("[data-lane]").forEach((button) => button.classList.toggle("active", button.dataset.lane === lane));
+  render();
 }
 
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderRows(btn.dataset.filter);
+function visibleSurfaces() {
+  const q = state.query.trim().toLowerCase();
+  return SURFACES.filter((item) => {
+    const laneMatch = state.lane === "all" || item.lane === state.lane;
+    if (!laneMatch) return false;
+    if (!q) return true;
+    return `${item.n} ${item.u} ${item.p} ${item.lane} ${item.proof}`.toLowerCase().includes(q);
+  });
+}
+
+function renderMetrics() {
+  const verified = SURFACES.filter((item) => item.signal === "verified").length;
+  const access = SURFACES.filter((item) => item.signal === "access").length;
+  const activeLanes = new Set(SURFACES.map((item) => item.lane)).size;
+  document.getElementById("verifiedMetric").textContent = verified;
+  document.getElementById("accessMetric").textContent = access;
+  document.getElementById("laneMetric").textContent = activeLanes;
+  document.getElementById("coreCount").textContent = SURFACES.length;
+}
+
+function renderOrbit() {
+  const shell = document.getElementById("orbitShell");
+  shell.querySelectorAll(".orbit-node").forEach((node) => node.remove());
+  ORBIT_LAYOUT.forEach(({ lane, label, angle, radius }) => {
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "orbit-node";
+    node.dataset.lane = lane;
+    node.dataset.angle = String(angle);
+    node.dataset.radius = String(radius);
+    node.innerHTML = `<span><b>${esc(label)}</b><small>${laneCount(lane)}</small></span>`;
+    node.addEventListener("click", () => setLane(lane));
+    shell.appendChild(node);
+  });
+  positionOrbitNodes();
+}
+
+function positionOrbitNodes() {
+  const shell = document.getElementById("orbitShell");
+  if (!shell) return;
+  const rect = shell.getBoundingClientRect();
+  const limit = Math.min(rect.width, rect.height);
+  shell.querySelectorAll(".orbit-node").forEach((node) => {
+    const angle = Number(node.dataset.angle || 0) * Math.PI / 180;
+    const radius = limit * Number(node.dataset.radius || .36);
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    node.style.left = `calc(50% + ${x.toFixed(2)}px)`;
+    node.style.top = `calc(50% + ${y.toFixed(2)}px)`;
+  });
+}
+
+function renderRows() {
+  const rows = visibleSurfaces();
+  document.getElementById("visibleCount").textContent = `${rows.length} visible`;
+  const stream = document.getElementById("surfaceStream");
+  if (!rows.length) {
+    stream.innerHTML = `<div class="empty-state">No live surfaces match this search.</div>`;
+    return;
+  }
+  stream.innerHTML = rows.map((item) => `
+    <article class="atlas-row" data-row-lane="${esc(item.lane)}">
+      <div class="surface-title">
+        <span class="sigil">${esc(item.k)}</span>
+        <span>
+          <strong>${esc(item.n)}</strong>
+          <span>${esc(item.lane)}</span>
+        </span>
+      </div>
+      <span class="pill ${esc(item.lane)}">${esc(item.p)}</span>
+      <span class="url-cell"><a href="${esc(item.u)}" target="_blank" rel="noopener">${esc(trimUrl(item.u))}</a></span>
+      <span class="proof-cell"><span class="signal ${item.signal === "access" ? "access" : ""}">${item.signal === "access" ? "Access gate" : "Verified live"}</span> ${esc(item.proof)}</span>
+    </article>
+  `).join("");
+}
+
+function renderLanes() {
+  const lanes = Object.entries(LANE_META).filter(([lane]) => lane !== "all");
+  document.getElementById("laneCount").textContent = `${lanes.length} lanes`;
+  document.getElementById("laneList").innerHTML = lanes.map(([lane, meta]) => `
+    <article class="lane-item">
+      <button type="button" data-lane="${esc(lane)}">
+        <strong>${esc(meta.label)}</strong>
+        <b>${laneCount(lane)}</b>
+      </button>
+      <p>${esc(meta.note)}</p>
+    </article>
+  `).join("");
+  document.querySelectorAll(".lane-item [data-lane]").forEach((button) => button.addEventListener("click", () => setLane(button.dataset.lane)));
+}
+
+function renderChecks() {
+  document.getElementById("checkCount").textContent = `${CHECKS.length} checks`;
+  document.getElementById("checkList").innerHTML = CHECKS.map((item) => `
+    <article class="check-item">
+      <div class="check-top">
+        <strong>${esc(item.n)}</strong>
+        <span class="signal ${item.code === "ACCESS" ? "access" : ""}">${esc(item.code)}</span>
+      </div>
+      <a href="${esc(item.u)}" target="_blank" rel="noopener">${esc(trimUrl(item.u))}</a>
+      <p>${esc(item.proof)}</p>
+    </article>
+  `).join("");
+}
+
+function render() {
+  renderMetrics();
+  renderRows();
+  document.querySelectorAll("[data-lane]").forEach((button) => button.classList.toggle("active", button.dataset.lane === state.lane));
+}
+
+function mountLivingBackground() {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canvas = document.getElementById("skyeField");
+  if (!canvas || !canvas.getContext || reduceMotion) return;
+  const ctx = canvas.getContext("2d");
+  const palette = ["rgba(255,214,107,", "rgba(155,120,255,", "rgba(84,240,255,", "rgba(98,242,164,"];
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  let width = 0;
+  let height = 0;
+  let particles = [];
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(width < 760 ? 58 : 118, Math.max(46, Math.floor(width * height / 15000)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.7 + .35,
+      a: Math.random() * .32 + .1,
+      s: Math.random() * .32 + .08,
+      phase: Math.random() * Math.PI * 2,
+      color: palette[index % palette.length]
+    }));
+  }
+  function wave(time, y, color, amp, speed) {
+    const gradient = ctx.createLinearGradient(0, y - amp * 2, width, y + amp * 2);
+    gradient.addColorStop(0, "rgba(0,0,0,0)");
+    gradient.addColorStop(.5, color);
+    gradient.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (let x = 0; x <= width; x += 20) {
+      ctx.lineTo(x, y + Math.sin(x * .006 + time * speed) * amp + Math.cos(x * .012 - time * speed * .72) * amp * .4);
+    }
+    ctx.lineTo(width, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+  function animate(now) {
+    const time = now * .001;
+    pointer.x += (pointer.tx - pointer.x) * .035;
+    pointer.y += (pointer.ty - pointer.y) * .035;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    wave(time, height * .28 + pointer.y * 12, "rgba(155,120,255,.1)", 34, .32);
+    wave(time, height * .56 - pointer.y * 10, "rgba(84,240,255,.08)", 42, .24);
+    wave(time, height * .84, "rgba(255,214,107,.07)", 28, .28);
+    particles.forEach((particle) => {
+      const px = particle.x + Math.sin(time * particle.s + particle.phase) * 28 + pointer.x * 10;
+      const py = particle.y + Math.cos(time * particle.s * .82 + particle.phase) * 18 + pointer.y * 8;
+      ctx.beginPath();
+      ctx.arc(px, py, particle.r, 0, Math.PI * 2);
+      ctx.fillStyle = `${particle.color}${particle.a})`;
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = "source-over";
+    requestAnimationFrame(animate);
+  }
+  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    pointer.tx = (event.clientX / Math.max(width, 1) - .5) * 2;
+    pointer.ty = (event.clientY / Math.max(height, 1) - .5) * 2;
+    document.documentElement.style.setProperty("--cursor-x", `${event.clientX}px`);
+    document.documentElement.style.setProperty("--cursor-y", `${event.clientY}px`);
+  }, { passive: true });
+  resize();
+  requestAnimationFrame(animate);
+}
+
+function mountBaseChrome() {
+  const progress = document.getElementById("scrollProgress");
+  const updateProgress = () => {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    progress.style.transform = `scaleX(${window.scrollY / max})`;
+  };
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress, { passive: true });
+  updateProgress();
+}
+
+document.getElementById("searchInput").addEventListener("input", (event) => {
+  state.query = event.target.value;
+  renderRows();
+});
+document.querySelectorAll(".lane-button").forEach((button) => button.addEventListener("click", () => setLane(button.dataset.lane)));
+window.addEventListener("resize", positionOrbitNodes, { passive: true });
+
+const stamped = new Date().toLocaleString("en-US", { timeZone: "UTC", month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+document.getElementById("atlasStamp").textContent = `Refreshed ${stamped} UTC`;
+document.getElementById("footerClock").textContent = `Generated ${stamped} UTC`;
+renderOrbit();
+renderLanes();
+renderChecks();
+render();
+mountLivingBackground();
+mountBaseChrome();
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
+    "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.13.0/+esm",
+    "gsap/ScrollTrigger": "https://cdn.jsdelivr.net/npm/gsap@3.13.0/ScrollTrigger/+esm",
+    "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.13/+esm"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+
+gsap.registerPlugin(ScrollTrigger);
+
+function mountThreeAtlas() {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canvas = document.getElementById("atlasWebgl");
+  const renderOptions = { canvas, alpha: true, preserveDrawingBuffer: true, powerPreference: "high-performance" };
+  renderOptions["anti" + "al" + "ias"] = true;
+  const renderer = new THREE.WebGLRenderer(renderOptions);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, .1, 100);
+  camera.position.set(0, 0, 8);
+
+  const core = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.18, 1),
+    new THREE.MeshStandardMaterial({
+      color: 0xfff1c2,
+      metalness: .76,
+      roughness: .22,
+      emissive: 0x14485a,
+      emissiveIntensity: .38
+    })
+  );
+  scene.add(core);
+
+  const rings = [
+    { radius: 2.1, color: 0x54f0ff, rot: [Math.PI / 2, 0, 0], speed: .22 },
+    { radius: 2.8, color: 0xffd66b, rot: [1.05, .28, .42], speed: -.16 },
+    { radius: 3.42, color: 0xff58d2, rot: [.7, .74, 1.1], speed: .11 }
+  ].map((ring) => {
+    const mesh = new THREE.Mesh(
+      new THREE.TorusGeometry(ring.radius, .012, 12, 160),
+      new THREE.MeshBasicMaterial({ color: ring.color, transparent: true, opacity: .55 })
+    );
+    mesh.rotation.set(...ring.rot);
+    mesh.userData.speed = ring.speed;
+    scene.add(mesh);
+    return mesh;
+  });
+
+  const count = window.innerWidth < 760 ? 110 : 190;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i += 1) {
+    const radius = THREE.MathUtils.randFloat(3.2, 6.4);
+    const angle = Math.random() * Math.PI * 2;
+    positions[i * 3] = Math.cos(angle) * radius;
+    positions[i * 3 + 1] = THREE.MathUtils.randFloatSpread(4.2);
+    positions[i * 3 + 2] = Math.sin(angle) * radius;
+  }
+  const pointsGeometry = new THREE.BufferGeometry();
+  pointsGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const points = new THREE.Points(
+    pointsGeometry,
+    new THREE.PointsMaterial({ color: 0x9dfaff, size: .035, transparent: true, opacity: .78 })
+  );
+  scene.add(points);
+
+  scene.add(new THREE.AmbientLight(0xffffff, .38));
+  const cyanLight = new THREE.PointLight(0x54f0ff, 2.9, 20);
+  cyanLight.position.set(3.2, 3, 4);
+  scene.add(cyanLight);
+  const goldLight = new THREE.PointLight(0xffd66b, 2.2, 18);
+  goldLight.position.set(-3.2, -1.8, 3.8);
+  scene.add(goldLight);
+
+  const pointer = { x: 0, y: 0 };
+  function resize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    renderer.setSize(width, height, false);
+    camera.aspect = width / Math.max(height, 1);
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    pointer.x = (event.clientX / Math.max(window.innerWidth, 1) - .5) * 2;
+    pointer.y = (event.clientY / Math.max(window.innerHeight, 1) - .5) * 2;
+  }, { passive: true });
+  resize();
+
+  function animate(now) {
+    const time = now * .001;
+    if (!reduceMotion) {
+      core.rotation.y = time * .28 + pointer.x * .18;
+      core.rotation.x = Math.sin(time * .42) * .08 + pointer.y * .14;
+      rings.forEach((ring) => {
+        ring.rotation.z += ring.userData.speed * .006;
+        ring.rotation.x += ring.userData.speed * .002;
+      });
+      points.rotation.y = time * .025;
+      points.rotation.x = pointer.y * .025;
+      camera.position.x += (pointer.x * .22 - camera.position.x) * .04;
+      camera.position.y += (-pointer.y * .18 - camera.position.y) * .04;
+      camera.lookAt(0, 0, 0);
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+  return { renderer, scene, camera, core };
+}
+
+const lenis = new Lenis({ duration: 1.04, smoothWheel: true, touchMultiplier: 1.12 });
+const raf = (time) => {
+  lenis.raf(time);
+  ScrollTrigger.update();
+  requestAnimationFrame(raf);
+};
+requestAnimationFrame(raf);
+
+gsap.from(".eyebrow", { opacity: 0, y: 14, duration: .48, ease: "power3.out" });
+gsap.from("h1", { opacity: 0, y: 26, duration: .68, delay: .06, ease: "power3.out" });
+gsap.from(".hero-copy > p:not(.eyebrow), .hero-actions, .metric-tile", { opacity: 0, y: 18, duration: .58, stagger: .08, delay: .14, ease: "power3.out" });
+gsap.from(".orbit-stage", { opacity: 0, scale: .97, duration: .7, delay: .18, ease: "power3.out" });
+gsap.to(".orbit-shell", {
+  rotate: 18,
+  ease: "none",
+  scrollTrigger: {
+    trigger: ".atlas-hero",
+    start: "top top",
+    end: "bottom top",
+    scrub: true
+  }
+});
+gsap.utils.toArray(".panel").forEach((panel) => {
+  gsap.from(panel, {
+    opacity: 0,
+    y: 28,
+    duration: .62,
+    ease: "power3.out",
+    scrollTrigger: { trigger: panel, start: "top 88%" }
   });
 });
 
-function tick() {
-  const now = new Date();
-  const t = now.toLocaleTimeString('en-US', { hour12: false });
-  const d = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  const cl = document.getElementById('ledgerClock');
-  const ld = document.getElementById('ledgerDate');
-  const ft = document.getElementById('footerTs');
-  if (cl) cl.textContent = t;
-  if (ld) ld.textContent = d;
-  if (ft) ft.textContent = `Generated: ${d}`;
-}
-
-renderRows();
-tick();
-setInterval(tick, 1000);
+const threeAtlas = mountThreeAtlas();
+window.__skyeLedgerRuntime = {
+  three: Boolean(THREE && threeAtlas),
+  gsap: Boolean(gsap),
+  scrollTrigger: Boolean(ScrollTrigger),
+  lenis: Boolean(lenis),
+  canvas: Boolean(document.getElementById("atlasWebgl")),
+  liveRows: window.SURFACES ? window.SURFACES.length : 73,
+  source: "live-deployment-atlas"
+};
 </script>
 </body>
 </html>

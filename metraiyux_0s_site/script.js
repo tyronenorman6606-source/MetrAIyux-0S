@@ -1072,3 +1072,994 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
 
   onReady(boot);
 })();
+
+(function(){
+  if(window.__metraiyuxZeroGuide) return;
+  window.__metraiyuxZeroGuide = true;
+
+  const VERSION = '2026-05-17-self-guided-0s';
+  const STORE_KEY = 'metraiyux0s.guide.state.v1';
+
+  const JOURNEYS = [
+    {
+      id: 'first-run',
+      title: 'First Run Command Tour',
+      audience: 'New user',
+      minutes: '12 min',
+      description: 'A complete first pass through the command deck, brain router, sales proof, client operations, admin brain, and training layer.',
+      steps: [
+        {
+          title: 'Start at the command surface',
+          path: 'index.html',
+          selector: '.hero-actions',
+          body: 'Use the first screen as the launch board. The primary buttons open the admin brain, neural map, customer signup, client preview, charter, and local brain.',
+          action: 'Study the highlighted launch controls, then press Next control.'
+        },
+        {
+          title: 'Read the proof route strip',
+          path: 'index.html',
+          selector: '#live-surface-command-strip',
+          body: 'This strip shows the live surfaces users should reach for first: public overview, brain wall, proof router, neural map, and FS27 gate proof.',
+          action: 'Review the proof routes, then press Next room to enter the Local Brain.'
+        },
+        {
+          title: 'Ask the Local Brain',
+          path: 'local-brain.html',
+          selector: '#brainQuestion',
+          body: 'The Local Brain teaches what brain owns a question, which reviewer checks it, and which live proof surface should be sent.',
+          action: 'Type a real business question and run it through the Local Brain.'
+        },
+        {
+          title: 'Learn the sales path',
+          path: 'sales-enablement/index.html',
+          selector: '.ultra-grid',
+          body: 'The Sales Kit is where AEs learn what to show, what to say, which objections to handle, and where proof belongs in the demo.',
+          action: 'Open the Live Proof Router or Discovery Blueprint.'
+        },
+        {
+          title: 'Learn client operations',
+          path: 'client-os/index.html',
+          selector: '.ultra-grid',
+          body: 'Client OS teaches onboarding, status, documents, escalation, renewals, and the client preview workspace.',
+          action: 'Open the Onboarding Wizard and see what data a client handoff needs.'
+        },
+        {
+          title: 'Try the Main Automation Brain',
+          path: 'admin/automation-brain.html',
+          selector: '.brain-command-row',
+          body: 'The admin brain is the command window. Fast commands show what the system can route, draft, queue, and require for approval.',
+          action: 'Click a fast command, then inspect the ledger and approval language.'
+        },
+        {
+          title: 'Check proof and safety',
+          path: 'proof/proof-center.html',
+          selector: '.upgrade-table',
+          body: 'The Proof Center separates built assets from operator-required tasks. Users should learn this before they make public claims.',
+          action: 'Review which items are built and which require real setup.'
+        },
+        {
+          title: 'Finish in training',
+          path: 'training-academy/index.html',
+          selector: '.zero-academy-journeys',
+          body: 'Training Academy turns the tour into role-specific practice. Each role can start a guided journey and save local training records.',
+          action: 'Choose the role that matches the user and start that path.'
+        }
+      ]
+    },
+    {
+      id: 'admin-operator',
+      title: 'Admin Operator Walkthrough',
+      audience: 'Owner/admin',
+      minutes: '18 min',
+      description: 'Teaches the private command window, worker endpoint, token validation, fast commands, approval gates, and smoke tests.',
+      steps: [
+        {
+          title: 'Open the admin command room',
+          path: 'admin/automation-brain.html',
+          selector: '.admin-hero',
+          body: 'This room explains the difference between local receipt mode and deployed Cloudflare Worker mode.',
+          action: 'Read the mode banner before sending commands.'
+        },
+        {
+          title: 'Connect the Worker when available',
+          path: 'admin/automation-brain.html',
+          selector: '#endpointInput',
+          body: 'The Worker origin and admin token turn the brain from a browser-local receipt maker into shared operational automation.',
+          action: 'Paste the Worker origin only when the deployed endpoint is ready.'
+        },
+        {
+          title: 'Send a command safely',
+          path: 'admin/automation-brain.html',
+          selector: '#adminMessage',
+          body: 'The composer is for routing real work. Strong commands name the goal, the cabinet owner, the reviewer, and the approval gate.',
+          action: 'Use a concrete command, not a vague request.'
+        },
+        {
+          title: 'Use fast commands as templates',
+          path: 'admin/automation-brain.html',
+          selector: '.brain-command-row',
+          body: 'Fast commands show the expected grammar for social, lead, client, government, proof, security, and deployment tasks.',
+          action: 'Click one and inspect the draft before approving anything.'
+        },
+        {
+          title: 'Export the ledger',
+          path: 'admin/automation-brain.html',
+          selector: '#exportAdminBrain',
+          body: 'Ledger export is how an operator proves what was asked, routed, saved, and kept approval-gated.',
+          action: 'Export before handoff or live operational claims.'
+        },
+        {
+          title: 'Open the admin tutorial map',
+          path: 'admin/tutorial/index.html',
+          selector: '.tutorial-nav',
+          body: 'The tutorial index is the deep reference map for login modes, brain routing, proof, Cloudflare, Resend, connectors, and safety.',
+          action: 'Use the numbered lessons as the reference manual.'
+        },
+        {
+          title: 'Review approval gates',
+          path: 'admin/tutorial/09-approval-gates.html',
+          selector: 'main',
+          body: 'Money, contracts, hiring, filings, legal/tax advice, security claims, and public claims stay human-approved.',
+          action: 'Do not let users treat automation as permission.'
+        },
+        {
+          title: 'Run final smoke checks',
+          path: 'admin/tutorial/22-operator-final-smoke.html',
+          selector: 'main',
+          body: 'Before calling the admin layer live, prove chat, persistence, approvals, provider state, and export receipts.',
+          action: 'Finish only when the proof path is visible.'
+        }
+      ]
+    },
+    {
+      id: 'ae-sales',
+      title: 'AE Sales Demo Walkthrough',
+      audience: 'Account executive',
+      minutes: '16 min',
+      description: 'Teaches AEs how to qualify a buyer, choose proof, handle objections, run a demo, build a proposal, and close without overclaiming.',
+      steps: [
+        {
+          title: 'Open the Sales Kit',
+          path: 'sales-enablement/index.html',
+          selector: '.ultra-grid',
+          body: 'This is the AE command library. Every demo should start from the buyer problem and move toward live proof.',
+          action: 'Start with the Live Proof Router.'
+        },
+        {
+          title: 'Route the buyer to proof',
+          path: 'sales/live-proof-router.html',
+          selector: 'main',
+          body: 'The proof router matches buyer pain to the right live surface so an AE does not improvise unsupported claims.',
+          action: 'Pick a buyer pain and open the recommended route.'
+        },
+        {
+          title: 'Run discovery',
+          path: 'sales-enablement/discovery-blueprint.html',
+          selector: 'main',
+          body: 'Discovery maps pain, urgency, stakeholders, budget, authority, timeline, and risk before proposals are discussed.',
+          action: 'Use the question bank before showing too much product.'
+        },
+        {
+          title: 'Handle objections',
+          path: 'sales-enablement/objection-matrix.html',
+          selector: 'main',
+          body: 'Objection handling keeps price, trust, timing, staffing reliability, and technology skepticism grounded in proof.',
+          action: 'Choose the objection that matches the buyer.'
+        },
+        {
+          title: 'Run the demo room',
+          path: 'sales-enablement/demo-room-script.html',
+          selector: 'main',
+          body: 'The demo script gives a show flow that avoids drowning buyers in private implementation detail.',
+          action: 'Show command, proof, client operations, and next step.'
+        },
+        {
+          title: 'Build the proposal',
+          path: 'proposal-center/index.html',
+          selector: '.route-grid',
+          body: 'Proposal Center gives scope modules, timeline, pricing narrative, contracting boundaries, and handoff language.',
+          action: 'Use proposal modules after buyer fit is clear.'
+        },
+        {
+          title: 'Practice the AE certification path',
+          path: 'training-academy/ae-certification-path.html',
+          selector: '.tool-panel',
+          body: 'The AE training page records the current status, evidence, blockers, next action, approval, and review date.',
+          action: 'Save a local training record.'
+        }
+      ]
+    },
+    {
+      id: 'client-success',
+      title: 'Client Success Walkthrough',
+      audience: 'Client success',
+      minutes: '15 min',
+      description: 'Teaches onboarding, document requests, status boards, escalation, renewal reviews, and handoff discipline.',
+      steps: [
+        {
+          title: 'Open Client OS',
+          path: 'client-os/index.html',
+          selector: '.ultra-grid',
+          body: 'Client OS is the front-office surface for intake, onboarding, status, renewal, escalation, and document control.',
+          action: 'Use this hub before opening individual tools.'
+        },
+        {
+          title: 'Collect onboarding data',
+          path: 'client-os/onboarding-wizard.html',
+          selector: 'main',
+          body: 'The onboarding wizard captures stakeholders, scope, files, access, timeline, and communication preferences.',
+          action: 'Fill the fields from a realistic client scenario.'
+        },
+        {
+          title: 'Request documents cleanly',
+          path: 'client-os/document-request-center.html',
+          selector: 'main',
+          body: 'The document center keeps requests client-facing and avoids exposing internal notes.',
+          action: 'Use a checklist instead of scattered messages.'
+        },
+        {
+          title: 'Track account status',
+          path: 'client-os/status-board.html',
+          selector: 'main',
+          body: 'The status board shows phase, risk, next action, owner, and renewal timing.',
+          action: 'Update status before escalation or renewal.'
+        },
+        {
+          title: 'Escalate with proof',
+          path: 'client-os/escalation-desk.html',
+          selector: 'main',
+          body: 'Escalation requires severity, owner, promised response, proof required, and resolution notes.',
+          action: 'Capture the issue before promising a fix.'
+        },
+        {
+          title: 'Prepare renewal review',
+          path: 'client-os/renewal-review.html',
+          selector: 'main',
+          body: 'Renewal review gathers account health, ROI notes, service issues, and expansion paths.',
+          action: 'Do not wait until the renewal date to collect evidence.'
+        },
+        {
+          title: 'Save client success training',
+          path: 'training-academy/client-success-training.html',
+          selector: '.tool-panel',
+          body: 'The training tool saves owner, status, evidence, blockers, next action, approval, and review date locally.',
+          action: 'Export a record after the practice run.'
+        }
+      ]
+    },
+    {
+      id: 'recruiting-staffing',
+      title: 'Recruiting and Staffing Walkthrough',
+      audience: 'Recruiter',
+      minutes: '14 min',
+      description: 'Teaches job orders, candidate scoring, placement workflow, client onboarding packets, and recruiter training records.',
+      steps: [
+        {
+          title: 'Open recruiting operations',
+          path: 'recruiting/index.html',
+          selector: '.route-grid',
+          body: 'Recruiting Operations groups job orders, scorecards, placement workflow, and client onboarding materials.',
+          action: 'Start from the hub to avoid skipping the intake step.'
+        },
+        {
+          title: 'Capture the job order',
+          path: 'recruiting/job-order-intake.html',
+          selector: '.form-shell',
+          body: 'A job order needs role, headcount, location, schedule, pay range, requirements, and urgency.',
+          action: 'Save a test order locally.'
+        },
+        {
+          title: 'Score the candidate',
+          path: 'recruiting/candidate-scorecard.html',
+          selector: '.form-shell',
+          body: 'The scorecard evaluates role fit, reliability, skill match, and client-fit risk.',
+          action: 'Calculate and save a sample score.'
+        },
+        {
+          title: 'Follow placement workflow',
+          path: 'recruiting/placement-workflow.html',
+          selector: '.timeline',
+          body: 'Placement moves from accepted job order to sourcing, submission, onboarding, and post-start check-in.',
+          action: 'Use the timeline to explain where the candidate is.'
+        },
+        {
+          title: 'Prepare client onboarding packet',
+          path: 'recruiting/client-onboarding-packet.html',
+          selector: '.upgrade-grid',
+          body: 'The packet organizes client information, role information, and delivery rhythm.',
+          action: 'Use it before sending a staffing client live.'
+        },
+        {
+          title: 'Save recruiter training',
+          path: 'training-academy/recruiter-training-path.html',
+          selector: '.tool-panel',
+          body: 'The training record captures proof that the recruiter knows the workflow.',
+          action: 'Export a record for handoff.'
+        }
+      ]
+    },
+    {
+      id: 'proof-governance',
+      title: 'Proof and Governance Walkthrough',
+      audience: 'QA, operator, founder',
+      minutes: '17 min',
+      description: 'Teaches proof receipts, launch evidence, claims review, governance, policies, and operator content control.',
+      steps: [
+        {
+          title: 'Start with Proof Center',
+          path: 'proof/proof-center.html',
+          selector: '.upgrade-table',
+          body: 'Proof Center tells users what is built, what is blocked, and what needs real operator setup.',
+          action: 'Read the status table before making claims.'
+        },
+        {
+          title: 'Open Proof Vault',
+          path: 'proof-vault/index.html',
+          selector: '.grid.cards,.route-grid,.upgrade-grid,main',
+          body: 'Proof Vault stores release receipts and readiness evidence for training, portal QA, branch launch, and security upgrades.',
+          action: 'Pick the receipt that matches the claim.'
+        },
+        {
+          title: 'Use Proof Export',
+          path: 'proof-export/index.html',
+          selector: '.route-grid,.grid.cards,.upgrade-grid,main',
+          body: 'Proof Export creates release receipts, claims sheets, link audits, content freeze records, and launch handoff evidence.',
+          action: 'Generate export evidence before publishing.'
+        },
+        {
+          title: 'Review governance',
+          path: 'governance/index.html',
+          selector: '.route-grid,.grid.cards,.upgrade-grid,main',
+          body: 'Governance organizes resolutions, authority, minutes, delegation, and founder approvals.',
+          action: 'Separate planning language from legal filings.'
+        },
+        {
+          title: 'Check policies',
+          path: 'policies/index.html',
+          selector: '.route-grid,.grid.cards,.upgrade-grid,main',
+          body: 'Policies explain privacy, terms, accessibility, data handling, and no-legal-advice boundaries.',
+          action: 'Use policies to keep public claims safer.'
+        },
+        {
+          title: 'Finish in Operator Command',
+          path: 'operator/index.html',
+          selector: '.route-grid,.grid.cards,.upgrade-grid,main',
+          body: 'Operator Command is where deployment runbooks, provider maps, content freeze, and brain tests belong.',
+          action: 'Run this path before launch handoff.'
+        }
+      ]
+    }
+  ];
+
+  const CONTEXTS = [
+    {
+      test: path => path === 'index.html',
+      title: 'Home command deck',
+      body: 'This page is the map. Use it to launch the brain, proof routes, sales kit, client OS, admin OS, and training.',
+      journey: 'first-run'
+    },
+    {
+      test: path => path === 'local-brain.html',
+      title: 'Local Brain room',
+      body: 'Use this room to ask where a question belongs, which cabinet owns it, which reviewer checks it, and what proof link to send.',
+      journey: 'first-run'
+    },
+    {
+      test: path => path.startsWith('admin/'),
+      title: 'Admin operating room',
+      body: 'This is protected operator territory. Teach users command syntax, approval gates, worker setup, ledgers, and proof before live actions.',
+      journey: 'admin-operator'
+    },
+    {
+      test: path => path.startsWith('sales') || path.startsWith('sales-enablement') || path.startsWith('proposal-center'),
+      title: 'Sales and proposal room',
+      body: 'Use this path to teach discovery, proof routing, objections, demo flow, proposals, and handoff language.',
+      journey: 'ae-sales'
+    },
+    {
+      test: path => path.startsWith('client-os') || path.startsWith('client-preview'),
+      title: 'Client operations room',
+      body: 'Use this path to teach onboarding, status, document requests, escalations, renewals, and client-ready handoff.',
+      journey: 'client-success'
+    },
+    {
+      test: path => path.startsWith('recruiting') || path.startsWith('candidates'),
+      title: 'Recruiting and staffing room',
+      body: 'Use this path to teach job order intake, candidate scoring, placement flow, and staffing client onboarding.',
+      journey: 'recruiting-staffing'
+    },
+    {
+      test: path => path.startsWith('proof') || path.startsWith('proof-vault') || path.startsWith('proof-export') || path.startsWith('governance') || path.startsWith('policies') || path.startsWith('operator'),
+      title: 'Proof and governance room',
+      body: 'Use this path to teach receipts, claims review, content freeze, governance, policies, and launch evidence.',
+      journey: 'proof-governance'
+    },
+    {
+      test: path => path.startsWith('training-academy') || path.startsWith('walkthroughs'),
+      title: 'Training and walkthrough room',
+      body: 'This is where users pick a role, start a guided path, practice the workflow, and save local completion records.',
+      journey: 'first-run'
+    }
+  ];
+
+  const LESSON_COACHES = {
+    'training-academy/ae-certification-path.html': {
+      title: 'AE lesson coach',
+      body: 'Complete this after walking through Sales Kit, Proof Router, Discovery Blueprint, Objection Matrix, Demo Script, and Proposal Center.',
+      journey: 'ae-sales'
+    },
+    'training-academy/recruiter-training-path.html': {
+      title: 'Recruiter lesson coach',
+      body: 'Complete this after job order intake, candidate scoring, placement workflow, and staffing client onboarding packet practice.',
+      journey: 'recruiting-staffing'
+    },
+    'training-academy/client-success-training.html': {
+      title: 'Client success lesson coach',
+      body: 'Complete this after onboarding wizard, document request, status board, escalation desk, and renewal room practice.',
+      journey: 'client-success'
+    },
+    'training-academy/operator-training-library.html': {
+      title: 'Operator lesson coach',
+      body: 'Complete this after the first-run tour, admin operator walkthrough, proof center, and operator command room.',
+      journey: 'admin-operator'
+    },
+    'training-academy/cabinet-leader-onboarding.html': {
+      title: 'Cabinet leader lesson coach',
+      body: 'Complete this after reviewing the cabinet dashboards, governance center, proof center, and admin approval gates.',
+      journey: 'proof-governance'
+    }
+  };
+
+  function onReady(fn){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }else{
+      fn();
+    }
+  }
+
+  function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+  }
+
+  function currentSitePath(){
+    const marker = '/metraiyux_0s_site/';
+    let path = location.pathname.replace(/\\/g, '/');
+    const index = path.indexOf(marker);
+    if(index >= 0) path = path.slice(index + marker.length);
+    else path = path.replace(/^\/+/, '');
+    if(!path || path.endsWith('/')) path += 'index.html';
+    return path.replace(/^\.?\//, '');
+  }
+
+  function normalizePath(path){
+    let normalized = String(path || 'index.html').replace(/^\/+/, '').replace(/^\.?\//, '');
+    if(!normalized || normalized.endsWith('/')) normalized += 'index.html';
+    return normalized;
+  }
+
+  function depthPrefix(){
+    const path = currentSitePath();
+    const depth = Math.max(0, path.split('/').length - 1);
+    return '../'.repeat(depth);
+  }
+
+  function hrefFor(path){
+    return depthPrefix() + normalizePath(path);
+  }
+
+  function isCurrentPath(path){
+    return normalizePath(path) === normalizePath(currentSitePath());
+  }
+
+  function readState(){
+    try{
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    }catch(_err){
+      return {};
+    }
+  }
+
+  function writeState(state){
+    localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, version: VERSION, updatedAt: new Date().toISOString() }));
+  }
+
+  function getJourney(id){
+    return JOURNEYS.find(journey => journey.id === id) || JOURNEYS[0];
+  }
+
+  function progressFor(journey, saved){
+    const completed = new Set(saved?.completed || []);
+    return Math.round((completed.size / journey.steps.length) * 100);
+  }
+
+  function contextForPage(){
+    const path = currentSitePath();
+    return CONTEXTS.find(context => context.test(path)) || {
+      title: '0S room',
+      body: 'This room is part of the MetrAIyux 0S operating surface. Use the guide to connect it to the right workflow.',
+      journey: 'first-run'
+    };
+  }
+
+  function ensureRoot(){
+    let root = document.querySelector('[data-zero-guide-root]');
+    if(root) return root;
+    root = document.createElement('div');
+    root.dataset.zeroGuideRoot = 'true';
+    root.innerHTML = [
+      '<button class="zero-guide-launcher" type="button" data-zero-guide-open aria-expanded="false"><span>Guide</span><b>0S</b></button>',
+      '<aside class="zero-guide-drawer" data-zero-guide-drawer hidden></aside>',
+      '<section class="zero-guide-panel" data-zero-guide-panel hidden></section>',
+      '<div class="zero-guide-spotlight" data-zero-guide-spotlight hidden></div>'
+    ].join('');
+    document.body.appendChild(root);
+    return root;
+  }
+
+  function renderDrawer(){
+    const root = ensureRoot();
+    const drawer = root.querySelector('[data-zero-guide-drawer]');
+    const state = readState();
+    const context = contextForPage();
+    const cards = JOURNEYS.map(journey => {
+      const saved = state.journeys?.[journey.id] || {};
+      const progress = progressFor(journey, saved);
+      const activeStep = typeof saved.step === 'number' ? saved.step : 0;
+      return [
+        '<article class="zero-guide-card">',
+        `  <div class="zero-guide-meta"><span>${escapeHtml(journey.audience)}</span><span>${escapeHtml(journey.minutes)}</span><span>${progress}% complete</span></div>`,
+        `  <h3>${escapeHtml(journey.title)}</h3>`,
+        `  <p>${escapeHtml(journey.description)}</p>`,
+        '  <div class="zero-guide-progress" aria-hidden="true"><i style="--zero-guide-progress:' + progress + '%"></i></div>',
+        '  <div class="zero-guide-actions">',
+        `    <button class="zero-guide-button primary" type="button" data-zero-guide-start="${escapeHtml(journey.id)}">Start</button>`,
+        `    <button class="zero-guide-button" type="button" data-zero-guide-resume="${escapeHtml(journey.id)}" data-zero-guide-step="${activeStep}">Resume</button>`,
+        `    <button class="zero-guide-button" type="button" data-zero-guide-reset="${escapeHtml(journey.id)}">Reset</button>`,
+        '  </div>',
+        '</article>'
+      ].join('');
+    }).join('');
+
+    drawer.innerHTML = [
+      '<div class="zero-guide-head">',
+      '  <div>',
+      '    <p class="eyebrow">Self-guided 0S</p>',
+      '    <h2>Pick a role and I will walk them through the command rooms.</h2>',
+      '    <p>No human demo needed. The guide opens the right brain, proof, sales, client, admin, or governance surface, highlights the right control, and tracks progress locally.</p>',
+      '  </div>',
+      '  <button class="zero-guide-close" type="button" data-zero-guide-close aria-label="Close guide">x</button>',
+      '</div>',
+      '<div class="zero-guide-context">',
+      `  <span class="zero-guide-pill">Current room</span><h3>${escapeHtml(context.title)}</h3>`,
+      `  <p>${escapeHtml(context.body)}</p>`,
+      '  <div class="zero-guide-actions">',
+      `    <button class="zero-guide-button primary" type="button" data-zero-guide-start="${escapeHtml(context.journey)}">Guide this room</button>`,
+      `    <a class="zero-guide-link" href="${escapeHtml(hrefFor('walkthroughs/index.html'))}">Open walkthrough center</a>`,
+      `    <a class="zero-guide-link" href="${escapeHtml(hrefFor('training-academy/index.html'))}">Open academy</a>`,
+      '  </div>',
+      '</div>',
+      '<div class="zero-guide-card-grid">',
+      cards,
+      '</div>'
+    ].join('');
+  }
+
+  function openDrawer(){
+    renderDrawer();
+    const root = ensureRoot();
+    root.querySelector('[data-zero-guide-drawer]').hidden = false;
+    root.querySelector('[data-zero-guide-open]').setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDrawer(){
+    const root = ensureRoot();
+    root.querySelector('[data-zero-guide-drawer]').hidden = true;
+    root.querySelector('[data-zero-guide-open]').setAttribute('aria-expanded', 'false');
+  }
+
+  function clearHighlight(){
+    document.querySelectorAll('.zero-guide-highlight').forEach(el => el.classList.remove('zero-guide-highlight'));
+    const spotlight = ensureRoot().querySelector('[data-zero-guide-spotlight]');
+    spotlight.hidden = true;
+  }
+
+  function targetForStep(step){
+    if(step.selector){
+      const selectors = step.selector.split(',').map(item => item.trim()).filter(Boolean);
+      for(const selector of selectors){
+        const found = document.querySelector(selector);
+        if(found) return found;
+      }
+    }
+    return document.querySelector('main h1, h1, main, body');
+  }
+
+  function positionSpotlight(target){
+    const spotlight = ensureRoot().querySelector('[data-zero-guide-spotlight]');
+    if(!target) return;
+    const rect = target.getBoundingClientRect();
+    const pad = 10;
+    spotlight.style.left = `${Math.max(8, rect.left - pad)}px`;
+    spotlight.style.top = `${Math.max(8, rect.top - pad)}px`;
+    spotlight.style.width = `${Math.min(window.innerWidth - 16, rect.width + pad * 2)}px`;
+    spotlight.style.height = `${Math.min(window.innerHeight - 16, rect.height + pad * 2)}px`;
+    spotlight.hidden = false;
+  }
+
+  function highlightStep(step){
+    clearHighlight();
+    if(!isCurrentPath(step.path)) return;
+    const target = targetForStep(step);
+    if(!target) return;
+    target.classList.add('zero-guide-highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    window.setTimeout(() => positionSpotlight(target), 320);
+  }
+
+  function saveActive(id, stepIndex){
+    const journey = getJourney(id);
+    const state = readState();
+    const current = state.journeys?.[id] || {};
+    state.active = { id, step: stepIndex, autopilot: true };
+    state.journeys = {
+      ...(state.journeys || {}),
+      [id]: {
+        ...current,
+        step: Math.max(0, Math.min(stepIndex, journey.steps.length - 1)),
+        lastPath: journey.steps[Math.max(0, Math.min(stepIndex, journey.steps.length - 1))].path
+      }
+    };
+    writeState(state);
+  }
+
+  function enterStep(id, stepIndex){
+    const journey = getJourney(id);
+    const boundedStep = Math.max(0, Math.min(stepIndex, journey.steps.length - 1));
+    const step = journey.steps[boundedStep];
+    saveActive(id, boundedStep);
+    closeDrawer();
+    if(!isCurrentPath(step.path)){
+      location.assign(hrefFor(step.path));
+      return true;
+    }
+    renderActive();
+    return false;
+  }
+
+  function markComplete(id, stepIndex){
+    const state = readState();
+    const current = state.journeys?.[id] || {};
+    const completed = Array.from(new Set([...(current.completed || []), stepIndex]));
+    state.journeys = {
+      ...(state.journeys || {}),
+      [id]: { ...current, completed }
+    };
+    writeState(state);
+  }
+
+  function renderActive(){
+    const root = ensureRoot();
+    const panel = root.querySelector('[data-zero-guide-panel]');
+    const state = readState();
+    const active = state.active;
+    if(!active){
+      panel.hidden = true;
+      clearHighlight();
+      return;
+    }
+
+    const journey = getJourney(active.id);
+    const stepIndex = Math.max(0, Math.min(active.step || 0, journey.steps.length - 1));
+    const step = journey.steps[stepIndex];
+    const saved = state.journeys?.[journey.id] || {};
+    const completed = new Set(saved.completed || []);
+    const stepCount = journey.steps.length;
+    const progress = Math.round(((completed.size + (completed.has(stepIndex) ? 0 : .35)) / stepCount) * 100);
+    const inRoom = isCurrentPath(step.path);
+    const next = journey.steps[stepIndex + 1];
+    const nextLabel = stepIndex === stepCount - 1
+      ? 'Finish'
+      : next && next.path !== step.path
+        ? 'Next room'
+        : 'Next control';
+    const roomAction = inRoom
+      ? '<span class="zero-guide-pill">You are in the right room</span>'
+      : `<span class="zero-guide-pill">Entering ${escapeHtml(step.path)}</span>`;
+
+    panel.innerHTML = [
+      '<div class="zero-guide-panel-head">',
+      '  <div>',
+      `    <p class="eyebrow">${escapeHtml(journey.title)}</p>`,
+      `    <h2>${escapeHtml(step.title)}</h2>`,
+      '  </div>',
+      '  <button class="zero-guide-close" type="button" data-zero-guide-panel-close aria-label="Close walkthrough">x</button>',
+      '</div>',
+      '<div class="zero-guide-progress" aria-hidden="true"><i style="--zero-guide-progress:' + Math.min(100, progress) + '%"></i></div>',
+      `<div class="zero-guide-meta"><span>Step ${stepIndex + 1} of ${stepCount}</span><span>${escapeHtml(journey.audience)}</span><span>${escapeHtml(step.path)}</span></div>`,
+      `<p>${escapeHtml(step.body)}</p>`,
+      `<p><strong>Action:</strong> ${escapeHtml(step.action)}</p>`,
+      '<div class="zero-guide-actions">',
+      roomAction,
+      `  <a class="zero-guide-link" href="${escapeHtml(hrefFor('training-academy/index.html'))}">Open academy</a>`,
+      '</div>',
+      '<div class="zero-guide-panel-actions">',
+      `  <button class="zero-guide-button" type="button" data-zero-guide-prev="${escapeHtml(journey.id)}" ${stepIndex === 0 ? 'disabled' : ''}>Previous</button>`,
+      `  <button class="zero-guide-button primary" type="button" data-zero-guide-next="${escapeHtml(journey.id)}">${nextLabel}</button>`,
+      `  <button class="zero-guide-button" type="button" data-zero-guide-open-list="${escapeHtml(journey.id)}">View steps</button>`,
+      '</div>'
+    ].join('');
+    panel.hidden = false;
+    if(inRoom) highlightStep(step);
+    else {
+      clearHighlight();
+      if(state.active?.autopilot){
+        window.setTimeout(() => {
+          if(!isCurrentPath(step.path)) location.assign(hrefFor(step.path));
+        }, 120);
+      }
+    }
+  }
+
+  function startJourney(id, stepIndex = 0){
+    enterStep(id, stepIndex);
+  }
+
+  function nextStep(id){
+    const state = readState();
+    const active = state.active || { id, step: 0 };
+    const journey = getJourney(id);
+    const stepIndex = Math.max(0, Math.min(active.step || 0, journey.steps.length - 1));
+    markComplete(id, stepIndex);
+    if(stepIndex >= journey.steps.length - 1){
+      const nextState = readState();
+      nextState.active = null;
+      nextState.journeys = {
+        ...(nextState.journeys || {}),
+        [id]: {
+          ...(nextState.journeys?.[id] || {}),
+          finishedAt: new Date().toISOString()
+        }
+      };
+      writeState(nextState);
+      clearHighlight();
+      ensureRoot().querySelector('[data-zero-guide-panel]').hidden = true;
+      openDrawer();
+      return;
+    }
+    enterStep(id, stepIndex + 1);
+  }
+
+  function previousStep(id){
+    const state = readState();
+    const active = state.active || { id, step: 0 };
+    enterStep(id, Math.max(0, (active.step || 0) - 1));
+  }
+
+  function resetJourney(id){
+    const state = readState();
+    if(state.journeys?.[id]) delete state.journeys[id];
+    if(state.active?.id === id) state.active = null;
+    writeState(state);
+    clearHighlight();
+    renderDrawer();
+    renderActive();
+  }
+
+  function showStepList(id){
+    const journey = getJourney(id);
+    const root = ensureRoot();
+    const drawer = root.querySelector('[data-zero-guide-drawer]');
+    const list = journey.steps.map((step, index) => [
+      `<a href="${escapeHtml(hrefFor(step.path))}" data-zero-guide-jump="${escapeHtml(journey.id)}" data-zero-guide-step="${index}">`,
+      `  <b>${index + 1}</b>`,
+      '  <span>',
+      `    <h4>${escapeHtml(step.title)}</h4>`,
+      `    <p>${escapeHtml(step.action)}</p>`,
+      '  </span>',
+      '</a>'
+    ].join('')).join('');
+    drawer.innerHTML = [
+      '<div class="zero-guide-head">',
+      '  <div>',
+      `    <p class="eyebrow">${escapeHtml(journey.audience)} path</p>`,
+      `    <h2>${escapeHtml(journey.title)}</h2>`,
+      `    <p>${escapeHtml(journey.description)}</p>`,
+      '  </div>',
+      '  <button class="zero-guide-close" type="button" data-zero-guide-close aria-label="Close guide">x</button>',
+      '</div>',
+      '<div class="zero-guide-step-list">',
+      list,
+      '</div>',
+      '<div class="zero-guide-actions">',
+      '  <button class="zero-guide-button" type="button" data-zero-guide-back>Back to journeys</button>',
+      '</div>'
+    ].join('');
+    drawer.hidden = false;
+  }
+
+  function injectGuideNav(){
+    const nav = document.querySelector('.site-header nav, .topnav, .nav-upgrade');
+    if(!nav || nav.querySelector('[data-zero-guide-nav]')) return;
+    const link = document.createElement('a');
+    link.href = hrefFor('walkthroughs/index.html');
+    link.dataset.zeroGuideNav = 'true';
+    link.textContent = 'Walkthroughs';
+    nav.appendChild(link);
+  }
+
+  function injectHomeGuideBand(){
+    if(!isCurrentPath('index.html') || document.querySelector('[data-zero-guide-band]')) return;
+    const hero = document.querySelector('main .hero, .hero');
+    if(!hero) return;
+    const band = document.createElement('section');
+    band.className = 'section zero-guide-band';
+    band.dataset.zeroGuideBand = 'true';
+    band.innerHTML = [
+      '<p class="eyebrow">Self-teaching operating system</p>',
+      '<h2>I made 0S walk users through the command rooms instead of waiting for a human demo.</h2>',
+      '<p class="wide">Start a role path and the guide opens the correct brain, proof, client, sales, admin, or governance room, highlights the right control, explains the action, and remembers progress in this browser.</p>',
+      '<div class="zero-guide-card-grid">',
+      JOURNEYS.slice(0, 6).map(journey => [
+        '<article class="zero-guide-card">',
+        `  <div class="zero-guide-meta"><span>${escapeHtml(journey.audience)}</span><span>${escapeHtml(journey.minutes)}</span></div>`,
+        `  <h3>${escapeHtml(journey.title)}</h3>`,
+        `  <p>${escapeHtml(journey.description)}</p>`,
+        `  <button class="zero-guide-button primary" type="button" data-zero-guide-start="${escapeHtml(journey.id)}">Start walkthrough</button>`,
+        '</article>'
+      ].join('')).join(''),
+      '</div>'
+    ].join('');
+    hero.insertAdjacentElement('afterend', band);
+  }
+
+  function injectLessonCoach(){
+    const path = currentSitePath();
+    const coach = LESSON_COACHES[path];
+    if(!coach || document.querySelector('[data-zero-lesson-coach]')) return;
+    const main = document.querySelector('main') || document.body;
+    const firstSection = main.querySelector('section');
+    const section = document.createElement('section');
+    section.className = 'section zero-lesson-coach';
+    section.dataset.zeroLessonCoach = 'true';
+    section.innerHTML = [
+      '<p class="eyebrow">Lesson coach</p>',
+      `<h2>${escapeHtml(coach.title)}</h2>`,
+      `<p>${escapeHtml(coach.body)}</p>`,
+      '<div class="zero-guide-actions">',
+      `  <button class="zero-guide-button primary" type="button" data-zero-guide-start="${escapeHtml(coach.journey)}">Start related walkthrough</button>`,
+      `  <a class="zero-guide-link" href="${escapeHtml(hrefFor('walkthroughs/index.html'))}">Open walkthrough center</a>`,
+      '</div>'
+    ].join('');
+    if(firstSection) firstSection.insertAdjacentElement('afterend', section);
+    else main.prepend(section);
+  }
+
+  function bindEvents(){
+    document.addEventListener('click', event => {
+      const open = event.target.closest('[data-zero-guide-open]');
+      if(open){
+        const drawer = ensureRoot().querySelector('[data-zero-guide-drawer]');
+        if(drawer.hidden) openDrawer();
+        else closeDrawer();
+        return;
+      }
+
+      if(event.target.closest('[data-zero-guide-close]')){
+        closeDrawer();
+        return;
+      }
+
+      if(event.target.closest('[data-zero-guide-panel-close]')){
+        const state = readState();
+        state.active = null;
+        writeState(state);
+        ensureRoot().querySelector('[data-zero-guide-panel]').hidden = true;
+        clearHighlight();
+        return;
+      }
+
+      const start = event.target.closest('[data-zero-guide-start]');
+      if(start){
+        event.preventDefault();
+        startJourney(start.dataset.zeroGuideStart, 0);
+        return;
+      }
+
+      const resume = event.target.closest('[data-zero-guide-resume]');
+      if(resume){
+        event.preventDefault();
+        startJourney(resume.dataset.zeroGuideResume, Number(resume.dataset.zeroGuideStep || 0));
+        return;
+      }
+
+      const reset = event.target.closest('[data-zero-guide-reset]');
+      if(reset){
+        event.preventDefault();
+        resetJourney(reset.dataset.zeroGuideReset);
+        return;
+      }
+
+      const next = event.target.closest('[data-zero-guide-next]');
+      if(next){
+        event.preventDefault();
+        nextStep(next.dataset.zeroGuideNext);
+        return;
+      }
+
+      const prev = event.target.closest('[data-zero-guide-prev]');
+      if(prev){
+        event.preventDefault();
+        previousStep(prev.dataset.zeroGuidePrev);
+        return;
+      }
+
+      const openList = event.target.closest('[data-zero-guide-open-list]');
+      if(openList){
+        event.preventDefault();
+        showStepList(openList.dataset.zeroGuideOpenList);
+        return;
+      }
+
+      if(event.target.closest('[data-zero-guide-back]')){
+        event.preventDefault();
+        renderDrawer();
+        return;
+      }
+
+      const jump = event.target.closest('[data-zero-guide-jump]');
+      if(jump){
+        saveActive(jump.dataset.zeroGuideJump, Number(jump.dataset.zeroGuideStep || 0));
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      const state = readState();
+      if(state.active){
+        const journey = getJourney(state.active.id);
+        const step = journey.steps[state.active.step || 0];
+        if(step && isCurrentPath(step.path)){
+          const target = targetForStep(step);
+          if(target) positionSpotlight(target);
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+      const state = readState();
+      if(state.active){
+        const journey = getJourney(state.active.id);
+        const step = journey.steps[state.active.step || 0];
+        if(step && isCurrentPath(step.path)){
+          const target = targetForStep(step);
+          if(target) positionSpotlight(target);
+        }
+      }
+    }, { passive: true });
+  }
+
+  function boot(){
+    ensureRoot();
+    renderDrawer();
+    renderActive();
+    injectGuideNav();
+    injectHomeGuideBand();
+    injectLessonCoach();
+    bindEvents();
+    window.MetrAIyuxZeroGuide = {
+      version: VERSION,
+      journeys: JOURNEYS,
+      start: startJourney,
+      state: readState
+    };
+  }
+
+  onReady(boot);
+})();

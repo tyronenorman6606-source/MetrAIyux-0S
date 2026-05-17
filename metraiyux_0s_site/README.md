@@ -5,6 +5,126 @@
 
 This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 16-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
 
+## ConnectLog + Relay13 Expansion
+
+This build adds `connectlog-v7.7-relay13-operator-proof/` and `relay13-core-v1.7-connectlog-operator-proof/` inside the 0S site. ConnectLog is the local-first relationship command app. Relay13 is the Cloudflare Worker messaging core and operator console package.
+
+Start points:
+
+- `live/connectlog-relay13-operator-proof.html` — 0S expansion hub.
+- `connectlog-v7.7-relay13-operator-proof/app.html` — ConnectLog app and Relay13 bridge panel.
+- `relay13-core-v1.7-connectlog-operator-proof/public/index.html` — Relay13 preview.
+- `proof/connectlog-relay13-expansion-receipt.html` — proof receipt and live Worker boundary.
+
+Relay13 is now live at `https://relay13-core.graylondonskyes.workers.dev/` using the shared `metraiyux-site-operator-db` D1 binding. Production proof covers workspace bootstrap, scoped API key creation, ConnectLog card upsert, scan conversation, message history, activation run, live-proof gates, and customer/operator WebSocket opens. Keep scoped API keys out of public source; ConnectLog defaults to the live origin/workspace for public-domain conversation creation only.
+
+## HouseOperations + SkyeBox Expansion
+
+This build adds `HouseOperations/skye-box-authenticator-vault/` inside the 0S site. HouseOperations is the local task/vendor/schedule/owner-alert command app. SkyeBox is a local encrypted TOTP authenticator vault nested under it.
+
+Start points:
+
+- `live/houseoperations-skyebox-operator-proof.html` - 0S expansion hub.
+- `HouseOperations/index.html` - HouseOperations app.
+- `HouseOperations/skye-box-authenticator-vault/index.html` - SkyeBox Authenticator Vault.
+- `proof/houseoperations-skyebox-expansion-receipt.html` - proof receipt and local-only boundary.
+
+The base public 0S rates are held in this pass. Plan scope now includes HouseOperations and SkyeBox handoff language by tier. SkyeBox is local-first: it does not provide cloud sync, server-side recovery, or managed secret custody without a later approved managed scope.
+
+## SkyeRouteX Workforce Command Expansion
+
+This build also adds `SkyeRouteX/` and `skyeroutex-workforce-command-v0.4.0/` inside the 0S site. SkyeRouteX is the workforce command lane for dispatch, provider job posting, contractor job boards, applicant pools, assignments, route stops, workforce readiness, proof vaults, payment-state ledgers, market reports, export packets, analytics, local runtime checks, and a manifest-only 0S mount.
+
+Start points:
+
+- `live/skyeroutex-workforce-command.html` — 0S expansion hub.
+- `SkyeRouteX/index.html` — routed workforce command shell.
+- `SkyeRouteX/runtime.html` — runtime lane and static contract link path.
+- `skyeroutex-workforce-command-v0.4.0/index.html` — static-safe v0.4.0 platform hub.
+- `skyeroutex-workforce-command-v0.4.0/public/index.html` — API-backed browser command UI when the Node runtime is running.
+- `proof/skyeroutex-expansion-receipt.html` — proof receipt and production boundary.
+
+Local proof command:
+
+```bash
+npm run 0s:skyeroutex:proof
+```
+
+That root command runs the V83 `SkyeRouteX` runtime harness, the v0.4.0 `smoke:all` API/browser/provider/mount harness, and the 0S public browser integration E2E.
+
+Concurrency stress command:
+
+```bash
+npm run 0s:skyeroutex:stress
+```
+
+The stress harness exercises concurrent providers, contractors, route jobs, applications, acceptance locks, assignment transitions, proof media, approvals, export packets, market reports, payment ledger state, persisted totals, and audit-chain integrity. The fresh default local JSON proof shape passed at 608 requests with no 500s, only 200/201 responses plus expected 409 assignment-lock conflicts, and p99 around 6.2s. A doubled shape also passed at 1,192 requests after caching/atomic compact writes and a serialized mutation queue were added, but p99 stayed around 10.5s, so production RouteX needs Postgres/object storage/provider infrastructure for serious throughput. Production boot now rejects local JSON/local file storage.
+
+Current pricing keeps RouteX Workforce Command at `$1,497/month` plus `$6,500 setup`, with a named SkyePay offer and owner-approved activation. SkyeGateFS27 now holds core MetrAIyux app lanes at `paid_pending_owner_approval` after payment; RouteX cannot auto-unlock from a Stripe success event.
+
+## SkyeProfitConsole Free99 Expansion
+
+This build adds `SkyeProfitConsole/` inside the 0S site. SkyeProfitConsole is the Free99 profit field for profit packs, split checks, margin pressure, signal loom lanes, proof events, local exports, and optional same-folder runtime persistence.
+
+Start points:
+
+- `live/skyeprofitconsole-profit-console.html` - 0S expansion hub.
+- `SkyeProfitConsole/index.html` - gated app entry.
+- `SkyeProfitConsole/runtime.html` - runtime mode.
+- `proof/skyeprofitconsole-expansion-receipt.html` - proof receipt and auth boundary.
+
+Free99 means no charge. It does not mean anonymous access. The app waits for a 0S or FS27 gate session before booting, and `runtime/local-runtime.mjs` returns 401 for ungated runtime API calls.
+
+Local proof command:
+
+```bash
+cd SkyeProfitConsole
+npm run smoke
+```
+
+## SkyeMediaCenter Free99 Expansion
+
+This build adds `SkyeMediaCenter/` inside the 0S site. SkyeMediaCenter is the Free99 media field for gated media intake, asset list/search, review boards, execution boards, dispatch boards, publishing, stats, file delivery, workflow timelines, and operator proof.
+
+Start points:
+
+- `live/skye-media-center-operator-proof.html` - 0S expansion hub.
+- `SkyeMediaCenter/index.html` - gated app entry.
+- `SkyeMediaCenter/public/index.html` - gated intake portal.
+- `SkyeMediaCenter/public/admin.html` - gated operator theater.
+- `proof/skyemediacenter-expansion-receipt.html` - proof receipt and auth boundary.
+
+Free99 means no charge. It does not mean anonymous access. The app waits for a 0S or FS27 gate session before booting, and media asset, search, publish, stats, and file-delivery functions reject ungated requests with 401.
+
+Local proof commands:
+
+```bash
+cd SkyeMediaCenter
+node smoke/skye-media-center-p2-smoke.mjs
+node smoke/smoke-proof.mjs
+```
+
+## SkyeMusicNexus Free99 Expansion
+
+This build adds `SkyeMusicNexus/` inside the 0S site. SkyeMusicNexus is the Free99 music operating stage for artist records, release forge, royalty ledger motion, payout review, analytics, operations workflows, and proof-safe provider boundaries.
+
+Start points:
+
+- `live/skyemusicnexus-neofront.html` - 0S expansion hub.
+- `SkyeMusicNexus/index.html` - gated app shell.
+- `SkyeMusicNexus/public/index.html` - Artist Stage.
+- `SkyeMusicNexus/public/admin.html` - Operator Stage.
+- `proof/skyemusicnexus-expansion-receipt.html` - proof receipt and auth boundary.
+
+Free99 means no charge. It does not mean anonymous access. The app shell and public stages require a 0S, FS27, or SkyGate session before use, and the music artist/release/workflow read endpoints reject ungated requests with 401.
+
+Local proof command:
+
+```bash
+cd SkyeMusicNexus
+npm run smoke
+```
+
 
 A static, deployable executive cabinet website with individual resume pages, portraits, executive roster, governance charter, AE positioning, and deployment instructions.
 

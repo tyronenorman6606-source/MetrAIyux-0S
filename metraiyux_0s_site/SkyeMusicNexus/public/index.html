@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus — NeoFront Artist Operating Stage</title>
+  <meta name="description" content="A living artist operating stage for releases, royalty movement, proof sessions, and distribution readiness." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="aurora aurora-one" aria-hidden="true"></div>
+  <div class="aurora aurora-two" aria-hidden="true"></div>
+
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home">
+      <span class="sigil-orbit"></span>
+      <span class="sigil-note">♬</span>
+    </a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Artist Field</p>
+      <h1>Release music through a living signal stage.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
+      <button class="ghost" data-action="proof-session">Proof Session</button>
+      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+      <a class="ghost" href="./admin.html">Ops Stage</a>
+    </div>
+  </header>
+
+  <main class="nexus-shell">
+    <section class="hero-stage panel-xl">
+      <div class="hero-copy">
+        <p class="eyebrow">release engine · living signal stage</p>
+        <h2>Every artist becomes a signal node. Every release becomes a launch object.</h2>
+        <p class="lede">Register the act, forge the drop, move it into operations, watch streams turn into ledger motion, and leave a proof trail that can survive a real smoke test.</p>
+        <div class="hero-actions">
+          <button class="primary" data-jump="releaseForge">Forge Release</button>
+          <button class="secondary" data-jump="artistNebula">Register Artist</button>
+        </div>
+      </div>
+      <div class="vinyl-core" aria-label="animated music nexus visual">
+        <div class="vinyl-ring ring-a"></div>
+        <div class="vinyl-ring ring-b"></div>
+        <div class="vinyl-ring ring-c"></div>
+        <div class="needle"></div>
+        <div class="core-label">
+          <span>SKYE</span>
+          <strong>NEXUS</strong>
+          <small>LIVE FIELD</small>
+        </div>
+      </div>
+      <div class="hero-meters">
+        <article><span id="meterArtists">—</span><small>artists</small></article>
+        <article><span id="meterReleases">—</span><small>releases</small></article>
+        <article><span id="meterStreams">—</span><small>streams</small></article>
+        <article><span id="meterPayouts">—</span><small>pending payouts</small></article>
+      </div>
+    </section>
+
+    <section class="signal-map" aria-label="music nexus signal map">
+      <button class="node active" data-lens="distribution"><span>01</span>Distribution Spine</button>
+      <button class="node" data-lens="royalty"><span>02</span>Royalty River</button>
+      <button class="node" data-lens="proof"><span>03</span>Proof Chain</button>
+      <button class="node" data-lens="ops"><span>04</span>Ops Sequencer</button>
+    </section>
+
+    <section class="lens panel-xl" id="lensPanel">
+      <div>
+        <p class="micro" id="lensMicro">Distribution Spine</p>
+        <h3 id="lensTitle">Release objects need a launch route, not a table row.</h3>
+        <p id="lensText">This lane frames each release as a live capsule with targets, review state, stream telemetry, and operations checkpoints.</p>
+      </div>
+      <div class="wave-reader" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="nebula panel" id="artistNebula">
+        <div class="section-head">
+          <p class="micro">Artist Nebula</p>
+          <h3>Register a signal node</h3>
+          <span class="tag">protected write</span>
+        </div>
+        <form id="artistForm" class="field-grid">
+          <label>Artist name<input name="name" required placeholder="Velvet Frequency" /></label>
+          <label>Email<input name="email" required type="email" placeholder="artist@example.com" /></label>
+          <label>Phone<input name="phone" placeholder="Optional" /></label>
+          <label>Genre tags<input name="genre" placeholder="alt r&b, synthwave, trap" /></label>
+          <label class="wide">Bio<textarea name="bio" rows="4" placeholder="What world does this artist create?"></textarea></label>
+          <button class="primary wide" type="submit">Create Artist Node</button>
+        </form>
+        <div id="artistResult" class="result-card compact">Awaiting signal.</div>
+      </article>
+
+      <article class="release-forge panel" id="releaseForge">
+        <div class="section-head">
+          <p class="micro">Release Forge</p>
+          <h3>Build the drop capsule</h3>
+          <span class="tag">artist + ops</span>
+        </div>
+        <form id="releaseForm" class="field-grid">
+          <label>Artist ID<input name="artistId" required placeholder="Paste artist id" /></label>
+          <label>Title<input name="title" required placeholder="Neon Weather" /></label>
+          <label>Type<select name="type"><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></select></label>
+          <label>Release date<input name="releaseDate" type="date" /></label>
+          <label class="wide">Distribution targets<input name="distributionTargets" placeholder="Spotify, Apple Music, Tidal, YouTube Music" /></label>
+          <label class="wide">Tracks<textarea name="tracks" rows="4" placeholder="One track per line. Example: Night Signal | 181"></textarea></label>
+          <button class="primary wide" type="submit">Forge Release</button>
+        </form>
+        <div id="releaseResult" class="result-card compact">No release forged yet.</div>
+      </article>
+    </section>
+
+    <section class="triple-grid">
+      <article class="panel river">
+        <div class="section-head">
+          <p class="micro">Royalty River</p>
+          <h3>Credit and payout motion</h3>
+        </div>
+        <form id="paymentForm" class="field-grid thin">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Credit amount<input name="amount" required type="number" min="1" step="0.01" value="13" /></label>
+          <label class="wide">Reason<input name="reason" placeholder="streaming proof credit" /></label>
+          <button class="secondary wide" type="submit">Credit Ledger</button>
+        </form>
+        <div id="paymentResult" class="result-card compact">Ledger idle.</div>
+      </article>
+
+      <article class="panel sequencer">
+        <div class="section-head">
+          <p class="micro">Ops Sequencer</p>
+          <h3>Queue the release runway</h3>
+        </div>
+        <form id="opsForm" class="field-grid thin">
+          <label>Release ID<input name="id" required placeholder="release id" /></label>
+          <label>Owner<input name="owner" value="release-ops" /></label>
+          <label>Status<select name="status"><option value="ready">Ready</option><option value="scheduled">Scheduled</option><option value="blocked">Blocked</option></select></label>
+          <label>Checkpoint<input name="checkpoint" value="distribution-ready" /></label>
+          <label class="wide">Notes<input name="notes" placeholder="handoff notes" /></label>
+          <button class="secondary wide" type="submit">Queue Operations</button>
+        </form>
+        <div id="opsResult" class="result-card compact">No workflow queued.</div>
+      </article>
+
+      <article class="panel constellation">
+        <div class="section-head">
+          <p class="micro">Live Constellation</p>
+          <h3>Records in motion</h3>
+          <button class="ghost mini" data-action="refresh-records">Refresh</button>
+        </div>
+        <div id="constellationList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="panel-xl proof-chain">
+      <div>
+        <p class="micro">Truth Boundary</p>
+        <h3>What is proven here</h3>
+        <p>This package proves local handlers for artist registration, release submission, release review/publish/reporting, operations queueing, payment ledger, payout queue, analytics, and SkyGate local proof sessions. Live DSP distribution is still an external integration boundary.</p>
+      </div>
+      <div class="proof-links">
+        <a href="../PROOF_STATUS.md">Proof Status</a>
+        <a href="../src/runtime-contract.json">Runtime Contract</a>
+        <a href="../smoke/smoke-proof.mjs">Smoke Proof</a>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="operatorDialog" class="operator-dialog">
+    <form method="dialog" id="operatorForm">
+      <h3>Local Operator Login</h3>
+      <p>Uses the existing SkyGate local bootstrap variables. No demo secrets are embedded.</p>
+      <label>Email<input name="email" type="email" required /></label>
+      <label>Password<input name="password" type="password" required /></label>
+      <menu>
+        <button class="ghost" value="cancel">Cancel</button>
+        <button class="primary" value="login">Login</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

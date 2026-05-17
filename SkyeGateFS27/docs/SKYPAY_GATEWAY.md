@@ -38,9 +38,10 @@ Public app endpoints:
 SkyePay now imports checkout-safe products from `metraiyux_0s_site/brain/sales-offer-registry.json`, the machine-readable partner to the root `STRIPE_PRODUCT_PRICE_CATALOG.md`.
 
 - Imported into SkyePay: 50 fixed-price `approved` or `approved_floor` offers from MetrAIyux-adjacent repo surfaces, SkyeGate, kAIxU, Lane Vault, SkyeCorp, SBCC, and SOL Staffing.
-- Already bundled manually: the three core MetrAIyux 0S app plans and the managed SkyeGateFS27 control-plane offer.
+- Already bundled manually: the five core MetrAIyux 0S app plans and the managed SkyeGateFS27 control-plane offer.
 - Left out of instant checkout by design: `quote_only`, `do_not_create`, `approved_metered`, and `one_time_variable`.
 - Checkout prefers existing Stripe Price lookup keys when they exist in the connected Stripe account. If a lookup key is not present yet, SkyePay falls back to Stripe Checkout `price_data` with the same repo metadata so checkout still works.
+- 2026-05-17 live Stripe sync moved the 0S lookup keys to the current Starter, Growth, RouteX, Autonomous, and Enterprise amounts; receipt: `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`.
 - `GET /skyepay/offers` returns `repo_stripe_catalog` with the source, imported checkout count, rule, and excluded instant-checkout categories.
 
 Example checkout request:
@@ -48,7 +49,7 @@ Example checkout request:
 ```json
 {
   "client_slug": "metraiyux-0s",
-  "offer_id": "metraiyux-starter-command",
+  "offer_id": "metraiyux-routex-workforce-command",
   "customer_name": "Client Owner",
   "customer_email": "owner@example.com",
   "company_name": "Client Company",
@@ -59,6 +60,7 @@ Example checkout request:
 ## Important Statuses
 
 - `checkout_created`: Checkout Session exists, but payment completion has not been confirmed.
+- `demo_pending_owner_approval`: Local proof mode showed the owner-approval hold without charging a card.
 - `payment_pending`: Stripe has not confirmed a delayed payment yet.
 - `payment_failed`: Stripe reported delayed payment failure.
 - `paid_pending_owner_approval`: Stripe completed the session and FS27 is waiting for owner approval.
@@ -104,13 +106,14 @@ Public order lookup by `order_id` is disabled by default; public return status s
 - Approved orders write SkyePay gate policy into `customers`: monthly cap, inherited RPM/RPD, device policy, provider/model allowlists, vault storage, file count, and workspace count.
 - Workspace unlock is blocked until owner approval.
 - Delayed Stripe payment failures move orders into `payment_failed`; delayed payment success can move orders into the owner approval lane.
+- Core MetrAIyux and SkyeGate app lanes are owner-approved before activation. SkyeVault subscriptions are the explicit auto-provision exception because they call the signed vault provisioning endpoint.
 
 ## Proof Receipts
 
 - Browser proof: `/workspaces/MetrAIyux-0S/test-artifacts/skyepay-proof/skyepay-browser-proof.json`
 - Proof reel: `/workspaces/MetrAIyux-0S/test-artifacts/skyepay-proof/skyepay-proof-reel.html`
 - 0S SkyeCrawler profile: `/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay-report.json`
-- Scanner result: `16 checks, 0 failures, 0 warnings`
+- Scanner result: `17 checks, 0 failures, 0 warnings`
 
 ## Guardrails
 

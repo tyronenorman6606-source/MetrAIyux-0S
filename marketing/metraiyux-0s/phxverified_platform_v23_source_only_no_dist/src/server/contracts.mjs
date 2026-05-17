@@ -111,6 +111,15 @@ export const ACTION_CONTRACTS = {
     public_intake: true,
     description: 'Captures paid exposure interest without claiming billing is complete.'
   },
+  customer_business_posting: {
+    title: '0S first-month customer public business landing',
+    queue: 'customer-business-postings',
+    required: ['customer_id', 'workspace_id', 'business_name', 'owner_name', 'owner_contact', 'city', 'category', 'posting_reason', 'subscription_started_at', 'first_paid_invoice_at'],
+    optional: ['website', 'phone', 'email', 'description', 'source_url', 'notes', 'eligibility_checked_at', 'eligible_at', 'free_posting_credit'],
+    roles: ['owner', 'ae', 'admin', 'system', 'customer'],
+    public_intake: false,
+    description: 'Queues the free Valley Verified public business landing/posting promised to qualified MetrAIyux 0S customers after their first paid month. It never publishes without review and does not require an upgrade.'
+  },
   owner_contact_log: {
     title: 'Owner contact log',
     queue: 'owner-contact-logs',
@@ -232,6 +241,11 @@ export function validateActionPayload(type, payload = {}, actor = {}){
     errors.push(`Actor role must include one of: ${contract.roles.join(', ')}`);
   }
   if(type === 'owner_claim' && payload.business_id && !/^[a-z0-9-]{3,120}$/i.test(String(payload.business_id))) errors.push('business_id must be a canonical public listing id.');
+  if(type === 'customer_business_posting'){
+    if(String(payload.business_name || '').trim().length < 2) errors.push('business_name must be at least 2 characters.');
+    if(String(payload.owner_contact || '').trim().length < 5) errors.push('owner_contact must include a usable contact value.');
+    if(payload.free_posting_credit !== true) errors.push('customer_business_posting requires free_posting_credit=true.');
+  }
   if(type === 'suppression_request' && !String(payload.reason || '').match(/duplicate|fraud|closed|owner|bad-data|abuse|legal|request/i)) errors.push('suppression reason must describe duplicate, fraud, closed, owner request, bad-data, abuse, legal, or similar basis.');
   if(type === 'verification_decision' && !['approved','rejected','needs_more_proof','suspended'].includes(String(payload.decision || '').toLowerCase())) errors.push('verification decision must be approved, rejected, needs_more_proof, or suspended.');
   if(type === 'claim_status_update' && !['submitted_for_review','approved','rejected','needs_more_proof','suspended','owner_verified','archived'].includes(String(payload.status || '').toLowerCase())) errors.push('claim status must be submitted_for_review, approved, rejected, needs_more_proof, suspended, owner_verified, or archived.');

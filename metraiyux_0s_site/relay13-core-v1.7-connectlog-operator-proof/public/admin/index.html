@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Relay13 Console</title>
+  <meta name="description" content="Relay13 operator console for workspaces, API keys, widget publishing, and real messaging threads.">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <main class="admin">
+    <aside class="side">
+      <div class="brand"><img class="brand-logo" src="../assets/relay13-logo-transparent.png" alt="Relay13 logo"><div><h1><span class="gold">Relay13</span> <span class="grad">Console</span></h1><p>Owned universal messaging control.</p></div></div>
+      <section class="panel stack"><label>Platform admin token</label><input id="adminToken" class="input" type="password" placeholder="PLATFORM_ADMIN_TOKEN"><button id="saveToken" class="btn">Load platform</button><button id="bootstrap" class="btn ghost">Bootstrap default workspace</button><span class="micro">The inbox only fills from real widget/API conversations.</span></section>
+      <section class="panel stack"><strong>Workspace</strong><select id="workspaceSelect" class="input"></select><div class="row"><input id="workspaceName" class="input" placeholder="New workspace name"><button id="createWorkspace" class="btn">Create</button></div></section>
+      <section class="stats" id="stats"></section>
+      <section class="panel stack"><strong>Allowed widget domains</strong><div class="row"><input id="domainName" class="input" placeholder="clientdomain.com"><button id="addDomain" class="btn">Allow</button></div><div id="domainList" class="micro">No workspace selected.</div></section>
+      <section class="panel stack"><strong>API keys</strong><input id="keyName" class="input" placeholder="Key name"><button id="createKey" class="btn">Create scoped key</button><div id="newKey" class="install"></div></section>
+      <section class="panel stack"><strong>Widget release</strong><input id="brandName" class="input" placeholder="Brand name"><input id="welcomeText" class="input" placeholder="Welcome text"><button id="publishWidget" class="btn">Publish config</button><pre id="installSnippet" class="install"></pre></section>
+      <section><div class="row"><select id="statusFilter" class="input"><option value="">All</option><option value="open">Open</option><option value="pending">Pending</option><option value="closed">Closed</option></select><button id="refresh" class="btn ghost">Refresh</button></div><div id="conversationList" class="conv-list"></div></section>
+    </aside>
+    <section class="main">
+      <header class="top"><div><strong id="threadTitle">Select a conversation</strong><span id="liveStatus" class="status bad">idle</span></div><div class="workspace-tools"><select id="threadStatus" class="input"><option value="open">open</option><option value="pending">pending</option><option value="closed">closed</option></select><input id="assignedTo" class="input" placeholder="Assigned to"><button id="saveThread" class="btn">Save</button><button id="queueJob" class="btn ghost">Queue release job</button></div></header>
+      <section class="layout"><aside id="profile" class="profile"><p class="micro">Conversation profile loads here.</p></aside><section class="thread"><div id="messages" class="messages"><div class="empty"><strong>No thread selected.</strong><span>Select a real conversation created by the widget or API.</span></div></div><form id="replyForm" class="composer"><textarea id="replyText" placeholder="Reply as operator…" disabled></textarea><button id="replyButton" class="btn" disabled>Send reply</button></form></section></section>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

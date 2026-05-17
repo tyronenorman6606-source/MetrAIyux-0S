@@ -133,7 +133,9 @@ export default wrap(async (req) => {
     order_id: order?.id || orderId,
     url: session.url,
     payment_status: session.payment_status || "created",
-    approval_status: "checkout_created",
+    approval_status: order?.approval_status || "checkout_created",
+    owner_approval_required: offer.owner_approval_required === true,
+    activation_path: offer.activation_path || null,
     trial_days: trialDays,
     zero_upfront_trial: trialDays > 0,
     client: {

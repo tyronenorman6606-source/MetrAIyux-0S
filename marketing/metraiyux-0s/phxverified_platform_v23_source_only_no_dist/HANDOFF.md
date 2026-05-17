@@ -1,6 +1,6 @@
-# PHX Verified v18 Handoff
+# Valley Verified v18 Handoff
 
-PHX Verified is a seeded Arizona business marketplace platform with upstream-auth-ready operator, AE, moderation, mutation, runtime-state, and exposure-order code paths.
+Valley Verified is a seeded Arizona business marketplace platform with upstream-auth-ready operator, AE, moderation, mutation, runtime-state, and exposure-order code paths.
 
 ## Current package status
 
@@ -17,11 +17,21 @@ Production-candidate code package; not live-production-certified until a deploye
 
 ## Auth stance
 
-No local auth was added. The runtime expects upstream identity through:
+The package is now wired for MetrAIyux 0S / SkyeGateFS27 auth. It still does not ship a separate local login, but function requests can be authenticated with `Authorization: Bearer <FS27 session JWT or kx_live API key>`. `src/server/gate-auth.mjs` introspects the token against FS27, strips public spoofed upstream headers, and injects:
 
 - `x-upstream-user-id`
 - `x-upstream-user-email`
 - `x-upstream-roles`
+- `x-upstream-customer-id`
+- `x-upstream-workspace-id`
+- `x-upstream-plan`
+
+Production env:
+
+- `SKYGATEFS27_ORIGIN=https://skyegatefs27-citadeldb.graylondonskyes.workers.dev`
+- `PHX_GATE_AUTH_REQUIRED=true`
+
+Only set `PHX_TRUST_UPSTREAM_HEADERS=true` behind a trusted reverse proxy that strips and injects those headers itself.
 
 ## Seeding stance
 
@@ -88,3 +98,13 @@ Important files:
 ## v23 handoff note
 
 The latest package includes a public website pass. Treat `/` as the public sales/marketplace entry point, not the operator dashboard. Use `/protected-admin/`, `/operator/`, and runtime routes behind upstream auth. Do not move dense AE/admin links back into the public topbar.
+
+## 0S first-month business landing
+
+MetrAIyux 0S customers now have a queued benefit path after their first paid month:
+
+- Contract: `customer_business_posting`
+- Queue: `customer-business-postings`
+- Endpoint: `/.netlify/functions/phx-customer-posting`
+- Eligibility: `subscription_started_at` plus `first_paid_invoice_at`, at least 30 days elapsed.
+- Rule: free landing/posting is review-required and never auto-publishes.

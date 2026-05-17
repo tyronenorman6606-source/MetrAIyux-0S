@@ -55,7 +55,7 @@ Licensee is responsible for legality of its products, claims, customer communica
 
 ## 11. Publicity And Marks
 
-Licensee may not use MetrAIyux, Skyes, SOL Enterprises, or related marks in marketing, press, screenshots, demos, or customer materials unless approved in writing.
+Licensee may not use MetrAIyux, Skyes, SOLEnterprises, or related marks in marketing, press, screenshots, demos, or customer materials unless approved in writing.
 
 ## 12. Confidentiality
 

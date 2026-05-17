@@ -1,0 +1,134 @@
+{
+  "version": "20.0.0",
+  "generated_at": "2026-05-17T18:46:21.196Z",
+  "endpoint": "/.netlify/functions/phx-lead",
+  "operations": [
+    "GET service model",
+    "POST operation=quote_request",
+    "POST operation=route_quote"
+  ],
+  "input_fields": [
+    "buyer_name",
+    "buyer_contact",
+    "city",
+    "category",
+    "details",
+    "timeline",
+    "budget",
+    "business_ids"
+  ],
+  "output_actions": [
+    "quote_request",
+    "lead_route_decision"
+  ],
+  "sample": {
+    "lead_id": "lead-58574820c464cc40c7f1c385",
+    "selected": [
+      {
+        "business_id": "arclight-event-films-tempe-85281-04b822a",
+        "name": "ArcLight Event Films",
+        "city": "Tempe",
+        "category": "Video Production",
+        "score": 113,
+        "reasons": [
+          "same city",
+          "category/niche match",
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/business/arclight-event-films-tempe-85281-04b822a/"
+      },
+      {
+        "business_id": "arizona-state-university-tempe-education-childcare-d5b33c6",
+        "name": "Arizona State University",
+        "city": "Tempe",
+        "category": "Education And Childcare",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/arizona-state-university-tempe-education-childcare-d5b33c6/"
+      },
+      {
+        "business_id": "desert-frame-studio",
+        "name": "Desert Frame Studio",
+        "city": "Tempe",
+        "category": "Photography",
+        "score": 60,
+        "reasons": [
+          "same city",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/business/desert-frame-studio/"
+      },
+      {
+        "business_id": "bobs-smoke-shop-litchfield-park",
+        "name": "Bob's Smoke Shop",
+        "city": "Litchfield Park",
+        "category": "Retail And Specialty",
+        "score": 39,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/bobs-smoke-shop-litchfield-park/"
+      },
+      {
+        "business_id": "empire-pallets-phoenix",
+        "name": "Empire Pallets",
+        "city": "Phoenix",
+        "category": "Business Services",
+        "score": 39,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/empire-pallets-phoenix/"
+      }
+    ],
+    "decision": {
+      "lead_id": "lead-58574820c464cc40c7f1c385",
+      "business_ids": [
+        "arclight-event-films-tempe-85281-04b822a",
+        "arizona-state-university-tempe-education-childcare-d5b33c6",
+        "desert-frame-studio",
+        "bobs-smoke-shop-litchfield-park",
+        "empire-pallets-phoenix",
+        "az-exotic-bird-supplies-tempe-85281-1b0259a",
+        "hulxe-constructions-services-tempe-85282-ee048b2",
+        "integrity-building-corp-tempe-85282-2dbf93a"
+      ],
+      "route_reason": "Top 8 matches by city/category/contact readiness/verification signals.",
+      "assigned_to": "ae-tempe-video-production",
+      "city": "Tempe",
+      "category": "Video Production",
+      "score_summary": "arclight-event-films-tempe-85281-04b822a:113|arizona-state-university-tempe-education-childcare-d5b33c6:66|desert-frame-studio:60|bobs-smoke-shop-litchfield-park:39|empire-pallets-phoenix:39|az-exotic-bird-supplies-tempe-85281-1b0259a:34|hulxe-constructions-services-tempe-85282-ee048b2:34|integrity-building-corp-tempe-85282-2dbf93a:34",
+      "sla": "next_business_day",
+      "notes": "Route candidates require AE/admin approval before owner delivery."
+    }
+  }
+}

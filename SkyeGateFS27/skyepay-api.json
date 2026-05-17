@@ -34,7 +34,7 @@
   "security": {
     "card_data": "Stripe Checkout only",
     "cors": "same-origin or SKYPAY_ALLOWED_ORIGINS",
-    "activation": "owner approval required before workspace unlock",
+    "activation": "owner-approved offers stay paid_pending_owner_approval until an authenticated FS27 admin approves and unlocks them",
     "idempotency": "send idempotency_key on checkout creation",
     "free_trials": "subscription offers can start with trial_period_days and $0 due today",
     "stripe_lookup_keys": "checkout prefers dashboard Stripe Price lookup keys, then falls back to metadata-preserving price_data",
@@ -42,7 +42,7 @@
   },
   "example_checkout_body": {
     "client_slug": "metraiyux-0s",
-    "offer_id": "metraiyux-starter-command",
+    "offer_id": "metraiyux-routex-workforce-command",
     "customer_name": "Client Owner",
     "customer_email": "owner@example.com",
     "company_name": "Client Company",

@@ -1,11 +1,11 @@
 window.METRAIYUX_PUBLIC_NEURAL_MAP = {
-  "generated_at": "2026-05-17T14:47:07.643Z",
+  "generated_at": "2026-05-17T00:00:00.000Z",
   "source": "curated-obsidian-sync",
   "safety": "public-safe: generated only from brain:true Obsidian export with internal paths removed",
   "note_count": 10,
-  "chunk_count": 58,
-  "node_count": 100,
-  "link_count": 326,
+  "chunk_count": 59,
+  "node_count": 103,
+  "link_count": 336,
   "nodes": [
     {
       "id": "hub:metraiyux",
@@ -211,13 +211,13 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "label": "Live Surface Registry",
       "type": "note",
       "group": "production",
-      "size": 18,
+      "size": 19,
       "tags": [
         "live-surfaces",
         "proof-router",
         "production"
       ],
-      "summary": "6 curated knowledge chunks"
+      "summary": "7 curated knowledge chunks"
     },
     {
       "id": "tag:live-surfaces",
@@ -451,7 +451,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Brain Architecture. The hard source of truth currently enumerates 16 brain profiles in metraiyux0ssite/brain/persona-brains. json. Some copy is versioned as 17-brain-live-review-routing or s"
+      "summary": "Brain Architecture. The hard source of truth currently enumerates 16 brain profiles in metraiyux0ssite/brain/persona-brains. json. For public claims, use \"16 enumerated/connected brain profi"
     },
     {
       "id": "signal:chatgpt-project-handoff-8",
@@ -603,7 +603,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "CEO Live Deployment Ledger. Canonical ledger: LIVEDEPLOYMENTLEDGER. md Latest capture: 2026-05-16 UTC."
+      "summary": "CEO Live Deployment Ledger. Canonical ledger: LIVEDEPLOYMENTLEDGER. md Latest capture: 2026-05-17 UTC."
     },
     {
       "id": "signal:ceo-live-deployment-ledger-27",
@@ -611,7 +611,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Current Count. - 13 Cloudflare Pages production projects. - 11 Cloudflare Workers production services. - 36 live HTTP checks passed. - New Skyes Over London Reviews production Pages project "
+      "summary": "Current Count. - 15 Cloudflare Pages production projects. - 11 Cloudflare Workers production services. - 36 live HTTP checks passed, plus the 2026-05-17 MetrAIyux 0S marketing pricing browse"
     },
     {
       "id": "signal:ceo-live-deployment-ledger-28",
@@ -619,7 +619,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Evidence Files. - internal source json - internal source json - internal source png"
+      "summary": "Evidence Files. - internal source json - internal source json - internal source png - internal source png - internal source png"
     },
     {
       "id": "signal:ceo-live-deployment-ledger-29",
@@ -671,6 +671,14 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
     },
     {
       "id": "signal:live-surface-registry-35",
+      "label": "Full Live Deployment Ledger",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Full Live Deployment Ledger. This expanded ledger captures live surfaces that were not fully listed in the older core-route summary, including SkyeMail, SkyeVault, Bob's Smoke Shop preview, "
+    },
+    {
+      "id": "signal:live-surface-registry-36",
       "label": "Review Wall And Intake Routes",
       "type": "signal",
       "group": "production",
@@ -678,7 +686,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Review Wall And Intake Routes. - Public review wall: https://skyes-over-london-reviews. pages. dev/skyes-over-london-reviews-expanded. - Client review intake: https://skyes-over-london-revie"
     },
     {
-      "id": "signal:live-surface-registry-36",
+      "id": "signal:live-surface-registry-37",
       "label": "Update Ritual",
       "type": "signal",
       "group": "production",
@@ -686,7 +694,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Update Ritual. When a route changes, update the source registry JSON, this vault note, the production report, and any proof receipt that cites the old route."
     },
     {
-      "id": "signal:production-blockers-37",
+      "id": "signal:production-blockers-38",
       "label": "Citadel Forge",
       "type": "signal",
       "group": "production",
@@ -694,7 +702,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Citadel Forge. Citadel Forge is locally stood up with Postgres, Forgejo, control plane, and portal containers. Production push is blocked by external account and deployment decisions: - Real"
     },
     {
-      "id": "signal:production-blockers-38",
+      "id": "signal:production-blockers-39",
       "label": "Client Drop Vault",
       "type": "signal",
       "group": "production",
@@ -702,7 +710,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Client Drop Vault. Client Drop Vault checks and smoke pass locally. Live upload proof is blocked by Google Drive service-account quota unless a Shared Drive, user-owned folders, or domain-wi"
     },
     {
-      "id": "signal:production-blockers-39",
+      "id": "signal:production-blockers-40",
       "label": "Node OS",
       "type": "signal",
       "group": "production",
@@ -710,7 +718,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Node OS. Node OS prep passed local checks, but full ISO build and boot proof need a host with enough disk for the NixOS ISO closure, recommended 30 to 50 GB free."
     },
     {
-      "id": "signal:production-blockers-40",
+      "id": "signal:production-blockers-41",
       "label": "SkyeGateFS27",
       "type": "signal",
       "group": "production",
@@ -718,7 +726,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "SkyeGateFS27. SkyeGateFS27 is the auth and gateway authority for the ecosystem. Production hardening depends on explicit CORS origins, admin auth policy, billing credentials if top-ups are a"
     },
     {
-      "id": "signal:proof-ledger-41",
+      "id": "signal:proof-ledger-42",
       "label": "Proof Ledger",
       "type": "signal",
       "group": "proof",
@@ -726,7 +734,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Proof Ledger. The proof ledger is the evidence trail for what the system can truthfully claim."
     },
     {
-      "id": "signal:proof-ledger-42",
+      "id": "signal:proof-ledger-43",
       "label": "Current Proof Anchors",
       "type": "signal",
       "group": "production",
@@ -734,7 +742,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Current Proof Anchors. - PRODUCTIONREADINESSREPORT. md - metraiyux0slivee2ereport. json - internal source - proof-recipes/metraiyux-public-proof. json - metraiyux0ssite/brain/live-surface-re"
     },
     {
-      "id": "signal:proof-ledger-43",
+      "id": "signal:proof-ledger-44",
       "label": "Proof Standard",
       "type": "signal",
       "group": "production",
@@ -742,7 +750,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Proof Standard. A claim is stronger when it has all four: - Live URL or local route. - Test command or proof recipe. - Dated result. - Screenshot, JSON report, or receipt artifact."
     },
     {
-      "id": "signal:proof-ledger-44",
+      "id": "signal:proof-ledger-45",
       "label": "Missing Proof Should Become Action",
       "type": "signal",
       "group": "production",
@@ -750,7 +758,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Missing Proof Should Become Action. If a note contains a useful claim without proof, create an operator action instead of treating it as sales language. Review submissions are proof candidat"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-45",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
       "label": "Summary",
       "type": "signal",
       "group": "production",
@@ -758,7 +766,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Summary. Skyes Over London LC public site was unpacked from the deployment archive, deep-scanned, renamed back to the company identity, redesigned as an editorial proof atlas, audited throug"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
       "label": "Local Surface",
       "type": "signal",
       "group": "production",
@@ -766,7 +774,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Local Surface. - Site folder: unpacked-projects/skyes-over-london-lc/ - Homepage: unpacked-projects/skyes-over-london-lc/index. html - Contact route: unpacked-projects/skyes-over-london-lc/p"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
       "label": "Browser QA",
       "type": "signal",
       "group": "proof",
@@ -774,7 +782,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Browser QA. - Desktop homepage: internal source png - Mobile homepage: internal source png - Desktop contact: internal source png - Mobile contact: internal source png"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
       "label": "MCP Result",
       "type": "signal",
       "group": "proof",
@@ -782,7 +790,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "MCP Result. - Command: npm run mcp:mine -- unpacked-projects/skyes-over-london-lc - Result: ok: true - Failed MCP calls: [] - Design direction: editorial-proof-atlas with company-attached pu"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
       "label": "Vault Package",
       "type": "signal",
       "group": "production",
@@ -790,7 +798,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Vault Package. - Stage folder: . skyevault-out/stage-skyes-over-london-lc-20260517/ - Archive: . skyevault-out/skyes-over-london-lc-proof-atlas-20260517T092216Z. zip - SHA-256: b608894ced563"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
       "label": "Git Base",
       "type": "signal",
       "group": "proof",
@@ -798,7 +806,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Git Base. - Base commit before this receipt: bd6ebb3"
     },
     {
-      "id": "signal:sales-and-handoff-map-51",
+      "id": "signal:sales-and-handoff-map-52",
       "label": "Sales And Handoff Map",
       "type": "signal",
       "group": "production",
@@ -806,7 +814,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Sales And Handoff Map. MetrAIyux 0S sales material should connect the buyer to working proof, clear deployment boundaries, and a credible next action."
     },
     {
-      "id": "signal:sales-and-handoff-map-52",
+      "id": "signal:sales-and-handoff-map-53",
       "label": "Useful Sales Assets",
       "type": "signal",
       "group": "production",
@@ -814,7 +822,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Useful Sales Assets. - Public proof router for showing live surfaces. - White-label client deck handoff. - Valuation brief and marketing copy. - Production readiness report for serious techn"
     },
     {
-      "id": "signal:sales-and-handoff-map-53",
+      "id": "signal:sales-and-handoff-map-54",
       "label": "Buyer-Safe Framing",
       "type": "signal",
       "group": "production",
@@ -822,7 +830,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Buyer-Safe Framing. Use proof-backed language: - \"Live proof route available. \" - \"Production gates identified. \" - \"Local checks passed. \" - \"External-account setup required before final pr"
     },
     {
-      "id": "signal:sales-and-handoff-map-54",
+      "id": "signal:sales-and-handoff-map-55",
       "label": "Review Routing",
       "type": "signal",
       "group": "proof",
@@ -830,7 +838,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Review Routing. If a prospect asks for testimonials, reviews, client proof, social proof, or customer experience, send the review wall and keep the claim grounded in the public page. If an e"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-55",
+      "id": "signal:metraiyux-0s-project-vault-56",
       "label": "MetrAIyux 0S Project Vault",
       "type": "signal",
       "group": "production",
@@ -838,7 +846,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "MetrAIyux 0S Project Vault. This vault is the human command center for MetrAIyux 0S, SkyeGateFS27, proof systems, client handoff material, deployment blockers, and decision memory."
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-56",
+      "id": "signal:metraiyux-0s-project-vault-57",
       "label": "Start Here",
       "type": "signal",
       "group": "production",
@@ -846,7 +854,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Start Here. - 00-command-center/Current Production State - 00-command-center/ChatGPT Project Handoff - 00-command-center/Next Operator Actions - 10-production/Production Blockers - 10-produc"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-57",
+      "id": "signal:metraiyux-0s-project-vault-58",
       "label": "Vault Rules",
       "type": "signal",
       "group": "proof",
@@ -854,12 +862,28 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Vault Rules. - Add brain: true in frontmatter only when a note is safe to export into the local browser brain. - Keep private credentials, real tokens, customer secrets, and unverified claim"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-58",
+      "id": "signal:metraiyux-0s-project-vault-59",
       "label": "Sync",
       "type": "signal",
       "group": "production",
       "size": 8,
       "summary": "Sync. Run the repo-local Obsidian sync command after changing curated notes. The detailed command allowlist lives outside the deployable static site in repo operator docs. The sync writes me"
+    },
+    {
+      "id": "signal:live-surface-registry-skyemediacenter-free99",
+      "label": "SkyeMediaCenter Free99",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "SkyeMediaCenter is now a Free99 no-charge 0S media surface with gated app boot, intake, operator theater, asset search, review, execution, dispatch, publish, stats, and file-delivery proof. Free99 does not bypass gate sessions."
+    },
+    {
+      "id": "signal:live-surface-registry-skyemusicnexus-free99",
+      "label": "SkyeMusicNexus Free99",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "SkyeMusicNexus is now a Free99 no-charge 0S music surface with gated app boot, Artist Stage, Operator Stage, artist records, release forge, royalty ledger motion, payout review, analytics, operations workflow, and proof boundary. Free99 does not bypass gate sessions."
     }
   ],
   "links": [
@@ -2244,13 +2268,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "cluster:sales",
-      "target": "signal:live-surface-registry-35",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:operator",
+      "source": "cluster:brain",
       "target": "signal:live-surface-registry-35",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2274,91 +2292,97 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "cluster:brain",
+      "source": "cluster:sales",
       "target": "signal:live-surface-registry-36",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:production-blockers",
-      "target": "signal:production-blockers-37",
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-36",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-37",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-37",
+      "target": "signal:live-surface-registry-37",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:production-blockers-37",
+      "target": "signal:live-surface-registry-37",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-37",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:production-blockers",
+      "target": "signal:production-blockers-38",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:production-blockers-38",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:production-blockers-38",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-37",
+      "target": "signal:production-blockers-38",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:production-blockers",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-39",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:production-blockers-38",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:production-blockers",
-      "target": "signal:production-blockers-39",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:production-blockers-39",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:production-blockers-39",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:operator",
       "target": "signal:production-blockers-39",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2376,61 +2400,67 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
+      "source": "cluster:proof",
+      "target": "signal:production-blockers-40",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "cluster:operator",
       "target": "signal:production-blockers-40",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-41",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:proof-ledger-41",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-42",
+      "source": "note:production-blockers",
+      "target": "signal:production-blockers-41",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
+      "target": "signal:production-blockers-41",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:production-blockers-41",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:proof-ledger",
+      "target": "signal:proof-ledger-42",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:proof",
       "target": "signal:proof-ledger-42",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
+      "source": "note:proof-ledger",
+      "target": "signal:proof-ledger-43",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:proof-ledger-43",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "cluster:proof",
-      "target": "signal:proof-ledger-42",
+      "target": "signal:proof-ledger-43",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:proof-ledger-42",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-43",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:proof-ledger-43",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
       "target": "signal:proof-ledger-43",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2450,42 +2480,36 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
     {
       "source": "cluster:proof",
       "target": "signal:proof-ledger-44",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:proof-ledger",
+      "target": "signal:proof-ledger-45",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:proof-ledger-45",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:proof-ledger-45",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:proof-ledger-44",
+      "target": "signal:proof-ledger-45",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:proof-ledger-44",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-45",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-45",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-45",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-45",
+      "target": "signal:proof-ledger-45",
       "type": "cluster-signal",
       "strength": 0.6
     },
@@ -2518,6 +2542,12 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
       "type": "signal",
       "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "type": "cluster-signal",
+      "strength": 0.6
     },
     {
       "source": "cluster:proof",
@@ -2556,19 +2586,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.9
     },
     {
-      "source": "cluster:production",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:sales",
       "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2586,7 +2604,19 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.9
     },
     {
+      "source": "cluster:production",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "cluster:proof",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
       "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2598,32 +2628,20 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "note:sales-and-handoff-map",
-      "target": "signal:sales-and-handoff-map-51",
+      "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
       "type": "signal",
       "strength": 0.9
     },
     {
-      "source": "cluster:production",
-      "target": "signal:sales-and-handoff-map-51",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
       "source": "cluster:proof",
-      "target": "signal:sales-and-handoff-map-51",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "cluster:sales",
-      "target": "signal:sales-and-handoff-map-51",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:operator",
-      "target": "signal:sales-and-handoff-map-51",
+      "source": "cluster:brain",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
       "type": "cluster-signal",
       "strength": 0.6
     },
@@ -2694,6 +2712,12 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.9
     },
     {
+      "source": "cluster:production",
+      "target": "signal:sales-and-handoff-map-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "cluster:proof",
       "target": "signal:sales-and-handoff-map-54",
       "type": "cluster-signal",
@@ -2706,38 +2730,26 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "note:metraiyux-0s-project-vault",
-      "target": "signal:metraiyux-0s-project-vault-55",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:metraiyux-0s-project-vault-55",
+      "source": "cluster:operator",
+      "target": "signal:sales-and-handoff-map-54",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
+      "source": "note:sales-and-handoff-map",
+      "target": "signal:sales-and-handoff-map-55",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
       "source": "cluster:proof",
-      "target": "signal:metraiyux-0s-project-vault-55",
+      "target": "signal:sales-and-handoff-map-55",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:metraiyux-0s-project-vault-55",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:operator",
-      "target": "signal:metraiyux-0s-project-vault-55",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:brain",
-      "target": "signal:metraiyux-0s-project-vault-55",
+      "target": "signal:sales-and-handoff-map-55",
       "type": "cluster-signal",
       "strength": 0.6
     },
@@ -2772,10 +2784,22 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
+      "source": "cluster:brain",
+      "target": "signal:metraiyux-0s-project-vault-56",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "note:metraiyux-0s-project-vault",
       "target": "signal:metraiyux-0s-project-vault-57",
       "type": "signal",
       "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:metraiyux-0s-project-vault-57",
+      "type": "cluster-signal",
+      "strength": 0.6
     },
     {
       "source": "cluster:proof",
@@ -2784,13 +2808,13 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "cluster:operator",
+      "source": "cluster:sales",
       "target": "signal:metraiyux-0s-project-vault-57",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "cluster:brain",
+      "source": "cluster:operator",
       "target": "signal:metraiyux-0s-project-vault-57",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2802,7 +2826,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.9
     },
     {
-      "source": "cluster:production",
+      "source": "cluster:proof",
       "target": "signal:metraiyux-0s-project-vault-58",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2816,6 +2840,66 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
     {
       "source": "cluster:brain",
       "target": "signal:metraiyux-0s-project-vault-58",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:metraiyux-0s-project-vault",
+      "target": "signal:metraiyux-0s-project-vault-59",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:metraiyux-0s-project-vault-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:metraiyux-0s-project-vault-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:metraiyux-0s-project-vault-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-skyemediacenter-free99",
       "type": "cluster-signal",
       "strength": 0.6
     }

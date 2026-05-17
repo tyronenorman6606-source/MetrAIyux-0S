@@ -3,9 +3,13 @@ import authIntrospect from '../netlify/functions/auth-introspect.js';
 import authSignup from '../netlify/functions/auth-signup.js';
 import authLogin from '../netlify/functions/auth-login.js';
 import authCard from '../netlify/functions/auth-card.js';
+import gatewayChat from '../netlify/functions/gateway-chat.js';
+import gatewayStream from '../netlify/functions/gateway-stream.js';
 import adminLogin from '../netlify/functions/admin-login.js';
 import adminPlatformEvents from '../netlify/functions/admin-platform-events.js';
+import adminPentestCards from '../netlify/functions/admin-pentest-cards.js';
 import platformEventIngest from '../netlify/functions/platform-event-ingest.js';
+import pentestCardRequest from '../netlify/functions/pentest-card-request.js';
 import sessionToken from '../netlify/functions/session-token.js';
 import authTokenIssue from '../netlify/functions/auth-token-issue.js';
 import oauthJwks from '../netlify/functions/oauth-jwks.js';
@@ -27,6 +31,12 @@ const ROUTES = [
   ['POST', '/auth-card', authCard],
   ['GET', '/.netlify/functions/auth-card', authCard],
   ['POST', '/.netlify/functions/auth-card', authCard],
+  ['POST', '/gateway-chat', gatewayChat],
+  ['POST', '/gateway/chat', gatewayChat],
+  ['POST', '/.netlify/functions/gateway-chat', gatewayChat],
+  ['POST', '/gateway-stream', gatewayStream],
+  ['POST', '/gateway/stream', gatewayStream],
+  ['POST', '/.netlify/functions/gateway-stream', gatewayStream],
   ['POST', '/auth-introspect', authIntrospect],
   ['POST', '/auth/introspect', authIntrospect],
   ['POST', '/.netlify/functions/auth-introspect', authIntrospect],
@@ -34,8 +44,16 @@ const ROUTES = [
   ['POST', '/.netlify/functions/admin-login', adminLogin],
   ['GET', '/admin/platform-events', adminPlatformEvents],
   ['GET', '/.netlify/functions/admin-platform-events', adminPlatformEvents],
+  ['GET', '/admin/pentest-cards', adminPentestCards],
+  ['POST', '/admin/pentest-cards', adminPentestCards],
+  ['GET', '/.netlify/functions/admin-pentest-cards', adminPentestCards],
+  ['POST', '/.netlify/functions/admin-pentest-cards', adminPentestCards],
   ['POST', '/platform/events', platformEventIngest],
   ['POST', '/.netlify/functions/platform-event-ingest', platformEventIngest],
+  ['GET', '/pentest/card-request', pentestCardRequest],
+  ['POST', '/pentest/card-request', pentestCardRequest],
+  ['GET', '/.netlify/functions/pentest-card-request', pentestCardRequest],
+  ['POST', '/.netlify/functions/pentest-card-request', pentestCardRequest],
   ['POST', '/session/token', sessionToken],
   ['POST', '/.netlify/functions/session-token', sessionToken],
   ['POST', '/auth/tokens/issue', authTokenIssue],
@@ -69,6 +87,7 @@ const routeMap = new Map(ROUTES.map(([method, path, handler]) => [routeKey(metho
 const ASSET_ALIASES = new Map([
   ['/pay', '/skyepay.html'],
   ['/store', '/skyepay-store.html'],
+  ['/connectlog-relay13', '/connectlog-relay13-gate.html'],
   ['/gateway/skyepay', '/skyepay.html'],
   ['/skyepay/store', '/skyepay-store.html'],
   ['/skyepay/api', '/skyepay-api.html'],

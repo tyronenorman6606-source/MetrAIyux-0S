@@ -1,4 +1,4 @@
-# PHX Verified Platform Proof
+# Valley Verified Platform Proof
 
 Latest package: v18.
 
@@ -79,3 +79,18 @@ Important counts from the v21 package:
 ✅ Protected admin replay operation fixed.
 
 See `proofs/v22-closure-summary.txt` and `proofs/v22-smoke-output.txt`.
+
+## 0S gate/auth proof addendum
+
+Added after the v23 source audit:
+
+- `src/server/gate-auth.mjs` maps FS27 bearer tokens to trusted upstream actor headers.
+- Runtime functions now call the gate adapter before privileged POST/admin/payment/customer landing actions.
+- `src/server/customer-posting-entitlement.mjs` enforces the first-paid-month free landing/posting rule.
+- `scripts/gate-auth-smoke.mjs` proves token introspection, spoofed header stripping, customer/workspace propagation, public contract read, and the queued `customer_business_posting` action.
+
+Run:
+
+```bash
+npm run gate-auth-smoke
+```
