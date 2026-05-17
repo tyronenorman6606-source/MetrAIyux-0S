@@ -21,7 +21,7 @@ const PLANS = {
     monthly: 397,
     setup: 1500,
     skyepay_offer_id: "metraiyux-starter-command",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command",
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval",
     // Customer-facing platform features — shown in marketing, portal, and SDK
@@ -62,7 +62,7 @@ const PLANS = {
     monthly: 997,
     setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet",
     owner_approval_required: true,
     activation_path: "owner_approved_after_route_scope",
     features: {
@@ -97,11 +97,11 @@ const PLANS = {
   },
   "routex-workforce-command": {
     name: "RouteX Workforce Command",
-    tagline: "Dispatch, routes, stops, proof vaults, and workforce runtime proof.",
+    tagline: "Dispatch, routes, stops, proof vaults, manual compliance, and workforce runtime proof.",
     monthly: 1497,
     setup: 6500,
     skyepay_offer_id: "metraiyux-routex-workforce-command",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command",
     owner_approval_required: true,
     activation_path: "owner_approved_after_route_scope",
     features: {
@@ -145,7 +145,7 @@ const PLANS = {
     monthly: 2497,
     setup: 7500,
     skyepay_offer_id: "metraiyux-autonomous-office",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-autonomous-office",
     owner_approval_required: true,
     activation_path: "owner_approved_after_sovereign_stack_review",
     features: {
@@ -185,7 +185,7 @@ const PLANS = {
     monthly: 3997,
     setup: 15000,
     skyepay_offer_id: "metraiyux-enterprise-command",
-    checkout_url: "https://skyesol.netlify.app/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
     owner_approval_required: true,
     activation_path: "owner_approved_after_gate_scope",
     features: {
@@ -581,19 +581,51 @@ async function deliverSkyeMeritPack(env, pack) {
   };
 }
 
+async function ensureSkyeMeritPackTable(env) {
+  if (!env.SAAS_DB) return false;
+  await env.SAAS_DB.prepare(`CREATE TABLE IF NOT EXISTS skyemerit_packs (
+    id TEXT PRIMARY KEY,
+    pack_id TEXT NOT NULL,
+    customer_id TEXT,
+    workspace_id TEXT,
+    email TEXT,
+    status TEXT NOT NULL DEFAULT 'issued',
+    kaixu_credit_cents INTEGER NOT NULL DEFAULT 0,
+    coupon_codes TEXT,
+    delivery TEXT,
+    payload TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`).run();
+  await env.SAAS_DB.prepare("CREATE INDEX IF NOT EXISTS idx_skyemerit_packs_email ON skyemerit_packs(email)").run();
+  await env.SAAS_DB.prepare("CREATE INDEX IF NOT EXISTS idx_skyemerit_packs_customer ON skyemerit_packs(customer_id)").run();
+  await env.SAAS_DB.prepare("CREATE INDEX IF NOT EXISTS idx_skyemerit_packs_workspace ON skyemerit_packs(workspace_id)").run();
+  return true;
+}
+
+async function insertSkyeMeritPackRow(env, pack, delivery, row) {
+  await env.SAAS_DB.prepare(`INSERT INTO skyemerit_packs
+    (id,pack_id,customer_id,workspace_id,email,status,kaixu_credit_cents,coupon_codes,delivery,payload,created_at,updated_at)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(pack.id, pack.pack_id, pack.customer_id || "", pack.workspace_id || "", pack.email || "", pack.status, pack.kaixu_credit_cents || 0, JSON.stringify(pack.coupon_codes || []), JSON.stringify(delivery || {}), JSON.stringify(row), pack.issued_at, row.updated_at)
+    .run();
+}
+
 async function recordSkyeMeritPack(env, pack, delivery) {
   const row = { ...pack, delivery, updated_at: now() };
   if (env.SAAS_KV) await env.SAAS_KV.put(`skyemerit_pack:${pack.id}`, JSON.stringify(row));
   if (env.SAAS_KV && pack.email) await env.SAAS_KV.put(`skyemerit_pack_email:${pack.email}`, JSON.stringify(row));
   if (env.SAAS_DB) {
     try {
-      await env.SAAS_DB.prepare(`INSERT INTO skyemerit_packs
-        (id,pack_id,customer_id,workspace_id,email,status,kaixu_credit_cents,coupon_codes,delivery,payload,created_at,updated_at)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
-        .bind(pack.id, pack.pack_id, pack.customer_id || "", pack.workspace_id || "", pack.email || "", pack.status, pack.kaixu_credit_cents || 0, JSON.stringify(pack.coupon_codes || []), JSON.stringify(delivery || {}), JSON.stringify(row), pack.issued_at, row.updated_at)
-        .run();
+      await insertSkyeMeritPackRow(env, pack, delivery, row);
     } catch (error) {
-      row.persistence_warning = error?.message || "skyemerit_packs migration not applied";
+      try {
+        await ensureSkyeMeritPackTable(env);
+        await insertSkyeMeritPackRow(env, pack, delivery, row);
+        row.persistence_repaired = true;
+      } catch (repairError) {
+        row.persistence_warning = repairError?.message || error?.message || "skyemerit_packs migration not applied";
+      }
     }
   }
   return row;
@@ -1299,24 +1331,32 @@ export default {
           const session = event.data?.object || {};
           const workspaceId = session.metadata?.workspace_id;
           const subscriptionId = session.metadata?.subscription_id;
+          const planId = session.metadata?.plan_id || "";
+          const plan = PLANS[planId] || null;
+          const ownerApprovalRequired = plan?.owner_approval_required !== false;
+          const workspaceStatus = ownerApprovalRequired ? "paid_pending_owner_approval" : "active";
+          const subscriptionStatus = ownerApprovalRequired ? "paid_pending_owner_approval" : "active";
+          const auditAction = ownerApprovalRequired ? "workspace_payment_confirmed_pending_owner_approval" : "workspace_activated";
+          const provisioningEvent = ownerApprovalRequired ? "billing.checkout_completed.pending_owner_approval" : "billing.checkout_completed";
+          const provisioningStatus = ownerApprovalRequired ? "pending_owner_approval" : "completed";
           const updated_at = now();
           if (workspaceId) {
             if (env.SAAS_DB) {
-              await env.SAAS_DB.prepare("UPDATE workspaces SET status=?, updated_at=? WHERE id=?").bind("active", updated_at, workspaceId).run();
-              if (subscriptionId) await env.SAAS_DB.prepare("UPDATE subscriptions SET status=?, provider_subscription_id=?, updated_at=? WHERE id=?").bind("active", session.id, updated_at, subscriptionId).run();
+              await env.SAAS_DB.prepare("UPDATE workspaces SET status=?, updated_at=? WHERE id=?").bind(workspaceStatus, updated_at, workspaceId).run();
+              if (subscriptionId) await env.SAAS_DB.prepare("UPDATE subscriptions SET status=?, provider_subscription_id=?, updated_at=? WHERE id=?").bind(subscriptionStatus, session.id, updated_at, subscriptionId).run();
             }
             if (env.SAAS_KV) {
               const ws = await env.SAAS_KV.get(`workspace:${workspaceId}`, "json");
-              if (ws) { ws.status = "active"; ws.updated_at = updated_at; await env.SAAS_KV.put(`workspace:${workspaceId}`, JSON.stringify(ws)); }
+              if (ws) { ws.status = workspaceStatus; ws.owner_approval_required = ownerApprovalRequired; ws.updated_at = updated_at; await env.SAAS_KV.put(`workspace:${workspaceId}`, JSON.stringify(ws)); }
             }
-            await audit(env, "stripe_webhook", "workspace_activated", "workspace", workspaceId, { stripe_session_id: session.id, subscription_id: subscriptionId });
-            await recordProvisioningEvent(env, workspaceId, "billing.checkout_completed", { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency, skyemerit: session.metadata?.skyemerit_code ? {
+            await audit(env, "stripe_webhook", auditAction, "workspace", workspaceId, { stripe_session_id: session.id, subscription_id: subscriptionId, plan_id: planId, owner_approval_required: ownerApprovalRequired });
+            await recordProvisioningEvent(env, workspaceId, provisioningEvent, { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency, owner_approval_required: ownerApprovalRequired, activation_path: plan?.activation_path || "paid_pending_owner_approval", skyemerit: session.metadata?.skyemerit_code ? {
               applied: session.metadata.skyemerit_applied,
               code: session.metadata.skyemerit_code,
               discount_cents: session.metadata.skyemerit_discount_cents,
               adjusted_due_cents: session.metadata.skyemerit_adjusted_due_cents
-            } : null }, "completed");
-            await email(env, "Payment confirmed — workspace active", `<h2>Payment received</h2><p>Workspace: ${workspaceId}</p><p>Stripe session: ${session.id}</p><p>Amount: $${((session.amount_total || 0) / 100).toFixed(2)} ${(session.currency || "usd").toUpperCase()}</p>`);
+            } : null }, provisioningStatus);
+            await email(env, ownerApprovalRequired ? "Payment confirmed — owner approval pending" : "Payment confirmed — workspace active", `<h2>Payment received</h2><p>Workspace: ${workspaceId}</p><p>Stripe session: ${session.id}</p><p>Amount: $${((session.amount_total || 0) / 100).toFixed(2)} ${(session.currency || "usd").toUpperCase()}</p><p>${ownerApprovalRequired ? "Paid status is recorded. FS27 is holding activation for owner approval." : "Workspace activation is complete."}</p>`);
           }
         }
         return json({ received: true });
@@ -1324,7 +1364,7 @@ export default {
 
       if (path === "/api/saas/billing/checkout-success") {
         const session_id = url.searchParams.get("session_id") || "";
-        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Stripe confirmation records paid status. Workspace activation follows the plan policy and any required owner approval. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
+        return new Response(`<!doctype html><html><body style="font-family:sans-serif;max-width:600px;margin:60px auto;text-align:center"><h1>Payment received</h1><p>Stripe confirmation records paid status. FS27 holds activation for owner approval before any paid workspace opens. You will receive a confirmation email shortly.</p><p style="color:#888;font-size:12px">Session: ${session_id}</p></body></html>`, { headers: { "content-type": "text/html" } });
       }
 
       if (path === "/api/saas/billing/checkout-cancel") {

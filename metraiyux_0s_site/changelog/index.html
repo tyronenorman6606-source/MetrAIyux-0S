@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetrAIyux 0S production changelog with ConnectLog, Relay13, FS27, Cloudflare deployment evidence, proof receipts, SkyePay, Skyes Reviews, and release history.">
+  <meta name="description" content="MetrAIyux 0S production changelog with ConnectLog, Relay13, FS27, SkyeVault/R2 storage proof, Cloudflare deployment evidence, proof receipts, SkyePay, Skyes Reviews, and release history.">
   <title>Changelog · MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
@@ -358,7 +358,7 @@
         <p class="eyebrow">Public release record</p>
         <img class="hero-platform-logo changelog-hero-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
         <h1 class="changelog-title">Skye Production Changelog</h1>
-        <p class="changelog-lede">I route the 0S release record through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, live Cloudflare surfaces, browser QA, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> handoff evidence, and the legacy release history that used to sit in the old receipt page.</p>
+        <p class="changelog-lede">I route the 0S release record through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, live Cloudflare surfaces, SkyeVault/R2 storage proof, browser QA, <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> handoff evidence, and the legacy release history that used to sit in the old receipt page.</p>
         <div class="hero-actions">
           <a class="button primary" href="../proof/index.html">Open Proof Routes</a>
           <a class="button" href="../operator/deployment-ledger.html">Deployment Ledger</a>
@@ -384,6 +384,197 @@
         <article class="release-entry">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">SkyeVault/R2 Storage Cutover</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Skye Content Forge</span><span>SkyeVault/R2</span><span>Google infra replaced</span><span>Root env</span><span>Gate required</span><span>Free99</span></div>
+            <h2>I replaced the Content Forge cloud storage lane with my own SkyeVault/R2 infrastructure.</h2>
+            <p>Skye Content Forge no longer depends on Google Drive as the primary cloud export path. The platform now writes generated Markdown into the live SkyeVault Cloudflare R2 bucket while keeping Free99 as no charge and keeping every API/export path behind a gate session.</p>
+            <ul class="release-points">
+              <li>I changed the app health, export panel, publisher target, docs, setup notes, hub, proof receipt, manifest, and 0S homepage copy from Google Drive-primary language to SkyeVault/R2-primary language.</li>
+              <li>I wired <code>/api/export/skyevault-r2</code> through the existing SkyeVault-Drop R2 adapter and normalized root env aliases for <code>CLOUDFLARE_R2_ACCOUNT_ID</code>, <code>CLOUDFLARE_R2_ACCESS_KEY</code>, <code>CLOUDFLARE_R2_SECRET_KEY</code>, and <code>S3_BUCKET</code>.</li>
+              <li>I verified the live R2 route by writing Markdown into bucket <code>client-drop-vault</code> under <code>content-forge-exports</code> and receiving a signed download URL back from the app.</li>
+              <li>I verified scheduled publishing through target <code>skyevault-r2</code>; scheduled item <code>439246bc-6c0a-4cb1-b4eb-e71d02c0085d</code> published into SkyeVault/R2 instead of a Google-owned folder.</li>
+              <li>I kept Google Drive as an optional legacy path only. The current Google service-account target is auth-valid but storage-owner blocked by normal My Drive rules unless a Shared Drive or delegated OAuth lane is used.</li>
+              <li>I proved the security boundary after the cutover: unauthenticated API health returns <code>401</code>, authenticated health returns <code>200</code>, and the browser dashboard shows <code>AI ready</code>, <code>Vault/R2 configured</code>, and <code>Upload to SkyeVault/R2</code>.</li>
+            </ul>
+            <div class="receipt-row"><span>Google infra replaced</span><span>SkyeVault/R2 primary</span><span>R2 route 200</span><span>Unauth 401</span><span>Publisher target proven</span><span>Free99 gated</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">HouseOperations Radical V3</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>HouseOperations</span><span>SkyeBox</span><span>MCP tooling</span><span>SkyePay</span><span>FS27 Gate</span><span>Browser proof</span></div>
+            <h2>I replaced the old HouseOperations shell with a real command-floor app surface.</h2>
+            <p>HouseOperations no longer presents as the same sidebar dashboard with polish on top. The current release opens as a cache-busted radical v3 command floor with top navigation, mission plates, a working operator intake dock, proof spine, billing console, tutorial deck, SkyeBox vault runway, and FS27 PIN Gate handoff.</p>
+            <ul class="release-points">
+              <li>I changed every HouseOperations page shell to <code>houseops-command-v3</code>, added <code>data-surface-version="houseops-radical-v3-20260517"</code>, and cache-busted the CSS/JS links so the browser cannot silently show the old UI.</li>
+              <li>I rebuilt the dashboard first viewport around the actual app actions: New Task, New Vendor, Save Proof, Export, open work count, owner escalations, vendor value, and active monthly plan.</li>
+              <li>I redesigned the billing and tutorial surfaces so charge-ready intents, tutorial receipts, SkyePay offer URLs, and activation boundaries are visible as product work instead of buried panels.</li>
+              <li>I kept the app honest: HouseOperations records local state, proof, billing intent, and gate mirror packets; SkyePay and FS27 still own payment confirmation, owner approval, policy activation, PIN login, and recovery boundaries.</li>
+              <li>I used the repo MCP workflow before and after the redesign. The final MCP miner receipt returned <code>ok: true</code> with <code>failedCalls: []</code>, and the MCP effect/validate passes recognize the neon scrollbar, motion chrome, living background, text effect, surface screenshot, and real logo asset signals.</li>
+              <li>I reran the full proof set: <code>npm run 0s:houseops-skyebox:e2e</code>, <code>npm run 0s:houseops:claims</code>, <code>npm run 0s:houseops:skyepay</code>, and the SkyeBox static/TOTP crypto proof scripts all passed.</li>
+              <li>I verified desktop and mobile browser flows for HouseOperations and SkyeBox: task creation, state advance, proof save, backup export, tutorial receipt export, billing intent export, TOTP save, encrypted vault backup, endpoint JSON checks, video playback proof, and no horizontal scroll.</li>
+            </ul>
+            <div class="receipt-row"><span>Radical v3 UI</span><span>Cache busted</span><span>MCP receipt clean</span><span>E2E clean</span><span>SkyeBox crypto clean</span><span>No horizontal scroll</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Customer-Ready SkyeMerit + Media Center</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Production deployed</span><span>SkyeMerit</span><span>SkyeMediaCenter</span><span>FS27 checkout</span><span>Gate required</span></div>
+            <h2>I closed the SkyeMerit and SkyeMediaCenter release for customer use.</h2>
+            <p>This closeout moves the new Free99 platform expansion from local proof into the live Cloudflare customer path. Free99 means no charge; it does not mean anonymous access, and paid work still routes through SkyePay, FS27, and owner approval.</p>
+            <ul class="release-points">
+              <li>I deployed the 0S full-system Worker, SaaS provisioning Worker, and FS27/SkyePay Worker with the new SkyeMerit, SkyeMediaCenter, pricing, and owner-approval changes live.</li>
+              <li>I changed customer checkout routing away from legacy <code>skyesol.netlify.app/skyepay</code> URLs and made the live FS27 Cloudflare Worker the active SkyePay checkout origin.</li>
+              <li>I proved the live SkyeMerit path end to end: catalog, preview math, no-auth issue rejection, signup pack issuance, D1 persistence, kAIxu credit, and gate-required pack state.</li>
+              <li>I added runtime self-repair for the <code>skyemerit_packs</code> D1 table so the live Worker can create the missing table through its bound database and keep issuing packs without a manual API migration blocker.</li>
+              <li>I verified SkyeMediaCenter as a real routed app surface with root, dashboard, records, workflows, runtime, settings, proof, public intake, and operator theater pages.</li>
+              <li>I confirmed paid MetrAIyux app lanes, including RouteX, remain owner-approved after payment instead of auto-unlocking from Stripe success.</li>
+            </ul>
+            <div class="receipt-row"><span>0S Worker live</span><span>SaaS Worker live</span><span>FS27 Worker live</span><span>Checkout on Cloudflare</span><span>D1 persistence repaired</span><span>Live proof clean</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Valley Publisher</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Valley Verified</span><span>28 guides</span><span>Scheduled publishing</span><span>0S Worker</span><span>Scope rollback</span></div>
+            <h2>I turned Valley Verified into a scheduled company-running publication engine.</h2>
+            <p>Valley Verified now has a real operating-insights section instead of a single blog stub: longform guides teach practical company work first, then point owners into the major 0S and company platforms that make the repeated work easier.</p>
+            <ul class="release-points">
+              <li>I added a 28-guide editorial library with 18 live guides, 10 scheduled guides, and 6 topic clusters covering weekly command rhythm, local visibility, intake, records, security, reviews, market research, pricing, proof, retention, delegation, cashflow, and customer status control.</li>
+              <li>I kept the backlinks focused on major live platforms only: MetrAIyux 0S, SkyeVault, SkyeGateFS27/SkyePay, Deployment Atlas, Skyes Over London Reviews, and SOLEnterprises.</li>
+              <li>I added the public insights hub at <code>/insights/</code>, category routes, the public schedule at <code>/insights/schedule/</code>, and the machine-readable calendar at <code>/api/insights-editorial-calendar.json</code>.</li>
+              <li>I wired the 0S Worker endpoint at <code>/api/valley/content-schedule</code> so the system can read the calendar, detect due guides, store receipts, and queue operator publish tasks.</li>
+              <li>I configured the Worker cron as <code>17 13 * * 1,3,5</code> and kept the manual tick route protected so scheduled publishing does not become an anonymous public button.</li>
+              <li>I verified production after deploy: the Valley publication engine browser QA returned 42 checks and zero failures.</li>
+              <li>I also rolled the unrelated portal/site-design deployment back to <code>c98babbd-7ea5-4151-8cea-65f79da6603f</code>; this changelog entry is scoped to the Valley blog and scheduler work only.</li>
+            </ul>
+            <div class="receipt-row"><span>18 live guides</span><span>10 scheduled</span><span>6 clusters</span><span>Calendar JSON 200</span><span>Worker schedule API 200</span><span>42 QA checks clean</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">0S Expansion Accounted</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMerit</span><span>RouteX unified</span><span>SkyeVault/R2</span><span>Proof router</span><span>Sales surfaces</span><span>Receipts</span></div>
+            <h2>I accounted for the new 0S platforms across proof, sales, pricing, and operator routing.</h2>
+            <p>This pass makes the expansion visible instead of just present in the repo: the changelog, proof routes, live proof router, surface registries, sales offer registry, README, public home routing, and SkyeVault/R2 storage posture now reflect the added lanes and their guardrails.</p>
+            <ul class="release-points">
+              <li>I added SkyeMerit as a first-class no-charge customer merit lane: wallet, operator issue control, protected discount math, kAIxu credit, FS27 SkyePay support, and proof receipt.</li>
+              <li>I documented the RouteX folder unification so SkyeRouteX and Workforce Command v0.4.0 stay together under <code>SkyeRouteX/workforce-command-v0.4.0</code>, with the old top-level path kept only as a compatibility pointer.</li>
+              <li>I kept the advertising path honest: Free99 means no charge, not anonymous access; paid lanes still require SkyePay, FS27, owner approval, and gate sessions where applicable.</li>
+              <li>I updated buyer routing so sales can show SkyeMerit for first-time credits and capped discount questions, SkyeRouteX for field workforce operations, SkyeMusicNexus for music drops and rights-gated release work, SkyeMediaCenter for asset operations, Skye Content Forge for publishing, SkyeProfitConsole for margin decisions, HouseOperations + SkyeBox for task/vendor and authenticator custody, and ConnectLog + Relay13 for relationship and messaging infrastructure.</li>
+              <li>I recorded the proof commands for SkyeMerit, SkyeRouteX, SkyeMusicNexus, SkyeMediaCenter, HouseOperations + SkyeBox, Skye Content Forge, SkyeProfitConsole, ConnectLog, and Relay13 so the system has an audit path for each expansion instead of loose copy.</li>
+              <li>I added the Content Forge storage cutover to the release record because replacing Google cloud storage assumptions with the owned SkyeVault/R2 lane is infrastructure, not copy polish.</li>
+            </ul>
+            <div class="receipt-row"><span>SkyeMerit receipt</span><span>Proof index updated</span><span>SkyeVault/R2 accounted</span><span>Sales router updated</span><span>Canonical RouteX path</span><span>No auth bypass claims</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Music Nexus Full Platform</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Upload Studio</span><span>Music Player</span><span>SkyGate</span><span>SkyeVault Path</span></div>
+            <h2>I split SkyeMusicNexus into a real gated platform with upload and player rooms.</h2>
+            <p>The music app is no longer bunched into one artist page. It now opens as platform rooms for dashboard, upload, player, releases, rights, exchange, and operator review, with audio upload/list/stream actions protected by the same gate session boundary.</p>
+            <ul class="release-points">
+              <li>I added a dedicated Upload Studio with a real file input, base64 audio handoff, generated release track lines, and an uploaded audio vault.</li>
+              <li>I added <code>music-assets.js</code> so audio upload, list, stream, and delete actions require SkyGate before any file movement, with local proof storage by default and an opt-in SkyeVault/R2 backend for durable audio objects.</li>
+              <li>I updated the Music Player so uploaded audio stream URLs are fetched through authenticated SkyGate fetch and played as object URLs instead of becoming public direct links.</li>
+              <li>I split the public app into <code>dashboard</code>, <code>upload</code>, <code>player</code>, <code>releases</code>, <code>rights</code>, and <code>exchange</code> rooms, then updated the root shell to launch those rooms directly.</li>
+              <li>I updated the rate card so Free99 Lite remains no charge but only gets a tiny proof upload, while serious upload/storage work has the paid Gated Audio Vault Pack and the SkyeVault/R2 upgrade path.</li>
+              <li>I kept the legal boundary honest: this proves gated upload and proof playback, not public streaming licensing, DSP ingestion, transcoding/CDN delivery, or provider catalog operations until those integrations are connected and tested.</li>
+            </ul>
+            <div class="receipt-row"><span>Roomed platform</span><span>Gated upload</span><span>Player fetch auth</span><span>Audio vault add-on</span><span>SkyeVault/R2 path</span><span>No auth bypass</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Client Chat Lanes</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Relay13</span><span>Bob's Smoke Shop</span><span>Empire Pallets</span><span>Workspace Chat</span><span>Password Gate</span></div>
+            <h2>I made the client app chat lanes real for Bob and Empire Pallets.</h2>
+            <p>Bob's Smoke Shop and Empire Pallets now have live, account-tied workspace chat widgets in their public apps. Relay13 auto-provisions both workspaces, validates the app origins, and accepts live conversation posts from the deployed client sites.</p>
+            <ul class="release-points">
+              <li>I installed the reusable workspace chat widget as an MCP pattern and mounted it in Bob's app, Bob's private workspace page, and the Empire Pallets app.</li>
+              <li>I deployed Relay13 with known-client widget provisioning for <code>bobs-smoke-shop</code> and <code>empire-pallets</code>, including app-origin CORS and workspace domain checks.</li>
+              <li>I deployed the updated Bob and Empire Cloudflare Pages projects so the live apps serve <code>/assets/workspace-chat-widget.js</code>.</li>
+              <li>I delivered Bob's workspace popup password into his live Relay13 workspace inbox as a dedicated handoff thread.</li>
+              <li>I verified live browser chat from <code>bobs-smoke-shop.pages.dev</code> and <code>empire-pallets.pages.dev</code>; both sent messages into Relay13 and returned live workspace-lane confirmations.</li>
+            </ul>
+            <div class="receipt-row"><span>Relay13 version 7bb9eb26</span><span>Bob inbox conv_ed59c64a</span><span>Bob proof conv_af22ca71</span><span>Empire proof conv_e585eeb1</span><span>4 app targets deployed</span><span>Widget assets 200</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">RouteX Live Gate</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeRouteX</span><span>SkyePay</span><span>Owner Approval</span><span>Root Env</span><span>Live Ops</span></div>
+            <h2>I brought SkyeRouteX into the 0S as a paid, gated client-use platform.</h2>
+            <p>SkyeRouteX Workforce Command is now wired into the 0S expansion surface, SkyePay checkout, owner-approval queue, live route intelligence, and production proof path. The app can take client payment into a controlled paid queue while keeping workspace activation behind owner approval.</p>
+            <ul class="release-points">
+              <li>I added the RouteX offer to SkyePay at $6,500 setup plus $1,497 per month, with lookup keys for setup and monthly Stripe prices.</li>
+              <li>I changed the paid app activation path so RouteX and core app lanes do not auto-unlock after payment; paid orders enter pending owner approval first.</li>
+              <li>I updated SkyePay checkout, status, store copy, API docs, admin ledger policy, and browser scanner expectations to show pending owner approval honestly.</li>
+              <li>I wired the root production env bridge to use existing repo aliases for Neon/Postgres, Cloudflare R2, Stripe, Twilio, compliance webhooks, SkyeHands runtime, and the root <code>mapbox_api_key</code> alias for Mapbox route intelligence.</li>
+              <li>I fixed the live env proof so it now reports <code>PASS</code>, <code>customer_ready_for_paid_owner_approval_queue: true</code>, <code>customer_ready_for_full_live_route_ops: true</code>, and zero warnings.</li>
+              <li>I stress tested RouteX with 608 requests and no 500s; expected assignment lock conflicts stayed controlled as 409s.</li>
+              <li>I reran the 0S RouteX proof, SkyePay owner-approval regression, SkyePay browser proof, SkyePay crawler, deploy readiness smoke, provider webhook smoke, and MCP tooling receipts.</li>
+            </ul>
+            <div class="receipt-row"><span>Live env PASS</span><span>Mapbox alias wired</span><span>R2 proof storage wired</span><span>Owner approval required</span><span>608 stress requests</span><span>0 warnings</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Free99+ Link Proof</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeProfitConsole</span><span>Free99</span><span>Money Moves</span><span>Gate Session</span><span>Link Proof</span></div>
+            <h2>I turned SkyeProfitConsole Free99 into a gated close desk and proved the links.</h2>
+            <p>I keep SkyeProfitConsole Free99, meaning no charge, while making it feel worth paying attention to: Money Moves rank cash-now lanes, close briefs package the ask, and the runtime archives the brief behind the same 0S/FS27 gate. Free99 does not mean no-auth.</p>
+            <ul class="release-points">
+              <li>I added the Money Moves panel across every SkyeProfitConsole route with fastest-cash ranking, ready/approved cash-now value, blocked-margin detection, selected-pack payback, and next-action scoring.</li>
+              <li>I added close brief generation so a selected profit pack can produce the ask, owner, deadline, expected profit, margin, payback, risk flags, split allocation, and runtime archive event.</li>
+              <li>I expanded the local runtime with gated close-brief storage, board counts, workflow timeline events, and a host override so the app can answer from the forwarded Codespaces link instead of only loopback.</li>
+              <li>I updated the price cards, SaaS surfaces, hub, receipt, operator route, README, and LLM context so SkyeProfitConsole is clearly Free99 and no charge while still presented as a higher-value platform feature.</li>
+              <li>I verified the auth boundary after the link fix: app shell returns 200, ungated runtime status returns 401, gated runtime status returns 200, and close brief archive proof stays behind the gate.</li>
+              <li>I reran proof after the final runtime fix: platform smoke and E2E passed, the MCP receipt returned zero failed calls, the commercial limits audit passed, and the static crawler checked 623 HTML files, 759 linked refs, desktop/mobile sweeps, 14 checks, zero failures, and zero warnings.</li>
+            </ul>
+            <div class="receipt-row"><span>Free99 no charge</span><span>Gate required</span><span>Links 200</span><span>Runtime 401/200</span><span>Close briefs</span><span>623 pages clean</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
             <span class="release-version">0S + Relay13</span>
           </div>
           <div class="release-body">
@@ -405,26 +596,6 @@
         <article class="release-entry">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
-            <span class="release-version">Free99+</span>
-          </div>
-          <div class="release-body">
-            <div class="tag-row"><span>SkyeProfitConsole</span><span>Free99</span><span>Money Moves</span><span>Gate Session</span></div>
-            <h2>I built SkyeProfitConsole into a Free99 close room with real money controls.</h2>
-            <p>I keep SkyeProfitConsole Free99, meaning no charge, while routing the app through a 0S/FS27 gate session, proof receipts, and a gated runtime. The close room ranks cash-now lanes, shows blocked margin, calculates payback, generates close briefs, and archives those briefs without opening anonymous access.</p>
-            <ul class="release-points">
-              <li>I added a Money Moves panel with fastest-cash ranking, ready/approved cash-now value, blocked-margin detection, and selected-pack payback multiple.</li>
-              <li>I added close brief generation so a selected profit pack can produce the ask, owner, deadline, expected profit, margin, payback, risk flags, and split allocation.</li>
-              <li>I expanded the runtime with gated close-brief storage, close-brief board counts, workflow timeline events, and the same 401 boundary used by review, execution, and dispatch.</li>
-              <li>I updated the price cards, SaaS surfaces, hub, receipt, operator route, README, and LLM context to keep the feature marked Free99 while showing the higher-value app capabilities.</li>
-              <li>Browser proof now walks through gate unlock, runtime sync, profit pack creation, close brief generation, runtime archive, nonblank canvas rendering, desktop/mobile screenshots, and video playback verification.</li>
-            </ul>
-            <div class="receipt-row"><span>Free99 no charge</span><span>Gate required</span><span>Close briefs</span><span>Runtime 401</span><span>Video proof</span></div>
-          </div>
-        </article>
-
-        <article class="release-entry">
-          <div class="release-meta">
-            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
             <span class="release-version">Valley Verified</span>
           </div>
           <div class="release-body">
@@ -440,6 +611,26 @@
               <li>Production browser proof returned HTTP 200 for the Valley home, Bob featured page, Empire featured page, long-tail business fallback, Bob after age gate, Empire, 0S home, and 0S marketplace.</li>
             </ul>
             <div class="receipt-row"><span>Clean Pages URLs</span><span>Two-way backlinks</span><span>Share actions</span><span>Client videos</span><span>Tooling receipts</span><span>Browser QA</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-17">May 17, 2026</time>
+            <span class="release-version">Music Rights Gate</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Rights Vault</span><span>Takedown Hold</span><span>Legal-Safe Controls</span></div>
+            <h2>I added the rights gate so MusicNexus can grow without pretending every song is cleared.</h2>
+            <p>SkyeMusicNexus now treats playback and release movement as rights-gated product actions: artists can still use the exchange, content, progress, and generated proof lanes, but linked audio and release distribution controls need attestation first.</p>
+            <ul class="release-points">
+              <li>I added a Rights Vault for ownership, preview-use, distribution, sample, cover, publisher, takedown contact, and notes attestation.</li>
+              <li>I added a Takedown Hold path that blocks playback and keeps the request in the release rights audit trail.</li>
+              <li>I made linked preview playback reject until ownership and preview-use rights are saved.</li>
+              <li>I made release publish, stream reporting, and operations queueing reject until the distribution rights gate is ready.</li>
+              <li>I kept the legal boundary honest: this proves product controls, not formal legal advice, registered DMCA-agent operations, live catalog licensing, or Spotify-scale streaming.</li>
+            </ul>
+            <div class="receipt-row"><span>Rights Vault</span><span>Takedown hold</span><span>Publish gate</span><span>Stream gate</span><span>Ops gate</span><span>Smoke proof</span></div>
           </div>
         </article>
 
