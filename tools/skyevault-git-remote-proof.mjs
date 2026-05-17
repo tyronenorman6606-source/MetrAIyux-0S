@@ -175,6 +175,7 @@ try {
   write(path.join(client, 'docs', 'second.md'), 'Second proof commit\n');
   run('git', ['add', 'docs/second.md'], { cwd: client });
   run('git', ['commit', '-m', 'Second proof commit'], { cwd: client });
+  const secondHead = run('git', ['rev-parse', 'HEAD'], { cwd: client });
   run('git', ['push', 'vault', 'main'], { cwd: client, stdio: 'pipe' });
   run('git', ['reset', '--hard', 'HEAD~1'], { cwd: client, stdio: 'pipe' });
   let forcePushRejected = false;
@@ -198,6 +199,16 @@ try {
     wrongWorkspaceRejected = true;
   }
   if (!wrongWorkspaceRejected) throw new Error('Expected cross-workspace push to be rejected.');
+  run('git', ['tag', 'v1.0.0'], { cwd: client, stdio: 'pipe' });
+  run('git', ['push', 'vault', 'v1.0.0'], { cwd: client, stdio: 'pipe' });
+  run('git', ['tag', '-f', 'v1.0.0', secondHead], { cwd: client, stdio: 'pipe' });
+  let protectedTagRejected = false;
+  try {
+    run('git', ['push', '--force', 'vault', 'v1.0.0'], { cwd: client, stdio: 'pipe' });
+  } catch {
+    protectedTagRejected = true;
+  }
+  if (!protectedTagRejected) throw new Error('Expected protected tag update to be rejected.');
   run('git', ['fetch', 'origin'], { cwd: clone, stdio: 'pipe' });
   const remoteHead = run('git', ['rev-parse', 'origin/main'], { cwd: clone });
 
@@ -225,11 +236,56 @@ try {
   const apiRefs = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/refs`, token);
   const apiEvents = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/events`, token);
   const apiNeuralMap = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/neural-map`, token);
+  const policy = curlJson(`${ready.baseUrl}/__skyevault/policy`, token);
+  const quota = curlJson(`${ready.baseUrl}/__skyevault/quota`, token);
+  const snapshot = curlJson(`${ready.baseUrl}/__skyevault/snapshots`, token, ['-X', 'POST']);
+  const snapshots = curlJson(`${ready.baseUrl}/__skyevault/snapshots`, token);
+  const snapshotVerify = curlJson(`${ready.baseUrl}/__skyevault/snapshots/${snapshot.snapshot.snapshotId}/verify`, token, ['-X', 'POST']);
+  if (!snapshotVerify.verification.ok) throw new Error('Remote snapshot verification failed.');
   const bundleExport = curlJson(`${ready.baseUrl}/__skyevault/repos/acme/demo/export`, token, ['-X', 'POST']);
   if (!fs.existsSync(bundleExport.export.path)) throw new Error('Exported bundle was not written to disk.');
   run('git', ['clone', bundleExport.export.path, bundleClone], { cwd: proofRoot, stdio: 'pipe' });
   const bundleHead = run('git', ['rev-parse', 'HEAD'], { cwd: bundleClone });
   if (bundleHead !== remoteHead) throw new Error('Exported bundle clone does not match remote HEAD.');
+
+  const maintenanceSnapshot = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-git-remote-maintenance.mjs'), 'snapshot', `--storage-root=${storageRoot}`]));
+  const maintenanceVerify = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-git-remote-maintenance.mjs'), 'verify', `--storage-root=${storageRoot}`, `--snapshot=${maintenanceSnapshot.snapshotId}`]));
+  if (!maintenanceVerify.ok) throw new Error('Maintenance snapshot verification failed.');
+  const restoredStorageRoot = path.join(proofRoot, 'restored-storage');
+  const restore = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-git-remote-maintenance.mjs'), 'restore', `--storage-root=${storageRoot}`, `--target-storage-root=${restoredStorageRoot}`, `--snapshot=${maintenanceSnapshot.snapshotId}`, '--repo=acme/demo']));
+  if (!restore.restored.length) throw new Error('Maintenance restore did not restore acme/demo.');
+  const restoredClone = path.join(proofRoot, 'restored-clone');
+  run('git', ['clone', path.join(restoredStorageRoot, 'repos', 'acme', 'demo.git'), restoredClone], { cwd: proofRoot, stdio: 'pipe' });
+  const restoredHead = run('git', ['rev-parse', 'HEAD'], { cwd: restoredClone });
+  if (restoredHead !== remoteHead) throw new Error('Restored snapshot clone does not match remote HEAD.');
+
+  const cliHome = path.join(proofRoot, 'cli-home');
+  const cliClone = path.join(proofRoot, 'cli-clone');
+  fs.mkdirSync(cliHome, { recursive: true });
+  const cliEnv = { HOME: cliHome, SKYEVAULT_CLI_CONFIG: path.join(cliHome, '.skyevault', 'config.json') };
+  const cliLogin = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-cli.mjs'), 'login', `--remote-url=${ready.baseUrl}`, `--token=${token}`, '--workspace=acme'], { env: cliEnv }));
+  const cliStatus = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-cli.mjs'), 'status'], { env: cliEnv }));
+  run(process.execPath, [path.join(root, 'tools/skyevault-cli.mjs'), 'clone', 'demo', cliClone], { env: cliEnv, stdio: 'pipe' });
+  const cliHead = run('git', ['rev-parse', 'HEAD'], { cwd: cliClone });
+  if (cliHead !== remoteHead) throw new Error('CLI clone does not match remote HEAD.');
+
+  const zipLeftDir = path.join(proofRoot, 'zip-left');
+  const zipRightDir = path.join(proofRoot, 'zip-right');
+  fs.mkdirSync(zipLeftDir, { recursive: true });
+  fs.mkdirSync(zipRightDir, { recursive: true });
+  write(path.join(zipLeftDir, 'same.txt'), 'same\n');
+  write(path.join(zipLeftDir, 'removed.txt'), 'removed\n');
+  write(path.join(zipRightDir, 'same.txt'), 'same\n');
+  write(path.join(zipRightDir, 'added.txt'), 'added\n');
+  write(path.join(zipRightDir, 'changed.txt'), 'changed\n');
+  write(path.join(zipLeftDir, 'changed.txt'), 'before\n');
+  const leftZip = path.join(proofRoot, 'left.zip');
+  const rightZip = path.join(proofRoot, 'right.zip');
+  run('zip', ['-qr', leftZip, '.'], { cwd: zipLeftDir, stdio: 'pipe' });
+  run('zip', ['-qr', rightZip, '.'], { cwd: zipRightDir, stdio: 'pipe' });
+  const vaultDiff = JSON.parse(run(process.execPath, [path.join(root, 'tools/skyevault-vault-diff.mjs'), `--left=${leftZip}`, `--right=${rightZip}`]));
+  if (vaultDiff.summary.added !== 1 || vaultDiff.summary.removed !== 1 || vaultDiff.summary.changed !== 1) throw new Error('Vault archive diff did not detect expected changes.');
+
   const ledger = fs.existsSync(ready.ledgerPath) ? fs.readFileSync(ready.ledgerPath, 'utf8').split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line)) : [];
   const neuralFiles = fs.existsSync(ready.neuralDir) ? fs.readdirSync(ready.neuralDir).filter((name) => name.endsWith('.json')) : [];
   const report = {
@@ -244,8 +300,16 @@ try {
     forcePushRejected,
     viewerPushRejected,
     wrongWorkspaceRejected,
+    protectedTagRejected,
     viewerCreateRejected,
     gateAuthOk: ready.auth === 'gate-introspection',
+    policyOk: Array.isArray(policy.policy.protectedRefs),
+    quotaOk: quota.workspaces.length > 0,
+    snapshotOk: snapshotVerify.verification.ok,
+    maintenanceSnapshotOk: maintenanceVerify.ok,
+    restoredHead,
+    cliOk: cliLogin.ok && cliStatus.ok && cliHead === remoteHead,
+    vaultDiff: vaultDiff.summary,
     uiOk: true,
     createdRepo: createdRepo.repo.id,
     viewerVisibleRepos: viewerRepos.repos.length,
@@ -262,6 +326,8 @@ try {
     refEvents: ledger.filter((event) => event.event === 'git.ref-update').length,
     requestEvents: ledger.filter((event) => event.event === 'git.remote-request').length,
     exportEvents: ledger.filter((event) => event.event === 'git.remote-export').length,
+    snapshotEvents: ledger.filter((event) => event.event === 'git.remote-snapshot').length,
+    snapshots: snapshots.snapshots.length,
     neuralFiles
   };
   console.log(JSON.stringify(report, null, 2));

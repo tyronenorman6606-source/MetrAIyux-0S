@@ -1,6 +1,6 @@
 # SkyeVault Git Remote Deploy
 
-This deploys the Git-level SkyeVault remote with persistent bare repositories, Gate token introspection, workspace isolation, ref protection, ledgers, bundle exports, and repo neural-map events.
+This deploys the Git-level SkyeVault remote with persistent bare repositories, Gate token introspection, workspace isolation, branch policy, quota accounting, verified snapshots, bundle exports, and repo neural-map events.
 
 ## Container deploy
 
@@ -10,7 +10,7 @@ docker compose -f deploy/skyevault-git-remote/compose.yml up -d --build
 curl -fsS http://127.0.0.1:8787/health
 ```
 
-The Compose volume `skyevault_git_remote_data` holds repos, exports, ledgers, and neural-map files across restarts.
+The Compose volume `skyevault_git_remote_data` holds repos, exports, ledgers, snapshots, branch policy, and neural-map files across restarts.
 
 ## Systemd deploy
 
@@ -27,11 +27,23 @@ sudo systemctl enable --now skyevault-git-remote
 systemctl status skyevault-git-remote --no-pager
 ```
 
-Developers clone and push with Gate-issued tokens:
+Developers clone and push with Gate-issued tokens through the SkyeVault CLI:
 
 ```bash
 test -n "$GATE_TOKEN"
-git clone http://x-token:$GATE_TOKEN@127.0.0.1:8787/acme/app.git
-git remote add vault http://x-token:$GATE_TOKEN@127.0.0.1:8787/acme/app.git
+node tools/skyevault-cli.mjs login --remote-url=http://127.0.0.1:8787 --token="$GATE_TOKEN" --workspace=acme
+node tools/skyevault-cli.mjs clone app ./app
+cd app
+node ../tools/skyevault-cli.mjs remote-add --repo=app --name=vault
 git push vault main
 ```
+
+Operator snapshot and restore:
+
+```bash
+node tools/skyevault-git-remote-maintenance.mjs snapshot --storage-root=/var/lib/skyevault-git-remote
+node tools/skyevault-git-remote-maintenance.mjs verify --storage-root=/var/lib/skyevault-git-remote --snapshot=latest
+node tools/skyevault-git-remote-maintenance.mjs restore --storage-root=/var/lib/skyevault-git-remote --target-storage-root=/var/lib/skyevault-git-remote-restored --snapshot=latest --repo=acme/app
+```
+
+SSH Git can be enabled per key by wiring `deploy/skyevault-git-remote/ssh/skyevault-ssh-command.sh` as the forced command for that key, then setting `SKYEVAULT_SSH_ROLE` and `SKYEVAULT_SSH_WORKSPACES` on the key command.

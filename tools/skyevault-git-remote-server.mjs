@@ -31,8 +31,13 @@ function json(res, status, body) {
   res.end(text);
 }
 
+function httpStatus(error, fallback = 400) {
+  const status = Number(error?.status);
+  return Number.isInteger(status) && status >= 400 && status <= 599 ? status : fallback;
+}
+
 function text(res, status, body) {
-  res.writeHead(status, { 'content-type': 'text/plain; charset=utf-8' });
+  res.writeHead(status >= 400 && status <= 599 ? status : 500, { 'content-type': 'text/plain; charset=utf-8' });
   res.end(body.endsWith('\n') ? body : `${body}\n`);
 }
 
@@ -357,6 +362,19 @@ function readJsonl(file) {
     });
 }
 
+function readJsonFile(file, fallback = null) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJsonFile(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+}
+
 function appendLedgers(event) {
   for (const file of [ledgerPath, workspaceLedgerPath]) {
     try {
@@ -367,11 +385,75 @@ function appendLedgers(event) {
   }
 }
 
+function defaultPolicy() {
+  return {
+    schema: 'skyevault.git-remote-policy.v1',
+    updatedAt: null,
+    protectedRefs: String(process.env.SKYEVAULT_PROTECTED_REFS || 'refs/heads/main,refs/heads/master')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean),
+    allowDeleteRefs: process.env.SKYEVAULT_ALLOW_DELETE_REFS === '1',
+    allowForcePush: process.env.SKYEVAULT_ALLOW_FORCE_PUSH === '1',
+    allowProtectedTagUpdates: process.env.SKYEVAULT_ALLOW_PROTECTED_TAG_UPDATES === '1',
+    protectedTags: String(process.env.SKYEVAULT_PROTECTED_TAGS || 'refs/tags/v*,refs/tags/release-*')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  };
+}
+
+function readPolicy() {
+  const saved = readJsonFile(policyPath, {});
+  const base = defaultPolicy();
+  return {
+    ...base,
+    ...saved,
+    protectedRefs: Array.isArray(saved.protectedRefs) ? saved.protectedRefs.map(String).filter(Boolean) : base.protectedRefs,
+    protectedTags: Array.isArray(saved.protectedTags) ? saved.protectedTags.map(String).filter(Boolean) : base.protectedTags,
+    allowDeleteRefs: Boolean(saved.allowDeleteRefs ?? base.allowDeleteRefs),
+    allowForcePush: Boolean(saved.allowForcePush ?? base.allowForcePush),
+    allowProtectedTagUpdates: Boolean(saved.allowProtectedTagUpdates ?? base.allowProtectedTagUpdates)
+  };
+}
+
+function savePolicy(input, auth) {
+  const current = readPolicy();
+  const next = {
+    schema: 'skyevault.git-remote-policy.v1',
+    updatedAt: nowIso(),
+    updatedBy: auth.remoteUser,
+    protectedRefs: Array.isArray(input.protectedRefs) ? input.protectedRefs.map(String).filter(Boolean) : current.protectedRefs,
+    protectedTags: Array.isArray(input.protectedTags) ? input.protectedTags.map(String).filter(Boolean) : current.protectedTags,
+    allowDeleteRefs: Boolean(input.allowDeleteRefs ?? current.allowDeleteRefs),
+    allowForcePush: Boolean(input.allowForcePush ?? current.allowForcePush),
+    allowProtectedTagUpdates: Boolean(input.allowProtectedTagUpdates ?? current.allowProtectedTagUpdates)
+  };
+  writeJsonFile(policyPath, next);
+  appendLedgers({
+    schema: 'skyevault.git-remote-policy-event.v1',
+    event: 'git.remote-policy-update',
+    recordedAt: nowIso(),
+    ...authLedgerFields(auth),
+    policy: next
+  });
+  return next;
+}
+
+function bytesHuman(value) {
+  const size = Number(value || 0);
+  if (!size) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const index = Math.min(Math.floor(Math.log(size) / Math.log(1024)), units.length - 1);
+  return `${(size / 1024 ** index).toFixed(index ? 2 : 0)} ${units[index]}`;
+}
+
 function installHook(repoPath, workspaceId, repoId) {
   const hooksDir = path.join(repoPath, 'hooks');
   fs.mkdirSync(hooksDir, { recursive: true });
   const preReceiveHook = `#!/usr/bin/env node
 const fs = require('node:fs');
+const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 function git(args) {
@@ -391,17 +473,55 @@ function protectedMatch(ref, protectedRefs) {
   return protectedRefs.some((rule) => {
     if (!rule) return false;
     if (rule.endsWith('/*')) return ref.startsWith(rule.slice(0, -1));
+    if (rule.includes('*')) {
+      const escaped = rule.replace(/[|\\\\{}()[\\]^$+?.]/g, '\\\\$&').replace(/\\*/g, '.*');
+      return new RegExp('^' + escaped + '$').test(ref);
+    }
     return ref === rule;
   });
 }
 
+function readPolicy() {
+  const file = process.env.SKYEVAULT_BRANCH_POLICY_FILE || '';
+  if (!file || !fs.existsSync(file)) return {};
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return {}; }
+}
+
+function diskBytes(dir) {
+  if (!dir || !fs.existsSync(dir)) return 0;
+  let total = 0;
+  const visit = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const file = path.join(current, entry.name);
+      const stat = fs.lstatSync(file);
+      if (entry.isDirectory()) visit(file);
+      else total += stat.size;
+    }
+  };
+  visit(dir);
+  return total;
+}
+
+function objectCount() {
+  try {
+    const output = execFileSync('git', ['count-objects', '-v'], { cwd: process.cwd(), encoding: 'utf8' });
+    const values = Object.fromEntries(output.split(/\\r?\\n/).map((line) => line.split(/:\\s+/)).filter((parts) => parts.length === 2));
+    return Number(values.count || 0) + Number(values['in-pack'] || 0);
+  } catch {
+    return 0;
+  }
+}
+
 const input = fs.readFileSync(0, 'utf8').trim().split(/\\r?\\n/).filter(Boolean);
-const protectedRefs = String(process.env.SKYEVAULT_PROTECTED_REFS || 'refs/heads/main,refs/heads/master')
-  .split(',')
-  .map((item) => item.trim())
-  .filter(Boolean);
-const allowDeletes = process.env.SKYEVAULT_ALLOW_DELETE_REFS === '1';
-const allowForce = process.env.SKYEVAULT_ALLOW_FORCE_PUSH === '1';
+const policy = readPolicy();
+const protectedRefs = Array.isArray(policy.protectedRefs) ? policy.protectedRefs : String(process.env.SKYEVAULT_PROTECTED_REFS || 'refs/heads/main,refs/heads/master').split(',').map((item) => item.trim()).filter(Boolean);
+const protectedTags = Array.isArray(policy.protectedTags) ? policy.protectedTags : String(process.env.SKYEVAULT_PROTECTED_TAGS || 'refs/tags/v*,refs/tags/release-*').split(',').map((item) => item.trim()).filter(Boolean);
+const allowDeletes = Boolean(policy.allowDeleteRefs ?? (process.env.SKYEVAULT_ALLOW_DELETE_REFS === '1'));
+const allowForce = Boolean(policy.allowForcePush ?? (process.env.SKYEVAULT_ALLOW_FORCE_PUSH === '1'));
+const allowProtectedTagUpdates = Boolean(policy.allowProtectedTagUpdates ?? (process.env.SKYEVAULT_ALLOW_PROTECTED_TAG_UPDATES === '1'));
+const workspaceQuotaBytes = Number(process.env.SKYEVAULT_WORKSPACE_QUOTA_BYTES || 0);
+const repoObjectLimit = Number(process.env.SKYEVAULT_REPO_OBJECT_LIMIT || 0);
+const workspacePath = process.env.SKYEVAULT_WORKSPACE_PATH || '';
 const errors = [];
 
 for (const line of input) {
@@ -414,6 +534,17 @@ for (const line of input) {
     const fastForward = git(['merge-base', '--is-ancestor', oldRev, newRev]);
     if (!fastForward) errors.push('Non-fast-forward update denied by SkyeVault policy: ' + ref);
   }
+  if (!allowProtectedTagUpdates && protectedMatch(ref, protectedTags) && !isZero(oldRev) && !isZero(newRev)) {
+    errors.push('Protected tag update denied by SkyeVault policy: ' + ref);
+  }
+}
+
+if (workspaceQuotaBytes > 0 && diskBytes(workspacePath) > workspaceQuotaBytes) {
+  errors.push('Workspace storage quota exceeded by SkyeVault policy: ' + workspacePath);
+}
+
+if (repoObjectLimit > 0 && objectCount() > repoObjectLimit) {
+  errors.push('Repository object quota exceeded by SkyeVault policy: ' + repoObjectLimit);
 }
 
 if (errors.length) {
@@ -612,6 +743,10 @@ function handleGit(req, res, repo, auth) {
     SKYEVAULT_REMOTE_LEDGER: ledgerPath,
     SKYEVAULT_REMOTE_WORKSPACE_LEDGER: workspaceLedgerPath,
     SKYEVAULT_REMOTE_NEURAL_DIR: neuralDir,
+    SKYEVAULT_BRANCH_POLICY_FILE: policyPath,
+    SKYEVAULT_WORKSPACE_PATH: path.join(repoRoot, repo.workspaceId),
+    SKYEVAULT_WORKSPACE_QUOTA_BYTES: auth.quotas?.storageMb ? String(auth.quotas.storageMb * 1024 * 1024) : '0',
+    SKYEVAULT_REPO_OBJECT_LIMIT: auth.quotas?.fileLimit ? String(auth.quotas.fileLimit) : '0',
     SKYEVAULT_PROTECTED_REFS: process.env.SKYEVAULT_PROTECTED_REFS || 'refs/heads/main,refs/heads/master',
     SKYEVAULT_ALLOW_DELETE_REFS: process.env.SKYEVAULT_ALLOW_DELETE_REFS || '0',
     SKYEVAULT_ALLOW_FORCE_PUSH: process.env.SKYEVAULT_ALLOW_FORCE_PUSH || '0',
@@ -742,6 +877,32 @@ function repoObjectCount(repoPath) {
   return Number(values.count || 0) + Number(values['in-pack'] || 0);
 }
 
+function workspaceRepos(workspaceId, auth = null) {
+  return listRepos(auth).filter((repo) => repo.workspaceId === sanitizePart(workspaceId));
+}
+
+function quotaSummary(workspaceId, auth) {
+  requireWorkspace(auth, workspaceId);
+  const repos = workspaceRepos(workspaceId, auth);
+  const usedBytes = workspaceDiskBytes(workspaceId);
+  const repoObjects = repos.reduce((sum, repo) => sum + repoObjectCount(repo.path), 0);
+  const storageLimitBytes = (auth.quotas?.storageMb || 0) * 1024 * 1024;
+  return {
+    schema: 'skyevault.git-remote-quota.v1',
+    workspaceId: sanitizePart(workspaceId),
+    repoCount: repos.length,
+    usedBytes,
+    usedHuman: bytesHuman(usedBytes),
+    storageLimitBytes,
+    storageLimitHuman: storageLimitBytes ? bytesHuman(storageLimitBytes) : null,
+    storageRemainingBytes: storageLimitBytes ? Math.max(0, storageLimitBytes - usedBytes) : null,
+    fileLimit: auth.quotas?.fileLimit || null,
+    objectCount: repoObjects,
+    objectRemaining: auth.quotas?.fileLimit ? Math.max(0, auth.quotas.fileLimit - repoObjects) : null,
+    workspaceLimit: auth.quotas?.workspaceLimit || null
+  };
+}
+
 function enforceGitQuota(auth, repo) {
   const quotas = auth.quotas || {};
   if (quotas.workspaceLimit && !fs.existsSync(repo.repoPath) && workspaceRepoCount(repo.workspaceId) >= quotas.workspaceLimit) {
@@ -766,6 +927,159 @@ function enforceGitQuota(auth, repo) {
       throw error;
     }
   }
+}
+
+async function createSnapshot(auth) {
+  requireRole(auth, requiredAdminRole);
+  const snapshotId = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const manifestPath = path.join(snapshotRoot, 'manifests', `${snapshotId}.json`);
+  const repos = [];
+  for (const repo of listRepos(auth)) {
+    requireWorkspace(auth, repo.workspaceId);
+    const refs = refsForRepo(repo.path);
+    if (!refs.length) {
+      repos.push({
+        workspaceId: repo.workspaceId,
+        repoId: repo.repoId,
+        empty: true,
+        bundlePath: null,
+        bundleFile: null,
+        bytes: 0,
+        human: '0 B',
+        sha256: null,
+        refs,
+        objectCount: repoObjectCount(repo.path),
+        diskBytes: repoDiskBytes(repo.path),
+        verify: ['Empty bare repository; no bundle generated.']
+      });
+      continue;
+    }
+    const bundleDir = path.join(snapshotRoot, 'bundles', snapshotId, repo.workspaceId, repo.repoId);
+    fs.mkdirSync(bundleDir, { recursive: true });
+    const bundlePath = path.join(bundleDir, `${repo.repoId}.bundle`);
+    git(['bundle', 'create', bundlePath, '--all'], { cwd: repo.path });
+    const verify = git(['bundle', 'verify', bundlePath], { cwd: repo.path });
+    const stat = fs.statSync(bundlePath);
+    const entry = {
+      workspaceId: repo.workspaceId,
+      repoId: repo.repoId,
+      bundlePath,
+      bundleFile: path.relative(snapshotRoot, bundlePath).split(path.sep).join('/'),
+      bytes: stat.size,
+      human: bytesHuman(stat.size),
+      sha256: await hashFile(bundlePath),
+      refs,
+      objectCount: repoObjectCount(repo.path),
+      diskBytes: repoDiskBytes(repo.path),
+      verify: verify.split(/\r?\n/).filter(Boolean)
+    };
+    repos.push(entry);
+  }
+  const manifest = {
+    schema: 'skyevault.git-remote-snapshot.v1',
+    snapshotId,
+    createdAt: nowIso(),
+    createdBy: auth.remoteUser,
+    repoCount: repos.length,
+    totalBundleBytes: repos.reduce((sum, repo) => sum + repo.bytes, 0),
+    totalBundleHuman: bytesHuman(repos.reduce((sum, repo) => sum + repo.bytes, 0)),
+    policy: readPolicy(),
+    repos
+  };
+  writeJsonFile(manifestPath, manifest);
+  writeJsonFile(path.join(snapshotRoot, 'latest.json'), manifest);
+  if (snapshotMirrorRoot) mirrorSnapshot(snapshotId, manifestPath, repos);
+  appendLedgers({
+    schema: 'skyevault.git-remote-snapshot-event.v1',
+    event: 'git.remote-snapshot',
+    recordedAt: nowIso(),
+    ...authLedgerFields(auth),
+    snapshotId,
+    repoCount: repos.length,
+    totalBundleBytes: manifest.totalBundleBytes
+  });
+  return manifest;
+}
+
+function mirrorSnapshot(snapshotId, manifestPath, repos) {
+  const targetRoot = path.join(snapshotMirrorRoot, snapshotId);
+  fs.mkdirSync(targetRoot, { recursive: true });
+  for (const repo of repos) {
+    if (!repo.bundlePath) continue;
+    const target = path.join(targetRoot, repo.bundleFile);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(repo.bundlePath, target);
+  }
+  fs.copyFileSync(manifestPath, path.join(targetRoot, 'manifest.json'));
+}
+
+function listSnapshots(auth) {
+  requireRole(auth, requiredViewRole);
+  const dir = path.join(snapshotRoot, 'manifests');
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
+    .filter((name) => name.endsWith('.json'))
+    .map((name) => readJsonFile(path.join(dir, name), null))
+    .filter(Boolean)
+    .map((manifest) => ({
+      snapshotId: manifest.snapshotId,
+      createdAt: manifest.createdAt,
+      repoCount: manifest.repos.filter((repo) => workspaceAllowed(auth, repo.workspaceId)).length,
+      totalBundleBytes: manifest.repos
+        .filter((repo) => workspaceAllowed(auth, repo.workspaceId))
+        .reduce((sum, repo) => sum + Number(repo.bytes || 0), 0)
+    }))
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+function snapshotManifest(snapshotId, auth) {
+  requireRole(auth, requiredViewRole);
+  const safeId = sanitizePart(snapshotId);
+  const manifest = readJsonFile(path.join(snapshotRoot, 'manifests', `${safeId}.json`), null);
+  if (!manifest) return null;
+  return {
+    ...manifest,
+    repos: manifest.repos.filter((repo) => workspaceAllowed(auth, repo.workspaceId))
+  };
+}
+
+async function verifySnapshot(snapshotId, auth) {
+  const manifest = snapshotManifest(snapshotId, auth);
+  if (!manifest) throw new Error(`Snapshot not found: ${snapshotId}`);
+  const checks = [];
+  for (const repo of manifest.repos) {
+    if (repo.empty && !repo.bundlePath) {
+      checks.push({ workspaceId: repo.workspaceId, repoId: repo.repoId, empty: true, exists: true, sha256Ok: true, bundleOk: true, verify: repo.verify || [] });
+      continue;
+    }
+    const exists = fs.existsSync(repo.bundlePath);
+    const sha256 = exists ? await hashFile(repo.bundlePath) : null;
+    let bundleOk = false;
+    let verify = [];
+    if (exists) {
+      try {
+        verify = git(['bundle', 'verify', repo.bundlePath], { cwd: root }).split(/\r?\n/).filter(Boolean);
+        bundleOk = true;
+      } catch (error) {
+        verify = [error.message];
+      }
+    }
+    checks.push({
+      workspaceId: repo.workspaceId,
+      repoId: repo.repoId,
+      exists,
+      sha256Ok: sha256 === repo.sha256,
+      bundleOk,
+      verify
+    });
+  }
+  return {
+    schema: 'skyevault.git-remote-snapshot-verify.v1',
+    snapshotId: manifest.snapshotId,
+    verifiedAt: nowIso(),
+    ok: checks.every((check) => check.exists && check.sha256Ok && check.bundleOk),
+    checks
+  };
 }
 
 function repoEvents(workspaceId, repoId) {
@@ -797,7 +1111,8 @@ function repoSummary(repo) {
     tags: refs.filter((item) => item.ref.startsWith('refs/tags/')).length,
     head: defaultHead,
     lastEvent: events.at(-1) || null,
-    diskBytes: repoDiskBytes(repo.path)
+    diskBytes: repoDiskBytes(repo.path),
+    objectCount: repoObjectCount(repo.path)
   };
 }
 
@@ -876,6 +1191,60 @@ async function handleAdminApi(req, res, url, auth) {
     ensureRepo(repo.repoPath, repo.workspaceId, repo.repoId);
     json(res, 201, { ok: true, repo: repoDetail(repo.workspaceId, repo.repoId) });
     return true;
+  }
+
+  if (url.pathname === '/__skyevault/policy' && req.method === 'GET') {
+    requireRole(auth, requiredViewRole);
+    json(res, 200, { ok: true, policy: readPolicy() });
+    return true;
+  }
+
+  if (url.pathname === '/__skyevault/policy' && req.method === 'PUT') {
+    requireRole(auth, requiredAdminRole);
+    json(res, 200, { ok: true, policy: savePolicy(await readJsonBody(req), auth) });
+    return true;
+  }
+
+  if (url.pathname === '/__skyevault/quota' && req.method === 'GET') {
+    requireRole(auth, requiredViewRole);
+    const workspaces = [...new Set(listRepos(auth).map((repo) => repo.workspaceId))]
+      .sort((a, b) => a.localeCompare(b))
+      .map((workspaceId) => quotaSummary(workspaceId, auth));
+    json(res, 200, { ok: true, workspaces });
+    return true;
+  }
+
+  const quotaRoute = url.pathname.match(/^\/__skyevault\/workspaces\/([^/]+)\/quota$/);
+  if (quotaRoute && req.method === 'GET') {
+    requireRole(auth, requiredViewRole);
+    json(res, 200, { ok: true, quota: quotaSummary(quotaRoute[1], auth) });
+    return true;
+  }
+
+  if (url.pathname === '/__skyevault/snapshots' && req.method === 'GET') {
+    json(res, 200, { ok: true, snapshots: listSnapshots(auth) });
+    return true;
+  }
+
+  if (url.pathname === '/__skyevault/snapshots' && req.method === 'POST') {
+    json(res, 201, { ok: true, snapshot: await createSnapshot(auth) });
+    return true;
+  }
+
+  const snapshotRoute = url.pathname.match(/^\/__skyevault\/snapshots\/([^/]+)(?:\/(verify))?$/);
+  if (snapshotRoute) {
+    const [, snapshotId, action] = snapshotRoute;
+    if (!action && req.method === 'GET') {
+      const manifest = snapshotManifest(snapshotId, auth);
+      if (!manifest) json(res, 404, { ok: false, error: `Snapshot not found: ${snapshotId}` });
+      else json(res, 200, { ok: true, snapshot: manifest });
+      return true;
+    }
+    if (action === 'verify' && req.method === 'POST') {
+      requireRole(auth, requiredAdminRole);
+      json(res, 200, { ok: true, verification: await verifySnapshot(snapshotId, auth) });
+      return true;
+    }
   }
 
   const repoRoute = url.pathname.match(/^\/__skyevault\/repos\/([^/]+)\/([^/]+)(?:\/(refs|events|neural-map|export))?$/);
@@ -1002,7 +1371,7 @@ function adminConsoleHtml() {
     }
     .repo.active { border-color: var(--accent); }
     .muted { color: var(--muted); }
-    .statgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .statgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
     .stat { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 12px; }
     .stat strong { display: block; font-size: 22px; margin-top: 4px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -1042,6 +1411,7 @@ function adminConsoleHtml() {
         <button class="primary" type="submit">Create Repo</button>
       </form>
       <button id="refresh" type="button">Refresh</button>
+      <button id="snapshotNow" type="button">Create Snapshot</button>
       <div id="repos"></div>
     </aside>
     <section>
@@ -1050,12 +1420,14 @@ function adminConsoleHtml() {
         <div class="stat"><span class="muted">Refs</span><strong id="refCount">0</strong></div>
         <div class="stat"><span class="muted">Events</span><strong id="eventCount">0</strong></div>
         <div class="stat"><span class="muted">Exports</span><strong id="exportCount">0</strong></div>
+        <div class="stat"><span class="muted">Snapshots</span><strong id="snapshotCount">0</strong></div>
+        <div class="stat"><span class="muted">Stored</span><strong id="storedCount">0 B</strong></div>
       </div>
       <div id="detail" class="stack"></div>
     </section>
   </main>
   <script>
-    const state = { repos: [], selected: null, ledger: null };
+    const state = { repos: [], selected: null, ledger: null, snapshots: [], quota: null, policy: null };
     const $ = (id) => document.getElementById(id);
     function setStatus(text, cls = '') {
       $('status').className = cls || 'status';
@@ -1102,11 +1474,22 @@ function adminConsoleHtml() {
     }
     async function load() {
       setStatus('Loading');
-      const [repos, ledger] = await Promise.all([api('/__skyevault/repos'), api('/__skyevault/ledger')]);
+      const [repos, ledger, snapshots, quota, policy] = await Promise.all([
+        api('/__skyevault/repos'),
+        api('/__skyevault/ledger'),
+        api('/__skyevault/snapshots'),
+        api('/__skyevault/quota'),
+        api('/__skyevault/policy')
+      ]);
       state.repos = repos.repos;
       state.ledger = ledger;
+      state.snapshots = snapshots.snapshots;
+      state.quota = quota;
+      state.policy = policy.policy;
       $('eventCount').textContent = ledger.eventCount;
       $('exportCount').textContent = ledger.exports;
+      $('snapshotCount').textContent = state.snapshots.length;
+      $('storedCount').textContent = bytes((quota.workspaces || []).reduce((sum, item) => sum + Number(item.usedBytes || 0), 0));
       renderRepos();
       if (!state.selected && state.repos[0]) await selectRepo(repoId(state.repos[0]));
       else if (state.selected) await selectRepo(repoId(state.selected));
@@ -1115,11 +1498,12 @@ function adminConsoleHtml() {
     async function selectRepo(id) {
       const [workspaceId, repoIdValue] = id.split('/');
       const basePath = repoApiPath(workspaceId, repoIdValue);
-      const [detail, refs, events, neural] = await Promise.all([
+      const [detail, refs, events, neural, quota] = await Promise.all([
         api(basePath),
         api(basePath + '/refs'),
         api(basePath + '/events'),
-        api(basePath + '/neural-map')
+        api(basePath + '/neural-map'),
+        api('/__skyevault/workspaces/' + encodeURIComponent(workspaceId) + '/quota')
       ]);
       state.selected = detail.repo;
       $('refCount').textContent = refs.refs.length;
@@ -1128,6 +1512,11 @@ function adminConsoleHtml() {
       $('detail').innerHTML =
         '<div class="stat"><span class="muted">Clone URL</span><p><code>' + esc(cloneUrl) + '</code></p><button id="exportBundle">Export Bundle</button></div>' +
         '<div class="stat"><span class="muted">Head</span><p><code>' + esc(detail.repo.head ? detail.repo.head.ref + ' @ ' + short(detail.repo.head.object) : 'empty') + '</code></p></div>' +
+        '<div class="stat"><span class="muted">Workspace Quota</span><p><strong>' + esc(quota.quota.usedHuman) + '</strong> used' + (quota.quota.storageLimitHuman ? ' of ' + esc(quota.quota.storageLimitHuman) : '') + '</p><p class="muted">' + esc(quota.quota.objectCount) + ' Git objects, ' + esc(quota.quota.repoCount) + ' repos</p></div>' +
+        '<div class="stat"><span class="muted">Branch Policy</span><p>Protected refs: <code>' + esc((state.policy.protectedRefs || []).join(', ')) + '</code></p><p>Protected tags: <code>' + esc((state.policy.protectedTags || []).join(', ')) + '</code></p></div>' +
+        '<div><h2>Snapshots</h2><table><thead><tr><th>Snapshot</th><th>Repos</th><th>Bytes</th></tr></thead><tbody>' +
+        state.snapshots.slice(0, 8).map((snapshot) => '<tr><td><code>' + esc(snapshot.snapshotId) + '</code></td><td>' + esc(snapshot.repoCount) + '</td><td>' + esc(bytes(snapshot.totalBundleBytes)) + '</td></tr>').join('') +
+        '</tbody></table></div>' +
         '<div><h2>Refs</h2><table><thead><tr><th>Ref</th><th>Object</th><th>Subject</th></tr></thead><tbody>' +
         refs.refs.map((ref) => '<tr><td><code>' + esc(ref.ref) + '</code></td><td><code>' + esc(short(ref.object)) + '</code></td><td>' + esc(ref.subject || '') + '</td></tr>').join('') +
         '</tbody></table></div>' +
@@ -1154,6 +1543,14 @@ function adminConsoleHtml() {
       } catch (error) { setStatus(error.message, 'error'); }
     });
     $('refresh').addEventListener('click', () => load().catch((error) => setStatus(error.message, 'error')));
+    $('snapshotNow').addEventListener('click', async () => {
+      try {
+        setStatus('Creating snapshot');
+        const result = await api('/__skyevault/snapshots', { method: 'POST' });
+        setStatus('Snapshot ready: ' + result.snapshot.snapshotId, 'ok');
+        await load();
+      } catch (error) { setStatus(error.message, 'error'); }
+    });
     load().catch((error) => setStatus(error.message, 'error'));
   </script>
 </body>
@@ -1167,6 +1564,9 @@ const repoRoot = path.join(storageRoot, 'repos');
 const ledgerPath = path.join(storageRoot, 'remote-ledger.jsonl');
 const workspaceLedgerPath = path.join(root, '.skyevault-out', 'git-remote-ledger.jsonl');
 const neuralDir = path.join(storageRoot, 'neural-map');
+const policyPath = path.join(storageRoot, 'config', 'branch-policy.json');
+const snapshotRoot = path.join(storageRoot, 'snapshots');
+const snapshotMirrorRoot = resolvePath(argValue('--snapshot-mirror-root') || process.env.SKYEVAULT_SNAPSHOT_MIRROR_ROOT, '');
 const gateIntrospectUrl = String(argValue('--gate-introspect-url') || process.env.SKYEVAULT_GATE_INTROSPECT_URL || '').trim();
 const requiredViewRole = String(process.env.SKYEVAULT_GATE_REQUIRED_VIEW_ROLE || 'viewer').toLowerCase();
 const requiredPushRole = String(process.env.SKYEVAULT_GATE_REQUIRED_PUSH_ROLE || 'deployer').toLowerCase();
@@ -1180,6 +1580,9 @@ if (!token && !devNoAuth && !gateIntrospectUrl) token = crypto.randomBytes(24).t
 fs.mkdirSync(repoRoot, { recursive: true });
 fs.mkdirSync(path.dirname(workspaceLedgerPath), { recursive: true });
 fs.mkdirSync(neuralDir, { recursive: true });
+fs.mkdirSync(path.dirname(policyPath), { recursive: true });
+fs.mkdirSync(snapshotRoot, { recursive: true });
+if (!fs.existsSync(policyPath)) writeJsonFile(policyPath, readPolicy());
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || `${host}:${port}`}`);
@@ -1189,6 +1592,8 @@ const server = http.createServer(async (req, res) => {
       service: 'skyevault-git-remote',
       storageRoot,
       repoRoot,
+      snapshotRoot,
+      policyPath,
       auth: devNoAuth ? 'disabled' : gateIntrospectUrl ? 'gate-introspection' : 'static-token',
       autoCreate,
       gateEnforceWorkspace,
@@ -1229,7 +1634,7 @@ const server = http.createServer(async (req, res) => {
     try {
       requireRole(auth, requiredViewRole);
     } catch (error) {
-      json(res, error.status || 403, { ok: false, error: error.message });
+      json(res, httpStatus(error, 403), { ok: false, error: error.message });
       return;
     }
     html(res, 200, adminConsoleHtml());
@@ -1250,7 +1655,7 @@ const server = http.createServer(async (req, res) => {
           ...authLedgerFields(auth),
           error: error.message
         });
-        if (!res.headersSent) json(res, error.status || 400, { ok: false, error: error.message });
+        if (!res.headersSent) json(res, httpStatus(error, 400), { ok: false, error: error.message });
       });
     return;
   }
@@ -1272,7 +1677,7 @@ const server = http.createServer(async (req, res) => {
       ...authLedgerFields(auth),
       error: error.message
     });
-    text(res, error.status || 500, error.message);
+    text(res, httpStatus(error, 500), error.message);
   }
 });
 
@@ -1292,7 +1697,10 @@ server.listen(port, host, () => {
     autoCreate,
     ledgerPath,
     workspaceLedgerPath,
-    neuralDir
+    neuralDir,
+    policyPath,
+    snapshotRoot,
+    snapshotMirrorRoot: snapshotMirrorRoot || null
   };
   console.log(`SKYEVAULT_GIT_REMOTE_READY ${JSON.stringify(ready)}`);
 });

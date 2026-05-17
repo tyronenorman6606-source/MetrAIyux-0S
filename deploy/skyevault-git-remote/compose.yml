@@ -20,6 +20,7 @@ services:
       SKYEVAULT_PROTECTED_REFS: "${SKYEVAULT_PROTECTED_REFS:-refs/heads/main,refs/heads/master}"
       SKYEVAULT_ALLOW_DELETE_REFS: "${SKYEVAULT_ALLOW_DELETE_REFS:-0}"
       SKYEVAULT_ALLOW_FORCE_PUSH: "${SKYEVAULT_ALLOW_FORCE_PUSH:-0}"
+      SKYEVAULT_SNAPSHOT_MIRROR_ROOT: "${SKYEVAULT_SNAPSHOT_MIRROR_ROOT:-}"
     volumes:
       - skyevault_git_remote_data:/var/lib/skyevault/git-remote
     healthcheck:
