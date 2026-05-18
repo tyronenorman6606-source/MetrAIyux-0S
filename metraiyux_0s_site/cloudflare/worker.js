@@ -108,6 +108,13 @@ const LIVE_SURFACES = [
     route_when: ['connectlog','relay13','operator proof','relationship command','messaging','websocket','production proof','live receipt']
   },
   {
+    id: 'relay13-chat-hub',
+    name: 'Relay13 Chat Hub',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-chat-hub.html',
+    purpose: 'Public chat infrastructure map for 0S website messaging, Relay13 admin inbox, ConnectLog routing, Bob and Empire SKM accounts, and persistence proof.',
+    route_when: ['chat hub','live chat','website chat','operator inbox','brain-assisted','direct operator','bob empire','skm chat','customer messages']
+  },
+  {
     id: 'relay13-core-live-worker',
     name: 'Relay13 Core Live Worker',
     url: 'https://relay13-core.graylondonskyes.workers.dev/',
@@ -966,6 +973,7 @@ const PRIVATE_SOURCE_PATHS = [
 ];
 const PUBLIC_LIVE_PATHS = [
   /^\/live\/connectlog-relay13-operator-proof(?:\.html)?$/i,
+  /^\/live\/relay13-chat-hub(?:\.html)?$/i,
   /^\/live\/skye-media-center-operator-proof(?:\.html)?$/i
 ];
 function isPublicCloudflareDocPath(pathname) {
