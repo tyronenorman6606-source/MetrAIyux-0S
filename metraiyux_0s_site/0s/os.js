@@ -1,3 +1,6 @@
+import { animate as motionAnimate } from "motion";
+import { animate as framerAnimate } from "framer-motion";
+
 const SITE_ROOT = "/workspaces/MetrAIyux-0S/metraiyux_0s_site/";
 
 const APP_DEFS = [
@@ -1052,17 +1055,12 @@ async function loadRegistries() {
 
 async function bootMotionRuntime() {
   try {
-    const motion = await import("motion");
-    const animate = motion.animate;
-    if (animate) {
-      animate(".boot-panel", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0)"] }, { duration: .55, ease: "cubic-bezier(.16, 1, .3, 1)" });
-      animate(".dock button", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0)"] }, { delay: .08, duration: .38 });
-      document.documentElement.dataset.motionRuntime = "motion";
-      window.__metraiyuxOsMotionRuntime = { library: "motion", loaded: true };
-      qs("#motionStatus").textContent = "motion: active";
-      return;
-    }
-    throw new Error("motion animate export unavailable");
+    motionAnimate(".boot-panel", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0)"] }, { duration: .55, ease: "cubic-bezier(.16, 1, .3, 1)" });
+    motionAnimate(".dock button", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0)"] }, { delay: .08, duration: .38 });
+    framerAnimate(".os-brand-logo", { opacity: [0, 1], scale: [.96, 1] }, { duration: .5, ease: [.16, 1, .3, 1] });
+    document.documentElement.dataset.motionRuntime = "motion+framer-motion";
+    window.__metraiyuxOsMotionRuntime = { motion: true, framerMotion: true, loaded: true };
+    qs("#motionStatus").textContent = "motion: active";
   } catch (_error) {
     document.documentElement.dataset.motionRuntime = "css-fallback";
     window.__metraiyuxOsMotionRuntime = { library: "css", loaded: true };
