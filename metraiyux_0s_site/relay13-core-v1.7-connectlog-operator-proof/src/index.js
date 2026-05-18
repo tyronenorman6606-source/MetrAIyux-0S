@@ -10,6 +10,7 @@ const STATUSES = new Set(['open', 'pending', 'closed']);
 const SYSTEM_JOB_TYPES = new Set(['release.widget_config.verify','widget.publish.verify','workspace.health.check','api_key.audit']);
 const MAX_JSON_BYTES = 32 * 1024;
 const DEFAULT_MAX_MESSAGE_CHARS = 4000;
+let guardrailSchemaReady = null;
 const GUARDRAIL_AI_MODES = new Set(['off', 'draft_only', 'auto_reply']);
 const DEFAULT_GUARDRAIL_POLICY = {
   status: 'active',
@@ -328,6 +329,30 @@ async function enforceWorkspaceLimits(env, workspace, type) {
   return { ok: true };
 }
 
+async function ensureGuardrailSchema(env) {
+  if (!env.DB) throw new Error('D1 binding missing');
+  if (!guardrailSchemaReady) {
+    guardrailSchemaReady = env.DB.batch([
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS workspace_guardrails (workspace_id TEXT PRIMARY KEY REFERENCES workspaces(id) ON DELETE CASCADE, status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','paused')), ai_mode TEXT NOT NULL DEFAULT 'draft_only' CHECK(ai_mode IN ('off','draft_only','auto_reply')), allow_ai_auto_reply INTEGER NOT NULL DEFAULT 0 CHECK(allow_ai_auto_reply IN (0,1)), allow_web_search INTEGER NOT NULL DEFAULT 0 CHECK(allow_web_search IN (0,1)), allow_file_search INTEGER NOT NULL DEFAULT 0 CHECK(allow_file_search IN (0,1)), max_ai_input_tokens INTEGER NOT NULL DEFAULT 8000, max_ai_output_tokens INTEGER NOT NULL DEFAULT 700, monthly_ai_reply_limit INTEGER NOT NULL DEFAULT 1000, per_ip_message_window_minutes INTEGER NOT NULL DEFAULT 10, per_ip_message_limit INTEGER NOT NULL DEFAULT 24, per_ip_conversation_limit INTEGER NOT NULL DEFAULT 8, max_links_per_message INTEGER NOT NULL DEFAULT 2, blocked_terms_json TEXT NOT NULL DEFAULT '[]', app_knowledge_json TEXT NOT NULL DEFAULT '{}', escalation_rules_json TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')), updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_workspace_guardrails_status ON workspace_guardrails(status, ai_mode)`)
+      , env.DB.prepare(`CREATE TABLE IF NOT EXISTS guardrail_events (id TEXT PRIMARY KEY, workspace_id TEXT REFERENCES workspaces(id) ON DELETE SET NULL, conversation_id TEXT REFERENCES conversations(id) ON DELETE SET NULL, event_type TEXT NOT NULL, severity TEXT NOT NULL DEFAULT 'info' CHECK(severity IN ('info','low','medium','high')), decision TEXT NOT NULL DEFAULT 'allow' CHECK(decision IN ('allow','review','block')), reason TEXT NOT NULL, origin TEXT, ip_hash TEXT, message_hash TEXT, route TEXT, metadata_json TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_guardrail_events_workspace_created ON guardrail_events(workspace_id, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_guardrail_events_workspace_decision_created ON guardrail_events(workspace_id, decision, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_guardrail_events_workspace_ip_created ON guardrail_events(workspace_id, ip_hash, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_guardrail_events_workspace_type_created ON guardrail_events(workspace_id, event_type, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_guardrail_events_conversation_created ON guardrail_events(conversation_id, created_at DESC)`)
+      , env.DB.prepare(`CREATE TABLE IF NOT EXISTS ai_usage_ledger (id TEXT PRIMARY KEY, workspace_id TEXT REFERENCES workspaces(id) ON DELETE SET NULL, conversation_id TEXT REFERENCES conversations(id) ON DELETE SET NULL, message_id TEXT REFERENCES messages(id) ON DELETE SET NULL, account_code TEXT, model TEXT NOT NULL, ai_mode TEXT NOT NULL DEFAULT 'draft_only', status TEXT NOT NULL DEFAULT 'recorded' CHECK(status IN ('recorded','blocked','drafted','sent','failed')), input_tokens INTEGER NOT NULL DEFAULT 0, output_tokens INTEGER NOT NULL DEFAULT 0, estimated_cost_usd REAL NOT NULL DEFAULT 0, metadata_json TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_ai_usage_workspace_created ON ai_usage_ledger(workspace_id, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_ai_usage_workspace_status_created ON ai_usage_ledger(workspace_id, status, created_at DESC)`)
+      , env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_ai_usage_conversation_created ON ai_usage_ledger(conversation_id, created_at DESC)`)
+    ]).catch((error) => {
+      guardrailSchemaReady = null;
+      throw error;
+    });
+  }
+  await guardrailSchemaReady;
+}
+
 function defaultGuardrailInputForWorkspace(workspace = {}) {
   const known = KNOWN_WORKSPACE_GUARDRAILS[workspace.slug] || {};
   return {
@@ -364,6 +389,7 @@ function normalizeGuardrailPolicy(row = {}, workspace = {}) {
 }
 async function ensureWorkspaceGuardrails(env, workspace) {
   try {
+    await ensureGuardrailSchema(env);
     let row = await env.DB.prepare(`SELECT * FROM workspace_guardrails WHERE workspace_id = ? LIMIT 1`).bind(workspace.id).first();
     if (!row) {
       const defaults = defaultGuardrailInputForWorkspace(workspace);
@@ -438,6 +464,7 @@ async function guardrailFingerprint(request, fallback = {}) {
   return await sha256Hex(`${ip}|${ua}|${origin}` || randomHex(8));
 }
 async function guardrailRecentCount(env, workspaceId, ipHash, type, minutes) {
+  await ensureGuardrailSchema(env);
   const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
   const sql = type === 'conversation'
     ? `SELECT COUNT(*) AS count FROM guardrail_events WHERE workspace_id = ? AND ip_hash = ? AND event_type = 'conversation.allowed' AND created_at >= ?`
@@ -447,6 +474,7 @@ async function guardrailRecentCount(env, workspaceId, ipHash, type, minutes) {
 }
 async function recordGuardrailEvent(env, request, { workspaceId, conversationId = null, eventType, decision, reason, severity = 'info', route = '', body = '', metadata = {}, network = {} }) {
   try {
+    await ensureGuardrailSchema(env);
     const ipHash = await guardrailFingerprint(request, network);
     const messageHash = body ? await sha256Hex(safeText(body, 4000).toLowerCase()) : '';
     await env.DB.prepare(`INSERT INTO guardrail_events (id, workspace_id, conversation_id, event_type, severity, decision, reason, origin, ip_hash, message_hash, route, metadata_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
