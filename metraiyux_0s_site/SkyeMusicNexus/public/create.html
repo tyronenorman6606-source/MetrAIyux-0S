@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyeMusicNexus // Open Source Creation Studio</title>
+  <meta name="description" content="Open-source creation engine lane for SkyeMusicNexus: openDAW bridge, stem staging, session ledger, export queue, and Release Forge handoff." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./open-source-studio.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="./neo-nexus.js"></script>
+  <script defer src="./open-source-studio.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist" data-room="creation-studio">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="aurora aurora-one" aria-hidden="true"></div>
+  <div class="aurora aurora-two" aria-hidden="true"></div>
+
+  <main class="nexus-shell open-source-studio-shell">
+    <header class="nexus-topline">
+      <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus dashboard"><img src="../assets/platform-mark.svg" alt="" /></a>
+      <div>
+        <p class="micro">SkyeMusicNexus // Creation Studio</p>
+        <h1>Build the song before it becomes a release.</h1>
+      </div>
+      <div class="session-rack" aria-label="Gate status">
+        <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
+        <button id="proofSessionButton" class="ghost" type="button" data-action="proof-session">Proof Session</button>
+        <button id="operatorLoginButton" class="ghost" type="button" data-action="operator-login">Operator Login</button>
+        <button id="disconnectButton" class="ghost" type="button" data-action="logout">Disconnect</button>
+      </div>
+    </header>
+
+    <nav class="nexus-nav" aria-label="SkyeMusicNexus rooms">
+      <a href="./index.html">Dashboard</a>
+      <a href="./upload.html">Upload Studio</a>
+      <a href="./player.html">Music Player</a>
+      <a href="./releases.html">Releases</a>
+      <a href="./rights.html">Rights</a>
+      <a href="./exchange.html">Exchange</a>
+      <a class="active" href="./create.html" aria-current="page">Create</a>
+      <a href="./admin.html">Operator</a>
+    </nav>
+
+    <section class="hero-panel studio-hero">
+      <div>
+        <p class="eyebrow">open source engine lane</p>
+        <h2>openDAW bridge, stem staging, sample packs, exports, and Release Forge handoff.</h2>
+        <p>
+          This page does not replace your existing upload/player/release/rights/exchange rooms.
+          It inserts the missing creation layer in front of them.
+        </p>
+      </div>
+      <div class="engine-status-card">
+        <strong id="selectedEngineName">openDAW</strong>
+        <span id="selectedEngineLicense">AGPLv3 browser DAW candidate</span>
+        <button id="openSourceLedgerButton" type="button">Open Source Ledger</button>
+      </div>
+    </section>
+
+    <section class="studio-grid">
+      <article class="panel glass-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">01 engine bridge</p>
+            <h3>Launch openDAW inside the Nexus.</h3>
+          </div>
+          <span class="status-pill">external engine</span>
+        </div>
+
+        <label class="field-stack">
+          <span>openDAW URL</span>
+          <input id="openDawUrlInput" value="http://localhost:5173" placeholder="http://localhost:5173 or deployed openDAW URL" />
+        </label>
+
+        <div class="action-row">
+          <button id="launchOpenDawButton" type="button">Launch openDAW Bridge</button>
+          <button id="detachOpenDawButton" type="button">Detach</button>
+        </div>
+
+        <div id="openDawFrameWrap" class="daw-frame-wrap" hidden>
+          <iframe id="openDawFrame" title="openDAW bridge" allow="autoplay; microphone; midi; clipboard-write; fullscreen"></iframe>
+        </div>
+
+        <p class="truth-note">
+          License boundary: openDAW is treated as an external open-source engine. Keep upstream license files and source obligations intact.
+        </p>
+      </article>
+
+      <article class="panel glass-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">02 session ledger</p>
+            <h3>Save creation sessions before release capsules.</h3>
+          </div>
+          <span class="status-pill">gated write</span>
+        </div>
+
+        <div class="form-grid">
+          <label class="field-stack">
+            <span>Artist ID</span>
+            <input id="artistIdInput" placeholder="artist_001" />
+          </label>
+          <label class="field-stack">
+            <span>Release ID</span>
+            <input id="releaseIdInput" placeholder="release_001" />
+          </label>
+          <label class="field-stack">
+            <span>Project title</span>
+            <input id="projectTitleInput" placeholder="Midnight pressure session" />
+          </label>
+          <label class="field-stack">
+            <span>BPM / Key</span>
+            <input id="tempoKeyInput" placeholder="84 BPM · F minor" />
+          </label>
+        </div>
+
+        <label class="field-stack">
+          <span>Creative notes</span>
+          <textarea id="creativeNotesInput" placeholder="Describe the sound, references, intended release, arrangement notes, and export target."></textarea>
+        </label>
+
+        <div class="action-row">
+          <button id="saveProjectButton" type="button">Save Studio Project</button>
+          <button id="exportProjectJsonButton" type="button">Export Project JSON</button>
+        </div>
+
+        <output id="projectSaveOutput" class="output-box">No studio project saved yet.</output>
+      </article>
+    </section>
+
+    <section class="studio-grid three">
+      <article class="panel glass-panel">
+        <p class="eyebrow">03 stem vault</p>
+        <h3>Stage stems and masters.</h3>
+        <p class="subcopy">Use this before gated Upload Studio. The production backend should route these to SkyeVault/R2/B2.</p>
+
+        <label class="drop-zone">
+          <input id="stemFileInput" type="file" multiple accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm" />
+          <span>Drop stems, bounces, masters, or previews</span>
+          <small>wav · mp3 · flac · ogg · m4a · webm</small>
+        </label>
+
+        <ul id="stemList" class="record-list"></ul>
+      </article>
+
+      <article class="panel glass-panel">
+        <p class="eyebrow">04 sample packs</p>
+        <h3>Open-source friendly pack rail.</h3>
+        <div id="samplePackRail" class="sample-pack-rail"></div>
+      </article>
+
+      <article class="panel glass-panel">
+        <p class="eyebrow">05 export queue</p>
+        <h3>Preview, master, and release handoff.</h3>
+        <div class="checkbox-stack">
+          <label><input type="checkbox" class="exportTarget" value="mp3-preview" checked /> MP3 preview</label>
+          <label><input type="checkbox" class="exportTarget" value="wav-master" checked /> WAV master</label>
+          <label><input type="checkbox" class="exportTarget" value="stem-archive" /> Stem archive</label>
+          <label><input type="checkbox" class="exportTarget" value="release-forge-line" checked /> Release Forge line</label>
+        </div>
+        <button id="queueExportButton" type="button">Queue Export</button>
+        <output id="exportQueueOutput" class="output-box">Export queue idle.</output>
+      </article>
+    </section>
+
+    <section class="panel glass-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">06 release forge handoff</p>
+          <h3>Move finished creative work into your existing release room.</h3>
+        </div>
+        <a class="ghost-link" href="./releases.html">Open Release Forge</a>
+      </div>
+      <pre id="releaseForgeLine" class="code-output">No handoff line generated yet.</pre>
+    </section>
+
+    <section id="openSourceLedger" class="panel glass-panel" hidden>
+      <p class="eyebrow">open-source stack ledger</p>
+      <h3>Engines to pull into the workspace.</h3>
+      <div id="engineLedgerGrid" class="engine-ledger-grid"></div>
+      <p class="truth-note">
+        Ardour, LMMS, and Audacity are desktop companion/reference tools. openDAW is the browser-DAW candidate.
+        This lane keeps them external so your SkyeMusicNexus business/runtime code stays clean.
+      </p>
+    </section>
+
+    <dialog id="operatorDialog" class="operator-dialog">
+      <form method="dialog" id="operatorForm">
+        <h3>Local Operator Login</h3>
+        <p>Uses the same SkyGate local proof posture as the other Nexus rooms. No demo secrets are embedded.</p>
+        <label>Email<input name="email" type="email" required /></label>
+        <label>Password<input name="password" type="password" required /></label>
+        <menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu>
+      </form>
+    </dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>

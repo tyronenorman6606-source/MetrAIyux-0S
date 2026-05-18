@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Operator control surface for SkyeMerit packs, protected coupons, kAIxu credit, and delivery channels.">
+  <title>SkyeMerit Operator Control - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">Operator</span></a>
+    <nav><a href="index.html">Operator</a><a href="../saas/skyemerit.html">SkyeMerit</a><a href="../saas/skyepay.html">SkyePay</a><a href="../admin/automation-brain.html">Admin Brain</a></nav>
+  </header>
+  <main class="portal-shell">
+    <div class="topnav"><a href="../index.html">Home</a><a href="index.html">Operator Hub</a><a href="../saas/skyemerit.html">Customer Wallet</a><a href="../saas/pricing.html">Pricing</a><a href="../saas/customer-dashboard.html">Customer Dashboard</a></div>
+
+    <section class="hero slim">
+      <p class="eyebrow">SkyeMerit control</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Issue merit packs without breaking your SkyeLine.</h1>
+      <p class="hero-copy">This owner surface controls SkyeMerit pack issue, delivery receipts, and discount previewing. It is an operator tool, so the live issue endpoint requires the 0S admin token; static mode still prints the payload for review.</p>
+    </section>
+
+    <section class="saas-grid">
+      <article class="saas-card"><p class="eyebrow">Pack</p><h3>First-Time SkyeMerit</h3><p>$6 premium kAIxu credit plus 23%, 28%, and 31% protected first-purchase rules.</p></article>
+      <article class="saas-card"><p class="eyebrow">Channels</p><h3>Resend, SkyeMail, Relay13, ConnectLog</h3><p>The Worker sends where configured and records skipped channels instead of pretending they fired.</p></article>
+      <article class="saas-card"><p class="eyebrow">Gate</p><h3>Nothing escapes auth</h3><p>SkyeMerit is a no-charge feature, not a public bypass. Free99 still requires a gate session.</p></article>
+    </section>
+
+    <section class="saas-band">
+      <p class="eyebrow">Issue pack</p>
+      <h2>Send a branded SkyeMerit pack.</h2>
+      <form class="saas-tool" id="issueForm">
+        <label>Admin token<input name="admin_token" type="password" autocomplete="off" placeholder="0S admin bearer token"></label>
+        <label>Customer email<input name="email" type="email" placeholder="owner@company.com"></label>
+        <label>Customer ID<input name="customer_id" placeholder="cus_..."></label>
+        <label>Workspace ID<input name="workspace_id" placeholder="ws_..."></label>
+        <label>Source<input name="source" value="operator_dashboard"></label>
+        <button type="button" id="issueBtn">Issue SkyeMerit Pack</button>
+      </form>
+      <pre class="saas-receipt" id="issueReceipt"></pre>
+    </section>
+
+    <section class="saas-band">
+      <p class="eyebrow">Rule audit</p>
+      <h2>Quick SkyeLine proof.</h2>
+      <p class="hero-copy">A $13,000 checkout with SKYEMERIT-SKYELINE-22 discounts only $7,000 of eligible spend: $1,540 off, $11,460 due. That is the math the proof script enforces.</p>
+      <div class="button-row"><a class="button" href="../saas/skyemerit.html">Open customer calculator</a><a class="button" href="../saas/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command&skyemerit_code=SKYEMERIT-SKYELINE-22">Preview enterprise checkout</a></div>
+    </section>
+  </main>
+  <script>
+    const out = (data) => { document.getElementById("issueReceipt").textContent = JSON.stringify(data, null, 2); };
+    document.getElementById("issueBtn").addEventListener("click", async () => {
+      const form = document.getElementById("issueForm");
+      const data = Object.fromEntries(new FormData(form).entries());
+      const payload = { email:data.email, customer_id:data.customer_id, workspace_id:data.workspace_id, source:data.source || "operator_dashboard" };
+      if (!data.admin_token) {
+        out({ok:true, static_payload:payload, note:"Add the admin token to send through /api/saas/skyemerit/issue."});
+        return;
+      }
+      try {
+        const res = await fetch("/api/saas/skyemerit/issue", {
+          method:"POST",
+          headers:{"content-type":"application/json", "authorization":`Bearer ${data.admin_token}`},
+          body:JSON.stringify(payload)
+        });
+        const body = await res.json();
+        out(body);
+      } catch (error) {
+        out({ok:false, error:error.message, static_payload:payload});
+      }
+    });
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

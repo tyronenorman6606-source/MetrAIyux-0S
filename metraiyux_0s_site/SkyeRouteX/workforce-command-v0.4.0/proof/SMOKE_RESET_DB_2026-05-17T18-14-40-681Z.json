@@ -1,0 +1,34 @@
+{
+  "started_at": "2026-05-17T18:14:40.440Z",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "reset_command_completed",
+      "data": {
+        "stdout": "Database reset: /workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/reset-smoke-db.json\nAdmin seed created for admin-reset-smoke@skyeroutex.local"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "reset_seeded_admin_user",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "reset_seed_audit_event_is_tamper_evident",
+      "data": {
+        "ok": true,
+        "event_count": 1,
+        "head_hash": "efca5c170e2b91cf64965d90a459f8cb06a70183432e27eef4fc0f1ba27c88f5",
+        "failures": []
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "reset_fails_closed_for_external_database_driver",
+      "data": {}
+    }
+  ],
+  "completed_at": "2026-05-17T18:14:40.681Z",
+  "status": "PASS"
+}

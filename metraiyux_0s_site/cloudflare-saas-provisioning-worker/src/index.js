@@ -58,7 +58,7 @@ const PLANS = {
   },
   "growth-cabinet": {
     name: "Growth Cabinet",
-    tagline: "All 5 operating lanes. Full multi-provider intelligence.",
+    tagline: "All 5 operating lanes. Full Skyes Over London intelligence.",
     monthly: 997,
     setup: 3500,
     skyepay_offer_id: "metraiyux-growth-cabinet",
@@ -237,6 +237,20 @@ const AI_RATE_CARD = {
   ]
 };
 
+const PUBLIC_AI_PROVIDER = "Skyes Over London";
+const PUBLIC_AI_MODELS = {
+  "openai::gpt-4o-mini": "kaixu-6.7-mini",
+  "openai::gpt-4o": "kaixu-6.7",
+  "gemini::gemini-2.5-flash": "kaixu-6.7-nano",
+  "gemini::gemini-embedding-001": "kaixu-6.7-embed",
+  "anthropic::claude-3-5-sonnet-20241022": "kaixu-6.7-pro",
+  "anthropic::claude-opus-4-6": "kaixu-6.7-max"
+};
+
+function publicAiModel(provider, model) {
+  return PUBLIC_AI_MODELS[`${provider}::${model}`] || (String(model || "").startsWith("kaixu") ? model : "kaixu-6.7");
+}
+
 // Customer-safe plan view — returns features only, never internal limits or AI dollar caps.
 function publicPlans() {
   const out = {};
@@ -269,7 +283,10 @@ function publicRateCard() {
     effective_date: AI_RATE_CARD.effective_date,
     unit: AI_RATE_CARD.unit,
     models: AI_RATE_CARD.models.map(({ provider, model, billable_input_per_1m_usd, billable_output_per_1m_usd }) => ({
-      provider, model, billable_input_per_1m_usd, billable_output_per_1m_usd
+      provider: PUBLIC_AI_PROVIDER,
+      model: publicAiModel(provider, model),
+      billable_input_per_1m_usd,
+      billable_output_per_1m_usd
     }))
   };
 }
@@ -303,8 +320,8 @@ const SOVEREIGN_STACK = {
   thesis: "MetrAIyux 0S can run on its own VPS while FS27 tracks billing, auth, AI usage, caps, customer data visuals, and platform action telemetry.",
   lanes: [
     { id: "citadeldb", title: "CitadelDB", replaces: ["neon"], status: "owner_selectable_database_lane" },
-    { id: "skyevault", title: "SkyeVault", replaces: ["google_drive", "github_repo_storage"], status: "owner_selectable_vault_lane" },
-    { id: "skyemail", title: "SkyeMail", replaces: ["gmail_only_business_email"], status: "workspace_mailbox_lane" },
+    { id: "skyevault", title: "SkyeVault", replaces: ["outside_drive_storage", "repo_package_storage"], status: "owner_selectable_vault_lane" },
+    { id: "skyemail", title: "SkyeMail", replaces: ["single_provider_business_email"], status: "workspace_mailbox_lane" },
     { id: "skyepay", title: "SkyePay", replaces: ["loose_payment_links"], status: "stripe_confirmed_controlled_activation_lane" },
     { id: "skyemerit", title: "SkyeMerit", replaces: ["unbounded_coupons", "manual_discount_math"], status: "gated_merit_credit_discount_lane" },
     { id: "skyeroutex", title: "SkyeRouteX", replaces: ["loose_dispatch_spreadsheets", "unproven_route_ledgers"], status: "owner_approved_workforce_command_lane" },
@@ -335,7 +352,7 @@ const PREVIEW_CLIENTS = {
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret"
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret,x-kaixu-install-id,x-kaixu-app,x-kaixu-build,x-kaixu-request-id"
 };
 
 const json = (data, status = 200) => new Response(JSON.stringify(data, null, 2), {
@@ -993,6 +1010,23 @@ async function sdkAuth(req, env) {
   return { ok: true, card: body.card, token };
 }
 
+function fs27GatewayPath(path) {
+  const normalized = String(path || "").replace(/\/+$/, "") || "/";
+  if (normalized === "/gateway-chat" || normalized === "/gateway/chat" || normalized === "/api/kaixu/chat" || normalized === "/.netlify/functions/gateway-chat") return "/gateway-chat";
+  if (normalized === "/gateway-stream" || normalized === "/gateway/stream" || normalized === "/api/kaixu/stream" || normalized === "/.netlify/functions/gateway-stream") return "/gateway-stream";
+  return "";
+}
+
+async function proxyFs27Gateway(req, env, targetPath) {
+  const sourceUrl = new URL(req.url);
+  const targetSearch = sourceUrl.search || "";
+  const targetUrl = env.FS27_WORKER
+    ? new URL(`https://fs27${targetPath}${targetSearch}`)
+    : new URL(`${String(env.FS27_URL || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev").replace(/\/$/, "")}${targetPath}${targetSearch}`);
+  const proxied = new Request(targetUrl, req);
+  return env.FS27_WORKER ? env.FS27_WORKER.fetch(proxied) : fetch(proxied);
+}
+
 async function buildCustomerVisuals(env, workspaceId) {
   const idToFind = workspaceId || "bob-smoke-shop-preview-001";
   let workspace = await safeFirst(env, "SELECT * FROM workspaces WHERE id=? OR slug=? LIMIT 1", [idToFind, idToFind]);
@@ -1018,6 +1052,9 @@ export default {
     const url = new URL(req.url);
     const path = url.pathname;
     try {
+      const gatewayTarget = fs27GatewayPath(path);
+      if (gatewayTarget && req.method === "POST") return proxyFs27Gateway(req, env, gatewayTarget);
+
       if (path === "/" || path === "/health" || path === "/api/saas/status") {
         return json({
           ok: true,

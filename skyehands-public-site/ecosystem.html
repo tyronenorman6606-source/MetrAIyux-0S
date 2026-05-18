@@ -1,0 +1,699 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A real Skyes Over London system map linking SkyeHands, MetrAIyux 0S, SkyeGate, SkyePay, Relay13, app lanes, client platforms, public proof, and infrastructure surfaces.">
+  <title>Skyes Ecosystem Map | SkyeHands</title>
+  <link rel="canonical" href="https://skyehands.netlify.app/ecosystem.html">
+  <link rel="stylesheet" href="assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+  <style>
+    :root {
+      --bg: #05060a;
+      --panel: #0d1118;
+      --panel-2: #121824;
+      --ink: #f8f1dd;
+      --muted: #aeb7c4;
+      --gold: #f3c95f;
+      --teal: #51e0cf;
+      --rust: #d87945;
+      --line: rgba(255, 255, 255, .12);
+      --soft: rgba(255, 255, 255, .06);
+      --shadow: rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scrollbar-color: var(--gold) #080a10; }
+    ::-webkit-scrollbar { width: 12px; height: 12px; }
+    ::-webkit-scrollbar-track { background: #080a10; }
+    ::-webkit-scrollbar-thumb {
+      border: 3px solid #080a10;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--gold), var(--teal));
+      box-shadow: 0 0 18px rgba(81, 224, 207, .35);
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(81, 224, 207, .14), transparent 30%),
+        radial-gradient(circle at 82% 0%, rgba(243, 201, 95, .12), transparent 28%),
+        linear-gradient(180deg, #05060a 0%, #090c12 44%, #06070a 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    .shell { width: min(1220px, calc(100% - 36px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(5, 6, 10, .86);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      width: min(1220px, calc(100% - 36px));
+      margin: 0 auto;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+    .brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 14px rgba(243, 201, 95, .28));
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    nav a, .pill-link, .action {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 11px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, .035);
+    }
+    nav a:hover, .pill-link:hover, .action:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero {
+      min-height: 88vh;
+      padding: clamp(76px, 9vw, 130px) 0 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .72fr);
+      gap: 34px;
+      align-items: center;
+    }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 880px;
+      font-size: clamp(3rem, 8vw, 7.4rem);
+      line-height: .88;
+      letter-spacing: 0;
+    }
+    .lede {
+      max-width: 780px;
+      margin: 24px 0 0;
+      color: #d9deea;
+      font-size: clamp(1rem, 1.5vw, 1.18rem);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .action.primary { background: var(--gold); color: #141006; border-color: var(--gold); }
+    .hero-visual {
+      min-height: 480px;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    .system-orbit {
+      width: min(100%, 520px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(243, 201, 95, .32);
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at center, rgba(243, 201, 95, .16), transparent 20%),
+        radial-gradient(circle at center, rgba(81, 224, 207, .10), transparent 42%);
+      box-shadow: 0 30px 90px var(--shadow), inset 0 0 70px rgba(255, 255, 255, .04);
+    }
+    .system-orbit::before, .system-orbit::after {
+      content: "";
+      position: absolute;
+      inset: 12%;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 50%;
+    }
+    .system-orbit::after { inset: 28%; border-color: rgba(81, 224, 207, .28); }
+    .core-mark {
+      width: 118px;
+      height: 118px;
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(243, 201, 95, .36);
+      border-radius: 18px;
+      background: rgba(5, 6, 10, .72);
+    }
+    .core-mark img { width: 84px; max-height: 84px; object-fit: contain; }
+    .orbit-node {
+      position: absolute;
+      width: 116px;
+      min-height: 56px;
+      display: grid;
+      place-items: center;
+      padding: 8px;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: rgba(13, 17, 24, .88);
+      font-size: .72rem;
+      font-weight: 900;
+      box-shadow: 0 16px 40px var(--shadow);
+    }
+    .n1 { left: 50%; top: -3%; transform: translateX(-50%); }
+    .n2 { right: -5%; top: 25%; }
+    .n3 { right: 8%; bottom: 8%; }
+    .n4 { left: 8%; bottom: 8%; }
+    .n5 { left: -5%; top: 25%; }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 56px;
+    }
+    .quick-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .045);
+    }
+    .quick-card strong { display: block; font-size: 1.9rem; line-height: 1; color: var(--gold); }
+    .quick-card span { display: block; color: var(--muted); font-size: .84rem; margin-top: 8px; }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin: 0 0 26px;
+    }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .055);
+      font: inherit;
+      outline: none;
+    }
+    .search:focus { border-color: var(--teal); }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .filter {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .035);
+      font-size: .78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .filter.is-active { color: #10130e; background: var(--teal); border-color: var(--teal); }
+
+    .section {
+      padding: 42px 0 30px;
+      border-top: 1px solid var(--line);
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    .section h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 3rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+    .section-head p {
+      max-width: 540px;
+      margin: 0;
+      color: var(--muted);
+    }
+    .map-spine {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0 34px;
+    }
+    .spine-node {
+      min-height: 112px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      position: relative;
+    }
+    .spine-node::after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      width: 10px;
+      height: 1px;
+      background: rgba(243, 201, 95, .55);
+    }
+    .spine-node:last-child::after { display: none; }
+    .spine-node b { display: block; color: var(--ink); margin-bottom: 6px; }
+    .spine-node span { color: var(--muted); font-size: .78rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .node-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .028));
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .16);
+    }
+    .node-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .tag.live { color: #10130e; background: var(--teal); border-color: var(--teal); }
+    .tag.gated { color: #140f04; background: var(--gold); border-color: var(--gold); }
+    .tag.local { color: #f7d3bf; border-color: rgba(216, 121, 69, .55); }
+    .node-card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    .node-card p { margin: 0; color: var(--muted); font-size: .92rem; }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 16px;
+    }
+    .links a {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-decoration: none;
+      color: var(--ink);
+      background: rgba(0, 0, 0, .18);
+      font-size: .78rem;
+      font-weight: 850;
+    }
+    .links a:hover { border-color: var(--gold); color: var(--gold); }
+
+    .full-width { grid-column: 1 / -1; }
+    .subplatform-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .subplatform-list a {
+      min-height: 76px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      text-decoration: none;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .035);
+      font-size: .84rem;
+      font-weight: 850;
+    }
+    .subplatform-list a span { display: block; margin-top: 5px; color: var(--muted); font-size: .72rem; font-weight: 700; }
+    .empty { display: none; padding: 24px; color: var(--muted); border: 1px solid var(--line); border-radius: 8px; }
+    .footer {
+      padding: 38px 0 56px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+    .footer a { color: var(--gold); }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-visual { min-height: 360px; }
+      .quick-grid, .grid, .subplatform-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .map-spine { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .spine-node::after { display: none; }
+      .section-head, .control-row { display: block; }
+      .filter-row { justify-content: flex-start; margin-top: 12px; }
+    }
+    @media (max-width: 640px) {
+      .topbar-inner { display: block; padding: 12px 0; }
+      .brand { margin-bottom: 8px; }
+      .hero { padding-top: 56px; }
+      .hero-visual { min-height: 310px; }
+      .system-orbit { width: min(100%, 330px); }
+      .orbit-node { width: 90px; min-height: 48px; font-size: .62rem; }
+      .core-mark { width: 92px; height: 92px; }
+      .core-mark img { width: 66px; }
+      .quick-grid, .grid, .subplatform-list, .map-spine { grid-template-columns: 1fr; }
+      .shell, .topbar-inner { width: min(100% - 24px, 1220px); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="ecosystem.html" aria-label="Skyes ecosystem home">
+        <img src="skyes-emblem.png" alt="Skyes Over London emblem">
+        <span>Skyes Ecosystem</span>
+      </a>
+      <nav aria-label="System map navigation">
+        <a href="#map">Map</a>
+        <a href="#skyehands">SkyeHands</a>
+        <a href="#metraiyux">MetrAIyux 0S</a>
+        <a href="#apps">Apps</a>
+        <a href="#infra">Infrastructure</a>
+        <a href="#clients">Client Surfaces</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="shell hero">
+      <div>
+        <p class="eyebrow">Skyes Over London LC - system map</p>
+        <h1>One map for the whole machine.</h1>
+        <p class="lede">SkyeHands is the sovereign engineering cloud. MetrAIyux 0S is the operating and business command layer. SkyeGate, SkyePay, Relay13, SkyeVault, Valley Verified, client apps, and the worker fleet sit around them as live routes, gated rooms, proof surfaces, and sellable subplatforms.</p>
+        <div class="hero-actions">
+          <a class="action primary" href="#map">Open the map</a>
+          <a class="action" href="https://metraiyux-ecosystem-portal.pages.dev/operator/deployment-ledger" target="_blank" rel="noopener">Deployment Atlas</a>
+          <a class="action" href="https://metraiyux-0s-public-spectacle.pages.dev/feature-atlas.html" target="_blank" rel="noopener">0S Feature Atlas</a>
+          <a class="action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s" target="_blank" rel="noopener">SkyePay Store</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="System orbit diagram">
+        <div class="system-orbit">
+          <div class="core-mark"><img src="skyes-emblem.png" alt=""></div>
+          <div class="orbit-node n1">SkyeHands</div>
+          <div class="orbit-node n2">MetrAIyux 0S</div>
+          <div class="orbit-node n3">Gate + Pay</div>
+          <div class="orbit-node n4">Apps + Clients</div>
+          <div class="orbit-node n5">Proof + Ledger</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell quick-grid" aria-label="Map counts">
+      <div class="quick-card"><strong>6</strong><span>major ecosystem lanes</span></div>
+      <div class="quick-card"><strong>30+</strong><span>public and gated destinations</span></div>
+      <div class="quick-card"><strong>12</strong><span>0S app and subplatform lanes</span></div>
+      <div class="quick-card"><strong>17</strong><span>worker-backed production surfaces in the ledger</span></div>
+    </section>
+
+    <section class="shell section" id="map">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Canonical flow</p>
+          <h2>The user path through the empire.</h2>
+        </div>
+        <p>Use this as the public router: broad identity first, live proof second, app lane third, then gated runtime or payment only when the user is ready.</p>
+      </div>
+      <div class="map-spine" aria-label="System flow">
+        <div class="spine-node"><b>Brand Layer</b><span>Skyes Over London, SkyeHands, legal trust, reviews, portfolio presence.</span></div>
+        <div class="spine-node"><b>Command Layer</b><span>MetrAIyux 0S, admin OS, cabinet brains, feature atlas, proof router.</span></div>
+        <div class="spine-node"><b>Gate Layer</b><span>SkyeGateFS27, FS13, 0meg4kAI, auth, approvals, event mirrors.</span></div>
+        <div class="spine-node"><b>Money Layer</b><span>SkyePay store, Stripe checkout, SaaS provisioning, owner activation.</span></div>
+        <div class="spine-node"><b>App Layer</b><span>RouteX, Media, Music, Profit, Split, HouseOps, Content, Marketing, Relay13.</span></div>
+        <div class="spine-node"><b>Proof Layer</b><span>Deployment Atlas, ledgers, receipts, live QA, client surfaces.</span></div>
+      </div>
+      <div class="control-row">
+        <input class="search" id="mapSearch" type="search" placeholder="Search apps, workers, proof rooms, client surfaces, or subplatforms" aria-label="Search ecosystem map">
+        <div class="filter-row" aria-label="Map filters">
+          <button class="filter is-active" data-filter="all" type="button">All</button>
+          <button class="filter" data-filter="public" type="button">Public</button>
+          <button class="filter" data-filter="gated" type="button">Gated</button>
+          <button class="filter" data-filter="worker" type="button">Workers</button>
+          <button class="filter" data-filter="client" type="button">Clients</button>
+        </div>
+      </div>
+      <div class="empty" id="emptyState">No matching system nodes. Try a product name like RouteX, SkyePay, Relay13, Valley, or SkyeGate.</div>
+    </section>
+
+    <section class="shell section map-section" id="skyehands">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">SkyeHands</p>
+          <h2>Sovereign engineering cloud and platform mesh.</h2>
+        </div>
+        <p>The SkyeHands lane organizes the engineering brain, memory, replay, proof, compliance, launchpad, and white-label platform system.</p>
+      </div>
+      <div class="grid">
+        <article class="node-card" data-category="public platform" data-search="skyehands skyequanta kai xu council memory replay proofops costbrain compliance autonomy clone foundry valuation platform mesh">
+          <div class="node-meta"><span class="tag live">Public</span><span class="tag">SkyeHands</span></div>
+          <h3>SkyeHands public ecosystem</h3>
+          <p>The live route this page fixes: a single map for SkyeHands, 0S, gate, payments, apps, clients, and proof ledgers.</p>
+          <div class="links"><a href="ecosystem.html">This map</a><a href="#metraiyux">0S lane</a><a href="#apps">App lane</a></div>
+        </article>
+        <article class="node-card full-width" data-category="public platform" data-search="kai xu council memory replay proofops costbrain compliance autonomy gradient clone foundry valuation audit power mesh path lens">
+          <div class="node-meta"><span class="tag">Planes</span><span class="tag local">Mapped Here</span></div>
+          <h3>SkyeHands capability planes</h3>
+          <p>These are the internal product planes users need to understand before entering the deeper platform: kAIxU Council, SkyeMemory Fabric, SkyeReplay, ProofOps, CostBrain, Compliance-Native, Autonomy Gradient, SkyeClone, Environment Mirror, SkyeFoundry, Valuation Audit Mode, Platform Power Mesh, and Path Lens.</p>
+          <div class="subplatform-list">
+            <a href="#skyehands">kAIxU Council<span>Specialist multi-agent work review</span></a>
+            <a href="#skyehands">SkyeMemory Fabric<span>Persistent engineering memory graph</span></a>
+            <a href="#skyehands">SkyeReplay<span>Run replay and forkable execution proof</span></a>
+            <a href="#skyehands">ProofOps<span>Evidence pack and change attestation</span></a>
+            <a href="#skyehands">CostBrain<span>Cost and rollback reasoning</span></a>
+            <a href="#skyehands">Compliance-Native<span>Named operational compliance modes</span></a>
+            <a href="#skyehands">SkyeClone<span>Environment reconstruction from projects</span></a>
+            <a href="#skyehands">SkyeFoundry<span>White-label autonomous cloud lane</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell section map-section" id="metraiyux">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">MetrAIyux 0S</p>
+          <h2>Business command layer, app router, and proof core.</h2>
+        </div>
+        <p>This is the route for buyers, operators, proof reviewers, customers, and app-specific product conversations.</p>
+      </div>
+      <div class="grid">
+        <article class="node-card" data-category="public" data-search="metraiyux 0s full system command brain feature atlas proof router admin os cabinet customer signup">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">Command</span></div>
+          <h3>MetrAIyux 0S Full System</h3>
+          <p>The full operating command surface with cabinet brains, admin OS, app lanes, SaaS onboarding, and proof routing.</p>
+          <div class="links">
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Home</a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/feature-atlas.html" target="_blank" rel="noopener">Feature Atlas</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales/live-proof-router.html" target="_blank" rel="noopener">Proof Router</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="public" data-search="public spectacle marketing ecosystem brain wall pricing metraiyux">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">Marketing</span></div>
+          <h3>0S public marketing surfaces</h3>
+          <p>Sendable pages for prospects who need the overview, pricing, brain system, and lighter public route before entering the deeper worker-backed surface.</p>
+          <div class="links">
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/" target="_blank" rel="noopener">Public Spectacle</a>
+            <a href="https://metraiyux-0s-marketing.pages.dev/" target="_blank" rel="noopener">Marketing</a>
+            <a href="https://metraiyux-marketing.pages.dev/" target="_blank" rel="noopener">Compatibility Mirror</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="gated public" data-search="admin automation brain operator cabinet local brain neural map governance policy approval">
+          <div class="node-meta"><span class="tag gated">Gated</span><span class="tag">Operator</span></div>
+          <h3>Admin and operator rooms</h3>
+          <p>Owner-facing command rooms for automation brain, admin OS, operator ledgers, governance, policy, and brain routing.</p>
+          <div class="links">
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/index.html" target="_blank" rel="noopener">Admin OS</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html" target="_blank" rel="noopener">Main Brain</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/operator/index.html" target="_blank" rel="noopener">Operator</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell section map-section" id="apps">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Apps and subplatforms</p>
+          <h2>Every major app lane has a door.</h2>
+        </div>
+        <p>These links route users to the public proof hub first, then into the app or subplatform room when it is appropriate.</p>
+      </div>
+      <div class="grid">
+        <article class="node-card full-width" data-category="public gated" data-search="apps subplatforms skypay routex media center music nexus profit split content forge marketing made easy houseoperations skyebox connectlog relay13">
+          <div class="node-meta"><span class="tag live">Live Hubs</span><span class="tag gated">Runtime Gated</span></div>
+          <h3>0S application lane index</h3>
+          <p>The public hubs explain the app, the price posture, the gate boundary, and the proof. Runtime actions remain gated where the app requires a 0S, FS27, SkyGate, or operator session.</p>
+          <div class="subplatform-list">
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html" target="_blank" rel="noopener">ConnectLog + Relay13<span>Relationship and messaging infrastructure</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/skyeroutex-workforce-command.html" target="_blank" rel="noopener">SkyeRouteX<span>Workforce, dispatch, jobs, routes, assignments</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/skyeprofitconsole-profit-console.html" target="_blank" rel="noopener">SkyeProfitConsole<span>Profit packs, close briefs, money moves</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/skye-split-engine-operator-proof.html" target="_blank" rel="noopener">Skye Split Engine<span>Commission and payout split logic</span></a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-media-center-operator-proof.html" target="_blank" rel="noopener">SkyeMediaCenter<span>Media intake, review, publish, delivery</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/skyemusicnexus-neofront.html" target="_blank" rel="noopener">SkyeMusicNexus<span>Music lite, artist ops, paid drops</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/skye-content-forge-publisher.html" target="_blank" rel="noopener">Skye Content Forge<span>Content scan, generation, queue, publishing</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/marketing-made-easy-growth-suite.html" target="_blank" rel="noopener">Marketing Made Easy<span>AE flow, launch, docs, web growth, brand kit</span></a>
+            <a href="https://metraiyux-0s-public-spectacle.pages.dev/live/houseoperations-skyebox-operator-proof.html" target="_blank" rel="noopener">HouseOps + SkyeBox<span>House command and encrypted authenticator vault</span></a>
+            <a href="https://relay13-core.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Relay13 Core<span>Production messaging worker and live proof</span></a>
+            <a href="https://skyevault-drop.graylondonskyes.workers.dev/" target="_blank" rel="noopener">SkyeVault Drop<span>Protected file handoff and workspace drops</span></a>
+            <a href="https://skyemail-platform.graylondonskyes.workers.dev/" target="_blank" rel="noopener">SkyeMail<span>Mailbox platform, aliases, Resend-backed flow</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell section map-section" id="infra">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Infrastructure</p>
+          <h2>Gate, payment, workers, and proof infrastructure.</h2>
+        </div>
+        <p>The backend layer is split into public proof, service workers, account-safe checkout, and access-gated control planes.</p>
+      </div>
+      <div class="grid">
+        <article class="node-card" data-category="public gated worker" data-search="skyegate fs27 skye pay skypay stripe checkout gate proof auth event mirror control plane">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag gated">Gate</span></div>
+          <h3>SkyeGateFS27 and SkyePay</h3>
+          <p>The gate and commerce layer for auth proof, event mirrors, public store, checkout handoff, and owner-approved activation.</p>
+          <div class="links">
+            <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html" target="_blank" rel="noopener">Gate Proof</a>
+            <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s" target="_blank" rel="noopener">SkyePay Store</a>
+            <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13" target="_blank" rel="noopener">ConnectLog Gate</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="worker public" data-search="workers cloudflare kai xu brain vantacore skydexia skyegate fs13 admin automation crown nexus sentinel omega security">
+          <div class="node-meta"><span class="tag live">Workers</span><span class="tag">Production</span></div>
+          <h3>Worker fleet</h3>
+          <p>Live workers include Relay13, SkyeVault, SkyeMail, SaaS provisioning, gate services, security review, site-operation workers, cabinet workers, VantaCore, SkyeDexia, and kAIxU infrastructure. Some control planes are intentionally gated, so the public doorway is the deployment atlas.</p>
+          <div class="links">
+            <a href="https://metraiyux-ecosystem-portal.pages.dev/operator/deployment-ledger" target="_blank" rel="noopener">Worker Atlas</a>
+            <a href="https://relay13-core.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Relay13</a>
+            <a href="https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/" target="_blank" rel="noopener">SaaS Worker</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="public worker" data-search="saas provisioning worker stripe billing checkout plans starter growth autonomous enterprise">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">SaaS</span></div>
+          <h3>SaaS provisioning and billing</h3>
+          <p>The worker route for plan-aware SaaS status, setup checkout, monthly checkout metadata, and 0S customer activation.</p>
+          <div class="links">
+            <a href="https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Provisioning Worker</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/index.html" target="_blank" rel="noopener">Customer Signup</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/pricing/index.html" target="_blank" rel="noopener">0S Pricing</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell section map-section" id="clients">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Public proof and client surfaces</p>
+          <h2>Proof pages, client apps, marketplace surfaces, and trust routes.</h2>
+        </div>
+        <p>These are the external-facing routes that make the ecosystem inspectable by buyers, customers, reviewers, and partners.</p>
+      </div>
+      <div class="grid">
+        <article class="node-card" data-category="public client" data-search="deployment atlas ecosystem portal proof ledger vault beta operator live surfaces">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">Proof</span></div>
+          <h3>MetrAIyux Ecosystem Portal</h3>
+          <p>Live deployment atlas, vault, beta, operator context, public proof rows, and route evidence.</p>
+          <div class="links">
+            <a href="https://metraiyux-ecosystem-portal.pages.dev/" target="_blank" rel="noopener">Portal</a>
+            <a href="https://metraiyux-ecosystem-portal.pages.dev/operator/deployment-ledger" target="_blank" rel="noopener">Deployment Atlas</a>
+            <a href="https://metraiyux-ecosystem-portal.pages.dev/vault" target="_blank" rel="noopener">Vault</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="public client" data-search="valley verified phx network business insights journal profiles bobs smoke shop">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">Network</span></div>
+          <h3>Valley Verified / PHX Network</h3>
+          <p>Public business visibility network, insights journal, profile renderer, and 0S platform backlinks.</p>
+          <div class="links">
+            <a href="https://phx-verified-network.pages.dev/" target="_blank" rel="noopener">Valley Home</a>
+            <a href="https://phx-verified-network.pages.dev/insights/" target="_blank" rel="noopener">Insights</a>
+            <a href="https://phx-verified-network.pages.dev/business/bobs-smoke-shop-litchfield-park/" target="_blank" rel="noopener">Business Profile</a>
+          </div>
+        </article>
+        <article class="node-card" data-category="public client" data-search="client apps bobs smoke shop empire pallets staffing reviews legal citadeldb skye design">
+          <div class="node-meta"><span class="tag live">Live</span><span class="tag">Clients</span></div>
+          <h3>Client and public company surfaces</h3>
+          <p>Client previews, reviews, legal center, staffing, CitadelDB, Skye Design MCP, and the wider public brand network.</p>
+          <div class="links">
+            <a href="https://bobs-smoke-shop-metraiyux-preview.pages.dev/" target="_blank" rel="noopener">Bob Preview</a>
+            <a href="https://empire-pallets-v3-app.pages.dev/" target="_blank" rel="noopener">Empire Pallets</a>
+            <a href="https://skyes-over-london-legal.pages.dev/" target="_blank" rel="noopener">Legal Center</a>
+            <a href="https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded" target="_blank" rel="noopener">Reviews</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <p>Skyes Over London LC system map. Built to keep SkyeHands, MetrAIyux 0S, SkyeGate, SkyePay, app lanes, worker routes, client surfaces, and proof ledgers discoverable from one public route.</p>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('mapSearch');
+    const filters = [...document.querySelectorAll('.filter')];
+    const cards = [...document.querySelectorAll('.node-card')];
+    const emptyState = document.getElementById('emptyState');
+    let activeFilter = 'all';
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+      for (const card of cards) {
+        const categories = (card.dataset.category || '').split(/\s+/);
+        const text = [card.dataset.search, card.textContent].join(' ').toLowerCase();
+        const filterMatch = activeFilter === 'all' || categories.includes(activeFilter);
+        const queryMatch = !query || text.includes(query);
+        const show = filterMatch && queryMatch;
+        card.style.display = show ? '' : 'none';
+        if (show) visible += 1;
+      }
+      emptyState.style.display = visible ? 'none' : 'block';
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    for (const filter of filters) {
+      filter.addEventListener('click', () => {
+        activeFilter = filter.dataset.filter;
+        filters.forEach(item => item.classList.toggle('is-active', item === filter));
+        applyFilters();
+      });
+    }
+  </script>
+  <script src="assets/mcp-implementation/mcp-effects.js" data-mcp-generated-js></script>
+</body>
+</html>

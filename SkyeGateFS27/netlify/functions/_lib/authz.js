@@ -186,12 +186,86 @@ export function keyCapCents(keyRow, customerRollup) {
   return customerCapCents(keyRow, customerRollup);
 }
 
-export function effectiveRpmLimit(keyRow, fallback = null) {
-  return keyRow?.rpm_limit ?? keyRow?.customer_default_rpm_limit ?? fallback;
+function policyObject(value) {
+  if (!value) return {};
+  if (typeof value === "object" && !Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
 }
 
-export function effectiveRpdLimit(keyRow, fallback = null) {
-  return keyRow?.rpd_limit ?? keyRow?.customer_default_rpd_limit ?? fallback;
+function firstFiniteLimit(...values) {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") continue;
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
+export function normalizePlatformId(value, fallback = "") {
+  const raw = String(value || "").trim().toLowerCase();
+  const cleaned = raw
+    .replace(/[^a-z0-9._:-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return cleaned || fallback || "";
+}
+
+export function platformIdFromKeyRow(keyRow, fallback = "metraiyux-0s") {
+  const keyMeta = policyObject(keyRow?.key_metadata);
+  const customerPolicy = policyObject(keyRow?.customer_skypay_policy);
+  return normalizePlatformId(
+    keyMeta.platform_id ||
+      keyMeta.platform ||
+      keyMeta.app_id ||
+      customerPolicy.default_platform_id ||
+      customerPolicy.platform_id ||
+      fallback,
+    fallback
+  );
+}
+
+export function platformUsageBucket(keyRow, platformId) {
+  const customerPolicy = policyObject(keyRow?.customer_skypay_policy);
+  const buckets = policyObject(customerPolicy.platform_usage_buckets || customerPolicy.platforms);
+  const normalized = normalizePlatformId(platformId, "");
+  if (!normalized) return {};
+  return policyObject(buckets[normalized] || buckets[platformId] || {});
+}
+
+export function hasPlatformUsageBucket(keyRow, platformId) {
+  return Object.keys(platformUsageBucket(keyRow, platformId)).length > 0;
+}
+
+export function effectiveRpmLimit(keyRow, fallback = null, platformId = null) {
+  const bucket = platformId ? platformUsageBucket(keyRow, platformId) : {};
+  return firstFiniteLimit(
+    bucket.default_rpm_limit,
+    bucket.rpm_limit,
+    bucket.rpm,
+    keyRow?.rpm_limit,
+    keyRow?.customer_default_rpm_limit,
+    fallback
+  );
+}
+
+export function effectiveRpdLimit(keyRow, fallback = null, platformId = null) {
+  const bucket = platformId ? platformUsageBucket(keyRow, platformId) : {};
+  return firstFiniteLimit(
+    bucket.default_rpd_limit,
+    bucket.rpd_limit,
+    bucket.rpd,
+    keyRow?.rpd_limit,
+    keyRow?.customer_default_rpd_limit,
+    fallback
+  );
 }
 
 

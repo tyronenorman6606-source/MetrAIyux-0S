@@ -1,11 +1,11 @@
 window.METRAIYUX_PUBLIC_NEURAL_MAP = {
-  "generated_at": "2026-05-17T00:00:00.000Z",
+  "generated_at": "2026-05-18T00:43:18.208Z",
   "source": "curated-obsidian-sync",
   "safety": "public-safe: generated only from brain:true Obsidian export with internal paths removed",
-  "note_count": 10,
-  "chunk_count": 59,
-  "node_count": 103,
-  "link_count": 336,
+  "note_count": 11,
+  "chunk_count": 82,
+  "node_count": 127,
+  "link_count": 456,
   "nodes": [
     {
       "id": "hub:metraiyux",
@@ -169,18 +169,57 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Curated vault tag"
     },
     {
+      "id": "note:skyerunners",
+      "label": "SkyeRunners",
+      "type": "note",
+      "group": "proof",
+      "size": 19,
+      "tags": [
+        "metraiyux",
+        "skyerunners",
+        "operator",
+        "brain",
+        "qa"
+      ],
+      "summary": "7 curated knowledge chunks"
+    },
+    {
+      "id": "tag:skyerunners",
+      "label": "#skyerunners",
+      "type": "tag",
+      "group": "tag",
+      "size": 11,
+      "summary": "Curated vault tag"
+    },
+    {
+      "id": "tag:brain",
+      "label": "#brain",
+      "type": "tag",
+      "group": "tag",
+      "size": 11,
+      "summary": "Curated vault tag"
+    },
+    {
+      "id": "tag:qa",
+      "label": "#qa",
+      "type": "tag",
+      "group": "tag",
+      "size": 11,
+      "summary": "Curated vault tag"
+    },
+    {
       "id": "note:ceo-live-deployment-ledger",
       "label": "CEO Live Deployment Ledger",
       "type": "note",
       "group": "production",
-      "size": 17,
+      "size": 22,
       "tags": [
         "production",
         "ceo",
         "live-ledger",
         "cloudflare"
       ],
-      "summary": "5 curated knowledge chunks"
+      "summary": "15 curated knowledge chunks"
     },
     {
       "id": "tag:ceo",
@@ -211,13 +250,13 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "label": "Live Surface Registry",
       "type": "note",
       "group": "production",
-      "size": 19,
+      "size": 22,
       "tags": [
         "live-surfaces",
         "proof-router",
         "production"
       ],
-      "summary": "7 curated knowledge chunks"
+      "summary": "13 curated knowledge chunks"
     },
     {
       "id": "tag:live-surfaces",
@@ -288,14 +327,6 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
     {
       "id": "tag:receipts",
       "label": "#receipts",
-      "type": "tag",
-      "group": "tag",
-      "size": 11,
-      "summary": "Curated vault tag"
-    },
-    {
-      "id": "tag:qa",
-      "label": "#qa",
       "type": "tag",
       "group": "tag",
       "size": 11,
@@ -598,7 +629,63 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Knowledge Gates. - Curate only stable, proof-safe notes into the local brain with brain: true. - Run the repo-local Obsidian sync command after changing exported vault notes. - Ask the local"
     },
     {
-      "id": "signal:ceo-live-deployment-ledger-26",
+      "id": "signal:skyerunners-26",
+      "label": "SkyeRunners",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "SkyeRunners. SkyeRunners are repo-aware worker agents for MetrAIyux 0S. They do not replace the human operator. They run local, allowlisted proof and knowledge-map lanes so the operator can "
+    },
+    {
+      "id": "signal:skyerunners-27",
+      "label": "Control Surface",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Control Surface. - Admin page: metraiyux0ssite/admin/skyerunners. html - Browser brain feed: metraiyux0ssite/brain/skyerunners. json - Local bridge: internal source mjs - Queue and ledger: i"
+    },
+    {
+      "id": "signal:skyerunners-28",
+      "label": "Runner Lanes",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Runner Lanes. - Repo Cartographer keeps the repo inventory, command map, proof map, and brain chunks current. - Human Flow Runner uses SkyeCrawler and browser QA to act like a user across pu"
+    },
+    {
+      "id": "signal:skyerunners-29",
+      "label": "Approval Boundary",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Approval Boundary. SkyeRunners can run complete local proof passes without tiny arbitrary QA caps. Spend-bearing provider calls, production deploys, billing changes, credential changes, paym"
+    },
+    {
+      "id": "signal:skyerunners-30",
+      "label": "Latest Stress Proof",
+      "type": "signal",
+      "group": "proof",
+      "size": 8,
+      "summary": "Latest Stress Proof. The 2026-05-18 local stress pass recorded: - 286 SkyeRunners bridge, browser, and queue operations with 0 failures. - 40 queue writes verified and cleaned back to 0. - A"
+    },
+    {
+      "id": "signal:skyerunners-31",
+      "label": "Operator Commands",
+      "type": "signal",
+      "group": "proof",
+      "size": 8,
+      "summary": "Operator Commands. Use the repo-local command runner or package scripts: npm run skyerunners:map npm run skyerunners:control npm run skyerunners:run -- knowledge-refresh npm run skyerunners:"
+    },
+    {
+      "id": "signal:skyerunners-32",
+      "label": "Routing Rule",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Routing Rule. Questions about SkyeRunners route to Orion Hayes for technology/system ownership and Victor Saint for QA/proof review. 0meg4kAI reviews any customer, tenant, credential, spend,"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-33",
       "label": "CEO Live Deployment Ledger",
       "type": "signal",
       "group": "production",
@@ -606,31 +693,111 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "CEO Live Deployment Ledger. Canonical ledger: LIVEDEPLOYMENTLEDGER. md Latest capture: 2026-05-17 UTC."
     },
     {
-      "id": "signal:ceo-live-deployment-ledger-27",
+      "id": "signal:ceo-live-deployment-ledger-34",
       "label": "Current Count",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Current Count. - 15 Cloudflare Pages production projects. - 11 Cloudflare Workers production services. - 36 live HTTP checks passed, plus the 2026-05-17 MetrAIyux 0S marketing pricing browse"
+      "summary": "Current Count. - 17 Cloudflare Pages production projects. - 17 Cloudflare Workers production services captured across the Cloudflare API inventory and follow-up Worker sweeps. - Follow-up Wo"
     },
     {
-      "id": "signal:ceo-live-deployment-ledger-28",
+      "id": "signal:ceo-live-deployment-ledger-35",
+      "label": "Current Count",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Count. - 36 earlier live HTTP checks passed, plus the 2026-05-17 MetrAIyux 0S marketing pricing browser proof, ConnectLog + Relay13 production proof, Stripe live lookup-key sync proo"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-36",
+      "label": "Current Count",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Count. dev/operator/deployment-ledger; latest Cloudflare Pages deployment cb3f578c-6d95-4cbe-a831-ea39e57cf357, with 78 public surfaces, 8 live checks, Valley Verified longform insig"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-37",
+      "label": "Current Count",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Count. - PHX Verified Network latest production deployment 1daa4796-a81a-4c75-967d-df7f019f0918 rebuilt the Valley Verified /insights/ operating journal into seven longform operator "
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-38",
+      "label": "Current Count",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Count. json shows live account acct1Seml2HEgCmnlKPJ, 7 products, 13 prices, 10 0S setup/monthly prices created or replaced, 8 stale prices archived, and 3 existing SkyeGate prices re"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-39",
       "label": "Evidence Files",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Evidence Files. - internal source json - internal source json - internal source png - internal source png - internal source png"
+      "summary": "Evidence Files. - internal source json - internal source json - internal source json - internal source json - internal source json - internal source json - internal source json - internal so"
     },
     {
-      "id": "signal:ceo-live-deployment-ledger-29",
+      "id": "signal:ceo-live-deployment-ledger-40",
+      "label": "Evidence Files",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Evidence Files. json - internal source png - internal source json - internal source png - internal source json - internal source png - internal source png - internal source json - internal s"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-41",
+      "label": "Evidence Files",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Evidence Files. json - internal source json - internal source json - internal source json - internal source json - internal source png - internal source png - internal source png - internal "
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-42",
+      "label": "Evidence Files",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Evidence Files. json - internal source json - internal source json - internal source json - internal source json - internal source json"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-43",
       "label": "CEO Reading Order",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "CEO Reading Order. 1. Open LIVEDEPLOYMENTLEDGER. md. 2. Review the Executive Summary. 3. Review the CEO Contribution Map. 4. Review the Pages and Workers production tables."
+      "summary": "CEO Reading Order. 1. Open LIVEDEPLOYMENTLEDGER. md. 2. Review the Executive Summary. 3. Review the CEO Contribution Map. 4. Review the Pages and Workers production tables. 5. Review the ope"
     },
     {
-      "id": "signal:ceo-live-deployment-ledger-30",
+      "id": "signal:ceo-live-deployment-ledger-44",
+      "label": "CEO Reading Order",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "CEO Reading Order. json as the operator top Vault link proof: sidebar href /vault, final URL /vault, HTTP 200, and no 404 body text. 9. Use internal source json as the portal brand-copy proo"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-45",
+      "label": "CEO Reading Order",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "CEO Reading Order. json as the current public production-infrastructure copy proof: 0S home, ConnectLog app, landing, hub, receipt, proof center, Cabinet Brain, and FS27 gate passed desktop/"
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-46",
+      "label": "CEO Reading Order",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "CEO Reading Order. json as the Valley Verified insights proof: /insights/, all seven longform operating articles, and the renderer-backed Bob's Smoke Shop business URL all returned HTTP 200 "
+    },
+    {
+      "id": "signal:ceo-live-deployment-ledger-47",
       "label": "Rule",
       "type": "signal",
       "group": "production",
@@ -638,7 +805,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Rule. This note points to the canonical ledger instead of duplicating every row. When the live deployment inventory changes, update the root ledger, this note's current count, and the Live S"
     },
     {
-      "id": "signal:live-surface-registry-31",
+      "id": "signal:live-surface-registry-48",
       "label": "Live Surface Registry",
       "type": "signal",
       "group": "production",
@@ -646,7 +813,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Live Surface Registry. The live surface registry is the map of buyer-facing proof, operator proof, and platform status routes. It should stay aligned with metraiyux0ssite/brain/live-surface-"
     },
     {
-      "id": "signal:live-surface-registry-32",
+      "id": "signal:live-surface-registry-49",
       "label": "Sales Rule",
       "type": "signal",
       "group": "production",
@@ -654,15 +821,15 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Sales Rule. Public sales claims should route buyers to proof surfaces that are live, safe to disclose, and appropriate to the audience. Admin-only setup, credentials, private customer data, "
     },
     {
-      "id": "signal:live-surface-registry-33",
+      "id": "signal:live-surface-registry-50",
       "label": "Core Routes",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Core Routes. - MetrAIyux 0S full system Worker. - Live proof router. - Public spectacle site. - Logo rollout mirror. - SkyeGateFS27 proof Worker. - SkyeGateFS27 gate-map alias. - Actual Skye"
+      "summary": "Core Routes. - MetrAIyux 0S full system Worker. - Live proof router. - ConnectLog + Relay13 operator proof, app, proof receipt, and Relay13 Core Worker. - Public spectacle site. - Logo rollo"
     },
     {
-      "id": "signal:live-surface-registry-34",
+      "id": "signal:live-surface-registry-51",
       "label": "Full Live Deployment Ledger",
       "type": "signal",
       "group": "production",
@@ -670,15 +837,63 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Full Live Deployment Ledger. The CEO-facing deployment ledger now lives at LIVEDEPLOYMENTLEDGER. md, with a vault pointer at internal source Live Deployment Ledger. md. Latest Cloudflare cap"
     },
     {
-      "id": "signal:live-surface-registry-35",
+      "id": "signal:live-surface-registry-52",
       "label": "Full Live Deployment Ledger",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Full Live Deployment Ledger. This expanded ledger captures live surfaces that were not fully listed in the older core-route summary, including SkyeMail, SkyeVault, Bob's Smoke Shop preview, "
+      "summary": "Full Live Deployment Ledger. - Expanded operator-provided Netlify/endpoint map captured 84 deployment rows, 17 endpoint checks, 63 verified-live deployments, 7 protected gates, and 19 attent"
     },
     {
-      "id": "signal:live-surface-registry-36",
+      "id": "signal:live-surface-registry-53",
+      "label": "Full Live Deployment Ledger",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Full Live Deployment Ledger. dev/, deployment 1daa4796-a81a-4c75-967d-df7f019f0918; Valley Verified now has /insights/ with seven longform business operating articles, official source notes,"
+    },
+    {
+      "id": "signal:live-surface-registry-54",
+      "label": "Full Live Deployment Ledger",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Full Live Deployment Ledger. js canvas runtime, GSAP/Lenis motion, 78 public surfaces, 8 live signal checks, Valley Verified longform insights proof, ConnectLog + Relay13 rows, SkyePay live "
+    },
+    {
+      "id": "signal:live-surface-registry-55",
+      "label": "Full Live Deployment Ledger",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Full Live Deployment Ledger. json; account acct1Seml2HEgCmnlKPJ, 7 products, 13 live prices, 10 0S prices created or replaced, 8 stale prices archived, 3 SkyeGate prices reused, and SkyePay "
+    },
+    {
+      "id": "signal:live-surface-registry-56",
+      "label": "Full Live Deployment Ledger",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Full Live Deployment Ledger. json confirms the live 0S home, ConnectLog app, landing, hub, receipt, proof center, Cabinet Brain, and FS27 gate lane all pass desktop/mobile browser checks wit"
+    },
+    {
+      "id": "signal:live-surface-registry-57",
+      "label": "Current Route-Fix Queue",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Route-Fix Queue. This queue is internal only. Do not expose these rows on the public deployment atlas until the URL opens or answers by design. - Netlify auth is missing in this work"
+    },
+    {
+      "id": "signal:live-surface-registry-58",
+      "label": "Current Route-Fix Queue",
+      "type": "signal",
+      "group": "production",
+      "size": 8,
+      "summary": "Current Route-Fix Queue. The repo config now includes /health and /gateway-chat redirects; it still needs an authenticated Netlify redeploy. - SkyeSol path fix needed: skyesol. netlify. app/"
+    },
+    {
+      "id": "signal:live-surface-registry-59",
       "label": "Review Wall And Intake Routes",
       "type": "signal",
       "group": "production",
@@ -686,7 +901,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Review Wall And Intake Routes. - Public review wall: https://skyes-over-london-reviews. pages. dev/skyes-over-london-reviews-expanded. - Client review intake: https://skyes-over-london-revie"
     },
     {
-      "id": "signal:live-surface-registry-37",
+      "id": "signal:live-surface-registry-60",
       "label": "Update Ritual",
       "type": "signal",
       "group": "production",
@@ -694,7 +909,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Update Ritual. When a route changes, update the source registry JSON, this vault note, the production report, and any proof receipt that cites the old route."
     },
     {
-      "id": "signal:production-blockers-38",
+      "id": "signal:production-blockers-61",
       "label": "Citadel Forge",
       "type": "signal",
       "group": "production",
@@ -702,7 +917,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Citadel Forge. Citadel Forge is locally stood up with Postgres, Forgejo, control plane, and portal containers. Production push is blocked by external account and deployment decisions: - Real"
     },
     {
-      "id": "signal:production-blockers-39",
+      "id": "signal:production-blockers-62",
       "label": "Client Drop Vault",
       "type": "signal",
       "group": "production",
@@ -710,7 +925,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Client Drop Vault. Client Drop Vault checks and smoke pass locally. Live upload proof is blocked by Google Drive service-account quota unless a Shared Drive, user-owned folders, or domain-wi"
     },
     {
-      "id": "signal:production-blockers-40",
+      "id": "signal:production-blockers-63",
       "label": "Node OS",
       "type": "signal",
       "group": "production",
@@ -718,7 +933,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Node OS. Node OS prep passed local checks, but full ISO build and boot proof need a host with enough disk for the NixOS ISO closure, recommended 30 to 50 GB free."
     },
     {
-      "id": "signal:production-blockers-41",
+      "id": "signal:production-blockers-64",
       "label": "SkyeGateFS27",
       "type": "signal",
       "group": "production",
@@ -726,7 +941,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "SkyeGateFS27. SkyeGateFS27 is the auth and gateway authority for the ecosystem. Production hardening depends on explicit CORS origins, admin auth policy, billing credentials if top-ups are a"
     },
     {
-      "id": "signal:proof-ledger-42",
+      "id": "signal:proof-ledger-65",
       "label": "Proof Ledger",
       "type": "signal",
       "group": "proof",
@@ -734,15 +949,15 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Proof Ledger. The proof ledger is the evidence trail for what the system can truthfully claim."
     },
     {
-      "id": "signal:proof-ledger-43",
+      "id": "signal:proof-ledger-66",
       "label": "Current Proof Anchors",
       "type": "signal",
       "group": "production",
       "size": 8,
-      "summary": "Current Proof Anchors. - PRODUCTIONREADINESSREPORT. md - metraiyux0slivee2ereport. json - internal source - proof-recipes/metraiyux-public-proof. json - metraiyux0ssite/brain/live-surface-re"
+      "summary": "Current Proof Anchors. - PRODUCTIONREADINESSREPORT. md - metraiyux0slivee2ereport. json - internal source - SkyeRunners local stress receipt: internal source md - SkyeRunners generated map: "
     },
     {
-      "id": "signal:proof-ledger-44",
+      "id": "signal:proof-ledger-67",
       "label": "Proof Standard",
       "type": "signal",
       "group": "production",
@@ -750,7 +965,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Proof Standard. A claim is stronger when it has all four: - Live URL or local route. - Test command or proof recipe. - Dated result. - Screenshot, JSON report, or receipt artifact."
     },
     {
-      "id": "signal:proof-ledger-45",
+      "id": "signal:proof-ledger-68",
       "label": "Missing Proof Should Become Action",
       "type": "signal",
       "group": "production",
@@ -758,7 +973,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Missing Proof Should Become Action. If a note contains a useful claim without proof, create an operator action instead of treating it as sales language. Review submissions are proof candidat"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-69",
       "label": "Summary",
       "type": "signal",
       "group": "production",
@@ -766,7 +981,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Summary. Skyes Over London LC public site was unpacked from the deployment archive, deep-scanned, renamed back to the company identity, redesigned as an editorial proof atlas, audited throug"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-70",
       "label": "Local Surface",
       "type": "signal",
       "group": "production",
@@ -774,7 +989,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Local Surface. - Site folder: unpacked-projects/skyes-over-london-lc/ - Homepage: unpacked-projects/skyes-over-london-lc/index. html - Contact route: unpacked-projects/skyes-over-london-lc/p"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-71",
       "label": "Browser QA",
       "type": "signal",
       "group": "proof",
@@ -782,7 +997,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Browser QA. - Desktop homepage: internal source png - Mobile homepage: internal source png - Desktop contact: internal source png - Mobile contact: internal source png"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-72",
       "label": "MCP Result",
       "type": "signal",
       "group": "proof",
@@ -790,7 +1005,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "MCP Result. - Command: npm run mcp:mine -- unpacked-projects/skyes-over-london-lc - Result: ok: true - Failed MCP calls: [] - Design direction: editorial-proof-atlas with company-attached pu"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "label": "Vault Package",
       "type": "signal",
       "group": "production",
@@ -798,7 +1013,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Vault Package. - Stage folder: . skyevault-out/stage-skyes-over-london-lc-20260517/ - Archive: . skyevault-out/skyes-over-london-lc-proof-atlas-20260517T092216Z. zip - SHA-256: b608894ced563"
     },
     {
-      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
+      "id": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-74",
       "label": "Git Base",
       "type": "signal",
       "group": "proof",
@@ -806,7 +1021,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Git Base. - Base commit before this receipt: bd6ebb3"
     },
     {
-      "id": "signal:sales-and-handoff-map-52",
+      "id": "signal:sales-and-handoff-map-75",
       "label": "Sales And Handoff Map",
       "type": "signal",
       "group": "production",
@@ -814,7 +1029,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Sales And Handoff Map. MetrAIyux 0S sales material should connect the buyer to working proof, clear deployment boundaries, and a credible next action."
     },
     {
-      "id": "signal:sales-and-handoff-map-53",
+      "id": "signal:sales-and-handoff-map-76",
       "label": "Useful Sales Assets",
       "type": "signal",
       "group": "production",
@@ -822,7 +1037,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Useful Sales Assets. - Public proof router for showing live surfaces. - White-label client deck handoff. - Valuation brief and marketing copy. - Production readiness report for serious techn"
     },
     {
-      "id": "signal:sales-and-handoff-map-54",
+      "id": "signal:sales-and-handoff-map-77",
       "label": "Buyer-Safe Framing",
       "type": "signal",
       "group": "production",
@@ -830,7 +1045,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Buyer-Safe Framing. Use proof-backed language: - \"Live proof route available. \" - \"Production gates identified. \" - \"Local checks passed. \" - \"External-account setup required before final pr"
     },
     {
-      "id": "signal:sales-and-handoff-map-55",
+      "id": "signal:sales-and-handoff-map-78",
       "label": "Review Routing",
       "type": "signal",
       "group": "proof",
@@ -838,7 +1053,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Review Routing. If a prospect asks for testimonials, reviews, client proof, social proof, or customer experience, send the review wall and keep the claim grounded in the public page. If an e"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-56",
+      "id": "signal:metraiyux-0s-project-vault-79",
       "label": "MetrAIyux 0S Project Vault",
       "type": "signal",
       "group": "production",
@@ -846,7 +1061,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "MetrAIyux 0S Project Vault. This vault is the human command center for MetrAIyux 0S, SkyeGateFS27, proof systems, client handoff material, deployment blockers, and decision memory."
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-57",
+      "id": "signal:metraiyux-0s-project-vault-80",
       "label": "Start Here",
       "type": "signal",
       "group": "production",
@@ -854,7 +1069,7 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Start Here. - 00-command-center/Current Production State - 00-command-center/ChatGPT Project Handoff - 00-command-center/Next Operator Actions - 10-production/Production Blockers - 10-produc"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-58",
+      "id": "signal:metraiyux-0s-project-vault-81",
       "label": "Vault Rules",
       "type": "signal",
       "group": "proof",
@@ -862,28 +1077,12 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "summary": "Vault Rules. - Add brain: true in frontmatter only when a note is safe to export into the local browser brain. - Keep private credentials, real tokens, customer secrets, and unverified claim"
     },
     {
-      "id": "signal:metraiyux-0s-project-vault-59",
+      "id": "signal:metraiyux-0s-project-vault-82",
       "label": "Sync",
       "type": "signal",
       "group": "production",
       "size": 8,
       "summary": "Sync. Run the repo-local Obsidian sync command after changing curated notes. The detailed command allowlist lives outside the deployable static site in repo operator docs. The sync writes me"
-    },
-    {
-      "id": "signal:live-surface-registry-skyemediacenter-free99",
-      "label": "SkyeMediaCenter Free99",
-      "type": "signal",
-      "group": "production",
-      "size": 8,
-      "summary": "SkyeMediaCenter is now a Free99 no-charge 0S media surface with gated app boot, intake, operator theater, asset search, review, execution, dispatch, publish, stats, and file-delivery proof. Free99 does not bypass gate sessions."
-    },
-    {
-      "id": "signal:live-surface-registry-skyemusicnexus-lite-paid-addons",
-      "label": "SkyeMusicNexus Lite + Paid Drops",
-      "type": "signal",
-      "group": "production",
-      "size": 8,
-      "summary": "SkyeMusicNexus now has a Free99 Lite music lane plus paid Studio, Label Command, managed music ops, and drop add-ons. App boot, Artist Stage, Operator Stage, artist records, release forge, royalty ledger motion, payout review, analytics, paid drops, operations workflow, and proof boundary all require gate sessions."
     }
   ],
   "links": [
@@ -1028,6 +1227,60 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
     {
       "source": "tag:operator",
       "target": "note:next-operator-actions",
+      "type": "tag",
+      "strength": 1.2
+    },
+    {
+      "source": "hub:metraiyux",
+      "target": "note:skyerunners",
+      "type": "note",
+      "strength": 1.2
+    },
+    {
+      "source": "cluster:proof",
+      "target": "note:skyerunners",
+      "type": "cluster-note",
+      "strength": 1.8
+    },
+    {
+      "source": "cluster:operator",
+      "target": "note:skyerunners",
+      "type": "cluster-note",
+      "strength": 1.8
+    },
+    {
+      "source": "cluster:brain",
+      "target": "note:skyerunners",
+      "type": "cluster-note",
+      "strength": 1.8
+    },
+    {
+      "source": "tag:metraiyux",
+      "target": "note:skyerunners",
+      "type": "tag",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:skyerunners",
+      "target": "note:skyerunners",
+      "type": "tag",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:operator",
+      "target": "note:skyerunners",
+      "type": "tag",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:brain",
+      "target": "note:skyerunners",
+      "type": "tag",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:qa",
+      "target": "note:skyerunners",
       "type": "tag",
       "strength": 1.2
     },
@@ -1956,6 +2209,12 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
+      "source": "cluster:brain",
+      "target": "signal:current-production-state-21",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "note:current-production-state",
       "target": "signal:current-production-state-22",
       "type": "signal",
@@ -2028,7 +2287,19 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
+      "source": "cluster:sales",
+      "target": "signal:next-operator-actions-24",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
       "source": "cluster:operator",
+      "target": "signal:next-operator-actions-24",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
       "target": "signal:next-operator-actions-24",
       "type": "cluster-signal",
       "strength": 0.6
@@ -2064,842 +2335,1490 @@ window.METRAIYUX_PUBLIC_NEURAL_MAP = {
       "strength": 0.6
     },
     {
-      "source": "note:ceo-live-deployment-ledger",
-      "target": "signal:ceo-live-deployment-ledger-26",
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-26",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:ceo-live-deployment-ledger-26",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:ceo-live-deployment-ledger",
-      "target": "signal:ceo-live-deployment-ledger-27",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:ceo-live-deployment-ledger-27",
+      "target": "signal:skyerunners-26",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:ceo-live-deployment-ledger-27",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:ceo-live-deployment-ledger",
-      "target": "signal:ceo-live-deployment-ledger-28",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:ceo-live-deployment-ledger-28",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:ceo-live-deployment-ledger-28",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:ceo-live-deployment-ledger",
-      "target": "signal:ceo-live-deployment-ledger-29",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:ceo-live-deployment-ledger-29",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:ceo-live-deployment-ledger",
-      "target": "signal:ceo-live-deployment-ledger-30",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:ceo-live-deployment-ledger-30",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-31",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:live-surface-registry-31",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:live-surface-registry-31",
+      "target": "signal:skyerunners-26",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:live-surface-registry-31",
+      "target": "signal:skyerunners-26",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:live-surface-registry-31",
+      "target": "signal:skyerunners-26",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:live-surface-registry-31",
+      "target": "signal:skyerunners-26",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-32",
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-27",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:live-surface-registry-32",
+      "target": "signal:skyerunners-27",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:live-surface-registry-32",
+      "target": "signal:skyerunners-27",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-27",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-27",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-28",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:skyerunners-28",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:skyerunners-28",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-28",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-28",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-29",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:skyerunners-29",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:skyerunners-29",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-29",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-29",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-30",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:skyerunners-30",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-30",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-30",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-31",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:skyerunners-31",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-31",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-31",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:skyerunners",
+      "target": "signal:skyerunners-32",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:skyerunners-32",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:skyerunners-32",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:skyerunners-32",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:skyerunners-32",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-33",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-33",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-34",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-34",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-34",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-34",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-34",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-35",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-35",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-35",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-35",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-36",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-36",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-36",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-36",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-36",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-37",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-37",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-37",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:live-surface-registry-32",
+      "target": "signal:ceo-live-deployment-ledger-37",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:live-surface-registry-32",
+      "target": "signal:ceo-live-deployment-ledger-37",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-33",
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-37",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-38",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:live-surface-registry-33",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:live-surface-registry-33",
+      "target": "signal:ceo-live-deployment-ledger-38",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:live-surface-registry-33",
+      "target": "signal:ceo-live-deployment-ledger-38",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-34",
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-39",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:live-surface-registry-34",
+      "target": "signal:ceo-live-deployment-ledger-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:live-surface-registry-34",
+      "target": "signal:ceo-live-deployment-ledger-39",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:live-surface-registry-34",
+      "target": "signal:ceo-live-deployment-ledger-39",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-35",
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-40",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:live-surface-registry-35",
+      "target": "signal:ceo-live-deployment-ledger-40",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:live-surface-registry-35",
+      "target": "signal:ceo-live-deployment-ledger-40",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-40",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:live-surface-registry-35",
+      "target": "signal:ceo-live-deployment-ledger-40",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-36",
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-41",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:live-surface-registry-36",
+      "target": "signal:ceo-live-deployment-ledger-41",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:live-surface-registry-36",
+      "target": "signal:ceo-live-deployment-ledger-41",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-41",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-42",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-42",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-42",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-43",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-43",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-43",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-43",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-43",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-44",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-44",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-44",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-44",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-44",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-45",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-45",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-45",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:ceo-live-deployment-ledger-45",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:ceo-live-deployment-ledger-45",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-46",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-46",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:ceo-live-deployment-ledger-46",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:ceo-live-deployment-ledger",
+      "target": "signal:ceo-live-deployment-ledger-47",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:ceo-live-deployment-ledger-47",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-48",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-48",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-48",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:live-surface-registry-36",
+      "target": "signal:live-surface-registry-48",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:live-surface-registry-36",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-37",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:live-surface-registry-37",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:live-surface-registry-37",
+      "target": "signal:live-surface-registry-48",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:live-surface-registry-37",
+      "target": "signal:live-surface-registry-48",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-49",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-49",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-49",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-49",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-49",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-50",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-50",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-50",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-50",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-51",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-51",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-51",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-51",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-51",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-52",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-52",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-52",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-52",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-53",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-53",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-53",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-53",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-54",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-54",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-55",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-55",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-55",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-55",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-56",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-56",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-56",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-56",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-56",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-57",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-57",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-57",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-57",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-57",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-58",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-58",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-58",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-58",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-58",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-59",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:sales",
+      "target": "signal:live-surface-registry-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:operator",
+      "target": "signal:live-surface-registry-59",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "note:live-surface-registry",
+      "target": "signal:live-surface-registry-60",
+      "type": "signal",
+      "strength": 0.9
+    },
+    {
+      "source": "cluster:production",
+      "target": "signal:live-surface-registry-60",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:proof",
+      "target": "signal:live-surface-registry-60",
+      "type": "cluster-signal",
+      "strength": 0.6
+    },
+    {
+      "source": "cluster:brain",
+      "target": "signal:live-surface-registry-60",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:production-blockers",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-61",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-61",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-61",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-38",
+      "target": "signal:production-blockers-61",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:production-blockers",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:production-blockers-39",
+      "target": "signal:production-blockers-62",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:production-blockers",
-      "target": "signal:production-blockers-40",
+      "target": "signal:production-blockers-63",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-40",
+      "target": "signal:production-blockers-63",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:production-blockers-40",
+      "target": "signal:production-blockers-63",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-40",
+      "target": "signal:production-blockers-63",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:production-blockers",
-      "target": "signal:production-blockers-41",
+      "target": "signal:production-blockers-64",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:production-blockers-41",
+      "target": "signal:production-blockers-64",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:production-blockers-41",
+      "target": "signal:production-blockers-64",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-42",
+      "target": "signal:proof-ledger-65",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:proof-ledger-42",
+      "target": "signal:proof-ledger-65",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-43",
+      "target": "signal:proof-ledger-66",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:proof-ledger-43",
+      "target": "signal:proof-ledger-66",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:proof-ledger-43",
+      "target": "signal:proof-ledger-66",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:proof-ledger-43",
+      "target": "signal:proof-ledger-66",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-44",
+      "target": "signal:proof-ledger-67",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:proof-ledger-44",
+      "target": "signal:proof-ledger-67",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:proof-ledger-44",
+      "target": "signal:proof-ledger-67",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:proof-ledger",
-      "target": "signal:proof-ledger-45",
+      "target": "signal:proof-ledger-68",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:proof-ledger-45",
+      "target": "signal:proof-ledger-68",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:proof-ledger-45",
+      "target": "signal:proof-ledger-68",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:proof-ledger-45",
+      "target": "signal:proof-ledger-68",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:proof-ledger-45",
+      "target": "signal:proof-ledger-68",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-69",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-69",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-69",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-46",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-69",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-70",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-70",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-70",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-47",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-70",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-71",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-71",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-48",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-71",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-72",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-72",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-49",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-72",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-50",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-73",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:skyes-over-london-lc-proof-atlas-receipt-2026-05-17",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-74",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-74",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-51",
+      "target": "signal:skyes-over-london-lc-proof-atlas-receipt-2026-05-17-74",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:sales-and-handoff-map",
-      "target": "signal:sales-and-handoff-map-52",
+      "target": "signal:sales-and-handoff-map-75",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:sales-and-handoff-map-52",
+      "target": "signal:sales-and-handoff-map-75",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:sales-and-handoff-map-52",
+      "target": "signal:sales-and-handoff-map-75",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:sales-and-handoff-map-52",
+      "target": "signal:sales-and-handoff-map-75",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:sales-and-handoff-map-52",
+      "target": "signal:sales-and-handoff-map-75",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:sales-and-handoff-map",
-      "target": "signal:sales-and-handoff-map-53",
+      "target": "signal:sales-and-handoff-map-76",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:sales-and-handoff-map-53",
+      "target": "signal:sales-and-handoff-map-76",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:sales-and-handoff-map-53",
+      "target": "signal:sales-and-handoff-map-76",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:sales-and-handoff-map-53",
+      "target": "signal:sales-and-handoff-map-76",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:sales-and-handoff-map-53",
+      "target": "signal:sales-and-handoff-map-76",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:sales-and-handoff-map",
-      "target": "signal:sales-and-handoff-map-54",
+      "target": "signal:sales-and-handoff-map-77",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:sales-and-handoff-map-54",
+      "target": "signal:sales-and-handoff-map-77",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:sales-and-handoff-map-54",
+      "target": "signal:sales-and-handoff-map-77",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:sales-and-handoff-map-54",
+      "target": "signal:sales-and-handoff-map-77",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:sales-and-handoff-map-54",
+      "target": "signal:sales-and-handoff-map-77",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:sales-and-handoff-map",
-      "target": "signal:sales-and-handoff-map-55",
+      "target": "signal:sales-and-handoff-map-78",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:sales-and-handoff-map-55",
+      "target": "signal:sales-and-handoff-map-78",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:sales-and-handoff-map-55",
+      "target": "signal:sales-and-handoff-map-78",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:metraiyux-0s-project-vault",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:metraiyux-0s-project-vault-56",
+      "target": "signal:metraiyux-0s-project-vault-79",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:metraiyux-0s-project-vault",
-      "target": "signal:metraiyux-0s-project-vault-57",
+      "target": "signal:metraiyux-0s-project-vault-80",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:metraiyux-0s-project-vault-57",
+      "target": "signal:metraiyux-0s-project-vault-80",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:proof",
-      "target": "signal:metraiyux-0s-project-vault-57",
+      "target": "signal:metraiyux-0s-project-vault-80",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:sales",
-      "target": "signal:metraiyux-0s-project-vault-57",
+      "target": "signal:metraiyux-0s-project-vault-80",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:metraiyux-0s-project-vault-57",
+      "target": "signal:metraiyux-0s-project-vault-80",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:metraiyux-0s-project-vault",
-      "target": "signal:metraiyux-0s-project-vault-58",
+      "target": "signal:metraiyux-0s-project-vault-81",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:proof",
-      "target": "signal:metraiyux-0s-project-vault-58",
+      "target": "signal:metraiyux-0s-project-vault-81",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:metraiyux-0s-project-vault-58",
+      "target": "signal:metraiyux-0s-project-vault-81",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:metraiyux-0s-project-vault-58",
+      "target": "signal:metraiyux-0s-project-vault-81",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "note:metraiyux-0s-project-vault",
-      "target": "signal:metraiyux-0s-project-vault-59",
+      "target": "signal:metraiyux-0s-project-vault-82",
       "type": "signal",
       "strength": 0.9
     },
     {
       "source": "cluster:production",
-      "target": "signal:metraiyux-0s-project-vault-59",
+      "target": "signal:metraiyux-0s-project-vault-82",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:operator",
-      "target": "signal:metraiyux-0s-project-vault-59",
+      "target": "signal:metraiyux-0s-project-vault-82",
       "type": "cluster-signal",
       "strength": 0.6
     },
     {
       "source": "cluster:brain",
-      "target": "signal:metraiyux-0s-project-vault-59",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "note:live-surface-registry",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
-      "type": "signal",
-      "strength": 0.9
-    },
-    {
-      "source": "cluster:production",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:proof",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:sales",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:operator",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
-      "type": "cluster-signal",
-      "strength": 0.6
-    },
-    {
-      "source": "cluster:brain",
-      "target": "signal:live-surface-registry-skyemediacenter-free99",
+      "target": "signal:metraiyux-0s-project-vault-82",
       "type": "cluster-signal",
       "strength": 0.6
     }

@@ -55,8 +55,13 @@ function expect(condition, message) {
 }
 
 async function expectText(page, text) {
-  const found = await page.getByText(text, { exact: false }).first().isVisible().catch(() => false);
-  if (!found) throw new Error(`Missing visible text: ${text}`);
+  const matches = page.getByText(text, { exact: false });
+  const count = await matches.count().catch(() => 0);
+  for (let index = 0; index < count; index += 1) {
+    if (await matches.nth(index).isVisible().catch(() => false)) return;
+  }
+  if (!count) throw new Error(`Missing text: ${text}`);
+  throw new Error(`Missing visible text: ${text}`);
 }
 
 async function assertNoHorizontalScroll(page, label) {
@@ -73,6 +78,22 @@ async function checkPage(page, baseUrl, route, label, requiredText, screenshotNa
 
 async function seedGate(context) {
   await context.addInitScript((token) => {
+    const identity = {
+      schema: "skye0s.identity.v1",
+      identityId: "2468135790",
+      skyeId: "2468135790",
+      idNumber: "2468135790",
+      name: "E2E Skye Artist",
+      displayName: "E2E Skye Artist",
+      email: "music-e2e@metraiyux.local",
+      profileType: "artist",
+      photoDataUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/l6xGngAAAABJRU5ErkJggg==",
+      photoName: "e2e-artist.png",
+      photoType: "image/png",
+      source: "Skye-ID",
+      reason: "e2e-seed",
+      updatedAt: new Date().toISOString()
+    };
     const session = {
       token,
       source: "skyemusicnexus-e2e",
@@ -89,6 +110,8 @@ async function seedGate(context) {
       email: "music-e2e@metraiyux.local",
       status: "active"
     }));
+    localStorage.setItem("skye0s.identity.current.v1", JSON.stringify(identity));
+    localStorage.setItem("kx.onboarding.idDraft", JSON.stringify(identity));
   }, GATE_TOKEN);
 }
 
@@ -149,8 +172,14 @@ async function main() {
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault"], "artist-stage-desktop.png");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Uploaded Audio Vault", "Release Forge"], "upload-studio-desktop.png");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/releases.html", "Releases desktop", ["Artist Nebula", "Release Forge", "Royalty River", "Ops Sequencer"], "releases-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge"], "upload-studio-desktop.png");
+    const dropBox = await page.locator("[data-song-drop-zone]").boundingBox();
+    expect(dropBox && dropBox.height >= 260 && dropBox.width >= 520, `Song drop zone is not large enough: ${JSON.stringify(dropBox)}`);
+    assertions.push("Upload Studio exposes a large song drop zone with enough visual target area for desktop use.");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/releases.html", "Releases desktop", ["Artist Nebula", "Skye ID Bridge", "Release Forge", "Royalty River", "Ops Sequencer"], "releases-desktop.png");
+    expect(await page.locator('#artistForm input[name="skyeId"]').inputValue() === "2468135790", "Skye ID bridge did not populate the artist form.");
+    expect(await page.locator("#artistPhotoPreview").isVisible(), "Skye ID bridge did not render the artist photo preview.");
+    assertions.push("Skye ID bridge populates the MusicNexus artist form and renders the shared artist photo.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/rights.html", "Rights desktop", ["Rights Vault", "Takedown Hold", "No rights, no linked playback"], "rights-desktop.png");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/exchange.html", "Exchange desktop", ["Creator Exchange", "Content Request Exchange", "Achievement Orbit", "Release Campaign Forge"], "exchange-desktop.png");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/player.html", "Music player desktop", ["Stream Deck", "Uploaded Audio Vault"], "player-desktop.png");

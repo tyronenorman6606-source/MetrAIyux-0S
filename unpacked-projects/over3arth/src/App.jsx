@@ -648,8 +648,9 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const [, setGrayScapeTraveler] = useState(null);
   const [overearthBootOpen, setOverearthBootOpen] = useState(false);
   const [overearthWorldVisible, setOverearthWorldVisible] = useState(false);
+  const [aurenEnergyVisible, setAurenEnergyVisible] = useState(false);
   const [aurenCheckInActive, setAurenCheckInActive] = useState(false);
-  const [aurenConversationUntil, setAurenConversationUntil] = useState(0);
+  const [aurenConversationActive, setAurenConversationActive] = useState(false);
   const [mapDragging, setMapDragging] = useState(false);
   const [aurenBrainStatus, setAurenBrainStatus] = useState({
     ok: false,
@@ -684,6 +685,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const grayScapeRunnerClearTimerRef = useRef(null);
   const bootGreetingRef = useRef(false);
   const aurenPulseTimerRef = useRef(null);
+  const aurenPulseTokenRef = useRef(0);
   const mapPanRef = useRef({ x: 0, y: 0, scale: 1, rotate: 0 });
   const mapDragRef = useRef({ active: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originScale: 1, originRotate: 0 });
 
@@ -734,19 +736,17 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   const activeGateCoord = activeGate.coordinate || { x: 50, y: 28 };
   const activeNeuralLane = getNeuralSpaceLane(neuralLaneId);
   const activeGrayScapeModule = getGrayScapeModule(grayScapeModuleId);
-  const aurenConversationPulse = aurenConversationUntil > Date.now();
+  const aurenConversationPulse = aurenConversationActive;
   const aurenEnergyMode = aurenBusy || brainMode === 'thinking'
     ? 'thinking'
-    : brainMode === 'speaking'
+    : aurenConversationPulse
       ? 'speaking'
-      : aurenConversationPulse
-          ? 'speaking'
-          : voiceEnabled || brainMode === 'listening'
-            ? 'listening'
-            : aurenCheckInActive
-              ? 'checkin'
-              : 'idle';
-  const aurenEnergyPresence = aurenBusy || brainMode === 'speaking' || aurenConversationPulse || aurenCheckInActive
+      : voiceEnabled || brainMode === 'listening'
+        ? 'listening'
+        : aurenCheckInActive
+          ? 'checkin'
+          : 'idle';
+  const aurenEnergyPresence = aurenBusy || aurenConversationPulse || aurenCheckInActive
     ? 'emerged'
     : voiceEnabled
       ? 'awake'
@@ -775,7 +775,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
       : `Greetings, user. I am ${vesselName}. Tell me what I should call you.`;
     const greetTimer = window.setTimeout(() => {
       bootGreetingRef.current = true;
-      speakBrain(greeting, 'vessel', { audible: false });
+      speakBrain(greeting, 'vessel', { audible: false, visual: false });
     }, prefersReducedMotion() ? 80 : 680);
 
     return () => window.clearTimeout(greetTimer);
@@ -783,6 +783,19 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
 
   useEffect(() => {
     if (!overearthWorldVisible) {
+      setAurenEnergyVisible(false);
+      return undefined;
+    }
+
+    const revealTimer = window.setTimeout(() => {
+      setAurenEnergyVisible(true);
+    }, 2800);
+
+    return () => window.clearTimeout(revealTimer);
+  }, [overearthWorldVisible]);
+
+  useEffect(() => {
+    if (!aurenEnergyVisible) {
       setAurenCheckInActive(false);
       return undefined;
     }
@@ -796,13 +809,13 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
           scheduleCheckIn();
         }, 5200);
         timers.add(holdTimer);
-      }, 22000);
+      }, 46000);
       timers.add(waitTimer);
     };
 
     scheduleCheckIn();
     return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [overearthWorldVisible]);
+  }, [aurenEnergyVisible]);
 
   return (
     <section className="spectacle-scene worldskin-scene overearth-zero-scene" data-brain={brainTarget} data-voice={brainMode} data-thinking={aurenBusy ? 'true' : 'false'} data-neural-lane={neuralLaneId} data-boot={overearthWorldVisible ? 'open' : overearthBootOpen ? 'opening' : 'sealed'} aria-label="Playable Overearth universe">
@@ -851,14 +864,16 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
               }}
             >
               <Globe className="game-world-globe spectacle-globe" intensity={Math.max(1.05, stats.energy / 58)} tilt={0} radiusScale={0.48} label={`${state.profile.worldName} world charge globe`} />
-              <AurenEnergyBeing
-                className="auren-globe-being"
-                mode={aurenEnergyMode}
-                presence={aurenEnergyPresence}
-                target={brainTarget}
-                energy={worldskinCharge}
-                label={`${vesselName} energy being inside ${state.profile.worldName}`}
-              />
+              {aurenEnergyVisible ? (
+                <AurenEnergyBeing
+                  className="auren-globe-being"
+                  mode={aurenEnergyMode}
+                  presence={aurenEnergyPresence}
+                  target={brainTarget}
+                  energy={worldskinCharge}
+                  label={`${vesselName} energy being inside ${state.profile.worldName}`}
+                />
+              ) : null}
               <div className="worldskin-gate-field overearth-node-map" aria-label="Overearth world gates">
                 <div className="overearth-active-node" aria-live="polite">
                   <strong>{activeGate.worldName}</strong>
@@ -1239,7 +1254,7 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
     setLastTranscript(command);
     setBrainTarget(target);
     setBrainMode('thinking');
-    pulseAurenEmergence(5200);
+    pulseAurenEmergence(9000);
     appendBrainLog([{
       id: uid('player'),
       role: 'player',
@@ -1733,20 +1748,22 @@ function UniverseSimulation({ state, stats, forecast, anchorStats, worldInsight,
   }
 
   function pulseAurenEmergence(duration = 4200) {
-    const pulseUntil = Date.now() + duration;
-    setAurenConversationUntil((current) => Math.max(current, pulseUntil));
+    const pulseToken = aurenPulseTokenRef.current + 1;
+    aurenPulseTokenRef.current = pulseToken;
+    setAurenConversationActive(true);
     window.clearTimeout(aurenPulseTimerRef.current);
     aurenPulseTimerRef.current = window.setTimeout(() => {
-      setAurenConversationUntil((current) => (current <= pulseUntil ? 0 : current));
+      if (aurenPulseTokenRef.current !== pulseToken) return;
+      setAurenConversationActive(false);
     }, duration);
   }
 
   async function speakBrain(text, target = 'vessel', options = {}) {
-    const { log = true, audible = true } = options;
+    const { log = true, audible = true, visual = true } = options;
     setBrainTarget(target);
     setBrainLine(text);
     setBrainMode('speaking');
-    pulseAurenEmergence(audible && audioOutputEnabled ? 6200 : 4400);
+    if (visual) pulseAurenEmergence(audible && audioOutputEnabled ? 8200 : 6800);
     if (log) {
       appendBrainLog([{
         id: uid('brain'),

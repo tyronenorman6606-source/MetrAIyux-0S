@@ -1,6 +1,6 @@
 # MetrAIyux 0S ChatGPT Handoff
 
-Current as of 2026-05-17T14:44:28Z UTC.
+Current as of 2026-05-18T00:29:29Z UTC.
 
 Paste this into ChatGPT when you need it to understand the project:
 
@@ -13,10 +13,11 @@ SkyeGateFS27 is the gate layer: identity, user/dashboard actions, event proof, k
 
 Main source folders:
 - metraiyux_0s_site/: main deployable 0S site and command deck. Static pages, admin pages, SaaS/customer portal pages, local brain assets, Cloudflare Worker kits, CROWN/NEXUS/Sentinel/autonomous business layers, proof pages, calculators, sales enablement, governance, pricing, client OS, and brain JSON registries.
-- metraiyux_0s_site/brain/: browser-local knowledge layer with knowledge-base.json, obsidian-sync.json, live-surface-registry.json, persona-brains.json, site-operator-brain.json, automation-brain.json, sales-offer-registry.json, legal sync, marketplace sync, and local-brain UI/runtime files.
+- metraiyux_0s_site/brain/: browser-local knowledge layer with knowledge-base.json, obsidian-sync.json, live-surface-registry.json, persona-brains.json, site-operator-brain.json, automation-brain.json, sales-offer-registry.json, legal sync, marketplace sync, SkyeVault repo map, SkyeRunners repo map, and local-brain UI/runtime files.
 - SkyeGateFS27/: gate and SkyePay system with live gate pages, proof pages, Cloudflare Worker, SkyePay store/admin/client assets, pricing registry, runtime store, openapi spec, SQL migrations, smoke tests, and deployment scripts.
 - MCP/: local QuantumSkyes/Skye design MCP server and design tooling. It exposes pattern packs, recipes, audits, quality gates, stack gates, logo/design manifests, browser proof expectations, and production-ledger access.
 - obsidian-vault/: private operator memory. Notes with brain: true export into metraiyux_0s_site/brain/obsidian-sync.json and into the public-safe neural map. Private graph lives in obsidian-vault/_neural-map/.
+- tools/skyerunners.mjs + metraiyux_0s_site/admin/skyerunners.html: repo-local SkyeRunners worker control lane for knowledge maps, human-flow QA, repo health, SkyeVault memory, queue/ledger receipts, and operator-brain refreshes. Generated map lives at metraiyux_0s_site/brain/skyerunners.json. Operator guide: docs/SKYERUNNERS_OPERATOR_GUIDE.md.
 - client-app-factory/: client deployment engine with factory server, scan engine, app generation, proof ledger, browser proof, service worker, manifest, storage records, and API/browser smoke tests.
 - marketing/: public spectacle/marketing surfaces, MetrAIyux marketing, review wall assets, and related deployable buyer-facing pages.
 
@@ -61,6 +62,7 @@ Key live Workers:
 
 Consistent proof signals:
 - MetrAIyux production E2E was previously recorded at 71 checks, 0 failures, and 0 warnings.
+- SkyeRunners local stress proof on 2026-05-18 recorded 286 bridge/browser/queue operations with 0 failures, queue cleanup back to 0, and static SkyeCrawler proof at 647 HTML pages, 874 local refs, 14 checks, 0 failures, and 0 warnings. Tracked receipt: docs/SKYERUNNERS_STRESS_RECEIPT_2026-05-18.md. Artifacts: test-artifacts/skyerunners/stress-final-report.json and test-artifacts/skye-crawler-report.json.
 - Live proof router: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sales/live-proof-router.html
 - Live surface registry: metraiyux_0s_site/brain/live-surface-registry.json, current version 2026-05-17-live-review-intake-routing.
 - SkyeGateFS27 proof routes: https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html, /gate-map.html, and /store.
@@ -86,6 +88,11 @@ Commands:
 - npm run skye:crawl:static
 - npm run skye:crawl:live
 - npm run repo:health
+- npm run skyerunners:map
+- npm run skyerunners:control
+- npm run skyerunners:run -- knowledge-refresh
+- npm run skyerunners:run -- repo-health
+- npm run skyerunners:run -- crawler-static
 - npm run mcp:mine -- <target-folder>
 - npm run mcp:skyesol
 

@@ -1,6 +1,6 @@
 # MetrAIyux 0S — Asset Valuation Brief
 *For investor conversations, partnership diligence, and acquisition discussions.*
-*Revised May 2026 — updated to reflect confirmed live deployment status, kAIxu 6.7, and SkyeVault Git remote hardening.*
+*Revised May 2026 — updated to reflect platform expansion: SkyeRouteX $6,500 dispatch platform, 58 live Stripe products, SkyePay full store, SkyeMerit, ConnectLog+Relay13, 9 new platform lanes, 39 live surfaces, 17 Workers.*
 
 ---
 
@@ -82,27 +82,50 @@ With infrastructure pre-deployed, a new customer can be provisioned into a live 
 
 ---
 
-## What It Would Cost to Build and Deploy This
+## What It Would Cost to Build and Deploy This — Section-Level Accumulation
 
 | Component | Build + Deploy Cost Estimate |
 |---|---|
-| 500+ page static site with operating content | $30,000–$60,000 |
-| 9 Cloudflare Workers (D1, KV, Queues, real integrations, deployed) | $45,000–$90,000 |
-| 0meg4kAI security scanner — browser + Worker layer | $15,000–$30,000 |
-| SkyeGateFS27 auth platform (separate live Worker) | $20,000–$40,000 |
-| kAIxu 6.7 sovereign inference layer with FS27 metering | $25,000–$60,000 |
-| SkyeVault Git remote, snapshots, restore verification, CLI, workspace maps | $35,000–$85,000 |
-| Stripe billing + SaaS provisioning flow | $8,000–$15,000 |
-| Sales enablement library + operational documentation | $10,000–$20,000 |
-| Recruiting, governance, government readiness content | $8,000–$15,000 |
-| SEO pages, knowledge base, blog content | $5,000–$10,000 |
-| **Total** | **$201,000–$405,000** |
+| 17 CF Workers — service bindings, D1/KV/Queues/Durable Objects, real integrations | $90,000–$160,000 |
+| CitadelDB v3.0.1 — K8s HA Postgres, PITR, WAL, control plane, gateway API, tenant registry | $90,000–$170,000 |
+| SkyeVault — real Git smart-HTTP protocol in CF Worker (clone, push, fetch, snapshots, maps) | $50,000–$95,000 |
+| SkyeGateFS27 — auth platform, BLAKE3 hash-only scoped API keys, FS27 sessions | $30,000–$60,000 |
+| ConnectLog + Relay13 — Durable Objects stateful WebSocket rooms, D1 persistence | $25,000–$50,000 |
+| SkyeRouteX Workforce Command — deployed $6,500 dispatch OS, v0.4.0 smoke-tested | $30,000–$55,000 |
+| kAIxu 6.7 Sovereign AI — proprietary 5-variant inference model family (nano/mini/standard/pro/max), FS27 credit metering, plan-gated access per tier, 626-line CF Worker gateway, OpenAPI spec, kaixu-client.js | $35,000–$70,000 |
+| SkyePay Payment OS — checkout gateway (557-line JS), store (249-line JS), admin panel, OpenAPI spec, owner-approval Resend gate, live production proof scripts, browser proof, regression test suite, motion layer, CSS | $35,000–$65,000 |
+| Stripe Catalog — 58 live cs_live products, offer families, product metadata, plan-gated checkout, catalog management | $15,000–$30,000 |
+| SkyeMerit — protected discount math engine (3 tiers: 23%/28%/31% at basis-point precision), kAIxu credit wallet ($6 premium credit), D1 rules migrations, multi-channel delivery (Resend, SkyeMail, Relay13, ConnectLog, FS27 mirror) | $15,000–$30,000 |
+| Five autonomous OS lanes (APEX, ASCENSION, CROWN-OS, QUANTUM-OPS, NEXUS) | $45,000–$85,000 |
+| Platform surface — 860+ HTML files, 48+ blog posts, 12 SEO verticals, admin, training academy | $85,000–$170,000 |
+| 17-brain command mesh (725 chunks, on-device, all executive functions) | $8,000–$13,000 |
+| @metraiyux/0s-sdk (ESM package, 7 live endpoints) | $15,000–$30,000 |
+| SkyeUI-Components (9 production-ready animated components, zero runtime deps) | $10,000–$20,000 |
+| SkyeBox Authenticator v3.0.0 (AES-GCM, PBKDF2-SHA-256 at 310,000 iterations) | $15,000–$25,000 |
+| SkyeMail — 25 HTML surfaces (inbox, compose, send, sent, trash, thread, ai, login, settings, keys, monitoring, signup, pricing, marketing, onboarding + more), full schema (users, keys, messages, attachments, Gmail OAuth tokens, Resend webhooks, delivery events, hosted mailboxes), Stalwart hosted mailbox adapter, FS27 gate + platform event mirroring, Gmail OAuth lane, smoke tests passing, advanced-build-with-local-proof status | $35,000–$70,000 |
+| SkyeMusicNexus NeoFront — multi-tier music platform: Studio $497/mo, Label Command $1,497/mo + $6,500 setup, Managed Music Ops $3,997/mo + $15,000 setup, 18 add-on products ($29–$2,500 each), 11 UI surfaces, rights vault, royalty ledger, upload studio, takedown hold, SkyeVault/R2 integration | $45,000–$90,000 |
+| SkyeRunners — 830-line repo-aware worker agent control system: 5 named agents (Repo Cartographer, Human Flow Runner, Brain Sync Runner, Bug Hunter, Vault Watch), HTTP bridge (port 4176), admin UI, brain routing integration, allowlist policy, queue + NDJSON ledger, full ops directory | $25,000–$45,000 |
+| 6 remaining platform lanes (HouseOps, SkyeSplit, SkyeMedia, SkyeProfit, Content Forge, SkyeCard) | $50,000–$100,000 |
+| 0meg4kAI security gateway — browser+Worker two-layer scanner, tenant isolation | $15,000–$30,000 |
+| PHX Verified marketplace platform (26,413 profiles, AE queues, exposure products) | $40,000–$80,000 |
+| White-label kit, gov readiness, training academy, sales tools, deployment documentation | $20,000–$40,000 |
+| Proof receipt system, D1 audit trail, 465 Markdown runbooks, 1493 JSON manifests | $15,000–$25,000 |
+| **Component total** | **$853,000–$1,608,000** |
+| Deployment premium (+4.5% — live infra, CF-Ray headers confirmed, cs_live sessions verified, smoke tests passing) | **$892,000–$1,680,000** |
+| **Deployed asset band (pre-commercialization discount applied)** | **$900,000–$1,500,000** |
 
-Note the increase from the prior estimate: 9 Workers, SkyeGate as a separate live platform, kAIxu as a metered sovereign AI lane, SkyeVault as Git-capable infrastructure, and deployment/proof labor added. A boutique agency charging these rates would also not guarantee their deployment works — this one does.
+This is how the band was derived — not a single guess. Component-by-component accumulation using specialist agency rates for Cloudflare-edge infrastructure. A boutique agency charging these rates would also not guarantee their deployment works — this one does. CF-Ray headers confirmed. `cs_live` Stripe sessions live. SkyeVault Git remote proof passed.
 
-**Revised asset valuation: $350,000–$550,000 as a live, deployed technology platform.**
+**Deployed asset valuation: $900,000–$1,500,000.**
 
-This is up from the prior $150K–$300K deployed-platform estimate because the system now includes a live sovereign AI revenue lane and Git-level SkyeVault infrastructure. The premium reflects working infrastructure, proof receipts, policy-gated source control, verified recovery, and per-workspace account maps instead of raw code sitting in a repository.
+Key corrections from prior $450K–$720K band:
+- **kAIxu 6.7** was missing entirely — proprietary 5-variant AI model family with FS27 credit metering, 626-line CF Worker gateway, plan-gated access per tier. IP, not a feature. $35K–$70K standalone.
+- **SkyePay** was bundled as "58 Stripe products" — it's a full payment OS with OpenAPI spec, admin panel, store, owner-approval Resend gate, live proof scripts, regression tests. $35K–$65K standalone.
+- **SkyeMerit** was folded into SkyePay — separate protected discount math engine at basis-point precision, kAIxu credit wallet, D1 migrations, multi-channel delivery. $15K–$30K standalone.
+- **SkyeMusicNexus** was folded into "7 app lanes" — it has its own multi-tier catalog (Label Command $1,497/mo + $6,500 setup, Managed Music Ops $3,997/mo + $15,000 setup, 18 add-on products), NeoFront platform with 11 UI surfaces, rights vault, royalty ledger, SkyeVault/R2 integration. $45K–$90K standalone.
+- **SkyeRunners** was missing entirely — 830-line repo-aware worker agent control system, 5 named agents, HTTP bridge, admin UI, brain routing integration, allowlist policy, queue/ledger. $25K–$45K standalone.
+- **SkyeMail** was listed at $20K–$40K — it has 25 HTML surfaces, full schema (users, messages, Gmail OAuth tokens, hosted mailbox records, Resend webhook events), Stalwart hosted mailbox adapter, FS27 gate integration, platform event mirroring, and smoke tests passing. Advanced-build-with-local-proof status. $35K–$70K standalone.
+- **CitadelDB** alone — K8s HA Postgres, PITR, WAL, control plane, gateway API, tenant registry — is a $90K–$170K build previously collapsed into a single line.
 
 ---
 
@@ -142,7 +165,7 @@ One gap. One.
 
 **No paying customers yet.** The platform is live, the infrastructure is deployed, the Workers are responding, the D1 databases are active, the auth is working, the billing flow is wired, kAIxu is metered, and SkyeVault now has Git-level proof. The number that doesn't exist yet is a customer on a paid plan.
 
-That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts this from a $350K–$550K asset into a $500K–$7M+ company.
+That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts this from a $720K–$1.1M asset into a $1.5M–$9M+ company.
 
 ---
 

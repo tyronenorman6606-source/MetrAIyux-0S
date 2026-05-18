@@ -6,6 +6,7 @@ import { resolveAuth, lookupKeyById } from "./_lib/authz.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceDevice } from "./_lib/devices.js";
 import { enforceUsagePreflight } from "./_lib/usageGates.js";
+import { resolveStoredPlatformUsageContext } from "./_lib/platformUsage.js";
 
 // NOTE: This is a Netlify Background Function.
 // Naming rule: must include "-background" in filename (Netlify docs).
@@ -91,6 +92,7 @@ export default async (req) => {
   const install_id = (telemetry.install_id || "").toString().trim().slice(0, 80) || null;
   const ip_hash = (telemetry.ip_hash || "").toString().trim().slice(0, 128) || null;
   const ua = (telemetry.ua || "").toString().trim().slice(0, 240) || null;
+  const platformUsage = resolveStoredPlatformUsageContext({ keyRow, meta, request, defaultLane: "ai-job" });
 
   const requested_provider = String(request.requested_provider || job.provider || request.provider || "").trim();
   const requested_model = String(request.requested_model || job.model || request.model || "").trim();
@@ -123,7 +125,7 @@ export default async (req) => {
 
   // Usage gate (cost is unknown until after completion; daily calls and current caps are hard-blocked here)
   const month = monthKeyUTC();
-  const preflight = await enforceUsagePreflight({ keyRow, month });
+  const preflight = await enforceUsagePreflight({ keyRow, month, platformId: platformUsage.platformId });
   if (!preflight.ok) {
     await q(
       `update async_jobs set status='failed', completed_at=now(), heartbeat_at=now(), error=$2 where id=$1`,
@@ -137,7 +139,7 @@ export default async (req) => {
     if (provider === "openai") result = await callOpenAI({ model, messages, max_tokens, temperature });
     else if (provider === "anthropic") result = await callAnthropic({ model, messages, max_tokens, temperature });
     else if (provider === "gemini") result = await callGemini({ model, messages, max_tokens, temperature });
-    else throw new Error("Unknown provider");
+    else throw new Error("Unknown Skyes Over London lane");
 
     const output_text = result.output_text || "";
     const input_tokens = result.input_tokens || 0;
@@ -151,7 +153,12 @@ export default async (req) => {
       requested_provider,
       requested_model,
       effective_provider: provider,
-      effective_model: model
+      effective_model: model,
+      platform: {
+        platform_id: platformUsage.platformId,
+        usage_lane: platformUsage.usageLane,
+        dedicated_bucket: platformUsage.dedicatedBucket
+      }
     };
 
     await q(
@@ -165,9 +172,9 @@ export default async (req) => {
     const month = monthKeyUTC();
 
     await q(
-      `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-      [job.customer_id, job.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua]
+      `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platform_id, usage_lane)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+      [job.customer_id, job.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platformUsage.platformId, platformUsage.usageLane]
     );
 
     await q(

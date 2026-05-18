@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus — Platform Dashboard</title>
+  <title>SkyeMusicNexus - Platform Dashboard</title>
   <meta name="description" content="SkyeMusicNexus platform dashboard for upload, player, releases, rights, exchange, and operations." />
   <link rel="stylesheet" href="./neo-nexus.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
   <script defer src="./neo-nexus.js"></script>
 </head>
 <body data-app="skye-music-nexus" data-mode="artist">
@@ -17,10 +19,10 @@
   <div class="aurora aurora-two" aria-hidden="true"></div>
 
   <header class="nexus-topline">
-    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><span class="sigil-orbit"></span><span class="sigil-note">♬</span></a>
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/platform-mark.svg" alt="" /></a>
     <div class="top-title">
       <p class="micro">SkyeMusicNexus // Platform Dashboard</p>
-      <h1>Run the music platform in rooms, not one crowded wall.</h1>
+      <h1>Release-ready artist platform with gated upload, playback, rights, and exchange.</h1>
     </div>
     <div class="session-rack">
       <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
@@ -37,16 +39,18 @@
     <a href="./releases.html">Releases</a>
     <a href="./rights.html">Rights</a>
     <a href="./exchange.html">Exchange</a>
+    <a href="./create.html">Create</a>
     <a href="./admin.html">Operator</a>
   </nav>
 
   <main class="nexus-shell">
     <section class="hero-stage panel-xl platform-hero">
       <div class="hero-copy">
-        <p class="eyebrow">upload · player · release ops · rights · exchange</p>
-        <h2>Artists get a real command platform: upload the song, gate the rights, play the preview, build the release, request the content.</h2>
-        <p class="lede">Lite stays Free99 and gated. Paid drops, Studio, Label Command, and Managed Music Ops sit on top once the artist needs more capacity.</p>
+        <p class="eyebrow">upload / player / release ops / rights / exchange</p>
+        <h2>Release-ready artist platform.</h2>
+        <p class="lede">Artists upload the song, gate the rights, play the preview, build the release, request the content, and move inside one authenticated music room.</p>
         <div class="hero-actions">
+          <a class="primary button-link" href="./create.html">Create Studio</a>
           <a class="primary button-link" href="./upload.html">Upload Audio</a>
           <a class="secondary button-link" href="./player.html">Open Player</a>
           <a class="ghost button-link" href="./rights.html">Rights Vault</a>
@@ -60,10 +64,10 @@
         <div class="core-label"><span>SKYE</span><strong>NEXUS</strong><small>PLATFORM</small></div>
       </div>
       <div class="hero-meters">
-        <article><span id="meterArtists">—</span><small>artists</small></article>
-        <article><span id="meterReleases">—</span><small>releases</small></article>
-        <article><span id="meterStreams">—</span><small>streams</small></article>
-        <article><span id="assetCount">—</span><small>uploads</small></article>
+        <article><span id="meterArtists">0</span><small>artists</small></article>
+        <article><span id="meterReleases">0</span><small>releases</small></article>
+        <article><span id="meterStreams">0</span><small>streams</small></article>
+        <article><span id="assetCount">0</span><small>uploads</small></article>
       </div>
     </section>
 

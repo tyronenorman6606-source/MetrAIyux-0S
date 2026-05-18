@@ -1,9 +1,9 @@
 window.METRAIYUX_OBSIDIAN_GRAPH = {
-  "generated_at": "2026-05-17T14:47:07.494Z",
+  "generated_at": "2026-05-18T00:43:16.672Z",
   "vault": "obsidian-vault",
-  "node_count": 74,
-  "link_count": 113,
-  "notes": 15,
+  "node_count": 125,
+  "link_count": 181,
+  "notes": 16,
   "nodes": [
     {
       "id": "note:00-command-center/0S Command Runner.md",
@@ -62,6 +62,22 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
         "metraiyux",
         "actions",
         "operator"
+      ]
+    },
+    {
+      "id": "note:00-command-center/SkyeRunners.md",
+      "label": "SkyeRunners",
+      "type": "note",
+      "group": "command",
+      "brain": true,
+      "path": "obsidian-vault/00-command-center/SkyeRunners.md",
+      "size": 16,
+      "tags": [
+        "metraiyux",
+        "skyerunners",
+        "operator",
+        "brain",
+        "qa"
       ]
     },
     {
@@ -411,6 +427,33 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       ]
     },
     {
+      "id": "source:metraiyux-0s-site-admin-skyerunners-html",
+      "label": "admin/skyerunners.html",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/admin/skyerunners.html",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-brain-skyerunners-json",
+      "label": "brain/skyerunners.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/brain/skyerunners.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:tools-skyerunners-mjs",
+      "label": "tools/skyerunners.mjs",
+      "type": "source",
+      "group": "source",
+      "path": "tools/skyerunners.mjs",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "source:test-artifacts-live-deployment-ledger",
       "label": "live-deployment-ledger/",
       "type": "source",
@@ -428,6 +471,90 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": [
         "actions"
       ]
+    },
+    {
+      "id": "tag:skyerunners",
+      "label": "#skyerunners",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "skyerunners"
+      ]
+    },
+    {
+      "id": "tag:brain",
+      "label": "#brain",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "brain"
+      ]
+    },
+    {
+      "id": "tag:qa",
+      "label": "#qa",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "qa"
+      ]
+    },
+    {
+      "id": "source:ops-skyerunners",
+      "label": "skyerunners/",
+      "type": "source",
+      "group": "source",
+      "path": "ops/skyerunners/",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyerunners-knowledge-map-json",
+      "label": "skyerunners/knowledge-map.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyerunners/knowledge-map.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:docs-skyerunners-operator-guide-md",
+      "label": "docs/SKYERUNNERS_OPERATOR_GUIDE.md",
+      "type": "source",
+      "group": "source",
+      "path": "docs/SKYERUNNERS_OPERATOR_GUIDE.md",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:docs-skyerunners-stress-receipt-2026-05-18-md",
+      "label": "docs/SKYERUNNERS_STRESS_RECEIPT_2026-05-18.md",
+      "type": "source",
+      "group": "source",
+      "path": "docs/SKYERUNNERS_STRESS_RECEIPT_2026-05-18.md",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skyerunners-stress-final-report-json",
+      "label": "skyerunners/stress-final-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skyerunners/stress-final-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skye-crawler-report-json",
+      "label": "test-artifacts/skye-crawler-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skye-crawler-report.json",
+      "size": 10,
+      "tags": []
     },
     {
       "id": "tag:neural-map",
@@ -487,6 +614,15 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       ]
     },
     {
+      "id": "source:test-artifacts-stripe-sync-metraiyux-stripe-sync-receipt-json",
+      "label": "stripe-sync/metraiyux-stripe-sync-receipt.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "source:test-artifacts-live-deployment-ledger-cloudflare-inventory-json",
       "label": "live-deployment-ledger/cloudflare-inventory.json",
       "type": "source",
@@ -505,11 +641,353 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
+      "id": "source:test-artifacts-live-deployment-ledger-netlify-public-root-checks-json",
+      "label": "live-deployment-ledger/netlify-public-root-checks.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/live-deployment-ledger/netlify-public-root-checks.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-live-deployment-ledger-operator-provided-deployments-checks-json",
+      "label": "live-deployment-ledger/operator-provided-deployments-checks.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/live-deployment-ledger/operator-provided-deployments-checks.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-live-deployment-ledger-operator-provided-deployments-unified-json",
+      "label": "live-deployment-ledger/operator-provided-deployments-unified.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/live-deployment-ledger/operator-provided-deployments-unified.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-live-deployment-ledger-operator-public-live-only-json",
+      "label": "live-deployment-ledger/operator-public-live-only.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/live-deployment-ledger/operator-public-live-only.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-live-only-prod-browser-qa-json",
+      "label": "ledger-live-only-prod/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-live-only-prod/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-live-only-prod-recheck-all-visible-links-browser-json",
+      "label": "ledger-live-only-prod-recheck/all-visible-links-browser.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-live-only-prod-recheck/all-visible-links-browser.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-hero-fix-prod-browser-qa-json",
+      "label": "ledger-hero-fix-prod/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-hero-fix-prod/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-orbit-fix-prod-browser-qa-json",
+      "label": "ledger-orbit-fix-prod/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-orbit-fix-prod/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-orbit-fix-prod-desktop-1440x1000-png",
+      "label": "ledger-orbit-fix-prod/desktop-1440x1000.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-orbit-fix-prod/desktop-1440x1000.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-orbit-fix-prod-mobile-390x844-orbit-png",
+      "label": "ledger-orbit-fix-prod/mobile-390x844-orbit.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-orbit-fix-prod/mobile-390x844-orbit.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-operator-vault-link-fix-browser-qa-json",
+      "label": "operator-vault-link-fix/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/operator-vault-link-fix/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-operator-vault-link-fix-operator-top-vault-click-png",
+      "label": "operator-vault-link-fix/operator-top-vault-click.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/operator-vault-link-fix/operator-top-vault-click.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-portal-brand-copy-fix-browser-qa-json",
+      "label": "portal-brand-copy-fix/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/portal-brand-copy-fix/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-portal-brand-copy-fix-portal-png",
+      "label": "portal-brand-copy-fix/portal.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/portal-brand-copy-fix/portal.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-stripe-sync-prod-browser-qa-json",
+      "label": "ledger-stripe-sync-prod/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-stripe-sync-prod/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-stripe-sync-prod-desktop-1440x1000-png",
+      "label": "ledger-stripe-sync-prod/desktop-1440x1000.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-stripe-sync-prod/desktop-1440x1000.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-stripe-sync-prod-mobile-390x844-png",
+      "label": "ledger-stripe-sync-prod/mobile-390x844.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-stripe-sync-prod/mobile-390x844.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-stripe-sync-prod-0s-live-postdeploy-check-json",
+      "label": "ledger-stripe-sync-prod/0s-live-postdeploy-check.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-stripe-sync-prod/0s-live-postdeploy-check.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-stress-connectlog-relay13-skyepay-live-stress-report-json",
+      "label": "connectlog-relay13-skyepay-live/stress-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/stress/connectlog-relay13-skyepay-live/stress-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-connectlog-production-infra-copy-2026-05-17t20-00-53-608z-browser-qa-json",
+      "label": "2026-05-17T20-00-53-608Z/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/connectlog-production-infra-copy/2026-05-17T20-00-53-608Z/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-connectlog-public-copy-fix-browser-qa-json",
+      "label": "connectlog-public-copy-fix/browser-qa.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/connectlog-public-copy-fix/browser-qa.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-connectlog-public-copy-fix-connectlog-app-deployment-section-png",
+      "label": "connectlog-public-copy-fix/connectlog-app-deployment-section.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/connectlog-public-copy-fix/connectlog-app-deployment-section.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-skyeroutex-workforce-command-v0-4-0-proof-stress-concurrency-2026-05-17t19-06-19-103z-json",
+      "label": "proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-stripe-sync-metraiyux-stripe-live-checkout-proof-json",
+      "label": "stripe-sync/metraiyux-stripe-live-checkout-proof.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/stripe-sync/metraiyux-stripe-live-checkout-proof.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-connectlog-relay13-production-proof-json",
+      "label": "test-artifacts/connectlog-relay13-production-proof.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/connectlog-relay13-production-proof.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-connectlog-relay13-e2e-report-json",
+      "label": "test-artifacts/connectlog-relay13-e2e-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/connectlog-relay13-e2e-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "source:test-artifacts-skyes-over-london-reviews-three-atlas-cloudflare-production-atlas-png",
       "label": "skyes-over-london-reviews-three-atlas/cloudflare-production-atlas.png",
       "type": "source",
       "group": "source",
       "path": "test-artifacts/skyes-over-london-reviews-three-atlas/cloudflare-production-atlas.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-live-portal-deployment-ledger-png",
+      "label": "ledger-live/portal-deployment-ledger.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-live/portal-deployment-ledger.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-ledger-live-portal-deployment-ledger-worker-refresh-png",
+      "label": "ledger-live/portal-deployment-ledger-worker-refresh.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/ledger-live/portal-deployment-ledger-worker-refresh.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-pricing-fix-production-postdeploy-pricing-png",
+      "label": "pricing-fix/production-postdeploy-pricing.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/pricing-fix/production-postdeploy-pricing.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-pricing-fix-production-mobile-growth-card-png",
+      "label": "pricing-fix/production-mobile-growth-card.png",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/pricing-fix/production-mobile-growth-card.png",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-business-insights-browser-qa-report-json",
+      "label": "valley-verified-business-insights/browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-business-insights/browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-business-insights-deploy-folder-browser-qa-report-json",
+      "label": "valley-verified-business-insights/deploy-folder-browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-business-insights/deploy-folder-browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-business-insights-prod-production-browser-qa-report-json",
+      "label": "valley-verified-business-insights-prod/production-browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-business-insights-prod/production-browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-business-insights-prod-deployment-atlas-phx-insights-check-json",
+      "label": "valley-verified-business-insights-prod/deployment-atlas-phx-insights-check.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-business-insights-prod/deployment-atlas-phx-insights-check.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-longform-local-browser-qa-report-json",
+      "label": "valley-verified-longform-local/browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-longform-local/browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-longform-deploy-folder-browser-qa-report-json",
+      "label": "valley-verified-longform-deploy-folder/browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-longform-deploy-folder/browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-longform-prod-production-browser-qa-report-json",
+      "label": "valley-verified-longform-prod/production-browser-qa-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-longform-prod/production-browser-qa-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-valley-verified-longform-prod-deployment-atlas-longform-proof-json",
+      "label": "valley-verified-longform-prod/deployment-atlas-longform-proof.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/valley-verified-longform-prod/deployment-atlas-longform-proof.json",
       "size": 10,
       "tags": []
     },
@@ -588,16 +1066,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "size": 13,
       "tags": [
         "receipts"
-      ]
-    },
-    {
-      "id": "tag:qa",
-      "label": "#qa",
-      "type": "tag",
-      "group": "tag",
-      "size": 13,
-      "tags": [
-        "qa"
       ]
     },
     {
@@ -938,6 +1406,24 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "note:00-command-center/Current Production State.md",
+      "target": "source:metraiyux-0s-site-admin-skyerunners-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Current Production State.md",
+      "target": "source:metraiyux-0s-site-brain-skyerunners-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Current Production State.md",
+      "target": "source:tools-skyerunners-mjs",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Current Production State.md",
       "target": "source:test-artifacts-live-e2e-metraiyux",
       "type": "source",
       "strength": 0.8
@@ -980,6 +1466,102 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "hub:metraiyux",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:command",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:metraiyux",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyerunners",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:operator",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:brain",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:qa",
+      "target": "note:00-command-center/SkyeRunners.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:metraiyux-0s-site-admin-skyerunners-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:metraiyux-0s-site-brain-skyerunners-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:tools-skyerunners-mjs",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:ops-skyerunners",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:test-artifacts-skyerunners-knowledge-map-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:docs-skyerunners-operator-guide-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:docs-skyerunners-stress-receipt-2026-05-18-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:test-artifacts-skyerunners-stress-final-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:test-artifacts-skye-crawler-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
       "target": "note:00-command-center/Vault Neural Map.md",
       "type": "vault",
       "strength": 1
@@ -1011,6 +1593,12 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:00-command-center/Vault Neural Map.md",
       "target": "source:obsidian-vault-neural-map-index-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Vault Neural Map.md",
+      "target": "source:metraiyux-0s-site-brain-skyerunners-json",
       "type": "source",
       "strength": 0.8
     },
@@ -1058,6 +1646,12 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-stripe-sync-metraiyux-stripe-sync-receipt-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
       "target": "source:test-artifacts-live-deployment-ledger-cloudflare-inventory-json",
       "type": "source",
       "strength": 0.8
@@ -1070,7 +1664,235 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-live-deployment-ledger-netlify-public-root-checks-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-live-deployment-ledger-operator-provided-deployments-checks-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-live-deployment-ledger-operator-provided-deployments-unified-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-live-deployment-ledger-operator-public-live-only-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-live-only-prod-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-live-only-prod-recheck-all-visible-links-browser-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-hero-fix-prod-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-orbit-fix-prod-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-orbit-fix-prod-desktop-1440x1000-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-orbit-fix-prod-mobile-390x844-orbit-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-operator-vault-link-fix-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-operator-vault-link-fix-operator-top-vault-click-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-portal-brand-copy-fix-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-portal-brand-copy-fix-portal-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-stripe-sync-prod-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-stripe-sync-prod-desktop-1440x1000-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-stripe-sync-prod-mobile-390x844-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-stripe-sync-prod-0s-live-postdeploy-check-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-stress-connectlog-relay13-skyepay-live-stress-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-connectlog-production-infra-copy-2026-05-17t20-00-53-608z-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-connectlog-public-copy-fix-browser-qa-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-connectlog-public-copy-fix-connectlog-app-deployment-section-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:metraiyux-0s-site-skyeroutex-workforce-command-v0-4-0-proof-stress-concurrency-2026-05-17t19-06-19-103z-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-stripe-sync-metraiyux-stripe-live-checkout-proof-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-connectlog-relay13-production-proof-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-connectlog-relay13-e2e-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
       "target": "source:test-artifacts-skyes-over-london-reviews-three-atlas-cloudflare-production-atlas-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-live-portal-deployment-ledger-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-ledger-live-portal-deployment-ledger-worker-refresh-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-pricing-fix-production-postdeploy-pricing-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-pricing-fix-production-mobile-growth-card-png",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-business-insights-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-business-insights-deploy-folder-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-business-insights-prod-production-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-business-insights-prod-deployment-atlas-phx-insights-check-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-longform-local-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-longform-deploy-folder-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-longform-prod-production-browser-qa-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/CEO Live Deployment Ledger.md",
+      "target": "source:test-artifacts-valley-verified-longform-prod-deployment-atlas-longform-proof-json",
       "type": "source",
       "strength": 0.8
     },
@@ -1113,6 +1935,36 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:10-production/Live Surface Registry.md",
       "target": "source:obsidian-vault-10-production-ceo",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/Live Surface Registry.md",
+      "target": "source:test-artifacts-stripe-sync-metraiyux-stripe-sync-receipt-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/Live Surface Registry.md",
+      "target": "source:test-artifacts-stripe-sync-metraiyux-stripe-live-checkout-proof-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/Live Surface Registry.md",
+      "target": "source:test-artifacts-stress-connectlog-relay13-skyepay-live-stress-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/Live Surface Registry.md",
+      "target": "source:metraiyux-0s-site-skyeroutex-workforce-command-v0-4-0-proof-stress-concurrency-2026-05-17t19-06-19-103z-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:10-production/Live Surface Registry.md",
+      "target": "source:test-artifacts-connectlog-production-infra-copy-2026-05-17t20-00-53-608z-browser-qa-json",
       "type": "source",
       "strength": 0.8
     },
@@ -1179,6 +2031,30 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:20-proof/Proof Ledger.md",
       "target": "source:test-artifacts-live-e2e-metraiyux",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Proof Ledger.md",
+      "target": "source:docs-skyerunners-stress-receipt-2026-05-18-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Proof Ledger.md",
+      "target": "source:metraiyux-0s-site-brain-skyerunners-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Proof Ledger.md",
+      "target": "source:test-artifacts-skyerunners-stress-final-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Proof Ledger.md",
+      "target": "source:test-artifacts-skye-crawler-report-json",
       "type": "source",
       "strength": 0.8
     },

@@ -18,6 +18,10 @@
       "href": "./public/index.html"
     },
     {
+      "label": "Create Studio",
+      "href": "./public/create.html"
+    },
+    {
       "label": "Upload Studio",
       "href": "./public/upload.html"
     },
@@ -52,9 +56,15 @@
   ],
   "modules": [
     "Platform Dashboard",
+    "Open Source Creation Studio",
+    "openDAW Bridge",
+    "Stem Staging Ledger",
+    "Export Manifest Queue",
     "Upload Studio",
+    "Large Song Drop Zone",
     "Gated Audio Vault",
     "Music Player",
+    "Skye ID Bridge",
     "Artist Nebula",
     "Release Forge",
     "Royalty River",
@@ -78,6 +88,7 @@
     "name": "NeoFront Music Nexus",
     "primaryFiles": [
       "public/index.html",
+      "public/create.html",
       "public/upload.html",
       "public/player.html",
       "public/releases.html",
@@ -90,9 +101,21 @@
     "principle": "roomed platform surface over crowded single-page app cards",
     "assetFunction": "netlify/functions/music-assets.js",
     "assetStorage": "local proof by default; SkyeVault/Cloudflare R2 when MUSIC_NEXUS_STORAGE_BACKEND=r2 or MUSIC_NEXUS_USE_R2=1 is configured",
+    "directUpload": "gated create-upload-session and complete-upload actions activate when MUSIC_NEXUS_ENABLE_DIRECT_UPLOAD=1",
+    "providerHooks": "netlify/functions/music-provider-hooks.js queues transcoding, waveform, CDN, DSP, legal, and royalty jobs until webhook env is configured",
+    "studioFunction": "netlify/functions/music-studio.js",
     "exchangeFunction": "netlify/functions/music-exchange.js",
     "exchangeCapabilities": [
+      "open-source creation session ledger",
+      "openDAW external bridge",
+      "local stem and master staging",
+      "sample pack rail",
+      "export manifest queue",
+      "Release Forge handoff line",
       "gated audio upload",
+      "large drag/drop song upload target",
+      "Skye-ID artist identity handoff",
+      "artist profile photo persistence",
       "uploaded audio stream URLs",
       "content requests",
       "Relay13-ready inbox threads",

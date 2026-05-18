@@ -294,6 +294,46 @@
     let dragRaf = 0;
     let pendingDrag = null;
     let metrics = null;
+    let dragScrollRestore = null;
+
+    function setScrollTopInstant(source, top){
+      const nextTop = Math.max(0, top);
+      if(
+        source === window ||
+        source === document.scrollingElement ||
+        source === document.documentElement ||
+        source === document.body
+      ){
+        window.scrollTo({ top: nextTop, left: window.scrollX, behavior: 'auto' });
+        document.documentElement.scrollTop = nextTop;
+        document.body.scrollTop = nextTop;
+        return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+      }
+      source.scrollTop = nextTop;
+      return source.scrollTop;
+    }
+
+    function beginDragMode(){
+      if(!dragScrollRestore){
+        dragScrollRestore = {
+          html: document.documentElement.style.scrollBehavior,
+          body: document.body?.style.scrollBehavior || ''
+        };
+      }
+      document.documentElement.style.scrollBehavior = 'auto';
+      if(document.body) document.body.style.scrollBehavior = 'auto';
+      document.documentElement.classList.add('mcp-neon-scroll-dragging');
+      document.body?.classList.add('mcp-neon-scroll-dragging');
+    }
+
+    function endDragMode(){
+      document.documentElement.classList.remove('mcp-neon-scroll-dragging');
+      document.body?.classList.remove('mcp-neon-scroll-dragging');
+      if(!dragScrollRestore) return;
+      document.documentElement.style.scrollBehavior = dragScrollRestore.html;
+      if(document.body) document.body.style.scrollBehavior = dragScrollRestore.body;
+      dragScrollRestore = null;
+    }
 
     function measure(){
       const ySource = verticalSource();
@@ -345,16 +385,16 @@
       const bounded = clamp(ratio, 0, 1);
 
       if(axis === 'y'){
-        next.ySource.scrollTop = bounded * next.yMax;
-        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        const yTop = setScrollTopInstant(next.ySource, bounded * next.yMax);
+        const yRatio = clamp(yTop / Math.max(1, next.yMax), 0, 1);
         paintRails({
           ...next,
           yRatio,
           xRatio: next.pageMode ? yRatio : next.xRatio
         });
       }else if(next.pageMode){
-        next.ySource.scrollTop = bounded * next.yMax;
-        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        const yTop = setScrollTopInstant(next.ySource, bounded * next.yMax);
+        const yRatio = clamp(yTop / Math.max(1, next.yMax), 0, 1);
         paintRails({
           ...next,
           yRatio,
@@ -398,7 +438,7 @@
         railStart = axis === 'y' ? railRect.top : railRect.left;
         track = axis === 'y' ? dragSnapshot.yTrack : dragSnapshot.xTrack;
         size = axis === 'y' ? dragSnapshot.ySize : dragSnapshot.xSize;
-        document.documentElement.classList.add('mcp-neon-scroll-dragging');
+        beginDragMode();
         rail.classList.add('is-dragging');
         rail.setPointerCapture?.(event.pointerId);
         pointerOffset = event.target === thumb || thumb.contains(event.target)
@@ -417,7 +457,7 @@
         if(!dragging) return;
         dragging = false;
         dragSnapshot = null;
-        document.documentElement.classList.remove('mcp-neon-scroll-dragging');
+        endDragMode();
         rail.classList.remove('is-dragging');
         rail.releasePointerCapture?.(event.pointerId);
         scheduleUpdate();
@@ -425,6 +465,8 @@
 
       rail.addEventListener('pointerup', endDrag);
       rail.addEventListener('pointercancel', endDrag);
+      document.addEventListener('pointerup', endDrag);
+      document.addEventListener('pointercancel', endDrag);
     }
 
     bindRail(yRail, yThumb, 'y', (ratio, snapshot) => queueDrag('y', ratio, snapshot));

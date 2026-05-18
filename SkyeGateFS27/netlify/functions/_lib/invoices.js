@@ -61,6 +61,20 @@ export async function computeInvoiceSnapshot(customer_id, month) {
     [customer_id, month]
   );
 
+  const platformRes = await q(
+    `select coalesce(platform_id, 'metraiyux-0s') as platform_id,
+            coalesce(usage_lane, 'ai') as usage_lane,
+            count(*)::int as calls,
+            coalesce(sum(cost_cents),0)::int as cost_cents,
+            coalesce(sum(input_tokens),0)::int as input_tokens,
+            coalesce(sum(output_tokens),0)::int as output_tokens
+     from usage_events
+     where customer_id=$1 and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
+     group by coalesce(platform_id, 'metraiyux-0s'), coalesce(usage_lane, 'ai')
+     order by cost_cents desc, calls desc`,
+    [customer_id, month]
+  );
+
   // --- KaixuPush charges (deploy pushes) ---
   let push = null;
   try {
@@ -150,6 +164,7 @@ export async function computeInvoiceSnapshot(customer_id, month) {
     },
     keys: kRes.rows || [],
     providers: pRes.rows || [],
+    platforms: platformRes.rows || [],
     topups: tRes.rows || [],
     auto_topup: {
       enabled: !!customer.auto_topup_enabled,

@@ -1,0 +1,20 @@
+{
+  "status": "active-runtime-proof",
+  "checkedAt": "2026-05-10",
+  "fullSkyeWebCreatorDeliveryRuntime": true,
+  "fullRuntime": true,
+  "mode": "same-folder local delivery runtime",
+  "smokeCommand": "npm run verify:runtime",
+  "proves": [
+    "local runtime starts and responds to health",
+    "delivery packs can be created from source snapshots",
+    "review, execution, dispatch, and workflow timeline endpoints persist state",
+    "runtime store records audit events",
+    "index UI exposes runtime board controls and status counts"
+  ],
+  "doesNotClaim": [
+    "live deployment",
+    "external provider execution",
+    "downstream AE service write-through"
+  ]
+}

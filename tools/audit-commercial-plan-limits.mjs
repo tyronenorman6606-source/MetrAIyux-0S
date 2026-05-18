@@ -32,6 +32,7 @@ const htmlRequiredTokens = {
     "$3,997",
     "$15,000",
     "SkyeProfitConsole",
+    "Skye Split Engine",
     "Free99",
     "gate session required",
     "SkyeRoutexFlow v0.4.0",
@@ -46,6 +47,7 @@ const htmlRequiredTokens = {
     "data-plan=\"routex-workforce-command\"",
     "data-plan=\"autonomous-office\"",
     "SkyeProfitConsole",
+    "Skye Split Engine",
     "Free99",
     "gate session required",
     "25,000 AI credits/mo",
@@ -65,7 +67,8 @@ const htmlRequiredTokens = {
     "90 rpm",
     "120 rpm",
     "180 rpm",
-    "Confirmed Stripe payment records paid status"
+    "Confirmed Stripe payment records paid status",
+    "Skye Split Engine"
   ],
   "saas/signup.html": [
     "$1,500 setup",
@@ -73,7 +76,8 @@ const htmlRequiredTokens = {
     "$6,500 setup",
     "$7,500 setup",
     "$15,000 setup",
-    "Signup intent does not start billing"
+    "Signup intent does not start billing",
+    "Skye Split Engine"
   ]
 };
 

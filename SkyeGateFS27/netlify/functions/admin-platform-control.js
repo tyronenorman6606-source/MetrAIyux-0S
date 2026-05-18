@@ -80,6 +80,30 @@ const PLATFORM_CATALOG = [
     launch_url: null
   },
   {
+    app_id: "marketing-made-easy",
+    title: "Marketing Made Easy",
+    description: "0S growth-suite lane for AE activation, brand identity, launch packs, document editing, web creation, growth operations, Arizona intelligence, and kAIxU brand kits.",
+    visibility: "client-admin",
+    storage_mode: "0s-suite-plus-fs27-event-mirror",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/index.html"
+  },
+  {
+    app_id: "marketing-made-easy-webcreator",
+    title: "SkyeWebCreatorMax",
+    description: "Marketing Made Easy web-creation room for briefs, templates, previews, delivery packs, and review/execution/dispatch runtime proof.",
+    visibility: "client-admin",
+    storage_mode: "same-folder-local-runtime-plus-gate-handoff",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/SkyeWebCreatorMax/index.html"
+  },
+  {
+    app_id: "marketing-made-easy-growth-ops",
+    title: "WebGrowthOperator",
+    description: "Public managed growth-operations site with service pages, proof/trust pages, AE command, client portal, and blog library.",
+    visibility: "public-client",
+    storage_mode: "static-site-plus-intake-boundary",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/WebGrowthOperator/index.html"
+  },
+  {
     app_id: "citadeldb-sovereign",
     title: "CitadelDB",
     description: "Sovereign database lane that can replace Neon for owners who want the database under their stack.",
@@ -133,6 +157,9 @@ function summarizePlatform(platform, ops) {
   if (platform.app_id === "skyehands-runtime-control") return "Runtime shell can target SkyeGateFS27 through aliased env vars and mirror audit events upward.";
   if (platform.app_id === "0s-auth-sdk") return "Client-side compatibility lane points at gate login but still needs fuller runtime/env adoption.";
   if (platform.app_id === "skymail-standalone") return "Mailboxes, key events, approval-sensitive sends, and mailbox provisioning should mirror into FS27.";
+  if (platform.app_id === "marketing-made-easy") return "Growth-suite activity can mirror scan, AE handoff, brand, launch, document, web-creation, market-intelligence, and kAIxU brand events into FS27 when configured.";
+  if (platform.app_id === "marketing-made-easy-webcreator") return "SkyeWebCreatorMax can hand off delivery packs through the gate; production generation or external writes require separate provider proof.";
+  if (platform.app_id === "marketing-made-easy-growth-ops") return "WebGrowthOperator is public growth copy and intake routing; pricing and checkout claims must stay aligned to approved SkyePay catalog entries.";
   return platform.description;
 }
 

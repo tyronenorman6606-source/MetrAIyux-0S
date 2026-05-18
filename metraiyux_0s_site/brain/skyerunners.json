@@ -1,0 +1,1694 @@
+{
+  "id": "skyerunners-repo-agent-map",
+  "name": "SkyeRunners",
+  "version": "0.1.0",
+  "generated_at": "2026-05-18T01:58:19.802Z",
+  "source": "tools/skyerunners.mjs",
+  "exposure": "admin/operator brain map; no secrets, no raw env values",
+  "summary": {
+    "total_files": 7986,
+    "tracked_files": 6029,
+    "untracked_files": 1967,
+    "package_scripts": 80,
+    "operator_commands": 22,
+    "obsidian_notes": 11,
+    "obsidian_chunks": 82,
+    "base_knowledge_chunks": 733,
+    "live_surfaces": 54,
+    "skyevault_repos": 1,
+    "skyevault_receipts": 3
+  },
+  "resource_policy": {
+    "mode": "operator-directed-full-proof",
+    "plain_english": "SkyeRunners are allowed to run complete local proof and repo-awareness passes when the operator asks. Paid API use, production deploys, billing changes, credential changes, and irreversible actions still require explicit operator approval.",
+    "spend_position": "No tiny arbitrary local QA cap; spend-bearing or production-mutating work is approval-gated and ledgered before it happens.",
+    "hard_boundaries": [
+      "Only commands in this SkyeRunners allowlist can run through the local bridge.",
+      "External provider spend is not triggered by this bridge by default.",
+      "Production deploy, billing, credential, legal, hiring, payment, or customer-impacting actions must be routed through owner approval.",
+      "Runner receipts must name the command, target, exit code, artifact path, and follow-up bug notes."
+    ]
+  },
+  "runners": [
+    {
+      "id": "skyerunner-cartographer",
+      "name": "Repo Cartographer",
+      "lane": "knowledge",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "victor-saint-brain",
+      "mission": "Keep the repo inventory, brain map, command map, proof map, and surface map current.",
+      "uses": [
+        "git inventory",
+        "package scripts",
+        "0S command registry",
+        "brain JSON",
+        "SkyeVault map",
+        "crawler receipts"
+      ],
+      "default_command": "map"
+    },
+    {
+      "id": "skyerunner-human-flow",
+      "name": "Human Flow Runner",
+      "lane": "browser-qa",
+      "primary_brain": "victor-saint-brain",
+      "secondary_brain": "site-operator-brain",
+      "mission": "Use public, admin, operator, and app surfaces like a human would, then report breakage before customers find it.",
+      "uses": [
+        "SkyeCrawler",
+        "Playwright browser sweeps",
+        "mobile layout checks",
+        "proof artifacts"
+      ],
+      "default_command": "crawler-static"
+    },
+    {
+      "id": "skyerunner-brain-sync",
+      "name": "Brain Sync Runner",
+      "lane": "knowledge",
+      "primary_brain": "site-operator-brain",
+      "secondary_brain": "central-company-command-brain",
+      "mission": "Refresh Obsidian exports, private neural maps, public-safe neural maps, and SkyeRunners brain chunks after repo changes.",
+      "uses": [
+        "Obsidian sync",
+        "private graph",
+        "public graph",
+        "SkyeRunners map"
+      ],
+      "default_command": "knowledge-refresh"
+    },
+    {
+      "id": "skyerunner-bug-hunter",
+      "name": "Bug Hunter",
+      "lane": "repo-qa",
+      "primary_brain": "victor-saint-brain",
+      "secondary_brain": "0meg4kai-security-brain",
+      "mission": "Run health checks, inspect dirty-state risk, compare receipts, and surface likely defects or missing proof.",
+      "uses": [
+        "repo health",
+        "static crawler",
+        "ledger checks",
+        "tracked secret-risk scan"
+      ],
+      "default_command": "repo-health"
+    },
+    {
+      "id": "skyerunner-vault-watch",
+      "name": "Vault Watch",
+      "lane": "repo-memory",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "0meg4kai-security-brain",
+      "mission": "Keep SkyeVault repo/change memory attached to the 0S brain without exposing workspace secrets.",
+      "uses": [
+        "SkyeVault 0S bridge",
+        "workspace maps",
+        "vault ledgers"
+      ],
+      "default_command": "vault-map"
+    }
+  ],
+  "commands": [
+    {
+      "id": "map",
+      "title": "Build SkyeRunners Repo Knowledge Map",
+      "lane": "knowledge",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Writes metraiyux_0s_site/brain/skyerunners.json and test-artifacts/skyerunners/knowledge-map.json.",
+      "steps": [
+        "Build SkyeRunners map"
+      ]
+    },
+    {
+      "id": "knowledge-refresh",
+      "title": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+      "lane": "knowledge",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Refreshes Obsidian brain export, private graph, public graph, and SkyeRunners repo map.",
+      "steps": [
+        "Sync Obsidian brain",
+        "Generate private Obsidian neural map",
+        "Generate public-safe neural map",
+        "Bridge SkyeVault map",
+        "Build SkyeRunners map"
+      ]
+    },
+    {
+      "id": "repo-health",
+      "title": "Run Repo Health Check",
+      "lane": "repo-qa",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Runs the repo health checker and records the result in the SkyeRunners ledger.",
+      "steps": [
+        "Repo health"
+      ]
+    },
+    {
+      "id": "crawler-static",
+      "title": "Run Static SkyeCrawler Human-Flow QA",
+      "lane": "browser-qa",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Runs static browser QA and writes the SkyeCrawler report under test-artifacts.",
+      "steps": [
+        "Static SkyeCrawler"
+      ]
+    },
+    {
+      "id": "crawler-live",
+      "title": "Run Live SkyeCrawler QA",
+      "lane": "browser-qa",
+      "risk": "medium",
+      "spend_profile": "network-read-only",
+      "result": "Runs live HTTP/browser checks against the configured production URL.",
+      "steps": [
+        "Live SkyeCrawler"
+      ]
+    },
+    {
+      "id": "vault-map",
+      "title": "Refresh SkyeVault 0S Neural Bridge",
+      "lane": "repo-memory",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Refreshes metraiyux_0s_site/brain/skyevault-vault-map.json.",
+      "steps": [
+        "SkyeVault 0S map"
+      ]
+    },
+    {
+      "id": "mcp-mine-0s",
+      "title": "Mine Repo MCP Receipt For 0S Site",
+      "lane": "mcp",
+      "risk": "low",
+      "spend_profile": "local-only",
+      "result": "Runs the repo-local QuantumSkyes MCP mining flow for metraiyux_0s_site.",
+      "steps": [
+        "MCP mine metraiyux_0s_site"
+      ]
+    }
+  ],
+  "operator_controls": {
+    "local_bridge_url": "http://127.0.0.1:4176",
+    "admin_page": "metraiyux_0s_site/admin/skyerunners.html",
+    "operator_page": "metraiyux_0s_site/operator/index.html",
+    "queue_dir": "ops/skyerunners/queue",
+    "ledger_path": "ops/skyerunners/ledger.ndjson"
+  },
+  "knowledge_map": {
+    "top_folders": [
+      {
+        "folder": "metraiyux_0s_site",
+        "files": 4643,
+        "untracked": 1934
+      },
+      {
+        "folder": "marketing",
+        "files": 1677,
+        "untracked": 5
+      },
+      {
+        "folder": "SkyeGateFS27",
+        "files": 385,
+        "untracked": 4
+      },
+      {
+        "folder": "MCP",
+        "files": 283,
+        "untracked": 3
+      },
+      {
+        "folder": "unpacked-projects",
+        "files": 261,
+        "untracked": 2
+      },
+      {
+        "folder": "Skye-Clients",
+        "files": 149,
+        "untracked": 0
+      },
+      {
+        "folder": "unpacked-zips",
+        "files": 135,
+        "untracked": 0
+      },
+      {
+        "folder": "SkyeVault-Drop",
+        "files": 77,
+        "untracked": 0
+      },
+      {
+        "folder": "client-app-factory",
+        "files": 71,
+        "untracked": 0
+      },
+      {
+        "folder": "legalskyes-website",
+        "files": 51,
+        "untracked": 0
+      },
+      {
+        "folder": "tools",
+        "files": 40,
+        "untracked": 4
+      },
+      {
+        "folder": "neon-rift-blocks-mobile-v13-site",
+        "files": 39,
+        "untracked": 0
+      },
+      {
+        "folder": "skyehands_runtime_control",
+        "files": 33,
+        "untracked": 8
+      },
+      {
+        "folder": "metraiyux-portal",
+        "files": 31,
+        "untracked": 0
+      },
+      {
+        "folder": "mcp_design_reference",
+        "files": 28,
+        "untracked": 0
+      },
+      {
+        "folder": "obsidian-vault",
+        "files": 23,
+        "untracked": 1
+      },
+      {
+        "folder": "(root)",
+        "files": 19,
+        "untracked": 1
+      },
+      {
+        "folder": "skyesol_spectacle_reference",
+        "files": 14,
+        "untracked": 0
+      },
+      {
+        "folder": "docs",
+        "files": 9,
+        "untracked": 2
+      },
+      {
+        "folder": "deploy",
+        "files": 5,
+        "untracked": 0
+      },
+      {
+        "folder": "ops",
+        "files": 5,
+        "untracked": 3
+      },
+      {
+        "folder": "Dynasty-Versions",
+        "files": 2,
+        "untracked": 0
+      },
+      {
+        "folder": "proof-recipes",
+        "files": 2,
+        "untracked": 0
+      },
+      {
+        "folder": "scripts",
+        "files": 2,
+        "untracked": 0
+      },
+      {
+        "folder": "Metraiyux-Marketing",
+        "files": 1,
+        "untracked": 0
+      },
+      {
+        "folder": "registry",
+        "files": 1,
+        "untracked": 0
+      }
+    ],
+    "extensions": [
+      {
+        "extension": ".json",
+        "count": 2368
+      },
+      {
+        "extension": ".html",
+        "count": 1918
+      },
+      {
+        "extension": ".md",
+        "count": 713
+      },
+      {
+        "extension": ".js",
+        "count": 696
+      },
+      {
+        "extension": ".png",
+        "count": 477
+      },
+      {
+        "extension": ".txt",
+        "count": 414
+      },
+      {
+        "extension": ".mjs",
+        "count": 324
+      },
+      {
+        "extension": "(none)",
+        "count": 139
+      },
+      {
+        "extension": ".sh",
+        "count": 117
+      },
+      {
+        "extension": ".css",
+        "count": 107
+      },
+      {
+        "extension": ".tsx",
+        "count": 105
+      },
+      {
+        "extension": ".jpg",
+        "count": 105
+      },
+      {
+        "extension": ".ts",
+        "count": 80
+      },
+      {
+        "extension": ".sql",
+        "count": 57
+      },
+      {
+        "extension": ".svg",
+        "count": 42
+      },
+      {
+        "extension": ".toml",
+        "count": 40
+      },
+      {
+        "extension": ".csv",
+        "count": 23
+      },
+      {
+        "extension": ".scssc",
+        "count": 20
+      },
+      {
+        "extension": ".mp4",
+        "count": 18
+      },
+      {
+        "extension": ".xml",
+        "count": 18
+      },
+      {
+        "extension": ".mdx",
+        "count": 17
+      },
+      {
+        "extension": ".example",
+        "count": 16
+      },
+      {
+        "extension": ".webmanifest",
+        "count": 15
+      },
+      {
+        "extension": ".jsx",
+        "count": 15
+      },
+      {
+        "extension": ".yml",
+        "count": 13
+      },
+      {
+        "extension": ".webp",
+        "count": 13
+      },
+      {
+        "extension": ".webm",
+        "count": 12
+      },
+      {
+        "extension": ".nix",
+        "count": 12
+      },
+      {
+        "extension": ".yaml",
+        "count": 10
+      },
+      {
+        "extension": ".service",
+        "count": 8
+      },
+      {
+        "extension": ".ttf",
+        "count": 7
+      },
+      {
+        "extension": ".py",
+        "count": 7
+      },
+      {
+        "extension": ".pyc",
+        "count": 5
+      },
+      {
+        "extension": ".wav",
+        "count": 5
+      },
+      {
+        "extension": ".scss",
+        "count": 5
+      },
+      {
+        "extension": ".ico",
+        "count": 4
+      },
+      {
+        "extension": ".timer",
+        "count": 4
+      },
+      {
+        "extension": ".tmp",
+        "count": 4
+      },
+      {
+        "extension": ".jpeg",
+        "count": 3
+      },
+      {
+        "extension": ".conf",
+        "count": 3
+      }
+    ],
+    "surfaces": [
+      {
+        "surface": "0s-site",
+        "count": 4643
+      },
+      {
+        "surface": "live",
+        "count": 1192
+      },
+      {
+        "surface": "skygate-fs27",
+        "count": 385
+      },
+      {
+        "surface": "mcp",
+        "count": 283
+      },
+      {
+        "surface": "client-app-factory",
+        "count": 71
+      },
+      {
+        "surface": "admin",
+        "count": 71
+      },
+      {
+        "surface": "tools",
+        "count": 40
+      },
+      {
+        "surface": "brain",
+        "count": 36
+      },
+      {
+        "surface": "proof",
+        "count": 34
+      },
+      {
+        "surface": "portal",
+        "count": 31
+      },
+      {
+        "surface": "obsidian-vault",
+        "count": 23
+      },
+      {
+        "surface": "operator",
+        "count": 10
+      },
+      {
+        "surface": "docs",
+        "count": 9
+      },
+      {
+        "surface": "ops",
+        "count": 5
+      }
+    ],
+    "html_count": 1918,
+    "script_count": 1220,
+    "brain_file_count": 59,
+    "sample_html": [
+      "MCP/skye-design-lab/dist/index.html",
+      "MCP/skye-design-lab/index.html",
+      "Metraiyux-Marketing/proof.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog/cigars-tobacco-hookah-basics.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog/exotic-snacks-smoke-shop-feature.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog/glass-vape-products-guide.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog/index.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/blog/smoke-shop-shopping-guide-litchfield-park.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/cbd-products.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/cigars.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/electronic-devices.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/exotic-snacks.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/glass.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/hookah.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/pipes.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/tobacco.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/categories/vapes.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/contact.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/delivery.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/faq.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/flyer.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/gallery.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/index.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/inventory.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/live-site-upgrades/source-html/about.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/live-site-upgrades/source-html/blog.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/live-site-upgrades/source-html/contact.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/live-site-upgrades/source-html/home.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/local-seo.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/specials.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/workspace-preview.html",
+      "Skye-Clients/bobs-smoke-shop-mcp-redo/workspace-preview/index.html",
+      "Skye-Clients/empire-pallets-v3-app/about.html",
+      "Skye-Clients/empire-pallets-v3-app/contact.html",
+      "Skye-Clients/empire-pallets-v3-app/custom-pallets.html",
+      "Skye-Clients/empire-pallets-v3-app/delivery.html",
+      "Skye-Clients/empire-pallets-v3-app/drop-trailer.html",
+      "Skye-Clients/empire-pallets-v3-app/faq.html",
+      "Skye-Clients/empire-pallets-v3-app/flyer.html"
+    ],
+    "sample_scripts": [
+      "MCP/design/patterns/adaptive-neon-scrollbar/adaptive-neon-scrollbar.js",
+      "MCP/design/patterns/app-first-command-center/AppFirstCommandCenter.tsx",
+      "MCP/design/patterns/cinematic-command-hero/CinematicCommandHero.tsx",
+      "MCP/design/patterns/editorial-proof-atlas/EditorialProofAtlas.tsx",
+      "MCP/design/patterns/kinetic-process-funnel/KineticProcessFunnel.tsx",
+      "MCP/design/patterns/neon-motion-chrome/NeonMotionChrome.tsx",
+      "MCP/design/patterns/scroll-proof-funnel/ScrollProofFunnel.tsx",
+      "MCP/design/patterns/skyesol-living-background/skyesol-living-background.js",
+      "MCP/design/patterns/spatial-product-lab/SpatialProductLab.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/blog/[slug]/metadata.ts",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/blog/[slug]/opengraph-image.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/blog/[slug]/page.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/layout.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/metadata.ts",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/not-found.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/opengraph-image.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/app/page.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/ads-placeholder.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/author-card.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/blog-card.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/copy-header.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/footer.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/hash-scroll-handler.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/magicui/flickering-grid.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/media-viewer.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/mobile-toc.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/promo-content.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/read-more-section.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/site-nav.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/skye-mcp-chrome.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/table-of-contents.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/tag-filter.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/theme-provider.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/theme-toggle.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/ui/accordion.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/ui/button.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/components/ui/drawer.tsx",
+      "MCP/magicuidesign-blog-template-bc0cb81/eslint.config.mjs",
+      "MCP/magicuidesign-blog-template-bc0cb81/lib/authors.ts",
+      "MCP/magicuidesign-blog-template-bc0cb81/lib/site.ts"
+    ]
+  },
+  "current_state": {
+    "git": {
+      "branch": "main",
+      "commit": "4767c66",
+      "status": {
+        "modified": 107,
+        "deleted": 0,
+        "untracked": 75,
+        "total": 182
+      }
+    },
+    "reports": {
+      "static": {
+        "exists": true,
+        "path": "test-artifacts/skye-crawler-report.json",
+        "ok": true,
+        "checks": 14,
+        "failures": 0,
+        "warnings": 0,
+        "started_at": "2026-05-18T00:24:11.951Z",
+        "finished_at": "2026-05-18T00:28:04.923Z",
+        "checkpoint": {
+          "stage": "screenshot artifacts captured",
+          "at": "2026-05-18T00:28:04.848Z"
+        }
+      },
+      "worker": {
+        "exists": false,
+        "path": "test-artifacts/skye-crawler-worker-report.json"
+      },
+      "live": {
+        "exists": false,
+        "path": "test-artifacts/skye-crawler-live-report.json"
+      }
+    },
+    "queue": {
+      "total": 0,
+      "latest": []
+    },
+    "ledger_count": 100,
+    "latest_ledger": [
+      {
+        "event": "task.queued",
+        "at": "2026-05-18T00:29:20.399Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": "skr_1779064160399_6483cc92",
+        "mission": "final stress task 36",
+        "error": null
+      },
+      {
+        "event": "task.queued",
+        "at": "2026-05-18T00:29:20.400Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": "skr_1779064160400_c4876c73",
+        "mission": "final stress task 37",
+        "error": null
+      },
+      {
+        "event": "task.queued",
+        "at": "2026-05-18T00:29:20.401Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": "skr_1779064160401_3cc4f562",
+        "mission": "final stress task 38",
+        "error": null
+      },
+      {
+        "event": "task.queued",
+        "at": "2026-05-18T00:29:20.402Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": "skr_1779064160402_54b1ef10",
+        "mission": "final stress task 39",
+        "error": null
+      },
+      {
+        "event": "task.queued",
+        "at": "2026-05-18T00:29:20.405Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": "skr_1779064160402_fc6c5a31",
+        "mission": "final stress task 40",
+        "error": null
+      },
+      {
+        "event": "map.generated",
+        "at": "2026-05-18T00:29:29.591Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": "metraiyux_0s_site/brain/skyerunners.json",
+        "artifact": "test-artifacts/skyerunners/knowledge-map.json",
+        "total_files": 7500,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "run.started",
+        "at": "2026-05-18T00:41:42.125Z",
+        "command_id": "knowledge-refresh",
+        "status": "running",
+        "title": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "map.generated",
+        "at": "2026-05-18T00:41:43.645Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": "metraiyux_0s_site/brain/skyerunners.json",
+        "artifact": "test-artifacts/skyerunners/knowledge-map.json",
+        "total_files": 7973,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "run.finished",
+        "at": "2026-05-18T00:41:43.645Z",
+        "command_id": "knowledge-refresh",
+        "status": "passed",
+        "title": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "run.started",
+        "at": "2026-05-18T00:43:15.381Z",
+        "command_id": "knowledge-refresh",
+        "status": "running",
+        "title": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "map.generated",
+        "at": "2026-05-18T00:43:19.885Z",
+        "command_id": null,
+        "status": null,
+        "title": null,
+        "path": "metraiyux_0s_site/brain/skyerunners.json",
+        "artifact": "test-artifacts/skyerunners/knowledge-map.json",
+        "total_files": 7974,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      },
+      {
+        "event": "run.finished",
+        "at": "2026-05-18T00:43:19.887Z",
+        "command_id": "knowledge-refresh",
+        "status": "passed",
+        "title": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+        "path": null,
+        "artifact": null,
+        "total_files": null,
+        "task_id": null,
+        "mission": null,
+        "error": null
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "skyerunners:hub",
+      "label": "SkyeRunners",
+      "type": "hub",
+      "group": "runner",
+      "size": 30
+    },
+    {
+      "id": "brain:local",
+      "label": "0S Local Brain",
+      "type": "brain",
+      "group": "brain",
+      "size": 22
+    },
+    {
+      "id": "admin:control",
+      "label": "Admin Control",
+      "type": "admin",
+      "group": "admin",
+      "size": 20,
+      "path": "metraiyux_0s_site/admin/skyerunners.html"
+    },
+    {
+      "id": "ops:state",
+      "label": "ops/skyerunners",
+      "type": "state",
+      "group": "ops",
+      "size": 18,
+      "path": "ops/skyerunners"
+    },
+    {
+      "id": "runner:skyerunner-cartographer",
+      "label": "Repo Cartographer",
+      "type": "runner",
+      "group": "knowledge",
+      "size": 18,
+      "summary": "Keep the repo inventory, brain map, command map, proof map, and surface map current."
+    },
+    {
+      "id": "runner:skyerunner-human-flow",
+      "label": "Human Flow Runner",
+      "type": "runner",
+      "group": "browser-qa",
+      "size": 18,
+      "summary": "Use public, admin, operator, and app surfaces like a human would, then report breakage before customers find it."
+    },
+    {
+      "id": "runner:skyerunner-brain-sync",
+      "label": "Brain Sync Runner",
+      "type": "runner",
+      "group": "knowledge",
+      "size": 18,
+      "summary": "Refresh Obsidian exports, private neural maps, public-safe neural maps, and SkyeRunners brain chunks after repo changes."
+    },
+    {
+      "id": "runner:skyerunner-bug-hunter",
+      "label": "Bug Hunter",
+      "type": "runner",
+      "group": "repo-qa",
+      "size": 18,
+      "summary": "Run health checks, inspect dirty-state risk, compare receipts, and surface likely defects or missing proof."
+    },
+    {
+      "id": "runner:skyerunner-vault-watch",
+      "label": "Vault Watch",
+      "type": "runner",
+      "group": "repo-memory",
+      "size": 18,
+      "summary": "Keep SkyeVault repo/change memory attached to the 0S brain without exposing workspace secrets."
+    },
+    {
+      "id": "command:map",
+      "label": "Build SkyeRunners Repo Knowledge Map",
+      "type": "command",
+      "group": "knowledge",
+      "size": 14,
+      "summary": "Writes metraiyux_0s_site/brain/skyerunners.json and test-artifacts/skyerunners/knowledge-map.json."
+    },
+    {
+      "id": "command:knowledge-refresh",
+      "label": "Refresh Brain, Neural Maps, and SkyeRunners Map",
+      "type": "command",
+      "group": "knowledge",
+      "size": 14,
+      "summary": "Refreshes Obsidian brain export, private graph, public graph, and SkyeRunners repo map."
+    },
+    {
+      "id": "command:repo-health",
+      "label": "Run Repo Health Check",
+      "type": "command",
+      "group": "repo-qa",
+      "size": 14,
+      "summary": "Runs the repo health checker and records the result in the SkyeRunners ledger."
+    },
+    {
+      "id": "command:crawler-static",
+      "label": "Run Static SkyeCrawler Human-Flow QA",
+      "type": "command",
+      "group": "browser-qa",
+      "size": 14,
+      "summary": "Runs static browser QA and writes the SkyeCrawler report under test-artifacts."
+    },
+    {
+      "id": "command:crawler-live",
+      "label": "Run Live SkyeCrawler QA",
+      "type": "command",
+      "group": "browser-qa",
+      "size": 14,
+      "summary": "Runs live HTTP/browser checks against the configured production URL."
+    },
+    {
+      "id": "command:vault-map",
+      "label": "Refresh SkyeVault 0S Neural Bridge",
+      "type": "command",
+      "group": "repo-memory",
+      "size": 14,
+      "summary": "Refreshes metraiyux_0s_site/brain/skyevault-vault-map.json."
+    },
+    {
+      "id": "command:mcp-mine-0s",
+      "label": "Mine Repo MCP Receipt For 0S Site",
+      "type": "command",
+      "group": "mcp",
+      "size": 14,
+      "summary": "Runs the repo-local QuantumSkyes MCP mining flow for metraiyux_0s_site."
+    },
+    {
+      "id": "folder:metraiyux_0s_site",
+      "label": "metraiyux_0s_site",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "4643 files"
+    },
+    {
+      "id": "folder:marketing",
+      "label": "marketing",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "1677 files"
+    },
+    {
+      "id": "folder:SkyeGateFS27",
+      "label": "SkyeGateFS27",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "385 files"
+    },
+    {
+      "id": "folder:MCP",
+      "label": "MCP",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "283 files"
+    },
+    {
+      "id": "folder:unpacked-projects",
+      "label": "unpacked-projects",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "261 files"
+    },
+    {
+      "id": "folder:Skye-Clients",
+      "label": "Skye-Clients",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "149 files"
+    },
+    {
+      "id": "folder:unpacked-zips",
+      "label": "unpacked-zips",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "135 files"
+    },
+    {
+      "id": "folder:SkyeVault-Drop",
+      "label": "SkyeVault-Drop",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "77 files"
+    },
+    {
+      "id": "folder:client-app-factory",
+      "label": "client-app-factory",
+      "type": "folder",
+      "group": "repo",
+      "size": 26,
+      "summary": "71 files"
+    },
+    {
+      "id": "folder:legalskyes-website",
+      "label": "legalskyes-website",
+      "type": "folder",
+      "group": "repo",
+      "size": 25.101319154423276,
+      "summary": "51 files"
+    },
+    {
+      "id": "folder:tools",
+      "label": "tools",
+      "type": "folder",
+      "group": "repo",
+      "size": 24.07265601385425,
+      "summary": "40 files"
+    },
+    {
+      "id": "folder:neon-rift-blocks-mobile-v13-site",
+      "label": "neon-rift-blocks-mobile-v13-site",
+      "type": "folder",
+      "group": "repo",
+      "size": 23.96578428466209,
+      "summary": "39 files"
+    },
+    {
+      "id": "folder:skyehands_runtime_control",
+      "label": "skyehands_runtime_control",
+      "type": "folder",
+      "group": "repo",
+      "size": 23.262388523751017,
+      "summary": "33 files"
+    },
+    {
+      "id": "folder:metraiyux-portal",
+      "label": "metraiyux-portal",
+      "type": "folder",
+      "group": "repo",
+      "size": 23,
+      "summary": "31 files"
+    },
+    {
+      "id": "folder:mcp_design_reference",
+      "label": "mcp_design_reference",
+      "type": "folder",
+      "group": "repo",
+      "size": 22.573942985382715,
+      "summary": "28 files"
+    },
+    {
+      "id": "folder:obsidian-vault",
+      "label": "obsidian-vault",
+      "type": "folder",
+      "group": "repo",
+      "size": 21.75488750216347,
+      "summary": "23 files"
+    },
+    {
+      "id": "folder:(root)",
+      "label": "(root)",
+      "type": "folder",
+      "group": "repo",
+      "size": 20.96578428466209,
+      "summary": "19 files"
+    },
+    {
+      "id": "folder:skyesol_spectacle_reference",
+      "label": "skyesol_spectacle_reference",
+      "type": "folder",
+      "group": "repo",
+      "size": 19.720671786825555,
+      "summary": "14 files"
+    },
+    {
+      "id": "folder:docs",
+      "label": "docs",
+      "type": "folder",
+      "group": "repo",
+      "size": 17.965784284662085,
+      "summary": "9 files"
+    },
+    {
+      "id": "folder:deploy",
+      "label": "deploy",
+      "type": "folder",
+      "group": "repo",
+      "size": 15.754887502163468,
+      "summary": "5 files"
+    },
+    {
+      "id": "folder:ops",
+      "label": "ops",
+      "type": "folder",
+      "group": "repo",
+      "size": 15.754887502163468,
+      "summary": "5 files"
+    },
+    {
+      "id": "folder:Dynasty-Versions",
+      "label": "Dynasty-Versions",
+      "type": "folder",
+      "group": "repo",
+      "size": 12.754887502163468,
+      "summary": "2 files"
+    },
+    {
+      "id": "folder:proof-recipes",
+      "label": "proof-recipes",
+      "type": "folder",
+      "group": "repo",
+      "size": 12.754887502163468,
+      "summary": "2 files"
+    },
+    {
+      "id": "folder:scripts",
+      "label": "scripts",
+      "type": "folder",
+      "group": "repo",
+      "size": 12.754887502163468,
+      "summary": "2 files"
+    },
+    {
+      "id": "folder:Metraiyux-Marketing",
+      "label": "Metraiyux-Marketing",
+      "type": "folder",
+      "group": "repo",
+      "size": 11,
+      "summary": "1 files"
+    },
+    {
+      "id": "folder:registry",
+      "label": "registry",
+      "type": "folder",
+      "group": "repo",
+      "size": 11,
+      "summary": "1 files"
+    },
+    {
+      "id": "surface:0s-site",
+      "label": "0s-site",
+      "type": "surface",
+      "group": "0s-site",
+      "size": 20,
+      "summary": "4643 files"
+    },
+    {
+      "id": "surface:live",
+      "label": "live",
+      "type": "surface",
+      "group": "live",
+      "size": 20,
+      "summary": "1192 files"
+    },
+    {
+      "id": "surface:skygate-fs27",
+      "label": "skygate-fs27",
+      "type": "surface",
+      "group": "skygate-fs27",
+      "size": 20,
+      "summary": "385 files"
+    },
+    {
+      "id": "surface:mcp",
+      "label": "mcp",
+      "type": "surface",
+      "group": "mcp",
+      "size": 20,
+      "summary": "283 files"
+    },
+    {
+      "id": "surface:client-app-factory",
+      "label": "client-app-factory",
+      "type": "surface",
+      "group": "client-app-factory",
+      "size": 20,
+      "summary": "71 files"
+    },
+    {
+      "id": "surface:admin",
+      "label": "admin",
+      "type": "surface",
+      "group": "admin",
+      "size": 20,
+      "summary": "71 files"
+    },
+    {
+      "id": "surface:tools",
+      "label": "tools",
+      "type": "surface",
+      "group": "tools",
+      "size": 20,
+      "summary": "40 files"
+    },
+    {
+      "id": "surface:brain",
+      "label": "brain",
+      "type": "surface",
+      "group": "brain",
+      "size": 20,
+      "summary": "36 files"
+    },
+    {
+      "id": "surface:proof",
+      "label": "proof",
+      "type": "surface",
+      "group": "proof",
+      "size": 20,
+      "summary": "34 files"
+    },
+    {
+      "id": "surface:portal",
+      "label": "portal",
+      "type": "surface",
+      "group": "portal",
+      "size": 20,
+      "summary": "31 files"
+    },
+    {
+      "id": "surface:obsidian-vault",
+      "label": "obsidian-vault",
+      "type": "surface",
+      "group": "obsidian-vault",
+      "size": 19.169925001442312,
+      "summary": "23 files"
+    },
+    {
+      "id": "surface:operator",
+      "label": "operator",
+      "type": "surface",
+      "group": "operator",
+      "size": 16.918863237274593,
+      "summary": "10 files"
+    },
+    {
+      "id": "surface:docs",
+      "label": "docs",
+      "type": "surface",
+      "group": "docs",
+      "size": 16.643856189774723,
+      "summary": "9 files"
+    },
+    {
+      "id": "surface:ops",
+      "label": "ops",
+      "type": "surface",
+      "group": "ops",
+      "size": 15.169925001442312,
+      "summary": "5 files"
+    }
+  ],
+  "links": [
+    {
+      "source": "skyerunners:hub",
+      "target": "brain:local",
+      "type": "feeds",
+      "strength": 2
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "admin:control",
+      "type": "controls",
+      "strength": 2
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "ops:state",
+      "type": "ledgers",
+      "strength": 1.7
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "runner:skyerunner-cartographer",
+      "type": "runner",
+      "strength": 1.8
+    },
+    {
+      "source": "runner:skyerunner-cartographer",
+      "target": "command:map",
+      "type": "default-command",
+      "strength": 1.5
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "runner:skyerunner-human-flow",
+      "type": "runner",
+      "strength": 1.8
+    },
+    {
+      "source": "runner:skyerunner-human-flow",
+      "target": "command:crawler-static",
+      "type": "default-command",
+      "strength": 1.5
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "runner:skyerunner-brain-sync",
+      "type": "runner",
+      "strength": 1.8
+    },
+    {
+      "source": "runner:skyerunner-brain-sync",
+      "target": "command:knowledge-refresh",
+      "type": "default-command",
+      "strength": 1.5
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "runner:skyerunner-bug-hunter",
+      "type": "runner",
+      "strength": 1.8
+    },
+    {
+      "source": "runner:skyerunner-bug-hunter",
+      "target": "command:repo-health",
+      "type": "default-command",
+      "strength": 1.5
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "runner:skyerunner-vault-watch",
+      "type": "runner",
+      "strength": 1.8
+    },
+    {
+      "source": "runner:skyerunner-vault-watch",
+      "target": "command:vault-map",
+      "type": "default-command",
+      "strength": 1.5
+    },
+    {
+      "source": "admin:control",
+      "target": "command:map",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:knowledge-refresh",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:repo-health",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:crawler-static",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:crawler-live",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:vault-map",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "admin:control",
+      "target": "command:mcp-mine-0s",
+      "type": "can-run",
+      "strength": 1.2
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:metraiyux_0s_site",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:marketing",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:SkyeGateFS27",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:MCP",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:unpacked-projects",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:Skye-Clients",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:unpacked-zips",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:SkyeVault-Drop",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:client-app-factory",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:legalskyes-website",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:tools",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:neon-rift-blocks-mobile-v13-site",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:skyehands_runtime_control",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:metraiyux-portal",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:mcp_design_reference",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:obsidian-vault",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:(root)",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:skyesol_spectacle_reference",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:docs",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:deploy",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:ops",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:Dynasty-Versions",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:proof-recipes",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:scripts",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:Metraiyux-Marketing",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "folder:registry",
+      "type": "knows-folder",
+      "strength": 0.8
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:0s-site",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:live",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:skygate-fs27",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:mcp",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:client-app-factory",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:admin",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:tools",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:brain",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:proof",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:portal",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:obsidian-vault",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:operator",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:docs",
+      "type": "surface",
+      "strength": 1
+    },
+    {
+      "source": "skyerunners:hub",
+      "target": "surface:ops",
+      "type": "surface",
+      "strength": 1
+    }
+  ],
+  "chunks": [
+    {
+      "id": "skyerunners-purpose",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Purpose",
+      "text": "SkyeRunners are repo-aware worker agents controlled from admin and operator surfaces. They know the repo through generated maps, brain JSON, command registries, proof receipts, and SkyeVault memory. They use the system like a human by launching browser QA, repo health, brain sync, and proof commands through an allowlisted local bridge.",
+      "source": "brain/skyerunners.json"
+    },
+    {
+      "id": "skyerunners-resource-policy",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Resource and approval policy",
+      "text": "SkyeRunners are allowed to run complete local proof and repo-awareness passes when the operator asks. Paid API use, production deploys, billing changes, credential changes, and irreversible actions still require explicit operator approval. No tiny arbitrary local QA cap; spend-bearing or production-mutating work is approval-gated and ledgered before it happens. Boundaries: Only commands in this SkyeRunners allowlist can run through the local bridge. External provider spend is not triggered by this bridge by default. Production deploy, billing, credential, legal, hiring, payment, or customer-impacting actions must be routed through owner approval. Runner receipts must name the command, target, exit code, artifact path, and follow-up bug notes.",
+      "source": "brain/skyerunners.json"
+    },
+    {
+      "id": "skyerunners-runner-roles",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Runner roles",
+      "text": "Repo Cartographer owns knowledge: Keep the repo inventory, brain map, command map, proof map, and surface map current. Human Flow Runner owns browser-qa: Use public, admin, operator, and app surfaces like a human would, then report breakage before customers find it. Brain Sync Runner owns knowledge: Refresh Obsidian exports, private neural maps, public-safe neural maps, and SkyeRunners brain chunks after repo changes. Bug Hunter owns repo-qa: Run health checks, inspect dirty-state risk, compare receipts, and surface likely defects or missing proof. Vault Watch owns repo-memory: Keep SkyeVault repo/change memory attached to the 0S brain without exposing workspace secrets.",
+      "source": "brain/skyerunners.json"
+    },
+    {
+      "id": "skyerunners-command-catalog",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Allowlisted command catalog",
+      "text": "map: Build SkyeRunners Repo Knowledge Map (knowledge, low, local-only); knowledge-refresh: Refresh Brain, Neural Maps, and SkyeRunners Map (knowledge, low, local-only); repo-health: Run Repo Health Check (repo-qa, low, local-only); crawler-static: Run Static SkyeCrawler Human-Flow QA (browser-qa, low, local-only); crawler-live: Run Live SkyeCrawler QA (browser-qa, medium, network-read-only); vault-map: Refresh SkyeVault 0S Neural Bridge (repo-memory, low, local-only); mcp-mine-0s: Mine Repo MCP Receipt For 0S Site (mcp, low, local-only)",
+      "source": "brain/skyerunners.json"
+    },
+    {
+      "id": "skyerunners-repo-inventory",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Repo inventory",
+      "text": "The current SkyeRunners map sees 7986 repo files, 6029 tracked files, 1967 untracked files, 1918 HTML surfaces, 1220 script files, and 59 brain or vault files. Top folders: metraiyux_0s_site: 4643 files, 1934 untracked; marketing: 1677 files, 5 untracked; SkyeGateFS27: 385 files, 4 untracked; MCP: 283 files, 3 untracked; unpacked-projects: 261 files, 2 untracked; Skye-Clients: 149 files; unpacked-zips: 135 files; SkyeVault-Drop: 77 files; client-app-factory: 71 files; legalskyes-website: 51 files; tools: 40 files, 4 untracked; neon-rift-blocks-mobile-v13-site: 39 files; skyehands_runtime_control: 33 files, 8 untracked; metraiyux-portal: 31 files; mcp_design_reference: 28 files; obsidian-vault: 23 files, 1 untracked; (root): 19 files, 1 untracked; skyesol_spectacle_reference: 14 files.",
+      "source": "brain/skyerunners.json"
+    },
+    {
+      "id": "skyerunners-current-proof-state",
+      "title": "SkyeRunners Repo Agent Map",
+      "heading": "Current proof state",
+      "text": "Latest static crawler report: 14 checks, 0 failures, 0 warnings. Repo dirty state: 182 working tree changes. Queue: 0 queued SkyeRunners task files. Ledger entries: 100.",
+      "source": "brain/skyerunners.json"
+    }
+  ]
+}

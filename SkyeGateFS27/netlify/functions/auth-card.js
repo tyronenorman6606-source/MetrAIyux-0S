@@ -54,6 +54,7 @@ import { lookupKey } from "./_lib/authz.js";
 import { verifyAccessToken } from "./_lib/oauth.js";
 import { q } from "./_lib/db.js";
 import { AUTH_TIERS, operationsForRole, operationsForScope } from "./_lib/policy.js";
+import { PUBLIC_PROVIDER_NAME, publicAllowedModels } from "./_lib/publicLabels.js";
 
 export default wrap(async (req) => {
   const cors = buildCors(req);
@@ -105,8 +106,8 @@ export default wrap(async (req) => {
       }),
       permissions: {
         scope,
-        allowed_providers: keyRow.allowed_providers || null,
-        allowed_models:    keyRow.allowed_models    || null,
+        allowed_providers: keyRow.allowed_providers ? [PUBLIC_PROVIDER_NAME] : null,
+        allowed_models:    publicAllowedModels(keyRow.allowed_models),
         max_devices:       keyRow.max_devices       || keyRow.customer_max_devices_per_key || null,
         require_install_id:keyRow.require_install_id ?? keyRow.customer_require_install_id ?? false
       },

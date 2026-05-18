@@ -13,6 +13,8 @@ MetrAIyux 0S is a public website, autonomous business OS, local-brain layer, Saa
 
 The current production report records live MetrAIyux 0S and SkyeGateFS27 Cloudflare Worker surfaces, public spectacle pages, proof router access, and verified browser proof artifacts.
 
+SkyeRunners are now the repo-local worker-control lane for knowledge maps, human-flow QA, repo health, SkyeVault memory, and operator-brain refreshes. The control page is `metraiyux_0s_site/admin/skyerunners.html`; the generated brain feed is `metraiyux_0s_site/brain/skyerunners.json`; the local bridge is `tools/skyerunners.mjs`.
+
 ## Known Live Surfaces
 
 - Full MetrAIyux 0S system: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/`
@@ -30,6 +32,8 @@ The current production report records live MetrAIyux 0S and SkyeGateFS27 Cloudfl
 The latest recorded MetrAIyux 0S production E2E run reported 71 checks, 0 failures, and 0 warnings. Browser screenshots live under `test-artifacts/live-e2e-metraiyux/`.
 
 The 2026-05-16 Cloudflare live deployment capture found 13 Pages projects, 11 Workers, and 36 live HTTP checks with 0 failures. Evidence lives under `test-artifacts/live-deployment-ledger/`.
+
+SkyeRunners verification starts with `npm run skyerunners:map`, then `npm run skyerunners:run -- knowledge-refresh` after vault or brain changes, and `npm run skyerunners:run -- crawler-static` when a human-flow pass is needed.
 
 ## Operating Truth
 

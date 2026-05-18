@@ -1,0 +1,117 @@
+{
+  "deliveryPacks": [
+    {
+      "id": "delivery-mpak07wt-37vudm",
+      "projectId": "proof-webcreator-runtime",
+      "projectName": "Runtime Proof Website",
+      "label": "Founder rollout handoff",
+      "target": "ae-commandhub",
+      "notes": "Needs AE command review and downstream route.",
+      "createdAt": "2026-05-18T01:57:12.845Z",
+      "sourceSnapshot": {
+        "index.html": "<main>contact proof gate</main>",
+        "styles.css": "body { color: white; }",
+        "app.js": "console.log(\"proof\");",
+        "README.md": "# Proof"
+      },
+      "recommendedActions": [
+        "review package",
+        "route to downstream lane"
+      ],
+      "targets": [
+        "SkyeLeadVault",
+        "SkyeProofx"
+      ],
+      "summary": {
+        "fileCount": 4,
+        "hasReadme": true,
+        "hasStyles": true,
+        "hasScript": true,
+        "hasMarkup": true
+      },
+      "review": {
+        "status": "dispatched",
+        "owner": "ae-operator",
+        "checkpoint": "approved for handoff",
+        "notes": "Approved in local review board.",
+        "updatedAt": "2026-05-18T01:57:12.884Z"
+      },
+      "execution": {
+        "status": "fulfilled",
+        "owner": "delivery-operator",
+        "checkpoint": "queued for downstream execution",
+        "notes": "Ready for downstream launch handling.",
+        "targets": [
+          "AE-FlowPro",
+          "SkyeProofx"
+        ],
+        "updatedAt": "2026-05-18T01:57:12.883Z"
+      },
+      "dispatch": {
+        "status": "delivered",
+        "owner": "dispatch-operator",
+        "checkpoint": "delivered to downstream lane",
+        "notes": "Dispatched into the next operator lane.",
+        "targets": [
+          "AE-FlowPro",
+          "SkyeProofx"
+        ],
+        "updatedAt": "2026-05-18T01:57:12.883Z"
+      }
+    }
+  ],
+  "audit": [
+    {
+      "type": "delivery_pack_dispatched",
+      "id": "delivery-mpak07wt-37vudm",
+      "createdAt": "2026-05-18T01:57:12.883Z",
+      "owner": "dispatch-operator",
+      "status": "delivered",
+      "checkpoint": "delivered to downstream lane",
+      "notes": "Dispatched into the next operator lane.",
+      "targets": [
+        "AE-FlowPro",
+        "SkyeProofx"
+      ]
+    },
+    {
+      "type": "delivery_pack_execution_updated",
+      "id": "delivery-mpak07wt-37vudm",
+      "createdAt": "2026-05-18T01:57:12.870Z",
+      "owner": "delivery-operator",
+      "status": "active",
+      "checkpoint": "queued for downstream execution",
+      "notes": "Ready for downstream launch handling.",
+      "targets": [
+        "AE-FlowPro",
+        "SkyeProofx"
+      ]
+    },
+    {
+      "type": "delivery_pack_reviewed",
+      "id": "delivery-mpak07wt-37vudm",
+      "createdAt": "2026-05-18T01:57:12.855Z",
+      "owner": "ae-operator",
+      "status": "approved",
+      "checkpoint": "approved for handoff",
+      "notes": "Approved in local review board.",
+      "targets": [
+        "SkyeLeadVault",
+        "SkyeProofx"
+      ]
+    },
+    {
+      "type": "delivery_pack_created",
+      "id": "delivery-mpak07wt-37vudm",
+      "createdAt": "2026-05-18T01:57:12.845Z",
+      "owner": "ae-operator",
+      "status": "ready",
+      "checkpoint": "ready for packaging",
+      "notes": "Needs AE command review and downstream route.",
+      "targets": [
+        "SkyeLeadVault",
+        "SkyeProofx"
+      ]
+    }
+  ]
+}

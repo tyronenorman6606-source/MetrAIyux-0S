@@ -25,6 +25,8 @@ Run the repo-local graph command after changing note links, tags, folders, or so
 
 Latest refresh source update: `2026-05-17T14:44:28Z`, after adding the ChatGPT Project Handoff note and rechecking 24 core live URLs with HTTP 200 results.
 
+SkyeRunners source update: `2026-05-18`, after adding the repo-aware runner control lane, admin page, local bridge, queue/ledger path, and generated `metraiyux_0s_site/brain/skyerunners.json` feed.
+
 ## What The Map Shows
 
 - Hub node for the whole MetrAIyux 0S vault.

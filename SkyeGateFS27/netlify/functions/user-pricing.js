@@ -4,6 +4,7 @@ import { resolveAuth, getMonthRollup, getKeyMonthRollup } from "./_lib/authz.js"
 import { q } from "./_lib/db.js";
 import { getPricingCatalog } from "./_lib/pricing.js";
 import { getPushPricing } from "./_lib/pushCaps.js";
+import { PUBLIC_PROVIDER_NAME, publicAllowedModels, publicModelName, publicProviderPolicy } from "./_lib/publicLabels.js";
 
 function normalizeList(value) {
   return Array.isArray(value) ? value.map((entry) => String(entry || "").trim()).filter(Boolean) : [];
@@ -90,12 +91,26 @@ export default wrap(async (req) => {
     usageMap.set(`${row.provider}::${row.model}`, row);
   }
 
+  const platformUsage = await q(
+    `select coalesce(platform_id, 'metraiyux-0s') as platform_id,
+            coalesce(usage_lane, 'ai') as usage_lane,
+            count(*)::int as calls,
+            coalesce(sum(cost_cents),0)::int as cost_cents,
+            coalesce(sum(input_tokens),0)::int as input_tokens,
+            coalesce(sum(output_tokens),0)::int as output_tokens
+     from usage_events
+     where api_key_id=$1 and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
+     group by coalesce(platform_id, 'metraiyux-0s'), coalesce(usage_lane, 'ai')
+     order by cost_cents desc`,
+    [keyRow.api_key_id, month]
+  );
+
   const providers = Object.entries(pricing || {}).flatMap(([provider, models]) => {
     return Object.entries(models || {}).map(([model, entry]) => {
       const usage = usageMap.get(`${provider}::${model}`) || null;
       return {
-        provider,
-        model,
+        provider: PUBLIC_PROVIDER_NAME,
+        model: publicModelName(provider, model),
         input_per_1m_usd: Number(entry?.input_per_1m_usd || 0),
         output_per_1m_usd: Number(entry?.output_per_1m_usd || 0),
         input_per_1k_usd: Number(entry?.input_per_1m_usd || 0) / 1000,
@@ -149,7 +164,7 @@ export default wrap(async (req) => {
   }
 
   return json(200, {
-    pricing_source: "pricing/pricing.json",
+    pricing_source: "Skyes Over London gate pricing",
     month,
     customer: {
       id: keyRow.customer_id,
@@ -163,10 +178,10 @@ export default wrap(async (req) => {
       role: keyRow.role || "deployer"
     },
     access_policy: {
-      providers: providerPolicy,
+      providers: publicProviderPolicy(providerPolicy),
       models: {
         source: modelPolicy.source,
-        values: modelPolicy.values
+        values: publicAllowedModels(modelPolicy.values)
       }
     },
     month_rollup: {
@@ -178,6 +193,7 @@ export default wrap(async (req) => {
       key_input_tokens: Number(keyMonth.input_tokens || 0),
       key_output_tokens: Number(keyMonth.output_tokens || 0)
     },
+    platform_usage: platformUsage.rows,
     ai_pricing: providers,
     push_pricing: push
   }, cors);

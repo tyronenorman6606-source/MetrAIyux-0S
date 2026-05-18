@@ -4,6 +4,10 @@
   "scripts": {
     "skye:serve:site": "cd metraiyux_0s_site && python3 -m http.server 4173 --bind 127.0.0.1",
     "skye:control": "node tools/skye-crawler-control.mjs",
+    "skyerunners:control": "node tools/skyerunners.mjs serve",
+    "skyerunners:map": "node tools/skyerunners.mjs map",
+    "skyerunners:status": "node tools/skyerunners.mjs status",
+    "skyerunners:run": "node tools/skyerunners.mjs run",
     "skye:crawl": "node tools/skye-crawler.mjs",
     "skye:crawl:static": "SKIP_API=1 node tools/skye-crawler.mjs",
     "skye:crawl:skyepay": "SKYE_CRAWLER_PROFILE=skyepay SITE_DIR=/workspaces/MetrAIyux-0S/SkyeGateFS27 BASE_URL=http://127.0.0.1:4197/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay node tools/skye-crawler.mjs",
@@ -74,7 +78,10 @@
     "0s:skyemediacenter:smoke": "cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs && node smoke/cloudflare-worker-production-smoke.mjs",
     "0s:skyemusicnexus:skyepay": "node metraiyux_0s_site/tests/skyemusicnexus-skyepay-offer-proof.mjs",
     "0s:skyemerit:proof": "node tools/audit-skyemerit.mjs",
-    "0s:platform-accounting": "node tools/audit-platform-integration-ledger.mjs"
+    "0s:platform-accounting": "node tools/audit-platform-integration-ledger.mjs",
+    "0s:marketing-made-easy:scan": "node tools/audit-marketing-made-easy.mjs",
+    "0s:marketing-made-easy:smoke": "node tools/audit-marketing-made-easy.mjs --smoke",
+    "0s:marketing-made-easy:proof": "npm run 0s:marketing-made-easy:scan && npm run 0s:marketing-made-easy:smoke"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

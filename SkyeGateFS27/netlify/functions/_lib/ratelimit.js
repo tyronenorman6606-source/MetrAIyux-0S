@@ -1,4 +1,5 @@
 import { q } from "./db.js";
+import { normalizePlatformId } from "./authz.js";
 
 let _Upstash = null;
 const _limiterByLimit = new Map();
@@ -37,9 +38,11 @@ function isoReset(reset) {
  * 1) Upstash sliding window (if UPSTASH_REDIS_REST_URL/TOKEN present)
  * 2) DB-backed fixed window (simple fallback)
  */
-export async function enforceRpm({ customerId, apiKeyId, rpmOverride }) {
+export async function enforceRpm({ customerId, apiKeyId, rpmOverride, platformId = "", usageLane = "gateway" }) {
   const defaultRpm = parseInt(process.env.DEFAULT_RPM_LIMIT || "120", 10);
   const limit = Number.isFinite(rpmOverride) ? rpmOverride : defaultRpm;
+  const scopedPlatformId = normalizePlatformId(platformId, "");
+  const scopedUsageLane = normalizePlatformId(usageLane, "gateway");
 
   if (!Number.isFinite(limit) || limit <= 0) {
     return { ok: true, remaining: null, reset: null, mode: "off" };
@@ -58,14 +61,18 @@ export async function enforceRpm({ customerId, apiKeyId, rpmOverride }) {
     }
 
     const limiter = _limiterByLimit.get(limit);
-    const key = `c${customerId}:k${apiKeyId}`;
+    const key = scopedPlatformId
+      ? `c${customerId}:k${apiKeyId}:p${scopedPlatformId}:l${scopedUsageLane}`
+      : `c${customerId}:k${apiKeyId}`;
     const res = await limiter.limit(key);
 
     return {
       ok: !!res.success,
       remaining: res.remaining ?? null,
       reset: isoReset(res.reset),
-      mode: "upstash"
+      mode: "upstash",
+      platform_id: scopedPlatformId || null,
+      usage_lane: scopedUsageLane || null
     };
   }
 
@@ -75,14 +82,23 @@ export async function enforceRpm({ customerId, apiKeyId, rpmOverride }) {
   const windowStart = new Date(Math.floor(now / windowMs) * windowMs);
   const reset = new Date(windowStart.getTime() + windowMs);
 
-  const res = await q(
-    `insert into rate_limit_windows(customer_id, api_key_id, window_start, count)
-     values ($1,$2,$3,1)
-     on conflict (customer_id, api_key_id, window_start)
-     do update set count = rate_limit_windows.count + 1
-     returning count`,
-    [customerId, apiKeyId, windowStart]
-  );
+  const res = scopedPlatformId
+    ? await q(
+      `insert into rate_limit_scoped_windows(customer_id, api_key_id, platform_id, usage_lane, window_start, count)
+       values ($1,$2,$3,$4,$5,1)
+       on conflict (customer_id, api_key_id, platform_id, usage_lane, window_start)
+       do update set count = rate_limit_scoped_windows.count + 1
+       returning count`,
+      [customerId, apiKeyId, scopedPlatformId, scopedUsageLane, windowStart]
+    )
+    : await q(
+      `insert into rate_limit_windows(customer_id, api_key_id, window_start, count)
+       values ($1,$2,$3,1)
+       on conflict (customer_id, api_key_id, window_start)
+       do update set count = rate_limit_windows.count + 1
+       returning count`,
+      [customerId, apiKeyId, windowStart]
+    );
 
   const count = res.rows?.[0]?.count ?? 1;
   const remaining = Math.max(0, limit - count);
@@ -90,6 +106,7 @@ export async function enforceRpm({ customerId, apiKeyId, rpmOverride }) {
   if (Math.random() < 0.01) {
     try {
       await q(`delete from rate_limit_windows where window_start < now() - interval '2 hours'`);
+      await q(`delete from rate_limit_scoped_windows where window_start < now() - interval '2 hours'`);
     } catch {}
   }
 
@@ -97,6 +114,8 @@ export async function enforceRpm({ customerId, apiKeyId, rpmOverride }) {
     ok: count <= limit,
     remaining,
     reset: reset.toISOString(),
-    mode: "db"
+    mode: scopedPlatformId ? "db-scoped" : "db",
+    platform_id: scopedPlatformId || null,
+    usage_lane: scopedUsageLane || null
   };
 }

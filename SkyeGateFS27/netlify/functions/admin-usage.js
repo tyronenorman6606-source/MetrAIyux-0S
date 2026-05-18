@@ -45,7 +45,7 @@ export default wrap(async (req) => {
   );
 
   const events = await q(
-    `select id, provider, model, input_tokens, output_tokens, cost_cents, created_at
+    `select id, provider, model, input_tokens, output_tokens, cost_cents, platform_id, usage_lane, created_at
      from usage_events
      where customer_id=$1 and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
      order by created_at desc
@@ -69,6 +69,20 @@ export default wrap(async (req) => {
     daily_call_limit: row.rpd_limit ?? capRes.rows[0].default_rpd_limit ?? null,
     rpm_limit: row.rpm_limit ?? capRes.rows[0].default_rpm_limit ?? null
   })));
+
+  const perPlatform = await q(
+    `select coalesce(platform_id, 'metraiyux-0s') as platform_id,
+            coalesce(usage_lane, 'ai') as usage_lane,
+            count(*)::int as calls,
+            coalesce(sum(cost_cents),0)::int as cost_cents,
+            coalesce(sum(input_tokens),0)::int as input_tokens,
+            coalesce(sum(output_tokens),0)::int as output_tokens
+     from usage_events
+     where customer_id=$1 and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
+     group by coalesce(platform_id, 'metraiyux-0s'), coalesce(usage_lane, 'ai')
+     order by cost_cents desc`,
+    [customer_id, month]
+  );
 
   // Build kAIxu-branded event list (no provider names — safe to share with customer).
   const kaixuEvents = events.rows.map(e => ({
@@ -97,6 +111,7 @@ export default wrap(async (req) => {
     month,
     rollup: roll.rowCount ? roll.rows[0] : { spent_cents: 0, extra_cents: 0, input_tokens: 0, output_tokens: 0, updated_at: null },
     per_key: perKeyRows,
+    per_platform: perPlatform.rows,
     // Admin-only: raw events with real provider+model for routing analysis
     events: events.rows,
     // Customer-safe: kAIxu branded breakdown (safe to forward to customer)

@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeRunners admin control for repo-aware worker agents, knowledge maps, human-flow QA, queue receipts, and operator brain refreshes.">
+  <title>SkyeRunners · Admin Control</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .skyerunners-console { min-height: 240px; max-height: 520px; overflow: auto; white-space: pre-wrap; }
+    .skyerunners-command-row { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+    .skyerunners-map-list { display: grid; gap: .75rem; }
+    .skyerunners-map-item { border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: .85rem; background: rgba(255,255,255,.04); }
+    .skyerunners-map-item strong, .skyerunners-map-item span { display: block; }
+    .skyerunners-task-form { display: grid; gap: .85rem; }
+    .skyerunners-task-form input, .skyerunners-task-form select, .skyerunners-task-form textarea { width: 100%; }
+    .skyerunners-status { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">SkyeRunners</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="index.html">Admin Hub</a>
+      <a href="../operator/index.html">Operator</a>
+      <a href="automation-brain.html">Main Brain</a>
+      <a href="../operator/skye-crawler.html">SkyeCrawler</a>
+      <a href="../local-brain.html">Local Brain</a>
+    </nav>
+  </header>
+
+  <main class="site-shell admin-shell">
+    <section class="admin-hero">
+      <p class="eyebrow">Repo-aware worker control</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>SkyeRunners</h1>
+      <p class="hero-lede">Control the repo-aware runners that refresh knowledge maps, run human-flow QA, watch proof receipts, and feed the operator brain.</p>
+      <div id="skyerunnersStatusPills" class="skyerunners-status">
+        <span class="status-pill">Loading runner map</span>
+      </div>
+      <div class="hero-actions">
+        <button class="button primary" type="button" data-run-command="map">Build Map</button>
+        <button class="button" type="button" data-run-command="knowledge-refresh">Refresh Knowledge</button>
+        <button class="button" type="button" data-refresh-status>Refresh Status</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="metric-row" id="skyerunnersMetrics">
+        <article class="metric"><strong>--</strong><span>repo files mapped</span></article>
+        <article class="metric"><strong>--</strong><span>runner roles</span></article>
+        <article class="metric"><strong>--</strong><span>allowlisted commands</span></article>
+        <article class="metric"><strong>--</strong><span>brain chunks</span></article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Local bridge</p>
+        <h2>Run controlled worker lanes from admin.</h2>
+        <p class="wide">Start the bridge in this repo, then use these controls.</p>
+        <pre class="receipt-box">cd /workspaces/MetrAIyux-0S
+npm run skyerunners:control</pre>
+        <div class="skyerunners-command-row">
+          <button class="button primary" type="button" data-run-command="map">Build Repo Map</button>
+          <button class="button" type="button" data-run-command="repo-health">Repo Health</button>
+          <button class="button" type="button" data-run-command="crawler-static">Static Human-Flow QA</button>
+          <button class="button" type="button" data-run-command="crawler-live">Live QA</button>
+          <button class="button" type="button" data-run-command="vault-map">Vault Map</button>
+          <button class="button" type="button" data-run-command="mcp-mine-0s">MCP Receipt</button>
+        </div>
+      </div>
+      <aside class="panel">
+        <h3>Runner console</h3>
+        <p id="skyerunnersBridgeState">Bridge status has not been checked.</p>
+        <pre id="skyerunnersConsole" class="receipt-box skyerunners-console">Start the SkyeRunners bridge, or build the map from the command line.
+
+cd /workspaces/MetrAIyux-0S
+npm run skyerunners:map
+npm run skyerunners:control</pre>
+      </aside>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Task queue</p>
+        <h2>Queue work for a SkyeRunner lane.</h2>
+        <form id="skyerunnersTaskForm" class="skyerunners-task-form">
+          <label>Mission<input id="skyerunnersMission" name="mission" required placeholder="Find broken admin/operator routes after the latest changes"></label>
+          <label>Lane
+            <select id="skyerunnersLane" name="lane">
+              <option value="browser-qa">browser-qa</option>
+              <option value="knowledge">knowledge</option>
+              <option value="repo-qa">repo-qa</option>
+              <option value="repo-memory">repo-memory</option>
+              <option value="mcp">mcp</option>
+            </select>
+          </label>
+          <label>Target<input id="skyerunnersTarget" name="target" placeholder="metraiyux_0s_site/admin"></label>
+          <label>Suggested command
+            <select id="skyerunnersSuggestedCommand" name="suggested_command">
+              <option value="map">map</option>
+              <option value="knowledge-refresh">knowledge-refresh</option>
+              <option value="repo-health">repo-health</option>
+              <option value="crawler-static">crawler-static</option>
+              <option value="crawler-live">crawler-live</option>
+              <option value="vault-map">vault-map</option>
+              <option value="mcp-mine-0s">mcp-mine-0s</option>
+            </select>
+          </label>
+          <label>Notes<textarea id="skyerunnersNotes" name="notes" rows="4" placeholder="What should the runner pay attention to?"></textarea></label>
+          <button class="button primary" type="submit">Queue Task</button>
+        </form>
+      </div>
+      <aside class="panel">
+        <h3>Queue</h3>
+        <div id="skyerunnersQueue" class="skyerunners-map-list"><p>No queue loaded.</p></div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Runner roles</p>
+      <div id="skyerunnersGrid" class="admin-grid"></div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Knowledge map</p>
+        <h2>Repo memory now feeds the local brain.</h2>
+        <div id="skyerunnersMapSummary" class="skyerunners-map-list"></div>
+      </div>
+      <aside class="panel">
+        <h3>Ledger</h3>
+        <div id="skyerunnersLedger" class="skyerunners-map-list"><p>No ledger loaded.</p></div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer"><p>MetrAIyux 0S command system · SkyeRunners run only through the local allowlist, admin approval gates, and proof receipts.</p></footer>
+
+  <script>
+    (() => {
+      const API = 'http://127.0.0.1:4176';
+      const $ = (id) => document.getElementById(id);
+      const escapeHtml = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      let pollTimer = null;
+      let mapData = null;
+
+      async function fetchJson(url, options) {
+        const res = await fetch(url, { cache: 'no-store', ...options });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+        return json;
+      }
+
+      function writeConsole(text) {
+        const box = $('skyerunnersConsole');
+        if (box) box.textContent = text;
+      }
+
+      function pills(items) {
+        const el = $('skyerunnersStatusPills');
+        if (!el) return;
+        el.innerHTML = items.map(item => `<span class="status-pill">${escapeHtml(item)}</span>`).join('');
+      }
+
+      function renderMetrics(map) {
+        const el = $('skyerunnersMetrics');
+        if (!el || !map) return;
+        el.innerHTML = `
+          <article class="metric"><strong>${escapeHtml(map.summary?.total_files || 0)}</strong><span>repo files mapped</span></article>
+          <article class="metric"><strong>${escapeHtml((map.runners || []).length)}</strong><span>runner roles</span></article>
+          <article class="metric"><strong>${escapeHtml((map.commands || []).length)}</strong><span>allowlisted commands</span></article>
+          <article class="metric"><strong>${escapeHtml((map.chunks || []).length)}</strong><span>brain chunks</span></article>
+        `;
+      }
+
+      function renderRunners(map) {
+        const el = $('skyerunnersGrid');
+        if (!el) return;
+        el.innerHTML = (map?.runners || []).map(runner => `
+          <article class="admin-card">
+            <h3>${escapeHtml(runner.name)}</h3>
+            <p>${escapeHtml(runner.mission)}</p>
+            <p><strong>Lane:</strong> ${escapeHtml(runner.lane)}</p>
+            <p><strong>Brains:</strong> ${escapeHtml(runner.primary_brain)} / ${escapeHtml(runner.secondary_brain)}</p>
+            <button class="button" type="button" data-run-command="${escapeHtml(runner.default_command)}">Run ${escapeHtml(runner.default_command)}</button>
+          </article>
+        `).join('') || '<p>No SkyeRunners map found. Build the map first.</p>';
+        bindRunButtons(el);
+      }
+
+      function renderMapSummary(map) {
+        const el = $('skyerunnersMapSummary');
+        if (!el || !map) return;
+        const surfaces = (map.knowledge_map?.surfaces || []).slice(0, 10).map(item => `${item.surface}: ${item.count}`).join(' · ');
+        const folders = (map.knowledge_map?.top_folders || []).slice(0, 12).map(item => `${item.folder}: ${item.files}`).join(' · ');
+        el.innerHTML = `
+          <article class="skyerunners-map-item"><strong>Generated</strong><span>${escapeHtml(map.generated_at)}</span></article>
+          <article class="skyerunners-map-item"><strong>Surfaces</strong><span>${escapeHtml(surfaces || 'No surface counts')}</span></article>
+          <article class="skyerunners-map-item"><strong>Top folders</strong><span>${escapeHtml(folders || 'No folder counts')}</span></article>
+          <article class="skyerunners-map-item"><strong>Resource policy</strong><span>${escapeHtml(map.resource_policy?.spend_position || '')}</span></article>
+        `;
+      }
+
+      function renderQueue(items) {
+        const el = $('skyerunnersQueue');
+        if (!el) return;
+        el.innerHTML = (items || []).slice(0, 12).map(task => `
+          <article class="skyerunners-map-item">
+            <strong>${escapeHtml(task.mission || task.id)}</strong>
+            <span>${escapeHtml(task.status)} · ${escapeHtml(task.lane)} · ${escapeHtml(task.suggested_command || '')}</span>
+            <p>${escapeHtml(task.target || task.notes || '')}</p>
+          </article>
+        `).join('') || '<p>No queued SkyeRunners tasks.</p>';
+      }
+
+      function renderLedger(items) {
+        const el = $('skyerunnersLedger');
+        if (!el) return;
+        el.innerHTML = (items || []).slice(-12).reverse().map(item => `
+          <article class="skyerunners-map-item">
+            <strong>${escapeHtml(item.event || 'event')}</strong>
+            <span>${escapeHtml(item.at || '')}</span>
+            <p>${escapeHtml(item.run?.title || item.path || item.task?.mission || item.error || '')}</p>
+          </article>
+        `).join('') || '<p>No SkyeRunners ledger entries yet.</p>';
+      }
+
+      function renderStatus(data) {
+        const map = data.map || {};
+        const lines = [];
+        lines.push(data.active ? `Running: ${data.activeRun.title} (${data.activeRun.current_step || data.activeRun.command_id})` : 'Idle');
+        if (map.exists) lines.push(`Map: ${map.path} · ${map.total_files} files · ${map.chunks} chunks`);
+        lines.push(`Queue: ${data.queue?.total || 0} tasks`);
+        if (data.logs?.length) {
+          lines.push('');
+          lines.push(...data.logs.slice(-36).map(item => item.line));
+        }
+        const state = $('skyerunnersBridgeState');
+        if (state) state.textContent = data.active ? 'SkyeRunners is running.' : 'SkyeRunners bridge is ready.';
+        writeConsole(lines.join('\n'));
+        renderQueue(data.queue?.latest || []);
+        renderLedger(data.ledger || []);
+        pills([
+          data.active ? 'running' : 'idle',
+          map.exists ? `map ${map.generated_at || 'ready'}` : 'map missing',
+          `${data.runners?.length || 0} runners`,
+          `${data.commands?.length || 0} commands`
+        ]);
+        if (data.active && !pollTimer) pollTimer = setInterval(refreshStatus, 2500);
+        if (!data.active && pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
+
+      async function loadMap() {
+        try {
+          mapData = await fetchJson('../brain/skyerunners.json');
+          renderMetrics(mapData);
+          renderRunners(mapData);
+          renderMapSummary(mapData);
+          pills([`${mapData.runners?.length || 0} runners`, `${mapData.commands?.length || 0} commands`, `${mapData.summary?.total_files || 0} files`, 'map loaded']);
+        } catch {
+          pills(['map missing', 'run npm run skyerunners:map']);
+        }
+      }
+
+      async function refreshStatus() {
+        try {
+          const data = await fetchJson(`${API}/status`);
+          renderStatus(data);
+        } catch {
+          const state = $('skyerunnersBridgeState');
+          if (state) state.textContent = 'Local SkyeRunners bridge is offline.';
+          writeConsole('Start the local bridge, then refresh:\n\ncd /workspaces/MetrAIyux-0S\nnpm run skyerunners:control');
+        }
+      }
+
+      async function run(command) {
+        writeConsole(`Starting ${command}...`);
+        try {
+          const data = await fetchJson(`${API}/run`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ command })
+          });
+          renderStatus({ ...await fetchJson(`${API}/status`), activeRun: data.run || null });
+        } catch (error) {
+          writeConsole(`Could not start ${command}: ${error.message}\n\nBridge command:\ncd /workspaces/MetrAIyux-0S\nnpm run skyerunners:control`);
+        }
+      }
+
+      async function enqueue(event) {
+        event.preventDefault();
+        const body = {
+          mission: $('skyerunnersMission')?.value || '',
+          lane: $('skyerunnersLane')?.value || 'operator',
+          target: $('skyerunnersTarget')?.value || '',
+          suggested_command: $('skyerunnersSuggestedCommand')?.value || 'map',
+          notes: $('skyerunnersNotes')?.value || ''
+        };
+        try {
+          await fetchJson(`${API}/enqueue`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          $('skyerunnersTaskForm')?.reset();
+          await refreshStatus();
+        } catch (error) {
+          writeConsole(`Could not queue task: ${error.message}\n\nStart the local bridge first.`);
+        }
+      }
+
+      function bindRunButtons(scope = document) {
+        scope.querySelectorAll('[data-run-command]').forEach(button => {
+          if (button.dataset.bound === '1') return;
+          button.dataset.bound = '1';
+          button.addEventListener('click', () => run(button.getAttribute('data-run-command') || 'map'));
+        });
+      }
+
+      document.querySelectorAll('[data-refresh-status]').forEach(button => button.addEventListener('click', refreshStatus));
+      $('skyerunnersTaskForm')?.addEventListener('submit', enqueue);
+      bindRunButtons();
+      loadMap().then(refreshStatus);
+    })();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

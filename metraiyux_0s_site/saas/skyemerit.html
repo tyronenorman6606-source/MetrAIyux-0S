@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeMerit customer wallet, kAIxu credit, and protected discount calculator for MetrAIyux 0S.">
+  <title>SkyeMerit Wallet - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="index.html">SaaS</a><a href="pricing.html">Pricing</a><a href="skyepay.html">SkyePay</a><a href="signup.html">Signup</a><a href="customer-dashboard.html">Dashboard</a></nav>
+  </header>
+  <main class="portal-shell">
+    <div class="topnav">
+      <a href="../index.html">Home</a>
+      <a href="index.html">SaaS Hub</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="skyepay.html">SkyePay</a>
+      <a href="skyemerit.html">SkyeMerit</a>
+      <a href="customer-onboarding.html">Onboarding</a>
+      <a href="customer-dashboard.html">Dashboard</a>
+    </div>
+
+    <section class="hero slim">
+      <p class="eyebrow">SkyeMerit Wallet</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Merits lower eligible SkyePay spend without opening the gate.</h1>
+      <p class="hero-copy">SkyeMerit is a Free99 customer feature: no charge to receive the pack, no anonymous access, and no escape from the gate. First-time users get a $6 premium kAIxu model spend credit plus protected discount codes that only apply inside the eligible spend band.</p>
+      <div class="button-row">
+        <a class="button primary" href="signup.html">Start Signup</a>
+        <a class="button" href="skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet&skyemerit_code=SKYEMERIT-FIRST-BEST">Open SkyePay with SkyeMerit</a>
+        <a class="button" href="../operator/skyemerit-admin.html">Operator Control</a>
+      </div>
+    </section>
+
+    <section class="saas-grid">
+      <article class="saas-card">
+        <p class="eyebrow">First-time pack</p>
+        <h3>$6 premium kAIxu credit</h3>
+        <p>Every first-time signup or onboarding record receives a SkyeMerit pack. The kAIxu credit is usage credit, not a cash payout.</p>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Protected coupons</p>
+        <h3>23%, 28%, and 31%</h3>
+        <p>The first-time code auto-selects the best eligible rule and caps the discounted spend, so large tickets do not discount the whole enterprise scope.</p>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">Gate policy</p>
+        <h3>Auth stays on</h3>
+        <p>Free99 and SkyeMerit do not remove FS27, SkyGate, client login, or local admin gate requirements.</p>
+      </article>
+    </section>
+
+    <section class="saas-band">
+      <p class="eyebrow">Calculator</p>
+      <h2>Preview the eligible spend math before checkout.</h2>
+      <form class="saas-tool" id="skyemeritCalc">
+        <label>Subtotal in dollars<input name="subtotal" type="number" min="0" step="1" value="13000"></label>
+        <label>SkyeMerit rule
+          <select name="code">
+            <option value="SKYEMERIT-FIRST-BEST">Auto first-time best</option>
+            <option value="SKYEMERIT-FIRST-23">First-Time Spark - 23%</option>
+            <option value="SKYEMERIT-FIRST-28">First-Time Lift - 28%</option>
+            <option value="SKYEMERIT-FIRST-31">First-Time SkyeLine - 31%</option>
+            <option value="SKYEMERIT-SKYELINE-22">SkyeLine Guard 22 - 22%</option>
+          </select>
+        </label>
+        <button type="button" id="calcBtn">Calculate Merit</button>
+      </form>
+      <pre class="saas-receipt" id="skyemeritReceipt"></pre>
+    </section>
+
+    <section class="saas-band">
+      <p class="eyebrow">Spend example</p>
+      <h2>$13,000 with SkyeLine Guard 22.</h2>
+      <p class="hero-copy">The rule discounts only the eligible spend between $3,000 and $10,000. That is $7,000 eligible, 22% off, $1,540 discount, and $11,460 due. The $3,000 floor and the $3,000 above the cap stay full price.</p>
+    </section>
+  </main>
+  <script>
+    const rules = [
+      {code:"SKYEMERIT-FIRST-23",title:"First-Time Spark",rate_bps:2300,floor_cents:0,cap_cents:670000,min_transaction_cents:1,max_transaction_cents:670000},
+      {code:"SKYEMERIT-FIRST-28",title:"First-Time Lift",rate_bps:2800,floor_cents:0,cap_cents:940000,min_transaction_cents:670001,max_transaction_cents:940000},
+      {code:"SKYEMERIT-FIRST-31",title:"First-Time SkyeLine",rate_bps:3100,floor_cents:0,cap_cents:940000,min_transaction_cents:940001,max_transaction_cents:null},
+      {code:"SKYEMERIT-SKYELINE-22",title:"SkyeLine Guard 22",rate_bps:2200,floor_cents:300000,cap_cents:1000000,min_transaction_cents:300001,max_transaction_cents:null}
+    ];
+    const money = (cents) => "$" + (Math.round(cents) / 100).toLocaleString("en-US", {maximumFractionDigits:2});
+    function calculate(rule, subtotal) {
+      const max = rule.max_transaction_cents == null ? null : rule.max_transaction_cents;
+      const applies = subtotal >= rule.min_transaction_cents && (max == null || subtotal <= max);
+      const eligible = applies ? Math.max(0, Math.min(subtotal, rule.cap_cents) - rule.floor_cents) : 0;
+      const discount = Math.round(eligible * rule.rate_bps / 10000);
+      return {code:rule.code,title:rule.title,eligible_cents:eligible,discount_cents:discount,payable_cents:subtotal-discount,applies};
+    }
+    function runCalc() {
+      const form = document.getElementById("skyemeritCalc");
+      const subtotal = Math.round(Number(form.subtotal.value || 0) * 100);
+      const code = form.code.value;
+      const candidates = code === "SKYEMERIT-FIRST-BEST" ? rules.slice(0,3) : rules.filter((rule) => rule.code === code);
+      const result = candidates.map((rule) => calculate(rule, subtotal)).sort((a,b) => b.discount_cents - a.discount_cents)[0];
+      document.getElementById("skyemeritReceipt").textContent = JSON.stringify({
+        subtotal: money(subtotal),
+        rule: result.code,
+        eligible: money(result.eligible_cents),
+        discount: money(result.discount_cents),
+        payable: money(result.payable_cents),
+        gate_required: true,
+        stripe_promo_stack: result.discount_cents > 0 ? "disabled_when_applied" : "available_if_no_skyemerit"
+      }, null, 2);
+    }
+    document.getElementById("calcBtn").addEventListener("click", runCalc);
+    runCalc();
+  </script>
+  <script src="../assets/js/saas-tools.js"></script>
+  <script src="../script.js"></script>
+</body>
+</html>

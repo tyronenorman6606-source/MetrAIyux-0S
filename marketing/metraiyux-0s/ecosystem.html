@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MetrAIyux 0S Ecosystem Map - Public Routes and Proof</title>
+  <meta name="description" content="A clean public ecosystem map for MetrAIyux 0S connecting the marketing site, Valley Verified company page, proof rooms, SkyePay, customer SaaS, app lanes, vault delivery, and the broader Skyes network.">
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .ecosystem-shell { width: min(1220px, calc(100% - 44px)); margin: 0 auto; padding: 104px 0 72px; }
+    .ecosystem-hero { min-height: auto; display: block; padding: 56px 0 34px; }
+    .ecosystem-hero h1 { max-width: 980px; }
+    .ecosystem-lede { max-width: 900px; color: var(--soft); font-size: 1.08rem; line-height: 1.75; margin: 0; }
+    .ecosystem-band { border: 1px solid rgba(255,255,255,.14); border-radius: 26px; padding: clamp(20px, 3vw, 30px); background: radial-gradient(circle at 12% 0%, rgba(100,217,255,.14), transparent 34%), radial-gradient(circle at 90% 8%, rgba(244,199,91,.14), transparent 32%), rgba(255,255,255,.035); box-shadow: var(--shadow); margin: 28px 0; }
+    .ecosystem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 14px; margin-top: 20px; }
+    .ecosystem-node { border: 1px solid rgba(255,255,255,.13); border-radius: 20px; padding: 18px; background: rgba(0,0,0,.22); }
+    .ecosystem-node span { display: inline-flex; color: var(--gold-soft); font-size: .76rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 9px; }
+    .ecosystem-node p { color: var(--soft); margin: 0; line-height: 1.62; }
+    .ecosystem-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin: 26px 0; }
+    .ecosystem-stat { border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 16px; background: rgba(255,255,255,.04); }
+    .ecosystem-stat strong { display: block; color: #fff; font-size: clamp(1.75rem, 4vw, 2.7rem); line-height: 1; }
+    .ecosystem-stat span { display: block; margin-top: 8px; color: var(--muted); font-size: .84rem; line-height: 1.45; }
+    .ecosystem-note { border-left: 4px solid var(--cyan); padding: 14px 16px; background: rgba(100,217,255,.08); color: var(--soft); }
+    .ecosystem-logo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 22px 0 0; }
+    .ecosystem-logo-row img { width: 74px; height: 74px; object-fit: contain; filter: drop-shadow(0 0 18px rgba(100,217,255,.36)); }
+    .route-grid.tight { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 14px; padding: 0; margin: 22px 0 0; }
+    .route-card { display: block; min-height: 100%; border: 1px solid rgba(255,255,255,.13); border-radius: 20px; padding: 18px; background: rgba(0,0,0,.22); color: inherit; text-decoration: none; }
+    .route-card:hover { border-color: rgba(244,199,91,.45); transform: translateY(-2px); }
+    .route-card p { color: var(--soft); margin: 0; }
+    .ecosystem-shell .skye-text-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+    @media(max-width:680px){ .ecosystem-shell{width:min(100% - 28px, 1220px); padding-top: 42px}.ecosystem-hero{padding-top:24px}.ecosystem-band{border-radius:20px} }
+  </style>
+</head>
+<body class="skyesol-living-page">
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="skyesol-scanline" aria-hidden="true"></div>
+  <canvas class="command-canvas living-background" data-living-background aria-hidden="true"></canvas>
+  <div class="motion-chrome scroll-progress" data-motion-chrome aria-hidden="true"><span></span></div>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">Overview</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">White Label</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a class="is-active" href="ecosystem.html">Ecosystem</a>
+        <a href="skyeroutex.html">RouteX</a>
+        <a href="proof.html">Live Proof</a>
+        <a href="valuation.html">Valuation</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ecosystem.html" target="_blank" rel="noopener">Valley Profile</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="ecosystem-shell">
+    <section class="hero ecosystem-hero">
+      <p class="eyebrow">Public ecosystem map</p>
+      <div class="ecosystem-logo-row">
+        <img class="floating-logo" src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <span class="ecosystem-note">Marketing-safe view. Buyer-facing routes only.</span>
+      </div>
+      <h1>MetrAIyux 0S connects the public pitch to the company proof.</h1>
+      <p class="ecosystem-lede">This version is the clean public route map: the marketing site, Valley Verified company profile, proof router, SkyePay activation, customer SaaS, app lanes, vault delivery, mailbox onboarding, and the wider Skyes network all have a clear doorway.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ecosystem.html" target="_blank" rel="noopener">Open Valley Verified Profile</a>
+        <a class="btn-ghost" href="marketplace.html">Open Marketplace</a>
+        <a class="btn-ghost" href="proof.html">Open Proof</a>
+      </div>
+      <div class="ecosystem-stat-grid" aria-label="Public ecosystem summary">
+        <div class="ecosystem-stat"><strong>13</strong><span>Cabinet model and operating lanes</span></div>
+        <div class="ecosystem-stat"><strong>16</strong><span>Named brain routes in the 0S story</span></div>
+        <div class="ecosystem-stat"><strong>39</strong><span>Live surfaces tracked in proof context</span></div>
+        <div class="ecosystem-stat"><strong>58</strong><span>SkyePay catalog products in the commercial lane</span></div>
+      </div>
+    </section>
+
+    <section class="section ecosystem-band" id="spine">
+      <p class="eyebrow">Route spine</p>
+      <h2>The public page should feel like a control map, not a pile of links.</h2>
+      <p class="wide">Every card below has one job: sell the 0S, prove the 0S, activate the 0S, or connect the buyer to a safe next surface. The private rooms remain gated, but the public path is obvious.</p>
+      <div class="ecosystem-grid">
+        <article class="ecosystem-node"><span>Marketing</span><h3>Public 0S Site</h3><p>Overview, capabilities, sell sheet, white-label licensing, marketplace, proof, valuation, and pricing.</p></article>
+        <article class="ecosystem-node"><span>Company</span><h3>Valley Verified Profile</h3><p>The full-system page now reads as the company profile for MetrAIyux 0S inside Valley Verified.</p></article>
+        <article class="ecosystem-node"><span>Proof</span><h3>Live Proof</h3><p>Public receipts, production status, platform ledgers, and safe claim boundaries.</p></article>
+        <article class="ecosystem-node"><span>Commerce</span><h3>SkyePay</h3><p>Catalog offers, checkout paths, FS27 store, Stripe handoff, and approval boundaries.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="routes">
+      <p class="eyebrow">Buyer routes</p>
+      <h2>Send people to the right surface fast.</h2>
+      <div class="route-grid tight">
+        <a class="route-card" href="index.html"><h3>Overview</h3><p>The first-stop public pitch for what MetrAIyux 0S does and who it is for.</p></a>
+        <a class="route-card" href="capabilities.html"><h3>Capabilities</h3><p>Command, approval, brain routing, customer SaaS, proof, and deployment scope.</p></a>
+        <a class="route-card" href="marketplace.html"><h3>Marketplace</h3><p>The public offer shelf for buyers who need a packaged entry point.</p></a>
+        <a class="route-card" href="skyeroutex.html"><h3>RouteX</h3><p>The route-heavy workforce command lane surfaced without exposing private controls.</p></a>
+        <a class="route-card" href="proof.html"><h3>Live Proof</h3><p>The proof-first surface for production, email, gate, and live workflow evidence.</p></a>
+        <a class="route-card" href="valuation.html"><h3>Valuation</h3><p>The value narrative for the built asset, deployed system, and revenue-backed upside.</p></a>
+        <a class="route-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html" target="_blank" rel="noopener"><h3>Feature Atlas</h3><p>The full inventory for buyers who want the deeper system map.</p></a>
+        <a class="route-card" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s" target="_blank" rel="noopener"><h3>SkyePay Store</h3><p>The commercial route where offers become checkout and approval workflows.</p></a>
+      </div>
+    </section>
+
+    <section class="section ecosystem-band" id="bridge">
+      <p class="eyebrow">Network bridge</p>
+      <h2>The 0S now has a clean public map and a Valley Verified company page.</h2>
+      <p class="wide">The marketing ecosystem page stays simple and sendable. The full-system ecosystem URL becomes the company profile for MetrAIyux 0S, with Valley Verified framing and links back into the proof, feature atlas, platform ledger, and live 0S surfaces.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ecosystem.html" target="_blank" rel="noopener">Open Company Profile</a>
+        <a class="btn-ghost" href="https://phx-verified-network.pages.dev/" target="_blank" rel="noopener">Open Valley Verified</a>
+        <a class="btn-ghost" href="https://skyehands.netlify.app/ecosystem.html" target="_blank" rel="noopener">Open Skyes Ecosystem</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>MetrAIyux 0S</strong>
+        <p>Public ecosystem map for the 0S marketing site, Valley Verified company page, proof rooms, payment activation, app lanes, vault, mailbox, and parent Skyes network.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Main Site</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="proof.html">Proof</a>
+      </div>
+      <div class="footer-links">
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ecosystem.html" target="_blank" rel="noopener">Valley Profile</a>
+        <a href="https://phx-verified-network.pages.dev/" target="_blank" rel="noopener">Valley Verified</a>
+        <a href="https://solenterprises.org/" target="_blank" rel="noopener">Legal Center</a>
+        <span class="tiny">Last revision: 2026-05-18</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const btn = document.querySelector('[data-menu-button]');
+      const links = document.querySelector('[data-nav-links]');
+      if (btn && links) {
+        btn.addEventListener('click', () => {
+          const open = links.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded', String(open));
+        });
+      }
+    })();
+  </script>
+  <script src="skye-effects.js"></script>
+</body>
+</html>

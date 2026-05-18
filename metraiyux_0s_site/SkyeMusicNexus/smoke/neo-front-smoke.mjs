@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requiredFiles = [
   'public/index.html',
+  'public/create.html',
   'public/upload.html',
   'public/player.html',
   'public/releases.html',
@@ -29,6 +30,7 @@ async function text(file) {
 for (const file of requiredFiles) await text(file);
 
 const index = await text('public/index.html');
+const create = await text('public/create.html');
 const upload = await text('public/upload.html');
 const player = await text('public/player.html');
 const releases = await text('public/releases.html');
@@ -39,19 +41,21 @@ const gate = await text('gate-session.js');
 const css = await text('public/neo-nexus.css');
 const js = await text('public/neo-nexus.js');
 
-const allArtistPages = [index, upload, player, releases, rights, exchange].join('\n');
-const indexMust = ['Platform Dashboard','Upload Studio','Music Player','Releases','Rights','Exchange','Truth Boundary','pulse-field'];
+const allArtistPages = [index, create, upload, player, releases, rights, exchange].join('\n');
+const indexMust = ['Platform Dashboard','Create','Upload Studio','Music Player','Releases','Rights','Exchange','Truth Boundary','pulse-field'];
 for (const marker of indexMust) if (!index.includes(marker)) failures.push(`public/index.html missing ${marker}`);
-const platformMust = ['Gated Audio Upload','Uploaded Audio Vault','Release Forge','Artist Nebula','Creator Exchange','Content Request Exchange','Inbox Relay','Community Relay','Achievement Orbit','Release Campaign Forge','Stream Deck','Rights Vault','Takedown Hold','Royalty River','Ops Sequencer'];
+const createMust = ['Open Source Creation Studio','Launch openDAW Bridge','Save Studio Project','Queue Export','Release Forge handoff'];
+for (const marker of createMust) if (!create.includes(marker)) failures.push(`public/create.html missing ${marker}`);
+const platformMust = ['Gated Audio Upload','Drop songs here','Uploaded Audio Vault','Release Forge','Artist Nebula','Creator Exchange','Content Request Exchange','Inbox Relay','Community Relay','Achievement Orbit','Release Campaign Forge','Stream Deck','Rights Vault','Takedown Hold','Royalty River','Ops Sequencer'];
 for (const marker of platformMust) if (!allArtistPages.includes(marker)) failures.push(`public platform pages missing ${marker}`);
 
 const adminMust = ['Operator Stage','Review Chamber','Exchange Console','Payout Gate','Analytics Prism','Capsule Wall','pulse-field'];
 for (const marker of adminMust) if (!admin.includes(marker)) failures.push(`public/admin.html missing ${marker}`);
 
-const cssMust = ['vinyl-core','signal-map','wave-reader','constellation-list','exchange-grid','achievement-grid','player-queue','rights-status','operator-dialog','aurora'];
+const cssMust = ['vinyl-core','signal-map','wave-reader','constellation-list','exchange-grid','achievement-grid','player-queue','rights-status','operator-dialog','song-drop-zone'];
 for (const marker of cssMust) if (!css.includes(marker)) failures.push(`neo-nexus.css missing ${marker}`);
 
-const jsMust = ['music-artists','music-releases','music-assets','music-payments','music-analytics','music-exchange','queue-operations','request-content','publish-community','build-release-campaign','report-streams','playback-stream','update-rights','takedown-request','AudioContext','bootstrapLocalProof','loginLocalOperator'];
+const jsMust = ['music-artists','music-releases','music-assets','music-payments','music-analytics','music-exchange','queue-operations','request-content','publish-community','build-release-campaign','report-streams','playback-stream','update-rights','takedown-request','DataTransfer','AudioContext','bootstrapLocalProof','loginLocalOperator'];
 for (const marker of jsMust) if (!js.includes(marker)) failures.push(`neo-nexus.js missing ${marker}`);
 
 for (const marker of ['Free99 Lite means no charge','SKYE_MUSIC_NEXUS_GATE_SESSION','SkyeMusicGate']) {
@@ -66,4 +70,4 @@ if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ ok: true, app: 'SkyeMusicNexus NeoFront', verified: ['platform dashboard', 'upload studio', 'gated audio upload', 'artist stage', 'operator stage', 'artist exchange', 'content request exchange', 'community relay', 'achievement orbit', 'release campaign forge', 'stream deck playback', 'rights vault', 'takedown hold', 'vinyl signal system', 'release forge', 'royalty river', 'operations sequencer', 'SkyGate client wiring'] }, null, 2));
+console.log(JSON.stringify({ ok: true, app: 'SkyeMusicNexus NeoFront', verified: ['platform dashboard', 'open-source create studio', 'upload studio', 'gated audio upload', 'artist stage', 'operator stage', 'artist exchange', 'content request exchange', 'community relay', 'achievement orbit', 'release campaign forge', 'stream deck playback', 'rights vault', 'takedown hold', 'vinyl signal system', 'release forge', 'royalty river', 'operations sequencer', 'SkyGate client wiring'] }, null, 2));

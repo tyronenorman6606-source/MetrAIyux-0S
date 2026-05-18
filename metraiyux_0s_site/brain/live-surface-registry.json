@@ -1,6 +1,6 @@
 {
   "version": "live-surfaces-platform-accounting",
-  "updated_at": "2026-05-17T00:00:00Z",
+  "updated_at": "2026-05-18T00:00:00Z",
   "primary_folder": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
   "gate_folder": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
   "positioning": "MetrAIyux 0S is the client-facing autonomous business command deck. SkyeGateFS27 is the gate that gives those decks identity, event evidence, key control, payment routing, and deployment tracking. SkyePay Store is the live catalog and checkout origin; SkyeVault adds gated file/workspace access; SkyeCard adds controlled usage and service-credit cards; SkyeMail adds FS27-backed mailbox proof and alias routing. SkyeMerit adds first-time protected merit packs, capped discount math, and kAIxu credit without bypassing SkyePay, owner approval, or gate sessions. Together they let Gray sell websites as sovereign web infrastructure, not disposable pages. SkyeProfitConsole adds a Free99 no-charge app lane, SkyeMusicNexus adds Free99 Lite plus paid music ops and drop add-ons, and all music lanes still require a 0S, FS27, or SkyGate session. SkyeMediaCenter adds Free99 no-charge media intake, review, dispatch, publish, stats, and file-delivery access under the same gate-session rule. Skye Content Forge adds Free99 no-charge approved-source scanning, original content generation, drafts, export, scheduler, backup, and deployment-hook proof under a 0S, FS27, SkyGate, or operator admin gate session.",
@@ -18,7 +18,7 @@
     "stripe_sync_receipt": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
     "public_atlas_proof": "test-artifacts/ledger-stripe-sync-prod/browser-qa.json"
   },
-  "surface_count": 39,
+  "surface_count": 54,
   "surfaces": [
     {
       "id": "skygate-fs27-proof-surface",
@@ -174,6 +174,29 @@
       "sales_use": "Use as the primary live demo for what a client can receive with their own branding and deployment.",
       "primary_brain": "gray-london-skyes-brain",
       "secondary_brain": "celeste-monroe-brain"
+    },
+    {
+      "id": "metraiyux-kaixu-chat-67",
+      "name": "kAIxU Chat 6.7",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/kAIxUChatv6.7/",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/kAIxUChatv6.7/index.html",
+      "audience": "gated operators, customers, builders, and technical evaluators",
+      "privacy": "public shell with Skyes Over London-only origin labeling; live chat requires a 0S or gate key",
+      "purpose": "Full kAIxU chat replacement surface for planning, reasoning, coding, operator decisions, saved local threads, model-lane selection, and gate-routed chat traffic.",
+      "route_when": [
+        "kaixu",
+        "kaixu chat",
+        "chat replacement",
+        "assistant",
+        "model lane",
+        "prompt workspace",
+        "code",
+        "reasoning",
+        "0s gate"
+      ],
+      "sales_use": "Use after a prospect has or can receive a gate key and needs to see a Skyes Over London-branded intelligence workspace without exposing hidden model routing.",
+      "primary_brain": "gray-london-skyes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
     },
     {
       "id": "metraiyux-skyeprofitconsole-expansion",
@@ -895,17 +918,280 @@
       "sales_use": "Use when a buyer or internal reviewer wants proof that SkyeMerit is controlled, capped, and not an auth bypass.",
       "primary_brain": "naomi-sterling-brain",
       "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-skyesplitengine-hub",
+      "name": "Skye Split Engine Free99 Hub",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-split-engine-operator-proof.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/skye-split-engine-operator-proof.html",
+      "audience": "buyers, customers, AEs, operators, finance reviewers",
+      "privacy": "public proof hub with gated app link",
+      "purpose": "Explains the Free99/no-charge split engine, gate-session requirement, split-rule workflows, reports, exports, backups, and no-money-movement boundary.",
+      "route_when": [
+        "split rules",
+        "commission split",
+        "payout report",
+        "settlement report",
+        "free99 split engine",
+        "no charge payout tooling"
+      ],
+      "sales_use": "Use when a buyer needs commission or payout split tooling without another bill, while preserving the gate session boundary.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-skyesplitengine-app",
+      "name": "Skye Split Engine App",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeSplitEngine/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/SkyeSplitEngine/index.html",
+      "audience": "gated customers and approved operators",
+      "privacy": "gate session required before app boot",
+      "purpose": "Local-first split engine for people, products, split rules, transactions, settlement reports, CSV/JSON export, backups, restore snapshots, and repair controls.",
+      "route_when": [
+        "open split app",
+        "split engine app",
+        "transaction ledger",
+        "csv payout export",
+        "backup split rules"
+      ],
+      "sales_use": "Demo only after a valid session is present. Free99 means no charge, not anonymous access.",
+      "primary_brain": "naomi-sterling-brain",
+      "secondary_brain": "site-operator-brain"
+    },
+    {
+      "id": "metraiyux-skyesplitengine-proof-receipt",
+      "name": "Skye Split Engine Expansion Receipt",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skyesplitengine-expansion-receipt.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/skyesplitengine-expansion-receipt.html",
+      "audience": "buyers, operators, technical evaluators, finance reviewers",
+      "privacy": "public proof receipt with no private tokens",
+      "purpose": "Records archive extraction, zip removal, gate-session wiring, price-card updates, browser proof, and commercial boundaries for the Free99 split engine.",
+      "route_when": [
+        "split engine proof",
+        "free99 proof",
+        "zip removed",
+        "gate session proof",
+        "price card proof"
+      ],
+      "sales_use": "Use when someone needs evidence that the import was wired into 0S and did not become an auth bypass.",
+      "primary_brain": "0meg4kai-security-brain",
+      "secondary_brain": "naomi-sterling-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-hub",
+      "name": "Marketing Made Easy Growth Suite Hub",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/marketing-made-easy-growth-suite.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/marketing-made-easy-growth-suite.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public proof-safe hub with protected production boundary",
+      "purpose": "Explains the Marketing Made Easy growth-suite import, folder coverage, MCP/deep-scan status, 0S routes, and FS27 gate boundary.",
+      "route_when": [
+        "marketing made easy",
+        "growth suite",
+        "brand launch web growth",
+        "deep scan receipt",
+        "Marketing-Made-Easy"
+      ],
+      "sales_use": "Use when a prospect asks whether the marketing, brand, launch, document, web creation, growth ops, Arizona intelligence, and kAIxU brand-kit imports are accounted for in the 0S.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-suite-index",
+      "name": "Marketing Made Easy Suite Index",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public route index with protected production boundary",
+      "purpose": "Routes the eight Marketing Made Easy subfolders from one 0S suite index.",
+      "route_when": [
+        "suite index",
+        "AE-FlowPro",
+        "BrandID",
+        "BusinessLaunchGo",
+        "SkyeDocxMax",
+        "SkyeWebCreatorMax",
+        "WebGrowthOperator",
+        "Arizona Growth Index",
+        "kAIxU BrandKit"
+      ],
+      "sales_use": "Use after the live hub when the buyer needs to inspect the imported subapp entry points.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "orion-hayes-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-deep-scan-receipt",
+      "name": "Marketing Made Easy Deep Scan Receipt",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/marketing-made-easy-deep-scan-receipt.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/marketing-made-easy-deep-scan-receipt.html",
+      "audience": "operators, technical evaluators, proof-seeking buyers",
+      "privacy": "public proof receipt with private credentials excluded",
+      "purpose": "Records the Marketing Made Easy MCP mine, scan summary, 0S wiring, FS27 dossier, proof commands, and production-claim boundary.",
+      "route_when": [
+        "deep scan",
+        "MCP receipt",
+        "proof receipt",
+        "gate dossier",
+        "Marketing Made Easy proof"
+      ],
+      "sales_use": "Use when someone asks what was actually scanned or what remains unproven before production claims.",
+      "primary_brain": "victor-saint-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-ae-flowpro",
+      "name": "Marketing Made Easy AE-FlowPro",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/AE-FlowPro/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes account-executive flow planning, sales-room discipline, and proof-oriented AE operations.",
+      "route_when": [
+        "AE flow",
+        "sales motion",
+        "account executive",
+        "pipeline proof"
+      ],
+      "sales_use": "Use for AE-FlowPro questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "celeste-monroe-brain",
+      "secondary_brain": "valentina-reyes-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-brandid-offline-pwa",
+      "name": "Marketing Made Easy BrandID Offline PWA",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BrandID-Offline-PWA/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/BrandID-Offline-PWA/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes offline-first brand identity work, brand-kit intake, local PWA proof, and handoff preparation.",
+      "route_when": [
+        "brand identity",
+        "offline PWA",
+        "brand kit",
+        "identity proof"
+      ],
+      "sales_use": "Use for BrandID Offline PWA questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-businesslaunchgo",
+      "name": "Marketing Made Easy BusinessLaunchGo",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BusinessLaunchGo/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/BusinessLaunchGo/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes launch-pack preparation, business setup sequencing, and launch proof without claiming filing or legal authority.",
+      "route_when": [
+        "business launch",
+        "startup pack",
+        "launch proof",
+        "business setup"
+      ],
+      "sales_use": "Use for BusinessLaunchGo questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "celeste-monroe-brain",
+      "secondary_brain": "victor-saint-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-skydocxmax",
+      "name": "Marketing Made Easy SkyeDocxMax",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/SkyeDocxMax/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes document editing, document proof, and delivery preparation while keeping production storage and external writes gated.",
+      "route_when": [
+        "document editing",
+        "docx",
+        "document proof",
+        "delivery prep"
+      ],
+      "sales_use": "Use for SkyeDocxMax questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "victor-saint-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-skyewebcreatormax",
+      "name": "Marketing Made Easy SkyeWebCreatorMax",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/SkyeWebCreatorMax/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes web creation briefs, templates, previews, exports, review, execution, and dispatch proof.",
+      "route_when": [
+        "web creation",
+        "site builder",
+        "website preview",
+        "template export"
+      ],
+      "sales_use": "Use for SkyeWebCreatorMax questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "valentina-reyes-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-webgrowthoperator",
+      "name": "Marketing Made Easy WebGrowthOperator",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/WebGrowthOperator/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/WebGrowthOperator/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes managed web presence, Phoenix/Arizona growth pages, operator playbooks, services, pricing posture, and proof routes.",
+      "route_when": [
+        "web growth",
+        "managed website",
+        "Phoenix growth",
+        "growth operations"
+      ],
+      "sales_use": "Use for WebGrowthOperator questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "celeste-monroe-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-arizona-growth-index",
+      "name": "Marketing Made Easy Arizona Growth Index",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/arizona-growth-index/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/arizona-growth-index/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes Arizona market-intelligence pages and local growth research without claiming live external data ingestion.",
+      "route_when": [
+        "Arizona growth",
+        "market index",
+        "local intelligence",
+        "Phoenix market"
+      ],
+      "sales_use": "Use for Arizona Growth Index questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "marcus-vale-brain"
+    },
+    {
+      "id": "metraiyux-marketing-made-easy-kaixu-brandkit",
+      "name": "Marketing Made Easy kAIxU BrandKit",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/kAIxUBrandKit/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/kAIxUBrandKit/index.html",
+      "audience": "buyers, operators, founder-led clients, growth teams, technical evaluators",
+      "privacy": "public imported app surface with gated production handoff",
+      "purpose": "Routes kAIxU brand-kit handoff, contract-proof checks, and brand system packaging under the 0S gate.",
+      "route_when": [
+        "kAIxU",
+        "brand kit",
+        "brand handoff",
+        "contract proof"
+      ],
+      "sales_use": "Use for kAIxU BrandKit questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
+      "primary_brain": "valentina-reyes-brain",
+      "secondary_brain": "0meg4kai-security-brain"
     }
   ],
   "brain_guidance": {
     "gray-london-skyes-brain": "Frame the system as sovereign web infrastructure: public site, command deck, auth gate, proof loop, and client-specific deployment strategy.",
-    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use SkyeMerit when the buyer asks about first-time credits, coupon math, or why large tickets are not blanket-discounted. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, a Free99 Lite preview, or paid one-song/release-drop music work that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session. Use Skye Content Forge when the pain is content repurposing, approved-source scanning, draft production, scheduler proof, or Free99 content publishing under auth.",
+    "celeste-monroe-brain": "Sell by listening first. Ask where work breaks down, then route the prospect to the one live surface that proves the relevant capability. Use SkyeMerit when the buyer asks about first-time credits, coupon math, or why large tickets are not blanket-discounted. Use ConnectLog + Relay13 when the pain is relationship capture, follow-up memory, or owned messaging. Use HouseOperations + SkyeBox when the pain is task/vendor pressure, owner alerts, proof closeout, or private authenticator custody handoff. Use SkyeRouteX when the pain is dispatch, route planning, stop proof, route analytics, or field workforce readiness. Use SkyeProfitConsole when the pain is profit planning or margin pressure. Use SkyeMusicNexus when the pain is artist records, release workflow, royalty motion, payout review, analytics, a Free99 Lite preview, or paid one-song/release-drop music work that still needs a gate session. Use SkyeMediaCenter when the pain is media intake, asset review, publishing, file delivery, or Free99 media access that still needs a gate session. Use Skye Content Forge when the pain is content repurposing, approved-source scanning, draft production, scheduler proof, or Free99 content publishing under auth. Use Marketing Made Easy when the buyer asks for marketing systems, brand identity, launch packs, document/web creation, growth operations, Arizona growth intelligence, or kAIxU brand-kit handoff, while keeping production execution gated.",
     "marcus-vale-brain": "Use HouseOperations for task/vendor/schedule/owner-alert operating discipline and SkyeRouteX for route-heavy operating discipline. Keep live provider, cloud persistence, and production deployment claims gated until proof exists.",
-    "orion-hayes-brain": "Explain technical depth in plain language: FS27 validates identity, MetrAIyux routes work, HouseOperations runs command workflows, SkyeBox keeps TOTP private and encrypted, ConnectLog captures relationship context, Relay13 handles production messaging, SkyeRouteX handles route-heavy workforce command, SkyeProfitConsole handles gated Free99 profit runtime proof, SkyeMediaCenter handles gated Free99 media intake/review/publish/file proof, Skye Content Forge handles gated Free99 source scan/generate/export/scheduler/backup proof, Cloudflare serves the system, and event receipts prove activity.",
-    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 Lite into anonymous access, or claims that paid drops include live DSP/distributor/payment authority before provider proof.",
+    "orion-hayes-brain": "Explain technical depth in plain language: FS27 validates identity, MetrAIyux routes work, HouseOperations runs command workflows, SkyeBox keeps TOTP private and encrypted, ConnectLog captures relationship context, Relay13 handles production messaging, SkyeRouteX handles route-heavy workforce command, SkyeProfitConsole handles gated Free99 profit runtime proof, SkyeMediaCenter handles gated Free99 media intake/review/publish/file proof, Skye Content Forge handles gated Free99 source scan/generate/export/scheduler/backup proof, Cloudflare serves the system, and event receipts prove activity. Marketing Made Easy is a routed 0S suite of eight imported subapps with local scan proof and FS27 event-accounting boundaries.",
+    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, or attempts to turn Free99 Lite into anonymous access, or claims that paid drops include live DSP/distributor/payment authority before provider proof. Flag Marketing Made Easy requests that try to bypass gate sessions, create unapproved checkout, spend ad budget, publish externally, or claim production customer tenancy before proof.",
     "site-operator-brain": "Route customer feedback to the review intake, route proof-seeking prospects to the review wall, and route publication decisions through the 0S QA queue.",
     "adrian-cross-brain": "When a client wants to talk about their experience, thank them and route them to the Skyes Over London Live Review Intake. When a prospect asks what customers say, route them to the Reviews Proof Wall. Use ConnectLog when the buyer needs relationship continuity after meetings, calls, events, recruiting, or vendor conversations.",
-    "valentina-reyes-brain": "Use the Reviews Proof Wall as public social proof. Keep review copy proof-safe and do not invent outcomes, client names, or consent. Route media-intake, asset-review, publish, and content-proof questions to SkyeMediaCenter when the user needs Free99 no-charge media operations under a gate session. Route content repurposing, approved-source scanning, draft generation, and scheduler-proof questions to Skye Content Forge when the user needs Free99 no-charge content publishing under a gate session.",
+    "valentina-reyes-brain": "Use the Reviews Proof Wall as public social proof. Keep review copy proof-safe and do not invent outcomes, client names, or consent. Route media-intake, asset-review, publish, and content-proof questions to SkyeMediaCenter when the user needs Free99 no-charge media operations under a gate session. Route content repurposing, approved-source scanning, draft generation, and scheduler-proof questions to Skye Content Forge when the user needs Free99 no-charge content publishing under a gate session. Route Marketing Made Easy questions to the growth-suite hub when the pain is brand, launch, web creation, growth operations, local market intelligence, or campaign packaging under the 0S gate.",
     "victor-saint-brain": "Review submissions before publication. Confirm consent, public-name preference, category fit, and proof safety; only five approved unpublished reviews should be batched for production. Relay13 live delivery claims can be made only with the current production proof artifacts, and never with admin token, API key, or private setup details exposed."
   },
   "public_claim_boundary": [
@@ -924,11 +1210,13 @@
     "Do not claim SkyeMusicNexus is anonymous or ungated. Free99 means no charge only for Lite; paid tiers and add-ons still require a gate session. App boot, Artist Stage, Operator Stage, artist records, release lists, operations board, analytics, payouts, paid drops, and workflow proof require a gate session.",
     "Do not claim SkyeMusicNexus paid drops include live distributor ingestion, DSP royalty settlement, real payment movement, production identity-provider handoff, label/legal authority, or deployed persistence until provider integrations are approved and proven.",
     "Do not claim Skye Content Forge is anonymous or ungated. Free99 means no charge only; app boot, health, source scan, generation, export, scheduler, backup, restore, deployment, and publish APIs require a gate session.",
-    "Do not claim Skye Content Forge provider publishing works without configured Drive, GitHub, Netlify, Cloudflare, Meta, Instagram, LinkedIn, OpenAI credentials, and platform permissions."
+    "Do not claim Skye Content Forge provider publishing works without configured Drive, GitHub, Netlify, Cloudflare, Meta, Instagram, LinkedIn, OpenAI credentials, and platform permissions.",
+    "Do not claim Marketing Made Easy is anonymous, fully production-tenanted, connected to ad spend, or approved for external publishing; the imported suite is routed and deep-scanned, while production execution remains owner-approved and proof-gated.",
+    "Do not turn WebGrowthOperator pricing language or Marketing Made Easy folder copy into SkyePay checkout products without an approved catalog entry and FS27 owner approval."
   ],
   "brain_routes": {
     "naomi-sterling-brain": "Use SkyeProfitConsole when a buyer asks about profit packs, margins, split checks, Free99 access, or no-charge profit tooling. Always say Free99 still requires a gate session.",
-    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, attempts to turn Free99 into anonymous access, or paid-drop/live-provider claims before proof.",
-    "valentina-reyes-brain": "Use SkyeMusicNexus when a buyer asks about artist records, release forge, royalty motion, payout review, music workflow proof, Free99 Lite access, paid Studio/Label/Managed music ops, or one-song/release drops. Use Skye Content Forge when a buyer asks about approved-source scanning, content drafts, repurposing, scheduler proof, export/backup, or Free99 content publishing. Always say every lane still requires a gate session."
+    "0meg4kai-security-brain": "Keep buyer demos away from owner-only controls. Flag any request that touches secrets, customer isolation, connector publishing, payments, contracts, legal claims, admin tokens, authenticator recovery, managed secret custody, SkyeProfitConsole, SkyeMediaCenter, Skye Content Forge, or SkyeMusicNexus gate-session bypass, runtime token exposure, attempts to turn Free99 into anonymous access, or paid-drop/live-provider claims before proof. Marketing Made Easy must stay gated: no anonymous production use, ad spend, external publishing, customer tenancy, or SkyePay checkout without approved proof.",
+    "valentina-reyes-brain": "Use SkyeMusicNexus when a buyer asks about artist records, release forge, royalty motion, payout review, music workflow proof, Free99 Lite access, paid Studio/Label/Managed music ops, or one-song/release drops. Use Skye Content Forge when a buyer asks about approved-source scanning, content drafts, repurposing, scheduler proof, export/backup, or Free99 content publishing. Always say every lane still requires a gate session. Use Marketing Made Easy when a buyer asks for brand, launch, web creation, growth operations, Arizona market intelligence, or kAIxU brand-kit proof."
   }
 }

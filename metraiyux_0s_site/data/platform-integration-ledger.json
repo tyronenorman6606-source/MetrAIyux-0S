@@ -1,0 +1,573 @@
+{
+  "version": "2026-05-18-free99-platform-intake-accounting",
+  "updated_at": "2026-05-18T00:00:00Z",
+  "source_changelogs": [
+    "SkyeGateFS27/docs/CHANGELOG.md",
+    "metraiyux_0s_site/changelog/index.html",
+    "metraiyux_0s_site/live/SkyeMail/CHANGELOG.md",
+    "SkyeGateFS27/docs/integration-dossiers/marketing-made-easy.md",
+    "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json"
+  ],
+  "rule": "Every platform named in the changelog or Free99 intake must have a system surface, buyer route, advertising angle, integration boundary, proof path, and platform_id usage boundary. Free99 means no charge only; it never means anonymous access, owner-control bypass, or paid-app checkout without approval.",
+  "platforms": [
+    {
+      "id": "skyepay-store",
+      "name": "SkyePay Ecosystem Store",
+      "status": "integrated",
+      "source_change": "SkyeGateFS27 changelog: public store, Stripe lookup-key checkout, trials, SkyeVault access, SkyeCard usage offers, and owner-approval copy.",
+      "system_surfaces": [
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay/offers?client=metraiyux-0s",
+        "metraiyux_0s_site/saas/skyepay.html"
+      ],
+      "integration_points": [
+        "SkyeGateFS27 skyepay-offers endpoint",
+        "SkyeGateFS27 skyepay-checkout endpoint",
+        "Stripe lookup-key checkout with metadata-preserving fallback",
+        "owner-approved activation states for controlled app lanes",
+        "0S SaaS plan links and FS27 customer checkout origin"
+      ],
+      "advertising": {
+        "buyer_signal": "They ask what is ready to buy right now.",
+        "headline": "I give buyers one live store instead of a private price spreadsheet.",
+        "cta": "Open the SkyePay Store",
+        "safe_claims": [
+          "Public catalog is live through FS27.",
+          "Approved offers can route to Stripe Checkout.",
+          "Owner-approved app lanes do not auto-unlock from payment alone."
+        ],
+        "avoid_claims": [
+          "Do not claim every repo price is instant checkout.",
+          "Do not invent Stripe links or payment terms.",
+          "Do not claim owner-approved lanes are auto-provisioned."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run proof:skyepay",
+          "npm run gateway:skyepay:scan",
+          "npm run gateway:skyepay:owner-approval"
+        ],
+        "receipts": [
+          "test-artifacts/skyepay-live-production/skyepay-live-production-proof.json",
+          "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json"
+        ]
+      }
+    },
+    {
+      "id": "skyemerit",
+      "name": "SkyeMerit Protected Merit System",
+      "status": "integrated",
+      "source_change": "SkyeGateFS27 changelog: SkyeMerit checkout math, metadata, kAIxu credit, and Stripe promo stacking disablement.",
+      "system_surfaces": [
+        "metraiyux_0s_site/saas/skyemerit.html",
+        "metraiyux_0s_site/operator/skyemerit-admin.html",
+        "metraiyux_0s_site/proof/skyemerit-expansion-receipt.html"
+      ],
+      "integration_points": [
+        "0S SaaS Worker /api/saas/skyemerit/catalog",
+        "0S SaaS Worker /api/saas/skyemerit/preview",
+        "0S SaaS Worker /api/saas/skyemerit/issue",
+        "FS27 SkyePay checkout adjustment",
+        "Resend, SkyeMail, Relay13, ConnectLog, and FS27 mirror delivery hooks when configured"
+      ],
+      "advertising": {
+        "buyer_signal": "They ask for first-time help, coupons, or capped discount logic.",
+        "headline": "I can help the first move without turning the whole system into a coupon.",
+        "cta": "Open SkyeMerit Wallet",
+        "safe_claims": [
+          "SkyeMerit is Free99 to receive.",
+          "Eligible SkyePay spend can be reduced by protected merit math.",
+          "kAIxu credit and discount metadata are recorded without bypassing the gate."
+        ],
+        "avoid_claims": [
+          "Do not describe SkyeMerit as cash.",
+          "Do not say Stripe promo stacking remains enabled when SkyeMerit applies.",
+          "Do not describe SkyeMerit as an auth bypass."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run 0s:skyemerit:proof",
+          "npm run audit:commercial-limits"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/proof/skyemerit-expansion-receipt.html"
+        ]
+      }
+    },
+    {
+      "id": "skyeroutex-workforce-command",
+      "name": "SkyeRouteX Workforce Command",
+      "status": "integrated",
+      "source_change": "SkyeGateFS27 changelog: RouteX offer, owner-approval checkout, root env aliases, and live route ops readiness.",
+      "system_surfaces": [
+        "metraiyux_0s_site/live/skyeroutex-workforce-command.html",
+        "metraiyux_0s_site/SkyeRouteX/index.html",
+        "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/index.html"
+      ],
+      "integration_points": [
+        "SkyePay offer metraiyux-routex-workforce-command",
+        "owner_approved_after_route_scope activation",
+        "SkyeRouteX V83 routed shell",
+        "SkyeRoutexFlow v0.4.0 local proof platform",
+        "layout compatibility pointer from legacy top-level path"
+      ],
+      "advertising": {
+        "buyer_signal": "The day breaks between provider jobs, contractor matching, route stops, and proof.",
+        "headline": "I turn field work into a command lane instead of a scattered text thread.",
+        "cta": "Open Workforce Command",
+        "safe_claims": [
+          "RouteX is a paid, owner-approved app lane.",
+          "The local v0.4.0 proof covers provider jobs, contractor boards, assignments, route stops, proof, payment-state ledgers, and exports.",
+          "Payment does not auto-unlock the workspace."
+        ],
+        "avoid_claims": [
+          "Do not claim live GPS/navigation operations without provider proof.",
+          "Do not claim live provider callbacks, production DB proof, or real payment movement until those checks exist."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run 0s:skyeroutex:proof",
+          "npm run 0s:skyeroutex:stress",
+          "npm run gateway:skyepay:owner-approval"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/proof/skyeroutex-expansion-receipt.html",
+          "metraiyux_0s_site/proof/skyeroutex-folder-unification-proof-2026-05-17.md"
+        ]
+      }
+    },
+    {
+      "id": "skyevault",
+      "name": "SkyeVault Access",
+      "status": "integrated",
+      "source_change": "SkyeGateFS27 changelog: SkyeVault access subscriptions with cap, rate, device, provider/model, storage, file, and workspace policy.",
+      "system_surfaces": [
+        "https://skyevault-drop.graylondonskyes.workers.dev/",
+        "SkyeVault-Drop/public/index.html",
+        "SkyeVault-Drop/netlify/functions/provision-workspace.js"
+      ],
+      "integration_points": [
+        "FS27 SkyePay offers: skyevault-starter-access, skyevault-pro-access, skyevault-command-access",
+        "SkyeVault-Drop signed workspace provisioning endpoint",
+        "customer gate policy vault_storage_mb, vault_file_limit, and vault_workspace_limit",
+        "SkyeMusicNexus Gated Audio Vault Pack path for larger audio handoff"
+      ],
+      "advertising": {
+        "buyer_signal": "They need gated files, uploads, workspace storage, or proof-safe handoff.",
+        "headline": "I keep the file handoff inside the operating system, not in loose email attachments.",
+        "cta": "Open SkyeVault",
+        "safe_claims": [
+          "SkyeVault access plans are cataloged through SkyePay.",
+          "Vault subscriptions carry explicit workspace, file, storage, and gate policy limits.",
+          "SkyeVault auto-provisioning is the named exception to owner-approved app activation."
+        ],
+        "avoid_claims": [
+          "Do not claim unlimited storage.",
+          "Do not claim managed secret custody.",
+          "Do not claim audio streaming licensing from storage alone."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "cd SkyeVault-Drop && npm run smoke:local"
+        ],
+        "receipts": [
+          "SkyeVault-Drop/docs/PROOF_LEDGER.md",
+          "SkyeGateFS27/docs/SKYPAY_GATEWAY.md"
+        ]
+      }
+    },
+    {
+      "id": "skyecard-usage",
+      "name": "SkyeCard Usage Offers",
+      "status": "integrated",
+      "source_change": "SkyeGateFS27 changelog: SkyeCard AI Boost, Push Pack, Launch Credit, and Audit Pack usage offers.",
+      "system_surfaces": [
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+        "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js"
+      ],
+      "integration_points": [
+        "FS27 SkyePay offer family skyecards",
+        "owner-approved credit activation",
+        "credits metadata buckets for ai_usage, pushes, and service_credit"
+      ],
+      "advertising": {
+        "buyer_signal": "They need a smaller add-on instead of upgrading the whole subscription.",
+        "headline": "I can sell small useful credits without pretending they are full plans.",
+        "cta": "Open Usage Cards",
+        "safe_claims": [
+          "SkyeCard offers are usage or service-credit cards.",
+          "AI Boost, Push Pack, Launch Credit, and Audit Pack are cataloged in SkyePay.",
+          "Owner approval still governs activation where required."
+        ],
+        "avoid_claims": [
+          "Do not call cards subscriptions unless the offer is recurring.",
+          "Do not promise uncapped usage.",
+          "Do not treat credits as cash refunds."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run proof:skyepay",
+          "npm run gateway:skyepay:scan"
+        ],
+        "receipts": [
+          "SkyeGateFS27/docs/CHANGELOG.md"
+        ]
+      }
+    },
+    {
+      "id": "skyemail",
+      "name": "SkyeMail Platform",
+      "status": "integrated",
+      "source_change": "SkyeMail changelog: FS27 gate card onboarding, mailbox claim, Resend-backed inbox route, alias-to-same-inbox proof, and public pricing.",
+      "system_surfaces": [
+        "https://skyemail-platform.graylondonskyes.workers.dev/",
+        "https://skyemail-platform.graylondonskyes.workers.dev/marketing",
+        "https://skyemail-platform.graylondonskyes.workers.dev/pricing",
+        "metraiyux_0s_site/live/SkyeMail/index.html"
+      ],
+      "integration_points": [
+        "FS27 gate card onboarding",
+        "SkyeMail return bridge",
+        "mailbox provisioning records",
+        "same-inbox alias foundation",
+        "Resend-backed send, receive, inbox, sent, and proof routes"
+      ],
+      "advertising": {
+        "buyer_signal": "They need owned email, aliases, mailbox proof, or a business inbox story.",
+        "headline": "I keep mail connected to the gate, not floating as a separate login island.",
+        "cta": "Open SkyeMail",
+        "safe_claims": [
+          "SkyeMail has live FS27-backed onboarding proof.",
+          "The inbox can prove sent and received records through the current Worker path.",
+          "Pricing is public and charge-ready, while launch access is currently free."
+        ],
+        "avoid_claims": [
+          "Do not claim billing is active yet.",
+          "Do not claim IMAP/SMTP/JMAP mailbox-server parity until that layer is wired.",
+          "Do not expose mailbox proof internals or private keys."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "cd metraiyux_0s_site/live/SkyeMail && npm run smoke"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/live/SkyeMail/CHANGELOG.md",
+          "metraiyux_0s_site/live/SkyeMail/proof/e2e-current/skyemail-fs27-current-e2e-proof.json"
+        ]
+      }
+    },
+    {
+      "id": "free99-platform-expansions",
+      "name": "Free99 0S Platform Expansions",
+      "status": "integrated",
+      "source_change": "0S changelog: SkyeProfitConsole, SkyeMediaCenter, Skye Split Engine, Skye Content Forge, SkyeMusicNexus Lite, HouseOperations + SkyeBox, and ConnectLog + Relay13 accounted across proof, sales, pricing, and operator routing.",
+      "system_surfaces": [
+        "metraiyux_0s_site/live/skyeprofitconsole-profit-console.html",
+        "metraiyux_0s_site/live/skye-media-center-operator-proof.html",
+        "metraiyux_0s_site/live/skye-content-forge-publisher.html",
+        "metraiyux_0s_site/live/skyemusicnexus-neofront.html",
+        "metraiyux_0s_site/live/houseoperations-skyebox-operator-proof.html",
+        "metraiyux_0s_site/live/connectlog-relay13-operator-proof.html",
+        "metraiyux_0s_site/live/skye-split-engine-operator-proof.html",
+        "metraiyux_0s_site/SkyeSplitEngine/index.html"
+      ],
+      "integration_points": [
+        "0S live proof router",
+        "0S live surface registry",
+        "0S sales offer registry",
+        "proof receipt index",
+        "operator command center",
+        "pricing and SaaS service selector"
+      ],
+      "advertising": {
+        "buyer_signal": "They need a specific operating lane but do not need a fake all-in-one pitch.",
+        "headline": "I show the exact room that solves the pain, with the gate still intact.",
+        "cta": "Open the Proof Router",
+        "safe_claims": [
+          "Each Free99 lane is no charge only where the route says Free99.",
+          "Free, paid, and add-on lanes remain gate-session protected.",
+          "Each expansion has a buyer-safe hub and proof receipt."
+        ],
+        "avoid_claims": [
+          "Do not describe Free99 as anonymous access.",
+          "Do not turn local/imported proof into production-provider claims.",
+          "Do not hide payment, rights, storage, or provider boundaries."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run 0s:skyeprofitconsole:proof",
+          "npm run 0s:skyemusicnexus:proof",
+          "npm run 0s:houseops:skyepay",
+          "npm run 0s:connectlog-relay13:proof",
+          "npm run 0s:skyesplitengine:proof"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/proof/index.html",
+          "metraiyux_0s_site/changelog/index.html",
+          "metraiyux_0s_site/proof/skyesplitengine-expansion-receipt.html"
+        ]
+      }
+    },
+    {
+      "id": "skyesplitengine-free99",
+      "name": "Skye Split Engine Free99",
+      "status": "integrated",
+      "source_change": "Imported skye_split_engine_visual_spectacle_v4.zip into metraiyux_0s_site/SkyeSplitEngine, removed the archive, added a 0S gate-session boot lock, and wired the Free99/no-charge feature across pricing, SaaS, proof, sales, operator, and registry surfaces.",
+      "system_surfaces": [
+        "metraiyux_0s_site/live/skye-split-engine-operator-proof.html",
+        "metraiyux_0s_site/SkyeSplitEngine/index.html",
+        "metraiyux_0s_site/proof/skyesplitengine-expansion-receipt.html",
+        "metraiyux_0s_site/pricing/index.html#skyesplitengine-free99",
+        "metraiyux_0s_site/saas/pricing.html#skyesplitengine-free99"
+      ],
+      "integration_points": [
+        "0S public homepage",
+        "0S SaaS pricing and signup surfaces",
+        "0S live proof router",
+        "0S live surface registry",
+        "0S sales offer registry",
+        "proof receipt index",
+        "operator command center",
+        "commercial price catalog"
+      ],
+      "advertising": {
+        "buyer_signal": "They need commission or payout split rules and reports without adding another bill.",
+        "headline": "Free99 split rules, still behind the gate.",
+        "cta": "Open the Skye Split Engine Hub",
+        "safe_claims": [
+          "Skye Split Engine is Free99, meaning no charge.",
+          "A gate session is still required before app boot.",
+          "The app supports split rules, transactions, reports, CSV/JSON exports, backups, restore snapshots, and local repair controls."
+        ],
+        "avoid_claims": [
+          "Do not describe Free99 as anonymous access.",
+          "Do not claim the app moves money, runs payroll, files taxes, or replaces accounting/legal review.",
+          "Do not claim cloud persistence or provider sync until separate provider proof exists."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run 0s:skyesplitengine:proof"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/proof/skyesplitengine-expansion-receipt.html"
+        ]
+      }
+    },
+    {
+      "id": "marketing-made-easy-growth-suite",
+      "name": "Marketing Made Easy Growth Suite",
+      "status": "routed_quote_only_gate_accounted",
+      "source_change": "Marketing-Made-Easy folder MCP mine, deep scan, 0S route hub, proof receipt, and FS27 integration dossier were added as one accounted growth-suite lane.",
+      "system_surfaces": [
+        "metraiyux_0s_site/live/marketing-made-easy-growth-suite.html",
+        "metraiyux_0s_site/Marketing-Made-Easy/index.html",
+        "metraiyux_0s_site/proof/marketing-made-easy-deep-scan-receipt.html",
+        "SkyeGateFS27/docs/integration-dossiers/marketing-made-easy.md",
+        "SkyeGateFS27/docs/integration-dossiers/marketing-made-easy.json"
+      ],
+      "integration_points": [
+        "0S live surface registry routes all eight Marketing Made Easy subapps",
+        "0S sales offer registry marks the suite quote-only/gated and blocks direct checkout from imported pricing copy",
+        "SkyePay gateway maps the suite as a non-checkout gated route",
+        "FS27 platform catalog and runtime store account for suite, web-creator, and growth-ops control lanes",
+        "MCP tooling receipt and deep-scan summary remain attached to the imported folder"
+      ],
+      "advertising": {
+        "buyer_signal": "They need marketing, brand, launch, document, web creation, or growth operations turned into a gated operating lane.",
+        "headline": "I can route the marketing suite through the 0S instead of leaving it as loose project folders.",
+        "cta": "Open Marketing Made Easy",
+        "safe_claims": [
+          "The Marketing Made Easy folder is scanned and routeable from the 0S.",
+          "Eight imported subapps are accounted for in the 0S live registry and FS27 gate dossier.",
+          "The suite is quote-only/gated until owner-approved production and checkout proof exists."
+        ],
+        "avoid_claims": [
+          "Do not claim ad spend, external publishing, Drive/GitHub/Netlify/Cloudflare writes, or customer tenancy are live.",
+          "Do not convert imported pricing/copy into SkyePay checkout products without approval.",
+          "Do not claim MCP mine audit failures are resolved unless the latest receipt says ok:true."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run 0s:marketing-made-easy:scan",
+          "npm run 0s:marketing-made-easy:smoke",
+          "npm run mcp:mine -- metraiyux_0s_site/Marketing-Made-Easy",
+          "npm run 0s:platform-accounting"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/Marketing-Made-Easy/MCP_TOOLING_RECEIPT.json",
+          "metraiyux_0s_site/Marketing-Made-Easy/DEEP_SCAN_SUMMARY.md",
+          "test-artifacts/marketing-made-easy/deep-scan.json",
+          "test-artifacts/direct-mcp/Marketing-Made-Easy-mcp-tooling-receipt.json"
+        ]
+      }
+    },
+    {
+      "id": "skyeopsconsole-free99",
+      "name": "SkyeOpsConsole Free99",
+      "status": "scanned_free99_gated",
+      "source_change": "Free99 intake scan: skyeopsconsolev2.13.zip is a static/offline console and the only no-charge platform in the new Free99 folder.",
+      "system_surfaces": [
+        "metraiyux_0s_site/Free99/skyeopsconsolev2.13.zip",
+        "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
+        "metraiyux_0s_site/data/free99-platform-intake.json"
+      ],
+      "integration_points": [
+        "0S sales offer registry marks SkyeOpsConsole as do_not_create_skyeopsconsole_free99",
+        "FS27 SkyePay policies include free99_access: skyeopsconsole",
+        "FS27 usage_events can record platform_id=skyeopsconsole and usage_lane for gated free usage proof",
+        "Free99 remains gate-session protected even when billable=false"
+      ],
+      "advertising": {
+        "buyer_signal": "They need an operations console without another bill, but still inside the owner gate.",
+        "headline": "SkyeOpsConsole is Free99, not anonymous.",
+        "cta": "Route SkyeOpsConsole through the 0S gate",
+        "safe_claims": [
+          "SkyeOpsConsole is the only no-charge app in the new Free99 intake.",
+          "It is a gated Free99 feature with billable=false usage accounting.",
+          "The gate still records platform_id and usage_lane when it is wired into FS27."
+        ],
+        "avoid_claims": [
+          "Do not say every app in the Free99 folder is free.",
+          "Do not claim SkyeOpsConsole bypasses login, owner approval, or proof checks.",
+          "Do not imply hosted provider integrations exist until wired and proven."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run mcp:mine -- metraiyux_0s_site/Free99",
+          "npm run 0s:platform-accounting"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
+          "test-artifacts/direct-mcp/Free99-mcp-tooling-receipt.json",
+          "metraiyux_0s_site/data/free99-platform-intake.json"
+        ]
+      }
+    },
+    {
+      "id": "free99-paid-platform-intake",
+      "name": "Free99 Paid Platform Intake",
+      "status": "scanned_pending_stripe_rebuild",
+      "source_change": "Free99/Paid-Apps scan: SkyeAPI + AegisCore, SovereignDocs, CodeStudio, Code Evaluator, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and kAIxU Storefront were unpacked and classified before checkout wiring.",
+      "system_surfaces": [
+        "metraiyux_0s_site/Free99/Paid-Apps",
+        "metraiyux_0s_site/data/free99-platform-intake.json",
+        "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+        "SkyeGateFS27/netlify/functions/_lib/usageGates.js",
+        "SkyeGateFS27/netlify/functions/_lib/ratelimit.js"
+      ],
+      "integration_points": [
+        "0S sales registry creates free99-paid-platform-intake as scanned_pending_stripe_rebuild",
+        "SkyePay gate_policy can carry platform_usage_buckets and free99_access separately",
+        "FS27 usage_events adds platform_id and usage_lane so cost can split by platform",
+        "FS27 rate_limit_scoped_windows supports per-platform RPM windows when a policy bucket exists",
+        "Paid platform buckets default to enabled=false until standalone checkout/add-on/owner approval activates them"
+      ],
+      "advertising": {
+        "buyer_signal": "They ask whether the new tech can be sold or bundled now.",
+        "headline": "I can inventory the new platforms without accidentally giving away paid usage.",
+        "cta": "Review the Free99 Paid Platform Intake",
+        "safe_claims": [
+          "The paid-app zips are scanned and classified.",
+          "Stripe rebuild is pending per-platform pricing and provider-cost review.",
+          "Usage must split by platform_id and usage_lane before invoices or caps are trusted."
+        ],
+        "avoid_claims": [
+          "Do not call the Paid-Apps folder Free99.",
+          "Do not create checkout products from imported pricing copy without owner approval.",
+          "Do not claim provider-backed operation until credentials and production proof exist."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run mcp:mine -- metraiyux_0s_site/Free99",
+          "node --check SkyeGateFS27/netlify/functions/_lib/usageGates.js",
+          "node --check SkyeGateFS27/netlify/functions/_lib/ratelimit.js",
+          "npm run 0s:platform-accounting"
+        ],
+        "receipts": [
+          "metraiyux_0s_site/data/free99-platform-intake.json",
+          "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
+          "test-artifacts/direct-mcp/Free99-mcp-tooling-receipt.json"
+        ]
+      }
+    }
+  ],
+  "campaign_matrix": [
+    {
+      "campaign": "First-Time Buyer Merit",
+      "platforms": [
+        "skyemerit",
+        "skyepay-store"
+      ],
+      "ad_angle": "Start with merit, then show the controlled checkout path.",
+      "proof_route": "metraiyux_0s_site/saas/skyemerit.html"
+    },
+    {
+      "campaign": "Buyable Operating Rooms",
+      "platforms": [
+        "skyepay-store",
+        "skyeroutex-workforce-command",
+        "skyecard-usage"
+      ],
+      "ad_angle": "Show a live catalog, then route the buyer to the lane matching the operational problem.",
+      "proof_route": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s"
+    },
+    {
+      "campaign": "Files, Mail, and Proof Handoff",
+      "platforms": [
+        "skyevault",
+        "skyemail",
+        "skyepay-store"
+      ],
+      "ad_angle": "Position the system as a real operating backend: gated files, gate-backed mailbox records, and payment/approval evidence.",
+      "proof_route": "metraiyux_0s_site/operator/platform-integration-ledger.html"
+    },
+    {
+      "campaign": "Free99 With Boundaries",
+      "platforms": [
+        "free99-platform-expansions",
+        "skyemerit"
+      ],
+      "ad_angle": "Sell the generosity without giving away the security model.",
+      "proof_route": "metraiyux_0s_site/sales/live-proof-router.html"
+    },
+    {
+      "campaign": "Free99 Split Engine",
+      "platforms": [
+        "skyesplitengine-free99",
+        "free99-platform-expansions"
+      ],
+      "ad_angle": "Give the buyer no-charge split-rule tooling while making the auth boundary explicit.",
+      "proof_route": "metraiyux_0s_site/live/skye-split-engine-operator-proof.html"
+    },
+    {
+      "campaign": "Marketing Made Easy Growth Suite",
+      "platforms": [
+        "marketing-made-easy-growth-suite",
+        "skyepay-store"
+      ],
+      "ad_angle": "Show the buyer a routed marketing suite, then keep fulfillment, publishing, ad spend, checkout, and tenancy inside owner-approved gates.",
+      "proof_route": "metraiyux_0s_site/live/marketing-made-easy-growth-suite.html"
+    },
+    {
+      "campaign": "Free99 New Tech Intake",
+      "platforms": [
+        "skyeopsconsole-free99",
+        "free99-paid-platform-intake",
+        "skyepay-store"
+      ],
+      "ad_angle": "Lead with the one real Free99 console, then route every paid app through platform-aware metering and owner-approved pricing.",
+      "proof_route": "metraiyux_0s_site/data/free99-platform-intake.json"
+    }
+  ]
+}

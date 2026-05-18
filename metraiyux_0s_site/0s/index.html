@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S launcher: a browser-native operating shell with dock, windows, app wrapping, command registry, and fullscreen mode.">
+  <meta name="theme-color" content="#03070b">
+  <title>MetrAIyux 0S Launcher</title>
+  <link rel="icon" type="image/png" href="../assets/metraiyux-0s-icon-512.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./os.css">
+</head>
+<body>
+  <canvas class="os-living-field" id="osLivingField" aria-hidden="true"></canvas>
+  <div class="os-scanline" aria-hidden="true"></div>
+  <div class="os-shell" id="osShell">
+    <header class="os-menu" aria-label="MetrAIyux 0S system menu">
+      <a class="os-brand" href="../index.html" aria-label="MetrAIyux 0S home">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="">
+        <span>MetrAIyux 0S</span>
+      </a>
+      <div class="os-menu-status" aria-live="polite">
+        <span id="motionStatus">motion: booting</span>
+        <span id="registryStatus">registry: loading</span>
+        <span id="windowStatus">windows: 0</span>
+      </div>
+      <div class="os-menu-actions">
+        <button class="icon-button" type="button" id="paletteButton" title="Command palette" aria-label="Command palette"><span aria-hidden="true">/</span></button>
+        <button class="icon-button" type="button" id="tileButton" title="Tile windows" aria-label="Tile windows"><span aria-hidden="true">[]</span></button>
+        <button class="icon-button" type="button" id="fullscreenButton" title="Fullscreen" aria-label="Fullscreen"><span aria-hidden="true">FS</span></button>
+        <time id="systemClock" datetime="">00:00</time>
+      </div>
+    </header>
+
+    <main class="os-desktop" id="desktop" aria-label="MetrAIyux 0S desktop">
+      <section class="boot-panel" id="bootPanel" aria-label="0S status board">
+        <div>
+          <p class="system-label">owner command environment</p>
+          <h1>MetrAIyux 0S Launcher</h1>
+          <p class="boot-line">Desktop shell online. Dock, windows, wrapped apps, command registry, live surfaces, and fullscreen mode are mounted.</p>
+        </div>
+        <div class="boot-metrics" aria-label="System metrics">
+          <button type="button" data-launch="command"><strong id="metricApps">0</strong><span>apps</span></button>
+          <button type="button" data-launch="atlas"><strong id="metricSurfaces">0</strong><span>surfaces</span></button>
+          <button type="button" data-launch="commands"><strong id="metricCommands">0</strong><span>commands</span></button>
+          <button type="button" data-command="fullscreen"><strong>1</strong><span>fullscreen shell</span></button>
+        </div>
+      </section>
+
+      <section class="workspace" id="workspace" aria-live="polite"></section>
+    </main>
+
+    <nav class="dock" id="dock" aria-label="MetrAIyux 0S dock"></nav>
+  </div>
+
+  <aside class="palette" id="palette" aria-label="Command palette" aria-hidden="true">
+    <form class="palette-panel" id="paletteForm">
+      <label class="system-label" for="paletteInput">launch</label>
+      <input id="paletteInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search apps, live surfaces, or commands">
+      <div class="palette-results" id="paletteResults" role="listbox"></div>
+    </form>
+  </aside>
+
+  <template id="windowTemplate">
+    <article class="os-window" role="dialog" aria-label="0S window">
+      <header class="window-bar">
+        <button class="window-grip" type="button" aria-label="Move window"><span></span><span></span><span></span></button>
+        <div class="window-title">
+          <span class="window-icon" aria-hidden="true"></span>
+          <strong></strong>
+          <small></small>
+        </div>
+        <div class="window-actions">
+          <button type="button" data-window-action="minimize" title="Minimize" aria-label="Minimize">_</button>
+          <button type="button" data-window-action="maximize" title="Maximize" aria-label="Maximize">[]</button>
+          <button type="button" data-window-action="close" title="Close" aria-label="Close">x</button>
+        </div>
+      </header>
+      <div class="window-body"></div>
+      <button class="resize-handle" type="button" aria-label="Resize window"></button>
+    </article>
+  </template>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "motion": "https://esm.sh/motion@12.38.0"
+      }
+    }
+  </script>
+  <script type="module" src="./os.js"></script>
+</body>
+</html>

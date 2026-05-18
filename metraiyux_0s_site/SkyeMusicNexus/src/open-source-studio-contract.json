@@ -1,0 +1,71 @@
+{
+  "platformId": "skye-music-nexus",
+  "title": "SkyeMusicNexus Open Source Creation Studio Drop-In",
+  "generatedAt": "2026-05-17",
+  "dropInFiles": [
+    "public/create.html",
+    "public/open-source-studio.css",
+    "public/open-source-studio.js",
+    "../netlify/functions/music-studio.js",
+    "src/open-source-studio-contract.json",
+    "open-source/open-source-manifest.json",
+    "open-source/scripts/install-open-source-engines.sh"
+  ],
+  "mountTarget": "SkyeMusicNexus/public/create.html",
+  "existingRoomsPreserved": [
+    "public/index.html",
+    "public/upload.html",
+    "public/player.html",
+    "public/releases.html",
+    "public/rights.html",
+    "public/exchange.html",
+    "public/admin.html"
+  ],
+  "newModules": [
+    "Open Source Creation Studio",
+    "openDAW Bridge",
+    "Stem Vault Staging",
+    "Studio Session Ledger",
+    "Sample Pack Rail",
+    "Export Manifest Queue",
+    "Release Forge Handoff"
+  ],
+  "externalOpenSourceEngines": [
+    {
+      "name": "openDAW",
+      "role": "primary browser DAW candidate",
+      "license": "AGPLv3",
+      "repo": "https://github.com/andremichelle/openDAW.git"
+    },
+    {
+      "name": "Ardour",
+      "role": "desktop DAW companion",
+      "license": "GPL-2.0-or-later",
+      "repo": "https://github.com/Ardour/ardour.git"
+    },
+    {
+      "name": "LMMS",
+      "role": "beat/MIDI/synth companion",
+      "license": "GPL family; verify upstream",
+      "repo": "https://github.com/LMMS/lmms.git"
+    },
+    {
+      "name": "Audacity",
+      "role": "waveform cleanup/editing companion",
+      "license": "GPLv3",
+      "repo": "https://github.com/audacity/audacity.git"
+    }
+  ],
+  "functionBoundary": {
+    "newFunction": "netlify/functions/music-studio.js",
+    "auth": "requires bearer/x-skygate-session token",
+    "storage": "proof ledger in /tmp by default; move to Citadel/SkyeVault/R2 for durable production",
+    "noClaims": [
+      "does not perform live DSP distribution",
+      "does not settle real royalties",
+      "does not provide legal review",
+      "does not move real payouts",
+      "does not vendor-copy open-source DAW code"
+    ]
+  }
+}

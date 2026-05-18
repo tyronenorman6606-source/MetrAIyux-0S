@@ -1,152 +1,643 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetrAIyux 0S SkyeMusicNexus hub with Free99 Lite, paid music ops, song drops, rights vault, takedown holds, content requests, social exchange, achievements, release campaigns, and gate-session auth.">
-  <title>SkyeMusicNexus Lite + Artist Exchange · MetrAIyux 0S</title>
+  <meta name="description" content="SkyeMusicNexus is the gated MetrAIyux 0S music platform for open-source creation sessions, artist profiles, uploads, release packets, rights notes, paid song drops, content requests, campaign rooms, and operator proof.">
+  <title>SkyeMusicNexus · Gated Music Release Ops</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --music-ink: #f8fbff;
+      --music-muted: rgba(232, 240, 255, .74);
+      --music-line: rgba(255, 255, 255, .16);
+      --music-panel: rgba(7, 12, 23, .72);
+      --music-panel-strong: rgba(11, 18, 33, .9);
+      --music-gold: #f6c961;
+      --music-cyan: #66e5ff;
+      --music-mint: #8ff3c7;
+      --music-coral: #ff8f70;
+    }
+
+    body.music-marketing {
+      color: var(--music-ink);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(102, 229, 255, .16), transparent 28rem),
+        radial-gradient(circle at 82% 4%, rgba(246, 201, 97, .18), transparent 24rem),
+        linear-gradient(135deg, #04070d 0%, #08121a 42%, #0d1019 100%);
+    }
+
+    .music-marketing .site-header {
+      background: rgba(4, 7, 13, .82);
+      backdrop-filter: blur(22px);
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .music-hero {
+      position: relative;
+      min-height: calc(100svh - 118px);
+      overflow: hidden;
+      display: grid;
+      align-items: end;
+      padding: 76px 5vw 44px;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+      isolation: isolate;
+    }
+
+    .music-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(3, 6, 13, .95) 0%, rgba(3, 6, 13, .68) 49%, rgba(3, 6, 13, .28) 100%),
+        linear-gradient(0deg, rgba(3, 6, 13, .96) 0%, transparent 46%);
+    }
+
+    .music-hero-video,
+    .music-hero-mark {
+      position: absolute;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .music-hero-video {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .46;
+      filter: saturate(1.18) contrast(1.08);
+    }
+
+    .music-hero-mark {
+      right: 6vw;
+      top: 18%;
+      width: 360px;
+      max-width: 36vw;
+      opacity: .92;
+      transform: rotate(-5deg);
+    }
+
+    .music-hero-copy {
+      width: min(920px, 100%);
+      display: grid;
+      gap: 22px;
+    }
+
+    .music-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 0;
+      color: var(--music-gold);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .music-kicker span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border: 1px solid rgba(246, 201, 97, .42);
+      border-radius: 999px;
+      background: rgba(3, 6, 13, .58);
+    }
+
+    .music-hero h1 {
+      margin: 0;
+      max-width: 860px;
+      font-size: 78px;
+      line-height: .93;
+      letter-spacing: 0;
+    }
+
+    .music-hero-lede {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(248, 251, 255, .87);
+      font-size: 22px;
+      line-height: 1.55;
+    }
+
+    .music-hero-actions,
+    .music-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .music-marketing .button,
+    .music-action,
+    .music-marketing .saas-btn {
+      border-radius: 8px;
+      letter-spacing: 0;
+    }
+
+    .music-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      background: rgba(255, 255, 255, .08);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .music-action.primary {
+      border-color: rgba(246, 201, 97, .7);
+      color: #061017;
+      background: linear-gradient(135deg, #f7d36f, #67e6ff);
+      box-shadow: 0 24px 64px rgba(102, 229, 255, .18);
+    }
+
+    .music-action:hover {
+      transform: translateY(-1px);
+      border-color: rgba(102, 229, 255, .72);
+    }
+
+    .music-proof-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: rgba(255, 255, 255, .12);
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .music-proof-strip span {
+      display: grid;
+      gap: 4px;
+      min-height: 92px;
+      padding: 22px 5vw;
+      background: rgba(4, 7, 13, .76);
+      color: var(--music-muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .music-proof-strip strong {
+      color: #fff;
+      font-size: 20px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .music-section {
+      position: relative;
+      padding: 86px 5vw;
+    }
+
+    .music-section.alt {
+      background: rgba(255, 255, 255, .035);
+      border-block: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .music-section h2 {
+      max-width: 920px;
+      margin: 0 0 18px;
+      color: #fff;
+      font-size: 46px;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .music-section .wide,
+    .music-wide {
+      max-width: 880px;
+      color: var(--music-muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    .music-section .eyebrow {
+      color: var(--music-cyan);
+      letter-spacing: 0;
+    }
+
+    .music-proof-layout {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(340px, 1.05fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .music-video-frame {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 8px;
+      background: #05080e;
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .45);
+    }
+
+    .music-video-frame video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: #05080e;
+    }
+
+    .music-grid,
+    .music-offer-grid,
+    .music-link-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .music-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .music-offer-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .music-link-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .music-card,
+    .music-offer,
+    .music-link-card,
+    .music-boundary {
+      border: 1px solid var(--music-line);
+      border-radius: 8px;
+      background: var(--music-panel);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, .2);
+    }
+
+    .music-card,
+    .music-offer,
+    .music-link-card {
+      padding: 22px;
+    }
+
+    .music-card h3,
+    .music-offer h3,
+    .music-link-card h3,
+    .music-boundary h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 22px;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .music-card p,
+    .music-offer p,
+    .music-link-card p,
+    .music-boundary p,
+    .music-boundary li {
+      color: var(--music-muted);
+      line-height: 1.62;
+    }
+
+    .music-tag {
+      display: inline-flex;
+      margin-bottom: 14px;
+      color: var(--music-gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .music-price {
+      margin: 10px 0 14px;
+      color: #fff;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .music-price small {
+      color: var(--music-muted);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .music-offer.featured {
+      border-color: rgba(246, 201, 97, .62);
+      background: linear-gradient(135deg, rgba(246, 201, 97, .14), rgba(102, 229, 255, .08)), var(--music-panel-strong);
+    }
+
+    .music-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+      counter-reset: music-flow;
+    }
+
+    .music-step {
+      position: relative;
+      min-height: 160px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .055);
+    }
+
+    .music-step::before {
+      counter-increment: music-flow;
+      content: "0" counter(music-flow);
+      display: block;
+      margin-bottom: 18px;
+      color: var(--music-mint);
+      font-weight: 900;
+    }
+
+    .music-step h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .music-step p {
+      margin: 0;
+      color: var(--music-muted);
+      line-height: 1.55;
+    }
+
+    .music-boundary {
+      display: grid;
+      grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+      gap: 28px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(255, 143, 112, .14), rgba(102, 229, 255, .08)), rgba(8, 12, 20, .82);
+    }
+
+    .music-boundary ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .music-link-card {
+      display: block;
+      min-height: 154px;
+      color: inherit;
+      text-decoration: none;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+
+    .music-link-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(102, 229, 255, .72);
+    }
+
+    .music-final {
+      min-height: 54svh;
+      display: grid;
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(246, 201, 97, .14), rgba(102, 229, 255, .09)),
+        #05080e;
+    }
+
+    .music-final h2 {
+      max-width: 900px;
+      margin-bottom: 16px;
+    }
+
+    .music-marketing footer {
+      border-top: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(4, 7, 13, .94);
+    }
+
+    @media (max-width: 1100px) {
+      .music-grid,
+      .music-offer-grid,
+      .music-link-grid,
+      .music-flow,
+      .music-proof-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .music-proof-layout,
+      .music-boundary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .music-hero {
+        min-height: auto;
+        padding-top: 54px;
+      }
+
+      .music-hero h1 {
+        font-size: 46px;
+      }
+
+      .music-hero-lede,
+      .music-section .wide,
+      .music-wide {
+        font-size: 16px;
+      }
+
+      .music-hero-mark {
+        right: -30px;
+        top: 80px;
+        max-width: 260px;
+        opacity: .36;
+      }
+
+      .music-section {
+        padding: 62px 5vw;
+      }
+
+      .music-section h2 {
+        font-size: 34px;
+      }
+
+      .music-grid,
+      .music-offer-grid,
+      .music-link-grid,
+      .music-flow,
+      .music-proof-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .music-proof-strip span {
+        min-height: auto;
+        padding: 18px 5vw;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="skyesol-living-page music-marketing">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="motion-progress scroll-progress motion-chrome" aria-hidden="true"><i></i></div>
+  <div class="motion-cursor-glow pointer-reactive motion-chrome" aria-hidden="true"></div>
+
   <header class="site-header">
     <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
     <nav>
-      <a href="../index.html">Home</a>
-      <a href="../SkyeMusicNexus/index.html">Music App</a>
-      <a href="../pricing/index.html">Pricing</a>
-      <a href="../proof/skyemusicnexus-expansion-receipt.html">Receipt</a>
-      <a href="../proof/index.html">Proof</a>
-      <a href="../operator/index.html">Operator</a>
+      <a href="../index.html">0S Home</a>
+      <a href="../SkyeMusicNexus/index.html">App</a>
+      <a href="../SkyeMusicNexus/public/create.html">Create</a>
+      <a href="../SkyeMusicNexus/public/upload.html">Upload</a>
+      <a href="../SkyeMusicNexus/public/releases.html">Releases</a>
+      <a href="../SkyeMusicNexus/public/exchange.html">Exchange</a>
+      <a href="../pricing/index.html#skyemusicnexus-paid-music-ops">Pricing</a>
+      <a href="../proof/skyemusicnexus-expansion-receipt.html">Proof</a>
     </nav>
   </header>
+
   <main>
-    <section class="section upgrade-hero commercial-hero">
-      <p class="eyebrow">SkyeMusicNexus expansion</p>
-      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
-      <h1>SkyeMusicNexus Lite is Free99. The artist exchange is where the value compounds.</h1>
-      <p class="hero-copy">SkyeMusicNexus is mounted inside the 0S as a gated music platform with a dashboard, upload studio, music player, releases room, rights vault, creator exchange, operator stage, royalty ledger motion, payout review, content requests, artist inbox threads, community signals, achievements, release campaigns, operations queues, analytics, and proof boundaries. Free99 now means the Lite lane is no charge. Studio, Label Command, managed music ops, song-drop add-ons, gated audio vault storage, and content add-ons are paid, and every lane still requires a gate session.</p>
-      <div class="hero-actions">
-        <a class="button primary" href="../SkyeMusicNexus/index.html">Open gated app shell</a>
-        <a class="button" href="../SkyeMusicNexus/public/index.html">Platform Dashboard</a>
-        <a class="button" href="../SkyeMusicNexus/public/upload.html">Upload Studio</a>
-        <a class="button" href="../SkyeMusicNexus/public/player.html">Music Player</a>
-        <a class="button" href="../SkyeMusicNexus/public/admin.html">Operator Stage</a>
-        <a class="button" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Buy Single Song Drop</a>
-        <a class="button" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Buy Release Content Kit</a>
-        <a class="button" href="../proof/skyemusicnexus-expansion-receipt.html">Open proof receipt</a>
+    <section class="music-hero" aria-labelledby="music-hero-title">
+      <video class="music-hero-video" autoplay muted loop playsinline poster="../assets/proof/skyemusicnexus-exchange-e2e-poster.png">
+        <source src="../assets/proof/skyemusicnexus-exchange-e2e.webm" type="video/webm">
+      </video>
+      <img class="music-hero-mark floating-logo" src="../SkyeMusicNexus/assets/platform-mark.svg" alt="SkyeMusicNexus mark">
+      <div class="music-hero-copy">
+        <p class="music-kicker"><span>Free99 Lite</span><span>Paid drops</span><span>Gate-session protected</span></p>
+        <h1 id="music-hero-title" class="neon-gradient-text"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color: var(--music-gold);">SkyeMusicNexus</span></h1>
+        <p class="music-hero-lede">I built SkyeMusicNexus as the music room before and after the song is ready: open-source creation session, stem staging, artist profile, upload lane, playback preview, release packet, rights notes, content requests, campaign tasks, payout review, analytics, and operator proof inside the 0S.</p>
+        <div class="music-hero-actions">
+          <a class="music-action primary" href="../SkyeMusicNexus/index.html">Open Free99 Lite</a>
+          <a class="music-action" href="../SkyeMusicNexus/public/create.html">Open Create Studio</a>
+          <a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-single-song-drop" target="_blank" rel="noopener">Buy Single Song Drop</a>
+          <a class="music-action" href="../proof/skyemusicnexus-expansion-receipt.html">View Proof Receipt</a>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="commercial-grid">
-        <article class="commercial-card featured" id="skyemusicnexus-lite-free99">
-          <p class="eyebrow">rate card</p>
-          <h3>SkyeMusicNexus Lite</h3>
-          <div class="commercial-price">$0 <small>/mo</small></div>
-          <p><strong>Setup:</strong> $0. Free99 means no charge for Lite, not anonymous access.</p>
-          <p>Lite is for gated previews: 1 artist profile, 1 draft release preview, 1 small proof audio upload, sample analytics, and proof receipt export.</p>
-          <div class="commercial-meta"><span>Free99 Lite</span><span>Gate session required</span><span>1 artist</span><span>1 draft release</span><span>1 proof upload</span></div>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">studio tier</p>
-          <h3>SkyeMusicNexus Studio</h3>
-          <div class="commercial-price">$497 <small>/mo</small></div>
-          <p><strong>Setup:</strong> $1,500</p>
-          <p>For active creators and small teams that need gated upload studio, proof playback, release workflow, royalty tracking, payout review, and operator proof.</p>
-          <div class="commercial-meta"><span>5 artists</span><span>25 releases</span><span>Upload studio</span><span>Proof exports</span></div>
-          <a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-studio">Start Studio</a>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">label tier</p>
-          <h3>Label Command</h3>
-          <div class="commercial-price">$1,497 <small>/mo</small></div>
-          <p><strong>Setup:</strong> $6,500</p>
-          <p>For multi-artist release operations, gated upload studio, SkyeVault/R2 storage scoping, approval workflows, payout review controls, analytics, and custom proof receipts.</p>
-          <div class="commercial-meta"><span>25 artists</span><span>150 releases</span><span>Audio vault scope</span><span>Owner approved</span></div>
-          <a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-label-command">Start Label Command</a>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">managed tier</p>
-          <h3>Managed Music Ops</h3>
-          <div class="commercial-price">$3,997 <small>/mo</small></div>
-          <p><strong>Setup:</strong> $15,000</p>
-          <p>For managed onboarding, team roles, client-facing music ops rooms, custom limits, and integration proof scopes.</p>
-          <div class="commercial-meta"><span>Custom limits</span><span>Team roles</span><span>Quote integrations</span><span>Owner approved</span></div>
-          <a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-managed-music-ops">Open Managed Lane</a>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">storage add-on</p>
-          <h3>Gated Audio Vault Pack</h3>
-          <div class="commercial-price">$79 <small>/mo</small></div>
-          <p>Music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing.</p>
-          <div class="commercial-meta"><span>SkyeVault/R2</span><span>Audio handoff</span><span>Gate required</span><span>No license claim</span></div>
-          <a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-gated-audio-vault-pack">Add Audio Vault</a>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">auth boundary</p>
-          <h3>Nothing escapes the gate</h3>
-          <ul class="limit-list">
-            <li>The app shell and public stages load a gate-session overlay.</li>
-            <li>Artist, release, operations-board, payment, and analytics calls require a bearer session.</li>
-            <li>Ungated artist, release, and workflow reads now return 401.</li>
-            <li>Free, paid, one-time, monthly, and quoted lanes all require a 0S, FS27, or SkyGate session.</li>
+    <section class="music-proof-strip" aria-label="SkyeMusicNexus platform summary">
+      <span><strong>$0 Lite</strong>Gated preview lane</span>
+      <span><strong>$199 Drop</strong>One-song release capsule</span>
+      <span><strong>7 Rooms</strong>Create, upload, player, releases, rights, exchange, operator</span>
+      <span><strong>No Bypass</strong>Free or paid still requires auth</span>
+    </section>
+
+    <section class="music-section alt" id="proof">
+      <div class="music-proof-layout">
+        <div>
+          <p class="eyebrow">Proof before pitch</p>
+          <h2>I make the music offer visible as a working app, not a loose promise.</h2>
+          <p class="wide">The page advertises what is actually mounted: a gated app shell, Create Studio, public artist rooms, an operator stage, SkyePay offer links, proof receipt, and provider-safe boundaries around distribution, public streaming, legal rights, and payout movement.</p>
+          <div class="music-actions">
+            <a class="music-action primary" href="../SkyeMusicNexus/public/index.html">Open Artist Stage</a>
+            <a class="music-action" href="../SkyeMusicNexus/public/create.html">Open Create Studio</a>
+            <a class="music-action" href="../SkyeMusicNexus/public/admin.html">Open Operator Stage</a>
+          </div>
+        </div>
+        <div class="music-video-frame">
+          <video controls preload="metadata" poster="../assets/proof/skyemusicnexus-exchange-e2e-poster.png">
+            <source src="../assets/proof/skyemusicnexus-exchange-e2e.webm" type="video/webm">
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <section class="music-section" id="rooms">
+      <p class="eyebrow">What it does</p>
+      <h2>I use SkyeMusicNexus to give artists and operators a gated release-ops workspace.</h2>
+      <p class="wide">I built it for people who need to organize the business side of a song without pretending the platform has live distributor authority before that integration is approved and proven.</p>
+      <div class="music-grid">
+        <article class="music-card"><span class="music-tag">Create Studio</span><h3>Build before the upload lane.</h3><p>Stage stems, bridge openDAW, save studio projects, queue export manifests, and hand finished work to Release Forge.</p></article>
+        <article class="music-card"><span class="music-tag">Upload Studio</span><h3>Intake the track and proof files.</h3><p>Capture proof audio, metadata, cover notes, and readiness flags behind a gate session.</p></article>
+        <article class="music-card"><span class="music-tag">Music Player</span><h3>Preview before release.</h3><p>Run ownership-aware playback previews with takedown holds and proof-safe use notes.</p></article>
+        <article class="music-card"><span class="music-tag">Release Forge</span><h3>Build the release packet.</h3><p>Shape title, artist, track count, status, capsule notes, campaign runway, and QA actions.</p></article>
+        <article class="music-card"><span class="music-tag">Rights Vault</span><h3>Keep the rights conversation attached.</h3><p>Store split notes, attestations, ownership context, and review prompts without making legal authority claims.</p></article>
+        <article class="music-card"><span class="music-tag">Artist Exchange</span><h3>Request content and coordinate the push.</h3><p>Use inbox threads, community signals, content requests, achievement progress, and campaign sprints.</p></article>
+        <article class="music-card"><span class="music-tag">Operator Stage</span><h3>Review before anything moves.</h3><p>Approve releases, inspect analytics, review payout requests, manage queues, and export receipts.</p></article>
+      </div>
+    </section>
+
+    <section class="music-section alt" id="offers">
+      <p class="eyebrow">Buyable lanes</p>
+      <h2>Free99 gets them in. Paid drops and ops lanes turn the music room into revenue.</h2>
+      <p class="wide">The Lite lane is no charge, but the work packets and team lanes are still gate-session protected and SkyePay-routed.</p>
+      <div class="music-offer-grid">
+        <article class="music-offer featured" id="skyemusicnexus-lite-free99"><span class="music-tag">Free99</span><h3>SkyeMusicNexus Lite</h3><div class="music-price">$0 <small>/mo</small></div><p>One artist profile, one draft release preview, one small proof upload, sample analytics, and proof export.</p><a class="music-action primary" href="../SkyeMusicNexus/index.html">Open Lite</a></article>
+        <article class="music-offer featured" id="skyemusicnexus-single-song-drop"><span class="music-tag">One-time</span><h3>Single Song Drop</h3><div class="music-price">$199 <small>once</small></div><p>One-song release capsule, metadata checklist, gated handoff, and proof receipt.</p><a class="music-action primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-single-song-drop" target="_blank" rel="noopener">Buy Drop</a></article>
+        <article class="music-offer"><span class="music-tag">Content</span><h3>Release Content Kit</h3><div class="music-price">$499 <small>once</small></div><p>Captions, short-form hooks, content requests, and release runway tasks generated from the exchange.</p><a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-release-content-kit" target="_blank" rel="noopener">Buy Kit</a></article>
+        <article class="music-offer"><span class="music-tag">Creator</span><h3>Studio</h3><div class="music-price">$497 <small>/mo</small></div><p>Create Studio, upload workflow, release workflow, rights notes, payout review, analytics, and operator proof for active creators.</p><a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-studio" target="_blank" rel="noopener">Start Studio</a></article>
+        <article class="music-offer"><span class="music-tag">Team</span><h3>Label Command</h3><div class="music-price">$1,497 <small>/mo</small></div><p>Multi-artist release operations with approval workflows, audio vault scoping, and custom proof receipts.</p><a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-label-command" target="_blank" rel="noopener">Start Label</a></article>
+        <article class="music-offer"><span class="music-tag">Managed</span><h3>Managed Music Ops</h3><div class="music-price">$3,997 <small>/mo</small></div><p>Team roles, client-facing music ops rooms, custom limits, onboarding, and integration proof scopes.</p><a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-managed-music-ops" target="_blank" rel="noopener">Open Managed</a></article>
+        <article class="music-offer"><span class="music-tag">Storage</span><h3>Gated Audio Vault</h3><div class="music-price">$79 <small>/mo</small></div><p>Music-specific SkyeVault/R2 storage scope for proof files, handoffs, and larger audio packets.</p><a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-gated-audio-vault-pack" target="_blank" rel="noopener">Add Vault</a></article>
+        <article class="music-offer"><span class="music-tag">Full menu</span><h3>More drop add-ons</h3><div class="music-price">13 <small>offers</small></div><p>EP drop, album drop, catalog import, ledger setup, payout review, profile buildout, cover request, clip brief, and campaign sprint.</p><a class="music-action" href="../pricing/index.html#skyemusicnexus-paid-music-ops">View Pricing</a></article>
+      </div>
+    </section>
+
+    <section class="music-section" id="workflow">
+      <p class="eyebrow">How it moves</p>
+      <h2>A song can move from raw upload to operator-reviewed campaign packet.</h2>
+      <div class="music-flow">
+        <article class="music-step"><h3>Gate session</h3><p>0S, FS27, SkyGate, or local admin auth controls every entry point.</p></article>
+        <article class="music-step"><h3>Create session</h3><p>Stems, notes, openDAW bridge context, and export targets get saved before the release lane.</p></article>
+        <article class="music-step"><h3>Upload and profile</h3><p>Artist profile, proof audio, metadata, and cover notes enter the music workspace.</p></article>
+        <article class="music-step"><h3>Rights notes</h3><p>Attestations, split context, takedown holds, and preview-use boundaries stay attached.</p></article>
+        <article class="music-step"><h3>Release packet</h3><p>Capsule, content kit, campaign sprint, and exchange tasks get organized for review.</p></article>
+        <article class="music-step"><h3>Proof and payment</h3><p>Operator review, proof receipt, payout review, and SkyePay offer links close the loop.</p></article>
+      </div>
+    </section>
+
+    <section class="music-section alt" id="boundary">
+      <div class="music-boundary">
+        <div>
+          <p class="eyebrow">Honest boundary</p>
+          <h2>It sells the room without overclaiming the rails.</h2>
+        </div>
+        <div>
+          <p>SkyeMusicNexus is a gated creation, release-ops, and proof workspace. It does not claim hosted DAW distribution, live DSP submission, distributor ingestion, public streaming licensing, royalty settlement, legal rights clearance, or real payout movement until those provider integrations are separately approved and proven.</p>
+          <ul>
+            <li>Free99 means no charge for Lite, not anonymous access.</li>
+            <li>Paid drops are work packets, not automatic distribution authority.</li>
+            <li>Rights and royalty views are proof-safe operating notes unless a verified provider scope is connected.</li>
+            <li>Every lane keeps the gate session requirement intact.</li>
           </ul>
-        </article>
-        <article class="commercial-card">
-          <p class="eyebrow">operator proof</p>
-          <h3>What works locally</h3>
-          <ul class="limit-list">
-            <li>Local SkyGate session bootstrap and operator login when configured.</li>
-            <li>Artist register/approve, release submit/review, rights attestation, publish gates, and stream reporting gates.</li>
-            <li>Linked preview playback requires ownership plus preview-use attestation; takedown holds block playback.</li>
-            <li>Royalty credit, payout request, pending payout list, and analytics readout.</li>
-            <li>Operations queue, workflow updates, and proof-safe provider boundary copy.</li>
-          </ul>
-        </article>
-        <article class="commercial-card featured">
-          <p class="eyebrow">social exchange</p>
-          <h3>Artist inbox, community relay, and progression</h3>
-          <p>Artists can request content, message the creator lane, post collab calls, generate release campaigns, and unlock visible achievement progress without leaving the gated music app.</p>
-          <div class="commercial-meta"><span>Content requests</span><span>Relay13-ready inbox</span><span>Community posts</span><span>Achievements</span><span>Campaign packs</span></div>
-        </article>
+        </div>
       </div>
     </section>
 
-    <section class="section" id="skyemusicnexus-addons">
-      <p class="eyebrow">paid drop menu</p>
-      <h2>Buy a single song drop or scale into release operations.</h2>
-      <p class="wide">Add-ons are purchasable work packets for people who do not need a full plan yet. They are proof-safe: no DSP submission, distributor ingestion, real payout movement, or label/legal authority is claimed until a separate provider integration is approved and proven.</p>
-      <div class="commercial-grid">
-        <article class="commercial-card featured" id="skyemusicnexus-single-song-drop"><p class="eyebrow">one song</p><h3>Single Song Drop</h3><div class="commercial-price">$199 <small>once</small></div><p>One song release capsule, metadata checklist, gated handoff, and proof receipt.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Buy Single Song Drop</a></article>
-        <article class="commercial-card"><p class="eyebrow">release prep</p><h3>Release Drop Plus</h3><div class="commercial-price">$399 <small>once</small></div><p>Single or multi-track release prep with cover/metadata QA, ops queue, and proof export.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-drop-plus">Buy Release Drop Plus</a></article>
-        <article class="commercial-card"><p class="eyebrow">ep</p><h3>EP Drop</h3><div class="commercial-price">$799 <small>once</small></div><p>Release capsule and proof workflow for up to 6 tracks.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-ep-drop">Buy EP Drop</a></article>
-        <article class="commercial-card"><p class="eyebrow">album</p><h3>Album Drop</h3><div class="commercial-price">$1,497 <small>once</small></div><p>Release capsule and proof workflow for up to 14 tracks.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-album-drop">Buy Album Drop</a></article>
-        <article class="commercial-card"><p class="eyebrow">catalog</p><h3>Catalog Import Pack</h3><div class="commercial-price">$299 <small>once</small></div><p>Import and structure up to 25 legacy release records.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-catalog-import-pack">Buy Catalog Pack</a></article>
-        <article class="commercial-card"><p class="eyebrow">ledger</p><h3>Royalty Ledger Setup</h3><div class="commercial-price">$249 <small>once</small></div><p>Configure a proof-safe royalty ledger view and split notes.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-royalty-ledger-setup">Buy Ledger Setup</a></article>
-        <article class="commercial-card"><p class="eyebrow">payout review</p><h3>Payout Review Pack</h3><div class="commercial-price">$149 <small>once</small></div><p>Prepare a gated payout review packet without moving real funds.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-payout-review-pack">Buy Payout Review</a></article>
-        <article class="commercial-card"><p class="eyebrow">profile</p><h3>Artist Profile Buildout</h3><div class="commercial-price">$99 <small>once</small></div><p>Build one artist profile with core bio, links, and proof fields.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-artist-profile-buildout">Buy Profile Buildout</a></article>
-        <article class="commercial-card featured"><p class="eyebrow">content</p><h3>Release Content Kit</h3><div class="commercial-price">$499 <small>once</small></div><p>Captions, short-form hooks, asset requests, and release runway tasks generated from the gated exchange.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Buy Content Kit</a></article>
-        <article class="commercial-card"><p class="eyebrow">social</p><h3>Social Caption Pack</h3><div class="commercial-price">$99 <small>once</small></div><p>A focused caption and posting prompt pack for one release or artist milestone.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-social-caption-pack">Buy Caption Pack</a></article>
-        <article class="commercial-card"><p class="eyebrow">visual</p><h3>Cover / Canvas Request</h3><div class="commercial-price">$199 <small>once</small></div><p>A gated creative request for cover direction, canvas notes, and proof-safe asset handoff.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-cover-canvas-request">Buy Cover / Canvas</a></article>
-        <article class="commercial-card"><p class="eyebrow">clips</p><h3>Short-Form Clip Brief</h3><div class="commercial-price">$249 <small>once</small></div><p>Hooks, shot list, caption angle, and creator handoff for a short-form release push.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-short-form-clip-brief">Buy Clip Brief</a></article>
-        <article class="commercial-card"><p class="eyebrow">campaign</p><h3>Community Campaign Sprint</h3><div class="commercial-price">$899 <small>once</small></div><p>Exchange-led release campaign with community prompts, inbox coordination, content runway, and proof receipt.</p><a class="saas-btn" href="../saas/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-community-campaign-sprint">Buy Campaign Sprint</a></article>
+    <section class="music-section" id="links">
+      <p class="eyebrow">Live links</p>
+      <h2>Send the marketing site, then route buyers into the exact room they need.</h2>
+      <div class="music-link-grid">
+        <a class="music-link-card" href="../SkyeMusicNexus/index.html"><h3>Free99 Lite App</h3><p>Gated app shell with room routing, runtime notes, and platform status.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/create.html"><h3>Create Studio</h3><p>openDAW bridge, stem staging, project ledger, export queue, and Release Forge handoff.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/upload.html"><h3>Upload Studio</h3><p>Track intake, proof upload, metadata, and readiness lane.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/player.html"><h3>Music Player</h3><p>Preview playback and proof-safe listening surface.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/releases.html"><h3>Release Forge</h3><p>Release capsule and campaign packet builder.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/rights.html"><h3>Rights Vault</h3><p>Ownership notes, attestations, takedown holds, and split context.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/exchange.html"><h3>Artist Exchange</h3><p>Content requests, inbox relay, community signals, achievements, and campaign work.</p></a>
+        <a class="music-link-card" href="../SkyeMusicNexus/public/admin.html"><h3>Operator Stage</h3><p>Review, publish gates, payout review, analytics, queue, and proof controls.</p></a>
+        <a class="music-link-card" href="../proof/skyemusicnexus-expansion-receipt.html"><h3>Proof Receipt</h3><p>Extraction, smoke, auth, pricing, registry, and QA evidence.</p></a>
+        <a class="music-link-card" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s" target="_blank" rel="noopener"><h3>SkyePay Store</h3><p>External FS27 storefront for approved 0S offers and music add-ons.</p></a>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Routes</h2>
-      <div class="route-grid">
-        <a class="route-card" href="../SkyeMusicNexus/index.html"><h3>Command Field</h3><p>Gated app entry with routed shell links, runtime contract, and proof status.</p></a>
-        <a class="route-card" href="../SkyeMusicNexus/public/index.html"><h3>Artist Stage</h3><p>Experiential artist-facing surface for registering acts, forging releases, saving rights gates, placing takedown holds, requesting content, posting community signals, unlocking achievements, and building release campaigns.</p></a>
-        <a class="route-card" href="../SkyeMusicNexus/public/admin.html"><h3>Operator Stage</h3><p>Review chamber, exchange console, payout gate, analytics prism, capsule wall, and operator proof boundaries.</p></a>
-        <a class="route-card" href="../saas/pricing.html#skyemusicnexus-lite-free99"><h3>SaaS Price Card</h3><p>Free99 Lite, paid tiers, and drop add-ons inside the SaaS plan comparison.</p></a>
-        <a class="route-card" href="../pricing/index.html#skyemusicnexus-paid-music-ops"><h3>Commercial Terms</h3><p>Public pricing page entry that shows Lite as Free99 and paid lanes as buyable offers.</p></a>
-        <a class="route-card" href="../proof/skyemusicnexus-expansion-receipt.html"><h3>Expansion Receipt</h3><p>Import, auth, smoke, pricing, registry, and 0S integration receipt.</p></a>
+    <section class="music-section music-final">
+      <div>
+        <p class="eyebrow">Marketing site active</p>
+        <h2>SkyeMusicNexus is now packaged as a public music offer, not just another app route.</h2>
+        <p class="music-wide">I use this page as the sendable front door for artists, studios, small labels, and operators who need a gated creation lane, release packet, proof trail, and a buyable path into music ops.</p>
+        <div class="music-actions">
+          <a class="music-action primary" href="../SkyeMusicNexus/index.html">Open SkyeMusicNexus</a>
+          <a class="music-action" href="../SkyeMusicNexus/public/create.html">Open Create Studio</a>
+          <a class="music-action" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=skyemusicnexus-single-song-drop" target="_blank" rel="noopener">Buy Single Song Drop</a>
+          <a class="music-action" href="../pricing/index.html#skyemusicnexus-paid-music-ops">Compare Plans</a>
+        </div>
       </div>
     </section>
   </main>
-  <footer><p>MetrAIyux 0S · SkyeMusicNexus Lite is Free99; paid tiers and add-ons are still gate-session protected.</p></footer>
+
+  <footer><p>MetrAIyux 0S · SkyeMusicNexus is Free99 Lite plus paid music ops, still gate-session protected.</p></footer>
   <script src="../script.js"></script>
 </body>
 </html>

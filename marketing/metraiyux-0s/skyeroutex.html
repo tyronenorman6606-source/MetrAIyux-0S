@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeRouteX Workforce Command — MetrAIyux 0S</title>
+  <meta name="description" content="SkyeRouteX Workforce Command: post jobs, dispatch contractors, capture assignment proof, advance payment states, and run House Command — all gated by FS27. $6,500 setup · $1,497/mo.">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── SkyeRouteX page-local styles ── */
+    .rx-hero {
+      position: relative;
+      min-height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 140px var(--wrap-pad, clamp(20px,4vw,56px)) 80px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .rx-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 55% 60% at 90% 20%, rgba(100,217,255,.09), transparent),
+        radial-gradient(ellipse 45% 50% at 6% 78%, rgba(244,199,91,.08), transparent),
+        radial-gradient(ellipse 35% 40% at 50% 95%, rgba(168,140,255,.06), transparent);
+    }
+    .rx-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border: 1px solid rgba(100,217,255,.32);
+      border-radius: 99px;
+      font-size: .73rem;
+      font-family: var(--font-label);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .rx-tag .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: pulse-cyan 2s ease-in-out infinite;
+    }
+    @keyframes pulse-cyan {
+      0%,100% { opacity:1; box-shadow: 0 0 8px var(--cyan); }
+      50% { opacity:.5; box-shadow: 0 0 16px var(--cyan); }
+    }
+    .rx-hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 6.5vw, 82px);
+      font-weight: 900;
+      line-height: 1.02;
+      letter-spacing: -.02em;
+      color: #f4f0e8;
+      margin: 0 0 20px;
+      max-width: 840px;
+    }
+    .rx-hero-title .accent-gold { color: var(--gold); }
+    .rx-hero-title .accent-cyan { color: var(--cyan); }
+    .rx-lede {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--soft);
+      max-width: 660px;
+      line-height: 1.55;
+      margin: 0 0 36px;
+    }
+    .rx-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+    .rx-price-chip {
+      display: inline-flex;
+      flex-direction: column;
+      border: 1px solid rgba(244,199,91,.38);
+      border-radius: 8px;
+      padding: 12px 22px;
+      background: rgba(244,199,91,.06);
+      gap: 2px;
+    }
+    .rx-price-chip strong {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--gold);
+      font-weight: 800;
+    }
+    .rx-price-chip span {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--font-label);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* ── Process rail ── */
+    .rx-rail {
+      max-width: var(--wrap);
+      margin: 0 auto;
+      padding: 80px var(--wrap-pad, clamp(20px,4vw,56px)) 100px;
+    }
+    .rx-rail-eyebrow {
+      font-family: var(--font-label);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-size: .75rem;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+    .rx-rail-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.8vw, 48px);
+      font-weight: 800;
+      margin: 0 0 56px;
+      color: var(--ink);
+      max-width: 680px;
+    }
+    .rx-stages {
+      display: grid;
+      gap: 2px;
+    }
+    .rx-stage {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 0 28px;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      opacity: 0;
+      transform: translateX(-22px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .rx-stage.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    .rx-stage-num {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .rx-stage-num .num {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--gold);
+      border: 1px solid rgba(244,199,91,.38);
+      border-radius: 6px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(244,199,91,.07);
+      flex-shrink: 0;
+    }
+    .rx-stage-num .line {
+      width: 1px;
+      flex: 1;
+      background: linear-gradient(180deg, rgba(244,199,91,.28), rgba(100,217,255,.12));
+      min-height: 24px;
+    }
+    .rx-stage-body h3 {
+      font-family: var(--font-display);
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+    .rx-stage-body p {
+      color: var(--soft);
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0 0 10px;
+    }
+    .rx-stage-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .rx-stage-tags span {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      border: 1px solid rgba(100,217,255,.22);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: var(--cyan);
+      background: rgba(100,217,255,.05);
+    }
+
+    /* ── Feature grid ── */
+    .rx-features {
+      max-width: var(--wrap);
+      margin: 0 auto;
+      padding: 0 var(--wrap-pad, clamp(20px,4vw,56px)) 100px;
+    }
+    .rx-features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .rx-feat {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 22px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      transition: border-color .22s, transform .22s;
+    }
+    .rx-feat:hover {
+      border-color: rgba(100,217,255,.42);
+      transform: translateY(-3px);
+    }
+    .rx-feat-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+    .rx-feat h4 {
+      font-family: var(--font-label);
+      font-size: 14px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 8px;
+    }
+    .rx-feat p {
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* ── Proof panel ── */
+    .rx-proof {
+      max-width: var(--wrap);
+      margin: 0 auto;
+      padding: 0 var(--wrap-pad, clamp(20px,4vw,56px)) 100px;
+    }
+    .rx-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 32px;
+    }
+    @media (max-width: 560px) { .rx-proof-grid { grid-template-columns: 1fr; } }
+    .rx-proof-card {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 20px;
+      background: rgba(0,0,0,.22);
+    }
+    .rx-proof-card .pstat {
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .rx-proof-card .pdesc {
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--font-label);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    /* ── Pricing / CTA ── */
+    .rx-pricing {
+      max-width: var(--wrap);
+      margin: 0 auto;
+      padding: 0 var(--wrap-pad, clamp(20px,4vw,56px)) 120px;
+    }
+    .rx-pricing-card {
+      border: 1px solid rgba(244,199,91,.36);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(244,199,91,.07), rgba(244,199,91,.02));
+      padding: 40px;
+      max-width: 660px;
+      position: relative;
+      overflow: hidden;
+    }
+    .rx-pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: -60% -30%;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+      transform: rotate(18deg);
+      animation: shimmer 9s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%,100% { transform: rotate(18deg) translateX(-100%); }
+      50% { transform: rotate(18deg) translateX(100%); }
+    }
+    .rx-pricing-card > * { position: relative; z-index: 1; }
+    .rx-pricing-card .plan-label {
+      font-family: var(--font-label);
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .rx-pricing-card h2 {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 900;
+      color: var(--ink);
+      margin: 0 0 10px;
+    }
+    .rx-pricing-card .sub { color: var(--soft); font-size: 15px; line-height: 1.55; margin: 0 0 26px; }
+    .rx-price-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .rx-price-block { display: flex; flex-direction: column; gap: 4px; }
+    .rx-price-block .amt {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+    .rx-price-block .lbl {
+      font-family: var(--font-label);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .rx-sep { width: 1px; background: rgba(255,255,255,.14); align-self: stretch; }
+    .rx-include-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px 20px;
+    }
+    .rx-include-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--soft);
+      line-height: 1.4;
+    }
+    .rx-include-list li::before { content: '—'; color: var(--cyan); flex-shrink: 0; }
+    .rx-gate-note {
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 20px;
+      line-height: 1.55;
+    }
+    .rx-gate-note strong { color: var(--gold); }
+
+    @media (max-width: 600px) {
+      .rx-hero { padding-top: 100px; }
+      .rx-stage { grid-template-columns: 48px 1fr; gap: 0 16px; }
+      .rx-pricing-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+
+  <div class="motion-chrome scroll-progress" aria-hidden="true"><span id="rx-progress-bar"></span></div>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">&larr; Main</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="ecosystem.html">Ecosystem</a>
+        <a class="is-active" href="skyeroutex.html">RouteX</a>
+        <a href="proof.html">Live Proof</a>
+        <a href="valuation.html">Valuation</a>
+        <a class="platform-link" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/store?client=metraiyux-0s" target="_blank" rel="noopener">Buy Now</a>
+        <a class="nav-cta" href="#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ── HERO ── -->
+    <section class="rx-hero reveal">
+      <div class="rx-tag"><span class="live-dot"></span>Workforce Dispatch OS · v0.4.0</div>
+      <h1 class="rx-hero-title">
+        <span class="accent-gold">SkyeRouteX</span><br>
+        Workforce <span class="accent-cyan">Command.</span>
+      </h1>
+      <p class="rx-lede">
+        I built this for the service business running on spreadsheets and group chats.
+        SkyeRouteX routes the full contractor lifecycle — post jobs, dispatch routes,
+        capture proof, advance payments, and run House Command — with every action
+        gated, logged, and ledgered through FS27.
+      </p>
+      <div class="rx-hero-actions">
+        <a class="btn-primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyeroutex-workforce-command" target="_blank" rel="noopener">
+          Buy via SkyePay &rarr;
+        </a>
+        <a class="btn-ghost" href="#how-it-works">See how it works</a>
+        <div class="rx-price-chip">
+          <strong>$6,500 setup · $1,497/mo</strong>
+          <span>Owner-approved activation · FS27 gated</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROCESS RAIL ── -->
+    <section id="how-it-works" class="rx-rail">
+      <p class="rx-rail-eyebrow">The dispatch loop</p>
+      <h2 class="rx-rail-title reveal">Every stage from job post to proof-backed payout.</h2>
+      <div class="rx-stages">
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">01</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Build Your Markets</h3>
+            <p>Create city/state markets, define service types, and set capacity. The platform gives every market its own job board, contractor pool, and audit trail from day one.</p>
+            <div class="rx-stage-tags"><span>create-market</span><span>service-type</span><span>capacity-cap</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">02</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Post Provider Jobs</h3>
+            <p>Post structured jobs with slots, requirements, and pay parameters. Contractors see the board without seeing each other's details or your provider margins.</p>
+            <div class="rx-stage-tags"><span>provider-job-board</span><span>slot-cap</span><span>scope-isolation</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">03</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Contractor Application Lane</h3>
+            <p>Contractors apply through the gated board. You review the applicant pool, accept or reject individuals, and the system blocks overfill automatically — single-acceptance and multi-slot cap enforcement built in.</p>
+            <div class="rx-stage-tags"><span>contractor-job-board</span><span>applicant-pool</span><span>accept-reject</span><span>overfill-block</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">04</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Assignment + Route Dispatch</h3>
+            <p>Confirm assignments, run check-ins, dispatch route stops. The workflow board and timeline track every job and assignment state so nothing falls through the cracks.</p>
+            <div class="rx-stage-tags"><span>assignment-confirm</span><span>check-in</span><span>route-stop-dispatch</span><span>workflow-board</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">05</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Proof Submission</h3>
+            <p>Contractors submit proof media tied to their assignment. Proof is structured, timestamped, and stored under the job record — not in a text message thread.</p>
+            <div class="rx-stage-tags"><span>proof-media</span><span>assignment-proof</span><span>timestamp</span><span>job-record</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">06</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Payment State Ledger</h3>
+            <p>Advance payment states from pending through approved. House Command can freeze payment at any stage if something is disputed or needs review — the freeze is logged, not silent.</p>
+            <div class="rx-stage-tags"><span>payment-state</span><span>house-command</span><span>payment-freeze</span><span>ledger</span></div>
+          </div>
+        </div>
+
+        <div class="rx-stage reveal">
+          <div class="rx-stage-num">
+            <div class="num">07</div>
+            <div class="line"></div>
+          </div>
+          <div class="rx-stage-body">
+            <h3>Audit Packet Export</h3>
+            <p>Generate a full audit packet for any job, market, or time period. Autonomous contractor recommendations come out of the same data — the system surfaces who to re-book based on proof history and ratings.</p>
+            <div class="rx-stage-tags"><span>audit-packet</span><span>contractor-recommendations</span><span>ratings</span><span>export</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── FEATURE GRID ── -->
+    <section class="rx-features">
+      <p class="rx-rail-eyebrow reveal">Platform features</p>
+      <h2 class="rx-rail-title reveal">Everything wired into one command hub.</h2>
+      <div class="rx-features-grid">
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">🗺</div>
+          <h4>Multi-Market Command</h4>
+          <p>Create and manage multiple city/state markets from the same operator account. Each market gets its own job board and contractor pool.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">📋</div>
+          <h4>Provider Job Board</h4>
+          <p>Structured job posts with slot caps, requirements, and pay parameters. Applicants see what they need to see — nothing more.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">🔒</div>
+          <h4>FS27 Gate Session</h4>
+          <p>Every operator action, contractor view, and admin control requires a live FS27 gate session. No anonymous access, no gaps in the audit trail.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">🤖</div>
+          <h4>Autonomous Recommendations</h4>
+          <p>The platform surfaces contractor re-book recommendations from proof history, completion rates, and ratings — no manual scoring needed.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">🏠</div>
+          <h4>House Command</h4>
+          <p>Operator-level control plane. Freeze payments, review disputes, run workflow overrides, and manage all markets from one command room.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">📸</div>
+          <h4>Assignment Proof</h4>
+          <p>Structured proof media attached to every assignment. Tied to the job record — not a photo in a group chat.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">💳</div>
+          <h4>Payment State Ledger</h4>
+          <p>Advance payment states with logging at each step. Dispute, freeze, or approve — every state change is a ledger record.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">📦</div>
+          <h4>Audit Packet Export</h4>
+          <p>Export audit packets for any job, market, contractor, or period. Built for compliance conversations, not just internal review.</p>
+        </div>
+
+        <div class="rx-feat reveal">
+          <div class="rx-feat-icon">🗂</div>
+          <h4>Workflow Timeline</h4>
+          <p>Persistent workflow board and timeline across all jobs and assignments. Always know what is open, what is pending, what is stalled.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── PROOF PANEL ── -->
+    <section class="rx-proof">
+      <p class="rx-rail-eyebrow reveal">What the smoke test confirms</p>
+      <h2 class="rx-rail-title reveal">Proven end to end at v0.4.0.</h2>
+      <div class="rx-proof-grid">
+        <div class="rx-proof-card reveal">
+          <div class="pstat">v0.4.0</div>
+          <div class="pdesc">Platform version — deployed & smoke-tested</div>
+        </div>
+        <div class="rx-proof-card reveal">
+          <div class="pstat">3</div>
+          <div class="pdesc">Smoke profiles: browser-panels, routex-operator, mount</div>
+        </div>
+        <div class="rx-proof-card reveal">
+          <div class="pstat">7+</div>
+          <div class="pdesc">End-to-end flows: login → market → job → apply → assign → proof → payment</div>
+        </div>
+        <div class="rx-proof-card reveal">
+          <div class="pstat">FS27</div>
+          <div class="pdesc">Gate-session required on every operator and contractor action</div>
+        </div>
+      </div>
+      <p class="reveal" style="color:var(--soft);font-size:14px;margin-top:20px;line-height:1.55;">
+        The smoke test confirms: admin login, market creation, user creation, provider job post, contractor application, single-acceptance overfill block, multi-slot cap block, assignment confirm / check-in / proof / approval, payment-state advancement, ratings, autonomous recommendations, House Command, and audit proof.
+      </p>
+    </section>
+
+    <!-- ── PRICING CTA ── -->
+    <section id="pricing" class="rx-pricing">
+      <p class="rx-rail-eyebrow reveal">Ready to deploy</p>
+      <h2 class="rx-rail-title reveal">One tier. Full operator access.</h2>
+      <div class="rx-pricing-card reveal">
+        <div class="plan-label">SkyeRouteX Workforce Command</div>
+        <h2>Owner-approved activation.<br>Full command on day one.</h2>
+        <p class="sub">Payment goes through SkyePay and creates a Stripe-backed checkout session. After payment, the activation requires owner approval — this is a full-service dispatch platform, not a self-serve button. Activation is confirmed by the operator, not auto-unlocked from Stripe.</p>
+        <div class="rx-price-row">
+          <div class="rx-price-block">
+            <div class="amt">$6,500</div>
+            <div class="lbl">One-time setup</div>
+          </div>
+          <div class="rx-sep"></div>
+          <div class="rx-price-block">
+            <div class="amt">$1,497</div>
+            <div class="lbl">Monthly</div>
+          </div>
+        </div>
+        <ul class="rx-include-list">
+          <li>Multi-market operator account</li>
+          <li>Full provider job board</li>
+          <li>Contractor application lane</li>
+          <li>Assignment + proof workflow</li>
+          <li>Payment state ledger</li>
+          <li>House Command control plane</li>
+          <li>Route stop dispatch</li>
+          <li>Audit packet export</li>
+          <li>Autonomous contractor recommendations</li>
+          <li>FS27 gate session (included)</li>
+          <li>Workflow board + timeline</li>
+          <li>Smoke-tested v0.4.0 platform</li>
+        </ul>
+        <div class="rx-gate-note">
+          <strong>Gate policy:</strong> SkyeRouteX activation requires a live FS27 gate session. Payment via SkyePay creates a <code>paid_pending_owner_approval</code> record. The operator activates the workspace after reviewing the order — paid app lanes do not auto-unlock from Stripe success alone.
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:28px;">
+          <a class="btn-primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyeroutex-workforce-command" target="_blank" rel="noopener">
+            Buy via SkyePay &rarr;
+          </a>
+          <a class="btn-ghost" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/store?client=metraiyux-0s" target="_blank" rel="noopener">
+            View full store
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>SkyeRouteX Workforce Command</strong>
+        <p>Workforce dispatch OS. Post jobs, route contractors, capture proof, advance payments, run House Command. Gated by FS27. $6,500 setup · $1,497/mo.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">MetrAIyux 0S</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="ecosystem.html">Ecosystem</a>
+        <a href="capabilities.html">Capabilities</a>
+      </div>
+      <div class="footer-links">
+        <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/store?client=metraiyux-0s" target="_blank" rel="noopener">SkyePay Store</a>
+        <a href="valuation.html">Valuation</a>
+        <a href="mailto:contact@metraiyux.com">contact@metraiyux.com</a>
+        <span class="tiny">Updated 2026-05-17</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* nav toggle */
+    (function() {
+      const b = document.querySelector('[data-menu-button]'), l = document.querySelector('[data-nav-links]');
+      if (b && l) b.addEventListener('click', () => { const o = l.classList.toggle('is-open'); b.setAttribute('aria-expanded', String(o)); });
+    })();
+
+    /* reveal on scroll */
+    (function() {
+      const items = document.querySelectorAll('.reveal,.rx-stage');
+      if (!items.length || !('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('is-visible')); return; }
+      const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } }), { threshold: 0.08 });
+      items.forEach(el => obs.observe(el));
+    })();
+
+    /* scroll progress bar */
+    (function() {
+      const bar = document.getElementById('rx-progress-bar');
+      if (!bar) return;
+      function update() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+
+    /* canvas particle field */
+    (function() {
+      const canvas = document.querySelector('.command-canvas');
+      if (!canvas || !canvas.getContext) return;
+      const ctx = canvas.getContext('2d');
+      const P = Array.from({ length: 56 }, (_, i) => ({
+        x: Math.random(), y: Math.random(),
+        speed: 0.00035 + Math.random() * 0.0006,
+        phase: i * 0.82,
+        color: i % 5 === 0 ? '#f4c75b' : i % 3 === 0 ? '#a88cff' : '#64d9ff'
+      }));
+      function resize() {
+        const r = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(window.innerWidth * r);
+        canvas.height = Math.floor(window.innerHeight * r);
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(r, 0, 0, r, 0, 0);
+      }
+      function draw(t) {
+        const w = window.innerWidth, h = window.innerHeight;
+        ctx.clearRect(0, 0, w, h);
+        P.forEach((p, i) => {
+          p.y -= p.speed * 2.2;
+          if (p.y < -0.08) p.y = 1.08;
+          const x = p.x * w + Math.sin(t * 0.0004 + p.phase) * 22, y = p.y * h;
+          ctx.beginPath(); ctx.arc(x, y, i % 7 === 0 ? 2 : 1.1, 0, Math.PI * 2);
+          ctx.fillStyle = p.color; ctx.globalAlpha = i % 5 === 0 ? 0.68 : 0.42; ctx.fill();
+          const n = P[(i + 8) % P.length], nx = n.x * w, ny = n.y * h, d = Math.hypot(nx - x, ny - y);
+          if (d < 170) { ctx.globalAlpha = Math.max(0, 0.18 - d / 850); ctx.strokeStyle = p.color; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke(); }
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+      resize(); window.addEventListener('resize', resize); requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>

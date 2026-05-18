@@ -2,8 +2,7 @@ import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest, getBearer } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { resolveAuth } from "./_lib/authz.js";
-
-const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 function parseRequestedModel(request) {
   if (!request) return "";
@@ -58,7 +57,7 @@ export default wrap(async (req) => {
     } catch {}
   }
 
-  const requested_model = parseRequestedModel(job.request) || job.model || "";
+  const requested_model = publicModelName(job.provider, parseRequestedModel(job.request) || job.model || "");
   const public_provider = PUBLIC_PROVIDER_NAME;
   const safeJob = {
     id: job.id,

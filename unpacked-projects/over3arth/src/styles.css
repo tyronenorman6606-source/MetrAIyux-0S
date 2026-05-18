@@ -5481,11 +5481,11 @@ html {
 }
 
 .overearth-map-viewport {
-  --map-size: clamp(520px, 48vw, 700px);
+  --map-size: clamp(640px, 58vw, 860px);
   --map-half: calc(var(--map-size) / 2);
   position: absolute;
   left: calc(50% - var(--map-half));
-  top: calc(47% - var(--map-half));
+  top: calc(50% - var(--map-half));
   z-index: 15;
   width: var(--map-size);
   height: var(--map-size);
@@ -5495,7 +5495,8 @@ html {
   cursor: grab;
   pointer-events: auto;
   touch-action: none;
-  transform-origin: center;
+  transform-origin: 50% 88%;
+  backface-visibility: hidden;
   will-change: transform, opacity, filter;
 }
 
@@ -5505,17 +5506,18 @@ html {
 
 .overearth-map-viewport[data-open="true"] {
   opacity: 1;
-  animation: overearthGlobeEmergence 1050ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: overearthGlobeEmergence 1820ms cubic-bezier(0.12, 0.88, 0.18, 1) both;
 }
 
 .overearth-node-globe.worldskin-orbit {
-  --globe-size: clamp(520px, 48vw, 700px);
+  --globe-size: clamp(640px, 58vw, 860px);
   width: var(--globe-size);
   height: var(--globe-size);
 }
 
 .overearth-zero-scene .spectacle-globe {
-  width: min(100%, 700px);
+  width: 100%;
+  height: 100%;
   transform: none;
   filter:
     drop-shadow(0 0 52px rgba(186, 74, 255, 0.34))
@@ -5532,7 +5534,7 @@ html {
   translate: -50% -50%;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.72;
+  opacity: 0.64;
   transform: translateY(4%) scale(0.9);
   transform-origin: 50% 58%;
   transition:
@@ -5542,14 +5544,17 @@ html {
     transform 760ms cubic-bezier(0.16, 1, 0.3, 1),
     filter 520ms cubic-bezier(0.16, 1, 0.3, 1);
   filter:
-    saturate(1.18)
-    drop-shadow(0 0 18px rgba(186, 74, 255, 0.26))
-    drop-shadow(0 0 20px rgba(255, 208, 92, 0.12));
+    saturate(1.06)
+    drop-shadow(0 0 12px rgba(186, 74, 255, 0.16))
+    drop-shadow(0 0 12px rgba(255, 208, 92, 0.06));
 }
 
 .auren-energy-being canvas,
 .auren-energy-being__field,
-.auren-energy-being__signal {
+.auren-energy-being__signal,
+.auren-energy-being__tether,
+.auren-energy-being__vessel,
+.auren-energy-being__avatar-core {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -5581,11 +5586,126 @@ html {
   animation: aurenEnergySignal 4.6s ease-in-out infinite;
 }
 
+.auren-energy-being__tether {
+  z-index: 3;
+  inset: auto;
+  left: 50%;
+  top: 51%;
+  width: 3px;
+  height: 43%;
+  translate: -50% 0;
+  opacity: 0;
+  transform-origin: 50% 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(35, 231, 255, 0.46) 24%, rgba(186, 74, 255, 0.22) 64%, transparent),
+    repeating-linear-gradient(180deg, rgba(255, 208, 92, 0.3) 0 5px, transparent 5px 12px);
+  filter: blur(0.35px) drop-shadow(0 0 12px rgba(35, 231, 255, 0.38));
+  clip-path: polygon(50% 0, 100% 100%, 50% 92%, 0 100%);
+  transition:
+    opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: aurenSoulTether 2.7s ease-in-out infinite;
+}
+
+.auren-energy-being__vessel {
+  z-index: 4;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 31%;
+  height: 42%;
+  translate: -50% -50%;
+  opacity: 0.1;
+  transform: scale(0.46);
+  border-radius: 48% 52% 44% 56% / 36% 40% 60% 64%;
+  background:
+    radial-gradient(circle at 48% 24%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.24) 16%, transparent 26%),
+    radial-gradient(ellipse at 50% 38%, rgba(35, 231, 255, 0.54), transparent 46%),
+    radial-gradient(ellipse at 54% 70%, rgba(186, 74, 255, 0.48), rgba(186, 74, 255, 0.1) 46%, transparent 72%),
+    linear-gradient(180deg, rgba(255, 208, 92, 0.18), rgba(35, 231, 255, 0.12), rgba(186, 74, 255, 0.1));
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.18),
+    inset 0 -20px 38px rgba(186, 74, 255, 0.18),
+    0 0 24px rgba(35, 231, 255, 0.18);
+  filter: blur(0.2px);
+  transition:
+    opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 720ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: aurenVesselBreath 4.4s ease-in-out infinite;
+}
+
+.auren-energy-being__vessel::before,
+.auren-energy-being__vessel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 82%;
+  height: 16%;
+  translate: -50% -50%;
+  border-radius: 999px;
+  border: 1px solid rgba(35, 231, 255, 0.24);
+  opacity: 0.66;
+  transform: rotate(-18deg);
+}
+
+.auren-energy-being__vessel::after {
+  width: 70%;
+  border-color: rgba(255, 208, 92, 0.22);
+  transform: rotate(24deg);
+}
+
+.auren-energy-being__avatar-core {
+  z-index: 5;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 22%;
+  height: 22%;
+  translate: -50% -50%;
+  border-radius: 48% 52% 46% 54%;
+  opacity: 0.18;
+  background:
+    radial-gradient(circle at 42% 34%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.32) 18%, transparent 28%),
+    radial-gradient(circle, rgba(35, 231, 255, 0.74), rgba(186, 74, 255, 0.38) 46%, rgba(255, 208, 92, 0.12) 68%, transparent 76%);
+  filter: blur(0.4px) drop-shadow(0 0 12px rgba(35, 231, 255, 0.26));
+  transform: scale(0.72);
+  transition:
+    opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: aurenAvatarCore 3.4s ease-in-out infinite;
+}
+
 .auren-energy-being[data-presence="inside"] {
-  top: 53%;
-  width: 38%;
-  opacity: 0.58;
-  transform: translateY(10%) scale(0.84);
+  top: 50%;
+  width: 26%;
+  opacity: 0.36;
+  transform: translateY(0) scale(0.78);
+  filter:
+    saturate(0.95)
+    drop-shadow(0 0 8px rgba(35, 231, 255, 0.1));
+}
+
+.auren-energy-being[data-presence="inside"] .auren-energy-being__field {
+  opacity: 0.18;
+}
+
+.auren-energy-being[data-presence="inside"] .auren-energy-being__signal {
+  opacity: 0;
+  animation: none;
+}
+
+.auren-energy-being[data-presence="inside"] .auren-energy-being__tether,
+.auren-energy-being[data-presence="inside"] .auren-energy-being__vessel {
+  opacity: 0;
+  animation: none;
+}
+
+.auren-energy-being[data-presence="inside"] .auren-energy-being__avatar-core {
+  opacity: 0.1;
+  transform: scale(0.48);
 }
 
 .auren-energy-being[data-presence="awake"] {
@@ -5604,6 +5724,30 @@ html {
     saturate(1.35)
     drop-shadow(0 0 30px rgba(186, 74, 255, 0.34))
     drop-shadow(0 0 34px rgba(255, 208, 92, 0.2));
+}
+
+.auren-energy-being[data-presence="emerged"] .auren-energy-being__avatar-core {
+  opacity: 0.88;
+  transform: scale(0.74);
+  filter:
+    blur(0.2px)
+    drop-shadow(0 0 18px rgba(255, 255, 255, 0.38))
+    drop-shadow(0 0 28px rgba(35, 231, 255, 0.32))
+    drop-shadow(0 0 28px rgba(255, 208, 92, 0.18));
+}
+
+.auren-energy-being[data-presence="emerged"] .auren-energy-being__tether {
+  opacity: 0.82;
+  transform: scaleY(1);
+}
+
+.auren-energy-being[data-presence="emerged"] .auren-energy-being__vessel {
+  opacity: 0.92;
+  transform: scale(1);
+  filter:
+    blur(0)
+    drop-shadow(0 0 22px rgba(35, 231, 255, 0.26))
+    drop-shadow(0 0 24px rgba(255, 208, 92, 0.14));
 }
 
 .auren-energy-being[data-state="listening"] {
@@ -5798,20 +5942,32 @@ html {
 @keyframes overearthGlobeEmergence {
   0% {
     opacity: 0;
-    transform: translateY(260px) scale(0.16) rotateX(16deg);
-    filter: blur(16px) saturate(0.72);
+    transform: perspective(1000px) translateY(230px) scale(0.08) rotateX(24deg);
+    filter: blur(22px) saturate(0.54) brightness(0.78);
   }
 
-  62% {
+  18% {
+    opacity: 0.18;
+    transform: perspective(1000px) translateY(174px) scale(0.2) rotateX(19deg);
+    filter: blur(18px) saturate(0.7) brightness(0.86);
+  }
+
+  48% {
+    opacity: 0.74;
+    transform: perspective(1000px) translateY(72px) scale(0.58) rotateX(10deg);
+    filter: blur(8px) saturate(0.96) brightness(0.98);
+  }
+
+  76% {
     opacity: 1;
-    transform: translateY(-10px) scale(1.02) rotateX(0deg);
-    filter: blur(0) saturate(1.2);
+    transform: perspective(1000px) translateY(-8px) scale(1.015) rotateX(0deg);
+    filter: blur(0.8px) saturate(1.18) brightness(1.04);
   }
 
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1) rotateX(0deg);
-    filter: blur(0) saturate(1.18);
+    transform: perspective(1000px) translateY(0) scale(1) rotateX(0deg);
+    filter: blur(0) saturate(1.18) brightness(1);
   }
 }
 
@@ -5854,6 +6010,45 @@ html {
   }
 }
 
+@keyframes aurenAvatarCore {
+  0%,
+  100% {
+    border-radius: 48% 52% 46% 54%;
+    scale: 0.94;
+  }
+
+  50% {
+    border-radius: 58% 42% 54% 46%;
+    scale: 1.08;
+  }
+}
+
+@keyframes aurenSoulTether {
+  0%,
+  100% {
+    opacity: 0.52;
+    transform: scaleY(0.82) skewX(-2deg);
+  }
+
+  50% {
+    opacity: 0.92;
+    transform: scaleY(1.06) skewX(2deg);
+  }
+}
+
+@keyframes aurenVesselBreath {
+  0%,
+  100% {
+    border-radius: 48% 52% 44% 56% / 36% 40% 60% 64%;
+    scale: 0.98;
+  }
+
+  50% {
+    border-radius: 56% 44% 52% 48% / 42% 34% 66% 58%;
+    scale: 1.04;
+  }
+}
+
 @media (max-width: 900px) {
   .overearth-boot-stage {
     width: 100vw;
@@ -5861,13 +6056,13 @@ html {
   }
 
   .overearth-map-viewport {
-    --map-size: min(390px, 90vw);
-    --map-half: min(195px, 45vw);
-    top: 27%;
+    --map-size: min(460px, 96vw);
+    --map-half: calc(var(--map-size) / 2);
+    top: calc(50% - var(--map-half));
   }
 
   .overearth-node-globe.worldskin-orbit {
-    --globe-size: min(360px, 88vw);
+    --globe-size: min(460px, 96vw);
   }
 
   .auren-energy-being[data-presence="emerged"] {

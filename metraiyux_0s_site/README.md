@@ -9,6 +9,30 @@ This package contains the full public website, owner/admin automation OS, custom
 
 The current repo-evidenced 0S feature inventory lives at `FEATURE_INVENTORY.md`. It was generated from MCP mining, route scans, docs, live-surface registries, package scripts, proof receipts, and platform ledgers on 2026-05-17. Use it as the first source before writing product copy, sales pages, pitch material, or public claims so the system is not undersold.
 
+## SkyeRunners Repo-Aware Worker Control
+
+This build includes SkyeRunners, a repo-local worker-control lane for knowledge maps, human-flow QA, repo health, SkyeVault memory, and operator-brain refreshes. SkyeRunners does not replace human approval and does not trigger paid provider spend by default.
+
+Start points:
+
+- `admin/skyerunners.html` - admin control page.
+- `brain/skyerunners.json` - generated local-brain feed.
+- `../tools/skyerunners.mjs` - local bridge and map generator.
+- `../docs/SKYERUNNERS_OPERATOR_GUIDE.md` - operator guide.
+- `../test-artifacts/skyerunners/stress-final-report.json` - latest local stress result.
+
+Local commands:
+
+```bash
+npm run skyerunners:map
+npm run skyerunners:control
+npm run skyerunners:run -- knowledge-refresh
+npm run skyerunners:run -- repo-health
+npm run skyerunners:run -- crawler-static
+```
+
+Latest local proof from 2026-05-18: 286 SkyeRunners bridge/browser/queue stress operations with 0 failures, static SkyeCrawler at 647 HTML pages and 874 local references with 14 checks, 0 failures, and 0 warnings.
+
 ## SkyeMerit Protected Merit System
 
 This build includes SkyeMerit as a no-charge first-time merit lane inside the 0S SaaS and SkyePay system. SkyeMerit gives first-time users a `$6` premium kAIxu credit and protected discount rules that lower only eligible SkyePay spend bands. It does not remove FS27, owner approval, checkout policy, or gate-session requirements.
@@ -27,7 +51,7 @@ npm run 0s:skyemerit:proof
 
 ## Platform Integration Accounting
 
-This build accounts for the changelog additions as first-class 0S platform lanes: SkyePay Store, SkyeVault access, SkyeCard usage offers, SkyeMail, SkyeMerit, SkyeRouteX, and the Free99 gated expansions. The operator ledger maps each lane to system surfaces, buyer routes, advertising angles, integration boundaries, and proof commands.
+This build accounts for the changelog additions as first-class 0S platform lanes: SkyePay Store, SkyeVault access, SkyeCard usage offers, SkyeMail, SkyeMerit, SkyeRouteX, Skye Split Engine, Marketing Made Easy, and the Free99 gated expansions. The operator ledger maps each lane to system surfaces, buyer routes, advertising angles, integration boundaries, and proof commands.
 
 Start points:
 
@@ -40,6 +64,27 @@ Local proof command:
 
 ```bash
 npm run 0s:platform-accounting
+```
+
+## Marketing Made Easy Growth Suite
+
+This build adds `Marketing-Made-Easy/` as a routed 0S growth-suite lane. The suite covers AE-FlowPro, BrandID Offline PWA, BusinessLaunchGo, SkyeDocxMax, SkyeWebCreatorMax, WebGrowthOperator, Arizona Growth Index, and kAIxU BrandKit.
+
+Start points:
+
+- `live/marketing-made-easy-growth-suite.html` - 0S proof-safe suite hub.
+- `Marketing-Made-Easy/index.html` - root route index for the eight imported subapps.
+- `proof/marketing-made-easy-deep-scan-receipt.html` - proof receipt and boundary.
+- `../SkyeGateFS27/docs/integration-dossiers/marketing-made-easy.md` - FS27 gate dossier.
+
+Production boundary: Marketing Made Easy is routeable and deep-scanned, but it is quote-only/gated. Do not claim external publishing, ad spend, Drive/GitHub/Netlify/Cloudflare writes, customer tenancy, or SkyePay checkout until owner approval and provider proof exist.
+
+Local proof commands:
+
+```bash
+npm run 0s:marketing-made-easy:scan
+npm run 0s:marketing-made-easy:smoke
+npm run 0s:marketing-made-easy:proof
 ```
 
 ## ConnectLog + Relay13 Expansion
@@ -98,6 +143,24 @@ npm run 0s:skyeroutex:stress
 The stress harness exercises concurrent providers, contractors, route jobs, applications, acceptance locks, assignment transitions, proof media, approvals, export packets, market reports, payment ledger state, persisted totals, and audit-chain integrity. The fresh default local JSON proof shape passed at 608 requests with no 500s, only 200/201 responses plus expected 409 assignment-lock conflicts, and p99 in the 6.2s to 12.2s local range. A doubled shape also passed at 1,192 requests after caching/atomic compact writes and a serialized mutation queue were added, but p99 stayed around 10.5s, so production RouteX needs Postgres/object storage/provider infrastructure for serious throughput. Production boot now rejects local JSON/local file storage.
 
 Current pricing keeps RouteX Workforce Command at `$1,497/month` plus `$6,500 setup`, with a named SkyePay offer and owner-approved activation. SkyeGateFS27 now holds core MetrAIyux app lanes at `paid_pending_owner_approval` after payment; RouteX cannot auto-unlock from a Stripe success event.
+
+## Skye Split Engine Free99 Expansion
+
+This build adds `SkyeSplitEngine/` inside the 0S site. Skye Split Engine is the Free99 commission and payout split field for people, products, split rules, transaction ledgers, settlement reports, CSV import/export, JSON backup/restore, snapshots, and local data repair.
+
+Routes:
+
+- `live/skye-split-engine-operator-proof.html` - buyer-safe Free99 expansion hub.
+- `SkyeSplitEngine/index.html` - gated app entry.
+- `proof/skyesplitengine-expansion-receipt.html` - import and proof receipt.
+
+Free99 means no charge. It does not mean anonymous access. The app waits for a 0S, FS27, SkyGate, or local admin gate session before booting. It does not move money, run payroll, file taxes, or replace accounting/legal review.
+
+Proof command:
+
+```bash
+npm run 0s:skyesplitengine:proof
+```
 
 ## SkyeProfitConsole Free99 Expansion
 

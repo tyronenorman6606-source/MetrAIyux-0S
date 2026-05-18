@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus — Operator Stage</title>
+  <title>SkyeMusicNexus - Operator Stage</title>
   <meta name="description" content="SkyeMusicNexus operator stage for music release review, workflow movement, analytics, payouts, and proof visibility." />
   <link rel="stylesheet" href="./neo-nexus.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
   <script defer src="./neo-nexus.js"></script>
 </head>
 <body data-app="skye-music-nexus" data-mode="admin">
@@ -18,8 +20,7 @@
 
   <header class="nexus-topline">
     <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus artist stage">
-      <span class="sigil-orbit"></span>
-      <span class="sigil-note">♬</span>
+      <img src="../assets/platform-mark.svg" alt="" />
     </a>
     <div class="top-title">
       <p class="micro">SkyeMusicNexus // Operator Stage</p>
@@ -30,6 +31,7 @@
       <button class="ghost" data-action="proof-session">Proof Session</button>
       <button class="ghost" data-action="operator-login">Operator Login</button>
       <button class="ghost" data-action="logout">Disconnect</button>
+      <a class="ghost" href="./create.html">Create Studio</a>
       <a class="ghost" href="./index.html">Artist Stage</a>
     </div>
   </header>
@@ -37,15 +39,15 @@
   <main class="nexus-shell admin-shell">
     <section class="ops-hero panel-xl">
       <div>
-        <p class="eyebrow">operations control · kinetic music command · exchange console</p>
+        <p class="eyebrow">operations control / kinetic music command / exchange console</p>
         <h2>Review, publish, credit, route content, and prove the music lane from one kinetic stage.</h2>
         <p class="lede">This view reads the existing Netlify function layer and turns records into action cards, workflow ribbons, royalty pulses, content requests, community signals, and smoke-proof boundaries.</p>
       </div>
       <div class="admin-kpis">
-        <article><span id="meterArtists">—</span><small>artist nodes</small></article>
-        <article><span id="meterReleases">—</span><small>release capsules</small></article>
-        <article><span id="meterLive">—</span><small>live drops</small></article>
-        <article><span id="meterPayouts">—</span><small>payouts pending</small></article>
+        <article><span id="meterArtists">0</span><small>artist nodes</small></article>
+        <article><span id="meterReleases">0</span><small>release capsules</small></article>
+        <article><span id="meterLive">0</span><small>live drops</small></article>
+        <article><span id="meterPayouts">0</span><small>payouts pending</small></article>
       </div>
     </section>
 

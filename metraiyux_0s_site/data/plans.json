@@ -55,7 +55,24 @@
       "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
       "skyemusicnexus_lite_access": "Free99 Lite gated feature; $0/month, $0 setup, no paid checkout, gate session required, 1 artist profile + 1 draft release preview",
       "skyemusicnexus_paid_upgrade_path": "Studio $497/mo + $1,500 setup; Label Command $1,497/mo + $6,500 setup; Managed Music Ops $3,997/mo + $15,000 setup; one-off drops from $199",
-      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required"
+      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyesplitengine_access": "Free99 gated split/payout engine feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyeopsconsole_access": "Free99 gated operations console; $0/month, $0 setup, no paid checkout, gate session required; platform_id=skyeopsconsole is billable=false.",
+      "free99_new_platform_intake": "Only SkyeOpsConsole is Free99 from metraiyux_0s_site/Free99. Paid-Apps imports require standalone checkout, owner approval, or a future Stripe SKU rebuild before live use.",
+      "platform_usage_accounting": {
+        "metering_scope": "per_platform_per_capability",
+        "request_fields": [
+          "platform_id",
+          "usage_lane"
+        ],
+        "free99_platforms": [
+          "skyeopsconsole"
+        ],
+        "paid_platform_lane_rule": "catalog/proof only until a standalone paid platform lane is approved",
+        "rate_limit_split": "FS27 uses platform_id + usage_lane for dedicated rate-limit windows when a SkyePay policy bucket exists; otherwise the global key/customer limits still apply.",
+        "cost_split": "usage_events records platform_id and usage_lane so invoices and caps can separate SkyeAPI, SovereignDocs, CodeStudio, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and SkyeOpsConsole usage.",
+        "paid_platform_lane_capacity_after_owner_approval": 0
+      }
     },
     "includes": [
       "Customer workspace",
@@ -74,9 +91,12 @@
       "One free PHX Verified public business landing after first paid month",
       "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
       "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "Skye Split Engine Free99 gated commission and payout split console access (no charge; gate session required)",
       "Skye Content Forge Free99 gated content publisher access (no charge; gate session required)",
       "SkyeMusicNexus Lite Free99 gated music preview (no charge; gate session required) plus paid Studio/Label/Managed and drop add-on upgrade path",
-      "FS27 records confirmed payment and holds the paid workspace for owner-approved activation"
+      "FS27 records confirmed payment and holds the paid workspace for owner-approved activation",
+      "SkyeOpsConsole Free99 gated console",
+      "Platform-aware usage split by platform_id and usage_lane"
     ]
   },
   {
@@ -137,7 +157,24 @@
       "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
       "skyemusicnexus_lite_access": "Free99 Lite gated feature; $0/month, $0 setup, no paid checkout, gate session required, 1 artist profile + 1 draft release preview",
       "skyemusicnexus_paid_upgrade_path": "Studio $497/mo + $1,500 setup; Label Command $1,497/mo + $6,500 setup; Managed Music Ops $3,997/mo + $15,000 setup; one-off drops from $199",
-      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required"
+      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyesplitengine_access": "Free99 gated split/payout engine feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyeopsconsole_access": "Free99 gated operations console; $0/month, $0 setup, no paid checkout, gate session required; platform_id=skyeopsconsole is billable=false.",
+      "free99_new_platform_intake": "Only SkyeOpsConsole is Free99 from metraiyux_0s_site/Free99. Paid-Apps imports require standalone checkout, owner approval, or a future Stripe SKU rebuild before live use.",
+      "platform_usage_accounting": {
+        "metering_scope": "per_platform_per_capability",
+        "request_fields": [
+          "platform_id",
+          "usage_lane"
+        ],
+        "free99_platforms": [
+          "skyeopsconsole"
+        ],
+        "paid_platform_lane_rule": "platform lane capacity is not active by default; each paid platform still needs checkout, an owner-approved add-on, or a bundle entitlement before usage is enabled",
+        "rate_limit_split": "FS27 uses platform_id + usage_lane for dedicated rate-limit windows when a SkyePay policy bucket exists; otherwise the global key/customer limits still apply.",
+        "cost_split": "usage_events records platform_id and usage_lane so invoices and caps can separate SkyeAPI, SovereignDocs, CodeStudio, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and SkyeOpsConsole usage.",
+        "paid_platform_lane_capacity_after_owner_approval": 1
+      }
     },
     "includes": [
       "Everything in Starter",
@@ -156,9 +193,12 @@
       "One free PHX Verified public business landing after first paid month",
       "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
       "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "Skye Split Engine Free99 gated commission and payout split console access (no charge; gate session required)",
       "Skye Content Forge Free99 gated content publisher access (no charge; gate session required)",
       "SkyeMusicNexus Lite Free99 gated music preview (no charge; gate session required) plus paid Studio/Label/Managed and drop add-on upgrade path",
-      "FS27 records confirmed payment and holds the paid workspace for owner-approved route scope activation"
+      "FS27 records confirmed payment and holds the paid workspace for owner-approved route scope activation",
+      "SkyeOpsConsole Free99 gated console",
+      "Platform-aware usage split by platform_id and usage_lane"
     ]
   },
   {
@@ -221,7 +261,24 @@
       "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
       "skyemusicnexus_lite_access": "Free99 Lite gated feature; $0/month, $0 setup, no paid checkout, gate session required, 1 artist profile + 1 draft release preview",
       "skyemusicnexus_paid_upgrade_path": "Studio $497/mo + $1,500 setup; Label Command $1,497/mo + $6,500 setup; Managed Music Ops $3,997/mo + $15,000 setup; one-off drops from $199",
-      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required"
+      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyesplitengine_access": "Free99 gated split/payout engine feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyeopsconsole_access": "Free99 gated operations console; $0/month, $0 setup, no paid checkout, gate session required; platform_id=skyeopsconsole is billable=false.",
+      "free99_new_platform_intake": "Only SkyeOpsConsole is Free99 from metraiyux_0s_site/Free99. Paid-Apps imports require standalone checkout, owner approval, or a future Stripe SKU rebuild before live use.",
+      "platform_usage_accounting": {
+        "metering_scope": "per_platform_per_capability",
+        "request_fields": [
+          "platform_id",
+          "usage_lane"
+        ],
+        "free99_platforms": [
+          "skyeopsconsole"
+        ],
+        "paid_platform_lane_rule": "platform lane capacity is not active by default; each paid platform still needs checkout, an owner-approved add-on, or a bundle entitlement before usage is enabled",
+        "rate_limit_split": "FS27 uses platform_id + usage_lane for dedicated rate-limit windows when a SkyePay policy bucket exists; otherwise the global key/customer limits still apply.",
+        "cost_split": "usage_events records platform_id and usage_lane so invoices and caps can separate SkyeAPI, SovereignDocs, CodeStudio, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and SkyeOpsConsole usage.",
+        "paid_platform_lane_capacity_after_owner_approval": 1
+      }
     },
     "includes": [
       "Everything in Growth",
@@ -234,9 +291,12 @@
       "0S live-surface registry and proof-router wiring",
       "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
       "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "Skye Split Engine Free99 gated commission and payout split console access (no charge; gate session required)",
       "Skye Content Forge Free99 gated content publisher access (no charge; gate session required)",
       "SkyeMusicNexus Lite Free99 gated music preview (no charge; gate session required) plus paid Studio/Label/Managed and drop add-on upgrade path",
-      "Confirmed Stripe payment records paid status, then FS27 holds RouteX for owner-approved activation; RouteX includes the manual-government-check compliance vault by default, with Checkr/Certn-style providers optional through webhook or native adapters"
+      "Confirmed Stripe payment records paid status, then FS27 holds RouteX for owner-approved activation; RouteX includes the manual-government-check compliance vault by default, with Checkr/Certn-style providers optional through webhook or native adapters",
+      "SkyeOpsConsole Free99 gated console",
+      "Platform-aware usage split by platform_id and usage_lane"
     ]
   },
   {
@@ -301,7 +361,24 @@
       "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
       "skyemusicnexus_lite_access": "Free99 Lite gated feature; $0/month, $0 setup, no paid checkout, gate session required, 1 artist profile + 1 draft release preview",
       "skyemusicnexus_paid_upgrade_path": "Studio $497/mo + $1,500 setup; Label Command $1,497/mo + $6,500 setup; Managed Music Ops $3,997/mo + $15,000 setup; one-off drops from $199",
-      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required"
+      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyesplitengine_access": "Free99 gated split/payout engine feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyeopsconsole_access": "Free99 gated operations console; $0/month, $0 setup, no paid checkout, gate session required; platform_id=skyeopsconsole is billable=false.",
+      "free99_new_platform_intake": "Only SkyeOpsConsole is Free99 from metraiyux_0s_site/Free99. Paid-Apps imports require standalone checkout, owner approval, or a future Stripe SKU rebuild before live use.",
+      "platform_usage_accounting": {
+        "metering_scope": "per_platform_per_capability",
+        "request_fields": [
+          "platform_id",
+          "usage_lane"
+        ],
+        "free99_platforms": [
+          "skyeopsconsole"
+        ],
+        "paid_platform_lane_rule": "platform lane capacity is not active by default; each paid platform still needs checkout, an owner-approved add-on, or a bundle entitlement before usage is enabled",
+        "rate_limit_split": "FS27 uses platform_id + usage_lane for dedicated rate-limit windows when a SkyePay policy bucket exists; otherwise the global key/customer limits still apply.",
+        "cost_split": "usage_events records platform_id and usage_lane so invoices and caps can separate SkyeAPI, SovereignDocs, CodeStudio, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and SkyeOpsConsole usage.",
+        "paid_platform_lane_capacity_after_owner_approval": 3
+      }
     },
     "includes": [
       "Everything in Growth",
@@ -321,9 +398,12 @@
       "One free PHX Verified public business landing after first paid month",
       "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
       "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "Skye Split Engine Free99 gated commission and payout split console access (no charge; gate session required)",
       "Skye Content Forge Free99 gated content publisher access (no charge; gate session required)",
       "SkyeMusicNexus Lite Free99 gated music preview (no charge; gate session required) plus paid Studio/Label/Managed and drop add-on upgrade path",
-      "FS27 records confirmed payment and holds the paid workspace for owner-approved sovereign-stack activation"
+      "FS27 records confirmed payment and holds the paid workspace for owner-approved sovereign-stack activation",
+      "SkyeOpsConsole Free99 gated console",
+      "Platform-aware usage split by platform_id and usage_lane"
     ]
   },
   {
@@ -388,7 +468,24 @@
       "skyemediacenter_access": "Free99 gated media center feature; $0/month, $0 setup, no paid checkout, gate session required",
       "skyemusicnexus_lite_access": "Free99 Lite gated feature; $0/month, $0 setup, no paid checkout, gate session required, 1 artist profile + 1 draft release preview",
       "skyemusicnexus_paid_upgrade_path": "Studio $497/mo + $1,500 setup; Label Command $1,497/mo + $6,500 setup; Managed Music Ops $3,997/mo + $15,000 setup; one-off drops from $199",
-      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required"
+      "skyecontentforge_access": "Free99 gated content publishing feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyesplitengine_access": "Free99 gated split/payout engine feature; $0/month, $0 setup, no paid checkout, gate session required",
+      "skyeopsconsole_access": "Free99 gated operations console; $0/month, $0 setup, no paid checkout, gate session required; platform_id=skyeopsconsole is billable=false.",
+      "free99_new_platform_intake": "Only SkyeOpsConsole is Free99 from metraiyux_0s_site/Free99. Paid-Apps imports require standalone checkout, owner approval, or a future Stripe SKU rebuild before live use.",
+      "platform_usage_accounting": {
+        "metering_scope": "per_platform_per_capability",
+        "request_fields": [
+          "platform_id",
+          "usage_lane"
+        ],
+        "free99_platforms": [
+          "skyeopsconsole"
+        ],
+        "paid_platform_lane_rule": "platform lane capacity is not active by default; each paid platform still needs checkout, an owner-approved add-on, or a bundle entitlement before usage is enabled",
+        "rate_limit_split": "FS27 uses platform_id + usage_lane for dedicated rate-limit windows when a SkyePay policy bucket exists; otherwise the global key/customer limits still apply.",
+        "cost_split": "usage_events records platform_id and usage_lane so invoices and caps can separate SkyeAPI, SovereignDocs, CodeStudio, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox, and SkyeOpsConsole usage.",
+        "paid_platform_lane_capacity_after_owner_approval": "custom"
+      }
     },
     "includes": [
       "Everything in Autonomous Office",
@@ -406,9 +503,12 @@
       "First-month PHX Verified public business landing workflow for each managed tenant",
       "SkyeProfitConsole Free99 gated profit console access (no charge; gate session required)",
       "SkyeMediaCenter Free99 gated media center access (no charge; gate session required)",
+      "Skye Split Engine Free99 gated commission and payout split console access (no charge; gate session required)",
       "Skye Content Forge Free99 gated content publisher access (no charge; gate session required)",
       "SkyeMusicNexus Lite Free99 gated music preview (no charge; gate session required) plus paid Studio/Label/Managed and drop add-on upgrade path",
-      "Operator training packet"
+      "Operator training packet",
+      "SkyeOpsConsole Free99 gated console",
+      "Platform-aware usage split by platform_id and usage_lane"
     ]
   }
 ]

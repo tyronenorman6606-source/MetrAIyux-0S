@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Energy Being</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
+            background-color: #050510; /* Deep cosmic blue/black */
+            font-family: 'Inter', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through to canvas */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+        }
+
+        .controls {
+            pointer-events: auto; /* Re-enable interaction for controls */
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+        }
+        
+        .control-group {
+            margin-bottom: 1rem;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: #60a5fa;
+        }
+        
+        .title-text {
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+        }
+
+        .instruction {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="energyCanvas"></canvas>
+        
+        <div id="ui-layer">
+            <div>
+                <h1 class="text-3xl title-text text-blue-300">ENERGY ENTITY v1.0</h1>
+                <p class="text-sm text-blue-500/70 mt-1 uppercase tracking-widest">Sentient Particle Matrix</p>
+            </div>
+            
+            <div class="controls self-end">
+                <div class="control-group">
+                    <label for="colorHue">Energy Signature (Hue)</label>
+                    <input type="range" id="colorHue" min="0" max="360" value="210">
+                </div>
+                
+                <div class="control-group">
+                    <label for="particleCount">Matrix Density (Particles)</label>
+                    <input type="range" id="particleCount" min="100" max="800" value="300">
+                </div>
+                
+                <div class="control-group">
+                    <label for="intensity">Core Intensity</label>
+                    <input type="range" id="intensity" min="1" max="10" value="5" step="0.5">
+                </div>
+                <p class="instruction">Move mouse/touch to interact</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('energyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Controls
+        const hueInput = document.getElementById('colorHue');
+        const countInput = document.getElementById('particleCount');
+        const intensityInput = document.getElementById('intensity');
+
+        let particles = [];
+        let numParticles = parseInt(countInput.value);
+        let baseHue = parseInt(hueInput.value);
+        let intensityMult = parseFloat(intensityInput.value);
+
+        let width, height, centerX, centerY;
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+
+        const mouse = {
+            x: centerX,
+            y: centerY,
+            isDown: false,
+            radius: 150
+        };
+
+        // For smooth follow
+        const targetMouse = { x: centerX, y: centerY };
+
+        function updateMousePosition(e) {
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            // Keep target mouse within bounds
+            targetMouse.x = Math.max(0, Math.min(width, clientX));
+            targetMouse.y = Math.max(0, Math.min(height, clientY));
+        }
+
+        window.addEventListener('mousemove', updateMousePosition);
+        window.addEventListener('touchmove', (e) => { updateMousePosition(e); });
+        
+        window.addEventListener('mousedown', () => mouse.isDown = true);
+        window.addEventListener('mouseup', () => mouse.isDown = false);
+        window.addEventListener('touchstart', () => mouse.isDown = true);
+        window.addEventListener('touchend', () => mouse.isDown = false);
+        
+        hueInput.addEventListener('input', (e) => {
+            baseHue = parseInt(e.target.value);
+        });
+        
+        countInput.addEventListener('change', (e) => {
+            const newCount = parseInt(e.target.value);
+            if (newCount > numParticles) {
+                // Add particles
+                for (let i = 0; i < newCount - numParticles; i++) {
+                    particles.push(new Particle());
+                }
+            } else if (newCount < numParticles) {
+                // Remove particles
+                particles.splice(0, numParticles - newCount);
+            }
+            numParticles = newCount;
+        });
+
+        intensityInput.addEventListener('input', (e) => {
+            intensityMult = parseFloat(e.target.value);
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+                // Randomize initial position slightly around center
+                this.x = centerX + (Math.random() - 0.5) * 200;
+                this.y = centerY + (Math.random() - 0.5) * 200;
+            }
+
+            reset() {
+                // Determine if this particle is part of the 'core' or the 'aura'
+                this.isCore = Math.random() > 0.7;
+                
+                this.radius = this.isCore ? Math.random() * 3 + 1 : Math.random() * 1.5 + 0.5;
+                this.baseSpeed = this.isCore ? Math.random() * 2 + 0.5 : Math.random() * 4 + 1;
+                
+                // Angle and distance relative to the entity center (mouse)
+                this.angle = Math.random() * Math.PI * 2;
+                // Core particles stay closer
+                this.targetDist = this.isCore ? Math.random() * 40 : Math.random() * 120 + 20;
+                this.currentDist = this.targetDist;
+                
+                // Wobble factors for organic movement
+                this.wobbleSpeed = Math.random() * 0.05 + 0.01;
+                this.wobbleAngle = Math.random() * Math.PI * 2;
+                
+                // Color variations based on base hue
+                const hueVariation = (Math.random() - 0.5) * 40;
+                this.hue = baseHue + hueVariation;
+                this.lightness = this.isCore ? 70 + Math.random() * 30 : 40 + Math.random() * 40;
+                
+                this.life = Math.random();
+                this.decay = Math.random() * 0.01 + 0.005;
+            }
+
+            update() {
+                // Smoothly interpolate current mouse to target mouse for fluid movement
+                mouse.x += (targetMouse.x - mouse.x) * 0.05;
+                mouse.y += (targetMouse.y - mouse.y) * 0.05;
+
+                // Update base color from controls
+                const hueVariation = (Math.random() - 0.5) * 20;
+                this.hue = baseHue + hueVariation;
+
+                // Orbit around the center point (mouse)
+                this.angle += this.baseSpeed * 0.01 * (mouse.isDown ? 3 : 1); // Speed up when clicking
+                this.wobbleAngle += this.wobbleSpeed;
+
+                // Organic distance fluctuation
+                const wobbleDist = Math.sin(this.wobbleAngle) * 20;
+                
+                // Expand distance slightly if mouse is down
+                const expansion = mouse.isDown ? 1.5 : 1;
+                this.currentDist = (this.targetDist + wobbleDist) * expansion;
+
+                // Calculate target coordinates based on orbit
+                let tx = mouse.x + Math.cos(this.angle) * this.currentDist;
+                let ty = mouse.y + Math.sin(this.angle) * this.currentDist;
+
+                // Add some chaotic noise
+                tx += (Math.random() - 0.5) * 5;
+                ty += (Math.random() - 0.5) * 5;
+
+                // Ease towards target for smooth flowing motion
+                this.x += (tx - this.x) * 0.1;
+                this.y += (ty - this.y) * 0.1;
+
+                // Life cycle
+                this.life += this.decay;
+                if (this.life > 1) {
+                    this.life = 0;
+                    // Optionally reset completely to bring them back to center occasionally
+                    if(Math.random() < 0.1) this.reset();
+                }
+            }
+
+            draw(ctx) {
+                // Pulsing alpha based on life
+                const alpha = Math.abs(Math.sin(this.life * Math.PI)) * (this.isCore ? 0.9 : 0.5);
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * (mouse.isDown? 1.5 : 1), 0, Math.PI * 2);
+                
+                // Create gradient for glow effect
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius * 2
+                );
+                
+                gradient.addColorStop(0, `hsla(${this.hue}, 100%, ${this.lightness}%, ${alpha})`);
+                gradient.addColorStop(1, `hsla(${this.hue}, 100%, ${this.lightness - 20}%, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            // Draw semi-transparent background to create trails
+            // Adjust opacity for longer/shorter trails
+            ctx.fillStyle = `rgba(5, 5, 16, 0.15)`; 
+            ctx.fillRect(0, 0, width, height);
+
+            // Enable additive blending for glowing effect
+            ctx.globalCompositeOperation = 'lighter';
+
+            // Optional: Draw connections between close particles to form a 'web'
+            drawConnections();
+
+            // Update and draw particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw(ctx);
+            }
+
+            // Draw central energy core
+            drawCore();
+
+            // Reset composite operation for next frame clear
+            ctx.globalCompositeOperation = 'source-over';
+            
+            requestAnimationFrame(animate);
+        }
+
+        function drawConnections() {
+            ctx.lineWidth = 0.5;
+            // Only check a subset of particles for performance
+            const checkLimit = Math.min(particles.length, 150);
+            
+            for (let i = 0; i < checkLimit; i++) {
+                for (let j = i + 1; j < checkLimit; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const distSq = dx * dx + dy * dy;
+                    
+                    // Connection distance threshold
+                    const maxDistSq = 4000; 
+                    
+                    if (distSq < maxDistSq) {
+                        const alpha = 1 - (distSq / maxDistSq);
+                        ctx.strokeStyle = `hsla(${baseHue}, 80%, 60%, ${alpha * 0.3})`;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function drawCore() {
+            const time = Date.now() * 0.001;
+            // Pulsing core radius
+            const coreRadius = 15 + Math.sin(time * 5) * 5 + (mouse.isDown ? 10 : 0);
+            
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, coreRadius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                mouse.x, mouse.y, 0,
+                mouse.x, mouse.y, coreRadius * 3 * (intensityMult * 0.5)
+            );
+            
+            // Core is bright white/light blue
+            gradient.addColorStop(0, `hsla(${baseHue}, 100%, 95%, 0.9)`);
+            gradient.addColorStop(0.2, `hsla(${baseHue}, 100%, 70%, 0.6)`);
+            gradient.addColorStop(1, `hsla(${baseHue}, 100%, 50%, 0)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // Wait for fonts/styles to render briefly before starting
+        window.onload = () => {
+            // Give it a small push towards center initially
+            mouse.x = centerX;
+            mouse.y = centerY;
+            animate();
+        };
+
+    </script>
+</body>
+</html>

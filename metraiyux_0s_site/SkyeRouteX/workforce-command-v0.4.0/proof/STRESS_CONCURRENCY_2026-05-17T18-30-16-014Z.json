@@ -1,0 +1,168 @@
+{
+  "ok": true,
+  "started_at": "2026-05-17T18:29:36.717Z",
+  "completed_at": "2026-05-17T18:30:16.012Z",
+  "shape": {
+    "providerCount": 8,
+    "contractorCount": 48,
+    "jobCount": 24,
+    "applicantsPerJob": 4,
+    "expectedAssignments": 32
+  },
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "server_booted",
+      "data": {
+        "version": "0.4.0",
+        "port": 5899
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "admin_market_seeded",
+      "data": {
+        "marketId": "mkt_361261544efb485327"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "providers_created_concurrently",
+      "data": {
+        "providerCount": 8
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "contractors_created_concurrently",
+      "data": {
+        "contractorCount": 48
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "jobs_created_concurrently",
+      "data": {
+        "jobCount": 24
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "applications_created_concurrently",
+      "data": {
+        "applicationCount": 96
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "concurrent_acceptance_locks_held",
+      "data": {
+        "assignments": 32,
+        "blocked_attempts": 64
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "assignment_state_transitions_completed_concurrently",
+      "data": {
+        "assignments": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "route_stops_completed_concurrently",
+      "data": {
+        "routeCount": 24,
+        "stopCount": 48
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "proof_media_submitted_concurrently",
+      "data": {
+        "expectedProofItems": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "provider_approvals_completed_concurrently",
+      "data": {
+        "assignments": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "export_packets_generated_concurrently",
+      "data": {
+        "expectedExports": 24
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "market_reports_generated_concurrently",
+      "data": {
+        "reports": 8
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "storage_counters_survived_concurrency",
+      "data": {
+        "driver": "local-json",
+        "database_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/stress-concurrency-mpa40ll9.json",
+        "media_root": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/proof-media",
+        "export_root": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/exports",
+        "proof_media_count": 32,
+        "export_packet_count": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "payment_ledger_survived_concurrency",
+      "data": {
+        "payoutEligible": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "audit_chain_valid_after_stress",
+      "data": {
+        "ok": true,
+        "event_count": 539,
+        "head_hash": "d01a0f9b2ad263f1457db5493fe510c8728bc8ab964c7a2a18e4d22e6f6e71d4",
+        "failures": []
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "persisted_totals_match_stress_shape",
+      "data": {
+        "jobs": 24,
+        "assignments": 32,
+        "proof_items": 32,
+        "proof_media": 32,
+        "export_packets": 32,
+        "audit_events": 539,
+        "health_jobs_open": 24,
+        "health_assignments_open": 0,
+        "health_routes_open": 0
+      }
+    }
+  ],
+  "metrics": {
+    "requests": 608,
+    "status_counts": {
+      "200": 303,
+      "201": 241,
+      "409": 64
+    },
+    "min_ms": 10,
+    "max_ms": 5773,
+    "avg_ms": 1755.54,
+    "p50_ms": 1454,
+    "p95_ms": 4340,
+    "p99_ms": 5458
+  },
+  "dbPath": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/stress-concurrency-mpa40ll9.json",
+  "server_log_excerpt": "SkyeRoutexFlow Workforce Command running on http://localhost:5899\n"
+}

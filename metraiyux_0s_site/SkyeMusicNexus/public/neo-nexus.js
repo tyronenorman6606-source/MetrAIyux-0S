@@ -6,6 +6,7 @@
     payouts: [],
     workflows: [],
     assets: [],
+    assetStorage: null,
     exchange: {
       contentRequests: [],
       threads: [],
@@ -30,6 +31,7 @@
     analytics: null,
     lastArtistId: sessionStorage.getItem('skye-music-nexus:lastArtistId') || '',
     lastReleaseId: sessionStorage.getItem('skye-music-nexus:lastReleaseId') || '',
+    identity: null,
   };
 
   const lensCopy = {
@@ -76,7 +78,9 @@
   const fmtNumber = (value) => new Intl.NumberFormat('en-US').format(Number(value || 0));
   const fmtMoney = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
   const apiBase = '/.netlify/functions/';
-  const staticPreview = window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW === true;
+  const staticPreviewOverride = window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW;
+  const staticPreview = staticPreviewOverride === true
+    || (staticPreviewOverride !== false && window.location.protocol === 'http:' && /^(127\.0\.0\.1|localhost)$/.test(window.location.hostname));
   const auth = window.createSkyGateAuth ? window.createSkyGateAuth({ storageKey: 'skye_music_nexus_session' }) : null;
   const previewSeconds = 24;
   window.__SKYE_MUSIC_PLAYBACK = { isPlaying: false, queueLength: 0, mode: 'idle', currentTime: 0 };
@@ -99,14 +103,15 @@
   function updateSessionChip(info) {
     const chip = $('#sessionChip');
     if (!chip) return;
-    if (staticPreview) {
-      chip.textContent = '0S static preview';
-      chip.className = 'chip chip-ready';
-      return;
-    }
-    if (auth && auth.hasToken()) {
+    const musicGateSession = window.SkyeMusicGate && typeof window.SkyeMusicGate.session === 'function'
+      ? window.SkyeMusicGate.session()
+      : null;
+    if ((auth && auth.hasToken()) || musicGateSession) {
       const session = info && info.activeSession;
-      chip.textContent = session && session.email ? `SkyGate: ${session.role || 'session'} · ${session.email}` : 'SkyGate session active';
+      chip.textContent = session && session.email ? `SkyGate: ${session.role || 'session'} / ${session.email}` : 'SkyGate session active';
+      chip.className = 'chip chip-ready';
+    } else if (staticPreview) {
+      chip.textContent = '0S static preview';
       chip.className = 'chip chip-ready';
     } else {
       chip.textContent = 'SkyGate required';
@@ -257,6 +262,75 @@
     });
   }
 
+  function readSkyeIdentity() {
+    if (!window.SkyeIDBridge || !window.SkyeIDBridge.readCurrentIdentity) return null;
+    state.identity = window.SkyeIDBridge.readCurrentIdentity();
+    return state.identity;
+  }
+
+  function currentSkyeArtistId() {
+    const identity = state.identity || readSkyeIdentity();
+    return (identity && (identity.skyeId || identity.idNumber || identity.identityId)) || '';
+  }
+
+  function refreshIdentityPanel(identity = state.identity || readSkyeIdentity()) {
+    const status = $('#artistIdentityStatus');
+    const meta = $('#artistPhotoMeta');
+    const preview = $('#artistPhotoPreview');
+    if (status) {
+      const id = identity && (identity.skyeId || identity.idNumber || identity.identityId);
+      status.textContent = id ? `${identity.name || 'Artist'} · ${id}` : 'No shared identity loaded';
+    }
+    if (meta) meta.textContent = identity && identity.photoDataUrl ? 'Skye ID photo linked.' : 'No artist photo linked yet.';
+    if (preview) {
+      if (identity && identity.photoDataUrl) {
+        preview.src = identity.photoDataUrl;
+        preview.hidden = false;
+      } else {
+        preview.removeAttribute('src');
+        preview.hidden = true;
+      }
+    }
+  }
+
+  function syncIdentityToArtistForm({ force = false } = {}) {
+    const form = $('#artistForm');
+    const identity = readSkyeIdentity();
+    if (!form || !identity) {
+      refreshIdentityPanel(identity);
+      return identity;
+    }
+    if (window.SkyeIDBridge && window.SkyeIDBridge.applyToArtistForm) window.SkyeIDBridge.applyToArtistForm(form);
+    if (force || !form.elements.skyeId.value) form.elements.skyeId.value = identity.skyeId || identity.idNumber || '';
+    if (form.elements.identityId) form.elements.identityId.value = identity.identityId || identity.skyeId || identity.idNumber || '';
+    if (force || !form.elements.name.value) form.elements.name.value = identity.name || form.elements.name.value;
+    refreshIdentityPanel(identity);
+    return identity;
+  }
+
+  async function readArtistPhoto(form, identity) {
+    const file = form && form.elements.profilePhotoFile && form.elements.profilePhotoFile.files && form.elements.profilePhotoFile.files[0];
+    if (!file) {
+      if (identity && identity.photoDataUrl) {
+        return {
+          dataUrl: identity.photoDataUrl,
+          name: identity.photoName || 'skye-id-photo.jpg',
+          type: identity.photoType || 'image/jpeg',
+          updatedAt: identity.photoUpdatedAt || identity.updatedAt,
+        };
+      }
+      return null;
+    }
+    if (window.SkyeIDBridge && window.SkyeIDBridge.fileToIdentityPhoto) return window.SkyeIDBridge.fileToIdentityPhoto(file);
+    const dataUrl = await fileToDataUrl(file);
+    return { dataUrl, name: file.name, type: file.type, originalBytes: file.size, updatedAt: new Date().toISOString() };
+  }
+
+  function publishArtistIdentity(payload) {
+    if (!window.SkyeIDBridge || !window.SkyeIDBridge.publishIdentity) return null;
+    return window.SkyeIDBridge.publishIdentity(payload, 'music-nexus-artist-register');
+  }
+
   function renderResult(target, title, fields) {
     const node = $(target);
     if (!node) return;
@@ -265,8 +339,10 @@
   }
 
   function fillLastIds() {
+    const identityArtistId = currentSkyeArtistId();
+    if (!state.lastArtistId && identityArtistId) state.lastArtistId = identityArtistId;
     $$('input[name="artistId"]').forEach((input) => {
-      if (!input.value && state.lastArtistId) input.value = state.lastArtistId;
+      if (!input.value && (state.lastArtistId || identityArtistId)) input.value = state.lastArtistId || identityArtistId;
     });
     $$('input[name="id"], input[name="releaseId"]').forEach((input) => {
       if (!input.value && state.lastReleaseId) input.value = state.lastReleaseId;
@@ -290,8 +366,11 @@
     });
   }
 
-  function recordCard(type, title, text, pills) {
-    return `<article class="record-card">
+  function recordCard(type, title, text, pills, options = {}) {
+    const photoDataUrl = String(options.photoDataUrl || '');
+    const safePhoto = photoDataUrl.startsWith('data:image/') ? photoDataUrl : '';
+    return `<article class="record-card${safePhoto ? ' has-photo' : ''}">
+      ${safePhoto ? `<img class="record-photo" src="${escapeHtml(safePhoto)}" alt="" />` : ''}
       <header><h4>${escapeHtml(title)}</h4><span class="pill ${type === 'release' ? 'pink' : type === 'payout' ? 'gold' : type === 'workflow' ? 'lime' : ''}">${escapeHtml(type)}</span></header>
       <p>${escapeHtml(text)}</p>
       <div class="record-meta">${(pills || []).map((pill) => `<span class="pill">${escapeHtml(pill)}</span>`).join('')}</div>
@@ -303,7 +382,11 @@
     if (!list) return;
     const cards = [];
     state.artists.slice(0, 6).forEach((artist) => {
-      cards.push(recordCard('artist', artist.name || 'Unnamed Artist', artist.email || artist.id, [artist.status || 'unknown', artist.id, fmtMoney(artist.balance || 0)]));
+      const photoDataUrl = artist.profilePhoto?.dataUrl || artist.photoDataUrl || artist.crossAppIdentity?.photoDataUrl || '';
+      const id = artist.skyeId || artist.id;
+      const pills = [artist.status || 'unknown', id, fmtMoney(artist.balance || 0)];
+      if (artist.skyeId && artist.skyeId !== artist.id) pills.push(`Skye ID ${artist.skyeId}`);
+      cards.push(recordCard('artist', artist.name || 'Unnamed Artist', artist.email || artist.id, pills, { photoDataUrl }));
     });
     state.releases.slice(0, 8).forEach((release) => {
       const streams = release.analytics && release.analytics.streams ? fmtNumber(release.analytics.streams) : '0';
@@ -729,6 +812,7 @@
     const count = $('#assetCount');
     const assets = Array.isArray(state.assets) ? state.assets : [];
     if (count) count.textContent = fmtNumber(assets.length);
+    renderStorageReadiness();
     if (!list) return;
     list.innerHTML = assets.length ? assets.slice(0, 12).map((asset) => `
       <article class="asset-card">
@@ -740,10 +824,22 @@
         <div class="record-meta">
           <span class="pill">${escapeHtml(asset.artistId || 'no artist')}</span>
           <span class="pill">${escapeHtml(asset.releaseId || 'no release')}</span>
+          <span class="pill ${asset.storage === 'skyevault-r2-gated-audio' ? 'lime' : ''}">${escapeHtml(asset.storage || 'local proof')}</span>
+          <span class="pill ${asset.status === 'ready' || !asset.status ? 'lime' : 'gold'}">${escapeHtml(asset.status || 'ready')}</span>
           <span class="pill">sha ${escapeHtml(String(asset.sha256 || '').slice(0, 10))}</span>
         </div>
         <button class="secondary mini" type="button" data-use-asset="${escapeHtml(asset.id)}">Use in Release Forge</button>
       </article>`).join('') : '<article class="asset-card"><h4>No audio uploaded yet</h4><p>Upload an owned or licensed preview to create a gated stream URL for the release forge.</p></article>';
+  }
+
+  function renderStorageReadiness() {
+    const target = $('#storageReadiness');
+    if (!target) return;
+    const storage = state.assetStorage || {};
+    const direct = storage.directUploadAvailable ? 'ready' : 'parked';
+    target.innerHTML = `<strong>${escapeHtml(storage.mode || 'local')} storage</strong><br>
+      durable: ${storage.durable ? 'yes' : 'no'} · direct R2 upload: ${direct}<br>
+      base64 cap: ${escapeHtml(fmtNumber(storage.maxBase64UploadBytes || 0))} bytes · direct cap: ${escapeHtml(fmtNumber(storage.maxDirectUploadBytes || 0))} bytes`;
   }
 
   async function refreshSession() {
@@ -794,8 +890,10 @@
       try {
         const assets = await callFunction('music-assets', { query: { action: 'list', artistId: state.lastArtistId } });
         state.assets = Array.isArray(assets.assets) ? assets.assets : [];
+        state.assetStorage = assets.storage || null;
       } catch {
         state.assets = [];
+        state.assetStorage = null;
       }
       try {
         const exchange = await callFunction('music-exchange', { query: { action: 'hub', artistId: state.lastArtistId } });
@@ -947,17 +1045,67 @@
   function wireArtistForm() {
     const form = $('#artistForm');
     if (!form) return;
+    let selectedPhoto = null;
+    syncIdentityToArtistForm();
+    $('[data-action="pull-skye-id"]', form)?.addEventListener('click', () => {
+      const identity = syncIdentityToArtistForm({ force: true });
+      toast(identity ? 'Skye ID synced into the artist node.' : 'No Skye ID draft found yet.', identity ? 'info' : 'error');
+    });
+    form.elements.profilePhotoFile?.addEventListener('change', async () => {
+      const meta = $('#artistPhotoMeta');
+      try {
+        if (meta) meta.textContent = 'Preparing artist photo...';
+        selectedPhoto = await readArtistPhoto(form, null);
+        if (selectedPhoto?.dataUrl) {
+          const preview = $('#artistPhotoPreview');
+          if (preview) {
+            preview.src = selectedPhoto.dataUrl;
+            preview.hidden = false;
+          }
+          if (meta) meta.textContent = `${selectedPhoto.name || 'Artist photo'} linked.`;
+        }
+      } catch (err) {
+        selectedPhoto = null;
+        if (meta) meta.textContent = err.message;
+        toast(err.message, 'error');
+      }
+    });
+    window.addEventListener('skye0s:identity-updated', (event) => {
+      state.identity = event.detail || null;
+      syncIdentityToArtistForm();
+      fillLastIds();
+    });
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const data = formData(form);
       try {
         setLoading(form, true);
+        const identity = syncIdentityToArtistForm() || {};
+        const data = formData(form);
+        const photo = selectedPhoto || await readArtistPhoto(form, identity);
+        const skyeId = data.skyeId || identity.skyeId || identity.idNumber || '';
+        const identityPayload = publishArtistIdentity({
+          ...identity,
+          name: data.name,
+          email: data.email,
+          skyeId,
+          idNumber: skyeId || identity.idNumber,
+          identityId: data.identityId || identity.identityId || skyeId,
+          profileType: 'artist',
+          photoDataUrl: photo && photo.dataUrl,
+          photoName: photo && photo.name,
+          photoType: photo && photo.type,
+          source: 'SkyeMusicNexus',
+        }) || identity;
         const created = await callFunction('music-artists', {
           method: 'POST',
           body: {
             action: 'register',
             name: data.name,
             email: data.email,
+            skyeId,
+            identityId: data.identityId || identityPayload.identityId || skyeId,
+            profilePhoto: photo,
+            crossAppIdentity: identityPayload,
             phone: data.phone,
             genre: parseCsv(data.genre),
             bio: data.bio,
@@ -966,7 +1114,13 @@
         });
         state.lastArtistId = created.artistId || (created.artist && created.artist.id) || '';
         sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
-        renderResult('#artistResult', 'Artist node created', { id: state.lastArtistId, status: created.artist && created.artist.status, name: created.artist && created.artist.name });
+        renderResult('#artistResult', 'Artist node created', {
+          id: state.lastArtistId,
+          skyeId: created.artist && (created.artist.skyeId || created.artist.identityId),
+          status: created.artist && created.artist.status,
+          photo: created.artist && created.artist.profilePhoto ? 'linked' : 'none',
+          name: created.artist && created.artist.name,
+        });
         toast('Artist node registered.');
         await refreshRecords({ quiet: true });
       } catch (err) {
@@ -1018,6 +1172,43 @@
   function wireUploadForm() {
     const form = $('#assetUploadForm');
     if (!form) return;
+    const fileInput = form.elements.audioFile;
+    const dropZone = $('[data-song-drop-zone]', form);
+    const fileName = $('#songDropFileName');
+    const titleInput = form.elements.title;
+    function setSelectedSong(file) {
+      if (!file || typeof file === 'string') {
+        if (fileName) fileName.textContent = 'No song selected yet';
+        dropZone?.classList.remove('has-file');
+        return;
+      }
+      if (fileName) fileName.textContent = `${file.name} · ${fmtNumber(file.size || 0)} bytes`;
+      dropZone?.classList.add('has-file');
+      if (titleInput && !titleInput.value) titleInput.value = String(file.name || '').replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ');
+    }
+    fileInput?.addEventListener('change', () => setSelectedSong(fileInput.files && fileInput.files[0]));
+    if (dropZone && fileInput) {
+      ['dragenter', 'dragover'].forEach((type) => dropZone.addEventListener(type, (event) => {
+        event.preventDefault();
+        dropZone.classList.add('is-dragging');
+      }));
+      ['dragleave', 'drop'].forEach((type) => dropZone.addEventListener(type, () => {
+        dropZone.classList.remove('is-dragging');
+      }));
+      dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+        if (!file) return;
+        if (!String(file.type || '').startsWith('audio/')) {
+          toast('Drop an audio file for this lane.', 'error');
+          return;
+        }
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        fileInput.files = transfer.files;
+        setSelectedSong(file);
+      });
+    }
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = formData(form);
@@ -1025,19 +1216,7 @@
       try {
         if (!file || typeof file === 'string' || !file.size) throw new Error('Choose an audio file first.');
         setLoading(form, true);
-        const dataUrl = await fileToDataUrl(file);
-        const uploaded = await callFunction('music-assets', {
-          method: 'POST',
-          body: {
-            action: 'upload',
-            title: data.title || file.name,
-            artistId: data.artistId,
-            releaseId: data.releaseId,
-            fileName: file.name,
-            contentType: file.type || 'audio/mpeg',
-            dataBase64: dataUrl,
-          },
-        });
+        const uploaded = await uploadAudioFile(data, file);
         if (uploaded.asset?.id) {
           state.assets = [uploaded.asset, ...state.assets.filter((asset) => asset.id !== uploaded.asset.id)];
           state.lastArtistId = data.artistId || state.lastArtistId;
@@ -1061,6 +1240,45 @@
       } finally {
         setLoading(form, false);
       }
+    });
+  }
+
+  async function uploadAudioFile(data, file) {
+    const title = data.title || file.name;
+    const payload = {
+      title,
+      artistId: data.artistId,
+      releaseId: data.releaseId,
+      fileName: file.name,
+      contentType: file.type || 'audio/mpeg',
+      bytes: file.size,
+    };
+    const status = await callFunction('music-assets', { query: { action: 'storage-status' } }).catch(() => null);
+    const storage = status && status.storage ? status.storage : state.assetStorage;
+    state.assetStorage = storage || state.assetStorage;
+    if (storage && storage.directUploadAvailable) {
+      const session = await callFunction('music-assets', {
+        method: 'POST',
+        body: { action: 'create-upload-session', ...payload },
+      });
+      const upload = await fetch(session.upload.url, {
+        method: session.upload.method || 'PUT',
+        headers: session.upload.headers || { 'content-type': payload.contentType },
+        body: file,
+      });
+      if (!upload.ok) throw new Error(`Direct R2 upload failed with ${upload.status}. Check MusicNexus R2 CORS and credentials.`);
+      return callFunction('music-assets', {
+        method: 'POST',
+        body: { action: 'complete-upload', id: session.asset.id, bytes: file.size },
+      });
+    }
+    if (storage && storage.maxBase64UploadBytes && file.size > Number(storage.maxBase64UploadBytes)) {
+      throw new Error('This file needs the direct R2 upload lane. Enable MUSIC_NEXUS_STORAGE_BACKEND=r2 and MUSIC_NEXUS_ENABLE_DIRECT_UPLOAD=1.');
+    }
+    const dataUrl = await fileToDataUrl(file);
+    return callFunction('music-assets', {
+      method: 'POST',
+      body: { action: 'upload', ...payload, dataBase64: dataUrl },
     });
   }
 
@@ -1404,6 +1622,59 @@
     wireTakedownForm();
   }
 
+  function ensureMcpChrome() {
+    const pageName = (window.location.pathname.split('/').pop() || 'index.html').replace(/\.html$/i, '') || 'index';
+    const roomName = pageName === 'index' ? 'dashboard' : pageName;
+    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
+    document.body.classList.add('one-music-site', 'skyesol-living-page', `room-${roomName}`);
+
+    const addChromeNode = (selector, createNode) => {
+      if (document.querySelector(selector)) return null;
+      const node = createNode();
+      document.body.insertBefore(node, document.body.firstChild);
+      return node;
+    };
+
+    addChromeNode('.neon-motion-chrome', () => {
+      const node = document.createElement('div');
+      node.className = 'neon-motion-chrome';
+      node.dataset.motionChrome = '';
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    });
+
+    addChromeNode('.skyesol-living-field', () => {
+      const node = document.createElement('canvas');
+      node.className = 'living-background skyesol-living-field';
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    });
+
+    addChromeNode('.skyesol-grain', () => {
+      const node = document.createElement('div');
+      node.className = 'skyesol-grain';
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    });
+
+    addChromeNode('.skyesol-scanline', () => {
+      const node = document.createElement('div');
+      node.className = 'skyesol-scanline';
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    });
+
+    if (!window.__skyeMusicNexusPublicLivingMounted && typeof window.mountSkyeSolLivingBackground === 'function') {
+      window.__skyeMusicNexusPublicLivingMounted = true;
+      window.mountSkyeSolLivingBackground({
+        canvasSelector: '.skyesol-living-field',
+        particleDensity: 18000,
+        maxParticles: 96,
+        minParticles: 34,
+      });
+    }
+  }
+
   function initCanvas() {
     const canvas = $('#pulse-field');
     if (!canvas) return;
@@ -1477,6 +1748,7 @@
   }
 
   async function init() {
+    ensureMcpChrome();
     initCanvas();
     wireChrome();
     wirePlayback();

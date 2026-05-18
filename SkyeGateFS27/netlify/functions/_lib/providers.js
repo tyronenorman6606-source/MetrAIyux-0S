@@ -1,10 +1,11 @@
 import { TextDecoder } from "util";
 
 function configError(message, hint) {
-  const err = new Error(message);
+  const err = new Error("Skyes Over London model lane is not configured.");
   err.code = "CONFIG";
   err.status = 500;
-  if (hint) err.hint = hint;
+  err.hint = "Ask an admin to enable this Skyes Over London model lane.";
+  err.private = { message, hint };
   return err;
 }
 
@@ -35,9 +36,10 @@ function upstreamError(provider, res, body) {
   try {
     msg = body?.error?.message || body?.error?.type || body?.message || "";
   } catch {}
-  const err = new Error(msg ? `${provider} upstream error ${status}: ${msg}` : `${provider} upstream error ${status}`);
+  const err = new Error(`Skyes Over London engine error${status ? ` ${status}` : ""}`);
   err.code = "UPSTREAM_ERROR";
   err.status = 502;
+  err.private = { provider, message: msg || "" };
   err.upstream = {
     provider,
     status,
@@ -49,7 +51,18 @@ function upstreamError(provider, res, body) {
 
 const BUILTIN_MODEL_ALIASES = Object.freeze({
   "KAIXU_PRIME6_7": { provider: "openai", model: "gpt-4o-mini" },
-  "KAIXU_PRIME7": { provider: "openai", model: "gpt-4o" }
+  "KAIXU_PRIME7": { provider: "openai", model: "gpt-4o" },
+  "KAIXU_6_7_NANO": { provider: "gemini", model: "gemini-2.5-flash" },
+  "KAIXU_6_7_MINI": { provider: "openai", model: "gpt-4o-mini" },
+  "KAIXU_6_7": { provider: "openai", model: "gpt-4o" },
+  "KAIXU_6_7_PRO": { provider: "anthropic", model: "claude-3-5-sonnet-20241022" },
+  "KAIXU_6_7_MAX": { provider: "anthropic", model: "claude-opus-4-6" },
+  "KAIXU_6_7_EMBED": { provider: "gemini", model: "gemini-embedding-001" },
+  "KAIXU_FLASH": { provider: "gemini", model: "gemini-2.5-flash" },
+  "KAIXU_DEEP": { provider: "anthropic", model: "claude-3-5-sonnet-20241022" },
+  "KAIXU_CODE": { provider: "openai", model: "gpt-4o" },
+  "KAIXU_VISION": { provider: "openai", model: "gpt-4o" },
+  "KAIXU_EMBED": { provider: "gemini", model: "gemini-embedding-001" }
 });
 
 function aliasToken(value) {

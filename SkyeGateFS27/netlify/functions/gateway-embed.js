@@ -6,18 +6,18 @@
  *
  * Body:
  * {
- *   "provider": "gemini",
- *   "model":    "gemini-embedding-001",
+ *   "provider": "Skyes Over London",
+ *   "model":    "kaixu-6.7-embed",
  *   "input":    "text to embed"  | ["text1","text2"],
- *   "taskType": "RETRIEVAL_QUERY",              // optional
- *   "title":    "doc title",                     // optional  (best with RETRIEVAL_DOCUMENT)
- *   "outputDimensionality": 1536                // optional  (default 3072)
+ *   "taskType": "RETRIEVAL_QUERY",
+ *   "title":    "doc title",
+ *   "outputDimensionality": 1536
  * }
  *
  * Response:
  * {
- *   "provider": "gemini",
- *   "model":    "gemini-embedding-001",
+ *   "provider": "Skyes Over London",
+ *   "model":    "kaixu-6.7-embed",
  *   "embeddings": [ [0.012, -0.034, …] , … ],
  *   "dimensions": 1536,
  *   "usage": { "input_tokens": 42, "cost_cents": 0 },
@@ -30,7 +30,7 @@ import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest, getBearer, monthKeyUTC, getInstallId, getClientIp, getUserAgent } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { costCents } from "./_lib/pricing.js";
-import { callGeminiEmbed } from "./_lib/providers.js";
+import { callGeminiEmbed, resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
 import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents, effectiveRpmLimit } from "./_lib/authz.js";
 import { enforceRpm } from "./_lib/ratelimit.js";
 import { hmacSha256Hex } from "./_lib/crypto.js";
@@ -38,6 +38,8 @@ import { maybeCapAlerts } from "./_lib/alerts.js";
 import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceUsagePreflight } from "./_lib/usageGates.js";
+import { resolvePlatformUsageContext } from "./_lib/platformUsage.js";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 export default wrap(async (req) => {
   const cors = buildCors(req);
@@ -51,8 +53,13 @@ export default wrap(async (req) => {
   let body;
   try { body = await req.json(); } catch { return badRequest("Invalid JSON", cors); }
 
-  const provider = (body.provider || "").toString().trim().toLowerCase();
-  const model    = (body.model    || "").toString().trim();
+  const requested_provider = (body.provider || PUBLIC_PROVIDER_NAME).toString().trim();
+  const requested_model = (body.model || "kaixu-6.7-embed").toString().trim();
+  const target = resolveUpstreamTarget(resolveProvider(requested_provider), requested_model);
+  const provider = target.provider;
+  const model = target.model;
+  const public_provider = PUBLIC_PROVIDER_NAME;
+  const public_model = publicModelName(provider, requested_model || model);
   const rawInput = body.input;
   const taskType = body.taskType ? String(body.taskType).trim() : undefined;
   const title    = body.title    ? String(body.title).trim()    : undefined;
@@ -60,8 +67,8 @@ export default wrap(async (req) => {
     ? parseInt(body.outputDimensionality, 10)
     : undefined;
 
-  if (!provider) return badRequest("Missing provider (gemini)", cors);
-  if (!model)    return badRequest("Missing model (e.g. gemini-embedding-001)", cors);
+  if (!requested_provider) return badRequest("Missing Skyes Over London origin label", cors);
+  if (!requested_model) return badRequest("Missing kAIxU embedding model", cors);
 
   // Normalize input to array of strings
   const texts = Array.isArray(rawInput)
@@ -87,15 +94,23 @@ export default wrap(async (req) => {
   const dev = await enforceDevice({ keyRow, install_id, ua, actor: "gateway-embed" });
   if (!dev.ok) return json(dev.status || 403, { error: dev.error }, cors);
 
+  const platformUsage = resolvePlatformUsageContext({ req, body, keyRow, defaultLane: "ai-embed" });
+
   // ── Rate limit ────────────────────────────────────────────────────
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: effectiveRpmLimit(keyRow) });
+  const rl = await enforceRpm({
+    customerId: keyRow.customer_id,
+    apiKeyId: keyRow.api_key_id,
+    rpmOverride: effectiveRpmLimit(keyRow, null, platformUsage.dedicatedPlatformId),
+    platformId: platformUsage.dedicatedPlatformId,
+    usageLane: platformUsage.usageLane
+  });
   if (!rl.ok) {
     return json(429, { error: "Rate limit exceeded", ratelimit: { remaining: rl.remaining, reset: rl.reset } }, cors);
   }
 
   // ── Monthly cap check ─────────────────────────────────────────────
   const month = monthKeyUTC();
-  const preflight = await enforceUsagePreflight({ keyRow, month });
+  const preflight = await enforceUsagePreflight({ keyRow, month, platformId: platformUsage.platformId });
   if (!preflight.ok) return json(preflight.status, preflight.payload, cors);
 
   // ── Upstream call ─────────────────────────────────────────────────
@@ -105,7 +120,6 @@ export default wrap(async (req) => {
 
   try {
     if (provider === "gemini") {
-      // Process each text — Gemini embedContent is per-text
       for (const text of texts) {
         const result = await callGeminiEmbed({ model, input: text, taskType, title, outputDimensionality });
         allEmbeddings.push(result.embedding);
@@ -113,10 +127,16 @@ export default wrap(async (req) => {
         dimensions = result.dimensions;
       }
     } else {
-      return badRequest("Embedding provider not supported yet. Use gemini.", cors);
+      return badRequest("Embedding lane is not enabled for this Skyes Over London model.", cors);
     }
   } catch (e) {
-    return json(e?.status || 500, { error: e?.message || "Provider error", provider }, cors);
+    return json(e?.status || 500, {
+      error: "Skyes Over London embedding error",
+      provider: public_provider,
+      model: public_model,
+      requested_provider: public_provider,
+      requested_model: public_model
+    }, cors);
   }
 
   // ── Usage tracking ────────────────────────────────────────────────
@@ -125,9 +145,9 @@ export default wrap(async (req) => {
   const cost = costCents(provider, model, input_tokens, output_tokens);
 
   await q(
-    `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-    [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost, install_id, ip_hash, ua]
+    `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platform_id, usage_lane)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost, install_id, ip_hash, ua, platformUsage.platformId, platformUsage.usageLane]
   );
 
   await q(
@@ -182,8 +202,10 @@ export default wrap(async (req) => {
 
   // ── Response ──────────────────────────────────────────────────────
   return json(200, {
-    provider,
-    model,
+    provider: public_provider,
+    model: public_model,
+    requested_provider: public_provider,
+    requested_model: public_model,
     embeddings: allEmbeddings,
     dimensions,
     usage: { input_tokens, cost_cents: cost },
@@ -197,6 +219,10 @@ export default wrap(async (req) => {
       key_cap_cents: key_cap_after,
       key_spent_cents: newKeyRoll.spent_cents || 0
     },
-    telemetry: { install_id: install_id || null }
+    telemetry: {
+      install_id: install_id || null,
+      platform_id: platformUsage.platformId,
+      usage_lane: platformUsage.usageLane
+    }
   }, cors);
 });

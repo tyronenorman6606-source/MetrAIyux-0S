@@ -52,6 +52,30 @@ Validate brain scripts and JSON:
 npm run 0s:command -- brain:validate
 ```
 
+Refresh SkyeRunners, Obsidian export, private graph, public-safe graph, and SkyeVault map in one run:
+
+```bash
+npm run 0s:command -- skyerunners:knowledge-refresh
+```
+
+Build only the SkyeRunners repo knowledge map:
+
+```bash
+npm run 0s:command -- skyerunners:map
+```
+
+Start the local SkyeRunners admin bridge:
+
+```bash
+npm run 0s:command -- skyerunners:control
+```
+
+Run the SkyeRunners static human-flow QA lane:
+
+```bash
+npm run 0s:command -- skyerunners:crawler-static
+```
+
 ## Exposure Boundary
 
 Do not move `ops/0s-command-registry.json` into `metraiyux_0s_site/` unless the deployment has an auth gate. Anything under `metraiyux_0s_site/` should be treated as static-public unless the host protects it.
@@ -59,3 +83,5 @@ Do not move `ops/0s-command-registry.json` into `metraiyux_0s_site/` unless the 
 The visual map lives at `obsidian-vault/_neural-map/index.html`. It is private operator material and should stay out of public sitemap/deployment paths unless protected by real auth.
 
 The public web map lives at `metraiyux_0s_site/neural-map.html`. Its data is generated only from curated `brain: true` Obsidian export data and strips internal source paths before publishing.
+
+SkyeRunners writes a repo-aware local brain feed at `metraiyux_0s_site/brain/skyerunners.json`. That file is safe for the admin/operator brain map, but the runtime queue and ledger under `ops/skyerunners/` stay repo-local and should not be treated as public static content.

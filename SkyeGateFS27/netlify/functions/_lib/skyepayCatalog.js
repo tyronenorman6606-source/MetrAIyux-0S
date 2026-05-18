@@ -23,6 +23,70 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function free99PlatformUsagePolicy({
+  paidPlatformLanes = 0,
+  paidPlatformsEnabled = false,
+  paidRpm = 30,
+  paidRpd = 300,
+  paidStatus = "requires_standalone_offer_or_owner_approval"
+} = {}) {
+  const paidEnabled = paidPlatformsEnabled === true;
+  const paidBucket = (label, capability) => ({
+    label,
+    capability,
+    billable: true,
+    enabled: paidEnabled,
+    status: paidEnabled ? "owner_approved_platform_lane" : paidStatus,
+    default_rpm_limit: paidRpm,
+    default_rpd_limit: paidRpd,
+    monthly_cap_cents: null,
+    requires_owner_approval: true,
+    stripe_rebuild_required: true
+  });
+  return {
+    platform_metering_mode: "shared_wallet_split_by_platform_id",
+    default_platform_id: "metraiyux-0s",
+    free99_access: ["skyeopsconsole"],
+    paid_platform_access: {
+      active_lanes_included: paidEnabled ? paidPlatformLanes : 0,
+      pending_lane_capacity: paidPlatformLanes,
+      status: paidEnabled ? "owner_approved_platform_lanes_available" : paidStatus,
+      stripe_rebuild_required: true,
+      note: "Only SkyeOpsConsole is Free99 from the Free99 intake; paid-app zips require a paid/owner-approved lane."
+    },
+    platform_usage_buckets: {
+      "skyeopsconsole": {
+        label: "SkyeOpsConsole v2.13",
+        capability: "offline-ops-console",
+        billable: false,
+        enabled: true,
+        status: "free99_gated",
+        default_rpm_limit: 30,
+        default_rpd_limit: 500,
+        monthly_cap_cents: 0
+      },
+      "skyeapi-aegiscore": paidBucket("SkyeAPI + AegisCore", "capability-gateway-control-plane"),
+      "sovereigndocs": paidBucket("SovereignDocs v20", "document-workflow-exports"),
+      "kaixu-codestudio": paidBucket("kAIxU CodeStudio", "provider-backplane-and-code-platform"),
+      "skaixu-code-evaluator": paidBucket("skAIxU Code Evaluator", "evaluation-rubric-platform"),
+      "skyevaultpro": paidBucket("SkyeVaultPro", "hosted-backup-ai-profile-sync"),
+      "doctor-ops-personal-vault": paidBucket("Doctor Ops Personal Vault", "personal-vault-hosted-add-on"),
+      "documorph": paidBucket("Documorph", "document-transform-db-platform"),
+      "skyearcade": paidBucket("SkyeArcade Sovereign Vault", "member-game-vault"),
+      "skyebox-authenticator": {
+        label: "SkyeBox Authenticator Vault",
+        capability: "local-first-encrypted-authenticator",
+        billable: false,
+        enabled: false,
+        status: "bundle_candidate_requires_owner_approval",
+        default_rpm_limit: 10,
+        default_rpd_limit: 100,
+        monthly_cap_cents: 0
+      }
+    }
+  };
+}
+
 function safeText(value, max = 400) {
   return String(value || "").trim().slice(0, max);
 }
@@ -46,6 +110,10 @@ function sumLineItems(offer, type) {
 
 function statusText(value, fallback = "approved") {
   return safeText(value || fallback, 80);
+}
+
+function objectOrNull(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : null;
 }
 
 const SKYPAY_OFFER_ENRICHMENTS = {
@@ -78,7 +146,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 1024,
       vault_file_limit: 250,
-      vault_workspace_limit: 1
+      vault_workspace_limit: 1,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 0, paidRpm: 15, paidRpd: 150 })
     }
   },
   "metraiyux-growth-cabinet": {
@@ -111,7 +180,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 5120,
       vault_file_limit: 1200,
-      vault_workspace_limit: 3
+      vault_workspace_limit: 3,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidRpm: 30, paidRpd: 600 })
     }
   },
   "metraiyux-houseoperations-command": {
@@ -144,7 +214,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 2048,
       vault_file_limit: 500,
-      vault_workspace_limit: 1
+      vault_workspace_limit: 1,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 0, paidRpm: 20, paidRpd: 250 })
     }
   },
   "metraiyux-houseoperations-managed": {
@@ -176,7 +247,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 10240,
       vault_file_limit: 2500,
-      vault_workspace_limit: 3
+      vault_workspace_limit: 3,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidRpm: 45, paidRpd: 900 })
     }
   },
   "metraiyux-routex-workforce-command": {
@@ -211,7 +283,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 10240,
       vault_file_limit: 2500,
-      vault_workspace_limit: 3
+      vault_workspace_limit: 3,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidRpm: 45, paidRpd: 900 })
     }
   },
   "metraiyux-autonomous-office": {
@@ -244,7 +317,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 20480,
       vault_file_limit: 5000,
-      vault_workspace_limit: 8
+      vault_workspace_limit: 8,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 3, paidRpm: 90, paidRpd: 2000 })
     }
   },
   "metraiyux-enterprise-command": {
@@ -293,7 +367,8 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       },
       vault_storage_mb: 10240,
       vault_file_limit: 2500,
-      vault_workspace_limit: 5
+      vault_workspace_limit: 5,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 2, paidRpm: 60, paidRpd: 1500 })
     }
   }
 };
@@ -312,7 +387,12 @@ function hydratedPolicy(offer, extra) {
     allowed_models: policy.allowed_models || null,
     vault_storage_mb: policy.vault_storage_mb ?? null,
     vault_file_limit: policy.vault_file_limit ?? null,
-    vault_workspace_limit: policy.vault_workspace_limit ?? null
+    vault_workspace_limit: policy.vault_workspace_limit ?? null,
+    platform_metering_mode: policy.platform_metering_mode || null,
+    default_platform_id: policy.default_platform_id || null,
+    free99_access: Array.isArray(policy.free99_access) ? policy.free99_access : [],
+    paid_platform_access: objectOrNull(policy.paid_platform_access),
+    platform_usage_buckets: objectOrNull(policy.platform_usage_buckets)
   };
 }
 
@@ -1318,6 +1398,22 @@ export const SKYPAY_PLATFORM_ROUTES = [
     note: "Canonical company OS offers route into SkyePay closeout after preview proof."
   },
   {
+    platform_id: "skyeopsconsole",
+    title: "SkyeOpsConsole Free99",
+    route: "/platforms/free99/skyeopsconsole",
+    default_offer_id: "metraiyux-starter-command",
+    wiring_status: "free99_gated_no_checkout",
+    note: "Only no-charge app in the Free99 intake. It remains gate-session protected and meters under platform_id=skyeopsconsole with billable=false."
+  },
+  {
+    platform_id: "free99-paid-platform-intake",
+    title: "Free99 Paid Platform Intake",
+    route: "/admin/platform-control?lane=free99-paid-platform-intake",
+    default_offer_id: "metraiyux-growth-cabinet",
+    wiring_status: "scanned_pending_stripe_rebuild",
+    note: "Paid-app zips are inventoried as platform lanes; Stripe SKU rebuild happens after owner-approved pricing and provider-cost review."
+  },
+  {
     platform_id: "bobs-smoke-shop-preview",
     title: "Bob's Smoke Shop Private Preview",
     route: "/skyepay.html?client=bobs-smoke-shop",
@@ -1434,7 +1530,12 @@ export function publicOffer(offer, client = null) {
       max_devices_per_key: offer.gate_policy.max_devices_per_key || null,
       vault_storage_mb: offer.gate_policy.vault_storage_mb || null,
       vault_file_limit: offer.gate_policy.vault_file_limit || null,
-      vault_workspace_limit: offer.gate_policy.vault_workspace_limit || null
+      vault_workspace_limit: offer.gate_policy.vault_workspace_limit || null,
+      platform_metering_mode: offer.gate_policy.platform_metering_mode || null,
+      default_platform_id: offer.gate_policy.default_platform_id || null,
+      free99_access: offer.gate_policy.free99_access || [],
+      paid_platform_access: offer.gate_policy.paid_platform_access || null,
+      platform_usage_buckets: offer.gate_policy.platform_usage_buckets || null
     } : null,
     line_items: offer.line_items.map((item) => ({
       id: item.id,
@@ -1575,6 +1676,9 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
     deferred_one_time_cents: String(activeTrialDays > 0 ? setup : 0),
     recurring_cents: String(recurring),
     gate_policy_id: safeText(offer.gate_policy?.policy_id, 140),
+    platform_metering_mode: safeText(offer.gate_policy?.platform_metering_mode, 120),
+    free99_platforms: Array.isArray(offer.gate_policy?.free99_access) ? offer.gate_policy.free99_access.join(",") : "",
+    platform_usage_bucket_count: String(Object.keys(offer.gate_policy?.platform_usage_buckets || {}).length),
     source_folder: safeText(offer.source_folder || "SkyeGateFS27", 180),
     source_file: safeText(offer.source_file || "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js", 180),
     catalog_source: safeText(offer.catalog_source || "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js", 180),

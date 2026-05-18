@@ -1,0 +1,116 @@
+{
+  "version": "2026-05-18-free99-platform-intake",
+  "source_folder": "metraiyux_0s_site/Free99",
+  "mcp_receipt": "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
+  "rule": "Only SkyeOpsConsole is Free99 in this intake. Every Paid-Apps platform must stay gated and must carry platform_id plus usage_lane before live usage, invoicing, or Stripe SKU rebuild.",
+  "metering_contract": {
+    "gate_fields": [
+      "platform_id",
+      "usage_lane"
+    ],
+    "free_platforms": [
+      "skyeopsconsole"
+    ],
+    "paid_platform_default": "enabled=false until standalone checkout, owner approval, or explicit bundle entitlement activates the platform usage bucket",
+    "rate_limit_rule": "Dedicated rate-limit windows use customer_id + api_key_id + platform_id + usage_lane when a SkyePay policy bucket exists; otherwise the global key/customer limit remains the fallback.",
+    "cost_rule": "usage_events records platform_id and usage_lane so invoices, caps, and operator reports can split usage by platform."
+  },
+  "platforms": [
+    {
+      "platform_id": "skyeopsconsole",
+      "name": "SkyeOpsConsole v2.13",
+      "source_archive": "metraiyux_0s_site/Free99/skyeopsconsolev2.13.zip",
+      "classification": "free99_gated",
+      "billing": "Free99 / $0; no Stripe product",
+      "usage_posture": "billable=false, still gate-session protected",
+      "scan_notes": [
+        "Static/offline console package with index.html, service worker, manifest, and icons.",
+        "No provider-cost, hosted database, or checkout dependency found in the source archive."
+      ]
+    },
+    {
+      "platform_id": "skyeapi-aegiscore",
+      "name": "SkyeAPI + AegisCore Platform",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/skyeapi-aegiscore-platform-v0.17.0.zip",
+      "classification": "paid_usage_metered_control_plane",
+      "billing": "Quote or usage-metered SKU after provider-cost review",
+      "usage_posture": "paid bucket required; supports plan enforcement, capability checks, usage/admin invoice surfaces, and rate-limit envs"
+    },
+    {
+      "platform_id": "sovereigndocs",
+      "name": "SovereignDocs v20",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/sovereigndocs_real_platform_v20_website_refresh.zip",
+      "classification": "paid_document_saas",
+      "billing": "Imported plan data shows Starter $19/mo, Business $59/mo, Agency $149/mo, Enterprise $499/mo; Stripe env still required before checkout",
+      "usage_posture": "paid bucket required; export quotas and entitlement checks already exist in the platform source",
+      "scan_notes": [
+        "Original archive was missing EOCD; recovered scan copy was used for inventory.",
+        "DOCX export quota enforcement exists in server/entitlements.mjs."
+      ]
+    },
+    {
+      "platform_id": "kaixu-codestudio",
+      "name": "kAIxU CodeStudio Platform",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/codestudio-platform-notheater-5.9.1-website.zip",
+      "classification": "paid_or_quote_platform_backplane",
+      "billing": "Quote after provider/backplane scope",
+      "usage_posture": "paid bucket required for provider packs, AI token policy, gateway calls, and costly-call approvals"
+    },
+    {
+      "platform_id": "skaixu-code-evaluator",
+      "name": "skAIxU Code Evaluator Platform",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/skaixu-code-evaluator-platform-2.6.0-website.zip",
+      "classification": "paid_or_quote_evaluation_platform",
+      "billing": "Quote after rubric/workflow scope",
+      "usage_posture": "paid bucket required for evaluator workflows, seed ETL, browser proof, and gateway use"
+    },
+    {
+      "platform_id": "skyevaultpro",
+      "name": "SkyeVaultPro",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/skyevaultpro.zip",
+      "classification": "paid_hosted_vault_add_on",
+      "billing": "Paid hosted backup, AI helper, profile sync, or subscription lane after scope",
+      "usage_posture": "paid bucket required for hosted backup, OpenAI helper, Netlify Blobs, Neon, or identity-backed features"
+    },
+    {
+      "platform_id": "doctor-ops-personal-vault",
+      "name": "Doctor Ops Personal Vault v6",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/doctor-ops-personal-vault-v6-website-logo.zip",
+      "classification": "personal_paid_subscription_candidate",
+      "billing": "Low-price personal subscription candidate; owner approval before checkout",
+      "usage_posture": "local-first core; hosted/runtime add-ons require paid bucket and medical-claim guardrails"
+    },
+    {
+      "platform_id": "documorph",
+      "name": "Documorph",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/skyesoverlondon_documorph_repack_new_logo.zip",
+      "classification": "paid_document_transform_platform",
+      "billing": "Quote after DB/runtime proof",
+      "usage_posture": "paid bucket required for database-backed document transformation and API runtime"
+    },
+    {
+      "platform_id": "skyearcade",
+      "name": "SkyeArcade Sovereign Vault",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/skyearcade_sovereign_vault_v1_8_1.zip",
+      "classification": "paid_or_member_add_on_candidate",
+      "billing": "Paid/member add-on candidate, not anonymous Free99",
+      "usage_posture": "static/local save core; gate or membership lane required if exposed from 0S"
+    },
+    {
+      "platform_id": "skyebox-authenticator",
+      "name": "SkyeBox Encrypted Authenticator Vault",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/SkyeBox Encrypted authenticator vault.zip",
+      "classification": "local_first_included_or_bundle_candidate",
+      "billing": "No direct provider-cost found; include/bundle before selling hosted recovery",
+      "usage_posture": "local-first encrypted TOTP vault; no cloud recovery claim without separate paid proof"
+    },
+    {
+      "platform_id": "kaixu-storefront",
+      "name": "kAIxU Storefront Mini Site",
+      "source_archive": "metraiyux_0s_site/Free99/Paid-Apps/ kaixustorefront.zip",
+      "classification": "sales_catalog_source_only",
+      "billing": "Not a direct checkout product",
+      "usage_posture": "use as product/ecosystem copy source only until tied to approved offers"
+    }
+  ]
+}

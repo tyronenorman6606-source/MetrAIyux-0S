@@ -16,11 +16,12 @@ export function getPricingCatalog() {
 }
 
 function unpricedError(provider, model) {
-  const err = new Error(`Unpriced model: ${provider}:${model}`);
+  const err = new Error("Requested Skyes Over London model is not enabled for billing.");
   err.code = "UNPRICED_MODEL";
+  err.private = { provider, model };
   // 409 communicates "your request is valid JSON but conflicts with server policy/config"
   err.status = 409;
-  err.hint = "This model/provider is not enabled for billing. Ask an admin to add it to pricing/pricing.json (and allowlists).";
+  err.hint = "Ask an admin to enable this Skyes Over London model lane for billing.";
   return err;
 }
 

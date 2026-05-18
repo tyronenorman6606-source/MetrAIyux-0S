@@ -28,7 +28,7 @@ export function assertAllowed({ provider, model, keyRow }) {
 
   if (providers && providers.length) {
     if (!providers.includes('*') && !providers.includes(provider)) {
-      return { ok: false, status: 403, error: `Provider not allowed for this key (${provider})` };
+      return { ok: false, status: 403, error: "Requested Skyes Over London model is not enabled for this key." };
     }
   }
 
@@ -44,11 +44,11 @@ export function assertAllowed({ provider, model, keyRow }) {
       const arr = normArray(list) || [];
       if (arr.includes('*')) return { ok: true };
       if (!arr.includes(model)) {
-        return { ok: false, status: 403, error: `Model not allowed for this key (${provider}:${model})` };
+        return { ok: false, status: 403, error: "Requested Skyes Over London model is not enabled for this key." };
       }
     } else {
       // If a models object exists but doesn't include provider, treat as deny.
-      return { ok: false, status: 403, error: `Provider not allowed by model allowlist (${provider})` };
+      return { ok: false, status: 403, error: "Requested Skyes Over London model is not enabled for this key." };
     }
   }
 

@@ -231,6 +231,9 @@
         let db; // IndexedDB instance
         let uploadedPhotoBase64 = null; // Store base64 of uploaded photo
         const ONBOARDING_ID_DRAFT_KEY = 'kx.onboarding.idDraft';
+        const CURRENT_IDENTITY_KEY = 'skye0s.identity.current.v1';
+        const IDENTITY_REGISTRY_KEY = 'skye0s.identity.registry.v1';
+        const MAX_IDENTITY_PHOTO_CHARS = 1800000;
 
         // DOM Elements
         const nameInput = document.getElementById('name-input');
@@ -253,19 +256,50 @@
         const btnClearDb = document.getElementById('btn-clear-db');
         const btnExportCsv = document.getElementById('btn-export-csv');
 
+        const normalizeSkyeId = (value) => {
+            const raw = String(value || '').trim();
+            const digits = raw.replace(/\D/g, '');
+            return digits.length === 10 ? digits : raw.replace(/[^\w-]/g, '').slice(0, 64);
+        };
+
+        const upsertIdentityRegistry = (identity) => {
+            const key = identity.identityId || identity.skyeId || identity.idNumber;
+            if(!key) return;
+            const current = JSON.parse(localStorage.getItem(IDENTITY_REGISTRY_KEY) || '[]');
+            const list = Array.isArray(current) ? current : [];
+            const next = [identity, ...list.filter(item => {
+                const itemKey = item && (item.identityId || item.skyeId || item.idNumber);
+                return itemKey !== key;
+            })].slice(0, 50);
+            localStorage.setItem(IDENTITY_REGISTRY_KEY, JSON.stringify(next));
+        };
+
         const publishIdentityDraft = (reason = 'update') => {
             const name = nameInput.value.trim();
             const idNumber = numberInput.value.trim();
             if(!name || !idNumber) return;
+            const skyeId = normalizeSkyeId(idNumber);
+            const photoDataUrl = uploadedPhotoBase64 && uploadedPhotoBase64.length <= MAX_IDENTITY_PHOTO_CHARS ? uploadedPhotoBase64 : '';
             const draft = {
+                schema: 'skye0s.identity.v1',
                 name,
                 idNumber,
+                skyeId,
+                identityId: skyeId || idNumber,
+                profileType: 'artist',
+                photoDataUrl,
+                photoName: photoUpload.files && photoUpload.files[0] ? photoUpload.files[0].name : '',
+                photoType: photoUpload.files && photoUpload.files[0] ? photoUpload.files[0].type : '',
+                photoUpdatedAt: photoDataUrl ? new Date().toISOString() : '',
                 source: 'Skye-ID',
                 reason,
                 updatedAt: new Date().toISOString()
             };
             try {
                 localStorage.setItem(ONBOARDING_ID_DRAFT_KEY, JSON.stringify(draft));
+                localStorage.setItem(CURRENT_IDENTITY_KEY, JSON.stringify(draft));
+                upsertIdentityRegistry(draft);
+                window.dispatchEvent(new CustomEvent('skye0s:identity-updated', { detail: draft }));
             } catch (err) {
                 console.warn('Could not publish onboarding identity draft', err);
             }
@@ -280,6 +314,7 @@
                     uploadedPhotoBase64 = e.target.result;
                     photoPreview.src = uploadedPhotoBase64;
                     photoPreview.classList.remove('hidden');
+                    publishIdentityDraft('photo-upload');
                 };
                 reader.readAsDataURL(file);
             }
@@ -325,6 +360,9 @@
                 name: currentName,
                 number: currentNum,
                 formattedNumber: formattedNumber,
+                skyeId: normalizeSkyeId(currentNum),
+                profileType: 'artist',
+                photoDataUrl: uploadedPhotoBase64 && uploadedPhotoBase64.length <= MAX_IDENTITY_PHOTO_CHARS ? uploadedPhotoBase64 : '',
                 timestamp: new Date().toISOString()
             };
             store.add(entry);

@@ -59,7 +59,7 @@
   },
   "owner_approval_required": true,
   "activation_path": "paid_status_then_plan_policy_activation",
-  "public_copy": "Clients can continue through SkyePay after preview. Confirmed Stripe payment writes the FS27 order, applies the plan policy, and records paid status before owner-approved activation where required. SkyeProfitConsole and SkyeMediaCenter are Free99/no charge. SkyeMusicNexus Lite is Free99/no charge, while Studio, Label Command, Managed Music Ops, drop add-ons, and content/community add-ons are paid SkyePay offers. Every route still requires a gate session.",
+  "public_copy": "Clients can continue through SkyePay after preview. Confirmed Stripe payment writes the FS27 order, applies the plan policy, and records paid status before owner-approved activation where required. SkyeProfitConsole, Skye Split Engine, and SkyeMediaCenter are Free99/no charge. SkyeMusicNexus Lite is Free99/no charge, while Studio, Label Command, Managed Music Ops, drop add-ons, and content/community add-ons are paid SkyePay offers. Every route still requires a gate session. Marketing Made Easy is a quote-only/gated growth-suite route with no direct checkout until an owner-approved catalog item exists.",
   "free99_non_checkout": {
     "skyeprofitconsole": {
       "label": "SkyeProfitConsole Free99",
@@ -76,6 +76,22 @@
       "checkout": false,
       "gate_session_required": true,
       "copy": "Free99 means SkyeMusicNexus Lite has no charge. It still requires a 0S, FS27, or SkyGate session."
+    },
+    "skyesplitengine": {
+      "label": "Skye Split Engine Free99",
+      "price": "$0 setup + $0/mo",
+      "url": "../live/skye-split-engine-operator-proof.html",
+      "checkout": false,
+      "gate_session_required": true,
+      "copy": "Free99 means no charge. It still requires a 0S, FS27, SkyGate, or local admin gate session."
+    },
+    "marketing_made_easy_growth_suite": {
+      "label": "Marketing Made Easy Growth Suite",
+      "price": "Catalog/quote only; no direct checkout until approved",
+      "url": "../live/marketing-made-easy-growth-suite.html",
+      "checkout": false,
+      "gate_session_required": true,
+      "copy": "Marketing Made Easy is routed through the 0S and FS27 gate. Production publishing, ad spend, external writes, customer tenancy, and checkout require owner approval."
     }
   },
   "free99_routes": {
@@ -92,6 +108,20 @@
       "checkout": false,
       "gate_session_required": true,
       "url": "../live/skyeprofitconsole-profit-console.html"
+    },
+    "skyesplitengine": {
+      "label": "Skye Split Engine Free99 gated feature",
+      "price": "Free99 / $0",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "../live/skye-split-engine-operator-proof.html"
+    },
+    "marketing_made_easy_growth_suite": {
+      "label": "Marketing Made Easy Growth Suite gated quote route",
+      "price": "Catalog/quote only; no direct checkout until approved",
+      "checkout": false,
+      "gate_session_required": true,
+      "url": "../live/marketing-made-easy-growth-suite.html"
     }
   },
   "paid_music_routes": {
@@ -115,6 +145,6 @@
     "extra_release_pack": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-extra-release-pack",
     "white_label_artist_portal": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-white-label-artist-portal"
   },
-  "updated_for": "skyemusicnexus-lite-paid-addons",
-  "updated_at": "2026-05-17T00:00:00Z"
+  "updated_for": "marketing-made-easy-growth-suite-gated-route",
+  "updated_at": "2026-05-18T00:00:00Z"
 }

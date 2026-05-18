@@ -1,5 +1,22 @@
 # SkyeGateFS27 Changelog
 
+## 2026-05-18 - Marketing Made Easy gate dossier and 0S route wiring
+
+- Added Marketing Made Easy as a gate-accounted 0S growth-suite lane covering AE-FlowPro, BrandID Offline PWA, BusinessLaunchGo, SkyeDocxMax, SkyeWebCreatorMax, WebGrowthOperator, Arizona Growth Index, and kAIxU BrandKit.
+- Added FS27 integration dossier files for the suite and documented the expected platform mirror event types.
+- Added the suite to FS27 platform control and the local runtime surface map so operators can see it as a client-admin platform group.
+- Kept the claim boundary explicit: local PWA/runtime proof does not prove production tenancy, checkout, external publishing, ad spend, or customer-impacting provider writes.
+- Completed local closeout for the suite with 0S accounting, deep scan, smoke proof, browser proof, and a Cloudflare dry run.
+- Marked production deploy as pending Cloudflare authentication; the new live Worker routes must not be represented as deployed until `wrangler deploy` succeeds.
+
+Verification target:
+
+- `npm run 0s:marketing-made-easy:proof`
+- `npm run mcp:mine -- metraiyux_0s_site/Marketing-Made-Easy`
+- `npm run 0s:platform-accounting`
+- Local browser proof for `/live/marketing-made-easy-growth-suite.html`, `/Marketing-Made-Easy/index.html`, and `/proof/marketing-made-easy-deep-scan-receipt.html`
+- `npx wrangler deploy --dry-run`
+
 ## 2026-05-17 - SkyeMerit production checkout origin closeout
 
 - Made the Cloudflare FS27 Worker the customer checkout origin for MetrAIyux 0S SkyePay links.

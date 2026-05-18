@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S platform integration ledger that maps changelog claims to live surfaces, advertising angles, integration boundaries, and proof commands.">
+  <title>Platform Integration Ledger · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .ledger-shell{max-width:1180px;margin:0 auto;padding:24px}
+    .ledger-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:20px 0}
+    .ledger-toolbar input{min-width:min(420px,100%);flex:1;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(0,0,0,.28);color:#fff;padding:13px 14px}
+    .ledger-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+    .ledger-card{border:1px solid rgba(255,255,255,.13);border-radius:8px;background:rgba(255,255,255,.055);padding:18px}
+    .ledger-card h3{color:#fff;margin:6px 0}
+    .ledger-card p,.ledger-card li{color:#d9e4e7}
+    .ledger-card ul{padding-left:18px}
+    .ledger-card code{white-space:normal}
+    .ledger-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+    .ledger-chip-row span{border:1px solid rgba(243,212,131,.28);border-radius:999px;padding:6px 9px;color:#ffe9a8;background:rgba(0,0,0,.22);font-size:12px;font-weight:800}
+    .ledger-ad{border-left:3px solid #35b7ff;padding-left:12px;margin:14px 0}
+    .ledger-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="index.html">Operator</a>
+      <a href="../proof/index.html">Proof</a>
+      <a href="../sales/live-proof-router.html">Live Router</a>
+      <a href="../changelog/index.html">Changelog</a>
+    </nav>
+  </header>
+
+  <main class="ledger-shell">
+    <section class="hero slim">
+      <div class="hero-copy">
+        <p class="eyebrow">Changelog to system map</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>Every new platform has a route, a sales angle, and a proof boundary.</h1>
+        <p class="hero-lede">This ledger keeps the 0S expansion honest: if the changelog names a platform, the operating system needs a surface, advertising posture, integration point, and verification path.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="../data/platform-integration-ledger.json">Open JSON Ledger</a>
+          <a class="button" href="../sales/live-proof-router.html">Open Proof Router</a>
+          <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s" target="_blank" rel="noreferrer">Open SkyePay Store</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Accounting board</p>
+          <h2 id="ledgerTitle">Loading platform ledger...</h2>
+        </div>
+      </div>
+      <div class="ledger-toolbar">
+        <input id="ledgerSearch" type="search" placeholder="Search platform, buyer signal, proof command, or integration point">
+        <a class="button" href="../changelog/index.html">Source Changelog</a>
+      </div>
+      <div id="ledgerCards" class="ledger-grid"></div>
+    </section>
+
+    <section class="section router-panel">
+      <p class="eyebrow">Campaign matrix</p>
+      <h2>Advertising paths that stay proof-safe.</h2>
+      <div id="campaignMatrix" class="ledger-grid"></div>
+    </section>
+  </main>
+
+  <footer><p>MetrAIyux 0S platform integration ledger. Public sales claims stay tied to live surfaces and proof receipts.</p></footer>
+
+  <script>
+    (() => {
+    const esc = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    const cards = document.getElementById("ledgerCards");
+    const title = document.getElementById("ledgerTitle");
+    const search = document.getElementById("ledgerSearch");
+    const campaignMatrix = document.getElementById("campaignMatrix");
+    let ledger = null;
+
+    function list(items) {
+      return `<ul>${(items || []).slice(0, 6).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`;
+    }
+
+    function chipRow(items) {
+      return `<div class="ledger-chip-row">${(items || []).map((item) => `<span>${esc(item)}</span>`).join("")}</div>`;
+    }
+
+    function renderPlatforms(query = "") {
+      const q = query.trim().toLowerCase();
+      const platforms = (ledger?.platforms || []).filter((platform) => JSON.stringify(platform).toLowerCase().includes(q));
+      title.textContent = `${platforms.length} platform${platforms.length === 1 ? "" : "s"} accounted for`;
+      cards.innerHTML = platforms.map((platform) => `
+        <article class="ledger-card">
+          <p class="eyebrow">${esc(platform.status)}</p>
+          <h3>${esc(platform.name)}</h3>
+          <p>${esc(platform.source_change)}</p>
+          <div class="ledger-ad">
+            <strong>${esc(platform.advertising?.headline)}</strong>
+            <p>${esc(platform.advertising?.buyer_signal)}</p>
+            ${chipRow([platform.advertising?.cta])}
+          </div>
+          <div class="ledger-columns">
+            <div><h4>Surfaces</h4>${list(platform.system_surfaces)}</div>
+            <div><h4>Integrations</h4>${list(platform.integration_points)}</div>
+          </div>
+          <h4>Proof Commands</h4>
+          ${list(platform.proof?.commands)}
+          <h4>Do Not Claim</h4>
+          ${list(platform.advertising?.avoid_claims)}
+        </article>
+      `).join("");
+    }
+
+    function renderCampaigns() {
+      campaignMatrix.innerHTML = (ledger?.campaign_matrix || []).map((row) => `
+        <article class="ledger-card">
+          <p class="eyebrow">Campaign</p>
+          <h3>${esc(row.campaign)}</h3>
+          <p>${esc(row.ad_angle)}</p>
+          ${chipRow(row.platforms)}
+          <p><strong>Proof route:</strong> <code>${esc(row.proof_route)}</code></p>
+        </article>
+      `).join("");
+    }
+
+    async function boot() {
+      try {
+        const res = await fetch("../data/platform-integration-ledger.json", { cache: "no-store" });
+        ledger = await res.json();
+        renderPlatforms();
+        renderCampaigns();
+      } catch (error) {
+        title.textContent = "Ledger could not be loaded";
+        cards.innerHTML = `<article class="ledger-card"><h3>Open the JSON ledger directly.</h3><p>${esc(error.message || error)}</p><a class="button primary" href="../data/platform-integration-ledger.json">Open JSON Ledger</a></article>`;
+      }
+    }
+
+    search?.addEventListener("input", () => renderPlatforms(search.value));
+    boot();
+    })();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Energy Being</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
+            background-color: #050510; /* Deep cosmic blue/black */
+            font-family: 'Inter', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        #demo-controls-container {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 1rem;
+            background: rgba(15, 20, 35, 0.6);
+            padding: 1rem;
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .demo-btn {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .demo-btn:hover { 
+            background: rgba(255,255,255,0.2); 
+            color: white; 
+            box-shadow: 0 0 10px rgba(255,255,255,0.1); 
+        }
+        
+        .demo-btn.active { 
+            background: rgba(96, 165, 250, 0.4); 
+            border-color: #60a5fa; 
+            color: white; 
+            box-shadow: 0 0 15px rgba(96,165,250,0.3); 
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="energyCanvas"></canvas>
+        
+        <div id="demo-controls-container">
+            <button class="demo-btn active" data-state="idle">Idle</button>
+            <button class="demo-btn" data-state="thinking">Thinking</button>
+            <button class="demo-btn" data-state="speaking">Speaking</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('energyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // AI Personality States
+        let aiState = 'idle'; // idle, thinking, speaking
+        let targetHue = 210;
+        let baseHue = 210;
+        
+        let particles = [];
+        let numParticles = 400; // Fixed dense background particle count
+        let intensityMult = 5;
+        let targetIntensity = 5;
+
+        let width, height, centerX, centerY;
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+
+        const mouse = {
+            x: centerX,
+            y: centerY,
+            radius: 150
+        };
+
+        const targetMouse = { x: centerX, y: centerY };
+
+        const demoBtns = document.querySelectorAll('.demo-btn');
+
+        // Exposing this globally so your external chat UI can trigger states
+        window.setAIState = function(newState) {
+            aiState = newState;
+            demoBtns.forEach(btn => {
+                if(btn.dataset.state === newState) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            if (newState === 'idle') {
+                targetHue = 210; // Blue
+                targetIntensity = 4;
+            } else if (newState === 'thinking') {
+                targetHue = 280; // Purple
+                targetIntensity = 8;
+            } else if (newState === 'speaking') {
+                targetHue = 180; // Cyan
+                targetIntensity = 6;
+            }
+        };
+
+        demoBtns.forEach(btn => {
+            btn.addEventListener('click', () => window.setAIState(btn.dataset.state));
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+                // Randomize initial position slightly around center
+                this.x = centerX + (Math.random() - 0.5) * 200;
+                this.y = centerY + (Math.random() - 0.5) * 200;
+            }
+
+            reset() {
+                // Determine if this particle is part of the 'core' or the 'aura'
+                this.isCore = Math.random() > 0.7;
+                
+                this.radius = this.isCore ? Math.random() * 3 + 1 : Math.random() * 1.5 + 0.5;
+                this.baseSpeed = this.isCore ? Math.random() * 2 + 0.5 : Math.random() * 4 + 1;
+                
+                // Angle and distance relative to the entity center (mouse)
+                this.angle = Math.random() * Math.PI * 2;
+                // Core particles stay closer
+                this.targetDist = this.isCore ? Math.random() * 40 : Math.random() * 120 + 20;
+                this.currentDist = this.targetDist;
+                
+                // Wobble factors for organic movement
+                this.wobbleSpeed = Math.random() * 0.05 + 0.01;
+                this.wobbleAngle = Math.random() * Math.PI * 2;
+                
+                // Color variations based on base hue
+                const hueVariation = (Math.random() - 0.5) * 40;
+                this.hue = baseHue + hueVariation;
+                this.lightness = this.isCore ? 70 + Math.random() * 30 : 40 + Math.random() * 40;
+                
+                this.life = Math.random();
+                this.decay = Math.random() * 0.01 + 0.005;
+            }
+
+            update() {
+                // Smoothly update hue based on state
+                baseHue += (targetHue - baseHue) * 0.02;
+                
+                const hueVariation = (Math.random() - 0.5) * 20;
+                this.hue = baseHue + hueVariation;
+
+                // Adjust speed based on AI state
+                let speedMult = 1;
+                if (aiState === 'thinking') speedMult = 3.5;
+                if (aiState === 'speaking') speedMult = 1.5;
+
+                // Orbit around the center point (mouse/target)
+                this.angle += this.baseSpeed * 0.01 * speedMult;
+                this.wobbleAngle += this.wobbleSpeed;
+
+                // Organic distance fluctuation
+                const wobbleDist = Math.sin(this.wobbleAngle) * 20;
+                
+                // Expand distance based on state
+                let expansion = 1;
+                if (aiState === 'thinking') expansion = 0.6; // Pull in tight
+                if (aiState === 'speaking') expansion = 1.2; // Push out slightly
+                
+                this.currentDist = (this.targetDist + wobbleDist) * expansion;
+
+                // Calculate target coordinates based on orbit
+                let tx = mouse.x + Math.cos(this.angle) * this.currentDist;
+                let ty = mouse.y + Math.sin(this.angle) * this.currentDist;
+
+                // Add chaos/noise based on state
+                let noise = 5;
+                if (aiState === 'speaking') noise = 12;
+                if (aiState === 'thinking') noise = 2;
+                
+                tx += (Math.random() - 0.5) * noise;
+                ty += (Math.random() - 0.5) * noise;
+
+                // Ease towards target for smooth flowing motion
+                this.x += (tx - this.x) * 0.1;
+                this.y += (ty - this.y) * 0.1;
+
+                // Life cycle
+                this.life += this.decay;
+                if (this.life > 1) {
+                    this.life = 0;
+                    if(Math.random() < 0.1) this.reset();
+                }
+            }
+
+            draw(ctx) {
+                // Pulsing alpha based on life
+                const alpha = Math.abs(Math.sin(this.life * Math.PI)) * (this.isCore ? 0.9 : 0.5);
+                
+                ctx.beginPath();
+                // Adjust radius pulse based on speaking state
+                let radiusBoost = (aiState === 'speaking') ? 1.2 : 1;
+                ctx.arc(this.x, this.y, this.radius * radiusBoost, 0, Math.PI * 2);
+                
+                // Create gradient for glow effect
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius * 2 * radiusBoost
+                );
+                
+                gradient.addColorStop(0, `hsla(${this.hue}, 100%, ${this.lightness}%, ${alpha})`);
+                gradient.addColorStop(1, `hsla(${this.hue}, 100%, ${this.lightness - 20}%, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle());
+        }
+
+        function updateAIBrain() {
+            const time = Date.now() * 0.001;
+            
+            // Smoothly adjust overall intensity
+            intensityMult += (targetIntensity - intensityMult) * 0.05;
+
+            // Autonomous movement patterns based on state
+            if (aiState === 'idle') {
+                // Wide, slow, figure-8 like breathing wandering
+                targetMouse.x = centerX + Math.sin(time * 0.3) * (width * 0.2) * Math.cos(time * 0.15);
+                targetMouse.y = centerY + Math.cos(time * 0.4) * (height * 0.2) * Math.sin(time * 0.25);
+            } else if (aiState === 'thinking') {
+                // Tighter, faster, erratic orbit
+                targetMouse.x = centerX + Math.sin(time * 2.5) * 60;
+                targetMouse.y = centerY + Math.cos(time * 3.0) * 60;
+            } else if (aiState === 'speaking') {
+                // Centered, slight vertical floating behind the chat
+                targetMouse.x = centerX;
+                targetMouse.y = centerY - 50 + Math.sin(time * 2) * 30;
+                // Add speaking pulse to intensity
+                intensityMult = targetIntensity + Math.sin(time * 15) * 2; 
+            }
+
+            // Smoothly interpolate the actual "gravitational center" to the AI's target
+            mouse.x += (targetMouse.x - mouse.x) * 0.02;
+            mouse.y += (targetMouse.y - mouse.y) * 0.02;
+        }
+
+        function animate() {
+            updateAIBrain();
+
+            // Draw semi-transparent background to create trails
+            // Darker background for better chat visibility
+            ctx.fillStyle = `rgba(5, 5, 12, 0.2)`; 
+            ctx.fillRect(0, 0, width, height);
+
+            // Enable additive blending for glowing effect
+            ctx.globalCompositeOperation = 'lighter';
+
+            // Optional: Draw connections between close particles to form a 'web'
+            drawConnections();
+
+            // Update and draw particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw(ctx);
+            }
+
+            // Draw central energy core
+            drawCore();
+
+            // Reset composite operation for next frame clear
+            ctx.globalCompositeOperation = 'source-over';
+            
+            requestAnimationFrame(animate);
+        }
+
+        function drawConnections() {
+            ctx.lineWidth = 0.5;
+            // Only check a subset of particles for performance
+            const checkLimit = Math.min(particles.length, 150);
+            
+            for (let i = 0; i < checkLimit; i++) {
+                for (let j = i + 1; j < checkLimit; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const distSq = dx * dx + dy * dy;
+                    
+                    // Connection distance threshold
+                    const maxDistSq = 4000; 
+                    
+                    if (distSq < maxDistSq) {
+                        const alpha = 1 - (distSq / maxDistSq);
+                        ctx.strokeStyle = `hsla(${baseHue}, 80%, 60%, ${alpha * 0.3})`;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function drawCore() {
+            const time = Date.now() * 0.001;
+            // Pulsing core radius based on AI state
+            let corePulse = Math.sin(time * 5) * 5;
+            if (aiState === 'speaking') corePulse = Math.sin(time * 20) * 8; // Faster pulse when speaking
+            
+            const coreRadius = 15 + corePulse;
+            
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, coreRadius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                mouse.x, mouse.y, 0,
+                mouse.x, mouse.y, coreRadius * 3 * (intensityMult * 0.5)
+            );
+            
+            // Core color adapts to the AI's current hue
+            gradient.addColorStop(0, `hsla(${baseHue}, 100%, 95%, 0.9)`);
+            gradient.addColorStop(0.2, `hsla(${baseHue}, 100%, 70%, 0.6)`);
+            gradient.addColorStop(1, `hsla(${baseHue}, 100%, 50%, 0)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // Wait for fonts/styles to render briefly before starting
+        window.onload = () => {
+            // Give it a small push towards center initially
+            mouse.x = centerX;
+            mouse.y = centerY;
+            animate();
+        };
+
+    </script>
+</body>
+</html>

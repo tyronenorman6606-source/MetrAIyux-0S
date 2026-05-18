@@ -477,7 +477,12 @@ const artifactPath = path.join(artifactDir, `${path.basename(targetFolder)}-mcp-
 fs.writeFileSync(siteReceiptPath, JSON.stringify(receipt, null, 2));
 fs.writeFileSync(artifactPath, JSON.stringify(receipt, null, 2));
 
-await client.close();
+let closeWarning = null;
+try {
+  await client.close();
+} catch (error) {
+  closeWarning = error.message;
+}
 
 const failedCalls = toolCalls.filter((call) => {
   if (!call.ok) return true;
@@ -496,6 +501,7 @@ console.log(JSON.stringify({
   resourceReadCount: resourcesRead.length,
   listedToolCount: tools.tools.length,
   toolCallCount: toolCalls.length,
+  closeWarning,
   failedCalls: failedCalls.map((call) => ({ name: call.name, error: call.error })),
   inventory: receipt.inventory
 }, null, 2));

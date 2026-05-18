@@ -11,8 +11,8 @@ import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceKaixuMessages } from "./_lib/kaixu.js";
 import { enforceUsagePreflight } from "./_lib/usageGates.js";
-
-const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
+import { resolvePlatformUsageContext } from "./_lib/platformUsage.js";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 export default wrap(async (req) => {
   const cors = buildCors(req);
@@ -32,13 +32,13 @@ export default wrap(async (req) => {
   const provider = target.provider;
   const model = target.model;
   const public_provider = PUBLIC_PROVIDER_NAME;
-  const public_model = requested_model || model;
+  const public_model = publicModelName(provider, requested_model || model);
   const messages_in = body.messages;
   const max_tokens = Number.isFinite(body.max_tokens) ? parseInt(body.max_tokens, 10) : 1024;
   const temperature = Number.isFinite(body.temperature) ? body.temperature : 1;
 
-  if (!requested_provider) return badRequest("Missing provider", cors);
-  if (!requested_model) return badRequest("Missing model", cors);
+  if (!requested_provider) return badRequest("Missing Skyes Over London origin label", cors);
+  if (!requested_model) return badRequest("Missing kAIxU model", cors);
   if (!Array.isArray(messages_in) || messages_in.length === 0) return badRequest("Missing messages[]", cors);
 
   const messages = enforceKaixuMessages(messages_in);
@@ -59,15 +59,22 @@ export default wrap(async (req) => {
   const dev = await enforceDevice({ keyRow, install_id, ua, actor: 'gateway' });
   if (!dev.ok) return json(dev.status || 403, { error: dev.error }, cors);
 
+  const platformUsage = resolvePlatformUsageContext({ req, body, keyRow, defaultLane: "ai-chat" });
 
   // Rate limit (DB-backed, fixed 60s window)
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: effectiveRpmLimit(keyRow) });
+  const rl = await enforceRpm({
+    customerId: keyRow.customer_id,
+    apiKeyId: keyRow.api_key_id,
+    rpmOverride: effectiveRpmLimit(keyRow, null, platformUsage.dedicatedPlatformId),
+    platformId: platformUsage.dedicatedPlatformId,
+    usageLane: platformUsage.usageLane
+  });
   if (!rl.ok) {
     return json(429, { error: "Rate limit exceeded", ratelimit: { remaining: rl.remaining, reset: rl.reset } }, cors);
   }
 
   const month = monthKeyUTC();
-  const preflight = await enforceUsagePreflight({ keyRow, month });
+  const preflight = await enforceUsagePreflight({ keyRow, month, platformId: platformUsage.platformId });
   if (!preflight.ok) return json(preflight.status, preflight.payload, cors);
 
   let result;
@@ -75,10 +82,10 @@ export default wrap(async (req) => {
     if (provider === "openai") result = await callOpenAI({ model, messages, max_tokens, temperature });
     else if (provider === "anthropic") result = await callAnthropic({ model, messages, max_tokens, temperature });
     else if (provider === "gemini") result = await callGemini({ model, messages, max_tokens, temperature });
-    else return badRequest("Unknown provider", cors);
+    else return badRequest("Unknown Skyes Over London lane", cors);
   } catch (e) {
     return json(500, {
-      error: "Provider error",
+      error: "Skyes Over London engine error",
       provider: public_provider,
       model: public_model,
       requested_provider: public_provider,
@@ -91,9 +98,9 @@ export default wrap(async (req) => {
   const cost_cents = costCents(provider, model, input_tokens, output_tokens);
 
   await q(
-    `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-    [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua]
+    `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platform_id, usage_lane)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platformUsage.platformId, platformUsage.usageLane]
   );
 
   await q(
@@ -163,6 +170,10 @@ export default wrap(async (req) => {
       key_cap_cents: key_cap_cents_after,
       key_spent_cents: newKeyRoll.spent_cents || 0
     },
-    telemetry: { install_id: install_id || null }
+    telemetry: {
+      install_id: install_id || null,
+      platform_id: platformUsage.platformId,
+      usage_lane: platformUsage.usageLane
+    }
   }, cors);
 });

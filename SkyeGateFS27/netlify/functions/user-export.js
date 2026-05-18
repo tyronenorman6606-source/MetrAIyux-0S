@@ -4,6 +4,7 @@ import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCa
 import { q } from "./_lib/db.js";
 import { toCsv } from "./_lib/csv.js";
 import { computeInvoiceSnapshot } from "./_lib/invoices.js";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 function monthRangeUTC(month) {
   const [y, m] = String(month || "").split("-").map((x) => parseInt(x, 10));
@@ -43,17 +44,17 @@ export default wrap(async (req) => {
 
   if (type === "events") {
     const res = await q(
-      `select created_at, provider, model, input_tokens, output_tokens, cost_cents, install_id
+      `select created_at, provider, model, input_tokens, output_tokens, cost_cents, install_id, platform_id, usage_lane
        from usage_events
        where api_key_id=$1 and created_at >= $2 and created_at < $3
        order by created_at asc
-       limit $3`,
+       limit $4`,
       [keyRow.api_key_id, range.start.toISOString(), range.end.toISOString(), limit]
     );
 
     const csv = toCsv({
-      header: ["created_at", "provider", "model", "input_tokens", "output_tokens", "cost_cents", "install_id"],
-      rows: res.rows.map(r => [r.created_at, r.provider, r.model, r.input_tokens, r.output_tokens, r.cost_cents, r.install_id])
+      header: ["created_at", "provider", "model", "input_tokens", "output_tokens", "cost_cents", "install_id", "platform_id", "usage_lane"],
+      rows: res.rows.map(r => [r.created_at, PUBLIC_PROVIDER_NAME, publicModelName(r.provider, r.model), r.input_tokens, r.output_tokens, r.cost_cents, r.install_id, r.platform_id || "metraiyux-0s", r.usage_lane || "ai"])
     });
 
     return text(200, csv, {

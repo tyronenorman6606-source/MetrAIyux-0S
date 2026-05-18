@@ -1,0 +1,44 @@
+{
+  "name": "SkyeMusicNexus Open Source Creation Stack",
+  "purpose": "Use open-source DAW/audio projects as external engines beneath the existing SkyeMusicNexus platform rooms.",
+  "engines": [
+    {
+      "name": "openDAW",
+      "repo": "https://github.com/andremichelle/openDAW.git",
+      "site": "https://opendaw.org/",
+      "license": "AGPLv3",
+      "role": "browser DAW engine candidate",
+      "integration": "Run/build externally, then mount into public/create.html through iframe bridge."
+    },
+    {
+      "name": "Ardour",
+      "repo": "https://github.com/Ardour/ardour.git",
+      "site": "https://ardour.org/",
+      "license": "GPL-2.0-or-later",
+      "role": "professional desktop DAW companion",
+      "integration": "Desktop workflow; import/export stems and masters into SkyeMusicNexus."
+    },
+    {
+      "name": "LMMS",
+      "repo": "https://github.com/LMMS/lmms.git",
+      "site": "https://lmms.io/",
+      "license": "GPL family; verify upstream",
+      "role": "beat/MIDI/synth production companion",
+      "integration": "Desktop workflow; export bounces, stems, MIDI, and sample packs."
+    },
+    {
+      "name": "Audacity",
+      "repo": "https://github.com/audacity/audacity.git",
+      "site": "https://www.audacityteam.org/",
+      "license": "GPLv3 with mixed file-level licensing",
+      "role": "waveform editing, cleanup, trimming, and vocal prep",
+      "integration": "Desktop workflow; export cleaned audio into gated upload/stem lane."
+    }
+  ],
+  "licenseBoundary": [
+    "Do not remove upstream licenses.",
+    "Do not claim third-party code as Skies/SOL-owned.",
+    "If modifying/distributing AGPL/GPL engines, preserve source availability obligations.",
+    "Keep platform business logic separate from vendor engine source where possible."
+  ]
+}

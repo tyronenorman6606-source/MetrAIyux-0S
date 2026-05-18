@@ -50,6 +50,11 @@ function gatePolicyFromOrder(order) {
       trial_days: numberOrNull(offer.trial_days) || 0,
       deferred_one_time_cents: numberOrNull(offer.deferred_one_time_cents) || 0,
       credits: Array.isArray(offer.credits) ? offer.credits : [],
+      platform_metering_mode: clean(policy.platform_metering_mode, 120),
+      default_platform_id: clean(policy.default_platform_id, 80),
+      free99_access: Array.isArray(policy.free99_access) ? policy.free99_access : [],
+      paid_platform_access: policy.paid_platform_access && typeof policy.paid_platform_access === "object" ? policy.paid_platform_access : null,
+      platform_usage_buckets: policy.platform_usage_buckets && typeof policy.platform_usage_buckets === "object" ? policy.platform_usage_buckets : null,
       owner_approval_required: ownerApprovalRequired,
       activation_path: clean(offer.activation_path, 180) || (ownerApprovalRequired ? "paid_pending_owner_approval" : "auto_unlock_after_confirmed_payment"),
       gate_policy: policy

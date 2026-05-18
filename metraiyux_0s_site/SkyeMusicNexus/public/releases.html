@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Releases</title>
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script><script defer src="./skygate-auth.js"></script><script defer src="../../assets/js/skye-id-bridge.js"></script><script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script><script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist">
+  <canvas id="pulse-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+  <header class="nexus-topline"><a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a><div class="top-title"><p class="micro">SkyeMusicNexus // Releases</p><h1>Artists, release capsules, royalty proof, and operations runway.</h1></div><div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div></header>
+  <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./upload.html">Upload Studio</a><a href="./player.html">Music Player</a><a class="active" href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./create.html">Create</a><a href="./admin.html">Operator</a></nav>
+  <main class="nexus-shell">
+    <section class="dual-grid">
+      <article class="nebula panel" id="artistNebula">
+        <div class="section-head"><p class="micro">Artist Nebula</p><h3>Register a signal node</h3><span class="tag">protected write</span></div>
+        <form id="artistForm" class="field-grid">
+          <div class="identity-card wide" id="artistIdentityCard">
+            <img id="artistPhotoPreview" data-skye-id-photo-preview hidden alt="Artist identity photo preview" />
+            <div>
+              <p class="micro">Skye ID Bridge</p>
+              <strong id="artistIdentityStatus">No shared identity loaded</strong>
+              <span id="artistPhotoMeta" data-skye-id-photo-meta>No artist photo linked yet.</span>
+            </div>
+            <div class="identity-actions">
+              <button class="ghost mini" type="button" data-action="pull-skye-id">Sync ID</button>
+              <a class="ghost mini" href="../../live/SkyeMail/generators/Skye-ID/index.html">Open ID Gen</a>
+            </div>
+          </div>
+          <input type="hidden" name="identityId" />
+          <label>Artist name<input name="name" required placeholder="Velvet Frequency" /></label><label>Email<input name="email" required type="email" placeholder="artist@example.com" /></label><label>Skye ID<input name="skyeId" inputmode="numeric" placeholder="10-digit ID" /></label><label>Profile photo<input name="profilePhotoFile" type="file" accept="image/*" /></label><label>Phone<input name="phone" placeholder="Optional" /></label><label>Genre tags<input name="genre" placeholder="alt r&b, synthwave, trap" /></label><label class="wide">Bio<textarea name="bio" rows="4" placeholder="What world does this artist create?"></textarea></label><button class="primary wide" type="submit">Create Artist Node</button>
+        </form><div id="artistResult" class="result-card compact">Awaiting signal.</div>
+      </article>
+      <article class="release-forge panel" id="releaseForge">
+        <div class="section-head"><p class="micro">Release Forge</p><h3>Build the drop capsule</h3><a class="tag" href="./upload.html">upload audio first</a></div>
+        <form id="releaseForm" class="field-grid">
+          <label>Artist ID<input name="artistId" required placeholder="Paste artist id" /></label><label>Title<input name="title" required placeholder="Neon Weather" /></label><label>Type<select name="type"><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></select></label><label>Release date<input name="releaseDate" type="date" /></label><label class="wide">Distribution targets<input name="distributionTargets" placeholder="SkyeMusicNexus Player, Spotify handoff boundary" /></label><label class="wide">Tracks<textarea name="tracks" rows="5" placeholder="One track per line. Example: Night Signal | 181 | /.netlify/functions/music-assets?action=stream&id=aud_..."></textarea></label><button class="primary wide" type="submit">Forge Release</button>
+        </form><div id="releaseResult" class="result-card compact">No release forged yet.</div>
+      </article>
+    </section>
+    <section class="triple-grid">
+      <article class="panel river"><div class="section-head"><p class="micro">Royalty River</p><h3>Credit proof motion</h3></div><form id="paymentForm" class="field-grid thin"><label>Artist ID<input name="artistId" required placeholder="artist id" /></label><label>Credit amount<input name="amount" required type="number" min="1" step="0.01" value="13" /></label><label class="wide">Reason<input name="reason" placeholder="streaming proof credit" /></label><button class="secondary wide" type="submit">Credit Ledger</button></form><div id="paymentResult" class="result-card compact">Ledger idle.</div></article>
+      <article class="panel sequencer"><div class="section-head"><p class="micro">Ops Sequencer</p><h3>Queue the release runway</h3></div><form id="opsForm" class="field-grid thin"><label>Release ID<input name="id" required placeholder="release id" /></label><label>Owner<input name="owner" value="release-ops" /></label><label>Status<select name="status"><option value="ready">Ready</option><option value="scheduled">Scheduled</option><option value="blocked">Blocked</option></select></label><label>Checkpoint<input name="checkpoint" value="distribution-ready" /></label><label class="wide">Notes<input name="notes" placeholder="handoff notes" /></label><button class="secondary wide" type="submit">Queue Operations</button></form><div id="opsResult" class="result-card compact">No workflow queued.</div></article>
+      <article class="panel constellation"><div class="section-head"><p class="micro">Live Constellation</p><h3>Records in motion</h3><button class="ghost mini" data-action="refresh-records">Refresh</button></div><div id="constellationList" class="constellation-list"></div></article>
+    </section>
+  </main>
+  <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog><div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

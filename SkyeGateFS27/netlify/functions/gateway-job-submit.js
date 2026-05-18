@@ -2,15 +2,16 @@ import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest, getBearer, monthKeyUTC, getInstallId, getClientIp, getUserAgent } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { enforceKaixuMessages, KAIXU_SYSTEM_HASH, SCHEMA_VERSION, BUILD_ID } from "./_lib/kaixu.js";
-import { resolveAuth, getMonthRollup, getKeyMonthRollup, customerCapCents, keyCapCents, effectiveRpmLimit } from "./_lib/authz.js";
+import { resolveAuth, effectiveRpmLimit } from "./_lib/authz.js";
 import { enforceRpm } from "./_lib/ratelimit.js";
 import { resolveProvider, resolveUpstreamTarget } from "./_lib/providers.js";
 import { randomUUID } from "crypto";
 import { hmacSha256Hex } from "./_lib/crypto.js";
 import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
-
-const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
+import { enforceUsagePreflight } from "./_lib/usageGates.js";
+import { resolvePlatformUsageContext } from "./_lib/platformUsage.js";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 function siteOrigin(req) {
   const urlEnv = process.env.URL || process.env.DEPLOY_PRIME_URL || process.env.DEPLOY_URL;
@@ -36,13 +37,13 @@ export default wrap(async (req) => {
   const provider = target.provider;
   const model = target.model;
   const public_provider = PUBLIC_PROVIDER_NAME;
-  const public_model = requested_model || model;
+  const public_model = publicModelName(provider, requested_model || model);
   const messages_in = body.messages;
   const max_tokens = Number.isFinite(body.max_tokens) ? parseInt(body.max_tokens, 10) : 4096;
   const temperature = Number.isFinite(body.temperature) ? body.temperature : 1;
 
-  if (!requested_provider) return badRequest("Missing provider", cors);
-  if (!requested_model) return badRequest("Missing model", cors);
+  if (!requested_provider) return badRequest("Missing Skyes Over London origin label", cors);
+  if (!requested_model) return badRequest("Missing kAIxU model", cors);
   if (!Array.isArray(messages_in) || messages_in.length === 0) return badRequest("Missing messages[]", cors);
 
   const messages = enforceKaixuMessages(messages_in);
@@ -62,29 +63,38 @@ export default wrap(async (req) => {
   const dev = await enforceDevice({ keyRow, install_id, ua, actor: 'job_submit' });
   if (!dev.ok) return json(dev.status || 403, { error: dev.error }, cors);
 
+  const platformUsage = resolvePlatformUsageContext({ req, body, keyRow, defaultLane: "ai-job" });
+
   // Light rate-limit on submit (prevents enqueue spam)
-  const inheritedRpm = effectiveRpmLimit(keyRow, 60);
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: Math.min(inheritedRpm || 60, 60) });
+  const inheritedRpm = effectiveRpmLimit(keyRow, 60, platformUsage.dedicatedPlatformId);
+  const rl = await enforceRpm({
+    customerId: keyRow.customer_id,
+    apiKeyId: keyRow.api_key_id,
+    rpmOverride: Math.min(inheritedRpm || 60, 60),
+    platformId: platformUsage.dedicatedPlatformId,
+    usageLane: platformUsage.usageLane
+  });
   if (!rl.ok) {
     return json(429, { error: "Rate limit exceeded", ratelimit: { remaining: rl.remaining, reset: rl.reset } }, cors);
   }
 
   // Cap gate (we don't know job cost yet, but if you're already capped, don't enqueue)
   const month = monthKeyUTC();
-  const custRoll = await getMonthRollup(keyRow.customer_id, month);
-  const keyRoll = await getKeyMonthRollup(keyRow.api_key_id, month);
-  const customer_cap_cents = customerCapCents(keyRow, custRoll);
-  const key_cap_cents = keyCapCents(keyRow, custRoll);
-
-  if ((custRoll.spent_cents || 0) >= customer_cap_cents) {
-    return json(402, { error: "Monthly cap reached", scope: "customer", month, cap_cents: customer_cap_cents, spent_cents: custRoll.spent_cents || 0 }, cors);
-  }
-  if ((keyRoll.spent_cents || 0) >= key_cap_cents) {
-    return json(402, { error: "Monthly cap reached", scope: "key", month, cap_cents: key_cap_cents, spent_cents: keyRoll.spent_cents || 0 }, cors);
-  }
+  const preflight = await enforceUsagePreflight({ keyRow, month, platformId: platformUsage.platformId });
+  if (!preflight.ok) return json(preflight.status, preflight.payload, cors);
 
   const job_id = randomUUID();
-  const request = { requested_provider, requested_model, provider, model, messages, max_tokens, temperature };
+  const request = {
+    requested_provider,
+    requested_model,
+    provider,
+    model,
+    messages,
+    max_tokens,
+    temperature,
+    platform_id: platformUsage.platformId,
+    usage_lane: platformUsage.usageLane
+  };
 
   await q(
     `insert into async_jobs(id, customer_id, api_key_id, provider, model, request, status, meta)
@@ -99,6 +109,11 @@ export default wrap(async (req) => {
       JSON.stringify({
         kaixu_system_hash: KAIXU_SYSTEM_HASH,
         telemetry: { install_id: install_id || null, ip_hash: ip_hash || null, ua: ua || null },
+        platform: {
+          platform_id: platformUsage.platformId,
+          usage_lane: platformUsage.usageLane,
+          dedicated_bucket: platformUsage.dedicatedBucket
+        },
         client: {
           app_id: (req.headers.get("x-kaixu-app") || "").toString().slice(0, 120) || null,
           build_id: (req.headers.get("x-kaixu-build") || "").toString().slice(0, 120) || null
@@ -134,10 +149,14 @@ export default wrap(async (req) => {
     job_id,
     provider: public_provider,
     model: public_model,
-    requested_provider: requested_provider || public_provider,
+    requested_provider: public_provider,
     requested_model: public_model,
     status_url,
     result_url,
+    platform: {
+      platform_id: platformUsage.platformId,
+      usage_lane: platformUsage.usageLane
+    },
     build: { id: BUILD_ID, schema: SCHEMA_VERSION, kaixu_system_hash: KAIXU_SYSTEM_HASH },
     note: "Job accepted. Poll status_url until status==='succeeded', then GET result_url."
   }, cors);

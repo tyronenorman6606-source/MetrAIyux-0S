@@ -2807,3 +2807,5 @@ server.registerTool('production_ledger', {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
+process.stdin.resume();
+setInterval(() => {}, 1 << 30);

@@ -77,7 +77,33 @@ The export writes:
 metraiyux_0s_site/brain/obsidian-sync.json
 ```
 
-The browser brain loads that file when present, alongside the main knowledge base, live surface registry, legal sync, marketplace sync, persona registry, site-operator routes, and sales offer registry.
+The browser brain loads that file when present, alongside the main knowledge base, live surface registry, legal sync, marketplace sync, persona registry, site-operator routes, sales offer registry, SkyeVault repo map, and SkyeRunners repo map.
+
+## SkyeRunners repo map
+
+SkyeRunners are the repo-aware worker lane for local proof, knowledge-map refreshes, human-flow QA, and bug discovery. Their generated browser-brain feed is:
+
+```text
+brain/skyerunners.json
+```
+
+Refresh it directly:
+
+```bash
+npm run skyerunners:map
+```
+
+Refresh the full knowledge chain:
+
+```bash
+npm run skyerunners:run -- knowledge-refresh
+```
+
+The operator guide lives at:
+
+```text
+docs/SKYERUNNERS_OPERATOR_GUIDE.md
+```
 
 ## 0S command runner
 

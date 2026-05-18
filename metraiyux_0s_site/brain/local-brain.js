@@ -5,6 +5,7 @@ let SITE_OPERATOR = null;
 let LEGAL_DATA = null;
 let SALES_OFFERS = null;
 let SKYEVAULT_MAP = null;
+let SKYERUNNERS_MAP = null;
 
 const TOTAL_BRAINS = 16;
 const BRAIN_ID_ALIASES = {
@@ -564,7 +565,7 @@ async function fetchJson(path) {
 async function loadKB() {
   const status = document.getElementById('brainStatus');
   try {
-    const [kbData, registry, legalData, marketplaceData, obsidianData, personas, siteOperator, offers, skyevaultMap] = await Promise.all([
+    const [kbData, registry, legalData, marketplaceData, obsidianData, personas, siteOperator, offers, skyevaultMap, skyerunnersMap] = await Promise.all([
       fetchJson('brain/knowledge-base.json'),
       fetchJson('brain/live-surface-registry.json'),
       fetchJson('brain/legal-sync.json'),
@@ -573,7 +574,8 @@ async function loadKB() {
       fetchJson('brain/persona-brains.json'),
       fetchJson('brain/site-operator-brain.json'),
       fetchJson('brain/sales-offer-registry.json'),
-      fetchJson('brain/skyevault-vault-map.json')
+      fetchJson('brain/skyevault-vault-map.json'),
+      fetchJson('brain/skyerunners.json')
     ]);
 
     if (!kbData) throw new Error('knowledge-base missing');
@@ -584,6 +586,7 @@ async function loadKB() {
     SITE_OPERATOR = siteOperator;
     SALES_OFFERS = offers;
     SKYEVAULT_MAP = skyevaultMap;
+    SKYERUNNERS_MAP = skyerunnersMap;
 
     KB = [
       ...(kbData.chunks || []),
@@ -592,6 +595,7 @@ async function loadKB() {
       ...siteOperatorToChunks(SITE_OPERATOR),
       ...offersToChunks(SALES_OFFERS),
       ...skyevaultToChunks(SKYEVAULT_MAP),
+      ...skyerunnersToChunks(SKYERUNNERS_MAP),
       ...(LEGAL_DATA?.chunks || []),
       ...(marketplaceData?.chunks || []),
       ...(obsidianData?.chunks || [])
@@ -606,6 +610,7 @@ async function loadKB() {
       LEGAL_DATA ? 'legal center' : null,
       marketplaceData ? 'marketplace catalog' : null,
       skyevaultMap ? 'SkyeVault repo map' : null,
+      skyerunnersMap ? 'SkyeRunners repo map' : null,
       obsidianData ? 'Obsidian vault sync' : null
     ].filter(Boolean);
     if (status) status.textContent = `Ready. Loaded ${brainCount} operating brains and ${KB.length} private knowledge chunks with ${extras.join(', ')}.`;
@@ -697,6 +702,26 @@ function skyevaultToChunks(map) {
     heading: `${repo.workspace_id}/${repo.repo_id}`,
     text: `SkyeVault repo ${repo.workspace_id}/${repo.repo_id}: ${repo.ref_updates || 0} ref updates, ${repo.requests || 0} Git requests, ${repo.exports || 0} exports, latest subject ${repo.latest_subject || 'none'}, latest head ${repo.latest_head || 'none'}. Gate should authorize access; 0S should show this in the workspace brain map.`,
     source: 'brain/skyevault-vault-map.json'
+  }));
+  return chunks;
+}
+
+function skyerunnersToChunks(map) {
+  if (!map) return [];
+  const chunks = [...(map.chunks || [])];
+  (map.runners || []).forEach(runner => chunks.push({
+    id: `skyerunners-role-${runner.id}`,
+    title: 'SkyeRunners Repo Agent Map',
+    heading: runner.name,
+    text: `${runner.name} is the ${runner.lane} SkyeRunner. Mission: ${runner.mission}. Primary brain: ${runner.primary_brain}. Secondary brain: ${runner.secondary_brain}. Default command: ${runner.default_command}. Uses: ${(runner.uses || []).join(', ')}.`,
+    source: 'brain/skyerunners.json'
+  }));
+  (map.commands || []).forEach(command => chunks.push({
+    id: `skyerunners-command-${command.id}`,
+    title: 'SkyeRunners Command Catalog',
+    heading: command.title,
+    text: `Command ${command.id} runs ${command.title}. Lane: ${command.lane}. Risk: ${command.risk}. Spend profile: ${command.spend_profile}. Result: ${command.result}. Steps: ${(command.steps || []).join(', ')}.`,
+    source: 'brain/skyerunners.json'
   }));
   return chunks;
 }

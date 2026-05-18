@@ -17,6 +17,8 @@ The gate now has a public proof page that translates this architecture into a bu
 - ConnectLog + Relay13 gate lane: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13`
 - ConnectLog + Relay13 0S proof hub: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html`
 - ConnectLog + Relay13 proof receipt: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/connectlog-relay13-expansion-receipt.html`
+- Marketing Made Easy 0S growth-suite hub: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/marketing-made-easy-growth-suite.html`
+- Marketing Made Easy deep-scan receipt: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/marketing-made-easy-deep-scan-receipt.html`
 - Relay13 live Worker: `https://relay13-core.graylondonskyes.workers.dev/`
 - SkyePay client closeout app: `skyepay.html`
 - SkyePay public aliases: `/pay`, `/gateway/skyepay`
@@ -156,6 +158,19 @@ The gate has five big jobs.
      "ws_id": "ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7"
    }
    ```
+
+8. Marketing Made Easy growth-suite lane
+
+   Marketing Made Easy is now a gate-accounted 0S platform group, not a loose import folder.
+
+   - 0S suite hub: `metraiyux_0s_site/Marketing-Made-Easy/index.html`
+   - 0S live hub: `metraiyux_0s_site/live/marketing-made-easy-growth-suite.html`
+   - Deep-scan receipt: `metraiyux_0s_site/proof/marketing-made-easy-deep-scan-receipt.html`
+   - Gate dossier: `docs/integration-dossiers/marketing-made-easy.md`
+
+   The lane covers AE-FlowPro, BrandID Offline PWA, BusinessLaunchGo, SkyeDocxMax, SkyeWebCreatorMax, WebGrowthOperator, Arizona Growth Index, and kAIxU BrandKit. FS27 may receive mirrored scan, brand, launch, document, web-creation, growth-ops, market-intelligence, and handoff events when the owner configures mirror credentials.
+
+   The gate must not claim local PWA proof equals production tenancy. Provider publishing, ad spend, Stripe checkout, Drive/GitHub/Netlify/Cloudflare writes, and customer-impacting actions require separate owner approval and proof.
 
 ## Runtime Lanes
 

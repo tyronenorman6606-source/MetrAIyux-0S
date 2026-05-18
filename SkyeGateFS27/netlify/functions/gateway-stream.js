@@ -11,8 +11,8 @@ import { enforceDevice } from "./_lib/devices.js";
 import { assertAllowed } from "./_lib/allowlist.js";
 import { enforceKaixuMessages } from "./_lib/kaixu.js";
 import { enforceUsagePreflight } from "./_lib/usageGates.js";
-
-const PUBLIC_PROVIDER_NAME = process.env.KAIXU_PUBLIC_PROVIDER_NAME || "Skyes Over London";
+import { resolvePlatformUsageContext } from "./_lib/platformUsage.js";
+import { PUBLIC_PROVIDER_NAME, publicModelName } from "./_lib/publicLabels.js";
 
 /**
  * SSE endpoint:
@@ -38,13 +38,13 @@ export default wrap(async (req) => {
   const provider = target.provider;
   const model = target.model;
   const public_provider = PUBLIC_PROVIDER_NAME;
-  const public_model = requested_model || model;
+  const public_model = publicModelName(provider, requested_model || model);
   const messages_in = body.messages;
   const max_tokens = Number.isFinite(body.max_tokens) ? parseInt(body.max_tokens, 10) : 1024;
   const temperature = Number.isFinite(body.temperature) ? body.temperature : 1;
 
-  if (!requested_provider) return badRequest("Missing provider", cors);
-  if (!requested_model) return badRequest("Missing model", cors);
+  if (!requested_provider) return badRequest("Missing Skyes Over London origin label", cors);
+  if (!requested_model) return badRequest("Missing kAIxU model", cors);
   if (!Array.isArray(messages_in) || messages_in.length === 0) return badRequest("Missing messages[]", cors);
 
   const messages = enforceKaixuMessages(messages_in);
@@ -65,13 +65,20 @@ export default wrap(async (req) => {
   const dev = await enforceDevice({ keyRow, install_id, ua, actor: 'gateway' });
   if (!dev.ok) return new Response(JSON.stringify({ error: dev.error }), { status: dev.status || 403, headers: { ...cors, "content-type": "application/json" } });
 
+  const platformUsage = resolvePlatformUsageContext({ req, body, keyRow, defaultLane: "ai-stream" });
 
   // Rate limit
-  const rl = await enforceRpm({ customerId: keyRow.customer_id, apiKeyId: keyRow.api_key_id, rpmOverride: effectiveRpmLimit(keyRow) });
+  const rl = await enforceRpm({
+    customerId: keyRow.customer_id,
+    apiKeyId: keyRow.api_key_id,
+    rpmOverride: effectiveRpmLimit(keyRow, null, platformUsage.dedicatedPlatformId),
+    platformId: platformUsage.dedicatedPlatformId,
+    usageLane: platformUsage.usageLane
+  });
   if (!rl.ok) return new Response(JSON.stringify({ error: "Rate limit exceeded" }), { status: 429, headers: { ...cors, "content-type": "application/json" } });
 
   const month = monthKeyUTC();
-  const preflight = await enforceUsagePreflight({ keyRow, month });
+  const preflight = await enforceUsagePreflight({ keyRow, month, platformId: platformUsage.platformId });
   if (!preflight.ok) {
     return new Response(JSON.stringify(preflight.payload), {
       status: preflight.status,
@@ -102,7 +109,11 @@ export default wrap(async (req) => {
         model: public_model,
         requested_provider: public_provider,
         requested_model: public_model,
-        telemetry: { install_id: install_id || null },
+        telemetry: {
+          install_id: install_id || null,
+          platform_id: platformUsage.platformId,
+          usage_lane: platformUsage.usageLane
+        },
         usage_limits: preflight.snapshot,
         month: {
           month,
@@ -131,7 +142,7 @@ export default wrap(async (req) => {
         else if (provider === "gemini") adapter = await streamGemini({ model, messages, max_tokens, temperature });
         else {
           send("error", {
-            error: "Unknown provider",
+            error: "Unknown Skyes Over London lane",
             provider: public_provider,
             model: public_model,
             requested_provider: public_provider,
@@ -143,7 +154,7 @@ controller.close();
         }
       } catch (e) {
         send("error", {
-          error: "Provider error",
+          error: "Skyes Over London engine error",
           provider: public_provider,
           model: public_model,
           requested_provider: public_provider,
@@ -187,9 +198,9 @@ controller.close();
         const cost_cents = costCents(provider, model, input_tokens, output_tokens);
 
         await q(
-          `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua)
-           values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-          [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua]
+          `insert into usage_events(customer_id, api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platform_id, usage_lane)
+           values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+          [keyRow.customer_id, keyRow.api_key_id, provider, model, input_tokens, output_tokens, cost_cents, install_id, ip_hash, ua, platformUsage.platformId, platformUsage.usageLane]
         );
 
         await q(
@@ -262,7 +273,7 @@ controller.close();
       } catch (err) {
         clearInterval(ping);
         controller.enqueue(encoder.encode(`event: error\n`));
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Stream error", provider: public_provider, model: public_model, requested_provider: public_provider, requested_model: public_model })}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Skyes Over London stream error", provider: public_provider, model: public_model, requested_provider: public_provider, requested_model: public_model })}\n\n`));
         clearInterval(ping);
         controller.close();
       }

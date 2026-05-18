@@ -22,9 +22,11 @@ tags:
 - Keep `PRODUCTION_READINESS_REPORT.md` updated when live surfaces, Worker versions, or blockers change.
 - Run crawler proof after navigation, API, Cloudflare, or routing changes.
 - Save proof receipts with clear date, route, result, and artifact links.
+- Use SkyeRunners for repeatable repo health, static human-flow QA, and knowledge-map refreshes before major handoff claims.
 
 ## Knowledge Gates
 
 - Curate only stable, proof-safe notes into the local brain with `brain: true`.
 - Run the repo-local Obsidian sync command after changing exported vault notes.
 - Ask the local brain questions against the vault sync before using notes in public copy or client handoff.
+- Run `npm run skyerunners:run -- knowledge-refresh` after changing SkyeRunners, Obsidian notes, SkyeVault memory, or operator command routing.

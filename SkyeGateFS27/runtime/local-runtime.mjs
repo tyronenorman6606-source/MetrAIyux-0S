@@ -63,6 +63,23 @@ const PLATFORM_SURFACES = [
     launch_url: null,
     downstream_targets: ["SkyeLeadVault", "AE-FlowPro"],
   },
+  {
+    app_id: "marketing-made-easy",
+    title: "Marketing Made Easy",
+    visibility: "client-admin",
+    storage_mode: "0s-suite-plus-fs27-event-mirror",
+    launch_url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/index.html",
+    downstream_targets: [
+      "AE-FlowPro",
+      "BrandID Offline PWA",
+      "BusinessLaunchGo",
+      "SkyeDocxMax",
+      "SkyeWebCreatorMax",
+      "WebGrowthOperator",
+      "Arizona Growth Index",
+      "kAIxU BrandKit",
+    ],
+  },
 ];
 
 function defaultReview(index) {
