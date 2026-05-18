@@ -2730,3 +2730,61 @@ function mountSkyeSolLivingBackground({
   });
 })();
 // END quantumskyes:neon-motion-chrome-vanilla-js
+
+(function(){
+  if(window.__metraiyux0sRelay13ChatBoot) return;
+  window.__metraiyux0sRelay13ChatBoot = true;
+
+  const currentScript = document.currentScript || Array.from(document.scripts).find(function(script){
+    return /(?:^|\/)script\.js(?:\?|$)/.test(script.src || '');
+  });
+  const scriptBase = currentScript && currentScript.src ? new URL('.', currentScript.src) : new URL('/', window.location.href);
+
+  function bootMetrAIyux0SChat(){
+    if(window.MetrAIyuxWorkspaceChat && window.MetrAIyuxWorkspaceChat.__mounted) return;
+    if(document.querySelector('script[data-metraiyux-workspace-chat-script]')) return;
+
+    const existing = window.MetrAIyuxWorkspaceChatConfig || {};
+    window.MetrAIyuxWorkspaceChatConfig = {
+      workspaceId: 'ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7',
+      workspaceSlug: 'connectlog-main',
+      clientName: 'MetrAIyux 0S',
+      appName: 'MetrAIyux 0S Public System',
+      launcherText: '0S live workspace chat',
+      operatorName: 'MetrAIyux Operator',
+      accent: '#64d6ff',
+      apiBase: 'https://relay13-core.graylondonskyes.workers.dev/',
+      welcomeText: 'Send a note into the MetrAIyux 0S live workspace lane.',
+      accountDisclaimer: 'Messages are tied to the MetrAIyux 0S ConnectLog and Relay13 workspace for support, proof receipts, QA, and follow-up.',
+      relayMetadata: {
+        source_app: 'metraiyux-0s-public-site',
+        source_lane: 'public-workspace-chat',
+        relay_bridge: 'connectlog-main'
+      },
+      connectLog: {
+        enabled: true,
+        cardId: 'metraiyux-0s-public-site',
+        cardLabel: 'MetrAIyux 0S public website',
+        campaign: '0S public workspace chat',
+        ownerName: 'MetrAIyux Operator',
+        ownerCompany: 'MetrAIyux 0S',
+        ownerRole: 'Operator',
+        welcomeMessage: 'MetrAIyux 0S public workspace chat opened through Relay13.',
+        tags: ['metraiyux-0s', 'public-site', 'relay13', 'connectlog']
+      },
+      ...existing
+    };
+
+    const widgetScript = document.createElement('script');
+    widgetScript.src = new URL('assets/js/workspace-chat-widget.js', scriptBase).toString();
+    widgetScript.defer = true;
+    widgetScript.dataset.metraiyuxWorkspaceChatScript = 'true';
+    document.body.appendChild(widgetScript);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bootMetrAIyux0SChat, { once: true });
+  } else {
+    bootMetrAIyux0SChat();
+  }
+})();

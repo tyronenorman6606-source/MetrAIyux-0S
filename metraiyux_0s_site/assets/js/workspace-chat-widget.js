@@ -20,6 +20,8 @@
     accountDisclaimer: DEFAULT_DISCLAIMER,
     accent: "",
     apiBase: "",
+    relayMetadata: {},
+    connectLog: null,
     trackEventsToRelay: false,
     accessReply: "",
     accessTriggers: ["password", "access", "code", "unlock", "workspace"],
@@ -496,6 +498,32 @@
     return new URL(path, base.endsWith("/") ? base : `${base}/`).toString();
   }
 
+  function relayMetadata(message, extra = {}) {
+    const configured = isPlainObject(config.relayMetadata) ? config.relayMetadata : {};
+    return {
+      ...configured,
+      local_message_id: message.id,
+      app_name: config.appName,
+      ...extra
+    };
+  }
+
+  function connectLogPayload() {
+    const bridge = isPlainObject(config.connectLog) ? config.connectLog : null;
+    if (!bridge || bridge.enabled === false) return {};
+    return {
+      connectlog_bridge: true,
+      connectlog_card_id: bridge.cardId || bridge.card_id || "",
+      connectlog_card_label: bridge.cardLabel || bridge.card_label || config.clientName || config.appName,
+      connectlog_campaign: bridge.campaign || "",
+      connectlog_owner_name: bridge.ownerName || bridge.owner_name || config.operatorName || "",
+      connectlog_owner_company: bridge.ownerCompany || bridge.owner_company || config.clientName || "",
+      connectlog_owner_role: bridge.ownerRole || bridge.owner_role || "Operator",
+      connectlog_welcome_message: bridge.welcomeMessage || bridge.welcome_message || "",
+      connectlog_tags: Array.isArray(bridge.tags) ? bridge.tags : []
+    };
+  }
+
   async function relayFetch(path, payload) {
     const url = apiUrl(path);
     if (!url) throw new Error("apiBase missing");
@@ -521,11 +549,10 @@
           visitor_token: state.visitor_token,
           sender_name: "Workspace visitor",
           body: message.body,
-          metadata: {
+          metadata: relayMetadata(message, {
             workspace_id: config.workspaceId,
-            local_message_id: message.id,
             source_url: location.href
-          }
+          })
         });
         track("network.sent", { messageId: message.id, conversationId: state.conversation_id, route: "message" });
         return { ok: true, conversationId: state.conversation_id, route: "message" };
@@ -538,10 +565,8 @@
         subject: `${config.clientName || config.appName} workspace chat`,
         message: message.body,
         source_url: location.href,
-        metadata: {
-          local_message_id: message.id,
-          app_name: config.appName
-        }
+        ...connectLogPayload(),
+        metadata: relayMetadata(message)
       });
       saveRelayState(created);
       track("network.sent", { messageId: message.id, conversationId: created.conversation_id, route: "conversation" });
