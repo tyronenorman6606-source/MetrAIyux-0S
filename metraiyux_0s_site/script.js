@@ -2756,7 +2756,14 @@ function mountSkyeSolLivingBackground({
       apiBase: 'https://relay13-core.graylondonskyes.workers.dev/',
       welcomeText: 'Send a note into the MetrAIyux 0S live workspace lane.',
       accountDisclaimer: 'Messages are tied to the MetrAIyux 0S ConnectLog and Relay13 workspace for support, proof receipts, QA, and follow-up.',
+      defaultRoute: 'brain-assisted',
+      routeOptions: [
+        { value: 'brain-assisted', label: 'Brain-assisted route' },
+        { value: 'direct-operator', label: 'Direct to Gray/operator' }
+      ],
       relayMetadata: {
+        account_code: 'METRAIYUX-0S-SKM',
+        skye_merit_account: true,
         source_app: 'metraiyux-0s-public-site',
         source_lane: 'public-workspace-chat',
         relay_bridge: 'connectlog-main'

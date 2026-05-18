@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-05-18",
+  "system": "MetrAIyux 0S Relay13 Chat Hub",
+  "relay13_origin": "https://relay13-core.graylondonskyes.workers.dev",
+  "skygate_origin": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+  "admin_console_url": "https://relay13-core.graylondonskyes.workers.dev/admin/",
+  "accounts": [
+    {
+      "account_code": "METRAIYUX-0S-SKM",
+      "company": "MetrAIyux 0S",
+      "role": "owner-public-site",
+      "relay13_workspace_slug": "connectlog-main",
+      "relay13_workspace_id": "ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7",
+      "connectlog_card_id": "metraiyux-0s-public-site",
+      "skygate_client_slug": "metraiyux-0s-skm",
+      "skye_merit_usage_owner": "MetrAIyux 0S",
+      "live_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/",
+      "message_modes": ["brain-assisted", "direct-operator"],
+      "status": "live-widget-mounted"
+    },
+    {
+      "account_code": "BOBS-SMOKE-SHOP-SKM",
+      "company": "Bob's Smoke Shop",
+      "role": "client-and-test-account",
+      "relay13_workspace_slug": "bobs-smoke-shop",
+      "relay13_workspace_id": "ws_bobs_smoke_shop",
+      "connectlog_card_id": "bobs-smoke-shop-client-workspace",
+      "skygate_client_slug": "bobs-smoke-shop-skm",
+      "skye_merit_usage_owner": "MetrAIyux 0S",
+      "live_url": "https://bobs-smoke-shop.pages.dev/",
+      "message_modes": ["client-workspace-chat"],
+      "status": "client-widget-configured"
+    },
+    {
+      "account_code": "EMPIRE-PALLETS-SKM",
+      "company": "Empire Pallets",
+      "role": "client-and-test-account",
+      "relay13_workspace_slug": "empire-pallets",
+      "relay13_workspace_id": "ws_empire_pallets",
+      "connectlog_card_id": "empire-pallets-client-workspace",
+      "skygate_client_slug": "empire-pallets-skm",
+      "skye_merit_usage_owner": "MetrAIyux 0S",
+      "live_url": "https://empire-pallets.pages.dev/",
+      "message_modes": ["client-workspace-chat"],
+      "status": "client-widget-configured"
+    }
+  ],
+  "proof_commands": [
+    "npm run 0s:relay13-chat:proof",
+    "node metraiyux_0s_site/tests/relay13-chat-system-proof.mjs",
+    "npm run 0s:connectlog-relay13:prod-proof"
+  ],
+  "latest_public_proof": "/data/relay13-chat-system-proof.json",
+  "boundaries": [
+    "Relay13 persists conversations and messages in D1 and opens live rooms through Durable Objects.",
+    "ConnectLog records relationship/request context for bridged conversations.",
+    "The public widget can route messages as brain-assisted or direct-operator through metadata.",
+    "Automated brain replies require a server-side brain bridge/API key. Browser widgets must not embed owner brain secrets.",
+    "Bob and Empire SKM accounts are house-paid SkyeMerit test lanes; customer production billing remains owner-approved through SkyeGateFS27."
+  ]
+}

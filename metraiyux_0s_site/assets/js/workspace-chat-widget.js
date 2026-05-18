@@ -22,6 +22,8 @@
     apiBase: "",
     relayMetadata: {},
     connectLog: null,
+    routeOptions: [],
+    defaultRoute: "",
     trackEventsToRelay: false,
     accessReply: "",
     accessTriggers: ["password", "access", "code", "unlock", "workspace"],
@@ -314,6 +316,21 @@
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 8px;
       }
+      .metraiyux-chat-route {
+        grid-column: 1 / -1;
+        min-width: 0;
+        height: 38px;
+        border: 1px solid rgba(var(--mwc-accent-rgb), 0.24);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--mwc-text);
+        padding: 0 12px;
+        font: 800 12px/1 inherit;
+        outline: none;
+      }
+      .metraiyux-chat-route option {
+        color: #071018;
+      }
       .metraiyux-chat-form input {
         min-width: 0;
         height: 42px;
@@ -479,6 +496,15 @@
     return message;
   }
 
+  function routeSelectMarkup() {
+    const options = routeOptions();
+    if (!options.length) return "";
+    return `<select class="metraiyux-chat-route" data-chat-route aria-label="Message route">${options.map((option) => {
+      const selected = (config.defaultRoute || options[0].value) === option.value ? " selected" : "";
+      return `<option value="${option.value}"${selected}>${option.label}</option>`;
+    }).join("")}</select>`;
+  }
+
   function sendSystemMessage(body, metadata = {}) {
     const existing = loadMessages().slice(-3).some((message) => message.body === body);
     if (existing) return null;
@@ -498,10 +524,25 @@
     return new URL(path, base.endsWith("/") ? base : `${base}/`).toString();
   }
 
+  function routeOptions() {
+    return Array.isArray(config.routeOptions)
+      ? config.routeOptions.filter((option) => option && option.value && option.label)
+      : [];
+  }
+
+  function activeRoute() {
+    const selected = root?.querySelector?.("[data-chat-route]")?.value || config.defaultRoute || "";
+    const options = routeOptions();
+    return options.find((option) => option.value === selected) || options[0] || null;
+  }
+
   function relayMetadata(message, extra = {}) {
     const configured = isPlainObject(config.relayMetadata) ? config.relayMetadata : {};
+    const route = activeRoute();
     return {
       ...configured,
+      route: route?.value || "",
+      route_label: route?.label || "",
       local_message_id: message.id,
       app_name: config.appName,
       ...extra
@@ -544,6 +585,7 @@
     }
     const state = loadRelayState();
     try {
+      const route = activeRoute();
       if (state.conversation_id && state.visitor_token) {
         await relayFetch(`api/v1/conversations/${state.conversation_id}/messages`, {
           visitor_token: state.visitor_token,
@@ -562,7 +604,7 @@
         workspace_id: config.workspaceId,
         channel: "website-widget",
         customer_name: "Workspace visitor",
-        subject: `${config.clientName || config.appName} workspace chat`,
+        subject: `${config.clientName || config.appName} workspace chat${route?.label ? ` - ${route.label}` : ""}`,
         message: message.body,
         source_url: location.href,
         ...connectLogPayload(),
@@ -634,6 +676,7 @@
         <div class="metraiyux-chat-foot">
           <div class="metraiyux-chat-disclaimer">${config.accountDisclaimer || DEFAULT_DISCLAIMER}</div>
           <form class="metraiyux-chat-form" data-chat-form>
+            ${routeSelectMarkup()}
             <input data-chat-input type="text" autocomplete="off" placeholder="Message this workspace" aria-label="Message this workspace">
             <button type="submit">Send</button>
           </form>

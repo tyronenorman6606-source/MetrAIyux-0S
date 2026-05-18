@@ -1,0 +1,189 @@
+{
+  "ok": true,
+  "origin": "https://relay13-core.graylondonskyes.workers.dev",
+  "gate_origin": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+  "checked_at": "2026-05-18T21:10:33.085Z",
+  "accounts": [
+    {
+      "account_code": "METRAIYUX-0S-SKM",
+      "workspace_slug": "connectlog-main",
+      "workspace_id": "ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7",
+      "conversation_id": "conv_a069d856-d85b-436d-9992-97af268ca648",
+      "bridge": "connectlog",
+      "connectlog_card_record_id": "clcard_a23793b9-9265-4c85-b598-9ed42d73d52e",
+      "persisted_message_count": 3,
+      "latest_message_names": [
+        "MetrAIyux Operator",
+        "MetrAIyux 0S SKM proof visitor",
+        "MetrAIyux 0S SKM visitor"
+      ]
+    },
+    {
+      "account_code": "BOBS-SMOKE-SHOP-SKM",
+      "workspace_slug": "bobs-smoke-shop",
+      "workspace_id": "ws_bobs_smoke_shop",
+      "conversation_id": "conv_dd274276-5fa6-4a0c-9843-4a3bb993111e",
+      "bridge": "connectlog",
+      "connectlog_card_record_id": "clcard_400975b4-6db2-4d7b-a3a2-18310f2242ab",
+      "persisted_message_count": 3,
+      "latest_message_names": [
+        "MetrAIyux Operator",
+        "Bob's Smoke Shop SKM proof visitor",
+        "Bob's Smoke Shop SKM visitor"
+      ]
+    },
+    {
+      "account_code": "EMPIRE-PALLETS-SKM",
+      "workspace_slug": "empire-pallets",
+      "workspace_id": "ws_empire_pallets",
+      "conversation_id": "conv_46f36b9f-74a7-4421-b241-a1b4b531dc54",
+      "bridge": "connectlog",
+      "connectlog_card_record_id": "clcard_7fc58fca-a414-48ae-bc4c-65a206b9d09a",
+      "persisted_message_count": 3,
+      "latest_message_names": [
+        "MetrAIyux Operator",
+        "Empire Pallets SKM proof visitor",
+        "Empire Pallets SKM visitor"
+      ]
+    }
+  ],
+  "intro_room": {
+    "account_code": "BOB-EMPIRE-SKM-INTRO",
+    "workspace_slug": "connectlog-main",
+    "workspace_id": "ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7",
+    "conversation_id": "conv_723d1424-a7fa-4d9e-beca-64ba1bd9d565",
+    "bridge": "connectlog",
+    "persisted_message_count": 4,
+    "participant_names_observed": [
+      "MetrAIyux Operator",
+      "Bob + Empire SKM intro room",
+      "Empire Pallets SKM",
+      "Bob's Smoke Shop SKM"
+    ]
+  },
+  "checks": [
+    {
+      "name": "relay13:health",
+      "ok": true,
+      "status": 200,
+      "workspace": null
+    },
+    {
+      "name": "connectlog:bridge_health",
+      "ok": true,
+      "status": 200,
+      "workspace": null
+    },
+    {
+      "name": "connectlog-main:create_conversation",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "connectlog-main:visitor_followup",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "connectlog-main:message_history",
+      "ok": true,
+      "status": 200,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "connectlog-main:customer_websocket",
+      "ok": true,
+      "status": 101,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "bobs-smoke-shop:create_conversation",
+      "ok": true,
+      "status": 201,
+      "workspace": "bobs-smoke-shop"
+    },
+    {
+      "name": "bobs-smoke-shop:visitor_followup",
+      "ok": true,
+      "status": 201,
+      "workspace": "bobs-smoke-shop"
+    },
+    {
+      "name": "bobs-smoke-shop:message_history",
+      "ok": true,
+      "status": 200,
+      "workspace": "bobs-smoke-shop"
+    },
+    {
+      "name": "bobs-smoke-shop:customer_websocket",
+      "ok": true,
+      "status": 101,
+      "workspace": "bobs-smoke-shop"
+    },
+    {
+      "name": "empire-pallets:create_conversation",
+      "ok": true,
+      "status": 201,
+      "workspace": "empire-pallets"
+    },
+    {
+      "name": "empire-pallets:visitor_followup",
+      "ok": true,
+      "status": 201,
+      "workspace": "empire-pallets"
+    },
+    {
+      "name": "empire-pallets:message_history",
+      "ok": true,
+      "status": 200,
+      "workspace": "empire-pallets"
+    },
+    {
+      "name": "empire-pallets:customer_websocket",
+      "ok": true,
+      "status": 101,
+      "workspace": "empire-pallets"
+    },
+    {
+      "name": "skm_intro:create_room",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "skm_intro:Empire Pallets SKM",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "skm_intro:Bob's Smoke Shop SKM",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main"
+    },
+    {
+      "name": "skm_intro:message_history",
+      "ok": true,
+      "status": 200,
+      "workspace": "connectlog-main"
+    }
+  ],
+  "boundaries": [
+    "Customer messages persisted through Relay13 D1 and were read back through the message-history API.",
+    "Customer WebSocket rooms opened for each account proof conversation.",
+    "Bob and Empire SKM intro proof is operator-mediated in one Relay13 room; separate authenticated business-to-business rooms require the next participant-token feature.",
+    "Automatic brain replies require a server-side brain bridge. The current widget stores brain-assisted/direct-operator route metadata without exposing owner secrets."
+  ],
+  "skgate_mirror": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "ok": true,
+      "request_id": "683a1d01-c260-40d4-93f0-1f3680d8ecb8",
+      "accepted": true
+    }
+  }
+}

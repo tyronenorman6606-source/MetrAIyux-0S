@@ -1357,6 +1357,28 @@ export const SKYPAY_CLIENTS = {
       contact_url: "https://skyesol.netlify.app/contact"
     }
   },
+  "metraiyux-0s-skm": {
+    slug: "metraiyux-0s-skm",
+    client_name: "MetrAIyux 0S - SKM",
+    company_name: "MetrAIyux 0S",
+    workspace_slug: "connectlog-main",
+    default_offer_id: "metraiyux-starter-command",
+    preview_status: "skm_house_paid_test_account",
+    free_trial_days: 0,
+    skye_merit_account_code: "METRAIYUX-0S-SKM",
+    included_usage: [
+      "House-paid SkyeMerit usage ledger",
+      "Relay13 public-site chat workspace",
+      "ConnectLog relationship request proof",
+      "FS27 messaging lane mirror"
+    ],
+    special_offer: "Internal SKM account for proving the live 0S chat system before client handoff.",
+    contact: {
+      email: "SkyesOverLondonLC@solenterprises.org",
+      phone: "(623) 260-7073",
+      contact_url: "https://skyesol.netlify.app/contact"
+    }
+  },
   "bobs-smoke-shop": {
     slug: "bobs-smoke-shop",
     client_name: "Bob's Smoke Shop",
@@ -1372,6 +1394,71 @@ export const SKYPAY_CLIENTS = {
       "Paid status with owner-approved activation"
     ],
     special_offer: "Free preview first. If Bob wants to continue, confirmed SkyePay checkout writes the FS27 order, paid status, and owner approval state; discounts still require an approved quote.",
+    contact: {
+      email: "SkyesOverLondonLC@solenterprises.org",
+      phone: "(623) 260-7073",
+      contact_url: "https://skyesol.netlify.app/contact"
+    }
+  },
+  "bobs-smoke-shop-skm": {
+    slug: "bobs-smoke-shop-skm",
+    client_name: "Bob's Smoke Shop - SKM",
+    company_name: "Bob's Smoke Shop",
+    workspace_slug: "bobs-smoke-shop",
+    default_offer_id: "metraiyux-starter-command",
+    preview_status: "skm_house_paid_test_account",
+    free_trial_days: 0,
+    skye_merit_account_code: "BOBS-SMOKE-SHOP-SKM",
+    included_usage: [
+      "House-paid SkyeMerit usage ledger",
+      "Bob client workspace chat test account",
+      "Relay13 message persistence proof",
+      "FS27 messaging event mirror"
+    ],
+    special_offer: "Internal SKM test lane. Bob remains a real client workspace while MetrAIyux pays for proof and QA usage.",
+    contact: {
+      email: "SkyesOverLondonLC@solenterprises.org",
+      phone: "(623) 260-7073",
+      contact_url: "https://skyesol.netlify.app/contact"
+    }
+  },
+  "empire-pallets": {
+    slug: "empire-pallets",
+    client_name: "Empire Pallets",
+    company_name: "Empire Pallets",
+    workspace_slug: "empire-pallets",
+    default_offer_id: "metraiyux-starter-command",
+    preview_status: "client_preview_active",
+    free_trial_days: 7,
+    included_usage: [
+      "Operations app chat lane",
+      "Relay13 workspace conversations",
+      "ConnectLog follow-up proof",
+      "Paid status with owner-approved activation"
+    ],
+    special_offer: "Free preview first. Confirmed SkyePay checkout writes the FS27 order, paid status, owner approval state, and usage language.",
+    contact: {
+      email: "SkyesOverLondonLC@solenterprises.org",
+      phone: "(623) 260-7073",
+      contact_url: "https://skyesol.netlify.app/contact"
+    }
+  },
+  "empire-pallets-skm": {
+    slug: "empire-pallets-skm",
+    client_name: "Empire Pallets - SKM",
+    company_name: "Empire Pallets",
+    workspace_slug: "empire-pallets",
+    default_offer_id: "metraiyux-starter-command",
+    preview_status: "skm_house_paid_test_account",
+    free_trial_days: 0,
+    skye_merit_account_code: "EMPIRE-PALLETS-SKM",
+    included_usage: [
+      "House-paid SkyeMerit usage ledger",
+      "Empire client workspace chat test account",
+      "Relay13 message persistence proof",
+      "FS27 messaging event mirror"
+    ],
+    special_offer: "Internal SKM test lane. Empire remains a real client workspace while MetrAIyux pays for proof and QA usage.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -1420,6 +1507,22 @@ export const SKYPAY_PLATFORM_ROUTES = [
     default_offer_id: "metraiyux-starter-command",
     wiring_status: "client_preview_ready",
     note: "First client lane wired into SkyePay with free preview, paid status, owner approval state, and usage language."
+  },
+  {
+    platform_id: "bobs-smoke-shop-skm",
+    title: "Bob's Smoke Shop SKM Test Account",
+    route: "/skyepay.html?client=bobs-smoke-shop-skm",
+    default_offer_id: "metraiyux-starter-command",
+    wiring_status: "skm_house_paid_test_account",
+    note: "Bob is both a real client workspace and a house-paid SkyeMerit test account for Relay13/ConnectLog messaging proof."
+  },
+  {
+    platform_id: "empire-pallets-skm",
+    title: "Empire Pallets SKM Test Account",
+    route: "/skyepay.html?client=empire-pallets-skm",
+    default_offer_id: "metraiyux-starter-command",
+    wiring_status: "skm_house_paid_test_account",
+    note: "Empire is both a real client workspace and a house-paid SkyeMerit test account for Relay13/ConnectLog messaging proof."
   },
   {
     platform_id: "repo-platforms-next",

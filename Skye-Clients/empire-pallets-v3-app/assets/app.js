@@ -580,6 +580,13 @@ function mountWorkspaceChat() {
     operatorName: "MetrAIyux Operator",
     accent: "#6bbf59",
     apiBase: "https://relay13-core.graylondonskyes.workers.dev/",
+    relayMetadata: {
+      account_code: "EMPIRE-PALLETS-SKM",
+      skye_merit_account: true,
+      source_app: "empire-pallets",
+      source_lane: "client-workspace-chat",
+      relay_bridge: "relay13-client-workspace"
+    },
     accountDisclaimer: "Messages are tied to the Empire Pallets workspace account and may be used for support, proof receipts, QA, and follow-up inside this client build lane.",
     ...existing
   };
