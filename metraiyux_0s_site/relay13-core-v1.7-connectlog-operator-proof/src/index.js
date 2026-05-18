@@ -10,6 +10,86 @@ const STATUSES = new Set(['open', 'pending', 'closed']);
 const SYSTEM_JOB_TYPES = new Set(['release.widget_config.verify','widget.publish.verify','workspace.health.check','api_key.audit']);
 const MAX_JSON_BYTES = 32 * 1024;
 const DEFAULT_MAX_MESSAGE_CHARS = 4000;
+const GUARDRAIL_AI_MODES = new Set(['off', 'draft_only', 'auto_reply']);
+const DEFAULT_GUARDRAIL_POLICY = {
+  status: 'active',
+  ai_mode: 'draft_only',
+  allow_ai_auto_reply: false,
+  allow_web_search: false,
+  allow_file_search: false,
+  max_ai_input_tokens: 8000,
+  max_ai_output_tokens: 700,
+  monthly_ai_reply_limit: 1000,
+  per_ip_message_window_minutes: 10,
+  per_ip_message_limit: 24,
+  per_ip_conversation_limit: 8,
+  max_links_per_message: 2,
+  blocked_terms: [],
+  escalation_rules: {
+    direct_operator_route: true,
+    security_or_secret_request: true,
+    unsupported_or_out_of_scope: true,
+    billing_or_contract_change: true
+  },
+  app_knowledge: {
+    profile: 'customer-app-knowledge',
+    answer_scope: [
+      'Answer from the configured customer app, workspace, product, and support knowledge only.',
+      'Surface the relevant page, app area, next step, or operator handoff path.',
+      'Do not use web search for customer website chat replies.'
+    ],
+    fallback: 'If the answer is not in the app knowledge, ask a short clarifying question or escalate to the operator.'
+  }
+};
+const KNOWN_WORKSPACE_GUARDRAILS = {
+  'connectlog-main': {
+    app_knowledge: {
+      profile: 'metraiyux-0s-public-site',
+      answer_scope: [
+        'Explain MetrAIyux 0S public surfaces, operator routes, Relay13 chat, ConnectLog relationship flow, SkyeGate/SkyePay lanes, and proof pages already wired into the 0S site.',
+        'Use Relay13 route metadata to distinguish brain-assisted drafts from direct Gray/operator handling.',
+        'Send sales, contract, billing, private credential, or unclear requests to the operator.'
+      ],
+      app_surfaces: [
+        { label: '0S homepage', path: '/' },
+        { label: 'Relay13 Chat Hub', path: '/live/relay13-chat-hub.html' },
+        { label: 'ConnectLog + Relay13 proof', path: '/live/connectlog-relay13-operator-proof.html' },
+        { label: 'Operator index', path: '/operator/index.html' },
+        { label: 'Proof index', path: '/proof/index.html' }
+      ],
+      fallback: 'Route to direct operator handling when the visitor asks for private business decisions, prices not present in the app, legal/financial advice, or anything outside 0S public app knowledge.'
+    }
+  },
+  'bobs-smoke-shop': {
+    app_knowledge: {
+      profile: 'bobs-smoke-shop-client-app',
+      answer_scope: [
+        "Help visitors use Bob's Smoke Shop app/workspace, ask about product interest, pickup/support needs, and next-step contact routing.",
+        'Keep replies inside the Bob workspace knowledge and Relay13/ConnectLog request flow.',
+        'Escalate inventory, payment, age-restricted, compliance, or unavailable details to the operator/client owner.'
+      ],
+      app_surfaces: [
+        { label: "Bob's public client workspace", path: 'https://bobs-smoke-shop.pages.dev/' },
+        { label: 'Bob 0S preview', path: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-preview/bobs-smoke-shop.html' }
+      ],
+      fallback: 'Capture the request and send it to the operator when the answer is not in Bob app knowledge.'
+    }
+  },
+  'empire-pallets': {
+    app_knowledge: {
+      profile: 'empire-pallets-client-app',
+      answer_scope: [
+        'Help visitors use the Empire Pallets app/workspace for pallet supply, delivery, recurring order, logistics, and support requests.',
+        'Keep replies inside Empire app knowledge and Relay13/ConnectLog request flow.',
+        'Escalate pricing, contracts, route commitments, or unsupported operational promises to the operator/client owner.'
+      ],
+      app_surfaces: [
+        { label: 'Empire Pallets public client workspace', path: 'https://empire-pallets.pages.dev/' }
+      ],
+      fallback: 'Capture the request and send it to the operator when the answer is not in Empire app knowledge.'
+    }
+  }
+};
 const CLIENT_WIDGET_WORKSPACES = {
   'bobs-smoke-shop': {
     id: 'ws_bobs_smoke_shop',
@@ -49,6 +129,31 @@ function nowIso() { return new Date().toISOString(); }
 function uuid(prefix = '') { return `${prefix}${crypto.randomUUID()}`; }
 function safeText(value, max = 2000) { return String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, max); }
 function normalizeSlug(value) { const s = safeText(value, 80).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, ''); return s; }
+function safeJson(value, fallback = {}) { try { const parsed = typeof value === 'string' ? JSON.parse(value || '') : value; return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : fallback; } catch { return fallback; } }
+function safeArray(value, fallback = []) { try { const parsed = typeof value === 'string' ? JSON.parse(value || '') : value; return Array.isArray(parsed) ? parsed : fallback; } catch { return fallback; } }
+function cleanBool(value, fallback = false) { if (value === undefined || value === null || value === '') return fallback; return value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true'; }
+function cleanInt(value, fallback, min, max) { const n = Number(value); if (!Number.isFinite(n)) return fallback; return Math.min(Math.max(Math.trunc(n), min), max); }
+function mergeAppKnowledge(base, override = {}) {
+  return {
+    ...base,
+    ...override,
+    answer_scope: Array.isArray(override.answer_scope) ? override.answer_scope.slice(0, 12).map((item) => safeText(item, 220)).filter(Boolean) : base.answer_scope,
+    app_surfaces: Array.isArray(override.app_surfaces) ? override.app_surfaces.slice(0, 30).map((item) => ({ label: safeText(item?.label || '', 120), path: safeText(item?.path || item?.url || '', 500) })).filter((item) => item.label || item.path) : base.app_surfaces
+  };
+}
+function cleanMetadata(value, maxKeys = 40, maxChars = 700) {
+  const raw = safeJson(value, {});
+  const out = {};
+  for (const [key, item] of Object.entries(raw).slice(0, maxKeys)) {
+    const cleanKey = safeText(key, 80).replace(/[^a-zA-Z0-9_.:-]/g, '_');
+    if (!cleanKey) continue;
+    if (Array.isArray(item)) out[cleanKey] = item.slice(0, 20).map((entry) => typeof entry === 'object' ? safeJson(entry, {}) : safeText(entry, maxChars));
+    else if (item && typeof item === 'object') out[cleanKey] = cleanMetadata(item, 20, maxChars);
+    else if (typeof item === 'boolean' || typeof item === 'number') out[cleanKey] = item;
+    else out[cleanKey] = safeText(item, maxChars);
+  }
+  return out;
+}
 function randomHex(bytes = 32) { const a = new Uint8Array(bytes); crypto.getRandomValues(a); return [...a].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 async function sha256Hex(input) { const data = new TextEncoder().encode(input); const hash = await crypto.subtle.digest('SHA-256', data); return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 function getBearer(request) { const h = request.headers.get('authorization') || ''; return h.toLowerCase().startsWith('bearer ') ? h.slice(7).trim() : ''; }
@@ -114,6 +219,7 @@ async function ensureBootstrapWorkspace(env) {
   await env.DB.prepare(`INSERT INTO workspaces (id, slug, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`).bind(id, slug, name, t, t).run();
   await env.DB.prepare(`INSERT INTO widget_configs (id, workspace_id, version, status, brand_name, welcome_text, launcher_text, operator_name, primary_color, accent_color, created_at, published_at) VALUES (?, ?, 1, 'published', ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(uuid('cfg_'), id, name, 'Send us a message. We will reply here.', 'Message us', `${name} Operator`, '#f6c85f', '#9a6cff', t, t).run();
+  await ensureWorkspaceGuardrails(env, { id, slug, name });
   await audit(env, { workspaceId: id, eventType: 'workspace.bootstrap', body: `Bootstrap workspace created: ${name}` });
   return await env.DB.prepare(`SELECT * FROM workspaces WHERE id = ?`).bind(id).first();
 }
@@ -131,6 +237,7 @@ async function ensureClientWidgetWorkspace(env, slug) {
     await env.DB.prepare(`INSERT INTO workspace_domains (id, workspace_id, domain, status, created_at) VALUES (?, ?, ?, 'active', ?) ON CONFLICT(workspace_id, domain) DO UPDATE SET status = 'active'`)
       .bind(`dom_${workspace.id}_${domain.replace(/[^a-z0-9]+/g, '_')}`, workspace.id, domain, t).run();
   }
+  await ensureWorkspaceGuardrails(env, workspace);
   await audit(env, { workspaceId: workspace.id, eventType: 'workspace.client_widget.ensure', body: slug, metadata: { domains: config.domains || [] } });
   return workspace;
 }
@@ -146,6 +253,7 @@ async function createWorkspace(request, env) {
     .bind(id, slug, name, Number(input.monthly_conversation_limit || 5000), Number(input.monthly_message_limit || 50000), Math.min(Math.max(Number(input.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS), 500), 4000), t, t).run();
   await env.DB.prepare(`INSERT INTO widget_configs (id, workspace_id, version, status, brand_name, welcome_text, launcher_text, operator_name, primary_color, accent_color, logo_url, created_at, published_at) VALUES (?, ?, 1, 'published', ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(uuid('cfg_'), id, name, safeText(input.welcome_text || 'Send us a message. We will reply here.', 300), safeText(input.launcher_text || 'Message us', 80), safeText(input.operator_name || `${name} Operator`, 120), safeText(input.primary_color || '#f6c85f', 24), safeText(input.accent_color || '#9a6cff', 24), safeText(input.logo_url || '', 500), t, t).run();
+  await ensureWorkspaceGuardrails(env, { id, slug, name });
   await audit(env, { workspaceId: id, actorType: 'admin', eventType: 'workspace.create', body: name });
   return json({ ok: true, workspace: { id, slug, name, status: 'active' } }, 201, corsHeaders(env, request));
 }
@@ -180,7 +288,8 @@ async function getWidgetConfig(request, env) {
   if (!row) return json({ ok: false, error: 'Workspace widget config not found' }, 404, corsHeaders(env, request));
   const domainCheck = await validateWorkspaceDomain(env, request, row.workspace_id);
   if (!domainCheck.ok) return json({ ok: false, error: domainCheck.error }, 403, corsHeaders(env, request));
-  return json({ ok: true, config: row }, 200, corsHeaders(env, request));
+  const guardrails = await ensureWorkspaceGuardrails(env, { id: row.workspace_id, slug: row.slug, name: row.name });
+  return json({ ok: true, config: row, guardrails: publicGuardrailPolicy(guardrails) }, 200, corsHeaders(env, request));
 }
 async function createApiKey(request, env) {
   const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
@@ -217,6 +326,158 @@ async function enforceWorkspaceLimits(env, workspace, type) {
   if (type === 'conversation' && await monthlyCount(env, 'conversations', workspace.id) >= workspace.monthly_conversation_limit) return { ok: false, error: 'Workspace monthly conversation limit reached' };
   if (type === 'message' && await monthlyCount(env, 'messages', workspace.id) >= workspace.monthly_message_limit) return { ok: false, error: 'Workspace monthly message limit reached' };
   return { ok: true };
+}
+
+function defaultGuardrailInputForWorkspace(workspace = {}) {
+  const known = KNOWN_WORKSPACE_GUARDRAILS[workspace.slug] || {};
+  return {
+    ...DEFAULT_GUARDRAIL_POLICY,
+    ...known,
+    app_knowledge: mergeAppKnowledge(DEFAULT_GUARDRAIL_POLICY.app_knowledge, known.app_knowledge || {})
+  };
+}
+function normalizeGuardrailPolicy(row = {}, workspace = {}) {
+  const defaults = defaultGuardrailInputForWorkspace(workspace);
+  const rowKnowledge = safeJson(row.app_knowledge_json, {});
+  const rowEscalation = safeJson(row.escalation_rules_json, {});
+  const mode = GUARDRAIL_AI_MODES.has(row.ai_mode) ? row.ai_mode : defaults.ai_mode;
+  const allowAutoReply = cleanBool(row.allow_ai_auto_reply, defaults.allow_ai_auto_reply) && mode === 'auto_reply';
+  return {
+    workspace_id: workspace.id || row.workspace_id || '',
+    workspace_slug: workspace.slug || '',
+    status: row.status === 'paused' ? 'paused' : 'active',
+    ai_mode: mode,
+    allow_ai_auto_reply: allowAutoReply,
+    allow_web_search: false,
+    allow_file_search: cleanBool(row.allow_file_search, defaults.allow_file_search),
+    max_ai_input_tokens: cleanInt(row.max_ai_input_tokens, defaults.max_ai_input_tokens, 500, 50000),
+    max_ai_output_tokens: cleanInt(row.max_ai_output_tokens, defaults.max_ai_output_tokens, 80, 4000),
+    monthly_ai_reply_limit: cleanInt(row.monthly_ai_reply_limit, defaults.monthly_ai_reply_limit, 0, 1000000),
+    per_ip_message_window_minutes: cleanInt(row.per_ip_message_window_minutes, defaults.per_ip_message_window_minutes, 1, 120),
+    per_ip_message_limit: cleanInt(row.per_ip_message_limit, defaults.per_ip_message_limit, 3, 1000),
+    per_ip_conversation_limit: cleanInt(row.per_ip_conversation_limit, defaults.per_ip_conversation_limit, 1, 300),
+    max_links_per_message: cleanInt(row.max_links_per_message, defaults.max_links_per_message, 0, 10),
+    blocked_terms: safeArray(row.blocked_terms_json, defaults.blocked_terms).slice(0, 80).map((item) => safeText(item, 120).toLowerCase()).filter(Boolean),
+    escalation_rules: { ...defaults.escalation_rules, ...rowEscalation },
+    app_knowledge: mergeAppKnowledge(defaults.app_knowledge, rowKnowledge)
+  };
+}
+async function ensureWorkspaceGuardrails(env, workspace) {
+  try {
+    let row = await env.DB.prepare(`SELECT * FROM workspace_guardrails WHERE workspace_id = ? LIMIT 1`).bind(workspace.id).first();
+    if (!row) {
+      const defaults = defaultGuardrailInputForWorkspace(workspace);
+      const t = nowIso();
+      await env.DB.prepare(`INSERT OR IGNORE INTO workspace_guardrails (workspace_id, status, ai_mode, allow_ai_auto_reply, allow_web_search, allow_file_search, max_ai_input_tokens, max_ai_output_tokens, monthly_ai_reply_limit, per_ip_message_window_minutes, per_ip_message_limit, per_ip_conversation_limit, max_links_per_message, blocked_terms_json, app_knowledge_json, escalation_rules_json, created_at, updated_at) VALUES (?, 'active', ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(workspace.id, defaults.ai_mode, defaults.allow_ai_auto_reply ? 1 : 0, defaults.allow_file_search ? 1 : 0, defaults.max_ai_input_tokens, defaults.max_ai_output_tokens, defaults.monthly_ai_reply_limit, defaults.per_ip_message_window_minutes, defaults.per_ip_message_limit, defaults.per_ip_conversation_limit, defaults.max_links_per_message, JSON.stringify(defaults.blocked_terms || []), JSON.stringify(defaults.app_knowledge || {}), JSON.stringify(defaults.escalation_rules || {}), t, t).run();
+      row = await env.DB.prepare(`SELECT * FROM workspace_guardrails WHERE workspace_id = ? LIMIT 1`).bind(workspace.id).first();
+    }
+    return normalizeGuardrailPolicy(row || {}, workspace);
+  } catch (error) {
+    return { ...normalizeGuardrailPolicy({}, workspace), storage_warning: safeText(error.message || 'guardrail table unavailable', 180) };
+  }
+}
+function publicGuardrailPolicy(policy) {
+  return {
+    workspace_id: policy.workspace_id,
+    workspace_slug: policy.workspace_slug,
+    status: policy.status,
+    ai_mode: policy.ai_mode,
+    allow_ai_auto_reply: policy.allow_ai_auto_reply,
+    allow_web_search: false,
+    allow_file_search: policy.allow_file_search,
+    max_ai_input_tokens: policy.max_ai_input_tokens,
+    max_ai_output_tokens: policy.max_ai_output_tokens,
+    monthly_ai_reply_limit: policy.monthly_ai_reply_limit,
+    rate_limits: {
+      window_minutes: policy.per_ip_message_window_minutes,
+      messages_per_window: policy.per_ip_message_limit,
+      conversations_per_window: policy.per_ip_conversation_limit
+    },
+    app_knowledge: policy.app_knowledge,
+    escalation_rules: policy.escalation_rules,
+    storage_warning: policy.storage_warning || null
+  };
+}
+function aiPolicyMetadata(policy) {
+  return {
+    mode: policy.ai_mode,
+    auto_reply_allowed: policy.allow_ai_auto_reply,
+    web_search_allowed: false,
+    file_search_allowed: policy.allow_file_search,
+    answer_source: 'customer_app_knowledge_only',
+    max_input_tokens: policy.max_ai_input_tokens,
+    max_output_tokens: policy.max_ai_output_tokens,
+    app_knowledge_profile: policy.app_knowledge?.profile || 'customer-app-knowledge'
+  };
+}
+function routeFromMetadata(metadata = {}, input = {}) {
+  return safeText(input.route || metadata.route || metadata.route_label || '', 80).toLowerCase();
+}
+function guardrailSignals(body, policy, route = '') {
+  const text = String(body || '');
+  const lower = text.toLowerCase();
+  const signals = [];
+  const linkCount = (text.match(/https?:\/\/|www\./gi) || []).length;
+  if (linkCount > policy.max_links_per_message) signals.push('too_many_links');
+  if (/<\/?script|javascript:|data:text\/html|onerror\s*=|onload\s*=/i.test(text)) signals.push('active_content_payload');
+  if (/(ignore|forget|override).{0,40}(previous|all|system|developer|instructions|rules)/i.test(text)) signals.push('prompt_injection');
+  if (/(system prompt|developer message|hidden instructions|reveal.*instructions|show.*instructions|jailbreak)/i.test(text)) signals.push('prompt_extraction');
+  if (/(api[_ -]?key|openai[_ -]?api[_ -]?key|platform[_ -]?admin[_ -]?token|bearer token|secret|\.env|private key)/i.test(text)) signals.push('secret_request');
+  if (/(drop table|truncate table|delete from|rm -rf|curl .*(token|secret)|fetch .*(token|secret))/i.test(text)) signals.push('destructive_or_exfiltration_request');
+  if (/(.)\1{80,}/.test(text) || /\b(\w+)(?:\s+\1){18,}\b/i.test(text)) signals.push('spam_repetition');
+  for (const term of policy.blocked_terms || []) if (term && lower.includes(term)) signals.push(`blocked_term:${term.slice(0, 32)}`);
+  if (/web search|search the web|google it|look up online|latest news/i.test(text)) signals.push('web_search_requested');
+  if (route.includes('direct')) signals.push('direct_operator_route');
+  return signals;
+}
+async function guardrailFingerprint(request, fallback = {}) {
+  const ip = safeText(fallback.ip || request?.headers?.get?.('cf-connecting-ip') || request?.headers?.get?.('x-forwarded-for') || '', 128);
+  const ua = safeText(fallback.ua || request?.headers?.get?.('user-agent') || '', 240);
+  const origin = safeText(fallback.origin || request?.headers?.get?.('origin') || request?.headers?.get?.('referer') || '', 500);
+  return await sha256Hex(`${ip}|${ua}|${origin}` || randomHex(8));
+}
+async function guardrailRecentCount(env, workspaceId, ipHash, type, minutes) {
+  const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+  const sql = type === 'conversation'
+    ? `SELECT COUNT(*) AS count FROM guardrail_events WHERE workspace_id = ? AND ip_hash = ? AND event_type = 'conversation.allowed' AND created_at >= ?`
+    : `SELECT COUNT(*) AS count FROM guardrail_events WHERE workspace_id = ? AND ip_hash = ? AND event_type IN ('conversation.allowed','message.allowed','websocket.allowed') AND created_at >= ?`;
+  const row = await env.DB.prepare(sql).bind(workspaceId, ipHash, since).first();
+  return Number(row?.count || 0);
+}
+async function recordGuardrailEvent(env, request, { workspaceId, conversationId = null, eventType, decision, reason, severity = 'info', route = '', body = '', metadata = {}, network = {} }) {
+  try {
+    const ipHash = await guardrailFingerprint(request, network);
+    const messageHash = body ? await sha256Hex(safeText(body, 4000).toLowerCase()) : '';
+    await env.DB.prepare(`INSERT INTO guardrail_events (id, workspace_id, conversation_id, event_type, severity, decision, reason, origin, ip_hash, message_hash, route, metadata_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(uuid('gr_'), workspaceId || null, conversationId || null, safeText(eventType, 100), safeText(severity, 20), safeText(decision, 20), safeText(reason, 500), safeText(network.origin || request?.headers?.get?.('origin') || request?.headers?.get?.('referer') || '', 500), ipHash, messageHash, safeText(route, 80), JSON.stringify(cleanMetadata(metadata, 30, 400)), nowIso()).run();
+  } catch (_) {}
+}
+async function evaluateInboundGuardrails(env, request, { workspace, conversationId = null, body = '', metadata = {}, input = {}, eventType = 'message', network = {} }) {
+  const policy = await ensureWorkspaceGuardrails(env, workspace);
+  const route = routeFromMetadata(metadata, input);
+  const ipHash = await guardrailFingerprint(request, network);
+  const rateType = eventType === 'conversation' ? 'conversation' : 'message';
+  let recent = 0;
+  try { recent = await guardrailRecentCount(env, workspace.id, ipHash, rateType, policy.per_ip_message_window_minutes); } catch (_) {}
+  const signals = guardrailSignals(body, policy, route);
+  let decision = 'allow';
+  let severity = 'info';
+  let reason = 'allowed';
+  if (policy.status === 'paused') {
+    decision = 'block'; severity = 'high'; reason = 'workspace_guardrails_paused';
+  } else if (rateType === 'conversation' && recent >= policy.per_ip_conversation_limit) {
+    decision = 'block'; severity = 'medium'; reason = 'conversation_rate_limit';
+  } else if (rateType === 'message' && recent >= policy.per_ip_message_limit) {
+    decision = 'block'; severity = 'medium'; reason = 'message_rate_limit';
+  } else if (signals.some((signal) => ['active_content_payload','prompt_injection','prompt_extraction','secret_request','destructive_or_exfiltration_request','spam_repetition'].includes(signal) || signal.startsWith('blocked_term:'))) {
+    decision = 'block'; severity = 'high'; reason = 'abuse_or_prompt_attack';
+  } else if (signals.includes('direct_operator_route') || signals.includes('web_search_requested')) {
+    decision = 'review'; severity = 'low'; reason = signals.includes('direct_operator_route') ? 'direct_operator_route' : 'web_search_disabled';
+  }
+  const result = { ok: decision !== 'block', decision, severity, reason, signals, route, policy: publicGuardrailPolicy(policy), ai_policy: aiPolicyMetadata(policy) };
+  await recordGuardrailEvent(env, request, { workspaceId: workspace.id, conversationId, eventType: `${eventType}.${decision === 'allow' || decision === 'review' ? 'allowed' : 'blocked'}`, decision, reason, severity, route, body, metadata: { signals, account_code: metadata.account_code || '', source_app: metadata.source_app || '' }, network });
+  return result;
 }
 
 
@@ -327,8 +588,9 @@ async function connectLogBridgeProof(request, env) {
     service: 'relay13-core-v1.7-connectlog-operator-proof',
     bridge: 'connectlog',
     proof_boundary: 'This endpoint proves route and source wiring only. Live delivery requires deployed Worker, migrated D1, created workspace/API key, message POST/GET proof, and browser WebSocket open/message events.',
-    routes: ['/api/v1/connectlog/health','/api/v1/connectlog/proof','/api/v1/connectlog/activation','/api/v1/connectlog/activation-runs','/api/v1/connectlog/scan','/api/v1/connectlog/cards','/api/v1/connectlog/requests','/api/v1/connectlog/requests/:id/events','/api/v1/connectlog/stats','/api/v1/connectlog/live-proof','/api/v1/connectlog/live-proof-runs','/api/v1/conversations/:id/messages','/api/ws/:conversation_id'],
-    migrations: ['0001_core.sql','0002_connectlog_bridge.sql','0003_connectlog_message_proof.sql','0004_connectlog_activation_proof.sql','0005_connectlog_live_proof.sql'],
+    routes: ['/api/v1/connectlog/health','/api/v1/connectlog/proof','/api/v1/connectlog/activation','/api/v1/connectlog/activation-runs','/api/v1/connectlog/scan','/api/v1/connectlog/cards','/api/v1/connectlog/requests','/api/v1/connectlog/requests/:id/events','/api/v1/connectlog/stats','/api/v1/connectlog/live-proof','/api/v1/connectlog/live-proof-runs','/api/v1/guardrails/proof','/api/admin/guardrails','/api/v1/conversations/:id/messages','/api/ws/:conversation_id'],
+    migrations: ['0001_core.sql','0002_connectlog_bridge.sql','0003_connectlog_message_proof.sql','0004_connectlog_activation_proof.sql','0005_connectlog_live_proof.sql','0006_system_guardrails.sql'],
+    ai_policy: { customer_web_search: false, answer_source: 'customer_app_knowledge_only', auto_reply_default: false },
     scopes: ['connectlog:read','connectlog:write','conversations:create','messages:read','messages:write'],
     realtime: { durable_object: 'ThreadRoom', binding: 'THREAD_ROOM', websocket_path: '/api/ws/:conversation_id', hibernation_ready: true },
     time: nowIso()
@@ -394,8 +656,14 @@ async function connectLogLiveProof(request, env) {
   const latestMessage = await env.DB.prepare(`SELECT id, conversation_id, sender_role, created_at FROM messages WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 1`).bind(workspaceId).first();
   const latestRequest = await env.DB.prepare(`SELECT id, conversation_id, connectlog_card_id, request_status, customer_name, created_at FROM connectlog_contact_requests WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 1`).bind(workspaceId).first();
   let latestLiveRun = null;
+  let guardrailPolicy = null;
+  let guardrailEvents = null;
   try {
     latestLiveRun = await env.DB.prepare(`SELECT id, status, summary, created_at FROM connectlog_live_proof_runs WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 1`).bind(workspaceId).first();
+  } catch (_) {}
+  try {
+    guardrailPolicy = await ensureWorkspaceGuardrails(env, workspace);
+    guardrailEvents = await env.DB.prepare(`SELECT COUNT(*) AS count FROM guardrail_events WHERE workspace_id = ?`).bind(workspaceId).first();
   } catch (_) {}
   const gates = [
     { name: 'workspace_active', ok: true, workspace_id: workspaceId, workspace_slug: workspace.slug },
@@ -407,7 +675,8 @@ async function connectLogLiveProof(request, env) {
     { name: 'message_history_exists', ok: Number(messages?.count || 0) > 0, count: Number(messages?.count || 0) },
     { name: 'request_event_ledger_exists', ok: Number(events?.count || 0) > 0, count: Number(events?.count || 0) },
     { name: 'activation_run_exists', ok: Number(activationRuns?.count || 0) > 0, count: Number(activationRuns?.count || 0) },
-    { name: 'latest_activation_passed', ok: latestActivation?.status === 'passed', status: latestActivation?.status || 'none' }
+    { name: 'latest_activation_passed', ok: latestActivation?.status === 'passed', status: latestActivation?.status || 'none' },
+    { name: 'system_guardrails_configured', ok: Boolean(guardrailPolicy && guardrailPolicy.allow_web_search === false), ai_mode: guardrailPolicy?.ai_mode || 'unknown', web_search_allowed: false }
   ];
   const productionReady = gates.every((gate) => gate.ok);
   return json({
@@ -424,8 +693,10 @@ async function connectLogLiveProof(request, env) {
       connectlog_conversations: Number(conversations?.count || 0),
       messages: Number(messages?.count || 0),
       request_events: Number(events?.count || 0),
-      activation_runs: Number(activationRuns?.count || 0)
+      activation_runs: Number(activationRuns?.count || 0),
+      guardrail_events: Number(guardrailEvents?.count || 0)
     },
+    guardrails: guardrailPolicy ? publicGuardrailPolicy(guardrailPolicy) : null,
     latest_activation: latestActivation || null,
     latest_request: latestRequest || null,
     latest_message: latestMessage || null,
@@ -507,7 +778,92 @@ async function updateConnectLogRequestStatus(request, env, requestId) {
 }
 
 async function connectLogBridgeHealth(request, env) {
-  return json({ ok: true, service: 'relay13-core-v1.7-connectlog-operator-proof', bridge: 'connectlog', features: ['card_registry', 'contact_requests', 'request_status_updates', 'request_event_ledger', 'bridge_stats', 'message_history_pull', 'websocket_proof_scaffold', 'activation_proof_endpoint', 'activation_run_ledger', 'live_proof_endpoint', 'live_proof_run_ledger', 'welcome_message_persistence', 'fallback_safe_client', 'local_first_connectlog_adapter'], routes: ['/api/v1/connectlog/health','/api/v1/connectlog/proof','/api/v1/connectlog/activation','/api/v1/connectlog/activation-runs','/api/v1/connectlog/cards','/api/v1/connectlog/requests','/api/v1/connectlog/stats','/api/v1/connectlog/live-proof','/api/v1/connectlog/live-proof-runs'], migrations: ['0001_core.sql','0002_connectlog_bridge.sql','0003_connectlog_message_proof.sql','0004_connectlog_activation_proof.sql','0005_connectlog_live_proof.sql'], time: nowIso() }, 200, corsHeaders(env, request));
+  return json({ ok: true, service: 'relay13-core-v1.7-connectlog-operator-proof', bridge: 'connectlog', features: ['card_registry', 'contact_requests', 'request_status_updates', 'request_event_ledger', 'bridge_stats', 'message_history_pull', 'websocket_proof_scaffold', 'activation_proof_endpoint', 'activation_run_ledger', 'live_proof_endpoint', 'live_proof_run_ledger', 'welcome_message_persistence', 'fallback_safe_client', 'local_first_connectlog_adapter', 'system_guardrails', 'no_web_search_customer_chat', 'customer_app_knowledge_policy', 'guardrail_event_ledger'], routes: ['/api/v1/connectlog/health','/api/v1/connectlog/proof','/api/v1/connectlog/activation','/api/v1/connectlog/activation-runs','/api/v1/connectlog/cards','/api/v1/connectlog/requests','/api/v1/connectlog/stats','/api/v1/connectlog/live-proof','/api/v1/connectlog/live-proof-runs','/api/v1/guardrails/proof','/api/admin/guardrails'], migrations: ['0001_core.sql','0002_connectlog_bridge.sql','0003_connectlog_message_proof.sql','0004_connectlog_activation_proof.sql','0005_connectlog_live_proof.sql','0006_system_guardrails.sql'], time: nowIso() }, 200, corsHeaders(env, request));
+}
+
+async function resolveWorkspaceForGuardrails(request, env, { requireDomain = false } = {}) {
+  const url = new URL(request.url);
+  const workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
+  const slug = normalizeSlug(url.searchParams.get('workspace') || '');
+  let workspace = workspaceId ? await workspaceById(env, workspaceId) : null;
+  if (!workspace && slug) {
+    let row = await getWidgetConfigBySlug(env, slug);
+    if (!row && CLIENT_WIDGET_WORKSPACES[slug]) {
+      await ensureClientWidgetWorkspace(env, slug);
+      row = await getWidgetConfigBySlug(env, slug);
+    }
+    if (row) workspace = { id: row.workspace_id, slug: row.slug, name: row.name, status: 'active' };
+  }
+  if (!workspace) return { ok: false, response: json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request)) };
+  if (requireDomain) {
+    const domainCheck = await validateWorkspaceDomain(env, request, workspace.id);
+    if (!domainCheck.ok) return { ok: false, response: json({ ok: false, error: domainCheck.error }, 403, corsHeaders(env, request)) };
+  }
+  return { ok: true, workspace };
+}
+
+async function guardrailsProof(request, env) {
+  const resolved = await resolveWorkspaceForGuardrails(request, env, { requireDomain: true });
+  if (!resolved.ok) return resolved.response;
+  const policy = await ensureWorkspaceGuardrails(env, resolved.workspace);
+  return json({
+    ok: true,
+    service: 'relay13-core-v1.7-connectlog-operator-proof',
+    feature: 'system_guardrails',
+    workspace_id: resolved.workspace.id,
+    guardrails: publicGuardrailPolicy(policy),
+    ai_boundaries: [
+      'Customer website chat does not use web search by default.',
+      'AI reply generation must use customer app knowledge, stored Relay13/ConnectLog context, and configured app surfaces only.',
+      'Auto-reply is disabled unless the workspace policy is explicitly set to auto_reply by an admin.',
+      'Prompt injection, secret extraction, active content payloads, destructive requests, repeated spam, and rate-limit abuse are blocked before persistence.',
+      'Direct-operator routes and web-search requests are persisted for operator review without granting web search.'
+    ],
+    migrations: ['0001_core.sql','0002_connectlog_bridge.sql','0003_connectlog_message_proof.sql','0004_connectlog_activation_proof.sql','0005_connectlog_live_proof.sql','0006_system_guardrails.sql'],
+    checked_at: nowIso()
+  }, 200, corsHeaders(env, request));
+}
+
+async function adminReadGuardrails(request, env) {
+  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const resolved = await resolveWorkspaceForGuardrails(request, env);
+  if (!resolved.ok) return resolved.response;
+  const policy = await ensureWorkspaceGuardrails(env, resolved.workspace);
+  const events = await env.DB.prepare(`SELECT id, workspace_id, conversation_id, event_type, severity, decision, reason, origin, route, metadata_json, created_at FROM guardrail_events WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 100`).bind(resolved.workspace.id).all();
+  return json({ ok: true, workspace: resolved.workspace, guardrails: publicGuardrailPolicy(policy), recent_events: events.results || [] }, 200, corsHeaders(env, request));
+}
+
+async function adminUpdateGuardrails(request, env) {
+  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const input = await readJson(request);
+  const workspaceId = safeText(input.workspace_id || '', 100);
+  const workspace = await workspaceById(env, workspaceId);
+  if (!workspace) return json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request));
+  const current = await ensureWorkspaceGuardrails(env, workspace);
+  const mode = GUARDRAIL_AI_MODES.has(input.ai_mode) ? input.ai_mode : current.ai_mode;
+  const allowAutoReply = cleanBool(input.allow_ai_auto_reply, current.allow_ai_auto_reply) && mode === 'auto_reply';
+  const policy = {
+    status: input.status === 'paused' ? 'paused' : 'active',
+    ai_mode: mode,
+    allow_ai_auto_reply: allowAutoReply,
+    allow_file_search: cleanBool(input.allow_file_search, current.allow_file_search),
+    max_ai_input_tokens: cleanInt(input.max_ai_input_tokens, current.max_ai_input_tokens, 500, 50000),
+    max_ai_output_tokens: cleanInt(input.max_ai_output_tokens, current.max_ai_output_tokens, 80, 4000),
+    monthly_ai_reply_limit: cleanInt(input.monthly_ai_reply_limit, current.monthly_ai_reply_limit, 0, 1000000),
+    per_ip_message_window_minutes: cleanInt(input.per_ip_message_window_minutes, current.per_ip_message_window_minutes, 1, 120),
+    per_ip_message_limit: cleanInt(input.per_ip_message_limit, current.per_ip_message_limit, 3, 1000),
+    per_ip_conversation_limit: cleanInt(input.per_ip_conversation_limit, current.per_ip_conversation_limit, 1, 300),
+    max_links_per_message: cleanInt(input.max_links_per_message, current.max_links_per_message, 0, 10),
+    blocked_terms: Array.isArray(input.blocked_terms) ? input.blocked_terms.slice(0, 80).map((item) => safeText(item, 120).toLowerCase()).filter(Boolean) : current.blocked_terms,
+    app_knowledge: mergeAppKnowledge(current.app_knowledge, safeJson(input.app_knowledge, {})),
+    escalation_rules: { ...current.escalation_rules, ...safeJson(input.escalation_rules, {}) }
+  };
+  const t = nowIso();
+  await env.DB.prepare(`INSERT INTO workspace_guardrails (workspace_id, status, ai_mode, allow_ai_auto_reply, allow_web_search, allow_file_search, max_ai_input_tokens, max_ai_output_tokens, monthly_ai_reply_limit, per_ip_message_window_minutes, per_ip_message_limit, per_ip_conversation_limit, max_links_per_message, blocked_terms_json, app_knowledge_json, escalation_rules_json, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(workspace_id) DO UPDATE SET status = excluded.status, ai_mode = excluded.ai_mode, allow_ai_auto_reply = excluded.allow_ai_auto_reply, allow_web_search = 0, allow_file_search = excluded.allow_file_search, max_ai_input_tokens = excluded.max_ai_input_tokens, max_ai_output_tokens = excluded.max_ai_output_tokens, monthly_ai_reply_limit = excluded.monthly_ai_reply_limit, per_ip_message_window_minutes = excluded.per_ip_message_window_minutes, per_ip_message_limit = excluded.per_ip_message_limit, per_ip_conversation_limit = excluded.per_ip_conversation_limit, max_links_per_message = excluded.max_links_per_message, blocked_terms_json = excluded.blocked_terms_json, app_knowledge_json = excluded.app_knowledge_json, escalation_rules_json = excluded.escalation_rules_json, updated_at = excluded.updated_at`)
+    .bind(workspace.id, policy.status, policy.ai_mode, policy.allow_ai_auto_reply ? 1 : 0, policy.allow_file_search ? 1 : 0, policy.max_ai_input_tokens, policy.max_ai_output_tokens, policy.monthly_ai_reply_limit, policy.per_ip_message_window_minutes, policy.per_ip_message_limit, policy.per_ip_conversation_limit, policy.max_links_per_message, JSON.stringify(policy.blocked_terms), JSON.stringify(policy.app_knowledge), JSON.stringify(policy.escalation_rules), t, t).run();
+  await audit(env, { workspaceId: workspace.id, actorType: 'admin', eventType: 'guardrails.update', body: policy.ai_mode, metadata: { allow_web_search: false, allow_ai_auto_reply: policy.allow_ai_auto_reply } });
+  const updated = await ensureWorkspaceGuardrails(env, workspace);
+  return json({ ok: true, guardrails: publicGuardrailPolicy(updated), warning: 'allow_web_search is locked false for customer website chat.' }, 200, corsHeaders(env, request));
 }
 
 async function createConversation(request, env) {
@@ -527,19 +883,28 @@ async function createConversation(request, env) {
   const connectLog = extractConnectLogBridge(input);
   const conversationId = uuid('conv_'); const rawVisitorToken = randomHex(32); const visitorHash = await sha256Hex(rawVisitorToken); const t = nowIso();
   const customerName = safeText(input.customer_name || input.visitor_name || input.name || 'Website Visitor', 140) || 'Website Visitor'; const customerEmail = safeText(input.customer_email || input.visitor_email || input.email || '', 220); const firstBody = safeText(input.body || input.message || '', workspace.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS); const subject = safeText(input.subject || (connectLog.enabled ? `ConnectLog: ${connectLog.cardLabel || connectLog.campaign || customerName}` : ''), 180);
+  const inputMetadata = cleanMetadata(input.metadata || {});
+  const guardrail = await evaluateInboundGuardrails(env, request, { workspace, body: firstBody || subject || customerName, metadata: inputMetadata, input, eventType: 'conversation' });
+  if (!guardrail.ok) return json({ ok: false, error: 'Message rejected by workspace guardrails', guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals } }, guardrail.reason.includes('rate_limit') ? 429 : 422, corsHeaders(env, request));
+  const guardrailMetadata = {
+    guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals, route: guardrail.route },
+    ai_policy: guardrail.ai_policy,
+    app_knowledge_profile: guardrail.policy.app_knowledge?.profile || ''
+  };
   await env.DB.prepare(`INSERT INTO conversations (id, workspace_id, channel, status, subject, visitor_token_hash, external_user_id, customer_name, customer_email, customer_phone, source_url, last_message_sort, created_at, updated_at) VALUES (?, ?, ?, 'open', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(conversationId, workspaceId, safeText(input.channel || (connectLog.enabled ? 'connectlog-card' : 'website'), 60), subject, visitorHash, safeText(input.external_user_id || (connectLog.cardId ? `connectlog:${connectLog.cardId}` : ''), 160), customerName, customerEmail, safeText(input.customer_phone || input.visitor_phone || input.phone || '', 60), safeText(input.source_url || request.headers.get('referer') || '', 500), t, t, t).run();
   await env.DB.prepare(`INSERT INTO participants (id, conversation_id, workspace_id, role, display_name, email, external_user_id, created_at) VALUES (?, ?, ?, 'customer', ?, ?, ?, ?)`).bind(uuid('part_'), conversationId, workspaceId, customerName, customerEmail, safeText(input.external_user_id || (connectLog.cardId ? `connectlog:${connectLog.cardId}` : ''), 160), t).run();
   if (connectLog.welcomeMessage) await persistMessage(env, { workspaceId, conversationId, senderRole: 'system', senderName: connectLog.ownerName || 'ConnectLog welcome', body: connectLog.welcomeMessage, metadata: { source: 'connectlog-welcome', ...connectLog.metadata } });
-  if (firstBody) await persistMessage(env, { workspaceId, conversationId, senderRole: 'customer', senderName: customerName, body: firstBody, metadata: { source, ...connectLog.metadata } });
+  if (firstBody) await persistMessage(env, { workspaceId, conversationId, senderRole: 'customer', senderName: customerName, body: firstBody, metadata: { ...inputMetadata, source, ...connectLog.metadata, ...guardrailMetadata } });
   let connectLogCard = null;
   if (connectLog.enabled) {
     connectLogCard = await upsertConnectLogCard(env, workspaceId, input, connectLog, conversationId);
     const connectLogRequest = await recordConnectLogContactRequest(env, { workspaceId, conversationId, cardRecord: connectLogCard, connectLog, customerName, customerEmail, sourceUrl: safeText(input.source_url || request.headers.get('referer') || '', 500) });
-    await logConnectLogRequestEvent(env, { workspaceId, requestId: connectLogRequest?.id, conversationId, eventType: 'request.created', actorType: auth ? 'api_key' : 'visitor', actorId: auth?.apiKeyId || null, body: `ConnectLog request opened for ${connectLog.cardId || 'unknown-card'}`, metadata: connectLog.metadata });
+    await logConnectLogRequestEvent(env, { workspaceId, requestId: connectLogRequest?.id, conversationId, eventType: 'request.created', actorType: auth ? 'api_key' : 'visitor', actorId: auth?.apiKeyId || null, body: `ConnectLog request opened for ${connectLog.cardId || 'unknown-card'}`, metadata: { ...connectLog.metadata, ...guardrailMetadata } });
   }
-  await audit(env, { workspaceId, actorType: auth ? 'api_key' : 'visitor', actorId: auth?.apiKeyId || null, eventType: connectLog.enabled ? 'conversation.create.connectlog' : 'conversation.create', body: conversationId, metadata: { ...connectLog.metadata, connectlog_card_record_id: connectLogCard?.id || null } });
-  return json({ ok: true, conversation_id: conversationId, visitor_token: rawVisitorToken, workspace_id: workspaceId, bridge: connectLog.enabled ? 'connectlog' : null, connectlog_card_record_id: connectLogCard?.id || null }, 201, corsHeaders(env, request));
+  await recordGuardrailEvent(env, request, { workspaceId, conversationId, eventType: 'conversation.persisted', decision: guardrail.decision, reason: guardrail.reason, severity: guardrail.severity, route: guardrail.route, body: firstBody || subject, metadata: inputMetadata });
+  await audit(env, { workspaceId, actorType: auth ? 'api_key' : 'visitor', actorId: auth?.apiKeyId || null, eventType: connectLog.enabled ? 'conversation.create.connectlog' : 'conversation.create', body: conversationId, metadata: { ...inputMetadata, ...connectLog.metadata, connectlog_card_record_id: connectLogCard?.id || null, ...guardrailMetadata } });
+  return json({ ok: true, conversation_id: conversationId, visitor_token: rawVisitorToken, workspace_id: workspaceId, bridge: connectLog.enabled ? 'connectlog' : null, connectlog_card_record_id: connectLogCard?.id || null, guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals }, ai_policy: guardrail.ai_policy }, 201, corsHeaders(env, request));
 }
 async function validateConversationWorkspace(env, conversationId, workspaceId) { return await env.DB.prepare(`SELECT conversations.id AS id, conversations.workspace_id AS workspace_id, workspaces.max_message_chars AS max_message_chars FROM conversations JOIN workspaces ON workspaces.id = conversations.workspace_id WHERE conversations.id = ? AND conversations.workspace_id = ? AND workspaces.status = 'active'`).bind(conversationId, workspaceId).first(); }
 async function persistMessage(env, { workspaceId, conversationId, senderRole, senderName, body, metadata = {} }) {
@@ -586,7 +951,15 @@ async function createMessage(request, env, conversationId) {
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const conv = await validateConversationWorkspace(env, conversationId, workspaceId); if (!conv) return json({ ok: false, error: 'Conversation not found' }, 404, corsHeaders(env, request));
   const body = safeText(input.body || input.message || '', conv.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS); if (!body) return json({ ok: false, error: 'Message body required' }, 400, corsHeaders(env, request));
-  try { const message = await persistMessage(env, { workspaceId, conversationId, senderRole, senderName: safeText(input.sender_name || senderRole, 140), body, metadata: { source: auth ? 'api' : visitorToken ? 'widget' : 'admin' } }); await room(env, conversationId).fetch(`https://internal/broadcast/${conversationId}`, { method: 'POST', body: JSON.stringify({ type: 'message', ...message }) }); return json({ ok: true, message }, 201, corsHeaders(env, request)); }
+  const inputMetadata = cleanMetadata(input.metadata || {});
+  let guardrail = null;
+  if (senderRole === 'customer') {
+    const workspace = await workspaceById(env, workspaceId);
+    guardrail = await evaluateInboundGuardrails(env, request, { workspace, conversationId, body, metadata: inputMetadata, input, eventType: 'message' });
+    if (!guardrail.ok) return json({ ok: false, error: 'Message rejected by workspace guardrails', guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals } }, guardrail.reason.includes('rate_limit') ? 429 : 422, corsHeaders(env, request));
+  }
+  const guardrailMetadata = guardrail ? { guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals, route: guardrail.route }, ai_policy: guardrail.ai_policy, app_knowledge_profile: guardrail.policy.app_knowledge?.profile || '' } : {};
+  try { const message = await persistMessage(env, { workspaceId, conversationId, senderRole, senderName: safeText(input.sender_name || senderRole, 140), body, metadata: { ...inputMetadata, source: auth ? 'api' : visitorToken ? 'widget' : 'admin', ...guardrailMetadata } }); await room(env, conversationId).fetch(`https://internal/broadcast/${conversationId}`, { method: 'POST', body: JSON.stringify({ type: 'message', ...message }) }); return json({ ok: true, message, guardrail: guardrail ? { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals } : null, ai_policy: guardrail?.ai_policy || null }, 201, corsHeaders(env, request)); }
   catch (e) { return json({ ok: false, error: safeText(e.message || 'Message rejected', 200) }, 429, corsHeaders(env, request)); }
 }
 async function updateConversation(request, env, conversationId) {
@@ -618,5 +991,101 @@ async function publishWidgetConfig(request, env) {
 function room(env, conversationId) { return env.THREAD_ROOM.get(env.THREAD_ROOM.idFromName(conversationId)); }
 async function wsRoute(request, env, conversationId) { return room(env, conversationId).fetch(request); }
 async function serveAsset(request, env) { const res = await env.ASSETS.fetch(request); const h = new Headers(res.headers); for (const [k, v] of Object.entries(SECURITY_HEADERS)) h.set(k, v); return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h }); }
-export default { async fetch(request, env) { try { if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(env, request) }); const url = new URL(request.url); const path = url.pathname.replace(/\/$/, '') || '/'; if (path === '/api/health') return json({ ok: true, service: 'relay13-core-v1.7-connectlog-operator-proof', time: nowIso() }, 200, corsHeaders(env, request)); if (path === '/api/bootstrap' && request.method === 'POST') { const admin = requireAdmin(request, env); if (!admin.ok) return admin.response; return json({ ok: true, workspace: await ensureBootstrapWorkspace(env) }, 200, corsHeaders(env, request)); } if (path === '/api/admin/workspaces' && request.method === 'GET') return listWorkspaces(request, env); if (path === '/api/admin/workspaces' && request.method === 'POST') return createWorkspace(request, env); if (path === '/api/admin/workspace-domains' && request.method === 'GET') return listWorkspaceDomains(request, env); if (path === '/api/admin/workspace-domains' && request.method === 'POST') return createWorkspaceDomain(request, env); if (path === '/api/admin/api-keys' && request.method === 'GET') return listApiKeys(request, env); if (path === '/api/admin/api-keys' && request.method === 'POST') return createApiKey(request, env); if (path === '/api/admin/dashboard' && request.method === 'GET') return dashboard(request, env); if (path === '/api/admin/jobs' && request.method === 'POST') return createJob(request, env); if (path === '/api/admin/widget-configs/publish' && request.method === 'POST') return publishWidgetConfig(request, env); const revoke = path.match(/^\/api\/admin\/api-keys\/([^/]+)\/revoke$/); if (revoke && request.method === 'POST') return revokeApiKey(request, env, revoke[1]); if (path === '/api/v1/connectlog/health' && request.method === 'GET') return connectLogBridgeHealth(request, env); if (path === '/api/v1/connectlog/proof' && request.method === 'GET') return connectLogBridgeProof(request, env); if (path === '/api/v1/connectlog/activation' && request.method === 'GET') return connectLogActivationReadiness(request, env); if (path === '/api/v1/connectlog/activation-runs' && request.method === 'POST') return recordConnectLogActivationRun(request, env); if (path === '/api/v1/connectlog/live-proof' && request.method === 'GET') return connectLogLiveProof(request, env); if (path === '/api/v1/connectlog/live-proof-runs' && request.method === 'POST') return recordConnectLogLiveProofRun(request, env); if (path === '/api/v1/connectlog/scan' && request.method === 'POST') return createConnectLogScanConversation(request, env); if (path === '/api/v1/connectlog/cards' && request.method === 'GET') return listConnectLogCards(request, env); if (path === '/api/v1/connectlog/cards' && request.method === 'POST') return upsertConnectLogCardEndpoint(request, env); if (path === '/api/v1/connectlog/requests' && request.method === 'GET') return listConnectLogRequests(request, env); if (path === '/api/v1/connectlog/stats' && request.method === 'GET') return connectLogBridgeStats(request, env); const clReqEvents = path.match(/^\/api\/v1\/connectlog\/requests\/([^/]+)\/events$/); if (clReqEvents && request.method === 'GET') return listConnectLogRequestEvents(request, env, clReqEvents[1]); const clReqPatch = path.match(/^\/api\/v1\/connectlog\/requests\/([^/]+)$/); if (clReqPatch && request.method === 'PATCH') return updateConnectLogRequestStatus(request, env, clReqPatch[1]); if (path === '/api/admin/connectlog/requests' && request.method === 'GET') return listConnectLogRequests(request, env); if (path === '/api/v1/widget-config' && request.method === 'GET') return getWidgetConfig(request, env); if (path === '/api/v1/conversations' && request.method === 'POST') return createConversation(request, env); if (path === '/api/v1/conversations' && request.method === 'GET') return listConversations(request, env); const msgs = path.match(/^\/api\/v1\/conversations\/([^/]+)\/messages$/); if (msgs && request.method === 'GET') return listMessages(request, env, msgs[1]); if (msgs && request.method === 'POST') return createMessage(request, env, msgs[1]); const patchConv = path.match(/^\/api\/admin\/conversations\/([^/]+)$/); if (patchConv && request.method === 'PATCH') return updateConversation(request, env, patchConv[1]); const ws = path.match(/^\/api\/ws\/([^/]+)$/); if (ws) return wsRoute(request, env, ws[1]); return serveAsset(request, env); } catch (err) { if (err instanceof Response) return err; return json({ ok: false, error: 'Internal error' }, 500); } } };
-export class ThreadRoom { constructor(state, env) { this.state = state; this.env = env; } async fetch(request) { const url = new URL(request.url); if (url.pathname.startsWith('/broadcast/')) { this.broadcast(await request.text()); return json({ ok: true }); } if ((request.headers.get('upgrade') || '').toLowerCase() !== 'websocket') return json({ ok: false, error: 'Expected WebSocket upgrade' }, 426); const conversationId = url.pathname.split('/').pop(); const role = safeText(url.searchParams.get('role') || 'customer', 30); const workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100); const tokenValue = safeText(url.searchParams.get('token') || '', 500); const auth = await this.authorize(conversationId, role, workspaceId, tokenValue); if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status || 401); const pair = new WebSocketPair(); const [client, server] = Object.values(pair); this.state.acceptWebSocket(server, [JSON.stringify({ conversationId, role, workspaceId: auth.workspaceId, name: safeText(url.searchParams.get('name') || role, 140) })]); server.send(JSON.stringify({ type: 'ready', conversation_id: conversationId, role, time: nowIso() })); this.presence(conversationId); return new Response(null, { status: 101, webSocket: client }); } async authorize(conversationId, role, workspaceId, tokenValue) { if (!conversationId || !tokenValue) return { ok: false, error: 'Missing token', status: 401 }; if (role === 'operator') { if ((this.env.PLATFORM_ADMIN_TOKEN || '').length >= 32 && timingSafeEqual(tokenValue, this.env.PLATFORM_ADMIN_TOKEN) && workspaceId) { const conv = await this.env.DB.prepare(`SELECT id FROM conversations WHERE id = ? AND workspace_id = ?`).bind(conversationId, workspaceId).first(); if (!conv) return { ok: false, error: 'Conversation not found', status: 404 }; return { ok: true, workspaceId }; } return { ok: false, error: 'Invalid operator token', status: 401 }; } const hash = await sha256Hex(tokenValue); const conv = await this.env.DB.prepare(`SELECT workspace_id FROM conversations WHERE id = ? AND visitor_token_hash = ?`).bind(conversationId, hash).first(); if (!conv) return { ok: false, error: 'Invalid visitor token', status: 401 }; return { ok: true, workspaceId: conv.workspace_id }; } async webSocketMessage(ws, raw) { let meta = {}; try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {} let input = {}; try { input = JSON.parse(raw); } catch { return; } if (input.type !== 'message') return; const conv = await validateConversationWorkspace(this.env, meta.conversationId, meta.workspaceId); if (!conv) return; const senderRole = meta.role === 'operator' ? 'operator' : 'customer'; const body = safeText(input.body || '', conv.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS); if (!body) return; try { const message = await persistMessage(this.env, { workspaceId: meta.workspaceId, conversationId: meta.conversationId, senderRole, senderName: safeText(input.sender_name || meta.name || senderRole, 140), body, metadata: { source: 'websocket' } }); this.broadcast(JSON.stringify({ type: 'message', ...message })); } catch { ws.send(JSON.stringify({ type: 'error', error: 'Message rejected' })); } } async webSocketClose(ws) { let meta = {}; try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {} this.presence(meta.conversationId); } async webSocketError(ws) { let meta = {}; try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {} this.presence(meta.conversationId); } presence(conversationId) { if (!conversationId) return; this.broadcast(JSON.stringify({ type: 'presence', conversation_id: conversationId, online: this.state.getWebSockets().length, time: nowIso() })); } broadcast(payload) { for (const socket of this.state.getWebSockets()) { try { socket.send(payload); } catch {} } } }
+export default { async fetch(request, env) { try { if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(env, request) }); const url = new URL(request.url); const path = url.pathname.replace(/\/$/, '') || '/'; if (path === '/api/health') return json({ ok: true, service: 'relay13-core-v1.7-connectlog-operator-proof', time: nowIso() }, 200, corsHeaders(env, request)); if (path === '/api/bootstrap' && request.method === 'POST') { const admin = requireAdmin(request, env); if (!admin.ok) return admin.response; return json({ ok: true, workspace: await ensureBootstrapWorkspace(env) }, 200, corsHeaders(env, request)); } if (path === '/api/admin/workspaces' && request.method === 'GET') return listWorkspaces(request, env); if (path === '/api/admin/workspaces' && request.method === 'POST') return createWorkspace(request, env); if (path === '/api/admin/workspace-domains' && request.method === 'GET') return listWorkspaceDomains(request, env); if (path === '/api/admin/workspace-domains' && request.method === 'POST') return createWorkspaceDomain(request, env); if (path === '/api/admin/api-keys' && request.method === 'GET') return listApiKeys(request, env); if (path === '/api/admin/api-keys' && request.method === 'POST') return createApiKey(request, env); if (path === '/api/admin/dashboard' && request.method === 'GET') return dashboard(request, env); if (path === '/api/admin/guardrails' && request.method === 'GET') return adminReadGuardrails(request, env); if (path === '/api/admin/guardrails' && request.method === 'POST') return adminUpdateGuardrails(request, env); if (path === '/api/admin/jobs' && request.method === 'POST') return createJob(request, env); if (path === '/api/admin/widget-configs/publish' && request.method === 'POST') return publishWidgetConfig(request, env); const revoke = path.match(/^\/api\/admin\/api-keys\/([^/]+)\/revoke$/); if (revoke && request.method === 'POST') return revokeApiKey(request, env, revoke[1]); if (path === '/api/v1/connectlog/health' && request.method === 'GET') return connectLogBridgeHealth(request, env); if (path === '/api/v1/connectlog/proof' && request.method === 'GET') return connectLogBridgeProof(request, env); if (path === '/api/v1/connectlog/activation' && request.method === 'GET') return connectLogActivationReadiness(request, env); if (path === '/api/v1/connectlog/activation-runs' && request.method === 'POST') return recordConnectLogActivationRun(request, env); if (path === '/api/v1/connectlog/live-proof' && request.method === 'GET') return connectLogLiveProof(request, env); if (path === '/api/v1/connectlog/live-proof-runs' && request.method === 'POST') return recordConnectLogLiveProofRun(request, env); if (path === '/api/v1/connectlog/scan' && request.method === 'POST') return createConnectLogScanConversation(request, env); if (path === '/api/v1/connectlog/cards' && request.method === 'GET') return listConnectLogCards(request, env); if (path === '/api/v1/connectlog/cards' && request.method === 'POST') return upsertConnectLogCardEndpoint(request, env); if (path === '/api/v1/connectlog/requests' && request.method === 'GET') return listConnectLogRequests(request, env); if (path === '/api/v1/connectlog/stats' && request.method === 'GET') return connectLogBridgeStats(request, env); const clReqEvents = path.match(/^\/api\/v1\/connectlog\/requests\/([^/]+)\/events$/); if (clReqEvents && request.method === 'GET') return listConnectLogRequestEvents(request, env, clReqEvents[1]); const clReqPatch = path.match(/^\/api\/v1\/connectlog\/requests\/([^/]+)$/); if (clReqPatch && request.method === 'PATCH') return updateConnectLogRequestStatus(request, env, clReqPatch[1]); if (path === '/api/admin/connectlog/requests' && request.method === 'GET') return listConnectLogRequests(request, env); if (path === '/api/v1/guardrails/proof' && request.method === 'GET') return guardrailsProof(request, env); if (path === '/api/v1/widget-config' && request.method === 'GET') return getWidgetConfig(request, env); if (path === '/api/v1/conversations' && request.method === 'POST') return createConversation(request, env); if (path === '/api/v1/conversations' && request.method === 'GET') return listConversations(request, env); const msgs = path.match(/^\/api\/v1\/conversations\/([^/]+)\/messages$/); if (msgs && request.method === 'GET') return listMessages(request, env, msgs[1]); if (msgs && request.method === 'POST') return createMessage(request, env, msgs[1]); const patchConv = path.match(/^\/api\/admin\/conversations\/([^/]+)$/); if (patchConv && request.method === 'PATCH') return updateConversation(request, env, patchConv[1]); const ws = path.match(/^\/api\/ws\/([^/]+)$/); if (ws) return wsRoute(request, env, ws[1]); return serveAsset(request, env); } catch (err) { if (err instanceof Response) return err; return json({ ok: false, error: 'Internal error' }, 500); } } };
+export class ThreadRoom {
+  constructor(state, env) {
+    this.state = state;
+    this.env = env;
+  }
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname.startsWith('/broadcast/')) {
+      this.broadcast(await request.text());
+      return json({ ok: true });
+    }
+    if ((request.headers.get('upgrade') || '').toLowerCase() !== 'websocket') return json({ ok: false, error: 'Expected WebSocket upgrade' }, 426);
+    const conversationId = url.pathname.split('/').pop();
+    const role = safeText(url.searchParams.get('role') || 'customer', 30);
+    const workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
+    const tokenValue = safeText(url.searchParams.get('token') || '', 500);
+    const auth = await this.authorize(conversationId, role, workspaceId, tokenValue);
+    if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status || 401);
+    const pair = new WebSocketPair();
+    const [client, server] = Object.values(pair);
+    this.state.acceptWebSocket(server, [JSON.stringify({
+      conversationId,
+      role,
+      workspaceId: auth.workspaceId,
+      name: safeText(url.searchParams.get('name') || role, 140),
+      origin: safeText(request.headers.get('origin') || request.headers.get('referer') || '', 500),
+      ua: safeText(request.headers.get('user-agent') || '', 240),
+      ip: safeText(request.headers.get('cf-connecting-ip') || '', 128)
+    })]);
+    server.send(JSON.stringify({ type: 'ready', conversation_id: conversationId, role, time: nowIso() }));
+    this.presence(conversationId);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  async authorize(conversationId, role, workspaceId, tokenValue) {
+    if (!conversationId || !tokenValue) return { ok: false, error: 'Missing token', status: 401 };
+    if (role === 'operator') {
+      if ((this.env.PLATFORM_ADMIN_TOKEN || '').length >= 32 && timingSafeEqual(tokenValue, this.env.PLATFORM_ADMIN_TOKEN) && workspaceId) {
+        const conv = await this.env.DB.prepare(`SELECT id FROM conversations WHERE id = ? AND workspace_id = ?`).bind(conversationId, workspaceId).first();
+        if (!conv) return { ok: false, error: 'Conversation not found', status: 404 };
+        return { ok: true, workspaceId };
+      }
+      return { ok: false, error: 'Invalid operator token', status: 401 };
+    }
+    const hash = await sha256Hex(tokenValue);
+    const conv = await this.env.DB.prepare(`SELECT workspace_id FROM conversations WHERE id = ? AND visitor_token_hash = ?`).bind(conversationId, hash).first();
+    if (!conv) return { ok: false, error: 'Invalid visitor token', status: 401 };
+    return { ok: true, workspaceId: conv.workspace_id };
+  }
+  async webSocketMessage(ws, raw) {
+    let meta = {};
+    try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {}
+    let input = {};
+    try { input = JSON.parse(raw); } catch { return; }
+    if (input.type !== 'message') return;
+    const conv = await validateConversationWorkspace(this.env, meta.conversationId, meta.workspaceId);
+    if (!conv) return;
+    const senderRole = meta.role === 'operator' ? 'operator' : 'customer';
+    const body = safeText(input.body || '', conv.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS);
+    if (!body) return;
+    const inputMetadata = cleanMetadata(input.metadata || {});
+    let guardrail = null;
+    try {
+      if (senderRole === 'customer') {
+        const workspace = await workspaceById(this.env, meta.workspaceId);
+        guardrail = await evaluateInboundGuardrails(this.env, null, { workspace, conversationId: meta.conversationId, body, metadata: inputMetadata, input, eventType: 'websocket', network: meta });
+        if (!guardrail.ok) {
+          ws.send(JSON.stringify({ type: 'error', error: 'Message rejected by workspace guardrails', guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals } }));
+          return;
+        }
+      }
+      const guardrailMetadata = guardrail ? { guardrail: { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals, route: guardrail.route }, ai_policy: guardrail.ai_policy, app_knowledge_profile: guardrail.policy.app_knowledge?.profile || '' } : {};
+      const message = await persistMessage(this.env, { workspaceId: meta.workspaceId, conversationId: meta.conversationId, senderRole, senderName: safeText(input.sender_name || meta.name || senderRole, 140), body, metadata: { ...inputMetadata, source: 'websocket', ...guardrailMetadata } });
+      this.broadcast(JSON.stringify({ type: 'message', ...message, guardrail: guardrail ? { decision: guardrail.decision, reason: guardrail.reason, signals: guardrail.signals } : null }));
+    } catch {
+      ws.send(JSON.stringify({ type: 'error', error: 'Message rejected' }));
+    }
+  }
+  async webSocketClose(ws) {
+    let meta = {};
+    try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {}
+    this.presence(meta.conversationId);
+  }
+  async webSocketError(ws) {
+    let meta = {};
+    try { meta = JSON.parse(ws.deserializeAttachment() || '{}'); } catch {}
+    this.presence(meta.conversationId);
+  }
+  presence(conversationId) {
+    if (!conversationId) return;
+    this.broadcast(JSON.stringify({ type: 'presence', conversation_id: conversationId, online: this.state.getWebSockets().length, time: nowIso() }));
+  }
+  broadcast(payload) {
+    for (const socket of this.state.getWebSockets()) {
+      try { socket.send(payload); } catch {}
+    }
+  }
+}
