@@ -2286,6 +2286,300 @@ document.querySelectorAll('.leader-card,.panel,.cabinet-map div,.quote-panel').f
     window.setTimeout(scheduleUpdate, 1200);
   });
 })();
+
+;(function(){
+  const CURATED_SEARCH_ROUTES = [
+    { title: '0S Launcher', category: '0S Core', href: '0s/index.html', summary: 'Public operating launcher for the protected MetrAIyux 0S command layer.', keywords: 'home core launcher system map operating system' },
+    { title: 'Ecosystem Map', category: '0S Core', href: 'ecosystem.html', summary: 'Interactive Valley Verified map for the 0S company profile, proof rooms, apps, and platforms.', keywords: 'ecosystem valley verified map atlas skyevalley platform profile' },
+    { title: 'Admin OS', category: 'Owner Command', href: 'admin/index.html', summary: 'Owner-only command center for approvals, policy, risk, tenant isolation, and brain operations.', keywords: 'owner admin command approval policy risk tenant isolation' },
+    { title: 'Main Automation Brain', category: 'Owner Command', href: 'admin/automation-brain.html', summary: 'Protected brain chat and operator command surface.', keywords: 'main brain automation chat operator command' },
+    { title: 'Approval Inbox', category: 'Owner Command', href: 'admin/approval-inbox.html', summary: 'Review and approve gated business actions before execution.', keywords: 'approve approvals inbox queue human gate gates' },
+    { title: 'Approval Queue', category: 'Owner Command', href: 'admin/approval-queue.html', summary: 'Queued owner decisions, status, and protected escalation flow.', keywords: 'queue approvals human review escalation' },
+    { title: 'Customer SaaS Isolation', category: 'Security', href: 'admin/customer-saas-isolation.html', summary: 'Rules that keep customers away from owner credentials, connectors, and private brains.', keywords: 'tenant isolation customer security credentials boundary' },
+    { title: '0meg4kAI Security', category: 'Security', href: 'admin/0meg4kai-security.html', summary: 'Security, QA, tenant review, and system audit brain.', keywords: 'omega 0meg4kai security qa audit tenant review' },
+    { title: 'Brain Command Matrix', category: 'Owner Command', href: 'admin/brain-command-matrix.html', summary: 'Admin matrix for operating brains, routes, responsibilities, and escalation.', keywords: 'brains matrix cabinet routing owner command' },
+    { title: 'Risk Register', category: 'Trust', href: 'admin/risk-register.html', summary: 'Risk capture and review surface for the protected operating system.', keywords: 'risk register trust governance controls' },
+    { title: 'Vendor Scorecard', category: 'Operations', href: 'admin/vendor-scorecard.html', summary: 'Vendor comparison and accountability surface.', keywords: 'vendor scorecard procurement operations' },
+    { title: 'SkyeRunners', category: 'Operations', href: 'admin/skyerunners.html', summary: 'Runner and task execution layer for operational follow-through.', keywords: 'runners skyerunners tasks execution dispatch' },
+    { title: 'SaaS Signup', category: 'Customer Layer', href: 'saas/index.html', summary: 'Customer signup and SaaS entry for protected workspaces.', keywords: 'signup customer saas onboard subscription workspace' },
+    { title: 'Customer Dashboard', category: 'Customer Layer', href: 'saas/customer-dashboard.html', summary: 'Customer portal for workspace status, access, and account flow.', keywords: 'customer portal dashboard workspace account' },
+    { title: 'SkyeMerit', category: 'Customer Layer', href: 'saas/skyemerit.html', summary: 'Protected first-time merit wallet with capped discount and issue controls.', keywords: 'skyemerit merit wallet discount credit first time' },
+    { title: 'SkyePay Store', category: 'Payments', href: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s', summary: 'Buyable FS27 storefront for approved 0S offers and gated platform access.', keywords: 'payment checkout skyepay store offers buy billing' },
+    { title: 'Client OS', category: 'Delivery Layer', href: 'client-os/index.html', summary: 'Client workspace for onboarding, status, documents, renewal review, and escalation.', keywords: 'client delivery workspace onboarding status documents escalation renewal' },
+    { title: 'Onboarding Wizard', category: 'Delivery Layer', href: 'client-os/onboarding-wizard.html', summary: 'Guided client intake and activation path.', keywords: 'onboarding wizard client intake activation' },
+    { title: 'Document Request Center', category: 'Delivery Layer', href: 'client-os/document-request-center.html', summary: 'Client document requests and evidence collection.', keywords: 'documents request files client evidence' },
+    { title: 'Status Board', category: 'Delivery Layer', href: 'client-os/status-board.html', summary: 'Client delivery status and project visibility.', keywords: 'status board client progress delivery' },
+    { title: 'Escalation Desk', category: 'Delivery Layer', href: 'client-os/escalation-desk.html', summary: 'Escalation room for client blockers and owner review.', keywords: 'escalation desk blocker client support' },
+    { title: 'Client Preview', category: 'Delivery Layer', href: 'client-preview/index.html', summary: 'Preview surface for client-specific work before launch.', keywords: 'client preview demo bobs smoke shop' },
+    { title: "Bob's Smoke Shop Preview", category: 'Delivery Layer', href: 'client-preview/bobs-smoke-shop.html', summary: 'Client preview example for a small business operating surface.', keywords: 'bobs smoke shop client preview small business' },
+    { title: 'Ascension Hub', category: 'Revenue Layer', href: 'ascension/index.html', summary: 'Revenue command layer for buyer intelligence, deal rooms, proof, and conversion.', keywords: 'ascension revenue sales buyer deal proof conversion' },
+    { title: 'Buyer Intelligence Center', category: 'Revenue Layer', href: 'ascension/buyer-intelligence-center.html', summary: 'Buyer pain, fit, objections, proof needs, and next-best route.', keywords: 'buyer intelligence center prospects pain fit objections' },
+    { title: 'Deal Room', category: 'Revenue Layer', href: 'ascension/deal-room.html', summary: 'Structured deal workspace for serious buyer movement.', keywords: 'deal room buyer proposal close revenue' },
+    { title: 'Revenue War Room', category: 'Revenue Layer', href: 'ascension/revenue-war-room.html', summary: 'Revenue priorities, pipeline pressure, and execution focus.', keywords: 'revenue war room pipeline sales priorities' },
+    { title: 'Executive Briefing Room', category: 'Revenue Layer', href: 'ascension/executive-briefing-room.html', summary: 'Executive-level briefing surface for decision makers.', keywords: 'executive briefing room buyer decision leadership' },
+    { title: 'Proof Export Center', category: 'Revenue Layer', href: 'ascension/proof-export-center.html', summary: 'Exportable proof packets for buyer review and trust handoff.', keywords: 'proof export receipts buyer trust packet' },
+    { title: 'Public Conversion System', category: 'Revenue Layer', href: 'ascension/public-conversion-system.html', summary: 'Public-facing conversion path tied to proof and buyer intent.', keywords: 'public conversion sales buyer route' },
+    { title: 'APEX Hub', category: 'Enterprise Layer', href: 'apex/index.html', summary: 'Enterprise account, KPI, implementation, retention, and readiness command room.', keywords: 'apex enterprise executive kpi account implementation retention' },
+    { title: 'Enterprise Account Plans', category: 'Enterprise Layer', href: 'apex/enterprise-account-plans.html', summary: 'Account strategy plans for bigger business relationships.', keywords: 'enterprise accounts account plans strategy' },
+    { title: 'Executive KPI Scoreboard', category: 'Enterprise Layer', href: 'apex/executive-kpi-scoreboard.html', summary: 'Executive metrics and operating performance scoreboard.', keywords: 'kpi scoreboard metrics executive performance' },
+    { title: 'Implementation Playbook', category: 'Enterprise Layer', href: 'apex/implementation-playbook.html', summary: 'Step-by-step implementation and rollout plan.', keywords: 'implementation playbook rollout project' },
+    { title: 'M&A Readiness', category: 'Enterprise Layer', href: 'apex/m-and-a-readiness.html', summary: 'Readiness room for acquisition, diligence, and operational maturity.', keywords: 'm&a acquisition diligence readiness' },
+    { title: 'Automation Hub', category: 'Workflow Layer', href: 'automation/index.html', summary: 'Intake routing, follow-up sequences, proof collection, and escalation rules.', keywords: 'automation workflow intake follow up proof escalation' },
+    { title: 'Follow-Up Sequence Planner', category: 'Workflow Layer', href: 'automation/follow-up-sequence-planner.html', summary: 'Plan follow-up timing, messages, and sales or client next steps.', keywords: 'follow up sequence planner messages sales' },
+    { title: 'Intake Routing Map', category: 'Workflow Layer', href: 'automation/intake-routing-map.html', summary: 'Map intake signals to the right brain, workspace, or approval gate.', keywords: 'intake routing map brain route' },
+    { title: 'Proof Collection Workflow', category: 'Workflow Layer', href: 'automation/proof-collection-workflow.html', summary: 'Workflow for gathering proof before public claims or buyer packets.', keywords: 'proof collection workflow receipts evidence' },
+    { title: 'Brain Governance Hub', category: 'Brain Layer', href: 'brain-governance/index.html', summary: 'Governance center for prompts, freshness, test battery, escalation, and safety.', keywords: 'brain governance prompts freshness testing safety escalation' },
+    { title: 'Brain Test Battery', category: 'Brain Layer', href: 'brain-governance/brain-test-battery.html', summary: 'Test the operating brains before relying on outputs.', keywords: 'brain test battery qa readiness' },
+    { title: 'Brain Freshness Ledger', category: 'Brain Layer', href: 'brain-governance/brain-freshness-ledger.html', summary: 'Ledger for keeping knowledge current and traceable.', keywords: 'freshness ledger knowledge current data' },
+    { title: 'Operator Brain Prompts', category: 'Brain Layer', href: 'brain-governance/operator-brain-prompts.html', summary: 'Prompt library and operating boundaries for operator brains.', keywords: 'prompts operator brain library instructions' },
+    { title: 'AI Readiness', category: 'Brain Layer', href: 'ai-readiness/index.html', summary: 'Readiness hub for AI company context, knowledge freshness, prompts, and testing.', keywords: 'ai readiness company context prompt library test console' },
+    { title: 'CROWN OS Hub', category: 'Command Rooms', href: 'crown-os/index.html', summary: 'Autonomous business rooms for approval gates, proof command, revenue pulse, and operations.', keywords: 'crown command approval gates proof revenue client health compliance' },
+    { title: 'Autonomous Command Room', category: 'Command Rooms', href: 'crown-os/autonomous-command-room.html', summary: 'Route signals through the Site Operator Brain and cabinet brains.', keywords: 'autonomous command room brain route' },
+    { title: 'Human Approval Gates', category: 'Command Rooms', href: 'crown-os/human-approval-gates.html', summary: 'Protected gates for money, contracts, hiring, legal, and public claims.', keywords: 'human approval gates contracts money hiring legal claims' },
+    { title: 'Proof Command Center', category: 'Command Rooms', href: 'crown-os/proof-command-center.html', summary: 'Command room for proof receipts, public claims, and evidence control.', keywords: 'proof command center receipts claims evidence' },
+    { title: 'Revenue Pulse Engine', category: 'Command Rooms', href: 'crown-os/revenue-pulse-engine.html', summary: 'Revenue signal tracking and priority engine.', keywords: 'revenue pulse engine sales signal' },
+    { title: 'NEXUS Hub', category: 'Record Mesh', href: 'nexus/index.html', summary: 'CRM-style records, business inbox triage, routing, approval gates, and proof receipts.', keywords: 'nexus crm records inbox routing approval proof' },
+    { title: 'Business Inbox', category: 'Record Mesh', href: 'nexus/business-inbox.html', summary: 'Classify and route business signals to the correct brain pair.', keywords: 'business inbox classify route signals' },
+    { title: 'Brain Mesh', category: 'Record Mesh', href: 'nexus/brain-mesh.html', summary: 'Define primary brains, secondary review, and human approvals.', keywords: 'brain mesh route approval review' },
+    { title: 'Conversion Hub', category: 'Buyer Path', href: 'conversion/index.html', summary: 'Buyer path for capability packets, discovery calls, engagement models, and trust governance.', keywords: 'conversion buyer capability packet discovery engagement trust' },
+    { title: 'Capability Packet', category: 'Buyer Path', href: 'conversion/capability-packet.html', summary: 'Sendable capability packet for what the 0S can do.', keywords: 'capability packet offer buyer sendable' },
+    { title: 'Discovery Call', category: 'Buyer Path', href: 'conversion/discovery-call.html', summary: 'Discovery call surface for qualifying and routing buyer needs.', keywords: 'discovery call buyer qualify' },
+    { title: 'Proposal Center', category: 'Buyer Path', href: 'proposal-center/index.html', summary: 'Proposal workspace for offers and business handoff.', keywords: 'proposal center sow offer business' },
+    { title: 'Sales Kit', category: 'Buyer Path', href: 'sales-enablement/index.html', summary: 'Sales enablement room for proof, packets, positioning, and buyer routes.', keywords: 'sales kit enablement proof positioning buyer' },
+    { title: 'Certification Readiness', category: 'Trust Layer', href: 'certification-readiness/index.html', summary: 'Certification matrix, insurance, employment compliance, and government document rooms.', keywords: 'certification readiness compliance insurance government employment' },
+    { title: 'Contracts Hub', category: 'Trust Layer', href: 'contracts/index.html', summary: 'MSA, SOW, SLA, and change-order workflow surfaces.', keywords: 'contracts msa sow sla change order legal' },
+    { title: 'Legal Readiness', category: 'Trust Layer', href: 'legal-readiness/index.html', summary: 'Legal posture and readiness surface for the company operating system.', keywords: 'legal readiness compliance risk' },
+    { title: 'Policies', category: 'Trust Layer', href: 'policies/index.html', summary: 'Public policy and operating boundary pages.', keywords: 'policies terms privacy public trust' },
+    { title: 'Quantum Ops', category: 'Infrastructure', href: 'quantum-ops/index.html', summary: 'Operator layer for Cloudflare state, Workers, proof routes, and command infrastructure.', keywords: 'quantum ops cloudflare worker d1 kv queues infrastructure' },
+    { title: 'Cloudflare State Plan', category: 'Infrastructure', href: 'quantum-ops/cloudflare-state-plan.html', summary: 'Cloudflare Worker, D1, KV, queue, and deployment-state planning.', keywords: 'cloudflare state worker d1 kv deployment wrangler' },
+    { title: 'Proof Center', category: 'Infrastructure', href: 'proof/index.html', summary: 'Proof receipts and release evidence for 0S surfaces.', keywords: 'proof center receipts release evidence' },
+    { title: 'Neural Map', category: 'Infrastructure', href: 'neural-map.html', summary: 'Public-safe visual map of production, proof, sales, and brain knowledge lanes.', keywords: 'neural map knowledge lanes visual proof' },
+    { title: 'Platform Ledger', category: 'Infrastructure', href: 'operator/platform-integration-ledger.html', summary: 'Ledger tying platforms to routes, catalog groups, advertising angles, and proof commands.', keywords: 'platform ledger integration routes catalog proof' },
+    { title: 'Industries', category: 'Market Layer', href: 'industries/index.html', summary: 'Industry-specific business owner pages and route packaging.', keywords: 'industries verticals business owners market' },
+    { title: 'Calculators', category: 'Market Layer', href: 'calculators/index.html', summary: 'Business calculators for pricing, savings, readiness, and value framing.', keywords: 'calculators value pricing savings readiness' },
+    { title: 'Recruiting', category: 'Operations', href: 'recruiting/index.html', summary: 'Recruiting surfaces for staffing and candidate workflows.', keywords: 'recruiting staffing candidates hiring' },
+    { title: 'Branch Expansion', category: 'Growth Layer', href: 'branch-expansion/index.html', summary: 'Branch launch, territory, local SEO, and market-entry planning.', keywords: 'branch expansion territory city market local seo' },
+    { title: 'ConnectLog + Relay13', category: 'Expansion Apps', href: 'live/connectlog-relay13-operator-proof.html', summary: 'Relationship intelligence and messaging infrastructure routed through the 0S.', keywords: 'connectlog relay13 relationships messaging qr bridge' },
+    { title: 'SkyeRouteX', category: 'Expansion Apps', href: 'live/skyeroutex-workforce-command.html', summary: 'Workforce command lane for provider jobs, assignments, proof, and routing.', keywords: 'skyeroutex routex workforce jobs contractors routes proof' },
+    { title: 'SkyeProfitConsole', category: 'Expansion Apps', href: 'live/skyeprofitconsole-profit-console.html', summary: 'Profit field for close briefs, split simulation, money moves, and proof.', keywords: 'profit console money close briefs margin' },
+    { title: 'Skye Split Engine', category: 'Expansion Apps', href: 'live/skye-split-engine-operator-proof.html', summary: 'Commission and payout split engine with ledgers, reports, exports, backups, and repair controls.', keywords: 'split engine commission payout settlement reports free99' },
+    { title: 'SkyeMediaCenter', category: 'Expansion Apps', href: 'live/skye-media-center-operator-proof.html', summary: 'Media intake, review, execution, dispatch, publishing, stats, and file delivery.', keywords: 'media center assets upload review dispatch publishing' },
+    { title: 'SkyeMusicNexus', category: 'Expansion Apps', href: 'live/skyemusicnexus-neofront.html', summary: 'Music platform for artist profiles, upload studio, release packets, campaigns, payouts, and proof.', keywords: 'music nexus artist upload release campaign payouts studio label' },
+    { title: 'Content Forge', category: 'Expansion Apps', href: 'live/skye-content-forge-publisher.html', summary: 'Content command lane for source scanning, drafts, archive, scheduling, exports, and deploy hooks.', keywords: 'content forge publisher articles drafts scheduler export' },
+    { title: 'Marketing Made Easy', category: 'Expansion Apps', href: 'live/marketing-made-easy-growth-suite.html', summary: 'Marketing, brand, launch, document, web creation, growth ops, and brand kit suite.', keywords: 'marketing made easy growth brand launch web creator documents' },
+    { title: 'Free99 Platform Intake', category: 'Expansion Apps', href: 'Free99/index.html', summary: 'Mounted intake hub for free and paid gated platform lanes.', keywords: 'free99 intake platform lanes suite' },
+    { title: 'HouseOps + SkyeBox', category: 'Expansion Apps', href: 'live/houseoperations-skyebox-operator-proof.html', summary: 'House command and encrypted authenticator-vault expansion.', keywords: 'house operations skyebox authenticator vault tasks vendors' }
+  ];
+
+  const PRIORITY_ROUTES = new Set([
+    '0s/index.html',
+    'admin/index.html',
+    'ascension/index.html',
+    'client-os/index.html',
+    'saas/index.html',
+    'apex/index.html',
+    'brain-governance/index.html',
+    'automation/index.html',
+    'crown-os/index.html',
+    'nexus/index.html',
+    'quantum-ops/index.html',
+    'ecosystem.html'
+  ]);
+
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
+    else fn();
+  }
+
+  function normalize(value){
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+
+  function siteRoot(){
+    const marker = '/metraiyux_0s_site/';
+    const path = window.location.pathname || '/';
+    const markerIndex = path.indexOf(marker);
+    if(markerIndex >= 0) return path.slice(0, markerIndex + marker.length);
+    return '/';
+  }
+
+  function routeHref(href){
+    const value = String(href || '').trim();
+    if(!value) return '#';
+    if(/^(https?:|mailto:|tel:)/i.test(value) || value.startsWith('#') || value.startsWith('/')) return value;
+    return siteRoot() + value.replace(/^\.?\//, '');
+  }
+
+  function cleanTitle(value){
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .replace(/^Open\s+/i, '')
+      .trim();
+  }
+
+  function collectAnchorRoutes(){
+    return [...document.querySelectorAll('a[href]')]
+      .map((anchor) => {
+        const href = anchor.getAttribute('href');
+        const titleSource = anchor.querySelector('h1,h2,h3,strong')?.textContent || anchor.textContent;
+        const title = cleanTitle(titleSource);
+        const categorySource = anchor.querySelector('span,.eyebrow')?.textContent || '';
+        if(!href || !title || title.length > 86) return null;
+        if(href.startsWith('javascript:')) return null;
+        return {
+          title,
+          category: cleanTitle(categorySource) || (anchor.closest('.hero-actions') ? 'Homepage Action' : 'Linked Route'),
+          href,
+          summary: anchor.closest('.route-card, .zero-map-node, .zero-capability-card')?.querySelector('p, small')?.textContent?.trim() || href,
+          keywords: `${title} ${href}`
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function buildSearchIndex(){
+    const seen = new Set();
+    return [...CURATED_SEARCH_ROUTES, ...collectAnchorRoutes()].filter((route) => {
+      const key = `${route.href}::${normalize(route.title)}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      route.searchText = normalize([route.title, route.category, route.summary, route.keywords, route.href].join(' '));
+      return true;
+    });
+  }
+
+  function scoreRoute(route, query){
+    const terms = normalize(query).split(' ').filter(Boolean);
+    if(!terms.length) return PRIORITY_ROUTES.has(route.href) ? 10 : 1;
+    const title = normalize(route.title);
+    const category = normalize(route.category);
+    let score = 0;
+    terms.forEach((term) => {
+      if(title.startsWith(term)) score += 16;
+      if(title.includes(term)) score += 10;
+      if(category.includes(term)) score += 6;
+      if(route.searchText.includes(term)) score += 4;
+      if(String(route.href).toLowerCase().includes(term)) score += 3;
+    });
+    if(PRIORITY_ROUTES.has(route.href)) score += 3;
+    return score;
+  }
+
+  function resultList(index, query){
+    const terms = normalize(query).split(' ').filter(Boolean);
+    return index
+      .map((route, order) => ({ route, order, score: scoreRoute(route, query) }))
+      .filter((item) => terms.length ? item.score > 0 : PRIORITY_ROUTES.has(item.route.href))
+      .sort((a, b) => b.score - a.score || a.order - b.order)
+      .slice(0, 10)
+      .map((item) => item.route);
+  }
+
+  function makeResult(route){
+    const link = document.createElement('a');
+    link.className = 'site-search-result';
+    link.href = routeHref(route.href);
+
+    const category = document.createElement('span');
+    category.textContent = route.category || '0S route';
+    const title = document.createElement('strong');
+    title.textContent = route.title;
+    const summary = document.createElement('small');
+    summary.textContent = route.summary || route.href;
+
+    link.append(category, title, summary);
+    return link;
+  }
+
+  function renameEcosystemLabels(){
+    document.querySelectorAll('a[href="ecosystem.html"], a[href$="/ecosystem.html"]').forEach((anchor) => {
+      const hasRichChildren = anchor.querySelector('h1,h2,h3,p,img,span');
+      if(!hasRichChildren && /Valley Profile/i.test(anchor.textContent || '')){
+        anchor.textContent = anchor.textContent.replace(/Valley Profile/i, 'Ecosystem Map');
+      }
+    });
+  }
+
+  function initSiteSearch(){
+    const header = document.querySelector('.site-header');
+    if(!header || header.querySelector('[data-site-search]')) return;
+    renameEcosystemLabels();
+
+    const form = document.createElement('form');
+    form.className = 'site-search';
+    form.dataset.siteSearch = 'true';
+    form.setAttribute('role', 'search');
+    form.innerHTML = [
+      '<label class="sr-only" for="siteSearchInput">Search MetrAIyux 0S</label>',
+      '<input id="siteSearchInput" data-site-search-input type="search" autocomplete="off" spellcheck="false" placeholder="Search 0S rooms, apps, proof, clients..." aria-expanded="false" aria-controls="siteSearchResults">',
+      '<div class="site-search-results" id="siteSearchResults" data-site-search-results hidden></div>'
+    ].join('');
+
+    const brand = header.querySelector('.brand');
+    if(brand) brand.insertAdjacentElement('afterend', form);
+    else header.prepend(form);
+
+    const input = form.querySelector('[data-site-search-input]');
+    const results = form.querySelector('[data-site-search-results]');
+    const index = buildSearchIndex();
+    let activeResults = [];
+
+    function close(){
+      form.classList.remove('is-open');
+      header.classList.remove('search-open');
+      input.setAttribute('aria-expanded', 'false');
+      results.hidden = true;
+    }
+
+    function open(){
+      form.classList.add('is-open');
+      header.classList.add('search-open');
+      input.setAttribute('aria-expanded', 'true');
+      results.hidden = false;
+    }
+
+    function render(){
+      const query = input.value.trim();
+      activeResults = resultList(index, query);
+      results.replaceChildren();
+      if(!activeResults.length){
+        const empty = document.createElement('div');
+        empty.className = 'site-search-empty';
+        const label = document.createElement('span');
+        label.textContent = 'No direct hit';
+        const text = document.createElement('small');
+        text.textContent = 'Try ascension, client, proof, SaaS, admin, contract, Cloudflare, music, split, route, or revenue.';
+        empty.append(label, text);
+        results.append(empty);
+      } else {
+        activeResults.forEach((route) => results.append(makeResult(route)));
+      }
+      open();
+    }
+
+    input.addEventListener('focus', render);
+    input.addEventListener('input', render);
+    input.addEventListener('keydown', (event) => {
+      if(event.key === 'Escape'){
+        close();
+        input.blur();
+      }
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if(!activeResults.length) render();
+      const first = activeResults[0];
+      if(first) window.location.href = routeHref(first.href);
+    });
+
+    document.addEventListener('click', (event) => {
+      if(!form.contains(event.target)) close();
+    });
+  }
+
+  ready(initSiteSearch);
+})();
 // END quantumskyes:adaptive-neon-scrollbar-js
 
 // BEGIN quantumskyes:skyesol-living-background-js
