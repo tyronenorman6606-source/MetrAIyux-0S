@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>No Direct Competitor — MetrAIyux 0S</title>
+  <meta name="description" content="MetrAIyux 0S occupies a category no other product has built: a sovereign, edge-native, AI-first operating infrastructure deployed on your own Cloudflare account. There is no direct competitor.">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Gap-page–specific styles ── */
+    .gap-hero-kicker {
+      font-family: var(--font-label);
+      font-size: 13px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .gap-statement {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(48px, 6.5vw, 96px);
+      line-height: 1.0;
+      color: var(--ink);
+      margin-bottom: 28px;
+    }
+    .gap-statement em { color: var(--cyan); font-style: normal; }
+
+    /* ── Category intro ── */
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+      margin: 60px 0;
+    }
+    @media (max-width: 800px) { .category-grid { grid-template-columns: 1fr; } }
+    .category-body { color: var(--soft); font-size: 17px; line-height: 1.75; }
+    .category-body p + p { margin-top: 18px; }
+    .category-aside {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+    }
+    .category-aside .aside-label {
+      font-family: var(--font-label);
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .category-aside ul { list-style: none; padding: 0; margin: 0; }
+    .category-aside li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--soft);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+    .category-aside li:last-child { border-bottom: none; }
+    .category-aside li .check { color: var(--cyan); flex-shrink: 0; font-size: 16px; }
+    .category-aside li .cross { color: #e05a5a; flex-shrink: 0; font-size: 16px; }
+
+    /* ── Full stack grid ── */
+    .stack-intro {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 48px;
+    }
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+    .stack-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .stack-card:hover { border-color: var(--gold); }
+    .stack-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(244,199,91,.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .stack-card-label {
+      font-family: var(--font-label);
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .stack-card h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .stack-card p {
+      font-size: 13px;
+      color: var(--soft);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .stack-card .stack-tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      border: 1px solid rgba(100,217,255,.25);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* ── Competitor matrix ── */
+    .comp-intro {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 40px;
+    }
+    .comp-matrix-wrap { overflow-x: auto; margin-bottom: 60px; }
+    .comp-matrix {
+      width: 100%;
+      min-width: 860px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .comp-matrix thead th {
+      padding: 14px 18px;
+      text-align: left;
+      font-family: var(--font-label);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .comp-matrix thead th.col-them { text-align: center; }
+    .comp-matrix thead th.col-0s {
+      text-align: center;
+      color: var(--gold);
+      background: rgba(244,199,91,.06);
+    }
+    .comp-matrix tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); }
+    .comp-matrix tbody tr:hover { background: rgba(255,255,255,.02); }
+    .comp-matrix td {
+      padding: 14px 18px;
+      vertical-align: top;
+      color: var(--soft);
+      line-height: 1.5;
+    }
+    .comp-matrix td.capability-name {
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .comp-matrix td.col-them { text-align: center; }
+    .comp-matrix td.col-0s {
+      text-align: center;
+      background: rgba(244,199,91,.04);
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .yes { color: #6ff2c7; font-size: 16px; }
+    .no  { color: #e05a5a; font-size: 16px; }
+    .partial { color: #f8cb5e; font-size: 16px; }
+    .comp-matrix .comp-name-row td {
+      padding: 20px 18px 10px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      border-bottom: none;
+      background: var(--surface);
+    }
+    .comp-matrix .comp-name-row td.col-0s { background: rgba(244,199,91,.06); }
+
+    /* ── Three pillars ── */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin: 48px 0 60px;
+    }
+    @media (max-width: 900px) { .pillars-grid { grid-template-columns: 1fr; } }
+    .pillar {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pillar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .pillar--sovereign::after { background: linear-gradient(90deg, var(--gold), var(--cyan)); }
+    .pillar--edge::after     { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+    .pillar--ai::after       { background: linear-gradient(90deg, var(--purple), var(--gold)); }
+    .pillar-icon { font-size: 32px; margin-bottom: 16px; }
+    .pillar h3 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .pillar p { font-size: 15px; color: var(--soft); line-height: 1.7; margin: 0; }
+    .pillar p + p { margin-top: 12px; }
+
+    /* ── Verdict section ── */
+    .verdict-wrap {
+      background: linear-gradient(135deg, rgba(244,199,91,.07) 0%, rgba(100,217,255,.05) 100%);
+      border: 1px solid rgba(244,199,91,.25);
+      border-radius: 18px;
+      padding: 52px 60px;
+      text-align: center;
+      margin: 60px 0;
+    }
+    @media (max-width: 700px) { .verdict-wrap { padding: 36px 24px; } }
+    .verdict-label {
+      font-family: var(--font-label);
+      font-size: 10px;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .verdict-headline {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(28px, 4vw, 52px);
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 22px;
+    }
+    .verdict-headline span { color: var(--gold); }
+    .verdict-body {
+      max-width: 680px;
+      margin: 0 auto 32px;
+      font-size: 17px;
+      color: var(--soft);
+      line-height: 1.75;
+    }
+
+    /* ── Proof bar ── */
+    .proof-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 40px 0;
+    }
+    .proof-cell {
+      background: var(--surface);
+      padding: 22px 16px;
+      text-align: center;
+    }
+    .proof-n {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 28px;
+      color: var(--gold);
+      line-height: 1;
+      display: block;
+    }
+    .proof-l {
+      font-family: var(--font-label);
+      font-size: 9px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <canvas class="command-canvas" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="index.html">
+        <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">&larr; Main</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="white-label.html">White Label</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="ecosystem.html">Ecosystem</a>
+        <a href="proof.html">Live Proof</a>
+        <a href="valuation.html">Valuation</a>
+        <a class="is-active" href="the-gap.html">No Competitors</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
+        <a class="nav-cta" href="index.html#pricing">Pricing</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="ticker-strip" aria-hidden="true">
+    <div class="ticker-track">
+      <span>17 Workers Live &nbsp;·&nbsp;</span>
+      <span>17 CF Pages Projects &nbsp;·&nbsp;</span>
+      <span>17 AI Brain Personas &nbsp;·&nbsp;</span>
+      <span>8 D1 Databases &nbsp;·&nbsp;</span>
+      <span>58 Live Stripe Products &nbsp;·&nbsp;</span>
+      <span>78 Verified Live Surfaces &nbsp;·&nbsp;</span>
+      <span>875+ HTML Surfaces &nbsp;·&nbsp;</span>
+      <span>$1.5M–$2.0M Deployed Asset &nbsp;·&nbsp;</span>
+      <span>43,395 Lines — SkyeMail &nbsp;·&nbsp;</span>
+      <span>20,284 Lines — SkyeGate FS27 &nbsp;·&nbsp;</span>
+      <span>kAIxu 6.7 — Sovereign AI &nbsp;·&nbsp;</span>
+      <span>SkyeVault Git Protocol &nbsp;·&nbsp;</span>
+      <span>CitadelDB K8s HA Postgres &nbsp;·&nbsp;</span>
+      <span>SkyeRouteX Dispatch OS &nbsp;·&nbsp;</span>
+      <span>SkyeMusicNexus Rights Vault &nbsp;·&nbsp;</span>
+      <span>17 Workers Live &nbsp;·&nbsp;</span>
+      <span>17 CF Pages Projects &nbsp;·&nbsp;</span>
+      <span>17 AI Brain Personas &nbsp;·&nbsp;</span>
+      <span>8 D1 Databases &nbsp;·&nbsp;</span>
+      <span>58 Live Stripe Products &nbsp;·&nbsp;</span>
+      <span>78 Verified Live Surfaces &nbsp;·&nbsp;</span>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ── Hero ── -->
+    <section class="page-hero reveal" style="text-align:center;padding-bottom:24px;">
+      <p class="gap-hero-kicker">Competitive Positioning · MetrAIyux 0S</p>
+      <h1 class="gap-statement">
+        There is no<br><em>direct competitor.</em>
+      </h1>
+      <p class="lead" style="max-width:740px;margin:0 auto 28px;">Not because we haven't looked. Because no other product has assembled sovereign edge deployment, a 17-brain AI routing OS, full-stack infrastructure, and a white-label commercial model into a single coherent platform. The market built pieces. We built the OS.</p>
+      <div class="cta-row" style="justify-content:center;">
+        <a class="btn-primary" href="capabilities.html">See the Full Capabilities</a>
+        <a class="btn-ghost" href="flyer.html" target="_blank">One-Page Overview &rarr;</a>
+        <a class="btn-ghost" href="valuation.html">Platform Valuation</a>
+      </div>
+    </section>
+
+    <!-- ── Why the category didn't exist ── -->
+    <section class="section" id="category">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">The Category Problem</p>
+          <h2>The market sold you subscriptions. We built sovereignty.</h2>
+        </div>
+      </div>
+
+      <div class="category-grid">
+        <div class="category-body reveal">
+          <p>Every company in the business software market made the same decision: build a SaaS product on their own cloud, lock customers in, and charge forever. Auth lives on Clerk's servers. Email lives on Resend's servers. Your database lives on PlanetScale's servers. Your customer data is distributed across a dozen vendor relationships you don't control.</p>
+          <p>Nobody built the alternative — not because it's impossible, but because it doesn't fit the VC SaaS playbook. Sovereignty doesn't create recurring revenue for the platform vendor. It creates recurring revenue for <em>you</em>.</p>
+          <p>MetrAIyux 0S is the sovereign alternative. Every component — auth, email, database, Git vault, AI routing, payments, dispatch, realtime rooms, music rights, staffing automation — deploys to <strong>your Cloudflare account</strong>. Your data never touches our infrastructure after deployment. That is structurally impossible for every competitor in this space.</p>
+          <p>Add the edge architecture (CF Workers, not servers), the AI-first command routing (17 brain personas as the OS layer, not as a plugin), and the commercial white-label model (you resell the entire OS under your brand), and you get a product that has no peer.</p>
+        </div>
+
+        <div class="category-aside reveal">
+          <p class="aside-label">What the market gave you</p>
+          <ul>
+            <li><span class="cross">✕</span> <span>Auth as a SaaS subscription on someone else's server (Clerk, Auth0, Firebase Auth)</span></li>
+            <li><span class="cross">✕</span> <span>Email as a metered API you don't own (Resend, SendGrid, Postmark)</span></li>
+            <li><span class="cross">✕</span> <span>Database as a managed service with their keys (PlanetScale, Neon, Supabase)</span></li>
+            <li><span class="cross">✕</span> <span>AI as a third-party provider you brand around (OpenAI, Anthropic)</span></li>
+            <li><span class="cross">✕</span> <span>Payments gated by their approval and their fee structure</span></li>
+            <li><span class="cross">✕</span> <span>White-label that still routes through the vendor's servers</span></li>
+            <li><span class="cross">✕</span> <span>No edge deployment — server-based with cold starts and latency</span></li>
+            <li><span class="check">✓</span> <span style="color:var(--ink);font-weight:600;">MetrAIyux 0S: all of the above, deployed sovereign to your edge account</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Full stack ── -->
+    <section class="section" id="stack">
+      <div class="stack-intro reveal">
+        <p class="eyebrow">The Platform</p>
+        <h2>23 platform lanes. One sovereign OS.</h2>
+        <p style="color:var(--soft);font-size:17px;margin-top:14px;line-height:1.7;">This isn't a tool with a few integrations bolted on. Every lane below is production-deployed, smoke-tested, and runs on Cloudflare's global edge. No competitor ships anything close to this as a cohesive deployable unit.</p>
+      </div>
+
+      <div class="stack-grid">
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Auth Platform</p>
+          <h3>SkyeGate FS27</h3>
+          <p>BLAKE3 hash-only API keys. Bearer token introspection. OAuth flows. Twilio voice &amp; SMS MFA. 2,063-line Stripe billing catalog. Email allowlist enforcement. Full audit trail. Raw key never persisted. 20,284 lines of production code.</p>
+          <span class="stack-tag">20,284 lines</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Email Platform</p>
+          <h3>SkyeMail</h3>
+          <p>25-surface email platform. CF Worker + Netlify backend. Stalwart hosted mailbox adapter. Gmail OAuth. AI generation module. Spam filtering. Key management. Full schema with delivery events and receipts.</p>
+          <span class="stack-tag">43,395 lines</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Sovereign Database</p>
+          <h3>CitadelDB v3.0.1</h3>
+          <p>K8s HA Postgres. PITR backup continuity. WAL streaming. Operator control plane. DR drills completed. Not a managed cloud DB — sovereign, self-controlled infrastructure with full restore capability.</p>
+          <span class="stack-tag">K8s HA · PITR · WAL</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Git Vault</p>
+          <h3>SkyeVault</h3>
+          <p>Real Git smart-HTTP protocol inside a Cloudflare Worker. Clone, push, fetch, ref tracking, snapshots, workspace neural maps, quota enforcement, policy gates, bundle export. Not a file upload wrapper — actual Git.</p>
+          <span class="stack-tag">Git at the edge</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Sovereign AI</p>
+          <h3>kAIxu 6.7</h3>
+          <p>Proprietary AI model built and operated by Skyes Over London LC. 5 capability variants: nano, mini, 6.7, pro, max. Provider branding fully abstracted — every response carries kAIxu identity. Plan-gated with FS27 credit metering. Not OpenAI with a skin.</p>
+          <span class="stack-tag">5 variants · plan-gated</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Security OS</p>
+          <h3>0meg4kAI</h3>
+          <p>Two-layer command scanner: browser-side regex scoring before any request leaves the client, plus an independent edge-side pass at the Worker before any D1 write. Tenant isolation, privilege escalation detection, legal/financial risk scoring, quarantine routing. Both layers must pass.</p>
+          <span class="stack-tag">2-layer · stateless edge</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Realtime Rooms</p>
+          <h3>Relay13 + ConnectLog v7.7</h3>
+          <p>Stateful WebSocket rooms at the CF edge via Durable Objects. D1 persistence. Proof receipts on every room event. v1.8 guardrails: per-workspace AI policy enforcement, server-side cost ledger, 18 live proof checks. Not a third-party realtime service.</p>
+          <span class="stack-tag">Durable Objects · D1</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Payment OS</p>
+          <h3>SkyePay</h3>
+          <p>Full payment operating system with owner-approval gate, product store, admin panel, and regression suite. Real Stripe integration with 58 live products across Free, Starter, Growth, Autonomous Office, and Enterprise tiers. Not a checkout widget.</p>
+          <span class="stack-tag">58 live Stripe products</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Workforce Dispatch</p>
+          <h3>SkyeRouteX v0.4.0</h3>
+          <p>Contractor routing OS. Workforce dispatch routes, payment ledger, contractor profiles, job assignment automation. $6,500 production dispatch OS — smoke-tested and live. No other infrastructure stack ships an embedded dispatch OS.</p>
+          <span class="stack-tag">$6,500 dispatch live</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Music &amp; Media</p>
+          <h3>SkyeMusicNexus NeoFront</h3>
+          <p>Multi-tier music platform Worker with rights vault and royalty ledger. Deployed CF Worker. Rights management, royalty tracking, multi-tier access control. An entire music business infrastructure inside the OS.</p>
+          <span class="stack-tag">Rights vault · royalty ledger</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Automation Agents</p>
+          <h3>SkyeRunners</h3>
+          <p>5-agent automation control plane. HTTP bridge on port 4176. NDJSON event ledger. Agent coordination, async task routing, and automation orchestration as an OS-level service — not a third-party integration.</p>
+          <span class="stack-tag">5 agents · NDJSON ledger</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">AI Command Routing</p>
+          <h3>17 Brain Personas</h3>
+          <p>Deterministic keyword-routing OS. 16 cabinet brains (Legal, Finance, Tech, Security, HR, Marketing, Operations, and more) plus the 17th semantic retrieval brain: 725 scored knowledge chunks, on-device, no external API call. Zero LLM cost per command routing decision.</p>
+          <span class="stack-tag">725 knowledge chunks · zero LLM cost</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Business Directory</p>
+          <h3>Valley Verified / PhxVerified</h3>
+          <p>Arizona verified business network. Free public business pages, optional upgrades, claim workflow, Valley posting integration. 89+ deployed HTML pages. A complete local business platform built into the OS as a white-label deployable.</p>
+          <span class="stack-tag">89+ pages · deployed CF Worker</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Staffing Platform</p>
+          <h3>SOL Staffing Agency</h3>
+          <p>Full staffing agency platform. 10,270 lines of production code, 89+ HTML pages, deployed Cloudflare Worker. Client management, contractor profiles, job posting, placement workflows. An entire staffing business baked into the OS.</p>
+          <span class="stack-tag">10,270 lines · deployed</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Legal Platform</p>
+          <h3>LegalSkyes</h3>
+          <p>Legal operations platform. Deployed CF Worker. Contract management, legal document workflows, compliance tracking. A full legal operations lane inside the OS — not a plugin to a third-party legal tool.</p>
+          <span class="stack-tag">2,999 lines · deployed</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Developer SDK</p>
+          <h3>@metraiyux/0s-sdk</h3>
+          <p>Published npm package wrapping the full gateway API. Command routing, workspace status, billing checkout, and proof receipts — all behind a single authenticated client. 4 production client templates via MCP stdio-server.</p>
+          <span class="stack-tag">npm · 4 client templates</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Edge Infrastructure</p>
+          <h3>17 Cloudflare Workers</h3>
+          <p>17 ES module Workers, each with its own D1 SQL database, KV namespace, and Queue bindings. Site-operator, brain-router, 0meg4kAI scanner, CROWN operator, QUANTUM operator, kAIxu inference gateway, SkyeGate, SkyeVault, SkyeMail, SkyeMusicNexus, SkyeRunners, and more — all confirmed live with CF-Ray headers.</p>
+          <span class="stack-tag">8 D1 · KV · Queues · DO</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Component Library</p>
+          <h3>SkyeUI</h3>
+          <p>Proprietary design system and component library powering all 875+ HTML surfaces. Meteors, ShineBorder, BorderBeam, TextBlurIn, OrbitRings — custom-built animation and UI primitives. No third-party UI dependency on the critical path.</p>
+          <span class="stack-tag">875+ surfaces</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Gated App Lanes</p>
+          <h3>Free99 App Lanes</h3>
+          <p>13 gate-deployed platform lanes with FS27 access control. Free99 tier lets users access a curated set of platform lanes before any payment. Paid tiers unlock progressively deeper access. Converts white-label deployments into self-contained commercial products.</p>
+          <span class="stack-tag">13 gated lanes</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Proof Infrastructure</p>
+          <h3>Audit Trail &amp; Receipts</h3>
+          <p>Every platform action produces a timestamped JSON receipt written to D1. CF-Ray headers confirm Cloudflare invocation. QA smoke receipts, release receipts, link audit JSONs, SkyeVault Git remote proof, and per-workspace vault maps. M&amp;A-ready audit posture.</p>
+          <span class="stack-tag">CF-Ray · D1 · JSON receipts</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Operator Onboarding</p>
+          <h3>28-Lesson Admin Tutorial</h3>
+          <p>Full operator onboarding embedded in the platform admin. 28 structured lessons covering brain routing, FS27 credentialing, Worker deployment, SkyeVault setup, CitadelDB operations, billing configuration, and white-label deployment. The OS trains its operators.</p>
+          <span class="stack-tag">28 lessons · embedded</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">White-Label OS</p>
+          <h3>Full Commercial Resale Model</h3>
+          <p>Every component is deployable under a buyer's brand on their Cloudflare account. The entire OS — auth, email, AI, payments, dispatch, database, vault, brains — becomes their product. Operator setup takes under 30 minutes via wrangler deploy.</p>
+          <span class="stack-tag">deploy in &lt;30 min</span>
+        </div>
+
+        <div class="stack-card reveal">
+          <p class="stack-card-label">Edge Deployment</p>
+          <h3>Cloudflare Pages × 17</h3>
+          <p>17 CF Pages projects serving every public-facing surface. No server. No cold start. No region selection. Every page is globally distributed at Cloudflare's edge — marketing, SaaS product, admin, client builds, and white-label storefronts all in one deployment footprint.</p>
+          <span class="stack-tag">17 Pages · global edge</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Competitor matrix ── -->
+    <section class="section" id="competitors">
+      <div class="comp-intro reveal">
+        <p class="eyebrow">The Competitive Map</p>
+        <h2>What the market covers — and where it ends.</h2>
+        <p style="color:var(--soft);font-size:17px;margin-top:14px;line-height:1.7;">Every competitor below is a credible product in its lane. None of them even attempt to occupy the same space. This is not a features comparison — it is a category comparison.</p>
+      </div>
+
+      <div class="comp-matrix-wrap reveal">
+        <table class="comp-matrix">
+          <thead>
+            <tr>
+              <th style="width:24%;">Capability</th>
+              <th class="col-them" style="width:12%;">GoHighLevel</th>
+              <th class="col-them" style="width:12%;">Supabase</th>
+              <th class="col-them" style="width:12%;">Firebase</th>
+              <th class="col-them" style="width:12%;">Appwrite</th>
+              <th class="col-them" style="width:12%;">Retool</th>
+              <th class="col-0s" style="width:16%;">MetrAIyux 0S</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td class="capability-name">Deploys to YOUR account</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Edge-native (CF Workers)</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Sovereign auth (BLAKE3, no vendor)</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Full email platform (hosted mailbox)</td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">K8s HA Postgres (sovereign DB)</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Git protocol vault at edge</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Proprietary sovereign AI model</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">17-brain AI command routing OS</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Durable Objects realtime rooms</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Payment OS + 58 live products</td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Workforce dispatch OS</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Music rights vault + royalty ledger</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Staffing platform built-in</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Legal ops platform built-in</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Two-layer security scanner (edge)</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">White-label full OS resale</td>
+              <td class="col-them"><span class="yes">✓</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Proof receipts on every action</td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+            <tr>
+              <td class="capability-name">Business directory (local listings)</td>
+              <td class="col-them"><span class="partial">~</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-them"><span class="no">✕</span></td>
+              <td class="col-0s"><span class="yes">✓</span></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:-40px;margin-bottom:60px;">
+        ✓ = native capability &nbsp;·&nbsp; ~ = partial / third-party dependency &nbsp;·&nbsp; ✕ = not present<br>
+        GoHighLevel is the only competitor with white-label resale — but it routes through GHL's servers. Data sovereignty: zero.
+      </p>
+    </section>
+
+    <!-- ── Three pillars ── -->
+    <section class="section" id="pillars">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Why No One Can Copy This Fast</p>
+          <h2>Three structural advantages. Each one alone is a moat.</h2>
+        </div>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar pillar--sovereign reveal">
+          <div class="pillar-icon">🏛</div>
+          <h3>Sovereignty at the Architecture Level</h3>
+          <p>Every component deploys to your Cloudflare account. SkyeGate FS27 runs on your Worker. CitadelDB runs on your K8s cluster. SkyeVault issues your credentials. When you deploy MetrAIyux 0S, our infrastructure is completely out of the loop.</p>
+          <p>This isn't a configuration option. It is the architecture. GoHighLevel can't offer this — their entire business model depends on you staying on their servers. Supabase can't offer this — their DB product requires their managed cloud. Sovereignty is structurally incompatible with most SaaS business models.</p>
+        </div>
+
+        <div class="pillar pillar--edge reveal">
+          <div class="pillar-icon">⚡</div>
+          <h3>Edge-Native, Not Server-Ported</h3>
+          <p>MetrAIyux 0S was built for Cloudflare Workers from day one. Not ported from server code. Not "deployable to edge with limitations." Every Worker is an ES module with D1 bindings, KV namespaces, Queue connections, and Durable Object links — the full CF primitive stack, used natively.</p>
+          <p>SkyeVault runs real Git smart-HTTP inside a Worker. That has never been done in any competing platform. kAIxu 6.7's inference gateway runs as a Worker with a service binding. 0meg4kAI's edge scanner runs stateless at the Worker before any D1 write. The edge is the OS, not the delivery mechanism.</p>
+        </div>
+
+        <div class="pillar pillar--ai reveal">
+          <div class="pillar-icon">🧠</div>
+          <h3>AI as the OS Layer, Not a Feature</h3>
+          <p>No competitor has 17 deterministic brain personas as the command routing substrate. In every other platform, AI is a chatbox, an autocomplete, or an API integration. In MetrAIyux 0S, the AI routing layer IS the operating system.</p>
+          <p>Every command enters the routing layer. Brain selection is deterministic (zero LLM cost). 725 knowledge chunks power semantic context on-device. kAIxu 6.7 handles the generative layer on authenticated requests. 0meg4kAI scans every command independently of the routing layer. This is not a feature. It is the architecture of the machine.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Proof numbers ── -->
+    <section class="section" id="proof">
+      <div class="section-head reveal" style="text-align:center;max-width:720px;margin:0 auto 32px;">
+        <p class="eyebrow">Infrastructure Proof</p>
+        <h2>This isn't a pitch deck. It's a deployed system.</h2>
+      </div>
+
+      <div class="proof-bar reveal">
+        <div class="proof-cell"><span class="proof-n">17</span><span class="proof-l">CF Workers Live</span></div>
+        <div class="proof-cell"><span class="proof-n">17</span><span class="proof-l">CF Pages Projects</span></div>
+        <div class="proof-cell"><span class="proof-n">17</span><span class="proof-l">AI Brain Personas</span></div>
+        <div class="proof-cell"><span class="proof-n">8</span><span class="proof-l">D1 SQL Databases</span></div>
+        <div class="proof-cell"><span class="proof-n">58</span><span class="proof-l">Live Stripe Products</span></div>
+        <div class="proof-cell"><span class="proof-n">78</span><span class="proof-l">Verified Surfaces</span></div>
+        <div class="proof-cell"><span class="proof-n">875+</span><span class="proof-l">HTML Surfaces</span></div>
+        <div class="proof-cell"><span class="proof-n">23</span><span class="proof-l">Platform Lanes</span></div>
+        <div class="proof-cell"><span class="proof-n">725</span><span class="proof-l">Knowledge Chunks</span></div>
+        <div class="proof-cell"><span class="proof-n">43K</span><span class="proof-l">Lines — SkyeMail</span></div>
+        <div class="proof-cell"><span class="proof-n">20K</span><span class="proof-l">Lines — SkyeGate</span></div>
+        <div class="proof-cell"><span class="proof-n">$1.5M</span><span class="proof-l">Asset Floor</span></div>
+      </div>
+    </section>
+
+    <!-- ── Verdict ── -->
+    <section class="section">
+      <div class="verdict-wrap reveal">
+        <p class="verdict-label">The Verdict</p>
+        <h2 class="verdict-headline">
+          You're not choosing between<br>
+          <span>MetrAIyux 0S and a competitor.</span><br>
+          You're choosing between this<br>and building it yourself.
+        </h2>
+        <p class="verdict-body">
+          No competitor ships sovereign edge auth, a hosted email platform, K8s HA Postgres, a Git vault at the CF edge, a proprietary AI model, 17 brain command routing, Durable Object realtime rooms, a payments OS, a workforce dispatch OS, a music rights vault, a staffing platform, a legal platform, a business directory, and a white-label commercial model — in a single deployable package on your own infrastructure. The category doesn't exist yet. We built it.
+        </p>
+        <div class="cta-row" style="justify-content:center;">
+          <a class="btn-primary" href="index.html#pricing">See Licensing Plans</a>
+          <a class="btn-ghost" href="capabilities.html">Full Capabilities &rarr;</a>
+          <a class="btn-ghost" href="proof.html">Live Proof &rarr;</a>
+          <a class="btn-ghost" href="flyer.html" target="_blank">Download One-Pager</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem" width="36" height="36">
+        <span>MetrAIyux 0S</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="sell-sheet.html">Sell Sheet</a>
+        <a href="valuation.html">Valuation</a>
+        <a href="the-gap.html">No Competitors</a>
+        <a href="proof.html">Live Proof</a>
+        <a href="mailto:graylondonskyes@gmail.com">Contact</a>
+      </div>
+      <p class="footer-copy tiny">© 2026 Skyes Over London LC · MetrAIyux 0S · Sovereign Infrastructure OS</p>
+    </div>
+  </footer>
+
+  <script src="skye-effects.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var hero = document.querySelector('.page-hero');
+      if (hero) SkyeUI.Meteors(hero, { count: 16, color: 'rgba(100,217,255,0.4)' });
+
+      document.querySelectorAll('.stack-card, .pillar, .proof-cell').forEach(function (el, i) {
+        var colors = [
+          { c1: '#a88cff', c2: '#f8cb5e', c3: '#64d9ff', duration: '5s' },
+          { c1: '#64d9ff', c2: '#6ff2c7', c3: '#a88cff', duration: '6s' },
+          { c1: '#f8cb5e', c2: '#a88cff', c3: '#6ff2c7', duration: '4.5s' },
+        ];
+        if (el.classList.contains('stack-card') || el.classList.contains('pillar')) {
+          SkyeUI.ShineBorder(el, colors[i % 3]);
+        }
+      });
+
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) e.target.classList.add('is-visible');
+        });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
+    });
+
+    (function() {
+      const b = document.querySelector('[data-menu-button]');
+      const l = document.querySelector('[data-nav-links]');
+      if (b && l) b.addEventListener('click', () => {
+        const o = l.classList.toggle('is-open');
+        b.setAttribute('aria-expanded', String(o));
+      });
+    })();
+  </script>
+</body>
+</html>
