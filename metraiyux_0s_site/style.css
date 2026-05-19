@@ -1353,8 +1353,8 @@ main,footer{position:relative;z-index:2}
 
   Optional MCP part. Add data-mcp-neon-scrollbar to html, body, or a scroll
   container when a site explicitly asks for visible neon scrollbars.
-  This hides basic native scrollbars and replaces them with always-visible,
-  draggable neon rails on the exact viewport edges.
+  This keeps native scrollbars visible and adds always-visible, draggable
+  neon rails on the exact viewport edges.
 */
 
 :root{
@@ -1371,14 +1371,16 @@ main,footer{position:relative;z-index:2}
 html[data-mcp-neon-scrollbar],
 html[data-mcp-neon-scrollbar] body,
 [data-mcp-neon-scrollbar]{
-  scrollbar-width:none !important;
-  -ms-overflow-style:none !important;
+  scrollbar-width:auto !important;
+  scrollbar-color:var(--mcp-neon-scrollbar-b) var(--mcp-neon-scrollbar-track);
+  -ms-overflow-style:auto !important;
 }
 
 html[data-mcp-neon-scrollbar] *,
 [data-mcp-neon-scrollbar] *{
-  scrollbar-width:none !important;
-  -ms-overflow-style:none !important;
+  scrollbar-width:auto !important;
+  scrollbar-color:var(--mcp-neon-scrollbar-b) var(--mcp-neon-scrollbar-track);
+  -ms-overflow-style:auto !important;
 }
 
 html[data-mcp-neon-scrollbar]::-webkit-scrollbar,
@@ -1386,10 +1388,10 @@ html[data-mcp-neon-scrollbar] body::-webkit-scrollbar,
 html[data-mcp-neon-scrollbar] *::-webkit-scrollbar,
 [data-mcp-neon-scrollbar]::-webkit-scrollbar,
 [data-mcp-neon-scrollbar] *::-webkit-scrollbar{
-  width:0 !important;
-  height:0 !important;
-  display:none !important;
-  background:transparent !important;
+  width:14px !important;
+  height:14px !important;
+  display:block !important;
+  background:var(--mcp-neon-scrollbar-track) !important;
 }
 
 .mcp-neon-scroll-rail{
@@ -1516,7 +1518,7 @@ html.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
 .mcp-neon-scroll-rail{
   position:fixed;
   z-index:180;
-  pointer-events:auto;
+  pointer-events:none;
   opacity:.94;
   border:1px solid var(--mcp-neon-scrollbar-rail);
   border-radius:999px;
@@ -1549,7 +1551,6 @@ html.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
 
 .mcp-neon-scroll-thumb{
   position:absolute;
-  pointer-events:auto;
   border:3px solid transparent;
   border-radius:999px;
   background:
@@ -1916,4 +1917,49 @@ html {
 .mini-route-row a{display:inline-flex;max-width:100%;padding:7px 9px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:var(--gold2);background:rgba(255,255,255,.035);font-size:.82rem;font-weight:800;line-height:1.15;overflow-wrap:anywhere;text-decoration:none}
 .mini-route-row a:hover{border-color:rgba(215,170,67,.45)}
 @media(max-width:760px){.site-search{order:2;width:100%;flex:0 0 auto;min-width:0}.site-header nav{order:3}.site-search-results{position:fixed;top:104px;left:14px;right:14px;max-height:calc(100vh - 126px)}.zero-map-shell{grid-template-columns:1fr}}
+
+.skyeway-page{background:radial-gradient(circle at 14% 4%,rgba(53,183,255,.12),transparent 30%),radial-gradient(circle at 86% 8%,rgba(243,212,131,.14),transparent 34%),#03070b}
+.skyeway-shell{position:relative;z-index:1}
+.skyeway-hero{min-height:calc(100vh - 82px);display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.52fr);gap:clamp(24px,5vw,70px);align-items:center;padding:clamp(42px,8vw,94px) 5vw clamp(44px,7vw,80px);overflow:hidden}
+.skyeway-hero-copy{max-width:960px}
+.skyeway-title{font-size:clamp(4rem,12vw,9.5rem);line-height:.9;letter-spacing:0;margin:0 0 18px}
+.skyeway-lede{max-width:820px;color:#e5f2f5;font-size:clamp(1rem,1.65vw,1.28rem);line-height:1.58}
+.skyeway-command{border:1px solid rgba(243,212,131,.28);border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.028));box-shadow:0 28px 90px rgba(0,0,0,.34);padding:clamp(18px,3vw,28px);min-width:0}
+.skyeway-command-head{display:flex;justify-content:space-between;gap:18px;align-items:end;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:18px;margin-bottom:18px}
+.skyeway-command-head span,.skyeway-lane span,.skyeway-result span{color:var(--gold2);font-size:.74rem;text-transform:uppercase;letter-spacing:.13em;font-weight:900}
+.skyeway-command-head strong{font-size:clamp(3rem,7vw,5.8rem);line-height:.82;color:#fff}
+.skyeway-metrics{display:grid;gap:10px}
+.skyeway-metrics span{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(0,0,0,.2);padding:12px;color:#d8e6ea}
+.skyeway-metrics b{color:#fff;font-size:1.32rem}
+.skyeway-line-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.skyeway-line-list a{border:1px solid rgba(53,183,255,.24);border-radius:8px;padding:10px 12px;text-decoration:none;color:#dff7ff;background:rgba(53,183,255,.07);font-weight:800;font-size:.88rem}
+.skyeway-line-list a:hover,.skyeway-lane:hover,.skyeway-result:hover{border-color:rgba(243,212,131,.72);transform:translateY(-2px)}
+.skyeway-lanes .wide{max-width:900px}
+.skyeway-lane-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:26px}
+.skyeway-lane{display:grid;gap:7px;border:1px solid rgba(255,255,255,.13);border-radius:8px;background:linear-gradient(145deg,rgba(255,255,255,.068),rgba(255,255,255,.022));padding:18px;text-decoration:none;color:inherit;min-height:150px;transition:transform .18s cubic-bezier(.16,1,.3,1),border-color .18s cubic-bezier(.16,1,.3,1)}
+.skyeway-lane strong{font-size:1.16rem;line-height:1.18;color:#fff}
+.skyeway-lane small{color:var(--muted);line-height:1.45}
+.skyeway-directory{padding-bottom:clamp(70px,9vw,120px)}
+.skyeway-directory-head{display:flex;justify-content:space-between;gap:24px;align-items:start}
+.skyeway-directory-head>div{max-width:850px}
+.skyeway-directory-head p{color:var(--muted);max-width:760px}
+.skyeway-controls{display:grid;grid-template-columns:minmax(240px,1fr) minmax(220px,330px);gap:12px;margin:26px 0 14px}
+.skyeway-controls input,.skyeway-controls select{width:100%;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(0,0,0,.34);color:#fff;padding:14px 15px;font:inherit;min-height:52px}
+.skyeway-controls select option{color:#071017}
+.skyeway-filter-row{display:flex;gap:8px;overflow-x:auto;padding:6px 0 14px;scrollbar-width:thin}
+.skyeway-filter{flex:0 0 auto;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(255,255,255,.045);color:#dce9ee;padding:9px 11px;font-weight:850;cursor:pointer}
+.skyeway-filter b{color:#fff;margin-left:5px}
+.skyeway-filter.is-active{border-color:rgba(243,212,131,.72);background:rgba(243,212,131,.13);color:#fff}
+.skyeway-result-bar{display:flex;justify-content:space-between;gap:16px;align-items:center;border-block:1px solid rgba(255,255,255,.1);padding:13px 0;margin-bottom:18px}
+.skyeway-result-bar p{margin:0;color:#d9e4e7}
+.skyeway-pager{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.skyeway-pager button{border:1px solid rgba(243,212,131,.32);border-radius:8px;background:rgba(243,212,131,.09);color:#fff;padding:9px 12px;font-weight:900;cursor:pointer}
+.skyeway-pager button:disabled{opacity:.42;cursor:not-allowed}
+.skyeway-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+.skyeway-result{display:grid;align-content:start;gap:8px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.042);min-height:142px;padding:15px;text-decoration:none;color:inherit;transition:transform .18s cubic-bezier(.16,1,.3,1),border-color .18s cubic-bezier(.16,1,.3,1)}
+.skyeway-result strong{color:#fff;font-size:1rem;line-height:1.22;overflow-wrap:anywhere}
+.skyeway-result small{color:var(--muted);line-height:1.35;overflow-wrap:anywhere}
+.skyeway-empty{grid-column:1/-1;border:1px dashed rgba(255,255,255,.2);border-radius:8px;padding:22px;color:var(--muted);background:rgba(0,0,0,.2)}
+@media(max-width:980px){.skyeway-hero{grid-template-columns:1fr;min-height:auto}.skyeway-command{max-width:760px}.skyeway-directory-head{display:grid}.skyeway-controls{grid-template-columns:1fr}}
+@media(max-width:680px){.skyeway-hero{padding:28px 5vw 36px;gap:20px}.skyeway-title{font-size:clamp(3.1rem,18vw,4.8rem);line-height:.96}.skyeway-lede{font-size:16px;line-height:1.48}.skyeway-command-head{display:grid}.skyeway-metrics span{grid-template-columns:58px 1fr}.skyeway-line-list{grid-template-columns:1fr}.skyeway-result-bar{display:grid}.skyeway-pager{justify-content:space-between}.skyeway-pager button{min-width:96px}.skyeway-directory-head .button{width:100%}}
 /* END metraiyux-0s-home-search-and-core-map */
