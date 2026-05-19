@@ -17,9 +17,16 @@
     .page {
       width: 100%; height: 10.45in;
       display: flex; flex-direction: column;
+      overflow: hidden;
       break-after: page; page-break-after: always;
+      break-inside: avoid; page-break-inside: avoid;
     }
     .page:last-child { break-after: avoid; page-break-after: avoid; }
+    @media print {
+      html, body { height: auto !important; background: #060810 !important; }
+      .page { height: 10.45in !important; overflow: hidden !important; }
+      .print-btn { display: none !important; }
+    }
 
     /* ── ACCENT LINE ── */
     .accent { height: 3px; flex-shrink: 0;
@@ -165,14 +172,14 @@
   <!-- Hero -->
   <div class="hero">
     <div class="hero-h">Built to run before <span>customers arrived.</span></div>
-    <div class="hero-sub">A sovereign, edge-native, AI-first operating system deployed on Cloudflare's global edge. 23 platform lanes, 17 AI brains, 17 CF Workers, 875+ HTML surfaces, 58 Stripe products, 8 D1 databases — all live. No direct competitor ships this as a deployable unit.</div>
+    <div class="hero-sub">A sovereign, edge-native, AI-first operating system deployed on Cloudflare's global edge. 24 platform lanes, 17 AI brains, 17 CF Workers, 875+ HTML surfaces, 58 Stripe products, 8 D1 databases, and encrypted secret-pack custody — all live. No direct competitor ships this as a deployable unit.</div>
   </div>
 
   <!-- Stats -->
   <div class="stats">
     <div class="st"><span class="st-n">17</span><span class="st-l">CF Workers</span></div>
     <div class="st"><span class="st-n">17</span><span class="st-l">AI Brains</span></div>
-    <div class="st"><span class="st-n">23</span><span class="st-l">Platform Lanes</span></div>
+    <div class="st"><span class="st-n">24</span><span class="st-l">Platform Lanes</span></div>
     <div class="st"><span class="st-n">58</span><span class="st-l">Stripe Products</span></div>
     <div class="st"><span class="st-n">875+</span><span class="st-l">HTML Surfaces</span></div>
     <div class="st"><span class="st-n">8</span><span class="st-l">D1 Databases</span></div>
@@ -180,14 +187,15 @@
     <div class="st"><span class="st-n">13</span><span class="st-l">Cabinets</span></div>
   </div>
 
-  <!-- All 23 Lanes -->
+  <!-- All 24 Lanes -->
   <div class="lanes-section">
-    <h4>Platform Lanes — All 23 Deployed</h4>
+    <h4>Platform Lanes — All 24 Deployed</h4>
     <div class="lane-grid-3">
       <div class="lane"><div class="lane-name">SkyeGate FS27</div><div class="lane-desc">BLAKE3 auth, OAuth, Twilio MFA, API keys, Stripe billing catalog — 20,284 lines</div><span class="lane-tag">Auth · Security</span></div>
       <div class="lane"><div class="lane-name">SkyeMail</div><div class="lane-desc">26-surface email platform, hosted mailbox, Gmail OAuth, AI generation — 43,395 lines</div><span class="lane-tag">Email OS</span></div>
       <div class="lane"><div class="lane-name">CitadelDB v3</div><div class="lane-desc">K8s HA Postgres, PITR, WAL streaming, operator control plane — sovereign DB</div><span class="lane-tag">Database</span></div>
       <div class="lane"><div class="lane-name">SkyeVault</div><div class="lane-desc">Real Git smart-HTTP in a CF Worker — clone, push, fetch, ref tracking, policy gates</div><span class="lane-tag">Git at Edge</span></div>
+      <div class="lane"><div class="lane-name">SkyeSecure Secret Packs</div><div class="lane-desc">FS27 -> SkyeVault encrypted secret-pack custody — metadata-only registration, grants, events, proof route</div><span class="lane-tag">Proof Live</span></div>
       <div class="lane"><div class="lane-name">kAIxu 6.7</div><div class="lane-desc">Proprietary sovereign AI — 5 variants, plan-gated, fully abstracted brand, FS27-metered</div><span class="lane-tag">Sovereign AI</span></div>
       <div class="lane"><div class="lane-name">0meg4kAI</div><div class="lane-desc">Two-layer command scanner — browser + edge, tenant isolation, quarantine, security OS</div><span class="lane-tag">Security OS</span></div>
       <div class="lane"><div class="lane-name">SkyePay</div><div class="lane-desc">Full payment OS, owner-approval gate, store, 58 live Stripe products, admin panel</div><span class="lane-tag">Payment OS</span></div>
@@ -254,7 +262,7 @@
         <li><span class="why-check">✓</span><span><span class="why-title">Edge-native, not ported.</span> Every Worker is a native ES module on CF's global edge — D1, KV, Queues, Durable Objects used as designed. Not a server app deployed to edge.</span></li>
         <li><span class="why-check">✓</span><span><span class="why-title">AI as the OS layer.</span> 17 deterministic brain personas ARE the command routing substrate. Zero LLM cost per route decision. kAIxu 6.7 for generative — sovereign, not OpenAI-branded.</span></li>
         <li><span class="why-check">✓</span><span><span class="why-title">White-label full OS.</span> Every lane deploys under your client's brand. You collect recurring revenue. Deploy in under 30 minutes via wrangler. Zero architecture work needed.</span></li>
-        <li><span class="why-check">✓</span><span><span class="why-title">23 lanes, one package.</span> Auth + email + database + Git vault + AI + payments + dispatch + realtime + music + staffing + legal + directory + media + content + marketing. No competitor ships this as a deployable unit. The category doesn't exist yet.</span></li>
+        <li><span class="why-check">✓</span><span><span class="why-title">24 lanes, one package.</span> Auth + email + database + Git vault + encrypted secret custody + AI + payments + dispatch + realtime + music + staffing + legal + directory + media + content + marketing. No competitor ships this as a deployable unit. The category doesn't exist yet.</span></li>
         <li><span class="why-check">✓</span><span><span class="why-title">Full commercial model built in.</span> Free99 tier, 5-tier pricing, SkyeMerit loyalty, Ascension deal rooms, APEX enterprise layer, white-label licensing — the entire revenue motion ships with the OS.</span></li>
       </ul>
 
@@ -284,7 +292,7 @@
           <tr><td><div class="pt-name">Free99</div></td><td class="pt-price">$0</td><td><div class="pt-includes">Gated app lane access, public surfaces</div></td></tr>
           <tr><td><div class="pt-name">Starter</div><div class="pt-includes">+ $997 setup</div></td><td class="pt-price">$49/mo</td><td><div class="pt-includes">Core OS, SkyeGate, brains, basic lanes</div></td></tr>
           <tr><td><div class="pt-name">Growth</div><div class="pt-includes">+ $2,500 setup</div></td><td class="pt-price">$297/mo</td><td><div class="pt-includes">Full platform, kAIxu, SkyeMail, SkyePay</div></td></tr>
-          <tr><td><div class="pt-name">Autonomous Office</div><div class="pt-includes">+ $5,000 setup</div></td><td class="pt-price">$1,997/mo</td><td><div class="pt-includes">Full OS + white-label rights, all 23 lanes</div></td></tr>
+          <tr><td><div class="pt-name">Autonomous Office</div><div class="pt-includes">+ $5,000 setup</div></td><td class="pt-price">$1,997/mo</td><td><div class="pt-includes">Full OS + white-label rights, all 24 lanes</div></td></tr>
           <tr><td><div class="pt-name">Enterprise</div></td><td class="pt-price" style="color:#a88cff">Custom</div></td><td><div class="pt-includes">Sovereign deploy, custom SLAs, onboarding</div></td></tr>
         </tbody>
       </table>
@@ -303,7 +311,7 @@
 
       <h4>White-Label &amp; Deploy</h4>
       <ul class="why-list">
-        <li><span class="why-check">→</span><span>Deploy the full 23-lane OS under your client's brand in under 30 minutes</span></li>
+        <li><span class="why-check">→</span><span>Deploy the full 24-lane OS under your client's brand in under 30 minutes</span></li>
         <li><span class="why-check">→</span><span>28-lesson Admin Tutorial ships with every deployment — clients onboard themselves</span></li>
         <li><span class="why-check">→</span><span>0s SkyeWay route atlas maps every surface, lane, and proof route in the OS</span></li>
         <li><span class="why-check">→</span><span>@metraiyux/0s-sdk npm package + 4 client templates for third-party integrations</span></li>
