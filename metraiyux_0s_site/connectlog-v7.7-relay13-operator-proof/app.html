@@ -37,15 +37,12 @@
 
       <nav class="nav-stack" aria-label="App sections">
         <a href="./index.html?landing=1" class="nav-pill landing-return"><span>◌</span><b class="nav-label">Landing</b></a>
-        <a href="#dashboard" class="nav-pill active" data-nav-target="dashboard"><span>◆</span><b class="nav-label">Dashboard</b></a>
+        <a href="#dashboard" class="nav-pill active" data-nav-target="dashboard"><span>◆</span><b class="nav-label">Start</b></a>
         <a href="#exchange" class="nav-pill" data-nav-target="exchange"><span>◇</span><b class="nav-label">Exchange</b></a>
         <a href="#cards" class="nav-pill" data-nav-target="cards"><span>▣</span><b class="nav-label">Cards</b></a>
         <a href="#relay13" class="nav-pill" data-nav-target="relay13"><span>✉</span><b class="nav-label">Relay13</b></a>
-        <a href="#deployment" class="nav-pill" data-nav-target="deployment"><span>⌁</span><b class="nav-label">Deploy</b></a>
+        <a href="#deployment" class="nav-pill" data-nav-target="deployment"><span>⌁</span><b class="nav-label">Proof</b></a>
         <a href="#contacts" class="nav-pill" data-nav-target="contacts"><span>●</span><b class="nav-label">People</b></a>
-        <a href="#followups" class="nav-pill" data-nav-target="followups"><span>↗</span><b class="nav-label">Follow-ups</b></a>
-        <a href="#vault" class="nav-pill" data-nav-target="vault"><span>◈</span><b class="nav-label">Vault</b></a>
-        <a href="#seed" class="nav-pill" data-nav-target="seed"><span>✶</span><b class="nav-label">Seed</b></a>
         <a href="#intelligence" class="nav-pill" data-nav-target="intelligence"><span>✦</span><b class="nav-label">Intelligence</b></a>
       </nav>
 
@@ -56,11 +53,11 @@
     </aside>
 
     <main class="workspace" id="top">
-      <header class="hero" id="dashboard">
+      <header class="hero page-active" id="dashboard" data-page="dashboard">
         <div class="hero-copy-stack">
           <p class="eyebrow">Production connection exchange</p>
           <h1>Exchange once. Remember forever. Move before the relationship goes cold.</h1>
-          <p class="hero-copy">A production-published relationship OS for contacts, context, tags, notes, timeline events, follow-up dates, contact health scoring, QR profile sharing, QR intake, phone-contact handoff, seed-folder ingestion, and Relay13-backed owned messaging.</p>
+          <p class="hero-copy">ConnectLog is the front room for relationship memory. Relay13 is the chat room behind it. Use this workspace as rooms: set up the card, open inbox threads, then prove the handoff.</p>
         </div>
         <figure class="hero-brand-stage" aria-label="ConnectLog visual identity">
           <span class="brand-orbit orbit-one"></span>
@@ -75,7 +72,7 @@
         </div>
       </header>
 
-      <section class="stats-grid" aria-label="Summary statistics">
+      <section class="stats-grid page-active" data-page="dashboard" aria-label="Summary statistics">
         <article class="stat-card"><span>Total people</span><strong id="statTotal">0</strong></article>
         <article class="stat-card urgent"><span>Due follow-ups</span><strong id="statDue">0</strong></article>
         <article class="stat-card"><span>Pinned</span><strong id="statPinned">0</strong></article>
@@ -84,7 +81,24 @@
         <article class="stat-card"><span>Next 7 days</span><strong id="statUpcoming">0</strong></article>
       </section>
 
-      <section class="intelligence-panel" id="intelligence" aria-label="Relationship intelligence center">
+      <section class="room-guide page-active" data-page="dashboard" aria-labelledby="roomGuideTitle">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Three minute tour</p>
+            <h2 id="roomGuideTitle">What they are getting, without making them wander.</h2>
+            <p class="panel-hint">This is the simple path to demo or train a business owner. Every step has its own room in the left menu.</p>
+          </div>
+          <a class="primary-btn small" href="#relay13">Open chat room</a>
+        </div>
+        <div class="guide-grid">
+          <article class="guide-card"><span>01</span><h3>Exchange</h3><p>Make a scannable card for a room, event, client, or vendor. The QR can save the person into ConnectLog or create a phone contact.</p><a href="#exchange">Set up cards</a></article>
+          <article class="guide-card"><span>02</span><h3>Relay13</h3><p>Open owned threads from those cards. Website messages, direct operator requests, and brain-assisted drafts all land here.</p><a href="#relay13">Run inbox</a></article>
+          <article class="guide-card"><span>03</span><h3>People</h3><p>Search the relationship vault, filter by lane/status/priority, log notes, and schedule follow-ups before the lead gets cold.</p><a href="#contacts">Work contacts</a></article>
+          <article class="guide-card"><span>04</span><h3>Proof</h3><p>Use the proof room for diagnostics, activation checks, redacted config export, and copyable deployment commands.</p><a href="#deployment">Show proof</a></article>
+        </div>
+      </section>
+
+      <section class="intelligence-panel" id="intelligence" data-page="intelligence" aria-label="Relationship intelligence center">
         <div class="intelligence-main">
           <p class="eyebrow">Relationship intelligence</p>
           <h2>Daily mission control for every connection.</h2>
@@ -107,7 +121,7 @@
       </section>
 
 
-      <section class="exchange-panel" id="exchange" aria-label="ConnectLog exchange center">
+      <section class="exchange-panel" id="exchange" data-page="exchange" aria-label="ConnectLog exchange center">
         <div class="exchange-copy">
           <p class="eyebrow">QR connection engine</p>
           <h2>Your profile becomes a scannable connection packet.</h2>
@@ -149,7 +163,7 @@
         </div>
       </section>
 
-      <section class="card-variant-panel" id="cards" aria-label="Exchange card variants">
+      <section class="card-variant-panel" id="cards" data-page="cards" aria-label="Exchange card variants">
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Card variants</p>
@@ -163,7 +177,7 @@
 
 
 
-      <section class="relay-panel" id="relay13" aria-label="Relay13 messaging bridge">
+      <section class="relay-panel" id="relay13" data-page="relay13" data-active-room="setup" aria-label="Relay13 messaging bridge">
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Relay13 bridge</p>
@@ -173,8 +187,14 @@
           <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Relay13 production bridge live.</div>
         </div>
 
+        <div class="room-tabs" aria-label="Relay13 room views">
+          <button class="room-tab active" type="button" data-room-group="relay" data-room-target="setup" aria-pressed="true">Setup</button>
+          <button class="room-tab" type="button" data-room-group="relay" data-room-target="inbox" aria-pressed="false">Inbox</button>
+          <button class="room-tab" type="button" data-room-group="relay" data-room-target="proof" aria-pressed="false">Proof</button>
+        </div>
+
         <div class="relay-grid">
-          <article class="relay-card relay-settings-card">
+          <article class="relay-card relay-settings-card" data-relay-room="setup">
             <p class="eyebrow">Connection settings</p>
             <div class="form-grid two">
               <label>Mode<select id="relayModeInput"><option value="local">Production vault</option><option value="relay13">Relay13 production bridge</option></select></label>
@@ -195,7 +215,7 @@
 
 
 
-          <article class="relay-card relay-ops-card">
+          <article class="relay-card relay-ops-card" data-relay-room="setup">
             <p class="eyebrow">Bridge operations</p>
             <h3>Sync the card registry before trusting inbox routing.</h3>
             <p class="panel-hint">These controls prove the ConnectLog-specific Relay13 endpoints separately from generic Worker health. They show the deployed bridge, card registry, request lane, message history, and stats path.</p>
@@ -209,7 +229,7 @@
             <div class="relay-request-list" id="relayRequestList" aria-live="polite"></div>
           </article>
 
-          <article class="relay-card relay-inbox-card">
+          <article class="relay-card relay-inbox-card" data-relay-room="inbox">
             <div class="relay-toolbar">
               <div><p class="eyebrow">Inbox adapter</p><h3>Threads</h3></div>
               <div class="exchange-actions compact-row">
@@ -232,14 +252,14 @@
             </div>
           </article>
 
-          <article class="relay-card relay-fallback-card">
+          <article class="relay-card relay-fallback-card" data-relay-room="inbox">
             <p class="eyebrow">Delivery integrity ledger</p>
             <h3>Production delivery stays provable.</h3>
             <p class="panel-hint">If a browser lacks operator credentials or cannot reach the Worker, messages are queued for verified Relay13 delivery instead of being falsely marked complete.</p>
             <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
           </article>
 
-          <article class="relay-card relay-proof-card wide">
+          <article class="relay-card relay-proof-card wide" data-relay-room="proof">
             <p class="eyebrow">Live proof console</p>
             <h3>Activation proof, stats, message-history pull, and WebSocket proof commands.</h3>
             <p class="panel-hint">This box fills with browser diagnostics by default. Activation proof writes to Relay13 only when a real origin, workspace, and scoped key are present. WebSocket proof is not a pass until the deployed Worker opens and echoes events.</p>
@@ -249,7 +269,7 @@
         </div>
       </section>
 
-      <section class="deployment-panel" id="deployment" aria-label="Production proof command center">
+      <section class="deployment-panel" id="deployment" data-page="deployment" data-active-room="status" aria-label="Production proof command center">
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Production Proof Command Center</p>
@@ -263,20 +283,25 @@
             <button class="ghost-btn small" id="copyRelayEnvBtn" type="button">Copy Relay13 env</button>
           </div>
         </div>
+        <div class="room-tabs" aria-label="Production proof room views">
+          <button class="room-tab active" type="button" data-room-group="deploy" data-room-target="status" aria-pressed="true">Status</button>
+          <button class="room-tab" type="button" data-room-group="deploy" data-room-target="commands" aria-pressed="false">Commands</button>
+          <button class="room-tab" type="button" data-room-group="deploy" data-room-target="runbook" aria-pressed="false">Runbook</button>
+        </div>
         <div class="deployment-grid">
-          <article class="deployment-card">
+          <article class="deployment-card" data-deploy-room="status">
             <p class="eyebrow">System status</p>
             <div class="deployment-status-deck" id="deploymentStatusDeck" aria-live="polite"></div>
           </article>
-          <article class="deployment-card">
+          <article class="deployment-card" data-deploy-room="status">
             <p class="eyebrow">Proof checklist</p>
             <div class="deployment-checklist" id="deploymentChecklist" aria-live="polite"></div>
           </article>
-          <article class="deployment-card wide">
+          <article class="deployment-card wide" data-deploy-room="commands">
             <p class="eyebrow">Copyable command block</p>
             <textarea id="deploymentConfigOutput" readonly rows="13" spellcheck="false" aria-label="Deployment command output"></textarea>
           </article>
-          <article class="deployment-card wide operator-runbook-card">
+          <article class="deployment-card wide operator-runbook-card" data-deploy-room="runbook">
             <p class="eyebrow">Relay13 operator runbook</p>
             <h3>Copy the exact setup blocks instead of guessing deployment order.</h3>
             <p class="panel-hint">Use this before and after Relay13 deploy. The exported bridge config redacts the browser API key so it can be stored safely with project notes.</p>
@@ -295,7 +320,7 @@
         </div>
       </section>
 
-      <section class="control-deck" id="contacts" aria-label="Search and filters">
+      <section class="control-deck" id="contacts" data-page="contacts" aria-label="Search and filters">
         <label class="searchbox" for="searchInput">
           <span>⌕</span>
           <input id="searchInput" type="search" autocomplete="off" placeholder="Search names, companies, tags, notes, details..." />
@@ -352,7 +377,7 @@
         <div class="tag-rail" id="tagRail" aria-label="Tag filters"></div>
       </section>
 
-      <section class="split-layout">
+      <section class="split-layout" data-page="contacts">
         <div>
           <div class="section-title-row">
             <div>

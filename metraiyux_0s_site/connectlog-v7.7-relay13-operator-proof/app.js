@@ -392,7 +392,26 @@
     els.quickLogForm.addEventListener('submit', saveQuickLog);
     els.closeQuickLogBtn.addEventListener('click', closeQuickLogDialog);
     els.cancelQuickLogBtn.addEventListener('click', closeQuickLogDialog);
+    bindRoomTabs();
     document.addEventListener('keydown', handleGlobalKeys);
+  }
+
+  function bindRoomTabs() {
+    document.querySelectorAll('[data-room-group][data-room-target]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const group = tab.dataset.roomGroup;
+        const target = tab.dataset.roomTarget;
+        const scopeSelector = group === 'deploy' ? '.deployment-panel' : '.relay-panel';
+        const scope = tab.closest(scopeSelector);
+        if (!scope || !target) return;
+        scope.dataset.activeRoom = target;
+        scope.querySelectorAll(`[data-room-group="${group}"]`).forEach((peer) => {
+          const isActive = peer === tab;
+          peer.classList.toggle('active', isActive);
+          peer.setAttribute('aria-pressed', String(isActive));
+        });
+      });
+    });
   }
 
   function openDatabase() {
@@ -1346,15 +1365,41 @@
     renderAll();
   }
 
+  const pageAliases = {
+    followups: 'contacts',
+    vault: 'contacts',
+    seed: 'contacts'
+  };
+  const appPages = new Set(['dashboard', 'exchange', 'cards', 'relay13', 'deployment', 'contacts', 'intelligence']);
+
+  function activePageFromHash() {
+    let raw = '';
+    try {
+      raw = decodeURIComponent(window.location.hash.replace('#', '') || '').trim();
+    } catch {
+      raw = window.location.hash.replace('#', '').trim();
+    }
+    if (!raw || raw.startsWith(CONNECT_HASH_PREFIX)) return 'dashboard';
+    const page = pageAliases[raw] || raw;
+    return appPages.has(page) ? page : 'dashboard';
+  }
+
   function updateNavState() {
-    const hash = window.location.hash.replace('#', '') || 'dashboard';
+    const page = activePageFromHash();
     document.querySelectorAll('[data-nav-target]').forEach((link) => {
-      link.classList.toggle('active', link.dataset.navTarget === hash);
+      link.classList.toggle('active', link.dataset.navTarget === page);
     });
+    document.querySelectorAll('[data-page]').forEach((section) => {
+      section.classList.toggle('page-active', section.dataset.page === page);
+    });
+    els.appShell?.setAttribute('data-current-room', page);
   }
 
   window.addEventListener('hashchange', () => {
     updateNavState();
+    if (!window.location.hash.startsWith('#connect=')) {
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    }
     processIncomingConnectCard();
   });
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetrAIyux 0S Relay13 chat hub for live website messaging, ConnectLog relationship routing, operator inbox control, SKM client test accounts, and persistence proof.">
-  <title>Relay13 Chat Hub - MetrAIyux 0S</title>
+  <meta name="description" content="MetrAIyux 0S Relay13 chat universe lobby for owned website messaging, operator inbox routing, ConnectLog memory, and proof-backed client handoff.">
+  <title>Relay13 Chat Universe · MetrAIyux 0S</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../favicon-32.png">
 </head>
@@ -14,90 +14,50 @@
     <nav>
       <a href="../index.html">Home</a>
       <a href="connectlog-relay13-operator-proof.html">ConnectLog + Relay13</a>
-      <a href="../operator/index.html">Operator</a>
+      <a href="../connectlog-v7.7-relay13-operator-proof/app.html">ConnectLog App</a>
       <a href="../proof/index.html">Proof</a>
-      <a href="../saas/skyemerit.html">SkyeMerit</a>
     </nav>
   </header>
   <main>
     <section class="hero slim commercial-hero">
       <div class="hero-copy">
-        <p class="eyebrow">Live chat infrastructure</p>
+        <p class="eyebrow">Chat universe lobby</p>
         <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
-        <h1>Relay13 is the live chat hub behind the 0S website and client workspaces.</h1>
-        <p class="hero-lede">The public widget opens real Relay13 conversations, stores messages in D1, ties 0S conversations to ConnectLog relationship proof, and gives the operator a live inbox. The 0S widget now has two routes: brain-assisted and direct to Gray/operator. Automated brain replies stay server-side; no owner brain secrets belong in browser code.</p>
+        <h1>Relay13 turns every client site into an owned chat room.</h1>
+        <p class="hero-lede">A visitor sends a message. Relay13 stores the thread. ConnectLog keeps the relationship memory. The operator gets the inbox. The proof room shows it actually happened.</p>
         <div class="hero-actions">
-          <a class="button primary" href="https://relay13-core.graylondonskyes.workers.dev/admin/" target="_blank" rel="noopener">Open Relay13 Console</a>
-          <a class="button" href="../connectlog-v7.7-relay13-operator-proof/app.html#relay13">Open ConnectLog Relay Panel</a>
-          <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13" target="_blank" rel="noopener">Open FS27 Gate Lane</a>
-          <a class="button" href="../data/relay13-chat-accounts.json">Account Map JSON</a>
-          <a class="button" href="../data/relay13-chat-system-proof.json">Latest Proof JSON</a>
-          <a class="button" href="../data/relay13-guardrails-proof.json">Guardrails Proof JSON</a>
+          <a class="button primary" href="https://relay13-core.graylondonskyes.workers.dev/admin/" target="_blank" rel="noopener">Open Console</a>
+          <a class="button" href="relay13-operator-tutorial.html">Operator Tutorial</a>
+          <a class="button" href="relay13-proof-room.html">Proof Room</a>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <p class="eyebrow">How admin works</p>
-      <h2>The message path is public widget to Relay13 to operator inbox, with ConnectLog and FS27 proof around it.</h2>
-      <div class="process-grid">
-        <div class="process-step"><h3>1. Visitor sends</h3><p>The website widget sends the message to <code>/api/v1/conversations</code> with workspace, account, route, and ConnectLog metadata.</p></div>
-        <div class="process-step"><h3>2. Relay13 persists</h3><p>Relay13 writes the conversation and messages to D1, returns a visitor token, and can open a Durable Object WebSocket room.</p></div>
-        <div class="process-step"><h3>3. Admin operates</h3><p>The Relay13 Console loads workspaces, conversations, message history, unread counts, and lets the operator reply live.</p></div>
-        <div class="process-step"><h3>4. Gate tracks</h3><p>SkyeGateFS27 mirrors messaging lane events for source app, workspace id, SKM account code, billable state, and proof status.</p></div>
-      </div>
-    </section>
-
-    <section class="section split">
-      <div>
-        <p class="eyebrow">Brain route vs direct route</p>
-        <h2>The widget can label the thread for a brain-assisted answer or direct operator handling.</h2>
-        <p class="wide">Brain-assisted means the thread is routed with metadata so the Site Operator Brain or a cabinet brain can be used to draft an answer. Direct operator means the inbox is for Gray/operator review. The infrastructure is live today; automatic brain replies need the server-side brain bridge so the API key and private prompts stay out of public JavaScript.</p>
-      </div>
-      <aside class="panel">
-        <h3>Operator console checklist</h3>
-        <p>Open Relay13 Console, paste the platform admin token, select <code>ConnectLog Main</code>, filter open threads, read the message history, reply as operator, then mark the thread pending or closed.</p>
-        <p>Use ConnectLog when the thread should become a relationship card, follow-up request, or customer/account opportunity.</p>
-      </aside>
-    </section>
-
-    <section class="section">
-      <p class="eyebrow">SKM client/test accounts</p>
-      <h2>Bob and Empire are both real client lanes and house-paid SkyeMerit test accounts.</h2>
+      <p class="eyebrow">Choose a room</p>
+      <h2>No long manual. Each thing has its own room.</h2>
       <div class="route-grid">
-        <a class="route-card" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s-skm" target="_blank" rel="noopener"><h3>METRAIYUX-0S-SKM</h3><p>Owner public-site workspace. Relay13 slug: <code>connectlog-main</code>. Routes 0S public chat into ConnectLog and Relay13.</p></a>
-        <a class="route-card" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=bobs-smoke-shop-skm" target="_blank" rel="noopener"><h3>BOBS-SMOKE-SHOP-SKM</h3><p>Bob's Smoke Shop real client workspace and house-paid SKM test account. Relay13 slug: <code>bobs-smoke-shop</code>.</p></a>
-        <a class="route-card" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=empire-pallets-skm" target="_blank" rel="noopener"><h3>EMPIRE-PALLETS-SKM</h3><p>Empire Pallets real client workspace and house-paid SKM test account. Relay13 slug: <code>empire-pallets</code>.</p></a>
-        <a class="route-card" href="../data/relay13-chat-accounts.json"><h3>Account Map</h3><p>Public-safe JSON record of account codes, workspace slugs, workspace ids, live URLs, and proof commands.</p></a>
+        <a class="route-card" href="relay13-what-you-get.html"><h3>What They Get</h3><p>The simple business-owner explanation: website chat, workspace inbox, ConnectLog memory, guardrails, and proof.</p></a>
+        <a class="route-card" href="relay13-operator-tutorial.html"><h3>Operator Tutorial</h3><p>The admin path: load workspace, read a thread, reply, route to ConnectLog, and close the loop.</p></a>
+        <a class="route-card" href="relay13-client-tutorial.html"><h3>Client Setup</h3><p>How Bob, Empire, and future customers get a workspace, widget, account code, and message lane.</p></a>
+        <a class="route-card" href="relay13-proof-room.html"><h3>Proof Room</h3><p>Live proof JSON, guardrails, account map, and the standards that prove messages persist.</p></a>
       </div>
-    </section>
-
-    <section class="section">
-      <p class="eyebrow">Proof standard</p>
-      <h2>The proof has to show persisted customer messages, not just a pretty bubble.</h2>
-      <div class="process-grid">
-        <div class="process-step"><h3>0S public chat</h3><p>Create a 0S website conversation with ConnectLog metadata and verify the returned Relay13 state includes <code>bridge: connectlog</code>.</p></div>
-        <div class="process-step"><h3>Bob customer thread</h3><p>Create a Bob workspace conversation, add a second customer message with the visitor token, and pull message history back from Relay13.</p></div>
-        <div class="process-step"><h3>Empire customer thread</h3><p>Create an Empire workspace conversation, add a second customer message with the visitor token, and pull message history back from Relay13.</p></div>
-        <div class="process-step"><h3>Bob + Empire intro room</h3><p>Create an operator-mediated SKM opportunity thread showing how the two accounts could discuss money moves while persistence is verified.</p></div>
-      </div>
-      <p class="button-row"><a class="button primary" href="../data/relay13-chat-system-proof.json">Open Latest Proof JSON</a><a class="button" href="../proof/connectlog-relay13-expansion-receipt.html">Open Expansion Receipt</a></p>
     </section>
 
     <section class="section split">
       <div>
-        <p class="eyebrow">Guardrails</p>
-        <h2>Relay13 blocks abuse before the future brain responder gets a turn.</h2>
-        <p class="wide">Customer chat stays on app knowledge. Web search is locked off for website replies, auto-reply defaults to draft-only, direct operator routes stay human-review routes, and prompt-injection or secret-extraction attempts are rejected before persistence.</p>
+        <p class="eyebrow">Open the actual apps</p>
+        <h2>The lobby points into the working system, not a sales brochure.</h2>
+        <p class="wide">ConnectLog is where relationship cards, follow-ups, and context live. Relay13 is where conversations, operator replies, workspace policy, and guardrails live.</p>
       </div>
       <aside class="panel">
-        <h3>Guardrail proof</h3>
-        <p>The proof checks 0S, Bob, and Empire lanes for app-knowledge policy, no-web-search AI metadata, web-search review handling, and prompt-attack blocking.</p>
-        <p class="button-row"><a class="button primary" href="../data/relay13-guardrails-proof.json">Open Guardrails Proof</a></p>
+        <h3>Fast path</h3>
+        <p class="button-row"><a class="button primary" href="../connectlog-v7.7-relay13-operator-proof/app.html#dashboard">Open ConnectLog Rooms</a></p>
+        <p class="button-row"><a class="button" href="https://relay13-core.graylondonskyes.workers.dev/admin/" target="_blank" rel="noopener">Open Relay13 Console</a></p>
       </aside>
     </section>
   </main>
-  <footer><p>MetrAIyux 0S - Relay13 chat hub for public messaging, operator inbox, ConnectLog routing, and SKM client proof.</p></footer>
+  <footer><p>MetrAIyux 0S - Relay13 chat universe, ConnectLog memory, operator inbox, and proof-backed client handoff.</p></footer>
   <script src="../script.js"></script>
 </body>
 </html>
