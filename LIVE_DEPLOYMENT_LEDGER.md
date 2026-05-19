@@ -109,7 +109,6 @@ Verified result: the MetrAIyux 0S marketing production URL returned HTTP `200`, 
 | `skyesol-current-public-site` | https://skyesol-current-public-site.pages.dev/ | `14f43893-78e3-40b3-b2e9-b9d0690e54f9` | `main` | `276bbf1` | 14 hours ago |
 | `bobs-smoke-shop-metraiyux-preview` | https://bobs-smoke-shop-metraiyux-preview.pages.dev/ | `945a64f5-5294-4051-b155-a0bb9c4fa382` | `main` | `614ff71` | 16 hours ago |
 | `sol-staffing-agency-site` | https://sol-staffing-agency-site.pages.dev/ | `02ef7437-43ba-4192-92d8-bbe8afd0b64a` | `main` | `74d1a19` | 21 hours ago |
-| `neon-rift-blocks-mobile` | https://neon-rift-blocks-mobile.pages.dev/ | `11ed55dc-f806-4cbd-a1dc-97b3df579a33` | `main` | `74398e2` | 22 hours ago |
 | `metraiyux-0s-client-preview` | https://metraiyux-0s-client-preview.pages.dev/ | `5e5ed187-0ea1-469a-83fa-0ea6f716a524` | `main` | `4559974` | 1 day ago |
 | `skyes-over-london-legal` | https://skyes-over-london-legal.pages.dev/ | `ac682e18-a30d-4c1f-a697-6e71487d0df8` | `main` | `f572a53` | 1 day ago |
 | `citadeldb-ultimate` | https://citadeldb-ultimate.pages.dev/ | `554374c8-56d6-4f27-b1c6-27afbfe67935` | `production` | `edd29fb` | 1 day ago |
@@ -128,7 +127,7 @@ Verified result: the MetrAIyux 0S marketing production URL returned HTTP `200`, 
 | `relay13-core` | https://relay13-core.graylondonskyes.workers.dev/ | 2026-05-17T17:44:36.262709Z | `4f4810d8-b3d6-46b9-b249-5d6a4693f31e` | `53344958-774e-4645-ae12-7e79101f09a0` |
 | `metraiyux-0s-full-system` | https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ | 2026-05-17T19:59:55.703215Z | `795461c3-5f45-4160-8323-07d7a5e380ae` | `96769fe3-5f2d-4062-8268-a0f08a5b96d9` |
 | `sovereign-saas-provisioning-worker` | https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/ | 2026-05-17T18:39:38.197718Z | `4b2c958d-9039-4f2d-8839-fc1519af483c` | `67506ab4-8940-4554-a631-1742c3392be4` |
-| `skyevault-drop` | https://skyevault-drop.graylondonskyes.workers.dev/ | 2026-05-16T17:58:12.995282Z | `2bcf4efc-2047-4d3b-9e3c-4bb630d29d88` | `14b80246-2046-4c7a-996f-ca7d682d0f75` |
+| `skyevault-drop` | https://skyevault-drop.graylondonskyes.workers.dev/ | 2026-05-18T19:51:20.231807Z | `28d9f4c0-890a-4be1-81da-4b8533d28901` | `660a851c-e852-4aeb-b41d-a6aff577a5a1` |
 | `skyemail-platform` | https://skyemail-platform.graylondonskyes.workers.dev/ | 2026-05-16T22:00:07.466881Z | `0ede2efa-6d6f-4aef-b6b2-3d39457d6032` | `47b213ed-59bb-4d6d-a521-885d5e2157e3` |
 | `skyegatefs27-citadeldb` | https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/ | 2026-05-17T19:45:27.156477Z | `cbcf8b54-f5ca-42e7-b003-fe6ca984c60a` | `958afbba-cb5d-45ea-8631-167efaaa8a2d` |
 | `sovereign-13-site-operator-quantum` | https://sovereign-13-site-operator-quantum.graylondonskyes.workers.dev/ | 2026-05-15T13:04:54.587592Z | `4386b1d0-d3e0-49f9-9baa-6f4542803e9b` | `8ec2bb72-53af-48d2-86ea-8266a42448cb` |
@@ -147,7 +146,6 @@ These were live in Cloudflare or deployed during this pass, but were not fully l
 - `skyesol-current-public-site`
 - `bobs-smoke-shop-metraiyux-preview`
 - `sol-staffing-agency-site`
-- `neon-rift-blocks-mobile`
 - `sol-staffing-marketing`
 - `metraiyux-0s-client-preview`
 - `metraiyux-ecosystem-portal`

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>DocuMorph App | SKYESOVERLONDON</title>
+
+  <meta name="theme-color" content="#06b6d4" />
+  <meta name="description" content="DocuMorph app — upload a PDF and generate a study dashboard (reader, flashcards, quiz, analytics). Offline-first with optional Neon cloud sync. SKYESOVERLONDON AI engines inside." />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DocuMorph" />
+  <meta name="application-name" content="DocuMorph" />
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React (UMD) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Babel (for in-browser JSX) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- PDF.js + JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    body { background:#020617; color:#e2e8f0; }
+    .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(15px); border:1px solid rgba(255,255,255,0.05); }
+    .animate-spin-slow { animation: spin 2.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .perspective-2000 { perspective: 2000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    /* lightweight "animate-in" helpers used by your Tailwind plugin classes */
+    .animate-in.fade-in { animation: fadeIn .5s ease both; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .slide-in-from-bottom-12 { animation: slideUp .7s ease both; }
+    @keyframes slideUp { from { transform: translateY(48px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+    /* line-clamp-2 fallback */
+    .line-clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+
+    /* scrollbar-hide */
+    .scrollbar-hide::-webkit-scrollbar { display:none; }
+    .scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
+  </style>
+  <script src="../../../free99-gate.js" data-platform-id="documorph" data-platform-name="Documorph" data-billing-mode="quote_only" data-price-label="Quote after DB/runtime proof" data-app-root="/Free99/apps/documorph/"></script>
+</head>
+
+<body class="selection:bg-cyan-500/40">
+  <div id="root"></div>
+
+  <script>
+    // PWA registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // ===== Constants =====
+    const PDFJS_WORKER_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // ===== SKYESOVERLONDON AI Engines (Rebranded) =====
+    // These are the *names users see*. Underlying model IDs can be overridden server-side.
+    const SKYES_AI = {
+      engines: [
+        { id: 'skyes-gemini', label: 'SKYESOVERLONDON • SkyesFlash', provider: 'gemini', defaultModel: 'gemini-2.5-flash-preview-09-2025' },
+        { id: 'skyes-openai', label: 'SKYESOVERLONDON • SkyesCrown', provider: 'openai', defaultModel: 'gpt-4o-mini' }
+      ]
+    };
+
+    const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+    const GEMINI_ENDPOINT = (model, key) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+
+    // ===== IndexedDB (offline-first storage) =====
+    const DB_NAME = 'documorph_db_v1';
+    const STORE = 'documents';
+
+    function idbOpen() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbGetAll() {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const st = tx.objectStore(STORE);
+        const req = st.getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbPut(doc) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(doc);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbDelete(id) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(id);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+
+    // ===== Client Identity (no-auth) =====
+    function uuidLite(){
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function getOrCreateClientId(){
+      const KEY = 'skyes_client_id';
+      let id = localStorage.getItem(KEY);
+      if (!id) {
+        id = uuidLite();
+        localStorage.setItem(KEY, id);
+      }
+      return id;
+    }
+
+    function getEngineById(id){
+      return (SKYES_AI.engines || []).find(e => e.id === id) || SKYES_AI.engines[0];
+    }
+
+    function getEngineLabel(id){
+      const e = getEngineById(id);
+      return e ? e.label : 'SKYESOVERLONDON • AI';
+    }
+
+    async function idbPutMany(docs){
+      if (!Array.isArray(docs) || docs.length === 0) return;
+      // best-effort sequential writes (keeps memory low for large docs)
+      for (const d of docs) {
+        try { await idbPut(d); } catch(e) {}
+      }
+    }
+    // ===== Small helpers =====
+    function uuid() {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'id-' + Math.random().toString(16).slice(2) + '-' + Date.now();
+    }
+
+    function safeJsonParse(s, fallback=null){
+      try { return JSON.parse(s); } catch { return fallback; }
+    }
+
+    function toastMsg(setToast, msg){
+      setToast(msg);
+      setTimeout(()=>setToast(''), 2200);
+    }
+
+    function guessSummary(text){
+      const cleaned = (text || '').replace(/\s+/g,' ').trim();
+      if(!cleaned) return "No text extracted.";
+      const m = cleaned.match(/[^.!?]+[.!?]+\s*[^.!?]+[.!?]+/);
+      return m ? m[0].trim() : cleaned.slice(0, 240) + (cleaned.length>240 ? '…' : '');
+    }
+
+    function topTerms(text, n=8){
+      const words = (text||'').toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(w=>w.length>5);
+      const stop = new Set(['because','should','would','therefore','within','between','around','people','system','business','during','before','after','their','which','these','those','other','about','where','while','under','every','really']);
+      const freq = new Map();
+      for(const w of words){
+        if(stop.has(w)) continue;
+        freq.set(w, (freq.get(w)||0)+1);
+      }
+      return [...freq.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n).map(([w])=>w);
+    }
+
+    function fallbackStudyPack(text){
+      const summary = guessSummary(text);
+      const terms = topTerms(text, 8);
+      const flashcards = terms.map(t => ({ term: t.toUpperCase(), context: `Key idea around "${t}" in this document. Re-read the sections where it appears and define it in your own words.` }));
+      const questions = terms.map((t, i) => ({
+        id: i+1,
+        question: `In this document, what does "${t}" most directly relate to?`,
+        answer: "It depends on the document context.",
+        options: ["It depends on the document context.","A minor detail only","A completely unrelated topic","An author signature"]
+      }));
+      return { summary, flashcards, questions };
+    }
+
+    // ===== Icon component (Lucide) =====
+    function Icon({ name, className="" }) {
+      useEffect(() => { try { lucide.createIcons(); } catch(e){} });
+      return <i data-lucide={name} className={className}></i>;
+    }
+
+    function Background(){
+      return (
+        <div className="fixed inset-0 z-0 pointer-events-none bg-[#020617] overflow-hidden">
+          <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-cyan-900/10 blur-[150px] animate-pulse"></div>
+          <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-indigo-900/10 blur-[150px] animate-pulse animation-delay-2000"></div>
+        </div>
+      );
+    }
+
+    function NavBtn({ active, icon, label, onClick }){
+      return (
+        <button onClick={onClick} className={"w-full flex items-center gap-5 px-8 py-5 rounded-[2rem] transition-all " + (active ? "bg-white/5 text-white border border-white/10 shadow-2xl" : "text-white/20 hover:text-white hover:bg-white/5")}>
+          <span className={"shrink-0 transition-colors " + (active ? "text-cyan-400" : "")}><Icon name={icon} className="w-6 h-6"/></span>
+          <span className="font-black text-[11px] tracking-[0.2em] uppercase">{label}</span>
+        </button>
+      );
+    }
+
+    function ReaderView({ sections, summary }){
+      return (
+        <div className="max-w-4xl mx-auto space-y-24 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+          <div className="p-12 glass rounded-[4rem] border-l-[10px] border-l-cyan-500/80 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-80 h-80 bg-cyan-500/5 rounded-full blur-[100px]"></div>
+            <div className="flex items-center gap-4 mb-8">
+              <Icon name="sparkles" className="w-6 h-6 text-cyan-400"/>
+              <h3 className="font-mono text-xs text-cyan-400 uppercase tracking-[0.4em] font-bold">Synthesized Core</h3>
+            </div>
+            <p className="text-2xl text-white/90 leading-relaxed font-light">{summary}</p>
+          </div>
+
+          {(sections||[]).map((s, i) => (
+            <div key={i} className="group relative">
+              <div className="flex items-center justify-between border-b border-white/5 pb-10 mb-12">
+                <h2 className="text-5xl font-black text-white tracking-tighter uppercase leading-tight max-w-2xl">{s.title}</h2>
+                <span className="font-mono text-xs text-white/10 tracking-[0.5em] font-bold">BLOCK_0{i+1}</span>
+              </div>
+              <div className="space-y-10 text-white/40 text-2xl font-light leading-relaxed max-w-3xl group-hover:text-white/60 transition-colors duration-500">
+                {(s.content||'').split('\n').map((p, j) => p.trim() ? <p key={j}>{p}</p> : null)}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function FlashcardView({ cards }){
+      const [idx, setIdx] = useState(0);
+      const [flipped, setFlipped] = useState(false);
+      if (!cards || cards.length === 0) return <div className="text-center text-white/5 uppercase tracking-[1em] py-40 text-xs font-bold font-mono">Mesh Empty</div>;
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[70vh] max-w-3xl mx-auto space-y-16">
+          <div className="flex gap-6 items-center">
+            <div className="text-[10px] font-mono text-white/20 uppercase tracking-[0.5em] font-bold">Node Identity</div>
+            <div className="w-12 h-[1px] bg-white/10"></div>
+            <div className="text-white font-black text-2xl">{idx + 1} <span className="text-white/10">/</span> {cards.length}</div>
+          </div>
+
+          <div onClick={() => setFlipped(!flipped)} className="w-full aspect-[1.8] perspective-2000 cursor-pointer group">
+            <div className={"relative w-full h-full transition-all duration-1000 transform-style-3d " + (flipped ? "rotate-y-180" : "")}>
+              <div className="absolute inset-0 backface-hidden glass rounded-[4rem] border border-white/10 flex flex-col items-center justify-center p-16 text-center group-hover:border-cyan-500/50 transition-all shadow-2xl">
+                <div className="text-[10px] font-mono text-cyan-400 mb-10 tracking-[0.5em] uppercase font-bold">Primary Term</div>
+                <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase">{cards[idx].term}</h3>
+                <div className="absolute bottom-12 text-white/5 text-[9px] font-mono tracking-[0.6em] animate-pulse uppercase font-bold">Trigger Flip Matrix</div>
+              </div>
+
+              <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white/[0.02] glass rounded-[4rem] border border-cyan-500/40 flex flex-col items-center justify-center p-16 md:p-24 text-center shadow-[0_0_100px_rgba(34,211,238,0.1)]">
+                <div className="text-[10px] font-mono text-cyan-400 mb-8 tracking-[0.5em] uppercase font-bold">Decrypted Definition</div>
+                <p className="text-2xl md:text-3xl text-white/80 font-light leading-snug italic tracking-tight">"{cards[idx].context}"</p>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={() => { setFlipped(false); setTimeout(() => setIdx((idx + 1) % cards.length), 300); }} className="px-16 py-7 bg-white text-black font-black rounded-3xl hover:scale-110 active:scale-95 transition-all shadow-[0_30px_60px_rgba(255,255,255,0.1)] uppercase text-[10px] tracking-[0.3em]">
+            Load Next Packet
+          </button>
+        </div>
+      );
+    }
+
+    function QuizView({ questions }){
+      const [ans, setAns] = useState({});
+      const [show, setShow] = useState(false);
+      if (!questions || questions.length === 0) return <div className="text-center text-white/5 uppercase tracking-[1em] py-40 text-xs font-bold font-mono">Verification Unavailable</div>;
+      const score = questions.filter((q) => ans[q.id] === q.answer).length;
+      return (
+        <div className="max-w-4xl mx-auto pb-60">
+          <div className="flex justify-between items-end mb-24 sticky top-0 bg-[#020617]/90 backdrop-blur-3xl py-12 z-30 border-b border-white/5">
+            <div>
+              <h2 className="text-6xl font-black tracking-tighter uppercase leading-none">Neural<br/><span className="text-cyan-400">Check</span></h2>
+              <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.5em] mt-6 font-bold">Depth Verification sequence active</p>
+            </div>
+            {show ? (
+              <div className="text-right">
+                <div className="text-[10px] font-mono text-white/20 mb-3 uppercase font-bold tracking-widest">Final Integrity Score</div>
+                <span className={"text-6xl font-black tracking-tighter " + (score > questions.length/2 ? "text-cyan-400" : "text-rose-500")}>
+                  {score} <span className="text-2xl text-white/5 tracking-normal">/ {questions.length}</span>
+                </span>
+              </div>
+            ) : (
+              <button onClick={() => setShow(true)} disabled={Object.keys(ans).length !== questions.length} className="px-14 py-7 bg-white text-black font-black rounded-3xl disabled:opacity-10 hover:bg-cyan-400 transition-all shadow-2xl uppercase text-[10px] tracking-widest">
+                Submit Final
+              </button>
+            )}
+          </div>
+
+          <div className="space-y-32">
+            {questions.map((q, i) => (
+              <div key={q.id} className="group relative">
+                <div className="flex gap-10 mb-14">
+                  <span className="text-8xl font-black text-white/[0.02] font-mono select-none leading-none -mt-4">0{i+1}</span>
+                  <p className="text-3xl text-white font-light leading-snug pt-3 group-hover:text-cyan-200 transition-colors">{q.question}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pl-0 md:pl-24">
+                  {q.options.map((o) => {
+                    let c = "border-white/5 text-white/30 hover:bg-white/5";
+                    if (show) {
+                      if (o === q.answer) c = "bg-cyan-500/20 border-cyan-500 text-cyan-200 shadow-[0_0_30px_rgba(34,211,238,0.2)]";
+                      else if (ans[q.id] === o) c = "bg-rose-500/20 border-rose-500 text-rose-300";
+                      else c = "opacity-10 grayscale";
+                    } else if (ans[q.id] === o) c = "bg-white/5 border-white/40 text-white shadow-2xl";
+                    return (
+                      <button key={o} onClick={() => !show && setAns({ ...ans, [q.id]: o })} className={"text-left p-8 rounded-[2rem] border transition-all font-bold text-base tracking-tight leading-tight " + c}>
+                        {o}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function StatsView({ text, flashcardCount, questionCount }){
+      const w = (text || '').split(/\s+/).filter(Boolean).length;
+      const t = Math.ceil(w / 200);
+      const keywords = useMemo(() => {
+        return (text || '')
+          .toLowerCase()
+          .replace(/[^a-z\s]/g, '')
+          .split(/\s+/)
+          .filter((x) => x.length > 5)
+          .slice(0, 20);
+      }, [text]);
+
+      return (
+        <div className="max-w-6xl mx-auto pb-40">
+          <h2 className="text-6xl font-black tracking-tighter mb-16 uppercase leading-none">Core<br/><span className="text-white/5">Analytics</span></h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20">
+            <div className="glass p-12 rounded-[4rem] border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500/50"></div>
+              <div className="text-[10px] font-mono text-cyan-400 mb-6 tracking-[0.4em] uppercase font-bold">Neural Pass</div>
+              <div className="text-6xl font-black text-white tracking-tighter">{t}m</div>
+              <p className="text-white/10 text-[10px] mt-4 uppercase tracking-[0.2em] font-bold">Estimated Runtime</p>
+            </div>
+
+            <div className="glass p-12 rounded-[4rem] border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-purple-500/50"></div>
+              <div className="text-[10px] font-mono text-purple-400 mb-6 tracking-[0.4em] uppercase font-bold">Token Stream</div>
+              <div className="text-6xl font-black text-white tracking-tighter">{w.toLocaleString()}</div>
+              <p className="text-white/10 text-[10px] mt-4 uppercase tracking-[0.2em] font-bold">Extracted Symbols</p>
+            </div>
+
+            <div className="glass p-12 rounded-[4rem] border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/50"></div>
+              <div className="text-[10px] font-mono text-emerald-400 mb-6 tracking-[0.4em] uppercase font-bold">Asset Load</div>
+              <div className="text-6xl font-black text-white tracking-tighter">{(flashcardCount || 0) + (questionCount || 0)}</div>
+              <p className="text-white/10 text-[10px] mt-4 uppercase tracking-[0.2em] font-bold">Generated Nodes</p>
+            </div>
+          </div>
+
+          <div className="glass p-16 rounded-[4rem] border border-white/5 relative overflow-hidden">
+            <div className="absolute -bottom-20 -right-20 w-[40%] h-[100%] bg-cyan-500/5 blur-[120px]"></div>
+            <h3 className="text-xl font-black text-white mb-14 flex items-center gap-6 uppercase tracking-tighter">
+              <Icon name="terminal" className="w-6 h-6 text-cyan-400"/> Semantic Keyword Density
+            </h3>
+            <div className="flex flex-wrap gap-5">
+              {keywords.map((kw, i) => (
+                <div key={i} className="px-8 py-5 glass rounded-2xl border border-white/5 text-[11px] font-mono uppercase tracking-[0.2em] text-white/30 hover:text-cyan-400 hover:border-cyan-500/50 transition-all cursor-default font-bold">
+                  {kw}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ===== Main App =====
+    function App(){
+      const [appState, setAppState] = useState('auth_loading'); // auth_loading | library | upload | processing | dashboard
+      const [viewMode, setViewMode] = useState('reader'); // reader | flashcards | quiz | stats
+      const [currentDoc, setCurrentDoc] = useState(null);
+      const [library, setLibrary] = useState([]);
+      const [loadingProgress, setLoadingProgress] = useState(0);
+      const [processingStatus, setProcessingStatus] = useState("");
+      const [error, setError] = useState(null);
+      const [toast, setToast] = useState("");
+
+      // settings
+      const [showSettings, setShowSettings] = useState(false);
+      const clientId = useMemo(() => getOrCreateClientId(), []);
+      const [aiMode, setAiMode] = useState(localStorage.getItem('skyes_ai_mode') || "server"); // server | local
+      const [aiEngine, setAiEngine] = useState(localStorage.getItem('skyes_ai_engine') || "skyes-gemini");
+      const [geminiKey, setGeminiKey] = useState(localStorage.getItem('skyes_gemini_key') || "");
+      const [openaiKey, setOpenaiKey] = useState(localStorage.getItem('skyes_openai_key') || "");
+      const [syncMode, setSyncMode] = useState(localStorage.getItem('skyes_sync_mode') || "local"); // local | neon
+
+      // export modal
+      const [showExportModal, setShowExportModal] = useState(false);
+      const [exportName, setExportName] = useState("");
+      const [exportIcon, setExportIcon] = useState("🧠");
+      const [exportColor, setExportColor] = useState("cyan");
+
+      useEffect(() => {
+        // Setup pdf.js worker
+        try {
+          if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+          }
+        } catch (e) {}
+
+        // Load library from IDB
+        (async () => {
+          try {
+            const docs = await idbGetAll();
+            docs.sort((a,b) => (b.uploadDate || 0) - (a.uploadDate || 0));
+            setLibrary(docs);
+            setAppState('library');
+            // If Neon Cloud Sync is enabled, pull latest in the background
+            try { syncFromServer(true); } catch(e) {}
+          } catch (e) {
+            setError("Storage error.");
+            setAppState('library');
+          }
+        })();
+      }, []);
+
+      async function refreshLibrary(){
+        const docs = await idbGetAll();
+        docs.sort((a,b) => (b.uploadDate || 0) - (a.uploadDate || 0));
+        setLibrary(docs);
+      }
+
+      // ===== Optional Neon Cloud Sync (no-auth, per-device clientId) =====
+      async function apiFetch(path, opts = {}) {
+        const headers = Object.assign(
+          { 'Content-Type': 'application/json', 'x-client-id': clientId },
+          (opts.headers || {})
+        );
+        return fetch(path, Object.assign({}, opts, { headers }));
+      }
+
+      async function serverPing() {
+        try {
+          const r = await apiFetch('/api/ping', { method: 'GET', headers: { 'Accept': 'application/json' } });
+          return r && r.ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      async function syncFromServer(silent = false) {
+        if (syncMode !== 'neon') return;
+        if (!navigator.onLine) return;
+        try {
+          const ok = await serverPing();
+          if (!ok) throw new Error('ping');
+          const r = await apiFetch('/api/documents', { method: 'GET', headers: { 'Accept': 'application/json' } });
+          const data = await r.json();
+          const docs = Array.isArray(data.documents) ? data.documents : [];
+          await idbPutMany(docs);
+          await refreshLibrary();
+          if (!silent) toastMsg(setToast, `Cloud sync ✓ (${docs.length})`);
+        } catch (e) {
+          if (!silent) toastMsg(setToast, "Cloud sync unavailable — using local");
+        }
+      }
+
+      async function pushDocToServer(doc) {
+        if (syncMode !== 'neon') return;
+        if (!navigator.onLine) return;
+        try {
+          await apiFetch('/api/documents', { method: 'POST', body: JSON.stringify({ document: doc }) });
+        } catch (e) {}
+      }
+
+      async function deleteDocOnServer(id) {
+        if (syncMode !== 'neon') return;
+        if (!navigator.onLine) return;
+        try {
+          await apiFetch(`/api/documents/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        } catch (e) {}
+      }
+
+      // ===== AI analysis (Gemini / OpenAI) =====
+      async function analyzeText(fullText) {
+        const engine = getEngineById(aiEngine);
+        const engineLabel = engine ? engine.label : 'SKYESOVERLONDON • AI';
+
+        const prompt = `Perform high-level analysis on this educational text. Output strictly JSON with keys: "flashcards" (8 items, {term, context}), "questions" (8 items, {id, question, answer, options}), and "summary" (2 sentences). Text: ${fullText.slice(0, 30000)}`;
+
+        // 1) Server mode (recommended): keeps keys off the client, enables Neon + shared compute
+        if (aiMode === 'server' && navigator.onLine) {
+          try {
+            const r = await apiFetch('/api/analyze', {
+              method: 'POST',
+              body: JSON.stringify({ engine: (engine && engine.id) || 'skyes-gemini', text: fullText.slice(0, 30000) })
+            });
+            if (r.ok) {
+              const data = await r.json();
+              if (data && data.flashcards && data.questions && data.summary) return data;
+            }
+          } catch (e) {}
+        }
+
+        // 2) Local mode (keys live in browser) — functional but NOT secure
+        try {
+          if (engine && engine.provider === 'gemini' && geminiKey && navigator.onLine) {
+            const r = await fetch(GEMINI_ENDPOINT(engine.defaultModel, geminiKey), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: 'application/json' }
+              })
+            });
+            const data = await r.json();
+            const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const parsed = safeJsonParse(raw, null);
+            if (parsed && parsed.flashcards && parsed.questions && parsed.summary) return parsed;
+          }
+
+          if (engine && engine.provider === 'openai' && openaiKey && navigator.onLine) {
+            const r = await fetch(OPENAI_ENDPOINT, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${openaiKey}`
+              },
+              body: JSON.stringify({
+                model: engine.defaultModel,
+                response_format: { type: 'json_object' },
+                temperature: 0.2,
+                messages: [
+                  { role: 'system', content: 'Return ONLY valid JSON. No markdown. No code fences. The JSON keys must be: flashcards (8 items: {term, context}), questions (8 items: {id, question, answer, options}), summary (2 sentences).' },
+                  { role: 'user', content: prompt }
+                ]
+              })
+            });
+            const data = await r.json();
+            const raw = data?.choices?.[0]?.message?.content || '';
+            const parsed = safeJsonParse(raw, null) || safeJsonParse(raw.replace(/```json|```/g, ''), null);
+            if (parsed && parsed.flashcards && parsed.questions && parsed.summary) return parsed;
+          }
+        } catch (e) {}
+
+        // 3) Fallback always works
+        return fallbackStudyPack(fullText);
+      }
+
+      async function handleFileUpload(ev){
+        const file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+
+        setError(null);
+        setAppState('processing');
+        setLoadingProgress(10);
+        setProcessingStatus("Initializing AI Core...");
+
+        try{
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+          let fullText = '';
+          const extractedSections = [];
+          let currentSection = { title: 'Genesis', content: '', page: 1 };
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            setLoadingProgress(15 + Math.floor((i / pdf.numPages) * 30));
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageLines = (textContent.items || []).map((it) => it.str).filter((s) => (s||'').trim().length > 0);
+
+            for (const line of pageLines) {
+              const isH = line.length < 60 && line.length > 3 && (line === line.toUpperCase() || /^[A-Z][a-z]+(\s[A-Z][a-z]+)*$/.test(line)) && !line.includes('.');
+              if (isH && currentSection.content.length > 300) {
+                extractedSections.push(currentSection);
+                currentSection = { title: line, content: '', page: i };
+              }
+              fullText += line + ' ';
+              currentSection.content += line + ' ';
+            }
+          }
+          extractedSections.push(currentSection);
+
+          setLoadingProgress(55);
+          setProcessingStatus("Neural Synthesis...");
+
+          // AI step (SKYESOVERLONDON engines) with offline fallback
+          setProcessingStatus(`SKYESOVERLONDON AI: ${getEngineLabel(aiEngine)}`);
+          const pack = await analyzeText(fullText);
+
+
+          setLoadingProgress(85);
+          setProcessingStatus("Finalizing Artifact...");
+
+          const newDocId = uuid();
+          const newDoc = {
+            id: newDocId,
+            fileName: file.name,
+            uploadDate: Date.now(),
+            stats: {
+              words: fullText.split(/\s+/).filter(Boolean).length,
+              cards: (pack.flashcards || []).length,
+              questions: (pack.questions || []).length
+            },
+            content: {
+              rawText: fullText,
+              sections: extractedSections,
+              flashcards: pack.flashcards || [],
+              questions: pack.questions || [],
+              summary: typeof pack.summary === 'string' ? pack.summary : (pack.summary?.toString?.() || guessSummary(fullText))
+            }
+          };
+
+          await idbPut(newDoc);
+          // optional Neon cloud sync
+          pushDocToServer(newDoc);
+          await refreshLibrary();
+
+          setCurrentDoc(newDoc);
+          setAppState('dashboard');
+          setViewMode('reader');
+          setLoadingProgress(100);
+          toastMsg(setToast, "Document synthesized ✔");
+        } catch (e) {
+          console.error(e);
+          setError("AI Engine Timeout.");
+          setAppState('upload');
+        }
+      }
+
+      async function deleteDocById(id){
+        try{
+          await idbDelete(id);
+          // optional Neon cloud sync
+          deleteDocOnServer(id);
+          await refreshLibrary();
+          if (currentDoc && currentDoc.id === id) setCurrentDoc(null);
+          toastMsg(setToast, "Deleted");
+        } catch(e){
+          setError("Delete failed.");
+        }
+      }
+
+      async function handleDownloadZip(){
+        if (!currentDoc || !window.JSZip) return;
+
+        const zip = new window.JSZip();
+        const colorMap = { cyan:'#06b6d4', purple:'#9333ea', emerald:'#10b981', rose:'#f43f5e', amber:'#f59e0b' };
+        const hexColor = colorMap[exportColor] || '#06b6d4';
+        const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="${hexColor}"/><text x="50" y="72" text-anchor="middle" font-size="72">${exportIcon}</text></svg>`;
+
+        const safeDoc = JSON.stringify(currentDoc).replace(/</g, '\\u003c');
+
+        const exportedIndex = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>${(exportName||'Study App').replace(/</g,'&lt;')}</title>
+  <meta name="theme-color" content="${hexColor}" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{color-scheme:dark}
+    body{background:#030712;color:#f8fafc;font-family:ui-sans-serif,system-ui;overflow-x:hidden}
+    .glass{background:rgba(255,255,255,0.02);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.05)}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script> if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(console.error); } </script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DOC = ${safeDoc};
+    function Icon({name, className=""}){ useEffect(()=>{try{lucide.createIcons();}catch(e){} }); return <i data-lucide={name} className={className}></i>; }
+    function App(){
+      const [view, setView] = useState('reader');
+      return (
+        <div className="min-h-screen flex flex-col md:flex-row">
+          <aside className="w-full md:w-64 border-r border-white/5 p-6 space-y-4">
+            <div className="flex items-center gap-3 mb-8 px-2">
+              <img src="icon.svg" className="w-10 h-10" />
+              <h1 className="font-bold truncate text-sm uppercase tracking-tighter">${(exportName||'Study App').replace(/</g,'&lt;')}</h1>
+            </div>
+            <button onClick={()=>setView('reader')} className={"w-full text-left p-4 rounded-xl flex items-center gap-3 " + (view==='reader'?'bg-white/5 border border-white/10':'opacity-40')}>
+              <Icon name="book-open" className="w-5 h-5"/> Content
+            </button>
+            <button onClick={()=>setView('cards')} className={"w-full text-left p-4 rounded-xl flex items-center gap-3 " + (view==='cards'?'bg-white/5 border border-white/10':'opacity-40')}>
+              <Icon name="brain" className="w-5 h-5"/> Recall
+            </button>
+            <button onClick={()=>setView('quiz')} className={"w-full text-left p-4 rounded-xl flex items-center gap-3 " + (view==='quiz'?'bg-white/5 border border-white/10':'opacity-40')}>
+              <Icon name="check-circle" className="w-5 h-5"/> Review
+            </button>
+          </aside>
+
+          <main className="flex-1 p-6 md:p-12 overflow-y-auto h-screen">
+            {view==='reader' && (
+              <div className="max-w-3xl space-y-12">
+                <div className="p-8 glass rounded-3xl border-l-4" style={{borderLeftColor:'${hexColor}'}}>
+                  <p className="text-lg leading-relaxed font-light">{DOC.content.summary}</p>
+                </div>
+                {DOC.content.sections.map((s,i)=>(
+                  <div key={i}>
+                    <h3 className="text-3xl font-bold mb-6">{s.title}</h3>
+                    <div className="space-y-4 opacity-70 leading-relaxed text-lg">
+                      {String(s.content||'').split('\n').map((p,j)=>p.trim() && <p key={j}>{p}</p>)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {view==='cards' && (
+              <div className="max-w-3xl space-y-6">
+                {DOC.content.flashcards.map((c,i)=>(
+                  <div key={i} className="glass p-6 rounded-2xl border border-white/10">
+                    <div className="font-black tracking-tight text-xl">{c.term}</div>
+                    <div className="text-white/60 mt-2">{c.context}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {view==='quiz' && (
+              <div className="max-w-3xl space-y-8">
+                {DOC.content.questions.map((q)=>(
+                  <div key={q.id} className="glass p-6 rounded-2xl border border-white/10">
+                    <div className="font-black tracking-tight text-xl">{q.question}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                      {q.options.map((o)=>(
+                        <div key={o} className={"p-4 rounded-xl border " + (o===q.answer ? "border-emerald-500/60 bg-emerald-500/10" : "border-white/10 bg-white/5")}>
+                          {o}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>`;
+
+        const exportedManifest = {
+          name: exportName || "Study App",
+          short_name: exportName || "Study",
+          start_url: "./index.html",
+          display: "standalone",
+          background_color: "#030712",
+          theme_color: hexColor,
+          icons: [{ src: "icon.svg", sizes: "512x512", type: "image/svg+xml" }]
+        };
+
+        const exportedSW = `
+          const CACHE='study-app-v1';
+          const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+          self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())); });
+          self.addEventListener('activate', e=>{ e.waitUntil(self.clients.claim()); });
+          self.addEventListener('fetch', e=>{
+            const req=e.request;
+            if(req.method!=='GET') return;
+            e.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(r=>{ const copy=r.clone(); caches.open(CACHE).then(c=>c.put(req,copy)); return r; }).catch(()=>cached)));
+          });
+        `.trim();
+
+        zip.file("index.html", exportedIndex);
+        zip.file("manifest.webmanifest", JSON.stringify(exportedManifest, null, 2));
+        zip.file("sw.js", exportedSW);
+        zip.file("icon.svg", iconSvg);
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (exportName || "study_app").replace(/[^a-z0-9]/gi, '_').toLowerCase() + "_bundle.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setShowExportModal(false);
+        toastMsg(setToast, "Exported ZIP ⬇");
+      }
+
+      function saveSettings(){
+        localStorage.setItem('skyes_ai_mode', aiMode || "server");
+        localStorage.setItem('skyes_ai_engine', aiEngine || "skyes-gemini");
+        localStorage.setItem('skyes_sync_mode', syncMode || "local");
+        localStorage.setItem('skyes_gemini_key', geminiKey || "");
+        localStorage.setItem('skyes_openai_key', openaiKey || "");
+
+        // backward compatibility keys
+        localStorage.setItem('documorph_gemini_key', geminiKey || "");
+
+        setShowSettings(false);
+        toastMsg(setToast, "Settings saved");
+      }
+
+      // ===== Screens =====
+
+      if (appState === 'auth_loading') {
+        return (
+          <div className="min-h-screen bg-[#020617] flex items-center justify-center font-mono text-white/10 uppercase tracking-[1em] text-xs">
+            Accessing Neural Mesh...
+          </div>
+        );
+      }
+
+      if (appState === 'library') {
+        return (
+          <div className="min-h-screen text-slate-200 relative overflow-x-hidden">
+            <Background />
+
+            {/* Settings */}
+            {showSettings && (
+              <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
+                <div className="max-w-lg w-full glass p-10 rounded-[2.5rem] border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="font-black uppercase tracking-tight text-xl">Settings</div>
+                    <button onClick={()=>setShowSettings(false)} className="text-white/30 hover:text-white transition">
+                      <Icon name="x" className="w-5 h-5"/>
+                    </button>
+                  </div>
+
+                  <div className="mt-5 p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest font-bold">Device Client ID (no-auth)</div>
+                    <div className="mt-2 font-mono text-xs text-white/70 break-all">{clientId}</div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div>
+                      <label className="block text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">AI Engine</label>
+                      <select value={aiEngine} onChange={(e)=>setAiEngine(e.target.value)} className="w-full mt-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-cyan-500 transition">
+                        {SKYES_AI.engines.map(e => (
+                          <option key={e.id} value={e.id}>{e.label}</option>
+                        ))}
+                      </select>
+                      <div className="text-white/30 text-xs mt-3">
+                        Underlying: <span className="text-white/60">{getEngineById(aiEngine).provider.toUpperCase()}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">AI Mode</label>
+                      <div className="grid grid-cols-2 gap-3 mt-3">
+                        <button onClick={()=>setAiMode('server')} className={`py-4 rounded-2xl border transition font-black uppercase text-[10px] tracking-widest ${aiMode==='server' ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:border-white/30'}`}>
+                          Server
+                        </button>
+                        <button onClick={()=>setAiMode('local')} className={`py-4 rounded-2xl border transition font-black uppercase text-[10px] tracking-widest ${aiMode==='local' ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:border-white/30'}`}>
+                          Local Key
+                        </button>
+                      </div>
+                      <div className="text-white/30 text-xs mt-3">
+                        Server mode hides keys + unlocks Neon sync. Local mode is functional but exposes keys in the browser.
+                      </div>
+                    </div>
+                  </div>
+
+                  {aiMode === 'local' && getEngineById(aiEngine).provider === 'gemini' && (
+                    <div className="mt-8">
+                      <label className="block text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">Gemini API Key</label>
+                      <input value={geminiKey} onChange={(e)=>setGeminiKey(e.target.value)} placeholder="AIza..." className="w-full mt-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                  )}
+
+                  {aiMode === 'local' && getEngineById(aiEngine).provider === 'openai' && (
+                    <div className="mt-8">
+                      <label className="block text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">OpenAI API Key</label>
+                      <input value={openaiKey} onChange={(e)=>setOpenaiKey(e.target.value)} placeholder="sk-..." className="w-full mt-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+                  )}
+
+                  <div className="mt-10">
+                    <label className="block text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">Storage Mode</label>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <button onClick={()=>setSyncMode('local')} className={`py-4 rounded-2xl border transition font-black uppercase text-[10px] tracking-widest ${syncMode==='local' ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:border-white/30'}`}>
+                        Local
+                      </button>
+                      <button onClick={()=>setSyncMode('neon')} className={`py-4 rounded-2xl border transition font-black uppercase text-[10px] tracking-widest ${syncMode==='neon' ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:border-white/30'}`}>
+                        Neon Cloud
+                      </button>
+                    </div>
+                    <div className="text-white/30 text-xs mt-3 leading-relaxed">
+                      Neon Cloud requires Netlify Functions (/api). ⚠️ Drag-and-drop static deploy will NOT run functions — use Git deploy or Netlify CLI.
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-10">
+                    <button onClick={saveSettings} className="flex-1 py-4 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition uppercase text-xs tracking-widest">Save</button>
+                    <button onClick={()=>syncFromServer(false)} disabled={syncMode!=='neon'} className="py-4 px-5 glass rounded-2xl text-white/60 hover:text-white transition border border-white/10 disabled:opacity-20">
+                      <Icon name="rotate-ccw" className="w-5 h-5"/>
+                    </button>
+                    <button onClick={()=>{ 
+                      setGeminiKey(''); setOpenaiKey('');
+                      localStorage.removeItem('skyes_gemini_key'); localStorage.removeItem('skyes_openai_key'); localStorage.removeItem('documorph_gemini_key');
+                      toastMsg(setToast, 'Keys cleared');
+                    }} className="py-4 px-5 glass rounded-2xl text-white/60 hover:text-white transition border border-white/10">
+                      <Icon name="trash-2" className="w-5 h-5"/>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="relative z-10 max-w-7xl mx-auto p-8 md:p-16">
+              <header className="flex flex-col md:flex-row justify-between items-center mb-24 gap-10">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-inner">
+                    <img src="assets/launcher.png" className="w-full h-full object-cover" alt="DocuMorph Launcher"/>
+                  </div>
+                  <div>
+                    <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none">DocuMorph</h1>
+                    <p className="text-white/20 text-xs font-mono tracking-widest uppercase mt-2">Offline-first PWA Synthesis Hub</p>
+                    <div className="mt-3 flex items-center gap-3 text-white/20 text-[10px] font-mono uppercase tracking-widest font-bold">
+                      <span className={"inline-flex items-center gap-2 " + (navigator.onLine ? "text-emerald-300/60" : "text-amber-300/60")}>
+                        <span className="w-2 h-2 rounded-full bg-current"></span> {navigator.onLine ? "ONLINE" : "OFFLINE"}
+                      </span>
+                      <span className="text-white/10">•</span>
+                      <button onClick={()=>setShowSettings(true)} className="hover:text-white transition inline-flex items-center gap-2">
+                        <Icon name="key" className="w-4 h-4"/> SETTINGS
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => setAppState('upload')} className="px-12 py-6 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-all shadow-2xl flex items-center gap-4 group">
+                  <Icon name="upload" className="w-5 h-5 group-hover:-translate-y-1 transition-transform"/> START NEW BUILD
+                </button>
+              </header>
+
+              {/* cover image */}
+              <div className="mb-16 glass rounded-[3rem] overflow-hidden border border-white/5">
+                <div className="grid grid-cols-1 md:grid-cols-3">
+                  <div className="md:col-span-1 bg-black/30 p-10 flex flex-col justify-center">
+                    <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.5em] font-bold">Front Cover</div>
+                    <div className="text-3xl font-black text-white tracking-tight mt-4">Your book cover lives here.</div>
+                    <div className="text-white/40 mt-3 text-sm">This uses the cover logo you provided (kept local in the deploy).</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <img src="assets/cover.png" alt="Front Cover" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="mb-10 p-5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-200">
+                  {error}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {library.length === 0 && (
+                  <div className="glass p-10 rounded-[3rem] border border-white/10 text-white/40">
+                    <div className="font-black text-white text-xl">No documents yet</div>
+                    <div className="mt-2 text-sm">Upload a PDF to generate your reader / flashcards / quiz.</div>
+                  </div>
+                )}
+
+                {library.map(docItem => (
+                  <div key={docItem.id} onClick={() => { setCurrentDoc(docItem); setAppState('dashboard'); }} className="group glass p-10 rounded-[3rem] hover:bg-white/[0.04] transition-all cursor-pointer relative overflow-hidden h-[400px] flex flex-col justify-between">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div>
+                      <div className="flex justify-between items-start mb-10">
+                        <div className="p-5 bg-white/5 rounded-2xl border border-white/5"><Icon name="file-text" className="w-6 h-6 text-cyan-400"/></div>
+                        <button onClick={(e) => { e.stopPropagation(); deleteDocById(docItem.id); }} className="p-3 text-white/10 hover:text-rose-500 transition-colors"><Icon name="trash-2" className="w-5 h-5"/></button>
+                      </div>
+                      <h3 className="text-2xl font-black text-white group-hover:text-cyan-400 transition-colors line-clamp-2 leading-tight">{docItem.fileName}</h3>
+                      <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-white/20 uppercase tracking-widest">
+                        <Icon name="box" className="w-3 h-3"/> Ready for Bundle
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 border-t border-white/5 pt-8 gap-px">
+                      <div className="text-center">
+                        <div className="text-xl font-black">{docItem.stats.cards}</div>
+                        <div className="text-[9px] uppercase tracking-widest text-white/10 font-bold mt-1">Nodes</div>
+                      </div>
+                      <div className="text-center border-x border-white/5">
+                        <div className="text-xl font-black">{docItem.stats.questions}</div>
+                        <div className="text-[9px] uppercase tracking-widest text-white/10 font-bold mt-1">Quizzes</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-black">{Math.ceil(docItem.stats.words/200)}m</div>
+                        <div className="text-[9px] uppercase tracking-widest text-white/10 font-bold mt-1">Runtime</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-14 text-white/20 text-xs font-mono uppercase tracking-widest">
+                Tip: Install via browser menu → “Install DocuMorph”. First open must be online once to cache CDN assets.
+              </div>
+            </div>
+
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] glass px-6 py-4 rounded-2xl border border-white/10 text-white/80 font-mono text-xs uppercase tracking-widest">
+                {toast}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      if (appState === 'upload') {
+        return (
+          <div className="min-h-screen flex items-center justify-center p-8 bg-[#020617] relative">
+            <Background />
+            <button onClick={() => setAppState('library')} className="absolute top-10 left-10 p-5 glass rounded-full text-white/20 hover:text-white transition-all"><Icon name="chevron-left" className="w-6 h-6"/></button>
+
+            <div className="max-w-2xl w-full glass p-20 rounded-[4rem] text-center shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[100px]"></div>
+
+              <div className="w-24 h-24 bg-white/5 rounded-[2.5rem] flex items-center justify-center mx-auto mb-12 shadow-inner border border-white/10 overflow-hidden">
+                <img src="assets/launcher.png" className="w-full h-full object-cover" alt="Launcher"/>
+              </div>
+
+              <h2 className="text-4xl font-black text-white mb-6 tracking-tighter uppercase">Source Acquisition</h2>
+              <p className="text-white/40 mb-10 text-lg font-light">Select a PDF to initiate extraction and study-pack generation.</p>
+
+              <div className="glass p-6 rounded-3xl border border-white/10 mb-10 flex items-center gap-4 text-left">
+                <Icon name="info" className="w-5 h-5 text-cyan-400"/>
+                <div className="text-sm text-white/50">
+                  Works offline after first load. If you set a Gemini key and you're online, you'll get smarter flashcards + quiz.
+                </div>
+              </div>
+
+              <div className="relative group border-2 border-dashed border-white/10 rounded-[3rem] p-24 hover:border-cyan-500/50 transition-all cursor-pointer overflow-hidden">
+                <input type="file" accept=".pdf" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                <Icon name="sparkles" className="mx-auto w-16 h-16 text-cyan-400 group-hover:scale-110 transition-transform duration-700 mb-6"/>
+                <p className="text-xs font-black text-white/20 uppercase tracking-[0.4em]">Execute Selection</p>
+              </div>
+            </div>
+
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] glass px-6 py-4 rounded-2xl border border-white/10 text-white/80 font-mono text-xs uppercase tracking-widest">
+                {toast}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      if (appState === 'processing') {
+        return (
+          <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 relative">
+            <Background />
+            <div className="z-10 w-full max-w-lg">
+              <div className="mb-20 flex flex-col items-center">
+                <div className="w-32 h-32 glass rounded-[2.5rem] flex items-center justify-center shadow-[0_0_80px_rgba(34,211,238,0.1)] animate-spin-slow relative">
+                  <Icon name="zap" className="text-cyan-400 w-12 h-12"/>
+                  <div className="absolute inset-0 border-4 border-cyan-500/20 rounded-[2.5rem] animate-ping"></div>
+                </div>
+                <div className="mt-12 font-mono text-cyan-400 tracking-[0.8em] animate-pulse text-xs uppercase font-bold">{processingStatus}</div>
+              </div>
+
+              <div className="bg-white/5 p-1.5 rounded-full overflow-hidden h-3 mb-8 shadow-inner">
+                <div className="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 shadow-[0_0_25px_rgba(34,211,238,1)] transition-all duration-700 rounded-full" style={{width: `${loadingProgress}%`}}></div>
+              </div>
+
+              <div className="flex justify-between text-[10px] font-mono text-white/30 uppercase tracking-[0.5em] font-bold">
+                <span>Task sequence active</span>
+                <span>{loadingProgress}% SYNTHESIZED</span>
+              </div>
+            </div>
+
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] glass px-6 py-4 rounded-2xl border border-white/10 text-white/80 font-mono text-xs uppercase tracking-widest">
+                {toast}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // dashboard
+      return (
+        <div className="min-h-screen bg-[#020617] text-slate-200 flex flex-col md:flex-row overflow-hidden relative selection:bg-cyan-500/40">
+          <Background />
+
+          {/* export modal */}
+          {showExportModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/98 backdrop-blur-xl animate-in fade-in duration-300">
+              <div className="max-w-md w-full glass p-16 rounded-[4rem] relative border border-white/20 shadow-[0_0_100px_rgba(0,0,0,1)]">
+                <button onClick={() => setShowExportModal(false)} className="absolute top-10 right-10 text-white/10 hover:text-white transition-all"><Icon name="x" className="w-6 h-6"/></button>
+
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="w-16 h-16 bg-cyan-500/10 rounded-[1.5rem] flex items-center justify-center border border-cyan-500/20"><Icon name="folder-open" className="text-cyan-400 w-8 h-8"/></div>
+                  <div>
+                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">Bundle<br/><span className="text-cyan-400">Factory</span></h2>
+                    <p className="text-white/20 text-[10px] uppercase font-mono tracking-widest mt-2">Production Export</p>
+                  </div>
+                </div>
+
+                <div className="space-y-10">
+                  <div>
+                    <label className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-4 block font-bold">App Label</label>
+                    <input value={exportName} onChange={(e) => setExportName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white focus:outline-none focus:border-cyan-500 font-black text-lg transition-all" />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-4 block font-bold">Identity Icon</label>
+                    <div className="grid grid-cols-6 gap-3">
+                      {["🧠", "🎓", "🚀", "⚡", "🔬", "📚"].map(i => (
+                        <button key={i} onClick={() => setExportIcon(i)} className={"w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all " + (exportIcon === i ? "bg-cyan-500/20 ring-2 ring-cyan-500" : "bg-white/5 hover:bg-white/10")}>
+                          {i}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-3xl flex gap-5">
+                    <Icon name="shield-check" className="text-emerald-400 shrink-0 w-6 h-6"/>
+                    <p className="text-[10px] text-emerald-200/40 leading-relaxed font-mono font-bold uppercase tracking-tight">
+                      Standard Directory Export (ZIP): index.html + manifest + sw.js + icon.svg.
+                    </p>
+                  </div>
+
+                  <button onClick={handleDownloadZip} className="w-full py-6 bg-white text-black font-black rounded-2xl flex items-center justify-center gap-4 hover:bg-cyan-400 transition-all shadow-2xl uppercase tracking-widest text-xs">
+                    Deploy ZIP Bundle
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* left nav */}
+          <aside className="hidden md:flex flex-col w-80 border-r border-white/5 bg-[#020617] p-10 relative z-20">
+            <div className="flex items-center gap-4 mb-20 px-2">
+              <div className="w-12 h-12 glass rounded-2xl overflow-hidden shadow-xl">
+                <img src="assets/launcher.png" className="w-full h-full object-cover" alt="Launcher"/>
+              </div>
+              <h1 className="text-2xl font-black tracking-tighter uppercase leading-none">DocuMorph</h1>
+            </div>
+
+            <nav className="space-y-3 flex-1">
+              <NavBtn active={viewMode === 'reader'} icon="book-open" label="Neural Read" onClick={() => setViewMode('reader')} />
+              <NavBtn active={viewMode === 'flashcards'} icon="brain" label="Recall Nodes" onClick={() => setViewMode('flashcards')} />
+              <NavBtn active={viewMode === 'quiz'} icon="check-circle" label="Review Check" onClick={() => setViewMode('quiz')} />
+              <NavBtn active={viewMode === 'stats'} icon="pie-chart" label="Core Metrics" onClick={() => setViewMode('stats')} />
+            </nav>
+
+            <div className="pt-10 border-t border-white/5 space-y-5">
+              <button onClick={() => setAppState('library')} className="w-full py-4 px-5 glass rounded-2xl text-[10px] font-mono tracking-widest text-white/30 hover:text-white transition-all flex items-center gap-4 uppercase font-bold">
+                <Icon name="rotate-ccw" className="w-4 h-4"/> Exit Library
+              </button>
+
+              <button onClick={() => { setExportName((currentDoc?.fileName || "Study App").replace(/\.pdf$/i, '')); setShowExportModal(true); }} className="w-full py-6 px-8 bg-gradient-to-br from-cyan-600 to-indigo-700 rounded-3xl text-white flex items-center gap-5 group hover:scale-105 transition-all shadow-2xl shadow-cyan-900/40 border border-white/10">
+                <div className="bg-white/10 p-3 rounded-2xl group-hover:bg-white/20 transition-all"><Icon name="smartphone" className="w-6 h-6"/></div>
+                <div className="text-left leading-tight">
+                  <div className="font-black text-sm uppercase tracking-tighter">BUILD Bundle</div>
+                  <div className="text-[10px] opacity-40 font-mono mt-1 uppercase font-bold">Root Deploy</div>
+                </div>
+              </button>
+            </div>
+          </aside>
+
+          {/* main */}
+          <main className="flex-1 overflow-y-auto p-8 md:p-16 relative z-10 scrollbar-hide">
+            {!currentDoc ? (
+              <div className="max-w-3xl mx-auto glass p-10 rounded-[3rem] border border-white/10 text-white/50">
+                <div className="text-2xl font-black text-white">No document selected</div>
+                <div className="mt-2">Go back to Library and pick a PDF.</div>
+              </div>
+            ) : (
+              <>
+                {viewMode === 'reader' && <ReaderView sections={currentDoc.content.sections} summary={currentDoc.content.summary} />}
+                {viewMode === 'flashcards' && <FlashcardView cards={currentDoc.content.flashcards} />}
+                {viewMode === 'quiz' && <QuizView questions={currentDoc.content.questions} />}
+                {viewMode === 'stats' && <StatsView text={currentDoc.content.rawText} flashcardCount={currentDoc.content.flashcards.length} questionCount={currentDoc.content.questions.length} />}
+              </>
+            )}
+          </main>
+
+          {toast && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] glass px-6 py-4 rounded-2xl border border-white/10 text-white/80 font-mono text-xs uppercase tracking-widest">
+              {toast}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

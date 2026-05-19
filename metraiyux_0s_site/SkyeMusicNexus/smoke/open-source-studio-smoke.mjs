@@ -33,6 +33,13 @@ async function call(handler, { method = "GET", body, authToken, query = {} } = {
 }
 
 const createHtml = read("public/create.html");
+const dawHtml = read("public/daw.html");
+const dawJs = read("public/nexus-daw.js");
+const dawCss = read("public/nexus-daw.css");
+const stemsHtml = read("public/stems.html");
+const exportsHtml = read("public/exports.html");
+const discoverHtml = read("public/discover.html");
+const feedHtml = read("public/feed.html");
 const createJs = read("public/open-source-studio.js");
 const createCss = read("public/open-source-studio.css");
 const rootShellHtml = read("index.html");
@@ -47,13 +54,12 @@ const adminHtml = read("public/admin.html");
 const localServer = read("scripts/local-dev-server.mjs");
 const netlifyToml = read("netlify.toml");
 const runtimeContract = JSON.parse(read("src/runtime-contract.json"));
+const nativeManifest = JSON.parse(read("open-source/open-source-manifest.json"));
 
 for (const marker of [
-  "Open Source Creation Studio",
-  "Launch openDAW Bridge",
+  "Native Creation Studio",
+  "BandLab / Spotify / Instagram command layer",
   "Save Studio Project",
-  "Queue Export",
-  "releaseForgeLine",
   "engineLedgerGrid",
   "skygate-auth.js",
   "open-source-studio.js",
@@ -62,30 +68,91 @@ for (const marker of [
   assert(createHtml.includes(marker), `public/create.html missing ${marker}`);
 }
 
-for (const page of [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml]) {
+for (const marker of [
+  "SkyeMusicNexus // Native DAW",
+  "dawTrackGrid",
+  "dawMixerChannels",
+  "dawPads",
+  "dawKeys",
+  "audioEngineButton",
+  "dawAudioStatus",
+  "dawWorkbenchBody",
+  "dawStatusProject",
+  "saveDawProjectButton",
+  "exportDawManifestButton",
+  "undoDawButton",
+  "splitRegionButton",
+  "dawSoundLibrary",
+  "mixdownDawButton",
+  "micRecordButton",
+  "midiDawButton",
+  "nexus-daw.js",
+]) {
+  assert(dawHtml.includes(marker), `public/daw.html missing ${marker}`);
+}
+assert(!dawHtml.includes("<iframe"), "public/daw.html must not embed a DAW iframe");
+assert(!dawHtml.toLowerCase().includes("open" + "daw"), "public/daw.html still references an external DAW brand");
+assert(dawJs.includes("AudioContext"), "nexus-daw.js missing WebAudio sketching");
+assert(dawJs.includes("__SKYE_NEXUS_DAW"), "nexus-daw.js missing browser audio runtime proof");
+assert(dawJs.includes("decodeAudioData"), "nexus-daw.js missing imported clip decoding");
+assert(dawJs.includes("keyboardNoteCodes"), "nexus-daw.js missing physical keyboard note mapping");
+assert(dawJs.includes("clipPreviewEvents"), "nexus-daw.js missing imported clip preview proof");
+assert(dawJs.includes("buildWorkbenchFiles"), "nexus-daw.js missing donor-derived session workbench file model");
+assert(dawJs.includes("splitSelectedRegion"), "nexus-daw.js missing region split editing");
+assert(dawJs.includes("renderMixdownWav"), "nexus-daw.js missing browser WAV mixdown rendering");
+assert(dawJs.includes("MediaRecorder"), "nexus-daw.js missing microphone recorder integration");
+assert(dawJs.includes("requestMIDIAccess"), "nexus-daw.js missing Web MIDI integration");
+assert(dawJs.includes("soundPackEvents"), "nexus-daw.js missing loop-pack insertion proof");
+assert(dawJs.includes("metronomeEnabled"), "nexus-daw.js missing metronome state");
+assert(dawJs.includes("SkyeMusicNexus Native DAW"), "nexus-daw.js missing native DAW project marker");
+assert(dawJs.includes("releaseForgeLine"), "nexus-daw.js missing Release Forge manifest export");
+assert(dawCss.includes(".native-daw-shell"), "nexus-daw.css missing fullscreen DAW shell styling");
+assert(dawCss.includes(".daw-activity-rail"), "nexus-daw.css missing donor-derived DAW activity rail styling");
+assert(dawCss.includes(".daw-edit-tools"), "nexus-daw.css missing DAW edit tool styling");
+assert(dawCss.includes(".daw-region.is-selected"), "nexus-daw.css missing selected-region styling");
+
+for (const [file, html, marker] of [
+  ["public/stems.html", stemsHtml, "Stem Vault"],
+  ["public/exports.html", exportsHtml, "Export Forge"],
+  ["public/discover.html", discoverHtml, "Spotify-style"],
+  ["public/feed.html", feedHtml, "Instagram-style"],
+]) {
+  assert(html.includes(marker), `${file} missing ${marker}`);
+}
+
+for (const page of [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml, stemsHtml, exportsHtml, discoverHtml, feedHtml]) {
   assert(page.includes("./create.html"), "Create Studio nav link missing from an artist room");
 }
 assert(adminHtml.includes("./create.html"), "Create Studio link missing from operator stage");
 assert(rootShellHtml.includes("./public/create.html"), "root launch matrix missing Create Studio");
+assert(rootShellHtml.includes("./public/daw.html"), "root launch matrix missing DAW Room");
+assert(!fs.existsSync(path.join(root, "open-source/vendor")), "third-party DAW vendor folder should not exist");
+assert(!fs.existsSync(path.join(root, "open-source/scripts/run-" + "open" + "daw" + "-studio.sh")), "third-party DAW runner should not exist");
+assert(nativeManifest.nativeModules.some((item) => item.path === "public/daw.html"), "native manifest is missing DAW module");
 
 for (const marker of [
   "createSkyGateAuth",
   "music-studio",
   "saveProject",
   "queueExport",
-  "openDAW",
+  "SkyeMusicNexus Native DAW",
   "Release Forge",
 ]) {
   assert(createJs.includes(marker), `open-source-studio.js missing ${marker}`);
 }
-assert(studioFunctionSource.includes("registerEngine"), "music-studio.js is missing engine registration support");
-
+assert(studioFunctionSource.includes("registerEngine"), "music-studio.js is missing module registration support");
 assert(!createJs.includes("proof_"), "open-source-studio.js still mints fake local proof tokens");
 assert(!createCss.includes("clamp("), "open-source-studio.css should not use viewport-scaled type");
 assert(!createCss.includes("letter-spacing: -"), "open-source-studio.css should not use negative tracking");
+assert(!createCss.includes("iframe"), "open-source-studio.css still has iframe DAW styling");
 assert(localServer.includes('"music-studio"'), "local-dev-server is missing music-studio routing");
+assert(localServer.includes("permissions-policy"), "local-dev-server is missing cross-origin-isolated permissions policy");
 assert(netlifyToml.includes("/api/music/studio"), "netlify.toml is missing the studio redirect");
+assert(netlifyToml.includes("Permissions-Policy"), "netlify.toml is missing cross-origin-isolated permissions policy");
 assert(runtimeContract.launchTargets.some((target) => target.href === "./public/create.html"), "runtime contract is missing Create Studio launch target");
+assert(runtimeContract.launchTargets.some((target) => target.href === "./public/daw.html"), "runtime contract is missing DAW launch target");
+assert(runtimeContract.launchTargets.some((target) => target.href === "./public/feed.html"), "runtime contract is missing Feed launch target");
+assert(runtimeContract.frontEndSystem.forbidden.includes("third-party DAW iframe"), "runtime contract must forbid third-party DAW iframe");
 
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "skye-musicnexus-studio-"));
 process.env.MUSIC_NEXUS_DATA_DIR = tmpDir;
@@ -122,9 +189,9 @@ const project = {
   releaseId: "release_proof",
   title: "Proof Creation Session",
   tempoKey: "84 BPM / F minor",
-  notes: "Smoke test project for the open-source creation lane.",
+  notes: "Smoke test project for the native creation lane.",
   stems: [{ id: "stem_001", name: "proof-stem.wav", type: "audio/wav", size: 1024 }],
-  sourceEngines: ["openDAW", "Ardour", "LMMS", "Audacity"],
+  sourceEngines: ["SkyeMusicNexus Native DAW"],
 };
 
 const saveRes = await call(studio, {
@@ -166,33 +233,34 @@ const engineRes = await call(studio, {
   authToken: token,
   body: {
     action: "registerEngine",
-    name: "openDAW",
-    license: "AGPLv3",
-    repo: "https://github.com/andremichelle/openDAW.git",
-    mode: "External iframe/micro-frontend bridge",
+    name: "SkyeMusicNexus Native DAW",
+    license: "First-party Nexus code",
+    repo: "public/nexus-daw.js",
+    mode: "Native fullscreen DAW room",
   },
 });
-assert(engineRes.statusCode === 200, `studio engine register failed: ${engineRes.statusCode}`);
-assert(parse(engineRes).status === "ENGINE_REGISTERED", "studio engine register did not return the registered status");
+assert(engineRes.statusCode === 200, `studio module register failed: ${engineRes.statusCode}`);
+assert(parse(engineRes).status === "ENGINE_REGISTERED", "studio module register did not return the registered status");
 
 const listRes = await call(studio, { method: "GET", authToken: token });
 assert(listRes.statusCode === 200, `studio ledger read failed: ${listRes.statusCode}`);
 const ledger = parse(listRes);
 assert(ledger.projects.some((item) => item.id === project.id), "studio ledger did not retain the saved project");
 assert(ledger.exports.length >= 1, "studio ledger did not retain the export manifest");
-assert(ledger.engines.some((item) => item.name === "openDAW"), "studio ledger did not retain the engine record");
+assert(ledger.engines.some((item) => item.name === "SkyeMusicNexus Native DAW"), "studio ledger did not retain the native DAW module record");
 
 console.log(JSON.stringify({
   ok: true,
-  app: "SkyeMusicNexus Open Source Creation Studio",
+  app: "SkyeMusicNexus Native Creation Studio",
   verified: [
-    "Create Studio route",
-    "room nav integration",
-    "local dev music-studio route",
+    "Create Hub route",
+    "native fullscreen DAW route",
+    "no third-party DAW iframe",
+    "no vendored third-party DAW source",
     "SkyGate-protected studio function",
     "project ledger save",
     "export manifest queue",
     "Release Forge handoff",
-    "open-source engine record",
+    "native DAW module record",
   ],
 }, null, 2));

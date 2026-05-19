@@ -126,7 +126,7 @@ function copySanitizedWorkspace(sourceDir, excludes) {
   const excludeFile = path.join(os.tmpdir(), `skyevault-git-excludes-${Date.now()}.txt`);
   fs.writeFileSync(excludeFile, excludes.map((item) => item.file).join('\n'));
   fs.mkdirSync(sourceDir, { recursive: true });
-  execFileSync('rsync', [
+  const rsyncArgs = [
     '-a',
     '--no-group',
     '--delete',
@@ -168,7 +168,17 @@ function copySanitizedWorkspace(sourceDir, excludes) {
     `--exclude-from=${excludeFile}`,
     './',
     `${sourceDir}/`
-  ], { cwd: root, stdio: 'inherit' });
+  ];
+  const result = spawnSync('rsync', rsyncArgs, { cwd: root, stdio: 'inherit' });
+  if (result.error) throw result.error;
+  if (result.status && result.status !== 24) {
+    const error = new Error(`rsync failed with status ${result.status}.`);
+    error.status = result.status;
+    throw error;
+  }
+  if (result.status === 24) {
+    console.warn('rsync reported vanished files while copying generated output; continuing with the consistent files that were staged.');
+  }
 }
 
 function scanStage(sourceDir) {
@@ -337,6 +347,7 @@ Contents:
 - \`source/\`: Sanitized working tree overlay, including uncommitted and untracked files that passed the vault secret scanner.
 - \`manifest.json\`: Hashes, refs, status, source file manifest, bundle fingerprint, and excluded secret-looking files.
 - \`neural-map.json\`: Workspace/developer/repo/commit/file graph seed for the account brain map.
+- \`SECRET_BOUNDARY.md\`: Local-only file/folder contract for secrets, databases, generated state, and anything intentionally left out.
 
 Fast restore with the repo tool:
 
@@ -367,7 +378,61 @@ git push --tags origin
 \`\`\`
 
 Safety boundary: files excluded as envs, private keys, dumps, archives, dependencies, generated artifacts, or secret-looking text are listed in \`manifest.json\` and are not restored from \`source/\`.
+Read \`SECRET_BOUNDARY.md\` before deleting the original workspace. It tells the dev what must come from a secret manager or a separate private local-only package.
 `;
+}
+
+function secretBoundaryReadme(manifest) {
+  const excluded = manifest.security.excludedSecretLikeFiles || [];
+  const ruleDirs = manifest.security.excludedRules?.directories || [];
+  const ruleExts = manifest.security.excludedRules?.extensions || [];
+  const lines = [
+    '# SkyeVault Secret Boundary',
+    '',
+    'This file documents what SkyeVault intentionally did not place in `source/`.',
+    '',
+    'It is a recovery checklist, not a secret dump. It never includes secret values.',
+    '',
+    '## Restore Rule',
+    '',
+    '1. Restore the Git bundle and sanitized `source/` overlay first.',
+    '2. Rehydrate local-only files from a secret manager, password vault, private client package, or local backup.',
+    '3. Do not commit the local-only package back into Git or the public vault archive.',
+    '',
+    '## Secret-Looking Files Excluded By Scanner',
+    ''
+  ];
+  if (excluded.length) {
+    for (const item of excluded) {
+      lines.push(`- \`${item.file}\` (${(item.hits || []).join(', ') || 'secret-like'})`);
+    }
+  } else {
+    lines.push('- None detected by the text scanner.');
+  }
+  lines.push(
+    '',
+    '## Always-Excluded Local State',
+    '',
+    'These names/patterns are kept out of the sanitized overlay by policy. Some are regeneratable, some are local recovery material.',
+    '',
+    `- Directories: ${ruleDirs.map((item) => `\`${item}\``).join(', ') || 'none'}`,
+    `- Extensions: ${ruleExts.map((item) => `\`${item}\``).join(', ') || 'none'}`,
+    '- `.env`, `.env.*`, `.env*`',
+    '- private keys, service-account JSON, credential JSON, archives, database files, dumps, and backup files',
+    '',
+    '## Private Local-Only Package Guidance',
+    '',
+    'If a team needs a separate private package, build it from the original workspace using the paths above plus any client-specific secret manager exports. Keep that package encrypted and access-controlled.',
+    '',
+    'Suggested handoff naming:',
+    '',
+    '```text',
+    `${manifest.repo.name}-local-only-secrets-and-state-YYYYMMDDTHHMMSSZ.encrypted.zip`,
+    '```',
+    '',
+    'Before deleting the original workspace, confirm every path in the scanner list is either intentionally disposable or recoverable from a private secret source.'
+  );
+  return `${lines.join('\n')}\n`;
 }
 
 async function buildIntegrity(packDir, manifest) {
@@ -404,6 +469,10 @@ async function buildIntegrity(packDir, manifest) {
       path: 'RESTORE.md',
       sha256: await hashFile(restorePath)
     },
+    secretBoundary: {
+      path: 'SECRET_BOUNDARY.md',
+      sha256: await hashFile(path.join(packDir, 'SECRET_BOUNDARY.md'))
+    },
     status: {
       path: 'status.txt',
       sha256: await hashFile(statusPath)
@@ -435,7 +504,7 @@ async function verifyIntegrity(packDir, manifest, integrity) {
   if (manifestHash !== integrity.manifest.sha256) throw new Error(`Manifest SHA mismatch: ${manifestHash} !== ${integrity.manifest.sha256}`);
   const sourceHash = sha256Text(stableJson(manifest.source.files));
   if (sourceHash !== integrity.sourceManifest.sha256) throw new Error(`Source manifest SHA mismatch: ${sourceHash} !== ${integrity.sourceManifest.sha256}`);
-  for (const item of [integrity.gitBundle, integrity.neuralMap, integrity.restoreReadme, integrity.status, integrity.refs].filter(Boolean)) {
+  for (const item of [integrity.gitBundle, integrity.neuralMap, integrity.restoreReadme, integrity.secretBoundary, integrity.status, integrity.refs].filter(Boolean)) {
     const file = path.join(packDir, item.path);
     if (!fs.existsSync(file)) throw new Error(`Integrity file missing: ${item.path}`);
     const hash = await hashFile(file);
@@ -543,7 +612,8 @@ async function createPack() {
     },
     restore: {
       defaultMode: 'clone bundle, then overlay sanitized source tree',
-      secretsBoundary: 'Secret-looking and explicitly excluded files are not present in source/. Restore them from the client secret manager, not from the vault pack.'
+      secretsBoundary: 'Secret-looking and explicitly excluded files are not present in source/. Restore them from the client secret manager or a separate private local-only package, not from the vault pack.',
+      secretBoundaryDocument: 'SECRET_BOUNDARY.md'
     },
     integrity: {
       path: 'integrity.json',
@@ -560,6 +630,7 @@ async function createPack() {
   writeJson(path.join(packDir, 'neural-map.json'), buildNeuralMap(manifest));
   writeText(path.join(packDir, 'status.txt'), git(['status', '--short', '--branch'], ''));
   writeText(path.join(packDir, 'refs.txt'), manifest.git.refs.map((ref) => `${ref.name}\t${ref.object}\t${ref.date}`).join('\n'));
+  writeText(path.join(packDir, 'SECRET_BOUNDARY.md'), secretBoundaryReadme(manifest));
   writeText(path.join(packDir, 'RESTORE.md'), restoreReadme(manifest));
   writeJson(path.join(packDir, 'integrity.json'), await buildIntegrity(packDir, manifest));
 

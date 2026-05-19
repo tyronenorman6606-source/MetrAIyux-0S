@@ -76,6 +76,34 @@ async function checkPage(page, baseUrl, route, label, requiredText, screenshotNa
   if (screenshotName) await page.screenshot({ path: path.join(ARTIFACT_DIR, screenshotName), fullPage: true });
 }
 
+async function writeProofWav(filePath) {
+  const sampleRate = 44100;
+  const seconds = 0.24;
+  const samples = Math.floor(sampleRate * seconds);
+  const dataBytes = samples * 2;
+  const buffer = Buffer.alloc(44 + dataBytes);
+  buffer.write("RIFF", 0);
+  buffer.writeUInt32LE(36 + dataBytes, 4);
+  buffer.write("WAVE", 8);
+  buffer.write("fmt ", 12);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20);
+  buffer.writeUInt16LE(1, 22);
+  buffer.writeUInt32LE(sampleRate, 24);
+  buffer.writeUInt32LE(sampleRate * 2, 28);
+  buffer.writeUInt16LE(2, 32);
+  buffer.writeUInt16LE(16, 34);
+  buffer.write("data", 36);
+  buffer.writeUInt32LE(dataBytes, 40);
+  for (let index = 0; index < samples; index += 1) {
+    const fade = Math.min(1, index / 600, (samples - index) / 1200);
+    const sample = Math.sin(2 * Math.PI * 440 * (index / sampleRate)) * 0.55 * fade;
+    buffer.writeInt16LE(Math.max(-1, Math.min(1, sample)) * 32767, 44 + index * 2);
+  }
+  await writeFile(filePath, buffer);
+  return filePath;
+}
+
 async function seedGate(context) {
   await context.addInitScript((token) => {
     const identity = {
@@ -117,6 +145,7 @@ async function seedGate(context) {
 
 async function main() {
   await mkdir(ARTIFACT_DIR, { recursive: true });
+  const dawImportPath = await writeProofWav(path.join(ARTIFACT_DIR, "native-daw-import-proof.wav"));
   const { server, baseUrl } = await startStaticServer(SITE_ROOT);
   const browser = await chromium.launch({ headless: true });
   const pageErrors = [];
@@ -134,7 +163,7 @@ async function main() {
     await ungated.screenshot({ path: path.join(ARTIFACT_DIR, "app-ungated-overlay.png"), fullPage: true });
     await ungatedContext.close();
 
-    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
     await seedGate(context);
     const page = await context.newPage();
     page.on("pageerror", (error) => pageErrors.push(`gated: ${error.message}`));
@@ -176,12 +205,58 @@ async function main() {
     const dropBox = await page.locator("[data-song-drop-zone]").boundingBox();
     expect(dropBox && dropBox.height >= 260 && dropBox.width >= 520, `Song drop zone is not large enough: ${JSON.stringify(dropBox)}`);
     assertions.push("Upload Studio exposes a large song drop zone with enough visual target area for desktop use.");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/daw.html", "Native DAW desktop", ["SkyeMusicNexus DAW", "Audio", "Project Files", "16-pad beat lane"], "native-daw-desktop.png");
+    await page.locator('[data-daw-rail="mix"]').click();
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.activeRail === "mix");
+    await page.locator("#audioEngineButton").click();
+    await page.setInputFiles("#dawFileInput", dawImportPath);
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.decodedClipCount >= 1);
+    await page.locator("[data-clip-preview]").first().click();
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.clipPreviewEvents >= 1);
+    await page.locator(".daw-arrangement").click({ position: { x: 360, y: 180 } });
+    await page.keyboard.press("KeyA");
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.keyboardEvents >= 1);
+    await page.locator(".daw-region").first().click();
+    await page.locator("#splitRegionButton").click();
+    await page.locator("#duplicateRegionButton").click();
+    await page.locator("#quantizeDawButton").click();
+    await page.locator("#deleteRegionButton").click();
+    await page.locator("#undoDawButton").click();
+    await page.locator("#redoDawButton").click();
+    await page.locator("#metronomeDawButton").click();
+    await page.locator("#loopDawButton").click();
+    await page.locator("[data-sound-pack]").first().click();
+    const mixdownDownload = page.waitForEvent("download");
+    await page.locator("#mixdownDawButton").click();
+    const mixdown = await mixdownDownload;
+    const mixdownPath = path.join(ARTIFACT_DIR, "native-daw-browser-mixdown.wav");
+    await mixdown.saveAs(mixdownPath);
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.mixdownEvents >= 1);
+    await page.locator('[data-pad-index="0"]').click();
+    await page.locator('[data-note="C"]').click();
+    await page.locator("#playTransportButton").click();
+    await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.audioState === "running" && window.__SKYE_NEXUS_DAW.soundEvents >= 4);
+    const dawAudio = await page.evaluate(() => window.__SKYE_NEXUS_DAW);
+    expect(dawAudio.audioUnlocked === true, `Native DAW audio did not unlock: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.workbenchFiles >= 5, `Native DAW workbench file model did not hydrate: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.decodedClipCount >= 1 && dawAudio.clipPreviewEvents >= 1, `Native DAW import/clip preview failed: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.keyboardEvents >= 1, `Native DAW physical keyboard did not trigger notes: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.editEvents >= 6, `Native DAW edit commands did not register: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.soundPackEvents >= 1, `Native DAW sound pack insertion did not register: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.mixdownEvents >= 1, `Native DAW browser WAV mixdown did not register: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.metronomeEnabled === true, `Native DAW metronome did not toggle on: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.loopEnabled === false, `Native DAW loop toggle did not register: ${JSON.stringify(dawAudio)}`);
+    expect(dawAudio.lastAudioError === "", `Native DAW audio reported an error: ${JSON.stringify(dawAudio)}`);
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, "native-daw-audio-desktop.png"), fullPage: true });
+    assertions.push("Native DAW imports/decodes audio, previews clips, maps the physical keyboard to notes, edits regions, inserts sound packs, toggles metronome/loop, renders a browser WAV mixdown, and exposes runtime audio proof.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/releases.html", "Releases desktop", ["Artist Nebula", "Skye ID Bridge", "Release Forge", "Royalty River", "Ops Sequencer"], "releases-desktop.png");
     expect(await page.locator('#artistForm input[name="skyeId"]').inputValue() === "2468135790", "Skye ID bridge did not populate the artist form.");
     expect(await page.locator("#artistPhotoPreview").isVisible(), "Skye ID bridge did not render the artist photo preview.");
     assertions.push("Skye ID bridge populates the MusicNexus artist form and renders the shared artist photo.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/rights.html", "Rights desktop", ["Rights Vault", "Takedown Hold", "No rights, no linked playback"], "rights-desktop.png");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/exchange.html", "Exchange desktop", ["Creator Exchange", "Content Request Exchange", "Achievement Orbit", "Release Campaign Forge"], "exchange-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/feed.html", "Open social feed desktop", ["Open Social Feed", "Post to Feed", "Like", "Comment"], "open-social-feed-desktop.png");
+    assertions.push("Open Social Feed renders Pixelfed/Fediverse connector, queue, publish, and feed-sync controls behind the seeded gate session.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/player.html", "Music player desktop", ["Stream Deck", "Uploaded Audio Vault"], "player-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
     await page.waitForFunction(() => window.__SKYE_MUSIC_PLAYBACK && window.__SKYE_MUSIC_PLAYBACK.queueLength > 0);
@@ -216,6 +291,7 @@ async function main() {
         free99_lite_no_charge: true,
         paid_addons_available: true,
         social_exchange_available: true,
+        open_social_spine_available: true,
         content_requests_available: true,
         achievements_available: true,
         rights_vault_available: true,
@@ -237,9 +313,14 @@ async function main() {
         "app-shell-gated-desktop.png",
         "artist-stage-desktop.png",
         "upload-studio-desktop.png",
+        "native-daw-desktop.png",
+        "native-daw-audio-desktop.png",
+        "native-daw-import-proof.wav",
+        "native-daw-browser-mixdown.wav",
         "releases-desktop.png",
         "rights-desktop.png",
         "exchange-desktop.png",
+        "open-social-feed-desktop.png",
         "player-desktop.png",
         "operator-stage-desktop.png",
         "hub-mobile.png",

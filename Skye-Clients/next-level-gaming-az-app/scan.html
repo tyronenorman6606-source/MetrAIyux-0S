@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Scan Route | Next Level Gaming AZ</title>
+  <meta name="description" content="QR-ready Next Level Gaming AZ app route for event schedule, shop contact, install prompt, online card shopping, and event requests.">
+  <meta name="theme-color" content="#07100e">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="importmap">{"imports":{"react":"https://esm.sh/react@19.2.6","react-dom/client":"https://esm.sh/react-dom@19.2.6/client","framer-motion":"https://esm.sh/framer-motion@12.38.0","motion":"https://esm.sh/motion@12.38.0","gsap":"https://esm.sh/gsap@3.15.0","gsap/ScrollTrigger":"https://esm.sh/gsap@3.15.0/ScrollTrigger","lenis":"https://esm.sh/lenis@1.3.23"}}</script>
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body data-page="scan">
+  <canvas class="living-background" data-living-background aria-hidden="true"></canvas>
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/assets/media/next-level-logo.png" alt="Next Level Gaming"><span>Scan Route</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary navigation">
+      <a href="/">App</a><a href="/events.html">Events</a><a href="/shop.html">Shop</a><a href="/preview.html">Preview</a><a class="nav-cta" href="/quote.html">Request Event</a>
+    </nav>
+  </header>
+  <main>
+    <section class="scan-shell">
+      <div class="scan-copy" data-reveal>
+        <span class="eyebrow">QR entry</span>
+        <h1>One scan, useful moves.</h1>
+        <p>Built for posters, table tents, checkout signs, tournament sheets, and social profiles.</p>
+        <div class="scan-actions">
+          <a class="btn primary" href="/events.html">Event Board</a>
+          <a class="btn green" href="/quote.html?source=scan">Request Event</a>
+          <a class="btn dark" href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">TCGPlayer</a>
+          <button class="btn dark" type="button" data-install-app>Install App</button>
+        </div>
+      </div>
+      <div class="qr-panel" data-reveal>
+        <img src="/assets/next-level-scan-qr.svg" alt="QR code for the Next Level Gaming AZ scan route">
+        <h2>Print and replace after deploy.</h2>
+        <p>This QR is generated for the preview target. Regenerate it if the production URL changes.</p>
+      </div>
+    </section>
+    <section class="band">
+      <div class="event-list compact" data-schedule-board data-limit="5"></div>
+    </section>
+  </main>
+  <aside class="install-banner" data-install-banner>
+    <strong>Install Next Level Gaming AZ</strong>
+    <span>Keep events and shop actions one tap away.</span>
+    <button class="btn primary" type="button" data-install-app>Install</button>
+    <button class="btn dark" type="button" data-dismiss-install>Dismiss</button>
+  </aside>
+</body>
+</html>

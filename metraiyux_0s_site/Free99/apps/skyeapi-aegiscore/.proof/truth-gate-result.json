@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "name": "public-truth-gate",
+  "scannedFiles": [
+    "README.md",
+    "PROOF_LEDGER.md",
+    "SECURITY.md",
+    "docs/ARCHITECTURE.md",
+    "docs/CAPABILITY_MODEL.md",
+    "docs/HOSTED_DEPLOYMENT_CLOUDFLARE.md",
+    "docs/V0_2_UPGRADES.md",
+    "docs/V0_3_REAL_PLATFORM_UPGRADES.md",
+    "docs/V0_4_PAID_PLATFORM_HARDENING.md",
+    "docs/V0_5_WORKFLOW_ENGINE.md",
+    "docs/PUBLIC_CLAIMS_REGISTER.md",
+    "apps/console/index.html",
+    "apps/website/index.html",
+    "apps/website/public/llms.txt",
+    "apps/website/public/ai.md"
+  ],
+  "bannedPatterns": [
+    "/production[- ]ready/gi",
+    "/fully production/gi",
+    "/enterprise[- ]grade/gi",
+    "/live provider proof(?! requires| is not|s are only claimed after)/gi",
+    "/guaranteed delivery/gi",
+    "/unlimited calls/gi",
+    "/bank[- ]grade/gi",
+    "/military[- ]grade/gi",
+    "/zero risk/gi",
+    "/cannot fail/gi"
+  ],
+  "requiredTruthPhrases": {
+    "PROOF_LEDGER.md": "Not yet claimed",
+    "README.md": "Live provider calls are only claimed after you run them with real provider credentials",
+    "docs/PUBLIC_CLAIMS_REGISTER.md": "Allowed public claim",
+    "apps/console/index.html": "Truth mode: configured means configured",
+    "apps/website/index.html": "Claim boundary"
+  },
+  "proves": [
+    "public docs and console do not use banned overclaim phrases",
+    "proof ledger retains explicit not-yet-claimed section",
+    "README tells users live provider success requires live credentials and explicit live proof"
+  ],
+  "does_not_prove": [
+    "marketing conversion quality",
+    "legal sufficiency of external claims",
+    "future edits after this proof run"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T01:06:35.884Z"
+}

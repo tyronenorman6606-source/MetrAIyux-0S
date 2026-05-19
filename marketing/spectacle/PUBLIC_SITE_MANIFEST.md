@@ -2,7 +2,7 @@
 
 Updated: 2026-05-16
 
-Purpose: a public, spectacle-grade website written from the founder/operator point of view. It shows what I built with MetrAIyux 0S, why it matters, how the system is layered, what the 16-brain model does, how proof/security are handled, and which live surface someone should open next.
+Purpose: a public, spectacle-grade website written from the founder/operator point of view. It shows what I built with MetrAIyux 0S, why it matters, how the system is layered, what the 17-brain model does, how proof/security are handled, and which live surface someone should open next.
 
 Included public pages: overview, live tour, platform map, tech stack overview, brain system, security boundary, value case, fit questionnaire, public brief export, founder page, and the marketing/pricing pages under `/Metraiyux-Marketing/`.
 

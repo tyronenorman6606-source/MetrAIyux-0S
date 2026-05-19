@@ -214,21 +214,7 @@ function bindMotionChrome(){
     progress.setAttribute('aria-hidden', 'true');
     document.body.prepend(progress);
   }
-  if(!$('.motion-scanline')){
-    const scanline = document.createElement('div');
-    scanline.className = 'motion-scanline';
-    scanline.setAttribute('aria-hidden', 'true');
-    document.body.prepend(scanline);
-  }
-  if(!$('.cursor-glow')){
-    const glow = document.createElement('div');
-    glow.className = 'cursor-glow';
-    glow.setAttribute('aria-hidden', 'true');
-    document.body.prepend(glow);
-  }
   const progress = $('.scroll-progress');
-  const glow = $('.cursor-glow');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function updateProgress(){
     if(!progress) return;
     const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -237,14 +223,8 @@ function bindMotionChrome(){
   addEventListener('scroll', updateProgress, { passive:true });
   addEventListener('resize', updateProgress, { passive:true });
   updateProgress();
-  if(!reduceMotion && glow){
-    document.body.classList.add('motion-ready');
-    addEventListener('pointermove', event => {
-      if(event.pointerType && event.pointerType !== 'mouse') return;
-      glow.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
-    }, { passive:true });
-  }
-  $$('.btn,.business-card,.platform-tile,.proof-card,.map-pin').forEach(el => el.classList.add('neon-magnetic'));
+  document.body.classList.add('vv-motion-ready');
+  $$('.btn,.business-card,.platform-tile,.proof-card,.map-pin').forEach(el => el.classList.add('vv-motion-control'));
 }
 function bindSkyeComponents(){
   $$('[data-skye-tab]').forEach(tab => tab.addEventListener('click', event => {
@@ -280,6 +260,9 @@ function bindSkyeComponents(){
 function startSky(){
   const canvas = $('#sky');
   if(!canvas) return;
+  canvas.setAttribute('data-disabled', 'true');
+  canvas.hidden = true;
+  return;
   canvas.classList.add('skyesol-living-background', 'living-background');
   const ctx = canvas.getContext('2d');
   let nodes = [], w = 0, h = 0, t = 0;

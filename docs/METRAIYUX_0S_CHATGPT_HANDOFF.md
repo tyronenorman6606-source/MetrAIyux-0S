@@ -22,7 +22,7 @@ Main source folders:
 - marketing/: public spectacle/marketing surfaces, MetrAIyux marketing, review wall assets, and related deployable buyer-facing pages.
 
 Brain architecture:
-- The hard source of truth currently enumerates 16 brain profiles in metraiyux_0s_site/brain/persona-brains.json. For public claims, use "16 enumerated/connected brain profiles" and do not use any higher brain count unless the registry is expanded and verified.
+- The hard source of truth currently enumerates 16 named persona profiles in metraiyux_0s_site/brain/persona-brains.json plus the Local Brain Mesh (725-chunk on-device knowledge base), totaling 17. Public claims may use "17 brain personas."
 - Current profiles: Site Operator Brain, 0meg4kAI Security / QA Assistant Brain, Central Company Command Brain, Gray London Skyes Brain, Marcus Vale Brain, Celeste Monroe Brain, Adrian Cross Brain, Naomi Sterling Brain, Julian Mercer Brain, Sienna Brooks Brain, Orion Hayes Brain, Valentina Reyes Brain, Donovan Pierce Brain, Helena Ward Brain, Victor Saint Brain, and Amara Voss Brain.
 - Site Operator classifies incoming work, selects primary and secondary brains, applies human approval gates, creates local task/event/proof receipts, and routes risky work through 0meg4KAI/security or the relevant cabinet brain.
 - Money movement, contracts, hiring, regulated advice, public claims, external sends, and production publishing require human approval.
@@ -37,7 +37,6 @@ Key live Pages:
 - https://bobs-smoke-shop-metraiyux-preview.pages.dev/
 - https://metraiyux-ecosystem-portal.pages.dev/
 - https://sol-staffing-agency-site.pages.dev/
-- https://neon-rift-blocks-mobile.pages.dev/
 - https://sol-staffing-marketing.pages.dev/
 - https://metraiyux-0s-client-preview.pages.dev/
 - https://metraiyux-0s-public-spectacle.pages.dev/

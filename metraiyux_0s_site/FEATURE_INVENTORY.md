@@ -34,7 +34,7 @@ MetrAIyux 0S is not just a public website. In this repo it is a protected autono
 - Owner/admin operating system
 - Customer SaaS workspace layer
 - 13-cabinet operating model
-- 16-brain command registry
+- 17-brain command registry
 - 0meg4kAI security and QA brain
 - Tenant isolation rules
 - Human approval gates
@@ -1048,7 +1048,7 @@ cd metraiyux_0s_site/live/SkyeMail && npm run smoke:standalone-proof
 
 The system can be described as:
 
-> A protected autonomous business operating system with public proof surfaces, owner/admin command, customer SaaS workspaces, gate-backed app lanes, a 16-brain command model, 13-cabinet operating structure, Cloudflare Worker/D1 infrastructure, sales/proposal/client/revenue tooling, proof receipts, and gated Free99/paid expansion lanes for relationships, messaging, workforce routing, profit planning, media operations, music operations, content publishing, split tracking, mailbox infrastructure, database command, and staffing operations.
+> A protected autonomous business operating system with public proof surfaces, owner/admin command, customer SaaS workspaces, gate-backed app lanes, a 17-brain command model, 13-cabinet operating structure, Cloudflare Worker/D1 infrastructure, sales/proposal/client/revenue tooling, proof receipts, and gated Free99/paid expansion lanes for relationships, messaging, workforce routing, profit planning, media operations, music operations, content publishing, split tracking, mailbox infrastructure, database command, and staffing operations.
 
 Do not describe it as:
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SkyeDocxMax Editor Runtime | SovereignDocs</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/Free99/apps/sovereigndocs/assets/styles.css">
+  <script src="../../../free99-gate.js" data-platform-id="sovereigndocs" data-platform-name="SovereignDocs v20" data-billing-mode="paid_pending_sku" data-price-label="Imported plans: $19/$59/$149/$499 per month; Stripe rebuild required" data-app-root="/Free99/apps/sovereigndocs/"></script>
+</head>
+<body class="sd-premium-surface">
+  <header class="site-header"><a href="/Free99/apps/sovereigndocs/" class="brand">SovereignDocs</a><nav><a href="/Free99/apps/sovereigndocs/customer-dashboard/">Dashboard</a><a href="/Free99/apps/sovereigndocs/documents/">Documents</a><a href="/Free99/apps/sovereigndocs/case-command-center/">Cases</a><a href="/Free99/apps/sovereigndocs/packet-builder/">Packets</a><a href="/Free99/apps/sovereigndocs/partner-workbench/">Partner Workbench</a><a href="/Free99/apps/sovereigndocs/template-ops/">Template Ops</a><a href="/Free99/apps/sovereigndocs/skye-docx-max/">SkyeDocxMax</a></nav></header>
+  <main class="workflow-shell">
+    <section class="hero compact-hero">
+      <p class="eyebrow">v14 integrated editor runtime</p>
+      <h1>SkyeDocxMax is now wired into SovereignDocs.</h1>
+      <p>SovereignDocs generates governed drafts, prep worksheets, packets, and review-ready payloads. SkyeDocxMax handles the serious document editing layer. The boundary remains intact: no legal advice, no attorney-client relationship, and no guarantee of compliance or acceptance.</p>
+      <div class="hero-actions"><a class="button gold" href="/Free99/apps/sovereigndocs/skye-docx-max/app/" target="_blank" rel="noopener">Open blank SkyeDocxMax</a><a class="button" href="/Free99/apps/sovereigndocs/documents/">Start from library</a></div>
+    </section>
+    <section class="workflow-panel"><h2>Editor adapter config</h2><pre id="skye-config" class="workflow-log"></pre></section>
+    <section class="grid two">
+      <form id="skye-handoff-form" class="workflow-panel">
+        <h2>Create live SkyeDocxMax session</h2>
+        <label>Template ID optional</label><input id="skye-template-id" placeholder="Example: US-AZ_llc-operating-agreement">
+        <label>Title</label><input id="skye-title" value="SovereignDocs Handoff">
+        <label>Markdown / content</label><textarea id="skye-markdown"># SovereignDocs Handoff
+
+This governed payload is intended for SkyeDocxMax editing.
+
+## Boundary
+
+This is document automation output, not legal advice.</textarea>
+        <button class="button gold" type="submit">Create and launch SkyeDocxMax session</button>
+      </form>
+      <article class="workflow-panel"><h2>Last handoff</h2><pre id="skye-output" class="workflow-log"></pre><div class="toolbar"><a id="skye-launch-link" class="button violet" href="/Free99/apps/sovereigndocs/skye-docx-max/app/" target="_blank" rel="noopener">Launch editor</a><button id="skye-refresh-frame" class="button" type="button">Load below</button></div></article>
+    </section>
+    <section class="workflow-panel"><h2>Embedded editor preview</h2><p class="mini">For full editing space, open the runtime in a new tab. This iframe proves the app is bundled, not just linked as a concept.</p><iframe id="skye-frame" src="/Free99/apps/sovereigndocs/skye-docx-max/app/" style="width:100%;height:720px;border:1px solid var(--line);border-radius:22px;background:#0b0914"></iframe></section>
+  </main>
+  <script src="/Free99/apps/sovereigndocs/assets/workflow-ui.js"></script><script>SDWorkflow.initSkyeDocxMax();</script>
+</body>
+</html>

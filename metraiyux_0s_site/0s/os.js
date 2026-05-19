@@ -165,6 +165,16 @@ const APP_DEFS = [
     size: [1040, 680]
   },
   {
+    id: "valley-verified",
+    name: "Valley Verified",
+    icon: "VV",
+    kind: "wrapped",
+    summary: "Business discovery network with actual Bob and Empire app-build lane examples.",
+    url: "../valley-verified/index.html",
+    dock: true,
+    size: [1120, 720]
+  },
+  {
     id: "gate",
     name: "FS27 Gate",
     icon: "G7",

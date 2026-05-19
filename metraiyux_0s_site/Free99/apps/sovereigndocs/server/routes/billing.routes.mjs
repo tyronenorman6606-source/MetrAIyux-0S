@@ -1,0 +1,2 @@
+export const name='billing.routes'; export const area='billing'; export const owns=['billing plans','entitlements']; export const routes=['GET /api/v17/billing/plans'];
+export async function handle(ctx){ const { method,url,sendJSON,loadDataFile }=ctx; if(method==='GET' && url.pathname==='/api/v17/billing/plans') return sendJSON(200, await loadDataFile('billing-plans.json',{plans:[]})); return {handled:false}; }

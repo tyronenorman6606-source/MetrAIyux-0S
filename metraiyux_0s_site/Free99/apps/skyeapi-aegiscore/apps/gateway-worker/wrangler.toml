@@ -1,0 +1,17 @@
+name = "skyeapi-gateway"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "AEGIS_KV"
+id = "replace_with_cloudflare_kv_namespace_id"
+
+# Required secrets:
+# wrangler secret put AEGIS_MASTER_KEY
+# wrangler secret put SKYE_ADMIN_KEY
+
+# Optional plain-text vars can be set in Cloudflare dashboard or wrangler.toml per environment:
+# SKYE_ALLOWED_ORIGINS = "https://your-console-domain.example"
+# SKYE_RATE_LIMIT_PER_MINUTE = "120"
+# SKYE_DEFAULT_PLAN = "builder"
+# SKYE_PLAN_CONFIG_JSON = '{"agency":{"dailyCallLimit":50000,"rateLimitPerMinute":1000,"allowedCapabilities":["*"]}}'

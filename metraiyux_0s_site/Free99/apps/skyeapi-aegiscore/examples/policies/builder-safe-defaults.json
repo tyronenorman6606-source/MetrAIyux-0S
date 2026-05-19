@@ -1,0 +1,38 @@
+[
+  {
+    "id": "deny-db-writes",
+    "label": "Block direct database writes from generic keys",
+    "enabled": true,
+    "capability": "db.query",
+    "effect": "deny",
+    "conditions": [{ "kind": "sql_readonly", "path": "sql" }],
+    "message": "Direct database writes require a dedicated elevated workflow."
+  },
+  {
+    "id": "approval-large-ai",
+    "label": "Require approval for large AI requests",
+    "enabled": true,
+    "capability": "ai.generate_text",
+    "effect": "require_approval",
+    "conditions": [{ "kind": "max_number", "path": "maxTokens", "max": 1000 }],
+    "message": "Large AI requests require an approval token."
+  },
+  {
+    "id": "sms-us-only",
+    "label": "Restrict SMS to approved country codes",
+    "enabled": true,
+    "capability": "sms.send",
+    "effect": "deny",
+    "conditions": [{ "kind": "allowed_phone_country_codes", "path": "to", "countryCodes": ["+1"] }],
+    "message": "SMS destination is outside approved country codes."
+  },
+  {
+    "id": "storage-prefix-lock",
+    "label": "Lock object uploads to project prefix",
+    "enabled": true,
+    "capability": "storage.upload",
+    "effect": "deny",
+    "conditions": [{ "kind": "storage_key_prefix", "path": "key", "prefixes": ["projects/"] }],
+    "message": "Storage uploads must remain under the projects/ prefix."
+  }
+]

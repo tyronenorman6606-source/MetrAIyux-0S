@@ -1,0 +1,191 @@
+{
+  "ok": true,
+  "checkedAt": "2026-05-11T00:24:13.981Z",
+  "checks": [
+    "provider pack source install receipt",
+    "provider pack certification receipt with signed manifest",
+    "registry publish/install receipt",
+    "billing invoice draft and exports",
+    "console Playwright-ready E2E contract"
+  ],
+  "sourceReceipt": {
+    "version": "skyeapi.provider-pack-source-install.v1",
+    "id": "packsrc_73805f1a26a2458eb545",
+    "projectId": "proj_v12",
+    "provider": "mailgun-custom",
+    "versionTag": "0.12.0",
+    "sourceType": "git",
+    "sourceUri": "https://example.com/mailgun-custom.git",
+    "checksum": "8ce47135f4fdeb7a20b4732b6d97454e205bb84d43a8001bc3ed94aa3139ce30",
+    "certification": {
+      "version": "skyeapi.provider-pack-certification.v1",
+      "generatedAt": "2026-05-11T00:24:13.949Z",
+      "ok": true,
+      "provider": "mailgun-custom",
+      "findings": [
+        {
+          "severity": "pass",
+          "code": "pack_shape_valid",
+          "message": "Provider pack shape is acceptable for authoring and review."
+        }
+      ],
+      "secrets_exposed": false
+    },
+    "installable": true,
+    "createdAt": "2026-05-11T00:24:13.965Z",
+    "notes": [],
+    "secrets_exposed": false
+  },
+  "certificationReceipt": {
+    "version": "skyeapi.provider-pack-certification-receipt.v1",
+    "id": "cert_52864330c9d54c9d9511",
+    "provider": "mailgun-custom",
+    "versionTag": "0.12.0",
+    "checksum": "8ce47135f4fdeb7a20b4732b6d97454e205bb84d43a8001bc3ed94aa3139ce30",
+    "certified": true,
+    "report": {
+      "version": "skyeapi.provider-pack-certification.v1",
+      "generatedAt": "2026-05-11T00:24:13.969Z",
+      "ok": true,
+      "provider": "mailgun-custom",
+      "findings": [
+        {
+          "severity": "pass",
+          "code": "pack_shape_valid",
+          "message": "Provider pack shape is acceptable for authoring and review."
+        }
+      ],
+      "secrets_exposed": false
+    },
+    "signedManifest": {
+      "version": "skyeapi.provider-pack-signed-manifest.v1",
+      "provider": "mailgun-custom",
+      "versionTag": "0.12.0",
+      "checksum": "8ce47135f4fdeb7a20b4732b6d97454e205bb84d43a8001bc3ed94aa3139ce30",
+      "signer": "smoke",
+      "signedAt": "2026-05-11T00:24:13.971Z",
+      "signature": "[redacted-signature]",
+      "dependencies": [],
+      "certification": {
+        "version": "skyeapi.provider-pack-certification.v1",
+        "generatedAt": "2026-05-11T00:24:13.971Z",
+        "ok": true,
+        "provider": "mailgun-custom",
+        "findings": [
+          {
+            "severity": "pass",
+            "code": "pack_shape_valid",
+            "message": "Provider pack shape is acceptable for authoring and review."
+          }
+        ],
+        "secrets_exposed": false
+      },
+      "secrets_exposed": false
+    },
+    "createdAt": "2026-05-11T00:24:13.975Z",
+    "secrets_exposed": false
+  },
+  "invoice": {
+    "version": "skyeapi.billing-invoice-draft.v1",
+    "id": "invoice_05e79266c5ff45dfa427",
+    "projectId": "proj_v12",
+    "customerEmail": "billing@example.com",
+    "window": "2026-05-10",
+    "status": "draft",
+    "currency": "usd",
+    "lineItems": [
+      {
+        "capability": "email.send",
+        "count": 13,
+        "billableUnits": 13,
+        "unitPriceCents": 1,
+        "estimatedCents": 13
+      }
+    ],
+    "subtotalCents": 13,
+    "totalCents": 13,
+    "generatedAt": "2026-05-11T00:24:13.976Z",
+    "dueAt": "2026-05-25T00:24:13.976Z",
+    "note": "Draft invoice object from SkyeAPI metered usage. This is not Stripe subscription collection or payment capture.",
+    "secrets_exposed": false
+  },
+  "e2e": {
+    "version": "skyeapi.console-e2e-contract.v1",
+    "generatedAt": "2026-05-11T00:24:13.980Z",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "pass",
+        "code": "selector_present",
+        "message": "#connection-form exists in console HTML."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_tested",
+        "message": "#connection-form is referenced by Playwright spec."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_present",
+        "message": "#claim-job-lease exists in console HTML."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_tested",
+        "message": "#claim-job-lease is referenced by Playwright spec."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_present",
+        "message": "#sign-provider-pack exists in console HTML."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_tested",
+        "message": "#sign-provider-pack is referenced by Playwright spec."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_present",
+        "message": "#install-pack-source exists in console HTML."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_tested",
+        "message": "#install-pack-source is referenced by Playwright spec."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_present",
+        "message": "#load-billing-invoice exists in console HTML."
+      },
+      {
+        "severity": "pass",
+        "code": "selector_tested",
+        "message": "#load-billing-invoice is referenced by Playwright spec."
+      },
+      {
+        "severity": "pass",
+        "code": "flow_wired",
+        "message": "installProviderPackSource is wired for console contract testing."
+      },
+      {
+        "severity": "pass",
+        "code": "flow_wired",
+        "message": "certificationReceipt is wired for console contract testing."
+      },
+      {
+        "severity": "pass",
+        "code": "flow_wired",
+        "message": "loadBillingInvoice is wired for console contract testing."
+      },
+      {
+        "severity": "pass",
+        "code": "flow_wired",
+        "message": "exportBillingInvoice is wired for console contract testing."
+      }
+    ],
+    "secrets_exposed": false
+  },
+  "secrets_exposed": false
+}

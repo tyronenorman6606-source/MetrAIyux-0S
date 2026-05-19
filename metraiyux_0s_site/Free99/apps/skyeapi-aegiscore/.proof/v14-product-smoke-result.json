@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "name": "v14-product-smoke",
+  "checks": {
+    "root proof uses single build before smoke chain": true,
+    "worker health imports modular version constants": true,
+    "worker HTTP behavioral smoke exists": true,
+    "worker exposes enqueue-job alias": true,
+    "billing lifecycle update function exists": true,
+    "invoice usage reconciliation exists": true,
+    "fixture certification function exists": true,
+    "SDK exposes v0.14 methods": true,
+    "CLI exposes v0.14 commands": true,
+    "v0.14 docs exist": true,
+    "console browser CI workflow exists": true
+  },
+  "proves": [
+    "behavioral Worker HTTP smoke was added to default proof chain",
+    "stale Worker health version moved to shared module and v0.14.0",
+    "billing lifecycle, reconciliation, and fixture certification code paths exist across Worker, SDK, and CLI",
+    "proof script is serialized to reduce recursive pnpm timeout risk"
+  ],
+  "does_not_prove": [
+    "live provider delivery",
+    "deployed Cloudflare behavior",
+    "globally atomic distributed locking",
+    "browser E2E in this sandbox unless smoke:console-browser is run successfully"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T00:24:15.024Z"
+}

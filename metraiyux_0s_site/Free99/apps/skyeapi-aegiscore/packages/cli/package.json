@@ -1,0 +1,29 @@
+{
+  "name": "skyeapi",
+  "version": "0.17.0",
+  "type": "module",
+  "bin": {
+    "skyeapi": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@skyeapi/aegis-core": "workspace:*",
+    "@skyeapi/core": "workspace:*",
+    "@skyeapi/ops": "workspace:*",
+    "@skyeapi/providers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}

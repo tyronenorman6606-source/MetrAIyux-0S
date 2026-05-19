@@ -184,6 +184,39 @@ const SKYPAY_OFFER_ENRICHMENTS = {
       ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidRpm: 30, paidRpd: 600 })
     }
   },
+  "valley-verified-app-build-lane": {
+    store_category: "Client app subscriptions",
+    store_rank: 21,
+    trial_days: 0,
+    zero_upfront_trial: false,
+    setup_handling: "owner_approved_after_app_scope",
+    storefront: true,
+    badge: "Valley app lane",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_app_scope",
+    includes: [
+      "Valley Verified public post",
+      "Bob/Empire-style app build scope",
+      "Media, forms, QR/share, and proof handoff",
+      "0S mount plus owner-approved activation"
+    ],
+    gate_policy: {
+      monthly_cap_cents: 50000,
+      default_rpm_limit: 60,
+      default_rpd_limit: 1200,
+      max_devices_per_key: 3,
+      require_install_id: true,
+      allowed_providers: ["openai", "gemini"],
+      allowed_models: {
+        openai: ["gpt-4o-mini", "gpt-4o"],
+        gemini: ["gemini-2.5-flash"]
+      },
+      vault_storage_mb: 2048,
+      vault_file_limit: 500,
+      vault_workspace_limit: 1,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidPlatformsEnabled: true, paidRpm: 25, paidRpd: 400 })
+    }
+  },
   "metraiyux-houseoperations-command": {
     store_category: "Client app subscriptions",
     store_rank: 22,
@@ -927,6 +960,35 @@ export const SKYPAY_OFFERS = [
     activation_path: "owner_approved_after_route_scope"
   },
   {
+    id: "valley-verified-app-build-lane",
+    plan_name: "valley-verified-app-build-lane",
+    title: "Valley Verified App Build Lane",
+    family: "valley-verified",
+    description: "Owner-approved Valley Verified lane for a business that wants a public post plus an actual Bob/Empire-style app build with media, routes, forms, QR/share handoff, and proof-backed 0S mounting.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["valley_verified_app_build_setup", "valley_verified_app_build_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "Valley Verified App Build Setup",
+        amount_cents: cents(2500),
+        type: "one_time",
+        lookup_key: "valley_verified_app_build_setup"
+      },
+      {
+        id: "monthly",
+        name: "Valley Verified App Build Lane",
+        amount_cents: cents(497),
+        type: "recurring",
+        interval: "month",
+        lookup_key: "valley_verified_app_build_monthly"
+      }
+    ],
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_app_scope"
+  },
+  {
     id: "metraiyux-houseoperations-command",
     plan_name: "houseoperations-command",
     title: "HouseOperations Command",
@@ -1357,6 +1419,27 @@ export const SKYPAY_CLIENTS = {
       contact_url: "https://skyesol.netlify.app/contact"
     }
   },
+  "valley-verified": {
+    slug: "valley-verified",
+    client_name: "Valley Verified",
+    company_name: "MetrAIyux 0S",
+    workspace_slug: "valley-verified",
+    default_offer_id: "valley-verified-app-build-lane",
+    preview_status: "app_build_lane_ready",
+    free_trial_days: 0,
+    included_usage: [
+      "Valley Verified public post",
+      "Bob/Empire-style app-build scope",
+      "0S mounted business app lane",
+      "Owner-approved activation after app scope"
+    ],
+    special_offer: "A business can start with a Valley Verified post, then scope an actual app build like Bob's Smoke Shop or Empire Pallets. Payment intent does not auto-activate production work without owner approval.",
+    contact: {
+      email: "SkyesOverLondonLC@solenterprises.org",
+      phone: "(623) 260-7073",
+      contact_url: "https://skyesol.netlify.app/contact"
+    }
+  },
   "metraiyux-0s-skm": {
     slug: "metraiyux-0s-skm",
     client_name: "MetrAIyux 0S - SKM",
@@ -1483,6 +1566,14 @@ export const SKYPAY_PLATFORM_ROUTES = [
     default_offer_id: "metraiyux-starter-command",
     wiring_status: "wiring_started",
     note: "Canonical company OS offers route into SkyePay closeout after preview proof."
+  },
+  {
+    platform_id: "valley-verified",
+    title: "Valley Verified App Build Lane",
+    route: "/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane",
+    default_offer_id: "valley-verified-app-build-lane",
+    wiring_status: "app_build_lane_ready",
+    note: "Mounted 0S business network with actual Bob and Empire app examples. Checkout remains owner-approved after app scope."
   },
   {
     platform_id: "skyeopsconsole",

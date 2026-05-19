@@ -13,14 +13,14 @@ Marketing assets for MetrAIyux 0S. All copy is written to be human-voiced, speci
 | `proof.html` | Live proof report — includes kAIxu 6.7 and SkyeVault Git remote proof rollups |
 | `style.css` | Shared design system (gold/navy palette, dark mode) |
 | `social-copy.md` | LinkedIn posts, Twitter/X posts, cold email templates, ad copy, video hook scripts |
-| `valuation-brief.md` | Investor/partner valuation brief — revised for 9 Workers, 17 brains, kAIxu, and Git-level SkyeVault |
+| `valuation-brief.md` | Investor/partner valuation brief — revised for 17 Workers, 17 brains, kAIxu, and Git-level SkyeVault |
 
 ## Current Release Notes
 
 The May 17, 2026 copy pass reflects the current infrastructure state:
 
 - 17 operating brains, including the kAIxu 6.7 sovereign inference lane.
-- 9 Cloudflare Workers, with the kAIxu brain added to the deployed Worker stack.
+- 17 Cloudflare Workers, with the kAIxu brain added to the deployed Worker stack.
 - SkyeVault as both an archive upload vault and a Git remote for clone, push, fetch, protected refs/tags, quota checks, verified snapshots, bundle restore, CLI access, SSH wrapper, and per-workspace neural maps.
 - Proof surfaces updated for SkyeVault Git remote verification and the public changelog.
 

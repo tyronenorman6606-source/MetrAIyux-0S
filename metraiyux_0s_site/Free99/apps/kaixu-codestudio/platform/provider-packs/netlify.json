@@ -1,0 +1,41 @@
+{
+  "id": "netlify",
+  "title": "Netlify Deploy",
+  "lane": "deploy",
+  "requiredSecrets": [
+    "NETLIFY_AUTH_TOKEN",
+    "NETLIFY_SITE_ID",
+    "NETLIFY_BUILD_HOOK_URL optional"
+  ],
+  "routes": [
+    "site.status",
+    "deploy.trigger"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#NetlifyAdapter",
+  "description": "Executable provider pack for Netlify Deploy routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "site-status",
+    "build-hooks",
+    "function-invoke"
+  ],
+  "metering": {
+    "unit": "deploy_operation",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "deploy",
+    "netlify"
+  ],
+  "executableActions": [
+    {
+      "route": "site.status",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "deploy.trigger",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

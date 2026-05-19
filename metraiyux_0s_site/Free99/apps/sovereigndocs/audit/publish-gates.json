@@ -1,0 +1,61 @@
+{
+  "version": "8.0.0-activation-enforcement",
+  "default_public_visibility": {
+    "high_risk": "admin_review_only_until_attorney_or_current_law_review",
+    "medium_risk": "public_with_draft_badge_and_review_warning",
+    "low_risk": "public_with_draft_badge_and_source_route_if_official"
+  },
+  "forbidden_claims": [
+    "attorney reviewed",
+    "state compliant",
+    "legally valid in all states",
+    "official government form replacement",
+    "court-ready without review",
+    "guaranteed enforceable",
+    "attorney-reviewed",
+    "lawyer-approved",
+    "legally compliant",
+    "state-compliant",
+    "court-ready",
+    "file directly",
+    "official filing",
+    "official submission",
+    "valid in all states"
+  ],
+  "required_badge_for_generated_templates": "Draft automation template \u2014 not attorney reviewed",
+  "required_badge_for_official_workflows": "Official-source prep workflow \u2014 use current official agency/court/tax source for final filing",
+  "release_gates": [
+    {
+      "gate": "database_seed",
+      "status": "pass",
+      "basis": "0 missing files, 0 bad JSON, 0 duplicate IDs/paths"
+    },
+    {
+      "gate": "public_browse_low_medium_with_warnings",
+      "status": "conditional_pass",
+      "basis": "warnings/rights/status present; do not remove draft badges"
+    },
+    {
+      "gate": "public_high_risk_template_generation",
+      "status": "fail_until_review",
+      "basis": "6069 high-risk records require attorney/current-law review"
+    },
+    {
+      "gate": "state_specific_claims",
+      "status": "fail_until_review",
+      "basis": "0 state overlays include verified state-specific law"
+    },
+    {
+      "gate": "official_form_filing_engine_claim",
+      "status": "fail_until_live_integration",
+      "basis": "official workflows are prep routes, not live agency filing submissions"
+    }
+  ],
+  "v8_enforcement": {
+    "high_risk_public_export": "blocked unless review decision allows prep worksheet or public gated draft",
+    "high_risk_static_mode": "prep worksheet only",
+    "official_workflows": "prep packet plus external official source route only",
+    "audit": "append-only hash-chain ledger enabled for API events",
+    "upstream_auth": "signed upstream session token support; no built-in login UI"
+  }
+}

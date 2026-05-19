@@ -13,6 +13,11 @@ const targetFolder = path.resolve(repoRoot, targetArg);
 const targetFolderExistsAtStart = fs.existsSync(targetFolder);
 const mcpConfigPath = path.join(repoRoot, '.mcp.json');
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'direct-mcp');
+const defaultWalkSkipDirs = new Set(['node_modules', 'dist', '.git', '.wrangler', '.netlify']);
+const extraWalkSkipDirs = new Set((process.env.MCP_SKIP_DIRS || '')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean));
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -28,7 +33,7 @@ function walkFiles(dir, predicate, acc = []) {
   if (!fs.existsSync(dir)) return acc;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory() && ['node_modules', 'dist', '.git', '.wrangler', '.netlify'].includes(entry.name)) continue;
+    if (entry.isDirectory() && (defaultWalkSkipDirs.has(entry.name) || extraWalkSkipDirs.has(entry.name))) continue;
     if (entry.isDirectory()) walkFiles(full, predicate, acc);
     else if (predicate(full)) acc.push(full);
   }
@@ -100,6 +105,7 @@ const relativeTarget = path.relative(repoRoot, targetFolder);
 const isSkyeGateFS27 = relativeTarget === 'SkyeGateFS27';
 const isSkyeSolTarget = relativeTarget === 'skyesol_current_public_site' || /(?:^|\/)SkyeSol(?:\/|$)/.test(relativeTarget);
 const isMetrAIyux0S = relativeTarget === 'metraiyux_0s_site' || /(?:^|\/)metraiyux_0s_site(?:\/|$)/.test(relativeTarget);
+const isFree99AppIntakeTarget = relativeTarget === 'metraiyux_0s_site/Free99' || /(?:^|\/)Free99$/.test(relativeTarget);
 const isDesignLab = relativeTarget === 'skye-design-lab' || relativeTarget === 'MCP/skye-design-lab';
 const isMcpServerTarget = relativeTarget === 'MCP';
 const templateTargetMatch = relativeTarget.match(/MCP\/magicuidesign-(changelog|blog|portfolio)-template-[^/]+/);
@@ -233,6 +239,8 @@ const requestedEffectOverrides = (process.env.MCP_EFFECTS || '')
 const requestedEffectsForTarget = [...new Set([...(isSkyeGateFS27
   ? ['textEffects', 'motionChrome', 'gsapScroll']
   : isMcpServerTarget
+  ? []
+  : isFree99AppIntakeTarget
   ? []
   : isDesignLab
   ? ['textEffects', 'motionChrome', 'livingBackground', 'gsapScroll', 'threeCanvas', 'surfaceScreenshots']
@@ -396,10 +404,12 @@ toolCalls.push(await callTool('design_logo_audit', {
   source: `${logoSourceForAudit}\n${auditSource.slice(0, 90000)}`
 }));
 if (!isMcpServerTarget) {
-  toolCalls.push(await callTool('design_effect_audit', {
-    requested: requestedEffectsForTarget,
-    source: auditSource.slice(0, 90000)
-  }));
+  if (!isFree99AppIntakeTarget) {
+    toolCalls.push(await callTool('design_effect_audit', {
+      requested: requestedEffectsForTarget,
+      source: auditSource.slice(0, 90000)
+    }));
+  }
   toolCalls.push(await callTool('design_performance_audit', { source: auditSource.slice(0, 90000) }));
   toolCalls.push(await callTool('design_stack_audit', { required: requiredStackForTarget, packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: auditSource.slice(0, 90000) }));
 } else {
@@ -425,7 +435,7 @@ if (hasBrowserActionProofClaim) {
     source: auditSource.slice(0, 90000)
   }));
 }
-if (targetHasPublicSource && !isMcpServerTarget) {
+if (targetHasPublicSource && !isMcpServerTarget && !isFree99AppIntakeTarget) {
   toolCalls.push(await callTool('design_validate', { content: auditSource.slice(0, 50000) }));
 }
 toolCalls.push(await callTool('design_quality_gate', { surface: relativeTarget }));

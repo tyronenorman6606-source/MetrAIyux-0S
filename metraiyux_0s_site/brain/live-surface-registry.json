@@ -1,5 +1,5 @@
 {
-  "version": "live-surfaces-platform-accounting",
+  "version": "live-surfaces-platform-accounting-auren",
   "updated_at": "2026-05-18T00:00:00Z",
   "primary_folder": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
   "gate_folder": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
@@ -18,7 +18,7 @@
     "stripe_sync_receipt": "test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json",
     "public_atlas_proof": "test-artifacts/ledger-stripe-sync-prod/browser-qa.json"
   },
-  "surface_count": 54,
+  "surface_count": 57,
   "surfaces": [
     {
       "id": "skygate-fs27-proof-surface",
@@ -93,13 +93,15 @@
       "local_path": "/workspaces/MetrAIyux-0S/SkyeVault-Drop/public/index.html",
       "audience": "buyers, customers, operators, file-handoff reviewers",
       "privacy": "public entry with gated upload, admin, and provisioning lanes",
-      "purpose": "Gated file, upload, and workspace handoff surface used by SkyeVault access plans and by larger app lanes that need proof-safe storage boundaries.",
+      "purpose": "Gated file, upload, repo workspace, and handoff surface used by SkyeVault access plans and larger app lanes that need proof-safe storage boundaries, diff/commit/push receipts, and documented local-only secret boundaries.",
       "route_when": [
         "vault",
         "file",
         "upload",
         "handoff",
         "workspace storage",
+        "repo workspace",
+        "repo receipts",
         "r2",
         "skyevault",
         "client files",
@@ -197,6 +199,36 @@
       "sales_use": "Use after a prospect has or can receive a gate key and needs to see a Skyes Over London-branded intelligence workspace without exposing hidden model routing.",
       "primary_brain": "gray-london-skyes-brain",
       "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "metraiyux-auren-central-intelligence",
+      "name": "Auren Central Intelligence",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Auren/",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Auren/index.html",
+      "audience": "Gray, operators, builders preparing the future 0S-integrated central intelligence",
+      "privacy": "local-first standalone app surface with optional runtime sync",
+      "purpose": "Unifies Over3arth realms, rituals, quests, proof, GrayScape task/journal/vault/calendar storage, and NeuralSpacePro runtime, research, build, knowledge, map, and handoff lanes behind Auren's visual identity.",
+      "route_when": [
+        "Auren",
+        "central ai",
+        "central intelligence",
+        "over3arth",
+        "overearth",
+        "grayscape",
+        "gray scape",
+        "neuralspace",
+        "neural space pro",
+        "living ai",
+        "quest",
+        "ritual",
+        "proof",
+        "research archive",
+        "build forge",
+        "handoff docks"
+      ],
+      "sales_use": "Use internally as the proof surface for Auren before wiring her deeper into the protected 0S runtime. Keep model/provider claims local-first unless a real backing service answers.",
+      "primary_brain": "gray-london-skyes-brain",
+      "secondary_brain": "orion-hayes-brain"
     },
     {
       "id": "metraiyux-skyeprofitconsole-expansion",
@@ -1181,6 +1213,44 @@
       "sales_use": "Use for kAIxU BrandKit questions only with the boundary that production publishing, external writes, payment, and customer tenancy require separate owner-approved proof.",
       "primary_brain": "valentina-reyes-brain",
       "secondary_brain": "0meg4kai-security-brain"
+    },
+    {
+      "id": "free99-platform-intake-hub",
+      "name": "Free99 Platform Intake Hub",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/index.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Free99/index.html",
+      "audience": "operators, buyers, technical evaluators",
+      "privacy": "gated review",
+      "purpose": "Mounted app hub for SkyeOpsConsole and every paid Free99/Paid-Apps platform lane.",
+      "route_when": [
+        "free99",
+        "paid platform intake",
+        "new tech",
+        "sovereigndocs",
+        "skyeopsconsole"
+      ],
+      "sales_use": "Use when someone asks what came in with the new Free99 tech bundle and what is actually free.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "naomi-sterling-brain"
+    },
+    {
+      "id": "free99-platform-intake-receipt",
+      "name": "Free99 Platform Intake Receipt",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/free99-platform-intake-receipt.html",
+      "local_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/free99-platform-intake-receipt.html",
+      "audience": "operators, proof reviewers",
+      "privacy": "public proof",
+      "purpose": "Receipt proving the Free99 app fleet is mounted under the 0S gate with platform-aware usage tags.",
+      "route_when": [
+        "proof",
+        "free99",
+        "paid platform intake",
+        "platform_id",
+        "usage_lane"
+      ],
+      "sales_use": "Use after the hub when a buyer or operator asks whether all imported apps were actually wired.",
+      "primary_brain": "orion-hayes-brain",
+      "secondary_brain": "naomi-sterling-brain"
     }
   ],
   "brain_guidance": {

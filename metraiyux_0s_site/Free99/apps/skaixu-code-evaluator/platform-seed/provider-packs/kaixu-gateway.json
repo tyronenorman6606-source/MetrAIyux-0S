@@ -1,0 +1,21 @@
+{
+  "type": "provider-pack",
+  "name": "kAIxuGateway13",
+  "version": "1.0.0",
+  "routing": {
+    "chat": "/.netlify/functions/gateway-chat",
+    "stream": "/.netlify/functions/gateway-stream",
+    "netlifyProxyPrefix": "/api"
+  },
+  "clientRules": [
+    "No direct provider SDKs in the browser.",
+    "No direct calls to OpenAI, Anthropic, Gemini, or other model APIs.",
+    "Use Authorization: Bearer <KAIXU_VIRTUAL_KEY>.",
+    "Streaming uses fetch + ReadableStream parsing, not EventSource."
+  ],
+  "upstreamAuth": {
+    "mode": "inherited",
+    "expectedInjection": "window.SKAI_UPSTREAM_IDENTITY",
+    "notes": "This app intentionally avoids a built-in auth wall. Tenant/user/role claims should be provided by the parent SaaS shell or server functions."
+  }
+}

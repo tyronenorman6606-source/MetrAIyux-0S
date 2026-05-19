@@ -31,7 +31,7 @@ This is not code waiting to be deployed. Every backend layer is running on Cloud
 | SkyeVault Git Remote | local proof service + deployable vault lane | ✓ Proof passed — clone, push, fetch, policy, quota, snapshot, restore |
 | Public Spectacle Overview | `metraiyux-0s-public-spectacle.pages.dev` | ✓ Live — Cloudflare Pages |
 
-**9 Workers. 8 D1 databases. 1 auth platform. Git-level SkyeVault remote proof passed.**
+**17 Workers. 8 D1 databases. 1 auth platform. Git-level SkyeVault remote proof passed.**
 
 ---
 
@@ -41,7 +41,7 @@ MetrAIyux 0S is a live business operating system consisting of:
 
 **Static Site Layer**
 - 522 HTML pages — marketing, admin command center, sales enablement library, client portal, knowledge base, blog, government readiness, governance center, proof vault, download center, AE command center, revenue ops.
-- 722 knowledge base chunks indexed for brain context retrieval.
+- 725 knowledge base chunks indexed for brain context retrieval.
 - 40+ city and service-specific SEO pages targeting staffing and operations verticals.
 - 20+ long-form thought leadership blog articles.
 - llms.txt for AI crawler indexing, sitemap.xml, robots.txt.

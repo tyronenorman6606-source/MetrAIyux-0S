@@ -1,4 +1,4 @@
-// SkyeMusicNexus Open Source Creation Studio function
+// SkyeMusicNexus Native Creation Studio function
 // CommonJS Netlify Function, proof-safe by default.
 //
 // Responsibilities:
@@ -6,7 +6,7 @@
 // - Save/load creation project metadata.
 // - Queue export manifests.
 // - Generate Release Forge handoff lines.
-// - Keep real DAW engines external; do not claim DSP distribution, legal review, or real payout movement.
+// - Record native creation modules; do not claim DSP distribution, legal review, or real payout movement.
 
 const fs = require("node:fs");
 const os = require("node:os");

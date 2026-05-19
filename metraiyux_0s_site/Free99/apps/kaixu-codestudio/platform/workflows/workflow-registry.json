@@ -1,0 +1,104 @@
+[
+  {
+    "id": "send_invoice",
+    "templateId": "send_invoice",
+    "title": "Send invoice",
+    "category": "Money",
+    "requiredProviders": [
+      "stripe",
+      "resend"
+    ],
+    "steps": [
+      "create_checkout_session",
+      "email_payment_link",
+      "write_receipt"
+    ],
+    "output": "payment_link",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  },
+  {
+    "id": "qualify_lead",
+    "templateId": "qualify_lead",
+    "title": "Qualify lead",
+    "category": "Sales",
+    "requiredProviders": [
+      "openai_gateway",
+      "neon"
+    ],
+    "steps": [
+      "normalize_lead",
+      "score_fit",
+      "write_crm_note"
+    ],
+    "output": "lead_score",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  },
+  {
+    "id": "book_appointment",
+    "templateId": "book_appointment",
+    "title": "Book appointment",
+    "category": "Ops",
+    "requiredProviders": [
+      "google_ops",
+      "resend"
+    ],
+    "steps": [
+      "check_calendar",
+      "create_event",
+      "email_confirmation"
+    ],
+    "output": "calendar_event",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  },
+  {
+    "id": "checkout_email_link",
+    "templateId": "checkout_email_link",
+    "title": "Checkout + email link",
+    "category": "Sales",
+    "requiredProviders": [
+      "stripe",
+      "resend"
+    ],
+    "steps": [
+      "create_checkout_session",
+      "email_link",
+      "audit_receipt"
+    ],
+    "output": "checkout_url",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  },
+  {
+    "id": "db_query_ai_summary",
+    "templateId": "db_query_ai_summary",
+    "title": "DB query + AI summary",
+    "category": "Data",
+    "requiredProviders": [
+      "neon",
+      "openai_gateway"
+    ],
+    "steps": [
+      "run_readonly_query",
+      "summarize_rows",
+      "export_summary"
+    ],
+    "output": "summary_markdown",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  },
+  {
+    "id": "legal_review_intake",
+    "templateId": "legal_review_intake",
+    "title": "Document review intake",
+    "category": "Partner review",
+    "requiredProviders": [
+      "google_ops",
+      "resend"
+    ],
+    "steps": [
+      "capture_submission",
+      "save_to_drive",
+      "notify_partner_queue"
+    ],
+    "output": "review_packet",
+    "runner": "server/platform-engine.mjs#runWorkflow"
+  }
+]

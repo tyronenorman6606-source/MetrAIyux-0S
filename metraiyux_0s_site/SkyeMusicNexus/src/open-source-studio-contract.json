@@ -1,71 +1,68 @@
 {
   "platformId": "skye-music-nexus",
-  "title": "SkyeMusicNexus Open Source Creation Studio Drop-In",
-  "generatedAt": "2026-05-17",
+  "title": "SkyeMusicNexus Native Creation Studio",
+  "generatedAt": "2026-05-18",
   "dropInFiles": [
     "public/create.html",
+    "public/daw.html",
+    "public/nexus-daw.css",
+    "public/nexus-daw.js",
     "public/open-source-studio.css",
     "public/open-source-studio.js",
     "../netlify/functions/music-studio.js",
     "src/open-source-studio-contract.json",
-    "open-source/open-source-manifest.json",
-    "open-source/scripts/install-open-source-engines.sh"
+    "open-source/open-source-manifest.json"
   ],
   "mountTarget": "SkyeMusicNexus/public/create.html",
-  "existingRoomsPreserved": [
-    "public/index.html",
-    "public/upload.html",
-    "public/player.html",
-    "public/releases.html",
-    "public/rights.html",
-    "public/exchange.html",
-    "public/admin.html"
-  ],
   "newModules": [
-    "Open Source Creation Studio",
-    "openDAW Bridge",
+    "Native Creation Hub",
+    "SkyeMusicNexus Native DAW",
     "Stem Vault Staging",
     "Studio Session Ledger",
     "Sample Pack Rail",
     "Export Manifest Queue",
     "Release Forge Handoff"
   ],
-  "externalOpenSourceEngines": [
-    {
-      "name": "openDAW",
-      "role": "primary browser DAW candidate",
-      "license": "AGPLv3",
-      "repo": "https://github.com/andremichelle/openDAW.git"
-    },
-    {
-      "name": "Ardour",
-      "role": "desktop DAW companion",
-      "license": "GPL-2.0-or-later",
-      "repo": "https://github.com/Ardour/ardour.git"
-    },
-    {
-      "name": "LMMS",
-      "role": "beat/MIDI/synth companion",
-      "license": "GPL family; verify upstream",
-      "repo": "https://github.com/LMMS/lmms.git"
-    },
-    {
-      "name": "Audacity",
-      "role": "waveform cleanup/editing companion",
-      "license": "GPLv3",
-      "repo": "https://github.com/audacity/audacity.git"
-    }
-  ],
+  "nativeDaw": {
+    "path": "public/daw.html",
+    "script": "public/nexus-daw.js",
+    "style": "public/nexus-daw.css",
+    "capabilities": [
+      "fullscreen first-party DAW shell",
+      "transport",
+      "tempo and key controls",
+      "arrangement timeline",
+      "track mute solo arm controls",
+      "audio clip import decode preview",
+      "mixer levels",
+      "drum pads",
+      "synth keys",
+      "physical computer keyboard notes",
+      "region select split duplicate delete quantize",
+      "undo redo edit history",
+      "loop and metronome toggles",
+      "local loop pack insertion",
+      "microphone recording path",
+      "Web MIDI connection path",
+      "browser WAV mixdown export",
+      "project save",
+      "release manifest export"
+    ]
+  },
   "functionBoundary": {
     "newFunction": "netlify/functions/music-studio.js",
     "auth": "requires bearer/x-skygate-session token",
-    "storage": "proof ledger in /tmp by default; move to Citadel/SkyeVault/R2 for durable production",
+    "storage": "proof ledger in MUSIC_NEXUS_DATA_DIR by default; move to Citadel/SkyeVault/R2 for durable production",
     "noClaims": [
       "does not perform live DSP distribution",
       "does not settle real royalties",
       "does not provide legal review",
-      "does not move real payouts",
-      "does not vendor-copy open-source DAW code"
+      "does not move real payouts"
     ]
-  }
+  },
+  "forbidden": [
+    "third-party DAW iframe on public/daw.html",
+    "vendored third-party DAW source inside open-source/vendor",
+    "external DAW bridge branding"
+  ]
 }

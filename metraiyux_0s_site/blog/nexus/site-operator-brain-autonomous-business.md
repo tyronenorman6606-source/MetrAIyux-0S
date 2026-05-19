@@ -42,7 +42,7 @@ The best sales use is to turn each section into a follow-up asset. Send the thes
 
 For marketing, the reusable angle is: turn the Site Operator Brain into a technical honesty story, sales demo path, and operating proof narrative. That means this post can feed a pillar page, a LinkedIn post, a short video script, a campaign landing page, an email sequence, and a local-brain answer. The key is to preserve the same operating claim across every version. The short version should not promise more than the long version proves.
 
-This is especially important for MetrAIyux 0S because the public story can get large quickly: 16 brains, cabinet rooms, Cloudflare workers, approval gates, proof receipts, staffing operations, enterprise readiness, and autonomous business language. The content engine keeps that story grounded. Each marketing asset should point back to a real room or a proof rule.
+This is especially important for MetrAIyux 0S because the public story can get large quickly: 17 brains, cabinet rooms, Cloudflare Workers, approval gates, proof receipts, staffing operations, enterprise readiness, and autonomous business language. The content engine keeps that story grounded. Each marketing asset should point back to a real room or a proof rule.
 
 ## Proof, boundaries, and trust
 

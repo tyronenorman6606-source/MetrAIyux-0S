@@ -1,0 +1,131 @@
+[
+  {
+    "id": "stripe",
+    "title": "Stripe Payments",
+    "lane": "payments",
+    "enabled": false,
+    "secretRef": "vault:stripe:primary",
+    "requiredSecrets": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ],
+    "routes": [
+      "checkout.create",
+      "invoice.send",
+      "webhook.payment"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#StripeAdapter"
+  },
+  {
+    "id": "resend",
+    "title": "Resend Email",
+    "lane": "email",
+    "enabled": false,
+    "secretRef": "vault:resend:primary",
+    "requiredSecrets": [
+      "RESEND_API_KEY"
+    ],
+    "routes": [
+      "email.send",
+      "email.sequence",
+      "webhook.email"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#ResendAdapter"
+  },
+  {
+    "id": "twilio",
+    "title": "Twilio Messaging",
+    "lane": "sms_voice",
+    "enabled": false,
+    "secretRef": "vault:twilio:primary",
+    "requiredSecrets": [
+      "TWILIO_ACCOUNT_SID",
+      "TWILIO_AUTH_TOKEN",
+      "TWILIO_FROM"
+    ],
+    "routes": [
+      "sms.send",
+      "voice.call",
+      "webhook.message"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#TwilioAdapter"
+  },
+  {
+    "id": "cloudflare",
+    "title": "Cloudflare Platform",
+    "lane": "infra",
+    "enabled": false,
+    "secretRef": "vault:cloudflare:primary",
+    "requiredSecrets": [
+      "CLOUDFLARE_ACCOUNT_ID",
+      "CLOUDFLARE_API_TOKEN"
+    ],
+    "routes": [
+      "account.verify",
+      "d1.query"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#CloudflareAdapter"
+  },
+  {
+    "id": "neon",
+    "title": "Neon Postgres",
+    "lane": "database",
+    "enabled": false,
+    "secretRef": "vault:neon:primary",
+    "requiredSecrets": [
+      "DATABASE_URL or NEON_SQL_HTTP_URL"
+    ],
+    "routes": [
+      "db.query"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#NeonAdapter"
+  },
+  {
+    "id": "netlify",
+    "title": "Netlify Deploy",
+    "lane": "deploy",
+    "enabled": false,
+    "secretRef": "vault:netlify:primary",
+    "requiredSecrets": [
+      "NETLIFY_AUTH_TOKEN",
+      "NETLIFY_SITE_ID",
+      "NETLIFY_BUILD_HOOK_URL optional"
+    ],
+    "routes": [
+      "site.status",
+      "deploy.trigger"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#NetlifyAdapter"
+  },
+  {
+    "id": "openai_gateway",
+    "title": "Kaixu AI Gateway",
+    "lane": "ai",
+    "enabled": true,
+    "secretRef": "vault:kaixu_gateway:primary",
+    "requiredSecrets": [
+      "KAIXU_GATEWAY_URL+KAIXU_GATEWAY_SUBKEY or OPENAI_API_KEY"
+    ],
+    "routes": [
+      "ai.chat",
+      "ai.summarize",
+      "ai.classify"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#AIGatewayAdapter"
+  },
+  {
+    "id": "google_ops",
+    "title": "Google Ops",
+    "lane": "docs_calendar",
+    "enabled": false,
+    "secretRef": "vault:google_ops:primary",
+    "requiredSecrets": [
+      "GOOGLE_SERVICE_ACCOUNT_JSON"
+    ],
+    "routes": [
+      "drive.save",
+      "calendar.book"
+    ],
+    "backend": "server/adapters/provider-registry.mjs#GoogleOpsAdapter"
+  }
+]

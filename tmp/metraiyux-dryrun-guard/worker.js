@@ -36,8 +36,8 @@ var LIVE_SURFACES = [
     id: "metraiyux-full-system",
     name: "MetrAIyux 0S Full System",
     url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/",
-    purpose: "Live 16-brain business command deck and client-deployment reference.",
-    route_when: ["metraiyux", "16 brains", "command deck", "autonomous business", "client website", "owner admin", "sales deck"]
+    purpose: "Live 17-brain business command deck and client-deployment reference.",
+    route_when: ["metraiyux", "17 brains", "command deck", "autonomous business", "client website", "owner admin", "sales deck"]
   },
   {
     id: "metraiyux-public-spectacle",

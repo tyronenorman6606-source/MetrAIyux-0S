@@ -12,5 +12,9 @@ Client builds live here, but each project still deploys to its own production ta
   - Live app: `https://empire-pallets.pages.dev/`
   - Valley Verified post: `https://valley-verified.pages.dev/business/empire-pallets-phoenix/`
   - Deploy: `npx wrangler pages deploy Skye-Clients/empire-pallets-v3-app --project-name empire-pallets --branch main --commit-dirty=true`
+- Next Level Gaming AZ: `Skye-Clients/next-level-gaming-az-app`
+  - Source site: `https://www.nextlevelgamingaz.com/`
+  - Local preview: `http://127.0.0.1:4188/`
+  - Deploy: `npx wrangler pages deploy Skye-Clients/next-level-gaming-az-app --project-name next-level-gaming-az --branch main --commit-dirty=true`
 
 The funnel rule is simple: the client app links out to its Valley Verified public post, and the Valley Verified post links back to the client app. The network gives them discovery and proof; their own app converts the visitor.

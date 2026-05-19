@@ -1,0 +1,67 @@
+{
+  "source_id": "uspto-patent-forms",
+  "workflows": [
+    {
+      "id": "uspto-patent-application",
+      "title": "USPTO Patent Application Forms Prep",
+      "category": "ip-technology",
+      "type": "official_source_workflow",
+      "version": "2.0.0-upgraded",
+      "risk_level": "high",
+      "source_id": "uspto-patent-forms",
+      "official_url": "https://www.uspto.gov/patents/apply/forms",
+      "prep_fields": [
+        "owner_name",
+        "applicant_name",
+        "mark_or_invention_title",
+        "filing_basis",
+        "goods_services_or_claim_scope",
+        "attorney_or_agent"
+      ],
+      "completion_model": "prep_packet_plus_official_form_link",
+      "document_generation_policy": "Do not recreate or replace official form unless the official source grants a reusable fillable form pathway. Generate a preparation worksheet, data packet, filing checklist, and route to the current official source.",
+      "notes": "USPTO Patent Application Forms Prep",
+      "rights": {
+        "official_source_referenced": true,
+        "official_text_copied": false,
+        "third_party_proprietary_text_used": false
+      },
+      "review": {
+        "source_verification_required_before_publish": true,
+        "attorney_review_required": true,
+        "last_verified": "2026-05-10"
+      }
+    },
+    {
+      "id": "uspto-patent-fillable-pdf",
+      "title": "USPTO Patent Fillable PDF Prep",
+      "category": "ip-technology",
+      "type": "official_source_workflow",
+      "version": "2.0.0-upgraded",
+      "risk_level": "high",
+      "source_id": "uspto-patent-forms",
+      "official_url": "https://www.uspto.gov/patents/apply/applying-online/form-fillable-pdfs-available",
+      "prep_fields": [
+        "owner_name",
+        "applicant_name",
+        "mark_or_invention_title",
+        "filing_basis",
+        "goods_services_or_claim_scope",
+        "attorney_or_agent"
+      ],
+      "completion_model": "prep_packet_plus_official_form_link",
+      "document_generation_policy": "Do not recreate or replace official form unless the official source grants a reusable fillable form pathway. Generate a preparation worksheet, data packet, filing checklist, and route to the current official source.",
+      "notes": "USPTO Patent Fillable PDF Prep",
+      "rights": {
+        "official_source_referenced": true,
+        "official_text_copied": false,
+        "third_party_proprietary_text_used": false
+      },
+      "review": {
+        "source_verification_required_before_publish": true,
+        "attorney_review_required": true,
+        "last_verified": "2026-05-10"
+      }
+    }
+  ]
+}

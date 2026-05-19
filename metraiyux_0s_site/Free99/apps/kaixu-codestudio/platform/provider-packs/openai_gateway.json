@@ -1,0 +1,45 @@
+{
+  "id": "openai_gateway",
+  "title": "Kaixu AI Gateway",
+  "lane": "ai",
+  "requiredSecrets": [
+    "KAIXU_GATEWAY_URL+KAIXU_GATEWAY_SUBKEY or OPENAI_API_KEY"
+  ],
+  "routes": [
+    "ai.chat",
+    "ai.summarize",
+    "ai.classify"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#AIGatewayAdapter",
+  "description": "Executable provider pack for Kaixu AI Gateway routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "chat",
+    "summarize",
+    "classify"
+  ],
+  "metering": {
+    "unit": "ai_call",
+    "defaultCostCents": 1
+  },
+  "policyTags": [
+    "ai",
+    "openai_gateway"
+  ],
+  "executableActions": [
+    {
+      "route": "ai.chat",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "ai.summarize",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "ai.classify",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

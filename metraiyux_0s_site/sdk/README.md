@@ -4,7 +4,7 @@ Official SDK for **MetrAIyux 0S** — the autonomous command platform powered by
 
 **One credential. Everything included.**
 
-Your FS27 gate card token is the only thing you need. No Cloudflare account, no Resend key, no Stripe keys, no config files. The SDK validates your token against FS27, reads your plan limits, and routes every command through the 16-brain classification system.
+Your FS27 gate card token is the only thing you need. No Cloudflare account, no Resend key, no Stripe keys, no config files. The SDK validates your token against FS27, reads your plan limits, and routes every command through the 17-brain classification system.
 
 ---
 
@@ -65,7 +65,7 @@ const card = await client.init();
 
 ### `client.command(text, opts?)` → result
 
-Routes a command through the 16-brain classification system with 0meg4kAI security review.
+Routes a command through the 17-brain classification system with 0meg4kAI security review.
 
 ```javascript
 const result = await client.command('Review the staffing proposal for Field Tech Solutions');

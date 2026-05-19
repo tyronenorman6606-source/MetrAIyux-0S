@@ -6,9 +6,16 @@
   "type": "module",
   "scripts": {
     "dev:local": "node scripts/local-dev-server.mjs",
-    "smoke": "node smoke/neo-front-smoke.mjs && node smoke/skye-music-nexus-p2-smoke.mjs && node smoke/open-source-studio-smoke.mjs && node smoke/smoke-proof.mjs",
+    "smoke": "node smoke/neo-front-smoke.mjs && node smoke/drop-orchestrator-smoke.mjs && node smoke/skye-music-nexus-p2-smoke.mjs && node smoke/open-source-studio-smoke.mjs && node smoke/smoke-proof.mjs",
     "smoke:ui": "node smoke/neo-front-smoke.mjs && node smoke/skye-music-nexus-p2-smoke.mjs && node smoke/open-source-studio-smoke.mjs",
-    "smoke:runtime": "node smoke/open-source-studio-smoke.mjs && node smoke/smoke-proof.mjs"
+    "smoke:runtime": "node smoke/open-source-studio-smoke.mjs && node smoke/smoke-proof.mjs",
+    "smoke:drops": "node smoke/drop-orchestrator-smoke.mjs",
+    "drops:env": "node scripts/drop-env-resolve.mjs",
+    "drops:estimate": "node scripts/estimate-drop-credits.mjs",
+    "drops:build": "node scripts/build-drop-site.mjs",
+    "drops:deploy": "node scripts/netlify-drop-deploy.mjs",
+    "drops:render-page": "node scripts/render-drop-page.mjs",
+    "drops:render-hub": "node scripts/render-drop-hub.mjs"
   },
   "engines": {
     "node": ">=20"

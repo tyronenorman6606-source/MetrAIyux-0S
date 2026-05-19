@@ -1,0 +1,19 @@
+{
+  "type": "provider-pack",
+  "name": "BrowserPreviewProof",
+  "version": "1.0.0",
+  "routing": {
+    "chat": "/.netlify/functions/gateway-chat",
+    "stream": "/.netlify/functions/gateway-stream",
+    "proof": "in-browser-preview-frame"
+  },
+  "clientRules": [
+    "Runs only against the local Service Worker preview frame.",
+    "Does not call model provider APIs directly.",
+    "Captures route/action/content proof without deployment claims."
+  ],
+  "upstreamAuth": {
+    "mode": "inherited",
+    "expectedInjection": "window.SKAI_UPSTREAM_IDENTITY"
+  }
+}

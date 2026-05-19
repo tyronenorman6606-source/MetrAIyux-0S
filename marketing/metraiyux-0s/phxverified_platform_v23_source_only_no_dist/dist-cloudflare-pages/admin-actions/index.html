@@ -4,13 +4,13 @@
     <title>Admin Actions | Valley Verified</title>
     <meta name="description" content="Operator action queue for Valley Verified duplicate control, suppression, and poster-risk review." />
     <meta name="robots" content="noindex,nofollow,noarchive" />
-    <link rel="canonical" href="https://phx-verified-network.pages.dev/admin-actions/" />
+    <link rel="canonical" href="https://valley-verified.pages.dev/admin-actions/" />
     <meta name="theme-color" content="#f5efe3" />
     <meta property="og:title" content="Admin Actions | Valley Verified" />
     <meta property="og:description" content="Operator action queue for Valley Verified duplicate control, suppression, and poster-risk review." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://phx-verified-network.pages.dev/admin-actions/" />
-    <meta property="og:image" content="https://phx-verified-network.pages.dev/assets/valley-verified-logo.png" />
+    <meta property="og:url" content="https://valley-verified.pages.dev/admin-actions/" />
+    <meta property="og:image" content="https://valley-verified.pages.dev/assets/valley-verified-logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/assets/valley-verified-logo.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -18,7 +18,7 @@
     
   </head><body class="admin-actions-page"><canvas id="sky" class="skyesol-living-background living-background" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div><header class="topbar public-topbar">
   <a class="brand" href="/" aria-label="Valley Verified home"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>real local business pages</small></span></a>
-  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a><a class="nav-operator" href="/protected-admin/" rel="nofollow">Operator</a></nav>
+  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a></nav>
 </header><main id="main" class="site-main"><section class="hero glass subhero"><div><p class="eyebrow">Admin action queue</p><h1>Remove, merge, contact, or suppress bad listings.</h1><p class="hero-text">This is the no-auth operator layer. Upstream auth can gate it later. The actual removal mechanism is durable: edit <code>seed/businesses/suppressions.json</code>, rebuild, and the listing disappears from public output.</p></div><aside class="hero-card"><div class="metric"><span>500</span><small>actions</small></div><div class="metric"><span>0</span><small>risk records</small></div></aside></section><section class="section glass"><div class="section-head"><div><p class="eyebrow">Suppression starter</p><h2>Template for removal control</h2></div><a class="btn small" href="/data/suppression-template.json">Download template</a></div><pre class="code-output">{
   &quot;notes&quot;: [
     &quot;Add ids, identity keys, domains, phones, emails, or source hashes here, then rebuild. Upstream auth can gate the admin surface, but suppression itself is seed-controlled.&quot;

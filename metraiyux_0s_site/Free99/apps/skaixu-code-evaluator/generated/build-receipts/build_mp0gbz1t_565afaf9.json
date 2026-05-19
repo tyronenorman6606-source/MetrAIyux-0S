@@ -1,0 +1,30 @@
+{
+  "id": "build_mp0gbz1t_565afaf9",
+  "type": "SKAI_BUILD_EXECUTION_RECEIPT",
+  "startedAt": "2026-05-11T00:16:41.009Z",
+  "rootDir": "/mnt/data/skaixu_website_work",
+  "dryRun": false,
+  "requestedStages": [
+    "test"
+  ],
+  "primaryFramework": "netlify-functions",
+  "planHash": "bba85363b98e0f4471c95c4cc5aeed7f084854f44e07df60748cb11994472609",
+  "stages": [
+    {
+      "stage": "test",
+      "command": "npm run test",
+      "commandHash": "0c7ec4aac044044cc5b274b09866dbba6c2eedca7ca0198dae0fa3b38e59513b",
+      "startedAt": "2026-05-11T00:16:41.009Z",
+      "status": "passed",
+      "stdout": "\n> skaixu-code-evaluator-platform@2.6.0-website test\n> node tools/smoke-check.mjs && node tools/platform-api-smoke.mjs && node tools/platform-hardening-smoke.mjs && node tools/platform-closure-smoke.mjs\n\n✅ smoke-check passed: website files exist, landing page is client-facing, app inline JS parses, platform UI/ops/data/marketplace/automation/backplane IDs exist, core platform functions exist, backplane files exist, seed manifest resolves, gateway-only endpoint scan passed.\n✅ platform-api-smoke passed: workspace store, ETL worker, provider lifecycle, framework adapters, and task runner validate.\n✅ platform-hardening-smoke passed\n✅ platform-closure-smoke passed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "issues": [],
+      "finishedAt": "2026-05-11T00:16:42.136Z"
+    }
+  ],
+  "status": "passed",
+  "issues": [],
+  "finishedAt": "2026-05-11T00:16:42.136Z",
+  "receiptHash": "d4fa20e4cc01b325247f5c6d7b58f34b5df1cce1e5c277c166774b0ca0e75c06"
+}

@@ -7,7 +7,8 @@
     <meta name="robots" content="noindex,nofollow" />
     <link rel="stylesheet" href="/assets/styles.css" />
   </head>
-  <body>
+  <body class="skyesol-living-page">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
     <main class="shell admin-shell">
       <aside class="admin-sidecar" aria-label="Operator vault navigation">
         <a class="sidecar-brand admin-sidecar-brand" href="/admin.html" aria-label="SkyeVault-Drop admin home">
@@ -59,12 +60,12 @@
       <section class="panel repo-operator-panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Repository snapshots</p>
-            <h2>Send a safe repo package into this vault</h2>
+            <p class="eyebrow">Repository workspaces</p>
+            <h2>Run repo-grade vault workflows</h2>
           </div>
           <div class="button-row"><a class="admin-link" href="/setup.html#repo-snapshot-setup">Setup guide</a></div>
         </div>
-        <p class="muted big-copy">Use the repo-side command when a project workspace needs to be stored as one <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">receipt-backed</span> archive. It builds a sanitized zip, excludes secrets and generated junk, uploads through this vault, then writes a local receipt JSON.</p>
+        <p class="muted big-copy">Use the repo-side commands when a project workspace needs a <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">receipt-backed</span> archive, a Git remote, or a working folder with status, diff, commit, sync, and push receipts.</p>
         <div class="repo-command-grid">
           <article>
             <strong>1. Prove the package locally</strong>
@@ -75,11 +76,15 @@
             <code>npm run vault:push</code>
           </article>
           <article>
-            <strong>3. Track the proof</strong>
-            <code>.skyevault-out/skyevault-receipt-*.json</code>
+            <strong>3. Work like Git</strong>
+            <code>npm run vault:repo -- status --dir=.</code>
+          </article>
+          <article>
+            <strong>4. Document local-only secrets</strong>
+            <code>npm run vault:secrets:manifest</code>
           </article>
         </div>
-        <p class="notice-copy">The command excludes .env files, .git, node_modules, Netlify/Wrangler folders, backups, database dumps, WAL archives, private keys, old archive bundles, and files flagged by the built-in credential scan.</p>
+        <p class="notice-copy">The commands exclude .env files, .git, node_modules, Netlify/Wrangler folders, backups, database dumps, WAL archives, private keys, old archive bundles, and files flagged by the built-in credential scan. The secret boundary manifest lists the local-only paths so a private encrypted recovery package can be handled outside normal Git and safe vault archives.</p>
       </section>
 
       <section id="adminWorkspace" class="panel hidden">

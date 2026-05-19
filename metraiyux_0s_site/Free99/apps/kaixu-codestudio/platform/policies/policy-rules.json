@@ -1,0 +1,7 @@
+[
+  {"id":"pol_ai_tokens","enabled":true,"scope":"ai","action":"max_tokens_per_call","limit":1200,"effect":"cap","requiresApproval":false},
+  {"id":"pol_sms_destinations","enabled":true,"scope":"sms_voice","action":"sms_destinations","limit":"us_ca_only","effect":"restrict","requiresApproval":false},
+  {"id":"pol_costly_calls","enabled":true,"scope":"payments","action":"refund_or_charge_over_500","limit":500,"effect":"approval_required","requiresApproval":true},
+  {"id":"pol_db_writes","enabled":true,"scope":"database","action":"destructive_write","limit":"blocked_without_approval","effect":"block","requiresApproval":true},
+  {"id":"pol_webhook_replay","enabled":true,"scope":"webhooks","action":"replay_live_event","limit":"local_only","effect":"restrict","requiresApproval":true}
+]

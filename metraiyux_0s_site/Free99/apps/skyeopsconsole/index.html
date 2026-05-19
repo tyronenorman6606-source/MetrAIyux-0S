@@ -1,0 +1,3125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#220033"/>
+  <title>SkyeOps Offline Console v2 — Single File</title>
+
+  <style>
+    :root{
+      --bg0:#07010d;
+      --bg1:#12001f;
+      --glass: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.14);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --dim: rgba(255,255,255,.55);
+      --purple:#7a2cff;
+      --purple2:#b04cff;
+      --gold:#ffd56a;
+      --good:#5dff9a;
+      --bad:#ff5d7a;
+      --warn:#ffcc66;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--txt);
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(122,44,255,.25), transparent 60%),
+        radial-gradient(800px 560px at 90% 30%, rgba(255,213,106,.18), transparent 60%),
+        radial-gradient(760px 520px at 50% 95%, rgba(176,76,255,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    body:before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.22) 50%, transparent 55%),
+        radial-gradient(1px 1px at 60% 12%, rgba(255,255,255,.18) 50%, transparent 55%),
+        radial-gradient(1px 1px at 35% 50%, rgba(255,255,255,.16) 50%, transparent 55%),
+        radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,.18) 50%, transparent 55%),
+        radial-gradient(1px 1px at 25% 80%, rgba(255,255,255,.14) 50%, transparent 55%),
+        radial-gradient(1px 1px at 90% 88%, rgba(255,255,255,.14) 50%, transparent 55%);
+      opacity: .35;
+      mix-blend-mode: screen;
+      filter: blur(.2px);
+    }
+
+    a{ color: var(--gold); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+
+    .wrap{
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 18px 16px 42px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 280px;
+    }
+    .brand .logo{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background:
+        radial-gradient(16px 16px at 30% 30%, rgba(255,213,106,.55), transparent 60%),
+        radial-gradient(18px 18px at 70% 70%, rgba(122,44,255,.55), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .brand .logo span{ font-size: 18px; }
+    .brand .title{
+      display:flex;
+      flex-direction:column;
+      line-height:1.1;
+    }
+    .brand .title b{ font-size: 14px; letter-spacing: .4px; }
+    .brand .title small{ color: var(--muted); font-size: 12px; }
+
+    .statusRow{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .dot{ width: 8px; height: 8px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 14px rgba(255,204,102,.35); }
+    .dot.good{ background: var(--good); box-shadow: 0 0 14px rgba(93,255,154,.35); }
+    .dot.bad{ background: var(--bad); box-shadow: 0 0 14px rgba(255,93,122,.35); }
+
+    .nav{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 14px 6px 0;
+    }
+    .tabbtn{
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      color: var(--txt);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-size: 13px;
+      transition: transform .08s ease, background .15s ease;
+      user-select:none;
+    }
+    .tabbtn:hover{ background: rgba(255,255,255,.08); transform: translateY(-1px); }
+    .tabbtn.active{
+      border-color: rgba(255,213,106,.55);
+      background: linear-gradient(180deg, rgba(255,213,106,.22), rgba(122,44,255,.10));
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (min-width: 980px){
+      .grid.grid2{ grid-template-columns: 1.1fr .9fr; }
+      .grid.grid3{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      padding: 14px;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow:hidden;
+    }
+    .card h2{
+      margin: 0 0 10px;
+      font-size: 14px;
+      letter-spacing:.3px;
+      color: rgba(255,255,255,.95);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .sub{
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 0 0;
+      line-height: 1.45;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .row.end{ justify-content:flex-end; }
+    .row.between{ justify-content:space-between; }
+
+    .btn{
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.20);
+      color: var(--txt);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-size: 13px;
+      transition: transform .08s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.08); transform: translateY(-1px); }
+    .btn.primary{
+      border-color: rgba(255,213,106,.60);
+      background: linear-gradient(180deg, rgba(255,213,106,.26), rgba(122,44,255,.12));
+    }
+    .btn.danger{
+      border-color: rgba(255,93,122,.55);
+      background: rgba(255,93,122,.10);
+    }
+    .btn.small{ padding: 8px 10px; border-radius: 10px; font-size: 12px; }
+    .btn.tiny{ padding: 6px 8px; border-radius: 10px; font-size: 12px; }
+
+    .input, select, textarea{
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      color: var(--txt);
+      padding: 10px 10px;
+      border-radius: 12px;
+      outline: none;
+      font-size: 13px;
+      min-width: 180px;
+    }
+    textarea{ min-width: 240px; min-height: 120px; resize: vertical; }
+    .input:focus, select:focus, textarea:focus{
+      border-color: rgba(255,213,106,.55);
+      box-shadow: 0 0 0 3px rgba(255,213,106,.12);
+    }
+    label{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .kpiGrid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (min-width: 980px){
+      .kpiGrid{ grid-template-columns: repeat(4, 1fr); }
+    }
+    .kpi{
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(0,0,0,.16);
+    }
+    .kpi b{ font-size: 18px; letter-spacing:.3px; }
+    .kpi small{ display:block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .kpi .tag{
+      margin-top: 8px;
+      display:inline-flex;
+      gap: 6px;
+      align-items:center;
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    .table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+      font-size: 13px;
+    }
+    .table th{
+      text-align:left;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 0 10px 6px;
+    }
+    .table td{
+      padding: 12px 10px;
+      border-top: 1px solid var(--stroke);
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(0,0,0,.16);
+      vertical-align: top;
+    }
+    .table tr td:first-child{
+      border-left: 1px solid var(--stroke);
+      border-radius: 14px 0 0 14px;
+    }
+    .table tr td:last-child{
+      border-right: 1px solid var(--stroke);
+      border-radius: 0 14px 14px 0;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .badge.good{ border-color: rgba(93,255,154,.45); background: rgba(93,255,154,.10); color: rgba(235,255,244,.95); }
+    .badge.warn{ border-color: rgba(255,204,102,.55); background: rgba(255,204,102,.10); color: rgba(255,248,229,.95); }
+    .badge.bad{ border-color: rgba(255,93,122,.55); background: rgba(255,93,122,.10); color: rgba(255,235,240,.95); }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 980px){
+      .split{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .mono{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.84);
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 12px;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      overflow:auto;
+      max-height: 520px;
+    }
+
+    .muted{ color: var(--muted); }
+    .dim{ color: var(--dim); }
+    .hide{ display:none !important; }
+
+    .toastWrap{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      z-index: 200;
+      pointer-events:none;
+    }
+    .toast{
+      pointer-events:auto;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      min-width: 260px;
+      max-width: 380px;
+      animation: pop .18s ease-out;
+    }
+    .toast b{ font-size: 12px; }
+    .toast small{ display:block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    @keyframes pop{
+      from{ transform: translateY(6px); opacity: .2; }
+      to{ transform: translateY(0); opacity: 1; }
+    }
+
+    .modalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 300;
+      padding: 16px;
+    }
+    .modal{
+      width: min(980px, 96vw);
+      border: 1px solid var(--stroke);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      overflow:hidden;
+    }
+    .modalHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--stroke);
+    }
+    .modalHeader b{ font-size: 14px; letter-spacing:.3px; }
+    .modalBody{ padding: 14px; }
+    .modalFooter{
+      display:flex;
+      justify-content:flex-end;
+      gap: 10px;
+      padding: 14px;
+      border-top: 1px solid var(--stroke);
+      flex-wrap: wrap;
+    }
+
+    .lockOverlay{
+      position: fixed;
+      inset: 0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 400;
+      background:
+        radial-gradient(800px 520px at 50% 30%, rgba(122,44,255,.22), transparent 60%),
+        radial-gradient(740px 520px at 50% 80%, rgba(255,213,106,.16), transparent 60%),
+        rgba(0,0,0,.72);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+    }
+    .lockCard{
+      width: min(560px, 95vw);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .lockCard h1{
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing:.3px;
+    }
+    .lockCard p{ margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height:1.5; }
+    .lockRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .footnote{
+      margin-top: 10px;
+      color: var(--dim);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#06e53e"><link rel="apple-touch-icon" href="icon-192.png"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));}</script>  <script src="../../free99-gate.js" data-platform-id="skyeopsconsole" data-platform-name="SkyeOpsConsole v2.13" data-billing-mode="free99" data-price-label="Free99 / $0" data-app-root="/Free99/apps/skyeopsconsole/"></script>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><span>🧠</span></div>
+        <div class="title">
+          <b id="appTitle">SkyeOps Offline Console v2</b>
+          <small id="appSubtitle">Leads • Sequences • Draft Generator • Vault • Backups</small>
+        </div>
+      </div>
+
+      <div class="statusRow">
+        <span class="pill" title="Connection status">
+          <span id="netDot" class="dot"></span>
+          <span id="netText">Checking…</span>
+        </span>
+        <span class="pill" title="Storage status">
+          <span id="storeDot" class="dot"></span>
+          <span id="storeText">Starting…</span>
+        </span>
+        <button class="btn small" data-action="loadDemo">🧪 Load Demo Data</button>
+        <button class="btn small primary" data-action="quickCapture">➕ Quick Capture</button>
+        <button class="btn small" data-action="lockNow">🔒 Lock</button>
+      </div>
+    </div>
+
+    <div class="nav" id="nav"></div>
+
+    <!-- DASHBOARD -->
+    <section class="grid" data-page="dashboard">
+      <div class="card">
+        <h2>
+          <span>📊 Dashboard</span>
+          <span class="row end">
+            <button class="btn small" data-action="selfTest">🧪 Self-Test</button>
+            <button class="btn small" data-action="exportBackup">⬇️ Backup</button>
+          </span>
+        </h2>
+        <div class="kpiGrid" id="kpiGrid"></div>
+        <p class="sub" id="dashHint"></p>
+      </div>
+
+      <div class="grid grid2">
+        <div class="card">
+          <h2>
+            <span>⚡ “Do something real” buttons</span>
+            <span class="badge warn">not a shell</span>
+          </h2>
+          <div class="row" style="margin-top:8px;">
+            <button class="btn primary" data-action="newLead">➕ New Lead</button>
+            <button class="btn primary" data-action="newGeneratorDraft">📝 Generate Blog Draft</button>
+            <button class="btn primary" data-action="newSequence">✉️ Generate 4-Email Sequence</button>
+            <button class="btn" data-action="newVaultNote">📦 Save Note to Vault</button>
+          </div>
+          <p class="footnote">
+            If you loaded demo data, go to <b>Content Engine</b> and generate a full draft instantly, then save to Vault.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>
+            <span>🧾 Recent activity</span>
+            <span class="badge" id="actBadge">0 logs</span>
+          </h2>
+          <div id="activityList" class="sub">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADS -->
+    <section class="grid hide" data-page="leads">
+      <div class="card">
+        <h2>
+          <span>🧲 Leads / CRM</span>
+          <span class="row end">
+            <input class="input" id="leadSearch" placeholder="Search leads…" />
+            <select id="leadStatusFilter">
+              <option value="">All statuses</option>
+              <option>New</option>
+              <option>Contacted</option>
+              <option>Warm</option>
+              <option>Meeting Set</option>
+              <option>Proposal Sent</option>
+              <option>Closed Won</option>
+              <option>Closed Lost</option>
+            </select>
+            <button class="btn small primary" data-action="newLead">➕ New Lead</button>
+            <button class="btn small" data-action="exportLeadsCsv">⬇️ Leads CSV</button>
+          </span>
+        </h2>
+
+        <div class="sub">Click “✉️” to jump to Email Studio with that lead selected. Click “🧾” to generate a blog draft about them in Content Engine.</div>
+
+        <table class="table" id="leadsTable">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>City / Service</th>
+              <th>Status</th>
+              <th>Next</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EMAIL STUDIO -->
+    <section class="grid hide" data-page="email">
+      <div class="grid grid2">
+        <div class="card">
+          <h2>
+            <span>✉️ Email Studio</span>
+            <span class="row end">
+              <button class="btn small" data-action="newTemplate">➕ Template</button>
+              <button class="btn small" data-action="manageTemplates">🧩 Manage</button>
+            </span>
+          </h2>
+
+          <div class="split">
+            <label>
+              Lead
+              <select id="emailLeadSelect"></select>
+            </label>
+
+            <label>
+              Template
+              <select id="emailTemplateSelect"></select>
+            </label>
+
+            <label>
+              Optional blog link (for “weekly editorial” messages)
+              <input id="emailBlogUrl" class="input" placeholder="https://… (or leave blank)" />
+            </label>
+
+            <label>
+              Optional blog title
+              <input id="emailBlogTitle" class="input" placeholder="Title (or leave blank)" />
+            </label>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button class="btn primary" data-action="generateEmail">⚡ Generate</button>
+            <button class="btn" data-action="copyEmail">📋 Copy</button>
+            <button class="btn" data-action="saveEmailToVault">📦 Save to Vault</button>
+            <button class="btn" data-action="logEmail">🧾 Log Activity</button>
+          </div>
+
+          <p class="footnote">
+            Variables: {{BUSINESS}} {{OWNER}} {{CITY}} {{SERVICE}} {{YOUR_COMPANY}} {{YOUR_NAME}} {{YOUR_SITE}} {{INTAKE_URL}} {{TODAY}} {{BLOG_URL}} {{BLOG_TITLE}} {{SIGNATURE}}
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>
+            <span>🧠 Output</span>
+            <span class="badge" id="emailVarsBadge">vars</span>
+          </h2>
+          <div class="mono" id="emailOutput">Pick a lead + template, then Generate.</div>
+          <div class="sub" id="emailVars"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT ENGINE -->
+    <section class="grid hide" data-page="content">
+      <div class="grid grid2">
+        <div class="card">
+          <h2>
+            <span>🧪 Content Engine (Offline Drafts)</span>
+            <span class="row end">
+              <button class="btn small" data-action="newGeneratorDraft">➕ Draft</button>
+              <button class="btn small" data-action="newSequence">✉️ Sequence</button>
+            </span>
+          </h2>
+
+          <div class="split">
+            <label>Lead (optional)
+              <select id="genLeadSelect"></select>
+              <span class="dim">Pick a lead to auto-fill business/city/service.</span>
+            </label>
+
+            <label>Draft type
+              <select id="genType">
+                <option value="spotlight">Local Success Spotlight (business editorial)</option>
+                <option value="howto">How-To Guide (service guide)</option>
+                <option value="cost">Cost & Value Guide (local pricing factors)</option>
+                <option value="comparison">Comparison Guide (choose the right provider)</option>
+              </select>
+            </label>
+
+            <label>Business name (optional for non-spotlight)
+              <input class="input" id="genBusiness" placeholder="Business name" />
+            </label>
+
+            <label>Owner / Contact name (optional)
+              <input class="input" id="genOwner" placeholder="Owner name" />
+            </label>
+
+            <label>City
+              <input class="input" id="genCity" placeholder="Phoenix, AZ" />
+            </label>
+
+            <label>Service
+              <input class="input" id="genService" placeholder="Web + Editorial Growth" />
+            </label>
+
+            <label>Primary keyword phrase
+              <input class="input" id="genKeyword" placeholder="web design phoenix" />
+            </label>
+
+            <label>Primary CTA (what the reader should do)
+              <select id="genCTA">
+                <option value="intake">Fill out intake form</option>
+                <option value="call">Call / Text</option>
+                <option value="book">Book a consultation</option>
+                <option value="quote">Request a quote</option>
+              </select>
+            </label>
+
+            <label>Angle / special note (optional)
+              <input class="input" id="genAngle" placeholder="e.g., focus on speed + credibility + weekly publishing" />
+            </label>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button class="btn primary" data-action="generateDraft">📝 Generate Full Draft</button>
+            <button class="btn" data-action="copyDraft">📋 Copy Draft</button>
+            <button class="btn" data-action="saveDraftToVault">📦 Save to Vault</button>
+          </div>
+
+          <p class="footnote">
+            This is deterministic offline writing (no API calls). Use it as a deployable draft, or as a “first pass” you refine.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>
+            <span>🧾 Draft Output</span>
+            <span class="row end">
+              <button class="btn tiny" data-action="toggleDraftMode">↔ Markdown / HTML</button>
+            </span>
+          </h2>
+          <div class="mono" id="draftOutput">Generate a draft to see output here.</div>
+          <div class="sub" id="draftMeta"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>✉️ 4-Email Sequence Generator</span>
+          <span class="badge warn">fills placeholders</span>
+        </h2>
+        <div class="row">
+          <label style="min-width:260px;">Lead
+            <select id="seqLeadSelect"></select>
+          </label>
+          <label style="min-width:240px;">Sequence goal
+            <select id="seqGoal">
+              <option value="set_meeting">Set a 15-minute alignment call</option>
+              <option value="weekly_editorial">Weekly editorial cadence</option>
+              <option value="conversion_upgrade">Conversion page + credibility upgrade</option>
+            </select>
+          </label>
+          <button class="btn primary" data-action="generateSequence">⚡ Generate Sequence</button>
+          <button class="btn" data-action="copySequence">📋 Copy</button>
+          <button class="btn" data-action="saveSequenceToVault">📦 Save to Vault</button>
+        </div>
+        <div class="mono" id="seqOutput" style="margin-top:12px;">Pick a lead, then Generate Sequence.</div>
+      </div>
+    </section>
+
+    <!-- VAULT -->
+    <section class="grid hide" data-page="vault">
+      <div class="card">
+        <h2>
+          <span>📦 Vault (Saved Outputs)</span>
+          <span class="row end">
+            <input class="input" id="vaultSearch" placeholder="Search vault…" />
+            <select id="vaultType">
+              <option value="">All types</option>
+              <option value="email">Email</option>
+              <option value="draft">Blog Draft</option>
+              <option value="sequence">Email Sequence</option>
+              <option value="note">Note</option>
+            </select>
+            <button class="btn small" data-action="exportVaultTxt">⬇️ Export Vault TXT</button>
+          </span>
+        </h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Linked</th>
+              <th>Date</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="vaultTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TASKS -->
+    <section class="grid hide" data-page="tasks">
+      <div class="card">
+        <h2>
+          <span>✅ Tasks / Follow-ups</span>
+          <span class="row end">
+            <select id="taskFilter">
+              <option value="">All</option>
+              <option value="open">Open</option>
+              <option value="done">Done</option>
+            </select>
+            <button class="btn small primary" data-action="newTask">➕ New Task</button>
+            <button class="btn small" data-action="exportTasksCsv">⬇️ Tasks CSV</button>
+          </span>
+        </h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Due</th>
+              <th>Linked</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tasksTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section class="grid hide" data-page="backup">
+      <div class="grid grid2">
+        <div class="card">
+          <h2>💾 Backup / Restore</h2>
+          <p class="sub">Data stays local. Export JSON weekly like an operator. 🧠</p>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" data-action="exportBackup">⬇️ Export Backup (JSON)</button>
+            <button class="btn danger" data-action="wipeAll">🧨 Wipe Local Data</button>
+          </div>
+
+          <div class="card" style="margin-top:12px; padding:12px;">
+            <h2 style="margin:0 0 8px; font-size:13px;">Restore from JSON</h2>
+            <div class="row">
+              <input class="input" type="file" id="restoreFile" accept="application/json" />
+              <button class="btn" data-action="restoreBackup">♻️ Restore</button>
+            </div>
+            <p class="footnote">Restore overwrites local data with the backup contents.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🧾 Exports</h2>
+          <p class="sub">CSV exports for Sheets/Excel, contractors, audits, etc.</p>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" data-action="exportLeadsCsv">⬇️ Leads CSV</button>
+            <button class="btn" data-action="exportTasksCsv">⬇️ Tasks CSV</button>
+          </div>
+          <div class="sub" style="margin-top:10px;">
+            Vault export is a plain text bundle so you can paste it into anywhere.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="grid hide" data-page="settings">
+      <div class="grid grid2">
+        <div class="card">
+          <h2>⚙️ Settings</h2>
+          <div class="split">
+            <label>Company name
+              <input class="input" id="setCompany" placeholder="Skyes Over London LC" />
+            </label>
+            <label>Your name (signature)
+              <input class="input" id="setYourName" placeholder="Tyrone Norman" />
+            </label>
+            <label>Your website
+              <input class="input" id="setYourSite" placeholder="https://Solenterprises.org" />
+            </label>
+            <label>Intake form URL
+              <input class="input" id="setIntake" placeholder="https://…/intake" />
+            </label>
+            <label>Default city
+              <input class="input" id="setCity" placeholder="Phoenix, AZ" />
+            </label>
+            <label>Default service
+              <input class="input" id="setService" placeholder="Web + Editorial Growth" />
+            </label>
+
+            <label>Signature block
+              <textarea id="setSig" placeholder="— Your Name&#10;Your Title&#10;Phone / Email"></textarea>
+            </label>
+
+            <label>App lock PIN (optional)
+              <input class="input" id="setPin" type="password" placeholder="Set / change PIN" />
+              <span class="dim">Deterrence, not military security.</span>
+            </label>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button class="btn primary" data-action="saveSettings">💾 Save Settings</button>
+            <button class="btn" data-action="clearPin">🧼 Remove PIN</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🧩 Email Templates</h2>
+          <p class="sub">Templates are stored locally and editable. Preloaded with a solid baseline set.</p>
+          <div class="sub" id="templateSummary">Loading…</div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" data-action="manageTemplates">🧩 Manage Templates</button>
+          </div>
+
+          <div class="footnote">
+            Variables: {{BUSINESS}} {{OWNER}} {{CITY}} {{SERVICE}} {{YOUR_COMPANY}} {{YOUR_NAME}} {{YOUR_SITE}} {{INTAKE_URL}} {{TODAY}} {{BLOG_URL}} {{BLOG_TITLE}} {{SIGNATURE}}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section class="grid hide" data-page="help">
+      <div class="card">
+        <h2>🧭 Help</h2>
+        <div class="sub" style="line-height:1.6;">
+          <b>What this is:</b> offline ops console for sales + editorial output. No APIs. No dependencies. No tracking.<br/><br/>
+          <b>Quick proof it works:</b><br/>
+          1) Click <b>Load Demo Data</b> (top right).<br/>
+          2) Go to <b>Content Engine</b> → click <b>Generate Full Draft</b> → you get a complete article + meta + OG tags.<br/>
+          3) Click <b>Save to Vault</b> → go to <b>Vault</b> → view/copy/export the saved item.<br/><br/>
+          <b>Reality:</b> PIN is a local deterrent. Use device security for real protection.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- modal -->
+  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHeader">
+        <b id="modalTitle">Modal</b>
+        <button class="btn tiny" data-action="closeModal">✖</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+      <div class="modalFooter" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <!-- lock -->
+  <div class="lockOverlay" id="lockOverlay" aria-hidden="true">
+    <div class="lockCard">
+      <h1>🔒 Locked</h1>
+      <p>Enter your PIN to unlock.</p>
+      <div class="lockRow">
+        <input id="unlockPin" class="input" type="password" placeholder="PIN" />
+        <button class="btn primary" data-action="unlock">Unlock</button>
+        <button class="btn" data-action="unlockHelp">Help</button>
+      </div>
+      <p class="footnote" id="lockMsg"></p>
+    </div>
+  </div>
+
+  <!-- toasts -->
+  <div class="toastWrap" id="toastWrap"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ============================================================
+  // SkyeOps Offline Console v2
+  // One HTML. Offline. Produces real drafts + sequences + vault.
+  // ============================================================
+
+  const APP_KEY = "skyeops_offline_singlefile_v2";
+  const PAGES = [
+    { id: "dashboard", label: "📊 Dashboard" },
+    { id: "leads",     label: "🧲 Leads" },
+    { id: "email",     label: "✉️ Email Studio" },
+    { id: "content",   label: "🧪 Content Engine" },
+    { id: "vault",     label: "📦 Vault" },
+    { id: "tasks",     label: "✅ Tasks" },
+    { id: "backup",    label: "💾 Backup" },
+    { id: "settings",  label: "⚙️ Settings" },
+    { id: "help",      label: "🧭 Help" },
+  ];
+
+  const STATUS_BADGES = {
+    "New":           { cls:"badge",      icon:"🆕" },
+    "Contacted":     { cls:"badge",      icon:"📨" },
+    "Warm":          { cls:"badge warn", icon:"🔥" },
+    "Meeting Set":   { cls:"badge warn", icon:"📅" },
+    "Proposal Sent": { cls:"badge warn", icon:"📄" },
+    "Closed Won":    { cls:"badge good", icon:"🏆" },
+    "Closed Lost":   { cls:"badge bad",  icon:"🧊" }
+  };
+
+  // --- safe globals
+  const G = (typeof globalThis !== "undefined") ? globalThis : window;
+  const GCrypto = (typeof G.crypto !== "undefined") ? G.crypto : null;
+
+  // --- tiny helpers
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  function esc(s=""){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+
+  function toast(title, msg=""){
+    const wrap = $("#toastWrap");
+    if (!wrap) return;
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = `<b>${esc(title)}</b>${msg ? `<small>${esc(msg)}</small>` : ""}`;
+    wrap.appendChild(el);
+    setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; }, 2400);
+    setTimeout(() => { el.remove(); }, 2900);
+  }
+
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+  function uid(){
+    try{
+      if (GCrypto && typeof GCrypto.randomUUID === "function") return GCrypto.randomUUID();
+    }catch{}
+    return "id-" + Math.random().toString(16).slice(2) + "-" + Date.now();
+  }
+
+  async function sha256Hex(str){
+    const s = String(str ?? "");
+    try{
+      if (GCrypto && GCrypto.subtle && typeof TextEncoder !== "undefined"){
+        const enc = new TextEncoder().encode(s);
+        const buf = await GCrypto.subtle.digest("SHA-256", enc);
+        const arr = Array.from(new Uint8Array(buf));
+        return arr.map(b => b.toString(16).padStart(2,"0")).join("");
+      }
+    }catch{}
+    // fallback (deterrence only)
+    let h = 2166136261;
+    for (let i=0;i<s.length;i++){
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    const hex = ("00000000" + (h >>> 0).toString(16)).slice(-8);
+    return hex.repeat(8);
+  }
+
+  async function copyText(text){
+    const t = String(text ?? "");
+    try{
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(t);
+        toast("Copied 📋", "Copied to clipboard");
+        return true;
+      }
+    }catch{}
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      toast("Copied 📋", "Copied to clipboard");
+      return true;
+    }catch{
+      toast("Copy failed", "Clipboard blocked by browser.");
+      return false;
+    }
+  }
+
+  function downloadFile(filename, content, mime="text/plain"){
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  // ============================================================
+  // Storage Adapter (localStorage with hard guard)
+  // ============================================================
+  const Storage = {
+    ok: true,
+    reason: "",
+    get(key){
+      try{
+        return localStorage.getItem(key);
+      }catch(e){
+        Storage.ok = false; Storage.reason = "localStorage blocked";
+        return null;
+      }
+    },
+    set(key, val){
+      try{
+        localStorage.setItem(key, val);
+        Storage.ok = true; Storage.reason = "";
+        return true;
+      }catch(e){
+        Storage.ok = false; Storage.reason = "localStorage blocked/full";
+        return false;
+      }
+    },
+    remove(key){
+      try{ localStorage.removeItem(key); return true; }catch{ return false; }
+    }
+  };
+
+  // ============================================================
+  // Data model
+  // ============================================================
+  function defaultSettings(){
+    return {
+      company: "Skyes Over London LC",
+      your_name: "Tyrone Norman",
+      your_site: "https://Solenterprises.org",
+      intake_url: "",
+      default_city: "Phoenix, AZ",
+      default_service: "Web + Editorial Growth",
+      signature: "— Tyrone Norman\nSkyes Over London LC\nSolenterprises.org",
+      pin_hash: "",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  function seedTemplates(){
+    const now = new Date().toISOString();
+    const commonFooter =
+`{{SIGNATURE}}
+
+Quick links:
+• Intake: {{INTAKE_URL}}
+• Site: {{YOUR_SITE}}`;
+
+    const base = [
+      {
+        name: "01 — Intro: editorial + web presence",
+        category: "Outreach",
+        subject_template: "Quick spotlight idea for {{BUSINESS}} in {{CITY}}",
+        body_template:
+`Hi {{OWNER}},
+
+I’m reaching out from {{YOUR_COMPANY}}. We publish local editorial spotlights and build clean upgrades that make small businesses look like market leaders without wasting weeks.
+
+I looked at {{BUSINESS}} and I think we could create an editorial feature explaining:
+• what you do best,
+• why locals trust you,
+• what makes you different in {{CITY}},
+• and a clear next step for customers.
+
+If you’re open to it, reply “YES” and I’ll send a 1-page mini plan (no cost) before we publish anything.
+
+{{SIGNATURE}}`
+      },
+      {
+        name: "02 — Follow-up: simple plan",
+        category: "Outreach",
+        subject_template: "{{BUSINESS}} — quick follow-up (simple plan)",
+        body_template:
+`Hi {{OWNER}},
+
+Following up with a simple plan for {{BUSINESS}}:
+
+1) One editorial feature targeting “{{SERVICE}} {{CITY}}”
+2) Optional upgrade: a single conversion page that turns clicks into calls
+3) Weekly posting cadence (the boring secret weapon)
+
+Reply “YES” and I’ll send the questions we use to write it.
+
+{{SIGNATURE}}`
+      },
+      {
+        name: "03 — Weekly editorial email (with blog link)",
+        category: "Client",
+        subject_template: "Your weekly editorial spotlight is live — {{BLOG_TITLE}}",
+        body_template:
+`Hi {{OWNER}},
+
+Your weekly editorial spotlight is live:
+
+Title: {{BLOG_TITLE}}
+Link: {{BLOG_URL}}
+
+If you want next week’s feature to emphasize a specific service or customer type, reply with the focus and I’ll queue it.
+
+{{SIGNATURE}}`
+      },
+      {
+        name: "04 — Month-later thank you + bonus editorial",
+        category: "Client",
+        subject_template: "Thank you, {{BUSINESS}} — bonus editorial drop",
+        body_template:
+`Hi {{OWNER}},
+
+It’s been a great experience working with {{BUSINESS}}. As a thank-you, we’re publishing an additional editorial feature at no cost—more background, more credibility, and another search-friendly asset tied to {{CITY}}.
+
+If you’d like it to highlight a specific offer or seasonal push, tell me the angle and I’ll shape the story around it.
+
+{{SIGNATURE}}`
+      },
+      {
+        name: "05 — Meeting set: 15 minutes",
+        category: "Outreach",
+        subject_template: "Quick 15-min alignment for {{BUSINESS}}",
+        body_template:
+`Hi {{OWNER}},
+
+If you’re open to it, I’d like to do a quick 15-minute alignment call.
+
+Goal:
+• confirm your top 1–2 services to push in {{CITY}}
+• map the next editorial topics
+• confirm the best next-step CTA (call, booking, quote)
+
+Reply with 2 time windows that work and I’ll lock it in.
+
+{{SIGNATURE}}`
+      }
+    ];
+
+    return base.map(t => ({
+      id: uid(),
+      name: t.name,
+      category: t.category,
+      subject_template: t.subject_template,
+      body_template: t.body_template.replaceAll("{{SIGNATURE}}", commonFooter),
+      created_at: now,
+      updated_at: now
+    }));
+  }
+
+  function emptyStore(){
+    return {
+      version: 2,
+      settings: defaultSettings(),
+      leads: [],
+      tasks: [],
+      templates: seedTemplates(),
+      vault: [],
+      activity: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  function loadStore(){
+    try{
+      const raw = Storage.get(APP_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj !== "object") return null;
+      return obj;
+    }catch{
+      return null;
+    }
+  }
+
+  function saveStore(obj){
+    obj.updated_at = new Date().toISOString();
+    const ok = Storage.set(APP_KEY, JSON.stringify(obj));
+    return ok;
+  }
+
+  function initStore(){
+    let s = loadStore();
+    if (!s){
+      s = emptyStore();
+      saveStore(s);
+    } else {
+      // minimal migration safety
+      s.version = 2;
+      s.settings = s.settings || defaultSettings();
+      s.leads = Array.isArray(s.leads) ? s.leads : [];
+      s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
+      s.templates = Array.isArray(s.templates) && s.templates.length ? s.templates : seedTemplates();
+      s.vault = Array.isArray(s.vault) ? s.vault : [];
+      s.activity = Array.isArray(s.activity) ? s.activity : [];
+      saveStore(s);
+    }
+    return s;
+  }
+
+  const state = {
+    page: "dashboard",
+    store: null,
+    locked: false,
+    lastEmail: "",
+    lastDraft: "",
+    lastDraftMeta: "",
+    lastSequence: "",
+    draftMode: "markdown", // markdown|html
+    selectedLeadForGen: "",
+    templatesManagerOpen: false
+  };
+
+  function persist(){
+    const ok = saveStore(state.store);
+    if (!ok) {
+      toast("Storage warning", Storage.reason || "Storage unavailable");
+    }
+    return ok;
+  }
+
+  // ============================================================
+  // Templating
+  // ============================================================
+  function fillTemplate(str, vars){
+    return String(str ?? "").replace(/\{\{([A-Z0-9_]+)\}\}/g, (_, key) => {
+      const v = vars[key];
+      return (v === undefined || v === null) ? "" : String(v);
+    });
+  }
+
+  function buildVarsFromLead(lead){
+    const s = state.store.settings;
+    const owner = (lead?.owner || "").trim() || "there";
+    return {
+      BUSINESS: lead?.business || "",
+      OWNER: owner,
+      CITY: lead?.city || s.default_city || "",
+      SERVICE: lead?.service || s.default_service || "",
+      YOUR_COMPANY: s.company || "",
+      YOUR_NAME: s.your_name || "",
+      YOUR_SITE: s.your_site || "",
+      INTAKE_URL: s.intake_url || "",
+      SIGNATURE: s.signature || "",
+      TODAY: todayISO(),
+      BLOG_URL: "",
+      BLOG_TITLE: ""
+    };
+  }
+
+  function logActivity(title, detail){
+    const item = { id: uid(), title, detail, created_at: new Date().toISOString() };
+    state.store.activity.push(item);
+    if (state.store.activity.length > 900) state.store.activity.splice(0, state.store.activity.length - 900);
+    persist();
+  }
+
+  // ============================================================
+  // UI: modal + lock
+  // ============================================================
+  function openModal({ title, bodyHTML, footerButtons = [] }){
+    $("#modalTitle").textContent = title;
+    $("#modalBody").innerHTML = bodyHTML;
+    const footer = $("#modalFooter");
+    footer.innerHTML = "";
+    for (const b of footerButtons){
+      const btn = document.createElement("button");
+      btn.className = "btn " + (b.className || "");
+      btn.textContent = b.label;
+      btn.dataset.action = b.action;
+      if (b.id) btn.dataset.id = b.id;
+      footer.appendChild(btn);
+    }
+    $("#modalOverlay").style.display = "flex";
+    $("#modalOverlay").setAttribute("aria-hidden","false");
+  }
+
+  function closeModal(){
+    $("#modalOverlay").style.display = "none";
+    $("#modalOverlay").setAttribute("aria-hidden","true");
+    state.templatesManagerOpen = false;
+  }
+
+  function showLock(){
+    state.locked = true;
+    $("#lockMsg").textContent = "";
+    $("#unlockPin").value = "";
+    $("#lockOverlay").style.display = "flex";
+    $("#lockOverlay").setAttribute("aria-hidden","false");
+  }
+  function hideLock(){
+    state.locked = false;
+    $("#lockOverlay").style.display = "none";
+    $("#lockOverlay").setAttribute("aria-hidden","true");
+  }
+
+  // ============================================================
+  // Render
+  // ============================================================
+  function renderNav(){
+    const nav = $("#nav");
+    nav.innerHTML = "";
+    for (const p of PAGES){
+      const b = document.createElement("button");
+      b.className = "tabbtn" + (p.id === state.page ? " active" : "");
+      b.dataset.page = p.id;
+      b.textContent = p.label;
+      nav.appendChild(b);
+    }
+  }
+
+  function setPage(pageId){
+    state.page = pageId;
+    $$(".tabbtn").forEach(b => b.classList.toggle("active", b.dataset.page === pageId));
+    $$("section[data-page]").forEach(sec => sec.classList.toggle("hide", sec.dataset.page !== pageId));
+
+    if (pageId === "dashboard") renderDashboard();
+    if (pageId === "leads") renderLeads();
+    if (pageId === "email") renderEmailStudio();
+    if (pageId === "content") renderContentEngine();
+    if (pageId === "vault") renderVault();
+    if (pageId === "tasks") renderTasks();
+    if (pageId === "settings") renderSettings();
+  }
+
+  function computeKPIs(){
+    const leads = state.store.leads;
+    const tasks = state.store.tasks;
+    const vault = state.store.vault;
+    const byStatus = (name) => leads.filter(l => l.status === name).length;
+
+    return {
+      leads_total: leads.length,
+      leads_new: byStatus("New"),
+      leads_warm: byStatus("Warm") + byStatus("Meeting Set") + byStatus("Proposal Sent"),
+      leads_won: byStatus("Closed Won"),
+      tasks_open: tasks.filter(t => t.status !== "done").length,
+      tasks_due_today: tasks.filter(t => t.status !== "done" && t.due === todayISO()).length,
+      vault_total: vault.length,
+      vault_drafts: vault.filter(v => v.type === "draft").length
+    };
+  }
+
+  function renderDashboard(){
+    const k = computeKPIs();
+    const grid = $("#kpiGrid");
+    grid.innerHTML = "";
+
+    const cards = [
+      { n: k.leads_total, t: "Total leads", tag: `${k.leads_new} new • ${k.leads_warm} warm`, icon:"🧲" },
+      { n: k.tasks_open, t: "Open tasks", tag: `${k.tasks_due_today} due today`, icon:"✅" },
+      { n: k.vault_total, t: "Vault items", tag: `${k.vault_drafts} drafts saved`, icon:"📦" },
+      { n: state.store.templates.length, t: "Email templates", tag: "editable + local", icon:"✉️" }
+    ];
+
+    for (const c of cards){
+      const el = document.createElement("div");
+      el.className = "kpi";
+      el.innerHTML = `<b>${esc(String(c.n))} <span class="dim">${esc(c.icon)}</span></b><small>${esc(c.t)}</small><div class="tag">• ${esc(c.tag)}</div>`;
+      grid.appendChild(el);
+    }
+
+    const s = state.store.settings;
+    $("#dashHint").textContent = `Defaults: ${s.default_city || "—"} • ${s.default_service || "—"} • Backups recommended weekly.`;
+
+    renderActivityList();
+  }
+
+  function renderActivityList(){
+    const list = $("#activityList");
+    const logs = [...state.store.activity].sort((a,b) => (b.created_at||"").localeCompare(a.created_at||"")).slice(0, 10);
+    $("#actBadge").textContent = `${state.store.activity.length} logs`;
+
+    if (!logs.length){
+      list.innerHTML = `<span class="muted">No activity yet. Load demo data, generate a draft, save to Vault. 📦</span>`;
+      return;
+    }
+
+    list.innerHTML = logs.map(a => {
+      const when = (a.created_at || "").slice(0,19).replace("T"," ");
+      return `
+        <div style="padding:10px; border:1px solid var(--stroke); border-radius:16px; background:rgba(0,0,0,.14); margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+            <b>${esc(a.title || "Activity")}</b>
+            <span class="dim" style="font-size:12px; white-space:nowrap;">${esc(when)}</span>
+          </div>
+          <div class="dim" style="margin-top:6px;">${esc(a.detail || "")}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function leadBadge(status){
+    const b = STATUS_BADGES[status] || { cls:"badge", icon:"•" };
+    return `<span class="${b.cls}">${esc(b.icon)} ${esc(status || "—")}</span>`;
+  }
+
+  function renderLeads(){
+    const q = ($("#leadSearch").value || "").toLowerCase().trim();
+    const sf = $("#leadStatusFilter").value || "";
+    let leads = [...state.store.leads];
+
+    if (sf) leads = leads.filter(l => l.status === sf);
+    if (q){
+      leads = leads.filter(l => {
+        const blob = `${l.business||""} ${l.owner||""} ${l.email||""} ${l.phone||""} ${l.city||""} ${l.service||""} ${l.website||""} ${l.notes||""}`.toLowerCase();
+        return blob.includes(q);
+      });
+    }
+
+    leads.sort((a,b) => (a.next_followup||"9999-99-99").localeCompare(b.next_followup||"9999-99-99") || (b.updated_at||"").localeCompare(a.updated_at||""));
+
+    const tbody = $("#leadsTbody");
+    tbody.innerHTML = "";
+
+    if (!leads.length){
+      tbody.innerHTML = `<tr><td colspan="5" style="border-radius:14px; border:1px solid var(--stroke); background:rgba(0,0,0,.12); padding:14px;">No leads. Click “Load Demo Data” or “New Lead.”</td></tr>`;
+      return;
+    }
+
+    for (const l of leads){
+      const next = l.next_followup ? l.next_followup : "—";
+      const citySvc = `${l.city || state.store.settings.default_city || ""} • ${l.service || state.store.settings.default_service || ""}`.trim();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <b>${esc(l.business || "—")}</b>
+          <div class="dim" style="margin-top:4px;">${esc(l.owner || "")}</div>
+          <div class="dim" style="margin-top:4px;">${l.website ? `<a href="${esc(l.website)}" target="_blank" rel="noopener">Website</a>` : ""}</div>
+        </td>
+        <td>${esc(citySvc)}</td>
+        <td>${leadBadge(l.status)}</td>
+        <td><span class="dim">${esc(next)}</span></td>
+        <td style="text-align:right;">
+          <button class="btn tiny" data-action="emailLead" data-id="${esc(l.id)}">✉️</button>
+          <button class="btn tiny" data-action="genFromLead" data-id="${esc(l.id)}">🧾</button>
+          <button class="btn tiny" data-action="editLead" data-id="${esc(l.id)}">✏️</button>
+          <button class="btn tiny danger" data-action="deleteLead" data-id="${esc(l.id)}">🗑️</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderEmailStudio(){
+    const leadSel = $("#emailLeadSelect");
+    const leads = [...state.store.leads].sort((a,b)=> (a.business||"").localeCompare(b.business||""));
+    leadSel.innerHTML = `<option value="">— Pick a lead —</option>` + leads.map(l =>
+      `<option value="${esc(l.id)}">${esc(l.business || "—")} • ${esc(l.city || "")}</option>`
+    ).join("");
+
+    const tSel = $("#emailTemplateSelect");
+    const templates = [...state.store.templates].sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+    tSel.innerHTML = `<option value="">— Pick a template —</option>` + templates.map(t =>
+      `<option value="${esc(t.id)}">${esc(t.name || "Template")}</option>`
+    ).join("");
+
+    $("#emailVars").textContent = "Variables will appear after generation.";
+    $("#emailVarsBadge").textContent = "vars";
+  }
+
+  function renderContentEngine(){
+    const leads = [...state.store.leads].sort((a,b)=> (a.business||"").localeCompare(b.business||""));
+    const genLeadSel = $("#genLeadSelect");
+    genLeadSel.innerHTML = `<option value="">— none —</option>` + leads.map(l =>
+      `<option value="${esc(l.id)}">${esc(l.business)} • ${esc(l.city||"")}</option>`
+    ).join("");
+
+    const seqLeadSel = $("#seqLeadSelect");
+    seqLeadSel.innerHTML = `<option value="">— Pick a lead —</option>` + leads.map(l =>
+      `<option value="${esc(l.id)}">${esc(l.business)} • ${esc(l.city||"")}</option>`
+    ).join("");
+
+    // If a lead was selected previously, keep it
+    if (state.selectedLeadForGen){
+      genLeadSel.value = state.selectedLeadForGen;
+      applyLeadToGenerator(state.selectedLeadForGen);
+    }
+  }
+
+  function renderVault(){
+    const q = ($("#vaultSearch").value || "").toLowerCase().trim();
+    const tf = $("#vaultType").value || "";
+    let items = [...state.store.vault].sort((a,b)=> (b.created_at||"").localeCompare(a.created_at||""));
+
+    if (tf) items = items.filter(v => v.type === tf);
+    if (q){
+      items = items.filter(v => {
+        const blob = `${v.title||""} ${v.type||""} ${v.content||""}`.toLowerCase();
+        return blob.includes(q);
+      });
+    }
+
+    const tb = $("#vaultTbody");
+    tb.innerHTML = "";
+    if (!items.length){
+      tb.innerHTML = `<tr><td colspan="5" style="border-radius:14px; border:1px solid var(--stroke); background:rgba(0,0,0,.12); padding:14px;">Vault is empty. Generate an email/draft and “Save to Vault.”</td></tr>`;
+      return;
+    }
+
+    for (const v of items){
+      const linked = v.lead_id ? (state.store.leads.find(x=>x.id===v.lead_id)?.business || "Lead") : "—";
+      const date = (v.created_at||"").slice(0,10) || "—";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${esc(v.title || "—")}</b><div class="dim" style="margin-top:4px;">${esc((v.content||"").slice(0,120))}${(v.content||"").length>120?"…":""}</div></td>
+        <td><span class="badge">${esc(v.type || "—")}</span></td>
+        <td><span class="dim">${esc(linked)}</span></td>
+        <td><span class="dim">${esc(date)}</span></td>
+        <td style="text-align:right;">
+          <button class="btn tiny" data-action="viewVault" data-id="${esc(v.id)}">👁️</button>
+          <button class="btn tiny" data-action="copyVault" data-id="${esc(v.id)}">📋</button>
+          <button class="btn tiny danger" data-action="deleteVault" data-id="${esc(v.id)}">🗑️</button>
+        </td>
+      `;
+      tb.appendChild(tr);
+    }
+  }
+
+  function renderTasks(){
+    const filter = $("#taskFilter").value || "";
+    let tasks = [...state.store.tasks].sort((a,b) => (a.due||"9999-99-99").localeCompare(b.due||"9999-99-99") || (b.updated_at||"").localeCompare(a.updated_at||""));
+    if (filter === "open") tasks = tasks.filter(t => t.status !== "done");
+    if (filter === "done") tasks = tasks.filter(t => t.status === "done");
+
+    const tb = $("#tasksTbody");
+    tb.innerHTML = "";
+    if (!tasks.length){
+      tb.innerHTML = `<tr><td colspan="5" style="border-radius:14px; border:1px solid var(--stroke); background:rgba(0,0,0,.12); padding:14px;">No tasks. Add one for follow-ups. ✅</td></tr>`;
+      return;
+    }
+
+    for (const t of tasks){
+      const linked = t.lead_id ? (state.store.leads.find(x=>x.id===t.lead_id)?.business || "Lead") : "—";
+      const badge = (t.status === "done")
+        ? `<span class="badge good">✅ done</span>`
+        : (t.due && t.due < todayISO())
+          ? `<span class="badge bad">⏳ overdue</span>`
+          : (t.due && t.due === todayISO())
+            ? `<span class="badge warn">📍 today</span>`
+            : `<span class="badge">open</span>`;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${esc(t.title || "—")}</b><div class="dim" style="margin-top:4px;">${esc(t.notes || "")}</div></td>
+        <td><span class="dim">${esc(t.due || "—")}</span></td>
+        <td><span class="dim">${esc(linked)}</span></td>
+        <td>${badge}</td>
+        <td style="text-align:right;">
+          <button class="btn tiny" data-action="editTask" data-id="${esc(t.id)}">✏️</button>
+          ${t.status === "done"
+            ? `<button class="btn tiny" data-action="undoTask" data-id="${esc(t.id)}">↩️</button>`
+            : `<button class="btn tiny" data-action="doneTask" data-id="${esc(t.id)}">✅</button>`
+          }
+          <button class="btn tiny danger" data-action="deleteTask" data-id="${esc(t.id)}">🗑️</button>
+        </td>
+      `;
+      tb.appendChild(tr);
+    }
+  }
+
+  function renderSettings(){
+    const s = state.store.settings;
+    $("#setCompany").value = s.company || "";
+    $("#setYourName").value = s.your_name || "";
+    $("#setYourSite").value = s.your_site || "";
+    $("#setIntake").value = s.intake_url || "";
+    $("#setCity").value = s.default_city || "";
+    $("#setService").value = s.default_service || "";
+    $("#setSig").value = s.signature || "";
+    $("#setPin").value = "";
+
+    const count = state.store.templates.length;
+    const cats = [...new Set(state.store.templates.map(x => x.category || "Uncategorized"))].join(", ") || "—";
+    $("#templateSummary").innerHTML = `<b>${count}</b> templates stored locally. Categories: ${esc(cats)}`;
+
+    $("#appSubtitle").textContent = `${s.company || "—"} • ${s.default_city || "—"} • ${s.default_service || "—"}`;
+  }
+
+  // ============================================================
+  // Forms
+  // ============================================================
+  function leadFormHTML(lead){
+    const s = state.store.settings;
+    const l = lead || {};
+    return `
+      <div class="split">
+        <label>Business
+          <input class="input" id="f_business" value="${esc(l.business||"")}" placeholder="Business name" />
+        </label>
+        <label>Owner / Contact
+          <input class="input" id="f_owner" value="${esc(l.owner||"")}" placeholder="Owner name" />
+        </label>
+        <label>Email
+          <input class="input" id="f_email" value="${esc(l.email||"")}" placeholder="name@business.com" />
+        </label>
+        <label>Phone
+          <input class="input" id="f_phone" value="${esc(l.phone||"")}" placeholder="(###) ###-####" />
+        </label>
+        <label>Website
+          <input class="input" id="f_website" value="${esc(l.website||"")}" placeholder="https://…" />
+        </label>
+        <label>City
+          <input class="input" id="f_city" value="${esc(l.city||s.default_city||"")}" />
+        </label>
+        <label>Service
+          <input class="input" id="f_service" value="${esc(l.service||s.default_service||"")}" />
+        </label>
+        <label>Status
+          <select id="f_status">
+            ${["New","Contacted","Warm","Meeting Set","Proposal Sent","Closed Won","Closed Lost"].map(x =>
+              `<option ${x===(l.status||"New") ? "selected":""}>${esc(x)}</option>`
+            ).join("")}
+          </select>
+        </label>
+        <label>Next follow-up (YYYY-MM-DD)
+          <input class="input" id="f_next" value="${esc(l.next_followup||"")}" placeholder="${todayISO()}" />
+        </label>
+        <label>Notes
+          <textarea id="f_notes">${esc(l.notes||"")}</textarea>
+        </label>
+      </div>
+    `;
+  }
+
+  function taskFormHTML(task){
+    const t = task || {};
+    const leads = [...state.store.leads].sort((a,b)=> (a.business||"").localeCompare(b.business||""));
+    return `
+      <div class="split">
+        <label>Task title
+          <input class="input" id="t_title" value="${esc(t.title||"")}" placeholder="Follow up, send proposal, publish blog…" />
+        </label>
+        <label>Due date (YYYY-MM-DD)
+          <input class="input" id="t_due" value="${esc(t.due||"")}" placeholder="${todayISO()}" />
+        </label>
+        <label>Link to lead (optional)
+          <select id="t_lead">
+            <option value="">— none —</option>
+            ${leads.map(l => `<option value="${esc(l.id)}" ${l.id===t.lead_id ? "selected":""}>${esc(l.business)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Status
+          <select id="t_status">
+            <option value="open" ${t.status!=="done" ? "selected":""}>open</option>
+            <option value="done" ${t.status==="done" ? "selected":""}>done</option>
+          </select>
+        </label>
+        <label>Notes
+          <textarea id="t_notes">${esc(t.notes||"")}</textarea>
+        </label>
+      </div>
+    `;
+  }
+
+  function templateFormHTML(tpl){
+    const t = tpl || {};
+    return `
+      <div class="split">
+        <label>Template name
+          <input class="input" id="s_name" value="${esc(t.name||"")}" placeholder="Template name" />
+        </label>
+        <label>Category
+          <input class="input" id="s_cat" value="${esc(t.category||"")}" placeholder="Outreach / Client / Follow-up…" />
+        </label>
+        <label>Subject template
+          <input class="input" id="s_subj" value="${esc(t.subject_template||"")}" placeholder="Subject with {{BUSINESS}}…" />
+        </label>
+        <label>Body template
+          <textarea id="s_body" style="min-height:220px;">${esc(t.body_template||"")}</textarea>
+        </label>
+        <div class="footnote">
+          Variables: {{BUSINESS}} {{OWNER}} {{CITY}} {{SERVICE}} {{YOUR_COMPANY}} {{YOUR_NAME}} {{YOUR_SITE}} {{INTAKE_URL}} {{TODAY}} {{BLOG_URL}} {{BLOG_TITLE}} {{SIGNATURE}}
+        </div>
+      </div>
+    `;
+  }
+
+  function quickCaptureHTML(){
+    return `
+      <div class="split">
+        <label>What are you capturing?
+          <select id="qc_type">
+            <option value="note">Note → Vault</option>
+            <option value="lead">Lead</option>
+            <option value="task">Task</option>
+          </select>
+        </label>
+        <label>Title / Business
+          <input class="input" id="qc_title" placeholder="e.g., Desert Bloom Plumbing" />
+        </label>
+        <label>Details
+          <textarea id="qc_body" placeholder="Paste anything: phone, email, notes, next step…"></textarea>
+        </label>
+      </div>
+      <p class="footnote">This is a fast capture. You can refine in the full editor after.</p>
+    `;
+  }
+
+  // ============================================================
+  // CRUD
+  // ============================================================
+  function upsertLead(lead){
+    const now = new Date().toISOString();
+    const isNew = !lead.id;
+    const obj = {
+      id: lead.id || uid(),
+      business: (lead.business||"").trim(),
+      owner: (lead.owner||"").trim(),
+      email: (lead.email||"").trim(),
+      phone: (lead.phone||"").trim(),
+      website: (lead.website||"").trim(),
+      city: (lead.city||"").trim(),
+      service: (lead.service||"").trim(),
+      status: (lead.status||"New").trim() || "New",
+      next_followup: (lead.next_followup||"").trim(),
+      notes: (lead.notes||"").trim(),
+      created_at: lead.created_at || now,
+      updated_at: now
+    };
+    const idx = state.store.leads.findIndex(x => x.id === obj.id);
+    if (idx >= 0) state.store.leads[idx] = obj; else state.store.leads.push(obj);
+    persist();
+    logActivity(isNew ? "Lead created" : "Lead updated", `${obj.business} • ${obj.status}`);
+    toast("Saved 🧲", obj.business || "Lead saved");
+  }
+
+  function deleteLead(id){
+    const lead = state.store.leads.find(x=>x.id===id);
+    state.store.leads = state.store.leads.filter(x => x.id !== id);
+    // also detach tasks referencing this lead
+    state.store.tasks = state.store.tasks.map(t => (t.lead_id===id ? {...t, lead_id:""} : t));
+    persist();
+    logActivity("Lead deleted", lead?.business || id);
+    toast("Deleted 🗑️", "Lead removed");
+  }
+
+  function upsertTask(task){
+    const now = new Date().toISOString();
+    const isNew = !task.id;
+    const obj = {
+      id: task.id || uid(),
+      title: (task.title||"").trim(),
+      due: (task.due||"").trim(),
+      status: (task.status||"open").trim(),
+      notes: (task.notes||"").trim(),
+      lead_id: task.lead_id || "",
+      created_at: task.created_at || now,
+      updated_at: now
+    };
+    const idx = state.store.tasks.findIndex(x => x.id === obj.id);
+    if (idx >= 0) state.store.tasks[idx] = obj; else state.store.tasks.push(obj);
+    persist();
+    logActivity(isNew ? "Task created" : "Task updated", `${obj.title} • ${obj.due || "no due"}`);
+    toast("Saved ✅", obj.title || "Task saved");
+  }
+
+  function deleteTask(id){
+    state.store.tasks = state.store.tasks.filter(x => x.id !== id);
+    persist();
+    logActivity("Task deleted", id);
+    toast("Deleted 🗑️", "Task removed");
+  }
+
+  function upsertTemplate(tpl){
+    const now = new Date().toISOString();
+    const isNew = !tpl.id;
+    const obj = {
+      id: tpl.id || uid(),
+      name: (tpl.name||"").trim(),
+      category: (tpl.category||"").trim(),
+      subject_template: (tpl.subject_template||"").trim(),
+      body_template: (tpl.body_template||"").trim(),
+      created_at: tpl.created_at || now,
+      updated_at: now
+    };
+    const idx = state.store.templates.findIndex(x => x.id === obj.id);
+    if (idx >= 0) state.store.templates[idx] = obj; else state.store.templates.push(obj);
+    persist();
+    logActivity(isNew ? "Template created" : "Template updated", obj.name);
+    toast("Saved ✉️", obj.name || "Template saved");
+  }
+
+  function deleteTemplate(id){
+    state.store.templates = state.store.templates.filter(x => x.id !== id);
+    persist();
+    logActivity("Template deleted", id);
+    toast("Deleted 🗑️", "Template removed");
+  }
+
+  function addToVault({ type, title, content, lead_id="" }){
+    const item = {
+      id: uid(),
+      type,
+      title: (title||"").trim() || `${type.toUpperCase()} • ${todayISO()}`,
+      content: String(content||""),
+      lead_id,
+      created_at: new Date().toISOString()
+    };
+    state.store.vault.push(item);
+    if (state.store.vault.length > 1200) state.store.vault.splice(0, state.store.vault.length - 1200);
+    persist();
+    logActivity("Saved to Vault", `${item.type} • ${item.title}`);
+    toast("Saved 📦", item.title);
+  }
+
+  function deleteVault(id){
+    state.store.vault = state.store.vault.filter(x => x.id !== id);
+    persist();
+    logActivity("Vault item deleted", id);
+    toast("Deleted 🗑️", "Vault item removed");
+  }
+
+  // ============================================================
+  // Email generation
+  // ============================================================
+  function doGenerateEmail(){
+    const leadId = $("#emailLeadSelect").value;
+    const tplId = $("#emailTemplateSelect").value;
+    const blogUrl = ($("#emailBlogUrl").value || "").trim();
+    const blogTitle = ($("#emailBlogTitle").value || "").trim();
+
+    const lead = state.store.leads.find(l => l.id === leadId);
+    const tpl = state.store.templates.find(t => t.id === tplId);
+    if (!lead || !tpl){
+      toast("Missing selection", "Pick a lead and a template.");
+      return;
+    }
+
+    const vars = buildVarsFromLead(lead);
+    vars.BLOG_URL = blogUrl;
+    vars.BLOG_TITLE = blogTitle;
+
+    const subject = fillTemplate(tpl.subject_template, vars).trim();
+    const body = fillTemplate(tpl.body_template, vars).trim();
+
+    const out = `SUBJECT:\n${subject}\n\nBODY:\n${body}`;
+    state.lastEmail = out;
+    $("#emailOutput").textContent = out;
+
+    const used = Object.keys(vars).filter(k => (tpl.subject_template + "\n" + tpl.body_template).includes(`{{${k}}}`));
+    $("#emailVarsBadge").textContent = `${used.length} vars`;
+    $("#emailVars").innerHTML = `Used: <span class="dim">${esc(used.join(", ") || "none")}</span>`;
+
+    logActivity("Email generated", `${lead.business} • ${tpl.name}`);
+    toast("Generated ✉️", `${lead.business}`);
+  }
+
+  // ============================================================
+  // Content generator (offline deterministic writing)
+  // ============================================================
+  function titleCase(s){
+    return String(s||"").split(" ").filter(Boolean).map(w => w[0] ? (w[0].toUpperCase() + w.slice(1)) : w).join(" ");
+  }
+  function clampText(s, max){
+    s = String(s||"").trim();
+    if (s.length <= max) return s;
+    return s.slice(0, max-1).trimEnd() + "…";
+  }
+
+  function mdToHtml(md){
+    // lightweight markdown -> html for headings/bullets/paras (offline, no libs)
+    const lines = String(md||"").split("\n");
+    let html = "";
+    let inUl = false;
+    for (const raw of lines){
+      const line = raw.trimEnd();
+      if (!line.trim()){
+        if (inUl){ html += "</ul>"; inUl = false; }
+        html += "<div style='height:10px'></div>";
+        continue;
+      }
+      if (line.startsWith("### ")){ if (inUl){ html+="</ul>"; inUl=false; } html += `<h3>${esc(line.slice(4))}</h3>`; continue; }
+      if (line.startsWith("## ")){ if (inUl){ html+="</ul>"; inUl=false; } html += `<h2>${esc(line.slice(3))}</h2>`; continue; }
+      if (line.startsWith("# ")){ if (inUl){ html+="</ul>"; inUl=false; } html += `<h1>${esc(line.slice(2))}</h1>`; continue; }
+      if (line.startsWith("- ")){
+        if (!inUl){ html += "<ul>"; inUl = true; }
+        html += `<li>${esc(line.slice(2))}</li>`;
+        continue;
+      }
+      if (inUl){ html += "</ul>"; inUl = false; }
+      const strongLine = esc(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      html += `<p>${strongLine}</p>`;
+    }
+    if (inUl) html += "</ul>";
+    return html;
+  }
+
+  function buildDraftInput(){
+    const s = state.store.settings;
+    const leadId = ($("#genLeadSelect").value || "").trim();
+    const lead = leadId ? state.store.leads.find(x=>x.id===leadId) : null;
+
+    const type = $("#genType").value;
+    const business = ($("#genBusiness").value || (lead?.business||"") || "").trim();
+    const owner = ($("#genOwner").value || (lead?.owner||"") || "").trim();
+    const city = ($("#genCity").value || (lead?.city||"") || s.default_city || "").trim();
+    const service = ($("#genService").value || (lead?.service||"") || s.default_service || "").trim();
+    const keyword = ($("#genKeyword").value || "").trim() || `${service} ${city}`.trim();
+    const cta = $("#genCTA").value;
+    const angle = ($("#genAngle").value || "").trim();
+
+    return { leadId, type, business, owner, city, service, keyword, cta, angle, settings:s };
+  }
+
+  function ctaLine(input){
+    const s = input.settings;
+    if (input.cta === "intake") return `Fill out our intake form: ${s.intake_url || "[set intake URL in Settings]"}`;
+    if (input.cta === "call") return `Call or text to get started (use your signature contact).`;
+    if (input.cta === "book") return `Book a quick consultation (use your preferred scheduling link).`;
+    if (input.cta === "quote") return `Request a quote and we’ll respond with a clear plan.`;
+    return `Next step: ${s.intake_url || "[set intake URL in Settings]"}`;
+  }
+
+  function draftTitleSuggestions(input){
+    const { type, business, city, service, keyword } = input;
+    const base = titleCase(keyword);
+    if (type === "spotlight"){
+      const b = business || "Local Business";
+      return [
+        `${b} in ${city}: How They Stand Out (and What You Can Learn)`,
+        `Why ${b} Is a Trusted Name in ${city}`,
+        `${b}: A Local Success Spotlight in ${city}`,
+        `Behind the Scenes: How ${b} Earns Trust in ${city}`,
+        `${b} + ${city}: What Consistent Quality Really Looks Like`
+      ];
+    }
+    if (type === "cost"){
+      return [
+        `${base}: Cost & Value Guide for ${city}`,
+        `How Much Does ${service} Cost in ${city}? (What Changes the Price)`,
+        `${base}: What You Pay For (and What to Avoid)`,
+        `Pricing Factors for ${service} in ${city} (Explained Clearly)`,
+        `${service} in ${city}: Budget Ranges + ROI`
+      ];
+    }
+    if (type === "comparison"){
+      return [
+        `Choosing the Right ${service} Provider in ${city}: A Simple Guide`,
+        `${base}: How to Compare Options (Without Guessing)`,
+        `The ${city} Checklist: Hiring the Right ${service} Provider`,
+        `What “Good” Looks Like in ${service} (and How to Spot It)`,
+        `${service} in ${city}: Red Flags, Green Flags, and Next Steps`
+      ];
+    }
+    // howto
+    return [
+      `How to Get Better Results from ${service} in ${city}`,
+      `${base}: A Practical How-To Guide`,
+      `A Step-by-Step Guide to ${service} in ${city}`,
+      `${service} in ${city}: The Simple Process That Works`,
+      `How to Plan ${service} the Right Way (Local Guide: ${city})`
+    ];
+  }
+
+  function generateDraftMarkdown(input){
+    const s = input.settings;
+    const titles = draftTitleSuggestions(input);
+    const title = titles[0];
+    const keyword = input.keyword;
+    const city = input.city;
+    const service = input.service;
+    const biz = input.business || "this business";
+    const owner = input.owner || "the owner";
+    const angle = input.angle ? `Special angle: ${input.angle}` : "";
+
+    const metaTitle = clampText(`${title} | ${biz}`, 58);
+    const metaDesc = clampText(`A practical guide to ${service} in ${city}: what quality looks like, what changes cost, and the next steps to get real results.`, 155);
+
+    const introA =
+`If you’re searching for **${keyword}**, you’re not looking for fluff — you’re looking for a result. In ${city}, the difference between “done” and “done right” is usually the difference between consistent demand and random luck.
+
+This guide breaks down what to look for, how to compare options, and what a clean next step looks like.`;
+
+    const qualitySection =
+`## What “quality” looks like (and what it isn’t)
+
+Quality in **${service}** usually shows up as:
+- Clear scope (you know exactly what you’re getting)
+- Simple next step for customers (call, book, buy, request)
+- Proof (reviews, examples, before/after, or measurable outcomes)
+- Consistency (not one big burst, but steady output)
+
+What quality isn’t:
+- Fancy words with no plan
+- A deliverable that doesn’t change customer behavior
+- “Looks cool” with no conversion path`;
+
+    const localFactors =
+`## Local factors in ${city} that change results
+
+In real life, local context matters. Results change based on:
+- Customer intent (what people in ${city} actually search + expect)
+- Competition density (how many similar options exist)
+- Trust signals (how fast a stranger becomes a customer)
+- Follow-up speed (how quickly leads get a human response)`;
+
+    const costSection =
+`## Cost & value: what changes the price (and the payoff)
+
+Pricing for **${service}** typically changes based on:
+- Scope (one page vs. full build)
+- Assets (photos/video, writing, editorial)
+- Speed (rush work costs more)
+- Strategy (conversion + SEO + publishing is more valuable than “just a site”)
+
+A simple rule: if it doesn’t improve conversion or trust, it’s not “value,” it’s decoration.`;
+
+    const spotlightSection =
+`## Local success spotlight: ${biz}
+
+When ${biz} wins in ${city}, it’s usually because they’re doing a few things consistently:
+- They make the next step obvious
+- They communicate clearly
+- They show proof instead of promising
+- They keep improving, even when it’s not dramatic
+
+If you’re evaluating ${biz}, ask ${owner}:
+- “What’s your process?”
+- “What does a successful outcome look like?”
+- “How do you measure that success?”`;
+
+    const checklist =
+`## Quick checklist (use this to choose fast)
+
+Before you commit:
+- Can they explain the plan in plain language?
+- Can they show proof of results or real examples?
+- Is there a clear timeline and scope?
+- Do you know what happens after launch (maintenance, updates, publishing)?
+- Is the next step for customers painfully obvious?`;
+
+    const faq =
+`## FAQ
+
+### How long does ${service} usually take?
+It depends on scope, but the best answer includes a timeline with checkpoints (not a vague estimate).
+
+### How do I compare providers in ${city}?
+Compare process + proof + clarity. If someone can’t explain the plan, they probably don’t have one.
+
+### What’s the biggest mistake people make?
+Buying the “thing” (site, content, ads) without a conversion path and follow-up system.
+
+### Do I need ongoing publishing?
+If you want consistent demand: yes. Consistency is boring and powerful.
+
+### What should I ask before hiring?
+Ask for scope, timeline, proof, and what success looks like.
+
+### What happens after launch?
+If the answer is “nothing,” you’re probably buying a static brochure instead of a growth asset.`;
+
+    const cta =
+`## Next step
+
+${ctaLine(input)}
+
+${s.signature ? `\n${s.signature}` : ""}`;
+
+    const og =
+`## Metadata (copy/paste)
+
+- Meta title: ${metaTitle}
+- Meta description: ${metaDesc}
+- OG title: ${metaTitle}
+- OG description: ${metaDesc}`;
+
+    // Type-specific adjustments
+    let typeLead = "";
+    if (input.type === "spotlight"){
+      typeLead = `# ${title}\n\n${introA}\n\n${angle ? `> ${angle}\n\n` : ""}${spotlightSection}\n\n${qualitySection}\n\n${localFactors}\n\n${checklist}\n\n${faq}\n\n${og}\n\n${cta}\n`;
+    } else if (input.type === "cost"){
+      typeLead = `# ${title}\n\n${introA}\n\n${angle ? `> ${angle}\n\n` : ""}${costSection}\n\n${qualitySection}\n\n${localFactors}\n\n${checklist}\n\n${faq}\n\n${og}\n\n${cta}\n`;
+    } else if (input.type === "comparison"){
+      typeLead = `# ${title}\n\n${introA}\n\n${angle ? `> ${angle}\n\n` : ""}${qualitySection}\n\n${localFactors}\n\n## How to compare options (simple scorecard)\n\n- **Clarity:** do you understand the plan?\n- **Proof:** do they show real examples?\n- **Conversion path:** is the next step obvious?\n- **Consistency:** what happens after launch?\n\n${checklist}\n\n${faq}\n\n${og}\n\n${cta}\n`;
+    } else { // howto
+      typeLead = `# ${title}\n\n${introA}\n\n${angle ? `> ${angle}\n\n` : ""}## The simple process that works\n\n- Define one primary outcome (calls, bookings, quotes)\n- Build one clean next step\n- Add proof (reviews, examples, editorial)\n- Publish consistently\n- Improve monthly based on what people actually do\n\n${qualitySection}\n\n${localFactors}\n\n${checklist}\n\n${faq}\n\n${og}\n\n${cta}\n`;
+    }
+
+    const meta =
+`Title suggestions:
+1) ${titles[0]}
+2) ${titles[1]}
+3) ${titles[2]}
+4) ${titles[3]}
+5) ${titles[4]}
+
+Target keyword: ${keyword}
+City: ${city}
+Service: ${service}
+Business: ${biz || "—"}
+`;
+
+    return { markdown: typeLead, metaTitle, metaDesc, metaBlock: meta, title };
+  }
+
+  function applyLeadToGenerator(leadId){
+    const s = state.store.settings;
+    const lead = state.store.leads.find(x=>x.id===leadId);
+    if (!lead){
+      $("#genBusiness").value = "";
+      $("#genOwner").value = "";
+      $("#genCity").value = s.default_city || "";
+      $("#genService").value = s.default_service || "";
+      $("#genKeyword").value = `${s.default_service||""} ${s.default_city||""}`.trim();
+      return;
+    }
+    $("#genBusiness").value = lead.business || "";
+    $("#genOwner").value = lead.owner || "";
+    $("#genCity").value = lead.city || s.default_city || "";
+    $("#genService").value = lead.service || s.default_service || "";
+    $("#genKeyword").value = `${lead.service || s.default_service || ""} ${lead.city || s.default_city || ""}`.trim();
+  }
+
+  function generateDraft(){
+    const input = buildDraftInput();
+    const out = generateDraftMarkdown(input);
+
+    state.lastDraft = out.markdown;
+    state.lastDraftMeta = out.metaBlock;
+
+    $("#draftMeta").innerHTML = `<span class="badge">Meta Title</span> <span class="dim">${esc(out.metaTitle)}</span><br/><span class="badge">Meta Desc</span> <span class="dim">${esc(out.metaDesc)}</span>`;
+    if (state.draftMode === "markdown"){
+      $("#draftOutput").textContent = out.metaBlock + "\n\n" + out.markdown;
+    } else {
+      const html = `<div>${mdToHtml(out.metaBlock + "\n\n" + out.markdown)}</div>`;
+      $("#draftOutput").textContent = html; // keep it copy-safe as raw html
+    }
+
+    logActivity("Draft generated", `${out.title}`);
+    toast("Draft generated 📝", out.title);
+  }
+
+  function toggleDraftMode(){
+    state.draftMode = (state.draftMode === "markdown") ? "html" : "markdown";
+    if (!state.lastDraft){
+      toast("No draft yet", "Generate a draft first.");
+      return;
+    }
+    // re-render current content
+    const shown = state.lastDraftMeta + "\n\n" + state.lastDraft;
+    if (state.draftMode === "markdown"){
+      $("#draftOutput").textContent = shown;
+      toast("Mode", "Markdown view");
+    } else {
+      $("#draftOutput").textContent = `<div>${mdToHtml(shown)}</div>`;
+      toast("Mode", "HTML view (raw HTML text)");
+    }
+  }
+
+  // ============================================================
+  // Sequence generator (4 emails)
+  // ============================================================
+  function generateSequence(){
+    const leadId = $("#seqLeadSelect").value;
+    const goal = $("#seqGoal").value;
+    const lead = state.store.leads.find(x=>x.id===leadId);
+    if (!lead){
+      toast("Pick a lead", "Sequence needs a lead.");
+      return;
+    }
+    const vars = buildVarsFromLead(lead);
+
+    let focusLine = "";
+    if (goal === "set_meeting") focusLine = "Goal: set a 15-minute alignment call.";
+    if (goal === "weekly_editorial") focusLine = "Goal: lock weekly editorial cadence as the ranking weapon.";
+    if (goal === "conversion_upgrade") focusLine = "Goal: sell a conversion upgrade (proof + next step) without being pushy.";
+
+    const seq =
+`4-EMAIL SEQUENCE (OFFLINE GENERATED)
+Lead: ${vars.BUSINESS} • ${vars.CITY} • ${vars.SERVICE}
+${focusLine}
+Date: ${vars.TODAY}
+
+EMAIL 1 — INTRO
+Subject: Quick spotlight idea for ${vars.BUSINESS} in ${vars.CITY}
+Body:
+Hi ${vars.OWNER},
+
+I’m reaching out from ${vars.YOUR_COMPANY}. We publish local editorial spotlights and build clean upgrades that turn attention into calls.
+
+I have a simple idea for ${vars.BUSINESS}: one editorial feature tied to “${vars.SERVICE} ${vars.CITY}” that explains what you do best, why locals trust you, and the best next step for customers.
+
+If you’re open to it, reply “YES” and I’ll send a 1-page mini plan (no cost) before we publish anything.
+
+${vars.SIGNATURE}
+
+EMAIL 2 — FOLLOW UP (24–48 hrs)
+Subject: ${vars.BUSINESS} — quick follow-up (simple plan)
+Body:
+Hi ${vars.OWNER},
+
+Quick follow-up.
+
+Plan:
+1) One editorial feature targeting “${vars.SERVICE} ${vars.CITY}”
+2) Optional upgrade: a single conversion page that turns clicks into calls
+3) Weekly publishing cadence (boring, powerful)
+
+Reply “YES” and I’ll send the mini-brief + the exact questions we use.
+
+${vars.SIGNATURE}
+
+EMAIL 3 — VALUE CLARIFIER (3–5 days)
+Subject: What “good” looks like for ${vars.BUSINESS}
+Body:
+Hi ${vars.OWNER},
+
+Most businesses don’t need more noise — they need a clear next step for customers and consistent credibility.
+
+If we do this right, you get:
+• search-friendly editorial coverage tied to ${vars.CITY}
+• a clean conversion path (call/booking/quote)
+• proof that reduces buyer hesitation
+
+If you want to aim the first feature at one service, which one should it be?
+
+${vars.SIGNATURE}
+
+EMAIL 4 — CLOSE / MEETING SET (7–10 days)
+Subject: Quick 15-min alignment for ${vars.BUSINESS}
+Body:
+Hi ${vars.OWNER},
+
+If you’re open to it, I’d like to do a quick 15-minute alignment call.
+
+Goal:
+• confirm your top 1–2 services to push in ${vars.CITY}
+• map the next editorial topics
+• confirm the best next-step CTA
+
+Reply with 2 time windows and I’ll lock it in.
+
+${vars.SIGNATURE}
+`;
+
+    state.lastSequence = seq;
+    $("#seqOutput").textContent = seq;
+    logActivity("Sequence generated", `${lead.business} • ${goal}`);
+    toast("Sequence generated ✉️", lead.business);
+  }
+
+  // ============================================================
+  // Backup/exports
+  // ============================================================
+  function csvEscape(v){
+    v = (v ?? "").toString();
+    return `"${v.replaceAll('"','""')}"`;
+  }
+
+  function exportLeadsCSV(){
+    const rows = [["business","owner","email","phone","website","city","service","status","next_followup","notes","created_at","updated_at"]];
+    for (const l of state.store.leads){
+      rows.push([l.business, l.owner, l.email, l.phone, l.website, l.city, l.service, l.status, l.next_followup, l.notes, l.created_at, l.updated_at]);
+    }
+    const csv = rows.map(r => r.map(csvEscape).join(",")).join("\n");
+    downloadFile(`skyeops-leads-${todayISO()}.csv`, csv, "text/csv");
+    toast("Exported ⬇️", "Leads CSV downloaded");
+  }
+
+  function exportTasksCSV(){
+    const rows = [["title","due","status","notes","lead_id","created_at","updated_at"]];
+    for (const t of state.store.tasks){
+      rows.push([t.title, t.due, t.status, t.notes, t.lead_id, t.created_at, t.updated_at]);
+    }
+    const csv = rows.map(r => r.map(csvEscape).join(",")).join("\n");
+    downloadFile(`skyeops-tasks-${todayISO()}.csv`, csv, "text/csv");
+    toast("Exported ⬇️", "Tasks CSV downloaded");
+  }
+
+  function exportVaultTXT(){
+    const items = [...state.store.vault].sort((a,b)=> (b.created_at||"").localeCompare(a.created_at||""));
+    const parts = [];
+    parts.push(`SKYEOPS VAULT EXPORT — ${new Date().toISOString()}`);
+    parts.push(`Items: ${items.length}`);
+    parts.push("");
+    for (const v of items){
+      const leadName = v.lead_id ? (state.store.leads.find(x=>x.id===v.lead_id)?.business || "Lead") : "—";
+      parts.push("=".repeat(60));
+      parts.push(`Title: ${v.title}`);
+      parts.push(`Type: ${v.type}`);
+      parts.push(`Lead: ${leadName}`);
+      parts.push(`Created: ${v.created_at}`);
+      parts.push("");
+      parts.push(v.content);
+      parts.push("");
+    }
+    downloadFile(`skyeops-vault-${todayISO()}.txt`, parts.join("\n"), "text/plain");
+    toast("Exported ⬇️", "Vault TXT downloaded");
+  }
+
+  function exportBackup(){
+    const payload = {
+      version: state.store.version || 2,
+      exported_at: new Date().toISOString(),
+      store: state.store
+    };
+    downloadFile(`skyeops-backup-${todayISO()}.json`, JSON.stringify(payload, null, 2), "application/json");
+    toast("Backup exported 💾", "JSON downloaded");
+  }
+
+  async function restoreBackupFromFile(file){
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data || typeof data !== "object") throw new Error("Invalid backup file.");
+    const s = data.store;
+    if (!s) throw new Error("Backup missing store.");
+    state.store = s;
+    // harden
+    state.store.settings = state.store.settings || defaultSettings();
+    state.store.leads = Array.isArray(state.store.leads) ? state.store.leads : [];
+    state.store.tasks = Array.isArray(state.store.tasks) ? state.store.tasks : [];
+    state.store.templates = Array.isArray(state.store.templates) && state.store.templates.length ? state.store.templates : seedTemplates();
+    state.store.vault = Array.isArray(state.store.vault) ? state.store.vault : [];
+    state.store.activity = Array.isArray(state.store.activity) ? state.store.activity : [];
+    state.store.version = 2;
+    persist();
+    toast("Restored ♻️", "Data restored");
+    renderAll();
+  }
+
+  function wipeAll(){
+    const ok = confirm("Wipe ALL local data? This cannot be undone unless you have a backup JSON.");
+    if (!ok) return;
+    Storage.remove(APP_KEY);
+    state.store = initStore();
+    state.lastEmail = "";
+    state.lastDraft = "";
+    state.lastSequence = "";
+    renderAll();
+    toast("Wiped 🧨", "Local data cleared");
+  }
+
+  // ============================================================
+  // Templates manager
+  // ============================================================
+  function openTemplatesManager(){
+    state.templatesManagerOpen = true;
+    const templates = [...state.store.templates].sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+    openModal({
+      title: "🧩 Manage Email Templates",
+      bodyHTML: `
+        <div class="sub">Templates stored locally. Edit freely. Backup before heavy changes.</div>
+        <div style="margin-top:10px;">
+          ${templates.map(t => `
+            <div style="padding:10px; border:1px solid var(--stroke); border-radius:16px; background:rgba(0,0,0,.14); margin-top:10px;">
+              <div class="row between">
+                <b>${esc(t.name || "Template")}</b>
+                <span class="badge">${esc(t.category || "—")}</span>
+              </div>
+              <div class="dim" style="margin-top:6px;">Subject: ${esc(t.subject_template || "")}</div>
+              <div class="row end" style="margin-top:10px;">
+                <button class="btn tiny" data-action="editTemplate" data-id="${esc(t.id)}">✏️ Edit</button>
+                <button class="btn tiny danger" data-action="deleteTemplate" data-id="${esc(t.id)}">🗑️ Delete</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `,
+      footerButtons: [
+        { label: "➕ New Template", className:"primary", action:"newTemplate" },
+        { label: "Close", action:"closeModal" }
+      ]
+    });
+  }
+
+  // ============================================================
+  // Demo data
+  // ============================================================
+  function loadDemoData(){
+    const ok = confirm("Load demo data? This will ADD sample leads/tasks and a few vault items.");
+    if (!ok) return;
+
+    const now = new Date().toISOString();
+    const demoLeads = [
+      {
+        id: uid(),
+        business: "Desert Bloom Plumbing",
+        owner: "Alyssa",
+        email: "info@desertbloomplumbing.com",
+        phone: "(602) 555-0191",
+        website: "https://example.com/desert-bloom-plumbing",
+        city: "Phoenix, AZ",
+        service: "Local SEO + Editorial Growth",
+        status: "New",
+        next_followup: todayISO(),
+        notes: "Needs better web presence + reviews funnel. Wants more calls.",
+        created_at: now, updated_at: now
+      },
+      {
+        id: uid(),
+        business: "Copper Canyon Auto Detail",
+        owner: "Marcus",
+        email: "hello@coppercanyonautodetail.com",
+        phone: "(480) 555-0113",
+        website: "https://example.com/copper-canyon-detail",
+        city: "Tempe, AZ",
+        service: "Conversion Page + Proof Wall",
+        status: "Warm",
+        next_followup: todayISO(),
+        notes: "Strong IG content. Website weak. Wants booking flow.",
+        created_at: now, updated_at: now
+      }
+    ];
+
+    const demoTasks = [
+      { id: uid(), title:"Follow up: Desert Bloom Plumbing (send mini plan)", due: todayISO(), status:"open", notes:"Email template 01 + propose editorial", lead_id: demoLeads[0].id, created_at: now, updated_at: now },
+      { id: uid(), title:"Draft: cost/value guide for conversion pages (Tempe)", due: "", status:"open", notes:"Use Content Engine → cost guide", lead_id: demoLeads[1].id, created_at: now, updated_at: now }
+    ];
+
+    // add (avoid duplicates by business name)
+    const existingNames = new Set(state.store.leads.map(l=> (l.business||"").toLowerCase().trim()));
+    for (const l of demoLeads){
+      if (!existingNames.has((l.business||"").toLowerCase().trim())){
+        state.store.leads.push(l);
+      }
+    }
+    state.store.tasks.push(...demoTasks);
+
+    // save a demo vault note
+    addToVault({
+      type:"note",
+      title:"Demo note: operator workflow",
+      content:"Load demo data → Content Engine generates draft → Save to Vault → Export Vault TXT → ship to contractors.",
+      lead_id:""
+    });
+
+    persist();
+    renderAll();
+    toast("Demo loaded 🧪", "2 leads + tasks + vault note");
+  }
+
+  // ============================================================
+  // Self test
+  // ============================================================
+  function selfTest(){
+    const results = [];
+    results.push(`Self-Test @ ${new Date().toISOString()}`);
+    results.push(`Storage OK: ${Storage.ok ? "YES" : "NO"} ${Storage.reason ? "(" + Storage.reason + ")" : ""}`);
+    results.push(`crypto: ${GCrypto ? "YES" : "NO"}`);
+    results.push(`clipboard API: ${(navigator.clipboard && navigator.clipboard.writeText) ? "YES" : "NO"}`);
+    results.push(`Leads: ${state.store.leads.length}`);
+    results.push(`Templates: ${state.store.templates.length}`);
+    results.push(`Vault: ${state.store.vault.length}`);
+    results.push(`Tasks: ${state.store.tasks.length}`);
+    results.push("");
+    results.push("If buttons do nothing, the click handler isn't firing. That would mean the file is incomplete or the browser is blocking scripts.");
+    openModal({
+      title: "🧪 Self-Test Results",
+      bodyHTML: `<div class="mono">${esc(results.join("\n"))}</div>`,
+      footerButtons: [
+        { label:"📋 Copy", className:"primary", action:"copySelfTest" },
+        { label:"Close", action:"closeModal" }
+      ]
+    });
+  }
+
+  // ============================================================
+  // Actions
+  // ============================================================
+  async function handleAction(action, id){
+    if (state.locked && !["unlock","unlockHelp"].includes(action)) return;
+
+    switch(action){
+      case "closeModal": closeModal(); break;
+
+      case "lockNow":
+        if (state.store.settings.pin_hash){
+          showLock();
+        } else {
+          toast("No PIN set", "Set an app lock PIN in Settings first.");
+          setPage("settings");
+        }
+        break;
+
+      case "unlock":{
+        const pin = ($("#unlockPin").value || "").trim();
+        if (!pin){ $("#lockMsg").textContent = "Enter your PIN."; return; }
+        const hash = await sha256Hex(pin);
+        if (hash === (state.store.settings.pin_hash || "")){
+          hideLock();
+          toast("Unlocked 🔓", "Welcome back.");
+        } else {
+          $("#lockMsg").textContent = "Wrong PIN.";
+        }
+        break;
+      }
+
+      case "unlockHelp":
+        $("#lockMsg").textContent = "If you forgot your PIN: restore from backup JSON, or wipe data in Backup.";
+        break;
+
+      case "selfTest": selfTest(); break;
+      case "copySelfTest":{
+        const txt = $("#modalBody .mono")?.textContent || "";
+        await copyText(txt);
+        break;
+      }
+
+      case "loadDemo": loadDemoData(); break;
+
+      case "quickCapture":
+        openModal({
+          title:"➕ Quick Capture",
+          bodyHTML: quickCaptureHTML(),
+          footerButtons:[
+            { label:"Save", className:"primary", action:"saveQuickCapture" },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+
+      case "saveQuickCapture":{
+        const type = $("#qc_type").value;
+        const title = ($("#qc_title").value || "").trim();
+        const body = ($("#qc_body").value || "").trim();
+        if (!title){
+          toast("Missing title", "Add a title/business name.");
+          return;
+        }
+        if (type === "note"){
+          addToVault({ type:"note", title, content: body || "(empty)" });
+          closeModal();
+          setPage("vault");
+          renderVault();
+          return;
+        }
+        if (type === "lead"){
+          upsertLead({ business:title, owner:"", email:"", phone:"", website:"", city: state.store.settings.default_city, service: state.store.settings.default_service, status:"New", next_followup: todayISO(), notes: body });
+          closeModal();
+          setPage("leads");
+          renderLeads();
+          return;
+        }
+        if (type === "task"){
+          upsertTask({ title, due: todayISO(), status:"open", notes: body, lead_id:"" });
+          closeModal();
+          setPage("tasks");
+          renderTasks();
+          return;
+        }
+        break;
+      }
+
+      // Leads
+      case "newLead":
+        openModal({
+          title: "➕ New Lead",
+          bodyHTML: leadFormHTML(null),
+          footerButtons: [
+            { label:"Save", className:"primary", action:"saveLead" },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+
+      case "editLead":{
+        const lead = state.store.leads.find(x=>x.id===id);
+        if (!lead) return;
+        openModal({
+          title: "✏️ Edit Lead",
+          bodyHTML: leadFormHTML(lead),
+          footerButtons: [
+            { label:"Save", className:"primary", action:"saveLead", id },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+      }
+
+      case "saveLead":{
+        const existing = id ? state.store.leads.find(x=>x.id===id) : null;
+        const lead = {
+          id: existing?.id,
+          created_at: existing?.created_at,
+          business: $("#f_business").value,
+          owner: $("#f_owner").value,
+          email: $("#f_email").value,
+          phone: $("#f_phone").value,
+          website: $("#f_website").value,
+          city: $("#f_city").value,
+          service: $("#f_service").value,
+          status: $("#f_status").value,
+          next_followup: $("#f_next").value,
+          notes: $("#f_notes").value
+        };
+        if (!String(lead.business||"").trim()){
+          toast("Missing business", "Business name is required.");
+          return;
+        }
+        upsertLead(lead);
+        closeModal();
+        renderAll();
+        break;
+      }
+
+      case "deleteLead":{
+        const ok = confirm("Delete this lead?");
+        if (!ok) return;
+        deleteLead(id);
+        renderAll();
+        break;
+      }
+
+      case "emailLead":{
+        setPage("email");
+        $("#emailLeadSelect").value = id;
+        toast("Email Studio", "Lead selected");
+        break;
+      }
+
+      case "genFromLead":{
+        state.selectedLeadForGen = id;
+        setPage("content");
+        $("#genLeadSelect").value = id;
+        applyLeadToGenerator(id);
+        toast("Content Engine", "Lead applied to generator");
+        break;
+      }
+
+      // Email actions
+      case "generateEmail": doGenerateEmail(); break;
+
+      case "copyEmail":
+        if (!state.lastEmail){ toast("Nothing to copy", "Generate an email first."); return; }
+        await copyText(state.lastEmail);
+        break;
+
+      case "saveEmailToVault":{
+        const leadId = $("#emailLeadSelect").value || "";
+        if (!state.lastEmail){ toast("Nothing to save", "Generate an email first."); return; }
+        const lead = leadId ? state.store.leads.find(x=>x.id===leadId) : null;
+        addToVault({ type:"email", title: `Email • ${lead?.business || "Unlinked"} • ${todayISO()}`, content: state.lastEmail, lead_id: leadId });
+        break;
+      }
+
+      case "logEmail":{
+        const leadId = $("#emailLeadSelect").value || "";
+        const lead = leadId ? state.store.leads.find(x=>x.id===leadId) : null;
+        logActivity("Email logged", `${lead?.business || "Unlinked"} • ${(state.lastEmail||"").slice(0,110).replaceAll("\n"," ")}${(state.lastEmail||"").length>110?"…":""}`);
+        toast("Logged 🧾", "Activity saved");
+        break;
+      }
+
+      // Templates
+      case "manageTemplates": openTemplatesManager(); break;
+
+      case "newTemplate":
+        openModal({
+          title:"➕ New Template",
+          bodyHTML: templateFormHTML(null),
+          footerButtons:[
+            { label:"Save", className:"primary", action:"saveTemplate" },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+
+      case "editTemplate":{
+        const tpl = state.store.templates.find(x=>x.id===id);
+        if (!tpl) return;
+        openModal({
+          title:"✏️ Edit Template",
+          bodyHTML: templateFormHTML(tpl),
+          footerButtons:[
+            { label:"Save", className:"primary", action:"saveTemplate", id },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+      }
+
+      case "saveTemplate":{
+        const existing = id ? state.store.templates.find(x=>x.id===id) : null;
+        const tpl = {
+          id: existing?.id,
+          created_at: existing?.created_at,
+          name: $("#s_name").value,
+          category: $("#s_cat").value,
+          subject_template: $("#s_subj").value,
+          body_template: $("#s_body").value
+        };
+        if (!String(tpl.name||"").trim()){ toast("Missing name", "Template name is required."); return; }
+        if (!String(tpl.subject_template||"").trim() || !String(tpl.body_template||"").trim()){
+          toast("Missing content", "Subject and body are required.");
+          return;
+        }
+        upsertTemplate(tpl);
+        // if manager was open, reopen it after save
+        if (state.templatesManagerOpen){
+          openTemplatesManager();
+        } else {
+          closeModal();
+        }
+        renderSettings();
+        renderEmailStudio();
+        break;
+      }
+
+      case "deleteTemplate":{
+        const ok = confirm("Delete this template?");
+        if (!ok) return;
+        deleteTemplate(id);
+        if (state.templatesManagerOpen) openTemplatesManager(); else closeModal();
+        renderSettings();
+        renderEmailStudio();
+        break;
+      }
+
+      // Content Engine
+      case "newGeneratorDraft":
+        setPage("content");
+        // set defaults
+        $("#genCity").value = state.store.settings.default_city || "";
+        $("#genService").value = state.store.settings.default_service || "";
+        $("#genKeyword").value = `${state.store.settings.default_service||""} ${state.store.settings.default_city||""}`.trim();
+        toast("Content Engine", "Ready to generate");
+        break;
+
+      case "generateDraft": generateDraft(); break;
+
+      case "toggleDraftMode": toggleDraftMode(); break;
+
+      case "copyDraft":
+        if (!state.lastDraft){ toast("Nothing to copy", "Generate a draft first."); return; }
+        if (state.draftMode === "markdown"){
+          await copyText(state.lastDraftMeta + "\n\n" + state.lastDraft);
+        } else {
+          await copyText(`<div>${mdToHtml(state.lastDraftMeta + "\n\n" + state.lastDraft)}</div>`);
+        }
+        break;
+
+      case "saveDraftToVault":{
+        if (!state.lastDraft){ toast("Nothing to save", "Generate a draft first."); return; }
+        const leadId = ($("#genLeadSelect").value || "").trim();
+        const titleLine = (state.lastDraft || "").split("\n")[0].replace(/^#\s*/,"").trim() || `Draft • ${todayISO()}`;
+        const payload = (state.draftMode === "markdown")
+          ? (state.lastDraftMeta + "\n\n" + state.lastDraft)
+          : (`<div>${mdToHtml(state.lastDraftMeta + "\n\n" + state.lastDraft)}</div>`);
+        addToVault({ type:"draft", title: titleLine, content: payload, lead_id: leadId });
+        break;
+      }
+
+      // Sequences
+      case "newSequence":
+        setPage("content");
+        toast("Sequence", "Pick a lead and generate");
+        break;
+
+      case "generateSequence": generateSequence(); break;
+
+      case "copySequence":
+        if (!state.lastSequence){ toast("Nothing to copy", "Generate a sequence first."); return; }
+        await copyText(state.lastSequence);
+        break;
+
+      case "saveSequenceToVault":{
+        const leadId = $("#seqLeadSelect").value || "";
+        const lead = leadId ? state.store.leads.find(x=>x.id===leadId) : null;
+        if (!state.lastSequence){ toast("Nothing to save", "Generate a sequence first."); return; }
+        addToVault({ type:"sequence", title:`Sequence • ${lead?.business || "Unlinked"} • ${todayISO()}`, content: state.lastSequence, lead_id: leadId });
+        break;
+      }
+
+      // Vault
+      case "newVaultNote": {
+        openModal({
+          title:"📦 New Vault Note",
+          bodyHTML:`<div class="split"><label>Title<input class="input" id="vn_title" placeholder="Note title"/></label><label>Note<textarea id="vn_body" placeholder="Write anything…"></textarea></label></div>`,
+          footerButtons:[
+            { label:"Save", className:"primary", action:"saveVaultNote" },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+      }
+
+      case "saveVaultNote":{
+        const title = ($("#vn_title").value || "").trim();
+        const body = ($("#vn_body").value || "").trim();
+        if (!title){ toast("Missing title", "Add a title."); return; }
+        addToVault({ type:"note", title, content: body || "(empty)" });
+        closeModal();
+        setPage("vault");
+        renderVault();
+        break;
+      }
+
+      case "viewVault":{
+        const v = state.store.vault.find(x=>x.id===id);
+        if (!v) return;
+        const leadName = v.lead_id ? (state.store.leads.find(x=>x.id===v.lead_id)?.business || "Lead") : "—";
+        openModal({
+          title:`📦 Vault Item`,
+          bodyHTML:`<div class="sub"><b>${esc(v.title)}</b><br/>Type: <span class="badge">${esc(v.type)}</span> • Lead: <span class="dim">${esc(leadName)}</span> • ${esc((v.created_at||"").slice(0,10))}</div><div class="mono" style="margin-top:12px;">${esc(v.content)}</div>`,
+          footerButtons:[
+            { label:"📋 Copy", className:"primary", action:"copyVault", id },
+            { label:"⬇️ Download", action:"downloadVault", id },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+      }
+
+      case "copyVault":{
+        const v = state.store.vault.find(x=>x.id===id);
+        if (!v) return;
+        await copyText(v.content || "");
+        break;
+      }
+
+      case "downloadVault":{
+        const v = state.store.vault.find(x=>x.id===id);
+        if (!v) return;
+        const safe = (v.title||"vault-item").replace(/[^\w\- ]+/g,"").trim().slice(0,60).replace(/\s+/g,"-").toLowerCase() || "vault-item";
+        downloadFile(`vault-${safe}-${todayISO()}.txt`, v.content || "", "text/plain");
+        toast("Downloaded ⬇️", v.title || "Vault item");
+        break;
+      }
+
+      case "deleteVault":{
+        const ok = confirm("Delete this vault item?");
+        if (!ok) return;
+        deleteVault(id);
+        renderVault();
+        break;
+      }
+
+      case "exportVaultTxt": exportVaultTXT(); break;
+
+      // Tasks
+      case "newTask":
+        openModal({
+          title: "➕ New Task",
+          bodyHTML: taskFormHTML(null),
+          footerButtons: [
+            { label:"Save", className:"primary", action:"saveTask" },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+
+      case "editTask":{
+        const t = state.store.tasks.find(x=>x.id===id);
+        if (!t) return;
+        openModal({
+          title: "✏️ Edit Task",
+          bodyHTML: taskFormHTML(t),
+          footerButtons: [
+            { label:"Save", className:"primary", action:"saveTask", id },
+            { label:"Close", action:"closeModal" }
+          ]
+        });
+        break;
+      }
+
+      case "saveTask":{
+        const existing = id ? state.store.tasks.find(x=>x.id===id) : null;
+        const task = {
+          id: existing?.id,
+          created_at: existing?.created_at,
+          title: $("#t_title").value,
+          due: $("#t_due").value,
+          status: $("#t_status").value,
+          notes: $("#t_notes").value,
+          lead_id: $("#t_lead").value
+        };
+        if (!String(task.title||"").trim()){
+          toast("Missing title", "Task title is required.");
+          return;
+        }
+        upsertTask(task);
+        closeModal();
+        renderTasks();
+        renderDashboard();
+        break;
+      }
+
+      case "doneTask":{
+        const t = state.store.tasks.find(x=>x.id===id);
+        if (!t) return;
+        t.status = "done";
+        upsertTask(t);
+        renderTasks();
+        renderDashboard();
+        break;
+      }
+
+      case "undoTask":{
+        const t = state.store.tasks.find(x=>x.id===id);
+        if (!t) return;
+        t.status = "open";
+        upsertTask(t);
+        renderTasks();
+        renderDashboard();
+        break;
+      }
+
+      case "deleteTask":{
+        const ok = confirm("Delete this task?");
+        if (!ok) return;
+        deleteTask(id);
+        renderTasks();
+        renderDashboard();
+        break;
+      }
+
+      // Backup
+      case "exportBackup": exportBackup(); break;
+
+      case "restoreBackup":{
+        const file = $("#restoreFile").files?.[0];
+        if (!file){ toast("No file", "Choose a backup JSON first."); return; }
+        const ok = confirm("Restore overwrites local data. Continue?");
+        if (!ok) return;
+        try{ await restoreBackupFromFile(file); }
+        catch(e){ toast("Restore failed", String(e?.message || e)); }
+        break;
+      }
+
+      case "wipeAll": wipeAll(); break;
+
+      // Exports
+      case "exportLeadsCsv": exportLeadsCSV(); break;
+      case "exportTasksCsv": exportTasksCSV(); break;
+
+      // Settings
+      case "saveSettings":{
+        const s = state.store.settings;
+        s.company = ($("#setCompany").value || "").trim();
+        s.your_name = ($("#setYourName").value || "").trim();
+        s.your_site = ($("#setYourSite").value || "").trim();
+        s.intake_url = ($("#setIntake").value || "").trim();
+        s.default_city = ($("#setCity").value || "").trim();
+        s.default_service = ($("#setService").value || "").trim();
+        s.signature = ($("#setSig").value || "").trim();
+        s.updated_at = new Date().toISOString();
+
+        const pin = ($("#setPin").value || "").trim();
+        if (pin){
+          s.pin_hash = await sha256Hex(pin);
+        }
+        persist();
+        toast("Saved ⚙️", "Settings updated");
+        renderSettings();
+        renderDashboard();
+        break;
+      }
+
+      case "clearPin":{
+        state.store.settings.pin_hash = "";
+        state.store.settings.updated_at = new Date().toISOString();
+        persist();
+        toast("PIN removed 🧼", "App lock disabled");
+        renderSettings();
+        break;
+      }
+
+      default: break;
+    }
+  }
+
+  // ============================================================
+  // Events
+  // ============================================================
+  function bindEvents(){
+    const nav = $("#nav");
+    nav.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tabbtn");
+      if (!btn) return;
+      setPage(btn.dataset.page);
+    });
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      handleAction(btn.dataset.action, btn.dataset.id || "");
+    });
+
+    const leadSearch = $("#leadSearch");
+    const leadStatus = $("#leadStatusFilter");
+    const vaultSearch = $("#vaultSearch");
+    const vaultType = $("#vaultType");
+    const taskFilter = $("#taskFilter");
+    const genLeadSelect = $("#genLeadSelect");
+
+    if (leadSearch) leadSearch.addEventListener("input", renderLeads);
+    if (leadStatus) leadStatus.addEventListener("change", renderLeads);
+    if (vaultSearch) vaultSearch.addEventListener("input", renderVault);
+    if (vaultType) vaultType.addEventListener("change", renderVault);
+    if (taskFilter) taskFilter.addEventListener("change", renderTasks);
+
+    if (genLeadSelect){
+      genLeadSelect.addEventListener("change", () => {
+        const id = genLeadSelect.value || "";
+        state.selectedLeadForGen = id;
+        if (id) applyLeadToGenerator(id);
+      });
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape"){
+        if ($("#modalOverlay").style.display === "flex") closeModal();
+      }
+    });
+
+    $("#modalOverlay").addEventListener("click", (e) => {
+      if (e.target === $("#modalOverlay")) closeModal();
+    });
+  }
+
+  // ============================================================
+  // Net + store status
+  // ============================================================
+  function initNetStatus(){
+    function update(){
+      const online = navigator.onLine;
+      $("#netDot").className = "dot " + (online ? "good" : "bad");
+      $("#netText").textContent = online ? "Online (optional)" : "Offline ✅";
+    }
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    update();
+  }
+
+  function initStoreStatus(){
+    const ok = Storage.ok;
+    $("#storeDot").className = "dot " + (ok ? "good" : "bad");
+    $("#storeText").textContent = ok ? "Local store ready" : ("Storage: " + (Storage.reason || "error"));
+  }
+
+  function renderAll(){
+    renderNav();
+    initStoreStatus();
+    renderSettings();
+    setPage(state.page); // triggers page render
+    renderDashboard();
+  }
+
+  // ============================================================
+  // Boot
+  // ============================================================
+  function boot(){
+    initNetStatus();
+    state.store = initStore();
+    initStoreStatus();
+
+    const s = state.store.settings;
+    $("#appSubtitle").textContent = `${s.company || "—"} • ${s.default_city || "—"} • ${s.default_service || "—"}`;
+
+    renderAll();
+    bindEvents();
+
+    // Lock on start if pin set
+    if (state.store.settings.pin_hash){
+      showLock();
+    }
+
+    toast("Ready ✅", "Offline console loaded");
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

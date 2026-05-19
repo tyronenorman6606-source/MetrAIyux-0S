@@ -1,55 +1,25 @@
-# SkyeMusicNexus Open Source Creation Studio Drop-In
+# SkyeMusicNexus Native Creation Stack
 
-This is a drop-in patch for the existing live SkyeMusicNexus NeoFront structure.
+The old third-party DAW sidecar path has been removed from this Nexus folder.
 
-It adds a real open-source creation lane instead of rebuilding the artist platform shell.
-
-## Added files
+Current creation rooms:
 
 ```txt
-SkyeMusicNexus/public/create.html
-SkyeMusicNexus/public/open-source-studio.css
-SkyeMusicNexus/public/open-source-studio.js
-SkyeMusicNexus/public/open-source-nav-snippet.html
-SkyeMusicNexus/src/open-source-studio-contract.json
-SkyeMusicNexus/open-source/open-source-manifest.json
-SkyeMusicNexus/open-source/scripts/install-open-source-engines.sh
-SkyeMusicNexus/docs/SKYE_MUSIC_NEXUS_OPEN_SOURCE_DROPIN.md
-SkyeMusicNexus/OPEN_SOURCE_PROOF_STATUS.md
+public/create.html
+public/daw.html
+public/nexus-daw.css
+public/nexus-daw.js
+public/stems.html
+public/exports.html
+public/discover.html
+public/feed.html
 netlify/functions/music-studio.js
 ```
 
-## Install
+## Native DAW V1
 
-Copy these files into the existing repo, preserving paths.
+`public/daw.html` is a first-party fullscreen Nexus DAW surface. It includes transport, tempo/key controls, arrangement timeline, track controls, clip import/decode/preview, mixer levels, drum pads, synth keys, physical keyboard notes, region editing, undo/redo, loop/metronome toggles, local loop packs, mic/Web MIDI hooks, browser WAV mixdown, local project save, and Release Forge manifest export.
 
-Add this nav item to the existing platform navs:
+## Boundary
 
-```html
-<a href="./create.html">Create</a>
-```
-
-Install open-source engines:
-
-```bash
-bash SkyeMusicNexus/open-source/scripts/install-open-source-engines.sh
-```
-
-Then open:
-
-```txt
-/SkyeMusicNexus/public/create.html
-```
-
-## Engine plan
-
-- openDAW: browser DAW bridge.
-- Ardour: desktop professional DAW companion.
-- LMMS: beat/MIDI/synth companion.
-- Audacity: waveform cleanup companion.
-
-## Function plan
-
-`netlify/functions/music-studio.js` handles gated studio project saves, export manifests, and engine records.
-
-Move its `/tmp` proof ledger to Citadel/Postgres for production.
+No vendored third-party DAW source or iframe bridge belongs in the Nexus DAW route.

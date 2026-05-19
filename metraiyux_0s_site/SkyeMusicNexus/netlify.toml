@@ -15,6 +15,22 @@
     Access-Control-Allow-Headers = "Content-Type, Authorization"
     Access-Control-Allow-Methods = "GET, POST, PUT, OPTIONS"
 
+[[headers]]
+  for = "/create.html"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Permissions-Policy = "cross-origin-isolated=(self)"
+
+[[headers]]
+  for = "/daw.html"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Permissions-Policy = "cross-origin-isolated=(self)"
+
 [[redirects]]
   from = "/api/music/analytics"
   to = "/.netlify/functions/music-analytics"
@@ -38,6 +54,11 @@
 [[redirects]]
   from = "/api/music/studio"
   to = "/.netlify/functions/music-studio"
+  status = 200
+
+[[redirects]]
+  from = "/api/music/social"
+  to = "/.netlify/functions/music-social"
   status = 200
 
 [[redirects]]

@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
@@ -117,7 +117,7 @@ function copyToStage(stage, excludes) {
   const excludeFile = path.join(os.tmpdir(), `skyevault-excludes-${Date.now()}.txt`);
   fs.writeFileSync(excludeFile, excludes.map((item) => item.file).join('\n'));
   fs.mkdirSync(stage, { recursive: true });
-  execFileSync('rsync', [
+  const rsyncArgs = [
     '-a',
     '--no-group',
     '--delete',
@@ -158,7 +158,17 @@ function copyToStage(stage, excludes) {
     `--exclude-from=${excludeFile}`,
     './',
     `${stage}/`
-  ], { cwd: root, stdio: 'inherit' });
+  ];
+  const result = spawnSync('rsync', rsyncArgs, { cwd: root, stdio: 'inherit' });
+  if (result.error) throw result.error;
+  if (result.status && result.status !== 24) {
+    const error = new Error(`rsync failed with status ${result.status}.`);
+    error.status = result.status;
+    throw error;
+  }
+  if (result.status === 24) {
+    console.warn('rsync reported vanished files while copying generated output; continuing with the consistent files that were staged.');
+  }
 }
 
 function scanStage(stage) {

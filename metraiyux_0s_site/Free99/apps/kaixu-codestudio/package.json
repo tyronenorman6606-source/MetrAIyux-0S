@@ -1,0 +1,22 @@
+{
+  "name": "kaixu-codestudio-platform",
+  "version": "5.9.1",
+  "private": true,
+  "type": "module",
+  "description": "kAIxu CodeStudio Pro executable platform engine with a premium website surface, SEO/AI discovery files, action-registry workflows, executable provider-pack actions, storage adapters, queue controls, webhook replay, and proof receipts.",
+  "scripts": {
+    "start": "node server/http-server.mjs",
+    "platform:server": "node server/http-server.mjs",
+    "smoke": "node scripts/smoke-platform.mjs",
+    "smoke:fixture": "CODESTUDIO_PROVIDER_MODE=fixture node scripts/smoke-platform.mjs",
+    "check": "node --check app/app.js && node --check dashboard.js && node --check server/http-server.mjs && node --check server/platform-engine.mjs && node --check scripts/browser-click-smoke.mjs && node scripts/smoke-platform.mjs --syntax-only",
+    "smoke:browser": "CODESTUDIO_PROVIDER_MODE=fixture node scripts/browser-click-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "optionalDependencies": {
+    "pg": "^8.13.1",
+    "better-sqlite3": "^11.8.1"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "networkName": "SovereignDocs Legal Partner Review Network",
+  "version": "9.0.0",
+  "mode": "operator-configured-external-review-network",
+  "partners": [
+    {
+      "id": "operator-configured-legal-network",
+      "displayName": "Configured Legal Partner Network",
+      "partnerType": "external_legal_review_pool",
+      "status": "configure_real_partner_roster_before_public_use",
+      "jurisdictions": [
+        "operator-configured"
+      ],
+      "reviewScopes": [
+        "business documents",
+        "contract review",
+        "formation packet review",
+        "landlord/property packet review",
+        "creator/media packet review",
+        "official-source prep packet review"
+      ],
+      "intakeMode": "SovereignDocs creates a review packet, then an authorized operator routes it to an external legal partner.",
+      "publicPromiseBoundary": "Partner routing is a request for review, not a guarantee that a legal partner will accept the matter or provide advice through SovereignDocs.",
+      "attorneyClientBoundary": "Any attorney-client relationship, if one is created, is between the user and the reviewing legal professional or firm under that partner's own engagement terms. SovereignDocs is not a law firm.",
+      "availability": "not guaranteed",
+      "sla": "not guaranteed until separately accepted by partner"
+    }
+  ],
+  "routingRules": {
+    "highRiskDefault": "review_required_or_prep_only",
+    "officialSourceDefault": "prep_packet_plus_external_official_source_route",
+    "publicExportBeforePartnerReview": "blocked_for_high_risk_completed_documents",
+    "operatorRolesAllowedToRoute": [
+      "owner",
+      "admin",
+      "operator",
+      "reviewer"
+    ],
+    "partnerRolesAllowedToUpdate": [
+      "owner",
+      "admin",
+      "operator",
+      "reviewer",
+      "legal_partner"
+    ]
+  },
+  "boundaries": [
+    "SovereignDocs is not a law firm and does not provide legal advice.",
+    "Submitting a packet for partner review does not create an attorney-client relationship with SovereignDocs.",
+    "SovereignDocs does not guarantee that any partner will accept, approve, revise, validate, or complete a review.",
+    "Partner review does not make SovereignDocs responsible for the user's facts, instructions, use, filing choices, deadlines, or outcomes.",
+    "Users are responsible for checking partner engagement terms, scope, fees, timelines, and jurisdiction limits."
+  ]
+}

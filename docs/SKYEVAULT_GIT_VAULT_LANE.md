@@ -21,9 +21,18 @@ The Git vault pack contains:
 - `manifest.json`: branch, head commit, refs, remotes with credentials redacted, status, hashes, source file manifest, and secret exclusions.
 - `integrity.json`: hashes for the manifest, bundle, source manifest, neural map, restore instructions, status, and refs.
 - `neural-map.json`: workspace/developer/repo/commit/file graph seed for the account brain map.
+- `SECRET_BOUNDARY.md`: local-only restore checklist for secrets, databases, private keys, generated state, and anything intentionally left out.
 - `RESTORE.md`: manual restore and push-back commands.
 
 The pack excludes `.env*`, private keys, credentials JSON, dependency folders, generated artifacts, dumps, local database files, previous archives, and any text file that matches the vault credential scanner.
+
+For a standalone local-only report before a handoff, run:
+
+```bash
+npm run vault:secrets:manifest
+```
+
+That writes JSON, Markdown, and `.paths.txt` reports under `.skyevault-out/secret-boundary/`. The reports list paths and reasons only; they do not print secret values.
 
 Set `SKYEVAULT_PACK_SIGNING_KEY` to attach an HMAC-SHA256 signature to `integrity.json`. Set `SKYEVAULT_PACK_SIGNING_KEY_ID` to label the active signing key without exposing the secret.
 

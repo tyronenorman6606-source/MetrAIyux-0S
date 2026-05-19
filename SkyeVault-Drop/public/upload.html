@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop Upload</title>
+    <meta name="description" content="Send project files, production media, repo snapshots, and handoff archives into SkyeVault-Drop." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body class="client-site route-upload">
+    <div class="spectacle-field" aria-hidden="true"></div>
+    <main class="site-shell">
+      <nav class="client-nav" aria-label="SkyeVault navigation">
+        <a class="nav-brand sky-brand" href="/" aria-label="SkyeVault-Drop home">
+          <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+          <span>
+            <strong>Skyes Over London</strong>
+            <small id="navBrandName">Drop Vault</small>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a class="nav-cta" href="/upload.html">Upload</a>
+          <a href="/vault.html">My Vault</a>
+          <a href="/repo.html">Repo Vault</a>
+          <a href="/process.html">Process</a>
+          <a href="/">Home</a>
+        </div>
+      </nav>
+
+      <aside class="vault-sidecar" aria-label="Vault routes">
+        <div class="sidecar-brand">
+          <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
+          <div>
+            <strong>Intake Room</strong>
+            <span>Files plus context</span>
+          </div>
+        </div>
+        <a href="/upload.html"><span>01</span> Secure intake</a>
+        <a href="/vault.html"><span>02</span> My vault files</a>
+        <a href="/repo.html"><span>03</span> Repo workspace</a>
+        <a href="/process.html"><span>04</span> Proof route</a>
+        <div class="sidecar-proof">
+          <strong>Upload boundary</strong>
+          <p>Send production files here. Keep local secrets and private recovery packages out of normal uploads.</p>
+        </div>
+      </aside>
+
+      <section id="upload" class="upload-layout">
+        <aside class="panel upload-instructions">
+          <p class="eyebrow">Vault Console</p>
+          <h1 class="page-title">Send files</h1>
+          <p id="publicInstructions" class="muted big-copy">Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.</p>
+          <div class="mini-metrics">
+            <div><strong id="destinationCount">0</strong><span>active destinations</span></div>
+            <div><strong id="chunkSizeLabel">8 MB</strong><span>upload chunk size</span></div>
+            <div><strong id="portalModeLabel">Code protected</strong><span>portal access</span></div>
+          </div>
+          <div id="destinationSummary" class="destination-summary"></div>
+          <div class="operator-seal">
+            <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+            <p>One package, full context, clean receipt. This is the working room for client and production assets.</p>
+          </div>
+          <p id="retentionNotice" class="notice-copy">Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.</p>
+        </aside>
+
+        <section class="panel upload-panel" aria-labelledby="uploadTitle">
+          <div class="panel-heading upload-heading">
+            <div>
+              <p class="eyebrow">Command Input</p>
+              <h2 id="uploadTitle">Drop files into the vault</h2>
+            </div>
+            <span id="queueSummary" class="queue-summary">No files selected</span>
+          </div>
+
+          <form id="uploadForm" class="upload-form">
+            <div class="grid two">
+              <label>
+                <span>Client name</span>
+                <input name="clientName" autocomplete="name" placeholder="Your name or company" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input name="clientEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Phone / text number</span>
+                <input name="clientPhone" autocomplete="tel" placeholder="Optional phone" />
+              </label>
+              <label>
+                <span>Website or project URL</span>
+                <input name="websiteUrl" type="url" placeholder="https://example.com" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Project / website</span>
+                <input name="projectName" placeholder="Project or vault folder" required />
+              </label>
+              <label>
+                <span>Client reference / job number</span>
+                <input name="clientReference" placeholder="Optional internal reference" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label>
+                <span>Asset type</span>
+                <select name="assetType">
+                  <option value="General project package">General project package</option>
+                  <option value="Website content">Website content</option>
+                  <option value="Brand assets">Brand assets</option>
+                  <option value="Photos / gallery">Photos / gallery</option>
+                  <option value="4K video / large media">4K video / large media</option>
+                  <option value="Revision request">Revision request</option>
+                  <option value="Launch / handoff docs">Launch / handoff docs</option>
+                </select>
+              </label>
+              <label>
+                <span>Needed by</span>
+                <input name="deadline" type="date" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <label id="portalKeyWrap" class="hidden">
+                <span>Upload access code</span>
+                <input name="portalKey" type="password" autocomplete="off" placeholder="Provided access code" />
+              </label>
+              <label>
+                <span>Destination</span>
+                <select name="destinationId" id="destinationSelect">
+                  <option value="">Auto route</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" rows="4" placeholder="Purpose, page, changes, deadline."></textarea>
+            </label>
+
+            <label class="hp-field" aria-hidden="true">
+              <span>Company website confirmation</span>
+              <input name="companyWebsite" tabindex="-1" autocomplete="off" />
+            </label>
+            <input name="turnstileToken" type="hidden" />
+            <div id="turnstileWrap" class="turnstile-wrap hidden"></div>
+
+            <div class="dropzone" id="dropzone">
+              <input id="fileInput" name="files" type="file" multiple />
+              <div>
+                <strong>Drop files into the vault</strong>
+                <p>Docs, images, videos, zips, brand packages, repo snapshots, exports, and production assets.</p>
+              </div>
+            </div>
+
+            <div class="queue-tools">
+              <button id="clearQueue" class="secondary-btn small-btn" type="button">Clear selected files</button>
+              <span id="selectedSize" class="muted">0 B selected</span>
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+
+            <div class="consent-box">
+              <label class="check-row strong-check">
+                <input name="usageRightsAccepted" type="checkbox" required />
+                <span>I confirm I have permission to send these files for project use.</span>
+              </label>
+              <label class="check-row strong-check">
+                <input name="retentionAcknowledged" type="checkbox" required />
+                <span>I understand these files will be stored for intake, production, review, and delivery.</span>
+              </label>
+            </div>
+
+            <div class="upload-actions-row">
+              <button class="primary-btn" type="submit">Start secure upload</button>
+              <button id="pauseUpload" class="secondary-btn" type="button" disabled>Pause current upload</button>
+            </div>
+          </form>
+
+          <div id="receiptPanel" class="receipt-panel hidden" aria-live="polite">
+            <div class="receipt-head">
+              <p class="eyebrow">Receipt</p>
+              <h3>Upload intake complete</h3>
+            </div>
+            <div class="receipt-toolbar">
+              <button id="copyReceipts" class="secondary-btn small-btn" type="button">Copy receipt JSON</button>
+              <button id="downloadReceipts" class="secondary-btn small-btn" type="button">Download receipt JSON</button>
+            </div>
+            <div id="receiptList" class="receipt-list"></div>
+          </div>
+
+          <div id="pendingPanel" class="receipt-panel warning-panel hidden" aria-live="polite">
+            <div class="receipt-head">
+              <p class="eyebrow">Receipt recovery</p>
+              <h3>Uploaded files waiting on ledger finalization</h3>
+            </div>
+            <p class="muted">These files reached storage, but the receipt call did not finish. Do not re-upload the same giant file. Retry finalization instead.</p>
+            <div id="pendingList" class="receipt-list"></div>
+            <button id="retryPending" class="secondary-btn small-btn" type="button">Retry pending receipts</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <template id="fileTemplate">
+      <article class="file-row">
+        <div>
+          <strong class="file-name"></strong>
+          <p class="file-meta"></p>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress"><span></span></div>
+          <small class="progress-label">Queued</small>
+        </div>
+        <button class="danger-btn small-btn remove-file" type="button">Remove</button>
+      </article>
+    </template>
+
+    <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
+    <script src="/assets/vendor/gsap.min.js" defer></script>
+    <script src="/assets/vendor/lenis.min.js" defer></script>
+    <script src="/assets/vault-motion.js" defer></script>
+    <script src="/assets/app.js" type="module"></script>
+  </body>
+</html>

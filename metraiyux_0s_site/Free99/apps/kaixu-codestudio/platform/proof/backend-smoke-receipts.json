@@ -1,0 +1,3416 @@
+[
+  {
+    "id": "rcpt_mp0gawyh_f00acd94fd",
+    "type": "project_import",
+    "ts": "2026-05-11T00:15:51.641Z",
+    "ok": true,
+    "projectId": "defa…rted",
+    "importId": "impo…60c7",
+    "counts": {
+      "providerInstalls": 5,
+      "workflowRuns": 11,
+      "webhookEvents": 2
+    }
+  },
+  {
+    "id": "rcpt_mp0gawxq_837f6dcecf",
+    "type": "project_export",
+    "ts": "2026-05-11T00:15:51.614Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "bundle": {
+      "id": "bund…b128",
+      "ts": "2026…611Z",
+      "projectId": "[redacted]",
+      "kind": "[redacted]",
+      "path": "data…json",
+      "bytes": 74114,
+      "hash": "b74d…b182",
+      "metadata": {
+        "schema": "kaix…e-v1"
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawxc_6d4b622332",
+    "type": "workflow_run_blocked",
+    "ts": "2026-05-11T00:15:51.600Z",
+    "ok": false,
+    "mode": "[redacted]",
+    "runId": "run_…0e3a",
+    "templateId": "chec…link",
+    "preflight": {
+      "ok": false,
+      "mode": "[redacted]",
+      "projectId": "[redacted]",
+      "templateId": "chec…link",
+      "workflow": {
+        "id": "chec…link",
+        "title": "Chec…link",
+        "category": "[redacted]",
+        "requiredProviders": [
+          "[redacted]",
+          "[redacted]"
+        ],
+        "steps": [
+          "crea…sion",
+          "emai…link",
+          "audi…eipt"
+        ],
+        "output": "chec…_url",
+        "templateId": "chec…link",
+        "runner": "serv…flow"
+      },
+      "missingProviders": [],
+      "providerProbes": {
+        "stripe": {
+          "ok": true,
+          "provider": "[redacted]",
+          "mode": "[redacted]",
+          "configured": true,
+          "missing": [],
+          "note": "Fixt…oof."
+        },
+        "resend": {
+          "ok": true,
+          "provider": "[redacted]",
+          "mode": "[redacted]",
+          "configured": true,
+          "missing": [],
+          "note": "Fixt…oof."
+        }
+      },
+      "providerInstalls": [
+        {
+          "id": "prov…b3eb",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "createdAt": "2026…280Z",
+          "lastRotatedAt": null,
+          "enabled": false,
+          "secretRef": "[redacted]",
+          "routes": [
+            "[redacted]",
+            "voic…call",
+            "webh…sage"
+          ],
+          "status": "[redacted]",
+          "updatedAt": "2026…280Z"
+        },
+        {
+          "id": "prov…6729",
+          "projectId": "[redacted]",
+          "providerId": "open…eway",
+          "createdAt": "2026…267Z",
+          "lastRotatedAt": null,
+          "enabled": true,
+          "secretRef": "[redacted]",
+          "routes": [
+            "[redacted]",
+            "ai.s…rize",
+            "ai.c…sify"
+          ],
+          "status": "inst…lled",
+          "updatedAt": "2026…267Z"
+        },
+        {
+          "id": "prov…5316",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "createdAt": "2026…260Z",
+          "lastRotatedAt": null,
+          "enabled": true,
+          "secretRef": "[redacted]",
+          "routes": [
+            "[redacted]"
+          ],
+          "status": "inst…lled",
+          "updatedAt": "2026…260Z"
+        },
+        {
+          "id": "prov…51dc",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "createdAt": "2026…254Z",
+          "lastRotatedAt": null,
+          "enabled": true,
+          "secretRef": "[redacted]",
+          "routes": [
+            "emai…send",
+            "emai…ence",
+            "webh…mail"
+          ],
+          "status": "inst…lled",
+          "updatedAt": "2026…254Z"
+        },
+        {
+          "id": "prov…f1fe",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "createdAt": "2026…248Z",
+          "lastRotatedAt": null,
+          "enabled": true,
+          "secretRef": "[redacted]",
+          "routes": [
+            "chec…eate",
+            "invo…send",
+            "webh…ment"
+          ],
+          "status": "inst…lled",
+          "updatedAt": "2026…248Z"
+        }
+      ],
+      "policy": {
+        "ok": false,
+        "blocks": [
+          {
+            "code": "appr…ired",
+            "ruleId": "pol_…alls",
+            "message": "Paym…500."
+          }
+        ],
+        "warnings": [],
+        "workflowId": "chec…link"
+      },
+      "approval": {
+        "id": "appr…d109",
+        "ts": "2026…594Z",
+        "status": "[redacted]",
+        "projectId": "[redacted]",
+        "reason": "work…cked",
+        "subject": "chec…cked",
+        "requestedBy": null,
+        "policy": {
+          "ok": false,
+          "blocks": [
+            {
+              "code": "appr…ired",
+              "ruleId": "pol_…alls",
+              "message": "Paym…500."
+            }
+          ],
+          "warnings": [],
+          "workflowId": "chec…link"
+        },
+        "payload": {
+          "templateId": "chec…link",
+          "input": {
+            "projectId": "[redacted]",
+            "to": "smok…test",
+            "amountCents": 9999999,
+            "productName": "Appr…ired"
+          }
+        }
+      },
+      "receipt": {
+        "id": "rcpt…36bb",
+        "type": "work…ight",
+        "ts": "2026…599Z",
+        "ok": false,
+        "mode": "[red…ted]",
+        "projectId": "[red…ted]",
+        "templateId": "chec…link",
+        "workflowId": "chec…link",
+        "missingProviders": [],
+        "providerProbes": {
+          "stripe": {
+            "ok": true,
+            "provider": "[red…ted]",
+            "mode": "[red…ted]",
+            "configured": true,
+            "missing": [],
+            "note": "Fixt…oof."
+          },
+          "resend": {
+            "ok": true,
+            "provider": "[red…ted]",
+            "mode": "[red…ted]",
+            "configured": true,
+            "missing": [],
+            "note": "Fixt…oof."
+          }
+        },
+        "providerInstalls": [
+          {
+            "id": "prov…b3eb",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "createdAt": "2026…280Z",
+            "lastRotatedAt": null,
+            "enabled": false,
+            "secretRef": "[redacted]",
+            "routes": [
+              "[red…ted]",
+              "voic…call",
+              "webh…sage"
+            ],
+            "status": "[red…ted]",
+            "updatedAt": "2026…280Z"
+          },
+          {
+            "id": "prov…6729",
+            "projectId": "[red…ted]",
+            "providerId": "open…eway",
+            "createdAt": "2026…267Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "[red…ted]",
+              "ai.s…rize",
+              "ai.c…sify"
+            ],
+            "status": "inst…lled",
+            "updatedAt": "2026…267Z"
+          },
+          {
+            "id": "prov…5316",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "createdAt": "2026…260Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "[red…ted]"
+            ],
+            "status": "inst…lled",
+            "updatedAt": "2026…260Z"
+          },
+          {
+            "id": "prov…51dc",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "createdAt": "2026…254Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "emai…send",
+              "emai…ence",
+              "webh…mail"
+            ],
+            "status": "inst…lled",
+            "updatedAt": "2026…254Z"
+          },
+          {
+            "id": "prov…f1fe",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "createdAt": "2026…248Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "chec…eate",
+              "invo…send",
+              "webh…ment"
+            ],
+            "status": "inst…lled",
+            "updatedAt": "2026…248Z"
+          }
+        ],
+        "policy": {
+          "ok": false,
+          "blocks": [
+            {
+              "code": "appr…ired",
+              "ruleId": "pol_…alls",
+              "message": "Paym…500."
+            }
+          ],
+          "warnings": [],
+          "workflowId": "chec…link"
+        },
+        "approval": {
+          "id": "appr…d109",
+          "ts": "2026…594Z",
+          "status": "[red…ted]",
+          "projectId": "[red…ted]",
+          "reason": "work…cked",
+          "subject": "chec…cked",
+          "requestedBy": null,
+          "policy": {
+            "ok": false,
+            "blocks": [
+              {
+                "code": "appr…ired",
+                "ruleId": "pol_…alls",
+                "message": "Paym…500."
+              }
+            ],
+            "warnings": [],
+            "workflowId": "chec…link"
+          },
+          "payload": {
+            "templateId": "chec…link",
+            "input": {
+              "projectId": "[red…ted]",
+              "to": "smok…test",
+              "amountCents": 9999999,
+              "productName": "Appr…ired"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawxb_ef816f36bb",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.599Z",
+    "ok": false,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "chec…link",
+    "workflowId": "chec…link",
+    "missingProviders": [],
+    "providerProbes": {
+      "stripe": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": [],
+        "note": "Fixt…oof."
+      },
+      "resend": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": [],
+        "note": "Fixt…oof."
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": false,
+      "blocks": [
+        {
+          "code": "appr…ired",
+          "ruleId": "pol_…alls",
+          "message": "Paym…500."
+        }
+      ],
+      "warnings": [],
+      "workflowId": "chec…link"
+    },
+    "approval": {
+      "id": "appr…d109",
+      "ts": "2026…594Z",
+      "status": "[redacted]",
+      "projectId": "[redacted]",
+      "reason": "work…cked",
+      "subject": "chec…cked",
+      "requestedBy": null,
+      "policy": {
+        "ok": false,
+        "blocks": [
+          {
+            "code": "appr…ired",
+            "ruleId": "pol_…alls",
+            "message": "Paym…500."
+          }
+        ],
+        "warnings": [],
+        "workflowId": "chec…link"
+      },
+      "payload": {
+        "templateId": "chec…link",
+        "input": {
+          "projectId": "[redacted]",
+          "to": "smok…test",
+          "amountCents": 9999999,
+          "productName": "Appr…ired"
+        }
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawwy_85f7cdbe64",
+    "type": "webhook_replay",
+    "ts": "2026-05-11T00:15:51.586Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "event": {
+      "id": "evt_…2b81",
+      "ts": "2026…568Z",
+      "status": "disp…_ran",
+      "projectId": "[redacted]",
+      "payload": {
+        "projectId": "[redacted]",
+        "provider": "[redacted]",
+        "type": "chec…eted",
+        "data": {
+          "id": "cs_d…moke"
+        }
+      },
+      "provider": "[redacted]",
+      "type": "chec…eted",
+      "requestedBy": null,
+      "idempotencyKey": "[redacted]",
+      "verification": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "verified": false,
+        "reason": "fixt…pass"
+      },
+      "replayedAt": "2026…584Z",
+      "replayedBy": null,
+      "dispatch": {
+        "ok": true,
+        "mode": "[redacted]",
+        "ruleId": "stri…note",
+        "workflowId": "db_q…mary",
+        "runId": "run_…9ef6",
+        "receiptId": "rcpt…6e87",
+        "error": null
+      },
+      "updatedAt": "2026…584Z"
+    },
+    "dispatch": {
+      "ok": true,
+      "mode": "[redacted]",
+      "ruleId": "stri…note",
+      "workflowId": "db_q…mary",
+      "runId": "run_…9ef6",
+      "receiptId": "rcpt…6e87",
+      "error": null
+    }
+  },
+  {
+    "id": "rcpt_mp0gawwu_b8e4066e87",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.582Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…9ef6",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "actionRegistry": true,
+    "output": {
+      "db": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…8e54",
+        "ts": "2026…575Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "88b8…a4c2"
+          }
+        ],
+        "rowCount": 1
+      },
+      "summary": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…031c",
+        "ts": "2026…575Z",
+        "text": "Fixt…ons."
+      },
+      "summaryMarkdown": "Fixt…ons."
+    },
+    "steps": [
+      {
+        "step": "run_…uery",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…8e54",
+          "ts": "2026…575Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "88b8…a4c2"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      {
+        "step": "summ…rows",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…031c",
+          "ts": "2026…575Z",
+          "text": "Fixt…ons."
+        }
+      },
+      {
+        "step": "expo…mary",
+        "action": "plat…port",
+        "result": {
+          "ok": true,
+          "bytes": 96
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…42a1",
+        "ts": "2026…578Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "db_q…mary",
+        "runId": "run_…9ef6",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…cc43",
+        "ts": "2026…580Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "db_q…mary",
+        "runId": "run_…9ef6",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawwm_fe9fc613b2",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.574Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "missingProviders": [],
+    "providerProbes": {
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "db_q…mary"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawwi_9d50ad9edb",
+    "type": "webhook_ingest",
+    "ts": "2026-05-11T00:15:51.570Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "event": {
+      "id": "evt_…2b81",
+      "ts": "2026…568Z",
+      "status": "[redacted]",
+      "projectId": "[redacted]",
+      "payload": {
+        "projectId": "[redacted]",
+        "provider": "[redacted]",
+        "type": "chec…eted",
+        "data": {
+          "id": "cs_d…moke"
+        }
+      },
+      "provider": "[redacted]",
+      "type": "chec…eted",
+      "requestedBy": null,
+      "idempotencyKey": "[redacted]",
+      "verification": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "verified": false,
+        "reason": "fixt…pass"
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawwd_4c3ae0a738",
+    "type": "webhook_replay",
+    "ts": "2026-05-11T00:15:51.565Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "event": {
+      "id": "evt_…26a6",
+      "ts": "2026…544Z",
+      "status": "disp…_ran",
+      "projectId": "[redacted]",
+      "payload": {
+        "projectId": "[redacted]",
+        "provider": "[redacted]",
+        "type": "chec…eted",
+        "data": {
+          "id": "[redacted]"
+        }
+      },
+      "provider": "[redacted]",
+      "type": "chec…eted",
+      "requestedBy": null,
+      "idempotencyKey": "[redacted]",
+      "verification": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "verified": false,
+        "reason": "fixt…pass"
+      },
+      "replayedAt": "2026…563Z",
+      "replayedBy": null,
+      "dispatch": {
+        "ok": true,
+        "mode": "[redacted]",
+        "ruleId": "stri…note",
+        "workflowId": "db_q…mary",
+        "runId": "run_…6500",
+        "receiptId": "rcpt…6000",
+        "error": null
+      },
+      "updatedAt": "2026…563Z"
+    },
+    "dispatch": {
+      "ok": true,
+      "mode": "[redacted]",
+      "ruleId": "stri…note",
+      "workflowId": "db_q…mary",
+      "runId": "run_…6500",
+      "receiptId": "rcpt…6000",
+      "error": null
+    }
+  },
+  {
+    "id": "rcpt_mp0gaww8_ba20de6000",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.560Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…6500",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "actionRegistry": true,
+    "output": {
+      "db": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…6cfe",
+        "ts": "2026…553Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "88b8…a4c2"
+          }
+        ],
+        "rowCount": 1
+      },
+      "summary": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…2126",
+        "ts": "2026…553Z",
+        "text": "Fixt…ons."
+      },
+      "summaryMarkdown": "Fixt…ons."
+    },
+    "steps": [
+      {
+        "step": "run_…uery",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…6cfe",
+          "ts": "2026…553Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "88b8…a4c2"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      {
+        "step": "summ…rows",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…2126",
+          "ts": "2026…553Z",
+          "text": "Fixt…ons."
+        }
+      },
+      {
+        "step": "expo…mary",
+        "action": "plat…port",
+        "result": {
+          "ok": true,
+          "bytes": 96
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…ad9e",
+        "ts": "2026…555Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "db_q…mary",
+        "runId": "run_…6500",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…7381",
+        "ts": "2026…557Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "db_q…mary",
+        "runId": "run_…6500",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gaww0_0fa68a172b",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.552Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "missingProviders": [],
+    "providerProbes": {
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "db_q…mary"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawvw_1debd4dee2",
+    "type": "webhook_ingest_duplicate",
+    "ts": "2026-05-11T00:15:51.548Z",
+    "ok": true,
+    "duplicate": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "eventId": "evt_…26a6",
+    "idempotencyKey": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawvu_fe04d57ba6",
+    "type": "webhook_ingest",
+    "ts": "2026-05-11T00:15:51.546Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "event": {
+      "id": "evt_…26a6",
+      "ts": "2026…544Z",
+      "status": "[redacted]",
+      "projectId": "[redacted]",
+      "payload": {
+        "projectId": "[redacted]",
+        "provider": "[redacted]",
+        "type": "chec…eted",
+        "data": {
+          "id": "[redacted]"
+        }
+      },
+      "provider": "[redacted]",
+      "type": "chec…eted",
+      "requestedBy": null,
+      "idempotencyKey": "[redacted]",
+      "verification": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "verified": false,
+        "reason": "fixt…pass"
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawvp_bee085168c",
+    "type": "job_drain",
+    "ts": "2026-05-11T00:15:51.541Z",
+    "ok": true,
+    "count": 1,
+    "results": [
+      {
+        "ok": true,
+        "jobId": "job_…eec0",
+        "status": "comp…eted"
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawvo_2b0fba9254",
+    "type": "job_run",
+    "ts": "2026-05-11T00:15:51.540Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…eec0",
+    "workflowId": "db_q…mary",
+    "status": "comp…eted",
+    "attempts": 1,
+    "lockId": "lock…a213",
+    "result": {
+      "ok": true,
+      "mode": "[redacted]",
+      "runId": "run_…d682",
+      "projectId": "[redacted]",
+      "templateId": "db_q…mary",
+      "actionRegistry": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…44ac",
+          "ts": "2026…524Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "bf5d…4506"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…841a",
+          "ts": "2026…524Z",
+          "text": "Fixt…ion\""
+        },
+        "summaryMarkdown": "Fixt…ion\""
+      },
+      "steps": [
+        {
+          "step": "run_…uery",
+          "providerId": "[redacted]",
+          "action": "[redacted]",
+          "result": {
+            "ok": true,
+            "provider": "[redacted]",
+            "action": "[redacted]",
+            "mode": "[redacted]",
+            "fixture": true,
+            "id": "neon…44ac",
+            "ts": "2026…524Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "bf5d…4506"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summ…rows",
+          "providerId": "open…eway",
+          "action": "[redacted]",
+          "result": {
+            "ok": true,
+            "provider": "open…eway",
+            "action": "[redacted]",
+            "mode": "[redacted]",
+            "fixture": true,
+            "id": "open…841a",
+            "ts": "2026…524Z",
+            "text": "Fixt…ion\""
+          }
+        },
+        {
+          "step": "expo…mary",
+          "action": "plat…port",
+          "result": {
+            "ok": true,
+            "bytes": 103
+          }
+        }
+      ],
+      "meters": [
+        {
+          "id": "mete…4b1c",
+          "ts": "2026…527Z",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "workflowId": "db_q…mary",
+          "runId": "run_…d682",
+          "unit": "[redacted]",
+          "quantity": 1,
+          "costCents": 0,
+          "metadata": {
+            "mode": "[redacted]",
+            "packSource": "file…json"
+          }
+        },
+        {
+          "id": "mete…ba90",
+          "ts": "2026…533Z",
+          "projectId": "[redacted]",
+          "providerId": "open…eway",
+          "workflowId": "db_q…mary",
+          "runId": "run_…d682",
+          "unit": "[redacted]",
+          "quantity": 1,
+          "costCents": 1,
+          "metadata": {
+            "mode": "[redacted]",
+            "packSource": "file…json"
+          }
+        }
+      ],
+      "receipt": {
+        "id": "rcpt…6065",
+        "type": "work…_run",
+        "ts": "2026…535Z",
+        "ok": true,
+        "mode": "[red…ted]",
+        "runId": "run_…d682",
+        "projectId": "[red…ted]",
+        "templateId": "db_q…mary",
+        "workflowId": "db_q…mary",
+        "actionRegistry": true,
+        "output": {
+          "db": {
+            "ok": true,
+            "provider": "[red…ted]",
+            "action": "[red…ted]",
+            "mode": "[red…ted]",
+            "fixture": true,
+            "id": "neon…44ac",
+            "ts": "2026…524Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "bf5d…4506"
+              }
+            ],
+            "rowCount": 1
+          },
+          "summary": {
+            "ok": true,
+            "provider": "open…eway",
+            "action": "[red…ted]",
+            "mode": "[red…ted]",
+            "fixture": true,
+            "id": "open…841a",
+            "ts": "2026…524Z",
+            "text": "Fixt…ion\""
+          },
+          "summaryMarkdown": "Fixt…ion\""
+        },
+        "steps": [
+          {
+            "step": "run_…uery",
+            "providerId": "[red…ted]",
+            "action": "[red…ted]",
+            "result": {
+              "ok": true,
+              "provider": "[red…ted]",
+              "action": "[red…ted]",
+              "mode": "[red…ted]",
+              "fixture": true,
+              "id": "neon…44ac",
+              "ts": "2026…524Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "bf5d…4506"
+                }
+              ],
+              "rowCount": 1
+            }
+          },
+          {
+            "step": "summ…rows",
+            "providerId": "open…eway",
+            "action": "[red…ted]",
+            "result": {
+              "ok": true,
+              "provider": "open…eway",
+              "action": "[red…ted]",
+              "mode": "[red…ted]",
+              "fixture": true,
+              "id": "open…841a",
+              "ts": "2026…524Z",
+              "text": "Fixt…ion\""
+            }
+          },
+          {
+            "step": "expo…mary",
+            "action": "plat…port",
+            "result": {
+              "ok": true,
+              "bytes": 103
+            }
+          }
+        ],
+        "meters": [
+          {
+            "id": "mete…4b1c",
+            "ts": "2026…527Z",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "workflowId": "db_q…mary",
+            "runId": "run_…d682",
+            "unit": "[red…ted]",
+            "quantity": 1,
+            "costCents": 0,
+            "metadata": {
+              "mode": "[red…ted]",
+              "packSource": "file…json"
+            }
+          },
+          {
+            "id": "mete…ba90",
+            "ts": "2026…533Z",
+            "projectId": "[red…ted]",
+            "providerId": "open…eway",
+            "workflowId": "db_q…mary",
+            "runId": "run_…d682",
+            "unit": "[red…ted]",
+            "quantity": 1,
+            "costCents": 1,
+            "metadata": {
+              "mode": "[red…ted]",
+              "packSource": "file…json"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawvj_47071a6065",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.535Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…d682",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "actionRegistry": true,
+    "output": {
+      "db": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…44ac",
+        "ts": "2026…524Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "bf5d…4506"
+          }
+        ],
+        "rowCount": 1
+      },
+      "summary": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…841a",
+        "ts": "2026…524Z",
+        "text": "Fixt…ion\""
+      },
+      "summaryMarkdown": "Fixt…ion\""
+    },
+    "steps": [
+      {
+        "step": "run_…uery",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…44ac",
+          "ts": "2026…524Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "bf5d…4506"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      {
+        "step": "summ…rows",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…841a",
+          "ts": "2026…524Z",
+          "text": "Fixt…ion\""
+        }
+      },
+      {
+        "step": "expo…mary",
+        "action": "plat…port",
+        "result": {
+          "ok": true,
+          "bytes": 103
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…4b1c",
+        "ts": "2026…527Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "db_q…mary",
+        "runId": "run_…d682",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…ba90",
+        "ts": "2026…533Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "db_q…mary",
+        "runId": "run_…d682",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawv8_756f1deaeb",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.524Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "missingProviders": [],
+    "providerProbes": {
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "db_q…mary"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawv2_fe5847b6cd",
+    "type": "schedule_tick",
+    "ts": "2026-05-11T00:15:51.518Z",
+    "ok": true,
+    "due": 1,
+    "enqueued": [
+      "job_…eec0"
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawuz_c06fae21c4",
+    "type": "job_enqueued",
+    "ts": "2026-05-11T00:15:51.515Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…eec0",
+    "workflowId": "db_q…mary"
+  },
+  {
+    "id": "rcpt_mp0gawuw_34b4b5c7d0",
+    "type": "schedule_upsert",
+    "ts": "2026-05-11T00:15:51.512Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "scheduleId": "sche…6b2c",
+    "workflowId": "db_q…mary"
+  },
+  {
+    "id": "rcpt_mp0gawuo_360796711b",
+    "type": "dead_letter_retried",
+    "ts": "2026-05-11T00:15:51.504Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "deadLetterId": "dead…bfeb",
+    "retryJobId": "job_…cc0b"
+  },
+  {
+    "id": "rcpt_mp0gawuk_ae01387c3f",
+    "type": "job_run",
+    "ts": "2026-05-11T00:15:51.500Z",
+    "ok": false,
+    "projectId": "[redacted]",
+    "jobId": "job_…bc46",
+    "workflowId": "miss…tter",
+    "status": "[redacted]",
+    "attempts": 1,
+    "lockId": "lock…6e78",
+    "result": {
+      "ok": false,
+      "blocked": true,
+      "runId": "run_…46c5",
+      "preflight": {
+        "ok": false,
+        "templateId": "miss…tter",
+        "blocks": [
+          {
+            "code": "unkn…flow",
+            "message": "Work…und."
+          }
+        ]
+      },
+      "receipt": {
+        "id": "rcpt…a4cc",
+        "type": "work…cked",
+        "ts": "2026…495Z",
+        "ok": false,
+        "mode": "[red…ted]",
+        "runId": "run_…46c5",
+        "templateId": "miss…tter",
+        "preflight": {
+          "ok": false,
+          "templateId": "miss…tter",
+          "blocks": [
+            {
+              "code": "unkn…flow",
+              "message": "Work…und."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawuf_841466a4cc",
+    "type": "workflow_run_blocked",
+    "ts": "2026-05-11T00:15:51.495Z",
+    "ok": false,
+    "mode": "[redacted]",
+    "runId": "run_…46c5",
+    "templateId": "miss…tter",
+    "preflight": {
+      "ok": false,
+      "templateId": "miss…tter",
+      "blocks": [
+        {
+          "code": "unkn…flow",
+          "message": "Work…und."
+        }
+      ]
+    }
+  },
+  {
+    "id": "rcpt_mp0gawub_74eb31e46a",
+    "type": "job_enqueued",
+    "ts": "2026-05-11T00:15:51.491Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…bc46",
+    "workflowId": "miss…tter"
+  },
+  {
+    "id": "rcpt_mp0gawu7_e824877a86",
+    "type": "job_stale_lock_recovery",
+    "ts": "2026-05-11T00:15:51.487Z",
+    "ok": true,
+    "recovered": []
+  },
+  {
+    "id": "rcpt_mp0gawu6_0db385ab24",
+    "type": "job_cancelled",
+    "ts": "2026-05-11T00:15:51.486Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…22d9",
+    "reason": "smok…ncel"
+  },
+  {
+    "id": "rcpt_mp0gawu3_867dee3fa2",
+    "type": "job_enqueued",
+    "ts": "2026-05-11T00:15:51.483Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…22d9",
+    "workflowId": "db_q…mary"
+  },
+  {
+    "id": "rcpt_mp0gawtz_431602dda8",
+    "type": "job_cancelled",
+    "ts": "2026-05-11T00:15:51.479Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…f950",
+    "reason": "clea…moke"
+  },
+  {
+    "id": "rcpt_mp0gawtv_e86dbbee3b",
+    "type": "job_lock_extended",
+    "ts": "2026-05-11T00:15:51.475Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…f950",
+    "lockExpiresAt": "2026…468Z"
+  },
+  {
+    "id": "rcpt_mp0gawtk_595689ab9e",
+    "type": "job_enqueued",
+    "ts": "2026-05-11T00:15:51.464Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…f950",
+    "workflowId": "db_q…mary"
+  },
+  {
+    "id": "rcpt_mp0gawtc_0a01aa459d",
+    "type": "job_run",
+    "ts": "2026-05-11T00:15:51.456Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…463c",
+    "workflowId": "db_q…mary",
+    "status": "comp…eted",
+    "attempts": 1,
+    "lockId": "lock…13d8",
+    "result": {
+      "ok": true,
+      "mode": "[redacted]",
+      "runId": "run_…d9f5",
+      "projectId": "[redacted]",
+      "templateId": "db_q…mary",
+      "actionRegistry": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…fba0",
+          "ts": "2026…446Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "a9df…8cdd"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…e675",
+          "ts": "2026…446Z",
+          "text": "Fixt…ion\""
+        },
+        "summaryMarkdown": "Fixt…ion\""
+      },
+      "steps": [
+        {
+          "step": "run_…uery",
+          "providerId": "[redacted]",
+          "action": "[redacted]",
+          "result": {
+            "ok": true,
+            "provider": "[redacted]",
+            "action": "[redacted]",
+            "mode": "[redacted]",
+            "fixture": true,
+            "id": "neon…fba0",
+            "ts": "2026…446Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "a9df…8cdd"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summ…rows",
+          "providerId": "open…eway",
+          "action": "[redacted]",
+          "result": {
+            "ok": true,
+            "provider": "open…eway",
+            "action": "[redacted]",
+            "mode": "[redacted]",
+            "fixture": true,
+            "id": "open…e675",
+            "ts": "2026…446Z",
+            "text": "Fixt…ion\""
+          }
+        },
+        {
+          "step": "expo…mary",
+          "action": "plat…port",
+          "result": {
+            "ok": true,
+            "bytes": 103
+          }
+        }
+      ],
+      "meters": [
+        {
+          "id": "mete…83b6",
+          "ts": "2026…449Z",
+          "projectId": "[redacted]",
+          "providerId": "[redacted]",
+          "workflowId": "db_q…mary",
+          "runId": "run_…d9f5",
+          "unit": "[redacted]",
+          "quantity": 1,
+          "costCents": 0,
+          "metadata": {
+            "mode": "[redacted]",
+            "packSource": "file…json"
+          }
+        },
+        {
+          "id": "mete…4a9a",
+          "ts": "2026…450Z",
+          "projectId": "[redacted]",
+          "providerId": "open…eway",
+          "workflowId": "db_q…mary",
+          "runId": "run_…d9f5",
+          "unit": "[redacted]",
+          "quantity": 1,
+          "costCents": 1,
+          "metadata": {
+            "mode": "[redacted]",
+            "packSource": "file…json"
+          }
+        }
+      ],
+      "receipt": {
+        "id": "rcpt…47fa",
+        "type": "work…_run",
+        "ts": "2026…452Z",
+        "ok": true,
+        "mode": "[red…ted]",
+        "runId": "run_…d9f5",
+        "projectId": "[red…ted]",
+        "templateId": "db_q…mary",
+        "workflowId": "db_q…mary",
+        "actionRegistry": true,
+        "output": {
+          "db": {
+            "ok": true,
+            "provider": "[red…ted]",
+            "action": "[red…ted]",
+            "mode": "[red…ted]",
+            "fixture": true,
+            "id": "neon…fba0",
+            "ts": "2026…446Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "a9df…8cdd"
+              }
+            ],
+            "rowCount": 1
+          },
+          "summary": {
+            "ok": true,
+            "provider": "open…eway",
+            "action": "[red…ted]",
+            "mode": "[red…ted]",
+            "fixture": true,
+            "id": "open…e675",
+            "ts": "2026…446Z",
+            "text": "Fixt…ion\""
+          },
+          "summaryMarkdown": "Fixt…ion\""
+        },
+        "steps": [
+          {
+            "step": "run_…uery",
+            "providerId": "[red…ted]",
+            "action": "[red…ted]",
+            "result": {
+              "ok": true,
+              "provider": "[red…ted]",
+              "action": "[red…ted]",
+              "mode": "[red…ted]",
+              "fixture": true,
+              "id": "neon…fba0",
+              "ts": "2026…446Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "a9df…8cdd"
+                }
+              ],
+              "rowCount": 1
+            }
+          },
+          {
+            "step": "summ…rows",
+            "providerId": "open…eway",
+            "action": "[red…ted]",
+            "result": {
+              "ok": true,
+              "provider": "open…eway",
+              "action": "[red…ted]",
+              "mode": "[red…ted]",
+              "fixture": true,
+              "id": "open…e675",
+              "ts": "2026…446Z",
+              "text": "Fixt…ion\""
+            }
+          },
+          {
+            "step": "expo…mary",
+            "action": "plat…port",
+            "result": {
+              "ok": true,
+              "bytes": 103
+            }
+          }
+        ],
+        "meters": [
+          {
+            "id": "mete…83b6",
+            "ts": "2026…449Z",
+            "projectId": "[red…ted]",
+            "providerId": "[red…ted]",
+            "workflowId": "db_q…mary",
+            "runId": "run_…d9f5",
+            "unit": "[red…ted]",
+            "quantity": 1,
+            "costCents": 0,
+            "metadata": {
+              "mode": "[red…ted]",
+              "packSource": "file…json"
+            }
+          },
+          {
+            "id": "mete…4a9a",
+            "ts": "2026…450Z",
+            "projectId": "[red…ted]",
+            "providerId": "open…eway",
+            "workflowId": "db_q…mary",
+            "runId": "run_…d9f5",
+            "unit": "[red…ted]",
+            "quantity": 1,
+            "costCents": 1,
+            "metadata": {
+              "mode": "[red…ted]",
+              "packSource": "file…json"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rcpt_mp0gawt8_1f2bb647fa",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.452Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…d9f5",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "actionRegistry": true,
+    "output": {
+      "db": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…fba0",
+        "ts": "2026…446Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "a9df…8cdd"
+          }
+        ],
+        "rowCount": 1
+      },
+      "summary": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…e675",
+        "ts": "2026…446Z",
+        "text": "Fixt…ion\""
+      },
+      "summaryMarkdown": "Fixt…ion\""
+    },
+    "steps": [
+      {
+        "step": "run_…uery",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…fba0",
+          "ts": "2026…446Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "a9df…8cdd"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      {
+        "step": "summ…rows",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…e675",
+          "ts": "2026…446Z",
+          "text": "Fixt…ion\""
+        }
+      },
+      {
+        "step": "expo…mary",
+        "action": "plat…port",
+        "result": {
+          "ok": true,
+          "bytes": 103
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…83b6",
+        "ts": "2026…449Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "db_q…mary",
+        "runId": "run_…d9f5",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…4a9a",
+        "ts": "2026…450Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "db_q…mary",
+        "runId": "run_…d9f5",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawt2_6044a8ad57",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.446Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "missingProviders": [],
+    "providerProbes": {
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "db_q…mary"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawsw_8028b1ca8f",
+    "type": "job_enqueued",
+    "ts": "2026-05-11T00:15:51.440Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "jobId": "job_…463c",
+    "workflowId": "db_q…mary"
+  },
+  {
+    "id": "rcpt_mp0gawso_491e43be3f",
+    "type": "incident_resolved",
+    "ts": "2026-05-11T00:15:51.432Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "incidentId": "inc_…d77f",
+    "status": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawsj_852f1c38a1",
+    "type": "incident_opened",
+    "ts": "2026-05-11T00:15:51.427Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "incidentId": "inc_…d77f",
+    "severity": "[redacted]",
+    "title": "Smok…dent"
+  },
+  {
+    "id": "rcpt_mp0gawsd_873fd5a6c5",
+    "type": "entitlement_checked",
+    "ts": "2026-05-11T00:15:51.421Z",
+    "ok": false,
+    "projectId": "[redacted]",
+    "key": "[redacted]",
+    "reason": "enti…eded"
+  },
+  {
+    "id": "rcpt_mp0gaws9_a060f363e4",
+    "type": "entitlement_checked",
+    "ts": "2026-05-11T00:15:51.417Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "key": "[redacted]",
+    "reason": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gaws4_0db677f465",
+    "type": "entitlement_upserted",
+    "ts": "2026-05-11T00:15:51.412Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "key": "[redacted]",
+    "enabled": true,
+    "limit": 1
+  },
+  {
+    "id": "rcpt_mp0gawrq_8a67b99cfb",
+    "type": "form_submitted",
+    "ts": "2026-05-11T00:15:51.398Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "formId": "form…8aa6",
+    "recordId": "rec_…bfb1",
+    "workflowOk": true
+  },
+  {
+    "id": "rcpt_mp0gawro_645d4c07ff",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.396Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…f60e",
+    "projectId": "[redacted]",
+    "templateId": "qual…lead",
+    "workflowId": "qual…lead",
+    "actionRegistry": true,
+    "output": {
+      "normalizedLead": {
+        "email": "lead…test",
+        "company": "[redacted]",
+        "source": "[redacted]"
+      },
+      "leadScore": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…0eff",
+        "ts": "2026…383Z",
+        "text": "Fixt…l\":\""
+      },
+      "crmWrite": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…8a74",
+        "ts": "2026…383Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "4d1f…0e53"
+          }
+        ],
+        "rowCount": 1
+      }
+    },
+    "steps": [
+      {
+        "step": "norm…lead",
+        "action": "plat…lize",
+        "result": {
+          "ok": true,
+          "normalized": true
+        }
+      },
+      {
+        "step": "scor…_fit",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…0eff",
+          "ts": "2026…383Z",
+          "text": "Fixt…l\":\""
+        }
+      },
+      {
+        "step": "writ…note",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…8a74",
+          "ts": "2026…383Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "4d1f…0e53"
+            }
+          ],
+          "rowCount": 1
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…aa14",
+        "ts": "2026…386Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "qual…lead",
+        "runId": "run_…f60e",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…3af9",
+        "ts": "2026…387Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "qual…lead",
+        "runId": "run_…f60e",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawra_0e6a21f7f1",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.382Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "qual…lead",
+    "workflowId": "qual…lead",
+    "missingProviders": [],
+    "providerProbes": {
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "qual…lead"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawqv_1c78867172",
+    "type": "form_saved",
+    "ts": "2026-05-11T00:15:51.367Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "formId": "form…8aa6",
+    "fields": 2
+  },
+  {
+    "id": "rcpt_mp0gawqm_cc81a26f9a",
+    "type": "workflow_graph_run",
+    "ts": "2026-05-11T00:15:51.358Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "graphId": "grap…743e",
+    "runId": "run_…7d87",
+    "steps": [
+      {
+        "step": "[redacted]",
+        "providerId": "open…eway",
+        "action": "scor…_fit",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…0794",
+          "ts": "2026…353Z",
+          "text": "Fixt…test"
+        }
+      },
+      {
+        "step": "[redacted]",
+        "providerId": "[redacted]",
+        "action": "writ…note",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…91cb",
+          "ts": "2026…353Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "5369…5843"
+            }
+          ],
+          "rowCount": 1
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…2950",
+        "ts": "2026…356Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "visu…flow",
+        "runId": "run_…7d87",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…a162",
+        "ts": "2026…357Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "visu…flow",
+        "runId": "run_…7d87",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawqa_898758f362",
+    "type": "workflow_graph_saved",
+    "ts": "2026-05-11T00:15:51.346Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "graphId": "grap…743e",
+    "nodeCount": 3,
+    "edgeCount": 2,
+    "compiledWorkflow": {
+      "id": "wf_1…b545",
+      "templateId": "visu…flow",
+      "title": "Smok…raph",
+      "category": "Visu…lder",
+      "enabled": true,
+      "requiredProviders": [
+        "open…eway",
+        "[redacted]"
+      ],
+      "steps": [
+        {
+          "id": "[redacted]",
+          "action": "scor…_fit",
+          "providerId": "open…eway",
+          "config": {}
+        },
+        {
+          "id": "[redacted]",
+          "action": "writ…note",
+          "providerId": "[redacted]",
+          "config": {}
+        }
+      ],
+      "output": "grap…sult"
+    }
+  },
+  {
+    "id": "rcpt_mp0gawq5_970006b8ac",
+    "type": "invoice_generated",
+    "ts": "2026-05-11T00:15:51.341Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "invoiceId": "inv_…7555",
+    "invoiceNumber": "KX-1…1340",
+    "totalCents": 52,
+    "lineItems": 4
+  },
+  {
+    "id": "rcpt_mp0gawpz_92f26df382",
+    "type": "provider_route_optimized",
+    "ts": "2026-05-11T00:15:51.335Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "intent": "[redacted]",
+    "selected": {
+      "providerId": "[redacted]",
+      "title": "Rese…mail",
+      "lane": "[redacted]",
+      "installed": true,
+      "probeOk": true,
+      "costCents": 0,
+      "score": 0,
+      "selectedRoute": "emai…send",
+      "missing": [],
+      "source": "file…json"
+    },
+    "candidateCount": 2,
+    "decisionId": "rout…df18"
+  },
+  {
+    "id": "rcpt_mp0gawpp_647e3db6d7",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.325Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…178d",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "actionRegistry": true,
+    "output": {
+      "db": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "neon…7767",
+        "ts": "2026…320Z",
+        "rows": [
+          {
+            "fixture": true,
+            "sqlHash": "5531…183b"
+          }
+        ],
+        "rowCount": 1
+      },
+      "summary": {
+        "ok": true,
+        "provider": "open…eway",
+        "action": "[redacted]",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "open…8276",
+        "ts": "2026…320Z",
+        "text": "Fixt…ion\""
+      },
+      "summaryMarkdown": "Fixt…ion\""
+    },
+    "steps": [
+      {
+        "step": "run_…uery",
+        "providerId": "[redacted]",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "neon…7767",
+          "ts": "2026…320Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "5531…183b"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      {
+        "step": "summ…rows",
+        "providerId": "open…eway",
+        "action": "[redacted]",
+        "result": {
+          "ok": true,
+          "provider": "open…eway",
+          "action": "[redacted]",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "open…8276",
+          "ts": "2026…320Z",
+          "text": "Fixt…ion\""
+        }
+      },
+      {
+        "step": "expo…mary",
+        "action": "plat…port",
+        "result": {
+          "ok": true,
+          "bytes": 103
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…53cb",
+        "ts": "2026…323Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "db_q…mary",
+        "runId": "run_…178d",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…b6d6",
+        "ts": "2026…324Z",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "workflowId": "db_q…mary",
+        "runId": "run_…178d",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 1,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawpj_9b7a011c39",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.319Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "db_q…mary",
+    "workflowId": "db_q…mary",
+    "missingProviders": [],
+    "providerProbes": {
+      "neon": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      },
+      "openai_gateway": {
+        "ok": true,
+        "provider": "open…eway",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": []
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "db_q…mary"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawpe_6b7cbe7227",
+    "type": "workflow_run",
+    "ts": "2026-05-11T00:15:51.314Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "runId": "run_…b951",
+    "projectId": "[redacted]",
+    "templateId": "chec…link",
+    "workflowId": "chec…link",
+    "actionRegistry": true,
+    "output": {
+      "checkout": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "chec…eate",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "stri…bf95",
+        "ts": "2026…308Z",
+        "checkoutUrl": "fixt…705d",
+        "amountCents": 1300,
+        "currency": "[redacted]"
+      },
+      "email": {
+        "ok": true,
+        "provider": "[redacted]",
+        "action": "emai…send",
+        "mode": "[redacted]",
+        "fixture": true,
+        "id": "rese…3e63",
+        "ts": "2026…308Z",
+        "messageId": "emai…e404",
+        "to": "smok…test",
+        "subject": "Your…link"
+      },
+      "paymentLink": "fixt…705d",
+      "actionReceipt": {
+        "id": "rcpt…c8ab",
+        "type": "work…eipt",
+        "ts": "2026…308Z",
+        "ok": true,
+        "workflowId": "chec…link",
+        "outputKeys": "[redacted]"
+      }
+    },
+    "steps": [
+      {
+        "step": "crea…sion",
+        "providerId": "[redacted]",
+        "action": "chec…eate",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "chec…eate",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "stri…bf95",
+          "ts": "2026…308Z",
+          "checkoutUrl": "fixt…705d",
+          "amountCents": 1300,
+          "currency": "[redacted]"
+        }
+      },
+      {
+        "step": "emai…link",
+        "providerId": "[redacted]",
+        "action": "emai…send",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "emai…send",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "rese…3e63",
+          "ts": "2026…308Z",
+          "messageId": "emai…e404",
+          "to": "smok…test",
+          "subject": "Your…link"
+        }
+      },
+      {
+        "step": "writ…eipt",
+        "action": "plat…eipt",
+        "result": {
+          "ok": true,
+          "receiptId": "rcpt…c8ab"
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…fab6",
+        "ts": "2026…312Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "chec…link",
+        "runId": "run_…b951",
+        "unit": "chec…sion",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      },
+      {
+        "id": "mete…f6f2",
+        "ts": "2026…313Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "chec…link",
+        "runId": "run_…b951",
+        "unit": "[redacted]",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawp8_e6862cc8ab",
+    "type": "workflow_action_receipt",
+    "ts": "2026…308Z",
+    "ok": true,
+    "workflowId": "chec…link",
+    "outputKeys": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawp7_121b88faf8",
+    "type": "workflow_preflight",
+    "ts": "2026-05-11T00:15:51.307Z",
+    "ok": true,
+    "mode": "[redacted]",
+    "projectId": "[redacted]",
+    "templateId": "chec…link",
+    "workflowId": "chec…link",
+    "missingProviders": [],
+    "providerProbes": {
+      "stripe": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": [],
+        "note": "Fixt…oof."
+      },
+      "resend": {
+        "ok": true,
+        "provider": "[redacted]",
+        "mode": "[redacted]",
+        "configured": true,
+        "missing": [],
+        "note": "Fixt…oof."
+      }
+    },
+    "providerInstalls": [
+      {
+        "id": "prov…b3eb",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…280Z",
+        "lastRotatedAt": null,
+        "enabled": false,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "voic…call",
+          "webh…sage"
+        ],
+        "status": "[redacted]",
+        "updatedAt": "2026…280Z"
+      },
+      {
+        "id": "prov…6729",
+        "projectId": "[redacted]",
+        "providerId": "open…eway",
+        "createdAt": "2026…267Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]",
+          "ai.s…rize",
+          "ai.c…sify"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…267Z"
+      },
+      {
+        "id": "prov…5316",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…260Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "[redacted]"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…260Z"
+      },
+      {
+        "id": "prov…51dc",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…254Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "emai…send",
+          "emai…ence",
+          "webh…mail"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…254Z"
+      },
+      {
+        "id": "prov…f1fe",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "createdAt": "2026…248Z",
+        "lastRotatedAt": null,
+        "enabled": true,
+        "secretRef": "[redacted]",
+        "routes": [
+          "chec…eate",
+          "invo…send",
+          "webh…ment"
+        ],
+        "status": "inst…lled",
+        "updatedAt": "2026…248Z"
+      }
+    ],
+    "policy": {
+      "ok": true,
+      "blocks": [],
+      "warnings": [],
+      "workflowId": "chec…link"
+    },
+    "approval": null
+  },
+  {
+    "id": "rcpt_mp0gawov_b878c6bfd7",
+    "type": "provider_pack_action_run",
+    "ts": "2026-05-11T00:15:51.295Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "[redacted]",
+    "route": "chec…eate",
+    "runId": "run_…7bc7",
+    "result": {
+      "ok": true,
+      "provider": "[redacted]",
+      "action": "chec…eate",
+      "mode": "[redacted]",
+      "fixture": true,
+      "id": "stri…ac0a",
+      "ts": "2026…290Z",
+      "checkoutUrl": "fixt…e371",
+      "amountCents": 1313,
+      "currency": "[redacted]"
+    },
+    "steps": [
+      {
+        "step": "chec…eate",
+        "providerId": "[redacted]",
+        "action": "chec…eate",
+        "result": {
+          "ok": true,
+          "provider": "[redacted]",
+          "action": "chec…eate",
+          "mode": "[redacted]",
+          "fixture": true,
+          "id": "stri…ac0a",
+          "ts": "2026…290Z",
+          "checkoutUrl": "fixt…e371",
+          "amountCents": 1313,
+          "currency": "[redacted]"
+        }
+      }
+    ],
+    "meters": [
+      {
+        "id": "mete…88c6",
+        "ts": "2026…294Z",
+        "projectId": "[redacted]",
+        "providerId": "[redacted]",
+        "workflowId": "prov…tion",
+        "runId": "run_…7bc7",
+        "unit": "chec…sion",
+        "quantity": 1,
+        "costCents": 0,
+        "metadata": {
+          "mode": "[redacted]",
+          "packSource": "file…json"
+        }
+      }
+    ]
+  },
+  {
+    "id": "rcpt_mp0gawoh_ed7c9215d7",
+    "type": "provider_install",
+    "ts": "2026-05-11T00:15:51.281Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "[redacted]",
+    "secretRef": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawo4_2bda67d020",
+    "type": "provider_install",
+    "ts": "2026-05-11T00:15:51.268Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "open…eway",
+    "secretRef": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawnx_d1dbd5ac1d",
+    "type": "provider_install",
+    "ts": "2026-05-11T00:15:51.261Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "[redacted]",
+    "secretRef": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawnq_b5c1f5a486",
+    "type": "provider_install",
+    "ts": "2026-05-11T00:15:51.255Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "[redacted]",
+    "secretRef": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawnk_7bfa80993d",
+    "type": "provider_install",
+    "ts": "2026-05-11T00:15:51.248Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "providerId": "[redacted]",
+    "secretRef": "[redacted]"
+  },
+  {
+    "id": "rcpt_mp0gawn9_c949a59410",
+    "type": "project_upsert",
+    "ts": "2026-05-11T00:15:51.237Z",
+    "ok": true,
+    "projectId": "[redacted]",
+    "name": "Defa…pace"
+  },
+  {
+    "id": "rcpt_mp0gawmu_6e6befd733",
+    "type": "project_upsert",
+    "ts": "2026-05-11T00:15:51.222Z",
+    "ok": true,
+    "projectId": "sign…ject",
+    "name": "Sign…ject"
+  },
+  {
+    "id": "rcpt_mp0gawmn_35917bfbd8",
+    "type": "storage_adapter_verified",
+    "ts": "2026-05-11T00:15:51.216Z",
+    "ok": true,
+    "adapter": {
+      "id": "[redacted]",
+      "title": "JSON…tore",
+      "durable": true,
+      "ready": true,
+      "implementation": "serv…tore",
+      "requiredEnv": []
+    },
+    "before": {
+      "projects": 1,
+      "providerInstalls": 0,
+      "workflowRuns": 0,
+      "webhookEvents": 0,
+      "openApprovals": 0,
+      "jobs": 0,
+      "queuedJobs": 0,
+      "deadLetters": 0,
+      "lockedJobs": 0,
+      "schedules": 0,
+      "meterEvents": 0,
+      "workflowGraphs": 0,
+      "routeDecisions": 0,
+      "invoices": 0,
+      "bundles": 0,
+      "imports": 0,
+      "auditEvents": 0,
+      "openIncidents": 0,
+      "entitlements": 0,
+      "records": 0,
+      "forms": 0,
+      "updatedAt": "2026…143Z"
+    },
+    "after": {
+      "projects": 1,
+      "providerInstalls": 0,
+      "workflowRuns": 0,
+      "webhookEvents": 0,
+      "openApprovals": 0,
+      "jobs": 0,
+      "queuedJobs": 0,
+      "deadLetters": 0,
+      "lockedJobs": 0,
+      "schedules": 0,
+      "meterEvents": 0,
+      "workflowGraphs": 0,
+      "routeDecisions": 0,
+      "invoices": 0,
+      "bundles": 0,
+      "imports": 0,
+      "auditEvents": 1,
+      "openIncidents": 0,
+      "entitlements": 0,
+      "records": 0,
+      "forms": 0,
+      "updatedAt": "2026…214Z"
+    }
+  }
+]

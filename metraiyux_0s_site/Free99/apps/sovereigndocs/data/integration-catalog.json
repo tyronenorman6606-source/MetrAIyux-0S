@@ -1,0 +1,69 @@
+[
+  {
+    "id": "upstream-auth",
+    "name": "Upstream Auth / Omega Skygate",
+    "status": "adapter-ready",
+    "env": [
+      "X-SOVEREIGNDOCS-USER",
+      "X-OMEGA-SKYGATE-USER"
+    ],
+    "notes": "No built-in auth. API reads trusted upstream identity headers."
+  },
+  {
+    "id": "neon",
+    "name": "Neon Postgres",
+    "status": "schema-ready",
+    "env": [
+      "DATABASE_URL"
+    ],
+    "notes": "Schema provided under database/neon/schema.sql."
+  },
+  {
+    "id": "cloudflare-d1",
+    "name": "Cloudflare D1",
+    "status": "schema-ready",
+    "env": [
+      "DB binding"
+    ],
+    "notes": "Schema provided under database/cloudflare-d1/schema.sql."
+  },
+  {
+    "id": "cloudflare-r2",
+    "name": "Cloudflare R2",
+    "status": "adapter-stub",
+    "env": [
+      "R2_BUCKET"
+    ],
+    "notes": "Storage adapter skeleton included; not wired to live bucket."
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe Billing",
+    "status": "plan-data-ready",
+    "env": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ],
+    "notes": "Plan data exists; live checkout route intentionally not claimed."
+  },
+  {
+    "id": "resend-ses",
+    "name": "Email Delivery",
+    "status": "planned",
+    "env": [
+      "RESEND_API_KEY",
+      "SES_REGION"
+    ],
+    "notes": "Needed for production delivery and signing notifications."
+  },
+  {
+    "id": "esign-provider",
+    "name": "External E-sign Provider",
+    "status": "planned",
+    "env": [
+      "DOCUSIGN_KEY",
+      "DROPBOX_SIGN_KEY"
+    ],
+    "notes": "Current signing lane is acknowledgment/audit prep, not full provider signing."
+  }
+]

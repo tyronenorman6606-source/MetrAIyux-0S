@@ -1,0 +1,53 @@
+{
+  "name": "SkyeMusicNexus Open Social Spine",
+  "generatedAt": "2026-05-18",
+  "purpose": "Connect SkyeMusicNexus to open-source, federated social platforms without copying provider secrets into browser code.",
+  "integrationPolicy": {
+    "tokenStorage": "Provider OAuth access tokens are referenced by server environment variable name only.",
+    "gate": "All social connector, queue, publish, feed-sync, and moderation actions require SkyGate or 0S proof session auth.",
+    "rightsBoundary": "MusicNexus social posts can reference releases and media, but production publication still depends on release rights, media ownership, provider rules, and instance moderation policy.",
+    "licenseBoundary": "This manifest records open-source platform integration targets. It does not vendor or relicense full upstream social platforms."
+  },
+  "platforms": [
+    {
+      "id": "pixelfed",
+      "name": "Pixelfed",
+      "source": "https://github.com/pixelfed/pixelfed",
+      "license": "AGPL-3.0",
+      "role": "Instagram-like photo/video feed for cover reveals, release images, reels/canvas teasers, and federated artist profiles.",
+      "protocols": ["ActivityPub", "Mastodon-compatible REST API"],
+      "musicNexusStatus": "first-class connector through netlify/functions/music-social.js",
+      "requiredEnv": ["SKYE_MUSIC_PIXELFED_TOKEN or connector-specific tokenEnvKey"]
+    },
+    {
+      "id": "mastodon",
+      "name": "Mastodon-compatible Fediverse",
+      "source": "https://docs.joinmastodon.org/",
+      "license": "AGPL-family",
+      "role": "Public status, hashtag, release-note, and fan-update lane.",
+      "protocols": ["OAuth2", "REST API", "ActivityPub"],
+      "musicNexusStatus": "first-class connector through netlify/functions/music-social.js",
+      "requiredEnv": ["connector-specific tokenEnvKey for publishing", "optional readTokenEnvKey for private timelines"]
+    },
+    {
+      "id": "funkwhale",
+      "name": "Funkwhale",
+      "source": "https://docs.funkwhale.audio/",
+      "license": "AGPL-family",
+      "role": "Self-hosted audio publication and federated music pod lane.",
+      "protocols": ["ActivityPub", "Funkwhale API"],
+      "musicNexusStatus": "cataloged as production audio federation target; publishing stays staged until native API token mapping is configured.",
+      "requiredEnv": ["future connector-specific Funkwhale tokenEnvKey"]
+    },
+    {
+      "id": "activitypub",
+      "name": "ActivityPub Actor Bridge",
+      "source": "https://www.w3.org/TR/activitypub/",
+      "license": "W3C Recommendation",
+      "role": "Native inbox/outbox federation contract for future owned 0S actor identities.",
+      "protocols": ["ActivityPub", "ActivityStreams"],
+      "musicNexusStatus": "contract preview generated in queued posts; native federation requires actor documents, WebFinger, HTTP signatures, inbox/outbox storage, and moderation controls.",
+      "requiredEnv": ["future actor signing material"]
+    }
+  ]
+}

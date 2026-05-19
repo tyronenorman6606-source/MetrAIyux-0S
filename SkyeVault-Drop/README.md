@@ -4,6 +4,17 @@ SkyeVault-Drop is the live Netlify-deployed intake platform for receiving client
 
 This is not a SaaS product. It is an operator-owned upload portal for project intake.
 
+## Storage reality check
+
+Current production storage is Cloudflare R2. Some compatibility modules and older docs still use Drive-shaped names such as `google-drive.js`, `driveFileId`, and `admin-drive-test`, but those names now wrap R2 S3-compatible behavior:
+
+- upload sessions create R2 multipart uploads,
+- the browser uploads directly to short-lived R2 presigned part URLs,
+- destinations are R2 prefixes such as `client-uploads/primary`,
+- receipts, manifests, audit events, config, and backups are JSON objects in R2.
+
+Google Drive folder links are not upload credentials. A folder URL can identify a Drive folder ID, but a Worker still needs an authenticated Google principal with write access before it can upload through the Drive API. Do not treat an "anyone with the link" folder as a secret or as a bearer token. If Drive is added back, use it as a mirror/export lane with OAuth or service-account credentials, not as an anonymous public writable folder.
+
 ## What is stronger in v2.3
 
 - v2.3 adds the Git-level SkyeVault remote lane beside the archive upload lane: smart HTTP push/fetch/clone against persistent bare repos, Gate-scoped workspace auth, role boundaries, branch policy, protected tag handling, quota APIs, verified snapshots, bundle exports, restore verification, CLI commands, Git credential helper, SSH forced-command wrapper, and per-workspace 0S neural maps.
@@ -21,51 +32,51 @@ This is not a SaaS product. It is an operator-owned upload portal for project in
 - Server-side required-field enforcement for client name, client email, project name, valid URL shape, valid date shape, file size, blocked extensions, destination file-size policy, and destination accept policy.
 - Upload receipt panel with receipt IDs and receipt-signature prefix after completion.
 - Immutable signed receipt JSON files: every completed upload creates `skye-upload-vault-receipt-<receipt-id>.json` in the config folder before the summary ledger update.
-- Idempotent completion: receipt IDs are derived from session ID + Drive file ID, so retrying completion does not create duplicate receipt proof.
+- Idempotent completion: receipt IDs are derived from session ID + stored object key, so retrying completion does not create duplicate receipt proof.
 - Ledger hardening: admin ledger reads receipt-backed entries and summary ledger entries.
-- Receipt recovery: if Google Drive accepts a giant file but `/api/upload-complete` fails, the browser stores a pending finalization and shows a recovery panel so you can retry the receipt without re-uploading the file bytes.
+- Receipt recovery: if R2 accepts a giant file but `/api/upload-complete` fails, the browser stores a pending finalization and shows a recovery panel so you can retry the receipt without re-uploading the file bytes.
 - Editable public copy through `/admin.html`: headline, subheadline, instructions, retention notice, brand name, support email, required fields, blocked extensions, destinations, and limits.
-- Internal Deployment Command Center at `/setup.html` for env vars, tokens, Drive setup, notification config, diagnostics, and proof commands.
-- Drive-backed upload session manifests: `/api/upload-session` writes `skye-upload-vault-session-<session-id>.json` before returning the Google upload URL.
+- Internal Deployment Command Center at `/setup.html` for env vars, tokens, R2 setup, notification config, diagnostics, and proof commands.
+- R2-backed upload session manifests: `/api/upload-session` writes `skye-upload-vault-session-<session-id>.json` before returning the signed upload URLs.
 - Manifest-gated completion: `/api/upload-complete` refuses to finalize uploads that do not have a matching session manifest.
-- Browser-side SHA-256 file fingerprints: small files get full-file SHA-256; large files get a head/middle/tail sampled fingerprint that is stored in the manifest, Drive appProperties, receipt entry, and admin view.
+- Browser-side SHA-256 file fingerprints: small files get full-file SHA-256; large files get a head/middle/tail sampled fingerprint that is stored in the manifest, R2 object metadata, receipt entry, and admin view.
 - Admin session-manifest view shows pending and completed sessions, including abandoned sessions that never became receipts.
 - Static hardening: `_headers` adds CSP, frame blocking, nosniff, permissions policy, and no-store/noindex rules for operator pages; `robots.txt` blocks admin/setup/operator/API routes; `404.html` is branded and noindexed.
 - Optional upload-complete notifications through `NOTIFY_WEBHOOK_URL` and/or Resend email env vars.
 - Admin notification test endpoint/button verifies alert delivery without a real client upload.
 - `npm run closure:audit` is now a real package script alias.
 - Batch/submission IDs now group multi-file client packages across manifests, receipts, notifications, and admin audit events.
-- Pause/resume support: the public portal can pause the active upload request and later resume from the saved Google Drive resumable session.
+- Pause/resume support: the public portal can pause the active upload request and later resume from the saved R2 multipart session.
 - Receipt JSON copy/download tools give clients/operator a portable proof bundle after upload completion.
 - `/api/upload-status` gives a portal-key-protected way to check a known session ID or receipt ID.
-- Drive-backed audit event files record session creation, upload completion, admin config saves, Drive tests, and notification tests.
+- R2-backed audit event files record session creation, upload completion, admin config saves, storage tests, and notification tests.
 - Configurable package limits now include max files per submission and max total submission GB.
 
 - v1.9 adds upload-session and status lookup rate limits, portal-code failed-attempt lockout, honeypot spam trap, and optional Cloudflare Turnstile verification.
 - v1.9 adds an admin Health Preflight endpoint/button for config-folder access, destination read/write checks, notification config, abuse controls, and recent audit context.
-- v1.9 adds a maintenance sweep endpoint/button that marks stale abandoned sessions and writes Drive-backed maintenance reports.
+- v1.9 adds a maintenance sweep endpoint/button that marks stale abandoned sessions and writes R2-backed maintenance reports.
 - v1.9 adds optional client receipt emails through Resend after upload completion.
 - v1.9 adds `npm run e2e:mock-browser`, a dependency-free local proof harness for public config, session creation, chunk upload, pause/query, resume, completion, receipt, and status lookup.
 
 ## Architecture
 
-Large uploads do not pass through Netlify as file bodies. Netlify Functions create authenticated Google Drive resumable upload sessions. The browser then uploads file chunks directly to Google Drive.
+Large uploads do not pass through Netlify as file bodies. The server creates authenticated R2 multipart upload sessions. The browser then uploads file chunks directly to short-lived R2 presigned URLs.
 
 Flow:
 
 1. Client opens `/`.
 2. Client adds project context and selects files.
 3. Browser calls `/api/upload-session`.
-4. Netlify validates origin, upload code, Drive routing, file limits, blocked extensions, required fields, and consent flags.
-5. Netlify creates a Google Drive resumable upload session using the service account.
-6. Netlify writes a pending upload-session manifest into the private config folder before returning the upload URL.
-7. Browser uploads chunks directly to the Google upload URL.
+4. Netlify/Worker validates origin, upload code, storage routing, file limits, blocked extensions, required fields, and consent flags.
+5. Netlify/Worker creates an R2 multipart upload session using the configured R2 access key.
+6. Netlify/Worker writes a pending upload-session manifest into the private R2 config prefix before returning the signed part URLs.
+7. Browser uploads chunks directly to the R2 presigned part URLs.
 8. Browser calls `/api/upload-complete`.
-9. Netlify verifies the Drive file metadata, appProperties, parent folder, session, manifest, destination, request identity, consent flags, fingerprint metadata, and size.
+9. Netlify/Worker finalizes the R2 multipart upload and verifies object metadata, prefix, session, manifest, destination, request identity, consent flags, fingerprint metadata, and size.
 10. Netlify creates an immutable signed receipt file.
 11. Netlify marks the session manifest complete.
 12. Netlify updates the summary ledger.
-13. Netlify writes a Drive-backed audit event for the completed upload.
+13. Netlify/Worker writes an R2-backed audit event for the completed upload.
 14. If configured, Netlify sends an upload-complete notification to webhook/email channels.
 15. If client receipt email is enabled, Netlify sends the client a receipt email.
 16. Admin can run health preflight and maintenance sweeps from the protected dashboard.
@@ -131,9 +142,12 @@ OPERATOR_SESSION_SECRET=replace-with-separate-long-random-operator-session-secre
 OPERATOR_SESSION_HOURS=12
 CLIENT_PORTAL_KEY=replace-with-client-upload-code
 RECEIPT_SIGNING_SECRET=replace-with-separate-long-random-receipt-signing-secret
-GOOGLE_SERVICE_ACCOUNT_EMAIL=service-account-name@project-id.iam.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nREPLACE_WITH_KEY\n-----END PRIVATE KEY-----\n"
-GOOGLE_CONFIG_FOLDER_ID=replace-with-google-drive-config-folder-id
+R2_ACCOUNT_ID=replace-with-cloudflare-account-id
+R2_ACCESS_KEY_ID=replace-with-r2-access-key-id
+R2_SECRET_ACCESS_KEY=replace-with-r2-secret-access-key
+R2_BUCKET=skyevault-drop
+R2_ENDPOINT=https://replace-with-account-id.r2.cloudflarestorage.com
+R2_CONFIG_PREFIX=vault-system
 NOTIFY_WEBHOOK_URL=
 NOTIFY_WEBHOOK_SECRET=
 RESEND_API_KEY=
@@ -150,24 +164,28 @@ STATUS_RATE_WINDOW_MS=600000
 PORTAL_KEY_MAX_FAILURES=8
 PORTAL_KEY_LOCKOUT_MS=900000
 STALE_SESSION_HOURS=72
-GOOGLE_DRIVE_CONFIG_JSON='{"brandName":"SkyeVault-Drop","routingMode":"priority","chunkSizeMb":8,"maxFilesPerSubmission":25,"maxTotalSubmissionGb":5000,"requireUsageRights":true,"requireRetentionAck":true,"requireClientName":true,"requireClientEmail":true,"requireProjectName":true,"blockedExtensions":[".exe",".msi",".bat",".cmd",".scr",".ps1",".vbs",".js",".jar",".com",".sh"],"destinations":[{"id":"primary","name":"Primary Client Intake","folderId":"replace-folder-id","enabled":true,"priority":1,"role":"primary","description":"Main intake folder.","maxFileSizeGb":5000,"accept":"*"}]}'
-GOOGLE_API_RETRIES=3
-DEBUG_GOOGLE_RETRIES=false
+R2_CONFIG_JSON='{"brandName":"SkyeVault-Drop","routingMode":"priority","chunkSizeMb":8,"maxFilesPerSubmission":25,"maxTotalSubmissionGb":5000,"requireUsageRights":true,"requireRetentionAck":true,"requireClientName":true,"requireClientEmail":true,"requireProjectName":true,"blockedExtensions":[".exe",".msi",".bat",".cmd",".scr",".ps1",".vbs",".js",".jar",".com",".sh"],"destinations":[{"id":"primary","name":"Primary Client Intake","folderId":"client-uploads/primary","enabled":true,"priority":1,"role":"primary","description":"Main intake prefix.","maxFileSizeGb":5000,"accept":"*"}]}'
+R2_PRESIGNED_URL_TTL_SECONDS=21600
 ```
 
-`GOOGLE_DRIVE_CONFIG_JSON` is bootstrap config only. After `/admin.html` saves config, the app reads `skye-upload-vault-config.json` from `GOOGLE_CONFIG_FOLDER_ID` first.
+`R2_CONFIG_JSON` is bootstrap config only. After `/admin.html` saves config, the app reads `skye-upload-vault-config.json` from `R2_CONFIG_PREFIX` first.
 
-## Google Drive setup
+## R2 setup
 
-1. Create or select a Google Cloud project.
-2. Enable the Google Drive API.
-3. Create a service account.
-4. Create a JSON key for the service account.
-5. Create a private Google Drive config folder.
-6. Create one or more intake folders: primary, overflow, client-specific, archive, etc.
-7. Share every target folder with the service account email as Editor/Contributor.
-8. Put the config folder ID into `GOOGLE_CONFIG_FOLDER_ID`.
-9. Use `/setup.html` to generate the Netlify env block and bootstrap routing config.
+1. Create or select a private Cloudflare R2 bucket.
+2. Create an R2 API token/access key scoped to that bucket.
+3. Set `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ENDPOINT`, and `R2_CONFIG_PREFIX`.
+4. Configure one or more destination prefixes: primary, overflow, client-specific, archive, etc.
+5. Use `/setup.html` to generate the env block and bootstrap routing config.
+
+## Optional Google Drive mirror
+
+Drive can be added as a mirror/export lane, but the Worker cannot upload with a public folder link alone. Store Drive folder IDs or folder URLs only as destination metadata. Store actual Google auth separately:
+
+- OAuth client ID, client secret, and refresh token for a human-owned Drive target, or
+- service-account credentials plus a Shared Drive or folder where that service account has writer/contributor access.
+
+For production intake, keep R2 as the source of truth and mirror/export to Drive after receipt creation.
 
 ## Netlify setup
 
@@ -219,21 +237,21 @@ Locally proven:
 
 Not proven until you deploy with real credentials:
 
-- Service account auth.
-- Folder sharing permissions.
-- Real Drive resumable upload completion.
-- Session manifest writes in your config folder.
-- Signed receipt file writes in your config folder.
-- Summary ledger update in your config folder.
+- R2 access key auth against the production bucket.
+- Destination prefix read/write permissions.
+- Real R2 multipart upload completion.
+- Session manifest writes in your R2 config prefix.
+- Signed receipt file writes in your R2 config prefix.
+- Summary ledger update in your R2 config prefix.
 - Session manifest completion after receipt creation.
 - Real large-video upload stability on your browser/network.
-- CORS behavior on your final Netlify/custom domain.
+- CORS behavior on your final Worker/custom domain.
 - Upload-complete webhook/email delivery if configured.
 - Client receipt email delivery if enabled.
-- Browser pause/resume behavior with real Drive resumable sessions.
-- Drive-backed audit event writes in your config folder.
-- Health preflight write tests against your real Drive folders.
-- Maintenance report writes against your real config folder.
+- Browser pause/resume behavior with real R2 multipart sessions.
+- R2-backed audit event writes in your config prefix.
+- Health preflight write tests against your real R2 prefixes.
+- Maintenance report writes against your real config prefix.
 
 ## Commands
 
@@ -245,7 +263,7 @@ npm run closure:audit
 npm run setup:audit
 npm run oss:audit
 npm run e2e:mock-browser
-npm run live:drive-smoke
+npm run live:r2-smoke
 ```
 
 ## v2.0 operator closure additions
@@ -253,12 +271,12 @@ npm run live:drive-smoke
 This package now includes the remaining controllable closure work beyond the upload engine:
 
 - Protected export center: `/api/admin-export` downloads ledger, sessions, audit events, config, or all metadata as CSV/JSON from the admin dashboard.
-- Metadata backup: `/api/admin-backup` writes a Drive-backed snapshot to `BACKUP_FOLDER_ID` or the config folder.
-- Scanner workflow: set `SCAN_MODE=manual_review` or `SCAN_MODE=external_webhook` to mark uploads for review or send signed metadata to a scanner/review endpoint. This app does not pretend to inspect private Google Drive bytes by itself.
+- Metadata backup: `/api/admin-backup` writes an R2-backed snapshot to `BACKUP_FOLDER_ID` or the config prefix.
+- Scanner workflow: set `SCAN_MODE=manual_review` or `SCAN_MODE=external_webhook` to mark uploads for review or send signed metadata to a scanner/review endpoint. This app does not pretend to inspect private R2 object bytes by itself.
 - Hardened notifications: webhooks are HMAC-signed when `NOTIFY_WEBHOOK_SECRET` is set, retryable, audit-logged, and replayable from the ledger.
 - Client receipt emails: optional Resend HTML/text receipts include receipt ID, project, file, destination, and scan-handling status.
 - Scheduled maintenance: `scheduled-maintenance.js` invokes stale-session maintenance on `MAINTENANCE_CRON`.
-- Setup folder helper: `/api/setup-folder-helper` validates Drive folder access and tells you which service-account email to share folders with.
+- Setup folder helper: `/api/setup-folder-helper` validates configured storage prefix access.
 - Optional real browser E2E: install Playwright and run `npm run e2e:browser` against `BASE_URL` after deployment.
 
 ### Scanner modes

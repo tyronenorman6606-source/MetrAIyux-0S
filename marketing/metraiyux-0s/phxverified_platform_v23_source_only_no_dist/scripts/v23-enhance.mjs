@@ -9,6 +9,7 @@ const REPO_ROOT = path.resolve(ROOT, '../../..');
 const TODAY = new Date().toISOString().slice(0, 10);
 const SITE_URL = String(process.env.SITE_URL || process.env.URL || 'https://valley-verified.pages.dev').replace(/\/+$/, '');
 const REQUEST_BUILD_HREF = 'mailto:graylondonskyes@gmail.com?subject=Request%20a%20MetrAIyux%200S%20client%20build&body=I%20want%20to%20request%20a%20client%20build%20and%20Valley%20Verified%20posting.';
+const APP_BUILD_GATE_HREF = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane';
 const MAJOR_PLATFORM_LINKS = [
   {
     key:'0S',
@@ -715,33 +716,49 @@ const clientBuilds = [
     id:'bobs',
     name:"Bob's Smoke Shop",
     label:'Retail app build',
-    copy:"A blue-lit smoke shop preview with age gate, live-media homepage, inventory lanes, specials, gallery, workspace preview, QR handoff, and Valley Verified backlink.",
+    industry:'Age-gated retail',
+    copy:"A blue-lit smoke shop app with age gate, live-media homepage, inventory lanes, specials, gallery, workspace preview, QR/social handoff, and Valley Verified backlink.",
+    actualApp:"Bob's live app is not a generated listing page. It is a branded retail surface for a real smoke shop, built around 21+ access, product category discovery, media, visit actions, and shareable handoff routes.",
     url:'https://bobs-smoke-shop.pages.dev/',
     valleyUrl:'/business/bobs-smoke-shop-litchfield-park/',
     video:'/assets/client-builds/bobs-live-build.mp4',
     poster:'/assets/client-builds/bobs-live-build-poster.jpg',
-    metrics:['21+ gate','Inventory lanes','Workspace preview']
+    sourceFolder:'Skye-Clients/bobs-smoke-shop-mcp-redo',
+    metrics:['21+ gate','Inventory lanes','Workspace preview'],
+    appRoutes:['Age gate','Live media home','Inventory','Specials','Gallery','Workspace preview','QR/social handoff'],
+    deliverables:['21+ gate and retail access boundary','PWA manifest and service worker shell','Live video homepage with poster fallback','Inventory/category lanes for glass, vapes, cigars, pipes, CBD, tobacco, hookah, electronics, and snacks','Specials, gallery, FAQ, contact, and blog-style local content','Workspace preview/free trial handoff with scan and command limits','Two-way Valley Verified backlink and live-app handoff'],
+    value:['Turns a walk-in smoke shop into a shareable mobile-first app instead of a thin directory listing.','Gives staff one clean route for inventory, specials, media, socials, and visit details.','Lets Valley Verified show what a featured retail customer could receive after buying an app build lane.','Keeps age-sensitive retail presentation behind an explicit 21+ screen before product exploration.'],
+    buyerActions:['Open inventory lanes','Check specials and gallery media','Call or plan a visit','Share the live app or Valley Verified post'],
+    proof:[['Actual app source','Skye-Clients/bobs-smoke-shop-mcp-redo'],['Live app URL','https://bobs-smoke-shop.pages.dev/'],['Valley route','/business/bobs-smoke-shop-litchfield-park/']]
   },
   {
     id:'empire',
     name:'Empire Pallets',
     label:'Operations app build',
+    industry:'Commercial operations',
     copy:'A Phoenix pallet operations app with quote intake, service lanes, scan route, intro video, mobile-first forms, commercial proof, and Valley Verified backlink.',
+    actualApp:"Empire's live app is an operations-facing sales and intake surface, not a generated profile. It carries quote intent, service selection, scan access, intro media, and procurement-friendly proof for a pallet company.",
     url:'https://empire-pallets.pages.dev/',
     valleyUrl:'/business/empire-pallets-phoenix/',
     video:'/assets/client-builds/empire-live-build.mp4',
     poster:'/assets/client-builds/empire-live-build-poster.jpg',
-    metrics:['Quote intake','Scan route','Service lanes']
+    sourceFolder:'Skye-Clients/empire-pallets-v3-app',
+    metrics:['Quote intake','Scan route','Service lanes'],
+    appRoutes:['Gated intro video','Service lanes','Quote intake','Scan route','Private preview','Programs','Industries','PWA/offline shell'],
+    deliverables:['Full-screen media intro with poster fallback','Service lanes for new pallets, recycled supply, removal, drop trailers, heat treatment, and custom design','Mobile-first quote form with safe submit/fallback behavior','QR scan route for yard/procurement handoff','Private preview route for client review','PWA manifest, service worker, and offline shell','Two-way Valley Verified backlink and commercial proof language'],
+    value:['Converts local discovery into a quote-ready procurement flow.','Makes commercial buyers choose the right pallet lane before asking for a quote.','Gives the business a reusable QR route for field, yard, and sales handoff.','Shows Valley Verified buyers what an operations app can do beyond a public listing.'],
+    buyerActions:['Start a quote','Choose a pallet service lane','Use scan/QR handoff','Open the live operations app'],
+    proof:[['Actual app source','Skye-Clients/empire-pallets-v3-app'],['Live app URL','https://empire-pallets.pages.dev/'],['Valley route','/business/empire-pallets-phoenix/']]
   }
 ];
 
 const publicNav = `<header class="topbar public-topbar">
   <a class="brand" href="/" aria-label="Valley Verified home"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>real local business pages</small></span></a>
-  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a><a class="nav-operator" href="/protected-admin/" rel="nofollow">Operator</a></nav>
+  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/app-builds/">App Builds</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a></nav>
 </header>`;
 const publicFooter = `<footer class="site-footer public-footer">
   <div><a class="brand mini" href="/"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>Network Platform</small></span></a><p>I built Valley Verified as a seeded Arizona business discovery network that gives real businesses public pages first. We keep public seed data honest: claim, correct, enrich, and verify before stronger owner-controlled claims are promoted.</p></div>
-  <nav aria-label="Footer"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/join/">Join</a><a href="/trust-network/">Trust Network</a><a href="/claims-ledger/">Claims Ledger</a><a href="/production-readiness/">Readiness</a><a href="/operator/" rel="nofollow">Seed Console</a></nav>
+  <nav aria-label="Footer"><a href="/featured/">Featured</a><a href="/app-builds/">App Builds</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/join/">Join</a><a href="/trust-network/">Trust Network</a><a href="/claims-ledger/">Claims Ledger</a><a href="/production-readiness/">Readiness</a><a href="/operator/" rel="nofollow">Seed Console</a></nav>
 </footer>`;
 function base({ title, description, canonical, bodyClass = 'website-page', robots = 'index,follow', schema = null }, body){
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>${html(title)}</title><meta name="description" content="${html(description)}"/><meta name="robots" content="${html(robots)}"/><link rel="canonical" href="${html(canonical)}"/><meta name="theme-color" content="#f5efe3"/><meta property="og:title" content="${html(title)}"/><meta property="og:description" content="${html(description)}"/><meta property="og:type" content="website"/><meta property="og:url" content="${html(canonical)}"/><meta property="og:image" content="${SITE_URL}/assets/valley-verified-logo.png"/><meta name="twitter:card" content="summary_large_image"/><link rel="icon" href="/assets/valley-verified-logo.png"/><link rel="manifest" href="/manifest.webmanifest"/><link rel="stylesheet" href="/assets/styles.css"/>${schema ? `<script type="application/ld+json">${jsonScript(schema)}</script>` : ''}</head><body class="${html(bodyClass)}"><canvas id="sky" class="skyesol-living-background living-background" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>${publicNav}<main id="main" class="site-main public-site-main">${body}</main>${publicFooter}<div id="toast" class="toast" role="status" aria-live="polite"></div><script type="module" src="/assets/app.js"></script></body></html>`;
@@ -761,7 +778,7 @@ function listChips(items = []){
 }
 function articleCard(article){
   const category = categoryFor(article.category);
-  return `<a class="article-card neon-magnetic" href="/insights/${html(article.slug)}/" data-category="${html(category.slug)}"><span>${html(category.name)}</span><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><small>${html(article.publishAt || TODAY)} / ${html(article.readTime)} read</small></a>`;
+  return `<a class="article-card" href="/insights/${html(article.slug)}/" data-category="${html(category.slug)}"><span>${html(category.name)}</span><h3>${html(article.title)}</h3><p>${html(article.deck)}</p><small>${html(article.publishAt || TODAY)} / ${html(article.readTime)} read</small></a>`;
 }
 function categoryCard(category){
   const published = PUBLISHED_INSIGHTS.filter(article => article.category === category.slug);
@@ -947,11 +964,32 @@ function skyeProofFunnel(){
   ];
   return `<section class="proof-funnel" data-skye-component="scroll-proof-funnel"><div class="proof-funnel__intro"><p>VISIBILITY FUNNEL</p><h2>Visibility first. Trust and placement only when the business wants it.</h2><span>The customer offer moves from first-month eligibility to a real public page, then into owner claim and optional growth if the owner asks for more reach.</span></div><div class="proof-funnel__steps">${steps.map(([title, body], index) => `<article class="proof-step"><div class="proof-rail"><span class="proof-rail__fill proof-rail__fill-${index}"></span></div><span>${String(index + 1).padStart(2, '0')}</span><h3>${html(title)}</h3><p>${html(body)}</p></article>`).join('')}</div></section>`;
 }
-function clientBuildShowcase(){
-  const cards = clientBuilds.map(build => `<article class="client-build-card"><div class="client-video-frame"><video autoplay muted loop playsinline controls preload="metadata" poster="${html(build.poster)}"><source src="${html(build.video)}" type="video/mp4"></video></div><div class="client-build-copy"><p class="eyebrow">${html(build.label)}</p><h3>${html(build.name)}</h3><p>${html(build.copy)}</p><div class="client-build-metrics">${build.metrics.map(item => `<span>${html(item)}</span>`).join('')}</div><div class="card-actions"><a class="btn small primary" href="${html(build.url)}" target="_blank" rel="noopener">Open live build</a><a class="btn small" href="${html(build.valleyUrl)}">Valley post</a><button class="btn small" data-share-profile data-share-url="${html(build.url)}" data-share-title="${html(`${build.name} live client build`)}" data-share-text="${html(build.copy)}">Share</button></div></div></article>`).join('');
-  return `<section class="section glass client-build-showcase" id="client-builds"><div class="section-head"><div><p class="eyebrow">Live client builds</p><h2>See what we build for free, then what we can scale.</h2></div><div class="button-row"><a class="btn small primary" href="${REQUEST_BUILD_HREF}">Request a build</a><a class="btn small" href="/featured/">See featured pages</a></div></div><p class="section-intro">The free Valley Verified page is the public bridge. Full client builds go deeper: branded app surfaces, quote flows, media, QR routes, and two-way links back into the network.</p><div class="client-build-grid">${cards}</div></section>`;
+function compactList(items = [], limit = 5){
+  return items.slice(0, limit).map(item => `<span>${html(item)}</span>`).join('');
 }
-function websiteHero(){ return `<section class="hero website-hero editorial-atlas"><div class="hero-copy"><p class="eyebrow">Arizona verified business network</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">A free public business page as our gift. Optional upgrades only when owners want more reach.</h1><p class="hero-text">Valley Verified turns local records and customer submissions into real landing pages businesses can claim, correct, share, and connect to their full website or app. No obligation: the included page stays useful on its own.</p><div class="hero-actions"><a class="btn primary" href="/directory/">Explore the marketplace</a><a class="btn" href="${REQUEST_BUILD_HREF}">Request a build</a><a class="btn ghost" href="#client-builds">See live client builds</a><a class="btn ghost" href="/for-businesses/">Claim or improve a profile</a></div></div><aside class="atlas-panel"><p class="eyebrow">Network receipt</p><div class="hero-card website-metrics">${metric(currency(count),'business pages')}${metric(currency(categoryCount),'service lanes')}${metric(currency(cityCount),'Arizona markets')}${metric(currency(report.records?.exact_merges || 1069),'duplicate records merged')}</div><div class="atlas-list"><div><strong>Our customer gift</strong><span>Qualified MetrAIyux 0S customers get one public business posting after their first paid month.</span></div><div><strong>No obligation</strong><span>Verification, placement, lead routing, sponsor lanes, and managed growth are optional upgrades only if wanted.</span></div></div></aside></section>`; }
+function clientBuildShowcase(){
+  const cards = clientBuilds.map(build => `<article class="client-build-card actual-client-card"><div class="client-video-frame"><video autoplay muted loop playsinline controls preload="metadata" poster="${html(build.poster)}"><source src="${html(build.video)}" type="video/mp4"></video></div><div class="client-build-copy"><p class="eyebrow">${html(build.label)} / ${html(build.industry)}</p><h3>${html(build.name)}</h3><p>${html(build.actualApp || build.copy)}</p><div class="client-build-metrics">${build.metrics.map(item => `<span>${html(item)}</span>`).join('')}</div><div class="client-app-spec"><strong>What the app build includes</strong><div>${compactList(build.deliverables, 4)}</div></div><div class="card-actions"><a class="btn small primary" href="${html(build.url)}" target="_blank" rel="noopener">Open actual app</a><a class="btn small" href="${html(build.valleyUrl)}">Valley post</a><a class="btn small" href="/app-builds/">App build lane</a><button class="btn small" data-share-profile data-share-url="${html(build.url)}" data-share-title="${html(`${build.name} live client build`)}" data-share-text="${html(build.copy)}">Share</button></div></div></article>`).join('');
+  return `<section class="section glass client-build-showcase actual-app-showcase" id="client-builds"><div class="section-head"><div><p class="eyebrow">Actual client app builds</p><h2>Bob's and Empire show the app a paying business would actually get.</h2></div><div class="button-row"><a class="btn small primary" href="/app-builds/">Open app build lane</a><a class="btn small" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Open gate offer</a></div></div><p class="section-intro">The free Valley Verified page is the public bridge. The app-build lane is different: a scoped business app with brand, routes, media, forms, QR/share behavior, proof language, and a two-way Valley Verified handoff.</p><div class="client-build-grid">${cards}</div></section>`;
+}
+function appBuildCaseStudyCard(build){
+  const proof = build.proof.map(([label, value]) => `<div><strong>${html(label)}</strong><span>${html(value)}</span></div>`).join('');
+  return `<article class="app-case-study glass" id="${html(build.id)}-app-build"><div class="case-study-media"><video autoplay muted loop playsinline controls preload="metadata" poster="${html(build.poster)}"><source src="${html(build.video)}" type="video/mp4"></video></div><div class="case-study-copy"><p class="eyebrow">${html(build.label)} / ${html(build.industry)}</p><h2>${html(build.name)} is the proof example.</h2><p>${html(build.actualApp)}</p><div class="app-value-grid"><article><strong>Deliverables</strong><div class="check-list compact-list">${compactList(build.deliverables, 12)}</div></article><article><strong>Business value</strong><div class="check-list compact-list">${compactList(build.value, 12)}</div></article></div><div class="deep-scan-receipt">${proof}</div><div class="button-row"><a class="btn primary" href="${html(build.url)}" target="_blank" rel="noopener">Open actual app</a><a class="btn" href="${html(build.valleyUrl)}">Open Valley post</a><a class="btn ghost" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Scope an app lane</a></div></div></article>`;
+}
+function appBuildLanePage(){
+  const routeTiles = clientBuilds.map(build => `<article class="proof-card glass"><span>${html(build.id.toUpperCase())}</span><h2>${html(build.name)}</h2><p>${html(build.copy)}</p><div class="tag-list big-tags">${compactList(build.appRoutes, 8)}</div><div class="button-row"><a class="btn small primary" href="${html(build.url)}" target="_blank" rel="noopener">Actual app</a><a class="btn small" href="${html(build.valleyUrl)}">Valley post</a></div></article>`).join('');
+  return base({
+    title:'Valley Verified App Build Lane | Actual Client App Examples',
+    description:"Bob's Smoke Shop and Empire Pallets show what a business gets when Valley Verified routes beyond a public post into a scoped MetrAIyux 0S app build.",
+    canonical:`${SITE_URL}/app-builds/`,
+    bodyClass:'website-page app-builds-page'
+  }, `<section class="hero glass subhero app-build-lane-hero"><div><p class="eyebrow">Valley Verified inside MetrAIyux 0S</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">The app-build lane shows the real thing, not generated placeholder pages.</h1><p class="hero-text">A Valley Verified post gives a business a public discovery bridge. A paid app build gives that business an actual app surface: branded routes, buyer actions, forms, media, proof language, QR/share handoffs, and gate-owned activation. Bob's and Empire are the examples customers can understand.</p><div class="hero-actions"><a class="btn primary" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Open SkyePay gate lane</a><a class="btn" href="/business/bobs-smoke-shop-litchfield-park/">Bob's Valley post</a><a class="btn" href="/business/empire-pallets-phoenix/">Empire Valley post</a></div></div><aside class="hero-card app-lane-receipt">${metric(clientBuilds.length,'actual apps scanned')}${metric('0','generated mockups')}${metric('0S','platform mount')}${metric('Gate','owner-approved offer')}</aside></section>
+${clientBuildShowcase()}
+<section class="section glass app-deliverable-grid"><div class="section-head"><div><p class="eyebrow">What a customer gets</p><h2>A public post plus a real business app lane.</h2></div><a class="btn small primary" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Start gate lane</a></div><div class="platform-strip">${tile('01','Valley Verified post','The public page gives buyers the business route, search/discovery context, contact paths, save/share controls, and a direct handoff into the live app.','/featured/')}${tile('02','Actual app build','The app carries the business-specific workflow: retail inventory and age gate for Bob, quote intake and service lanes for Empire.','/app-builds/')}${tile('03','Proof and handoff','The app links back to Valley Verified, the Valley post links to the app, and the gate records the commercial lane without pretending every listing is owner-verified.','/claims-ledger/')}</div></section>
+<section class="section glass app-route-examples"><div class="section-head"><div><p class="eyebrow">Deep scan routes</p><h2>The real app surfaces behind the Valley posts.</h2></div></div><div class="platform-strip">${routeTiles}</div></section>
+<section class="app-case-study-stack">${clientBuilds.map(appBuildCaseStudyCard).join('')}</section>
+<section class="section glass app-build-gate-panel"><div class="section-head"><div><p class="eyebrow">Gate and 0S wiring</p><h2>This lane belongs inside the 0S, with owner-approved checkout and proof.</h2></div></div><p class="section-intro">A customer does not just get a directory entry. They get a scoped app build that can be mounted in the 0S, linked from Valley Verified, and routed through SkyeGateFS27/SkyePay for approval, payment, and activation state. Public claims stay careful: seeded listings are not automatically owner-verified, and paid intent does not unlock production work without approval.</p><div class="hero-actions"><a class="btn primary" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Open SkyePay offer</a><a class="btn" href="/api/client-app-deep-scan.json">Open scan JSON</a><a class="btn ghost" href="/network/">Network map</a></div></section>`);
+}
+function websiteHero(){ return `<section class="hero website-hero editorial-atlas"><div class="hero-copy"><p class="eyebrow">Arizona verified business network</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">Valley Verified gives the public post. The app-build lane shows what a business can actually buy.</h1><p class="hero-text">Valley Verified turns local records and customer submissions into useful public landing pages, then connects qualified businesses to real app builds when they need buyer actions, quote flows, media, QR routes, and proof-backed handoff.</p><div class="hero-actions"><a class="btn primary" href="/directory/">Explore the marketplace</a><a class="btn" href="/app-builds/">Open app build lane</a><a class="btn ghost" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">SkyePay gate offer</a><a class="btn ghost" href="/for-businesses/">Claim or improve a profile</a></div></div><aside class="atlas-panel"><p class="eyebrow">Network receipt</p><div class="hero-card website-metrics">${metric(currency(count),'business pages')}${metric(currency(categoryCount),'service lanes')}${metric(currency(cityCount),'Arizona markets')}${metric(currency(report.records?.exact_merges || 1069),'duplicate records merged')}</div><div class="atlas-list"><div><strong>Our customer gift</strong><span>Qualified MetrAIyux 0S customers get one public business posting after their first paid month.</span></div><div><strong>Actual app lane</strong><span>Bob's and Empire show the upgrade: branded app surfaces, media, forms, QR routes, and gate-owned activation.</span></div></div></aside></section>`; }
 
 await copyClientBuildAssets();
 await write('index.html', base({ title:'Valley Verified | Arizona Verified Business Network', description:'Valley Verified is a seeded Phoenix-area business marketplace where owners can claim profiles, buyers can discover services, and AEs can activate verified exposure products.', canonical:`${SITE_URL}/`, bodyClass:'home-page website-home', schema:{ '@context':'https://schema.org', '@type':'WebSite', name:'Valley Verified', url:`${SITE_URL}/`, potentialAction:{ '@type':'SearchAction', target:`${SITE_URL}/directory/?q={search_term_string}`, 'query-input':'required name=search_term_string' } } }, `${websiteHero()}
@@ -961,7 +999,7 @@ await write('index.html', base({ title:'Valley Verified | Arizona Verified Busin
     ${clientBuildShowcase()}
 <section class="section glass"><div class="section-head"><div><p class="eyebrow">Platform tools</p><h2>Buyer and operator workflows</h2></div><a class="btn small" href="/deal-desk/">Open deal desk</a></div><div class="tile-grid">${tile('BUY','Buyer discovery','Directory, match, compare, shortlist, and request workflows help visitors move from search to action.','/directory/')}${tile('EDU','Operating insights','Field notes teach the manual business habit first, then show where 0S removes repeated admin drag.','/insights/')}${tile('OWN','Owner activation','Claim, correction, enrichment, and paid-exposure intent workflows improve seeded records.','/join/')}${tile('OPS','Operator control','Fraud defense, duplicate queues, suppressions, admin actions, and AE work orders protect the network.','/protected-admin/')}</div></section>
 <section class="split-grid website-money-path"><div class="section glass"><p class="eyebrow">For buyers</p><h2>Browse real local service lanes without guessing where to start.</h2><p>Use directory, category, city, market, match, shortlist, and compare tools to move from search to quote request. Thin records are clearly treated as enrichment opportunities, not fake verified claims.</p><div class="hero-actions"><a class="btn primary" href="/match/">Use match engine</a><a class="btn" href="/compare/">Compare providers</a></div></div><div class="section glass"><p class="eyebrow">For businesses</p><h2>Claim, correct, enrich, and promote the canonical listing.</h2><p>Business owners can submit correction packets and optional exposure interest. Admin approval and upstream auth own the final live workflow; the public site does not pretend otherwise.</p><div class="hero-actions"><a class="btn primary" href="/join/">Start owner path</a><a class="btn" href="/claim/">Submit update packet</a></div></div></section>
-<section class="section glass"><div class="section-head"><div><p class="eyebrow">Marketplace sample</p><h2>Generated business profiles</h2></div><a class="btn small" href="/directory/">View all</a></div><div class="cards">${sample.map(miniCard).join('')}</div></section>
+<section class="section glass homepage-featured-section"><div class="section-head"><div><p class="eyebrow">Marketplace sample</p><h2>Generated business profiles</h2></div><a class="btn small" href="/directory/">View all</a></div><div class="cards featured-card-grid homepage-feature-card-grid">${sample.map(miniCard).join('')}</div></section>
 <section class="section glass website-proof"><div class="section-head"><div><p class="eyebrow">Data honesty</p><h2>Current enrichment depth</h2></div><a class="btn small" href="/claims-ledger/">Claims ledger</a></div><div class="detail-grid"><div><strong>Website fields</strong><span>${currency(websiteCount)} records currently include a website.</span></div><div><strong>Phone fields</strong><span>${currency(phoneCount)} records currently include a phone.</span></div><div><strong>Email fields</strong><span>${currency(emailCount)} records currently include an email.</span></div><div><strong>Owner activation</strong><span>Claim and enrichment workflows are designed to improve these records after AE outreach.</span></div></div></section>`));
 
 const featuredShown = featured.length ? featured : full.filter(b => b.website).slice(0, 12);
@@ -970,11 +1008,13 @@ await write('featured/index.html', base({
   description:'Featured Valley Verified businesses get public landing pages that connect local discovery to their live business site or app.',
   canonical:`${SITE_URL}/featured/`,
   bodyClass:'website-page featured-page'
-}, `<section class="hero glass subhero website-subhero featured-hero"><div><p class="eyebrow">Featured Valley Verified</p><h1>Featured businesses get a real public landing, not a throwaway listing.</h1><p class="hero-text">This lane shows the value of the offer: a business can have one clean Valley Verified page for local discovery, then route buyers into its full website or app when they are ready to act. The included page is useful on its own, with no obligation to upgrade.</p><div class="hero-actions"><a class="btn primary" href="/for-businesses/">Get a business posting</a><a class="btn" href="#client-builds">See live client builds</a><a class="btn" href="${REQUEST_BUILD_HREF}">Request a build</a></div></div><aside class="hero-card">${metric(featuredShown.length,'featured pages')}${metric(currency(count),'network pages')}${metric('1','free posting after month one')}</aside></section>
+}, `<section class="hero glass subhero website-subhero featured-hero"><div><p class="eyebrow">Featured Valley Verified</p><h1>Featured businesses get a real public landing, not a throwaway listing.</h1><p class="hero-text">This lane shows the value of the offer: a business can have one clean Valley Verified page for local discovery, then route buyers into its full website or app when they are ready to act. The included page is useful on its own, with no obligation to upgrade.</p><div class="hero-actions"><a class="btn primary" href="/for-businesses/">Get a business posting</a><a class="btn" href="/app-builds/">See actual app builds</a><a class="btn" href="${APP_BUILD_GATE_HREF}" target="_blank" rel="noopener">Open gate lane</a></div></div><aside class="hero-card">${metric(featuredShown.length,'featured pages')}${metric(currency(count),'network pages')}${metric('1','free posting after month one')}</aside></section>
 ${skyeCommandCenter()}
 <section class="section glass featured-value"><div class="section-head"><div><p class="eyebrow">Why it has value</p><h2>The featured page becomes a public bridge into the real business.</h2></div></div><div class="platform-strip">${tile('PAGE','Built landing','Each featured post is written like a one-page business landing with buyer actions, contact paths, service context, and a direct live-site handoff.','/featured/')}${tile('BACK','Two-way funnel','The business app links to Valley Verified, and Valley Verified links back to the full business app or website.','/network/')}${tile('UP','Optional scale','After the free page proves value, verification, featured placement, lead routing, sponsor lanes, and managed growth are available only if wanted.','/advertise/')}</div></section>
 ${clientBuildShowcase()}
-<section class="section glass"><div class="section-head"><div><p class="eyebrow">Featured posts</p><h2>Live examples</h2></div><a class="btn small" href="/directory/">Open directory</a></div><div class="cards">${featuredShown.map(miniCard).join('') || '<article class="business-card"><h3>No featured pages yet</h3><p class="card-desc">Featured pages appear here after a business is marked as featured in the seed data.</p></article>'}</div></section>`));
+<section class="section glass featured-posts-section"><div class="section-head"><div><p class="eyebrow">Featured posts</p><h2>Live examples</h2></div><a class="btn small" href="/directory/">Open directory</a></div><div class="cards featured-card-grid">${featuredShown.map(miniCard).join('') || '<article class="business-card"><h3>No featured pages yet</h3><p class="card-desc">Featured pages appear here after a business is marked as featured in the seed data.</p></article>'}</div></section>`));
+
+await write('app-builds/index.html', appBuildLanePage());
 
 const pages = [
   ['about','About Valley Verified','Valley Verified is an Arizona business network built from seeded public records, duplicate prevention, owner claim workflows, and AE activation systems.', 'A verified network starts with disciplined marketplace data.', [ ['Seed first','A marketplace with no supply is dead. Valley Verified starts by organizing public and licensed business records into searchable profiles.'], ['Verify over time','Listings begin as seeded records. Stronger claims require owner proof, enrichment, admin review, and transparent profile updates.'], ['Sell exposure honestly','AEs can sell visibility products only where the marketplace has a real category/city lane and claim discipline.'] ]],
@@ -1003,13 +1043,52 @@ const editorialCalendar = editorialCalendarPayload();
 await writeJson('data/insights-editorial-calendar.json', editorialCalendar);
 await writeJson('api/insights-editorial-calendar.json', editorialCalendar);
 
-const websiteContent = { version:'23.1.0', updated_at:TODAY, purpose:'Public website layer for Valley Verified', routes:['/','/featured/','/about/','/how-it-works/','/for-businesses/','/advertise/','/network/','/contact/', ...INSIGHT_ROUTES], counts:{ published_businesses:count, featured_pages:featuredShown.length, insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, websites:websiteCount, phones:phoneCount, emails:emailCount, duplicate_merges:report.records?.exact_merges || null }, claims_guardrails:['Seeded public records are not automatically owner-verified.','Paid exposure intent does not equal paid activation until webhook and admin approval complete.','Duplicate prevention is enforced through canonical identity, collision reports, and suppression workflows.','Business insights should educate first and link only to major live 0S/company platforms.','Scheduled articles appear in the editorial calendar before publish, but public article routes are generated only when publish_at has arrived.'] };
+const clientAppDeepScan = {
+  version:'23.2.0',
+  updated_at:TODAY,
+  lane:{
+    id:'valley-verified-app-build-lane',
+    name:'Valley Verified App Build Lane',
+    public_route:'/app-builds/',
+    gate_url:APP_BUILD_GATE_HREF,
+    platform_mount:'/valley-verified/',
+    position:'Valley Verified public post plus optional MetrAIyux 0S app build for businesses that need a real app, quote route, retail flow, QR handoff, or proof-backed customer surface.'
+  },
+  actual_client_apps:clientBuilds.map(build => ({
+    id:build.id,
+    name:build.name,
+    industry:build.industry,
+    source_folder:build.sourceFolder,
+    live_app_url:build.url,
+    valley_post_url:build.valleyUrl,
+    routes:build.appRoutes,
+    deliverables:build.deliverables,
+    value:build.value,
+    buyer_actions:build.buyerActions,
+    proof:Object.fromEntries(build.proof)
+  })),
+  customer_value:[
+    'A real public Valley Verified route for local discovery and trust context.',
+    'A business-specific app surface that matches how the company sells or serves customers.',
+    'Live app handoff, Valley backlink, share/QR behavior, and proof-safe copy.',
+    'SkyeGateFS27/SkyePay lane for owner-approved commercial activation.'
+  ],
+  guardrails:[
+    'These are actual app examples, not generated placeholder pages.',
+    'Seeded Valley records are not automatically owner-verified.',
+    'Paid intent does not activate production work without owner approval and proof.'
+  ]
+};
+await writeJson('data/client-app-deep-scan.json', clientAppDeepScan);
+await writeJson('api/client-app-deep-scan.json', clientAppDeepScan);
+
+const websiteContent = { version:'23.2.0', updated_at:TODAY, purpose:'Public website layer for Valley Verified', routes:['/','/featured/','/app-builds/','/about/','/how-it-works/','/for-businesses/','/advertise/','/network/','/contact/', ...INSIGHT_ROUTES], counts:{ published_businesses:count, featured_pages:featuredShown.length, client_app_builds:clientBuilds.length, insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, websites:websiteCount, phones:phoneCount, emails:emailCount, duplicate_merges:report.records?.exact_merges || null }, claims_guardrails:['Seeded public records are not automatically owner-verified.','Paid exposure intent does not equal paid activation until webhook and admin approval complete.','Duplicate prevention is enforced through canonical identity, collision reports, and suppression workflows.','Bob and Empire are actual client app examples, not generated placeholder pages.','Business insights should educate first and link only to major live 0S/company platforms.','Scheduled articles appear in the editorial calendar before publish, but public article routes are generated only when publish_at has arrived.'] };
 await writeJson('data/website-content.json', websiteContent);
 await writeJson('api/website-content.json', { updated_at:TODAY, href:'/data/website-content.json', routes:websiteContent.routes, counts:websiteContent.counts });
 const brainSalesGuide = {
   updated_at:TODAY,
   product:'Valley Verified',
-  positioning:'Our gift to qualified MetrAIyux 0S customers after the first paid month: one reviewed public business landing with no obligation to upgrade.',
+  positioning:'Our gift to qualified MetrAIyux 0S customers after the first paid month: one reviewed public business landing with no obligation to upgrade. The paid app-build lane turns qualified businesses into actual Bob/Empire-style app surfaces when they need a real workflow.',
   hard_rules:[
     'Do not say upgrades are required to keep the account or included public page.',
     'Do not claim every seeded record is owner-verified.',
@@ -1019,14 +1098,17 @@ const brainSalesGuide = {
     home:`${SITE_URL}/`,
     insights:`${SITE_URL}/insights/`,
     featured:`${SITE_URL}/featured/`,
+    app_builds:`${SITE_URL}/app-builds/`,
     bobs_post:`${SITE_URL}/business/bobs-smoke-shop-litchfield-park/`,
     empire_post:`${SITE_URL}/business/empire-pallets-phoenix/`,
     bobs_live:'https://bobs-smoke-shop.pages.dev/',
     empire_live:'https://empire-pallets.pages.dev/',
-    request_build:REQUEST_BUILD_HREF
+    request_build:REQUEST_BUILD_HREF,
+    gate_offer:APP_BUILD_GATE_HREF
   },
   products:[
     { name:'Free public business landing', price:'Included after first paid month for qualified 0S customers', obligation:'No upgrade required' },
+    { name:'Valley Verified App Build Lane', price:'Owner-approved SkyePay lane', obligation:'Only when the business wants a real app like Bob or Empire' },
     { name:'Verified profile upgrade', price:'Optional', obligation:'Only if the business wants stronger trust presentation' },
     { name:'Featured market placement', price:'Optional', obligation:'Only if the business wants more lane visibility' },
     { name:'Lead routing / managed growth', price:'Optional', obligation:'Only if the business wants managed routing or campaign support' }
@@ -1075,7 +1157,7 @@ for(const file of files){
 const websiteRoutes = websiteContent.routes.filter(r => r !== '/');
 const routeManifest = await maybeReadJson('data/route-manifest.json', { surfaces:[] });
 routeManifest.version = '23.0.0';
-routeManifest.website = { routes:websiteContent.routes, header:'public_nav_simplified', owner_path:'/for-businesses/', advertise_path:'/advertise/' };
+routeManifest.website = { routes:websiteContent.routes, header:'public_nav_simplified', owner_path:'/for-businesses/', advertise_path:'/advertise/', app_build_lane:'/app-builds/', gate_offer:APP_BUILD_GATE_HREF };
 routeManifest.surfaces = Array.from(new Set([...(routeManifest.surfaces || []), ...websiteContent.routes]));
 await writeJson('data/route-manifest.json', routeManifest);
 
@@ -1097,7 +1179,10 @@ await write('robots.txt', robots.trim() + '\n');
 
 let llms = await read('llms.txt').catch(()=> '# Valley Verified\n');
 if(!llms.includes('## Public website')){
-  llms += `\n## Public website\nValley Verified has a public marketplace website layer at /, /about/, /how-it-works/, /for-businesses/, /advertise/, /network/, /contact/, and /insights/. The site should be described as a seeded Arizona business discovery network with owner claim, enrichment, duplicate-prevention, AE activation, exposure-product workflows, and practical business operating education. Do not claim every seeded business is owner-verified.\n`;
+  llms += `\n## Public website\nValley Verified has a public marketplace website layer at /, /featured/, /app-builds/, /about/, /how-it-works/, /for-businesses/, /advertise/, /network/, /contact/, and /insights/. The site should be described as a seeded Arizona business discovery network with owner claim, enrichment, duplicate-prevention, AE activation, exposure-product workflows, actual app-build examples, and practical business operating education. Do not claim every seeded business is owner-verified.\n`;
+}
+if(!llms.includes('## Client app build lane')){
+  llms += `\n## Client app build lane\nThe /app-builds/ route explains the Valley Verified App Build Lane inside MetrAIyux 0S. Bob's Smoke Shop and Empire Pallets are actual app examples from Skye-Clients, not generated placeholder pages. Bob demonstrates an age-gated retail app with inventory, specials, media, workspace preview, QR/social handoff, and Valley backlink. Empire demonstrates an operations app with quote intake, service lanes, scan route, gated intro media, preview handoff, PWA/offline support, and Valley backlink. The gate route is ${APP_BUILD_GATE_HREF} and activation remains owner-approved.\n`;
 }
 if(!llms.includes('## Business insights')){
   llms += `\n## Business insights\nThe /insights/ section is a public operating journal for business owners. It teaches manual company-running methods first, then shows how MetrAIyux 0S, SkyeVault, SkyeGateFS27/SkyePay, the Deployment Atlas, Skyes Over London Reviews, and SOLEnterprises reduce repeated admin work. Only major live platforms should be linked from this section.\n`;
@@ -1125,17 +1210,22 @@ if(!css.includes('v23 publication engine layer')){
   css += publicationCssBlock;
   await fs.writeFile(cssPath, css);
 }
+const appBuildCssBlock = `\n/* v23 client app build lane */\n.public-topbar{background:rgba(248,250,247,.92);border-color:rgba(15,22,20,.18)}.public-footer{background:#101513;color:#f6f8f3}.public-footer p,.public-footer small{color:rgba(246,248,243,.72)}.public-footer a{color:#f6f8f3}.website-page .section.glass,.website-page .hero.glass,.article-card,.category-card,.schedule-row,.diagnostic-grid article,.check-list span,.source-link-grid a,.website-proof .detail-grid div,.website-page .detail-grid div{background:rgba(255,255,255,.78);border-color:rgba(15,22,20,.14)}.website-page .section.glass,.website-page .hero.glass{box-shadow:0 26px 70px rgba(15,22,20,.12)}.website-hero,.app-build-lane-hero{background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(231,242,236,.76) 48%,rgba(255,245,226,.58));border:1px solid rgba(15,22,20,.14);box-shadow:0 30px 90px rgba(15,22,20,.14)}.app-build-lane-hero{grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);align-items:stretch}.app-lane-receipt{background:#101513;color:#f6f8f3}.actual-app-showcase{position:relative;overflow:hidden}.actual-app-showcase .section-intro,.app-build-gate-panel .section-intro{max-width:980px}.actual-client-card{grid-template-columns:minmax(300px,.92fr) minmax(0,1fr);background:rgba(255,255,255,.86)}.client-app-spec{display:grid;gap:10px;margin-top:12px;border:1px solid rgba(0,124,120,.2);border-radius:8px;background:rgba(0,124,120,.06);padding:12px}.client-app-spec strong{font-size:12px;text-transform:uppercase;color:var(--teal)}.client-app-spec div{display:flex;flex-wrap:wrap;gap:8px}.client-app-spec span,.tag-list span{border:1px solid rgba(15,22,20,.14);border-radius:999px;background:#fff;padding:7px 9px;color:var(--ink-soft);font-size:12px;font-weight:800}.app-route-examples .proof-card,.app-deliverable-grid .platform-tile{min-height:260px}.app-case-study-stack{display:grid;gap:18px;margin-top:18px}.app-case-study{display:grid;grid-template-columns:minmax(340px,.86fr) minmax(0,1fr);gap:0;overflow:hidden;border:1px solid rgba(15,22,20,.14);border-radius:8px;background:rgba(255,255,255,.86);box-shadow:0 24px 70px rgba(15,22,20,.12)}.case-study-media{min-height:100%;background:#101513}.case-study-media video{width:100%;height:100%;min-height:480px;display:block;object-fit:cover}.case-study-copy{display:grid;gap:18px;padding:26px}.case-study-copy h2{font-family:var(--display);font-size:clamp(2rem,4vw,4.2rem);line-height:1;margin:0}.case-study-copy p{margin:0;color:var(--ink-soft);line-height:1.62}.app-value-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.app-value-grid article{border:1px solid rgba(15,22,20,.12);border-radius:8px;background:rgba(248,250,247,.78);padding:14px}.app-value-grid article>strong{display:block;margin-bottom:10px;text-transform:uppercase;font-size:12px;color:var(--oxblood)}.deep-scan-receipt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.deep-scan-receipt div{border:1px solid rgba(15,22,20,.12);border-radius:8px;background:#101513;color:#f6f8f3;padding:12px}.deep-scan-receipt strong{display:block;color:#f5b84f;font-size:12px;text-transform:uppercase}.deep-scan-receipt span{display:block;overflow-wrap:anywhere;color:rgba(246,248,243,.78);font-size:13px;line-height:1.4}.app-build-gate-panel{background:linear-gradient(135deg,#101513,#152823)!important;color:#f6f8f3}.app-build-gate-panel .section-intro,.app-build-gate-panel h2{color:#f6f8f3}.app-build-gate-panel .eyebrow{color:#f5b84f}@media(max-width:1050px){.actual-client-card,.app-case-study,.app-build-lane-hero{grid-template-columns:1fr}.case-study-media video{min-height:320px}.app-value-grid,.deep-scan-receipt{grid-template-columns:1fr}}@media(max-width:760px){.client-app-spec div{display:grid}.case-study-copy{padding:20px}.case-study-media video{min-height:250px}}\n`;
+if(!css.includes('v23 client app build lane')){
+  css += appBuildCssBlock;
+  await fs.writeFile(cssPath, css);
+}
 
 const readiness = await maybeReadJson('data/v22-code-readiness.json', {});
 const priorV23Readiness = await maybeReadJson('data/v23-website-readiness.json', { proof:{} });
 const effectiveHeaderReplacements = Math.max(headerReplacements, Number(priorV23Readiness.proof?.header_replacements || 0), 1);
 const effectiveFooterInserts = Math.max(footerInserts, Number(priorV23Readiness.proof?.footer_inserts || 0));
-await writeJson('data/v23-website-readiness.json', { version:'23.1.0', updated_at:TODAY, completed:['public_homepage_rewritten','clean_public_nav','about_page','how_it_works_page','for_businesses_page','advertise_page','network_page','contact_page','insights_operating_journal','insights_topic_clusters','insights_editorial_calendar','insights_schedule_feed','0s_scheduled_publisher_contract','major_platform_backlinks','website_content_json','sitemap_public_routes','llms_website_context','footer_public_guardrails'], proof:{ published_businesses:count, insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts, previous_closure:readiness.version || '22.0.0' } });
+await writeJson('data/v23-website-readiness.json', { version:'23.2.0', updated_at:TODAY, completed:['public_homepage_rewritten','clean_public_nav','about_page','how_it_works_page','for_businesses_page','advertise_page','network_page','contact_page','app_build_lane','actual_client_app_deep_scan','app_build_gate_offer_link','insights_operating_journal','insights_topic_clusters','insights_editorial_calendar','insights_schedule_feed','0s_scheduled_publisher_contract','major_platform_backlinks','website_content_json','sitemap_public_routes','llms_website_context','footer_public_guardrails'], proof:{ published_businesses:count, featured_pages:featuredShown.length, client_app_builds:clientBuilds.length, app_build_lane:'/app-builds/', gate_offer:APP_BUILD_GATE_HREF, client_app_deep_scan:'/api/client-app-deep-scan.json', insights:PUBLISHED_INSIGHTS.length, insights_total:BUSINESS_INSIGHTS.length, insights_scheduled:UPCOMING_INSIGHTS.length, insight_categories:PUBLICATION_CATEGORIES.length, major_platforms:MAJOR_PLATFORM_LINKS.length, categories:categoryCount, cities:cityCount, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts, previous_closure:readiness.version || '22.0.0' } });
 await writeJson('api/v23-website-readiness.json', { updated_at:TODAY, href:'/data/v23-website-readiness.json' });
 
 const seedReport = await maybeReadJson('seed-report.json', {});
-seedReport.version = '23.1.0';
-seedReport.website = { public_routes:websiteContent.routes, public_nav:'simplified', homepage:'rewritten_for_marketplace_sales', insight_publication_engine:{published:PUBLISHED_INSIGHTS.length, scheduled:UPCOMING_INSIGHTS.length, categories:PUBLICATION_CATEGORIES.length, calendar:'/api/insights-editorial-calendar.json'}, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts };
+seedReport.version = '23.2.0';
+seedReport.website = { public_routes:websiteContent.routes, public_nav:'simplified', homepage:'rewritten_for_marketplace_sales', app_build_lane:{route:'/app-builds/', gate_offer:APP_BUILD_GATE_HREF, client_app_builds:clientBuilds.length, scan_json:'/api/client-app-deep-scan.json'}, insight_publication_engine:{published:PUBLISHED_INSIGHTS.length, scheduled:UPCOMING_INSIGHTS.length, categories:PUBLICATION_CATEGORIES.length, calendar:'/api/insights-editorial-calendar.json'}, header_replacements:effectiveHeaderReplacements, footer_inserts:effectiveFooterInserts };
 await writeJson('seed-report.json', seedReport);
 
 console.log(`v23 website enhanced: ${websiteContent.routes.length} public website routes, ${PUBLISHED_INSIGHTS.length} live insights, ${UPCOMING_INSIGHTS.length} scheduled, ${headerReplacements} headers cleaned, ${footerInserts} footers inserted.`);

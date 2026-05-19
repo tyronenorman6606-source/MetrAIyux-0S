@@ -4,13 +4,13 @@
     <title>Operator Import Console | Valley Verified</title>
     <meta name="description" content="Operator import console for turning outside scrape exports into Valley Verified seed files." />
     <meta name="robots" content="noindex,nofollow,noarchive" />
-    <link rel="canonical" href="https://phx-verified-network.pages.dev/operator/" />
+    <link rel="canonical" href="https://valley-verified.pages.dev/operator/" />
     <meta name="theme-color" content="#f5efe3" />
     <meta property="og:title" content="Operator Import Console | Valley Verified" />
     <meta property="og:description" content="Operator import console for turning outside scrape exports into Valley Verified seed files." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://phx-verified-network.pages.dev/operator/" />
-    <meta property="og:image" content="https://phx-verified-network.pages.dev/assets/valley-verified-logo.png" />
+    <meta property="og:url" content="https://valley-verified.pages.dev/operator/" />
+    <meta property="og:image" content="https://valley-verified.pages.dev/assets/valley-verified-logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/assets/valley-verified-logo.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -18,7 +18,7 @@
     
   </head><body class="operator-page"><canvas id="sky" class="skyesol-living-background living-background" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div><header class="topbar public-topbar">
   <a class="brand" href="/" aria-label="Valley Verified home"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>real local business pages</small></span></a>
-  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a><a class="nav-operator" href="/protected-admin/" rel="nofollow">Operator</a></nav>
+  <nav class="nav-actions public-nav" aria-label="Primary"><a href="/featured/">Featured</a><a href="/directory/">Directory</a><a href="/insights/">Insights</a><a href="/network/">Network</a><a href="/how-it-works/">How it works</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a></nav>
 </header><main id="main" class="site-main"><section class="operator-hero glass"><a class="back-link" href="/">← Back to network</a><p class="eyebrow">Operator surface</p><h1>Scrape Import Console</h1><p>This browser tool converts pasted or uploaded CSV/JSON scrape exports into seed files for review and publishing.</p><div class="operator-grid small"><div><strong>Drop target</strong><br><code>seed/businesses/inbox/</code></div><div><strong>Build command</strong><br><code>npm run build</code></div><div><strong>Publish output</strong><br><code>dist</code></div></div></section>
   <section class="glass operator-panel"><div class="section-head"><div><p class="eyebrow">1. Normalize</p><h2>Convert outside business data</h2></div><span id="operatorCount" class="stat-pill">0 ready</span></div><p class="muted">Accepted fields include name, category, subcategory, website, booking_url, phone, email, address, city, state, zip, lat, lng, tags, languages, starting_price, no_hidden_fees, business_verified, mobile, insured, instagram, tiktok, youtube, last_verified.</p><div class="form-row"><label for="seedName">Generated seed filename</label><input id="seedName" value="phx-scrape-batch.json" /></div><div class="form-row"><label for="seedFile">Upload CSV or JSON</label><input id="seedFile" type="file" accept=".csv,.json,application/json,text/csv" /></div><div class="form-row"><label for="seedPaste">Or paste raw CSV/JSON</label><textarea id="seedPaste" placeholder="name,category,city,website,phone..."></textarea></div><div class="button-row"><button id="normalizeBtn" class="btn primary">Normalize seed</button><button id="copyBtn" class="btn" disabled>Copy JSON</button><button id="downloadBtn" class="btn" disabled>Download seed file</button></div></section>
   <section class="glass operator-panel"><div class="section-head"><div><p class="eyebrow">2. Review</p><h2>Generated seed JSON</h2></div></div><pre id="seedOutput" class="code-output">Paste or upload data, then click Normalize seed.</pre></section>

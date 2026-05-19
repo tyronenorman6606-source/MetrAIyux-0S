@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "name": "platform-controls-smoke",
+  "checks": {
+    "worker has plan definitions": true,
+    "worker exposes plan catalog API": true,
+    "worker exposes plan mutation API": true,
+    "worker enforces daily plan usage": true,
+    "worker enforces capability allowlist": true,
+    "worker supports scoped key expiry": true,
+    "SDK exposes plan admin calls": true,
+    "CLI exposes paid-platform commands": true,
+    "console has plan enforcement UI": true,
+    "console contains truth-mode copy": true
+  },
+  "proves": [
+    "source includes plan catalog and plan mutation APIs",
+    "source includes runtime capability/usage enforcement hooks",
+    "source includes scoped key expiry handling",
+    "CLI, SDK, and console expose the paid-platform controls"
+  ],
+  "does_not_prove": [
+    "live billing collection",
+    "deployed Cloudflare Worker behavior",
+    "real provider delivery success"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T00:24:11.875Z"
+}

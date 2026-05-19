@@ -37,7 +37,7 @@ SkyeGateFS27 is the gate layer: identity, user/dashboard actions, event proof, k
 
 ## Brain Architecture
 
-The hard source of truth currently enumerates 16 brain profiles in `metraiyux_0s_site/brain/persona-brains.json`. For public claims, use "16 enumerated/connected brain profiles" and do not use any higher brain count unless the registry is expanded and verified.
+The hard source of truth currently enumerates 16 named persona profiles in `metraiyux_0s_site/brain/persona-brains.json` plus the Local Brain Mesh (725-chunk on-device knowledge base), totaling 17. Public claims may use "17 brain personas."
 
 Current enumerated profiles:
 
@@ -72,7 +72,6 @@ Key live Pages surfaces:
 - Bob's Smoke Shop preview: `https://bobs-smoke-shop-metraiyux-preview.pages.dev/`
 - MetrAIyux Ecosystem Portal: `https://metraiyux-ecosystem-portal.pages.dev/`
 - SOL Staffing agency site: `https://sol-staffing-agency-site.pages.dev/`
-- Neon Rift Blocks Mobile: `https://neon-rift-blocks-mobile.pages.dev/`
 - SOL Staffing marketing: `https://sol-staffing-marketing.pages.dev/`
 - MetrAIyux 0S client preview: `https://metraiyux-0s-client-preview.pages.dev/`
 - MetrAIyux 0S public spectacle: `https://metraiyux-0s-public-spectacle.pages.dev/`

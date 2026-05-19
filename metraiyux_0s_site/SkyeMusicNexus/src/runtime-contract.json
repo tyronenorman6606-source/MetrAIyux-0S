@@ -1,7 +1,7 @@
 {
   "platformId": "skye-music-nexus",
   "title": "SkyeMusicNexus NeoFront",
-  "generatedAt": "2026-05-17",
+  "generatedAt": "2026-05-18",
   "root": "QuantumSkyes/Vanta13/standalone-platforms/SkyeMusicNexus",
   "routes": [
     "index.html",
@@ -13,53 +13,44 @@
     "settings.html"
   ],
   "launchTargets": [
-    {
-      "label": "Platform Dashboard",
-      "href": "./public/index.html"
-    },
-    {
-      "label": "Create Studio",
-      "href": "./public/create.html"
-    },
-    {
-      "label": "Upload Studio",
-      "href": "./public/upload.html"
-    },
-    {
-      "label": "Music Player",
-      "href": "./public/player.html"
-    },
-    {
-      "label": "Releases",
-      "href": "./public/releases.html"
-    },
-    {
-      "label": "Rights",
-      "href": "./public/rights.html"
-    },
-    {
-      "label": "Creator Exchange",
-      "href": "./public/exchange.html"
-    },
-    {
-      "label": "Operator Stage",
-      "href": "./public/admin.html"
-    },
-    {
-      "label": "NeoFront Smoke",
-      "href": "./smoke/neo-front-smoke.mjs"
-    },
-    {
-      "label": "Runtime Smoke Proof",
-      "href": "./smoke/smoke-proof.mjs"
-    }
+    { "label": "Platform Dashboard", "href": "./public/index.html" },
+    { "label": "Create Hub", "href": "./public/create.html" },
+    { "label": "Native DAW", "href": "./public/daw.html" },
+    { "label": "Stem Vault", "href": "./public/stems.html" },
+    { "label": "Export Forge", "href": "./public/exports.html" },
+    { "label": "Discover", "href": "./public/discover.html" },
+    { "label": "Feed", "href": "./public/feed.html" },
+    { "label": "Upload Studio", "href": "./public/upload.html" },
+    { "label": "Music Player", "href": "./public/player.html" },
+    { "label": "Releases", "href": "./public/releases.html" },
+    { "label": "Rights", "href": "./public/rights.html" },
+    { "label": "Creator Exchange", "href": "./public/exchange.html" },
+    { "label": "Operator Stage", "href": "./public/admin.html" },
+    { "label": "NeoFront Smoke", "href": "./smoke/neo-front-smoke.mjs" },
+    { "label": "Runtime Smoke Proof", "href": "./smoke/smoke-proof.mjs" }
   ],
   "modules": [
     "Platform Dashboard",
-    "Open Source Creation Studio",
-    "openDAW Bridge",
+    "Native Creation Hub",
+    "SkyeMusicNexus Native DAW",
+    "DAW Transport",
+    "Arrangement Timeline",
+    "Track Mixer",
+    "Drum Pads",
+    "Synth Keys",
+    "Physical Keyboard Notes",
+    "Region Editing",
+    "Loop Pack Insertion",
+    "Browser WAV Mixdown",
+    "Mic and Web MIDI Hooks",
     "Stem Staging Ledger",
     "Export Manifest Queue",
+    "Discover Playlist Rail",
+    "Social Feed Composer",
+    "Open Social Spine",
+    "Pixelfed Connector",
+    "Fediverse Feed Sync",
+    "Provider-Safe Social Queue",
     "Upload Studio",
     "Large Song Drop Zone",
     "Gated Audio Vault",
@@ -83,12 +74,19 @@
     "Proof Chain"
   ],
   "sourceDependency": false,
-  "platformState": "roomed-neofront-music-platform-with-gated-upload-player-exchange-and-rights-vault",
+  "platformState": "roomed-neofront-music-platform-with-native-daw-gated-upload-player-exchange-and-rights-vault",
   "frontEndSystem": {
     "name": "NeoFront Music Nexus",
     "primaryFiles": [
       "public/index.html",
       "public/create.html",
+      "public/daw.html",
+      "public/nexus-daw.css",
+      "public/nexus-daw.js",
+      "public/stems.html",
+      "public/exports.html",
+      "public/discover.html",
+      "public/feed.html",
       "public/upload.html",
       "public/player.html",
       "public/releases.html",
@@ -104,14 +102,29 @@
     "directUpload": "gated create-upload-session and complete-upload actions activate when MUSIC_NEXUS_ENABLE_DIRECT_UPLOAD=1",
     "providerHooks": "netlify/functions/music-provider-hooks.js queues transcoding, waveform, CDN, DSP, legal, and royalty jobs until webhook env is configured",
     "studioFunction": "netlify/functions/music-studio.js",
+    "socialFunction": "netlify/functions/music-social.js",
     "exchangeFunction": "netlify/functions/music-exchange.js",
     "exchangeCapabilities": [
-      "open-source creation session ledger",
-      "openDAW external bridge",
+      "native creation session ledger",
+      "native fullscreen DAW",
+      "transport and arrangement timeline",
+      "audio import decode preview",
+      "physical keyboard note input",
+      "region editing and undo redo",
+      "loop pack insertion",
+      "browser WAV mixdown",
+      "mic recording and Web MIDI hooks",
+      "drum pads and synth keys",
       "local stem and master staging",
       "sample pack rail",
       "export manifest queue",
       "Release Forge handoff line",
+      "Spotify-shaped Discover room",
+      "Instagram-shaped Feed room",
+      "Pixelfed/Mastodon-compatible connector",
+      "Funkwhale publication contract",
+      "provider-token-safe release post queue",
+      "federated hashtag feed sync",
       "gated audio upload",
       "large drag/drop song upload target",
       "Skye-ID artist identity handoff",
@@ -127,6 +140,11 @@
       "rights attestation gate",
       "takedown playback hold",
       "distribution publish gate"
+    ],
+    "forbidden": [
+      "third-party DAW iframe",
+      "vendored browser DAW source",
+      "external DAW brand mounted as Nexus"
     ]
   }
 }

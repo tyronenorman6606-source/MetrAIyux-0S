@@ -1,0 +1,31 @@
+{
+  "product": "SovereignDocs",
+  "version": "14.0.0",
+  "codename": "SkyeDocxMax Integrated Runtime",
+  "createdAt": "2026-05-10T00:00:00Z",
+  "base": "sovereigndocs_real_platform_v13_workflow_surface.zip",
+  "editorSource": "SkyeDocxMax(1).zip",
+  "coreChanges": [
+    "Bundled uploaded SkyeDocxMax app under /skye-docx-max/app/",
+    "Injected sd-bridge.js to import SovereignDocs handoff payloads via sd_handoff query parameter.",
+    "Added server-side full handoff payload persistence under data/editor-handoffs/.",
+    "Added GET/opened/return APIs for SkyeDocxMax sessions.",
+    "Returned SkyeDocxMax packages now create SovereignDocs document lifecycle records.",
+    "Updated workflow UI to create and launch live SkyeDocxMax sessions.",
+    "Kept no-law-firm/no-legal-advice/no-guarantee boundaries intact.",
+    "Added v14 smoke proof for bundled editor runtime, launch URL, payload retrieval, return package, and audit ledger."
+  ],
+  "newOrChangedFiles": [
+    "skye-docx-max/app/**",
+    "skye-docx-max/app/sd-bridge.js",
+    "skye-docx-max/index.html",
+    "server/editor-adapter.mjs",
+    "server/sovereigndocs-server.mjs",
+    "assets/workflow-ui.js",
+    "scripts/smoke-v14-skye-docx-integration.mjs",
+    "docs/SKYEDOCXMAX_INTEGRATION_V14.md",
+    "docs/LAST_SMOKE_RUN_V14.md"
+  ],
+  "proof": "npm run smoke:all passed before runtime cleanup",
+  "honesty": "This zip bundles the SkyeDocxMax editor runtime and wires handoff/return behavior. It still requires the user\u2019s upstream auth and live provider activation for production SaaS."
+}

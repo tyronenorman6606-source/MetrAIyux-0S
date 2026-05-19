@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop Repo Vault</title>
+    <meta name="description" content="SkyeVault-Drop repo workspace lane for safe archives, Git remotes, diff receipts, and secret boundary manifests." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body class="client-site route-repo">
+    <div class="spectacle-field" aria-hidden="true"></div>
+    <main class="site-shell">
+      <nav class="client-nav" aria-label="SkyeVault navigation">
+        <a class="nav-brand sky-brand" href="/" aria-label="SkyeVault-Drop home">
+          <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+          <span>
+            <strong>Skyes Over London</strong>
+            <small id="navBrandName">Drop Vault</small>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a href="/upload.html">Upload</a>
+          <a href="/vault.html">My Vault</a>
+          <a class="nav-cta" href="/repo.html">Repo Vault</a>
+          <a href="/process.html">Process</a>
+          <a href="/">Home</a>
+        </div>
+      </nav>
+
+      <aside class="vault-sidecar" aria-label="Vault routes">
+        <div class="sidecar-brand">
+          <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
+          <div>
+            <strong>Repo Room</strong>
+            <span>Archives, Git, receipts</span>
+          </div>
+        </div>
+        <a href="/upload.html"><span>01</span> Secure intake</a>
+        <a href="/vault.html"><span>02</span> My vault files</a>
+        <a href="/repo.html"><span>03</span> Repo workspace</a>
+        <a href="/process.html"><span>04</span> Proof route</a>
+        <div class="sidecar-proof">
+          <strong>Secret boundary</strong>
+          <p>Normal repo packages stay clean. Local-only secrets get documented for a separate private recovery handoff.</p>
+        </div>
+      </aside>
+
+      <section id="repo-snapshots" class="section-grid repo-snapshot-section route-section">
+        <article class="panel rich-panel">
+          <p class="eyebrow">Repo Vault Lane</p>
+          <h1 class="page-title">Safe archive, Git remote, or working vault folder.</h1>
+          <p class="muted big-copy">For handoff packages, the repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger.</p>
+          <div class="command-stack" aria-label="Repository snapshot commands">
+            <span class="code-pill">npm run vault:dry-run</span>
+            <span class="code-pill">npm run vault:push</span>
+            <span class="code-pill">npm run vault:repo -- status --dir=.</span>
+            <span class="code-pill">npm run vault:secrets:manifest</span>
+            <span class="code-pill">npm run vault:cli clone app ./app</span>
+          </div>
+        </article>
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Safety Behavior</p>
+          <h2>Archive safety and Git-level recovery stay separate.</h2>
+          <p class="muted big-copy">The archive package skips local secrets, generated dependency folders, backup data, database files, private keys, old archives, and text files flagged by the credential scanner.</p>
+          <ul class="check-list">
+            <li>Use dry run first to inspect the sanitized archive.</li>
+            <li>Use push when the archive is ready for the vault ledger.</li>
+            <li>Use the Git remote when the dev needs clone, fetch, and push behavior.</li>
+            <li>Use the repo workspace helper for status, diff, commit, sync, and push receipts.</li>
+            <li>Use the secret manifest before deleting or handing off a local workspace.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="surface-grid repo-grid" aria-label="Repo workflow lanes">
+        <article class="panel route-card">
+          <span class="eyebrow">Archive</span>
+          <strong>Receipt-backed snapshot</strong>
+          <p>Best for project handoff, release proof, disaster recovery, and client-safe downloads.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Git</span>
+          <strong>Bare repo remote</strong>
+          <p>Best when a developer needs normal clone, fetch, push, tags, and branch policy.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Workspace</span>
+          <strong>Working folder receipts</strong>
+          <p>Best when a vault folder needs status, diff, commit, sync, and push proof.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Boundary</span>
+          <strong>Local-only recovery list</strong>
+          <p>Best for secrets, databases, private keys, dependency folders, and generated state.</p>
+        </article>
+      </section>
+    </main>
+
+    <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
+    <script src="/assets/vendor/gsap.min.js" defer></script>
+    <script src="/assets/vendor/lenis.min.js" defer></script>
+    <script src="/assets/vault-motion.js" defer></script>
+    <script src="/assets/app.js" type="module"></script>
+  </body>
+</html>

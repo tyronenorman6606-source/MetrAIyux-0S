@@ -66,6 +66,27 @@ await check('mobile viewport has no horizontal scroll', async () => {
   return { overflow };
 });
 
+await check('split public route pages render without mega-scroll coupling', async () => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const routes = [
+    { path: '/upload.html', text: /Drop files into the vault|Start secure upload/i },
+    { path: '/vault.html', text: /Open my vault|Find and download stored files/i },
+    { path: '/repo.html', text: /Repo Vault Lane|repo workspace/i },
+    { path: '/process.html', text: /Proof Route|Send production signal/i }
+  ];
+  const results = [];
+  for (const route of routes) {
+    const response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle' });
+    const body = await page.textContent('body');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (!response?.ok()) throw new Error(`${route.path} returned ${response?.status()}`);
+    if (!route.text.test(body || '')) throw new Error(`${route.path} did not render expected route text.`);
+    if (overflow > 2) throw new Error(`${route.path} horizontal overflow: ${overflow}px`);
+    results.push({ path: route.path, status: response.status(), overflow });
+  }
+  return results;
+});
+
 await check('operator session opens admin vault browser', async () => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   const login = await page.request.post(`${baseUrl}/api/operator-session`, { data: { token: adminToken } });

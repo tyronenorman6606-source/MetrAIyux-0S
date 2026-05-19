@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop My Vault</title>
+    <meta name="description" content="Open completed SkyeVault-Drop receipts and protected download links." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body class="client-site route-vault">
+    <div class="spectacle-field" aria-hidden="true"></div>
+    <main class="site-shell">
+      <nav class="client-nav" aria-label="SkyeVault navigation">
+        <a class="nav-brand sky-brand" href="/" aria-label="SkyeVault-Drop home">
+          <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+          <span>
+            <strong>Skyes Over London</strong>
+            <small id="navBrandName">Drop Vault</small>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a href="/upload.html">Upload</a>
+          <a class="nav-cta" href="/vault.html">My Vault</a>
+          <a href="/repo.html">Repo Vault</a>
+          <a href="/process.html">Process</a>
+          <a href="/">Home</a>
+        </div>
+      </nav>
+
+      <aside class="vault-sidecar" aria-label="Vault routes">
+        <div class="sidecar-brand">
+          <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
+          <div>
+            <strong>Recovery Room</strong>
+            <span>Completed vault files</span>
+          </div>
+        </div>
+        <a href="/upload.html"><span>01</span> Secure intake</a>
+        <a href="/vault.html"><span>02</span> My vault files</a>
+        <a href="/repo.html"><span>03</span> Repo workspace</a>
+        <a href="/process.html"><span>04</span> Proof route</a>
+        <div class="sidecar-proof">
+          <strong>Receipt gate</strong>
+          <p>Completed uploads can be listed by email and access code without loading the whole intake page.</p>
+        </div>
+      </aside>
+
+      <section class="page-hero compact-page-hero">
+        <div>
+          <p class="eyebrow">Client Vault</p>
+          <h1 class="page-title">Open my vault</h1>
+          <p class="lede">Use the email from your upload and your access code to retrieve completed receipt-backed files.</p>
+        </div>
+        <a class="secondary-btn link-btn" href="/upload.html">Send another package</a>
+      </section>
+
+      <section id="my-vault" class="client-vault-panel panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Vault Lookup</p>
+            <h2>Find and download stored files.</h2>
+          </div>
+          <span id="clientVaultCount" class="queue-summary">Locked</span>
+        </div>
+        <form id="clientVaultForm" class="client-vault-form">
+          <div class="grid two">
+            <label>
+              <span>Email used on upload</span>
+              <input name="clientEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+            </label>
+            <label id="clientVaultKeyWrap">
+              <span>Vault access code</span>
+              <input name="portalKey" type="password" autocomplete="off" placeholder="Provided access code" />
+            </label>
+          </div>
+          <div class="vault-actions-row">
+            <button class="primary-btn" type="submit">Open my vault</button>
+            <button id="clearClientVault" class="secondary-btn" type="button">Lock view</button>
+          </div>
+        </form>
+        <div id="clientVaultList" class="client-vault-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
+    <script src="/assets/vendor/gsap.min.js" defer></script>
+    <script src="/assets/vendor/lenis.min.js" defer></script>
+    <script src="/assets/vault-motion.js" defer></script>
+    <script src="/assets/app.js" type="module"></script>
+  </body>
+</html>

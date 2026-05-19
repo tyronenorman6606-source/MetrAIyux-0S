@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyeMusicNexus // Discover</title>
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./open-source-studio.css" />
+  <script defer src="../gate-session.js"></script><script defer src="./skygate-auth.js"></script><script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script><script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist" data-room="discover">
+  <canvas id="pulse-field" class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+  <main class="nexus-shell open-source-studio-shell">
+    <header class="nexus-topline"><a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a><div><p class="micro">SkyeMusicNexus // Discover</p><h1>Spotify-style listening lanes for gated releases.</h1></div><div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div></header>
+    <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a class="active" href="./discover.html" aria-current="page">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a></nav>
+    <section class="hero-panel studio-hero"><div><p class="eyebrow">discovery graph</p><h2>Playlists, live drops, and release lanes without losing rights control.</h2><p>Discovery is a surface, not a hidden player card. It routes listeners into the Stream Deck while keeping preview rights attached.</p></div><div class="engine-status-card"><strong>24</strong><span>proof-safe preview slots ready for playlist curation</span><a class="ghost-link" href="./player.html">Open Player</a></div></section>
+    <section class="discovery-shell">
+      <article class="panel glass-panel"><p class="eyebrow">playlist rail</p><h3>Release rooms people can browse.</h3><div class="playlist-rail"><article class="playlist-card"><strong>Night Signal</strong><span>late R&B / chrome drums</span></article><article class="playlist-card"><strong>Proof Drops</strong><span>new gated previews</span></article><article class="playlist-card"><strong>Creator Heat</strong><span>community-picked releases</span></article><article class="playlist-card"><strong>Operator Ready</strong><span>cleared for review</span></article></div></article>
+      <article class="panel glass-panel"><p class="eyebrow">track queue</p><h3>Spotify-shaped, rights-aware playback queue.</h3><div class="track-stack"><article class="track-card"><span class="track-number">01</span><div><strong>Midnight Pressure</strong><span>Proof Artist / preview-use required</span></div><a class="ghost-link" href="./player.html">Play</a></article><article class="track-card"><span class="track-number">02</span><div><strong>Chrome Choir</strong><span>release draft / rights pending</span></div><a class="ghost-link" href="./rights.html">Rights</a></article><article class="track-card"><span class="track-number">03</span><div><strong>Signal Run</strong><span>campaign-ready drop</span></div><a class="ghost-link" href="./releases.html">Release</a></article></div></article>
+    </section>
+    <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog><div id="toast" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>

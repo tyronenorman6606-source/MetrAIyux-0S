@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>DocuMorph by SKYESOVERLONDON — Turn PDFs into study dashboards</title>
+
+  <meta name="description" content="DocuMorph converts PDFs into a clean study dashboard: reader, flashcards, quizzes, and analytics. Offline-first. Optional Neon cloud sync. Powered by SKYESOVERLONDON AI engines.">
+  <meta name="theme-color" content="#020617">
+
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="googlebot" content="index,follow">
+
+  <!-- Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DocuMorph by SKYESOVERLONDON">
+  <meta property="og:description" content="PDF → study dashboard (reader, flashcards, quiz) with offline-first storage and optional cloud sync.">
+  <meta property="og:image" content="/app/assets/cover.png">
+  <meta property="og:image:alt" content="DocuMorph cover">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DocuMorph by SKYESOVERLONDON">
+  <meta name="twitter:description" content="Turn PDFs into a study dashboard: reader, flashcards, quizzes, and analytics.">
+  <meta name="twitter:image" content="/app/assets/cover.png">
+
+  <!-- Geo (lightweight; no precise address) -->
+  <meta name="geo.region" content="US-AZ">
+  <meta name="geo.placename" content="Phoenix, Arizona">
+  <meta name="ICBM" content="33.4484, -112.0740">
+
+  <link rel="icon" type="image/png" href="/Free99/apps/documorph/app/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/Free99/apps/documorph/app/icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    body { background:#020617; color:#e2e8f0; }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(18px); border:1px solid rgba(255,255,255,0.06); }
+    .glow { box-shadow: 0 0 45px rgba(34,211,238,0.15); }
+    .ringglow { box-shadow: 0 0 80px rgba(34,211,238,0.12), inset 0 0 0 1px rgba(255,255,255,0.06); }
+    .scanline { background: linear-gradient(to bottom, rgba(34,211,238,0.0), rgba(34,211,238,0.06), rgba(34,211,238,0.0)); animation: scan 5.2s linear infinite; }
+    @keyframes scan { 0%{transform: translateY(-60%);} 100%{transform: translateY(160%);} }
+    .floaty { animation: floaty 5.5s ease-in-out infinite; }
+    @keyframes floaty { 0%,100%{transform: translateY(0);} 50%{transform: translateY(-10px);} }
+    .pulseSoft { animation: pulseSoft 2.8s ease-in-out infinite; }
+    @keyframes pulseSoft { 0%,100%{opacity:.85;} 50%{opacity:1;} }
+    .btn { transition: transform .12s ease, background .2s ease, box-shadow .2s ease; }
+    .btn:active { transform: scale(.98); }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"DocuMorph",
+    "applicationCategory":["EducationalApplication","ProductivityApplication"],
+    "operatingSystem":"Web",
+    "description":"DocuMorph converts PDFs into a study dashboard: reader, flashcards, quizzes, and analytics. Offline-first. Optional Neon cloud sync. Powered by SKYESOVERLONDON AI engines.",
+    "publisher":{"@type":"Organization","name":"SKYESOVERLONDON","areaServed":"Worldwide"},
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+  }
+  </script>
+  <script src="../../free99-gate.js" data-platform-id="documorph" data-platform-name="Documorph" data-billing-mode="quote_only" data-price-label="Quote after DB/runtime proof" data-app-root="/Free99/apps/documorph/"></script>
+</head>
+
+<body class="selection:bg-cyan-500/40">
+  <div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute -top-24 -left-24 w-[520px] h-[520px] bg-cyan-500/10 blur-[140px] rounded-full"></div>
+    <div class="absolute -bottom-24 -right-24 w-[520px] h-[520px] bg-indigo-500/10 blur-[160px] rounded-full"></div>
+    <div class="absolute inset-0 opacity-[0.08]" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.18) 1px, transparent 0); background-size: 26px 26px;"></div>
+  </div>
+
+  <header class="relative z-10 max-w-7xl mx-auto px-6 py-6">
+    <nav class="flex items-center justify-between gap-6">
+      <a href="/Free99/apps/documorph/" class="flex items-center gap-4">
+        <img src="/Free99/apps/documorph/app/assets/launcher.png" alt="DocuMorph" class="w-10 h-10 floaty">
+        <div class="leading-tight">
+          <div class="text-white font-black tracking-tight text-lg">DocuMorph</div>
+          <div class="text-white/30 text-[10px] font-mono uppercase tracking-[0.35em]">by SKYESOVERLONDON</div>
+        </div>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8 text-white/60 text-sm">
+        <a href="#features" class="hover:text-white transition">Features</a>
+        <a href="#use-cases" class="hover:text-white transition">Use cases</a>
+        <a href="#ai" class="hover:text-white transition">AI engines</a>
+        <a href="#faq" class="hover:text-white transition">FAQ</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/Free99/apps/documorph/app/" class="btn px-5 py-3 rounded-2xl bg-white text-black font-black tracking-tight hover:bg-cyan-300 shadow-2xl">Launch App</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="relative z-10">
+    <section class="max-w-7xl mx-auto px-6 pt-10 pb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="space-y-8">
+          <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full glass ringglow">
+            <span class="w-2 h-2 rounded-full bg-cyan-300 pulseSoft"></span>
+            <span class="text-[10px] font-mono uppercase tracking-[0.35em] text-white/60">Offline‑first • Optional cloud sync • PWA install</span>
+          </div>
+
+          <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95] text-white">
+            Turn any PDF into a
+            <span class="text-cyan-300"> study dashboard</span>.
+          </h1>
+
+          <p class="text-lg md:text-xl text-white/60 leading-relaxed max-w-xl">
+            DocuMorph extracts text, detects sections, and generates structured study assets:
+            a clean reader, flashcards, quizzes, and analytics — with a premium SKYESOVERLONDON UI.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 items-start">
+            <a href="/Free99/apps/documorph/app/" class="btn px-7 py-4 rounded-2xl bg-cyan-300 text-black font-black hover:bg-white glow">Launch the App</a>
+            <button id="installBtn" class="btn px-7 py-4 rounded-2xl glass text-white font-black hover:bg-white/5 hidden">Install PWA</button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+            <div class="glass p-5 rounded-3xl">
+              <div class="text-[10px] font-mono uppercase tracking-[0.35em] text-white/40">Upload</div>
+              <div class="text-white font-black text-lg mt-2">PDF ingest</div>
+              <div class="text-white/50 text-sm mt-2">Drop a PDF and extract usable study text.</div>
+            </div>
+            <div class="glass p-5 rounded-3xl">
+              <div class="text-[10px] font-mono uppercase tracking-[0.35em] text-white/40">Synthesize</div>
+              <div class="text-white font-black text-lg mt-2">AI study assets</div>
+              <div class="text-white/50 text-sm mt-2">Summary, flashcards, quiz prompts.</div>
+            </div>
+            <div class="glass p-5 rounded-3xl">
+              <div class="text-[10px] font-mono uppercase tracking-[0.35em] text-white/40">Study</div>
+              <div class="text-white font-black text-lg mt-2">Dashboard</div>
+              <div class="text-white/50 text-sm mt-2">Reader, recall nodes, verification checks.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute inset-0 rounded-[3rem] scanline"></div>
+          <div class="glass rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,.75)]">
+            <div class="p-6 border-b border-white/10 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <img src="/Free99/apps/documorph/app/assets/launcher.png" alt="DocuMorph" class="w-9 h-9 floaty">
+                <div class="leading-tight">
+                  <div class="text-white font-black tracking-tight">DocuMorph</div>
+                  <div class="text-white/30 text-[10px] font-mono uppercase tracking-[0.35em]">SKYESOVERLONDON</div>
+                </div>
+              </div>
+              <div class="text-white/30 text-[10px] font-mono uppercase tracking-[0.35em]">Preview</div>
+            </div>
+            <div class="relative">
+              <img src="/Free99/apps/documorph/app/assets/cover.png" alt="DocuMorph cover" class="w-full h-[420px] object-cover opacity-90">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/10 to-transparent"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-7">
+                <div class="glass rounded-3xl p-6">
+                  <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">What it replaces</div>
+                  <div class="text-white font-black text-2xl mt-2 tracking-tight">Chaotic notes → structured study</div>
+                  <div class="text-white/60 text-sm mt-3 leading-relaxed">
+                    One place to read, drill flashcards, take quizzes, and track learning momentum.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="absolute -bottom-7 -left-7 w-40 h-40 bg-cyan-500/10 blur-[90px] rounded-full"></div>
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-indigo-500/10 blur-[110px] rounded-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="max-w-7xl mx-auto px-6 py-16">
+      <div class="flex items-end justify-between gap-6 flex-wrap mb-10">
+        <div>
+          <div class="text-white/40 text-[10px] font-mono uppercase tracking-[0.35em]">Features</div>
+          <h2 class="text-3xl md:text-5xl text-white font-black tracking-tighter mt-2">Built for real study workflows</h2>
+        </div>
+        <a href="/Free99/apps/documorph/app/" class="btn px-6 py-3 rounded-2xl glass text-white font-black hover:bg-white/5">Open DocuMorph →</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Reader</div>
+          <div class="text-white font-black text-2xl mt-2">Sectioned content</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Automatic section detection + a clean reading surface that feels like an app, not a web page.</div>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Recall</div>
+          <div class="text-white font-black text-2xl mt-2">Flashcard nodes</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Flip‑card recall mode to drill key terms and context fast.</div>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Verify</div>
+          <div class="text-white font-black text-2xl mt-2">Quiz checks</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Multiple‑choice review with scoring to validate retention.</div>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Offline‑first</div>
+          <div class="text-white font-black text-2xl mt-2">Works without accounts</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Stores documents on-device (IndexedDB). No login required to use the core app.</div>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Optional cloud</div>
+          <div class="text-white font-black text-2xl mt-2">Neon sync</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Enable cloud saving with Neon Postgres when you want multi-device access.</div>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-7">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Export</div>
+          <div class="text-white font-black text-2xl mt-2">Portable bundles</div>
+          <div class="text-white/60 text-sm mt-3 leading-relaxed">Generate a deployable ZIP bundle of study artifacts for sharing or archiving.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="use-cases" class="max-w-7xl mx-auto px-6 py-16">
+      <div class="glass rounded-[3rem] p-10 md:p-14 border border-white/10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div>
+            <div class="text-white/40 text-[10px] font-mono uppercase tracking-[0.35em]">Use cases</div>
+            <h2 class="text-3xl md:text-5xl text-white font-black tracking-tighter mt-2">Not just for school.</h2>
+            <p class="text-white/60 text-lg mt-6 leading-relaxed">
+              DocuMorph is ideal for anybody who learns from PDFs: students, certification prep, internal SOPs, onboarding manuals, compliance training, and technical documentation.
+            </p>
+            <div class="mt-8 flex gap-4 flex-wrap">
+              <span class="px-4 py-2 rounded-full glass text-white/70 text-sm">📚 Exam prep</span>
+              <span class="px-4 py-2 rounded-full glass text-white/70 text-sm">🧑‍🏫 Course notes</span>
+              <span class="px-4 py-2 rounded-full glass text-white/70 text-sm">🧾 Compliance & SOPs</span>
+              <span class="px-4 py-2 rounded-full glass text-white/70 text-sm">🧠 Technical ramp-up</span>
+              <span class="px-4 py-2 rounded-full glass text-white/70 text-sm">🏢 Team training</span>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="glass rounded-[2rem] p-6">
+              <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Workflow</div>
+              <div class="text-white font-black text-xl mt-2">Upload → Synthesize → Study</div>
+              <ol class="mt-4 space-y-2 text-white/60 text-sm">
+                <li><span class="text-white font-black">1.</span> Upload a PDF.</li>
+                <li><span class="text-white font-black">2.</span> Extract text + detect sections.</li>
+                <li><span class="text-white font-black">3.</span> Generate summary, flashcards, quiz.</li>
+                <li><span class="text-white font-black">4.</span> Save locally (or sync to Neon).</li>
+              </ol>
+            </div>
+            <div class="glass rounded-[2rem] p-6">
+              <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">Built in Arizona</div>
+              <div class="text-white font-black text-xl mt-2">SKYESOVERLONDON</div>
+              <p class="mt-3 text-white/60 text-sm leading-relaxed">Designed for speed, clarity, and real-world usability — a premium UI layer on top of a practical study engine.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai" class="max-w-7xl mx-auto px-6 py-16">
+      <div class="flex items-end justify-between gap-6 flex-wrap mb-10">
+        <div>
+          <div class="text-white/40 text-[10px] font-mono uppercase tracking-[0.35em]">AI engines</div>
+          <h2 class="text-3xl md:text-5xl text-white font-black tracking-tighter mt-2">SKYESOVERLONDON AI inside</h2>
+        </div>
+        <a href="/Free99/apps/documorph/app/" class="btn px-6 py-3 rounded-2xl bg-white text-black font-black hover:bg-cyan-300 shadow-2xl">Use it now</a>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-[2.5rem] p-8 border border-white/10">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">SKYESOVERLONDON • SkyesFlash</div>
+          <div class="text-white font-black text-2xl mt-2">Fast synthesis</div>
+          <p class="text-white/60 text-sm mt-4 leading-relaxed">
+            Optimized for quick, clean study assets from PDFs: summary, flashcards, and quiz questions.
+          </p>
+        </div>
+
+        <div class="glass rounded-[2.5rem] p-8 border border-white/10">
+          <div class="text-cyan-300 text-[10px] font-mono uppercase tracking-[0.35em]">SKYESOVERLONDON • SkyesCrown</div>
+          <div class="text-white font-black text-2xl mt-2">Deep reasoning</div>
+          <p class="text-white/60 text-sm mt-4 leading-relaxed">
+            Designed for higher quality explanations and stronger question generation when you want maximum study fidelity.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 text-white/50 text-sm leading-relaxed">
+        Tip: for best security, run AI in <span class="text-white font-black">Server Mode</span> so your API keys stay off the client. DocuMorph supports both server and local-key operation.
+      </div>
+    </section>
+
+    <section id="faq" class="max-w-7xl mx-auto px-6 py-16">
+      <div class="glass rounded-[3rem] p-10 md:p-14 border border-white/10">
+        <div class="text-white/40 text-[10px] font-mono uppercase tracking-[0.35em]">FAQ</div>
+        <h2 class="text-3xl md:text-5xl text-white font-black tracking-tighter mt-2">Answers</h2>
+
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <div class="text-white font-black text-lg">Do I need an account?</div>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">No. The core app runs offline-first and stores your documents on your device. Cloud sync is optional.</p>
+          </div>
+          <div>
+            <div class="text-white font-black text-lg">Does it work offline?</div>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">Yes for the app shell and stored documents after first load. AI synthesis requires internet access.</p>
+          </div>
+          <div>
+            <div class="text-white font-black text-lg">What gets sent to AI?</div>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">Only the extracted text needed for the analysis prompt. Server Mode keeps your keys on the backend.</p>
+          </div>
+          <div>
+            <div class="text-white font-black text-lg">Can I sync across devices?</div>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">Yes with Neon Cloud mode enabled (requires server functions + Neon database).</p>
+          </div>
+        </div>
+
+        <div class="mt-12 flex flex-col sm:flex-row gap-4 items-start">
+          <a href="/Free99/apps/documorph/app/" class="btn px-7 py-4 rounded-2xl bg-cyan-300 text-black font-black hover:bg-white glow">Launch DocuMorph</a>
+          <a href="/Free99/apps/documorph/privacy" class="btn px-7 py-4 rounded-2xl glass text-white font-black hover:bg-white/5">Privacy</a>
+          <a href="/Free99/apps/documorph/terms" class="btn px-7 py-4 rounded-2xl glass text-white font-black hover:bg-white/5">Terms</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="max-w-7xl mx-auto px-6 py-12 text-white/40 text-sm">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <img src="/Free99/apps/documorph/app/assets/launcher.png" alt="DocuMorph" class="w-8 h-8">
+          <div>
+            <div class="text-white/70 font-black">DocuMorph</div>
+            <div class="text-[10px] font-mono uppercase tracking-[0.35em]">© 2026 SKYESOVERLONDON</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-5">
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/app/">App</a>
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/privacy">Privacy</a>
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/terms">Terms</a>
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/ai.md">AI</a>
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/llms.txt">LLMs</a>
+          <a class="hover:text-white transition" href="/Free99/apps/documorph/sitemap.xml">Sitemap</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Show Install button when supported
+    let deferredPrompt = null;
+    const btn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btn.classList.remove('hidden');
+    });
+
+    btn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      btn.classList.add('hidden');
+    });
+
+    // Best-effort: set OG url dynamically for crawlers that execute JS
+    try {
+      const origin = window.location.origin;
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (!ogUrl) {
+        const m = document.createElement('meta');
+        m.setAttribute('property','og:url');
+        m.setAttribute('content', origin + '/');
+        document.head.appendChild(m);
+      } else {
+        ogUrl.setAttribute('content', origin + '/');
+      }
+    } catch {}
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "type": "seed-schema",
+  "name": "Business Directory Seed Schema",
+  "version": "1.0.0",
+  "purpose": "Canonical shape for scraped/imported businesses that should materialize into generated/platform-data/business-directory.json.",
+  "required": ["name"],
+  "recommended": ["website", "phone", "email", "address", "city", "state", "category", "sourceUrl", "verified"],
+  "fields": {
+    "name": "Business or organization display name.",
+    "website": "Public website URL if known.",
+    "phone": "Public business phone if known.",
+    "email": "Public contact email if known.",
+    "address": "Street or mailing address if public.",
+    "city": "City/market, e.g. Glendale, Phoenix, Mesa, Scottsdale, Tempe.",
+    "state": "State code, defaults to AZ when omitted during materialization.",
+    "category": "String or array of categories/services/industries.",
+    "sourceUrl": "Public source URL used for verification/provenance.",
+    "verified": "Boolean or evidence flag showing this was reviewed or source-backed."
+  }
+}

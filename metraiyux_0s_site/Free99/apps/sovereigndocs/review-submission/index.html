@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Submit a Document for Partner Review | SovereignDocs</title><meta name="description" content="A serious review-request workflow for users who want a generated draft or prep worksheet routed to legal partners."><link rel="stylesheet" href="/Free99/apps/sovereigndocs/assets/styles.css"><link rel="manifest" href="/Free99/apps/sovereigndocs/manifest.webmanifest">  <script src="../../../free99-gate.js" data-platform-id="sovereigndocs" data-platform-name="SovereignDocs v20" data-billing-mode="paid_pending_sku" data-price-label="Imported plans: $19/$59/$149/$499 per month; Stripe rebuild required" data-app-root="/Free99/apps/sovereigndocs/"></script>
+</head><body><main class="page-shell"><nav class="top-nav"><a href="/Free99/apps/sovereigndocs/">SovereignDocs</a><a href="/Free99/apps/sovereigndocs/documents/">Documents</a><a href="/Free99/apps/sovereigndocs/legal-review/">Partner Review</a><a href="/Free99/apps/sovereigndocs/partner-network/">Partner Network</a><a href="/Free99/apps/sovereigndocs/review-submission/">Submit Review</a><a href="/Free99/apps/sovereigndocs/not-legal-advice/">Not Legal Advice</a></nav><section class="hero-card"><p class="eyebrow">SovereignDocs partner review</p><h1>Submit a Document for Partner Review</h1><p>A serious review-request workflow for users who want a generated draft or prep worksheet routed to legal partners.</p></section><section class="card"><h2>Required acknowledgments</h2><ul><li>Not legal advice.</li><li>Partner review terms accepted.</li><li>No guarantee of partner acceptance or outcome.</li><li>SovereignDocs is not responsible for partner review outcome.</li><li>User is responsible for accurate facts and final use.</li></ul></section><section class="card"><h2>Submission endpoint</h2><pre><code>POST /api/legal-review/submit
+{
+  "templateId": "US-AZ-business-formation-governance-single-member-llc-operating-agreement",
+  "acceptBoundary": true,
+  "acceptPartnerReviewTerms": true,
+  "acceptNoGuarantee": true,
+  "acceptNoSovereignDocsLiabilityForOutcome": true,
+  "acceptUserFactsResponsibility": true,
+  "answers": {}
+}</code></pre></section></main></body></html>

@@ -19,7 +19,6 @@ const siteRoots = [
   "marketing",
   "metraiyux-portal",
   "metraiyux_0s_site",
-  "neon-rift-blocks-mobile-v13-site",
   "skyesol_spectacle_reference/reference-site",
 ];
 
@@ -376,4 +375,3 @@ const report = {
 };
 
 console.log(JSON.stringify(report, null, 2));
-

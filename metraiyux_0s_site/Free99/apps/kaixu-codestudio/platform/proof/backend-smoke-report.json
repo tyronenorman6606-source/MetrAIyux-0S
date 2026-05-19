@@ -1,0 +1,415 @@
+{
+  "ok": true,
+  "ts": "2026-05-11T00:15:51.171Z",
+  "mode": "fixture",
+  "base": "http://127.0.0.1:45823",
+  "checks": [
+    {
+      "name": "health route returns provider probes",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.171Z",
+      "detail": {
+        "providers": [
+          "stripe",
+          "resend",
+          "twilio",
+          "openai_gateway",
+          "netlify",
+          "cloudflare",
+          "neon",
+          "google_ops"
+        ]
+      }
+    },
+    {
+      "name": "provider probe route is executable",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.193Z",
+      "detail": {
+        "mode": "fixture",
+        "providerCount": 8
+      }
+    },
+    {
+      "name": "OpenAPI document and action registry are exposed",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.196Z",
+      "detail": {
+        "pathCount": 53,
+        "actionCount": 55,
+        "storageAdapters": [
+          "json",
+          "sqlite",
+          "postgres",
+          "d1"
+        ]
+      }
+    },
+    {
+      "name": "active storage adapter verifies with real write/read contract",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.203Z",
+      "detail": {
+        "active": "json",
+        "adapters": [
+          "json",
+          "sqlite",
+          "postgres",
+          "d1"
+        ],
+        "auditBefore": 0,
+        "auditAfter": 1
+      }
+    },
+    {
+      "name": "signed upstream claims are verified when secret is present",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.217Z",
+      "detail": {
+        "verifiedProject": "signed-smoke-project",
+        "badStatus": 401
+      }
+    },
+    {
+      "name": "file-based provider pack catalog loads",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.226Z",
+      "detail": {
+        "packCount": 8,
+        "filePackCount": 8
+      }
+    },
+    {
+      "name": "provider-pack routes are registered as first-class actions",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.232Z",
+      "detail": {
+        "registeredProviderPackActions": 38
+      }
+    },
+    {
+      "name": "project control plane creates and lists projects",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.234Z",
+      "detail": {
+        "projectCount": 2,
+        "store": {
+          "projects": 2,
+          "providerInstalls": 0,
+          "workflowRuns": 0,
+          "webhookEvents": 0,
+          "openApprovals": 0,
+          "jobs": 0,
+          "queuedJobs": 0,
+          "deadLetters": 0,
+          "lockedJobs": 0,
+          "schedules": 0,
+          "meterEvents": 0,
+          "workflowGraphs": 0,
+          "routeDecisions": 0,
+          "invoices": 0,
+          "bundles": 0,
+          "imports": 0,
+          "auditEvents": 0,
+          "openIncidents": 0,
+          "entitlements": 0,
+          "records": 0,
+          "forms": 0,
+          "updatedAt": "2026-05-11T00:15:51.236Z"
+        }
+      }
+    },
+    {
+      "name": "provider packs install per project",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.240Z",
+      "detail": {
+        "enabled": [
+          "openai_gateway",
+          "neon",
+          "resend",
+          "stripe"
+        ]
+      }
+    },
+    {
+      "name": "file provider pack install endpoint works",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.271Z",
+      "detail": {
+        "providerId": "twilio",
+        "enabled": false,
+        "routes": [
+          "sms.send",
+          "voice.call",
+          "webhook.message"
+        ]
+      }
+    },
+    {
+      "name": "provider-pack declared action runs through action registry",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.283Z",
+      "detail": {
+        "providerId": "stripe",
+        "route": "checkout.create",
+        "runId": "run_mp0gawoo_65fff37bc7"
+      }
+    },
+    {
+      "name": "static app route serves platform UI",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.297Z",
+      "detail": {
+        "status": 200,
+        "bytes": 8911
+      }
+    },
+    {
+      "name": "workflow preflight enforces upstream claims",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.300Z",
+      "detail": {
+        "blocked": true
+      }
+    },
+    {
+      "name": "checkout_email_link executes fixture adapter chain",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.303Z",
+      "detail": {
+        "paymentLink": "fixture://stripe/checkout/cs_mp0gawp8_45cb3e705d",
+        "receiptId": "rcpt_mp0gawpe_6b7cbe7227"
+      }
+    },
+    {
+      "name": "database + AI summary executes fixture adapter chain",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.317Z",
+      "detail": {
+        "receiptId": "rcpt_mp0gawpp_647e3db6d7"
+      }
+    },
+    {
+      "name": "metering records workflow provider usage",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.328Z",
+      "detail": {
+        "totalEvents": 5,
+        "providers": [
+          "openai_gateway",
+          "neon",
+          "resend",
+          "stripe"
+        ]
+      }
+    },
+    {
+      "name": "provider routing optimizer selects a ready route",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.329Z",
+      "detail": {
+        "selected": "resend",
+        "decisionId": "route_mp0gawpy_89c6fbdf18"
+      }
+    },
+    {
+      "name": "usage invoice generator builds invoice from meters",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.337Z",
+      "detail": {
+        "invoiceNumber": "KX-1778458551340",
+        "totalCents": 52,
+        "lines": 4
+      }
+    },
+    {
+      "name": "visual workflow graph builder validates and compiles graph",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.343Z",
+      "detail": {
+        "graphId": "graph_mp0gawq9_bc1af6743e",
+        "nodes": 3,
+        "compiledProviders": [
+          "openai_gateway",
+          "neon"
+        ]
+      }
+    },
+    {
+      "name": "visual workflow graph runner executes compiled graph steps",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.349Z",
+      "detail": {
+        "graphId": "graph_mp0gawq9_bc1af6743e",
+        "runId": "run_mp0gawqf_bae9e57d87",
+        "steps": 2
+      }
+    },
+    {
+      "name": "forms, records, and submission workflow are executable",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.362Z",
+      "detail": {
+        "formId": "form_mp0gawqr_ecf6eb8aa6",
+        "recordId": "rec_mp0gawqx_7f3b2cbfb1",
+        "workflowOk": true
+      }
+    },
+    {
+      "name": "entitlement gates meter usage and open incidents on hard blocks",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.402Z",
+      "detail": {
+        "entitlementKey": "workflow_runs",
+        "firstOk": true,
+        "secondReason": "entitlement_limit_exceeded"
+      }
+    },
+    {
+      "name": "incident center and audit trail persist operational receipts",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.424Z",
+      "detail": {
+        "incidentId": "inc_mp0gawsh_59a017d77f",
+        "auditEvents": 8
+      }
+    },
+    {
+      "name": "project scorecard summarizes platform health from real state",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.435Z",
+      "detail": {
+        "score": 97,
+        "runSuccessRate": 100,
+        "openIncidents": 1
+      }
+    },
+    {
+      "name": "job queue can enqueue and execute workflow jobs",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.436Z",
+      "detail": {
+        "jobId": "job_mp0gawsu_695793463c",
+        "status": "completed"
+      }
+    },
+    {
+      "name": "queue lock lease can be extended for a running job",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.460Z",
+      "detail": {
+        "jobId": "job_mp0gawti_7ed37ff950",
+        "lockExpiresAt": "2026-05-11T00:17:51.468Z"
+      }
+    },
+    {
+      "name": "queue supports cancellation and stale-lock recovery routes",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.480Z",
+      "detail": {
+        "cancelled": "job_mp0gawu1_9f677222d9",
+        "recovered": 0,
+        "deadLetters": 0
+      }
+    },
+    {
+      "name": "dead-letter jobs can be retried as new queued jobs",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.489Z",
+      "detail": {
+        "deadLetterId": "dead_mp0gawui_2ae526bfeb",
+        "retryJobId": "job_mp0gawun_5f5757cc0b"
+      }
+    },
+    {
+      "name": "schedules tick into queued jobs and drain",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.509Z",
+      "detail": {
+        "scheduleId": "sched_mp0gawuu_8eec1e6b2c",
+        "enqueued": 1,
+        "drained": 1
+      }
+    },
+    {
+      "name": "webhook ingest verifies/idempotency-gates and replay writes receipts",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.542Z",
+      "detail": {
+        "eventId": "evt_mp0gawvs_a9c55026a6",
+        "duplicate": true,
+        "replayReceiptId": "rcpt_mp0gawwd_4c3ae0a738",
+        "verification": {
+          "ok": true,
+          "provider": "stripe",
+          "mode": "fixture",
+          "verified": false,
+          "reason": "fixture_signature_bypass"
+        }
+      }
+    },
+    {
+      "name": "webhook replay dispatches mapped workflow instead of only flipping status",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.566Z",
+      "detail": {
+        "ruleId": "stripe-checkout-completed-to-crm-note",
+        "workflowId": "db_query_ai_summary",
+        "runId": "run_mp0gawwj_ef3c6d9ef6"
+      }
+    },
+    {
+      "name": "workflow run history and webhook queue are persisted",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.587Z",
+      "detail": {
+        "runCount": 10,
+        "webhookCount": 2
+      }
+    },
+    {
+      "name": "approval queue opens for blocked expensive workflow",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.590Z",
+      "detail": {
+        "approvalId": "appr_mp0gawx6_0204bad109",
+        "approvalCount": 1
+      }
+    },
+    {
+      "name": "project export/import bundle migration works",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.608Z",
+      "detail": {
+        "bundleId": "bundle_mp0gawxn_2880a8b128",
+        "importId": "import_mp0gawye_20ace260c7",
+        "hash": "b74d2bb9b3cb"
+      }
+    },
+    {
+      "name": "receipt list includes executable proof",
+      "ok": true,
+      "ts": "2026-05-11T00:15:51.643Z",
+      "detail": {
+        "receiptCount": 20,
+        "receiptTypes": [
+          "project_import",
+          "project_export",
+          "workflow_run_blocked",
+          "workflow_preflight",
+          "webhook_replay",
+          "workflow_run",
+          "webhook_ingest",
+          "webhook_ingest_duplicate",
+          "job_drain",
+          "job_run",
+          "schedule_tick",
+          "job_enqueued",
+          "schedule_upsert"
+        ]
+      }
+    }
+  ],
+  "receiptCount": 61
+}

@@ -232,6 +232,46 @@
       "risk": "low",
       "when_to_run": "Before routing Marketing Made Easy as a gate-accounted 0S suite in buyer or operator contexts.",
       "result": "Refreshes the deep scan receipt and then runs the available smoke proof plan."
+    },
+    {
+      "id": "valley-verified:mcp-mine",
+      "title": "Mine Valley Verified MCP Tooling Receipt",
+      "command": "npm run mcp:mine -- marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist",
+      "cwd": ".",
+      "category": "mcp",
+      "risk": "low",
+      "when_to_run": "Before or after redesigning Valley Verified source, app-build lane pages, or generated profile output.",
+      "result": "Refreshes marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist/MCP_TOOLING_RECEIPT.json and the direct MCP artifact."
+    },
+    {
+      "id": "valley-verified:build",
+      "title": "Build Valley Verified Source Site",
+      "command": "npm run 0s:valley-verified:build",
+      "cwd": ".",
+      "category": "build",
+      "risk": "low",
+      "when_to_run": "After editing Valley Verified generator scripts, CSS, seed data, or client app build copy.",
+      "result": "Regenerates the Valley Verified dist folder from the source generator."
+    },
+    {
+      "id": "valley-verified:sync-0s",
+      "title": "Sync Valley Verified Into 0S Folder",
+      "command": "npm run 0s:valley-verified:sync",
+      "cwd": ".",
+      "category": "integration",
+      "risk": "low",
+      "when_to_run": "After the Valley Verified build passes and before testing the /valley-verified/ mounted route inside 0S.",
+      "result": "Copies the generated Valley Verified dist into metraiyux_0s_site/valley-verified and rewrites absolute routes for the 0S mount."
+    },
+    {
+      "id": "valley-verified:proof",
+      "title": "Build And Mount Valley Verified In 0S",
+      "command": "npm run 0s:valley-verified:proof",
+      "cwd": ".",
+      "category": "qa",
+      "risk": "low",
+      "when_to_run": "Before claiming Valley Verified is wired into the 0S platform and ready for browser proof.",
+      "result": "Runs the source build and syncs the mounted 0S /valley-verified/ folder."
     }
   ]
 }

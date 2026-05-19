@@ -1152,7 +1152,7 @@ function baseHead({ title, description, canonical, type = 'website', bodyClass =
 function siteHeader(){
   return `<header class="topbar">
     <a class="brand" href="/" aria-label="Valley Verified home"><img class="brand-logo" src="/assets/valley-verified-logo.png" alt="" aria-hidden="true"/><span class="brand-wordmark"><strong>Valley Verified</strong><small>real local business pages</small></span></a>
-    <nav class="nav-actions" aria-label="Primary"><a href="/directory/">Directory</a><a href="/market/">Markets</a><a href="/match/">Match</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/protected-admin/" rel="nofollow">Operator</a></nav>
+    <nav class="nav-actions" aria-label="Primary"><a href="/directory/">Directory</a><a href="/market/">Markets</a><a href="/match/">Match</a><a href="/for-businesses/">For businesses</a><a href="/advertise/">Exposure</a><a href="/pricing/">Pricing</a><a href="/contact/">Contact</a></nav>
   </header>`;
 }
 function pageWrap(opts, body, scripts = '<script type="module" src="/assets/app.js"></script>'){

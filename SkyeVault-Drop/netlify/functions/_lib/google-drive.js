@@ -372,6 +372,21 @@ export async function createAndTrashHealthcheck(folderId) {
   return created;
 }
 
+export async function deleteDriveFile(fileId) {
+  const key = String(fileId || '').trim();
+  if (!key) {
+    const error = new Error('R2 object key is required.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const response = await r2Request('DELETE', key);
+  if (response.status === 404) {
+    return { id: key, key, deleted: false, missing: true, provider: 'cloudflare-r2' };
+  }
+  await r2JsonResponse(response, `Could not delete R2 object ${key}.`);
+  return { id: key, key, deleted: true, missing: false, provider: 'cloudflare-r2' };
+}
+
 function appPropertyValue(value, max = 120) {
   return String(value || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
 }

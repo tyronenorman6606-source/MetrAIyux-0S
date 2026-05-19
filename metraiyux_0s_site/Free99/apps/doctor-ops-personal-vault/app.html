@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Ops Personal Vault — App Command Deck</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/brand/doctor-ops-icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/brand/doctor-ops-icon-192.png" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <meta name="description" content="Doctor Ops Personal Vault is a local-first personal workflow companion for doctors: 13 practical office workflows, local file-backed storage, portable backups, exports, audit receipts, and no external sync by default." />
+  <meta name="robots" content="index,follow" />
+  <meta property="og:title" content="Doctor Ops Personal Vault" />
+  <meta property="og:description" content="A $2.99/month-style personal doctor utility for local workflow tracking, private exports, backup confidence, and day-to-day office operations." />
+  <meta property="og:type" content="website" />
+  <script src="../../free99-gate.js" data-platform-id="doctor-ops-personal-vault" data-platform-name="Doctor Ops Personal Vault" data-billing-mode="paid_pending_owner_approval" data-price-label="Personal subscription candidate; owner approval before checkout" data-app-root="/Free99/apps/doctor-ops-personal-vault/"></script>
+</head>
+<body>
+  <div class="shell" id="platform-dashboard">
+    <header class="product-topbar">
+      <a class="brand-lockup" href="index.html" aria-label="Doctor Ops Personal Vault website">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy"><strong>Doctor Ops Personal Vault</strong><span>Private clinical workflow cockpit · local-first by default</span></span>
+      </a>
+      <div class="topbar-badges"><span>Local vault</span><span>13 workflow lanes</span><span>Exports + restore points</span><span>$2.99 personal utility posture</span></div>
+    </header>
+    <nav class="menu">
+      <a href="index.html">🌐 Website</a> <a class="active" href="app.html">🏠 Command Deck</a> <a href="apps/intake-triage-ops.html">🩺 Intake</a> <a href="apps/soap-note-studio.html">📝 SOAP</a> <a href="apps/referral-router.html">📨 Referrals</a> <a href="apps/prior-auth-tracker.html">🧾 Auth</a> <a href="apps/lab-followup-board.html">🧪 Labs</a> <a href="apps/med-recon-desk.html">💊 Meds</a> <a href="apps/imaging-results-commander.html">🩻 Imaging</a> <a href="apps/care-gap-radar.html">📡 Gaps</a> <a href="apps/visit-prep-board.html">📋 Prep</a> <a href="apps/procedure-consent-vault.html">🔏 Consent</a> <a href="apps/chronic-care-tracker.html">❤️ Chronic</a> <a href="apps/discharge-packet-builder.html">📦 Discharge</a> <a href="apps/incident-handoff-log.html">🚨 Handoff</a>
+    </nav>
+
+    <section class="hero command-hero">
+      <div class="hero-card">
+        <div class="kicker">Doctor Ops Personal Vault · v6.0</div>
+        <h1>A sellable personal-use doctor workflow vault that keeps data local by design.</h1>
+        <p>This is positioned as a lightweight monthly utility, not an enterprise EHR replacement. It gives a doctor a private local command layer for office workflows: reminders, packets, follow-ups, notes, receipts, exports, restore points, and file-backed backups. No external database, telemetry, or third-party cloud sync is configured by default.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="apps/intake-triage-ops.html">Open workflow floor</a>
+          <button class="btn gold" id="export-workspace" type="button">Export browser workspace</button>
+          <label class="btn ghost" for="import-workspace">Import workspace JSON</label>
+          <input id="import-workspace" type="file" accept="application/json" hidden />
+        </div>
+      </div>
+      <div class="hero-card hero-side">
+        <img class="command-logo" src="assets/brand/doctor-ops-logo.webp" alt="Doctor Ops Personal Vault logo" loading="eager" />
+        <div class="notice">Designed for local-first personal workflow use. The optional Node runtime writes to <code>data/platform-store.json</code> and local <code>data/backups/</code>. This package does not claim HIPAA certification, medical advice, billing advice, or legal compliance.</div>
+        <div class="workspace-editor">
+          <div class="field"><label>Workspace name</label><input id="workspace-input" type="text" /></div>
+          <div class="field"><label>Operator label</label><input id="operator-input" type="text" /></div>
+          <button class="btn ghost" id="save-workspace" type="button">Save workspace context</button>
+        </div>
+        <div class="workspace-strip dashboard-strip"><strong id="workspace-name">Doctor Ops Personal Vault</strong><span id="workspace-meta">Workspace metadata loading…</span></div>
+        <div class="runtime-bridge" id="runtime-bridge">
+          <div><strong>Local API bridge</strong><span id="runtime-status">Checking optional local runtime…</span></div>
+          <div class="toolbar compact">
+            <button class="btn ghost" id="runtime-pull" type="button">Pull API store</button>
+            <button class="btn ghost" id="runtime-push" type="button">Push browser workspace</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="value-ribbon" aria-label="Product confidence summary">
+      <div class="value-chip"><strong>Private by posture</strong><span>No external sync, telemetry, or third-party storage configured by default.</span></div>
+      <div class="value-chip"><strong>Useful in minutes</strong><span>Focused workflow lanes for the small doctor-office loops that create friction.</span></div>
+      <div class="value-chip"><strong>Referral-worthy</strong><span>Clean enough to show colleagues without pretending to be a hospital system.</span></div>
+      <div class="value-chip"><strong>Portable safety</strong><span>Manual exports, local backups, hashes, restore points, and clear receipts.</span></div>
+    </section>
+
+    <section class="panel command-band trust-panel">
+      <div class="section-title">
+        <div>
+          <h2>Local confidence vault</h2>
+          <p>Doctors should feel safe using a small utility. This panel makes the data model obvious: local file store, manual export, backup list, download, and restore proof.</p>
+        </div>
+        <div class="toolbar"><button class="btn gold" id="create-backup" type="button">Create local backup</button></div>
+      </div>
+      <div class="trust-grid">
+        <div class="trust-card"><strong>Local by default</strong><span>No cloud database, external sync, telemetry, or third-party storage is wired into this package.</span></div>
+        <div class="trust-card"><strong>Portable by design</strong><span>Export a full workspace JSON from browser mode or create file-backed runtime backups.</span></div>
+        <div class="trust-card"><strong>Clear boundary</strong><span>Personal workflow companion; not an EHR replacement and not a compliance certification claim.</span></div>
+      </div>
+      <div class="vault-status" id="vault-status"><strong>Checking vault…</strong><span>Loading local posture.</span></div>
+      <div class="backup-list" id="backup-list"></div>
+    </section>
+
+    <section class="panel command-band">
+      <div class="stat-grid command-stats">
+        <div class="stat"><strong id="apps-live">13/13</strong><span>Workflow surfaces registered</span></div>
+        <div class="stat"><strong id="total-records">0</strong><span>Total local records across apps</span></div>
+        <div class="stat"><strong id="open-risks">0</strong><span>Open risk / warning signals</span></div>
+        <div class="stat"><strong id="overdue-items">0</strong><span>Overdue or due-today items</span></div>
+      </div>
+      <div class="signal-row" id="status-buckets"></div>
+    </section>
+
+    <div class="grid-2 command-grid">
+      <section class="panel">
+        <div class="section-title"><div><h2>Hot work queue</h2><p>Cross-app records with urgent, overdue, denied, blocked, pending, or review-state signals.</p></div></div>
+        <div class="queue-list" id="risk-list"></div>
+      </section>
+      <section class="panel">
+        <div class="section-title"><div><h2>Platform activity feed</h2><p>Audit and receipt events from every workflow surface.</p></div></div>
+        <div class="audit-list" id="activity-feed"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="section-title">
+        <div>
+          <h2>Workflow apps</h2>
+          <p>Each app runs through the shared platform core: validation, batch operations, restore points, receipts, JSON/CSV exports, and deduped imports.</p>
+        </div>
+      </div>
+      <div class="cards" id="app-grid"></div>
+    </section>
+
+    <div class="grid-2 command-grid">
+      <section class="panel">
+        <div class="section-title"><div><h2>Patient/workflow index</h2><p>Local cross-app grouping by patient name for quick operational navigation.</p></div></div>
+        <div class="queue-list" id="patient-index"></div>
+      </section>
+      <section class="panel">
+        <div class="section-title"><div><h2>Seed + backup contract</h2><p>Drop data into the documented seed shape, import it here, or wire upstream systems to emit the same workspace JSON envelope.</p></div></div>
+        <div class="preview small-preview">Seed folder: <strong>seed-packs/</strong>
+Schema: <strong>contracts/workspace-seed.schema.json</strong>
+Example: <strong>seed-packs/example-workspace-seed.json</strong>
+Local store: <strong>data/platform-store.json</strong>
+Backups: <strong>data/backups/</strong>
+Smoke proof: <strong>npm run smoke</strong>
+
+Auth is pass-through. Feed it an upstream claim; do not rebuild login here.</div>
+      </section>
+    </div>
+
+    <div class="footer">Doctor Ops Personal Vault — local-first personal workflow companion for doctors. No external sync by default. Not medical advice or compliance certification.</div>
+  </div>
+  <script src="assets/js/catalog.js"></script>
+  <script src="assets/js/api-client.js"></script>
+  <script src="assets/js/platform.js"></script>
+  <script src="assets/js/visuals.js"></script>
+</body>
+</html>

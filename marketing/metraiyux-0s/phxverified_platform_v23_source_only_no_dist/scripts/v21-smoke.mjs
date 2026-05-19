@@ -35,7 +35,7 @@ const routeManifest = await json('data/route-manifest.json');
 const first = data.businesses[0];
 const last = data.businesses[data.businesses.length - 1];
 
-ok(['21.0.0','22.0.0','23.0.0'].includes(report.version), 'seed report is upgraded to v21 or later');
+ok(['21.0.0','22.0.0','23.0.0','23.1.0'].includes(report.version), 'seed report is upgraded to v21 or later');
 ok(report.records.profile_mode === 'full-static', 'profile mode is full-static');
 ok(report.records.static_business_pages === data.businesses.length, 'static profile count equals business count');
 ok(await countStaticProfiles() === data.businesses.length, 'static profile HTML file count equals business count');

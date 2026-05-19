@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeAPI + AegisCore | Capability control plane for provider keys</title>
+  <meta name="description" content="SkyeAPI turns provider credentials into scoped app, agent, CLI, MCP, workflow, billing, audit, and operator capabilities powered by AegisCore." />
+  <meta name="theme-color" content="#05040a" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta property="og:title" content="SkyeAPI + AegisCore" />
+  <meta property="og:description" content="A capability control plane for apps and agents that need scoped provider access without exposing raw credentials." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og.png" />
+  <meta name="twitter:image" content="/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="/Free99/apps/skyeapi-aegiscore/" />
+  <link rel="icon" type="image/png" href="/Free99/apps/skyeapi-aegiscore/favicon.png" />
+  <link rel="apple-touch-icon" href="/Free99/apps/skyeapi-aegiscore/apple-touch-icon.png" />
+  <link rel="preload" as="image" href="./assets/skyeapi-aegiscore-logo-wide.png" />
+  <link rel="stylesheet" href="./src/site.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SkyeAPI + AegisCore",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web, CLI, MCP",
+    "description": "A scoped capability control plane for provider credentials, apps, agents, workflows, billing ledgers, and audit trails.",
+    "creator": { "@type": "Organization", "name": "Skyes Over London" }
+  }
+  </script>
+  <script src="../../../../free99-gate.js" data-platform-id="skyeapi-aegiscore" data-platform-name="SkyeAPI + AegisCore" data-billing-mode="paid_pending_sku" data-price-label="Usage-metered or quote after provider-cost review" data-app-root="/Free99/apps/skyeapi-aegiscore/"></script>
+</head>
+<body>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <header class="topbar" data-reveal>
+    <a class="brand brand-logo-link" href="#top" aria-label="SkyeAPI home">
+      <img class="brand-logo" src="./assets/skyeapi-aegiscore-logo-wide.png" alt="SkyeAPI + AegisCore" width="216" height="72" />
+      <span class="brand-copy"><strong>SkyeAPI</strong><small>powered by AegisCore</small></span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#capabilities">Capabilities</a>
+      <a href="#operators">Operators</a>
+      <a href="#truth">Truth</a>
+      <a class="nav-cta" href="./console/">Open console</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" data-reveal>
+      <div class="hero-copy">
+        <img class="hero-brand-lockup" src="./assets/skyeapi-aegiscore-logo-wide.png" alt="SkyeAPI + AegisCore platform logo" width="540" height="360" />
+        <p class="eyebrow">SkyeAPI · AegisCore · Skyes Over London</p>
+        <h1>One controlled capability layer over every provider key your app depends on.</h1>
+        <p class="lede">Import provider credentials once. Route apps, agents, workflows, CLI commands, and MCP tools through scoped SkyeAPI capabilities without handing raw secrets to every repo, script, or automation surface.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="./console/">Open operator console</a>
+          <a class="button ghost" href="#capabilities">See what it controls</a>
+        </div>
+        <div class="trust-row" aria-label="Platform pillars">
+          <span>Scoped keys</span>
+          <span>Encrypted credential authority</span>
+          <span>Workflow receipts</span>
+          <span>Billing ledgers</span>
+        </div>
+      </div>
+      <aside class="command-card branded-command-card" aria-label="SkyeAPI command preview">
+        <img class="command-card-mark" src="./assets/skyeapi-aegiscore-mark.png" alt="" aria-hidden="true" />
+        <div class="card-header"><span></span><span></span><span></span></div>
+        <pre><code>skyeapi hosted enqueue-job \
+  --project proj_skyes \
+  --capability email.send \
+  --json '{"to":"client@example.com"}'
+
+skyeapi hosted claim-job-lease \
+  --project proj_skyes
+
+skyeapi hosted audit-export \
+  --project proj_skyes</code></pre>
+      </aside>
+    </section>
+
+    <section class="metric-strip" data-reveal aria-label="Current platform surface">
+      <div><strong>34+</strong><span>Worker behaviors covered by local HTTP smoke</span></div>
+      <div><strong>6</strong><span>core provider families modeled</span></div>
+      <div><strong>CLI · SDK · MCP</strong><span>developer entrypoints included</span></div>
+      <div><strong>Console</strong><span>operator surface routed behind /console</span></div>
+    </section>
+
+    <section id="capabilities" class="section" data-reveal>
+      <div class="section-head">
+        <p class="eyebrow">Capability control</p>
+        <h2>Built around actions, policies, receipts, and operator control.</h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card"><span>01</span><h3>AegisCore authority</h3><p>Encrypted provider bundles create safe manifests and scoped capability keys, so apps can call approved actions without receiving raw provider secrets.</p></article>
+        <article class="feature-card"><span>02</span><h3>SkyeBroker routing</h3><p>Provider adapters route email, SMS, database, storage, AI, and billing actions through one normalized envelope.</p></article>
+        <article class="feature-card"><span>03</span><h3>Workflow engine</h3><p>Chain capabilities with interpolation, approvals, usage records, and redacted step receipts.</p></article>
+        <article class="feature-card"><span>04</span><h3>Policy guardrails</h3><p>Block risky inputs, require approvals, restrict provider packs, and bind project access to upstream workspace roles.</p></article>
+        <article class="feature-card"><span>05</span><h3>Jobs and webhooks</h3><p>Queue work, claim leases, record dead letters, manage outbound subscriptions, and inspect delivery records.</p></article>
+        <article class="feature-card"><span>06</span><h3>Billing and audit</h3><p>Generate usage records, invoice drafts, reconciliation diffs, subscription lifecycle records, and redacted audit bundles.</p></article>
+      </div>
+    </section>
+
+    <section id="operators" class="section split" data-reveal>
+      <div>
+        <p class="eyebrow">For operators and builders</p>
+        <h2>Designed for the messy middle where apps, agents, and provider credentials collide.</h2>
+        <p>SkyeAPI is strongest when a business has many provider accounts, many apps, and too many places where secrets would otherwise spread. The console is for project imports, scoped keys, provider-pack state, policies, approvals, jobs, webhooks, billing ledgers, and audit exports.</p>
+      </div>
+      <div class="stacked-list">
+        <div><strong>For app teams</strong><span>Use one capability API instead of embedding every provider SDK and key into every product surface.</span></div>
+        <div><strong>For automation teams</strong><span>Give agents scoped actions and manifests without exposing raw Twilio, Resend, Neon, Stripe, R2, or model provider secrets.</span></div>
+        <div><strong>For operators</strong><span>See queued jobs, approval requests, usage changes, provider-pack installs, invoice records, and audit bundles from one console.</span></div>
+      </div>
+    </section>
+
+    <section id="truth" class="section truth" data-reveal>
+      <div>
+        <p class="eyebrow">Claim boundary</p>
+        <h2>Clear status. No inflated launch language.</h2>
+      </div>
+      <div class="truth-grid">
+        <div><strong>Included now</strong><p>Source, build scripts, console, CLI, SDK, MCP server, Worker gateway, local HTTP behavior smoke, fixture certification route, billing lifecycle records, and audit bundle code.</p></div>
+        <div><strong>Verified per environment</strong><p>Live provider delivery, Cloudflare runtime behavior, payment capture, and browser execution depend on the target environment and explicit validation runs.</p></div>
+        <div><strong>Best first offer</strong><p>Managed implementation, internal alpha, and concierge developer platform setups before opening broad self-serve onboarding.</p></div>
+      </div>
+    </section>
+
+    <section class="cta" data-reveal>
+      <p class="eyebrow">Operator handoff</p>
+      <h2>Open the console, connect a gateway, import a provider bundle, then mint scoped capability keys.</h2>
+      <a class="button primary" href="./console/">Launch console</a>
+    </section>
+  </main>
+
+  <footer>
+    <strong>SkyeAPI + AegisCore</strong>
+    <span>Skyes Over London capability infrastructure.</span>
+    <a href="./llms.txt">AI summary</a>
+    <a href="./sitemap.xml">Sitemap</a>
+  </footer>
+  <script type="module" src="./src/site.js"></script>
+</body>
+</html>

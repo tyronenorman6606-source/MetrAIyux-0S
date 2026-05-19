@@ -1,0 +1,468 @@
+{
+  "version": "20.0.0",
+  "generated_at": "2026-05-18T21:43:39.898Z",
+  "purpose": "Ranks quote/lead requests against seeded businesses, stages quote_request and lead_route_decision actions, and keeps delivery claims separate from routing suggestions.",
+  "service": {
+    "version": "20.0.0",
+    "endpoints": [
+      "/.netlify/functions/phx-lead",
+      "/.netlify/functions/phx-admin operation=route_lead"
+    ],
+    "actions": [
+      "quote_request",
+      "lead_route_decision",
+      "ae_assignment",
+      "lead_status_update"
+    ],
+    "rules": [
+      "Lead routing ranks candidates but does not claim delivery.",
+      "Route decisions require AE/admin action before owner contact.",
+      "Buyer-selected listings outrank algorithmic suggestions.",
+      "Listings without routable contact data are penalized."
+    ]
+  },
+  "contracts": [
+    {
+      "type": "quote_request",
+      "title": "Quote request intake",
+      "queue": "quote-requests",
+      "required": [
+        "buyer_name",
+        "buyer_contact",
+        "city",
+        "category",
+        "details"
+      ],
+      "optional": [
+        "business_ids",
+        "budget",
+        "timeline",
+        "service_lane",
+        "source_url",
+        "consent_to_contact"
+      ],
+      "roles": [
+        "buyer",
+        "ae",
+        "admin"
+      ],
+      "public_intake": true,
+      "description": "Creates a structured quote request that can be ranked, routed, and followed by AEs without creating fake lead delivery claims."
+    },
+    {
+      "type": "lead_route_decision",
+      "title": "Lead route decision",
+      "queue": "lead-route-decisions",
+      "required": [
+        "lead_id",
+        "business_ids",
+        "route_reason",
+        "assigned_to"
+      ],
+      "optional": [
+        "city",
+        "category",
+        "score_summary",
+        "sla",
+        "notes"
+      ],
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "public_intake": false,
+      "description": "Records which businesses should receive or be considered for a quote/lead and why."
+    },
+    {
+      "type": "ae_assignment",
+      "title": "AE account assignment",
+      "queue": "ae-assignments",
+      "required": [
+        "business_id",
+        "assigned_to",
+        "territory",
+        "stage",
+        "next_action"
+      ],
+      "optional": [
+        "priority",
+        "due_date",
+        "notes",
+        "product"
+      ],
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "public_intake": false,
+      "description": "Assigns an account or territory task to an AE while preserving upstream auth ownership."
+    }
+  ],
+  "sample_lead": {
+    "buyer_name": "Sample Buyer",
+    "buyer_contact": "buyer@example.com",
+    "city": "Tempe",
+    "category": "Video Production",
+    "details": "Need Video Production help from verified local providers with a clear response path.",
+    "timeline": "this week",
+    "budget": "open"
+  },
+  "sample_route": {
+    "lead_id": "lead-58574820c464cc40c7f1c385",
+    "selected": [
+      {
+        "business_id": "arclight-event-films-tempe-85281-04b822a",
+        "name": "ArcLight Event Films",
+        "city": "Tempe",
+        "category": "Video Production",
+        "score": 113,
+        "reasons": [
+          "same city",
+          "category/niche match",
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/business/arclight-event-films-tempe-85281-04b822a/"
+      },
+      {
+        "business_id": "arizona-state-university-tempe-education-childcare-d5b33c6",
+        "name": "Arizona State University",
+        "city": "Tempe",
+        "category": "Education And Childcare",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/arizona-state-university-tempe-education-childcare-d5b33c6/"
+      },
+      {
+        "business_id": "desert-frame-studio",
+        "name": "Desert Frame Studio",
+        "city": "Tempe",
+        "category": "Photography",
+        "score": 60,
+        "reasons": [
+          "same city",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/business/desert-frame-studio/"
+      },
+      {
+        "business_id": "bobs-smoke-shop-litchfield-park",
+        "name": "Bob's Smoke Shop",
+        "city": "Litchfield Park",
+        "category": "Retail And Specialty",
+        "score": 39,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/bobs-smoke-shop-litchfield-park/"
+      },
+      {
+        "business_id": "empire-pallets-phoenix",
+        "name": "Empire Pallets",
+        "city": "Phoenix",
+        "category": "Business Services",
+        "score": 39,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/empire-pallets-phoenix/"
+      },
+      {
+        "business_id": "az-exotic-bird-supplies-tempe-85281-1b0259a",
+        "name": "Az Exotic Bird Supplies",
+        "city": "Tempe",
+        "category": "Retail And Specialty",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/az-exotic-bird-supplies-tempe-85281-1b0259a/"
+      },
+      {
+        "business_id": "hulxe-constructions-services-tempe-85282-ee048b2",
+        "name": "Hulxe Constructions Services",
+        "city": "Tempe",
+        "category": "Home Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/hulxe-constructions-services-tempe-85282-ee048b2/"
+      },
+      {
+        "business_id": "integrity-building-corp-tempe-85282-2dbf93a",
+        "name": "Integrity Building Corp",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/integrity-building-corp-tempe-85282-2dbf93a/"
+      }
+    ],
+    "alternates": [
+      {
+        "business_id": "nexus-alarm-and-suppression-inc-tempe-85283-247f88d",
+        "name": "Nexus Alarm And Suppression, Inc.",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/nexus-alarm-and-suppression-inc-tempe-85283-247f88d/"
+      },
+      {
+        "business_id": "sundial-solar-tempe-85282-9b3de0b",
+        "name": "Sundial Solar",
+        "city": "Tempe",
+        "category": "Home Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/sundial-solar-tempe-85282-9b3de0b/"
+      },
+      {
+        "business_id": "sunstate-mechanical-services-tempe-85282-cfd491e",
+        "name": "Sunstate Mechanical Services",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/sunstate-mechanical-services-tempe-85282-cfd491e/"
+      },
+      {
+        "business_id": "suntria-tempe-85282-815c1c5",
+        "name": "Suntria",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/suntria-tempe-85282-815c1c5/"
+      },
+      {
+        "business_id": "temcon-concrete-construction-tempe-85284-1dcac37",
+        "name": "Temcon Concrete Construction",
+        "city": "Tempe",
+        "category": "Home Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/temcon-concrete-construction-tempe-85284-1dcac37/"
+      },
+      {
+        "business_id": "tlw-construction-tempe-85284-c9880f2",
+        "name": "Tlw Construction",
+        "city": "Tempe",
+        "category": "Home Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/tlw-construction-tempe-85284-c9880f2/"
+      },
+      {
+        "business_id": "victory-steel-llc-tempe-85284-2fb98c7",
+        "name": "Victory Steel Llc",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/victory-steel-llc-tempe-85284-2fb98c7/"
+      },
+      {
+        "business_id": "vortex-industries-llc-tempe-85284-bb6f757",
+        "name": "Vortex Industries, Llc",
+        "city": "Tempe",
+        "category": "Business Services",
+        "score": 34,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "accepts requests",
+          "thin contact data",
+          "moderation flags present"
+        ],
+        "contact_ready": false,
+        "url": "/business/vortex-industries-llc-tempe-85284-bb6f757/"
+      },
+      {
+        "business_id": "fade-masters-phx",
+        "name": "Fade Masters PHX",
+        "city": "Phoenix",
+        "category": "Haircuts",
+        "score": 33,
+        "reasons": [
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score"
+        ],
+        "contact_ready": true,
+        "url": "/business/fade-masters-phx/"
+      },
+      {
+        "business_id": "amazon-phoenix-major-employer-adc4ff0",
+        "name": "Amazon",
+        "city": "Phoenix",
+        "category": "Major Employers",
+        "score": 31,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/amazon-phoenix-major-employer-adc4ff0/"
+      },
+      {
+        "business_id": "american-express-phoenix-legal-financial-services-accebed",
+        "name": "American Express",
+        "city": "Phoenix",
+        "category": "Legal And Financial",
+        "score": 31,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/american-express-phoenix-legal-financial-services-accebed/"
+      },
+      {
+        "business_id": "avnet-phoenix-contractor-home-service-014d78b",
+        "name": "Avnet",
+        "city": "Phoenix",
+        "category": "Home Services",
+        "score": 31,
+        "reasons": [
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/avnet-phoenix-contractor-home-service-014d78b/"
+      }
+    ],
+    "decision": {
+      "lead_id": "lead-58574820c464cc40c7f1c385",
+      "business_ids": [
+        "arclight-event-films-tempe-85281-04b822a",
+        "arizona-state-university-tempe-education-childcare-d5b33c6",
+        "desert-frame-studio",
+        "bobs-smoke-shop-litchfield-park",
+        "empire-pallets-phoenix",
+        "az-exotic-bird-supplies-tempe-85281-1b0259a",
+        "hulxe-constructions-services-tempe-85282-ee048b2",
+        "integrity-building-corp-tempe-85282-2dbf93a"
+      ],
+      "route_reason": "Top 8 matches by city/category/contact readiness/verification signals.",
+      "assigned_to": "ae-tempe-video-production",
+      "city": "Tempe",
+      "category": "Video Production",
+      "score_summary": "arclight-event-films-tempe-85281-04b822a:113|arizona-state-university-tempe-education-childcare-d5b33c6:66|desert-frame-studio:60|bobs-smoke-shop-litchfield-park:39|empire-pallets-phoenix:39|az-exotic-bird-supplies-tempe-85281-1b0259a:34|hulxe-constructions-services-tempe-85282-ee048b2:34|integrity-building-corp-tempe-85282-2dbf93a:34",
+      "sla": "next_business_day",
+      "notes": "Route candidates require AE/admin approval before owner delivery."
+    },
+    "generated_at": "2026-05-18T21:43:41.423Z",
+    "total_candidates": 26415,
+    "considered": 31
+  },
+  "anti_theater_rules": [
+    "A route is not a delivered lead.",
+    "Owner contact requires message/delivery action proof.",
+    "AEs must update lead status after outreach.",
+    "Listings without contact data are penalized."
+  ]
+}

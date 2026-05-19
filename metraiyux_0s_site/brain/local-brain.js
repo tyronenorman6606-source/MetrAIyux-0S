@@ -38,8 +38,8 @@ const localRouteRules = [
     intent: 'brain_count_or_runtime',
     route_to: 'site-operator-brain',
     secondary: 'central-company-command-brain',
-    create_task: 'Explain the 16-brain runtime and route the question to the right owner',
-    triggers: ['how many brains', 'brain count', '16 brains', 'cabinet brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
+    create_task: 'Explain the 17-brain runtime and route the question to the right owner',
+    triggers: ['how many brains', 'brain count', '17 brains', 'cabinet brains', 'person brains', 'runtime', 'router', 'who owns', 'which brain']
   },
   {
     intent: 'client_review_or_feedback',
@@ -292,12 +292,12 @@ function chooseRoute(query) {
       score: 99
     };
   }
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'cabinet brains'])) {
     return {
       intent: 'brain_count_or_runtime',
       primary: profileById('site-operator-brain'),
       secondary: profileById('central-company-command-brain'),
-      createTask: 'Explain the 16-brain runtime accurately',
+      createTask: 'Explain the 17-brain runtime accurately',
       score: 99
     };
   }
@@ -401,7 +401,7 @@ function smartDirectAnswer(query, route, surfaces) {
   const secondaryOwner = ownerName(secondary);
   const firstSurface = surfaces[0];
 
-  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '16 brains', 'cabinet brains'])) {
+  if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'cabinet brains'])) {
     return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
   }
 
@@ -451,7 +451,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['marketplace', 'product hub', 'product catalog', 'all products', 'full catalog'])) {
-    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (16 brains, 8 Workers, $150K+ infrastructure), Skye BCC, SOLEnterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
+    return `The MetrAIyux 0S Marketplace at https://metraiyux-marketing.pages.dev/marketplace.html is the unified product hub. It lists MetrAIyux 0S (17 brains, 17 Workers, $900K+ infrastructure), Skye BCC, SOLEnterprises, Skye Vault, Legal Center, and White-Label deployments. The brain campaign terminal on that page routes sales, marketing, and enterprise deals through the correct cabinet brain.`;
   }
 
   if (hasAny(q, ['vault', 'upload', 'file drop', 'storage', 'send files', 'client upload'])) {
@@ -459,7 +459,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['campaign', 'brain campaign', 'run campaign', 'autonomous', 'auto sell', 'ai campaign'])) {
-    return `Brain campaigns route sales and marketing tasks autonomously through the 16-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Celeste Monroe), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
+    return `Brain campaigns route sales and marketing tasks autonomously through the 17-brain runtime. Four campaigns are available: MetrAIyux 0S (Celeste Monroe + Valentina Reyes), Skye BCC (Donovan Pierce for enterprise/government), Vault (Celeste Monroe), and White-Label (Julian Mercer + Gray London Skyes). Launch them from the marketplace campaign terminal at https://metraiyux-marketing.pages.dev/marketplace.html.`;
   }
 
   if (hasAny(q, ['portal', 'ecosystem portal', 'empire hub', 'all sites', 'all properties'])) {

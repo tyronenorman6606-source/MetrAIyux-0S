@@ -1,0 +1,193 @@
+{
+  "id": "US-ME-employment-hr-ip-assignment-employee",
+  "base_id": "employment-hr/ip-assignment-employee",
+  "slug": "ip-assignment-employee",
+  "title": "Employee Invention and IP Assignment",
+  "category": {
+    "slug": "employment-hr",
+    "name": "Employment & HR"
+  },
+  "jurisdiction": {
+    "country": "US",
+    "state_code": "ME",
+    "state_name": "Maine",
+    "jurisdiction_id": "US-ME"
+  },
+  "version": "1.0.0-seed",
+  "status": "original_seed_not_attorney_reviewed",
+  "risk_level": "high",
+  "not_legal_advice": true,
+  "use_case": "Assignment of work product and inventions; state sensitive.",
+  "questionnaire": [
+    {
+      "key": "state_full_name",
+      "label": "State Full Name",
+      "type": "system",
+      "required": true
+    },
+    {
+      "key": "state_code",
+      "label": "State Code",
+      "type": "system",
+      "required": true
+    },
+    {
+      "key": "document_title",
+      "label": "Document Title",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "effective_date",
+      "label": "Effective Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "key": "party_one_name",
+      "label": "Party One Legal Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "party_one_address",
+      "label": "Party One Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "key": "party_two_name",
+      "label": "Party Two Legal Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "party_two_address",
+      "label": "Party Two Address",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "key": "county",
+      "label": "County",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "custom_terms",
+      "label": "Additional Custom Terms",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "key": "worker_name",
+      "label": "Worker Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "role_title",
+      "label": "Role / Title",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "compensation",
+      "label": "Compensation",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "key": "supervisor",
+      "label": "Supervisor / Reporting Contact",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "work_location",
+      "label": "Work Location",
+      "type": "text",
+      "required": false
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Important Notice",
+      "body": "This template is an original SovereignDocs automation seed. It is not legal advice, is not a substitute for advice from a licensed attorney, and may require state, county, city, agency, court, industry, or transaction-specific review before use."
+    },
+    {
+      "heading": "Parties and Effective Date",
+      "body": "This {{document_title}} is prepared as of {{effective_date}} by and between {{party_one_name}} of {{party_one_address}}{{#if party_two_name}} and {{party_two_name}} of {{party_two_address}}{{/if}}."
+    },
+    {
+      "heading": "Purpose",
+      "body": "The purpose of this document is to create a clear written record for: Assignment of work product and inventions; state sensitive. The parties should complete every variable field accurately before signing or relying on this document."
+    },
+    {
+      "heading": "Role and Relationship",
+      "body": "Worker: {{worker_name}}. Role: {{role_title}}. Work location: {{work_location}}. Reporting contact: {{supervisor}}. Compensation: {{compensation}}."
+    },
+    {
+      "heading": "Policies and Standards",
+      "body": "The worker should follow applicable written policies, confidentiality obligations, data-handling requirements, safety rules, and lawful instructions related to the role."
+    },
+    {
+      "heading": "State-Sensitive Employment Review",
+      "body": "Employment, wage, leave, final pay, restrictive covenant, worker classification, and separation rules vary by jurisdiction. This document is flagged for current-law review before use."
+    },
+    {
+      "heading": "Governing Law Placeholder",
+      "body": "Unless a qualified reviewer changes this section, the parties intend this document to be interpreted under the laws of {{state_full_name}}, with any required venue, forum, notice, filing, consumer, court, agency, or local requirement reviewed before use."
+    },
+    {
+      "heading": "Additional Terms",
+      "body": "Additional custom terms: {{custom_terms}}."
+    },
+    {
+      "heading": "Signatures",
+      "body": "The parties sign below to confirm the information supplied in this document is accurate to the best of their knowledge and that they have had the opportunity to seek independent advice before signing.\n\n{{party_one_name}}\nSignature: ______________________________ Date: ______________\n\n{{#if party_two_name}}{{party_two_name}}\nSignature: ______________________________ Date: ______________{{/if}}"
+    }
+  ],
+  "render_markdown": "# Employee Invention and IP Assignment\n\nJurisdiction: Maine\n\n## Important Notice\nThis template is an original SovereignDocs automation seed. It is not legal advice, is not a substitute for advice from a licensed attorney, and may require state, county, city, agency, court, industry, or transaction-specific review before use.\n\n## Parties and Effective Date\nThis {{document_title}} is prepared as of {{effective_date}} by and between {{party_one_name}} of {{party_one_address}}{{#if party_two_name}} and {{party_two_name}} of {{party_two_address}}{{/if}}.\n\n## Purpose\nThe purpose of this document is to create a clear written record for: Assignment of work product and inventions; state sensitive. The parties should complete every variable field accurately before signing or relying on this document.\n\n## Role and Relationship\nWorker: {{worker_name}}. Role: {{role_title}}. Work location: {{work_location}}. Reporting contact: {{supervisor}}. Compensation: {{compensation}}.\n\n## Policies and Standards\nThe worker should follow applicable written policies, confidentiality obligations, data-handling requirements, safety rules, and lawful instructions related to the role.\n\n## State-Sensitive Employment Review\nEmployment, wage, leave, final pay, restrictive covenant, worker classification, and separation rules vary by jurisdiction. This document is flagged for current-law review before use.\n\n## Governing Law Placeholder\nUnless a qualified reviewer changes this section, the parties intend this document to be interpreted under the laws of Maine, with any required venue, forum, notice, filing, consumer, court, agency, or local requirement reviewed before use.\n\n## Additional Terms\nAdditional custom terms: {{custom_terms}}.\n\n## Signatures\nThe parties sign below to confirm the information supplied in this document is accurate to the best of their knowledge and that they have had the opportunity to seek independent advice before signing.\n\n{{party_one_name}}\nSignature: ______________________________ Date: ______________\n\n{{#if party_two_name}}{{party_two_name}}\nSignature: ______________________________ Date: ______________{{/if}}\n",
+  "rights": {
+    "origin": "Original SovereignDocs generated seed template.",
+    "third_party_proprietary_text_used": false,
+    "lawdepot_text_used": false,
+    "license_status": "owned_original_seed_requires_review_before_distribution",
+    "source_basis": "Generated from original category architecture and generic drafting patterns; no third-party proprietary clauses copied."
+  },
+  "review": {
+    "requires_attorney_review": true,
+    "requires_current_law_review": true,
+    "human_review_required": true,
+    "review_notes": "Generated jurisdiction record for Maine. This record does not encode state statutes. Use state/county/city/agency/court review before publishing.",
+    "state_specific_law_included": false,
+    "jurisdiction_overlay_applied": "US-ME"
+  },
+  "source_basis": "Original seed record derived from base template plus jurisdiction overlay.",
+  "tags": [
+    "employment-hr",
+    "ip-assignment-employee",
+    "US-ME",
+    "Maine",
+    "high"
+  ],
+  "checksum": "befafa56996c689f",
+  "v2_upgrade": {
+    "upgrade_version": "2.0.0-upgraded",
+    "questionnaire_schema_ref": "template-library/questionnaires/questionnaires.json#q-employment-hr",
+    "validation_rules_ref": "template-library/_schema/validation-rules-v2.json",
+    "clause_library_ref": "template-library/clause-library/clauses.json",
+    "state_overlay_v2_ref": "template-library/state-overlays-v2/US-ME.json",
+    "review_truth_level": "L1",
+    "official_source_policy": "If an official government/court/tax/agency form exists for this workflow, route to official-source workflow instead of pretending this private template replaces it.",
+    "export_supported": [
+      "markdown",
+      "html",
+      "docx",
+      "print_to_pdf_html"
+    ],
+    "admin_console_supported": true,
+    "ai_assist_policy_ref": "ai-assist/assist-policy.json"
+  }
+}

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeAPI Console · AegisCore</title>
+  <link rel="icon" type="image/png" href="./assets/skyeapi-aegiscore-mark.png" />
+  <meta name="description" content="Operational SkyeAPI admin console for AegisCore provider imports, scoped keys, capability calls, event logs, and usage." />
+  <link rel="stylesheet" href="./src/styles.css" />
+  <script src="../../../../free99-gate.js" data-platform-id="skyeapi-aegiscore" data-platform-name="SkyeAPI + AegisCore" data-billing-mode="paid_pending_sku" data-price-label="Usage-metered or quote after provider-cost review" data-app-root="/Free99/apps/skyeapi-aegiscore/"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero panel">
+      <div>
+        <img class="console-brand-lockup" src="./assets/skyeapi-aegiscore-logo-wide.png" alt="SkyeAPI + AegisCore" width="360" height="240" />
+        <p class="eyebrow">SkyeAPI · AegisCore</p>
+        <h1>Capability control plane for real provider secrets.</h1>
+        <p class="lede">Import provider credentials, mint scoped SkyeAPI keys, enforce plans, test capabilities, inspect usage, and read gateway events. This console talks to the hosted Worker API; it is not a static mock.</p>
+        <p class="truth-chip">Truth mode: configured means configured. Live provider proof requires a live call and a proof receipt.</p>
+      </div>
+      <div class="status-card branded-status-card">
+        <img class="status-card-mark" src="./assets/skyeapi-aegiscore-mark.png" alt="" aria-hidden="true" />
+        <span id="connection-dot" class="dot idle"></span>
+        <strong id="connection-label">Not connected</strong>
+        <small id="connection-detail">Enter gateway URL and admin key, then run health check.</small>
+      </div>
+    </section>
+
+    <section class="grid two">
+      <form id="connection-form" class="panel stack">
+        <h2>Gateway connection</h2>
+        <label>Gateway base URL<input id="base-url" placeholder="https://skyeapi-gateway.your.workers.dev" autocomplete="off" /></label>
+        <label>Admin key<input id="admin-key" type="password" placeholder="SKYE_ADMIN_KEY" autocomplete="off" /></label>
+        <label>Project ID<input id="project-id" placeholder="proj_skye_default" autocomplete="off" /></label>
+        <div class="actions">
+          <button type="submit">Save + Health Check</button>
+          <button type="button" id="clear-local" class="ghost">Clear Local Console State</button>
+        </div>
+      </form>
+
+      <section class="panel stack">
+        <h2>Project import</h2>
+        <p class="muted">Paste a provider `.env` bundle. The Worker encrypts and stores it inside AegisCore. The console never displays the raw secrets after submit.</p>
+        <textarea id="env-text" spellcheck="false" placeholder="RESEND_API_KEY=...&#10;TWILIO_ACCOUNT_SID=...&#10;NEON_DATABASE_URL=..."></textarea>
+        <div class="inline">
+          <input id="initial-scopes" value="*" />
+          <button id="import-env">Import + Mint Key</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="grid three">
+      <section class="panel stack">
+        <h2>Scoped keys</h2>
+        <div class="inline"><input id="key-scopes" value="manifest:read,providers:test,email:send" /><input id="key-expires-at" placeholder="Optional expiry ISO" /><button id="create-key">Create Key</button></div>
+        <div id="key-result" class="result small"></div>
+        <button id="load-keys" class="ghost">Load Project Keys</button>
+        <div id="keys-list" class="list"></div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Capabilities</h2>
+        <input id="api-key" type="password" placeholder="Paste SkyeAPI key for capability calls" autocomplete="off" />
+        <div class="actions"><button id="load-capabilities">Load Manifest</button><button id="dry-run" class="ghost">Dry Run Selected</button></div>
+        <select id="capability-select"></select>
+        <div id="capabilities-list" class="list"></div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Capability call</h2>
+        <p class="muted">Explicit calls only. Dry run does not hit providers. Live call uses the selected capability and scoped SkyeAPI key.</p>
+        <textarea id="call-json" spellcheck="false">{
+  "to": "test@example.com",
+  "subject": "SkyeAPI proof",
+  "body": "AegisCore routed this email capability."
+}</textarea>
+        <div class="actions"><button id="live-call">Run Live Call</button><button id="copy-result" class="ghost">Copy Result</button></div>
+      </section>
+    </section>
+
+
+
+
+    <section class="panel stack">
+      <h2>Workflow runner</h2>
+      <p class="muted">Run chained capabilities with template interpolation. Example: generate text, then send it as an email. Dry run validates and resolves the workflow without hitting providers.</p>
+      <textarea id="workflow-json" spellcheck="false">{
+  "workflowId": "welcome-flow",
+  "input": {
+    "email": "test@example.com",
+    "name": "Client"
+  },
+  "steps": [
+    {
+      "id": "draft",
+      "capability": "ai.generate_text",
+      "input": {
+        "prompt": "Write a short welcome email for {{input.name}}."
+      }
+    },
+    {
+      "id": "send",
+      "capability": "email.send",
+      "input": {
+        "to": "{{input.email}}",
+        "subject": "Welcome from SkyeAPI",
+        "body": "{{steps.draft.data.text}}"
+      }
+    }
+  ]
+}</textarea>
+      <div class="actions"><button id="workflow-dry-run" class="ghost">Dry Run Workflow</button><button id="workflow-live">Run Live Workflow</button></div>
+      <div id="workflow-receipts" class="receipts"><p class="muted">No workflow step receipts loaded yet.</p></div>
+    </section>
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Plan enforcement</h2>
+        <p class="muted">Paid-platform controls: set the project plan, daily call limit, per-minute rate limit, capability allowlist, and status. This is runtime enforcement in the Worker gateway.</p>
+        <div class="inline"><input id="plan-name" value="builder" /><select id="plan-status"><option value="active">active</option><option value="paused">paused</option></select></div>
+        <div class="inline"><input id="daily-limit" placeholder="Daily call limit" /><input id="rate-limit" placeholder="Rate/minute" /></div>
+        <textarea id="plan-capabilities" spellcheck="false">*</textarea>
+        <div class="actions"><button id="set-plan">Set Plan</button><button id="load-project" class="ghost">Load Project Summary</button><button id="load-plans" class="ghost">Load Plan Catalog</button></div>
+        <div id="project-summary" class="list"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Readiness ledger</h2>
+        <div class="ledger">
+          <div><strong>Implemented locally</strong><span>Vault encryption, safe manifests, SDK, CLI, MCP, console, Worker routes.</span></div>
+          <div><strong>Runtime-enforced</strong><span>Scopes, key revocation, key expiry, plan limits, usage counters, idempotency, provider body suppression.</span></div>
+          <div><strong>Not auto-claimed</strong><span>Live provider success, Cloudflare deployment, browser E2E, billing collection.</span></div>
+        </div>
+      </section>
+    </section>
+
+
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Provider marketplace</h2>
+        <p class="muted">Install/disable provider packs per project without editing core code. Disabled packs remove their capabilities from the manifest and runtime.</p>
+        <div class="actions"><button id="load-provider-packs">Load Pack Catalog</button><button id="load-project-providers" class="ghost">Load Project Providers</button></div>
+        <div class="inline"><input id="provider-name" value="resend" /><select id="provider-enabled"><option value="true">enabled</option><option value="false">disabled</option></select></div>
+        <input id="provider-reason" placeholder="Reason / note" />
+        <button id="set-provider">Save Provider State</button>
+        <div id="provider-marketplace" class="list"></div>
+        <div id="project-providers-list" class="list"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Policy builder</h2>
+        <p class="muted">Runtime gates for risky inputs: SQL writes, expensive AI calls, SMS destinations, storage prefixes, and other capability rules.</p>
+        <textarea id="policies-json" spellcheck="false">[
+  {
+    "id": "deny-db-writes",
+    "label": "Block direct database writes",
+    "enabled": true,
+    "capability": "db.query",
+    "effect": "deny",
+    "conditions": [{ "kind": "sql_readonly", "path": "sql" }]
+  }
+]</textarea>
+        <div class="actions"><button id="save-policies">Save Policies</button><button id="load-policies" class="ghost">Load Policies</button></div>
+      </section>
+    </section>
+
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Upstream roles</h2>
+        <p class="muted">Accept upstream identity claims from headers like x-skye-role and enforce project roles without building auth here.</p>
+        <textarea id="roles-json" spellcheck="false">{
+  "owner": { "allowedCapabilities": ["*"] },
+  "readonly": { "allowedCapabilities": ["manifest.read", "providers.health", "db.inspect_schema"] }
+}</textarea>
+        <div class="actions"><button id="save-roles">Save Roles</button><button id="load-roles" class="ghost">Load Roles</button></div>
+      </section>
+      <section class="panel stack">
+        <h2>Secret rotation</h2>
+        <p class="muted">Rotate one stored provider credential, update the encrypted AegisCore bundle, and record an audit receipt without revealing values.</p>
+        <input id="rotate-key" placeholder="RESEND_API_KEY" />
+        <input id="rotate-value" type="password" placeholder="new secret value" autocomplete="off" />
+        <input id="rotate-reason" placeholder="reason" />
+        <div class="actions"><button id="rotate-secret">Rotate Secret</button><button id="load-rotations" class="ghost">Load Rotation Receipts</button></div>
+        <div id="rotations-list" class="list"></div>
+      </section>
+    </section>
+
+    <section class="panel stack">
+      <h2>Webhook ingestion + replay</h2>
+      <p class="muted">Inbound provider webhooks land at /v1/webhooks/:provider?projectId=PROJECT_ID. Replay records downstream processing intent; it does not fake a live provider event.</p>
+      <div class="inline"><input id="webhook-event-id" placeholder="Webhook event ID" /><button id="replay-webhook">Replay Event</button><button id="load-webhooks" class="ghost">Load Webhook Events</button></div>
+      <div id="webhooks-list" class="list tall"></div>
+    </section>
+
+
+    <section class="grid three">
+      <section class="panel stack">
+        <h2>Approval queue</h2>
+        <p class="muted">Policies can now create pending approval requests instead of only blocking. Approve returns a one-time retry token tied to the exact input fingerprint.</p>
+        <div class="inline"><input id="approval-request-id" placeholder="approval request id" /><select id="approval-action"><option value="approve">approve</option><option value="deny">deny</option></select></div>
+        <div class="actions"><button id="load-approvals">Load Approvals</button><button id="resolve-approval" class="ghost">Resolve Request</button></div>
+        <div id="approvals-list" class="list tall"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Config snapshots</h2>
+        <p class="muted">Create and restore project configuration snapshots for plans, provider pack state, policies, roles, and safe manifest summary. Raw provider secrets are not copied into snapshots.</p>
+        <input id="snapshot-reason" placeholder="snapshot reason" />
+        <div class="inline"><input id="snapshot-id" placeholder="snapshot id to restore" /><button id="restore-snapshot" class="ghost">Restore</button></div>
+        <div class="actions"><button id="create-snapshot">Create Snapshot</button><button id="load-snapshots" class="ghost">Load Snapshots</button></div>
+        <div id="snapshots-list" class="list tall"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Workflow run ledger</h2>
+        <p class="muted">Every hosted workflow run is stored as a redacted receipt with step status, proof IDs, actor headers, dry-run flag, and final output summary.</p>
+        <div class="actions"><button id="load-workflow-runs">Load Workflow Runs</button><button id="load-workflow-runs-detail" class="ghost">Load Detailed Runs</button></div>
+        <div id="workflow-runs-list" class="list tall"></div>
+      </section>
+    </section>
+
+
+
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Async job queue</h2>
+        <p class="muted">Queue capability work for later execution. Dry-run jobs prove the queue path without hitting providers; live jobs process through the same provider router.</p>
+        <div class="inline"><input id="job-capability" value="email.send" /><label class="check"><input id="job-dry-run" type="checkbox" checked /> dry run</label><input id="job-max-attempts" value="3" /></div>
+        <textarea id="job-json" spellcheck="false">{
+  "to": "test@example.com",
+  "subject": "Queued SkyeAPI proof",
+  "body": "This was queued through SkyeAPI."
+}</textarea>
+        <div class="inline"><input id="job-id" placeholder="job id to cancel" /><input id="job-cancel-reason" placeholder="cancel reason" /></div>
+        <div class="actions"><button id="enqueue-job">Enqueue Job</button><button id="process-job" class="ghost">Process Next</button><button id="cancel-job" class="ghost">Cancel Job</button><button id="load-jobs" class="ghost">Load Jobs</button><button id="load-dead-letter-jobs" class="ghost">Dead Letters</button><button id="retry-dead-letter-job" class="ghost">Retry Dead Letter</button></div>
+        <div id="jobs-list" class="list tall"></div>
+        <div id="dead-letter-jobs-list" class="list tall"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Outbound webhooks</h2>
+        <p class="muted">Create HTTPS event subscriptions, queue outbound deliveries, and explicitly process them. Processing performs real HTTP delivery to the subscriber URL.</p>
+        <input id="outbound-url" placeholder="https://example.com/skyeapi-webhook" />
+        <div class="inline"><input id="outbound-events" value="workflow.completed,capability.called" /><input id="outbound-secret-ref" placeholder="optional secret ref for HMAC" /><input id="outbound-max-attempts" value="3" /></div>
+        <div class="inline"><input id="outbound-subscription-id" placeholder="subscription id" /><select id="outbound-enabled"><option value="">leave enabled state</option><option value="true">enabled</option><option value="false">disabled</option></select></div>
+        <div class="inline"><input id="outbound-event-type" value="workflow.completed" /><button id="emit-outbound" class="ghost">Queue Event</button></div>
+        <textarea id="outbound-payload" spellcheck="false">{"example": true}</textarea>
+        <div class="actions"><button id="create-outbound-subscription">Create Subscription</button><button id="update-outbound-subscription" class="ghost">Update Subscription</button><button id="delete-outbound-subscription" class="ghost">Delete Subscription</button><button id="load-outbound-subscriptions" class="ghost">Load Subscriptions</button><button id="load-outbound-deliveries" class="ghost">Load Deliveries</button><button id="process-outbound" class="ghost">Process Deliveries</button><button id="load-dead-letter-outbound" class="ghost">Dead Letters</button></div>
+        <div id="outbound-subscriptions-list" class="list"></div>
+        <div id="outbound-deliveries-list" class="list tall"></div>
+        <div id="outbound-deadletters-list" class="list tall"></div>
+      </section>
+    </section>
+
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Ops doctor + anomalies</h2>
+        <p class="muted">Inspect project wiring and usage patterns without exposing raw secrets. These are product-code checks, not deployment checks.</p>
+        <div class="actions"><button id="load-doctor">Run Doctor</button><button id="load-anomalies" class="ghost">Load Anomalies</button><button id="load-ops-readiness" class="ghost">Ops Readiness</button></div>
+        <div id="doctor-list" class="list"></div>
+        <div id="anomalies-list" class="list"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Provider-pack authoring</h2>
+        <p class="muted">Generate and certify provider-pack definitions before letting custom providers into the platform. Certification rejects token-shaped values.</p>
+        <textarea id="provider-pack-json" spellcheck="false">{
+  "version": "skyeapi.provider-pack.v1",
+  "provider": "mailgun-custom",
+  "label": "Mailgun Custom",
+  "category": "email",
+  "capabilities": ["email.send"],
+  "requiredSecrets": ["MAILGUN_API_KEY", "MAILGUN_DOMAIN"],
+  "optionalSecrets": [],
+  "secrets_exposed": false
+}</textarea>
+        <div class="grid four"><input id="scaffold-provider" value="mailgun-custom" /><input id="scaffold-label" value="Mailgun Custom" /><input id="scaffold-capabilities" value="email.send" /><input id="scaffold-required" value="MAILGUN_API_KEY,MAILGUN_DOMAIN" /></div>
+        <input id="scaffold-category" value="email" />
+        <div class="grid two"><input id="provider-pack-version" value="0.1.0" /><input id="provider-pack-registry-id" placeholder="registry id to install" /></div>
+        <div class="actions"><button id="certify-provider-pack">Certify Pack</button><button id="scaffold-provider-pack" class="ghost">Scaffold Pack</button><button id="publish-provider-pack" class="ghost">Publish Registry Entry</button><button id="load-provider-pack-registry" class="ghost">Load Registry</button><button id="install-provider-pack" class="ghost">Install Pack</button><button id="load-provider-pack-installations" class="ghost">Installations</button></div>
+        <div id="provider-pack-registry-list" class="list tall"></div>
+      </section>
+    </section>
+
+    <section class="grid two">
+      <section class="panel stack">
+        <h2>Usage + billing ledger</h2>
+        <p class="muted">Billing usage records are estimated platform-meter records, not Stripe subscription collection.</p>
+        <button id="load-usage">Load Usage Snapshot</button><button id="load-billing-usage" class="ghost">Load Billing Usage</button>
+        <div id="usage-list" class="list"></div>
+        <div id="billing-usage-list" class="list"></div>
+      </section>
+      <section class="panel stack">
+        <h2>Gateway events</h2>
+        <button id="load-events">Load Recent Events</button>
+        <div id="events-list" class="list tall"></div>
+      </section>
+    </section>
+
+
+    <section class="grid three">
+      <section class="panel stack">
+        <h2>Job leases</h2>
+        <p class="muted">Claim one queued job with an execution lease, then complete it with the matching lease token. This is code-level duplicate-execution control, not deployment theater.</p>
+        <input id="job-lease-ms" value="300000" />
+        <div class="actions"><button id="claim-job-lease">Claim Job Lease</button><button id="complete-job-lease" class="ghost">Complete Lease From Result</button></div>
+      </section>
+      <section class="panel stack">
+        <h2>Provider-pack signing</h2>
+        <textarea id="signed-pack-json" spellcheck="false">{"version":"skyeapi.provider-pack.v1","provider":"mailgun-custom","label":"Mailgun Custom","category":"email","capabilities":["email.send"],"requiredSecrets":["MAILGUN_API_KEY"],"dependencies":[],"secrets_exposed":false}</textarea>
+        <div class="actions"><button id="validate-pack-dependencies">Check Dependencies</button><button id="sign-provider-pack" class="ghost">Sign Pack</button><button id="verify-provider-pack" class="ghost">Verify Last Signature</button></div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Pack source install + invoice drafts</h2>
+        <p class="muted">Install certified provider packs from a recorded source receipt and generate draft invoice objects from metered usage. These are code receipts, not payment collection claims.</p>
+        <div class="grid three"><input id="pack-source-type" value="inline" /><input id="pack-source-uri" placeholder="optional zip/git/directory source uri" /><input id="invoice-customer-email" placeholder="customer email optional" /></div>
+        <div class="actions"><button id="install-pack-source">Install Pack From Source</button><button id="certification-receipt" class="ghost">Certification Receipt</button><button id="load-billing-invoice" class="ghost">Invoice Draft</button><button id="export-invoice-json" class="ghost">Export Invoice JSON</button><button id="export-invoice-csv" class="ghost">Export Invoice CSV</button></div>
+        <div id="billing-invoice-list" class="list tall"></div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Billing exports</h2>
+        <p class="muted">Export usage as CSV or JSONL for billing reconciliation. This still does not claim Stripe subscription collection.</p>
+        <div class="actions"><button id="export-billing-csv">Export CSV</button><button id="export-billing-jsonl" class="ghost">Export JSONL</button></div>
+      </section>
+    </section>
+
+
+    <section class="grid three">
+      <section class="panel stack">
+        <h2>Provider-pack source loader + sandbox</h2>
+        <p class="muted">Inline source loading is hosted; directory, zip, and git extraction are CLI/local loader jobs so the Worker does not pretend to clone repositories.</p>
+        <textarea id="sandbox-adapter-source" spellcheck="false" placeholder="Optional adapter source for static sandbox scan"></textarea>
+        <div class="actions"><button id="load-pack-source">Load Inline Source</button><button id="sandbox-provider-pack" class="ghost">Sandbox Pack</button></div>
+      </section>
+      <section class="panel stack">
+        <h2>Invoice history + subscriptions</h2>
+        <p class="muted">Persist invoice records and create subscription draft objects without claiming payment capture.</p>
+        <div class="grid three"><input id="subscription-plan" value="builder" /><input id="subscription-cycle" value="monthly" /><input id="subscription-base-cents" value="0" /></div>
+        <div class="grid two"><input id="subscription-included-calls" value="1000" /><input id="subscription-overage-cents" value="1" /></div>
+        <div class="actions"><button id="create-billing-invoice">Persist Invoice</button><button id="list-billing-invoices" class="ghost">List Invoices</button><button id="mark-invoice-issued" class="ghost">Mark Issued</button><button id="create-subscription" class="ghost">Create Subscription</button><button id="load-subscriptions" class="ghost">Load Subscriptions</button></div>
+      </section>
+      <section class="panel stack">
+        <h2>Workspace hooks + audit bundle</h2>
+        <p class="muted">Accept upstream workspace context and bind it to projects; export redacted platform audit bundles.</p>
+        <div class="grid two"><input id="workspace-id" value="wksp_default" /><input id="workspace-roles" value="owner,developer" /></div>
+        <div class="grid two"><input id="workspace-role-check" value="developer" /><input id="workspace-capability-check" value="email.send" /></div>
+        <div class="actions"><button id="create-workspace-binding">Bind Workspace</button><button id="load-workspace-bindings" class="ghost">Load Bindings</button><button id="check-workspace-access" class="ghost">Check Access</button><button id="audit-export" class="ghost">Audit Export</button></div>
+      </section>
+    </section>
+
+    <section class="panel stack">
+      <h2>Result console</h2>
+      <pre id="result">Ready.</pre>
+    </section>
+  </main>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

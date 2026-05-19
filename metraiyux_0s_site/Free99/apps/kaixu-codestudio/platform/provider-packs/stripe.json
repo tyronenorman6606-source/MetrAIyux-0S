@@ -1,0 +1,46 @@
+{
+  "id": "stripe",
+  "title": "Stripe Payments",
+  "lane": "payments",
+  "requiredSecrets": [
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET"
+  ],
+  "routes": [
+    "checkout.create",
+    "invoice.send",
+    "webhook.payment"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#StripeAdapter",
+  "description": "Executable provider pack for Stripe Payments routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "checkout",
+    "billing",
+    "payment-webhooks"
+  ],
+  "metering": {
+    "unit": "checkout_session",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "payments",
+    "stripe"
+  ],
+  "executableActions": [
+    {
+      "route": "checkout.create",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "invoice.send",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "webhook.payment",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

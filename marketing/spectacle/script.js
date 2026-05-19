@@ -328,7 +328,7 @@ function buildBriefObject() {
     platform: "MetrAIyux 0S",
     publicOverviewUrl,
     fullWebsiteUrl,
-    publicPositioning: "I built this public overview for a founder-controlled company operating system with admin command, customer SaaS workspaces, proof receipts, approval gates, and a 16-brain operating model.",
+    publicPositioning: "I built this public overview for a founder-controlled company operating system with admin command, customer SaaS workspaces, proof receipts, approval gates, and a 17-brain operating model.",
     coreCapabilities: [
       "Public buyer education and live fit routing",
       "Customer signup, onboarding, service selection, and workspace paths",

@@ -1,4 +1,2 @@
-# Valley Verified Cloudflare Pages deploy: keep the full business dataset in JSON
-# and serve /business/:id/ through the scalable renderer to stay under Pages'
-# 20,000-file deployment cap.
-/business/* /business-profile/ 200
+# Valley Verified full-static build: business pages are emitted as real HTML.
+# Keep /business/:id/ routes on their generated files instead of shadowing them with the profile renderer.

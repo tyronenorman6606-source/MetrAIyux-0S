@@ -42,6 +42,18 @@ git push vault main
 git fetch vault
 ```
 
+Or let the workspace helper set up the local folder and keep receipts for the Git-style operations:
+
+```bash
+npm run vault:repo -- init --dir=./my-repo --workspace=acme --repo=my-repo
+npm run vault:repo -- status --dir=./my-repo
+npm run vault:repo -- diff --dir=./my-repo
+npm run vault:repo -- commit --dir=./my-repo --message="Update workspace"
+SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:repo -- push --dir=./my-repo --branch=main
+```
+
+The helper stores a clean remote URL and supplies the token through a runtime HTTP auth header when pushing/fetching.
+
 The server auto-creates a bare repo on first authenticated access unless started with `--no-auto-create`.
 
 Supported Git smart HTTP behavior:

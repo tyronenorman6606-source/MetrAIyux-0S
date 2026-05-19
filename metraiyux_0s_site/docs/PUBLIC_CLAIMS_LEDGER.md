@@ -7,7 +7,7 @@ This ledger keeps public copy strong without overclaiming. For the full repo-evi
 ## Claims The Site Can Make
 
 - The 0S demonstrates a 13-cabinet operating model with public cabinet profiles, resumes, dashboards, executive rooms, and a governance charter.
-- The 0S includes a 16-brain command model: Site Operator Brain, Central Company Command Brain, 13 cabinet/person brains, and 0meg4kAI security/QA brain.
+- The 0S includes a 17-brain command model: Site Operator Brain, Central Company Command Brain, 13 cabinet/person brains, and 0meg4kAI security/QA brain.
 - The 0S includes a local cabinet brain, persona-brain library, brain governance pages, brain freshness ledger, brain test battery, neural map, and optional local/proxy model path.
 - The 0S includes an owner/admin automation OS with Main Automation Brain Chat, approval queue, approval inbox, risk register, meeting room, vendor scorecard, content engine lane, social autopilot posture, Resend approval workflow, operator runbooks, and admin tutorial library.
 - The 0S includes customer SaaS surfaces for signup, login, onboarding, service selection, company profile, workspace setup, tenant provisioning, customer dashboard, billing intent, SkyePay routing, and SkyeMerit protected merit math.

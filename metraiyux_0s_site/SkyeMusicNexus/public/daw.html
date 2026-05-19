@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyeMusicNexus // Native DAW</title>
+  <meta name="description" content="Fullscreen first-party SkyeMusicNexus DAW for making tracks, arranging stems, mixing, and exporting release packets." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./open-source-studio.css" />
+  <link rel="stylesheet" href="./nexus-daw.css" />
+  <script defer src="./skygate-auth.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="./nexus-daw.js"></script>
+</head>
+<body class="native-daw-body" data-app="skye-music-nexus" data-mode="artist" data-room="native-daw">
+  <main class="native-daw-shell" aria-label="SkyeMusicNexus native fullscreen DAW">
+    <header class="daw-topbar">
+      <a class="daw-brand" href="./create.html" aria-label="Back to Create Hub">
+        <img src="../assets/platform-mark.svg" alt="" />
+        <span>SkyeMusicNexus DAW</span>
+      </a>
+      <section class="daw-transport" aria-label="Transport">
+        <button id="stopTransportButton" type="button" aria-label="Stop">Stop</button>
+        <button id="playTransportButton" type="button" aria-label="Play">Play</button>
+        <button id="recordTransportButton" type="button" aria-label="Record">Record</button>
+        <button id="audioEngineButton" type="button" aria-label="Start audio engine">Audio</button>
+        <label>BPM<input id="dawTempoInput" type="number" min="40" max="220" value="96" /></label>
+        <label>Key<select id="dawKeyInput"><option>F minor</option><option>C minor</option><option>A minor</option><option>G minor</option><option>D minor</option><option>C major</option><option>G major</option></select></label>
+        <span id="dawClock" class="daw-clock">001:01</span>
+        <span id="dawAudioStatus" class="daw-audio-status">Audio locked</span>
+      </section>
+      <section class="daw-project-actions" aria-label="Project actions">
+        <button id="saveDawProjectButton" type="button">Save</button>
+        <button id="exportDawManifestButton" type="button">Export</button>
+        <a href="./exports.html">Forge</a>
+      </section>
+    </header>
+
+    <section class="daw-workbench">
+      <aside class="daw-activity-rail" aria-label="DAW workbench lanes">
+        <button class="active" type="button" data-daw-rail="session" aria-label="Session explorer">S</button>
+        <button type="button" data-daw-rail="tracks" aria-label="Track map">T</button>
+        <button type="button" data-daw-rail="clips" aria-label="Clip bin">C</button>
+        <button type="button" data-daw-rail="mix" aria-label="Mix console">M</button>
+        <button type="button" data-daw-rail="export" aria-label="Release export">E</button>
+      </aside>
+
+      <aside class="daw-browser" aria-label="Session browser">
+        <div class="daw-panel-head">
+          <p class="micro">native session</p>
+          <h1>Make it inside Nexus.</h1>
+        </div>
+        <label>Artist ID<input id="dawArtistInput" value="artist_unassigned" /></label>
+        <label>Project<input id="dawProjectInput" value="Nexus native session" /></label>
+        <label>Import audio<input id="dawFileInput" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm" multiple /></label>
+        <div class="daw-edit-tools" aria-label="DAW edit tools">
+          <button id="undoDawButton" type="button" aria-label="Undo edit">Undo</button>
+          <button id="redoDawButton" type="button" aria-label="Redo edit">Redo</button>
+          <button id="splitRegionButton" type="button" aria-label="Split selected region">Split</button>
+          <button id="duplicateRegionButton" type="button" aria-label="Duplicate selected region">Dupe</button>
+          <button id="deleteRegionButton" type="button" aria-label="Delete selected region">Delete</button>
+          <button id="quantizeDawButton" type="button" aria-label="Quantize arrangement">Quantize</button>
+          <button id="metronomeDawButton" type="button" aria-label="Toggle metronome">Metro</button>
+          <button id="loopDawButton" type="button" aria-label="Toggle loop playback">Loop</button>
+          <button id="micRecordButton" type="button" aria-label="Record microphone">Mic</button>
+          <button id="midiDawButton" type="button" aria-label="Connect MIDI">MIDI</button>
+          <button id="mixdownDawButton" type="button" aria-label="Export WAV mixdown">WAV</button>
+        </div>
+        <div class="daw-sound-library" aria-label="Sound library">
+          <div class="daw-panel-title-row">
+            <span>sounds</span>
+            <strong>Loop Pack</strong>
+          </div>
+          <div id="dawSoundLibrary" class="daw-sound-grid"></div>
+        </div>
+        <div class="daw-workbench-panel">
+          <div class="daw-panel-title-row">
+            <span id="dawWorkbenchKicker">session</span>
+            <strong id="dawWorkbenchTitle">Project Files</strong>
+          </div>
+          <div id="dawWorkbenchBody" class="daw-workbench-body"></div>
+        </div>
+        <div class="daw-browser-list" id="dawClipList" aria-label="Imported clips"></div>
+      </aside>
+
+      <section class="daw-arrangement" aria-label="Arrangement timeline">
+        <div class="daw-ruler" id="dawRuler"></div>
+        <div class="daw-track-grid" id="dawTrackGrid"></div>
+      </section>
+
+      <aside class="daw-mixer" aria-label="Mixer">
+        <div class="daw-panel-head">
+          <p class="micro">mixer</p>
+          <h2>Levels</h2>
+        </div>
+        <div id="dawMixerChannels" class="daw-mixer-channels"></div>
+      </aside>
+    </section>
+
+    <section class="daw-bottom-deck" aria-label="Instrument and performance deck">
+      <article class="daw-pad-section">
+        <div class="daw-panel-head">
+          <p class="micro">drum pads</p>
+          <h2>16-pad beat lane</h2>
+        </div>
+        <div id="dawPads" class="daw-pads" aria-label="Drum pads"></div>
+      </article>
+      <article class="daw-key-section">
+        <div class="daw-panel-head">
+          <p class="micro">keys</p>
+          <h2>Synth sketch</h2>
+        </div>
+        <div id="dawKeys" class="daw-keys" aria-label="Piano keys"></div>
+      </article>
+      <article class="daw-output-section">
+        <div class="daw-panel-head">
+          <p class="micro">release packet</p>
+          <h2>Handoff</h2>
+        </div>
+        <pre id="dawOutput" class="daw-output">Native DAW idle.</pre>
+      </article>
+    </section>
+
+    <footer class="daw-statusbar" aria-label="DAW session status">
+      <div class="daw-status-left">
+        <span id="dawStatusProject">Nexus native session</span>
+        <span id="dawStatusTrackCount">5 tracks</span>
+        <span id="dawStatusClipCount">0 clips</span>
+      </div>
+      <div class="daw-status-right">
+        <span id="dawStatusAudio">Audio locked</span>
+        <span id="dawStatusSave">Local session</span>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>

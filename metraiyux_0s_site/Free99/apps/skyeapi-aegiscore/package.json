@@ -1,0 +1,49 @@
+{
+  "name": "skyeapi-aegiscore-platform",
+  "version": "0.17.0",
+  "private": true,
+  "description": "SkyeAPI + AegisCore monorepo: one capability key over encrypted provider credentials for apps, agents, CLI, and MCP.",
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-workspaces.mjs",
+    "typecheck": "node tools/build-workspaces.mjs",
+    "smoke:local": "node tools/smoke-local.mjs",
+    "smoke:built": "pnpm build && node tools/smoke-built.mjs",
+    "proof": "node tools/proof-fast.mjs",
+    "clean": "rm -rf packages/*/dist apps/*/dist .proof",
+    "smoke:console": "node tools/smoke-console.mjs",
+    "smoke:worker": "node tools/smoke-worker-source.mjs",
+    "smoke:platform-controls": "node tools/smoke-platform-controls.mjs",
+    "truth-gate": "node tools/truth-gate.mjs",
+    "smoke:workflow": "pnpm build && node tools/smoke-workflow.mjs",
+    "smoke:v06-product": "pnpm build && node tools/smoke-v06-product.mjs",
+    "smoke:v07-product": "pnpm build && node tools/smoke-v07-product.mjs",
+    "smoke:v08-product": "pnpm build && node tools/smoke-v08-product.mjs",
+    "smoke:v09-product": "pnpm build && node tools/smoke-v09-product.mjs",
+    "smoke:v10-product": "pnpm build && node tools/smoke-v10-product.mjs",
+    "smoke:v11-product": "pnpm build && node tools/smoke-v11-product.mjs",
+    "no-theater-gate": "node tools/no-theater-gate.mjs",
+    "smoke:v12-product": "pnpm build && node tools/smoke-v12-product.mjs",
+    "smoke:v13-product": "pnpm build && node tools/smoke-v13-product.mjs",
+    "smoke:console-browser": "pnpm build && node tools/smoke-console-browser.mjs",
+    "smoke:worker-http": "pnpm build && node tools/smoke-worker-http.mjs",
+    "smoke:v14-product": "pnpm build && node tools/smoke-v14-product.mjs",
+    "proof:full": "node tools/build-workspaces.mjs && node tools/typecheck-workspaces.mjs && node tools/proof-fast.mjs",
+    "smoke:v15-product": "pnpm build && node tools/smoke-v15-product.mjs",
+    "proof:regression": "node tools/proof-regression.mjs",
+    "smoke:website": "node tools/smoke-website.mjs",
+    "smoke:v16-product": "pnpm build && node tools/smoke-v16-product.mjs",
+    "smoke:v17-product": "pnpm build && node tools/smoke-v17-product.mjs"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

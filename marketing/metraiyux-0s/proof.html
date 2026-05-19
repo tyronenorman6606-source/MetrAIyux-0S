@@ -128,7 +128,7 @@
         <div class="test-header">
           <div class="test-num">T01</div>
           <div class="test-header-text">
-            <h3>All 9 Workers — Health Sweep</h3>
+            <h3>All 17 Workers — Health Sweep</h3>
             <p>Every Worker was hit at its <code>/health</code> endpoint. All returned HTTP 200 with D1, KV, and Queue bindings confirmed live. This proves the deployed infrastructure is not a demo environment — it is production Cloudflare edge compute with active storage bindings.</p>
           </div>
           <span class="status-pill pill-pass">ALL LIVE</span>
@@ -137,12 +137,12 @@
           <div class="worker-grid">
             <div class="worker-card">
               <div class="wname">metraiyux-0s-full-system</div>
-              <div class="wstatus">Main routing brain. 16 brains, 8 surfaces. Version: AUTONOMOUS_BUSINESS_SITE_OPERATOR_1.0.0</div>
+              <div class="wstatus">Main routing brain. 17 brains, 39 surfaces. Version: AUTONOMOUS_BUSINESS_SITE_OPERATOR_1.0.0</div>
               <div class="wbadges"><span class="wbadge">D1 ✓</span><span class="wbadge">KV ✓</span><span class="wbadge">QUEUE ✓</span><span class="wbadge">SKYGATE ✓</span></div>
             </div>
             <div class="worker-card">
               <div class="wname">admin-automation-brain</div>
-              <div class="wstatus">Owner command layer. 16 brains mapped. Resend approval email configured. SkyeGate auth + event mirror live.</div>
+              <div class="wstatus">Owner command layer. 17 brains mapped. Resend approval email configured. SkyeGate auth + event mirror live.</div>
               <div class="wbadges"><span class="wbadge">D1 ✓</span><span class="wbadge">KV ✓</span><span class="wbadge">RESEND ✓</span><span class="wbadge">SKYGATE ✓</span></div>
             </div>
             <div class="worker-card">
@@ -593,7 +593,7 @@
           <div class="test-num">T23–T24</div>
           <div class="test-header-text">
             <h3>SDK Deployment + Single-Credential Command Routing</h3>
-            <p>The <code>@metraiyux/0s-sdk</code> package was written and deployed. The gateway Worker was updated with <code>/api/sdk/*</code> endpoints that validate any FS27 token via the auth-card endpoint and scope all requests to the token's workspace. Verified: SDK init hits FS27 auth-card and returns gate card. SDK command routes through the 16-brain classifier. No Cloudflare account, Resend key, or Stripe key required by the customer.</p>
+            <p>The <code>@metraiyux/0s-sdk</code> package was written and deployed. The gateway Worker was updated with <code>/api/sdk/*</code> endpoints that validate any FS27 token via the auth-card endpoint and scope all requests to the token's workspace. Verified: SDK init hits FS27 auth-card and returns gate card. SDK command routes through the 17-brain classifier. No Cloudflare account, Resend key, or Stripe key required by the customer.</p>
           </div>
           <span class="status-pill pill-pass">SDK LIVE</span>
         </div>

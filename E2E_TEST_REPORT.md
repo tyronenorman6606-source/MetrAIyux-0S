@@ -26,7 +26,7 @@ All 8 workers return `server: cloudflare` + `cf-ray` headers. D1 persistence con
 
 ## TEST RESULTS
 
-### ✅ PASS — Brain Routing System (16 Brains)
+### ✅ PASS — Brain Routing System (17 Brains)
 
 The keyword classifier correctly routes on 11 of 13 tested intents.
 
@@ -189,7 +189,7 @@ approvals@solenterprises.org
 
 This is a working proof. Not a prototype. Here's what ran live during this test:
 
-- **16 brain routing** — keyword classifier correctly routes commands to named executive function brains. All events get a UUID receipt and are written to D1 SQL in real time.
+- **17 brain routing** — keyword classifier correctly routes commands to named executive function brains. All events get a UUID receipt and are written to D1 SQL in real time.
 - **0meg4kAI two-layer scan** — every command gets browser-side intent analysis (in the UI) and Worker-edge risk scoring. Quarantine, approval_required, and allow decisions fire in real time with specific finding codes.
 - **Hard approval gates** — contract, payment, hiring, legal, and public publishing actions are caught and blocked from auto-execution. They sit in a D1 queue awaiting human approval. This is non-configurable by customers.
 - **Multi-tenant isolation** — customers can't touch the owner brain, other workspaces, or production connectors. The boundary is enforced at the 0meg4kAI scan level, not just the UI.

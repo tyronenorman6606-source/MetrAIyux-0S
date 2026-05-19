@@ -7,6 +7,10 @@ const required = [
   'netlify.toml',
   '.env.example',
   'public/index.html',
+  'public/upload.html',
+  'public/vault.html',
+  'public/repo.html',
+  'public/process.html',
   'public/operator.html',
   'internal-pages/admin.html',
   'internal-pages/setup.html',
@@ -42,7 +46,7 @@ if (missing.length) {
   process.exit(1);
 }
 
-const publicText = ['public/index.html', 'public/operator.html', 'internal-pages/admin.html', 'internal-pages/setup.html', 'public/assets/app.js', 'public/assets/admin.js', 'public/assets/setup.js', 'public/assets/operator.js']
+const publicText = ['public/index.html', 'public/upload.html', 'public/vault.html', 'public/repo.html', 'public/process.html', 'public/operator.html', 'internal-pages/admin.html', 'internal-pages/setup.html', 'public/assets/app.js', 'public/assets/admin.js', 'public/assets/setup.js', 'public/assets/operator.js']
   .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
   .join('\n');
 

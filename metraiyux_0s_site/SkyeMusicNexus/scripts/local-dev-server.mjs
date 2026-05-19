@@ -40,10 +40,12 @@ const functionNames = new Set([
   "music-analytics",
   "music-artists",
   "music-assets",
+  "music-drops",
   "music-exchange",
   "music-payments",
   "music-provider-hooks",
   "music-releases",
+  "music-social",
   "music-studio",
   "skygate-session",
 ]);
@@ -74,6 +76,10 @@ function send(res, statusCode, headers, body, isBase64Encoded = false) {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET,POST,DELETE,OPTIONS",
     "access-control-allow-headers": "content-type,authorization",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "cross-origin-isolated=(self)",
     ...headers,
   });
   res.end(isBase64Encoded ? Buffer.from(body || "", "base64") : body || "");
@@ -152,6 +158,10 @@ function listen(port) {
     console.log(`SkyeMusicNexus local platform server: ${baseUrl}`);
     console.log(`Dashboard: ${baseUrl}/SkyeMusicNexus/public/index.html`);
     console.log(`Create Studio: ${baseUrl}/SkyeMusicNexus/public/create.html`);
+    console.log(`DAW Room: ${baseUrl}/SkyeMusicNexus/public/daw.html`);
+    console.log(`Discover: ${baseUrl}/SkyeMusicNexus/public/discover.html`);
+    console.log(`Feed: ${baseUrl}/SkyeMusicNexus/public/feed.html`);
+    console.log(`Drops: ${baseUrl}/SkyeMusicNexus/public/drops.html`);
     console.log(`Upload Studio: ${baseUrl}/SkyeMusicNexus/public/upload.html`);
     console.log(`Music Player: ${baseUrl}/SkyeMusicNexus/public/player.html`);
     console.log(`Local data: ${process.env.MUSIC_NEXUS_DATA_DIR}`);

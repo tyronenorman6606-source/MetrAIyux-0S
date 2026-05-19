@@ -55,12 +55,14 @@ const clientVaultCount = document.querySelector('#clientVaultCount');
 const clearClientVault = document.querySelector('#clearClientVault');
 
 function showStatus(message, type = '') {
+  if (!statusBox) return;
   statusBox.className = `status-card ${type}`.trim();
   statusBox.textContent = message;
   statusBox.classList.remove('hidden');
 }
 
 function hideStatus() {
+  if (!statusBox) return;
   statusBox.classList.add('hidden');
 }
 
@@ -202,6 +204,7 @@ function validateSelectedFiles() {
 }
 
 function updateQueueSummary() {
+  if (!queueSummary || !selectedSize) return;
   const count = state.files.length;
   const total = totalSelectedBytes();
   queueSummary.textContent = count ? `${count} file${count === 1 ? '' : 's'} queued` : 'No files selected';
@@ -209,6 +212,7 @@ function updateQueueSummary() {
 }
 
 function destinationLimitForCurrentSelection() {
+  if (!destinationSelect) return null;
   const selectedId = destinationSelect.value;
   const destinations = state.config?.destinations || [];
   if (selectedId) {
@@ -220,6 +224,7 @@ function destinationLimitForCurrentSelection() {
 }
 
 function renderFiles() {
+  if (!fileList || !template) return;
   fileList.innerHTML = '';
   state.rows.clear();
   const maxGb = destinationLimitForCurrentSelection();
@@ -621,6 +626,7 @@ async function uploadOne(file) {
 }
 
 function renderDestinationSummary(destinations = []) {
+  if (!destinationSummary) return;
   destinationSummary.textContent = '';
   if (!destinations.length) {
     const warning = document.createElement('p');
@@ -687,6 +693,7 @@ function removePendingFinalization(key) {
 }
 
 function renderPendingFinalizations() {
+  if (!pendingList || !pendingPanel) return;
   state.pendingFinalizations = loadPendingFinalizations();
   pendingList.textContent = '';
   for (const item of state.pendingFinalizations) {
@@ -741,6 +748,7 @@ async function completeUploadWithRetry(file, session, driveFile, maxAttempts = 4
 }
 
 async function retryPendingFinalizations() {
+  if (!retryPending) return;
   const pending = loadPendingFinalizations();
   if (!pending.length) return;
   retryPending.disabled = true;
@@ -766,6 +774,7 @@ async function retryPendingFinalizations() {
 }
 
 function renderReceipts() {
+  if (!receiptList || !receiptPanel) return;
   receiptList.textContent = '';
   for (const item of state.receipts) {
     const entry = item.receipt?.entry || {};
@@ -806,6 +815,7 @@ function renderReceipts() {
 }
 
 function clientVaultPayload(action, receiptId = '') {
+  if (!clientVaultForm) return { action, receiptId };
   const data = new FormData(clientVaultForm);
   return {
     action,
@@ -939,19 +949,21 @@ async function loadPublicConfig() {
   setText(publicSubheadline, config.publicSubheadline);
   setText(publicInstructions, config.publicInstructions);
   setText(retentionNotice, config.retentionNotice);
-  portalKeyWrap.classList.toggle('hidden', !config.portalKeyRequired);
-  destinationSelect.innerHTML = '<option value="">Auto route to best available folder</option>';
-  for (const destination of config.destinations || []) {
-    const option = document.createElement('option');
-    option.value = destination.id;
-    option.textContent = `${destination.name}${destination.role === 'fallback' ? ' · fallback' : ''}`;
-    destinationSelect.append(option);
+  if (portalKeyWrap) portalKeyWrap.classList.toggle('hidden', !config.portalKeyRequired);
+  if (destinationSelect) {
+    destinationSelect.innerHTML = '<option value="">Auto route</option>';
+    for (const destination of config.destinations || []) {
+      const option = document.createElement('option');
+      option.value = destination.id;
+      option.textContent = `${destination.name}${destination.role === 'fallback' ? ' · fallback' : ''}`;
+      destinationSelect.append(option);
+    }
   }
   setText(destinationCount, String((config.destinations || []).length));
   setText(chunkSizeLabel, `${config.chunkSizeMb || 8} MB`);
   setText(portalModeLabel, config.portalKeyRequired ? 'Code protected' : 'Open link');
   if (clientVaultKeyWrap) clientVaultKeyWrap.classList.toggle('hidden', !config.portalKeyRequired);
-  if (config.maxFilesPerSubmission) queueSummary.title = `${config.maxFilesPerSubmission} file submission limit · ${config.maxTotalSubmissionGb || 5000} GB total package limit`;
+  if (queueSummary && config.maxFilesPerSubmission) queueSummary.title = `${config.maxFilesPerSubmission} file submission limit · ${config.maxTotalSubmissionGb || 5000} GB total package limit`;
   if (config.turnstileSiteKey) {
     renderTurnstile(config.turnstileSiteKey).catch((error) => showStatus(error.message, 'error'));
   } else if (turnstileWrap) {
@@ -962,79 +974,88 @@ async function loadPublicConfig() {
   renderFiles();
 }
 
-fileInput.addEventListener('change', (event) => addFiles(event.target.files));
-destinationSelect.addEventListener('change', renderFiles);
-clearQueue.addEventListener('click', () => {
-  if (state.uploading) return;
-  state.files = [];
-  fileInput.value = '';
-  renderFiles();
-});
-
-for (const eventName of ['dragenter', 'dragover']) {
-  dropzone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    dropzone.classList.add('dragging');
+if (fileInput) fileInput.addEventListener('change', (event) => addFiles(event.target.files));
+if (destinationSelect) destinationSelect.addEventListener('change', renderFiles);
+if (clearQueue) {
+  clearQueue.addEventListener('click', () => {
+    if (state.uploading) return;
+    state.files = [];
+    if (fileInput) fileInput.value = '';
+    renderFiles();
   });
 }
 
-for (const eventName of ['dragleave', 'drop']) {
-  dropzone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    dropzone.classList.remove('dragging');
-  });
+if (dropzone) {
+  for (const eventName of ['dragenter', 'dragover']) {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add('dragging');
+    });
+  }
+
+  for (const eventName of ['dragleave', 'drop']) {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove('dragging');
+    });
+  }
+
+  dropzone.addEventListener('drop', (event) => addFiles(event.dataTransfer.files));
 }
 
-dropzone.addEventListener('drop', (event) => addFiles(event.dataTransfer.files));
-
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  if (state.uploading) return;
-  if (!state.files.length) {
-    showStatus('Choose at least one file before starting.', 'error');
-    return;
-  }
-  const policyErrors = validateSelectedFiles();
-  if (policyErrors.length) {
-    showStatus(policyErrors.join(' '), 'error');
-    return;
-  }
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
-
-  state.uploading = true;
-  state.pauseRequested = false;
-  state.submissionId = Object.keys(loadStoredSessions()).length ? (state.submissionId || randomId('cdvsub')) : randomId('cdvsub');
-  state.receipts = [];
-  renderReceipts();
-  form.querySelector('button[type="submit"]').disabled = true;
-  if (pauseUpload) pauseUpload.disabled = false;
-  for (const button of form.querySelectorAll('.remove-file, #clearQueue')) button.disabled = true;
-  hideStatus();
-
-  try {
-    for (const file of state.files) {
-      const result = await uploadOne(file);
-      state.receipts.push(result);
-      renderReceipts();
+if (form) {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (state.uploading) return;
+    if (!state.files.length) {
+      showStatus('Choose at least one file before starting.', 'error');
+      return;
     }
-    showStatus('All uploads finished. Files were delivered and recorded in the intake ledger.', 'success');
-  } catch (error) {
-    showStatus(error.message || 'Upload failed.', 'error');
-  } finally {
-    state.uploading = false;
-    state.uploadAbortController = null;
-    if (pauseUpload) pauseUpload.disabled = true;
-    form.querySelector('button[type="submit"]').disabled = false;
-    for (const button of form.querySelectorAll('.remove-file, #clearQueue')) button.disabled = false;
-  }
-});
+    const policyErrors = validateSelectedFiles();
+    if (policyErrors.length) {
+      showStatus(policyErrors.join(' '), 'error');
+      return;
+    }
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
 
-retryPending.addEventListener('click', () => {
-  retryPendingFinalizations().catch((error) => showStatus(error.message, 'error'));
-});
+    state.uploading = true;
+    state.pauseRequested = false;
+    state.submissionId = Object.keys(loadStoredSessions()).length ? (state.submissionId || randomId('cdvsub')) : randomId('cdvsub');
+    state.receipts = [];
+    renderReceipts();
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
+    if (pauseUpload) pauseUpload.disabled = false;
+    for (const button of form.querySelectorAll('.remove-file, #clearQueue')) button.disabled = true;
+    hideStatus();
+
+    try {
+      for (const file of state.files) {
+        const result = await uploadOne(file);
+        state.receipts.push(result);
+        renderReceipts();
+      }
+      showStatus('All uploads finished. Files were delivered and recorded in the intake ledger.', 'success');
+    } catch (error) {
+      showStatus(error.message || 'Upload failed.', 'error');
+    } finally {
+      state.uploading = false;
+      state.uploadAbortController = null;
+      if (pauseUpload) pauseUpload.disabled = true;
+      if (submitButton) submitButton.disabled = false;
+      for (const button of form.querySelectorAll('.remove-file, #clearQueue')) button.disabled = false;
+    }
+  });
+}
+
+if (retryPending) {
+  retryPending.addEventListener('click', () => {
+    retryPendingFinalizations().catch((error) => showStatus(error.message, 'error'));
+  });
+}
 
 if (pauseUpload) {
   pauseUpload.addEventListener('click', () => {

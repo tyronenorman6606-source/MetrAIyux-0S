@@ -1,8 +1,8 @@
 /*
-  SkyeMusicNexus Open Source Creation Studio
+  SkyeMusicNexus Native Creation Studio
   Drop-in browser logic for /SkyeMusicNexus/public/create.html
 
-  This file intentionally keeps third-party DAW engines external.
+  This file intentionally keeps the DAW lane first-party.
 */
 
 (function () {
@@ -10,8 +10,7 @@
 
   const STORAGE_KEYS = {
     session: "skyeMusicNexusStudioSession",
-    projects: "skyeMusicNexusStudioProjects",
-    openDawUrl: "skyeMusicNexusOpenDawUrl"
+    projects: "skyeMusicNexusStudioProjects"
   };
 
   const API = {
@@ -25,34 +24,34 @@
     ? window.createSkyGateAuth({ storageKey: "skye_music_nexus_session" })
     : null;
 
-  const engines = [
+  const nativeModules = [
     {
-      name: "openDAW",
-      role: "Primary browser DAW engine candidate",
-      license: "AGPLv3",
-      repo: "https://github.com/andremichelle/openDAW.git",
-      mode: "External iframe/micro-frontend bridge"
+      name: "Nexus Native DAW",
+      role: "Fullscreen first-party arrangement, transport, pads, keys, and mixer",
+      license: "SkyeMusicNexus owned code",
+      repo: "local public/nexus-daw.js",
+      mode: "Native Nexus room"
     },
     {
-      name: "Ardour",
-      role: "Professional desktop DAW companion",
-      license: "GPL-2.0-or-later",
-      repo: "https://github.com/Ardour/ardour.git",
-      mode: "Desktop companion / import-export lane"
+      name: "Stem Vault",
+      role: "Local stems, bounces, masters, and reference intake",
+      license: "SkyeMusicNexus owned code",
+      repo: "local public/stems.html",
+      mode: "Native Nexus room"
     },
     {
-      name: "LMMS",
-      role: "Beat, MIDI, synth, and loop production companion",
-      license: "GPL family; verify upstream",
-      repo: "https://github.com/LMMS/lmms.git",
-      mode: "Desktop companion / sample and MIDI workflow"
+      name: "Export Forge",
+      role: "Project JSON, proof manifest, and Release Forge handoff",
+      license: "SkyeMusicNexus owned code",
+      repo: "local public/exports.html",
+      mode: "Native Nexus room"
     },
     {
-      name: "Audacity",
-      role: "Waveform cleanup, trimming, and vocal prep",
-      license: "GPLv3 with mixed file-level licensing",
-      repo: "https://github.com/audacity/audacity.git",
-      mode: "Desktop companion / edited stem import"
+      name: "Release Ops",
+      role: "Rights, exchange, upload, player, and operator handoff",
+      license: "SkyeMusicNexus owned code",
+      repo: "local Nexus runtime",
+      mode: "Gated Nexus rooms"
     }
   ];
 
@@ -85,6 +84,11 @@
 
   function $(id) {
     return document.getElementById(id);
+  }
+
+  function valueFor(id, fallback) {
+    const node = $(id);
+    return node && "value" in node ? node.value.trim() || fallback : fallback;
   }
 
   function getGateToken() {
@@ -158,11 +162,11 @@
   }
 
   function collectProject() {
-    const artistId = $("artistIdInput").value.trim() || "artist_unassigned";
-    const releaseId = $("releaseIdInput").value.trim() || "release_draft";
-    const title = $("projectTitleInput").value.trim() || "Untitled SkyeMusicNexus Studio Session";
-    const tempoKey = $("tempoKeyInput").value.trim() || "tempo/key unset";
-    const notes = $("creativeNotesInput").value.trim();
+    const artistId = valueFor("artistIdInput", "artist_unassigned");
+    const releaseId = valueFor("releaseIdInput", "release_draft");
+    const title = valueFor("projectTitleInput", "Untitled SkyeMusicNexus Studio Session");
+    const tempoKey = valueFor("tempoKeyInput", "tempo/key unset");
+    const notes = valueFor("creativeNotesInput", "");
 
     return {
       id: `studio_${artistId}_${releaseId}`.replace(/[^a-zA-Z0-9_-]/g, "_"),
@@ -172,7 +176,7 @@
       tempoKey,
       notes,
       stems: state.stems,
-      sourceEngines: ["openDAW", "Ardour", "LMMS", "Audacity"],
+      sourceEngines: ["SkyeMusicNexus Native DAW"],
       status: "creation_session_saved",
       updatedAt: new Date().toISOString()
     };
@@ -214,7 +218,7 @@
     const grid = $("engineLedgerGrid");
     if (!grid) return;
 
-    grid.innerHTML = engines.map((engine) => {
+    grid.innerHTML = nativeModules.map((engine) => {
       return `<article class="engine-ledger-card">
         <h4>${escapeHtml(engine.name)}</h4>
         <p>${escapeHtml(engine.role)}</p>
@@ -234,37 +238,16 @@
         title: stem.name.replace(/\.[^.]+$/, ""),
         source: stem.objectKey || stem.localObjectUrl || stem.name,
         proofUse: "creation-session-staged",
-        engine: "open-source-studio-lane"
+        engine: "native-nexus-daw-lane"
       })),
       exportTargets,
       rightsRequiredBeforePlayback: true,
       sendTo: "SkyeMusicNexus Release Forge"
     };
 
-    $("releaseForgeLine").textContent = JSON.stringify(line, null, 2);
+    const output = $("releaseForgeLine");
+    if (output) output.textContent = JSON.stringify(line, null, 2);
     return line;
-  }
-
-  function launchOpenDaw() {
-    const input = $("openDawUrlInput");
-    const raw = input.value.trim() || "http://localhost:5173";
-
-    window.localStorage.setItem(STORAGE_KEYS.openDawUrl, raw);
-
-    const project = collectProject();
-    const url = new URL(raw);
-    url.searchParams.set("projectId", project.id);
-    url.searchParams.set("artistId", project.artistId);
-    url.searchParams.set("releaseId", project.releaseId);
-    url.searchParams.set("returnUrl", window.location.href);
-
-    $("openDawFrame").src = url.toString();
-    $("openDawFrameWrap").hidden = false;
-  }
-
-  function detachOpenDaw() {
-    $("openDawFrame").src = "about:blank";
-    $("openDawFrameWrap").hidden = true;
   }
 
   async function saveProject() {
@@ -374,7 +357,7 @@
     if (auth && typeof auth.bootstrapLocalProof === "function") {
       try {
         const session = await auth.bootstrapLocalProof({
-          subject: "open-source-creation-studio",
+        subject: "native-creation-studio",
           role: "admin"
         });
         alert(`Local SkyGate proof session created for ${session.subject || "studio lane"}.`);
@@ -410,13 +393,6 @@
   }
 
   function init() {
-    const savedOpenDaw = window.localStorage.getItem(STORAGE_KEYS.openDawUrl);
-    if (savedOpenDaw && $("openDawUrlInput")) {
-      $("openDawUrlInput").value = savedOpenDaw;
-    }
-
-    $("launchOpenDawButton")?.addEventListener("click", launchOpenDaw);
-    $("detachOpenDawButton")?.addEventListener("click", detachOpenDaw);
     $("saveProjectButton")?.addEventListener("click", saveProject);
     $("exportProjectJsonButton")?.addEventListener("click", exportProjectJson);
     $("queueExportButton")?.addEventListener("click", queueExport);

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Ops Personal Vault — Private Local Workflow Utility for Doctors</title>
+  <meta name="description" content="Doctor Ops Personal Vault is a local-first personal workflow companion for doctors. Launch a private command deck for SOAP notes, triage, referrals, prior auth, labs, care gaps, exports, backups, and restore points." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#07111f" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/brand/doctor-ops-icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/brand/doctor-ops-icon-192.png" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <meta property="og:title" content="Doctor Ops Personal Vault" />
+  <meta property="og:description" content="A $2.99/month personal doctor workflow vault: local-first, exportable, backup-ready, and built for focused daily office operations." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/brand/doctor-ops-advertising.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Doctor Ops Personal Vault",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "Web browser, local Node runtime optional",
+    "description": "Local-first personal workflow companion for doctors with workflow lanes, exports, backups, restore points, and no external sync configured by default.",
+    "offers": {"@type":"Offer","price":"2.99","priceCurrency":"USD"},
+    "featureList": ["Local-first workflow records", "SOAP note studio", "Intake and triage board", "Referral tracking", "Prior authorization tracking", "Lab follow-up board", "Medication reconciliation", "Imaging results tracking", "Care gap radar", "Visit prep board", "Procedure consent vault", "Chronic care tracker", "Discharge packet builder", "Incident handoff log", "Manual exports", "Local backups", "Restore points"]
+  }
+  </script>
+  <script src="../../free99-gate.js" data-platform-id="doctor-ops-personal-vault" data-platform-name="Doctor Ops Personal Vault" data-billing-mode="paid_pending_owner_approval" data-price-label="Personal subscription candidate; owner approval before checkout" data-app-root="/Free99/apps/doctor-ops-personal-vault/"></script>
+</head>
+<body class="landing-page">
+  <div class="shell landing-shell">
+    <header class="product-topbar landing-topbar">
+      <a class="brand-lockup" href="index.html" aria-label="Doctor Ops Personal Vault website">
+        <span class="brand-mark image-mark" aria-hidden="true"></span>
+        <span class="brand-copy"><strong>Doctor Ops Personal Vault</strong><span>Private workflow cockpit for doctors</span></span>
+      </a>
+      <div class="topbar-badges"><span>Local-first</span><span>Backups + exports</span><span>No external sync by default</span><span>$2.99 personal utility</span></div>
+    </header>
+
+    <main>
+      <section class="landing-hero">
+        <div class="landing-copy">
+          <div class="kicker">Personal-use doctor utility · not an EHR replacement</div>
+          <h1>A private workflow vault a doctor can actually use, trust, and recommend.</h1>
+          <p>Doctor Ops Personal Vault gives a doctor a clean local command deck for the small daily loops that burn time: notes, intake, prior auth, referrals, labs, med reconciliation, imaging follow-up, care gaps, visit prep, consent, chronic care, discharge packets, and handoffs.</p>
+          <div class="hero-actions landing-actions">
+            <a class="btn primary xl" href="app.html">Launch the app</a>
+            <a class="btn gold xl" href="#privacy">See privacy posture</a>
+            <a class="btn ghost xl" href="assets/brand/doctor-ops-advertising.png" download>Download promo graphic</a>
+          </div>
+          <div class="landing-proof-row" aria-label="Product trust summary">
+            <span><strong>13</strong> workflow lanes</span>
+            <span><strong>0</strong> external sync configured</span>
+            <span><strong>JSON</strong> exports</span>
+            <span><strong>Local</strong> runtime backups</span>
+          </div>
+        </div>
+        <div class="landing-visual-card">
+          <picture>
+            <source srcset="assets/brand/doctor-ops-logo.webp" type="image/webp" />
+            <img src="assets/brand/doctor-ops-logo.png" alt="Doctor Ops Personal Vault logo" class="landing-logo-art" loading="eager" />
+          </picture>
+          <div class="launch-panel">
+            <strong>Ready to work privately?</strong>
+            <span>The website stays public. The command deck opens separately at <code>app.html</code>.</span>
+            <a class="btn primary" href="app.html">Open Command Deck</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-strip" aria-label="Positioning">
+        <div><strong>Built for one doctor</strong><span>Personal workflow organization without pretending to be a hospital platform.</span></div>
+        <div><strong>Own your records</strong><span>Use browser storage, local runtime storage, manual exports, and local backups.</span></div>
+        <div><strong>Referral-ready polish</strong><span>Clean enough for a doctor to send a colleague without explaining away a rough prototype.</span></div>
+      </section>
+
+      <section class="landing-section split" id="privacy">
+        <div>
+          <div class="kicker">Local confidence model</div>
+          <h2>Private by product posture, not by vague marketing.</h2>
+          <p>The app is designed to run locally first. The optional Node runtime writes to its own local data folder, and the browser-only mode exports portable JSON. There is no third-party database, cloud sync, telemetry, analytics tracker, or outside storage wired into this package by default.</p>
+          <p class="fine-print">Boundary: this package does not claim HIPAA certification, medical advice, billing advice, legal advice, or EHR replacement status. It is a personal workflow companion.</p>
+        </div>
+        <div class="privacy-stack">
+          <div class="trust-card"><strong>Browser mode</strong><span>Records stay in the browser workspace until the user exports or clears them.</span></div>
+          <div class="trust-card"><strong>Optional local runtime</strong><span>File-backed store writes to <code>data/platform-store.json</code> and backs up to <code>data/backups/</code>.</span></div>
+          <div class="trust-card"><strong>Portability</strong><span>Manual JSON exports, local backup downloads, restore points, and SHA-256 hashes.</span></div>
+        </div>
+      </section>
+
+      <section class="landing-section">
+        <div class="section-title center-title">
+          <div>
+            <div class="kicker">Workflow floor</div>
+            <h2>Thirteen practical lanes, one personal command deck.</h2>
+            <p>Focused tools for daily doctor-office friction. No fake enterprise modules. No forced login layer. Upstream auth can wrap it later.</p>
+          </div>
+        </div>
+        <div class="workflow-showcase">
+          <a href="apps/intake-triage-ops.html"><span>🩺</span><strong>Intake & Triage</strong><small>Acuity, rooming, and arrival flow.</small></a>
+          <a href="apps/soap-note-studio.html"><span>📝</span><strong>SOAP Note Studio</strong><small>Structured visit note drafting.</small></a>
+          <a href="apps/referral-router.html"><span>📨</span><strong>Referral Router</strong><small>Specialty handoffs and due dates.</small></a>
+          <a href="apps/prior-auth-tracker.html"><span>🧾</span><strong>Prior Auth Tracker</strong><small>Payer friction, denials, appeals.</small></a>
+          <a href="apps/lab-followup-board.html"><span>🧪</span><strong>Lab Follow-up</strong><small>Abnormal result closure loops.</small></a>
+          <a href="apps/med-recon-desk.html"><span>💊</span><strong>Medication Recon</strong><small>Medication list truth checks.</small></a>
+          <a href="apps/imaging-results-commander.html"><span>🩻</span><strong>Imaging Results</strong><small>Radiology follow-through.</small></a>
+          <a href="apps/care-gap-radar.html"><span>📡</span><strong>Care Gap Radar</strong><small>Screenings and outreach attempts.</small></a>
+          <a href="apps/visit-prep-board.html"><span>📋</span><strong>Visit Prep</strong><small>Chart readiness before the visit.</small></a>
+          <a href="apps/procedure-consent-vault.html"><span>🔏</span><strong>Consent Vault</strong><small>Procedure consent readiness.</small></a>
+          <a href="apps/chronic-care-tracker.html"><span>❤️</span><strong>Chronic Care</strong><small>Condition targets and barriers.</small></a>
+          <a href="apps/discharge-packet-builder.html"><span>📦</span><strong>Discharge Packets</strong><small>Aftercare packet generation.</small></a>
+          <a href="apps/incident-handoff-log.html"><span>🚨</span><strong>Incident Handoff</strong><small>Ops event ledger and resolution.</small></a>
+        </div>
+      </section>
+
+      <section class="landing-section split sales-panel">
+        <div>
+          <div class="kicker">Sellable at a low monthly price</div>
+          <h2>Small price, serious confidence.</h2>
+          <p>At $2.99/month, this should feel like a personal productivity tool doctors keep because it saves small amounts of time repeatedly. The value is not “enterprise compliance.” The value is private organization, exports, backups, and workflow clarity.</p>
+        </div>
+        <div class="price-card">
+          <span class="price-label">Personal utility posture</span>
+          <strong>$2.99</strong>
+          <small>per month target</small>
+          <a class="btn primary" href="app.html">Launch App</a>
+        </div>
+      </section>
+
+      <section class="landing-section ad-section">
+        <div class="ad-copy">
+          <div class="kicker">Advertising asset</div>
+          <h2>Use the full promo graphic for ads and social posts.</h2>
+          <p>The app logo stops at “Personal Vault.” The longer graphic with trust callouts is included separately as the advertising image.</p>
+          <a class="btn gold" href="assets/brand/doctor-ops-advertising.png" download>Download advertising graphic</a>
+        </div>
+        <picture>
+          <source srcset="assets/brand/doctor-ops-advertising.webp" type="image/webp" />
+          <img src="assets/brand/doctor-ops-advertising.png" alt="Doctor Ops Personal Vault advertising graphic" class="ad-art" loading="lazy" />
+        </picture>
+      </section>
+    </main>
+
+    <footer class="footer landing-footer">
+      <span>Doctor Ops Personal Vault — public website and private local app launcher.</span>
+      <a href="app.html">Launch app</a>
+      <a href="ai.md">AI summary</a>
+    </footer>
+  </div>
+  <script src="assets/js/visuals.js"></script>
+</body>
+</html>

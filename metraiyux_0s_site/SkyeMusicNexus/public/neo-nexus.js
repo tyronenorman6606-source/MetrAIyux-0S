@@ -1,4 +1,31 @@
 (function bootSkyeMusicNexusNeoFront() {
+  function starterSocialPayload() {
+    const createdAt = new Date().toISOString();
+    const feedItems = [{
+      id: 'static_feed_signal',
+      type: 'release-post',
+      source: 'musicnexus',
+      status: 'local-preview',
+      artistId: 'static_preview_artist',
+      releaseId: 'static_preview_release',
+      author: 'Gate Signal',
+      handle: 'skye:preview',
+      avatar: 'GS',
+      title: 'Gate Signal Preview',
+      caption: 'First post in the MusicNexus feed: release signal, artist profile, story rail, comments, saves, and provider publishing all stay attached.',
+      hashtags: ['newmusic', 'musicnexus'],
+      media: { kind: 'generated-cover', gradient: 'linear-gradient(135deg,#6be8d6,#f2c766)', label: 'GS' },
+      stats: { likes: 13, saves: 5, boosts: 2, comments: [{ id: 'static_comment', artistId: 'operator', body: 'Feed mechanics are live in static preview.', createdAt }] },
+      createdAt,
+    }];
+    return {
+      feedItems,
+      stories: [{ id: 'static_story', artistId: 'static_preview_artist', label: 'Gate Signal', sublabel: 'release-post', avatar: 'GS', releaseId: 'static_preview_release' }],
+      summary: { connectors: 0, readyConnectors: 0, feedItems: feedItems.length, queuedPosts: 0, publishedPosts: 0, providerTokenRequired: 0 },
+    };
+  }
+
+  const starterSocial = starterSocialPayload();
   const state = {
     mode: document.body.dataset.mode || 'artist',
     artists: [],
@@ -7,12 +34,30 @@
     workflows: [],
     assets: [],
     assetStorage: null,
+    drops: {
+      items: [],
+      batches: [],
+      deploys: [],
+      trafficSummary: null,
+      env: null,
+      estimate: null,
+    },
     exchange: {
       contentRequests: [],
       threads: [],
       communityPosts: [],
       campaigns: [],
       progress: null,
+    },
+    social: {
+      catalog: [],
+      connectors: [],
+      postQueue: [],
+      feedItems: starterSocial.feedItems,
+      stories: starterSocial.stories,
+      feedPulls: [],
+      moderation: [],
+      summary: starterSocial.summary,
     },
     player: {
       queue: [],
@@ -75,6 +120,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const escapeHtml = (value) => String(value == null ? '' : value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  const plainText = (value) => String(value == null ? '' : value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const fmtNumber = (value) => new Intl.NumberFormat('en-US').format(Number(value || 0));
   const fmtMoney = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
   const apiBase = '/.netlify/functions/';
@@ -160,6 +206,15 @@
     }
     if (name === 'music-artists') return { ok: true, artists: [] };
     if (name === 'music-assets') return { ok: true, assets: [], total: 0, maxUploadBytes: 52428800 };
+    if (name === 'music-drops') return {
+      ok: true,
+      drops: [],
+      batches: [],
+      deploys: [],
+      trafficSummary: { total: 0, pageViews: 0, playStarts: 0, qualifiedStreams: 0, completePlays: 0, downloads: 0 },
+      env: { netlify: { configured: false, liveDeployEnabled: false }, email: { provider: 'local-receipt', configured: false } },
+      estimate: { estimatedCredits: 15, estimatedBandwidthGb: 0, fitsReserve: true },
+    };
     if (name === 'music-releases' && action === 'operations-board') return { ok: true, workflows: [] };
     if (name === 'music-releases' && action === 'playback-stream') return {
       ok: true,
@@ -228,6 +283,43 @@
           ],
           missions: [],
         },
+      };
+    }
+    if (name === 'music-social') {
+      const starter = starterSocialPayload();
+      return {
+        ok: true,
+        gateSessionRequired: true,
+        catalog: [
+          {
+            id: 'pixelfed',
+            name: 'Pixelfed',
+            lane: 'instagram-like-photo-feed',
+            protocol: 'ActivityPub plus Mastodon-compatible REST posting',
+            productionBoundary: 'Connect a self-hosted or trusted Pixelfed token through a server environment variable.',
+          },
+          {
+            id: 'mastodon',
+            name: 'Mastodon-compatible Fediverse',
+            lane: 'status-feed-and-hashtag-discovery',
+            protocol: 'OAuth2 + REST API + ActivityPub federation',
+            productionBoundary: 'Use OAuth app tokens stored in the server runtime.',
+          },
+          {
+            id: 'funkwhale',
+            name: 'Funkwhale',
+            lane: 'federated-audio-publication',
+            protocol: 'ActivityPub audio federation + Funkwhale API',
+            productionBoundary: 'Use after rights, storage, and native API mapping are live.',
+          },
+        ],
+        connectors: [],
+        postQueue: [],
+        feedItems: starter.feedItems,
+        stories: starter.stories,
+        feedPulls: [],
+        moderation: [],
+        summary: starter.summary,
       };
     }
     if (name === 'music-analytics') {
@@ -777,6 +869,167 @@
     }
   }
 
+  function feedMedia(item) {
+    const media = item && item.media ? item.media : {};
+    if (media.kind === 'image' && media.url) {
+      return `<figure class="feed-media"><img src="${escapeHtml(media.url)}" alt="${escapeHtml(media.alt || item.title || 'Feed media')}" loading="lazy" decoding="async" /></figure>`;
+    }
+    const label = media.label || item.avatar || 'SM';
+    const gradient = media.gradient || 'linear-gradient(135deg,#6be8d6,#f2c766)';
+    return `<figure class="feed-media generated-feed-cover" style="--feed-cover:${escapeHtml(gradient)}"><span>${escapeHtml(label)}</span><small>${escapeHtml(item.type || 'music')}</small></figure>`;
+  }
+
+  function feedCard(item) {
+    const stats = item.stats || {};
+    const comments = Array.isArray(stats.comments) ? stats.comments : [];
+    const hashtags = Array.isArray(item.hashtags) ? item.hashtags : [];
+    return `<article class="real-feed-card" data-feed-post="${escapeHtml(item.id)}">
+      <header class="feed-author-row">
+        <span class="feed-avatar">${escapeHtml(item.avatar || 'SM')}</span>
+        <div>
+          <strong>${escapeHtml(item.author || 'MusicNexus Artist')}</strong>
+          <small>${escapeHtml(item.handle || item.source || 'musicnexus')} · ${escapeHtml(item.status || 'live')}</small>
+        </div>
+        <button class="ghost mini" type="button" data-feed-action="follow" data-feed-target="${escapeHtml(item.id)}" data-feed-artist="${escapeHtml(item.artistId || '')}">Follow</button>
+      </header>
+      ${feedMedia(item)}
+      <div class="feed-actions" aria-label="Feed actions">
+        <button type="button" class="feed-icon" data-feed-action="like" data-feed-target="${escapeHtml(item.id)}" data-feed-artist="${escapeHtml(item.artistId || '')}">Like</button>
+        <button type="button" class="feed-icon" data-feed-action="comment" data-feed-target="${escapeHtml(item.id)}" data-feed-artist="${escapeHtml(item.artistId || '')}">Comment</button>
+        <button type="button" class="feed-icon" data-feed-action="boost" data-feed-target="${escapeHtml(item.id)}" data-feed-artist="${escapeHtml(item.artistId || '')}">Boost</button>
+        <button type="button" class="feed-icon" data-feed-action="save" data-feed-target="${escapeHtml(item.id)}" data-feed-artist="${escapeHtml(item.artistId || '')}">Save</button>
+      </div>
+      <div class="feed-body">
+        <strong>${escapeHtml(item.title || 'Release signal')}</strong>
+        <p>${escapeHtml(plainText(item.caption || ''))}</p>
+        ${hashtags.length ? `<div class="feed-tags">${hashtags.map((tag) => `<span>#${escapeHtml(String(tag).replace(/^#/, ''))}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="feed-stats">
+        <span>${escapeHtml(stats.likes || 0)} likes</span>
+        <span>${escapeHtml(stats.saves || 0)} saves</span>
+        <span>${escapeHtml(stats.boosts || 0)} boosts</span>
+        ${stats.plays ? `<span>${escapeHtml(fmtNumber(stats.plays))} plays</span>` : ''}
+      </div>
+      <div class="feed-comments">
+        ${comments.length ? comments.slice(0, 3).map((comment) => `<p><strong>${escapeHtml(comment.artistId || 'artist')}</strong> ${escapeHtml(comment.body || '')}</p>`).join('') : '<p class="muted-feed-line">No comments yet.</p>'}
+      </div>
+      <form class="feed-comment-form" data-feed-comment-form="${escapeHtml(item.id)}">
+        <input name="body" placeholder="Add a comment" />
+        <button class="secondary mini" type="submit">Post</button>
+      </form>
+    </article>`;
+  }
+
+  function renderSocial() {
+    const social = state.social || {};
+    const catalog = Array.isArray(social.catalog) ? social.catalog : [];
+    const connectors = Array.isArray(social.connectors) ? social.connectors : [];
+    const posts = Array.isArray(social.postQueue) ? social.postQueue : [];
+    const feedItems = Array.isArray(social.feedItems) ? social.feedItems : [];
+    const stories = Array.isArray(social.stories) ? social.stories : [];
+    const pulls = Array.isArray(social.feedPulls) ? social.feedPulls : [];
+    const summary = social.summary || {};
+
+    const deck = $('#socialFeedDeck');
+    if (deck) {
+      deck.innerHTML = feedItems.length ? feedItems.map(feedCard).join('') : `
+        <article class="real-feed-card empty-feed">
+          <div class="feed-body">
+            <strong>No feed posts yet</strong>
+            <p>Create the first artist post above, or publish a community signal from the Exchange.</p>
+          </div>
+        </article>`;
+    }
+
+    const storyRail = $('#socialStoryRail');
+    if (storyRail) {
+      storyRail.innerHTML = stories.length ? stories.map((story) => `
+        <button type="button" class="story-bubble" data-route="./player.html">
+          <span>${escapeHtml(story.avatar || 'SM')}</span>
+          <strong>${escapeHtml(story.label || 'Artist')}</strong>
+          <small>${escapeHtml(story.sublabel || 'signal')}</small>
+        </button>`).join('') : '<article class="story-bubble story-empty"><span>+</span><strong>Start</strong><small>new post</small></article>';
+    }
+
+    const trending = $('#trendingReleaseRail');
+    if (trending) {
+      const releases = feedItems.filter((item) => item.releaseId || item.type === 'release').slice(0, 5);
+      trending.innerHTML = releases.length ? releases.map((item) => `
+        <button class="trend-row" type="button" data-route="./player.html">
+          <span>${escapeHtml(item.avatar || 'SM')}</span>
+          <strong>${escapeHtml(item.title || 'Release')}</strong>
+          <small>${escapeHtml(item.status || item.source || 'music')}</small>
+        </button>`).join('') : '<div class="trend-row"><span>SM</span><strong>No releases yet</strong><small>Forge a release</small></div>';
+    }
+
+    const catalogNode = $('#socialPlatformCatalog');
+    if (catalogNode) {
+      catalogNode.innerHTML = catalog.length ? catalog.map((item) => `
+        <article class="social-platform-card">
+          <span>${escapeHtml(item.id)}</span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <p>${escapeHtml(item.lane || item.protocol || '')}</p>
+          <small>${escapeHtml(item.productionBoundary || item.source || '')}</small>
+        </article>`).join('') : '<article class="record-card"><h4>No platform catalog loaded</h4><p>Open the Netlify runtime to read the open social spine manifest.</p></article>';
+    }
+
+    const summaryNode = $('#socialSummary');
+    if (summaryNode) {
+      summaryNode.innerHTML = `
+        <div class="social-score"><strong>${escapeHtml(summary.feedItems || feedItems.length || 0)}</strong><span>feed posts</span></div>
+        <div class="social-score"><strong>${escapeHtml(summary.readyConnectors || 0)}</strong><span>token-ready</span></div>
+        <div class="social-score"><strong>${escapeHtml(summary.queuedPosts || 0)}</strong><span>queued</span></div>
+        <div class="social-score"><strong>${escapeHtml(summary.publishedPosts || 0)}</strong><span>published</span></div>`;
+    }
+
+    const connectorSelects = $$('select[name="connectorId"]');
+    connectorSelects.forEach((select) => {
+      const current = select.value;
+      const options = connectors.map((connector) => `<option value="${escapeHtml(connector.id)}">${escapeHtml(connector.name || connector.platformName || connector.id)} / ${escapeHtml(connector.tokenStatus || connector.status || 'status')}</option>`).join('');
+      select.innerHTML = `<option value="">Select connector</option>${options}`;
+      if (current && connectors.some((connector) => connector.id === current)) select.value = current;
+    });
+
+    const connectorList = $('#socialConnectorList');
+    if (connectorList) {
+      connectorList.innerHTML = connectors.length ? connectors.map((connector) => recordCard(
+        connector.platform || 'social',
+        connector.name || connector.platformName || 'Social connector',
+        `${connector.instanceUrl || 'no instance'} ${connector.handle ? `/${connector.handle}` : ''}`,
+        [connector.status || 'needs-token-env', connector.tokenEnvKey || 'no token env', connector.defaultVisibility || 'visibility']
+      )).join('') : '<article class="record-card"><h4>No social connectors yet</h4><p>Add Pixelfed, Mastodon-compatible, or Funkwhale server details. Tokens stay in server env vars.</p></article>';
+    }
+
+    const queueList = $('#socialPostQueue');
+    if (queueList) {
+      queueList.innerHTML = posts.length ? posts.slice(0, 10).map((post) => recordCard(
+        post.platform || 'post',
+        post.release && post.release.title ? post.release.title : post.id,
+        post.statusText || post.caption || 'Queued social post',
+        [post.status || 'queued', post.visibility || 'visibility', post.connectorId || 'connector']
+      )).join('') : '<article class="record-card"><h4>No queued posts yet</h4><p>Queue an artist/release post, then publish when the provider token is attached.</p></article>';
+    }
+
+    const publishSelect = $('#publishPostId');
+    if (publishSelect) {
+      const current = publishSelect.value;
+      publishSelect.innerHTML = `<option value="">Select queued post</option>${posts.map((post) => `<option value="${escapeHtml(post.id)}">${escapeHtml(post.status || 'queued')} / ${escapeHtml((post.release && post.release.title) || post.id)}</option>`).join('')}`;
+      if (current && posts.some((post) => post.id === current)) publishSelect.value = current;
+    }
+
+    const feedList = $('#federatedFeedList');
+    if (feedList) {
+      const latestPull = pulls[0];
+      const statuses = latestPull && Array.isArray(latestPull.statuses) ? latestPull.statuses : [];
+      feedList.innerHTML = statuses.length ? statuses.map((status) => recordCard(
+        'fediverse',
+        status.account && (status.account.displayName || status.account.acct) ? (status.account.displayName || status.account.acct) : status.id,
+        plainText(status.contentHtml || status.url || 'Federated status'),
+        [status.visibility || 'public', `${status.boosts || 0} boosts`, `${status.favourites || 0} likes`]
+      )).join('') : '<article class="record-card"><h4>No federated feed pull yet</h4><p>Sync a hashtag or local public feed from a connected instance.</p></article>';
+    }
+  }
+
   function renderRights() {
     const list = $('#rightsAuditList');
     if (!list) return;
@@ -842,6 +1095,90 @@
       base64 cap: ${escapeHtml(fmtNumber(storage.maxBase64UploadBytes || 0))} bytes · direct cap: ${escapeHtml(fmtNumber(storage.maxDirectUploadBytes || 0))} bytes`;
   }
 
+  function renderDrops() {
+    const dropsState = state.drops || {};
+    const drops = Array.isArray(dropsState.items) ? dropsState.items : [];
+    const batches = Array.isArray(dropsState.batches) ? dropsState.batches : [];
+    const deploys = Array.isArray(dropsState.deploys) ? dropsState.deploys : [];
+    const estimate = dropsState.estimate || {};
+    const env = dropsState.env || {};
+    const traffic = dropsState.trafficSummary || {};
+
+    const meter = $('#dropCreditMeter');
+    if (meter) {
+      meter.innerHTML = `
+        <div class="prism-row"><span>Estimated credits</span><strong>${escapeHtml(Number(estimate.estimatedCredits || 0).toFixed(2))}</strong></div>
+        <div class="prism-row"><span>Bandwidth GB</span><strong>${escapeHtml(Number(estimate.estimatedBandwidthGb || 0).toFixed(3))}</strong></div>
+        <div class="prism-row"><span>Reserve fit</span><strong>${estimate.fitsReserve ? 'Yes' : 'No'}</strong></div>
+        <div class="prism-row"><span>Live deploy</span><strong>${env.netlify?.liveDeployEnabled ? 'On' : 'Off'}</strong></div>`;
+    }
+
+    const envNode = $('#dropEnvStatus');
+    if (envNode) {
+      envNode.innerHTML = `
+        <strong>Credential inventory is redacted</strong>
+        <div class="record-meta" style="margin-top:10px">
+          <span class="pill ${env.netlify?.configured ? 'lime' : 'gold'}">Netlify ${env.netlify?.configured ? 'ready' : 'missing'}</span>
+          <span class="pill ${env.email?.configured ? 'lime' : 'gold'}">Email ${escapeHtml(env.email?.provider || 'local')}</span>
+          <span class="pill ${env.privateStorage?.configured ? 'lime' : ''}">${escapeHtml(env.privateStorage?.mode || 'local proof')}</span>
+          <span class="pill">${env.netlify?.liveDeployEnabled ? 'production enabled' : 'deploy intent only'}</span>
+        </div>`;
+    }
+
+    const dropList = $('#dropList');
+    if (dropList) {
+      dropList.innerHTML = drops.length ? drops.slice(0, 18).map((drop) => recordCard(
+        'drop',
+        drop.title || drop.dropId,
+        `${drop.artistName || drop.artistId || 'artist'} · ${drop.dropType || 'drop'} · ${drop.visibility || 'public'}`,
+        [drop.status || 'draft', drop.dropId, drop.rightsStatus || 'rights', drop.tierPolicy || 'tier']
+      )).join('') : '<article class="record-card"><h4>No drops yet</h4><p>Create a drop from an uploaded track or release, then submit it to the deploy pool.</p></article>';
+    }
+
+    const batchList = $('#dropBatchList');
+    if (batchList) {
+      batchList.innerHTML = batches.length ? batches.slice(0, 14).map((batch) => recordCard(
+        'batch',
+        batch.batchId,
+        `${(batch.dropIds || []).length} drops · ${Number(batch.estimatedCredits || 0).toFixed(2)} est credits`,
+        [batch.status || 'queued', batch.autoApprovalEligibleAt || 'approval not sent', batch.liveBaseUrl || 'no live url']
+      )).join('') : '<article class="record-card"><h4>No batches yet</h4><p>Batch compatible drops to maximize one Netlify production deploy.</p></article>';
+    }
+
+    const deployList = $('#dropDeployList');
+    if (deployList) {
+      deployList.innerHTML = deploys.length ? deploys.slice(0, 10).map((deploy) => recordCard(
+        'deploy',
+        deploy.deployReceiptId || deploy.batchId,
+        deploy.liveBaseUrl || deploy.outputDir || 'Deploy intent written locally',
+        [deploy.status || 'receipt', deploy.mode || 'mode', deploy.redacted ? 'redacted' : 'receipt']
+      )).join('') : '<article class="record-card"><h4>No deploy receipts yet</h4><p>Publishing in local mode writes a deploy intent. Production deploy needs the explicit live flag.</p></article>';
+    }
+
+    const trafficNode = $('#dropTrafficSummary');
+    if (trafficNode) {
+      trafficNode.innerHTML = `
+        <div class="social-score"><strong>${escapeHtml(traffic.pageViews || 0)}</strong><span>views</span></div>
+        <div class="social-score"><strong>${escapeHtml(traffic.playStarts || 0)}</strong><span>starts</span></div>
+        <div class="social-score"><strong>${escapeHtml(traffic.qualifiedStreams || 0)}</strong><span>qualified</span></div>
+        <div class="social-score"><strong>${escapeHtml(traffic.downloads || 0)}</strong><span>downloads</span></div>`;
+    }
+
+    const dropSelects = $$('select[name="dropId"]');
+    dropSelects.forEach((select) => {
+      const current = select.value;
+      select.innerHTML = `<option value="">Select drop</option>${drops.map((drop) => `<option value="${escapeHtml(drop.dropId)}">${escapeHtml(drop.status || 'draft')} / ${escapeHtml(drop.title || drop.dropId)}</option>`).join('')}`;
+      if (current && drops.some((drop) => drop.dropId === current)) select.value = current;
+    });
+
+    const batchSelects = $$('select[name="batchId"]');
+    batchSelects.forEach((select) => {
+      const current = select.value;
+      select.innerHTML = `<option value="">Select batch</option>${batches.map((batch) => `<option value="${escapeHtml(batch.batchId)}">${escapeHtml(batch.status || 'queued')} / ${escapeHtml(batch.batchId)}</option>`).join('')}`;
+      if (current && batches.some((batch) => batch.batchId === current)) select.value = current;
+    });
+  }
+
   async function refreshSession() {
     if (staticPreview) return updateSessionChip(null);
     if (!auth) return updateSessionChip(null);
@@ -896,6 +1233,19 @@
         state.assetStorage = null;
       }
       try {
+        const drops = await callFunction('music-drops', { query: { action: 'hub' } });
+        state.drops = {
+          items: Array.isArray(drops.drops) ? drops.drops : [],
+          batches: Array.isArray(drops.batches) ? drops.batches : [],
+          deploys: Array.isArray(drops.deploys) ? drops.deploys : [],
+          trafficSummary: drops.trafficSummary || null,
+          env: drops.env || null,
+          estimate: drops.estimate || null,
+        };
+      } catch {
+        state.drops = { items: [], batches: [], deploys: [], trafficSummary: null, env: null, estimate: null };
+      }
+      try {
         const exchange = await callFunction('music-exchange', { query: { action: 'hub', artistId: state.lastArtistId } });
         state.exchange = {
           contentRequests: Array.isArray(exchange.contentRequests) ? exchange.contentRequests : [],
@@ -907,15 +1257,32 @@
       } catch {
         state.exchange = { contentRequests: [], threads: [], communityPosts: [], campaigns: [], progress: null };
       }
+      try {
+        const social = await callFunction('music-social', { query: { action: 'hub', artistId: state.lastArtistId } });
+        state.social = {
+          catalog: Array.isArray(social.catalog) ? social.catalog : [],
+          connectors: Array.isArray(social.connectors) ? social.connectors : [],
+          postQueue: Array.isArray(social.postQueue) ? social.postQueue : [],
+          feedItems: Array.isArray(social.feedItems) ? social.feedItems : [],
+          stories: Array.isArray(social.stories) ? social.stories : [],
+          feedPulls: Array.isArray(social.feedPulls) ? social.feedPulls : [],
+          moderation: Array.isArray(social.moderation) ? social.moderation : [],
+          summary: social.summary || null,
+        };
+      } catch {
+        state.social = { catalog: [], connectors: [], postQueue: [], feedItems: [], stories: [], feedPulls: [], moderation: [], summary: null };
+      }
     }
 
     setMeters();
     renderRecords();
     renderAnalytics();
     renderExchange();
+    renderSocial();
     renderPlayback();
     renderRights();
     renderAssets();
+    renderDrops();
     fillLastIds();
     if (!quiet) toast('Nexus records refreshed.');
   }
@@ -1528,6 +1895,246 @@
     });
   }
 
+  function wireSocialConnectorForm() {
+    const form = $('#socialConnectorForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const saved = await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'save-connector',
+            platform: data.platform,
+            name: data.name,
+            instanceUrl: data.instanceUrl,
+            handle: data.handle,
+            tokenEnvKey: data.tokenEnvKey,
+            readTokenEnvKey: data.readTokenEnvKey,
+            defaultVisibility: data.defaultVisibility,
+          },
+        });
+        renderResult('#socialConnectorResult', 'Social connector saved', {
+          connector: saved.connector && saved.connector.id,
+          platform: saved.connector && saved.connector.platformName,
+          token: saved.connector && saved.connector.tokenStatus,
+        });
+        toast('Open social connector saved.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#socialConnectorResult', 'Connector save failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireFeedComposeForm() {
+    const form = $('#feedComposeForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const created = await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'create-feed-post',
+            artistId: data.artistId,
+            releaseId: data.releaseId,
+            caption: data.caption,
+            hashtags: data.hashtags,
+            mediaUrl: data.mediaUrl,
+            altText: data.altText,
+            visibility: 'local-feed',
+          },
+        });
+        state.lastArtistId = data.artistId;
+        if (data.releaseId) state.lastReleaseId = data.releaseId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        if (state.lastReleaseId) sessionStorage.setItem('skye-music-nexus:lastReleaseId', state.lastReleaseId);
+        renderResult('#feedComposeResult', 'Feed post live', {
+          post: created.post && created.post.id,
+          artist: created.post && created.post.artistId,
+          state: created.post && created.post.status,
+        });
+        form.reset();
+        toast('Feed post published inside MusicNexus.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#feedComposeResult', 'Feed post failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireFeedActions() {
+    document.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-feed-action]');
+      if (!button) return;
+      const feedAction = button.dataset.feedAction;
+      if (feedAction === 'comment') {
+        const card = button.closest('[data-feed-post]');
+        const input = card && card.querySelector('.feed-comment-form input[name="body"]');
+        if (input) input.focus();
+        return;
+      }
+      try {
+        const targetId = button.dataset.feedTarget;
+        const artistId = button.dataset.feedArtist || state.lastArtistId || currentSkyeArtistId();
+        await callFunction('music-social', {
+          method: 'POST',
+          body: { action: 'feed-action', feedAction, targetId, artistId },
+        });
+        toast(`${feedAction} saved.`);
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+    });
+
+    document.addEventListener('submit', async (event) => {
+      const form = event.target.closest('.feed-comment-form');
+      if (!form) return;
+      event.preventDefault();
+      const targetId = form.dataset.feedCommentForm;
+      const body = form.elements.body && form.elements.body.value;
+      if (!body || !body.trim()) return;
+      try {
+        await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'feed-action',
+            feedAction: 'comment',
+            targetId,
+            artistId: state.lastArtistId || currentSkyeArtistId(),
+            body,
+          },
+        });
+        form.reset();
+        toast('Comment posted.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+    });
+  }
+
+  function wireSocialPostForm() {
+    const form = $('#socialPostForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const queued = await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'queue-post',
+            connectorId: data.connectorId,
+            artistId: data.artistId,
+            releaseId: data.releaseId,
+            caption: data.caption,
+            hashtags: data.hashtags,
+            mediaUrl: data.mediaUrl,
+            altText: data.altText,
+            visibility: data.visibility,
+            language: data.language,
+          },
+        });
+        state.lastArtistId = data.artistId;
+        if (data.releaseId) state.lastReleaseId = data.releaseId;
+        sessionStorage.setItem('skye-music-nexus:lastArtistId', state.lastArtistId);
+        if (state.lastReleaseId) sessionStorage.setItem('skye-music-nexus:lastReleaseId', state.lastReleaseId);
+        renderResult('#socialPostResult', 'Social post queued', {
+          post: queued.post && queued.post.id,
+          platform: queued.post && queued.post.platform,
+          state: queued.post && queued.post.status,
+        });
+        toast('Social release post queued.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#socialPostResult', 'Social queue failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireSocialPublishForm() {
+    const form = $('#socialPublishForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const published = await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'publish-post',
+            postId: data.postId,
+          },
+        });
+        const publication = published.publication || {};
+        renderResult('#socialPublishResult', publication.ok ? 'Provider publish complete' : 'Provider token required', {
+          post: published.post && published.post.id,
+          status: published.post && published.post.status,
+          url: publication.statusUrl || publication.note || publication.tokenEnvKey || 'pending',
+        });
+        toast(publication.ok ? 'Social post published through provider.' : 'Post is queued; attach provider token env to publish.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#socialPublishResult', 'Provider publish failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
+  function wireSocialFeedForm() {
+    const form = $('#socialFeedForm');
+    if (!form) return;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const synced = await callFunction('music-social', {
+          method: 'POST',
+          body: {
+            action: 'sync-feed',
+            connectorId: data.connectorId,
+            artistId: data.artistId,
+            hashtag: data.hashtag,
+            limit: data.limit,
+          },
+        });
+        renderResult('#socialFeedResult', 'Federated feed synced', {
+          pull: synced.pull && synced.pull.id,
+          statuses: synced.pull && synced.pull.statusCount,
+          source: synced.pull && synced.pull.sourceUrl,
+        });
+        toast('Federated feed read into MusicNexus.');
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult('#socialFeedResult', 'Feed sync failed', { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    });
+  }
+
   function wireRightsForm() {
     const form = $('#rightsForm');
     if (!form) return;
@@ -1606,6 +2213,144 @@
     });
   }
 
+  function wireDropForms() {
+    const createForm = $('#dropCreateForm');
+    if (createForm) {
+      createForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = formData(createForm);
+        try {
+          setLoading(createForm, true);
+          const created = await callFunction('music-drops', {
+            method: 'POST',
+            body: {
+              action: 'create-drop',
+              artistId: data.artistId,
+              artistName: data.artistName,
+              releaseId: data.releaseId,
+              title: data.title,
+              dropType: data.dropType,
+              visibility: data.visibility,
+              rightsStatus: data.rightsStatus,
+              tierPolicy: data.tierPolicy,
+              story: data.story,
+              coverArtUrl: data.coverArtUrl,
+              downloadAllowed: data.downloadAllowed === 'true',
+              tracks: parseTracks(data.tracks),
+            },
+          });
+          renderResult('#dropCreateResult', 'Drop created', { id: created.drop && created.drop.dropId, status: created.drop && created.drop.status, tier: created.drop && created.drop.tierPolicy });
+          toast('Drop draft created.');
+          await refreshRecords({ quiet: true });
+        } catch (err) {
+          renderResult('#dropCreateResult', 'Drop create failed', { error: err.message });
+          toast(err.message, 'error');
+        } finally {
+          setLoading(createForm, false);
+        }
+      });
+    }
+
+    const submitForm = $('#dropSubmitForm');
+    if (submitForm) {
+      submitForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = formData(submitForm);
+        try {
+          setLoading(submitForm, true);
+          const submitted = await callFunction('music-drops', {
+            method: 'POST',
+            body: { action: 'submit-drop', dropId: data.dropId },
+          });
+          renderResult('#dropSubmitResult', 'Drop moved to deploy pool', { id: submitted.drop && submitted.drop.dropId, status: submitted.drop && submitted.drop.status });
+          toast('Drop is in the deploy pool.');
+          await refreshRecords({ quiet: true });
+        } catch (err) {
+          renderResult('#dropSubmitResult', 'Drop submit failed', { error: err.message });
+          toast(err.message, 'error');
+        } finally {
+          setLoading(submitForm, false);
+        }
+      });
+    }
+
+    const batchForm = $('#dropBatchForm');
+    if (batchForm) {
+      batchForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = formData(batchForm);
+        try {
+          setLoading(batchForm, true);
+          const batched = await callFunction('music-drops', {
+            method: 'POST',
+            body: { action: 'form-batch', dropIds: parseCsv(data.dropIds) },
+          });
+          renderResult('#dropBatchResult', 'Batch formed', { id: batched.batch && batched.batch.batchId, drops: batched.batch && batched.batch.dropIds && batched.batch.dropIds.length, credits: batched.batch && Number(batched.batch.estimatedCredits || 0).toFixed(2) });
+          toast('Deploy batch formed.');
+          await refreshRecords({ quiet: true });
+        } catch (err) {
+          renderResult('#dropBatchResult', 'Batch failed', { error: err.message });
+          toast(err.message, 'error');
+        } finally {
+          setLoading(batchForm, false);
+        }
+      });
+    }
+
+    async function runBatchAction(form, action, resultTarget, successTitle, toastText) {
+      const data = formData(form);
+      try {
+        setLoading(form, true);
+        const result = await callFunction('music-drops', {
+          method: 'POST',
+          body: { action, batchId: data.batchId },
+        });
+        renderResult(resultTarget, successTitle, {
+          batch: result.batch && result.batch.batchId,
+          status: result.batch && result.batch.status,
+          receipt: result.approval?.approvalId || result.receipt?.approvalId || result.deploy?.deployReceiptId || result.outputDir || '',
+        });
+        toast(toastText);
+        await refreshRecords({ quiet: true });
+      } catch (err) {
+        renderResult(resultTarget, `${successTitle} failed`, { error: err.message });
+        toast(err.message, 'error');
+      } finally {
+        setLoading(form, false);
+      }
+    }
+
+    const approvalForm = $('#dropApprovalForm');
+    if (approvalForm) approvalForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runBatchAction(approvalForm, 'send-approval', '#dropApprovalResult', 'Approval sent', 'Approval payload sent or receipted.');
+    });
+
+    const approveForm = $('#dropManualApproveForm');
+    if (approveForm) approveForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runBatchAction(approveForm, 'approve-batch', '#dropManualApproveResult', 'Batch approved', 'Batch manually approved.');
+    });
+
+    const brainForm = $('#dropBrainForm');
+    if (brainForm) brainForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runBatchAction(brainForm, 'run-approval-brain', '#dropBrainResult', 'Approval brain ran', '72-hour approval brain evaluated the batch.');
+    });
+
+    const buildForm = $('#dropBuildForm');
+    if (buildForm) buildForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runBatchAction(buildForm, 'build-static-bundle', '#dropBuildResult', 'Bundle built', 'Static drop bundle generated.');
+    });
+
+    const publishForm = $('#dropPublishForm');
+    if (publishForm) publishForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runBatchAction(publishForm, 'publish-batch', '#dropPublishResult', 'Publish ran', 'Publish wrote a deploy receipt or live deploy.');
+    });
+  }
+
   function wireForms() {
     wireArtistForm();
     wireReleaseForm();
@@ -1618,8 +2363,15 @@
     wireMessageForm();
     wireCommunityPostForm();
     wireReleaseCampaignForm();
+    wireFeedComposeForm();
+    wireFeedActions();
+    wireSocialConnectorForm();
+    wireSocialPostForm();
+    wireSocialPublishForm();
+    wireSocialFeedForm();
     wireRightsForm();
     wireTakedownForm();
+    wireDropForms();
   }
 
   function ensureMcpChrome() {
@@ -1760,9 +2512,11 @@
     renderRecords();
     renderAnalytics();
     renderExchange();
+    renderSocial();
     renderPlayback();
     renderRights();
     renderAssets();
+    renderDrops();
     await refreshSession();
     await refreshRecords({ quiet: true });
   }

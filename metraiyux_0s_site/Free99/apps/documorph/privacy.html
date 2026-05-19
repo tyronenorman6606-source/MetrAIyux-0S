@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>DocuMorph Privacy Policy — SKYESOVERLONDON</title>
+  <meta name="description" content="Privacy policy for DocuMorph by SKYESOVERLONDON.">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#020617">
+  <link rel="icon" type="image/png" href="/Free99/apps/documorph/app/icons/icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { background:#020617; color:#e2e8f0; }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(18px); border:1px solid rgba(255,255,255,0.06); }
+  </style>
+  <script src="../../free99-gate.js" data-platform-id="documorph" data-platform-name="Documorph" data-billing-mode="quote_only" data-price-label="Quote after DB/runtime proof" data-app-root="/Free99/apps/documorph/"></script>
+</head>
+<body class="selection:bg-cyan-500/40">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <a href="/Free99/apps/documorph/" class="inline-flex items-center gap-3 text-white/60 hover:text-white transition">
+      ← Back to landing
+    </a>
+
+    <div class="mt-8 glass rounded-[2.5rem] p-8 border border-white/10">
+      <h1 class="text-3xl md:text-5xl font-black tracking-tighter text-white">Privacy Policy</h1>
+      <p class="text-white/50 mt-3 text-sm">Last updated: 2026-05-10</p>
+
+      <div class="mt-8 space-y-6 text-white/70 leading-relaxed">
+        <p>
+          DocuMorph is an offline-first web app. By default, it stores your documents and generated study assets
+          locally on your device (IndexedDB). You can use the core app without an account.
+        </p>
+
+        <h2 class="text-xl font-black text-white">What data is stored</h2>
+        <ul class="list-disc pl-6 space-y-2">
+          <li>Uploaded PDF filename</li>
+          <li>Extracted text and detected sections</li>
+          <li>Generated summary, flashcards, and quiz questions</li>
+          <li>App preferences (selected AI engine, storage mode)</li>
+        </ul>
+
+        <h2 class="text-xl font-black text-white">AI processing</h2>
+        <p>
+          When you run synthesis, DocuMorph sends the extracted text (or a portion of it) to the AI engine you select.
+          If you use Server Mode, the request is routed through the DocuMorph backend so your API keys do not live in the browser.
+          If you use Local Key Mode, your browser calls the provider directly using the key you paste in Settings.
+        </p>
+
+        <h2 class="text-xl font-black text-white">Optional Neon cloud sync</h2>
+        <p>
+          If you enable Neon Cloud mode, documents are saved to a Neon Postgres database via the DocuMorph backend.
+          Cloud sync is optional; local storage remains available regardless.
+        </p>
+
+        <h2 class="text-xl font-black text-white">Third-party services</h2>
+        <p>
+          Depending on your configuration, DocuMorph may communicate with AI providers (Gemini or OpenAI) and a database provider (Neon).
+          Their handling of data is governed by their own policies.
+        </p>
+
+        <h2 class="text-xl font-black text-white">Contact</h2>
+        <p>
+          DocuMorph is published by SKYESOVERLONDON. For privacy questions, use the contact method provided on the deployment site.
+        </p>
+      </div>
+
+      <div class="mt-10 flex gap-4 flex-wrap">
+        <a href="/Free99/apps/documorph/app/" class="px-6 py-3 rounded-2xl bg-cyan-300 text-black font-black hover:bg-white transition">Open App</a>
+        <a href="/Free99/apps/documorph/terms" class="px-6 py-3 rounded-2xl glass text-white font-black hover:bg-white/5 transition">Terms</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

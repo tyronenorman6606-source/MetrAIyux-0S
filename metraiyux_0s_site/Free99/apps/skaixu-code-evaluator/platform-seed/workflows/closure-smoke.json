@@ -1,0 +1,14 @@
+{
+  "type": "workflow",
+  "name": "Closure Smoke Workflow",
+  "version": "1.0.0",
+  "steps": [
+    { "step": 1, "name": "Load project", "proof": "File count and deterministic summary update." },
+    { "step": 2, "name": "Run local checks", "proof": "Secrets, risky APIs, TODOs, docs, dependency smells, env vars, routes, actions, and public claims are computed." },
+    { "step": 3, "name": "Autoload seeds", "proof": "Seed registry count increases from platform-seed/manifest.json." },
+    { "step": 4, "name": "Save workspace", "proof": "IndexedDB workspace registry records project file count and readiness." },
+    { "step": 5, "name": "Generate proof pack", "proof": "proof-ledger.json, project-summary.txt, seed-registry.json, and upstream-auth-contract.json export as zip." },
+    { "step": 6, "name": "AI analysis", "proof": "Gateway stream returns report; no direct provider calls exist in client source." },
+    { "step": 7, "name": "Patch bundle", "proof": "Valid SKAI_PATCH_BUNDLE is parsed and can be applied after skAI mode safety latch." }
+  ]
+}

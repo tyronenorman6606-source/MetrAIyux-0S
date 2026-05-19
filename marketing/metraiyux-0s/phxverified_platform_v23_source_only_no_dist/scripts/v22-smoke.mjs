@@ -73,7 +73,7 @@ const apiBusinesses = await json('api/businesses.json');
 const apiSearch = await json('api/search-index.json');
 const lite = await json('data/businesses-lite.json');
 
-ok(['22.0.0','23.0.0'].includes(seed.version), 'seed report upgraded to v22');
+ok(['22.0.0','23.0.0','23.1.0'].includes(seed.version), 'seed report upgraded to v22');
 ok(readiness.completed.includes('runtime_context_for_all_functions'), 'v22 readiness records runtime context wiring');
 ok(runtime.functions.includes('phx-claim'), 'runtime wiring covers phx-claim');
 ok(runtime.functions.includes('phx-customer-posting'), 'runtime wiring covers first-month customer posting');

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0a0a0a"/>
+  <meta name="description" content="kAIxu CodeStudio Pro — offline-first developer platform with provider packs, workflow templates, policy rules, webhook replay, vault security, sandboxed code, and Kaixu Gateway AI."/>
+  <title>kAIxu CodeStudio Pro | SOLEnterprises</title>
+  <link rel="manifest" href="./manifest.webmanifest"/>
+  <link rel="icon" href="./assets/icon-192.png"/>
+  <link rel="stylesheet" href="./app.css"/>
+  <script src="../../../free99-gate.js" data-platform-id="kaixu-codestudio" data-platform-name="kAIxU CodeStudio Platform" data-billing-mode="quote_only" data-price-label="Quote after provider/backplane scope" data-app-root="/Free99/apps/kaixu-codestudio/"></script>
+</head>
+<body class="font-medium">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div id="app" class="appRoot" aria-label="kAIxu CodeStudio Pro">
+    <header class="topbar" role="banner">
+      <div class="brand" aria-label="Brand">
+        <img class="logo" src="./assets/logo.png" alt="logo"/>
+        <div class="title">
+          <b id="brandName">kAIxu CodeStudio Pro</b>
+          <span id="brandMeta">SOLEnterprises • v5.9.0 • codestudio-v5 • build platform590-20260510</span>
+        </div>
+      </div>
+
+      <div class="pill" id="pillOnline" aria-label="Network status">
+        <span class="dot" id="dotOnline"></span>
+        <span id="txtOnline">Checking…</span>
+      </div>
+
+      <div class="pill" id="pillVault" aria-label="Vault status">
+        <span class="dot" id="dotVault"></span>
+        <span id="txtVault">Vault</span>
+      </div>
+
+      <div class="pill hidden" id="pillUpdate" aria-label="Update available">
+        <span class="dot warn"></span>
+        <span>Update ready</span>
+        <button class="btn ghost mini" id="btnReload" type="button">Reload</button>
+      </div>
+
+      <div class="spacer"></div>
+
+      <nav class="actions" aria-label="Actions">
+        <button class="btn ghost" id="btnCommands" type="button" title="Command palette (Ctrl+O)">
+          <span class="i" data-icon="search" aria-hidden="true"></span><span>Commands</span><span class="kbd">Ctrl+O</span>
+        </button>
+        <button class="btn ghost" id="btnFind" type="button" title="Find (Ctrl+F)">
+          <span class="i" data-icon="find" aria-hidden="true"></span><span>Find</span><span class="kbd">Ctrl+F</span>
+        </button>
+        <button class="btn ghost" id="btnTerminal" type="button" title="Terminal (Ctrl+`)">
+          <span class="i" data-icon="terminal" aria-hidden="true"></span><span>Terminal</span>
+        </button>
+        <button class="btn primary" id="btnVault" type="button" title="Secure Vault (Ctrl+K)">
+          <span class="i" data-icon="lock" aria-hidden="true"></span><span>Secure Vault</span><span class="kbd">Ctrl+K</span>
+        </button>
+        <button class="btn ghost" id="btnExport" type="button" title="Export workspace (Ctrl+Shift+E)">
+          <span class="i" data-icon="download" aria-hidden="true"></span><span>Export</span>
+        </button>
+        <button class="btn ghost" id="btnImport" type="button" title="Import workspace (Ctrl+Shift+I)">
+          <span class="i" data-icon="upload" aria-hidden="true"></span><span>Import</span>
+        </button>
+        <button class="btn ghost" id="btnSettings" type="button" title="Settings">
+          <span class="i" data-icon="settings" aria-hidden="true"></span><span>Settings</span>
+        </button>
+        <button class="btn ghost" id="btnTutorial" type="button" title="Tutorial / Getting Started">
+          <span class="i" data-icon="info" aria-hidden="true"></span><span>Tutorial</span>
+        </button>
+        <button class="btn primary" id="btnPlatform" type="button" title="Platform Console">
+          <span class="i" data-icon="settings" aria-hidden="true"></span><span>Platform</span>
+        </button>
+        <button class="btn ghost" id="btnAbout" type="button" title="About / Health (Ctrl+H)">
+          <span class="i" data-icon="info" aria-hidden="true"></span><span>About</span><span class="kbd">Ctrl+H</span>
+        </button>
+      </nav>
+    </header>
+
+    <main class="shell" role="main">
+      <section class="panel left" aria-label="Explorer">
+        <div class="panelHeader">
+          <b>Explorer</b>
+          <div class="row">
+            <button class="btn ghost mini" id="btnNewFile" type="button" title="New file">+ File</button>
+            <button class="btn ghost mini" id="btnNewFolder" type="button" title="New folder">+ Folder</button>
+          </div>
+        </div>
+        <div class="panelBody">
+          <input class="input" id="explorerFilter" placeholder="Filter…" autocomplete="off"/>
+          <div class="sep"></div>
+          <div class="tree" id="tree" role="tree" aria-label="Files"></div>
+        </div>
+      </section>
+
+      <section class="panel mid" aria-label="Editor">
+        <div class="editorTop" id="editorTop">
+          <div class="tabs" id="tabs" role="tablist" aria-label="Open files"></div>
+          <button class="btn ghost" id="btnPreview" type="button" title="Toggle preview (Ctrl+P)">
+            <span class="i" data-icon="magic" aria-hidden="true"></span><span>Preview</span><span class="kbd">Ctrl+P</span>
+          </button>
+          <button class="btn primary" id="btnRun" type="button" title="Run active file (Ctrl+Enter)">
+            <span class="i" data-icon="play" aria-hidden="true"></span><span>Run</span><span class="kbd">Ctrl+Enter</span>
+          </button>
+        </div>
+
+        <div class="editorWrap" id="editorWrap">
+          <div class="gutter" id="gutter" aria-hidden="true"></div>
+          <div class="code" id="codeWrap">
+            <textarea id="codeArea" spellcheck="false" aria-label="Code editor"></textarea>
+          </div>
+          <div class="preview hidden" id="previewWrap" aria-label="Preview">
+            <iframe id="previewFrame" title="Preview sandbox" sandbox="allow-scripts allow-modals" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel right" aria-label="Assistant">
+        <div class="panelHeader">
+          <b>kAIxu Assistant</b>
+          <div class="row">
+            <span class="badge purple" id="badgePolicy">Policy</span>
+            <button class="btn ghost mini" id="btnClearChat" type="button" title="Clear chat">Clear</button>
+          </div>
+        </div>
+        <div class="panelBody assistantBody">
+          <div id="chat" class="chat" aria-label="Chat history"></div>
+          <div class="assistantComposer">
+            <textarea class="textarea" id="aiPrompt" placeholder="Ask kAIxu… (context includes active file)" maxlength="20000" aria-label="Assistant prompt"></textarea>
+            <div class="row">
+              <select class="select" id="aiModel" aria-label="Model">
+                <option value="kaixu:smart">kaixu:smart</option>
+                <option value="kaixu:fast">kaixu:fast</option>
+                <option value="kaixu:deep">kaixu:deep</option>
+              </select>
+              <button class="btn primary" id="btnSendAI" type="button" title="Send (Ctrl+Enter)">
+                <span class="i" data-icon="send" aria-hidden="true"></span><span>Send</span>
+              </button>
+            </div>
+            <div class="small" id="aiStatus" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toastHost" class="toastHost" aria-live="polite" aria-relevant="additions"></div>
+
+  <!-- Terminal -->
+  <section id="terminal" class="terminal" aria-label="Terminal">
+    <div class="terminalHeader">
+      <b>Terminal</b>
+      <div class="row">
+        <button class="btn ghost mini" id="btnTerminalClear" type="button">Clear</button>
+        <button class="btn ghost mini" id="btnTerminalClose" type="button">Close</button>
+      </div>
+    </div>
+    <div id="terminalLogs" class="terminalLogs" aria-label="Terminal logs"></div>
+  </section>
+
+  <!-- Backdrop + Modals -->
+  <div id="backdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" id="modal">
+      <div class="modalHeader">
+        <b id="modalTitle">Modal</b>
+        <button class="btn ghost mini" id="btnModalClose" type="button">Close</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Splash -->
+  <div id="splash" class="splash" aria-label="Loading">
+    <div class="splashCard">
+      <div class="pulse"><img class="splashLogo" src="./assets/logo.png" alt="logo"/></div>
+      <div class="splashTitle">Calibrating Skyline…</div>
+      <div class="splashSub">Offline-first secure workspace • Encrypted secrets • Kaixu Gateway routing</div>
+      <div class="splashBar"><div></div></div>
+      <div class="small">Build platform590-20260510 • 2026-05-10T23:39:00Z</div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

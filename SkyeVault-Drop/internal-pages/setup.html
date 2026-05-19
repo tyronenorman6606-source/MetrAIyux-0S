@@ -165,19 +165,19 @@
           </label>
           <label class="wide">
             <span>Public hero headline</span>
-            <textarea id="publicHeadlineValue" rows="2">I built SkyeVault-Drop so client files, media, and repo snapshots stop drifting through inboxes and land in one receipt-backed vault.</textarea>
+            <textarea id="publicHeadlineValue" rows="2">Files, media, and repo packages land in one receipt-backed vault.</textarea>
           </label>
           <label class="wide">
             <span>Public subheadline</span>
-            <textarea id="publicSubheadlineValue" rows="3">The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.</textarea>
+            <textarea id="publicSubheadlineValue" rows="3">Choose the room: upload files, recover vault items, review repo workflow, or read the proof route. No giant scroll, no loose handoff.</textarea>
           </label>
           <label class="wide">
             <span>Upload instructions</span>
-            <textarea id="publicInstructionsValue" rows="3">Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.</textarea>
+            <textarea id="publicInstructionsValue" rows="3">Add project context, attach files or a sanitized repo package, confirm permission, and keep this tab open until the receipt finishes.</textarea>
           </label>
           <label class="wide">
             <span>Retention / handling notice</span>
-            <textarea id="retentionNoticeValue" rows="3">Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.</textarea>
+            <textarea id="retentionNoticeValue" rows="3">Vault uploads are used for intake, production, review, delivery, and proof. Keep secrets, private keys, databases, dependency folders, and generated state in a separate secret-boundary package.</textarea>
           </label>
           <label>
             <span>Routing mode</span>
@@ -338,11 +338,11 @@
       <section id="repo-snapshot-setup" class="panel repo-operator-panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Repo snapshot command</p>
-            <h2>Let an operator push a whole workspace into the vault safely</h2>
+            <p class="eyebrow">Repo workspace command</p>
+            <h2>Let an operator push, diff, commit, and recover a workspace safely</h2>
           </div>
         </div>
-        <p class="muted big-copy">Add the repo-side helper to any project that needs controlled vault snapshots. The helper packages a sanitized zip locally, scans staged text files for common secret patterns, uploads through this vault's R2 multipart API, and writes a receipt JSON.</p>
+        <p class="muted big-copy">Add the repo-side helper to any project that needs controlled vault snapshots or Git-style vault work. The helpers package sanitized zips, run secret scans, initialize working repo folders, write diff/commit/push receipts, and produce a local-only secret boundary manifest before handoff.</p>
         <div class="repo-command-grid">
           <article>
             <strong>Required local values</strong>
@@ -356,6 +356,14 @@
           <article>
             <strong>Upload with proof</strong>
             <code>npm run vault:push</code>
+          </article>
+          <article>
+            <strong>Use a working repo folder</strong>
+            <code>npm run vault:repo -- init --dir=./app --workspace=acme --repo=app</code>
+          </article>
+          <article>
+            <strong>Secret boundary report</strong>
+            <code>npm run vault:secrets:manifest</code>
           </article>
         </div>
         <p class="notice-copy">If your deployed vault uses a custom allowed origin, set <span class="code-pill">SKYEVAULT_UPLOAD_ORIGIN</span> locally before running the push command.</p>

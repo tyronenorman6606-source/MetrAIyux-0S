@@ -1,0 +1,29 @@
+{
+  "workflowId": "db-query-ai-summary",
+  "input": {
+    "reportEmail": "ops@example.com"
+  },
+  "steps": [
+    {
+      "id": "schema",
+      "capability": "db.inspect_schema",
+      "input": {}
+    },
+    {
+      "id": "summary",
+      "capability": "ai.generate_text",
+      "input": {
+        "prompt": "Summarize these database tables for an operator: {{steps.schema.data.rows}}"
+      }
+    },
+    {
+      "id": "email",
+      "capability": "email.send",
+      "input": {
+        "to": "{{input.reportEmail}}",
+        "subject": "Database summary",
+        "body": "{{steps.summary.data.text}}"
+      }
+    }
+  ]
+}

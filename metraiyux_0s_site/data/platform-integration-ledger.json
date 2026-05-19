@@ -1,15 +1,65 @@
 {
-  "version": "2026-05-18-free99-platform-intake-accounting",
+  "version": "2026-05-18-valley-verified-app-build-lane",
   "updated_at": "2026-05-18T00:00:00Z",
   "source_changelogs": [
     "SkyeGateFS27/docs/CHANGELOG.md",
     "metraiyux_0s_site/changelog/index.html",
     "metraiyux_0s_site/live/SkyeMail/CHANGELOG.md",
     "SkyeGateFS27/docs/integration-dossiers/marketing-made-easy.md",
-    "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json"
+    "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
+    "marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist/MCP_TOOLING_RECEIPT.json",
+    "metraiyux_0s_site/valley-verified/MOUNTED_IN_0S.json"
   ],
-  "rule": "Every platform named in the changelog or Free99 intake must have a system surface, buyer route, advertising angle, integration boundary, proof path, and platform_id usage boundary. Free99 means no charge only; it never means anonymous access, owner-control bypass, or paid-app checkout without approval.",
+  "rule": "Every platform named in the changelog, Free99 intake, or Valley Verified app-build lane must have a system surface, buyer route, advertising angle, integration boundary, proof path, and platform_id usage boundary. Free99 means no charge only; it never means anonymous access, owner-control bypass, or paid-app checkout without approval.",
   "platforms": [
+    {
+      "id": "valley-verified",
+      "name": "Valley Verified Business Network + App Build Lane",
+      "status": "integrated",
+      "source_change": "Valley Verified was regenerated from the source platform, mounted inside metraiyux_0s_site/valley-verified, and wired to Bob's and Empire's actual app-build examples instead of generic generated script pages.",
+      "system_surfaces": [
+        "metraiyux_0s_site/valley-verified/index.html",
+        "metraiyux_0s_site/valley-verified/app-builds/index.html",
+        "metraiyux_0s_site/valley-verified/business/bobs-smoke-shop-litchfield-park/index.html",
+        "metraiyux_0s_site/valley-verified/business/empire-pallets-phoenix/index.html",
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane"
+      ],
+      "integration_points": [
+        "0S launcher app id valley-verified",
+        "Valley Verified /app-builds/ public lane",
+        "Bob's Smoke Shop actual app source Skye-Clients/bobs-smoke-shop-mcp-redo",
+        "Empire Pallets actual app source Skye-Clients/empire-pallets-v3-app",
+        "SkyeGateFS27 SkyePay offer valley-verified-app-build-lane",
+        "0S command registry build/sync/proof commands"
+      ],
+      "advertising": {
+        "buyer_signal": "They want more than a listing and need to understand what a real business app would do for them.",
+        "headline": "I turn the Valley post into an actual app lane when the business needs buyer actions, media, forms, QR handoff, and proof.",
+        "cta": "Open Valley Verified App Builds",
+        "safe_claims": [
+          "Valley Verified is mounted inside the 0S at /valley-verified/.",
+          "Bob's and Empire are actual app examples, not generated placeholder pages.",
+          "The app-build lane is owner-approved through SkyeGateFS27/SkyePay."
+        ],
+        "avoid_claims": [
+          "Do not claim every seeded listing is owner-verified.",
+          "Do not claim payment alone auto-activates production work.",
+          "Do not describe Bob's or Empire's pages as script-generated examples."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run mcp:mine -- marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist",
+          "npm run 0s:valley-verified:proof",
+          "npm run mcp:mine -- metraiyux_0s_site/valley-verified"
+        ],
+        "receipts": [
+          "marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist/MCP_TOOLING_RECEIPT.json",
+          "metraiyux_0s_site/valley-verified/MOUNTED_IN_0S.json",
+          "test-artifacts/valley-verified-0s/browser-proof.json"
+        ]
+      }
+    },
     {
       "id": "skyepay-store",
       "name": "SkyePay Ecosystem Store",

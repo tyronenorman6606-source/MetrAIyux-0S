@@ -3,7 +3,7 @@
 
 **MetrAIyux 0S** is the official product name for this package. It replaces prior working names such as Sovereign 13 Cabinet, 13-Cabinet Executive Office, CabinetOS, SovereignOffice OS, and generic Autonomous Business OS language.
 
-This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 16-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
+This package contains the full public website, owner/admin automation OS, customer SaaS layer, tenant isolation, 0meg4kAI security/QA brain, 17-brain registry, Cloudflare Worker kits, D1 migrations, Resend approval email workflow, tutorials, valuation pages, proof receipts, and deployment documentation.
 
 ## Deep Feature Inventory
 
@@ -237,6 +237,7 @@ Start points:
 - `SkyeMusicNexus/public/player.html` - Music Player.
 - `SkyeMusicNexus/public/releases.html` - Releases.
 - `SkyeMusicNexus/public/rights.html` - Rights Vault.
+- `SkyeMusicNexus/public/feed.html` - Open Social Feed for Pixelfed/Mastodon-compatible/Funkwhale connector work.
 - `SkyeMusicNexus/public/exchange.html` - Creator Exchange.
 - `SkyeMusicNexus/public/admin.html` - Operator Stage.
 - `proof/skyemusicnexus-expansion-receipt.html` - proof receipt and auth boundary.

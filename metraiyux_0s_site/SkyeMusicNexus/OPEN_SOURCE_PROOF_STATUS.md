@@ -1,29 +1,29 @@
-# SkyeMusicNexus Open Source Creation Studio Proof Status
+# SkyeMusicNexus Native Creation Proof Status
 
-✅ Existing live architecture respected: this patch targets the roomed static/Netlify structure.
+✅ Existing roomed static/Netlify structure respected.
 
-✅ New public creation room added: `public/create.html`.
+✅ Native creation hub wired at `public/create.html`.
 
-✅ Open-source engine boundary documented: openDAW, Ardour, LMMS, Audacity stay external.
+✅ First-party fullscreen DAW built at `public/daw.html`.
 
-✅ Studio browser logic added: `public/open-source-studio.js`.
+✅ Native DAW code added: `public/nexus-daw.js` and `public/nexus-daw.css`.
 
-✅ Studio visual system added: `public/open-source-studio.css`.
+✅ DAW includes transport, BPM/key controls, arrangement timeline, track mute/solo/arm controls, audio import/decode/preview, mixer, drum pads, synth keys, physical computer keyboard mapping, project save, and release manifest export.
 
-✅ Studio API boundary added: `netlify/functions/music-studio.js` and wired to the existing SkyGate guard.
+✅ BandLab-style DAW parity controls added: region select/split/duplicate/delete/quantize, undo/redo, metronome, loop toggle, local loop-pack insertion, browser microphone recording path, Web MIDI connection path, and browser WAV mixdown export.
 
-✅ Runtime contract added: `src/open-source-studio-contract.json`.
+✅ Split creation surfaces remain wired: `public/stems.html`, `public/exports.html`, `public/discover.html`, and `public/feed.html`.
 
-✅ Open-source pull script added: `open-source/scripts/install-open-source-engines.sh`.
+✅ Studio API boundary remains: `netlify/functions/music-studio.js`, protected by the existing SkyGate guard.
 
-✅ Create room nav links wired across the artist rooms and operator stage.
+✅ Third-party DAW vendor source removed from this repo.
 
-☐ Real openDAW build not included in zip. Pull/build upstream with the script.
+✅ DAW route contains no iframe bridge.
 
-☐ Durable project persistence not wired. The studio ledger now uses `MUSIC_NEXUS_DATA_DIR` locally; replace with Citadel/Postgres for production.
+☐ Durable project persistence not wired. The studio ledger still uses `MUSIC_NEXUS_DATA_DIR` locally; replace with Citadel/Postgres for production.
 
-☐ Real ffmpeg export worker not wired. Current export queue produces proof manifests.
+☐ Server-side ffmpeg/audio render worker not wired. The DAW now renders a browser WAV mixdown locally; production server export/transcode remains a provider/worker boundary.
 
-☐ Real SkyeVault/R2 upload signing not wired inside this patch. Connect existing `music-assets.js` or storage adapter.
+☐ Real SkyeVault/R2 upload signing is handled by the existing audio asset lane, not by the DAW page itself.
 
-☐ Hosted openDAW deployment is not bundled. The in-page iframe bridge expects a local or deployed openDAW URL.
+☐ Native ActivityPub actor federation still needs actor documents, WebFinger, HTTP signatures, inbox/outbox queues, moderation, and abuse controls.

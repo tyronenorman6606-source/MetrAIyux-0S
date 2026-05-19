@@ -1,0 +1,11 @@
+import { writeFile, mkdir, rm } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+for(const f of ['data/legal-review-submissions.json','data/customer-orders.json','data/esign-envelope-log.json','data/audit.json','data/vault.json','data/document-records.json','data/packet-records.json','data/reminders.json','data/template-patch-requests.json','data/editor-handoff-log.json','data/editor-return-log.json','data/case-records.json','data/case-intakes.json','data/case-notes.json','data/case-artifacts.json']) await writeFile(path.join(ROOT,f),'[]\n');
+await writeFile(path.join(ROOT,'data/template-overrides.json'), JSON.stringify({ ok:true, version:'16.0.0', overrides:[], boundary:'Template overrides are operator metadata/rendering adjustments only. They are not attorney review and do not create state-compliance claims.' }, null, 2)+'\n');
+await writeFile(path.join(ROOT,'data/audit-ledger.ndjson'),'');
+await rm(path.join(ROOT,'data/editor-handoffs'), { recursive:true, force:true });
+await mkdir(path.join(ROOT,'data/editor-handoffs'), { recursive:true });
+await mkdir(path.join(ROOT,'runtime'), { recursive:true });
+console.log('✅ Runtime data reset to clean repo handoff state');

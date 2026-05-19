@@ -1,0 +1,39 @@
+{
+  "version": "17.0.0",
+  "generated_at": "2026-05-18T21:43:34.237Z",
+  "purpose": "Export runtime decisions into reviewable seed/admin files instead of silently mutating the public dataset.",
+  "outputs": [
+    "admin-change-set.json",
+    "admin-change-set.csv",
+    "suppression-patch.json",
+    "listing-patches.json",
+    "claim-status-sync.json",
+    "lead-status-sync.json",
+    "ae-followups.csv"
+  ],
+  "suppression_patch": {
+    "ids": [
+      "example-duplicate-business-id"
+    ],
+    "identity_keys": [],
+    "domains": [],
+    "phones": [],
+    "emails": [],
+    "source_hashes": []
+  },
+  "listing_patch_example": {
+    "business_id": "example-business-id",
+    "patch": {
+      "website": "https://example.com",
+      "phone": "6025550100"
+    },
+    "reason": "Owner-submitted correction after proof review."
+  },
+  "review_steps": [
+    "Export runtime state",
+    "Review changes with admin",
+    "Patch seed/businesses/suppressions.json or inbox seed files",
+    "Rebuild",
+    "Run smoke/production-check"
+  ]
+}

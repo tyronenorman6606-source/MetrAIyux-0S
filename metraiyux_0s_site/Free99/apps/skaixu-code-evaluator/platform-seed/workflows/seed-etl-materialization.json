@@ -1,0 +1,27 @@
+{
+  "type": "workflow",
+  "name": "Seed ETL Materialization Workflow",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step": 1,
+      "name": "Autoload seed manifest",
+      "proof": "Seed registry receives manifest-listed files."
+    },
+    {
+      "step": 2,
+      "name": "Validate seed registry",
+      "proof": "Schema inference, duplicate detection, and issue report generated."
+    },
+    {
+      "step": 3,
+      "name": "Plan ETL queue",
+      "proof": "generated/etl-jobs/queue.json contract can be written."
+    },
+    {
+      "step": 4,
+      "name": "Materialize data outputs",
+      "proof": "generated/platform-data/*.json and seed-validation markdown are written."
+    }
+  ]
+}

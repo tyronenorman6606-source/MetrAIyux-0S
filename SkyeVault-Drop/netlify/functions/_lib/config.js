@@ -36,10 +36,10 @@ function bootstrapConfig() {
   return {
     brandName: 'SkyeVault-Drop',
     supportEmail: '',
-    publicHeadline: 'I built SkyeVault-Drop so client files, media, and repo snapshots stop drifting through inboxes and land in one receipt-backed vault.',
-    publicSubheadline: 'The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.',
-    publicInstructions: 'Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.',
-    retentionNotice: 'Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.',
+    publicHeadline: 'Files, media, and repo packages land in one receipt-backed vault.',
+    publicSubheadline: 'Choose the room: upload files, recover vault items, review repo workflow, or read the proof route. No giant scroll, no loose handoff.',
+    publicInstructions: 'Add project context, attach files or a sanitized repo package, confirm permission, and keep this tab open until the receipt finishes.',
+    retentionNotice: 'Vault uploads are used for intake, production, review, delivery, and proof. Keep secrets, private keys, databases, dependency folders, and generated state in a separate secret-boundary package.',
     requireUsageRights: true,
     requireRetentionAck: true,
     requireClientName: true,
@@ -112,10 +112,10 @@ export function normalizeConfig(input = {}) {
   return {
     brandName: String(input.brandName || 'SkyeVault-Drop').trim().slice(0, 140),
     supportEmail: String(input.supportEmail || '').trim().slice(0, 160),
-    publicHeadline: String(input.publicHeadline || 'I built SkyeVault-Drop so client files, media, and repo snapshots stop drifting through inboxes and land in one receipt-backed vault.').trim().slice(0, 260),
-    publicSubheadline: String(input.publicSubheadline || 'The surface beside this copy is the actual intake room: add context, send the package, and keep the proof receipts clean. I route files through routing gates into Cloudflare R2, write the ledger receipt, and review the archive from the operator side.').trim().slice(0, 360),
-    publicInstructions: String(input.publicInstructions || 'Add the project details, attach the files or sanitized repo zip, confirm permission, and keep this page open until every file says complete.').trim().slice(0, 420),
-    retentionNotice: String(input.retentionNotice || 'Uploaded files are used for intake, production, review, delivery, and proof. Tell your project contact before sending anything that needs special handling.').trim().slice(0, 420),
+    publicHeadline: String(input.publicHeadline || 'Files, media, and repo packages land in one receipt-backed vault.').trim().slice(0, 260),
+    publicSubheadline: String(input.publicSubheadline || 'Choose the room: upload files, recover vault items, review repo workflow, or read the proof route. No giant scroll, no loose handoff.').trim().slice(0, 360),
+    publicInstructions: String(input.publicInstructions || 'Add project context, attach files or a sanitized repo package, confirm permission, and keep this tab open until the receipt finishes.').trim().slice(0, 420),
+    retentionNotice: String(input.retentionNotice || 'Vault uploads are used for intake, production, review, delivery, and proof. Keep secrets, private keys, databases, dependency folders, and generated state in a separate secret-boundary package.').trim().slice(0, 420),
     requireUsageRights: input.requireUsageRights !== false,
     requireRetentionAck: input.requireRetentionAck !== false,
     requireClientName: input.requireClientName !== false,
@@ -218,6 +218,7 @@ export async function loadAuditEvents(limit = 80) {
 export async function loadLedger(limit = 120) {
   const folderId = getConfigFolderId();
   const safeLimit = Math.min(2500, Math.max(1, Number(limit || 120)));
+  // receipts+summary: the operator ledger prefers the receipt-backed summary and falls back to receipt files.
   const summaryFile = await findFileInFolder(folderId, LEDGER_FILE);
   if (summaryFile) {
     const ledger = await downloadJsonFile(summaryFile.id, { entries: [] });

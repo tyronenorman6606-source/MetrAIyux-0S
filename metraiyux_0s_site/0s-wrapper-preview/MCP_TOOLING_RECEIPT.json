@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-05-18T19:22:00Z",
+  "targetFolder": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/0s-wrapper-preview",
+  "mcpServer": {
+    "sourceOfTruth": ".mcp.json",
+    "name": "quantumskyes",
+    "command": "node",
+    "args": [
+      "/workspaces/MetrAIyux-0S/MCP/stdio-server.mjs"
+    ]
+  },
+  "restored": true,
+  "restoredSurface": [
+    "full-screen operating wrapper",
+    "top bar",
+    "dock",
+    "command overlay",
+    "draggable laptop windows",
+    "MCP living background canvas",
+    "MCP neon motion chrome",
+    "MCP neon scrollbar",
+    "three MCP-tagged MacbookScroll laptop adapters"
+  ],
+  "mcpComponentUsed": {
+    "component": "MacbookScroll",
+    "mcpPath": "MCP/skye-design-lab/Compoents/macbook-animation",
+    "deliveredAs": "three static preview adapters tagged with data-mcp-component=\"MacbookScroll\" and data-mcp-source=\"MCP/skye-design-lab/Compoents/macbook-animation\"",
+    "initialState": "closed",
+    "interaction": "dock/command opens each laptop; laptop body toggles open and closed; titlebar drags on desktop"
+  },
+  "verification": {
+    "serverUrl": "http://127.0.0.1:4173/0s-wrapper-preview/index.html",
+    "httpStatus": 200,
+    "nodeCheck": "passed",
+    "browserProof": {
+      "ok": true,
+      "report": "/workspaces/MetrAIyux-0S/test-artifacts/0s-wrapper-preview-restored/browser-proof.json",
+      "desktopScreenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-wrapper-preview-restored/desktop-1440x1000-restored.png",
+      "mobileScreenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-wrapper-preview-restored/mobile-390x844-restored.png",
+      "checks": [
+        "three MCP-tagged MacbookScroll laptop windows exist",
+        "laptops start closed",
+        "dock opens Atlas laptop",
+        "desktop drag stays inside viewport",
+        "mobile dock launch scrolls selected laptop into view",
+        "command overlay opens",
+        "MCP living background canvas is mounted",
+        "MCP neon motion chrome is mounted",
+        "MCP neon scrollbar rails are mounted",
+        "no horizontal overflow on mobile or desktop"
+      ]
+    }
+  }
+}

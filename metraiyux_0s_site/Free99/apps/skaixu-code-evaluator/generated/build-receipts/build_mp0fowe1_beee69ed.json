@@ -1,0 +1,30 @@
+{
+  "id": "build_mp0fowe1_beee69ed",
+  "type": "SKAI_BUILD_EXECUTION_RECEIPT",
+  "startedAt": "2026-05-10T23:58:44.473Z",
+  "rootDir": "/mnt/data/skaixu_closure_work",
+  "dryRun": false,
+  "requestedStages": [
+    "test"
+  ],
+  "primaryFramework": "netlify-functions",
+  "planHash": "469cd362c2703bb6865c01e1dcdab767e70e8389fb3fd58205d91dfa4d01123a",
+  "stages": [
+    {
+      "stage": "test",
+      "command": "npm run test",
+      "commandHash": "0c7ec4aac044044cc5b274b09866dbba6c2eedca7ca0198dae0fa3b38e59513b",
+      "startedAt": "2026-05-10T23:58:44.473Z",
+      "status": "passed",
+      "stdout": "\n> skaixu-code-evaluator-platform@2.5.0-platform-closure test\n> node tools/smoke-check.mjs && node tools/platform-api-smoke.mjs && node tools/platform-hardening-smoke.mjs && node tools/platform-closure-smoke.mjs\n\n✅ smoke-check passed: inline JS parses, platform UI/ops/data/marketplace/automation/backplane IDs exist, core platform functions exist, backplane files exist, seed manifest resolves, gateway-only endpoint scan passed.\n✅ platform-api-smoke passed: workspace store, ETL worker, provider lifecycle, framework adapters, and task runner validate.\n✅ platform-hardening-smoke passed\n✅ platform-closure-smoke passed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "issues": [],
+      "finishedAt": "2026-05-10T23:58:45.586Z"
+    }
+  ],
+  "status": "passed",
+  "issues": [],
+  "finishedAt": "2026-05-10T23:58:45.586Z",
+  "receiptHash": "40de313e1dd88f1d3fb198490741c7599cfd78d9f3467c0ce7b8c2a9b1247298"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "SovereignDocs v12 Code-Core Build",
+  "version": "12.0.0",
+  "focus": "application code engines, not deployment wiring",
+  "added": [
+    "server/entitlements.mjs",
+    "server/document-lifecycle.mjs",
+    "server/packet-engine.mjs",
+    "server/reminder-engine.mjs",
+    "server/template-operations.mjs",
+    "server/request-validation.mjs",
+    "scripts/smoke-v12-code-core.mjs",
+    "docs/V12_CODE_CORE.md",
+    "docs/LAST_SMOKE_RUN_V12.md"
+  ],
+  "runtimeFiles": [
+    "data/document-records.json",
+    "data/packet-records.json",
+    "data/reminders.json",
+    "data/template-patch-requests.json"
+  ],
+  "proofCommand": "npm run smoke:all",
+  "proofStatus": "passed"
+}

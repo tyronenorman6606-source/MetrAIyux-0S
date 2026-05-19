@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "version": "10.0.0",
+  "rules": [
+    {
+      "id": "high-risk-doc-review",
+      "when": {
+        "risk": "high"
+      },
+      "routeTo": "legal-partner-review",
+      "reason": "High-risk documents require partner-review lane before public completed-document posture."
+    },
+    {
+      "id": "business-formation-state-sensitive",
+      "when": {
+        "lane": "business-formation-os"
+      },
+      "routeTo": "business-formation-partner-or-official-source",
+      "reason": "State-sensitive formation facts and filings require official-source/partner route."
+    },
+    {
+      "id": "tax-court-uspto",
+      "when": {
+        "officialSource": true
+      },
+      "routeTo": "official-source-prep",
+      "reason": "Government/tax/court/IP filing workflows are not recreated as fake forms."
+    }
+  ],
+  "boundary": "Routing rules support triage only and do not create professional advice or guarantee partner acceptance."
+}

@@ -38,7 +38,7 @@ And then you quoted them $40,000 and they balked. Or you took the project and it
 
 I've spent two years building MetrAIyux 0S specifically so that question has a different answer.
 
-It's a complete, deployable business operating system — 522 pages, 6 Cloudflare Workers, brain routing across all executive functions, tenant isolation, approval gates, proof receipts, government readiness package, and a full sales enablement library.
+It's a complete, deployable business operating system — 875 pages, 17 Cloudflare Workers, brain routing across all executive functions, tenant isolation, approval gates, proof receipts, government readiness package, and a full sales enablement library.
 
 White-label licensing is available on the Autonomous Office tier.
 
@@ -109,7 +109,7 @@ The brains in MetrAIyux 0S are not LLMs. They're keyword classifiers that route 
 Things MetrAIyux 0S will never do automatically, regardless of what the brain receives: sign a contract, move money, hire or fire someone, file a legal document, post publicly. The approval gates are structural, not configurable. That's the point.
 
 ### Single Post — Stats
-522 pages. 6 Cloudflare Workers. 16 routing brains. 722 knowledge base chunks. 28 admin tutorial lessons. 0 build steps for the static layer. One deployment kit. MetrAIyux 0S is dense.
+875 pages. 17 Cloudflare Workers. 17 routing brains. 725 knowledge base chunks. 28 admin tutorial lessons. 0 build steps for the static layer. One deployment kit. MetrAIyux 0S is dense.
 
 ---
 
@@ -121,7 +121,7 @@ Things MetrAIyux 0S will never do automatically, regardless of what the brain re
 
 I noticed [Company] is in [industry/city]. I run a company in a similar space and I've been talking to operators who have the same problem we had: everything lands on one person, there's no documented routing, and when you need to show enterprise buyers or a government agency how you run — you don't have much to show.
 
-I built an operating system for this. It's called MetrAIyux 0S. It routes every company command through a named functional layer, gates anything risky behind approval, and logs a proof receipt for everything that happens. It runs on Cloudflare, deploys without a dev team, and the full thing — 522 pages, 9 Workers, brain routing, security gateway — is in one package.
+I built an operating system for this. It's called MetrAIyux 0S. It routes every company command through a named functional layer, gates anything risky behind approval, and logs a proof receipt for everything that happens. It runs on Cloudflare, deploys without a dev team, and the full thing — 875 pages, 17 Workers, brain routing, security gateway — is in one package.
 
 I'm not pitching you on a SaaS subscription. I'm asking if this is a problem you're actually dealing with and whether you'd want to take 20 minutes to look at what we built.
 
@@ -186,7 +186,7 @@ Let me walk you through how it actually works."
 
 ### Short body copy variants
 - "MetrAIyux 0S routes every company command through a named functional brain, blocks risky actions behind approval, and logs a receipt for everything. Cloudflare-hosted. No build step."
-- "Built for service companies that need enterprise operating credibility without enterprise headcount. 522 pages. 9 Workers. 17 brains. One deployment."
+- "Built for service companies that need enterprise operating credibility without enterprise headcount. 875 pages. 17 Workers. 17 brains. One deployment."
 - "If you build for business clients, you can resell MetrAIyux 0S as your own product. White-label licensing on Autonomous Office tier. Deploy once. Bill monthly."
 
 ### CTA variants

@@ -44,6 +44,7 @@ const assets = require(path.join(root, "netlify/functions/music-assets.js"));
 const payments = require(path.join(root, "netlify/functions/music-payments.js"));
 const analytics = require(path.join(root, "netlify/functions/music-analytics.js"));
 const exchange = require(path.join(root, "netlify/functions/music-exchange.js"));
+const social = require(path.join(root, "netlify/functions/music-social.js"));
 const providerHooks = require(path.join(root, "netlify/functions/music-provider-hooks.js"));
 const session = require(path.join(root, "netlify/functions/skygate-session.js"));
 
@@ -52,6 +53,7 @@ const uploadHtml = fs.readFileSync(path.join(root, "public/upload.html"), "utf8"
 const playerHtml = fs.readFileSync(path.join(root, "public/player.html"), "utf8");
 const releasesHtml = fs.readFileSync(path.join(root, "public/releases.html"), "utf8");
 const rightsHtml = fs.readFileSync(path.join(root, "public/rights.html"), "utf8");
+const feedHtml = fs.readFileSync(path.join(root, "public/feed.html"), "utf8");
 const exchangeHtml = fs.readFileSync(path.join(root, "public/exchange.html"), "utf8");
 const adminHtml = fs.readFileSync(path.join(root, "public/admin.html"), "utf8");
 const gateSession = fs.readFileSync(path.join(root, "gate-session.js"), "utf8");
@@ -62,6 +64,7 @@ const skyeIdBridge = fs.readFileSync(path.join(root, "../assets/js/skye-id-bridg
 const skyeMailIdGen = fs.readFileSync(path.join(root, "../live/SkyeMail/generators/Skye-ID/index.html"), "utf8");
 const fs27IdGen = fs.readFileSync(path.resolve(root, "../../SkyeGateFS27/generators/Skye-ID/index.html"), "utf8");
 const assetsSource = fs.readFileSync(path.join(root, "netlify/functions/music-assets.js"), "utf8");
+const socialManifest = fs.readFileSync(path.join(root, "open-source/social-platform-manifest.json"), "utf8");
 assert(indexHtml.includes("Platform Dashboard"), "public/index.html is missing the platform dashboard title");
 const artistPages = [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml].join("\n");
 assert(uploadHtml.includes("Gated Audio Upload"), "public/upload.html is missing gated audio upload");
@@ -81,6 +84,13 @@ assert(exchangeHtml.includes("Creator Exchange"), "public/exchange.html is missi
 assert(exchangeHtml.includes("Content Request Exchange"), "public/exchange.html is missing the content request exchange language");
 assert(exchangeHtml.includes("Achievement Orbit"), "public/exchange.html is missing the achievement orbit surface");
 assert(exchangeHtml.includes("Release Campaign Forge"), "public/exchange.html is missing the release campaign forge");
+assert(feedHtml.includes("Open Social Feed"), "public/feed.html is missing the open social feed surface");
+assert(feedHtml.includes("feedComposeForm"), "public/feed.html is missing the real feed composer");
+assert(feedHtml.includes("socialFeedDeck"), "public/feed.html is missing the social feed deck");
+assert(feedHtml.includes("socialConnectorForm"), "public/feed.html is missing the social connector form");
+assert(feedHtml.includes("socialPostForm"), "public/feed.html is missing the social post queue form");
+assert(feedHtml.includes("socialFeedForm"), "public/feed.html is missing the federated feed sync form");
+assert(feedHtml.includes("Pixelfed"), "public/feed.html is missing the Pixelfed platform lane");
 assert(rightsHtml.includes("Rights Vault"), "public/rights.html is missing the rights vault");
 assert(rightsHtml.includes("Takedown Hold"), "public/rights.html is missing the takedown hold surface");
 assert(artistPages.includes("Upload Studio"), "public platform pages are missing Upload Studio");
@@ -92,6 +102,7 @@ assert(adminHtml.includes("Review Chamber"), "public/admin.html is missing the r
 assert(adminHtml.includes("Payout Gate"), "public/admin.html is missing the payout gate");
 assert(adminHtml.includes("Analytics Prism"), "public/admin.html is missing the analytics prism");
 assert(adminHtml.includes("Exchange Console"), "public/admin.html is missing the exchange console");
+assert(adminHtml.includes("Open Social Spine"), "public/admin.html is missing the open social operator spine");
 assert(adminHtml.includes("../gate-session.js"), "public/admin.html is missing the SkyeMusicNexus gate-session overlay");
 assert(adminHtml.includes("skygate-auth.js"), "public/admin.html is missing the shared SkyGate browser auth helper");
 assert(neoJs.includes("/.netlify/functions/"), "neo-nexus.js is missing Netlify function API wiring");
@@ -107,6 +118,7 @@ assert(neoJs.includes("directUploadAvailable") && neoJs.includes("create-upload-
 assert(neoJs.includes("music-payments"), "neo-nexus.js is missing music-payments wiring");
 assert(neoJs.includes("music-analytics"), "neo-nexus.js is missing music-analytics wiring");
 assert(neoJs.includes("music-exchange"), "neo-nexus.js is missing music-exchange wiring");
+assert(neoJs.includes("music-social"), "neo-nexus.js is missing music-social wiring");
 assert(neoJs.includes("queue-operations"), "neo-nexus.js is missing operations queue wiring");
 assert(neoJs.includes("report-streams"), "neo-nexus.js is missing stream reporting wiring");
 assert(neoJs.includes("playback-stream"), "neo-nexus.js is missing playback stream proof wiring");
@@ -116,6 +128,12 @@ assert(neoJs.includes("AudioContext"), "neo-nexus.js is missing Web Audio playba
 assert(neoJs.includes("request-content"), "neo-nexus.js is missing content request wiring");
 assert(neoJs.includes("publish-community"), "neo-nexus.js is missing community post wiring");
 assert(neoJs.includes("build-release-campaign"), "neo-nexus.js is missing release campaign wiring");
+assert(neoJs.includes("save-connector"), "neo-nexus.js is missing social connector wiring");
+assert(neoJs.includes("create-feed-post"), "neo-nexus.js is missing real feed post wiring");
+assert(neoJs.includes("feed-action"), "neo-nexus.js is missing real feed action wiring");
+assert(neoJs.includes("queue-post"), "neo-nexus.js is missing social post queue wiring");
+assert(neoJs.includes("publish-post"), "neo-nexus.js is missing social provider publish wiring");
+assert(neoJs.includes("sync-feed"), "neo-nexus.js is missing federated feed sync wiring");
 assert(neoCss.includes("vinyl-core"), "neo-nexus.css is missing the vinyl core display system");
 assert(neoCss.includes("wave-reader"), "neo-nexus.css is missing the signal wave display system");
 assert(neoCss.includes("player-queue"), "neo-nexus.css is missing the playback queue display system");
@@ -135,6 +153,7 @@ assert(authHelper.includes("loginLocalOperator"), "skygate-auth.js is missing lo
 assert(authHelper.includes("logoutSession"), "skygate-auth.js is missing local session logout wiring");
 assert(gateSession.includes("Free99 Lite means no charge"), "gate-session.js must spell out that Free99 Lite means no charge");
 assert(gateSession.includes("SKYE_MUSIC_NEXUS_GATE_SESSION"), "gate-session.js is missing the dedicated app session storage key");
+assert(socialManifest.includes("Pixelfed") && socialManifest.includes("Funkwhale") && socialManifest.includes("ActivityPub"), "open-source social platform manifest is missing required platform targets");
 
 const unauthArtistsRes = await call(artists, { method: "GET", query: { action: "list" } });
 assert(unauthArtistsRes.statusCode === 401, `unauthenticated artist list escaped the gate: ${unauthArtistsRes.statusCode}`);
@@ -144,6 +163,8 @@ const unauthOperationsRes = await call(releases, { method: "GET", query: { actio
 assert(unauthOperationsRes.statusCode === 401, `unauthenticated operations board escaped the gate: ${unauthOperationsRes.statusCode}`);
 const unauthExchangeRes = await call(exchange, { method: "GET", query: { action: "hub" } });
 assert(unauthExchangeRes.statusCode === 401, `unauthenticated music exchange escaped the gate: ${unauthExchangeRes.statusCode}`);
+const unauthSocialRes = await call(social, { method: "GET", query: { action: "hub" } });
+assert(unauthSocialRes.statusCode === 401, `unauthenticated music social spine escaped the gate: ${unauthSocialRes.statusCode}`);
 const unauthAssetsRes = await call(assets, { method: "GET", query: { action: "list" } });
 assert(unauthAssetsRes.statusCode === 401, `unauthenticated music assets escaped the gate: ${unauthAssetsRes.statusCode}`);
 const unauthProviderHooksRes = await call(providerHooks, { method: "GET", query: { action: "status" } });
@@ -480,6 +501,91 @@ const campaign = parse(campaignRes).campaign;
 assert(campaign?.contentPack?.captions?.length >= 3, "release campaign did not create captions");
 assert(campaign?.contentPack?.shortFormHooks?.length >= 3, "release campaign did not create short-form hooks");
 
+const localFeedPostRes = await call(social, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "create-feed-post",
+    artistId,
+    releaseId,
+    caption: "Proof Release is live inside the MusicNexus feed.",
+    hashtags: "newmusic,feedproof",
+  },
+});
+assert(localFeedPostRes.statusCode === 201, `local feed post failed: ${localFeedPostRes.statusCode}`);
+const localFeedPost = parse(localFeedPostRes).post;
+assert(localFeedPost?.status === "local-published", "local feed post did not publish into the in-app feed");
+
+const feedActionRes = await call(social, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "feed-action",
+    feedAction: "comment",
+    targetId: localFeedPost.id,
+    artistId,
+    body: "This feed comment is persisted by the social spine.",
+  },
+});
+assert(feedActionRes.statusCode === 201, `feed action failed: ${feedActionRes.statusCode}`);
+assert(parse(feedActionRes).stats?.comments?.length >= 1, "feed action did not persist a comment");
+
+const socialConnectorRes = await call(social, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "save-connector",
+    platform: "pixelfed",
+    name: "Proof Pixelfed",
+    instanceUrl: "https://pixelfed.social",
+    handle: "@proof@pixelfed.social",
+    tokenEnvKey: "SKYE_MUSIC_PROOF_PIXELFED_TOKEN",
+    defaultVisibility: "unlisted",
+  },
+});
+assert(socialConnectorRes.statusCode === 201, `social connector save failed: ${socialConnectorRes.statusCode}`);
+const socialConnector = parse(socialConnectorRes).connector;
+assert(socialConnector?.platform === "pixelfed", "social connector did not persist Pixelfed platform");
+assert(socialConnector?.tokenStatus === "env-token-required", "social connector should require a server env token during smoke proof");
+
+const socialPostRes = await call(social, {
+  method: "POST",
+  authToken: token,
+  body: {
+    action: "queue-post",
+    connectorId: socialConnector.id,
+    artistId,
+    releaseId,
+    caption: "Proof Release is moving through the open social spine.",
+    hashtags: "newmusic,skyeproof",
+    visibility: "unlisted",
+    altText: "Proof release social image placeholder.",
+  },
+});
+assert(socialPostRes.statusCode === 201, `social post queue failed: ${socialPostRes.statusCode}`);
+const socialPost = parse(socialPostRes).post;
+assert(socialPost?.status === "queued", "social post did not enter the queued state");
+assert(socialPost?.activityPreview?.type === "Create", "social post did not include an ActivityPub-style preview");
+
+const socialPublishRes = await call(social, {
+  method: "POST",
+  authToken: token,
+  body: { action: "publish-post", postId: socialPost.id },
+});
+assert(socialPublishRes.statusCode === 202, `social publish without env token should stage instead of fail: ${socialPublishRes.statusCode}`);
+assert(parse(socialPublishRes).post?.status === "provider-token-required", "social publish did not preserve the provider token boundary");
+
+const socialHubRes = await call(social, {
+  method: "GET",
+  authToken: token,
+  query: { action: "hub", artistId },
+});
+assert(socialHubRes.statusCode === 200, `social hub failed: ${socialHubRes.statusCode}`);
+const socialHub = parse(socialHubRes);
+assert(socialHub.connectors.length === 1, "social hub did not return the saved connector");
+assert(socialHub.postQueue.some((item) => item.id === socialPost.id), "social hub did not return the queued post");
+assert(socialHub.summary?.providerTokenRequired >= 1, "social hub did not surface provider token required count");
+
 const exchangeHubRes = await call(exchange, {
   method: "GET",
   authToken: token,
@@ -618,10 +724,16 @@ console.log(JSON.stringify({
     "community posts persist through the exchange handler",
     "release campaign packs generate captions, hooks, rollout tasks, and asset requests",
     "achievement progression unlocks a launch runway when release, content, community, and campaign tracks are active",
+    "open social feed surface includes Pixelfed/Mastodon/Funkwhale connector controls",
+    "music social connector records keep provider tokens in server env variables",
+    "provider-token-safe social posts queue with ActivityPub-style previews",
+    "social provider publishing preserves the token-required boundary when env is absent",
   ],
   not_proven: [
     "real identity-provider handoff into SkyGate tokens",
     "deployed platform distribution integrations",
+    "native owned ActivityPub actor federation",
+    "live Pixelfed/Mastodon/Funkwhale provider publish with production tokens",
     "formal legal review or production DMCA-agent operations",
   ],
   artistId,

@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "version": "0.11.0",
+  "checks": [
+    "lease_claim_prevents_double_claim",
+    "lease_completion_requires_token",
+    "provider_pack_dependency_missing_rejected",
+    "provider_pack_dependency_satisfied",
+    "signed_provider_pack_manifest_verified",
+    "tampered_provider_pack_rejected",
+    "billing_csv_jsonl_exports",
+    "hosted_v011_routes_present",
+    "console_contract_smoke",
+    "no_theater_gate"
+  ],
+  "artifacts": {
+    "jobId": "job_813e1bbdd42e4c389c22",
+    "leaseId": "lease_5a5f517e10f747bdbe8c",
+    "signedProvider": "mailgun-custom",
+    "billingCsvBytes": 305,
+    "billingJsonlBytes": 614,
+    "consoleContractFindings": 9
+  },
+  "does_not_prove": [
+    "distributed KV compare-and-swap under concurrent deployed Workers",
+    "live Stripe subscription collection",
+    "browser/Chromium click E2E",
+    "live outbound webhook delivery to customer endpoints"
+  ],
+  "secrets_exposed": false
+}

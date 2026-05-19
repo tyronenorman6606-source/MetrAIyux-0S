@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en" data-auren-surface>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Auren Central Intelligence is a local-first 0S app that unifies Over3arth realms, GrayScape tools, and NeuralSpacePro runtime lanes.">
+  <title>Auren Central Intelligence · MetrAIyux 0S</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <link rel="stylesheet" href="./auren.css">
+  <script defer src="./auren.js"></script>
+</head>
+<body>
+  <canvas id="livingField" class="living-field" aria-hidden="true"></canvas>
+  <div class="scan-field" aria-hidden="true"></div>
+  <div class="cursor-field" id="cursorField" aria-hidden="true"></div>
+
+  <header class="auren-topbar">
+    <a class="brand" href="../index.html" aria-label="Return to MetrAIyux 0S">
+      <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="">
+      <span>
+        <b>Auren</b>
+        <em>central intelligence</em>
+      </span>
+    </a>
+    <nav class="mode-tabs" aria-label="Auren modes">
+      <button class="active" type="button" data-tab="core">Core</button>
+      <button type="button" data-tab="world">World</button>
+      <button type="button" data-tab="grayscape">GrayScape</button>
+      <button type="button" data-tab="neural">NeuralSpace</button>
+      <button type="button" data-tab="memory">Memory</button>
+      <button type="button" data-tab="settings">Settings</button>
+    </nav>
+    <div class="runtime-pill" id="runtimePill">
+      <span></span>
+      <b>Local core</b>
+    </div>
+  </header>
+
+  <main class="auren-shell">
+    <section class="command-deck" aria-label="Auren command deck">
+      <div class="identity-stage">
+        <div class="identity-copy">
+          <p class="microline">MetrAIyux 0S vessel layer</p>
+          <h1>Auren is awake inside the 0S.</h1>
+          <p class="signal-line" id="signalLine">Reading realms, GrayScape records, NeuralSpace lanes, and the proof ledger.</p>
+        </div>
+
+        <div class="auren-vessel" aria-label="Auren visual identity">
+          <div class="vessel-ring ring-a"></div>
+          <div class="vessel-ring ring-b"></div>
+          <div class="vessel-ring ring-c"></div>
+          <div class="vessel-core">
+            <span>AUREN</span>
+            <b id="vesselCharge">0%</b>
+          </div>
+          <div class="vessel-thread thread-a"></div>
+          <div class="vessel-thread thread-b"></div>
+        </div>
+      </div>
+
+      <form class="command-line" id="commandForm">
+        <label for="commandInput">Auren command</label>
+        <div class="command-input-wrap">
+          <input id="commandInput" autocomplete="off" placeholder="Tell Auren what to move, capture, build, remember, or seal">
+          <button type="submit">Send</button>
+        </div>
+      </form>
+
+      <div class="quick-actions" aria-label="Quick actions">
+        <button type="button" data-command="give me the next proof move">Next proof</button>
+        <button type="button" data-command="forge a mission">Forge mission</button>
+        <button type="button" data-command="seal proof">Seal proof</button>
+        <button type="button" data-command="start ritual pulse">Ritual pulse</button>
+        <button type="button" data-command="sync grayscape">Sync GrayScape</button>
+        <button type="button" data-command="sync runtime">Sync runtime</button>
+      </div>
+    </section>
+
+    <section class="metric-strip" aria-label="Auren telemetry">
+      <article>
+        <span>World charge</span>
+        <strong id="metricCharge">0%</strong>
+      </article>
+      <article>
+        <span>Open proof</span>
+        <strong id="metricOpenQuests">0</strong>
+      </article>
+      <article>
+        <span>GrayScape records</span>
+        <strong id="metricGray">0</strong>
+      </article>
+      <article>
+        <span>Neural lanes</span>
+        <strong id="metricNeural">0</strong>
+      </article>
+      <article>
+        <span>Memory cells</span>
+        <strong id="metricMemory">0</strong>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <aside class="rail-panel" aria-label="Active systems">
+        <div class="panel-head">
+          <p class="microline">route rail</p>
+          <h2>Systems</h2>
+        </div>
+        <div class="system-list" id="systemList"></div>
+      </aside>
+
+      <section class="main-panel">
+        <section class="tab-panel active" id="tab-core">
+          <div class="core-layout">
+            <article class="conversation-panel">
+              <div class="panel-head">
+                <p class="microline">conversation</p>
+                <h2>Auren log</h2>
+              </div>
+              <div class="chat-log" id="chatLog" aria-live="polite"></div>
+            </article>
+
+            <article class="next-panel">
+              <div class="panel-head">
+                <p class="microline">current move</p>
+                <h2 id="nextMoveTitle">Proof route</h2>
+              </div>
+              <div class="next-move" id="nextMove"></div>
+              <div class="inline-actions">
+                <button type="button" id="missionButton">Forge mission</button>
+                <button type="button" id="proofButton">Seal proof</button>
+                <button type="button" id="focusButton">13 min focus</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-world">
+          <div class="panel-head">
+            <p class="microline">over3arth core</p>
+            <h2>Realms, rituals, quests, proof</h2>
+          </div>
+          <div class="realm-grid" id="realmGrid"></div>
+          <div class="world-tools">
+            <article>
+              <h3>Quest forge</h3>
+              <form id="questForm" class="stack-form">
+                <input id="questTitle" placeholder="Quest title" required>
+                <select id="questRealm"></select>
+                <input id="questEvidence" placeholder="Evidence target">
+                <button type="submit">Add quest</button>
+              </form>
+            </article>
+            <article>
+              <h3>Ritual pulse</h3>
+              <form id="ritualForm" class="stack-form">
+                <select id="ritualRealm"></select>
+                <textarea id="ritualText" placeholder="What reality are you feeding today?"></textarea>
+                <button type="submit">Seal ritual</button>
+              </form>
+            </article>
+            <article>
+              <h3>Proof ledger</h3>
+              <div class="compact-list" id="proofList"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-grayscape">
+          <div class="panel-head">
+            <p class="microline">grayscape superapp</p>
+            <h2>Tasks, journal, command calendar, vault</h2>
+          </div>
+          <div class="module-grid" id="grayModules"></div>
+          <div class="tool-grid">
+            <article>
+              <h3>Task capture</h3>
+              <form id="grayTaskForm" class="stack-form">
+                <input id="grayTaskTitle" placeholder="Task title" required>
+                <input id="grayTaskDue" type="date">
+                <button type="submit">Capture task</button>
+              </form>
+              <div class="compact-list" id="grayTaskList"></div>
+            </article>
+            <article>
+              <h3>Journal capture</h3>
+              <form id="grayJournalForm" class="stack-form">
+                <input id="grayJournalTitle" placeholder="Entry title" required>
+                <textarea id="grayJournalText" placeholder="Write the signal"></textarea>
+                <button type="submit">Save entry</button>
+              </form>
+            </article>
+            <article>
+              <h3>Vault capture</h3>
+              <form id="grayVaultForm" class="stack-form">
+                <input id="grayVaultTitle" placeholder="Vault item" required>
+                <textarea id="grayVaultText" placeholder="Private note"></textarea>
+                <button type="submit">Store item</button>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-neural">
+          <div class="panel-head">
+            <p class="microline">neuralspacepro</p>
+            <h2>Runtime, knowledge, research, build, handoff</h2>
+          </div>
+          <div class="lane-grid" id="neuralLanes"></div>
+          <div class="tool-grid">
+            <article>
+              <h3>Research archive</h3>
+              <form id="researchForm" class="stack-form">
+                <input id="researchTitle" placeholder="Session title" required>
+                <textarea id="researchNotes" placeholder="Research notes"></textarea>
+                <button type="submit">Archive session</button>
+              </form>
+            </article>
+            <article>
+              <h3>Build forge</h3>
+              <form id="buildForm" class="stack-form">
+                <input id="buildName" placeholder="Project name" required>
+                <textarea id="buildBrief" placeholder="Build brief"></textarea>
+                <button type="submit">Queue build</button>
+              </form>
+            </article>
+            <article>
+              <h3>Handoff docks</h3>
+              <form id="handoffForm" class="stack-form">
+                <input id="handoffTitle" placeholder="Handoff title" required>
+                <textarea id="handoffNotes" placeholder="Operator notes"></textarea>
+                <button type="submit">Create handoff</button>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-memory">
+          <div class="panel-head">
+            <p class="microline">local memory</p>
+            <h2>Notes, snapshots, imports, exports</h2>
+          </div>
+          <div class="memory-layout">
+            <article>
+              <h3>Memory capture</h3>
+              <form id="noteForm" class="stack-form">
+                <input id="noteTitle" placeholder="Memory title">
+                <textarea id="noteText" placeholder="What should Auren remember?"></textarea>
+                <button type="submit">Remember</button>
+              </form>
+              <div class="inline-actions">
+                <button type="button" id="importOver3arth">Read Over3arth storage</button>
+                <button type="button" id="syncGray">Read GrayScape storage</button>
+                <button type="button" id="snapshotButton">Snapshot</button>
+              </div>
+            </article>
+            <article>
+              <h3>Memory ledger</h3>
+              <div class="compact-list tall-list" id="memoryList"></div>
+            </article>
+            <article>
+              <h3>Snapshots</h3>
+              <div class="compact-list tall-list" id="snapshotList"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-settings">
+          <div class="panel-head">
+            <p class="microline">standalone mode</p>
+            <h2>Auren identity and data boundary</h2>
+          </div>
+          <div class="settings-layout">
+            <form id="profileForm" class="stack-form">
+              <label>Operator name<input id="profileName" autocomplete="off"></label>
+              <label>Vessel name<input id="profileVessel" autocomplete="off"></label>
+              <label>World name<input id="profileWorld" autocomplete="off"></label>
+              <label>Runtime URL<input id="runtimeUrl" autocomplete="off"></label>
+              <button type="submit">Save identity</button>
+            </form>
+            <div class="settings-actions">
+              <button type="button" id="exportButton">Export Auren packet</button>
+              <label class="file-button" for="importFile">Import packet</label>
+              <input id="importFile" type="file" accept="application/json">
+              <button type="button" id="resetButton">Reset Auren local state</button>
+            </div>
+            <article class="boundary-note">
+              <h3>Boundary</h3>
+              <p>Auren stores this standalone app locally in the browser. Runtime, model, Cloudflare, or 0S authority claims stay off until a real backing service answers.</p>
+            </article>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

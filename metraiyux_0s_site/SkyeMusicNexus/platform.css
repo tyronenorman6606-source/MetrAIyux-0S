@@ -132,14 +132,11 @@ html[data-mcp-neon-scrollbar] *::-webkit-scrollbar,
 }
 
 html.mcp-neon-scroll-dragging,
-html.mcp-neon-scroll-dragging *,
-body.mcp-neon-scroll-dragging,
-body.mcp-neon-scroll-dragging *{
+html.mcp-neon-scroll-dragging *{
   scroll-behavior:auto !important;
 }
 
-html.mcp-neon-scroll-dragging .mcp-neon-scroll-rail,
-body.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
+html.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
   opacity:1;
 }
 
@@ -172,7 +169,7 @@ body.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
 .mcp-neon-scroll-rail{
   position:fixed;
   z-index:180;
-  pointer-events:auto;
+  pointer-events:none;
   opacity:.94;
   border:1px solid var(--mcp-neon-scrollbar-rail);
   border-radius:999px;
@@ -184,9 +181,6 @@ body.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
     0 0 18px rgba(53,183,255,.20),
     0 0 28px rgba(243,212,131,.12);
   backdrop-filter:blur(10px);
-  cursor:grab;
-  touch-action:none;
-  user-select:none;
 }
 
 .mcp-neon-scroll-rail-y{
@@ -208,8 +202,6 @@ body.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
 
 .mcp-neon-scroll-thumb{
   position:absolute;
-  pointer-events:auto;
-  touch-action:none;
   border:3px solid transparent;
   border-radius:999px;
   background:
@@ -220,8 +212,6 @@ body.mcp-neon-scroll-dragging .mcp-neon-scroll-rail{
     0 0 30px rgba(243,212,131,.42),
     0 0 44px rgba(111,242,199,.22),
     inset 0 0 12px rgba(255,255,255,.34);
-  transition:none!important;
-  will-change:transform,height,width;
 }
 
 .mcp-neon-scroll-rail-y .mcp-neon-scroll-thumb{

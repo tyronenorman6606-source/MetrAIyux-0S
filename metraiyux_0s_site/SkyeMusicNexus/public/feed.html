@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="feed-pattern" content="Instagram-style open social music feed powered by Pixelfed and ActivityPub lanes" />
+  <title>SkyeMusicNexus // Feed</title>
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./open-source-studio.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist" data-room="feed">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nexus-topline feed-topline">
+    <a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Open Social Feed</p>
+      <h1>Artist posts, release signals, stories, comments, saves, and Fediverse pull-ins.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
+      <button class="ghost" data-action="proof-session">Proof Session</button>
+      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav">
+    <a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a class="active" href="./feed.html" aria-current="page">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a>
+  </nav>
+
+  <main class="nexus-shell feed-app-shell">
+    <section class="feed-status-strip" aria-label="Feed status">
+      <div id="socialSummary" class="social-summary"></div>
+      <div class="feed-mode-tabs" aria-label="Feed filters">
+        <button class="secondary mini" type="button">For You</button>
+        <button class="ghost mini" type="button">Following</button>
+        <button class="ghost mini" type="button">Releases</button>
+        <button class="ghost mini" type="button">Fediverse</button>
+      </div>
+    </section>
+
+    <section id="socialStoryRail" class="real-story-rail" aria-label="Artist stories"></section>
+
+    <section class="real-feed-layout">
+      <aside class="feed-side feed-left">
+        <section class="feed-profile-panel">
+          <span class="feed-profile-avatar">SM</span>
+          <strong>MusicNexus Feed</strong>
+          <small>SkyGate social room</small>
+          <div class="feed-profile-stats">
+            <span><b id="meterReleases">0</b> releases</span>
+            <span><b id="assetCount">0</b> uploads</span>
+          </div>
+        </section>
+        <section class="feed-side-section">
+          <p class="micro">Trending releases</p>
+          <div id="trendingReleaseRail" class="trend-list"></div>
+        </section>
+      </aside>
+
+      <section class="feed-center">
+        <article class="feed-composer-panel">
+          <form id="feedComposeForm" class="feed-compose-form">
+            <div class="feed-compose-row">
+              <span class="feed-avatar">ME</span>
+              <label class="feed-compose-caption">
+                <span>Post to feed</span>
+                <textarea name="caption" required rows="3" placeholder="Share a release moment, studio note, drop teaser, collab call, or fan prompt."></textarea>
+              </label>
+            </div>
+            <div class="feed-compose-grid">
+              <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+              <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+              <label>Hashtags<input name="hashtags" placeholder="newmusic, release, collab" /></label>
+              <label>Media URL<input name="mediaUrl" placeholder="https://..." /></label>
+              <label class="wide">Alt text<input name="altText" placeholder="Describe the media" /></label>
+            </div>
+            <div class="feed-compose-actions">
+              <a class="ghost mini" href="./upload.html">Attach Upload</a>
+              <a class="ghost mini" href="./releases.html">Use Release</a>
+              <button class="primary" type="submit">Post to Feed</button>
+            </div>
+          </form>
+          <div id="feedComposeResult" class="result-card compact">Feed composer ready.</div>
+        </article>
+
+        <div id="socialFeedDeck" class="real-feed-deck">
+          <article class="real-feed-card" data-feed-post="starter_gate_signal">
+            <header class="feed-author-row">
+              <span class="feed-avatar">GS</span>
+              <div>
+                <strong>Gate Signal</strong>
+                <small>skye:preview · local-published</small>
+              </div>
+              <button class="ghost mini" type="button" data-feed-action="follow" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Follow</button>
+            </header>
+            <figure class="feed-media generated-feed-cover" style="--feed-cover:linear-gradient(135deg,#6be8d6,#f2c766)">
+              <span>GS</span>
+              <small>release-post</small>
+            </figure>
+            <div class="feed-actions" aria-label="Feed actions">
+              <button type="button" class="feed-icon" data-feed-action="like" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Like</button>
+              <button type="button" class="feed-icon" data-feed-action="comment" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Comment</button>
+              <button type="button" class="feed-icon" data-feed-action="boost" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Boost</button>
+              <button type="button" class="feed-icon" data-feed-action="save" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Save</button>
+            </div>
+            <div class="feed-body">
+              <strong>Gate Signal Preview</strong>
+              <p>First post in the MusicNexus feed: release signal, artist profile, story rail, comments, saves, and provider publishing all stay attached.</p>
+              <div class="feed-tags"><span>#newmusic</span><span>#musicnexus</span></div>
+            </div>
+            <div class="feed-stats">
+              <span>13 likes</span><span>5 saves</span><span>2 boosts</span>
+            </div>
+            <div class="feed-comments">
+              <p><strong>operator</strong> Feed mechanics are live in static preview.</p>
+            </div>
+            <form class="feed-comment-form" data-feed-comment-form="starter_gate_signal">
+              <input name="body" placeholder="Add a comment" />
+              <button class="secondary mini" type="submit">Post</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <aside class="feed-side feed-right">
+        <section class="feed-side-section">
+          <p class="micro">Live connectors</p>
+          <div id="socialConnectorList" class="mini-social-list"></div>
+        </section>
+        <section class="feed-side-section">
+          <p class="micro">Fediverse</p>
+          <div id="federatedFeedList" class="mini-social-list"></div>
+        </section>
+      </aside>
+    </section>
+
+    <details class="social-ops-drawer">
+      <summary><span>Provider publishing bay</span><small>Pixelfed / Mastodon-compatible / Funkwhale</small></summary>
+      <section class="social-grid">
+        <article class="panel glass-panel social-catalog-panel">
+          <div class="section-head">
+            <div>
+              <p class="micro">Open-source platforms</p>
+              <h3>Pixelfed first, Fediverse-wide after.</h3>
+            </div>
+            <span class="tag">ActivityPub-backed</span>
+          </div>
+          <div id="socialPlatformCatalog" class="social-platform-grid"></div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Connector</p>
+            <h3>Server account lane</h3>
+          </div>
+          <form id="socialConnectorForm" class="field-grid thin">
+            <label>Platform<select name="platform"><option value="pixelfed">Pixelfed</option><option value="mastodon">Mastodon-compatible</option><option value="funkwhale">Funkwhale</option><option value="activitypub">ActivityPub Actor</option></select></label>
+            <label>Visibility<select name="defaultVisibility"><option value="unlisted">Unlisted</option><option value="public">Public</option><option value="private">Followers</option></select></label>
+            <label class="wide">Connector name<input name="name" required placeholder="Nexus Pixelfed" /></label>
+            <label class="wide">Instance URL<input name="instanceUrl" required placeholder="https://pixelfed.social" /></label>
+            <label>Handle<input name="handle" placeholder="@artist@pixelfed.social" /></label>
+            <label>Write token env<input name="tokenEnvKey" placeholder="SKYE_MUSIC_PIXELFED_TOKEN" /></label>
+            <label class="wide">Read token env<input name="readTokenEnvKey" placeholder="optional read token env" /></label>
+            <button class="primary wide" type="submit">Save Social Connector</button>
+          </form>
+          <div id="socialConnectorResult" class="result-card compact">Connector bay idle.</div>
+        </article>
+      </section>
+
+      <section class="social-grid">
+        <article class="panel-xl glass-panel">
+          <div class="section-head">
+            <div>
+              <p class="micro">Provider queue</p>
+              <h3>Queue a provider-ready artist post.</h3>
+            </div>
+            <span class="tag">token-safe queue</span>
+          </div>
+          <form id="socialPostForm" class="field-grid">
+            <label>Connector<select name="connectorId" required><option value="">Select connector</option></select></label>
+            <label>Visibility<select name="visibility"><option value="unlisted">Unlisted</option><option value="public">Public</option><option value="private">Followers</option></select></label>
+            <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+            <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+            <label class="wide">Caption<textarea name="caption" required rows="4" placeholder="Drop signal, release note, visual caption, or fan prompt."></textarea></label>
+            <label>Hashtags<input name="hashtags" placeholder="newmusic, skyes, release" /></label>
+            <label>Language<input name="language" value="en" /></label>
+            <label class="wide">Public media URL<input name="mediaUrl" placeholder="https://..." /></label>
+            <label class="wide">Alt text<textarea name="altText" rows="3" placeholder="Describe the image or video for accessibility."></textarea></label>
+            <button class="primary wide" type="submit">Queue Social Post</button>
+          </form>
+          <div id="socialPostResult" class="result-card compact">No provider post queued yet.</div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Provider publish</p>
+            <h3>Push the queued post.</h3>
+          </div>
+          <form id="socialPublishForm" class="field-grid thin">
+            <label class="wide">Queued post<select id="publishPostId" name="postId" required><option value="">Select queued post</option></select></label>
+            <button class="secondary wide" type="submit">Publish Through Provider</button>
+          </form>
+          <div id="socialPublishResult" class="result-card compact">Publishing gate idle.</div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Federated read</p>
+            <h3>Sync a hashtag feed.</h3>
+          </div>
+          <form id="socialFeedForm" class="field-grid thin">
+            <label class="wide">Connector<select name="connectorId" required><option value="">Select connector</option></select></label>
+            <label>Artist ID<input name="artistId" placeholder="optional artist id" /></label>
+            <label>Hashtag<input name="hashtag" placeholder="newmusic" /></label>
+            <label>Limit<input name="limit" type="number" min="1" max="20" value="8" /></label>
+            <button class="secondary wide" type="submit">Sync Feed</button>
+          </form>
+          <div id="socialFeedResult" class="result-card compact">No federated feed read yet.</div>
+        </article>
+      </section>
+
+      <section class="social-grid">
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Queue</p>
+            <h3>Release social posts</h3>
+          </div>
+          <div id="socialPostQueue" class="exchange-list"></div>
+        </article>
+      </section>
+    </details>
+
+    <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>
