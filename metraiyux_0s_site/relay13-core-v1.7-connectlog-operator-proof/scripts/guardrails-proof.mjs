@@ -67,7 +67,7 @@ const accounts = [
 
 const checks = [];
 
-async function relay(pathname, { account, method = 'GET', body, name } = {}) {
+async function relay(pathname, { account, method = 'GET', body, name, expectStatus } = {}) {
   const res = await fetch(`${origin}${pathname}`, {
     method,
     headers: {
@@ -77,7 +77,7 @@ async function relay(pathname, { account, method = 'GET', body, name } = {}) {
     body: body ? JSON.stringify(body) : undefined
   });
   const data = await res.json().catch(() => ({}));
-  const ok = res.ok && data.ok !== false;
+  const ok = expectStatus ? res.status === expectStatus : res.ok && data.ok !== false;
   if (name) checks.push({ name, ok, status: res.status, workspace: account?.workspace || null, reason: data.guardrail?.reason || data.error || null });
   return { res, data, ok };
 }
@@ -149,6 +149,7 @@ async function proveAccount(account) {
     account,
     method: 'POST',
     name: `${account.workspace}:prompt_attack_blocked`,
+    expectStatus: 422,
     body: {
       workspace: account.workspace,
       channel: 'website-widget',
