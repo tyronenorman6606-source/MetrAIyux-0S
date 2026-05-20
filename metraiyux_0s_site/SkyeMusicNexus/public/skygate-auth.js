@@ -9,10 +9,17 @@
     return raw.toLowerCase().startsWith('bearer ') ? raw.slice(7).trim() : raw;
   }
 
+  function defaultSessionPath() {
+    const configured = window.METRAIYUX_API_BASES && window.METRAIYUX_API_BASES.skymusicnexus;
+    if (configured) return clean(configured).replace(/\/+$/, '') + '/skygate-session';
+    if (/^(127\.0\.0\.1|localhost)$/i.test(window.location.hostname)) return '/.netlify/functions/skygate-session';
+    return '/api/skymusicnexus/skygate-session';
+  }
+
   window.createSkyGateAuth = function createSkyGateAuth(config) {
     const options = config || {};
     const storageKey = clean(options.storageKey || 'skygate_token');
-    const sessionPath = clean(options.sessionPath || '/.netlify/functions/skygate-session');
+    const sessionPath = clean(options.sessionPath || defaultSessionPath());
 
     function readStorage(storage) {
       try {

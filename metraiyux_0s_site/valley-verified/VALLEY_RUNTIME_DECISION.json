@@ -1,0 +1,36 @@
+{
+  "surface": "Valley Verified",
+  "checkedAt": "2026-05-19",
+  "decision": "public_directory_static_admin_external_proof_only",
+  "canonicalPublicRoute": "/valley-verified/",
+  "canonicalDataRoutes": [
+    "/valley-verified/data/businesses.json",
+    "/valley-verified/data/search-index.json",
+    "/valley-verified/data/search-shards/"
+  ],
+  "mounted0sBehavior": {
+    "publicDirectory": "live_static",
+    "businessPages": "live_static",
+    "apiFolder": "manifest_only",
+    "adminConsole": "external_proof_only",
+    "payments": "external_gate_owned"
+  },
+  "notMountedOn0s": [
+    "/valley-verified/.netlify/functions/phx-admin",
+    "/valley-verified/.netlify/functions/phx-payment",
+    "/valley-verified/.netlify/functions/phx-action",
+    "/valley-verified/.netlify/functions/phx-lead"
+  ],
+  "operatorTruth": "The 0S Valley mount serves public directory/search/data/proof pages. Admin mutation, PHX action, and payment execution do not run on the 0S static mount. Those pages are proof/model surfaces unless a future gated Valley backend is deliberately mounted.",
+  "liveBackends": {
+    "northstar0sMount": "/northstar/",
+    "northstarApiBase": "/api/northstar",
+    "skyePayGateOffer": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane",
+    "fs27Gate": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/"
+  },
+  "closure": {
+    "VALLEY-01": "Admin functions do not belong on this 0S static mount in the current closure pass.",
+    "VALLEY-02": "Not applicable because the selected decision is not to mount PHX admin/payment functions on 0S.",
+    "VALLEY-03": "Admin/payment pages are marked external/proof-only and point to gate-owned live backend routes."
+  }
+}

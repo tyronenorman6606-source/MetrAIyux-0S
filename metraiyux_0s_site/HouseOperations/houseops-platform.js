@@ -2,6 +2,7 @@
   const APP_VERSION = '1.1.0';
   const STORAGE_KEY = 'skye0s.houseops.truth.v2';
   const GATE_BRIDGE_KEY = 'skye0s.houseops.gate.bridge.v1';
+  const PRODUCTION_API_BASE = '/api/houseops';
   const SKYPAY_ORIGIN = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
   const PLAN_CATALOG = {
     'houseoperations-command': {
@@ -36,23 +37,23 @@
     }
   };
   const tutorialSteps = [
-    ['create-task', 'Create a task', 'Adds a real task record to local HouseOperations state.'],
+    ['create-task', 'Create a task', 'Adds a real task record to the HouseOperations working state.'],
     ['create-vendor', 'Create a vendor', 'Adds a real vendor request with value, contact, and status.'],
     ['advance-task', 'Advance work', 'Moves a task from open to queued/review/done.'],
     ['create-alert', 'Create owner alert', 'Creates a blocked owner item so the alert lane has something to resolve.'],
     ['resolve-alert', 'Resolve owner alert', 'Marks the highest-pressure owner alert done.'],
-    ['save-proof', 'Save proof', 'Writes a proof snapshot into the local proof ledger.'],
+    ['save-proof', 'Save proof', 'Writes a proof snapshot into the proof ledger.'],
     ['queue-gate', 'Queue Gate packet', 'Creates an exportable FS27 mirror packet from current state.'],
     ['create-billing', 'Create billing intent', 'Records the paid-plan intent and matching SkyePay offer URL.']
   ];
   const claimContract = [
-    ['task_intake', 'Create and store house tasks', 'Task form/button writes records into local state and E2E verifies new task text.'],
-    ['vendor_intake', 'Create and store vendor requests', 'Vendor form writes value/contact/status into local state.'],
-    ['workboard', 'Move work through states', 'Advance buttons update task/vendor status through the app flow.'],
+    ['task_intake', 'Create and store house tasks', 'Task form/button writes records in the browser cache; /api/houseops/tasks is the gated cloud storage route.'],
+    ['vendor_intake', 'Create and store vendor requests', 'Vendor form writes value/contact/status; /api/houseops/vendors is the gated cloud storage route.'],
+    ['workboard', 'Move work through states', 'Advance buttons update task/vendor status and the Worker exposes matching advance routes.'],
     ['owner_alerts', 'Show and resolve owner alerts', 'Blocked/review/high-priority tasks render in Alerts and can be resolved.'],
-    ['proof_ledger', 'Save proof snapshots', 'Save Proof writes local proof ledger rows and browser E2E asserts the toast.'],
+    ['proof_ledger', 'Save proof snapshots', 'Save Proof writes proof ledger rows; /api/houseops/proof persists cloud proof snapshots.'],
     ['backup_export', 'Export backup JSON', 'Export downloads houseoperations-standalone-backup.json.'],
-    ['gate_packet_export', 'Queue/export FS27 mirror packets', 'Queue Gate Mirror creates packets; export downloads packet JSON.'],
+    ['gate_packet_export', 'Queue/export FS27 mirror packets', 'Queue Gate Mirror creates packets; /api/houseops/gate-packets persists cloud handoff packets.'],
     ['skyebox_vault', 'Open encrypted local TOTP vault', 'SkyeBox creates/unlocks WebCrypto vault, saves TOTP, exports encrypted backup.'],
     ['pin_gate', 'Hand off to FS27 PIN/recovery gate', 'FS27 has setup/login/recovery/rotation endpoints and PIN Gate UI; runtime requires FS27 env/DB.'],
     ['billing_intent', 'Create charge-ready plan intent', 'Billing page records plan, setup/monthly price, SkyePay offer, and activation boundary.'],
@@ -116,6 +117,21 @@
   const money = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value || 0));
   const uid = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
   const flow = ['open', 'queued', 'review', 'done'];
+  const HOUSEOPS_API_BASE = (() => {
+    const configured = window.METRAIYUX_API_BASES?.houseops || window.METRAIYUX_API_BASES?.houseoperations;
+    if (configured) return String(configured).replace(/\/+$/, '');
+    if (/^(localhost|127\.0\.0\.1)$/i.test(location.hostname)) return '';
+    return PRODUCTION_API_BASE;
+  })();
+
+  function runtimeModeLabel() {
+    return HOUSEOPS_API_BASE ? '0S Worker runtime' : 'browser-local runtime';
+  }
+
+  function endpointHref(path) {
+    const clean = String(path || '').replace(/^\/+/, '');
+    return HOUSEOPS_API_BASE ? `${HOUSEOPS_API_BASE}/${clean}` : `./${clean}`;
+  }
 
   function skyePayUrl(offerId, client = 'metraiyux-0s') {
     const url = new URL('/skyepay.html', SKYPAY_ORIGIN);
@@ -440,8 +456,9 @@
   }
 
   function runtimeView() {
-    return `<section class="grid">${gatePanel()}<div class="panel span12"><div class="panelHead"><div><h2>Runtime Proof</h2><p>Local static endpoints and preserved legacy shell.</p></div></div><div class="panelBody runtimeList">
-      ${['health','status','queue','handoff-packs','review-board','execution-board','dispatch-board','v1/runtime-summary','v1/sessions'].map((path) => `<div class="runtimeRow"><div><b>${path}</b><br><code>./${path}</code></div><a class="btn" href="./${path}">Open</a></div>`).join('')}
+    const apiPaths = ['health','status','tasks','vendors','schedule','alerts','assignments','proof','gate-packets','queue','handoff-packs','review-board','execution-board','dispatch-board','v1/runtime-summary','v1/sessions','exports','audit'];
+    return `<section class="grid">${gatePanel()}<div class="panel span12"><div class="panelHead"><div><h2>Runtime Proof</h2><p>${runtimeModeLabel()} endpoints plus preserved legacy shell links.</p></div></div><div class="panelBody runtimeList">
+      ${apiPaths.map((path) => `<div class="runtimeRow"><div><b>${path}</b><br><code>${esc(endpointHref(path))}</code></div><a class="btn" href="${esc(endpointHref(path))}">Open</a></div>`).join('')}
       <div class="runtimeRow"><div><b>SkyeBox Authenticator Vault</b><br><code>./skye-box-authenticator-vault/index.html</code></div><a class="btn" href="./skye-box-authenticator-vault/index.html">Open</a></div>
       <div class="runtimeRow"><div><b>SkyeGate PIN Gate</b><br><code>https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html</code></div><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">Open</a></div>
       <div class="runtimeRow"><div><b>HouseOperations tutorial</b><br><code>./tutorial.html</code></div><a class="btn" href="./tutorial.html">Open</a></div>
@@ -486,7 +503,7 @@
 
   function settingsView() {
     const cfg = gateConfig();
-    return `<section class="grid"><div class="panel span6"><div class="panelHead"><div><h2>Settings</h2><p>Local 0s-owned controls.</p></div></div><div class="panelBody formGrid"><button class="btn primary" data-action="fullscreen">Enter Fullscreen</button><button class="btn" data-action="export">Export Backup</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn danger" data-action="reset">Reset Local State</button></div></div><div class="panel span6"><div class="panelHead"><div><h2>SkyeGate bridge settings</h2><p>Store only public origin/app metadata here. Event mirror secrets belong in Worker/env, not the browser.</p></div></div><div class="panelBody"><form class="intakeForm" data-form="gate"><label>Gate origin<input name="origin" value="${esc(cfg.origin || '')}" placeholder="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"></label><label>App id<input name="appId" value="${esc(cfg.appId || 'metraiyux-houseoperations')}"></label><button class="btn primary" type="submit">Save Gate Bridge</button></form></div></div><div class="panel span12"><div class="panelHead"><div><h2>Storage</h2><p>Standalone namespace.</p></div></div><div class="panelBody runtimeList"><div class="runtimeRow"><div><b>State key</b><br><code>${STORAGE_KEY}</code></div>${badge('owned')}</div><div class="runtimeRow"><div><b>Legacy closure</b><br><code>_legacy_shell/</code></div>${badge('pass')}</div><div class="runtimeRow"><div><b>Runtime endpoints</b><br><code>health / status / queue / handoff-packs</code></div>${badge('local')}</div></div></div></section>`;
+    return `<section class="grid"><div class="panel span6"><div class="panelHead"><div><h2>Settings</h2><p>0S-owned controls.</p></div></div><div class="panelBody formGrid"><button class="btn primary" data-action="fullscreen">Enter Fullscreen</button><button class="btn" data-action="export">Export Backup</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn danger" data-action="reset">Reset Local State</button></div></div><div class="panel span6"><div class="panelHead"><div><h2>SkyeGate bridge settings</h2><p>Store only public origin/app metadata here. Event mirror secrets belong in Worker/env, not the browser.</p></div></div><div class="panelBody"><form class="intakeForm" data-form="gate"><label>Gate origin<input name="origin" value="${esc(cfg.origin || '')}" placeholder="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"></label><label>App id<input name="appId" value="${esc(cfg.appId || 'metraiyux-houseoperations')}"></label><button class="btn primary" type="submit">Save Gate Bridge</button></form></div></div><div class="panel span12"><div class="panelHead"><div><h2>Storage</h2><p>Browser cache plus gated Worker namespace.</p></div></div><div class="panelBody runtimeList"><div class="runtimeRow"><div><b>Browser cache key</b><br><code>${STORAGE_KEY}</code></div>${badge('owned')}</div><div class="runtimeRow"><div><b>Worker API base</b><br><code>${esc(HOUSEOPS_API_BASE || 'not mounted on localhost')}</code></div>${badge(HOUSEOPS_API_BASE ? 'live/gated' : 'local')}</div><div class="runtimeRow"><div><b>Legacy closure</b><br><code>_legacy_shell/</code></div>${badge('pass')}</div><div class="runtimeRow"><div><b>Runtime endpoints</b><br><code>health / status / tasks / vendors / schedule / alerts / assignments / proof / exports</code></div>${badge(HOUSEOPS_API_BASE ? 'worker' : 'local')}</div></div></div></section>`;
   }
 
   const views = { dashboard: dashboardView, tasks: tasksView, schedule: scheduleView, vendors: vendorsView, alerts: alertsView, assignments: assignmentsView, runtime: runtimeView, billing: billingView, tutorial: tutorialView, settings: settingsView };
@@ -514,7 +531,7 @@
       vendors: 'Vendor requests, value, approval, and closeout.',
       alerts: 'Owner-facing blocked, review, and high-priority items.',
       assignments: 'Team load, lane ownership, and handoff pressure.',
-      runtime: 'Local runtime endpoints, SkyeBox, SkyeGate, and legacy shell closure.',
+      runtime: '0S Worker endpoints, SkyeBox, SkyeGate, and legacy shell closure.',
       billing: 'Charge-ready plan intent, SkyePay offer, and activation boundary.',
       tutorial: 'Training workflow that executes the real app workflow.',
       settings: 'Storage, bridge metadata, proof, fullscreen, and backup controls.'

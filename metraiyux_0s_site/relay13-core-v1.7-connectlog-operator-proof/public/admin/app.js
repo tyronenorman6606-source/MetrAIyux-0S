@@ -7,12 +7,42 @@ let activeConversation = null;
 let activeMessages = [];
 let guardrails = null;
 let ws = null;
-$('adminToken').value = token;
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]))}
 function status(text,bad=false){$('liveStatus').textContent=text;$('liveStatus').classList.toggle('bad',bad)}
-async function api(path, options={}){const r=await fetch(path,{...options,headers:{'content-type':'application/json',authorization:`Bearer ${token}`,...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||`Request failed ${r.status}`);return d}
+function gateBridge(){return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null)}
+function gateToken(){
+  const session=gateBridge()?.requireSession?.({platformId:'relay13-console',usageLane:'messaging-admin'})
+    || gateBridge()?.current?.();
+  if(session?.token) return session.token;
+  try{const raw=sessionStorage.getItem('METRAIYUX_GATE_SESSION')||localStorage.getItem('METRAIYUX_GATE_SESSION')||'';return raw.trim().startsWith('{')?JSON.parse(raw).token||'':raw.trim()}catch{return ''}
+}
+function relayApiPath(path){
+  if(window.MetrAIyuxApi?.path) return window.MetrAIyuxApi.path('relay13', path);
+  const raw=String(path||'');
+  if(raw.startsWith('/api/')) return `/api/relay13${raw.slice('/api'.length)}`;
+  return `/api/relay13/${raw.replace(/^\/+/,'')}`;
+}
+async function api(path, options={}){
+  token=gateToken()||token;
+  const bridgeHeaders=gateBridge()?.headers?.({'x-skye-platform':'relay13-console','x-skye-usage-lane':'messaging-admin'})||{};
+  const r=await fetch(relayApiPath(path),{...options,headers:{'content-type':'application/json',...bridgeHeaders,authorization:`Bearer ${token}`,...(options.headers||{})}});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||`Request failed ${r.status}`);
+  return d;
+}
 function currentWorkspace(){return workspaces.find(w=>w.id===activeWorkspace)}
-async function loadAll(){token=$('adminToken').value.trim();if(!token)throw new Error('Admin token required');localStorage.setItem('r13_admin_token',token);await loadWorkspaces();if(activeWorkspace)await Promise.all([loadStats(),loadDomains(),loadGuardrails(),loadConversations()]);renderSnippet();}
+function setAdminRoom(room){
+  const admin=document.querySelector('.admin');
+  if(!admin||!room)return;
+  admin.dataset.adminRoom=room;
+  document.querySelectorAll('[data-admin-room-target]').forEach((button)=>{
+    const active=button.dataset.adminRoomTarget===room;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+}
+document.querySelectorAll('[data-admin-room-target]').forEach((button)=>button.addEventListener('click',()=>setAdminRoom(button.dataset.adminRoomTarget)));
+async function loadAll(){token=gateToken()||token;if(!token)throw new Error('0S/SkyGate session required');localStorage.setItem('r13_admin_token',token);await loadWorkspaces();if(activeWorkspace)await Promise.all([loadStats(),loadDomains(),loadGuardrails(),loadConversations()]);renderSnippet();}
 async function loadWorkspaces(){const d=await api('/api/admin/workspaces');workspaces=d.workspaces||[];if(!activeWorkspace&&workspaces[0])activeWorkspace=workspaces[0].id;$('workspaceSelect').innerHTML=workspaces.map(w=>`<option value="${esc(w.id)}" ${w.id===activeWorkspace?'selected':''}>${esc(w.name)} · ${esc(w.slug)}</option>`).join('');}
 async function loadStats(){if(!activeWorkspace)return;const d=await api(`/api/admin/dashboard?workspace_id=${encodeURIComponent(activeWorkspace)}`);const s=d.stats||{};$('stats').innerHTML=[['Open',s.open_count||0],['Pending',s.pending_count||0],['Unread',s.unread_for_operator||0],['Messages',s.total_messages||0]].map(([k,v])=>`<div class="stat"><strong>${Number(v||0)}</strong><span>${esc(k)}</span></div>`).join('')}
 async function loadDomains(){if(!activeWorkspace)return;const d=await api(`/api/admin/workspace-domains?workspace_id=${encodeURIComponent(activeWorkspace)}`);const domains=d.domains||[];$('domainList').innerHTML=domains.length?domains.map(x=>`<span class="chip">${esc(x.domain)} · ${esc(x.status)}</span>`).join(' '):'No domains set. Until you add one, the widget is permissive for easier first setup.'}
@@ -24,7 +54,7 @@ function renderGuardrails(){if(!guardrails){$('guardrailPanel').textContent='No 
 async function openConversation(id){activeConversation=conversations.find(c=>c.id===id);renderProfile();renderConversations();$('replyText').disabled=false;$('replyButton').disabled=false;const d=await api(`/api/v1/conversations/${id}/messages?workspace_id=${encodeURIComponent(activeWorkspace)}`);activeMessages=d.messages||[];renderMessages();connect();await Promise.all([loadStats(),loadConversations()]);}
 function renderMessages(){$('messages').innerHTML='';if(!activeMessages.length){$('messages').innerHTML='<div class="empty"><strong>No messages yet.</strong><span>When this thread receives a real message it appears here.</span></div>';return}activeMessages.forEach(addMessage)}
 function addMessage(m){const holder=$('messages');const empty=holder.querySelector('.empty');if(empty)holder.innerHTML='';const div=document.createElement('div');div.className=`msg ${m.sender_role==='operator'||m.sender_role==='system'?'me':'them'}`;div.innerHTML=`${esc(m.body)}<small>${esc(m.sender_name||m.sender_role)} · ${esc(m.created_at||'')}</small>`;holder.appendChild(div);holder.scrollTop=holder.scrollHeight}
-function connect(){if(ws)ws.close();if(!activeConversation)return;const proto=location.protocol==='https:'?'wss:':'ws:';ws=new WebSocket(`${proto}//${location.host}/api/ws/${activeConversation.id}?role=operator&workspace_id=${encodeURIComponent(activeWorkspace)}&token=${encodeURIComponent(token)}&name=Operator`);status('connecting');ws.onopen=()=>status('live');ws.onclose=()=>status('offline',true);ws.onerror=()=>status('socket error',true);ws.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='message'){activeMessages.push(d);addMessage(d);loadStats().catch(()=>{})}if(d.type==='presence')status(`${d.online} online`)}}
+function connect(){if(ws)ws.close();if(!activeConversation)return;const path=relayApiPath(`/api/ws/${activeConversation.id}?role=operator&workspace_id=${encodeURIComponent(activeWorkspace)}&token=${encodeURIComponent(token)}&name=Operator`);const url=path.startsWith('http')?path.replace(/^http/,'ws'):`${location.protocol==='https:'?'wss:':'ws:'}//${location.host}${path}`;ws=new WebSocket(url);status('connecting');ws.onopen=()=>status('live');ws.onclose=()=>status('offline',true);ws.onerror=()=>status('socket error',true);ws.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='message'){activeMessages.push(d);addMessage(d);loadStats().catch(()=>{})}if(d.type==='presence')status(`${d.online} online`)}}
 function renderSnippet(){const ws=currentWorkspace();$('installSnippet').textContent=ws?`<script src="${location.origin}/widget/embed.js" data-workspace="${ws.slug}" async></script>`:''}
 $('saveToken').onclick=()=>loadAll().catch(e=>alert(e.message));
 $('bootstrap').onclick=async()=>{await api('/api/bootstrap',{method:'POST'});await loadAll()};
@@ -39,7 +69,7 @@ $('enforceGuardrails').onclick=async()=>{if(!activeWorkspace)return;const d=awai
 $('saveThread').onclick=async()=>{if(!activeConversation)return;await api(`/api/admin/conversations/${activeConversation.id}`,{method:'PATCH',body:JSON.stringify({workspace_id:activeWorkspace,status:$('threadStatus').value,assigned_to:$('assignedTo').value})});await loadConversations();activeConversation=conversations.find(c=>c.id===activeConversation.id)||activeConversation;renderProfile()};
 $('replyForm').onsubmit=async e=>{e.preventDefault();const body=$('replyText').value.trim();if(!body||!activeConversation)return;$('replyText').value='';if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'message',body,sender_name:'Operator'}));else{const d=await api(`/api/v1/conversations/${activeConversation.id}/messages`,{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,sender_role:'operator',sender_name:'Operator',body})});addMessage(d.message)}};
 $('queueJob').onclick=async()=>{if(!activeWorkspace)return;const d=await api('/api/admin/jobs',{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,type:'release.widget_config.verify',payload:{conversation_id:activeConversation?.id||null}})});alert(`Queued job: ${d.job.id}`)};
-if(token)loadAll().catch(()=>status('token required',true));
+if(token||gateToken())loadAll().catch(()=>status('0S/SkyGate session required',true));
 
 // BEGIN quantumskyes:adaptive-neon-scrollbar-js
 (function(){

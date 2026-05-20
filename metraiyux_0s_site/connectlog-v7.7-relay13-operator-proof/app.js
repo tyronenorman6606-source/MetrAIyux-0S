@@ -76,6 +76,35 @@
   const $ = (selector) => document.querySelector(selector);
   const els = {};
 
+  function gateBridge() {
+    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  }
+
+  function gateToken() {
+    const session = gateBridge()?.requireSession?.({ platformId: 'connectlog-relay13', usageLane: 'relationship-messaging' })
+      || gateBridge()?.current?.();
+    if (session?.token) return session.token;
+    try {
+      const raw = sessionStorage.getItem('METRAIYUX_GATE_SESSION') || localStorage.getItem('METRAIYUX_GATE_SESSION') || '';
+      return raw.trim().startsWith('{') ? JSON.parse(raw).token || '' : raw.trim();
+    } catch {
+      return '';
+    }
+  }
+
+  function relayOperatorToken(cfg = state.relayConfig || {}) {
+    return gateToken() || cfg.apiKey || '';
+  }
+
+  function relayOperatorHeaders(cfg = state.relayConfig || {}, extra = {}) {
+    const token = relayOperatorToken(cfg);
+    return {
+      ...(gateBridge()?.headers?.({ 'x-skye-platform': 'connectlog-relay13', 'x-skye-usage-lane': 'relationship-messaging' }) || {}),
+      ...(token ? { 'x-relay13-api-key': token, authorization: `Bearer ${token}` } : {}),
+      ...extra
+    };
+  }
+
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
@@ -552,11 +581,16 @@
     showToast(`Active card: ${state.profile.cardName || state.profile.name}`);
   }
 
+  function defaultRelayApiBase() {
+    const helper = window.MetrAIyuxApi;
+    if (helper?.path) return helper.path('relay13');
+    return (window.METRAIYUX_API_BASES?.relay13 || '/api/relay13').replace(/\/+$/, '');
+  }
 
   function defaultRelayConfig() {
     return {
       mode: 'relay13',
-      origin: 'https://relay13-core.graylondonskyes.workers.dev',
+      origin: defaultRelayApiBase(),
       workspace: 'connectlog-main',
       workspaceId: 'ws_2533ccd0-08e2-48ec-b74c-f1389c7062a7',
       apiKey: '',
@@ -598,10 +632,11 @@
   function normalizeRelayOrigin(value) {
     const raw = String(value || '').trim().replace(/\/+$/, '');
     if (!raw) return '';
+    if (raw.startsWith('/')) return raw.replace(/\/+$/, '') || '/api/relay13';
     try {
       const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
       if (!/^https?:$/.test(url.protocol)) return '';
-      return url.origin;
+      return `${url.origin}${url.pathname === '/' ? '' : url.pathname.replace(/\/+$/, '')}`;
     } catch (_) {
       return '';
     }
@@ -1370,7 +1405,7 @@
     vault: 'contacts',
     seed: 'contacts'
   };
-  const appPages = new Set(['dashboard', 'exchange', 'cards', 'relay13', 'deployment', 'contacts', 'intelligence']);
+  const appPages = new Set(['dashboard', 'tutorial', 'exchange', 'cards', 'relay13', 'deployment', 'contacts', 'intelligence']);
 
   function activePageFromHash() {
     let raw = '';
@@ -2486,18 +2521,17 @@
       'npx wrangler d1 create relay13_core',
       '# Paste returned database_id into wrangler.toml under [[d1_databases]].',
       'npm run doctor:deploy',
-      'openssl rand -hex 32',
-      'npx wrangler secret put PLATFORM_ADMIN_TOKEN',
+      '# Platform admin now comes from 0S/SkyGate. Keep any Worker secret managed by the gate deployment.',
       'npm run d1:migrate:remote',
       'npm run deploy',
       '',
       '# Live proof after deploy:',
       '# curl https://YOUR-WORKER.workers.dev/api/health',
-      '# POST /api/bootstrap with Authorization: Bearer $PLATFORM_ADMIN_TOKEN',
-      '# Create an API key with conversations/messages/connectlog scopes',
-      '# Paste origin/workspace/API key into ConnectLog /app.html#deployment and run diagnostics.',
+      '# POST /api/bootstrap with Authorization from the active 0S/SkyGate session',
+      '# Workspace messaging uses gate-scoped headers from the 0S bridge',
+      '# Save origin/workspace in ConnectLog /app.html#deployment and run diagnostics.',
       '# Then use /app.html#relay13 → Run activation proof.',
-      '# Optional terminal closeout: RELAY13_ORIGIN=... RELAY13_API_KEY=... RELAY13_WORKSPACE_ID=... npm run proof:live'
+      '# Optional terminal closeout should use a gate-issued bearer, not a pasted browser key.'
     ].join('\n');
   }
 
@@ -2506,7 +2540,7 @@
     const allowed = cfg.origin ? safeOrigin(cfg.origin) : 'https://YOUR-CONNECTLOG-SITE.netlify.app';
     return [
       '# Relay13 Worker vars/secrets',
-      'PLATFORM_ADMIN_TOKEN=<set with npx wrangler secret put PLATFORM_ADMIN_TOKEN>',
+      '0S_SKYGATE_AUTH=active browser/session bearer managed by the 0S gate',
       `ALLOWED_ORIGINS=${allowed}`,
       `BOOTSTRAP_WORKSPACE_SLUG=${cfg.workspace || 'connectlog-main'}`,
       `BOOTSTRAP_WORKSPACE_NAME=ConnectLog Relay13 Inbox`,
@@ -2515,7 +2549,7 @@
       `Relay13 Worker origin: ${cfg.origin || '<paste Worker origin>'}`,
       `Public workspace slug: ${cfg.workspace || 'connectlog-main'}`,
       `Workspace ID: ${cfg.workspaceId || '<paste workspace id after bootstrap>'}`,
-      'Operator API key: <stored only in browser; never embed in public QR>'
+      'Operator auth: inherited from the active 0S/SkyGate session; never embed private credentials in QR'
     ].join('\n');
   }
 
@@ -2544,7 +2578,7 @@
   function relayPreflightChecklist() {
     const cfg = state.relayConfig || defaultRelayConfig();
     const originOk = !cfg.origin || /^https:\/\//i.test(cfg.origin);
-    const keyOk = !cfg.apiKey || cfg.apiKey.startsWith('r13_') || cfg.apiKey.length >= 32;
+    const keyOk = Boolean(relayOperatorToken(cfg));
     const cardOk = Boolean(state.profile?.name && state.profile?.cardId);
     const workspaceOk = Boolean(cfg.workspace || cfg.workspaceId);
     const remoteModeOk = cfg.mode !== 'relay13' || Boolean(cfg.origin && workspaceOk);
@@ -2554,7 +2588,7 @@
       { name: 'relay_mode_safe', ok: remoteModeOk, detail: cfg.mode === 'relay13' ? 'Production bridge mode has origin/workspace shape.' : 'Production vault mode active.' },
       { name: 'origin_https_shape', ok: originOk, detail: cfg.origin ? cfg.origin : 'No origin set yet.' },
       { name: 'workspace_identifier_present', ok: workspaceOk || cfg.mode === 'local', detail: workspaceOk ? (cfg.workspaceId || cfg.workspace) : 'Workspace needed before live Relay13 proof.' },
-      { name: 'operator_key_shape', ok: keyOk, detail: cfg.apiKey ? 'Key shape is acceptable for private operator proof.' : 'No private operator API key yet.' },
+      { name: 'operator_gate_session', ok: keyOk, detail: relayOperatorToken(cfg) ? '0S/SkyGate operator session is active.' : '0S/SkyGate operator session missing.' },
       { name: 'delivery_queue_controlled', ok: state.relayOutbox.length < 50, detail: `${state.relayOutbox.length} queued delivery item(s).` },
       { name: 'delivery_claim_controlled', ok: !state.relayStatus.toLowerCase().includes('delivered') || Boolean(state.relayStats), detail: state.relayStatus || 'Delivery proof state controlled.' }
     ];
@@ -2590,7 +2624,7 @@
       `- Relay13 origin: ${cfg.origin || '<not set>'}`,
       `- Workspace slug: ${cfg.workspace || '<not set>'}`,
       `- Workspace ID: ${cfg.workspaceId || '<not set>'}`,
-      `- API key stored here: ${cfg.apiKey ? 'yes, operator browser/session only' : 'no'}`,
+      `- 0S/SkyGate session: ${relayOperatorToken(cfg) ? 'active' : 'missing'}`,
       `- Active card: ${state.profile?.cardName || state.profile?.name || '<not created>'}`,
       `- Delivery queue: ${state.relayOutbox.length}`,
       '',
@@ -2599,10 +2633,10 @@
       '',
       'Launch order:',
       '1. In Relay13 folder: npm install && npm run smoke && npm run doctor:deploy.',
-      '2. Create Cloudflare D1, paste database_id into wrangler.toml, set PLATFORM_ADMIN_TOKEN, run remote migrations, deploy.',
-      '3. Bootstrap workspace with the admin token.',
-      '4. Create a scoped API key with connectlog:read, connectlog:write, conversations:create, conversations:read, conversations:write, messages:read, messages:write.',
-      '5. Paste origin/workspace/API key into ConnectLog, save bridge, run Health check, Bridge health, Bridge stats, then Run activation proof.',
+      '2. Create Cloudflare D1, paste database_id into wrangler.toml, keep admin auth behind the 0S/SkyGate layer, run remote migrations, deploy.',
+      '3. Bootstrap workspace with the active 0S/SkyGate admin session.',
+      '4. Keep messaging scopes attached to gate cards and server-side policy.',
+      '5. Save origin/workspace in ConnectLog, save bridge, run Health check, Bridge health, Bridge stats, then Run activation proof.',
       '6. Copy WS proof only after a conversation exists; browser console must show open + ready + message event before realtime is trusted.',
       '',
       'Live closeout proof required before production claim:',
@@ -2630,11 +2664,12 @@
     return [
       '# Relay13 bootstrap workspace proof',
       'export RELAY13_ORIGIN=' + JSON.stringify(origin),
-      'export PLATFORM_ADMIN_TOKEN="PASTE_PLATFORM_ADMIN_TOKEN"',
+      'export SKYGATE_SESSION="ACTIVE_0S_SKYGATE_SESSION"',
       '',
       'curl -fsS "$RELAY13_ORIGIN/api/health" | jq .',
       'curl -fsS -X POST "$RELAY13_ORIGIN/api/bootstrap" \\',
-      '  -H "authorization: Bearer $PLATFORM_ADMIN_TOKEN" | jq .',
+      '  -H "authorization: Bearer $SKYGATE_SESSION" \\',
+      '  -H "x-0s-gate-session: $SKYGATE_SESSION" | jq .',
       '',
       '# Save the returned workspace.id into ConnectLog Workspace ID.'
     ].join('\n');
@@ -2656,23 +2691,25 @@
       scopes: ['connectlog:read','connectlog:write','conversations:create','conversations:read','conversations:write','messages:read','messages:write']
     }, null, 2).replace(/'/g, "'\\''");
     return [
-      '# Relay13 scoped API key creation',
+      '# Relay13 gate-scoped workspace policy check',
       'export RELAY13_ORIGIN=' + JSON.stringify(origin),
-      'export PLATFORM_ADMIN_TOKEN="PASTE_PLATFORM_ADMIN_TOKEN"',
+      'export RELAY13_WORKSPACE_ID=' + JSON.stringify(workspaceId),
+      'export SKYGATE_SESSION="ACTIVE_0S_SKYGATE_SESSION"',
       '',
       "curl -fsS -X POST \"$RELAY13_ORIGIN/api/admin/api-keys\" \\",
-      '  -H "authorization: Bearer $PLATFORM_ADMIN_TOKEN" \\',
+      '  -H "authorization: Bearer $SKYGATE_SESSION" \\',
+      '  -H "x-0s-gate-session: $SKYGATE_SESSION" \\',
       '  -H "content-type: application/json" \\',
       "  --data '" + payload + "' | jq .",
       '',
-      '# Copy the returned raw key into ConnectLog Operator API key. It is shown once.'
+      '# The browser app should inherit the 0S/SkyGate session; do not paste raw operator keys into ConnectLog.'
     ].join('\n');
   }
 
   function copyRelayApiKeyCurlBlock() {
     const block = buildRelayApiKeyCurlBlock();
     writeOperatorOutput(block);
-    copyText(block, 'Relay13 API-key curl copied.');
+    copyText(block, 'Relay13 gate-scoped curl copied.');
   }
 
   function buildRelayLiveProofBlock() {
@@ -2682,14 +2719,14 @@
     return [
       '# Relay13 live proof script',
       'export RELAY13_ORIGIN=' + JSON.stringify(origin),
-      'export RELAY13_API_KEY="PASTE_SCOPED_API_KEY"',
+      'export SKYGATE_SESSION="ACTIVE_0S_SKYGATE_SESSION"',
       'export RELAY13_WORKSPACE_ID=' + JSON.stringify(workspaceId),
       '',
       'npm run proof:live',
       '',
       '# Or curl directly:',
       'curl -fsS "$RELAY13_ORIGIN/api/health" | jq .',
-      'curl -fsS -H "x-relay13-api-key: $RELAY13_API_KEY" "$RELAY13_ORIGIN/api/v1/connectlog/live-proof?workspace_id=$RELAY13_WORKSPACE_ID" | jq .'
+      'curl -fsS -H "authorization: Bearer $SKYGATE_SESSION" -H "x-0s-gate-session: $SKYGATE_SESSION" "$RELAY13_ORIGIN/api/v1/connectlog/live-proof?workspace_id=$RELAY13_WORKSPACE_ID" | jq .'
     ].join('\n');
   }
 
@@ -2743,7 +2780,7 @@
         mode: cfg.mode,
         origin_set: Boolean(cfg.origin),
         workspace_set: Boolean(cfg.workspace || cfg.workspaceId),
-        api_key_present_locally: Boolean(cfg.apiKey),
+        gate_session_present: Boolean(relayOperatorToken(cfg)),
         remote_ready: relayRemoteReady(cfg),
         status: state.relayStatus
       },
@@ -2784,18 +2821,18 @@
       ['Relay13 mode', cfg.mode === 'relay13' ? `Production bridge enabled · ${cfg.origin || 'origin missing'}` : 'Production vault mode'],
       ['Outbox', state.relayOutbox.length ? `${state.relayOutbox.length} queued remote message(s)` : 'No queued remote messages'],
       ['Bridge stats', state.relayStats ? `${Number(state.relayStats.cards_active || 0)} active cards · checked ${new Date(state.relayStats.checked_at || Date.now()).toLocaleString()}` : 'No stats pull yet'],
-      ['Relay13 readiness', relayRemoteReady(cfg) ? 'Origin + workspace available for production bridge checks.' : 'Operator credentials needed before this browser can send through Relay13.'],
+      ['Relay13 readiness', relayRemoteReady(cfg) ? 'Origin + workspace available for production bridge checks.' : '0S/SkyGate session needed before this browser can send through Relay13.'],
       ['Preflight', relayPreflightChecklist().ok ? 'Production preflight passes.' : 'Production preflight has setup gaps; run the preflight button.']
     ];
     replaceChildren(els.deploymentStatusDeck, ...statusItems.map(([title, body]) => deploymentInfoNode('deployment-status-item', title, body)));
     const checks = [
       ['✅ App package check', 'Run npm run check before deployment. It validates app IDs, functions, service worker cache, card variants, Relay13 bridge, and this command center.'],
       [cfg.origin ? '✅ Relay13 origin configured' : '☐ Relay13 origin configured', cfg.origin || 'Paste the deployed Worker origin after Relay13 is live.'],
-      [cfg.workspace || cfg.workspaceId ? '✅ Workspace set' : '☐ Workspace set', 'Use public workspace slug for visitor/card creation and workspace ID/API key for operator reads/writes.'],
-      [cfg.apiKey ? '✅ Operator API key stored privately' : '☐ Operator API key stored privately', 'Needed for operator refresh/send. Never embed this in QR payloads or public HTML.'],
+      [cfg.workspace || cfg.workspaceId ? '✅ Workspace set' : '☐ Workspace set', 'Use public workspace slug for visitor/card creation and workspace ID for operator reads/writes.'],
+      [relayOperatorToken(cfg) ? '✅ 0S/SkyGate session active' : '☐ 0S/SkyGate session missing', 'Needed for operator refresh/send. Never embed private credentials in QR payloads or public HTML.'],
       [state.relayOutbox.length ? '☐ Delivery queue needs sync' : '✅ Delivery queue clean', state.relayOutbox.length ? 'Run Sync queued after Relay13 health passes.' : 'Delivery queue has no pending Relay13 sends.'],
-      [state.relayStats ? '✅ Relay13 stats endpoint proven in browser' : '☐ Relay13 stats endpoint proven in browser', state.relayStats ? 'Stats were pulled with the private operator API key.' : 'Run Bridge stats after deployment and API key setup.'],
-      ['☐ Live Cloudflare proof', 'Deploy Relay13, apply D1 migrations, bootstrap workspace, create scoped API key, run activation proof, sync card, create thread, send message, reload history, run live-proof endpoint, then test WebSocket room.']
+      [state.relayStats ? '✅ Relay13 stats endpoint proven in browser' : '☐ Relay13 stats endpoint proven in browser', state.relayStats ? 'Stats were pulled with the active gate session.' : 'Run Bridge stats after deployment and 0S/SkyGate login.'],
+      ['☐ Live Cloudflare proof', 'Deploy Relay13, apply D1 migrations, bootstrap workspace, run activation proof, sync card, create thread, send message, reload history, run live-proof endpoint, then test WebSocket room.']
     ];
     replaceChildren(els.deploymentChecklist, ...checks.map(([title, body]) => deploymentInfoNode('deployment-check-item', title, body)));
     if (els.deploymentConfigOutput && !els.deploymentConfigOutput.value) els.deploymentConfigOutput.value = buildConnectLogDeployBlock();
@@ -2820,18 +2857,20 @@
     els.relayWorkspaceInput.value = cfg.workspace;
     els.relayWorkspaceIdInput.value = cfg.workspaceId;
     els.relayApiKeyInput.value = cfg.apiKey;
+    els.relayApiKeyInput.placeholder = relayOperatorToken(cfg) ? '0S/SkyGate session active' : 'Sign into 0S/SkyGate first';
     els.relayOperatorNameInput.value = cfg.operatorName;
     els.relayShareBridgeInput.checked = Boolean(cfg.shareBridge);
     const remoteReady = relayRemoteReady(cfg);
+    const operatorReady = Boolean(relayOperatorToken(cfg));
     els.relayConnectionStatus.textContent = remoteReady ? state.relayStatus : `${state.relayStatus} ${cfg.mode === 'relay13' ? 'Add origin + workspace before Relay13 delivery.' : ''}`.trim();
     els.relayHealthBtn.disabled = !cfg.origin;
     if (els.relayBridgeHealthBtn) els.relayBridgeHealthBtn.disabled = !cfg.origin;
-    if (els.relaySyncCardBtn) els.relaySyncCardBtn.disabled = !cfg.origin || !cfg.apiKey || !state.profile?.name;
-    if (els.relayRefreshRequestsBtn) els.relayRefreshRequestsBtn.disabled = !cfg.origin || !cfg.apiKey;
-    if (els.relayStatsBtn) els.relayStatsBtn.disabled = !cfg.origin || !cfg.apiKey;
-    if (els.relayRefreshMessagesBtn) els.relayRefreshMessagesBtn.disabled = !cfg.origin || !cfg.apiKey || !getActiveRelayThread();
+    if (els.relaySyncCardBtn) els.relaySyncCardBtn.disabled = !cfg.origin || !operatorReady || !state.profile?.name;
+    if (els.relayRefreshRequestsBtn) els.relayRefreshRequestsBtn.disabled = !cfg.origin || !operatorReady;
+    if (els.relayStatsBtn) els.relayStatsBtn.disabled = !cfg.origin || !operatorReady;
+    if (els.relayRefreshMessagesBtn) els.relayRefreshMessagesBtn.disabled = !cfg.origin || !operatorReady || !getActiveRelayThread();
     if (els.relayCopyWebSocketProofBtn) els.relayCopyWebSocketProofBtn.disabled = !cfg.origin && !getActiveRelayThread();
-    if (els.relayRunActivationProofBtn) els.relayRunActivationProofBtn.disabled = !(cfg.origin && cfg.apiKey && (cfg.workspace || cfg.workspaceId));
+    if (els.relayRunActivationProofBtn) els.relayRunActivationProofBtn.disabled = !(cfg.origin && operatorReady && (cfg.workspace || cfg.workspaceId));
     if (els.relayCopyActivationCurlBtn) els.relayCopyActivationCurlBtn.disabled = !cfg.origin;
     if (els.relayCopyBootstrapCurlBtn) els.relayCopyBootstrapCurlBtn.disabled = !cfg.origin;
     if (els.relayCopyApiKeyCurlBtn) els.relayCopyApiKeyCurlBtn.disabled = !cfg.origin || !cfg.workspaceId;
@@ -2953,11 +2992,11 @@
     const cfg = state.relayConfig || defaultRelayConfig();
     const payload = buildRelayCardPayload();
     if (!payload) return showToast('Create a card first.');
-    if (!cfg.origin || !cfg.apiKey) return showToast('Card sync needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Card sync needs Relay13 origin + 0S/SkyGate session.');
     try {
       const response = await fetch(`${cfg.origin}/api/v1/connectlog/cards`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-relay13-api-key': cfg.apiKey },
+        headers: relayOperatorHeaders(cfg, { 'content-type': 'application/json' }),
         body: JSON.stringify(payload)
       });
       const data = await response.json().catch(() => ({}));
@@ -2975,11 +3014,11 @@
 
   async function refreshRelayRequests() {
     const cfg = state.relayConfig || defaultRelayConfig();
-    if (!cfg.origin || !cfg.apiKey) return showToast('Request refresh needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Request refresh needs Relay13 origin + 0S/SkyGate session.');
     try {
       const params = new URLSearchParams();
       if (cfg.workspaceId) params.set('workspace_id', cfg.workspaceId);
-      const response = await fetch(`${cfg.origin}/api/v1/connectlog/requests?${params.toString()}`, { headers: { 'x-relay13-api-key': cfg.apiKey }, cache: 'no-store' });
+      const response = await fetch(`${cfg.origin}/api/v1/connectlog/requests?${params.toString()}`, { headers: relayOperatorHeaders(cfg), cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
       state.relayRequests = (data.requests || []).map(normalizeRelayRequest).filter(Boolean);
@@ -2995,11 +3034,11 @@
 
   async function fetchRelayStats() {
     const cfg = state.relayConfig || defaultRelayConfig();
-    if (!cfg.origin || !cfg.apiKey) return showToast('Stats check needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Stats check needs Relay13 origin + 0S/SkyGate session.');
     try {
       const params = new URLSearchParams();
       if (cfg.workspaceId) params.set('workspace_id', cfg.workspaceId);
-      const response = await fetch(`${cfg.origin}/api/v1/connectlog/stats?${params.toString()}`, { headers: { 'x-relay13-api-key': cfg.apiKey }, cache: 'no-store' });
+      const response = await fetch(`${cfg.origin}/api/v1/connectlog/stats?${params.toString()}`, { headers: relayOperatorHeaders(cfg), cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
       state.relayStats = { ...data, checked_at: new Date().toISOString() };
@@ -3019,11 +3058,11 @@
     const cfg = state.relayConfig || defaultRelayConfig();
     if (!thread) return showToast('Select a Relay13 thread first.');
     if (thread.mode !== 'relay13' || !thread.conversationId) return showToast('Selected thread is in the production vault only.');
-    if (!cfg.origin || !cfg.apiKey) return showToast('Message refresh needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Message refresh needs Relay13 origin + 0S/SkyGate session.');
     try {
       const params = new URLSearchParams();
       if (thread.workspaceId || cfg.workspaceId) params.set('workspace_id', thread.workspaceId || cfg.workspaceId);
-      const response = await fetch(`${thread.origin || cfg.origin}/api/v1/conversations/${encodeURIComponent(thread.conversationId)}/messages?${params.toString()}`, { headers: { 'x-relay13-api-key': cfg.apiKey }, cache: 'no-store' });
+      const response = await fetch(`${thread.origin || cfg.origin}/api/v1/conversations/${encodeURIComponent(thread.conversationId)}/messages?${params.toString()}`, { headers: relayOperatorHeaders(cfg), cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
       thread.messages = (data.messages || []).map(normalizeRelayMessage).filter(Boolean);
@@ -3044,8 +3083,8 @@
     const origin = (thread?.origin || cfg.origin || '').replace(/^http/, 'ws');
     const workspaceId = thread?.workspaceId || cfg.workspaceId || 'PASTE_WORKSPACE_ID';
     const conversationId = thread?.conversationId || 'PASTE_CONVERSATION_ID';
-    const token = cfg.apiKey ? 'PASTE_PLATFORM_ADMIN_TOKEN_FOR_OPERATOR_WS' : (thread?.visitorToken || 'PASTE_VISITOR_TOKEN');
-    const role = cfg.apiKey ? 'operator' : 'customer';
+    const token = relayOperatorToken(cfg) ? '0S_SKYGATE_SESSION_FOR_OPERATOR_WS' : (thread?.visitorToken || 'PASTE_VISITOR_TOKEN');
+    const role = relayOperatorToken(cfg) ? 'operator' : 'customer';
     const url = `${origin || 'wss://YOUR_RELAY13_WORKER.workers.dev'}/api/ws/${encodeURIComponent(conversationId)}?role=${role}&workspace_id=${encodeURIComponent(workspaceId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(cfg.operatorName || 'ConnectLog Operator')}`;
     return `// Relay13 WebSocket browser proof block\n// Run only after Relay13 is deployed, D1 migrated, workspace bootstrapped, and a real conversation exists.\nconst socket = new WebSocket(${JSON.stringify(url)});\nsocket.onopen = () => {\n  console.log('Relay13 WS open');\n  socket.send(JSON.stringify({ type: 'message', body: 'ConnectLog live WebSocket proof ' + new Date().toISOString(), sender_name: ${JSON.stringify(cfg.operatorName || 'ConnectLog Operator')} }));\n};\nsocket.onmessage = (event) => console.log('Relay13 WS event', JSON.parse(event.data));\nsocket.onerror = (event) => console.error('Relay13 WS error', event);\nsocket.onclose = (event) => console.log('Relay13 WS closed', event.code, event.reason);`;
   }
@@ -3075,20 +3114,20 @@
     return [
       '# Relay13 + ConnectLog activation proof',
       'export RELAY13_ORIGIN=' + JSON.stringify(origin),
-      'export RELAY13_API_KEY="PASTE_SCOPED_API_KEY"',
+      'export SKYGATE_SESSION="ACTIVE_0S_SKYGATE_SESSION"',
       'export RELAY13_WORKSPACE_ID=' + JSON.stringify(workspaceId),
       'export RELAY13_WORKSPACE_SLUG=' + JSON.stringify(workspace),
       '',
       'curl -fsS "$RELAY13_ORIGIN/api/health" | jq .',
       'curl -fsS "$RELAY13_ORIGIN/api/v1/connectlog/health" | jq .',
-      'curl -fsS -H "x-relay13-api-key: $RELAY13_API_KEY" "$RELAY13_ORIGIN/api/v1/connectlog/proof?workspace_id=$RELAY13_WORKSPACE_ID" | jq .',
-      'curl -fsS -H "x-relay13-api-key: $RELAY13_API_KEY" "$RELAY13_ORIGIN/api/v1/connectlog/stats?workspace_id=$RELAY13_WORKSPACE_ID" | jq .',
+      'curl -fsS -H "authorization: Bearer $SKYGATE_SESSION" -H "x-0s-gate-session: $SKYGATE_SESSION" "$RELAY13_ORIGIN/api/v1/connectlog/proof?workspace_id=$RELAY13_WORKSPACE_ID" | jq .',
+      'curl -fsS -H "authorization: Bearer $SKYGATE_SESSION" -H "x-0s-gate-session: $SKYGATE_SESSION" "$RELAY13_ORIGIN/api/v1/connectlog/stats?workspace_id=$RELAY13_WORKSPACE_ID" | jq .',
       '',
-      "curl -fsS -X POST \"$RELAY13_ORIGIN/api/v1/connectlog/cards\" -H \"content-type: application/json\" -H \"x-relay13-api-key: $RELAY13_API_KEY\" --data '" + cardPayload + "' | jq .",
+      "curl -fsS -X POST \"$RELAY13_ORIGIN/api/v1/connectlog/cards\" -H \"content-type: application/json\" -H \"authorization: Bearer $SKYGATE_SESSION\" -H \"x-0s-gate-session: $SKYGATE_SESSION\" --data '" + cardPayload + "' | jq .",
       "curl -fsS -X POST \"$RELAY13_ORIGIN/api/v1/connectlog/scan\" -H \"content-type: application/json\" --data '" + scanPayload + "' | jq .",
       '',
       '# Copy the returned conversation.id and visitor_token, then prove history:',
-      '# curl -fsS -H "x-relay13-api-key: $RELAY13_API_KEY" "$RELAY13_ORIGIN/api/v1/conversations/CONV_ID/messages" | jq .',
+      '# curl -fsS -H "authorization: Bearer $SKYGATE_SESSION" -H "x-0s-gate-session: $SKYGATE_SESSION" "$RELAY13_ORIGIN/api/v1/conversations/CONV_ID/messages" | jq .',
       '# Browser WebSocket proof still requires a live conversation and token/operator auth.'
     ].join('\n');
   }
@@ -3106,6 +3145,7 @@
       cache: 'no-store',
       ...options,
       headers: {
+        ...relayOperatorHeaders(cfg),
         ...(options.headers || {})
       }
     });
@@ -3119,13 +3159,13 @@
       proof: 'connectlog-relay13-activation',
       app_version: APP_VERSION,
       started_at: new Date().toISOString(),
-      boundary: 'This mutates Relay13 only when a production origin, workspace, and API key are configured. Failures keep delivery queued until proof passes.',
+      boundary: 'This mutates Relay13 only when a production origin, workspace, and active 0S/SkyGate session are configured. Failures keep delivery queued until proof passes.',
       checks: []
     };
     const push = (name, ok, detail = {}) => report.checks.push({ name, ok: Boolean(ok), ...detail, checked_at: new Date().toISOString() });
     try {
       if (!cfg.origin) throw new Error('Relay13 origin missing');
-      if (!cfg.apiKey) throw new Error('Relay13 API key missing');
+      if (!relayOperatorToken(cfg)) throw new Error('0S/SkyGate session missing');
       if (!(cfg.workspace || cfg.workspaceId)) throw new Error('Relay13 workspace slug or ID missing');
       const health = await fetchRelayJson('/api/health');
       push('worker_health', health.ok, { status: health.status, service: health.data.service || '' });
@@ -3133,9 +3173,9 @@
       push('connectlog_bridge_health', bridge.ok && bridge.data.bridge === 'connectlog', { status: bridge.status, features: bridge.data.features || [] });
       const proofParams = new URLSearchParams();
       if (cfg.workspaceId) proofParams.set('workspace_id', cfg.workspaceId);
-      const proof = await fetchRelayJson(`/api/v1/connectlog/proof${proofParams.toString() ? `?${proofParams}` : ''}`, { headers: { 'x-relay13-api-key': cfg.apiKey } });
+      const proof = await fetchRelayJson(`/api/v1/connectlog/proof${proofParams.toString() ? `?${proofParams}` : ''}`);
       push('connectlog_proof_endpoint', proof.ok, { status: proof.status, migrations: proof.data.migrations || [] });
-      const activation = await fetchRelayJson(`/api/v1/connectlog/activation${proofParams.toString() ? `?${proofParams}` : ''}`, { headers: { 'x-relay13-api-key': cfg.apiKey } });
+      const activation = await fetchRelayJson(`/api/v1/connectlog/activation${proofParams.toString() ? `?${proofParams}` : ''}`);
       push('activation_readiness_endpoint', activation.ok, { status: activation.status, checks: activation.data.checks || [] });
       const syncedCard = await syncActiveCardToRelay();
       push('active_card_registry_sync', Boolean(syncedCard), { card: syncedCard?.card_label || syncedCard?.connectlog_card_id || state.profile?.cardName || state.profile?.name || '' });
@@ -3146,7 +3186,7 @@
         const message = normalizeRelayMessage({ senderRole: 'operator', senderName: cfg.operatorName, body: `ConnectLog activation proof ${new Date().toISOString()}`, pending: true });
         const sent = await postRelayMessage(thread, message);
         push('operator_message_post', Boolean(sent && sent.id), { message_id: sent?.id || '' });
-        const pulled = await fetchRelayJson(`/api/v1/conversations/${encodeURIComponent(thread.conversationId)}/messages`, { headers: { 'x-relay13-api-key': cfg.apiKey } });
+        const pulled = await fetchRelayJson(`/api/v1/conversations/${encodeURIComponent(thread.conversationId)}/messages`);
         push('message_history_reload', pulled.ok && Array.isArray(pulled.data.messages) && pulled.data.messages.length > 0, { status: pulled.status, message_count: pulled.data.messages?.length || 0 });
         thread.messages = (pulled.data.messages || []).map(normalizeRelayMessage);
         upsertRelayThread(thread);
@@ -3158,7 +3198,7 @@
       if (finalThread?.conversationId) report.conversation_id = finalThread.conversationId;
       await fetchRelayJson('/api/v1/connectlog/activation-runs', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-relay13-api-key': cfg.apiKey },
+        headers: relayOperatorHeaders(cfg, { 'content-type': 'application/json' }),
         body: JSON.stringify({ ...report, summary: report.ok ? 'ConnectLog activation proof passed' : 'ConnectLog activation proof completed with failures' })
       }).catch(() => null);
       state.relayStatus = report.ok ? 'Relay13 activation proof passed. Production messaging source is responding.' : 'Relay13 activation proof found failures. Keep delivery queued.';
@@ -3189,11 +3229,11 @@
   async function updateRelayRequestStatus(requestId, status) {
     const cfg = state.relayConfig || defaultRelayConfig();
     if (!requestId || !status) return;
-    if (!cfg.origin || !cfg.apiKey) return showToast('Request status update needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Request status update needs Relay13 origin + 0S/SkyGate session.');
     try {
       const response = await fetch(`${cfg.origin}/api/v1/connectlog/requests/${encodeURIComponent(requestId)}`, {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json', 'x-relay13-api-key': cfg.apiKey },
+        headers: relayOperatorHeaders(cfg, { 'content-type': 'application/json' }),
         body: JSON.stringify({ status })
       });
       const data = await response.json().catch(() => ({}));
@@ -3316,8 +3356,7 @@
       connectlog_welcome_message: card.welcomeMessage || '',
       connectlog_bridge: true
     };
-    const headers = { 'content-type': 'application/json' };
-    if (cfg.apiKey) headers['x-relay13-api-key'] = cfg.apiKey;
+    const headers = relayOperatorHeaders(cfg, { 'content-type': 'application/json' });
     const response = await fetch(`${cfg.origin}/api/v1/conversations`, { method: 'POST', headers, body: JSON.stringify(payload) });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.ok) throw new Error(data.error || `Relay13 conversation failed (${response.status})`);
@@ -3357,17 +3396,16 @@
 
   async function postRelayMessage(thread, message) {
     const cfg = state.relayConfig || defaultRelayConfig();
-    const headers = { 'content-type': 'application/json' };
+    const headers = relayOperatorHeaders(cfg, { 'content-type': 'application/json' });
     const payload = { body: message.body, sender_name: message.senderName || cfg.operatorName };
-    if (cfg.apiKey) {
-      headers['x-relay13-api-key'] = cfg.apiKey;
+    if (relayOperatorToken(cfg)) {
       payload.sender_role = 'operator';
       payload.workspace_id = thread.workspaceId || cfg.workspaceId;
     } else if (thread.visitorToken) {
       payload.visitor_token = thread.visitorToken;
       payload.sender_role = 'customer';
     } else {
-      throw new Error('Relay13 thread needs an API key or visitor token.');
+      throw new Error('Relay13 thread needs a 0S/SkyGate session or visitor token.');
     }
     const response = await fetch(`${thread.origin || cfg.origin}/api/v1/conversations/${encodeURIComponent(thread.conversationId)}/messages`, { method: 'POST', headers, body: JSON.stringify(payload) });
     const data = await response.json().catch(() => ({}));
@@ -3412,12 +3450,12 @@
 
   async function refreshRelayThreads() {
     const cfg = state.relayConfig || defaultRelayConfig();
-    if (!cfg.origin || !cfg.apiKey) return showToast('Thread refresh needs Relay13 origin + operator API key.');
+    if (!cfg.origin || !relayOperatorToken(cfg)) return showToast('Thread refresh needs Relay13 origin + 0S/SkyGate session.');
     try {
       const params = new URLSearchParams();
       if (cfg.workspaceId) params.set('workspace_id', cfg.workspaceId);
       params.set('limit', '50');
-      const response = await fetch(`${cfg.origin}/api/v1/conversations?${params.toString()}`, { headers: { 'x-relay13-api-key': cfg.apiKey }, cache: 'no-store' });
+      const response = await fetch(`${cfg.origin}/api/v1/conversations?${params.toString()}`, { headers: relayOperatorHeaders(cfg), cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
       (data.conversations || []).forEach((row) => upsertRelayThread(normalizeRelayThread({
@@ -4595,3 +4633,376 @@
     return JSON.parse(JSON.stringify(value));
   }
 })();
+
+// BEGIN quantumskyes:adaptive-neon-scrollbar-js
+(function(){
+  if(window.__mcpVisibleNeonScrollbars) return;
+  window.__mcpVisibleNeonScrollbars = true;
+
+  function onReady(fn){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }else{
+      fn();
+    }
+  }
+
+  function clamp(value, min, max){
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function verticalSource(){
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function horizontalSource(){
+    const doc = document.scrollingElement || document.documentElement;
+    if(doc.scrollWidth > doc.clientWidth + 4) return { node: doc, mode: 'horizontal' };
+    const selectors = [
+      '.site-header nav',
+      '.table-wrap',
+      '.topnav',
+      '.route-grid',
+      '.command-table',
+      '.saas-table'
+    ];
+    const node = selectors
+      .flatMap((selector) => [...document.querySelectorAll(selector)])
+      .find((element) => element.scrollWidth > element.clientWidth + 4);
+    return node ? { node, mode: 'horizontal' } : { node: doc, mode: 'page' };
+  }
+
+  onReady(() => {
+    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
+    document.querySelectorAll('.mcp-neon-scroll-rail,.mcp-neon-scroll-corner').forEach((node) => node.remove());
+
+    const yRail = document.createElement('div');
+    yRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-y';
+    yRail.setAttribute('aria-hidden', 'true');
+    yRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const xRail = document.createElement('div');
+    xRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-x';
+    xRail.setAttribute('aria-hidden', 'true');
+    xRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const corner = document.createElement('div');
+    corner.className = 'mcp-neon-scroll-corner';
+    corner.setAttribute('aria-hidden', 'true');
+
+    document.body.append(yRail, xRail, corner);
+
+    const yThumb = yRail.querySelector('.mcp-neon-scroll-thumb');
+    const xThumb = xRail.querySelector('.mcp-neon-scroll-thumb');
+    let activeHorizontal = horizontalSource();
+    let raf = 0;
+    let dragRaf = 0;
+    let pendingDrag = null;
+    let metrics = null;
+
+    function measure(){
+      const ySource = verticalSource();
+      const yTrack = Math.max(1, yRail.clientHeight);
+      const yMax = Math.max(1, ySource.scrollHeight - window.innerHeight);
+      const yRatio = clamp(window.scrollY / yMax, 0, 1);
+      const ySize = clamp((window.innerHeight / Math.max(ySource.scrollHeight, window.innerHeight)) * yTrack, 78, yTrack);
+
+      if(!activeHorizontal?.node || !document.documentElement.contains(activeHorizontal.node)){
+        activeHorizontal = horizontalSource();
+      }
+      const xTrack = Math.max(1, xRail.clientWidth);
+      const xSource = activeHorizontal.node;
+      const xMax = Math.max(0, xSource.scrollWidth - xSource.clientWidth);
+      const pageMode = activeHorizontal.mode === 'page' || xMax <= 1;
+      const xRatio = pageMode ? yRatio : clamp(xSource.scrollLeft / xMax, 0, 1);
+      const xSize = pageMode
+        ? clamp(xTrack * .24, 84, Math.max(84, xTrack * .38))
+        : clamp((xSource.clientWidth / Math.max(xSource.scrollWidth, xSource.clientWidth)) * xTrack, 84, xTrack);
+
+      return { ySource, yTrack, yMax, yRatio, ySize, xSource, xTrack, xMax, xRatio, xSize, pageMode };
+    }
+
+    function paintRails(view){
+      yThumb.style.height = `${Math.floor(view.ySize)}px`;
+      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(view.yRatio * Math.max(0, view.yTrack - view.ySize))}px`);
+      xThumb.style.width = `${Math.floor(view.xSize)}px`;
+      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(view.xRatio * Math.max(0, view.xTrack - view.xSize))}px`);
+      xRail.dataset.scrollMode = view.pageMode ? 'page' : 'horizontal';
+    }
+
+    function scheduleUpdate(){
+      if(raf) return;
+      raf = window.requestAnimationFrame(updateRails);
+    }
+
+    function updateRails(){
+      raf = 0;
+      metrics = measure();
+      paintRails(metrics);
+    }
+
+    function flushDrag(){
+      dragRaf = 0;
+      if(!pendingDrag) return;
+      const { axis, ratio, snapshot } = pendingDrag;
+      pendingDrag = null;
+      const next = snapshot || measure();
+      const bounded = clamp(ratio, 0, 1);
+
+      if(axis === 'y'){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: next.pageMode ? yRatio : next.xRatio
+        });
+      }else if(next.pageMode){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: yRatio
+        });
+      }else{
+        next.xSource.scrollLeft = bounded * next.xMax;
+        paintRails({
+          ...next,
+          xRatio: clamp(next.xSource.scrollLeft / Math.max(1, next.xMax), 0, 1)
+        });
+      }
+      scheduleUpdate();
+    }
+
+    function queueDrag(axis, ratio, snapshot){
+      pendingDrag = { axis, ratio, snapshot };
+      if(!dragRaf) dragRaf = window.requestAnimationFrame(flushDrag);
+    }
+
+    function bindRail(rail, thumb, axis, setter){
+      let dragging = false;
+      let pointerOffset = 0;
+      let dragSnapshot = null;
+      let railStart = 0;
+      let track = 1;
+      let size = 1;
+
+      function ratioFromEvent(event, keepOffset){
+        const coordinate = axis === 'y' ? event.clientY : event.clientX;
+        const localOffset = keepOffset ? pointerOffset : size / 2;
+        return clamp((coordinate - railStart - localOffset) / Math.max(1, track - size), 0, 1);
+      }
+
+      rail.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        dragSnapshot = measure();
+        const railRect = rail.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        railStart = axis === 'y' ? railRect.top : railRect.left;
+        track = axis === 'y' ? dragSnapshot.yTrack : dragSnapshot.xTrack;
+        size = axis === 'y' ? dragSnapshot.ySize : dragSnapshot.xSize;
+        document.documentElement.classList.add('mcp-neon-scroll-dragging');
+        rail.classList.add('is-dragging');
+        rail.setPointerCapture?.(event.pointerId);
+        pointerOffset = event.target === thumb || thumb.contains(event.target)
+          ? (axis === 'y' ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
+          : (axis === 'y' ? thumbRect.height / 2 : thumbRect.width / 2);
+        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)), dragSnapshot);
+      });
+
+      rail.addEventListener('pointermove', (event) => {
+        if(!dragging) return;
+        event.preventDefault();
+        setter(ratioFromEvent(event, true), dragSnapshot);
+      });
+
+      function endDrag(event){
+        if(!dragging) return;
+        dragging = false;
+        dragSnapshot = null;
+        document.documentElement.classList.remove('mcp-neon-scroll-dragging');
+        rail.classList.remove('is-dragging');
+        rail.releasePointerCapture?.(event.pointerId);
+        scheduleUpdate();
+      }
+
+      rail.addEventListener('pointerup', endDrag);
+      rail.addEventListener('pointercancel', endDrag);
+    }
+
+    bindRail(yRail, yThumb, 'y', (ratio, snapshot) => queueDrag('y', ratio, snapshot));
+    bindRail(xRail, xThumb, 'x', (ratio, snapshot) => queueDrag('x', ratio, snapshot));
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      activeHorizontal = horizontalSource();
+      scheduleUpdate();
+    }, { passive: true });
+    document.addEventListener('scroll', (event) => {
+      if(event.target && event.target === activeHorizontal.node) scheduleUpdate();
+    }, true);
+    document.addEventListener('pointerover', (event) => {
+      const candidate = event.target && event.target.closest && event.target.closest('.site-header nav,.table-wrap,.topnav,.route-grid');
+      if(candidate && candidate.scrollWidth > candidate.clientWidth + 4){
+        activeHorizontal = { node: candidate, mode: 'horizontal' };
+        scheduleUpdate();
+      }
+    }, { passive: true });
+
+    scheduleUpdate();
+    window.setTimeout(scheduleUpdate, 350);
+    window.setTimeout(scheduleUpdate, 1200);
+  });
+})();
+// END quantumskyes:adaptive-neon-scrollbar-js
+
+// BEGIN quantumskyes:skyesol-living-background-js
+function mountSkyeSolLivingBackground({
+  canvasSelector = '.skyesol-living-field',
+  particleDensity = 16000,
+  maxParticles = 120,
+  minParticles = 58
+} = {}) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.querySelector(canvasSelector);
+  if (!canvas || !canvas.getContext || reduceMotion) return () => {};
+
+  const ctx = canvas.getContext('2d');
+  const palette = [
+    'rgba(201,168,76,',
+    'rgba(138,99,255,',
+    'rgba(39,242,255,'
+  ];
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let raf = 0;
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(maxParticles, Math.max(minParticles, Math.floor(width * height / particleDensity)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.8 + .4,
+      a: Math.random() * .34 + .12,
+      s: Math.random() * .34 + .08,
+      phase: Math.random() * Math.PI * 2,
+      color: palette[index % palette.length]
+    }));
+  }
+
+  function drawWave(time, yOffset, colorA, colorB, amp, speed) {
+    const gradient = ctx.createLinearGradient(0, yOffset - amp * 2, width, yOffset + amp * 2);
+    gradient.addColorStop(0, colorA);
+    gradient.addColorStop(.5, colorB);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (let x = 0; x <= width; x += 18) {
+      const n = Math.sin((x * .006) + time * speed) * amp;
+      const n2 = Math.cos((x * .011) - time * speed * .7) * amp * .46;
+      ctx.lineTo(x, yOffset + n + n2);
+    }
+    ctx.lineTo(width, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  function animate(now) {
+    if (document.body.classList.contains('motion-paused')) {
+      raf = requestAnimationFrame(animate);
+      return;
+    }
+    const t = now * .001;
+    pointer.x += (pointer.tx - pointer.x) * .035;
+    pointer.y += (pointer.ty - pointer.y) * .035;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'screen';
+    drawWave(t, height * .28 + pointer.y * 12, 'rgba(138,99,255,0)', 'rgba(138,99,255,.10)', 36, .34);
+    drawWave(t, height * .54 - pointer.y * 10, 'rgba(39,242,255,0)', 'rgba(39,242,255,.08)', 42, .24);
+    drawWave(t, height * .82, 'rgba(201,168,76,0)', 'rgba(201,168,76,.07)', 28, .28);
+    particles.forEach((particle) => {
+      const px = particle.x + Math.sin(t * particle.s + particle.phase) * 28 + pointer.x * 10;
+      const py = particle.y + Math.cos(t * particle.s * .8 + particle.phase) * 18 + pointer.y * 8;
+      ctx.beginPath();
+      ctx.arc(px, py, particle.r, 0, Math.PI * 2);
+      ctx.fillStyle = `${particle.color}${particle.a})`;
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    raf = requestAnimationFrame(animate);
+  }
+
+  function onPointerMove(event) {
+    pointer.tx = (event.clientX / Math.max(width, 1) - .5) * 2;
+    pointer.ty = (event.clientY / Math.max(height, 1) - .5) * 2;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onPointerMove, { passive: true });
+  raf = requestAnimationFrame(animate);
+
+  return () => {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('mousemove', onPointerMove);
+  };
+}
+
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();
+// END quantumskyes:skyesol-living-background-js
+
+// BEGIN quantumskyes:neon-motion-chrome-vanilla-js
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();
+// END quantumskyes:neon-motion-chrome-vanilla-js

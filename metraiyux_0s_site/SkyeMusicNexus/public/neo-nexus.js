@@ -123,7 +123,13 @@
   const plainText = (value) => String(value == null ? '' : value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const fmtNumber = (value) => new Intl.NumberFormat('en-US').format(Number(value || 0));
   const fmtMoney = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
-  const apiBase = '/.netlify/functions/';
+  function musicFunctionBase() {
+    const configured = window.METRAIYUX_API_BASES && window.METRAIYUX_API_BASES.skymusicnexus;
+    if (configured) return `${String(configured).replace(/\/+$/, '')}/`;
+    if (/^(127\.0\.0\.1|localhost)$/i.test(window.location.hostname)) return '/.netlify/functions/';
+    return '/api/skymusicnexus/';
+  }
+  const apiBase = musicFunctionBase();
   const staticPreviewOverride = window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW;
   const staticPreview = staticPreviewOverride === true
     || (staticPreviewOverride !== false && window.location.protocol === 'http:' && /^(127\.0\.0\.1|localhost)$/.test(window.location.hostname));
@@ -198,95 +204,453 @@
     return readJson(response);
   }
 
+  function staticId(prefix) {
+    return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function ensureStaticCollections() {
+    if (!Array.isArray(state.artists)) state.artists = [];
+    if (!Array.isArray(state.releases)) state.releases = [];
+    if (!Array.isArray(state.assets)) state.assets = [];
+    if (!Array.isArray(state.payouts)) state.payouts = [];
+    if (!Array.isArray(state.workflows)) state.workflows = [];
+    if (!state.drops || typeof state.drops !== 'object') state.drops = {};
+    if (!Array.isArray(state.drops.items)) state.drops.items = [];
+    if (!Array.isArray(state.drops.batches)) state.drops.batches = [];
+    if (!Array.isArray(state.drops.deploys)) state.drops.deploys = [];
+    if (!state.drops.trafficSummary) {
+      state.drops.trafficSummary = { total: 0, pageViews: 0, playStarts: 0, qualifiedStreams: 0, completePlays: 0, downloads: 0 };
+    }
+    if (!state.drops.env) {
+      state.drops.env = {
+        netlify: { configured: false, liveDeployEnabled: false },
+        email: { provider: 'local-receipt', configured: false },
+        privateStorage: { configured: false, mode: 'browser-static-preview' },
+      };
+    }
+    if (!state.drops.estimate) state.drops.estimate = { estimatedCredits: 15, estimatedBandwidthGb: 0, fitsReserve: true };
+    if (!state.exchange || typeof state.exchange !== 'object') state.exchange = {};
+    ['contentRequests', 'threads', 'communityPosts', 'campaigns'].forEach((key) => {
+      if (!Array.isArray(state.exchange[key])) state.exchange[key] = [];
+    });
+    if (!state.exchange.progress) {
+      state.exchange.progress = {
+        points: 50,
+        level: 1,
+        nextLevelAt: 300,
+        percentToNext: 17,
+        counts: { contentRequests: 0, communityPosts: 0, inboxThreads: 0, campaigns: 0 },
+        achievements: [],
+        missions: [],
+      };
+    }
+    if (!state.social || typeof state.social !== 'object') state.social = {};
+    ['catalog', 'connectors', 'postQueue', 'feedItems', 'stories', 'feedPulls', 'moderation'].forEach((key) => {
+      if (!Array.isArray(state.social[key])) state.social[key] = [];
+    });
+    if (!state.social.feedItems.length) state.social.feedItems = starterSocial.feedItems.slice();
+    if (!state.social.stories.length) state.social.stories = starterSocial.stories.slice();
+    if (!state.social.summary) state.social.summary = { ...starterSocial.summary };
+  }
+
+  function refreshStaticDropEstimate() {
+    ensureStaticCollections();
+    const dropCount = state.drops.items.length;
+    const batchCount = state.drops.batches.length;
+    state.drops.estimate = {
+      estimatedCredits: Math.max(15, dropCount * 4 + batchCount * 3),
+      estimatedBandwidthGb: Number((dropCount * 0.015).toFixed(3)),
+      fitsReserve: true,
+    };
+  }
+
+  function staticDropEnvelope(extra = {}) {
+    ensureStaticCollections();
+    refreshStaticDropEstimate();
+    return {
+      ok: true,
+      drops: state.drops.items,
+      batches: state.drops.batches,
+      deploys: state.drops.deploys,
+      trafficSummary: state.drops.trafficSummary,
+      env: state.drops.env,
+      estimate: state.drops.estimate,
+      previewOnly: true,
+      ...extra,
+    };
+  }
+
+  function findStaticBatch(batchId) {
+    ensureStaticCollections();
+    return state.drops.batches.find((batch) => batch.batchId === batchId) || state.drops.batches[0] || null;
+  }
+
+  function writeStaticDrop(action, body = {}) {
+    ensureStaticCollections();
+    const now = new Date().toISOString();
+    if (action === 'create-drop') {
+      const drop = {
+        dropId: body.dropId || staticId('drop'),
+        artistId: body.artistId || state.lastArtistId || 'static_preview_artist',
+        artistName: body.artistName || 'Static Preview Artist',
+        releaseId: body.releaseId || state.lastReleaseId || '',
+        title: body.title || 'Untitled MusicNexus Drop',
+        dropType: body.dropType || 'single_drop',
+        visibility: body.visibility || 'public',
+        rightsStatus: body.rightsStatus || 'preview-ready',
+        tierPolicy: body.tierPolicy || 'free99-lite',
+        story: body.story || '',
+        coverArtUrl: body.coverArtUrl || '',
+        downloadAllowed: body.downloadAllowed === true,
+        tracks: Array.isArray(body.tracks) && body.tracks.length ? body.tracks : [{ title: body.title || 'Untitled Signal', duration: 180, previewUrl: '' }],
+        status: 'draft',
+        createdAt: now,
+        updatedAt: now,
+        previewOnly: true,
+      };
+      state.drops.items.unshift(drop);
+      state.lastArtistId = drop.artistId;
+      if (drop.releaseId) state.lastReleaseId = drop.releaseId;
+      return staticDropEnvelope({ drop });
+    }
+    if (action === 'submit-drop') {
+      const drop = state.drops.items.find((item) => item.dropId === body.dropId) || state.drops.items[0];
+      if (!drop) throw new Error('Create a drop draft before submitting to the deploy pool.');
+      drop.status = 'deploy-pool';
+      drop.updatedAt = now;
+      return staticDropEnvelope({ drop });
+    }
+    if (action === 'form-batch') {
+      const requested = Array.isArray(body.dropIds) ? body.dropIds.filter(Boolean) : [];
+      const candidates = requested.length
+        ? state.drops.items.filter((drop) => requested.includes(drop.dropId))
+        : state.drops.items.filter((drop) => drop.status === 'deploy-pool');
+      const selected = candidates.length ? candidates : state.drops.items;
+      if (!selected.length) throw new Error('Create or submit at least one drop before forming a batch.');
+      selected.forEach((drop) => {
+        drop.status = 'batched';
+        drop.updatedAt = now;
+      });
+      const batch = {
+        batchId: staticId('batch'),
+        dropIds: selected.map((drop) => drop.dropId),
+        status: 'formed',
+        estimatedCredits: Math.max(15, selected.length * 4),
+        createdAt: now,
+        updatedAt: now,
+        autoApprovalEligibleAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+        previewOnly: true,
+      };
+      state.drops.batches.unshift(batch);
+      return staticDropEnvelope({ batch });
+    }
+    const batch = findStaticBatch(body.batchId);
+    if (!batch) throw new Error('Form a batch before running this deploy action.');
+    batch.updatedAt = now;
+    if (action === 'send-approval') {
+      batch.status = 'approval-sent';
+      return staticDropEnvelope({ batch, approval: { approvalId: staticId('approval'), status: 'sent-preview', createdAt: now } });
+    }
+    if (action === 'approve-batch') {
+      batch.status = 'approved';
+      return staticDropEnvelope({ batch, receipt: { approvalId: staticId('manual_approval'), status: 'approved-preview', createdAt: now } });
+    }
+    if (action === 'run-approval-brain') {
+      batch.status = 'auto-approved';
+      return staticDropEnvelope({ batch, receipt: { approvalId: staticId('brain_approval'), status: 'auto-approved-preview', createdAt: now } });
+    }
+    if (action === 'build-static-bundle') {
+      batch.status = 'bundle-built';
+      batch.outputDir = `browser-static-bundle/${batch.batchId}`;
+      return staticDropEnvelope({ batch, outputDir: batch.outputDir });
+    }
+    if (action === 'publish-batch') {
+      batch.status = 'deploy-intent-written';
+      const deploy = {
+        deployReceiptId: staticId('deploy_receipt'),
+        batchId: batch.batchId,
+        status: 'intent-preview',
+        mode: 'cloudflare-static-preview',
+        outputDir: batch.outputDir || `browser-static-bundle/${batch.batchId}`,
+        liveBaseUrl: '',
+        redacted: true,
+        createdAt: now,
+      };
+      state.drops.deploys.unshift(deploy);
+      return staticDropEnvelope({ batch, deploy });
+    }
+    return staticDropEnvelope();
+  }
+
+  function writeStaticArtist(action, body = {}) {
+    ensureStaticCollections();
+    const now = new Date().toISOString();
+    const id = body.id || body.artistId || body.skyeId || staticId('artist');
+    let artist = state.artists.find((item) => item.id === id || item.skyeId === id);
+    if (!artist) {
+      artist = {
+        id,
+        skyeId: body.skyeId || id,
+        identityId: body.identityId || body.skyeId || id,
+        name: body.name || 'Static Preview Artist',
+        email: body.email || '',
+        genre: body.genre || [],
+        bio: body.bio || '',
+        status: action === 'approve' ? 'active' : 'pending',
+        balance: 0,
+        profilePhoto: body.profilePhoto || null,
+        crossAppIdentity: body.crossAppIdentity || null,
+        createdAt: now,
+        previewOnly: true,
+      };
+      state.artists.unshift(artist);
+    }
+    if (action === 'approve') artist.status = 'active';
+    state.lastArtistId = artist.id;
+    return { ok: true, artistId: artist.id, artist, artists: state.artists, previewOnly: true };
+  }
+
+  function writeStaticRelease(action, body = {}) {
+    ensureStaticCollections();
+    const now = new Date().toISOString();
+    const id = body.id || body.releaseId || staticId('release');
+    let release = state.releases.find((item) => item.id === id);
+    if (!release) {
+      release = {
+        id,
+        artistId: body.artistId || state.lastArtistId || 'static_preview_artist',
+        title: body.title || body.releaseTitle || 'Static Preview Release',
+        type: body.type || 'single',
+        status: 'submitted',
+        releaseDate: body.releaseDate || '',
+        tracks: Array.isArray(body.tracks) && body.tracks.length ? body.tracks : [{ title: body.title || 'Static Preview Track', duration: 180, previewUrl: '' }],
+        distributionTargets: body.distributionTargets || ['SkyeMusicNexus Player'],
+        analytics: { streams: 0, downloads: 0, saves: 0, plays: 0, listenSeconds: 0 },
+        rights: { status: 'preview-ready', ownershipAttested: true, previewUseAuthorized: true, distributionAuthorized: false },
+        submittedAt: now,
+        previewOnly: true,
+      };
+      state.releases.unshift(release);
+    }
+    if (action === 'review') release.status = body.decision === 'reject' ? 'needs-review' : 'reviewed';
+    if (action === 'publish') {
+      release.status = 'live';
+      release.publishedAt = now;
+    }
+    if (action === 'report-streams') {
+      release.analytics = {
+        ...release.analytics,
+        streams: Number(release.analytics?.streams || 0) + Number(body.streams || 0),
+        downloads: Number(release.analytics?.downloads || 0) + Number(body.downloads || 0),
+        saves: Number(release.analytics?.saves || 0) + Number(body.saves || 0),
+      };
+    }
+    if (action === 'queue-operations') {
+      const workflow = { id: staticId('workflow'), releaseId: release.id, owner: body.owner || 'operator', checkpoint: body.checkpoint || 'Runway check', notes: body.notes || '', status: body.status || 'queued', createdAt: now };
+      state.workflows.unshift(workflow);
+      return { ok: true, workflow, workflows: state.workflows, release, previewOnly: true };
+    }
+    if (action === 'update-rights') {
+      release.rights = { ...(release.rights || {}), ...(body.rights || {}), status: 'preview-ready' };
+      return { ok: true, release, rights: release.rights, previewOnly: true };
+    }
+    if (action === 'takedown-request') {
+      release.rights = { ...(release.rights || {}), status: 'blocked', takedownHold: true, playbackBlocked: true, takedownContactEmail: body.requesterEmail || '' };
+      return { ok: true, release, rights: release.rights, request: { id: staticId('takedown'), reason: body.reason || '', createdAt: now }, previewOnly: true };
+    }
+    state.lastArtistId = release.artistId;
+    state.lastReleaseId = release.id;
+    return { ok: true, release, releases: state.releases, previewOnly: true };
+  }
+
+  function writeStaticAsset(action, body = {}) {
+    ensureStaticCollections();
+    if (action === 'create-upload-session') {
+      const asset = { id: staticId('asset'), ...body, storage: 'browser-static-preview', status: 'upload-session-preview' };
+      return { ok: true, asset, upload: { url: 'data:application/octet-stream,static-preview', method: 'PUT', headers: { 'content-type': body.contentType || 'audio/mpeg' } }, previewOnly: true };
+    }
+    const asset = {
+      id: body.id || staticId('asset'),
+      artistId: body.artistId || state.lastArtistId || 'static_preview_artist',
+      releaseId: body.releaseId || state.lastReleaseId || '',
+      title: body.title || body.fileName || 'Static Preview Audio',
+      fileName: body.fileName || 'static-preview-audio.mp3',
+      contentType: body.contentType || 'audio/mpeg',
+      bytes: Number(body.bytes || 0),
+      streamUrl: '',
+      sha256: staticId('sha').replace('sha_', ''),
+      storage: 'browser-static-preview',
+      status: 'ready',
+      previewOnly: true,
+    };
+    state.assets.unshift(asset);
+    state.lastArtistId = asset.artistId;
+    if (asset.releaseId) state.lastReleaseId = asset.releaseId;
+    return { ok: true, asset, assets: state.assets, storage: state.assetStorage, previewOnly: true };
+  }
+
+  function writeStaticPayment(action, body = {}) {
+    ensureStaticCollections();
+    const payout = { id: body.payoutId || staticId('payout'), artistId: body.artistId || state.lastArtistId || 'static_preview_artist', amount: Number(body.amount || 0), status: action === 'complete-payout' ? 'completed' : 'pending', payoutMethod: 'static-preview', createdAt: new Date().toISOString() };
+    if (action === 'complete-payout') state.payouts = state.payouts.map((item) => item.id === payout.id ? payout : item);
+    else state.payouts.unshift(payout);
+    return { ok: true, balance: Number(body.amount || 0), entry: { id: staticId('ledger'), amount: Number(body.amount || 0) }, payout, payouts: state.payouts, previewOnly: true };
+  }
+
+  function writeStaticExchange(action, body = {}) {
+    ensureStaticCollections();
+    const now = new Date().toISOString();
+    if (action === 'request-content') {
+      const request = { id: staticId('request'), threadId: staticId('thread'), artistId: body.artistId || state.lastArtistId, releaseId: body.releaseId || '', requestType: body.requestType || 'content', title: body.title || 'Content request', brief: body.brief || '', budgetLane: body.budgetLane || 'standard', dueAt: body.dueAt || '', status: 'open', createdAt: now };
+      state.exchange.contentRequests.unshift(request);
+      return { ok: true, request, previewOnly: true };
+    }
+    if (action === 'send-message') {
+      const thread = { id: staticId('thread'), artistId: body.artistId || state.lastArtistId, topic: body.topic || 'Artist inbox', messages: [{ body: body.body || '', createdAt: now }], relay: { status: 'static-preview-receipted' } };
+      state.exchange.threads.unshift(thread);
+      return { ok: true, thread, previewOnly: true };
+    }
+    if (action === 'publish-community') {
+      const post = { id: staticId('community'), artistId: body.artistId || state.lastArtistId, linkedReleaseId: body.linkedReleaseId || '', category: body.category || 'signal', body: body.body || '', status: 'published-preview', createdAt: now };
+      state.exchange.communityPosts.unshift(post);
+      return { ok: true, post, previewOnly: true };
+    }
+    if (action === 'build-release-campaign') {
+      const campaign = { id: staticId('campaign'), artistId: body.artistId || state.lastArtistId, releaseId: body.releaseId || state.lastReleaseId, releaseTitle: body.releaseTitle || 'Static Preview Release', mood: body.mood || '', platforms: body.platforms || '', offerLane: body.offerLane || 'download', status: 'built-preview', createdAt: now };
+      state.exchange.campaigns.unshift(campaign);
+      return { ok: true, campaign, previewOnly: true };
+    }
+    return { ok: true, ...state.exchange, previewOnly: true };
+  }
+
+  function writeStaticSocial(action, body = {}) {
+    ensureStaticCollections();
+    const now = new Date().toISOString();
+    if (action === 'save-connector') {
+      const connector = { id: staticId('connector'), platform: body.platform || 'mastodon', platformName: body.platform || 'Open social', name: body.name || 'Static connector', handle: body.handle || '', instanceUrl: body.instanceUrl || '', tokenStatus: body.tokenEnvKey ? 'env-key-set' : 'token-required', defaultVisibility: body.defaultVisibility || 'public', createdAt: now };
+      state.social.connectors.unshift(connector);
+      return { ok: true, connector, previewOnly: true };
+    }
+    if (action === 'create-feed-post' || action === 'queue-post') {
+      const post = { id: staticId('post'), type: 'release-post', source: 'musicnexus', status: action === 'queue-post' ? 'queued-preview' : 'local-preview', artistId: body.artistId || state.lastArtistId || 'static_preview_artist', releaseId: body.releaseId || state.lastReleaseId || '', author: body.artistId || 'Preview Artist', handle: 'skye:preview', avatar: 'SP', title: 'MusicNexus post', caption: body.caption || '', hashtags: parseCsv(body.hashtags), media: { kind: 'external', url: body.mediaUrl || '', altText: body.altText || '' }, stats: { likes: 0, saves: 0, boosts: 0, comments: [] }, platform: body.connectorId || body.visibility || 'local-feed', createdAt: now };
+      if (action === 'queue-post') state.social.postQueue.unshift(post);
+      state.social.feedItems.unshift(post);
+      return { ok: true, post, previewOnly: true };
+    }
+    if (action === 'publish-post') {
+      const post = state.social.postQueue.find((item) => item.id === body.postId) || state.social.postQueue[0] || state.social.feedItems[0];
+      if (post) post.status = 'provider-token-required';
+      return { ok: true, post, publication: { ok: false, note: 'Static preview queued the provider publish intent.', tokenEnvKey: 'SOCIAL_PROVIDER_TOKEN' }, previewOnly: true };
+    }
+    if (action === 'sync-feed') {
+      const pull = { id: staticId('feed_pull'), connectorId: body.connectorId || '', artistId: body.artistId || state.lastArtistId, hashtag: body.hashtag || '', statusCount: 3, sourceUrl: body.hashtag ? `#${body.hashtag}` : 'static-preview', createdAt: now };
+      state.social.feedPulls.unshift(pull);
+      return { ok: true, pull, previewOnly: true };
+    }
+    if (action === 'feed-action') {
+      const post = state.social.feedItems.find((item) => item.id === body.targetId) || state.social.feedItems[0];
+      if (post && body.feedAction === 'comment') post.stats.comments.push({ id: staticId('comment'), artistId: body.artistId || state.lastArtistId, body: body.body || '', createdAt: now });
+      if (post && body.feedAction === 'like') post.stats.likes += 1;
+      if (post && body.feedAction === 'save') post.stats.saves += 1;
+      if (post && body.feedAction === 'boost') post.stats.boosts += 1;
+      return { ok: true, post, previewOnly: true };
+    }
+    return { ok: true, ...state.social, previewOnly: true };
+  }
+
   async function staticFunctionResponse(name, options = {}) {
     const method = String(options.method || 'GET').toUpperCase();
     const action = (options.query && options.query.action) || (options.body && options.body.action) || '';
-    if (method !== 'GET' && !(name === 'music-releases' && action === 'playback-stream')) {
-      throw new Error('Open the Netlify app runtime to write SkyeMusicNexus records.');
+    const body = options.body || {};
+    ensureStaticCollections();
+    if (method !== 'GET') {
+      if (name === 'music-drops') return writeStaticDrop(action, body);
+      if (name === 'music-artists') return writeStaticArtist(action, body);
+      if (name === 'music-releases') return writeStaticRelease(action, body);
+      if (name === 'music-assets') return writeStaticAsset(action, body);
+      if (name === 'music-payments') return writeStaticPayment(action, body);
+      if (name === 'music-exchange') return writeStaticExchange(action, body);
+      if (name === 'music-social') return writeStaticSocial(action, body);
+      return { ok: true, previewOnly: true, action };
     }
-    if (name === 'music-artists') return { ok: true, artists: [] };
-    if (name === 'music-assets') return { ok: true, assets: [], total: 0, maxUploadBytes: 52428800 };
-    if (name === 'music-drops') return {
-      ok: true,
-      drops: [],
-      batches: [],
-      deploys: [],
-      trafficSummary: { total: 0, pageViews: 0, playStarts: 0, qualifiedStreams: 0, completePlays: 0, downloads: 0 },
-      env: { netlify: { configured: false, liveDeployEnabled: false }, email: { provider: 'local-receipt', configured: false } },
-      estimate: { estimatedCredits: 15, estimatedBandwidthGb: 0, fitsReserve: true },
+    if (name === 'music-artists') return { ok: true, artists: state.artists };
+    if (name === 'music-assets' && action === 'storage-status') {
+      state.assetStorage = { mode: 'browser-static-preview', durable: false, directUploadAvailable: false, maxBase64UploadBytes: 52428800, maxDirectUploadBytes: 0 };
+      return { ok: true, storage: state.assetStorage };
+    }
+    if (name === 'music-assets') return { ok: true, assets: state.assets, total: state.assets.length, maxUploadBytes: 52428800, storage: state.assetStorage };
+    if (name === 'music-drops') return staticDropEnvelope();
+    const fallbackRelease = {
+      id: 'static_preview_release',
+      artistId: 'static_preview_artist',
+      title: 'Gate Signal Preview',
+      type: 'single',
+      status: 'live',
+      tracks: [
+        { title: 'Gate Signal', duration: 24, previewUrl: '', plays: 0, listenSeconds: 0 },
+        { title: 'Relay Bounce', duration: 26, previewUrl: '', plays: 0, listenSeconds: 0 },
+      ],
+      analytics: { streams: 1280, downloads: 22, saves: 87, plays: 0, listenSeconds: 0 },
+      rights: { status: 'preview-ready', ownershipAttested: true, previewUseAuthorized: true, distributionAuthorized: false },
+      distributionTargets: ['SkyeMusicNexus Player', 'Spotify handoff boundary'],
     };
-    if (name === 'music-releases' && action === 'operations-board') return { ok: true, workflows: [] };
+    const releaseReadSet = state.releases.length ? state.releases : [fallbackRelease];
+    if (name === 'music-releases' && action === 'operations-board') return { ok: true, workflows: state.workflows };
     if (name === 'music-releases' && action === 'playback-stream') return {
       ok: true,
       playback: { playbackKind: 'generated-proof-preview', plays: 1, proofPlays: 1 },
     };
     if (name === 'music-releases' && action === 'rights-audit') return {
       ok: true,
-      rights: [{
-        releaseId: 'static_preview_release',
-        title: 'Gate Signal Preview',
-        status: 'preview-ready',
-        ownershipAttested: true,
-        previewUseAuthorized: true,
-        distributionAuthorized: false,
-        playbackBlocked: false,
-        linkedPreviewCount: 0,
-      }],
-      summary: { total: 1, ready: 1, blocked: 0, needsClearance: 0 },
+      rights: releaseReadSet.map((release) => {
+        const rights = release.rights || {};
+        return {
+          releaseId: release.id,
+          title: release.title,
+          status: rights.status || 'preview-ready',
+          ownershipAttested: rights.ownershipAttested !== false,
+          previewUseAuthorized: rights.previewUseAuthorized !== false,
+          distributionAuthorized: rights.distributionAuthorized === true,
+          playbackBlocked: rights.playbackBlocked === true || rights.takedownHold === true,
+          linkedPreviewCount: Array.isArray(release.tracks) ? release.tracks.filter((track) => track.previewUrl).length : 0,
+        };
+      }),
+      summary: {
+        total: releaseReadSet.length,
+        ready: releaseReadSet.filter((release) => (release.rights?.status || 'preview-ready') === 'preview-ready').length,
+        blocked: releaseReadSet.filter((release) => release.rights?.playbackBlocked || release.rights?.takedownHold).length,
+        needsClearance: releaseReadSet.filter((release) => (release.rights?.status || '') === 'needs-clearance').length,
+      },
     };
-    if (name === 'music-releases') return {
-      ok: true,
-      releases: [{
-        id: 'static_preview_release',
-        artistId: 'static_preview_artist',
-        title: 'Gate Signal Preview',
-        type: 'single',
-        status: 'live',
-        tracks: [
-          { title: 'Gate Signal', duration: 24, previewUrl: '', plays: 0, listenSeconds: 0 },
-          { title: 'Relay Bounce', duration: 26, previewUrl: '', plays: 0, listenSeconds: 0 },
-        ],
-        analytics: { streams: 1280, downloads: 22, saves: 87, plays: 0, listenSeconds: 0 },
-        distributionTargets: ['SkyeMusicNexus Player', 'Spotify handoff boundary'],
-      }],
-    };
-    if (name === 'music-payments') return { ok: true, payouts: [] };
+    if (name === 'music-releases') return { ok: true, releases: releaseReadSet };
+    if (name === 'music-payments') return { ok: true, payouts: state.payouts };
     if (name === 'music-exchange') {
+      state.exchange.progress.counts = {
+        contentRequests: state.exchange.contentRequests.length,
+        communityPosts: state.exchange.communityPosts.length,
+        inboxThreads: state.exchange.threads.length,
+        campaigns: state.exchange.campaigns.length,
+      };
       return {
         ok: true,
         gateSessionRequired: true,
-        contentRequests: [],
-        threads: [],
-        communityPosts: [],
-        campaigns: [],
-        progress: {
-          points: 50,
-          level: 1,
-          nextLevelAt: 300,
-          percentToNext: 17,
-          counts: { contentRequests: 0, communityPosts: 0, inboxThreads: 0, campaigns: 0 },
-          achievements: [
-            {
-              id: 'gate-session-lit',
-              name: 'Gate Session Lit',
-              points: 50,
-              unlocked: true,
-              detail: 'The artist lane is operating behind SkyGate.',
-            },
-            {
-              id: 'content-request-opened',
-              name: 'Content Request Opened',
-              points: 120,
-              unlocked: false,
-              detail: 'Open the Netlify runtime to request release content.',
-            },
-          ],
-          missions: [],
-        },
+        contentRequests: state.exchange.contentRequests,
+        threads: state.exchange.threads,
+        communityPosts: state.exchange.communityPosts,
+        campaigns: state.exchange.campaigns,
+        progress: state.exchange.progress,
       };
     }
     if (name === 'music-social') {
-      const starter = starterSocialPayload();
+      const summary = {
+        connectors: state.social.connectors.length,
+        readyConnectors: state.social.connectors.filter((connector) => connector.tokenStatus === 'env-key-set').length,
+        feedItems: state.social.feedItems.length,
+        queuedPosts: state.social.postQueue.length,
+        publishedPosts: state.social.postQueue.filter((post) => post.status === 'published').length,
+        providerTokenRequired: state.social.postQueue.filter((post) => post.status === 'provider-token-required').length,
+      };
+      state.social.summary = summary;
       return {
         ok: true,
         gateSessionRequired: true,
@@ -313,17 +677,25 @@
             productionBoundary: 'Use after rights, storage, and native API mapping are live.',
           },
         ],
-        connectors: [],
-        postQueue: [],
-        feedItems: starter.feedItems,
-        stories: starter.stories,
-        feedPulls: [],
-        moderation: [],
-        summary: starter.summary,
+        connectors: state.social.connectors,
+        postQueue: state.social.postQueue,
+        feedItems: state.social.feedItems,
+        stories: state.social.stories,
+        feedPulls: state.social.feedPulls,
+        moderation: state.social.moderation,
+        summary,
       };
     }
     if (name === 'music-analytics') {
-      return { ok: true, totalArtists: 0, activeArtists: 0, totalReleases: 0, liveReleases: 0, totalStreams: 0, pendingPayouts: 0 };
+      return {
+        ok: true,
+        totalArtists: state.artists.length,
+        activeArtists: state.artists.filter((artist) => artist.status === 'active').length,
+        totalReleases: releaseReadSet.length,
+        liveReleases: releaseReadSet.filter((release) => release.status === 'live').length,
+        totalStreams: releaseReadSet.reduce((sum, release) => sum + Number(release.analytics?.streams || 0), 0),
+        pendingPayouts: state.payouts.filter((payout) => payout.status === 'pending').length,
+      };
     }
     return { ok: true };
   }
@@ -719,7 +1091,7 @@
     audio.preload = 'auto';
     audio.crossOrigin = 'anonymous';
     const url = new URL(track.previewUrl, window.location.href).toString();
-    if (track.previewUrl.includes('/.netlify/functions/music-assets') && auth) {
+    if ((track.previewUrl.includes('/.netlify/functions/music-assets') || track.previewUrl.includes('/api/skymusicnexus/music-assets')) && auth) {
       const response = await auth.fetch(url);
       if (!response.ok) throw new Error(`Gated audio fetch failed with ${response.status}`);
       const blob = await response.blob();
@@ -1205,7 +1577,7 @@
       if (!quiet) toast(`Releases read failed: ${err.message}`, 'error');
     }
 
-    if (auth && auth.hasToken()) {
+    if (staticPreview || (auth && auth.hasToken())) {
       try {
         const analytics = await callFunction('music-analytics');
         state.analytics = analytics;

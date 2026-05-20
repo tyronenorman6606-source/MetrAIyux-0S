@@ -1,0 +1,159 @@
+{
+  "app": "Marketing Made Easy",
+  "checkedAt": "2026-05-19",
+  "decision": "local_static_proof_only_until_dedicated_backend",
+  "productionApiBase": "/api/marketing-made-easy",
+  "rootApiPolicy": "/api/runtime/* is blocked as api_root_collision on the 0S Worker",
+  "workerHealth": "/api/marketing-made-easy/health reports local_static_proof_only and backend_not_mounted unless MARKETING_MADE_EASY_WORKER or MARKETING_MADE_EASY_WORKER_ORIGIN is configured",
+  "apps": [
+    {
+      "id": "AE-FlowPro",
+      "mode": "local_runtime_proof",
+      "publicEntry": "AE-FlowPro/index.html",
+      "runtimeFiles": [
+        "AE-FlowPro/runtime/local-runtime.mjs",
+        "AE-FlowPro/src/runtime-contract.json"
+      ],
+      "privateSourceFiles": [
+        "AE-FlowPro/_headers",
+        "AE-FlowPro/smoke/ae-flowpro-p1-smoke.mjs",
+        "AE-FlowPro/smoke/smoke-proof.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Same-folder runtime proof only; no public 0S production backend is mounted."
+    },
+    {
+      "id": "BrandID-Offline-PWA",
+      "mode": "local_runtime_proof",
+      "publicEntry": "BrandID-Offline-PWA/index.html",
+      "runtimeFiles": [
+        "BrandID-Offline-PWA/runtime/local-runtime.mjs",
+        "BrandID-Offline-PWA/runtime/data/ops-journal.json",
+        "BrandID-Offline-PWA/src/runtime-contract.json"
+      ],
+      "privateSourceFiles": [
+        "BrandID-Offline-PWA/smoke/brandid-offline-pwa-p1-smoke.mjs",
+        "BrandID-Offline-PWA/smoke/smoke-proof.mjs",
+        "BrandID-Offline-PWA/smoke/smoke-static-proof.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Offline-first PWA with local runtime proof; no anonymous cloud runtime is exposed."
+    },
+    {
+      "id": "BusinessLaunchGo",
+      "mode": "local_runtime_with_optional_netlify_hooks",
+      "publicEntry": "BusinessLaunchGo/index.html",
+      "runtimeFiles": [
+        "BusinessLaunchGo/runtime/local-runtime.mjs",
+        "BusinessLaunchGo/runtime/store.json",
+        "BusinessLaunchGo/src/runtime-contract.json"
+      ],
+      "privateSourceFiles": [
+        "BusinessLaunchGo/netlify/functions/blob-store-pack.js",
+        "BusinessLaunchGo/netlify/functions/client-error-report.js",
+        "BusinessLaunchGo/netlify/functions/neon-health.js",
+        "BusinessLaunchGo/netlify/functions/neon-lead-upsert.js",
+        "BusinessLaunchGo/netlify.toml",
+        "BusinessLaunchGo/schema.sql",
+        "BusinessLaunchGo/smoke/businesslaunchgo-p1-smoke.mjs",
+        "BusinessLaunchGo/smoke/smoke-proof.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Browser-local launch pack workflow; optional Netlify/server hooks are source, not public 0S APIs."
+    },
+    {
+      "id": "SkyeDocxMax",
+      "mode": "local_first_pwa",
+      "publicEntry": "SkyeDocxMax/index.html",
+      "runtimeFiles": [],
+      "privateSourceFiles": [
+        "SkyeDocxMax/netlify.toml",
+        "SkyeDocxMax/package.json",
+        "SkyeDocxMax/smoke/smoke-proof-contract.mjs",
+        "SkyeDocxMax/smoke/smoke-standalone.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Private document editor runs as a local-first PWA; future cloud API work must use a dedicated namespaced backend."
+    },
+    {
+      "id": "SkyeWebCreatorMax",
+      "mode": "local_runtime_proof",
+      "publicEntry": "SkyeWebCreatorMax/index.html",
+      "runtimeFiles": [
+        "SkyeWebCreatorMax/runtime/local-runtime.mjs",
+        "SkyeWebCreatorMax/runtime/store.json"
+      ],
+      "privateSourceFiles": [
+        "SkyeWebCreatorMax/netlify.toml",
+        "SkyeWebCreatorMax/package.json",
+        "SkyeWebCreatorMax/smoke/smoke-browser.mjs",
+        "SkyeWebCreatorMax/smoke/smoke-proof.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Builder UI and local runtime proof remain static/local until a dedicated backend is mounted."
+    },
+    {
+      "id": "WebGrowthOperator",
+      "mode": "static_marketing_site_with_private_function_source",
+      "publicEntry": "WebGrowthOperator/index.html",
+      "runtimeFiles": [],
+      "privateSourceFiles": [
+        "WebGrowthOperator/_headers",
+        "WebGrowthOperator/netlify/functions/contractor-onboarding-submit.js",
+        "WebGrowthOperator/netlify.toml",
+        "WebGrowthOperator/package.json"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Static public growth site; Netlify function source is not a public 0S runtime."
+    },
+    {
+      "id": "arizona-growth-index",
+      "mode": "static_market_intelligence_site",
+      "publicEntry": "arizona-growth-index/index.html",
+      "runtimeFiles": [],
+      "privateSourceFiles": [
+        "arizona-growth-index/_headers",
+        "arizona-growth-index/_redirects",
+        "arizona-growth-index/netlify.toml",
+        "arizona-growth-index/scripts/generate-sitemap.mjs",
+        "arizona-growth-index/scripts/qa-audit.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "Static market intelligence publication; scripts and deploy config stay private."
+    },
+    {
+      "id": "kAIxUBrandKit",
+      "mode": "local_runtime_with_optional_netlify_hooks",
+      "publicEntry": "kAIxUBrandKit/index.html",
+      "runtimeFiles": [
+        "kAIxUBrandKit/runtime/local-runtime.mjs",
+        "kAIxUBrandKit/src/runtime-contract.json"
+      ],
+      "privateSourceFiles": [
+        "kAIxUBrandKit/netlify/functions/client-error-report.js",
+        "kAIxUBrandKit/netlify/functions/kaixu-generate.js",
+        "kAIxUBrandKit/netlify.toml",
+        "kAIxUBrandKit/package.json",
+        "kAIxUBrandKit/smoke/kaixu-brandkit-p1-smoke.mjs",
+        "kAIxUBrandKit/smoke/smoke-contract-proof.mjs",
+        "kAIxUBrandKit/smoke/smoke-proof.mjs"
+      ],
+      "publicApiMounted": false,
+      "operatorTruth": "BrandKit handoff/runtime proof remains local; provider generation requires configured backend credentials."
+    }
+  ],
+  "sourceBlockPolicy": [
+    "runtime/local-runtime.mjs",
+    "runtime/store.json",
+    "runtime/data/*",
+    "src/*",
+    "smoke/*",
+    "scripts/*",
+    "netlify/functions/*",
+    "package.json",
+    "schema.sql",
+    "netlify.toml",
+    "_headers",
+    "_redirects"
+  ]
+}

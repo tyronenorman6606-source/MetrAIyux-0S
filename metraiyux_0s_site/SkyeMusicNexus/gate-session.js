@@ -14,9 +14,13 @@
   const EVENT_READY = "skyemusicnexus:gate-ready";
   let resolvedSession = null;
   let waitingResolve = null;
+  const STANDALONE_STATIC_PREVIEW = location.hostname === "skye-music-nexus.pages.dev"
+    || location.hostname.endsWith(".skye-music-nexus.pages.dev")
+    || globalThis.SKYE_MUSIC_NEXUS_STATIC_PREVIEW === true;
 
   const safeToken = (value) => String(value || "").trim().replace(/[^a-zA-Z0-9:_.-]/g, "").slice(0, 240);
   const tokenLooksValid = (value) => /^[a-zA-Z0-9:_.-]{8,240}$/.test(String(value || ""));
+  const gateBridge = () => globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
   const readJson = (store, key) => {
     try {
       return JSON.parse(store.getItem(key) || "null");
@@ -24,6 +28,34 @@
       return null;
     }
   };
+
+  if (STANDALONE_STATIC_PREVIEW) {
+    globalThis.__mcpVisibleNeonScrollbars = true;
+    const previewSession = {
+      token: "static-preview-session",
+      source: "cloudflare-pages-static-preview",
+      client: "SkyeMusicNexus public preview",
+      status: "public_static_preview",
+      issued_at: new Date().toISOString()
+    };
+    globalThis.SkyeMusicGate = {
+      requireSession: () => Promise.resolve(previewSession),
+      session: () => previewSession,
+      headers: () => ({
+        "x-skye-static-preview": "true",
+        "x-skye-gate-source": previewSession.source
+      }),
+      persist: () => previewSession,
+      storageKey: SESSION_KEY
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+      document.documentElement.classList.remove("skyemusic-gate-locked");
+      document.body?.classList.remove("skyemusic-gate-locked");
+      document.getElementById("skyeMusicGate")?.remove();
+      document.dispatchEvent(new CustomEvent(EVENT_READY, { detail: previewSession }));
+    });
+    return;
+  }
 
   function clientLoginHref() {
     const path = location.pathname || "";
@@ -33,6 +65,19 @@
   }
 
   function fromStorage() {
+    const bridge = gateBridge();
+    const bridgeSession = bridge?.requireSession?.({ platformId: "skyemusicnexus", usageLane: "music-nexus" })
+      || bridge?.current?.();
+    if (bridgeSession && tokenLooksValid(bridgeSession.token)) {
+      return {
+        ...bridgeSession,
+        token: safeToken(bridgeSession.token),
+        source: bridgeSession.source || "0s-gate-card-bridge",
+        client: bridgeSession.client || "MetrAIyux 0S",
+        status: bridgeSession.status || "free99_gate_session"
+      };
+    }
+
     const query = new URLSearchParams(location.search);
     const queryToken = safeToken(query.get("gate_session") || query.get("skygate_session") || query.get("session"));
     if (tokenLooksValid(queryToken)) {
@@ -96,6 +141,12 @@
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(clean));
     sessionStorage.setItem(AUTH_HELPER_KEY, clean.token);
     localStorage.removeItem(AUTH_HELPER_KEY);
+    gateBridge()?.persist?.({
+      ...clean,
+      platform_id: "skyemusicnexus",
+      usage_lane: "music-nexus"
+    }, { silent: true });
+    gateBridge()?.record?.("skyemusic_gate_ready", clean, clean);
     resolvedSession = clean;
     document.documentElement.classList.remove("skyemusic-gate-locked");
     document.body?.classList.remove("skyemusic-gate-locked");
@@ -173,10 +224,10 @@
         <p>Free99 means the Lite lane has no charge. It does not mean anonymous access. A valid 0S or SkyeGate session is required before the artist stage, operator stage, records, workflows, analytics, payouts, paid drops, or proof lanes can run.</p>
         <label class="skyemusic-gate-field">
           <span>Gate session token</span>
-          <input id="skyeMusicGateToken" type="password" autocomplete="off" placeholder="Paste 0S / FS27 session token">
+          <input id="skyeMusicGateToken" type="password" autocomplete="off" placeholder="0S should already be signed in; fallback only">
         </label>
         <div class="skyemusic-gate-actions">
-          <button class="primary" id="skyeMusicGateUnlock" type="button">Unlock Free99 Lite Session</button>
+          <button class="primary" id="skyeMusicGateUnlock" type="button">Attach Fallback Session</button>
           <button id="skyeMusicGateUseClient" type="button">Use 0S Client Session</button>
           <a href="${clientLoginHref()}">Open Client Login</a>
         </div>
@@ -208,9 +259,15 @@
   function headers() {
     const current = session();
     if (!current) return {};
+    const bridgeHeaders = gateBridge()?.headers?.({
+      "x-skye-platform": "skyemusicnexus",
+      "x-skye-usage-lane": "music-nexus"
+    }) || {};
     return {
+      ...bridgeHeaders,
       authorization: `Bearer ${current.token}`,
       "x-skye-gate-session": current.token,
+      "x-0s-gate-session": current.token,
       "x-skye-gate-source": current.source || "unknown",
       "x-skye-free99": "true"
     };
