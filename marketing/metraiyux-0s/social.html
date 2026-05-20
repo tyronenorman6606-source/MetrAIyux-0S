@@ -142,768 +142,608 @@
 <script>
 const POSTS = {
   linkedin: [
-    { title: "Platform Announcement", tags: "#SovereignTech #Cloudflare #SaaS", body: `Most "AI platforms" are dashboards bolted onto someone else's cloud.
+    { title: `The Real Build`, tags: ``, body: `Everyone's building SaaS.
 
-MetrAIyux 0S is different.
+I built an operating system.
 
-It's a sovereign operating system — 23 platform lanes, 17 Cloudflare Workers, 17 AI brains, 58 live Stripe products, 8 D1 databases — deployed on YOUR Cloudflare account.
+Not a dashboard with a login screen.
+Not a "platform" that's really just Airtable + Zapier with a custom domain.
 
-Not our cloud. Yours.
+An actual OS:
+→ 17 Cloudflare Workers wired via service bindings
+→ 17 AI brain personas with deterministic keyword routing
+→ Real Git smart-HTTP protocol running inside a CF Worker
+→ K8s HA Postgres with PITR and WAL streaming
+→ 58 live Stripe products — cs_live, not cs_test
+→ 875+ deployed HTML surfaces indexed and functional
 
-That distinction matters because:
-→ Your data never touches our servers after deployment
-→ You collect recurring revenue from every client lane
-→ You can white-label the entire stack under your brand in under 30 minutes
-→ No vendor can pull the plug on your business
+Pre-revenue. Infrastructure-complete. Zero direct competitors.
 
-We built the category. No direct competitor ships this as a deployable unit.
+I didn't buy a drag-and-drop tool and call it a product.
+I built the thing that drag-and-drop tools wish they could become.` },
+    { title: `The Valuation Conversation`, tags: ``, body: `When I tell investors MetrAIyux 0S is valued at $1.5M–$2.0M pre-revenue, some raise an eyebrow.
 
-GoHighLevel routes through their cloud. Firebase and Supabase are dev infrastructure. Retool is internal tools. None of them combine auth + email + database + Git vault + AI + payments + dispatch + realtime + music + staffing + legal + directory into one sovereign package.
+Then I show them the receipts.
 
-We did.
+CF-Ray headers on every endpoint.
+58 cs_live Stripe session IDs. Real ones.
+Git clone/push/fetch running against a CF Worker.
+Durable Objects WebSocket rooms at 300+ global PoPs.
+CitadelDB with DR drills run and passed.
+SkyeSecure secret packs with live proof counts.
+18 Relay13 proof checks — all green.
 
-Live system: metraiyux-0s-full-system.graylondonskyes.workers.dev
-Full breakdown: metraiyux-0s-marketing.pages.dev
+This isn't a pitch deck with mock screenshots.
+It's a deployed system. Every claim has a receipt.
 
-#SovereignTech #Cloudflare #AIInfrastructure #StartupFounder #SaaS #TechFounder` },
+A team starting from zero today:
+18–24 months. $3–5M in engineering.
 
-    { title: "The Valuation Post", tags: "#TechValuation #DeployedAsset", body: `$1.5M – $2.0M. Pre-revenue. Infrastructure-complete.
+Our ask: $1.5M–$2.0M.
 
-Here's what's deployed:
+That's not a valuation. That's a discount.` },
+    { title: `Why No Direct Competitor Exists`, tags: ``, body: `I've spent months looking for a direct competitor to MetrAIyux 0S.
 
-• 17 Cloudflare Workers — live, CF-Ray confirmed
-• 17 AI brain personas routing commands across the OS
-• 58 Stripe products — cs_live sessions, not test mode
-• 875+ HTML surfaces across 23 platform lanes
-• 8 D1 SQL databases (admin, security, SaaS, CROWN, NEXUS, QUANTUM, Sentinel, SkyeGate)
-• SkyeVault: real Git smart-HTTP protocol running inside a CF Worker
-• SkyeMusicNexus: native DAW, Drops room, Artist Exchange, rights vault
-• Valley Verified: 875+ Phoenix business surfaces
-• 28-lesson Admin Tutorial shipped with every deployment
+I can't find one.
 
-This isn't a pitch deck. It's a deployed asset with proof receipts on every endpoint.
+GoHighLevel — cloud-locked, no sovereignty, no real AI routing
+Firebase — dev infrastructure, not a business OS
+Supabase — excellent DB tool, not an operating system
+Retool — internal tools only, no payments, AI, or dispatch
+Bubble — no-code with zero infrastructure depth
 
-The valuation is conservative for what's been built.
+None of them ship:
+Auth + Email + Database + Git Vault + Encrypted Secret Custody + Proprietary AI + Payments + Realtime + Music + Staffing + Legal + Directory + Media + Content + Marketing
 
-#DeployedAsset #TechValuation #Cloudflare #SovereignInfrastructure #FounderJourney` },
+...as a single sovereign deployable package.
 
-    { title: "No Direct Competitor", tags: "#NoCompetitor #CategoryCreator", body: `I've been asked what competitor MetrAIyux 0S competes with.
+We didn't find a gap in the market.
+We found a category that didn't exist and built it ourselves.` },
+    { title: `What Sovereign Actually Means`, tags: ``, body: `"Sovereign infrastructure" gets thrown around a lot.
 
-The honest answer: none.
+Here's what it actually means when you deploy MetrAIyux 0S:
 
-Here's the gap:
+It goes into YOUR Cloudflare account.
 
-GoHighLevel — white-label model, but cloud-locked. Your client's data lives on their servers. Not sovereign.
+Not ours.
+Not a shared tenant environment.
+Yours.
 
-Supabase / Firebase / Appwrite — dev infrastructure. No AI routing layer, no payments OS, no workforce dispatch, no white-label commercial model.
+Your KV namespaces. Your D1 databases.
+Your Workers. Your R2 buckets. Your Durable Objects.
 
-Retool — internal tooling. Not a deployable business OS.
+After deployment, your data never touches our servers again.
 
-Bubble — no-code, no sovereignty, no edge infrastructure.
+GoHighLevel charges you forever to live in their house.
+MetrAIyux 0S hands you the deed on day one.` },
+    { title: `17 Brains. One OS.`, tags: ``, body: `Most AI products give you one model and call it intelligent.
 
-MetrAIyux 0S ships:
-✓ Auth + email + database + Git vault
-✓ 17 deterministic AI brains as the command routing substrate
-✓ Payments OS with 58 live Stripe products
-✓ Workforce dispatch + music platform + staffing + legal + directory
-✓ White-label deploy to YOUR Cloudflare account in 30 minutes
+MetrAIyux 0S ships 17 distinct AI brain personas.
 
-The category doesn't exist yet. We built it.
+Each owns a domain:
+Celeste — Revenue & Sales
+Victor Saint — Quality Assurance
+Marcus Oak — Technical Architecture
+Arthur Mirve — Legal & Compliance
+Delmar Mirror — Finance & Accounting
+Bennett Brooks — Brand & Marketing
+Sterling Navarre — Dispatch & Logistics
+Ariana Stross — Ecosystem Strategy
+Gray London Skyes — Main Automation Brain (connects all 17)
++ 8 more
 
-Full competitive breakdown: metraiyux-0s-marketing.pages.dev/the-gap.html
+Auren routes every command to the brain that owns the answer.
 
-#NoCompetitor #TechInnovation #SovereignTech #AIInfrastructure #Cloudflare` },
+Not a generic wrapper.
+Deterministic keyword classification.
+Same command in = same brain every time.
+Every decision logged. Every receipt generated.
 
-    { title: "Meet Auren", tags: "#SovereignAI #ArtificialIntelligence", body: `Meet Auren.
+Intelligence with accountability. That's the difference.` },
+    { title: `The Honest Numbers`, tags: ``, body: `Here's where MetrAIyux 0S actually stands:
 
-Not a chatbot. Not a plugin. The central intelligence layer of an operating system.
+Revenue: $0
+Customers: Pre-launch
+Team: 1 person
 
-Auren routes commands across all 17 AI brain personas, 13 cabinet functions, and 23 platform lanes in MetrAIyux 0S.
+What's live anyway:
+17 Cloudflare Workers
+17 CF Pages projects
+23 gated platform lanes
+58 Stripe products (cs_live)
+875+ indexed HTML surfaces
+8 active D1 databases
+78 surfaces with verified CF-Ray proof
+npm SDK published (@metraiyux/0s-sdk)
+SkyeVault — real Git protocol (clone, push, fetch, snapshot, policy)
+CitadelDB v3 — K8s HA Postgres with PITR
+SkyeSecure FS27 — encrypted secret custody with live proof count
+725-chunk local brain mesh — on-device, no LLM API calls for routing
 
-When an executive command fires, Auren routes it to the right brain — sales, staffing, legal, finance, tech, operations — and returns a doctrine-aware answer from the company corpus.
+A funded team building this from scratch: $3M–$5M, 18–24 months.
 
-Zero LLM cost per route decision. 725 knowledge chunks on-device. Sovereign, not OpenAI-branded.
+I'm not a unicorn.
+I just didn't stop building.` },
+    { title: `SkyeVault: Git in a CF Worker`, tags: ``, body: `I built a real Git server inside a Cloudflare Worker.
 
-This is what AI as an OS layer actually looks like.
+Not an integration. Not a GitHub API wrapper.
 
-Not "add AI to your workflow."
-AI IS the workflow.
+A full Git smart-HTTP protocol implementation running at the edge.
 
-#ArtificialIntelligence #AIInfrastructure #SovereignAI #TechFounder #OperatingSystem` },
+Clone. Push. Fetch. Snapshot. Restore. Policy. Quota. Per-workspace neural maps.
 
-    { title: "SkyeMusicNexus", tags: "#MusicTech #SovereignTech", body: `We built a full music operating system inside MetrAIyux 0S.
+CF Worker as the Git remote.
+D1 as the pack store.
+FS27 auth on every operation.
+Full CLI support.
 
-SkyeMusicNexus includes:
-• Native DAW — browser-based, no install
-• Drops Room — artist release and purchase surface
-• Music Discover + Feed — artist discovery network
-• Upload Studio — direct-to-platform publishing
-• Release Forge — mastering and distribution pipeline
-• Artist Exchange — collaboration and licensing marketplace
-• Rights Vault — royalty ledger and rights documentation
-• Split Engine — real-time royalty splits and payout routing
+We ran every proof check:
+Clone a real repo ✓
+Push a commit ✓
+Fetch and verify integrity ✓
+Snapshot and restore ✓
+Apply quota limits ✓
+Enforce policy ✓
 
-It's all sold through SkyePay. Every transaction routes through the 58-product Stripe catalog. Rights are stored in vault. Royalties auto-split.
+All passed.
 
-This is one lane in a 23-lane OS.
+Nobody builds this in a weekend.
+Nobody builds this at all.` },
+    { title: `58 Products. cs_live.`, tags: ``, body: `58 Stripe products. All live.
 
-#MusicTech #MusicBusiness #SovereignTech #AIMusic #TechFounder` },
+Not test mode. cs_live.
 
-    { title: "White Label Opportunity", tags: "#WhiteLabel #RecurringRevenue", body: `The white-label opportunity with MetrAIyux 0S:
+Music drops. Staffing fees. Vault access.
+Legal templates. White-label seats. Featured placement.
+API tiers. Owner-approval purchases. Subscriptions.
 
-You deploy a 23-lane OS under your client's brand.
-You collect the recurring revenue.
-You own the infrastructure relationship.
+One payment OS. Every lane. Every transaction receipted.
 
-What the client gets:
-→ Full auth platform (SkyeGate FS27)
-→ Email OS (SkyeMail — 43,395 lines, hosted mailbox)
-→ Sovereign database (CitadelDB v3 — K8s HA Postgres)
-→ Git vault (SkyeVault — real Git protocol at CF edge)
-→ Proprietary AI (kAIxu 6.7 — 5 variants, fully white-labeled)
-→ Payment OS (SkyePay — 58 products)
-→ Music platform, staffing, legal, dispatch, media, and 14 more lanes
+Most "platforms" have a payment integration.
+MetrAIyux 0S has a payment operating system.
 
-What you get:
-→ $49–$1,997/mo per client
-→ No architecture work — provisioning-ready today
-→ 28-lesson admin tutorial so clients onboard themselves
-→ @metraiyux/0s-sdk npm package + 4 client integration templates
+SkyePay sits at the center and every revenue event runs through it.` },
+    { title: `CROWN OS: This Is What Control Looks Like`, tags: ``, body: `Every MetrAIyux 0S operator gets a command surface called CROWN OS.
 
-Deploy time: under 30 minutes via wrangler.
+It is not a dashboard.
 
-#WhiteLabel #SaaS #TechEntrepreneur #Cloudflare #RecurringRevenue` },
+It is a control room.
 
-    { title: "Valley Verified", tags: "#ValleyVerified #Phoenix", body: `875+ verified business surfaces. All live. All deployed.
+Nothing moves without explicit owner approval.
+Every deployment is logged.
+Every revenue event is visible in real time.
+Every brain routing decision stored in D1.
+Every security scan result receipted.
 
-Valley Verified is the Phoenix-area business discovery network built into MetrAIyux 0S.
+If a user tries to post something publicly, 0meg4kAI scans it first.
+It sits in an approval queue.
+The owner releases it — or it never goes live.
 
-But it's more than a directory:
-• Trust network — verified, gated business profiles
-• Service lanes — searchable by category and location
-• Custom app builds — Bob's Smoke Shop, Empire Pallets, 480 Realty, Dink & Dine, Techbros, ArcLight Pictures — all live
-• Location-aware routing — CF Worker-powered geolocation
-• Featured placement — sold through SkyePay
+When I say this system was built for owners, this is what I mean.` },
+    { title: `SOL Staffing`, tags: ``, body: `SOL Staffing is one lane inside MetrAIyux 0S.
 
-Every business on Valley Verified gets a surface deployed on Cloudflare's global edge. Not a Squarespace page. An edge-native application.
+89 pages. 10,270+ lines of production code.
+Intake → Screening → Placement → Payment.
 
-This is one lane. There are 22 others.
+Cloudflare Worker.
+Auth: SkyeGate FS27.
+Payments: SkyePay.
+Data: D1.
+Realtime dispatch: Relay13.
 
-#LocalBusiness #Phoenix #ValleyVerified #TechFounder #EdgeNative` },
+This is not a job board.
+This is a full workforce management platform.
 
-    { title: "13-Cabinet Structure", tags: "#Leadership #CompanyOS", body: `MetrAIyux 0S isn't just a tech product. It's a company operating system.
+And it is one of 23 lanes.
 
-We run a 13-cabinet office model:
+The staffing industry spent $218 billion last year on platforms that don't work like this.` },
+    { title: `The SDK`, tags: ``, body: `@metraiyux/0s-sdk is live on npm.
 
-1. Executive Command — Gray London Skyes (Founder)
-2. Operations — Marcus Vale (CEO/COO)
-3. Sales & AE — Celeste Monroe (CRO)
-4. Client Success — Adrian Cross
-5. Finance — Naomi Sterling
-6. Legal & Compliance — Julian Mercer
-7. HR & Staffing — Sienna Brooks
-8. Technology — Orion Hayes (CTO)
-9. Marketing & Brand — Valentina Reyes
-10. Government & Enterprise — Donovan Pierce
-11. Partnerships — Helena Ward
-12. Quality Assurance — Victor Saint
-13. Expansion & Innovation — Amara Voss
+4 legal templates at install.
+TypeScript types exported.
+FS27 service binding integration baked in.
+Built to extend the OS without modifying the core.
 
-Each cabinet has an attached AI brain persona trained on the company corpus. Every AE, operator, and client gets doctrine-consistent answers from a knowledge base that understands which function owns what.
+Third-party developers can now build ON MetrAIyux 0S.
+Operators can extend their deployment without waiting on us.
+White-label partners get an SDK contract, not just a theme file.
 
-#ExecutiveLeadership #CompanyStructure #AIFirst #OperatingSystem #TechFounder` },
+This is what platform infrastructure looks like when it's built to scale.` },
+    { title: `Free99`, tags: ``, body: `Free99 is not a trial.
 
-    { title: "Proof Post", tags: "#ProofOfWork #Deployed", body: `People ask how I know it works.
+It is a permanent free tier of MetrAIyux 0S.
 
-Here's the proof:
+Full auth. Public surface access. kAIxu 6.7 on free corpus.
+SkyeMerit reputation system from day one.
+No credit card. No timer. No expiration.
 
-✓ CF-Ray headers confirmed on every Worker endpoint
-✓ 58 cs_live Stripe sessions — production checkout, not test mode
-✓ Durable Objects realtime — stateful WebSocket rooms, D1 persistence, proof receipts per session
-✓ SkyeVault Git remote proof passed — clone, push, fetch, policy, snapshots all verified
-✓ Relay13 v1.8 guardrails live — server-side AI policy, AI cost ledger, full audit trail
-✓ 8 D1 SQL databases active and queryable
-✓ 875+ HTML surfaces indexed and routable
-✓ 78 live surfaces with verified uptime
+We want you to see the system is real before you pay anything.
 
-Every endpoint has a proof receipt. Every Worker has a CF-Ray. Every Stripe session is cs_live.
+Most SaaS hides behind a demo call.
+We let you in the front door.
 
-This isn't a demo environment. It's a production system.
+If you're ready to move past Free99, paid tiers start at $49/mo.` },
+    { title: `SkyeMusicNexus`, tags: ``, body: `Nobody expects an OS to have a music platform inside it.
 
-#ProofOfWork #TechFounder #Cloudflare #SovereignTech #Deployed` },
+SkyeMusicNexus is one of 23 lanes in MetrAIyux 0S.
 
-    { title: "The @metraiyux/0s-sdk", tags: "#npm #DeveloperTools", body: `We shipped an npm package.
+Native browser DAW. Drops Room. Artist Exchange.
+Rights Vault (backed by SkyeVault Git). Split Engine. Release Forge.
 
-@metraiyux/0s-sdk
+Every right documented.
+Every royalty split receipted.
+Every transaction through SkyePay.
 
-What it gives third-party developers:
-→ 4 client integration templates (pre-wired to the 0S API)
-→ Authentication bridge to SkyeGate FS27
-→ Payment hooks into SkyePay's 58-product catalog
-→ Typed access to CitadelDB and SkyeVault endpoints
-→ LegalSkyes document routing templates
+Music artists don't need three tools, a distribution deal, and a lawyer.
+They need one OS that handles all of it.
 
-This is how the ecosystem grows. Independent developers building on sovereign infrastructure they don't have to maintain.
+That's this lane.` },
+    { title: `LegalSkyes`, tags: ``, body: `Most business software tells you to "consult a lawyer."
 
-npm install @metraiyux/0s-sdk
+MetrAIyux 0S built the legal infrastructure in.
 
-#npm #SDK #DeveloperTools #Cloudflare #TechFounder` },
+LegalSkyes:
+→ Contract routing and templating
+→ Compliance workflow automation
+→ Document version control
+→ Risk classification by document type
+→ 4 legal templates in the SDK at install
 
-    { title: "CROWN OS + NEXUS OS", tags: "#EnterpriseOS #CRM", body: `Two systems inside MetrAIyux 0S that most platforms don't even attempt:
+Every business function has a legal surface.
+Legal is infrastructure — not an afterthought.` },
+    { title: `Valley Verified`, tags: ``, body: `875+ Phoenix businesses. All verified. All edge-deployed.
 
-CROWN OS — the command room layer
-• Approval gates for every owner-level action
-• Revenue pulse dashboard — real-time operator share tracking
-• Proof command surface — every deployment logged and receipted
-• Executive command routing through Auren
+Valley Verified is not a Yelp alternative.
 
-NEXUS OS — the record mesh layer
-• Full CRM — pipeline records, contact management, deal tracking
-• Brain-routed inbox — messages classified and routed by AI persona
-• Multi-tenant isolation — every client's records siloed by design
-• Connects to APEX enterprise layer for deal room escalation
+It is a business directory on Cloudflare's global edge.
 
-These aren't modules you add on. They're core OS surfaces.
+Every listing is a real HTML surface.
+Every business has verified contact records.
+Every paying business gets a custom-built app — not just a listing.
 
-#CRM #EnterpriseOS #Cloudflare #SovereignTech #AIInfrastructure` },
+Six live client builds already deployed.
+Branded app, buyer actions, video proof, QR routes, quote flows.
 
-    { title: "Ascension + APEX", tags: "#SalesOps #EnterpriseB2B", body: `Two revenue-layer surfaces inside MetrAIyux 0S:
+Phoenix runs on small businesses.
+Valley Verified gives them infrastructure-grade visibility.` },
+    { title: `White Label`, tags: ``, body: `Agency owners. Developers. Read this.
 
-Ascension — the buyer conversion layer
-• Buyer intelligence surface — who's in the funnel and where
-• Deal rooms — real-time collaborative deal management
-• Revenue war room — operator-level revenue command
-• Proof export — send verified capability proof to prospects
+MetrAIyux 0S is fully white-label deployable.
 
-APEX — the enterprise layer
-• Enterprise account plans with executive KPI tracking
-• M&A readiness briefs — trust documents for acquisition conversations
-• Government readiness — procurement, capability statements
-• APEX playbooks — enterprise-specific AE sales scripts
+Under 30 minutes via wrangler.
+Your logo. Your domain. Your clients. Your pricing.
+$49–$1,997/mo per client.
+28-lesson tutorial included.
+Zero architecture work.
 
-The entire revenue motion — from Free99 intake to enterprise close — ships as part of the OS.
+You're not reselling a SaaS subscription.
+You're deploying a sovereign OS under your brand.
 
-#SalesStrategy #EnterpriseB2B #RevenueOps #TechFounder #SovereignTech` },
+Infrastructure is done. Clients are yours. Revenue is recurring.
 
-    { title: "For Investors", tags: "#InvestorRelations #PreRevenue", body: `What $1.5M–$2.0M buys you in MetrAIyux 0S:
+This is what white-label was supposed to be.` },
+    { title: `Auren vs. a Chatbot`, tags: ``, body: `People keep calling their AI product "intelligent."
 
-Infrastructure (deployed):
-• 17 Cloudflare Workers on production edge
-• 8 D1 SQL databases with full schema
-• 23 platform lanes — all live, all routable
+Here's the actual difference:
 
-AI Layer (running):
-• 17 brain personas on-device
-• Auren central intelligence routing
-• 725 knowledge chunks in corpus
-• kAIxu 6.7 — 5 sovereign AI variants
+A chatbot takes your input and sends it to an LLM.
 
-Commercial Model (built):
-• 5 licensing tiers — Free99 through Enterprise
-• White-label deploy model
-• @metraiyux/0s-sdk for ecosystem expansion
-• SkyeMerit loyalty system
+Auren takes your command, classifies it by keyword, routes it to the brain that owns that domain, generates a receipt, and logs the decision in D1 — without calling an external LLM for the routing step.
 
-Revenue path:
-• $49–$1,997/mo per deployed client
-• White-label licensing (custom)
-• SkyePay store transactions
+Zero API cost on route decisions.
+725 knowledge chunks on-device.
+17 brains. Each with their own corpus.
+Every action timestamped and auditable.
 
-Pre-revenue. Infrastructure-complete. Category-defining.
+Intelligence isn't a model. Intelligence is architecture.` },
+    { title: `CitadelDB`, tags: ``, body: `We don't use Firebase.
+We don't use Supabase.
+We don't use PlanetScale.
 
-#InvestorRelations #TechInvestment #PreRevenue #Startup #SovereignTech` },
+We built our own sovereign database layer.
 
-    { title: "SOL Staffing", tags: "#Staffing #WorkforceTech", body: `We built a full staffing agency platform and deployed it on a Cloudflare Worker.
+CitadelDB v3.0.1:
+K8s HA Postgres cluster
+PITR (point-in-time recovery)
+WAL streaming replication
+Operator control plane
+DR drills completed and passed
+8 active D1 databases alongside it at edge
 
-SOL Staffing:
-• 89+ pages
-• 10,270 lines of production code
-• Intake routing — candidate → screening → placement pipeline
-• Workforce planning surface
-• SkyeRouteX integration — $6,500 live dispatch OS
-• SkyePay-gated — all staffing fees run through the 58-product catalog
+Enterprise deployments don't want their data in someone else's managed cloud under terms they don't control.
 
-This is one lane in a 23-lane OS.
+CitadelDB gives operators a real database on their own infrastructure.` },
+    { title: `What Pre-Revenue Really Means`, tags: ``, body: `Pre-revenue gets treated like a red flag.
 
-The staffing platform, the payment system, the legal review layer, the dispatch routing, the AI brain, and the proof receipts — all deployed together as a sovereign stack.
+It shouldn't be — if the infrastructure is real.
 
-#Staffing #WorkforceTech #Cloudflare #SovereignTech #TechFounder` },
+Pre-revenue with nothing: a Notion doc, a Figma, and a landing page.
 
-    { title: "Free99 Tier", tags: "#FreeTier #ProductLed", body: `The free tier that proves the product before anyone pays.
+MetrAIyux 0S pre-revenue:
+17 Workers live with real service bindings
+58 cs_live Stripe products
+A functioning staffing platform (89 pages, 10K+ lines)
+A music platform with a native browser DAW
+A working Git server in a CF Worker
+A sovereign database with DR drills done
+An npm SDK with legal templates
+875+ deployed surfaces
 
-Free99 is the gated free-lane intake surface in MetrAIyux 0S:
-• Gated access to public platform surfaces
-• SkyeGate FS27 — full auth even on free tier
-• Brain-routed onboarding — kAIxu answers from free corpus
-• Upgrades directly into the 5-tier licensing model
-• SkyeMerit points start accumulating from day one
+Pre-revenue means no customers yet.
+It doesn't mean nothing exists.
 
-Free users see the full system. They just don't have owner-level command.
+Everything exists. Everything works.
+We're opening the doors.` },
+    { title: `Ascension`, tags: ``, body: `Ascension is how MetrAIyux 0S converts buyers.
 
-The goal: show them the platform is real before asking for a dollar.
+Not a CRM.
+A sales operating system.
 
-#FreeTier #SaaS #ProductLed #TechFounder #Cloudflare` },
+Buyer intel dashboard.
+Deal rooms — logged and timestamped.
+Revenue war room with live pulse.
+Proof export — timestamped, ready to send.
+Celeste brain routes every buyer interaction.
+Full funnel from Free99 intake to enterprise close.
 
-    { title: "Admin Tutorial", tags: "#SaaS #OnboardingExperience", body: `28 lessons. Shipped with every deployment.
+Every deal room conversation logged in D1.
+Every proof export signed with a timestamp.
+Every buyer movement through the funnel visible.
 
-The MetrAIyux 0S Admin Tutorial covers:
-• OS orientation — navigating the 23-lane system
-• SkyeGate FS27 — key management, API setup, OAuth flows
-• CitadelDB — schema management, PITR, operator controls
-• SkyeMail — mailbox setup, AI generation, delivery config
-• SkyePay — product catalog, approval gates, billing flows
-• kAIxu 6.7 — brain activation, plan gating, corpus training
-• Auren — command routing, brain persona configuration
-• White-label setup — wrangler deploy, brand switching, DNS routing
-• CROWN OS — command room setup, approval workflows
-• NEXUS OS — CRM setup, inbox routing, pipeline config
-• And 18 more lessons
-
-No hand-holding by us required. Operators onboard themselves.
-
-#SaaS #ProductDocumentation #TechFounder #OnboardingExperience #Cloudflare` },
-
-    { title: "Quantum Ops + SkyeWay", tags: "#CloudflareWorkers #DevOps", body: `Two surfaces that make the OS legible to operators:
-
-0s SkyeWay — the route atlas
-• Maps every surface, lane, and proof route in the OS
-• Real-time route health visualization
-• Shows which Workers are live, which brains are active
-• Entry point for new operators learning the system
-
-Quantum Ops — the runtime layer
-• Cloudflare state management and Worker health monitoring
-• D1 database query surface — live data inspection
-• Runtime orchestration — deploy triggers, rollback controls
-• CF Worker performance metrics and invocation logs
-
-When you own the infrastructure, you need the tools to see it clearly.
-
-#CloudflareWorkers #DevOps #Infrastructure #TechFounder #SovereignTech` },
-
-    { title: "The Build Story", tags: "#BuildInPublic #FounderStory", body: `I didn't buy a no-code tool and call it a platform.
-
-I built:
-• 17 Cloudflare Workers from scratch
-• A real Git protocol running inside a CF Worker (SkyeVault)
-• A proprietary AI model family (kAIxu 6.7 — 5 variants)
-• A music DAW running in the browser
-• A staffing platform with 10,270 lines of production code
-• A payment OS with 58 live Stripe products
-• A legal ops platform with an npm SDK
-• A central intelligence layer (Auren) routing commands across 17 brains
-
-Every line of this was built with intention. Every surface has a proof receipt. Every endpoint has a CF-Ray.
-
-Pre-revenue. Infrastructure-complete. Category-defining.
-
-#FounderStory #BuildInPublic #TechFounder #Cloudflare #SovereignTech` },
-
-    { title: "LegalSkyes", tags: "#LegalTech #Compliance", body: `Legal infrastructure shouldn't be an afterthought.
-
-LegalSkyes is the legal ops lane inside MetrAIyux 0S:
-• Contract template routing — standard agreements for each service type
-• Compliance workflow surface — risk classification and routing
-• Document control — version tracking inside SkyeVault
-• Julian Mercer brain — the compliance cabinet AI trained on legal doctrine
-• Policy surface — jurisdiction-aware policy routing
-• @metraiyux/0s-sdk — pre-built legal templates for third-party integrations
-
-Every staffing placement, every client engagement, every white-label deployment has a legal surface behind it.
-
-Not a "consult a lawyer" button. A compliance-aware OS.
-
-#LegalTech #Compliance #RiskManagement #TechFounder #SovereignTech` },
-
-    { title: "Content Forge + Marketing Made Easy", tags: "#ContentMarketing #MarTech", body: `Two surfaces inside MetrAIyux 0S that handle the entire content and marketing motion:
-
-Content Forge:
-• Full publishing surface — articles, posts, announcements
-• Runs inside the OS, not a third-party CMS
-• Brain-assisted drafting via kAIxu 6.7
-• Content routes to SkyeMediaCenter for distribution
-
-Marketing Made Easy:
-• Full-surface growth suite built into the OS
-• Campaign routing — every campaign has an approval gate
-• Lead intake connected to NEXUS OS CRM
-• Conversion tracking wired to Ascension deal rooms
-• Brand-switchable for white-label deployments
-
-The marketing motion is part of the product. Not a plugin. Not an integration.
-
-#ContentMarketing #MarTech #TechFounder #SovereignTech #Cloudflare` }
+When someone asks if we can close: this is the answer.` }
   ],
-
   facebook: [
-    { title: "Platform Introduction", body: `We built something that doesn't exist anywhere else.
+    { title: `I built an operating system for businesses.`, tags: ``, body: `Not a SaaS tool. Not an app. An actual OS.
 
-MetrAIyux 0S is a sovereign infrastructure operating system — 23 platform lanes, 17 AI brains, deployed on YOUR Cloudflare account. Not ours. Yours.
-
-What that means in plain English:
-✅ Your data never leaves your servers
-✅ You own every part of the stack
-✅ You can white-label the whole thing and sell it to clients
-✅ 23 fully deployed platform lanes — auth, email, database, music, staffing, legal, payments, dispatch, media, marketing, AI, and more
-
-All of this is live. Right now. With proof receipts on every endpoint.
-
-No competitor ships this as a single deployable package. We built the category.
-
-👉 See it live: metraiyux-0s-full-system.graylondonskyes.workers.dev
-👉 Marketing site: metraiyux-0s-marketing.pages.dev` },
-
-    { title: "SkyeMusicNexus Deep Dive", body: `We put a full music platform inside an operating system. Let me explain why.
-
-SkyeMusicNexus isn't a Spotify clone or a SoundCloud ripoff. It's a complete music operating surface:
-
-🎵 Native DAW — record, produce, and mix in the browser
-🎵 Drops Room — release your music and sell it directly to fans
-🎵 Artist Exchange — collaboration and licensing marketplace
-🎵 Release Forge — mastering and distribution pipeline
-🎵 Rights Vault — your royalty documentation, secured in SkyeVault
-🎵 Split Engine — automatic royalty splits to every contributor
-
-Every transaction goes through SkyePay. Every rights document is stored in SkyeVault. Every royalty split is calculated and logged in real time.
-
-Artists own their music. Labels own their catalog. Everyone gets paid automatically.
-
-This is one of 23 lanes. The other 22 are just as deep.
-
-👉 metraiyux-0s-marketing.pages.dev` },
-
-    { title: "The Proof Post", body: `"Is this actually live or just a demo?"
-
-Here's the proof:
-
-🔴 CF-Ray headers on EVERY Worker endpoint — Cloudflare's timestamp on every single request. Can't fake it.
-
-🔴 58 cs_live Stripe sessions — cs_live means real production checkout. Not test mode. Real money.
-
-🔴 Durable Objects WebSocket rooms — stateful real-time sessions with D1 persistence and proof receipts per session.
-
-🔴 SkyeVault Git remote proof — actual clone, push, fetch, and policy enforcement on a real Git protocol running inside a Cloudflare Worker.
-
-🔴 8 D1 SQL databases active — admin, security, SaaS, CROWN, NEXUS, QUANTUM, Sentinel, SkyeGate. All live. All queryable.
-
-🔴 Relay13 v1.8 guardrails — server-side AI policy, AI cost ledger, full audit trail.
-
-This is a production system. Everything has a receipt.` },
-
-    { title: "Meet Auren", body: `This is Auren. The central intelligence of MetrAIyux 0S.
-
-Not a chatbot. Not a feature. A command routing layer that sits at the center of the entire operating system.
-
-When an executive command fires in MetrAIyux 0S, Auren decides which of the 17 AI brain personas should handle it. Sales question? Routes to Celeste (the Revenue brain). Compliance issue? Routes to Julian (the Legal brain). Tech question? Routes to Orion (the Technology brain).
-
-Each brain is trained on the company corpus — resumes, charter, doctrine, proof receipts, live surface registry.
-
-Zero LLM cost per route decision. The routing is deterministic. The answers come from the brain. The brain runs on 725 on-device knowledge chunks.
-
-This is what AI actually integrated into a business looks like.` },
-
-    { title: "Valley Verified — Phoenix", body: `875+ businesses. All verified. All deployed on Cloudflare's global edge.
-
-Valley Verified is the Phoenix-area business discovery network inside MetrAIyux 0S.
-
-Every business on Valley Verified gets:
-• An edge-native surface (CF Worker, not a shared hosting page)
-• Trust verification badge and profile
-• Service lane categorization
-• Location-aware routing
-• SkyePay integration for featured placement and services
-
-For local businesses, this is how you get a real internet presence — not a Yelp listing, an actual deployed application.
-
-📍 metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/` },
-
-    { title: "White Label Opportunity", body: `Want to build a SaaS business without building the infrastructure?
-
-MetrAIyux 0S white-label licensing lets you deploy the full 23-lane OS under YOUR brand in under 30 minutes.
-
-Here's what your clients get under your brand:
-🔧 Full auth platform (SkyeGate FS27)
-📬 Email OS (SkyeMail — complete mailbox + AI generation)
-🗄️ Sovereign database (CitadelDB — K8s HA Postgres)
-🔐 Git vault (SkyeVault — real Git protocol at edge)
-🧠 Proprietary AI (kAIxu 6.7 — white-labeled to YOUR brand)
-💳 Payment OS (SkyePay — your products, your revenue)
-🎵 Music platform, staffing, legal, dispatch, media, and 16 more lanes
-
-Your infrastructure. Your brand. Your revenue.
-
-👉 metraiyux-0s-marketing.pages.dev/white-label.html` },
-
-    { title: "Sovereign Infrastructure Explained", body: `"Sovereign infrastructure" gets used a lot. Here's what it actually means with MetrAIyux 0S.
-
-Traditional SaaS: You sign up. Their servers. Their rules. Their outage is your outage. Their price increase is your problem.
-
-MetrAIyux 0S sovereign deploy:
-✅ Deployed to YOUR Cloudflare account
-✅ YOUR environment variables, YOUR API keys, YOUR database credentials
-✅ Data never touches our servers after deployment
-✅ You control every setting, every gate, every approval
-✅ We go away tomorrow — your system keeps running
-
-This is the difference between renting and owning.
-
-You don't rent MetrAIyux 0S. You deploy it, own it, and run it.` },
-
-    { title: "The 13 Cabinets", body: `MetrAIyux 0S doesn't just run on Cloudflare. It runs on a 13-cabinet executive structure.
-
-Every cabinet has a function, a leader, and a dedicated AI brain trained on company doctrine:
-
-👑 Executive Command — Gray London Skyes (Founder)
-⚙️ Operations — Marcus Vale (CEO/COO)
-💼 Sales & AE — Celeste Monroe (CRO)
-🤝 Client Success — Adrian Cross
-💰 Finance — Naomi Sterling
-⚖️ Legal & Compliance — Julian Mercer
-👥 HR & Staffing — Sienna Brooks
-🖥️ Technology — Orion Hayes (CTO)
-📣 Marketing & Brand — Valentina Reyes
-🏛️ Government & Enterprise — Donovan Pierce
-🤝 Partnerships — Helena Ward
-✅ Quality Assurance — Victor Saint
-🚀 Expansion & Innovation — Amara Voss
-
-When you ask a question in the 0S, you're not asking a generic AI. You're asking the cabinet brain that owns that function.` },
-
-    { title: "SkyePay Deep Dive", body: `58 live Stripe products. All cs_live. All in production.
-
-SkyePay is the full payment OS inside MetrAIyux 0S. Here's what it handles:
-
-• Owner-approval gate — no charge goes through without explicit owner sign-off
-• Platform subscriptions — all 5 licensing tiers (Free99 → Enterprise)
-• SkyeMusicNexus — single song drops, album releases, artist subscriptions
-• SkyeRouteX — workforce dispatch fees and contractor payments
-• SOL Staffing — placement fees and retainer billing
-• Valley Verified — featured placement and service bookings
-• And every other monetizable action across 23 platform lanes
-
-One payment system. Every lane. Owner approval on everything.
-
-That's not a Stripe integration. That's a payment OS.` },
-
-    { title: "For Phoenix Business Owners", body: `Attention Phoenix business owners 👋
-
-Valley Verified is the MetrAIyux 0S business directory built specifically for the Valley.
-
-What you get with a Valley Verified listing:
-✅ Edge-native business surface (faster than any traditional website)
-✅ Trust verification badge
-✅ Searchable by category, location, and service type
-✅ SkyePay-powered booking and featured placement
-✅ Connected to a 875+ surface network of Phoenix businesses
-
-If you're tired of Yelp taking a cut, Google Business not showing up, and your website looking like everyone else's — this is the alternative.
-
-📍 metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/` },
-
-    { title: "SOL Staffing", body: `We built a complete staffing agency platform and deployed it to a Cloudflare Worker.
-
-SOL Staffing:
-📋 89+ pages — full agency website and client portal
-📝 10,270 lines of production code
-🔄 End-to-end pipeline: intake → screening → placement → payout
-💳 SkyeRouteX integration — dispatch OS with payment ledger
-⚖️ LegalSkyes connection — every placement has a compliance surface
-🧠 Sienna Brooks brain — the HR cabinet AI on every staffing query
-
-This isn't a job board. This is a staffing COMPANY operating system.
-
-Companies looking to build or run a staffing agency: this infrastructure is already deployed. White-label licensing available.` },
-
-    { title: "28-Lesson Admin Tutorial", body: `28 lessons. Shipped with every deployment. Zero hand-holding required.
-
-The MetrAIyux 0S Admin Tutorial doesn't just explain the system — it teaches operators how to run it.
-
-Topics covered:
-📌 OS navigation and lane overview
-📌 SkyeGate FS27 key management and OAuth setup
-📌 CitadelDB operator controls and schema management
-📌 kAIxu 6.7 brain activation and corpus training
-📌 Auren command routing configuration
-📌 White-label brand switching via wrangler
-📌 CROWN OS command room setup
-📌 NEXUS OS CRM and inbox configuration
-📌 SkyePay product catalog and approval gates
-📌 28 modules total covering every major lane
-
-If you can follow instructions, you can run MetrAIyux 0S. The tutorial is proof.` },
-
-    { title: "Content + Marketing Stack", body: `MetrAIyux 0S handles your entire content and marketing operation:
-
-📝 Content Forge — write and publish from inside the OS
-📱 SkyeMediaCenter — manage and distribute all media assets
-📣 Marketing Made Easy — full growth suite with campaign routing
-🔍 SEO surfaces — auto-generated on every publish
-📊 Conversion tracking — wired to Ascension deal rooms
-🤖 kAIxu 6.7 — AI-assisted drafting, not a third-party plugin
-
-No Wordpress. No Webflow. No HubSpot.
-
-Your content. Your brand. Your OS.` },
-
-    { title: "HouseOps + SkyeBox", body: `Operations management and secure file delivery. Two lanes, one mission: keep the machine running.
-
-HouseOps — internal operations surface:
-• Task routing across cabinet functions
-• Team coordination without leaving the OS
-• Approval workflows connected to CROWN OS
-• Real-time operations visibility
-
-SkyeBox — secure file delivery:
-• Workspace-gated access (SkyeGate FS27 required)
-• Every file handoff generates a proof receipt
-• No public sharing links — everything is permission-gated
-• Integrates with SkyeVault for version tracking
-
-When you're running a business on sovereign infrastructure, "sending a file" means something different. Every handoff is logged. Every access is gated. Every receipt is permanent.` },
-
-    { title: "Why We Built This", body: `The honest reason MetrAIyux 0S exists:
-
-Every platform I looked at either:
-❌ Locked my data on their servers
-❌ Charged me per seat with no end in sight
-❌ Required me to be their customer forever to run my business
-❌ Gave me a dashboard with no actual infrastructure underneath
-
-So I built the alternative.
-
-A platform that deploys to your account.
-That you own completely.
-That generates recurring revenue for YOU, not a vendor.
-That runs 23 platform lanes as one sovereign package.
-
-Pre-revenue. Infrastructure-complete. No direct competitor.
-
-That's MetrAIyux 0S.
-
-👉 metraiyux-0s-marketing.pages.dev` },
-
-    { title: "LegalSkyes Feature", body: `Legal infrastructure for the modern business OS.
-
-LegalSkyes inside MetrAIyux 0S:
-⚖️ Contract template routing — standard agreements pre-loaded for every service type
-📋 Compliance workflow surface — classify and route risk automatically
-📁 Document control — version tracking inside SkyeVault
-🧠 Julian Mercer brain — the compliance AI trained on legal doctrine
-🌐 Policy surface — jurisdiction-aware policy routing
-📦 @metraiyux/0s-sdk — legal templates for third-party integrations
-
-Every staffing placement has a contract surface.
-Every white-label deployment has a compliance checklist.
-Every client engagement runs through legal review.
-
-Not a "consult a lawyer" button. A compliance-aware OS.` },
-
-    { title: "Relay13 + ConnectLog", body: `Real-time infrastructure that actually works.
-
-Relay13 + ConnectLog is the realtime surface inside MetrAIyux 0S:
-
-⚡ Durable Objects WebSocket rooms at Cloudflare's global edge
-⚡ Stateful sessions with D1 persistence
-⚡ Per-workspace AI policy enforcement (server-side)
-⚡ AI usage cost ledger — know exactly what every session costs
-⚡ Proof receipts on every connection event
-⚡ 18 live proof checks verified
-
-v1.8 guardrails: We don't just provide realtime — we provide auditable, policy-gated, AI-aware realtime.
-
-Every room knows who's in it. Every message has a policy. Every session has a receipt.
-
-This is what infrastructure-complete realtime looks like.` },
-
-    { title: "Valuation Breakdown", body: `$1.5M – $2.0M. Pre-revenue. Here's why the number is conservative.
-
-What's been built and deployed:
-
-Infrastructure: 17 CF Workers, 8 D1 databases, 17 CF Pages projects, Durable Objects, KV stores
-
-Platform lanes: 23 deployed surfaces including a music OS, staffing platform, legal ops system, full payment OS, Git vault, email platform, sovereign AI, and more
-
-Code: 875+ HTML surfaces. SkyeMail alone is 43,395 lines. SOL Staffing is 10,270 lines. SkyeGate FS27 is 20,284 lines.
-
-Commercial: 58 live Stripe products, cs_live proof sessions, 5-tier pricing model, white-label licensing, @metraiyux/0s-sdk npm package
-
-A team building this from scratch would spend 18–24 months and $3–5M in engineering costs.
-
-The valuation is $1.5M–$2.0M. That's conservative.` },
-
-    { title: "Free99 Tier", body: `Want to see the full system before paying anything?
-
-Free99 is the gated free tier inside MetrAIyux 0S.
-
-What you get for free:
-✅ Full SkyeGate FS27 authentication
-✅ Access to public platform surfaces
-✅ kAIxu 6.7 on the free corpus
-✅ SkyeMerit points from day one
-✅ The full OS navigation — you see everything
-
-What you don't get (yet):
-⛔ Owner-level command
-⛔ White-label deploy
-⛔ Full lane activation
-
-The free tier isn't a trial with a timer. It's a permanent access level.
-
-We want you to see the system is real before you pay for it. That's Free99.` },
-
-    { title: "The SDK Launch", body: `Developers 👋 — @metraiyux/0s-sdk is live on npm.
-
-What you can build with it:
-🔧 Authentication — bridge your app to SkyeGate FS27
-💳 Payments — hook into SkyePay's 58-product catalog
-🗄️ Database — typed access to CitadelDB endpoints
-🔐 Vault — SkyeVault file and repo access
-⚖️ Legal — pre-built LegalSkyes document routing templates
-
-4 client integration templates included. Fully typed. Production-ready.
-
-npm install @metraiyux/0s-sdk` }
-  ],
-
-  instagram: [
-    { title: "Platform Hero", tags: "#MetrAIyux #SovereignTech #Cloudflare #AIInfrastructure #TechFounder #OperatingSystem #BuildInPublic #StartupLife #SaaSFounder #EdgeNative", body: `We didn't build a dashboard.
-
-We built an operating system.
-
+17 Cloudflare Workers.
 23 platform lanes.
 17 AI brains.
-17 Cloudflare Workers.
 58 live Stripe products.
 875+ deployed surfaces.
 
-All sovereign. All yours.
+One founder. One year. Zero funding.
 
-No competitor ships this as one deployable package.
+It's live. It works. Come see it.
+graylondonskyes@gmail.com` },
+    { title: `People ask what MetrAIyux 0S actually does.`, tags: ``, body: `Here's the short version:
 
-We built the category.
+Everything your business needs to operate — auth, email, database, payments, AI routing, legal, staffing, music, real-time comms, directory listings, content, marketing — deployed on YOUR Cloudflare account in under 30 minutes.
 
-👉 Link in bio` },
+Not our cloud. Yours.
+Your data stays yours. Forever.` },
+    { title: `I spent 12 months building something that doesn't have a direct competitor.`, tags: ``, body: `I looked. Hard.
 
-    { title: "Meet Auren", tags: "#Auren #AIInfrastructure #SovereignAI #TechFounder #MetrAIyux #ArtificialIntelligence #Cloudflare #BuildInPublic", body: `Meet Auren.
+GoHighLevel, Firebase, Supabase, Retool, Bubble — none of them build what we built.
 
-Central intelligence.
+None of them ship auth + database + Git vault + AI + payments + realtime + staffing + music + legal as one sovereign deployable unit.
+
+We built the category. Not the product. The category.` },
+    { title: `To Phoenix business owners:`, tags: ``, body: `Valley Verified is live.
+
+Your business. Verified. Edge-deployed on Cloudflare's global network.
+
+Not a Yelp listing. A real infrastructure-backed business surface.
+
+875+ businesses already in the directory.
+Paying businesses get a full custom app — not just a profile.
+
+Find your business or get listed:
+metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/` },
+    { title: `White label is open.`, tags: ``, body: `If you're an agency, freelancer, or developer:
+
+Deploy MetrAIyux 0S under your brand.
+Your clients. Your pricing. Your revenue.
+
+$49–$1,997/mo per client.
+Under 30 minutes to deploy via wrangler.
+28-lesson tutorial walks you through everything.
+
+This is the recurring revenue model most agencies are trying to build from scratch.
+The infrastructure is already done.
+
+graylondonskyes@gmail.com to get started.` },
+    { title: `Free99 is permanent.`, tags: ``, body: `No trial timer. No credit card. No "upgrade to see the real product."
+
+Full auth. Public surfaces. AI routing on the free corpus.
+SkyeMerit reputation from day one.
+
+We want you to see it's real before you pay a dollar.
+
+If you're a business owner, musician, staffing professional, or developer — come in.
+
+metraiyux-0s-full-system.graylondonskyes.workers.dev` },
+    { title: `SOL Staffing is live.`, tags: ``, body: `If you need to hire or you're looking for work in Phoenix:
+
+Full staffing platform. Intake → Screening → Placement → Payment.
+89 pages. 10,270+ lines. Built on sovereign infrastructure.
+
+This isn't a job board.
+It's a full workforce OS on a Cloudflare Worker.
+
+And it's one lane out of 23 in MetrAIyux 0S.` },
+    { title: `For musicians and artists in Phoenix and beyond:`, tags: ``, body: `SkyeMusicNexus is built into MetrAIyux 0S.
+
+Native browser DAW.
+Drops Room to release music.
+Artist Exchange to sell.
+Rights Vault backed by SkyeVault Git.
+Split Engine — automatic royalty splits.
+
+No middleman taking 80%.
+No label owning your masters.
+No platform keeping your rights.
+
+Just you, your music, and infrastructure that works for you.` },
+    { title: `The hardest part of building MetrAIyux 0S wasn't the code.`, tags: ``, body: `It was staying sane while building 17 Workers, 23 platform lanes, 17 AI brains, and 875+ deployed surfaces — alone — without revenue — without knowing if anyone was going to care.
+
+I kept building because the system was real.
+CF-Ray proof on every endpoint. 58 cs_live Stripe sessions. Real Git protocol at edge.
+
+The receipts don't lie.
+Come see what we built.` },
+    { title: `$1.5M–$2.0M.`, tags: ``, body: `That's the valuation for MetrAIyux 0S.
+
+Pre-revenue. Infrastructure-complete.
+
+If you started building this from scratch today: $3–5M, 18–24 months minimum.
+
+We're asking $1.5M–$2.0M.
+
+For a system that already runs.
+Already deployed.
+Already receipted.
+
+Investors, operators, acquirers — graylondonskyes@gmail.com.` },
+    { title: `Let me tell you about Auren.`, tags: ``, body: `Auren is the central intelligence of MetrAIyux 0S.
+
+17 AI brain personas. Each owns a domain. Auren routes your commands to the right brain — without calling an LLM API for the routing decision.
+
+Zero cost per route.
+725 knowledge chunks on-device.
+Every decision logged. Every receipt generated.
+
+This is what AI looks like when it's built for accountability, not hype.` },
+    { title: `Every action in MetrAIyux 0S has a receipt.`, tags: ``, body: `CF-Ray header on every Worker response.
+D1 log entry on every brain routing decision.
+cs_live session on every payment.
+Timestamped export on every proof request.
+Signed snapshot on every Git operation.
+
+Nothing in this system happens without documentation.
+
+That's not a feature. That's a principle.` },
+    { title: `The 13 cabinets of MetrAIyux 0S:`, tags: ``, body: `Each cabinet has a leader, a brain, and a corpus.
+
+When you fire a command, you're not asking a generic AI.
+You're asking the cabinet that owns the answer.
+
+Sales. Legal. Finance. Ops. Tech. Staffing. Brand. Dispatch. Quality. Strategy. Music. Directory. Intelligence.
+
+13 departments. 17 brains. One OS.` },
+    { title: `CROWN OS is your command surface.`, tags: ``, body: `Nothing in the system moves without your approval.
+
+Deployments — logged.
+Revenue events — real time.
+Security scans — receipted.
+AI decisions — in D1.
+Public posts — 0meg4kAI scans before you release.
+
+You built a business. CROWN OS makes sure you actually control it.` },
+    { title: `For anyone who's ever gotten a price hike from a SaaS tool you depend on:`, tags: ``, body: `MetrAIyux 0S deploys to YOUR Cloudflare account.
+
+After deployment, we don't control your infrastructure.
+You do.
+
+No platform risk.
+No vendor lock-in.
+No "we're raising prices next quarter."
+
+Your cloud. Your OS. Your rules.` },
+    { title: `We didn't build AI features.`, tags: ``, body: `We built an AI architecture.
+
+17 brains. Deterministic routing. On-device corpus.
+Owner-approval gates on every public output.
+0meg4kAI security scanning everything before it goes out.
+
+The difference: features can be removed. Architecture can't be extracted.
+
+MetrAIyux 0S has AI baked into the foundation, not bolted on the side.` },
+    { title: `Relay13 + ConnectLog is the realtime layer.`, tags: ``, body: `Durable Objects WebSocket rooms at CF edge.
+Per-workspace AI policy enforcement.
+AI usage cost ledger.
+Proof receipts on every session.
+18 live proof checks — all verified.
+
+This is not a polling widget.
+This is distributed stateful real-time built for sovereignty.` },
+    { title: `LegalSkyes is the legal surface built into MetrAIyux 0S.`, tags: ``, body: `Contract routing. Compliance workflows.
+Document control. Risk classification.
+4 legal templates in the SDK.
+
+Every business function has a legal surface attached to it.
+
+When you're building an OS for businesses, you don't leave legal as an integration.
+You build it in.` },
+    { title: `kAIxu 6.7 is our proprietary AI model family.`, tags: ``, body: `5 variants. Nano through Max.
+Plan-gated access.
+Branded as yours on white-label deployments.
+
+Not OpenAI. Not Anthropic. Not branded to anyone else.
+
+When a client deploys MetrAIyux 0S under their brand, the AI is theirs.
+
+That's what sovereign AI looks like.` },
+    { title: `0s SkyeWay is the full route atlas of MetrAIyux 0S.`, tags: ``, body: `Every surface. Every lane. Every Worker. Every proof route. Mapped.
+
+When you own infrastructure at this scale, you need to see it clearly.
+
+SkyeWay shows you every connection in the system.
+
+Not a sales deck. A real architectural map of a real deployed platform.` }
+  ],
+  instagram: [
+    { title: `Platform Hero`, tags: `#MetrAIyux #SovereignTech #Cloudflare #BuiltInPublic #TechFounder #OperatingSystem #EdgeNative #AIInfrastructure #StartupLife #IndieHacker`, body: `Visual: 01-platform-hero.png
+
+17 Workers.
+23 lanes.
+58 live Stripe products.
+875+ deployed surfaces.
+
+One OS. Zero competitors.
+
+Built. Not pitched.` },
+    { title: `Auren`, tags: `#Auren #AIInfrastructure #SovereignAI #MetrAIyux #TechFounder #ArtificialIntelligence #Cloudflare #BuiltInPublic`, body: `Visual: 02-auren.png
+
+Meet Auren.
+
 17 brains.
 One routing layer.
+Zero LLM cost per decision.
 
-When you fire a command in MetrAIyux 0S, Auren decides which brain answers it.
+When you fire a command, Auren picks the brain that owns it.
+Sales. Legal. Finance. Ops. Tech.
 
-Sales. Legal. Finance. Ops. Tech. Staffing.
-
-Zero LLM cost per route decision.
-725 knowledge chunks on-device.
-Sovereign. Not OpenAI-branded.
-
-This is AI as an OS layer.
 Not a chatbot.
-An operating system.` },
+The central nervous system of an OS.` },
+    { title: `No Competitors`, tags: `#NoCompetitor #MetrAIyux #CategoryCreator #SovereignTech #TechFounder #Cloudflare #AIInfrastructure`, body: `Visual: 03-no-competitors.png
 
-    { title: "SkyeMusicNexus", tags: "#SkyeMusicNexus #MusicTech #IndieArtist #MusicProducer #DAW #MusicBusiness #RoyaltyFree #SovereignTech #MetrAIyux", body: `A full music platform.
-Inside an operating system.
+GoHighLevel ✗
+Firebase ✗
+Supabase ✗
+Retool ✗
+Bubble ✗
+
+None of them build what we built.
+
+We didn't beat the competition.
+We made it irrelevant.` },
+    { title: `Valuation`, tags: `#Valuation #TechInvestment #StartupFunding #MetrAIyux #PreRevenue #DeployedAsset #TechFounder`, body: `Visual: 04-valuation.png
+
+$2,000,000.
+
+Pre-revenue.
+Infrastructure-complete.
+
+17 Workers live.
+58 cs_live Stripe products.
+875+ deployed surfaces.
+
+A funded team building this: $3–5M, 18–24 months.
+
+Our ask is less than that.` },
+    { title: `Sovereignty`, tags: `#SovereignTech #Cloudflare #DataPrivacy #NoVendorLockIn #MetrAIyux #TechFounder #EdgeNative`, body: `Visual: 05-sovereignty.png
+
+Everyone else: your data on their servers.
+
+MetrAIyux 0S: deploys to YOUR Cloudflare account.
+
+Not our cloud.
+Yours. Forever.
+
+That's sovereignty.` },
+    { title: `SkyeMusicNexus`, tags: `#SkyeMusicNexus #MusicTech #IndieArtist #MusicProducer #RoyaltyFree #SovereignTech #MetrAIyux #OwnYourMasters`, body: `Your music.
+Your rights.
+Your revenue.
 
 🎵 Native DAW
 🎵 Drops Room
@@ -912,644 +752,619 @@ Inside an operating system.
 🎵 Split Engine
 🎵 Release Forge
 
-Every royalty auto-split.
-Every right documented in SkyeVault.
-Every transaction through SkyePay.
-
-Artists own their music.
-Labels own their catalog.
-Everyone gets paid.
+No middleman.
+No label taking 80%.
+No platform owning your masters.
 
 This is one of 23 lanes.` },
+    { title: `SkyeVault`, tags: `#SkyeVault #Git #Cloudflare #DevOps #SovereignTech #MetrAIyux #CloudflareWorkers`, body: `Real Git.
+In a Cloudflare Worker.
 
-    { title: "The Numbers", tags: "#MetrAIyux #TechFounder #Cloudflare #SovereignTech #StartupStats #BuildInPublic #AIInfrastructure", body: `17 Workers. Live.
-17 AI Brains. On-device.
-23 Platform Lanes. Deployed.
-58 Stripe Products. cs_live.
-875+ HTML Surfaces. Indexed.
-8 D1 Databases. Active.
-78 Live surfaces. Verified.
-$1.5M–$2.0M. Valuation.
-0 direct competitors.
+Clone. Push. Fetch. Snapshot. Policy.
 
-Pre-revenue.
-Infrastructure-complete.
-Category-defining.` },
+Not an integration.
+Not a wrapper.
+A full Git smart-HTTP protocol running at edge.
 
-    { title: "Sovereign Deploy", tags: "#SovereignTech #Cloudflare #DataPrivacy #TechFounder #MetrAIyux #EdgeNative #NoVendorLockIn", body: `Your data.
-Your account.
-Your infrastructure.
+Your repos.
+Your rules.
+Your infrastructure.` },
+    { title: `58 Products Live`, tags: `#SkyePay #Stripe #PaymentOS #MetrAIyux #TechFounder #SovereignTech #Fintech`, body: `58 Stripe products.
 
-MetrAIyux 0S deploys to YOUR Cloudflare account.
+cs_live.
 
-Not ours.
-Yours.
+Not test mode.
+Not demo screenshots.
+Live. Real. Receipted.` },
+    { title: `CROWN OS`, tags: `#CrownOS #MetrAIyux #TechFounder #SovereignTech #OwnerFirst #Cloudflare`, body: `Your OS.
+Your approvals.
+Your control.
 
-Data never touches our servers after deployment.
+CROWN OS: nothing moves without you saying go.
 
-GoHighLevel? Their cloud.
-Firebase? Their cloud.
-Supabase? Their cloud.
+Every deployment logged.
+Every revenue event visible.
+Every brain decision in D1.
 
-MetrAIyux 0S? YOUR cloud.
+This is what owner-first infrastructure looks like.` },
+    { title: `SOL Staffing`, tags: `#SOLStaffing #StaffingAgency #WorkforceTech #MetrAIyux #Cloudflare #HRTech`, body: `A staffing agency.
+On a Cloudflare Worker.
 
-That's sovereignty.` },
+89 pages.
+10,270+ lines.
+Intake to placement to payout.
 
-    { title: "Valley Verified", tags: "#ValleyVerified #Phoenix #PhoenixBusiness #LocalBusiness #ArizonaBusiness #MetrAIyux #EdgeNative #Cloudflare", body: `Phoenix 📍
+One lane. 22 more like it.` },
+    { title: `Free99`, tags: `#Free99 #MetrAIyux #SaaS #FreeTier #ProductLed #TechFounder`, body: `No trial.
+No credit card.
+No bait and switch.
 
-875+ businesses.
+Free99 is permanent.
+
+See the whole OS for free.
+Pay when you're ready.` },
+    { title: `Valley Verified Phoenix`, tags: `#ValleyVerified #Phoenix #PhoenixBusiness #LocalBusiness #ArizonaBusiness #MetrAIyux #EdgeNative`, body: `875+ Phoenix businesses.
 All verified.
-All edge-native.
+All edge-deployed.
 
-Valley Verified isn't a Yelp page.
-
-It's an edge-deployed business surface on Cloudflare's global network.
-
-Faster. Verified. Owned.
-
-Local commerce on sovereign infrastructure.` },
-
-    { title: "White Label", tags: "#WhiteLabel #SaaS #SaaSFounder #TechEntrepreneur #Cloudflare #RecurringRevenue #MetrAIyux", body: `Deploy the whole thing under your brand.
-
-23 lanes.
-Your logo.
-Your clients.
+Not a Yelp page.
+A business surface on Cloudflare's global network.` },
+    { title: `White Label`, tags: `#WhiteLabel #SaaS #SaaSFounder #RecurringRevenue #MetrAIyux #Cloudflare #Agency`, body: `Your brand.
+Their OS.
 Your revenue.
 
-Under 30 minutes via wrangler.
-
+Deploy MetrAIyux 0S under your logo.
 $49–$1,997/mo per client.
-Zero architecture work.
-28-lesson tutorial included.
-
-Your SaaS business.
-Our infrastructure.
-Your sovereignty.` },
-
-    { title: "kAIxu 6.7", tags: "#kAIxu #SovereignAI #PropietaryAI #AIInfrastructure #TechFounder #MetrAIyux #ArtificialIntelligence", body: `kAIxu 6.7.
-
-Proprietary.
+Under 30 minutes to launch.` },
+    { title: `kAIxu 6.7`, tags: `#kAIxu #SovereignAI #MetrAIyux #AIInfrastructure #TechFounder`, body: `Proprietary.
 Sovereign.
 5 variants.
-Plan-gated.
-Your brand.
-
 Not OpenAI.
 Not Anthropic.
-Not branded to anyone else.
 
-This AI is yours.` },
+When you deploy under your brand, the AI is branded yours.
 
-    { title: "Proof", tags: "#ProofOfWork #MetrAIyux #Cloudflare #TechFounder #BuildInPublic #SovereignTech #DeployedAsset", body: `People say "show me proof."
+That's what sovereign AI means.` },
+    { title: `The Build`, tags: `#BuiltInPublic #TechFounder #MetrAIyux #FounderStory #SovereignTech #IndieHacker`, body: `I didn't buy a tool and call it a platform.
 
-CF-Ray on every endpoint ✅
-58 cs_live Stripe sessions ✅
-Real Git protocol in a CF Worker ✅
-Durable Objects realtime ✅
-8 active D1 databases ✅
-18 Relay13 proof checks ✅
-875+ live HTML surfaces ✅
+17 Workers.
+Real Git protocol.
+Proprietary AI.
+Native DAW.
+Staffing OS.
+58 live Stripe products.
+Legal platform with SDK.
+Central intelligence routing 17 brains.
 
-This isn't a demo.
-This is a production system.
-Everything has a receipt.` },
+Every line. Every surface. Every receipt.` },
+    { title: `Relay13 Realtime`, tags: `#Realtime #WebSocket #Cloudflare #DurableObjects #MetrAIyux #EdgeNative`, body: `Stateful.
+Auditable.
+Policy-gated.
 
-    { title: "SkyePay", tags: "#SkyePay #PaymentOS #Stripe #SovereignTech #MetrAIyux #Fintech #TechFounder", body: `58 products.
-cs_live.
-Owner-approval on everything.
+Durable Objects WebSocket rooms.
+AI policy enforcement per workspace.
+Usage cost ledger.
+Proof receipts on every session.
 
-SkyePay is the payment OS inside MetrAIyux 0S.
+Realtime built for sovereignty.` },
+    { title: `LegalSkyes`, tags: `#LegalTech #MetrAIyux #SovereignTech #Compliance #SDK`, body: `Built-in legal infrastructure.
 
-Music drops.
-Staffing fees.
-Vault access.
-Legal templates.
-Subscriptions.
-Featured placement.
-White-label licensing.
+Not "consult a lawyer."
+Contract routing. Compliance. Document control.
+Risk classification. 4 templates in the SDK.
 
-One payment system.
-Every lane.
-Every transaction receipted.` },
+Legal is infrastructure.
+Not an afterthought.` },
+    { title: `CitadelDB`, tags: `#CitadelDB #Database #Postgres #SovereignTech #MetrAIyux`, body: `Not Firebase.
+Not Supabase.
+Not PlanetScale.
 
-    { title: "CitadelDB", tags: "#CitadelDB #Database #Postgres #SovereignTech #Cloudflare #MetrAIyux #DatabaseEngineering", body: `K8s HA Postgres.
-PITR.
-WAL streaming.
-Operator control plane.
+K8s HA Postgres.
+PITR. WAL streaming.
 DR drills done.
 
-CitadelDB v3.
+Your database.
+Your infrastructure.` },
+    { title: `Ascension Sales OS`, tags: `#Ascension #SalesOps #MetrAIyux #TechFounder #SovereignTech`, body: `Buyer intel.
+Deal rooms.
+Revenue war room.
+Proof export.
 
-Not Firebase.
-Not Supabase.
-Not a managed database on someone else's infrastructure.
+Ascension is the sales OS inside MetrAIyux 0S.
 
-A sovereign database layer you control completely.` },
-
-    { title: "13 Cabinets", tags: "#MetrAIyux #AI #CabinetStructure #TechFounder #OperatingSystem #SovereignTech #Leadership", body: `13 cabinets.
+Every deal logged.
+Every proof timestamped.
+Celeste brain routes every buyer.` },
+    { title: `13 Cabinets`, tags: `#MetrAIyux #AI #OperatingSystem #SovereignTech #TechFounder`, body: `13 cabinets.
 13 leaders.
 13 AI brains.
-
-One operating system.
 
 Every function has an owner.
 Every owner has a brain.
 Every brain has a corpus.
 
-When you ask the 0S a question, you're not asking a generic AI.
+When you ask the OS something, you're asking the cabinet that owns the answer.` },
+    { title: `Pre-Revenue Truth`, tags: `#BuiltInPublic #MetrAIyux #TechFounder #PreRevenue #SovereignTech`, body: `Pre-revenue doesn't mean nothing exists.
 
-You're asking the cabinet that owns the answer.` },
-
-    { title: "Free99", tags: "#Free99 #FreeTier #SaaS #MetrAIyux #TechFounder #ProductLed #Cloudflare", body: `See the whole thing.
-Pay nothing.
-
-Free99 is the permanent free tier of MetrAIyux 0S.
-
-Full auth.
-Public surfaces.
-kAIxu 6.7 on free corpus.
-SkyeMerit from day one.
-
-No trial timer.
-No credit card required.
-No bait and switch.
-
-We want you to see it's real before you pay for it.` },
-
-    { title: "SkyeVault", tags: "#SkyeVault #Git #Cloudflare #DevOps #SovereignTech #MetrAIyux #TechFounder #CloudflareWorkers", body: `Real Git.
-In a Cloudflare Worker.
-
-Clone. Push. Fetch. Policy. Snapshots.
-
-SkyeVault isn't a file storage system.
-
-It's a real Git smart-HTTP protocol running at the edge.
-
-Your repos.
-Your rules.
-Your infrastructure.` },
-
-    { title: "SOL Staffing", tags: "#SOLStaffing #StaffingAgency #WorkforceTech #TechFounder #MetrAIyux #Cloudflare #HRTech", body: `A full staffing agency.
-On a Cloudflare Worker.
-
-89 pages.
-10,270 lines.
-Intake to placement to payout.
-
-SOL Staffing is one of 23 lanes inside MetrAIyux 0S.
-
-Workforce tech on sovereign infrastructure.` },
-
-    { title: "LegalSkyes + SDK", tags: "#LegalTech #Compliance #SDK #npm #TechFounder #MetrAIyux #SovereignTech", body: `Legal infrastructure.
-Built into the OS.
-
-Not a "consult a lawyer" button.
-
-Contract routing.
-Compliance workflows.
-Document control.
-Risk classification.
-@metraiyux/0s-sdk with 4 legal templates.
-
-Every business function has a legal surface.` },
-
-    { title: "No Competitors", tags: "#NoCompetitor #MetrAIyux #SovereignTech #TechFounder #AIInfrastructure #Cloudflare #CategoryCreator", body: `What company competes with MetrAIyux 0S?
-
-GoHighLevel: cloud-locked ❌
-Firebase: dev infra, no AI OS ❌
-Supabase: dev infra, no payments ❌
-Retool: internal tools only ❌
-Bubble: no-code, no sovereignty ❌
-
-None of them ship:
-Auth + email + DB + Git vault + AI + payments + dispatch + music + staffing + legal + directory + media + marketing as one sovereign deployable.
-
-We do.
-
-No direct competitor.
-We built the category.` },
-
-    { title: "The Build", tags: "#BuildInPublic #TechFounder #MetrAIyux #FounderStory #SovereignTech #Cloudflare #IndieHacker", body: `I didn't buy a tool and call it a platform.
-
-I built:
-17 Cloudflare Workers
-A real Git protocol in a CF Worker
-A proprietary AI model family
-A native browser DAW
-A staffing OS with 10K+ lines
-58 live Stripe products
-A legal ops platform with an npm SDK
-A central intelligence layer routing 17 brains
-
-Every line. Every surface. Every receipt.
-
-Pre-revenue.
-Infrastructure-complete.
-Category-defining.` },
-
-    { title: "Content + Media", tags: "#ContentMarketing #ContentCreator #MarTech #MetrAIyux #TechFounder #SovereignTech", body: `Create it.
-Distribute it.
-Own it.
-
-Content Forge: publish from inside the OS.
-SkyeMediaCenter: manage and distribute all assets.
-Marketing Made Easy: full growth suite, no third-party tools.
-
-Your content operation.
-Your brand.
-Your infrastructure.
-
-No WordPress. No HubSpot. No Webflow.
-
-Just you and your OS.` },
-
-    { title: "Valuation", tags: "#Valuation #TechInvestment #StartupFunding #MetrAIyux #TechFounder #Cloudflare #SovereignTech #DeployedAsset", body: `$1.5M – $2.0M.
-
-Pre-revenue.
-Infrastructure-complete.
+It means no customers yet.
 
 17 Workers live.
-23 lanes deployed.
-58 Stripe products active.
-875+ surfaces indexed.
-0 competitors.
+58 cs_live Stripe products.
+Staffing platform deployed.
+Music platform with native DAW.
+Real Git protocol.
+Sovereign database.
+npm SDK.
+875+ surfaces.
 
-A team building this from scratch: 18–24 months. $3–5M in engineering.
-
-Our ask: $1.5M–$2.0M.
-
-That's conservative.` },
-
-    { title: "CROWN OS", tags: "#CrownOS #MetrAIyux #TechFounder #SovereignTech #OwnerFirst #Cloudflare", body: `Command rooms.
-Approval gates.
-Revenue pulse.
-Proof receipts.
-
-CROWN OS is the owner command surface inside MetrAIyux 0S.
-
-Nothing moves without owner approval.
-Every deployment is logged.
-Every revenue event is visible in real time.
-
-This is what control looks like when it's built into the OS.` },
-
-    { title: "Ascension Revenue Layer", tags: "#Ascension #SalesOps #RevenueOps #MetrAIyux #TechFounder #SovereignTech #B2BSales", body: `Buyer intel.
-Deal rooms.
-Revenue war room.
-Proof export.
-
-Ascension is the revenue conversion surface in MetrAIyux 0S.
-
-From Free99 intake to enterprise close, the full buyer journey runs through Ascension.
-
-Celeste brain routes every buyer interaction.
-Every deal room is logged.
-Every proof export is timestamped.
-
-This is your sales OS.` },
-
-    { title: "Relay13 Realtime", tags: "#Realtime #WebSocket #Cloudflare #DurableObjects #MetrAIyux #TechFounder #EdgeNative", body: `Stateful.
-Auditable.
-Policy-gated.
-
-Relay13 + ConnectLog is the realtime surface in MetrAIyux 0S.
-
-Durable Objects WebSocket rooms at CF edge.
-Per-workspace AI policy enforcement.
-AI usage cost ledger.
-Proof receipts on every session.
-18 live proof checks.
-
-This is what realtime looks like when it's built for sovereignty.` },
-
-    { title: "For Music Artists", tags: "#IndieArtist #MusicProducer #MusicBusiness #MusicTech #SkyeMusicNexus #MetrAIyux #OwnYourMasters", body: `Your music.
-Your rights.
-Your revenue.
-
-SkyeMusicNexus inside MetrAIyux 0S:
-
-🎵 Record in the native DAW
-🎵 Release through Drops Room
-🎵 Sell on Artist Exchange
-🎵 Protect your rights in SkyeVault
-🎵 Auto-split royalties with Split Engine
-
-No middleman.
-No label taking 80%.
-No platform keeping your masters.
-
-Just you, your music, and sovereign infrastructure.` },
-
-    { title: "0s SkyeWay", tags: "#SkyeWay #Cloudflare #MetrAIyux #TechFounder #Infrastructure #SovereignTech #RouteAtlas", body: `Every surface.
+The doors open soon.` },
+    { title: `0s SkyeWay`, tags: `#SkyeWay #MetrAIyux #Infrastructure #SovereignTech #Cloudflare`, body: `Every surface.
 Every lane.
 Every proof route.
 
 Mapped.
 
-0s SkyeWay is the full route atlas of MetrAIyux 0S.
+When you own infrastructure at this scale, you need to see it clearly.
 
-See where every Worker connects.
-See which brains are active.
-See every surface in the system.
+SkyeWay shows you everything.` },
+    { title: `For Investors`, tags: `#TechInvestment #Valuation #MetrAIyux #StartupFunding #SovereignTech`, body: `$1.5M–$2.0M.
 
-When you own the infrastructure, you need to see it clearly.
+17 Workers live.
+23 lanes deployed.
+58 Stripe products active.
+875+ surfaces indexed.
+0 direct competitors.
 
-SkyeWay shows you everything.` }
+A team replicating this: $3–5M, 18–24 months.
+
+Our ask is less than the replacement cost.
+
+graylondonskyes@gmail.com` },
+    { title: `Quantum Ops`, tags: `#QuantumOps #MetrAIyux #Infrastructure #SovereignTech #Cloudflare`, body: `Infrastructure intelligence.
+Operational brain routing.
+Deployment oversight.
+System pulse in real time.
+
+Quantum Ops keeps the whole OS visible.` },
+    { title: `Category Creator`, tags: `#CategoryCreator #MetrAIyux #SovereignTech #TechFounder #NoCompetitor #BuiltInPublic`, body: `Nobody built this before.
+
+Not because it's impossible.
+Because nobody was crazy enough to try.
+
+23 lanes.
+17 Workers.
+17 AI brains.
+One sovereign deployable package.
+
+We didn't enter a market.
+We created one.` }
   ],
-
   reddit: [
-    { title: "Built a 23-lane OS on CF Workers — technical breakdown", sub: "r/cloudflare r/selfhosted r/devops", body: `Long post incoming. Skip to the TL;DR if you want.
+    { title: `r/cloudflare`, subreddit: `r/cloudflare`, tags: ``, body: `Title: I built a real Git smart-HTTP server inside a Cloudflare Worker — here's what that actually required
 
-I've been building MetrAIyux 0S for the past year and a half. It's a sovereign infrastructure operating system — 23 platform lanes, 17 Cloudflare Workers, 17 AI brain personas, 8 D1 databases, 58 live Stripe products, 875+ deployed HTML surfaces.
+---
 
-The "sovereign" part matters: it deploys to YOUR Cloudflare account. Your environment variables, your API keys, your database credentials. I go away tomorrow and your system keeps running.
+This came up as a technical challenge while building MetrAIyux 0S and I want to share what was involved because I haven't seen anyone document it clearly.
 
-Here's what each major technical piece actually is:
+**What "real Git smart-HTTP" means:**
+Git has a smart HTTP protocol that handles pack negotiation, ref discovery, pack upload, and pack receive. It's not just serving files — it's a stateful negotiation between client and server.
 
-**SkyeGate FS27** — Full auth platform. BLAKE3 hash-only API keys (raw key never persisted), OAuth flows, Twilio voice/SMS MFA, 2,063-line Stripe billing catalog, allowlist management, full audit trail. 20,284 lines.
+**What I had to implement:**
+- \`/info/refs?service=git-upload-pack\` — ref discovery for clone/fetch
+- \`/info/refs?service=git-receive-pack\` — ref discovery for push
+- \`/git-upload-pack\` — pack generation on fetch/clone (server sends objects client needs)
+- \`/git-receive-pack\` — pack receive on push (server receives and stores new objects)
 
-**SkyeVault** — Real Git smart-HTTP protocol running inside a CF Worker. Not a file storage wrapper. Actual clone, push, fetch, ref tracking, policy gates, bundle export.
+**The D1 storage layer:**
+Pack files stored as blobs in Cloudflare D1. Object metadata tracked in a separate table. Ref table maps branch names to commit hashes.
 
-**SkyeMail** — CF Worker + Stalwart hosted mailbox adapter, Gmail OAuth, AI generation module, spam filtering. 43,395 lines.
+**Auth layer:**
+SkyeGate FS27 validates every request. Per-workspace quota enforcement. Per-workspace policy rules (branch protection, write access, read access).
 
-**CitadelDB v3** — K8s HA Postgres with PITR, WAL streaming, operator control plane.
+**Proof checks we ran:**
+1. \`git clone <worker-url>/<repo>\` — full clone of a real repo
+2. \`git push origin main\` — push a new commit
+3. \`git fetch\` — verify we get new objects
+4. Snapshot — point-in-time archive of a repo state
+5. Restore — restore from snapshot to a new workspace
+6. Quota enforcement — push a commit that exceeds quota, verify rejection
+7. Policy enforcement — attempt write from unauthorized key, verify rejection
+8. Per-workspace neural map — each workspace gets a separate identity layer
 
-**Relay13 + ConnectLog** — Durable Objects WebSocket rooms with D1 persistence, per-workspace AI policy enforcement (server-side), AI usage cost ledger. v1.8 guardrails.
+All checks passed. This is production-deployed inside a larger platform called MetrAIyux 0S.
 
-**kAIxu 6.7** — Proprietary AI model family. 5 variants, plan-gated. Zero LLM cost per route decision — routing is deterministic.
+Happy to answer questions about the pack protocol implementation — it was the most technically interesting part.` },
+    { title: `r/cloudflare`, subreddit: `r/cloudflare`, tags: ``, body: `Title: Durable Objects for realtime stateful rooms at scale — things I learned building Relay13
 
-Plus SkyaPay (58-product Stripe catalog), SkyeRouteX, Auren (central intelligence routing 17 brains), SkyeMusicNexus (full music platform with native DAW), Valley Verified (875+ business surfaces), SOL Staffing, LegalSkyes, and 11 more lanes.
+---
 
-Everything has CF-Ray proof on every endpoint. 58 cs_live Stripe sessions.
+I've been running Relay13 + ConnectLog in production as the realtime layer of MetrAIyux 0S. Here's what I learned that the docs don't tell you clearly.
 
-Happy to go deep on any of the technical pieces. The SkyaVault Git-in-a-Worker implementation especially got interesting.
+**The architecture:**
+- Each workspace gets its own Durable Object instance
+- Clients connect via WebSocket to their workspace DO
+- Messages are broadcast to all connected clients in that workspace
+- Persistence goes to D1 — every message logged
+- AI policy enforcement runs on every outbound message before delivery
 
-**TL;DR:** Built a 23-lane sovereign OS on Cloudflare Workers. Real Git protocol in a Worker. 17 AI brains on-device. 58 live Stripe products. Deploys to your CF account.
+**What "AI policy enforcement per workspace" means:**
+Each workspace has a policy configuration (stored in D1) that defines what kinds of messages can be sent. The policy check runs before message delivery. If a message violates policy, it's quarantined and routed to an approval queue rather than delivered.
 
-Live: metraiyux-0s-full-system.graylondonskyes.workers.dev` },
+**The cost ledger:**
+Every AI operation that runs inside a Relay13 room generates a ledger entry. Operators can see exactly what AI cost they're incurring per workspace, per session, per message type.
 
-    { title: "Honest competitive analysis for a $1.5M pre-revenue infrastructure stack", sub: "r/entrepreneur r/startups r/SaaS", body: `I keep getting asked "what company competes with MetrAIyux 0S?" so I wrote out the honest answer.
+**18 proof checks we run:**
+WebSocket connect, disconnect, reconnect, message delivery, message ordering, policy pass, policy quarantine, quota enforcement, D1 persistence, AI routing, cost ledger entry, approval queue routing, per-workspace isolation, cross-workspace isolation test, auth token validation, expired token rejection, session receipt generation, historical replay.
 
-**GoHighLevel** — This is the closest. White-label model, agency focus. But it routes through their cloud. Your client data lives on GoHighLevel servers. You can white-label the UI but you can't white-label the infrastructure. You're renting their system forever.
+All 18 pass in production.
 
-**Supabase / Firebase / Appwrite** — Dev infrastructure. These are tools for developers to build things. They don't include AI routing, a payments OS, a music platform, a staffing system, legal ops, workforce dispatch, or a white-label commercial model.
+The hardest part was the hibernation API — getting DOs to sleep and wake correctly without losing WebSocket state. Happy to go into that if anyone's interested.` },
+    { title: `r/selfhosted`, subreddit: `r/selfhosted`, tags: ``, body: `Title: I deployed a full business OS to my own Cloudflare account — here's the architecture
 
-**Retool** — Internal tooling. Not a deployable business OS.
+---
 
-**Bubble** — No-code. Zero sovereignty. They host everything.
+I want to share the architecture of MetrAIyux 0S because I think it's a model more people should look at when thinking about self-hosted business infrastructure.
 
-**None of them combine:**
-- Sovereign deploy to your own CF account
-- 17 on-device AI brain personas as the command routing layer
-- Full payment OS (58 products, owner-approval gates)
-- Music platform + staffing + legal + dispatch + directory in one package
-- White-label everything in 30 minutes via wrangler
+**The core principle:**
+Everything deploys into YOUR Cloudflare account. Not our servers. Your KV, your D1, your Workers, your R2, your Durable Objects. After deployment, our infrastructure has zero access to your data.
 
-The category doesn't exist yet. I built it.
+**What's in the deployment:**
+- SkyeGate FS27 — auth platform (20,284 lines of production code)
+- SkyeMail — email platform (43,395 lines, Stalwart + CF Worker + Netlify)
+- CitadelDB — K8s HA Postgres with PITR and WAL streaming
+- SkyeVault — Git smart-HTTP server in a CF Worker
+- SkyeSecure FS27 — encrypted secret pack custody
+- kAIxu 6.7 — 5-variant proprietary AI model family
+- 0meg4kAI — two-layer security scanner (edge + browser)
+- Relay13 + ConnectLog — Durable Objects realtime
+- SkyePay — 58 live Stripe products
+- SkyeRouteX — dispatch and logistics OS
+- Auren — central AI routing layer (17 brains, 725 knowledge chunks)
+- SkyeMusicNexus — native DAW + drops + exchange + rights vault
+- Valley Verified — edge-deployed business directory
+- Content Forge + SkyeMediaCenter — content and media management
+- Marketing Made Easy — full growth suite
+- SkyeProfitConsole + Split Engine — financial intelligence + royalty splits
+- HouseOps + SkyeBox — operations + secure storage
+- SOL Staffing — 89-page staffing platform
+- LegalSkyes + SDK — legal ops + npm SDK
+- CROWN OS + NEXUS OS — command surface + CRM record mesh
+- Ascension + APEX — sales OS + expansion layer
+- Free99 + SkyeMerit — permanent free tier + reputation system
+- Admin OS + Tutorial — 28-lesson deployment tutorial
+- 0s SkyeWay + Quantum Ops — route atlas + infrastructure intelligence
 
-Pre-revenue. Infrastructure-complete. Valuation: $1.5M–$2.0M.
+23 platform lanes total. 17 Workers. 875+ HTML surfaces.
 
-AMA on the business model, technical stack, or competitive positioning.` },
+I'll answer any architecture questions in comments.` },
+    { title: `r/webdev`, subreddit: `r/webdev`, tags: ``, body: `Title: I implemented BLAKE3-scoped API keys in a Cloudflare Worker for multi-tenant auth — write-up
 
-    { title: "Sovereign CF Workers alternative to Firebase/GoHighLevel — AMA", sub: "r/selfhosted r/homelab r/privacy", body: `The pitch in one sentence: MetrAIyux 0S is a 23-lane business operating system that deploys entirely to your Cloudflare account so your data never touches my servers.
+---
 
-For the self-hosted crowd, here's what that actually means technically:
+SkyeGate FS27 is the auth platform inside MetrAIyux 0S. The most interesting piece technically is the API key system.
 
-- Every Worker runs in YOUR CF account's namespace
-- Every D1 database is YOUR CF account's database
-- Every KV store is YOUR KV store
-- Every Durable Object is in YOUR account
-- Environment variables never leave your account
-- I provide the code and the deploy mechanism. You own the runtime.
+**The problem with standard API keys:**
+Most implementations hash the full key and compare. This works but gives every key identical scope. You can't have a key that's valid for one tenant's resources but not another's.
 
-The SkyaVault implementation is probably most interesting to this crowd — it's a real Git smart-HTTP server running inside a CF Worker. You can git clone, git push, git fetch against it like any other remote.
+**How we solved it:**
+BLAKE3 hash-only scoped API keys.
 
-Current status: pre-revenue, infrastructure-complete. 17 Workers live, 23 lanes deployed, 875+ surfaces indexed.
+The key format encodes:
+- Workspace ID (which tenant this key belongs to)
+- Scope bitmap (what operations this key can perform)
+- Expiry timestamp
+- Creator identity
 
-What questions do you have about the architecture?` },
+The BLAKE3 hash is computed over all of these together. Changing ANY component produces a completely different hash that won't validate.
 
-    { title: "Running real Git smart-HTTP inside a Cloudflare Worker — SkyeVault architecture", sub: "r/webdev r/javascript r/cloudflare", body: `One of the more technically interesting parts of MetrAIyux 0S is SkyeVault — a real Git smart-HTTP server running inside a Cloudflare Worker.
+**Why BLAKE3 over SHA-256:**
+Speed at the edge. We're validating keys on every request inside a Worker. BLAKE3 is significantly faster than SHA-256 for this workload and has no known collision vulnerabilities for this use case.
 
-When I say "real Git," I mean:
-- git clone works
-- git push works
-- git fetch works
-- Ref negotiation works
-- Pack-protocol works
-- Policy gates fire before any write commits
-- Bundle export for backup
+**What "allowlist" means:**
+Every key is either on the global allowlist (can hit any surface the scope permits) or on a per-workspace allowlist (can only hit surfaces belonging to that workspace). The Worker checks both layers before passing the request through.
 
-The challenge: CF Workers have no persistent filesystem. Git needs to store objects somewhere. Our solution: D1 for the object database + KV for ref storage + streaming pack-protocol parsing that never touches disk.
+The auth platform is 20,284 lines of production code. Happy to go deeper on any specific part.` },
+    { title: `r/entrepreneur`, subreddit: `r/entrepreneur`, tags: ``, body: `Title: I built a pre-revenue OS with $0 funding. Here's the honest breakdown.
 
-The pack-protocol parsing is the interesting part. Git's pack format is a binary streaming protocol. Implementing the negotiation, delta resolution, and object storage entirely in a stateless Worker with no filesystem is... an experience.
+---
 
-On top of that we added:
-- Per-repo policy gates
-- Quota enforcement
-- Neural map generation from repo contents
-- Snapshot/bundle export via the SkyePay checkout flow
+MetrAIyux 0S exists because I kept building past the point where most people stop.
 
-This is one of 23 lanes in MetrAIyux 0S. Happy to go deep on the implementation.` },
+**What "pre-revenue" means for us:**
+It means no customers yet. It doesn't mean nothing works. Here's the actual state:
 
-    { title: "Built a music OS (DAW + distribution + rights + royalties) — looking for artist feedback", sub: "r/WeAreTheMusicMakers r/edmproduction r/makinghiphop", body: `SkyeMusicNexus is the music platform inside MetrAIyux 0S. I want honest feedback from working musicians.
+17 Cloudflare Workers deployed and live
+23 gated platform lanes
+58 Stripe products — cs_live session IDs confirmed
+875+ indexed HTML surfaces
+8 active D1 databases
+Real Git smart-HTTP server running in a CF Worker
+K8s HA Postgres (our own, not managed)
+Full staffing platform (89 pages, 10,270+ lines)
+Native browser DAW inside a music platform
+npm SDK published (@metraiyux/0s-sdk)
+Encrypted secret custody with live proof counts
+725-chunk local AI brain mesh — no LLM API calls for routing
+18 Relay13 realtime proof checks — all passing
 
-Here's what it does:
+**Why no customers yet:**
+Deliberate sequencing. I wanted infrastructure-complete before I opened the doors. When someone deploys MetrAIyux 0S, I want it to work the first time. Not "we're still building the payment system" or "the database is temporary."
 
-**Creation layer:**
-- Native browser DAW — no install required
-- Upload Studio — direct upload with metadata, ISRC, rights documentation
+**The valuation:**
+$1.5M–$2.0M. A team building this from scratch: $3–5M, 18–24 months. We're asking less than replacement cost.
 
-**Release layer:**
-- Drops Room — set your price, set your release date, sell directly
-- Release Forge — mastering pipeline and distribution routing
+**What I'm looking for:**
+Investors, operators, white-label partners, or acquirers who understand that infrastructure-complete pre-revenue is different from "we have an idea and a Figma."
 
-**Rights layer:**
-- SkyeVault — your masters stored in a real Git vault (not cloud storage — actual versioned Git objects)
-- Rights documentation attached to every track at upload
-- Split Engine — configure royalty percentages per contributor, auto-splits on every sale
+graylondonskyes@gmail.com` },
+    { title: `r/SaaS`, subreddit: `r/SaaS`, tags: ``, body: `Title: I white-labeled a 23-lane sovereign OS. Here's what the economics look like.
 
-**Discovery layer:**
-- Music Feed — activity and release feed for followers
-- Discover — genre/mood-based discovery
-- Artist Exchange — collaboration requests and licensing marketplace
+---
 
-The key difference from Spotify/SoundCloud: you're not uploading to their platform. You're operating on sovereign infrastructure deployed to your own Cloudflare account. Your files, your rights, your revenue.
+MetrAIyux 0S has a white-label tier that I want to explain clearly because it's different from most white-label SaaS.
 
-What would you want to know before using something like this?` },
+**What you're actually deploying:**
+Not a themed version of our product on our servers.
 
-    { title: "Phoenix sovereign business directory — 875+ businesses on Valley Verified", sub: "r/Phoenix r/arizona r/PhoenixSuburbs", body: `Valley Verified is a business discovery platform built into MetrAIyux 0S, specifically focused on the Phoenix metro area.
+Your own independent deployment of MetrAIyux 0S, into your own Cloudflare account (or your client's), under your brand.
 
-It's not a Yelp ripoff. Here's what makes it different:
+Your logo. Your domain. Your clients. Your pricing.
 
-**For businesses:**
-- Your listing is an edge-native application (Cloudflare Worker), not a shared hosting page
-- Trust verification — not just a claimed listing
-- SkyePay integration — accept bookings and featured placement purchases directly
+After deployment, we have no relationship with your client's data. None.
 
-**For users:**
-- 875+ verified Phoenix businesses already indexed
-- Location-aware routing (CF geolocation)
-- Service-specific search
+**The economics:**
+- Starter: $49/mo per client
+- Growth: $399/mo per client  
+- Autonomous Office: $1,997/mo per client
 
-**For Phoenix businesses specifically:**
-We're actively adding businesses. If you have a Phoenix-area business or know one that should be on Valley Verified, reach out at graylondonskyes@gmail.com.
+10 Growth clients: $3,990 MRR
+25 mixed clients: ~$8,000–$15,000 MRR depending on tier
+50 Autonomous Office clients: $99,850 MRR
 
-metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/` },
+Those aren't projections. Those are what the pricing table says. What you make depends on how many clients you close.
 
-    { title: "White-label SaaS without cloud lock-in — how the licensing model works", sub: "r/SaaS r/entrepreneur", body: `Most white-label SaaS platforms have a fatal flaw: you're white-labeling their product on their cloud.
+**What's included:**
+Full 23-lane OS. 17 Workers. 17 AI brains. 58 Stripe products already wired. 28-lesson deployment tutorial. Under 30 minutes to deploy via wrangler.
 
-The MetrAIyux 0S white-label model is different:
+**The infrastructure work:**
+Already done. You don't build anything. You deploy and sell.
+
+graylondonskyes@gmail.com` },
+    { title: `r/startups`, subreddit: `r/startups`, tags: ``, body: `Title: 12 months. 1 person. Here's what I built.
+
+---
+
+I've been building MetrAIyux 0S for about a year. I want to share what the actual output looks like because the scale surprised even me when I wrote it all down.
+
+**What I built:**
+
+A complete business operating system. 23 platform lanes. All sovereign. All deployable to your own Cloudflare account.
+
+Lane by lane:
+1. SkyeGate FS27 — auth platform (20,284 lines)
+2. SkyeMail — email platform (43,395 lines)
+3. CitadelDB v3 — K8s HA Postgres
+4. SkyeVault — Git smart-HTTP in a CF Worker
+5. SkyeSecure FS27 — encrypted secret custody
+6. kAIxu 6.7 — 5-variant proprietary AI family
+7. 0meg4kAI — two-layer security scanner
+8. Relay13 + ConnectLog — Durable Objects realtime
+9. SkyePay — 58 live Stripe products
+10. SkyeRouteX — dispatch and logistics OS
+11. Auren — central AI routing (17 brains, 725 chunks)
+12. SkyeMusicNexus — DAW + drops + exchange + rights
+13. Valley Verified — edge-deployed business directory
+14. Content Forge + SkyeMediaCenter
+15. Marketing Made Easy
+16. SkyeProfitConsole + Split Engine
+17. HouseOps + SkyeBox
+18. SOL Staffing — full staffing platform (89 pages)
+19. LegalSkyes + @metraiyux/0s-sdk
+20. CROWN OS + NEXUS OS
+21. Ascension + APEX
+22. Free99 + SkyeMerit
+23. Admin OS + 28-lesson Tutorial
+
+Proof:
+- 17 CF Workers live with service bindings
+- 17 CF Pages projects deployed
+- 58 cs_live Stripe sessions
+- CF-Ray header on every endpoint
+- 875+ HTML surfaces indexed
+- Real Git clone/push/fetch verified
+- CitadelDB DR drills completed
+- 18 Relay13 proof checks all passing
+
+No funding. No team. Took about a year.
+
+Happy to answer questions on any part of this.` },
+    { title: `r/artificial`, subreddit: `r/artificial`, tags: ``, body: `Title: I built a 17-brain deterministic AI routing layer without calling an LLM for routing — write-up
+
+---
+
+The AI architecture in MetrAIyux 0S is something I want to document because it's fundamentally different from what most "AI-powered" tools are doing.
+
+**The problem with LLM-as-router:**
+Using a language model to decide which department should handle a request costs money on every single request, adds latency, and is non-deterministic (same input can produce different routing decisions).
+
+**What we built instead:**
+Deterministic keyword classification routing 17 brain personas.
 
 **How it works:**
-1. You license the stack
-2. You deploy it to YOUR Cloudflare account via wrangler (< 30 minutes)
-3. You configure your brand, domain, pricing
-4. You sell subscriptions to your clients at your price point
-5. Revenue goes to your SkyePay Stripe account, not through us
+Each of the 17 brains has a keyword corpus — a list of domain-specific terms, phrases, and patterns that belong to its domain. Auren (the routing layer) tokenizes the incoming command and runs it against all 17 corpora simultaneously. The brain with the highest keyword match score receives the command.
 
-**What deploys:**
-- All 23 platform lanes under your brand
-- 17 AI brain personas (rebrandable)
-- Full payment OS — your products, your catalog, your Stripe
-- 28-lesson admin tutorial rebranded to your platform
+**The numbers:**
+725 total knowledge chunks distributed across 17 brain corpora.
+Average 42 chunks per brain.
+Routing decision made in-memory, no API call.
+Zero cost per routing decision.
 
-**What we don't do:**
-- Take a cut of your client revenue
-- Control your pricing
-- Have any relationship with your clients
-- Access your client data
+**What the brain then does:**
+After routing, the receiving brain does use kAIxu 6.7 (our proprietary model family) for the actual response generation. The LLM is used for generation, not routing.
 
-This is how you build a SaaS business on infrastructure you actually own.` },
+**Why this matters:**
+At scale, routing is the highest-frequency operation. If you call an LLM for every routing decision, you're paying for the most frequent, cheapest, most deterministic operation. Our architecture inverts this — cheap deterministic routing, LLM only for generation.
 
-    { title: "Deterministic AI routing layer (17 brain personas) — no LLM calls for routing", sub: "r/artificial r/MachineLearning r/LocalLLaMA", body: `Most "AI-powered" platforms mean: we call GPT-4 for everything.
+**The receipt layer:**
+Every routing decision generates a D1 entry: timestamp, incoming command hash, brain assigned, confidence score, action outcome. Every routing decision is auditable.
 
-The kAIxu 6.7 / Auren architecture in MetrAIyux 0S works differently:
+Happy to answer technical questions.` },
+    { title: `r/LocalLLaMA`, subreddit: `r/LocalLLaMA`, tags: ``, body: `Title: 725-chunk on-device brain mesh for business OS — architecture notes
 
-**Routing layer (Auren):**
-- Deterministic. No LLM call.
-- 17 brain persona classifiers based on command type + context
-- Route decision happens in-Worker, zero latency, zero cost
+---
 
-**Generation layer (kAIxu 6.7):**
-- Only fires when a generative response is actually needed
-- 5 variants (plan-gated)
-- 725 knowledge chunks on-device per brain
-- Sovereign branding
+The AI routing in MetrAIyux 0S uses an on-device knowledge corpus rather than calling an external LLM for routing. Here's the architecture.
 
-**The result:**
-- Zero per-route LLM cost (routing is deterministic)
-- Generation only when necessary, from the correct brain corpus
-- Each brain stays in its lane
+**What "on-device" means in a CF Worker context:**
+The knowledge chunks are compiled into the Worker bundle at deploy time. No network call for retrieval. The entire corpus is in memory during request processing.
 
-We're not anti-LLM — kAIxu 6.7 uses generation for real. But we don't burn tokens on routing decisions that can be deterministic.` },
+**Chunk structure:**
+Each chunk has:
+- Domain tag (which brain it belongs to)
+- Keyword set (terms that activate this chunk)
+- Weight (how strongly this chunk indicates the domain)
+- Metadata (cabinet, sub-domain, action type)
 
-    { title: "Pre-revenue $1.5M infrastructure — honest breakdown of what's actually built", sub: "r/Entrepreneur r/smallbusiness", body: `There's a lot of "I built a SaaS" posts that mean "I made a landing page." This is the opposite problem — I built too much before finding customers.
+**The 17 brains and their corpus sizes:**
+The distribution isn't equal — some domains are naturally larger than others. Legal, Finance, and Technical Architecture have the most chunks. Brand and Music have fewer but more specialized ones.
 
-**What's deployed:**
-- 17 Cloudflare Workers (CF-Ray proof on every endpoint)
-- 23 platform lanes (all live and routable)
-- 875+ HTML surfaces
-- 8 D1 SQL databases
-- 58 Stripe products (cs_live — real production, not test mode)
+**What kAIxu 6.7 actually is:**
+5 variants: Nano, Mini, Standard, Pro, Max.
+Nano and Mini are on-device compact models.
+Standard through Max use the full proprietary stack.
+All variants are plan-gated — access depends on subscription tier.
+On white-label deployments, the model family is rebranded under the operator's identity.
 
-**What it cost:**
-- ~18 months of focused development
-- Engineering time primarily
-- Cloudflare billing (relatively cheap at these volumes)
+This is not a GPT wrapper. kAIxu is a proprietary model family.
 
-**What's missing:**
-- Paying customers
-- Go-to-market executed
+I'm happy to discuss the chunk compilation pipeline or the retrieval architecture in more detail.` },
+    { title: `r/WeAreTheMusicMakers`, subreddit: `r/WeAreTheMusicMakers`, tags: ``, body: `Title: I built a full music platform inside a business OS — here's what that means for artists
 
-**The honest valuation argument:**
-A dev team building this from scratch: 18–24 months minimum, $3–5M in engineering at market rates. We're asking $1.5M–$2.0M for a deployed, proof-receipted OS.
+---
 
-That's not hype math. That's a discount on what's been built.
+SkyeMusicNexus is one lane inside MetrAIyux 0S, but it's a complete music platform. Here's what it actually includes and why the architecture matters for independent artists.
 
-AMA.` },
+**What's in SkyeMusicNexus:**
 
-    { title: "8 D1 databases across 23-lane Cloudflare Workers OS — schema decisions", sub: "r/webdev r/programming r/cloudflare", body: `One of the more interesting architectural decisions in MetrAIyux 0S: we use 8 separate D1 databases rather than one large schema.
+**Native browser DAW:**
+Not a simplified sequencer. A real DAW running in the browser with track recording, mixing, and export.
 
-**The 8 databases:**
-1. Admin — owner commands, approvals, audit log
-2. Security — 0meg4kAI threat log, quarantine records, tenant events
-3. SaaS — customer accounts, subscriptions, SkyeMerit points
-4. CROWN — command room sessions, approval queue state
-5. NEXUS — CRM records, inbox, pipeline
-6. QUANTUM — runtime state, Worker health, deploy receipts
-7. Sentinel — Relay13/ConnectLog session state, AI usage ledger
-8. SkyeGate — auth events, API key log, OAuth sessions
+**Drops Room:**
+Time-gated release mechanism. Artists set a drop date and time. When the drop opens, buyers can purchase through SkyePay. Revenue goes directly to the rights holders based on the split table.
 
-**Why separate databases instead of schemas?**
-- Tenant isolation: client data can be in a separate D1 binding entirely
-- Access control: different Workers bind only the databases they need
-- Blast radius: a buggy query in SaaS can't corrupt CROWN data
-- Compliance: audit/security data stays separate from application data
+**Artist Exchange:**
+Peer-to-peer marketplace for beats, samples, collaborations, and licensing.
 
-Cross-database joins don't exist in D1. Anything that needs data from multiple databases goes through Worker-level application joins. For our use case this is fine since most queries are single-domain.
+**Rights Vault:**
+Built on SkyeVault (our Git smart-HTTP protocol). Every version of a track is committed. Every rights change is a commit. Complete ownership history is immutable and timestamped.
 
-Happy to go deeper on any of the schema decisions.` },
+**Split Engine:**
+Before any release goes live, the rights holders and their percentages are registered. When a sale occurs, SkyePay automatically splits the payment according to the registered table. No manual reconciliation. No "I'll send you your cut next week."
 
-    { title: "Durable Objects WebSocket rooms with per-workspace AI policy — Relay13 v1.8", sub: "r/webdev r/cloudflare", body: `Quick technical writeup on Relay13 + ConnectLog, the realtime surface in MetrAIyux 0S.
+**Release Forge:**
+Distribution and metadata management for completed releases.
 
-**The problem we were solving:**
-Standard WebSocket rooms don't know anything about AI policy. If different workspaces have different AI usage policies (some clients can use kAIxu 6.7, some can't, some have usage caps), you need policy enforcement at the room level.
+**The sovereignty angle:**
+Every piece of this runs on the artist's (or operator's) own Cloudflare account. The platform doesn't own your masters. The platform doesn't store your payment info on our servers. The rights are in YOUR Git vault.
 
-**Relay13 v1.8 architecture:**
+This is what the music industry should have built 20 years ago.` },
+    { title: `r/Phoenix`, subreddit: `r/Phoenix`, tags: ``, body: `Title: Valley Verified — edge-deployed business directory for Phoenix — looking for business owners
 
-Each workspace gets a Durable Object. The DO holds:
-- Active WebSocket connections for that workspace
-- The workspace's AI policy config (plan level, usage caps, allowed brain personas)
-- A session AI usage ledger
+---
 
-When a message triggers an AI action:
-1. DO checks the policy config before forwarding to kAIxu
-2. If the workspace is over cap: returns policy rejection, logs the event
-3. If allowed: forwards to the appropriate brain persona, logs the call + cost
-4. ConnectLog records the full session event in D1/Sentinel database
+Valley Verified is live and I'm looking to grow the directory.
 
-**The "server-side enforcement" part:**
-The policy check happens in the DO, not in client-side JS. This matters because you can't trust the client to enforce its own usage limits.
+**What it is:**
+A Phoenix business directory where every listing is a real HTML surface deployed on Cloudflare's global edge network.
 
-**18 live proof checks:**
-We have 18 specific connection/policy scenarios we test on every deploy. All 18 are currently green.` },
+Not a Yelp listing. Not a Google profile. An actual deployed web surface with your business information, verified contact details, and (for paying businesses) a full custom-built app.
 
-    { title: "Launched @metraiyux/0s-sdk on npm — what it gives developers", sub: "r/SaaS r/webdev r/javascript", body: `Just published @metraiyux/0s-sdk. Quick breakdown for developers who might want to integrate with MetrAIyux 0S:
+**What the free tier includes:**
+Verified listing in the directory.
+Edge-deployed business surface.
+Contact information and map.
+Valley Verified badge.
 
-**What the SDK gives you:**
+**What paying businesses get:**
+Custom-built app under your brand.
+Buyer action surfaces (quote forms, appointment booking, product showcases).
+Video proof integration.
+QR route to your surface.
+Valley Verified backlink network.
 
-Authentication bridge: Connect your application to SkyeGate FS27 for BLAKE3 API key auth and OAuth flows.
+Six live client builds are already deployed showing what this looks like. You can see them at the live platform.
 
-Payment hooks: Access SkyePay's 58-product catalog. Create checkout sessions, handle webhooks, manage subscriptions.
+**Current state:**
+875+ businesses already in the directory.
+All verified.
+All edge-deployed.
 
-Database access: Typed access to CitadelDB endpoints. Schema is documented, types are generated.
+If you own a Phoenix business, or know someone who does, I'd like to get them on Valley Verified.
 
-Vault integration: SkyeVault file upload, repo access, workspace neural map generation.
+graylondonskyes@gmail.com` },
+    { title: `r/ArizonaJobs`, subreddit: `r/ArizonaJobs`, tags: ``, body: `Title: SOL Staffing is live — Phoenix-based sovereign staffing platform
 
-Legal templates: LegalSkyes pre-built document routing templates.
+---
 
-**The 4 client templates:**
-1. SaaS integration — plug an existing product into 0S auth + billing
-2. White-label deploy — configure and deploy a branded 0S instance
-3. Staffing integration — connect SOL Staffing to an external ATS
-4. Music platform — integrate SkyeMusicNexus into an existing artist website
+SOL Staffing is the workforce management lane of MetrAIyux 0S and it's open for business.
 
-npm install @metraiyux/0s-sdk` },
+**What it is:**
+A full staffing platform. Not a job board.
 
-    { title: "SOL Staffing — staffing platform on sovereign CF infrastructure, Phoenix focus", sub: "r/Phoenix r/ArizonaJobs r/entrepreneur", body: `SOL Staffing is the staffing agency platform inside MetrAIyux 0S, built with Phoenix-area operators in mind.
+Intake → Screening → Placement → Payment — all in one system.
 
-What it handles:
-- Full candidate intake pipeline (form → screening → placement)
-- Workforce planning surface
-- SkyeRouteX integration — contractor dispatch with payment ledger
-- SkyePay billing — placement fees, retainer billing, milestone payments
-- LegalSkyes connection — every placement has a contract surface
-- Sienna Brooks brain — the HR cabinet AI trained on staffing doctrine
+89 pages of production UI.
+10,270+ lines of code.
+Built on a Cloudflare Worker with D1, KV, and SkyePay integration.
 
-For staffing agencies:
-The white-label licensing model means you can deploy SOL Staffing under your brand to your Cloudflare account. Your candidates. Your clients. Your revenue. Our infrastructure.
+**For employers:**
+Post positions with detailed requirements.
+Screen candidates through structured intake.
+Manage placements and track status.
+Pay placement fees through SkyePay — receipted and auditable.
 
-Currently: pre-revenue, infrastructure-complete. Looking for early operators.` }
+**For job seekers:**
+Submit intake forms.
+Track your placement status.
+Get paid directly through the platform when placed.
+
+**Why "sovereign" matters for staffing:**
+Your candidate data stays in your deployment. No staffing platform aggregating your workforce data. No "we might share your info with our partners."
+
+Phoenix and Arizona metro area for now.
+
+graylondonskyes@gmail.com` },
+    { title: `r/devops`, subreddit: `r/devops`, tags: ``, body: `Title: K8s HA Postgres with PITR, WAL streaming, and DR drills — CitadelDB architecture notes
+
+---
+
+CitadelDB is the sovereign database layer in MetrAIyux 0S. I want to share the architecture because it represents a different approach to database infrastructure for SaaS-scale deployments.
+
+**The core problem we were solving:**
+Managed database services (RDS, PlanetScale, Supabase, Neon) are excellent but they make a specific tradeoff: you give the provider control of your data in exchange for operational simplicity.
+
+For a platform that claims sovereignty, that tradeoff is unacceptable.
+
+**CitadelDB v3.0.1 architecture:**
+
+**High availability:**
+K8s operator managing a multi-node Postgres cluster. Automatic leader election. Automatic failover without intervention. We use a custom operator (not Patroni, though Patroni was the reference implementation).
+
+**PITR:**
+Continuous WAL archiving to our own S3-compatible storage. Recovery to any point within the retention window. We've tested recovery to specific transaction IDs.
+
+**WAL streaming replication:**
+Hot standby replicas for read scaling. Streaming replication slot management. Replication lag monitoring.
+
+**The DR drill:**
+We run a full DR drill on a schedule: simulate primary failure, verify standby promotion, verify application reconnection, verify data integrity after failover, restore from backup to a clean cluster and verify table checksums.
+
+All drills have passed. Drill results are logged.
+
+**Integration with the edge layer:**
+The 8 D1 databases at the CF edge handle high-frequency transactional data (auth tokens, realtime events, receipt logs). CitadelDB handles bulk data, analytics, and anything requiring ACID compliance with complex joins.
+
+Happy to discuss the operator architecture or the DR testing methodology.` }
   ]
 };
 
