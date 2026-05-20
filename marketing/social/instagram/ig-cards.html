@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; font-family: 'Arial Black', Arial, sans-serif; }
+
+.card {
+  width: 1080px;
+  height: 1080px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+/* CARD 1 — Hero Stats */
+.c1 {
+  background: #060810;
+  background-image: radial-gradient(ellipse 900px 600px at 50% 110%, rgba(100,217,255,0.12) 0%, transparent 70%),
+                    radial-gradient(ellipse 600px 400px at 80% 20%, rgba(244,199,91,0.08) 0%, transparent 60%);
+}
+.c1 .tag { font-size: 22px; letter-spacing: .3em; text-transform: uppercase; color: #F4C75B; font-weight: 700; margin-bottom: 48px; font-family: Arial, sans-serif; }
+.c1 h1 { font-size: 96px; font-weight: 900; color: #fff; text-align: center; line-height: 1; margin-bottom: 16px; text-transform: uppercase; letter-spacing: -.02em; }
+.c1 h1 em { color: #64D9FF; font-style: normal; }
+.c1 .sub { font-size: 28px; color: rgba(255,255,255,0.55); font-weight: 400; font-family: Arial, sans-serif; margin-bottom: 72px; text-align: center; line-height: 1.5; max-width: 700px; }
+.stats-row { display: flex; gap: 48px; align-items: flex-start; }
+.stat { text-align: center; }
+.stat .num { font-size: 64px; font-weight: 900; color: #F4C75B; line-height: 1; }
+.stat .lbl { font-size: 18px; color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; margin-top: 8px; letter-spacing: .05em; }
+.logo-mark { position: absolute; bottom: 48px; font-size: 20px; color: rgba(255,255,255,0.3); letter-spacing: .15em; font-weight: 700; }
+
+/* CARD 2 — Auren */
+.c2 {
+  background: #060810;
+  background-image: radial-gradient(ellipse 1000px 800px at 50% 60%, rgba(100,217,255,0.08) 0%, transparent 70%);
+  align-items: flex-start;
+  padding: 96px;
+}
+.c2 .kicker { font-size: 20px; letter-spacing: .3em; text-transform: uppercase; color: #64D9FF; font-weight: 700; margin-bottom: 32px; font-family: Arial, sans-serif; }
+.c2 h1 { font-size: 88px; font-weight: 900; color: #fff; line-height: .95; margin-bottom: 48px; }
+.c2 h1 em { color: #F4C75B; font-style: normal; display: block; }
+.c2 .desc { font-size: 26px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 780px; font-family: Arial, sans-serif; font-weight: 400; margin-bottom: 64px; }
+.pill-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.pill { background: rgba(100,217,255,0.1); border: 1px solid rgba(100,217,255,0.3); border-radius: 100px; padding: 14px 28px; font-size: 20px; color: #64D9FF; font-weight: 700; }
+
+/* CARD 3 — No competitor */
+.c3 {
+  background: #060810;
+  justify-content: space-between;
+  padding: 80px;
+  align-items: stretch;
+}
+.c3 .top-tag { font-size: 20px; letter-spacing: .3em; color: #F4C75B; font-weight: 700; text-transform: uppercase; font-family: Arial, sans-serif; }
+.c3 h1 { font-size: 80px; font-weight: 900; color: #fff; line-height: 1; text-align: center; margin: auto 0; }
+.c3 h1 em { color: #F4C75B; font-style: normal; }
+.c3 h1 span { display: block; font-size: 44px; color: rgba(255,255,255,0.5); font-weight: 400; margin-top: 16px; }
+.comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+.comp-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; font-family: Arial, sans-serif; }
+.comp-name { font-size: 22px; color: rgba(255,255,255,0.6); font-weight: 600; }
+.comp-x { font-size: 28px; color: #ff4444; font-weight: 900; }
+
+/* CARD 4 — Numbers */
+.c4 {
+  background: #060810;
+  background-image: radial-gradient(ellipse 1000px 500px at 50% 100%, rgba(244,199,91,0.07) 0%, transparent 60%);
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 80px;
+}
+.c4 .kicker { font-size: 20px; letter-spacing: .3em; text-transform: uppercase; color: #F4C75B; font-weight: 700; margin-bottom: 40px; font-family: Arial, sans-serif; }
+.big-num { font-size: 160px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -.04em; }
+.big-num em { color: #64D9FF; font-style: normal; }
+.num-desc { font-size: 32px; color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; font-weight: 400; margin-top: 16px; max-width: 680px; line-height: 1.4; }
+.c4-list { position: absolute; top: 80px; right: 80px; display: flex; flex-direction: column; gap: 20px; }
+.c4-item { font-size: 22px; color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; text-align: right; }
+.c4-item strong { color: #F4C75B; font-size: 28px; display: block; }
+
+/* CARD 5 — Sovereignty */
+.c5 {
+  background: #060810;
+  background-image: radial-gradient(ellipse 800px 800px at 20% 80%, rgba(100,217,255,0.06) 0%, transparent 60%);
+  align-items: flex-start;
+  padding: 96px;
+  justify-content: space-between;
+}
+.c5 h1 { font-size: 100px; font-weight: 900; color: #fff; line-height: .9; }
+.c5 h1 em { color: #64D9FF; font-style: normal; }
+.c5 .vs-block { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.c5 .vs-col { padding: 32px; border-radius: 16px; }
+.c5 .vs-col.bad { background: rgba(255,60,60,0.06); border: 1px solid rgba(255,60,60,0.15); }
+.c5 .vs-col.good { background: rgba(100,217,255,0.06); border: 1px solid rgba(100,217,255,0.2); }
+.c5 .vs-title { font-size: 20px; letter-spacing: .15em; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; font-family: Arial, sans-serif; }
+.c5 .vs-col.bad .vs-title { color: rgba(255,80,80,0.7); }
+.c5 .vs-col.good .vs-title { color: #64D9FF; }
+.c5 .vs-item { font-size: 22px; color: rgba(255,255,255,0.6); font-family: Arial, sans-serif; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); line-height: 1.3; }
+.c5 .vs-item:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<!-- CARD 1: PLATFORM HERO STATS -->
+<div class="card c1">
+  <p class="tag">MetrAIyux 0S</p>
+  <h1>Built to<br><em>Run.</em></h1>
+  <p class="sub">23 platform lanes. Zero competitors.<br>All sovereign. All deployed.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="num">17</div><div class="lbl">CF Workers</div></div>
+    <div class="stat"><div class="num">23</div><div class="lbl">Platform Lanes</div></div>
+    <div class="stat"><div class="num">58</div><div class="lbl">Stripe Products</div></div>
+    <div class="stat"><div class="num">875+</div><div class="lbl">Live Surfaces</div></div>
+  </div>
+  <div class="logo-mark">METRAIYUX 0S</div>
+</div>
+
+<!-- CARD 2: AUREN -->
+<div class="card c2">
+  <p class="kicker">Central Intelligence</p>
+  <h1>Meet<br><em>Auren.</em></h1>
+  <p class="desc">17 AI brains. One routing layer.<br>Zero LLM cost per route decision.<br>725 knowledge chunks. On-device. Sovereign.</p>
+  <div class="pill-row">
+    <div class="pill">Sales Brain</div>
+    <div class="pill">Legal Brain</div>
+    <div class="pill">Finance Brain</div>
+    <div class="pill">Ops Brain</div>
+    <div class="pill">Tech Brain</div>
+    <div class="pill">Staffing Brain</div>
+    <div class="pill">+ 11 more</div>
+  </div>
+  <div class="logo-mark">METRAIYUX 0S</div>
+</div>
+
+<!-- CARD 3: NO COMPETITORS -->
+<div class="card c3">
+  <p class="top-tag">Category Creator</p>
+  <h1>0 direct<br>competitors.<br><em>We built<br>the category.</em></h1>
+  <div class="comp-grid">
+    <div class="comp-item"><span class="comp-name">GoHighLevel</span><span class="comp-x">✗</span></div>
+    <div class="comp-item"><span class="comp-name">Firebase</span><span class="comp-x">✗</span></div>
+    <div class="comp-item"><span class="comp-name">Supabase</span><span class="comp-x">✗</span></div>
+    <div class="comp-item"><span class="comp-name">Retool</span><span class="comp-x">✗</span></div>
+    <div class="comp-item"><span class="comp-name">Bubble</span><span class="comp-x">✗</span></div>
+    <div class="comp-item"><span class="comp-name">Webflow</span><span class="comp-x">✗</span></div>
+  </div>
+  <div class="logo-mark">METRAIYUX 0S</div>
+</div>
+
+<!-- CARD 4: VALUATION -->
+<div class="card c4">
+  <div class="c4-list">
+    <div class="c4-item"><strong>17</strong>CF Workers Live</div>
+    <div class="c4-item"><strong>23</strong>Platform Lanes</div>
+    <div class="c4-item"><strong>58</strong>Stripe Products</div>
+    <div class="c4-item"><strong>875+</strong>HTML Surfaces</div>
+    <div class="c4-item"><strong>$0</strong>Revenue Yet</div>
+  </div>
+  <p class="kicker">Pre-Revenue Valuation</p>
+  <div class="big-num">$<em>2M</em></div>
+  <p class="num-desc">Infrastructure complete.<br>No customers yet.<br>The math still works.</p>
+  <div class="logo-mark">METRAIYUX 0S</div>
+</div>
+
+<!-- CARD 5: SOVEREIGNTY -->
+<div class="card c5">
+  <h1>Your<br>cloud.<br><em>Not<br>theirs.</em></h1>
+  <div class="vs-block">
+    <div class="vs-col bad">
+      <div class="vs-title">Everyone else</div>
+      <div class="vs-item">Your data on their servers</div>
+      <div class="vs-item">Their terms. Their uptime.</div>
+      <div class="vs-item">Vendor lock-in baked in</div>
+      <div class="vs-item">Price hike = your problem</div>
+    </div>
+    <div class="vs-col good">
+      <div class="vs-title">MetrAIyux 0S</div>
+      <div class="vs-item">Deploys to YOUR Cloudflare</div>
+      <div class="vs-item">Your account. Your rules.</div>
+      <div class="vs-item">Data never touches our servers</div>
+      <div class="vs-item">Sovereign. Forever.</div>
+    </div>
+  </div>
+  <div class="logo-mark">METRAIYUX 0S</div>
+</div>
+
+</body>
+</html>
