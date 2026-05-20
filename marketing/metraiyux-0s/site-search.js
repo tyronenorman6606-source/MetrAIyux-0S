@@ -19,6 +19,7 @@
     { title: 'Facebook Posts', url: 'social.html', keywords: 'facebook posts community business local phoenix valley verified announcement' },
     { title: 'Instagram Captions', url: 'social.html', keywords: 'instagram captions hashtags visual content creator reels music tech founder' },
     { title: 'Reddit Posts', url: 'social.html', keywords: 'reddit posts r/cloudflare r/selfhosted r/webdev r/entrepreneur r/saas r/startups r/artificial technical deep dive' },
+    { title: 'Gray Skyes — Founder &amp; Builder', url: 'gray-skyes.html', keywords: 'gray skyes founder builder architect skyes over london phoenix az who built metraiyux 0s one person one year zero funding hire work with services' },
     { title: 'SkyeRouteX — Dispatch OS', url: 'skyeroutex.html', keywords: 'skyeroutex routex dispatch workforce routes contractor payment ledger' },
     { title: 'Valley Verified — Phoenix Business Directory', url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/', keywords: 'valley verified phoenix phx arizona local business directory listings verified edge' },
     { title: 'SkyeGate FS27 — Auth Platform', url: 'capabilities.html#workers', keywords: 'skyegate fs27 auth blake3 oauth twilio bearer token api keys allowlist' },
