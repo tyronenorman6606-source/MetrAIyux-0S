@@ -961,6 +961,30 @@ code, .mono {
   font-weight: 700;
 }
 
+.ai-lane-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ai-lane-grid span {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background: rgba(255,255,255,0.045);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.ai-lane-grid strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
 /* ---- Valuation Numbers ---- */
 .val-number {
   font-family: var(--font-display);
@@ -1837,6 +1861,10 @@ code, .mono {
 
 @media (max-width: 900px) {
   .client-loop-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-lane-grid {
     grid-template-columns: 1fr;
   }
 
