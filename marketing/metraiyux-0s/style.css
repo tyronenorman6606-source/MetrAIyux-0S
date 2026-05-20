@@ -142,20 +142,20 @@ button, input, select, textarea { font: inherit; }
 .nav-shell {
   width: var(--wrap);
   margin: 0 auto;
-  min-height: 92px;
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 12px;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.18rem;
+  font-size: 1rem;
   letter-spacing: 0;
   color: var(--ink);
   white-space: nowrap;
@@ -163,8 +163,8 @@ button, input, select, textarea { font: inherit; }
 }
 
 .brand img {
-  width: 64px;
-  height: 64px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   filter: drop-shadow(0 0 16px rgba(100,217,255,0.4)) drop-shadow(0 0 20px rgba(248,203,94,0.28));
 }
@@ -172,19 +172,19 @@ button, input, select, textarea { font: inherit; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-wrap: nowrap;
 }
 
 .nav-links a {
-  min-height: 38px;
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   border: 1px solid transparent;
   border-radius: var(--radius);
-  padding: 8px 11px;
+  padding: 6px 9px;
   color: var(--soft);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
@@ -216,8 +216,8 @@ button, input, select, textarea { font: inherit; }
   flex-shrink: 0;
 }
 .nav-search-input {
-  width: 200px;
-  height: 38px;
+  width: 155px;
+  height: 34px;
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -234,7 +234,7 @@ button, input, select, textarea { font: inherit; }
 .nav-search-input::placeholder { color: var(--muted); }
 .nav-search-input:focus {
   border-color: rgba(244,199,91,.5);
-  width: 260px;
+  width: 210px;
   background-color: rgba(255,255,255,0.07);
 }
 .nav-search-results {
@@ -273,7 +273,7 @@ button, input, select, textarea { font: inherit; }
   font-size: 13px;
   color: var(--muted);
 }
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .nav-search { display: none; }
 }
 
@@ -886,6 +886,79 @@ code, .mono {
 .feature-card a:hover {
   border-color: var(--line-strong);
   color: white;
+}
+
+/* ---- Client Operating Loop ---- */
+.client-loop-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.client-loop-steps {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 12px;
+  counter-reset: client-loop;
+}
+
+.client-loop-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.035);
+  color: var(--soft);
+  line-height: 1.58;
+}
+
+.client-loop-steps li::before {
+  counter-increment: client-loop;
+  content: counter(client-loop);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #07090d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.client-loop-steps strong {
+  display: block;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.cost-guardrail {
+  background:
+    linear-gradient(135deg, rgba(100,217,255,0.09), transparent 36%),
+    linear-gradient(180deg, rgba(18,24,31,0.82), rgba(8,11,15,0.72));
+}
+
+.mini-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.mini-pill-row span {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: var(--muted);
+  background: rgba(255,255,255,0.05);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 /* ---- Valuation Numbers ---- */
@@ -1592,10 +1665,10 @@ code, .mono {
   .macbook-device { justify-self: center; }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1080px) {
   .menu-button { display: inline-block; }
   .nav-shell { flex-wrap: wrap; min-height: 64px; }
-  .brand img { width: 54px; height: 54px; }
+  .brand img { width: 46px; height: 46px; }
   .nav-links {
     width: 100%;
     display: none;
@@ -1763,6 +1836,10 @@ code, .mono {
 }
 
 @media (max-width: 900px) {
+  .client-loop-grid {
+    grid-template-columns: 1fr;
+  }
+
   .client-proof-grid {
     grid-template-columns: 1fr;
   }

@@ -39,8 +39,6 @@
         <a href="capabilities.html">Capabilities</a>
         <a href="sell-sheet.html">Sell Sheet</a>
         <a href="white-label.html">White Label</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="ecosystem.html">Ecosystem</a>
         <a href="proof.html">Live Proof</a>
         <a href="valuation.html">Valuation</a>
         <a href="the-gap.html">No Competitors</a>
@@ -99,6 +97,46 @@
         <span>CitadelDB sovereign database — K8s HA Postgres, WAL streaming, point-in-time restore, operator job queue</span>
       </div>
     </div>
+
+    <!-- ============ CLIENT OPERATING LOOP ============ -->
+    <section class="section" id="client-operating-loop">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Client App Workflow</p>
+          <h2>What a business can actually do with it on day one.</h2>
+        </div>
+        <p>A client app is not just a nicer homepage. It is a phone-ready intake surface, a workspace, a lead ledger, a message route, and a payment/add-on lane tied to the same 0S account.</p>
+      </div>
+      <div class="client-loop-grid">
+        <article class="panel reveal">
+          <p class="eyebrow" style="margin-bottom:10px;">How the client uses it</p>
+          <ol class="client-loop-steps">
+            <li><span><strong>Customer scans or opens the app.</strong>The business can put the app URL or QR code on cards, trucks, counters, invoices, and social profiles.</span></li>
+            <li><span><strong>The request is captured.</strong>Quote forms, contact forms, service requests, and app messages write a lead, contact, and activity record through FS27.</span></li>
+            <li><span><strong>The workspace receives it.</strong>Relay13 opens a client-specific thread so the owner sees the request in the right company lane.</span></li>
+            <li><span><strong>ConnectLog keeps the trail.</strong>The relationship record carries source URL, campaign, request type, timestamps, and follow-up state.</span></li>
+            <li><span><strong>The owner replies or routes it.</strong>The client can answer manually, assign follow-up, archive the request, or activate paid AI response drafts.</span></li>
+          </ol>
+        </article>
+        <article class="panel cost-guardrail reveal">
+          <p class="eyebrow" style="margin-bottom:10px;">AI without surprise bills</p>
+          <h3>Local brain first. Paid AI only when the client activates it.</h3>
+          <p>The default client workflow uses deterministic local routing and operator review, so normal lead capture does not burn provider money. The optional Relay13 AI Response Starter is a SkyePay add-on: $35/mo, 100 AI response drafts/month, owner-reviewed before sending. If the add-on is inactive or the usage cap is hit, Relay13 stays in local-brain/manual mode.</p>
+          <div class="mini-pill-row" aria-label="Client workflow guarantees">
+            <span>Lead persists in FS27</span>
+            <span>Thread opens in Relay13</span>
+            <span>Event writes to ConnectLog</span>
+            <span>AI drafts require paid activation</span>
+            <span>Owner approval stays on</span>
+          </div>
+          <div class="cta-row" style="margin-top:20px;">
+            <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-what-you-get.html" target="_blank" rel="noopener">What Clients Get</a>
+            <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-client-tutorial.html" target="_blank" rel="noopener">Client Setup Guide</a>
+            <a class="btn-ghost" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s-skm&offer=relay13-ai-response-starter" target="_blank" rel="noopener">AI Add-On</a>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <!-- ============ PROBLEM ============ -->
     <section class="section" id="problem">
