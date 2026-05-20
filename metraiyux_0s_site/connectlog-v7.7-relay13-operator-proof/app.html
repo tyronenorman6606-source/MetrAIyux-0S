@@ -20,55 +20,65 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="icon" href="assets/favicon.png" />
   <link rel="stylesheet" href="styles.css" />
-</head>
+<link rel="stylesheet" href="/assets/css/0s-runtime-truth.css" data-runtime-truth-style><script defer src="/assets/js/0s-runtime-truth.js" data-surface-id="connectlog-relay13" data-repair-href="/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md#phase-4-ui-truth-layer"></script></head>
 <body>
   <div class="shell" id="appShell">
-    <aside class="sidebar" aria-label="ConnectLog navigation">
-      <div class="sidebar-head">
-        <a class="brand" href="#top" aria-label="ConnectLog app home">
+    <header class="app-topbar" aria-label="ConnectLog navigation">
+      <div class="topbar-head">
+        <a class="brand" href="dashboard.html" aria-label="ConnectLog app home">
           <img src="assets/connectlog-logo-192.png" alt="" class="brand-mark" width="54" height="54" />
           <span class="brand-copy">
             <strong>ConnectLog</strong>
             <small>Connection OS</small>
           </span>
         </a>
-        <button class="menu-toggle" id="menuCollapseBtn" type="button" aria-expanded="true" aria-label="Minimize central menu">⇤</button>
+        <button class="compat-hook" id="menuCollapseBtn" type="button" hidden aria-hidden="true" tabindex="-1">Menu compatibility hook</button>
       </div>
 
-      <nav class="nav-stack" aria-label="App sections">
+      <nav class="top-nav" aria-label="App sections">
         <a href="./index.html?landing=1" class="nav-pill landing-return"><span>◌</span><b class="nav-label">Landing</b></a>
-        <a href="#dashboard" class="nav-pill active" data-nav-target="dashboard"><span>◆</span><b class="nav-label">Start</b></a>
-        <a href="#exchange" class="nav-pill" data-nav-target="exchange"><span>◇</span><b class="nav-label">Exchange</b></a>
-        <a href="#cards" class="nav-pill" data-nav-target="cards"><span>▣</span><b class="nav-label">Cards</b></a>
-        <a href="#relay13" class="nav-pill" data-nav-target="relay13"><span>✉</span><b class="nav-label">Relay13</b></a>
-        <a href="#deployment" class="nav-pill" data-nav-target="deployment"><span>⌁</span><b class="nav-label">Proof</b></a>
-        <a href="#contacts" class="nav-pill" data-nav-target="contacts"><span>●</span><b class="nav-label">People</b></a>
-        <a href="#intelligence" class="nav-pill" data-nav-target="intelligence"><span>✦</span><b class="nav-label">Intelligence</b></a>
+        <a href="dashboard.html" class="nav-pill active"><span>01</span><b class="nav-label">Lobby</b></a>
+        <a href="tutorial.html" class="nav-pill"><span>02</span><b class="nav-label">Tutorial</b></a>
+        <a href="exchange.html" class="nav-pill"><span>03</span><b class="nav-label">Exchange</b></a>
+        <a href="cards.html" class="nav-pill"><span>04</span><b class="nav-label">Cards</b></a>
+        <a href="relay13-inbox.html" class="nav-pill"><span>05</span><b class="nav-label">Relay13</b></a>
+        <a href="deployment.html" class="nav-pill"><span>06</span><b class="nav-label">Proof</b></a>
+        <a href="people.html" class="nav-pill"><span>07</span><b class="nav-label">People</b></a>
+        <a href="intelligence.html" class="nav-pill"><span>08</span><b class="nav-label">Intelligence</b></a>
       </nav>
 
-      <section class="privacy-card" aria-label="Privacy posture">
+      <section class="privacy-card topbar-proof" aria-label="Privacy posture">
         <p class="eyebrow">Production infrastructure</p>
         <p>ConnectLog is live in production on the 0S Worker. Relay13 is the deployed messaging core with D1 workspace proof, scoped keys, activation proof, and WebSocket proof.</p>
       </section>
-    </aside>
+    </header>
 
     <main class="workspace" id="top">
-      <header class="hero page-active" id="dashboard" data-page="dashboard">
-        <div class="hero-copy-stack">
-          <p class="eyebrow">Production connection exchange</p>
-          <h1>Exchange once. Remember forever. Move before the relationship goes cold.</h1>
-          <p class="hero-copy">ConnectLog is the front room for relationship memory. Relay13 is the chat room behind it. Use this workspace as rooms: set up the card, open inbox threads, then prove the handoff.</p>
+      <header class="app-lobby page-active" id="dashboard" data-page="dashboard">
+        <div class="lobby-copy">
+          <img class="lobby-logo" src="assets/connectlog-logo-512.png" alt="ConnectLog logo" width="72" height="72" />
+          <p class="eyebrow">ConnectLog + Relay13 rooms</p>
+          <h1>One lobby. Short rooms. Real chat handoff.</h1>
+          <p class="panel-hint">This is the operator path for the full universe: build the card, open the owned inbox, work the relationship, then show proof. No room needs a long scroll to make sense.</p>
+          <div class="hero-actions inline-actions">
+            <a class="primary-btn" href="relay13-inbox.html">Open Relay13 Inbox</a>
+            <a class="ghost-btn" href="tutorial.html">Start tutorial</a>
+            <button class="ghost-btn" id="heroShareBtn" type="button">◇ Share my card</button>
+            <button class="ghost-btn" id="heroScanBtn" type="button">⌗ Scan QR</button>
+          </div>
         </div>
-        <figure class="hero-brand-stage" aria-label="ConnectLog visual identity">
-          <span class="brand-orbit orbit-one"></span>
-          <span class="brand-orbit orbit-two"></span>
-          <img src="assets/connectlog-logo-512.png" alt="ConnectLog logo" width="260" height="260" />
-        </figure>
-        <div class="hero-actions">
+        <div class="lobby-console" aria-label="Room map">
+          <div class="lobby-console-head"><span></span><span></span><span></span><strong>room path</strong></div>
+          <div class="lobby-flow">
+            <a href="exchange.html"><b>01</b><span>Build the card</span></a>
+            <a href="relay13-inbox.html"><b>02</b><span>Open the chat thread</span></a>
+            <a href="people.html"><b>03</b><span>Save the relationship</span></a>
+            <a href="deployment.html"><b>04</b><span>Show proof</span></a>
+          </div>
+        </div>
+        <div class="hero-actions lobby-quick-actions">
           <button class="primary-btn" id="addContactBtn" type="button">＋ Add person</button>
           <button class="ghost-btn" id="quickLogBtn" type="button">✦ Quick log</button>
-          <button class="ghost-btn" id="heroShareBtn" type="button">◇ Share my card</button>
-          <button class="ghost-btn" id="heroScanBtn" type="button">⌗ Scan QR</button>
         </div>
       </header>
 
@@ -85,16 +95,57 @@
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Three minute tour</p>
-            <h2 id="roomGuideTitle">What they are getting, without making them wander.</h2>
-            <p class="panel-hint">This is the simple path to demo or train a business owner. Every step has its own room in the left menu.</p>
+            <h2 id="roomGuideTitle">What they get, in plain owner language.</h2>
+            <p class="panel-hint">Use this as the demo script: capture a person, keep the thread, route the follow-up, and prove the system is real.</p>
           </div>
-          <a class="primary-btn small" href="#relay13">Open chat room</a>
+          <a class="primary-btn small" href="relay13-inbox.html">Open chat room</a>
         </div>
         <div class="guide-grid">
-          <article class="guide-card"><span>01</span><h3>Exchange</h3><p>Make a scannable card for a room, event, client, or vendor. The QR can save the person into ConnectLog or create a phone contact.</p><a href="#exchange">Set up cards</a></article>
-          <article class="guide-card"><span>02</span><h3>Relay13</h3><p>Open owned threads from those cards. Website messages, direct operator requests, and brain-assisted drafts all land here.</p><a href="#relay13">Run inbox</a></article>
-          <article class="guide-card"><span>03</span><h3>People</h3><p>Search the relationship vault, filter by lane/status/priority, log notes, and schedule follow-ups before the lead gets cold.</p><a href="#contacts">Work contacts</a></article>
-          <article class="guide-card"><span>04</span><h3>Proof</h3><p>Use the proof room for diagnostics, activation checks, redacted config export, and copyable deployment commands.</p><a href="#deployment">Show proof</a></article>
+          <article class="guide-card"><span>01</span><h3>Exchange</h3><p>Make a scannable card for a room, event, client, or vendor. The QR can save the person into ConnectLog or create a phone contact.</p><a href="exchange.html">Set up cards</a></article>
+          <article class="guide-card"><span>02</span><h3>Relay13</h3><p>Open owned threads from those cards. Website messages, direct operator requests, and brain-assisted drafts all land here.</p><a href="relay13-inbox.html">Run inbox</a></article>
+          <article class="guide-card"><span>03</span><h3>People</h3><p>Search the relationship vault, filter by lane/status/priority, log notes, and schedule follow-ups before the lead gets cold.</p><a href="people.html">Work contacts</a></article>
+          <article class="guide-card"><span>04</span><h3>Proof</h3><p>Use the proof room for diagnostics, activation checks, redacted config export, and copyable deployment commands.</p><a href="deployment.html">Show proof</a></article>
+        </div>
+      </section>
+
+      <section class="tutorial-panel" id="tutorial" data-page="tutorial" aria-label="ConnectLog and Relay13 tutorial">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Simple tutorial</p>
+            <h2>What this gives a business owner and how they use it.</h2>
+            <p class="panel-hint">Keep the handoff short: this is a chat universe, relationship vault, and proof console broken into rooms.</p>
+          </div>
+          <div class="exchange-actions compact-row">
+            <a class="primary-btn small" href="relay13-inbox.html">Use inbox</a>
+            <a class="ghost-btn small" href="../live/relay13-operator-tutorial.html">Operator tutorial</a>
+            <a class="ghost-btn small" href="../live/relay13-client-tutorial.html">Client tutorial</a>
+          </div>
+        </div>
+        <div class="tutorial-grid">
+          <article class="lesson-card">
+            <span>Buyer promise</span>
+            <h3>They get an owned message room.</h3>
+            <p>A website visitor, scanner, or client can start a thread. The owner sees the conversation in Relay13 instead of losing it in forms, inboxes, or screenshots.</p>
+            <a href="relay13-inbox.html">Open the room</a>
+          </article>
+          <article class="lesson-card">
+            <span>Daily workflow</span>
+            <h3>Read, reply, route, follow up.</h3>
+            <p>Open Relay13, select the thread, send or queue the reply, then save the person into ConnectLog with a next action.</p>
+            <a href="people.html">Work the relationship</a>
+          </article>
+          <article class="lesson-card">
+            <span>Setup path</span>
+            <h3>One card connects the system.</h3>
+            <p>Build a card, save the bridge settings, sync the active card, and keep the QR ready for the room where the owner meets people.</p>
+            <a href="exchange.html">Build a card</a>
+          </article>
+          <article class="lesson-card">
+            <span>Proof path</span>
+            <h3>Show it is not pretend.</h3>
+            <p>Run diagnostics, health checks, activation proof, and WebSocket proof before calling a delivery complete.</p>
+            <a href="deployment.html">Run proof</a>
+          </article>
         </div>
       </section>
 
@@ -177,19 +228,20 @@
 
 
 
-      <section class="relay-panel" id="relay13" data-page="relay13" data-active-room="setup" aria-label="Relay13 messaging bridge">
+      <section class="relay-panel" id="relay13" data-page="relay13" data-active-room="inbox" aria-label="Relay13 messaging bridge">
         <div class="section-title-row">
           <div>
             <p class="eyebrow">Relay13 bridge</p>
             <h2>Relay13 production inbox for owned conversations.</h2>
-            <p class="panel-hint">ConnectLog is the production relationship/card app. Relay13 is the live messaging backend. This adapter lets cards open owned conversations through the deployed Worker, D1 workspace, scoped key, and WebSocket-proven bridge.</p>
+            <p class="panel-hint">This is the chat universe: threads in the center, setup in its own room, proof in its own room. Start with Inbox, then only move when the next action needs it.</p>
           </div>
           <div class="relay-status" id="relayConnectionStatus" aria-live="polite">Relay13 production bridge live.</div>
         </div>
 
         <div class="room-tabs" aria-label="Relay13 room views">
-          <button class="room-tab active" type="button" data-room-group="relay" data-room-target="setup" aria-pressed="true">Setup</button>
-          <button class="room-tab" type="button" data-room-group="relay" data-room-target="inbox" aria-pressed="false">Inbox</button>
+          <button class="room-tab active" type="button" data-room-group="relay" data-room-target="inbox" aria-pressed="true">Inbox</button>
+          <button class="room-tab" type="button" data-room-group="relay" data-room-target="setup" aria-pressed="false">Setup</button>
+          <button class="room-tab" type="button" data-room-group="relay" data-room-target="learn" aria-pressed="false">Use it</button>
           <button class="room-tab" type="button" data-room-group="relay" data-room-target="proof" aria-pressed="false">Proof</button>
         </div>
 
@@ -201,10 +253,10 @@
               <label>Relay13 Worker origin<input id="relayOriginInput" type="text" maxlength="240" placeholder="your Relay13 Worker origin" autocomplete="off" /></label>
               <label>Public workspace slug<input id="relayWorkspaceInput" type="text" maxlength="80" placeholder="connectlog-main" autocomplete="off" /></label>
               <label>Workspace ID<input id="relayWorkspaceIdInput" type="text" maxlength="120" placeholder="Optional for operator API calls" autocomplete="off" /></label>
-              <label>Operator API key<input id="relayApiKeyInput" type="password" maxlength="260" placeholder="Optional. Stored only in this browser." autocomplete="off" /></label>
+              <label>0S/SkyGate session<input id="relayApiKeyInput" type="password" maxlength="260" placeholder="Auto-loaded from 0S; fallback only" autocomplete="off" /></label>
               <label>Operator display name<input id="relayOperatorNameInput" type="text" maxlength="140" placeholder="ConnectLog Operator" /></label>
             </div>
-            <label class="relay-check"><input id="relayShareBridgeInput" type="checkbox" /> Embed public Relay13 bridge data in my ConnectLog QR cards. This never embeds the API key.</label>
+            <label class="relay-check"><input id="relayShareBridgeInput" type="checkbox" /> Embed public Relay13 bridge data in my ConnectLog QR cards. This never embeds private gate credentials.</label>
             <div class="exchange-actions compact-row">
               <button class="primary-btn small" id="relaySaveSettingsBtn" type="button">Save bridge</button>
               <button class="ghost-btn small" id="relayHealthBtn" type="button">Health check</button>
@@ -229,34 +281,77 @@
             <div class="relay-request-list" id="relayRequestList" aria-live="polite"></div>
           </article>
 
-          <article class="relay-card relay-inbox-card" data-relay-room="inbox">
-            <div class="relay-toolbar">
-              <div><p class="eyebrow">Inbox adapter</p><h3>Threads</h3></div>
-              <div class="exchange-actions compact-row">
-                <button class="ghost-btn small" id="relayCreateThreadBtn" type="button">Thread from active card</button>
-                <button class="ghost-btn small" id="relayRefreshThreadsBtn" type="button">Refresh remote</button>
-                <button class="ghost-btn small" id="relayRefreshMessagesBtn" type="button">Pull messages</button>
-                <button class="ghost-btn small" id="relayCopyWebSocketProofBtn" type="button">Copy WS proof</button>
-              </div>
-            </div>
-            <div class="relay-inbox-layout">
-              <div class="relay-thread-list" id="relayThreadList" aria-live="polite"></div>
-              <div class="relay-message-pane">
+          <article class="relay-card relay-inbox-card relay-inbox-app" data-relay-room="inbox">
+            <div class="relay-mailbox-shell" aria-label="Relay13 inbox workspace">
+              <aside class="relay-mailbox-rail" aria-label="Mailbox folders">
+                <p class="eyebrow">Mailbox</p>
+                <h3>Relay13 Inbox</h3>
+                <p class="panel-hint">Desktop is a real operator desk: folders, thread list, conversation, and delivery context all visible at once.</p>
+                <div class="mail-folder-list" aria-label="Inbox folders">
+                  <button type="button" class="mail-folder active"><span>Inbox</span><b>live</b></button>
+                  <button type="button" class="mail-folder"><span>Needs reply</span><b>focus</b></button>
+                  <button type="button" class="mail-folder"><span>Queued</span><b>proof</b></button>
+                  <button type="button" class="mail-folder"><span>All threads</span><b>vault</b></button>
+                </div>
+                <div class="mailbox-actions">
+                  <button class="primary-btn small" id="relayCreateThreadBtn" type="button">Thread from active card</button>
+                  <button class="ghost-btn small" id="relayRefreshThreadsBtn" type="button">Refresh remote</button>
+                  <button class="ghost-btn small" id="relayCopyWebSocketProofBtn" type="button">Copy WS proof</button>
+                </div>
+              </aside>
+
+              <section class="relay-thread-column" aria-label="Relay13 thread list">
+                <div class="relay-column-head">
+                  <div>
+                    <p class="eyebrow">Threads</p>
+                    <h3>Open conversations</h3>
+                  </div>
+                  <button class="ghost-btn small" id="relayRefreshMessagesBtn" type="button">Pull messages</button>
+                </div>
+                <div class="relay-thread-list" id="relayThreadList" aria-live="polite"></div>
+              </section>
+
+              <section class="relay-conversation-column" aria-label="Selected conversation">
+                <div class="relay-column-head">
+                  <div>
+                    <p class="eyebrow">Conversation</p>
+                    <h3>Operator reply pane</h3>
+                  </div>
+                  <span class="relay-live-chip">thread room</span>
+                </div>
                 <div class="relay-message-log" id="relayMessageLog" aria-live="polite"></div>
                 <label class="relay-compose">Message<textarea id="relayMessageInput" rows="4" maxlength="4000" placeholder="Write a note. Ctrl/⌘ + Enter sends."></textarea></label>
                 <div class="exchange-actions compact-row">
                   <button class="primary-btn small" id="relaySendBtn" type="button">Send / save</button>
                   <button class="ghost-btn small" id="relaySyncOutboxBtn" type="button">Sync queued</button>
                 </div>
+              </section>
+
+              <aside class="relay-context-column" aria-label="Thread context and delivery proof">
+                <p class="eyebrow">Context</p>
+                <h3>Card, routing, delivery.</h3>
+                <p class="panel-hint">The operator can see whether this thread came from the active card, whether delivery is remote or queued, and what still needs proof.</p>
+                <div class="context-stack">
+                  <div><span>Active route</span><strong>ConnectLog card → Relay13 thread</strong></div>
+                  <div><span>Proof rule</span><strong>No fake “sent” state without Worker confirmation.</strong></div>
+                </div>
+                <div class="delivery-ledger">
+                  <p class="eyebrow">Delivery integrity ledger</p>
+                  <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
+                </div>
               </div>
             </div>
           </article>
 
-          <article class="relay-card relay-fallback-card" data-relay-room="inbox">
-            <p class="eyebrow">Delivery integrity ledger</p>
-            <h3>Production delivery stays provable.</h3>
-            <p class="panel-hint">If a browser lacks operator credentials or cannot reach the Worker, messages are queued for verified Relay13 delivery instead of being falsely marked complete.</p>
-            <div class="seed-results" id="relayFallbackLog" aria-live="polite"></div>
+          <article class="relay-card relay-guide-card wide" data-relay-room="learn">
+            <p class="eyebrow">How to use this room</p>
+            <h3>Four moves: card, thread, reply, follow-up.</h3>
+            <div class="tutorial-grid compact">
+              <article class="lesson-card"><span>1</span><h4>Make or pick the active card.</h4><p>The card tells the visitor who they are talking to and what room they entered.</p><a href="exchange.html">Go to Exchange</a></article>
+              <article class="lesson-card"><span>2</span><h4>Open or create the thread.</h4><p>Threads stay in Relay13. Local fallback keeps notes honest when credentials are missing.</p><a href="relay13-inbox.html">Stay in Inbox</a></article>
+              <article class="lesson-card"><span>3</span><h4>Reply like an operator.</h4><p>Use the message pane. If delivery cannot be proven, sync queued keeps the claim honest.</p><a href="../live/relay13-operator-tutorial.html">Operator tutorial</a></article>
+              <article class="lesson-card"><span>4</span><h4>Save the relationship.</h4><p>Move the person into ConnectLog with lane, status, notes, and next follow-up.</p><a href="people.html">Go to People</a></article>
+            </div>
           </article>
 
           <article class="relay-card relay-proof-card wide" data-relay-room="proof">
@@ -304,7 +399,7 @@
           <article class="deployment-card wide operator-runbook-card" data-deploy-room="runbook">
             <p class="eyebrow">Relay13 operator runbook</p>
             <h3>Copy the exact setup blocks instead of guessing deployment order.</h3>
-            <p class="panel-hint">Use this before and after Relay13 deploy. The exported bridge config redacts the browser API key so it can be stored safely with project notes.</p>
+            <p class="panel-hint">Use this before and after Relay13 deploy. The exported bridge config redacts private browser credentials so it can be stored safely with project notes.</p>
             <div class="exchange-actions compact-row">
               <button class="primary-btn small" id="relayRunPreflightBtn" type="button">Run preflight</button>
               <button class="ghost-btn small" id="relayCopyOperatorRunbookBtn" type="button">Copy runbook</button>
@@ -583,6 +678,8 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/js/metraiyux-api-bases.js?v=relay13-api-base" defer></script>
+  <script src="../assets/js/0s-gate-card-bridge.js" defer></script>
   <script src="qr-lite.js" defer></script>
   <script src="app.js" defer></script>
 </body>
