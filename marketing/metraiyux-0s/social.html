@@ -30,10 +30,12 @@
     .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
     .post-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-      padding: 24px; position: relative; transition: border-color .15s;
+      padding: 0; position: relative; transition: border-color .15s; overflow: hidden;
     }
     .post-card:hover { border-color: var(--gold); }
-    .post-num { font-family: var(--font-label); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .post-visual { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 0; }
+    .post-body { padding: 20px 24px 24px; }
+    .post-num { font-family: var(--font-label); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; margin-top: 4px; }
     .post-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 12px; line-height: 1.4; }
     .post-preview { font-size: 13px; color: var(--soft); line-height: 1.65; margin-bottom: 16px; white-space: pre-wrap; max-height: 160px; overflow: hidden; position: relative; }
     .post-preview::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(transparent, var(--surface)); }
@@ -1388,6 +1390,23 @@ function toggleExpand(card, btn) {
   btn.textContent = card.classList.contains('expanded') ? 'Show less' : 'Show more';
 }
 
+const IG_FILES = [
+  '01-platform-hero.png','02-auren.png','03-no-competitors.png','04-valuation.png','05-sovereignty.png',
+  '06-music.png','07-skyevault.png','08-skyepay.png','09-crown-os.png','10-sol-staffing.png',
+  '11-free99.png','12-valley-verified.png','13-white-label.png','14-kaixu.png','15-the-build.png',
+  '16-relay13.png','17-legalskyes.png','18-citadeldb.png','19-ascension.png','20-13-cabinets.png',
+  '21-pre-revenue.png','22-skyeway.png','23-investors.png','24-quantum-ops.png','25-category-creator.png'
+];
+
+function getVisualSrc(platform, i) {
+  const n = String(i+1).padStart(2,'0');
+  if (platform === 'linkedin')   return `assets/social/linkedin/li-${n}.png`;
+  if (platform === 'facebook')   return `assets/social/facebook/fb-${n}.png`;
+  if (platform === 'instagram')  return `assets/social/instagram/${IG_FILES[i] || ''}`;
+  if (platform === 'reddit')     return `assets/social/reddit/rd-${n}.png`;
+  return '';
+}
+
 function buildGrid(platform, data) {
   const grid = document.getElementById(platform + '-grid');
   data.forEach((post, i) => {
@@ -1397,15 +1416,19 @@ function buildGrid(platform, data) {
     const fullText = isReddit
       ? (post.sub ? '**Title:** ' + post.title + '\n\n**Subreddits:** ' + post.sub + '\n\n' + post.body : post.title + '\n\n' + post.body)
       : (post.tags ? post.body + '\n\n' + post.tags : post.body);
+    const imgSrc = getVisualSrc(platform, i);
     card.innerHTML = `
-      <div class="post-num">Post ${String(i+1).padStart(2,'0')}</div>
-      ${isReddit && post.sub ? `<div class="subreddit-tag">${post.sub}</div>` : ''}
-      <div class="post-title">${post.title}</div>
-      <div class="post-preview">${fullText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-      ${post.tags && !isReddit ? `<div class="hashtags">${post.tags}</div>` : ''}
-      <div class="post-actions">
-        <button class="btn-copy" onclick="copyText(${JSON.stringify(fullText)}, this)">Copy</button>
-        <button class="btn-expand" onclick="toggleExpand(this.closest('.post-card'), this)">Show more</button>
+      ${imgSrc ? `<img class="post-visual" src="${imgSrc}" alt="${post.title}" loading="lazy">` : ''}
+      <div class="post-body">
+        <div class="post-num">Post ${String(i+1).padStart(2,'0')}</div>
+        ${isReddit && post.sub ? `<div class="subreddit-tag">${post.sub}</div>` : ''}
+        <div class="post-title">${post.title}</div>
+        <div class="post-preview">${fullText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        ${post.tags && !isReddit ? `<div class="hashtags">${post.tags}</div>` : ''}
+        <div class="post-actions">
+          <button class="btn-copy" onclick="copyText(${JSON.stringify(fullText)}, this)">Copy</button>
+          <button class="btn-expand" onclick="toggleExpand(this.closest('.post-card'), this)">Show more</button>
+        </div>
       </div>`;
     grid.appendChild(card);
   });
