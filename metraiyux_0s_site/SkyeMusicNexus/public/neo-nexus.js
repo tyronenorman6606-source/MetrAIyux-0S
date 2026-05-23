@@ -171,6 +171,140 @@
     }
   }
 
+  function pageRoom() {
+    const pageName = (window.location.pathname.split('/').pop() || 'index.html').replace(/\.html$/i, '') || 'index';
+    if (document.body.dataset.mode === 'home') return 'home';
+    return pageName === 'index' ? 'dashboard' : pageName;
+  }
+
+  function relativeProofHref() {
+    return window.location.pathname.includes('/public/') ? '../proof.html' : './proof.html';
+  }
+
+  function ensureProofNavLink() {
+    const nav = $('.nexus-nav');
+    if (!nav || nav.querySelector('[data-proof-link]')) return;
+    const link = document.createElement('a');
+    link.href = relativeProofHref();
+    link.dataset.proofLink = 'true';
+    link.textContent = 'Readiness';
+    nav.appendChild(link);
+  }
+
+  function walkthroughGuide() {
+    const guides = {
+      home: {
+        micro: 'start here',
+        title: 'Use the Nexus from left to right.',
+        text: 'Open Dashboard for the map, DAW or Upload Studio to create/import audio, Rights before playback/release, Drops for pages and delivery, then Operator for review and proof.',
+        steps: ['Dashboard shows every room.', 'DAW is marked beta while creation tools keep hardening.', 'Upload, release, rights, drops, feed, exchange, and operator rooms call the Worker API behind SkyGate.'],
+      },
+      dashboard: {
+        micro: 'platform map',
+        title: 'Pick the room that matches the job.',
+        text: 'Start with DAW for creation or Upload Studio for existing audio. Use Release Forge and Rights Vault before publishing or playback, then Drops and Feed for rollout.',
+        steps: ['Use the room cards for navigation.', 'Refresh recent records to see backend state.', 'Open Readiness when you need proof, routes, and boundaries.'],
+      },
+      create: {
+        micro: 'creation hub',
+        title: 'Choose how the music enters the system.',
+        text: 'Start a DAW session, import stems, or move straight to release/export lanes. The session remains tied to the shared gate identity.',
+        steps: ['Open DAW for new sessions.', 'Use Upload Studio for finished audio.', 'Send usable output to Release Forge.'],
+      },
+      upload: {
+        micro: 'upload walkthrough',
+        title: 'Import audio, then turn it into a release line.',
+        text: 'Paste or create an Artist ID, choose the audio file, upload it through the gated API, then copy the generated track line into Release Forge.',
+        steps: ['Artist ID identifies the owner.', 'The file goes through music-assets.', 'Release Forge links that uploaded stream to a release.'],
+      },
+      player: {
+        micro: 'playback walkthrough',
+        title: 'Play only what the rights state allows.',
+        text: 'The player loads the gated release queue, checks linked audio/preview mode, and blocks uncleared rights states from pretending they are publish-ready.',
+        steps: ['Refresh records after upload/release work.', 'Press play to prove audio advances.', 'Use Rights Vault if playback is blocked.'],
+      },
+      releases: {
+        micro: 'release walkthrough',
+        title: 'Create the artist, forge the release, then move operations.',
+        text: 'Release Forge stores artist and release records, review state, payout movement, stream reports, and operations checkpoints.',
+        steps: ['Register artist or confirm Skye ID bridge.', 'Submit release with tracks.', 'Queue review, publish intent, and operations only after rights are clear.'],
+      },
+      rights: {
+        micro: 'rights walkthrough',
+        title: 'Clear the song before the platform treats it as ready.',
+        text: 'Ownership, preview use, distribution permission, takedown holds, and playback blocks are kept visible so nobody mistakes a preview for a cleared live distribution.',
+        steps: ['Attach the release ID.', 'Set ownership/preview/distribution attestations.', 'Use holds when rights are uncertain.'],
+      },
+      exchange: {
+        micro: 'exchange walkthrough',
+        title: 'Request creative help and keep the thread attached.',
+        text: 'Content requests, inbox messages, community posts, achievements, and campaign packs stay connected to the artist and release records.',
+        steps: ['Create a content request from the release need.', 'Reply in the generated thread.', 'Build campaign copy when the rollout is ready.'],
+      },
+      drops: {
+        micro: 'drop walkthrough',
+        title: 'Build delivery pages after the release has enough proof.',
+        text: 'Create a drop, submit it, batch it, send approval, then publish intent. Private delivery stays behind SkyGate instead of becoming a public file dump.',
+        steps: ['Create drop from artist/release IDs.', 'Submit and batch for approval.', 'Operator publishes or records the deploy receipt.'],
+      },
+      discover: {
+        micro: 'discover walkthrough',
+        title: 'Browse the listener-facing release graph.',
+        text: 'Discovery is for scanning previews, playlists, and artist lanes after releases and rights are in a usable state.',
+        steps: ['Use this after releases exist.', 'Open the player for proof playback.', 'Return to Rights if a track is blocked.'],
+      },
+      feed: {
+        micro: 'feed walkthrough',
+        title: 'Post release moments without hiding provider boundaries.',
+        text: 'The local feed, stories, comments, saves, boosts, queue, and connector states are wired. External posting waits for provider tokens in server env.',
+        steps: ['Compose a local release post.', 'Queue external social posts.', 'Operator reviews provider-token-required items.'],
+      },
+      admin: {
+        micro: 'operator walkthrough',
+        title: 'Owner/operator work stays behind the shared gate.',
+        text: 'This room is for review, payout, analytics, drops, exchange, social queue, and proof inspection. It relies on the 0S/SkyGate auth lane, not a separate app password.',
+        steps: ['Review releases and operations state.', 'Inspect analytics and payout queues.', 'Use Readiness for audit events and route proof.'],
+      },
+      exports: {
+        micro: 'export walkthrough',
+        title: 'Package usable outputs for the release lane.',
+        text: 'Exports should end in a track line, manifest, or handoff that Release Forge and Drops can understand.',
+        steps: ['Confirm artist/release IDs.', 'Export the manifest.', 'Move the result to Release Forge or Drops.'],
+      },
+      stems: {
+        micro: 'stem walkthrough',
+        title: 'Keep private working files tied to delivery rules.',
+        text: 'Stem work belongs behind the gate and should move into private delivery only after the operator confirms the recipient and rights state.',
+        steps: ['Organize stems by artist/release.', 'Keep private delivery gated.', 'Record the handoff in Drops or Operator.'],
+      },
+    };
+    return guides[pageRoom()] || guides.dashboard;
+  }
+
+  function injectWalkthroughGuide() {
+    if (document.querySelector('[data-nexus-walkthrough]')) return;
+    const shell = $('.nexus-shell');
+    if (!shell) return;
+    const guide = walkthroughGuide();
+    const node = document.createElement('section');
+    node.className = 'panel-xl nexus-guidance';
+    node.dataset.nexusWalkthrough = 'true';
+    node.innerHTML = `
+      <div class="nexus-guidance-copy">
+        <p class="micro">${escapeHtml(guide.micro)}</p>
+        <h2>${escapeHtml(guide.title)}</h2>
+        <p>${escapeHtml(guide.text)}</p>
+      </div>
+      <div class="nexus-guidance-steps">
+        ${guide.steps.map((step, index) => `<article><span>${index + 1}</span><strong>${escapeHtml(step)}</strong></article>`).join('')}
+      </div>
+      <div class="nexus-guidance-actions">
+        <a class="ghost mini" href="${relativeProofHref()}">Readiness + proof</a>
+        <button class="ghost mini" type="button" data-action="refresh-records">Refresh records</button>
+      </div>`;
+    shell.insertBefore(node, shell.firstElementChild);
+  }
+
   async function readJson(response) {
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.ok === false) {
@@ -2873,6 +3007,8 @@
 
   async function init() {
     ensureMcpChrome();
+    ensureProofNavLink();
+    injectWalkthroughGuide();
     initCanvas();
     wireChrome();
     wirePlayback();

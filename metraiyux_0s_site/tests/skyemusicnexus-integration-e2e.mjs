@@ -200,12 +200,14 @@ async function main() {
     await page.screenshot({ path: path.join(ARTIFACT_DIR, "app-shell-gated-desktop.png"), fullPage: true });
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault"], "artist-stage-desktop.png");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge"], "upload-studio-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault", "Readiness + proof"], "artist-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/proof.html", "Readiness proof page desktop", ["Production Readiness", "Observable Wiring", "DAW beta", "Observability Matrix"], "readiness-proof-desktop.png");
+    assertions.push("Readiness page documents client-facing status, DAW beta boundary, observability, and production proof lanes.");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge", "Import audio"], "upload-studio-desktop.png");
     const dropBox = await page.locator("[data-song-drop-zone]").boundingBox();
     expect(dropBox && dropBox.height >= 260 && dropBox.width >= 520, `Song drop zone is not large enough: ${JSON.stringify(dropBox)}`);
     assertions.push("Upload Studio exposes a large song drop zone with enough visual target area for desktop use.");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/daw.html", "Native DAW desktop", ["SkyeMusicNexus DAW", "Audio", "Project Files", "16-pad beat lane"], "native-daw-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/daw.html", "Native DAW desktop", ["SkyeMusicNexus DAW", "DAW beta", "Audio", "Project Files", "16-pad beat lane"], "native-daw-desktop.png");
     await page.locator('[data-daw-rail="mix"]').click();
     await page.waitForFunction(() => window.__SKYE_NEXUS_DAW && window.__SKYE_NEXUS_DAW.activeRail === "mix");
     await page.locator("#audioEngineButton").click();
@@ -312,6 +314,7 @@ async function main() {
         "sales-router-desktop.png",
         "app-shell-gated-desktop.png",
         "artist-stage-desktop.png",
+        "readiness-proof-desktop.png",
         "upload-studio-desktop.png",
         "native-daw-desktop.png",
         "native-daw-audio-desktop.png",

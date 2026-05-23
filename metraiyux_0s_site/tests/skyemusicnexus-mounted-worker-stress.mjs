@@ -299,6 +299,7 @@ const readStressRoutes = [
   '/api/skymusicnexus/music-exchange?action=hub',
   '/api/skymusicnexus/music-social?action=hub',
   '/api/skymusicnexus/music-analytics',
+  '/api/skymusicnexus/observability',
 ];
 const readStress = await Promise.all(Array.from({ length: READ_STRESS_REQUESTS }, async (_, index) => {
   const route = readStressRoutes[index % readStressRoutes.length];
@@ -309,8 +310,11 @@ assert(readStress.every((item) => item.ok), 'read stress returned a failed respo
 
 const adminHub = (await call('GET', '/api/skymusicnexus/hub', { token: 'admin:music-owner@example.com', admin: true })).payload;
 const analytics = (await call('GET', '/api/skymusicnexus/music-analytics', { token: 'admin:music-owner@example.com', admin: true })).payload;
+const observability = (await call('GET', '/api/skymusicnexus/music-analytics?action=observability', { token: 'admin:music-owner@example.com', admin: true })).payload;
 assert(results.length === ITERATIONS, `expected ${ITERATIONS} stress results, got ${results.length}`);
 assert(analytics.totalReleases >= 1, 'analytics did not retain any stress release records');
+assert(observability.counts.auditEvents >= ITERATIONS, `observability retained too few audit events: ${observability.counts.auditEvents}`);
+assert(observability.latestEvents.length > 0, 'observability did not expose latest audit events');
 assert(adminHub.storage_mode === 'kv', 'mounted Worker did not use KV storage mode in stress env');
 
 const report = {
@@ -335,6 +339,12 @@ const report = {
     drops: adminHub.analytics.drops,
     feedItems: adminHub.analytics.feedItems,
     streams: adminHub.analytics.totalStreams,
+    auditEvents: observability.counts.auditEvents,
+  },
+  observability: {
+    storage: observability.storage,
+    retained: observability.retained,
+    latestEvents: observability.latestEvents.slice(0, 12),
   },
   assertions: [
     'routes manifest stays gate-owned and accurate',
@@ -342,7 +352,8 @@ const report = {
     'writes reject unauthenticated access',
     'shared FS27/SkyGate token path unlocks music API routes',
     'artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, and social queue survive repeated serialized mutation stress',
-    'hub, assets, releases, rights, exchange, social, and analytics routes survive concurrent authenticated read stress',
+    'hub, assets, releases, rights, exchange, social, analytics, and observability routes survive concurrent authenticated read stress',
+    'successful music mutations append audit events that are visible through the gated observability API',
     'Worker stores stress state in shared KV lane without app-specific passwords',
   ],
   results,

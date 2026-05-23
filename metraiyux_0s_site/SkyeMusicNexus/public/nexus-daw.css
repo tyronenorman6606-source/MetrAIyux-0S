@@ -54,11 +54,26 @@
   color: #fff;
   font-weight: 900;
   text-decoration: none;
+  flex-wrap: wrap;
 }
 
 .daw-brand img {
   width: 2.15rem;
   height: 2.15rem;
+}
+
+.daw-beta-pill {
+  display: inline-flex;
+  min-height: 1.65rem;
+  align-items: center;
+  border: 1px solid rgba(245,199,107,.48);
+  border-radius: 8px;
+  padding: .24rem .48rem;
+  color: #f5c76b;
+  background: rgba(245,199,107,.12);
+  font-size: .68rem;
+  font-weight: 950;
+  text-transform: uppercase;
 }
 
 .daw-transport {
@@ -217,6 +232,67 @@
   font-size: .72rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.daw-beta-note,
+.daw-quickstart article {
+  border: 1px solid rgba(245,199,107,.22);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(245,199,107,.12), rgba(102,229,255,.06));
+  color: rgba(255,255,255,.78);
+}
+
+.daw-beta-note {
+  display: grid;
+  gap: .35rem;
+  padding: .72rem;
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+.daw-beta-note strong {
+  color: #f5c76b;
+  text-transform: uppercase;
+}
+
+.daw-quickstart {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem;
+}
+
+.daw-quickstart article {
+  min-height: 5.6rem;
+  display: grid;
+  grid-template-columns: 1.55rem minmax(0,1fr);
+  gap: .32rem .5rem;
+  align-items: start;
+  padding: .62rem;
+}
+
+.daw-quickstart span {
+  grid-row: 1 / 3;
+  width: 1.55rem;
+  height: 1.55rem;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: #07100f;
+  background: linear-gradient(135deg, #f5c76b, #66e5ff);
+  font-weight: 950;
+}
+
+.daw-quickstart strong {
+  color: #fff;
+  font-size: .78rem;
+  line-height: 1.1;
+}
+
+.daw-quickstart small {
+  min-width: 0;
+  color: rgba(255,255,255,.62);
+  font-size: .68rem;
+  line-height: 1.25;
 }
 
 .daw-browser input {

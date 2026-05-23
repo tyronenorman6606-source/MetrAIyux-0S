@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SkyeMusicNexus — Proof Chamber</title>
-  <meta name="description" content="Smoke proof verifies handlers, local auth bootstrap, persistence, and public read endpoints without claiming live DSP distribution.">
+  <title>SkyeMusicNexus - Readiness and Proof</title>
+  <meta name="description" content="Client-facing readiness, walkthrough, backend wiring, observability, and production proof for SkyeMusicNexus.">
   <link rel="stylesheet" href="./platform.css">
   <script defer src="./gate-session.js"></script>
   <script defer src="./platform.js"></script>
@@ -16,19 +16,39 @@
   </aside>
   <main class="surface">
     <header class="topbar">
-      <div><p class="kicker">NeoFront routed shell</p><h1>Proof Chamber</h1><p>Smoke proof verifies handlers, local auth bootstrap, persistence, and public read endpoints without claiming live DSP distribution.</p></div>
-      <div class="quicklinks"><a href="./public/index.html">Artist Stage</a><a href="./public/admin.html">Operator Stage</a><a href="./smoke/smoke-proof.mjs">Smoke Proof</a></div>
+      <div>
+        <p class="kicker">client readiness / route wiring / proof receipts</p>
+        <h1>SkyeMusicNexus Readiness</h1>
+        <p>This page is the operator and client-facing map for what works, what is gated, how to use each room, what the backend routes are, and where observability lives.</p>
+      </div>
+      <div class="quicklinks"><a href="./public/index.html">Artist Stage</a><a href="./public/admin.html">Operator Stage</a><a href="/api/skymusicnexus/observability">Observability API</a></div>
     </header>
     <section class="hero">
-      <div><p class="kicker">experiential app promoted</p><h2>The shipped app surface now lives as a music operating stage.</h2><p>Generic route cards were demoted into this truth shell. The public app now presents artist creation, release forging, royalty movement, workflow queueing, analytics, and proof boundaries as a distinctive front-end system.</p></div>
-      <div class="metrics"><strong>2</strong><span>NeoFront app stages</span><strong>5</strong><span>preserved handlers</span><strong>1</strong><span>truthful proof lane</span></div>
+      <div>
+        <p class="kicker">Production Readiness</p>
+        <h2>Client-facing, shared-gate protected, and proofed with one beta boundary.</h2>
+        <p>The platform rooms are live behind the 0S/SkyGate/Free99 gate. Upload, player, releases, rights, exchange, feed, drops, operator, hub, analytics, and stress workflows are smoke-proven through the mounted Worker API. DAW beta is intentionally labeled while creation, import, edit, mixdown, save/export, and handoff keep hardening.</p>
+      </div>
+      <div class="metrics"><strong>12+</strong><span>rooms and workflows</span><strong>300</strong><span>audit events retained</span><strong>1</strong><span>DAW beta banner</span></div>
     </section>
-    <section class="grid"><article class="panel"><span class="badge">Neo 01</span><h3>Artist Nebula</h3><p>Register and approve artists through the protected artist handler.</p><button data-action="artist-nebula">Capture Signal</button></article><article class="panel"><span class="badge">Neo 02</span><h3>Release Forge</h3><p>Submit, review, publish, report streams, and queue operations.</p><button data-action="release-forge">Capture Signal</button></article><article class="panel"><span class="badge">Neo 03</span><h3>Royalty River</h3><p>Credit ledgers and payout requests through the payment handler.</p><button data-action="royalty-river">Capture Signal</button></article><article class="panel"><span class="badge">Neo 04</span><h3>SkyGate Proof</h3><p>Mint local proof sessions when operator env vars are configured.</p><button data-action="skygate-proof">Capture Signal</button></article><article class="panel"><span class="badge">Neo 05</span><h3>Ops Sequencer</h3><p>Persist release handoffs and checkpoint status.</p><button data-action="ops-sequencer">Capture Signal</button></article><article class="panel"><span class="badge">Neo 06</span><h3>Public Stage</h3><p>Launch the experiential app in the deployable public folder.</p><button data-action="public-stage">Capture Signal</button></article></section>
+    <section class="grid">
+      <article class="panel"><span class="badge">Gate</span><h3>Admin Screens</h3><p>Owner/operator surfaces use the shared 0S gate and operator helpers. There is no SkyeMusicNexus-specific admin password lane.</p><a href="./public/admin.html">Open Operator</a></article>
+      <article class="panel"><span class="badge">DAW beta</span><h3>Native DAW</h3><p>Audio import, transport, pads, keys, edit actions, browser WAV mixdown, save, and export are smoke-proven. Provider-grade DAW polish remains marked beta.</p><a href="./public/daw.html">Open DAW</a></article>
+      <article class="panel"><span class="badge">Observable Wiring</span><h3>API Events</h3><p>Successful music mutations append audit events to shared KV and expose them through the gated observability API.</p><a href="/api/skymusicnexus/music-analytics?action=observability">Open Audit API</a></article>
+      <article class="panel"><span class="badge">Proof</span><h3>Stress Receipt</h3><p>The canonical stress receipt verifies repeated artist, upload, stream, studio, release, rights, drop, exchange, feed, social, analytics, and read-stress flows.</p><a href="./proof/skyemusicnexus-mounted-worker-stress-latest.json">Open Stress Receipt</a></article>
+      <article class="panel"><span class="badge">Contract</span><h3>Routes Manifest</h3><p>The mounted Worker exposes the music function manifest at the production API base and keeps private source functions out of the browser contract.</p><a href="/api/skymusicnexus/routes/manifest">Open Manifest</a></article>
+      <article class="panel"><span class="badge">Boundary</span><h3>Provider Truth</h3><p>Live DSP ingestion, external social posting, royalty settlement, formal legal review, and provider webhooks require provider credentials and separate proof.</p><a href="./PROOF_STATUS.md">Open Proof Status</a></article>
+    </section>
     <section class="split">
-      <article class="panel"><h3>Launch Artist Stage</h3><p>The main deployable experience in <code>public/index.html</code>.</p><a class="primary" href="./public/index.html">Open Artist Stage</a></article>
-      <article class="panel"><h3>Launch Operator Stage</h3><p>The operations experience in <code>public/admin.html</code>.</p><a href="./public/admin.html">Open Operator Stage</a></article>
-      <article class="panel"><h3>Runtime Contract</h3><p>Routes, launch targets, modules, and source dependency truth.</p><a href="./src/runtime-contract.json">Open Contract</a></article>
-      <article class="panel"><h3>Proof Status</h3><p>What is proven locally and what remains an external provider boundary.</p><a href="./PROOF_STATUS.md">Open Proof Status</a></article>
+      <article class="panel"><h3>Walkthrough Path</h3><p>Dashboard maps the rooms. DAW or Upload brings music in. Release Forge stores the release. Rights Vault controls readiness. Drops packages delivery. Feed/Exchange handle rollout. Operator reviews and observes.</p><a class="primary" href="./public/index.html">Start at Dashboard</a></article>
+      <article class="panel"><h3>Backend Route Matrix</h3><p><code>music-assets</code> handles upload/stream. <code>music-studio</code> handles DAW save/export. <code>music-releases</code> handles catalog/review/streams/rights. <code>music-drops</code> handles pages, batching, approval, and publish intent.</p><a href="/api/skymusicnexus/hub">Open Hub API</a></article>
+      <article class="panel"><h3>Social and Exchange Matrix</h3><p><code>music-exchange</code> handles content requests, inbox threads, community posts, and campaigns. <code>music-social</code> handles feed posts, actions, connectors, queues, moderation, and provider token boundaries.</p><a href="./public/exchange.html">Open Exchange</a></article>
+      <article class="panel"><h3>Observability Matrix</h3><p><code>music-analytics</code> returns counts. <code>music-analytics?action=observability</code> returns storage mode, auth posture, functions, operator actions, retained counts, latest audit events, receipts, and proof commands.</p><a href="/api/skymusicnexus/observability">Open Observability</a></article>
+    </section>
+    <section class="grid">
+      <article class="panel"><span class="badge">Local</span><h3>Smoke + E2E</h3><p><code>npm run 0s:skyemusicnexus:proof</code> runs local smoke, SkyePay proof, Playwright integration, exchange video proof, and mounted Worker stress.</p></article>
+      <article class="panel"><span class="badge">Stress</span><h3>Worker Stress</h3><p><code>npm run 0s:skyemusicnexus:stress</code> writes the latest controlled stress report into <code>SkyeMusicNexus/proof/</code>.</p></article>
+      <article class="panel"><span class="badge">Production</span><h3>Live Browser Gate</h3><p>After deploy, the 0S live browser verifier must open production in a headed browser, log in through the owner gate, click routes, scroll desktop/mobile, check APIs, and save screenshots plus a receipt.</p></article>
     </section>
   </main>
 </body>

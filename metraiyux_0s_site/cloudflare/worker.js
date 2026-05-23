@@ -9313,6 +9313,7 @@ const MUSIC_SOCIAL_CATALOG = Object.freeze([
   {id:'mastodon', name:'Mastodon-compatible Fediverse', lane:'status-feed-and-hashtag-discovery', protocol:'OAuth2 plus REST API plus ActivityPub federation', productionBoundary:'Use OAuth app tokens stored in the Worker runtime.'},
   {id:'funkwhale', name:'Funkwhale', lane:'federated-audio-publication', protocol:'ActivityPub audio federation plus Funkwhale API', productionBoundary:'Use after rights, storage, and native API mapping are live.'}
 ]);
+const MUSIC_AUDIT_LIMIT = 300;
 
 function musicJson(payload, status = 200) {
   return json(payload, status);
@@ -9350,13 +9351,14 @@ function musicDefaultState() {
     payments:{ledger:[], payouts:[]},
     exchange:{contentRequests:[], threads:[], communityPosts:[], campaigns:[]},
     social:{connectors:[], postQueue:[], feedItems:[], stories:[], feedPulls:[], moderation:[]},
-    receipts:[]
+    receipts:[],
+    auditEvents:[]
   };
 }
 function musicNormalizeState(raw) {
   const base = musicDefaultState();
   const state = raw && typeof raw === 'object' ? {...base, ...raw} : base;
-  for (const key of ['artists','assets','releases','receipts']) if (!Array.isArray(state[key])) state[key] = [];
+  for (const key of ['artists','assets','releases','receipts','auditEvents']) if (!Array.isArray(state[key])) state[key] = [];
   state.studio = state.studio && typeof state.studio === 'object' ? {...base.studio, ...state.studio} : base.studio;
   state.drops = state.drops && typeof state.drops === 'object' ? {...base.drops, ...state.drops} : base.drops;
   state.payments = state.payments && typeof state.payments === 'object' ? {...base.payments, ...state.payments} : base.payments;
@@ -9378,7 +9380,7 @@ async function musicReadState(env) {
 function musicMergeRows(existing = [], incoming = [], deleted = []) {
   const deletedKeys = new Set(deleted.map(String));
   const keyFor = (item) => {
-    for (const key of ['id','dropId','batchId','approvalId','deployReceiptId','releaseId','artistId','threadId']) {
+    for (const key of ['id','eventId','dropId','batchId','approvalId','deployReceiptId','releaseId','artistId','threadId']) {
       if (item && item[key]) return `${key}:${item[key]}`;
     }
     return `row:${JSON.stringify(item)}`;
@@ -9403,6 +9405,9 @@ function musicMergeState(latest, incoming) {
   next.assets = musicMergeRows(prior.assets, nextInput.assets, deleted.assets);
   next.releases = musicMergeRows(prior.releases, nextInput.releases, deleted.releases);
   next.receipts = musicMergeRows(prior.receipts, nextInput.receipts, deleted.receipts);
+  next.auditEvents = musicMergeRows(prior.auditEvents, nextInput.auditEvents, deleted.auditEvents)
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+    .slice(0, MUSIC_AUDIT_LIMIT);
   next.studio.projects = musicMergeRows(prior.studio.projects, nextInput.studio.projects, deleted.studioProjects);
   next.studio.exports = musicMergeRows(prior.studio.exports, nextInput.studio.exports, deleted.studioExports);
   next.studio.engines = musicMergeRows(prior.studio.engines, nextInput.studio.engines, deleted.studioEngines);
@@ -9527,7 +9532,97 @@ function musicAnalytics(state) {
     pendingPayouts,
     assets:state.assets.length,
     drops:state.drops.items.length,
-    feedItems:state.social.feedItems.length
+    feedItems:state.social.feedItems.length,
+    auditEvents:state.auditEvents.length
+  };
+}
+async function musicResponseJson(response) {
+  return response.clone().json().catch(() => ({}));
+}
+function musicPayloadIds(payload = {}) {
+  const ids = {};
+  const scan = (source = {}) => {
+    for (const key of ['id','artistId','assetId','releaseId','dropId','batchId','threadId','connectorId','postId','payoutId','approvalId','deployReceiptId']) {
+      if (source && source[key] && !ids[key]) ids[key] = source[key];
+    }
+  };
+  scan(payload);
+  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export']) scan(payload[key]);
+  return ids;
+}
+function musicPayloadResult(payload = {}) {
+  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export']) {
+    if (payload[key]) return key;
+  }
+  return payload.ok === true ? 'ok' : 'unknown';
+}
+function musicRecordAuditEvent(state, access = {}, fnName, action, method, status, payload = {}) {
+  state.auditEvents = Array.isArray(state.auditEvents) ? state.auditEvents : [];
+  const event = {
+    id:musicId('audit'),
+    eventId:musicId('audit_evt'),
+    createdAt:musicNow(),
+    system:'SkyeMusicNexus',
+    route:`${MUSIC_BASE}/${fnName}`,
+    functionName:fnName,
+    action:action || payload.action || method.toLowerCase(),
+    method,
+    status,
+    ok:status < 400,
+    actor:access.actor || 'unknown',
+    role:access.role || 'unknown',
+    operator:access.operator === true,
+    via:access.via || 'unknown',
+    result:musicPayloadResult(payload),
+    ids:musicPayloadIds(payload),
+  };
+  state.auditEvents.unshift(event);
+  state.auditEvents = state.auditEvents.slice(0, MUSIC_AUDIT_LIMIT);
+  return event;
+}
+function musicObservability(state, env) {
+  const analytics = musicAnalytics(state);
+  return {
+    ok:true,
+    gateSessionRequired:true,
+    surface:'SkyeMusicNexus',
+    generatedAt:musicNow(),
+    storage:{mode:musicStorageMode(env), durable:musicStorageMode(env) === 'kv', stateKey:musicKey('state')},
+    auth:{sharedZeroOsGate:true, appSpecificAdminPassword:false, operatorActions:Object.fromEntries(Object.entries(MUSIC_OPERATOR_ACTIONS).map(([key, value]) => [key, Array.from(value)]))},
+    frontendBackendContract:{
+      apiBase:MUSIC_BASE,
+      browserRule:'Production browser rooms call /api/skymusicnexus/{function}; local source functions remain private source.',
+      functions:MUSIC_FUNCTIONS,
+      observabilityRoutes:[`${MUSIC_BASE}/observability`, `${MUSIC_BASE}/music-analytics?action=observability`],
+    },
+    counts:analytics,
+    retained:{
+      artists:state.artists.length,
+      assets:state.assets.length,
+      releases:state.releases.length,
+      drops:state.drops.items.length,
+      payouts:state.payments.payouts.length,
+      exchangeRequests:state.exchange.contentRequests.length,
+      feedItems:state.social.feedItems.length,
+      auditEvents:state.auditEvents.length,
+    },
+    latestEvents:state.auditEvents.slice(0, 50),
+    receipts:state.receipts.slice(0, 25),
+    smokeProof:{
+      localScript:'npm run 0s:skyemusicnexus:proof',
+      stressScript:'npm run 0s:skyemusicnexus:stress',
+      canonicalStressReceipt:'metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-latest.json',
+    },
+    readiness:{
+      clientFacing:true,
+      dawBeta:true,
+      publicEntryRequiresGate:true,
+      adminBehindSharedGate:true,
+      liveDspDistributionBoundary:true,
+      liveRoyaltySettlementBoundary:true,
+      formalLegalReviewBoundary:true,
+      providerTokenBoundary:true,
+    },
   };
 }
 function musicSocialSummary(social) {
@@ -9562,6 +9657,7 @@ function musicHubEnvelope(state) {
     payouts:state.payments.payouts.slice(0, 25),
     social:musicSocialSummary(state.social),
     analytics:musicAnalytics(state),
+    latestAuditEvents:state.auditEvents.slice(0, 8),
     storage_mode:'kv'
   };
 }
@@ -9976,10 +10072,15 @@ async function musicHandleFunction(request, env, url, fnName) {
   else if (fnName === 'music-exchange') response = await musicHandleExchange(method, url, state, body, access);
   else if (fnName === 'music-social') response = await musicHandleSocial(method, url, state, body, access);
   else if (fnName === 'music-payments') response = await musicHandlePayments(method, url, state, body, access);
-  else if (fnName === 'music-analytics') response = method === 'GET' ? musicJson({ok:true, ...musicAnalytics(state)}) : musicJson({ok:false, error:'Method not allowed'}, 405);
+  else if (fnName === 'music-analytics') response = method === 'GET'
+    ? (url.searchParams.get('action') === 'observability' ? musicJson(musicObservability(state, env)) : musicJson({ok:true, ...musicAnalytics(state)}))
+    : musicJson({ok:false, error:'Method not allowed'}, 405);
   else if (fnName === 'music-provider-hooks') response = musicJson({ok:true, hooks:[], providerBoundary:'Configure dedicated provider credentials before live music provider webhooks.'});
   else response = musicJson({ok:false, error:'skymusicnexus_function_not_found', fnName}, 404);
-  if (method !== 'GET' && response.status < 400) await musicWriteState(env, state);
+  if (method !== 'GET' && response.status < 400) {
+    musicRecordAuditEvent(state, access, fnName, action, method, response.status, await musicResponseJson(response));
+    await musicWriteState(env, state);
+  }
   return response;
 }
 async function musicHandleRoute(request, env, url) {
@@ -9992,6 +10093,11 @@ async function musicHandleRoute(request, env, url) {
     const gate = await requireMusicGate(request, env, 'SkyeMusicNexus hub');
     if (!gate.ok) return gate.response;
     return musicJson(musicHubEnvelope(await musicReadState(env)));
+  }
+  if (path === '/observability') {
+    const gate = await requireMusicGate(request, env, 'SkyeMusicNexus observability');
+    if (!gate.ok) return gate.response;
+    return musicJson(musicObservability(await musicReadState(env), env));
   }
   if (path === '/skygate-session') return musicHandleSession(request, env);
   const fnName = path.replace(/^\/+/, '').split('/')[0];
