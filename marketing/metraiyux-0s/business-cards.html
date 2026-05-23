@@ -7,7 +7,7 @@
   <meta name="description" content="Premium print-ready 3.5″ × 2″ business cards for Gray London Skyes, Valley Verified clients, and every MetrAIyux 0S platform.">
   <link rel="icon" href="/assets/favicon-32.png">
   <link rel="stylesheet" href="/style.css">
-  <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="/assets/vendor/qrcode-generator.js"></script>
 
   <style>
     /* ================================================================
@@ -47,7 +47,7 @@
     /* ── CARD GRID ── */
     .bc-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
       gap: 56px 64px;
     }
     .bc-wrap { display: flex; flex-direction: column; gap: 16px; }
@@ -64,7 +64,7 @@
 
     /* ── CARD DISPLAY WRAPPER ── */
     .bc-display {
-      width: 600px; height: 343px;
+      width: min(600px, 100%); height: 343px;
       position: relative; overflow: hidden;
       border-radius: 14px; flex-shrink: 0;
       box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
@@ -74,7 +74,7 @@
     .bc {
       width: 336px; height: 192px;
       position: absolute; top: 0; left: 0;
-      transform: scale(1.786); transform-origin: top left;
+      transform: scale(var(--screen-scale, 1.786)); transform-origin: top left;
       border-radius: 8px; overflow: hidden;
       font-family: var(--font-body); color: #f4f0e8;
     }
@@ -1009,20 +1009,50 @@
 <script>
 /* ── GENERATE ALL QR CODES ── */
 function genQR(canvas) {
-  if (!canvas || !window.QRCode) return;
+  if (!canvas || !window.qrcode) return;
   var url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
   var fg  = canvas.dataset.fg  || '#f4c75b';
   var bg  = canvas.dataset.bg  || '#07060a';
-  QRCode.toCanvas(canvas, url, {
-    width: 56, margin: 1,
-    color: { dark: fg, light: bg }
-  }, function(err){ if (err) console.warn('QR:', err); });
+  var qr = qrcode(0, 'M');
+  qr.addData(url);
+  qr.make();
+  var size = 56;
+  var margin = 2;
+  var count = qr.getModuleCount();
+  var cell = size / (count + margin * 2);
+  var ctx = canvas.getContext('2d');
+  canvas.width = size;
+  canvas.height = size;
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = fg;
+  for (var row = 0; row < count; row += 1) {
+    for (var col = 0; col < count; col += 1) {
+      if (!qr.isDark(row, col)) continue;
+      var x = Math.floor((col + margin) * cell);
+      var y = Math.floor((row + margin) * cell);
+      var nextX = Math.ceil((col + margin + 1) * cell);
+      var nextY = Math.ceil((row + margin + 1) * cell);
+      ctx.fillRect(x, y, Math.max(1, nextX - x), Math.max(1, nextY - y));
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  fitCardPreviews();
   document.querySelectorAll('.bc canvas').forEach(genQR);
   updateVV();
 });
+window.addEventListener('resize', fitCardPreviews);
+
+function fitCardPreviews() {
+  document.querySelectorAll('.bc-display').forEach(function (wrap) {
+    var width = Math.min(600, Math.max(280, wrap.parentElement.getBoundingClientRect().width));
+    wrap.style.width = width + 'px';
+    wrap.style.height = Math.round(width * 343 / 600) + 'px';
+    wrap.style.setProperty('--screen-scale', String(width / 336));
+  });
+}
 
 /* ── PRINT ONE CARD ── */
 function printCard(id) {

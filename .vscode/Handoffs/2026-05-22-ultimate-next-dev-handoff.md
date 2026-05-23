@@ -1524,13 +1524,48 @@ If the Codespace has no display server, wrap the proof command with `xvfb-run -a
 Source state:
 
 - Business Cards v2 is present in Git at `marketing/metraiyux-0s/business-cards.html`.
-- The marketing changelog now records the v2 source-ready state at `marketing/metraiyux-0s/CHANGELOG.md`.
+- Local QR generation is vendored at `marketing/metraiyux-0s/assets/vendor/qrcode-generator.js`; the external unpkg dependency was removed after live proof caught the failed CDN request.
+- The marketing changelog now records the deployed v2 production state at `marketing/metraiyux-0s/CHANGELOG.md`.
 - The dedicated deploy handoff is `.vscode/Handoffs/2026-05-23-business-cards-v2-handoff.md`.
 
 Production state:
 
-- Live URL `https://metraiyux-0s-marketing.pages.dev/business-cards.html` still serves the older card CSS (`scale(1.5)` / `504px`).
-- Repo v2 uses `scale(1.786)` / `600px`.
-- Wrangler Pages deploy hung during the Pages upload lane and was stopped.
-- Direct Cloudflare Pages project token probe checked 5 local token candidates; all failed with Cloudflare Authentication error (`401`, `403`, `401`, `401`, `403`).
-- Do not add a v2 live ledger entry until a fresh Cloudflare Pages deploy token is supplied, production deploy succeeds, and headed live-browser proof passes.
+- Live URL `https://metraiyux-0s-marketing.pages.dev/business-cards.html` now serves v2.
+- Cloudflare Pages deployment: `f8e8b6e0-2077-42a9-a757-28f191a52cf3`.
+- Preview URL: `https://f8e8b6e0.metraiyux-0s-marketing.pages.dev`.
+- Final deploy used `tools/cloudflare-pages-direct-upload.mjs` because Wrangler Pages upload was hanging in this Codespace.
+- Root `.env` line `1240` was the token lane that could reach Pages. Do not print or commit the value. The token around line `1236` could read account/Zero Trust resources but was not valid for Pages deployment.
+- Headed live-browser proof passed desktop `1440x980` and mobile `390x844`: production URL opened, expected card text rendered, Valley Verified fields updated in-browser, four print actions fired, QR canvas pixels were nonblank, full-page scroll proof was captured, and there were zero console errors plus zero failed requests.
+- Proof receipt: `test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json`.
+- Deploy receipt: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json`.
+- Manifest: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json`.
+
+Repeat deploy command shape:
+
+```bash
+CLOUDFLARE_API_TOKEN="$(sed -n '1240p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+CLOUDFLARE_ACCOUNT_ID="$(sed -n '1241p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+PAGES_PROJECT=metraiyux-0s-marketing \
+PAGES_DIR=marketing/metraiyux-0s \
+PAGES_COMMIT_MESSAGE="Business Cards v2 local QR and responsive proof" \
+node tools/cloudflare-pages-direct-upload.mjs
+```
+
+Repeat proof:
+
+```bash
+npm run proof:business-cards
+```
+
+Closure validation for this business-card production pass already ran:
+
+```text
+node --check tools/cloudflare-pages-direct-upload.mjs
+node --check tools/proof-business-cards-v2-production.mjs
+python3 -m py_compile cf_pages_deploy.py
+npm run proof:business-cards
+npm run brain:sync:obsidian
+npm run vault:0s:map
+```
+
+Brain/neural-map refresh result: 13 Obsidian notes into 224 local-brain chunks, plus 1 SkyeVault repo / 24 receipts / 62 nodes / 61 links / 1 workspace map.

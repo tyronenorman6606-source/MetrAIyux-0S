@@ -1,84 +1,151 @@
-# Business Cards v2 — Deploy Handoff
+# Business Cards v2 - Production Handoff
 **Date:** 2026-05-23  
-**Status:** Built in repo, pushed to Git, production deploy blocked on invalid Cloudflare Pages token credentials
+**Status:** Deployed live, headed-browser proof passed, Git source ready for next dev
 
 ---
 
-## What's Done
+## Final Production State
 
-Business cards v2 is fully rebuilt at:
-`marketing/metraiyux-0s/business-cards.html`
-
-Premium redesign with:
-- 600×343px card display (up from 1.5× scale)
-- Multi-layer backgrounds with grid texture, dual glow orbs, 4 corner marks, accent bar
-- 2 personal cards (Gold founder + Cyan tech)
-- 1 Valley Verified client card (live form, real-time update, QR code)
-- 12 platform cards (MetrAIyux 0S, SkyeMusicNexus, SkyeRouteX, PHX Verified, NorthStar, Free99, LegalSkyes, QuantumSkyes, kAIxu, Agentic Growth, SkyeVaultOS, Merser)
-- Print isolation: each card prints alone on 3.5"×2" page
-- QR codes client-side via qrcode.js
-
-Nav link added to `marketing/metraiyux-0s/index.html`.
-
-**Older v1 card CSS is still live** at `https://metraiyux-0s-marketing.pages.dev/business-cards.html` (deployment `6e4ce0e3`). The repo contains v2.
-
----
-
-## Deploy Blocker
-
-All CF API token candidates in `.env` were reported as returning 401 or 403 during the business-card deploy attempt. Raw token values were intentionally removed from this handoff. Re-check the local `.env` token labels only; do not paste or commit tokens in docs.
-
-The `skye-secret-rotation` worker auth works fine (`configured: true`) but can only manage Worker secrets, not deploy Pages, and can't expose its own internal token.
-
-2026-05-23 direct verification:
+Business Cards v2 is live at:
 
 ```text
-repo business-cards.html: scale(1.786), 600px display wrapper
-live business-cards.html: scale(1.5), 504px display wrapper
-Wrangler Pages deploy: hung during Pages deploy scan and was stopped
-Cloudflare Pages project token probe: 5 local token candidates checked, all failed with Cloudflare Authentication error
-token results: 401, 403, 401, 401, 403
-raw token values: intentionally not printed or committed
+https://metraiyux-0s-marketing.pages.dev/business-cards.html
 ```
 
-Do not mark v2 production-live until a fresh token with Cloudflare Pages deploy permission is supplied, the Pages deploy succeeds, and a headed live-browser proof confirms the live URL has the `scale(1.786)` / `600px` v2 card CSS.
+Cloudflare Pages production deployment:
+
+```text
+deploymentId: f8e8b6e0-2077-42a9-a757-28f191a52cf3
+preview: https://f8e8b6e0.metraiyux-0s-marketing.pages.dev
+project: metraiyux-0s-marketing
+source: marketing/metraiyux-0s
+assetCount: 171
+receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json
+manifest: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json
+```
+
+Line `1240` in root `.env` was the token lane that could reach Cloudflare Pages. Do not print or commit the value. The token around line `1236` could read account and Zero Trust resources, but it returned Cloudflare Pages auth errors and was not valid for this deploy lane.
 
 ---
 
-## How to Deploy Once You Have a Fresh CF Token
+## What Shipped
 
-1. Go to **dash.cloudflare.com → My Profile → API Tokens** and create a new token with:
-   - `Cloudflare Pages: Edit` permission on your account
-   - OR use an existing token that has this permission
+Source:
 
-2. Provide the token through a local environment variable or an ignored local secrets file. Do not hardcode it in committed source:
-   ```python
-   CF_TOKEN = os.environ["CLOUDFLARE_API_TOKEN"]
-   ```
+```text
+marketing/metraiyux-0s/business-cards.html
+marketing/metraiyux-0s/assets/vendor/qrcode-generator.js
+```
 
-3. Run:
-   ```bash
-   python3 cf_pages_deploy.py metraiyux-0s-marketing marketing/metraiyux-0s/
-   ```
+Business Cards v2 includes:
 
-4. Update the ledger at `LIVE_DEPLOYMENT_LEDGER.md` with the new deployment ID and preview URL.
-
----
-
-## Files Changed This Session
-
-| File | Change |
-|------|--------|
-| `marketing/metraiyux-0s/business-cards.html` | Full v2 premium rebuild |
-| `marketing/metraiyux-0s/index.html` | Added Business Cards nav link |
-| `marketing/metraiyux-0s/CHANGELOG.md` | Added v2 source-ready / production-blocked changelog |
-| `LIVE_DEPLOYMENT_LEDGER.md` | Added v1 deploy entry (needs v2 entry after deploy) |
+- 2 founder cards: Gold founder edition and Cyan tech edition.
+- 1 Valley Verified client card with live business/city/category form updates.
+- 12 platform cards: MetrAIyux 0S, SkyeMusicNexus, SkyeRouteX, PHX Verified, NorthStar, Free99, LegalSkyes, QuantumSkyes MCP, kAIxu CodeStudio, Agentic Growth Layer, SkyeVaultOS, and Merser.
+- Print isolation: each card prints alone on a 3.5in by 2in page.
+- Local QR generation from `assets/vendor/qrcode-generator.js`; the old unpkg dependency was removed so production does not fail if the CDN blocks.
+- Desktop card previews fit the requested 600px display target, while mobile computes `--screen-scale` at runtime so cards do not overflow the viewport.
 
 ---
 
-## Live URLs
+## Live Browser Proof
 
-- **v1 (currently live):** https://metraiyux-0s-marketing.pages.dev/business-cards.html
-- **v2 deploy target:** https://metraiyux-0s-marketing.pages.dev/business-cards.html (same URL, overwrites)
-- **Pages project:** metraiyux-0s-marketing
-- **Account ID:** e700b92580cd05de0104128efbd3e676
+Headed production proof passed under Chromium with desktop and mobile viewports:
+
+```text
+proof command: node tools/proof-business-cards-v2-production.mjs
+receipt: test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json
+desktop: 1440x980
+mobile: 390x844
+failures: []
+```
+
+The proof opened the live production URL, verified expected text, checked responsive layout, edited the Valley Verified card fields, clicked four print buttons with `window.print` trapped, inspected QR canvas pixels, checked for broken images, scrolled the full rendered page on both viewports, saved screenshots at each scroll stop, and recorded zero console errors plus zero failed network requests.
+
+---
+
+## Deploy Lane That Worked
+
+Wrangler Pages upload was hanging in this Codespace, so the repo now has a direct Cloudflare Pages asset-upload tool:
+
+```text
+tools/cloudflare-pages-direct-upload.mjs
+```
+
+The compatibility wrapper now points to that tool:
+
+```text
+cf_pages_deploy.py
+```
+
+Package scripts:
+
+```bash
+npm run pages:direct-upload
+npm run proof:business-cards
+```
+
+Deploy command shape, with secret values sourced locally and never printed:
+
+```bash
+CLOUDFLARE_API_TOKEN="$(sed -n '1240p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+CLOUDFLARE_ACCOUNT_ID="$(sed -n '1241p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+PAGES_PROJECT=metraiyux-0s-marketing \
+PAGES_DIR=marketing/metraiyux-0s \
+PAGES_COMMIT_MESSAGE="Business Cards v2 local QR and responsive proof" \
+PAGES_RECEIPT=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json \
+PAGES_MANIFEST=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json \
+node tools/cloudflare-pages-direct-upload.mjs
+```
+
+The uploader uses Cloudflare's current Pages upload-token/assets/manifest flow and writes a receipt plus manifest under `test-artifacts/cloudflare-pages/`. It discovers the BLAKE3 helper from the repo environment or Wrangler's npm cache; if the standalone `blake3-wasm` registry dependency is still broken, let the script bootstrap Wrangler's cache instead of hardcoding another deploy token or reverting to the older Python-only uploader.
+
+---
+
+## Validation Commands
+
+Run these before another commit touching this lane:
+
+```bash
+node --check tools/cloudflare-pages-direct-upload.mjs
+node --check tools/proof-business-cards-v2-production.mjs
+python3 -m py_compile cf_pages_deploy.py
+npm run proof:business-cards
+```
+
+2026-05-23 closure validation already run:
+
+```text
+node --check tools/cloudflare-pages-direct-upload.mjs
+node --check tools/proof-business-cards-v2-production.mjs
+python3 -m py_compile cf_pages_deploy.py
+npm run proof:business-cards
+npm run brain:sync:obsidian
+npm run vault:0s:map
+```
+
+Brain/neural-map result after the business-card production pass:
+
+```text
+Obsidian brain sync: 13 notes into 224 local-brain chunks
+SkyeVault 0S neural bridge: 1 repo, 24 receipts, 62 nodes, 61 links, 1 workspace map
+```
+
+---
+
+## Files To Keep Together
+
+```text
+cf_pages_deploy.py
+package.json
+tools/cloudflare-pages-direct-upload.mjs
+tools/proof-business-cards-v2-production.mjs
+marketing/metraiyux-0s/business-cards.html
+marketing/metraiyux-0s/assets/vendor/qrcode-generator.js
+marketing/metraiyux-0s/CHANGELOG.md
+LIVE_DEPLOYMENT_LEDGER.md
+.vscode/Handoffs/2026-05-23-business-cards-v2-handoff.md
+.vscode/Handoffs/2026-05-22-ultimate-next-dev-handoff.md
+```
+
+Do not commit `.env`, raw Cloudflare tokens, signed vault links, direct restore-kit key material, `.skyesecrets`, or unlock-code files.
