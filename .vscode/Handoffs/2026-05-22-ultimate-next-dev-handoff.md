@@ -1569,3 +1569,245 @@ npm run vault:0s:map
 ```
 
 Brain/neural-map refresh result: 13 Obsidian notes into 224 local-brain chunks, plus 1 SkyeVault repo / 24 receipts / 62 nodes / 61 links / 1 workspace map.
+
+## 2026-05-23 Next-Agent Operating Playbook - Repo, Production, Vaults, And Local Clone
+
+This is the practical "do not break the owner's project" playbook for any next agent/dev landing in this repo.
+
+### First Read Order
+
+1. Read `AGENTS.md` at repo root. It is the active repo rulebook.
+2. Read `.agents/live-browser-verifier/browser-proof-policy.toml` before claiming any production-facing web/app work is done.
+3. Read this handoff, then the specific dated handoff for the surface being touched.
+4. For MCP/tooling work, use the repo MCP source of truth in `.mcp.json`: `quantumskyes` runs `node /workspaces/MetrAIyux-0S/MCP/stdio-server.mjs`.
+5. For SkyeVault/drive/restore work, read `SkyeVault-Drop/docs/ENCRYPTED_REPO_ZIP_RESTORE.md`, `SkyeVault-Drop/CHANGELOG.md`, and the SkyeVault sections in this handoff.
+
+### Non-Negotiable Repo Rules
+
+- Do not create per-app founder/admin/client passwords for mounted 0S apps. Owner/admin access must use the shared FS27/SkyGate/Free99 gate lane and accepted headers/cookies/helpers.
+- Every mounted app path inside `metraiyux_0s_site` must pass through `enforceZeroOsGate` before assets or proxied APIs are served.
+- Production-facing web/app changes are not complete until a headed browser proof passes on the deployed production URL across desktop and mobile. Curl, static screenshots, and headless-only checks do not satisfy the repo gate.
+- Never commit or print raw bearer tokens, Cloudflare API token values, `.env`, `.dev.vars`, signed vault links in docs, `.skyesecrets`, unlock-code files, artifact key material, or direct restore-kit key material.
+- Work with the current tree. Do not reset, checkout, or revert user changes unless the owner explicitly asks.
+- Keep the site neural map and brains current during repo-wide preservation/deploy passes: run `npm run brain:sync:obsidian` and `npm run vault:0s:map`.
+
+### Git Source Of Truth
+
+Canonical Git remote:
+
+```text
+https://github.com/tyronenorman6606-source/MetrAIyux-0S
+```
+
+Canonical branch:
+
+```text
+main
+```
+
+Safety snapshot branch used during this pass:
+
+```text
+full-workspace-snapshot-20260523-fastzip-contact-handoff
+```
+
+Local VS Code clone commands for the owner:
+
+```bash
+mkdir -p ~/Projects
+cd ~/Projects
+git clone --progress https://github.com/tyronenorman6606-source/MetrAIyux-0S.git
+cd MetrAIyux-0S
+git switch main
+git pull --ff-only
+code .
+```
+
+If the owner wants the snapshot branch instead:
+
+```bash
+git fetch origin full-workspace-snapshot-20260523-fastzip-contact-handoff
+git switch -c full-workspace-snapshot-20260523-fastzip-contact-handoff origin/full-workspace-snapshot-20260523-fastzip-contact-handoff
+code .
+```
+
+The repo already clones into one folder named `MetrAIyux-0S/`. Do not move every project into another nested folder inside the repo; many scripts use repo-relative paths.
+
+### Safe Commit And Push Flow
+
+Before commit:
+
+```bash
+git status --short --branch
+git diff --stat
+```
+
+Stage normal source/docs/proof artifacts:
+
+```bash
+git add -A
+```
+
+If a safe proof receipt/screenshot under ignored `test-artifacts/` must be preserved, force-add only that exact receipt folder:
+
+```bash
+git add -f test-artifacts/<safe-proof-folder-or-receipt>
+```
+
+Pre-commit safety checks:
+
+```bash
+git diff --cached --name-only | rg '(^|/)\\.env$|\\.dev\\.vars$|\\.skyevault-out|\\.skyesecrets$|UNLOCK_CODES|artifact-key-material|full-repo-.*\\.(zip|enc)$|X-Amz-Signature|\\.env[0-9]+$|private-key|secret-pack|control-pack' || true
+git diff --cached -U0 | rg -n '(cfat_[A-Za-z0-9]+|cfut_[A-Za-z0-9]+|sk_live_[A-Za-z0-9]+|-----BEGIN [A-Z ]*PRIVATE KEY-----|X-Amz-Signature=|R2_SECRET_ACCESS_KEY=)' || true
+git diff --cached --name-only -z --diff-filter=AM | xargs -0 -r stat -c '%s %n' | awk '$1 > 100000000 {print}'
+git diff --cached --check
+```
+
+Commit and push:
+
+```bash
+git commit -m "<short accurate message>"
+git push origin main
+git branch -f full-workspace-snapshot-20260523-fastzip-contact-handoff main
+git push origin full-workspace-snapshot-20260523-fastzip-contact-handoff
+git status --short --branch
+```
+
+If `main` ever rejects for policy/size/auth reasons, push the snapshot branch and report the branch name/hash to the owner immediately.
+
+### Cloudflare Pages Production Push Lane
+
+Use this lane for the MetrAIyux marketing Pages project and other static Pages deploys when Wrangler Pages upload hangs:
+
+```text
+tools/cloudflare-pages-direct-upload.mjs
+cf_pages_deploy.py
+npm run pages:direct-upload
+```
+
+Root `.env` line `1240` was the Pages-capable token lane in this Codespace, and line `1241` was the matching account ID. Do not print the values. The token around line `1236` could read account/Zero Trust resources but failed Cloudflare Pages deployment.
+
+Repeat shape:
+
+```bash
+CLOUDFLARE_API_TOKEN="$(sed -n '1240p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+CLOUDFLARE_ACCOUNT_ID="$(sed -n '1241p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
+PAGES_PROJECT=metraiyux-0s-marketing \
+PAGES_DIR=marketing/metraiyux-0s \
+PAGES_COMMIT_MESSAGE="<accurate deploy message>" \
+node tools/cloudflare-pages-direct-upload.mjs
+```
+
+After deploy, verify production over HTTP and then run headed browser proof. For Business Cards v2:
+
+```bash
+npm run proof:business-cards
+```
+
+Latest Business Cards v2 production facts:
+
+```text
+production URL: https://metraiyux-0s-marketing.pages.dev/business-cards.html
+deployment: f8e8b6e0-2077-42a9-a757-28f191a52cf3
+preview: https://f8e8b6e0.metraiyux-0s-marketing.pages.dev
+deploy receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json
+browser proof: test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json
+```
+
+### Cloudflare Worker Push Lane
+
+For Workers, use the repo runner instead of assuming a local package install:
+
+```bash
+ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.94.0 node ../tools/run-root-wrangler.mjs deploy --dry-run --outdir /tmp/<worker>-wrangler-dry-run
+ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.94.0 node ../tools/run-root-wrangler.mjs deploy
+```
+
+Then perform the required headed live-browser proof on the production Worker URL. Do not claim production-live when Cloudflare auth blocks deploy. SkyeVault Drop was still Worker-deploy blocked by Cloudflare auth during the earlier restore-flow pass, even though its local smoke/dry-run checks passed.
+
+### SkyeDrive / SkyeVault Full-Repo Backup Lane
+
+The full "lose nothing" workspace backup lane is SkyeVault/SkyeDrive, not Git. Git is the safe source snapshot; the vault artifact is the full encrypted workspace preservation path, including ignored/untracked material that should not be committed.
+
+Current full-repo backup tool:
+
+```text
+tools/skyevault-full-repo-push.mjs
+npm run vault:repo:full
+```
+
+Use ZIP mode. The owner explicitly wanted ZIP, not tar-only:
+
+```bash
+SKYEVAULT_DROP_URL=https://skyevault-drop.graylondonskyes.workers.dev \
+npm run vault:repo:full -- \
+  --repo=/workspaces/MetrAIyux-0S \
+  --repo-name=MetrAIyux-0S \
+  --archive-format=zip \
+  --zip-level=0 \
+  --zip-upload-concurrency=8 \
+  --max-gb=100
+```
+
+Important restore wording:
+
+```text
+Download two files: the encrypted repo artifact and the direct restore kit.
+The artifact ends in .zip.enc because it is protected.
+The restore kit unlocks it into the real .zip, verifies it, and extracts the repo folder.
+```
+
+Never tell the owner that `.zip.enc` is directly unzip-able. The real `.zip` only appears after decrypting/unlocking with the restore kit.
+
+Direct restore command shape:
+
+```bash
+unzip MetrAIyux-0S-full-repo-direct-restore-kit-<stamp>.zip -d restore-kit
+node restore-kit/skyevault-restore-encrypted-zip.mjs --artifact=./MetrAIyux-0S-full-repo-<stamp>.zip.enc --key-file=./restore-kit/MetrAIyux-0S-artifact-key-material.txt --out-dir=./restore-metraiyux-0s --force
+```
+
+Vault outputs and what can be shared:
+
+- It is okay to give the owner fresh short-lived signed download links in chat when explicitly requested.
+- Do not commit signed URLs, unlock codes, `.skyesecrets`, direct restore kit contents, or key material to Git.
+- Commit only safe docs/receipts that do not contain raw secrets.
+- Keep the local `FULL_REPO_SKYDRIVE_HANDOFF.json`, `SKYDRIVE_UPLOAD_RECEIPT.json`, range proofs, and `.skyevault-out/*download-links*.json` private unless the owner asks for link details in chat.
+
+### Customer-Grade Restore Rule
+
+For customers, the UI/copy must make the restore flow obvious:
+
+```text
+.zip.enc is the protected artifact.
+Direct restore kit is the unlock/restore helper.
+Run the helper and it creates the real .zip/extracted repo.
+```
+
+The direct restore kit is intentionally small because it contains helper files and key material, not the whole repo. The large `.zip.enc` is the whole repo artifact.
+
+### Brain / Neural Map Refresh
+
+Run these after repo-wide backup/deploy/handoff passes:
+
+```bash
+npm run brain:sync:obsidian
+npm run vault:0s:map
+```
+
+Latest refresh from this pass:
+
+```text
+Obsidian brain sync: 13 notes into 224 local-brain chunks
+SkyeVault 0S neural bridge: 1 repo, 24 receipts, 62 nodes, 61 links, 1 workspace map
+```
+
+### Contact Accuracy
+
+The contact inventory is already attached earlier in this handoff:
+
+```text
+.vscode/Handoffs/contact-info-inventory-latest.md
+.vscode/Handoffs/contact-info-inventory-latest.json
+```
+
+Do not guess company contact details from old generated pages. Treat `graylondonskyes@gmail.com`, `hello@skyesoverlondon.com`, `ops@skyesoverlondon.com`, `admin@skyesoverlondon.com`, `operator@metraiyux.com`, and the high-repeat phone `(480) 469-5416` as candidates until the owner-approved current source of truth is confirmed. Client/profile phone numbers are not automatically company contact info.

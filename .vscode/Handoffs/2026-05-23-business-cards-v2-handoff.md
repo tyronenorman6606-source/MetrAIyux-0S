@@ -149,3 +149,45 @@ LIVE_DEPLOYMENT_LEDGER.md
 ```
 
 Do not commit `.env`, raw Cloudflare tokens, signed vault links, direct restore-kit key material, `.skyesecrets`, or unlock-code files.
+
+---
+
+## Next-Agent Project Operating Notes
+
+For the full repo/deploy/vault playbook, read:
+
+```text
+.vscode/Handoffs/2026-05-22-ultimate-next-dev-handoff.md
+```
+
+The short version for this surface:
+
+- Business Cards v2 is a Cloudflare Pages surface in `marketing/metraiyux-0s`.
+- The live URL is `https://metraiyux-0s-marketing.pages.dev/business-cards.html`.
+- Pages deploys should use `tools/cloudflare-pages-direct-upload.mjs` or `cf_pages_deploy.py`; Wrangler Pages upload hung during this pass.
+- Root `.env` line `1240` was the Pages-capable token lane and line `1241` was the account ID. Do not print the values.
+- After a production push, run `npm run proof:business-cards` and keep the headed proof receipt.
+- Then update `marketing/metraiyux-0s/CHANGELOG.md`, `LIVE_DEPLOYMENT_LEDGER.md`, this handoff, and the ultimate handoff.
+- Run `npm run brain:sync:obsidian` and `npm run vault:0s:map` after repo-wide closure/preservation passes.
+- Push `main`, then move `full-workspace-snapshot-20260523-fastzip-contact-handoff` to the same commit if the owner asks for one repo of truth plus a snapshot branch.
+
+Owner local clone commands:
+
+```bash
+mkdir -p ~/Projects
+cd ~/Projects
+git clone --progress https://github.com/tyronenorman6606-source/MetrAIyux-0S.git
+cd MetrAIyux-0S
+git switch main
+git pull --ff-only
+code .
+```
+
+SkyeDrive/SkyeVault rule:
+
+```text
+Git is the safe source snapshot.
+SkyeVault/SkyeDrive is the full "lose nothing" workspace backup.
+The full artifact is .zip.enc, and the direct restore kit unlocks it into the real .zip.
+Fresh signed links belong in owner chat only, not committed handoff files.
+```
