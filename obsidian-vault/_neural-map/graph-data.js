@@ -1,5 +1,5 @@
 window.METRAIYUX_OBSIDIAN_GRAPH = {
-  "generated_at": "2026-05-23T03:20:01.291Z",
+  "generated_at": "2026-05-23T04:26:13.396Z",
   "vault": "obsidian-vault",
   "node_count": 148,
   "link_count": 213,
