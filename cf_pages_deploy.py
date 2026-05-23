@@ -7,9 +7,12 @@ Usage: python3 cf_pages_deploy.py <project_name> <directory>
 import sys, os, hashlib, mimetypes, json, base64
 import urllib.request, urllib.error
 
-CF_TOKEN   = "cfat_piHgsOaeLV5FrRwqdQhE9Aphp3Kgplj8gS6MxZSmef3ffcd8"
-CF_ACCOUNT = "e700b92580cd05de0104128efbd3e676"
+CF_TOKEN   = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+CF_ACCOUNT = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "e700b92580cd05de0104128efbd3e676")
 API        = "https://api.cloudflare.com/client/v4"
+
+if not CF_TOKEN:
+    raise SystemExit("Missing CLOUDFLARE_API_TOKEN. Export a local token; do not hardcode it in this file.")
 
 HEADERS = {
     "Authorization": f"Bearer {CF_TOKEN}",
