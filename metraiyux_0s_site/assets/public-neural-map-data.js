@@ -1,5 +1,5 @@
 window.METRAIYUX_PUBLIC_NEURAL_MAP = {
-  "generated_at": "2026-05-22T23:11:28.598Z",
+  "generated_at": "2026-05-23T03:20:01.491Z",
   "source": "curated-obsidian-sync",
   "safety": "public-safe: generated only from brain:true Obsidian export with internal paths removed",
   "note_count": 13,
