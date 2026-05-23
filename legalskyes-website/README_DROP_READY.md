@@ -6,13 +6,13 @@ This is a branded static legal center for Skyes Over London LC, ready for Netlif
 1. Upload this ZIP directly to Netlify Drop, or unzip and drag the folder.
 2. Attach `solenterprises.org`.
 3. Verify:
-   - `https://solenterprises.org/legal/`
-   - `https://solenterprises.org/legal/terms/`
-   - `https://solenterprises.org/legal/privacy/`
-   - `https://solenterprises.org/legal/ai-terms/`
-   - `https://solenterprises.org/legal/sms-communications/`
-   - `https://solenterprises.org/sms-consent/`
-   - `https://solenterprises.org/contact/`
+   - `https://skyes-over-london-legal.pages.dev/legal/`
+   - `https://skyes-over-london-legal.pages.dev/legal/terms/`
+   - `https://skyes-over-london-legal.pages.dev/legal/privacy/`
+   - `https://skyes-over-london-legal.pages.dev/legal/ai-terms/`
+   - `https://skyes-over-london-legal.pages.dev/legal/sms-communications/`
+   - `https://skyes-over-london-legal.pages.dev/sms-consent/`
+   - `https://skyes-over-london-legal.pages.dev/contact/`
 
 ## Included legal coverage
 - Master Terms

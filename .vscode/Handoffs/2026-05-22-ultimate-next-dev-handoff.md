@@ -116,7 +116,7 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | SkyeSol deep scan/company brain | Complete, live Company Knowledge API ingested, browser proof passed, neural maps updated at that time. | Preserve artifacts; split into smaller notes later if useful. |
 | 0S pricing/intake router | Live and headed-browser proofed. | Regenerate MCP receipt later; separate SkyePay pricing pass only if requested. |
 | Sign In Pro Free99 demo | Closed end to end, live API and browser proof passed. | Rotate demo code before meetings if needed; do not paste full code. |
-| Legal Skyes AI Operators + 0S changelog | Shipped, deployed, live-headed proofed. | Decide generated/staged changelog tracking; SOL Enterprises custom-domain issue remains separate. |
+| Legal Skyes AI Operators + Legal Center route correction | Shipped, deployed, live-headed proofed. Public Legal Center links now use the LegalSkyes Pages policy hub instead of the broken SOLE legal path. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
 | Free Sauce MCP suite/dev hub | Built, npm packages published, dev hub deployed, custom headed proof passed. | Add setup pages/status badges if desired. |
 | Drinique MCP comparison | Live, proofed, visible site hash-matches local source. | Optional: redeploy updated JSON receipts, then rerun proof. |
 | FS27 SkyeNet runtime/deploy API | FS27 Worker live; deploy API smoke proved `/skynet-smoke/`. | Main 0S changelog edit is local until deployed/proofed. |
@@ -414,6 +414,49 @@ Status:
 - The canonical proved Legal Skyes URL is the Cloudflare Pages domain.
 - `solenterprises.org` still serves a different gateway/wrong surface. Import/change SOL Enterprises separately before claiming that custom-domain route.
 - No attorney reviewed the page.
+
+2026-05-23 Legal Center route correction:
+
+```text
+Public LegalSkyes policy hub: https://skyes-over-london-legal.pages.dev/legal/
+Marketplace policy route: https://skyes-over-london-legal.pages.dev/legal/marketplace-commerce/
+Broken route closed out of public Legal Center surfaces: https://solenterprises.org/legal/ returned 404.
+```
+
+Deployments:
+
+```text
+LegalSkyes Pages deployment: 56a9197d-6113-470e-8411-63d94a9cb730
+LegalSkyes preview: https://56a9197d.skyes-over-london-legal.pages.dev
+MetrAIyux marketing deployment: 14855f13-5688-4de8-a86d-665c561823ad
+MetrAIyux marketing preview: https://14855f13.metraiyux-0s-marketing.pages.dev
+Gray portfolio mirror deployment: e09e7995-ebe9-404a-aee2-e03db06ef678
+Gray portfolio mirror preview: https://e09e7995.gray-skyes-founder-portfolio.pages.dev
+```
+
+Files corrected:
+
+```text
+legalskyes-website/** canonical/OG/JSON-LD public URLs
+marketing/metraiyux-0s/index.html
+marketing/metraiyux-0s/marketplace.html
+marketing/metraiyux-0s/ecosystem.html
+marketing/metraiyux-0s/business-cards.html
+marketing/gray-skyes-canonical-site/marketplace.html
+marketing/gray-skyes-canonical-site/ecosystem.html
+```
+
+Proof:
+
+```text
+proof command: node tools/proof-legal-skyes-policy-routes.mjs
+receipt: test-artifacts/live-browser-verifier/2026-05-23T03-04-19-649Z-legal-skyes-policy-routes/live-browser-verification-report.json
+desktop: 1440x980
+mobile: 390x844
+failures: []
+```
+
+The proof opened the deployed LegalSkyes hub and marketplace-policy routes, clicked Legal Center and Marketplace Policy links from MetrAIyux and Gray public pages, verified the Business Cards LegalSkyes card display/QR target, scrolled every checked page on desktop and mobile, and confirmed the checked public legal-center surfaces no longer contain `https://solenterprises.org/legal/`.
 
 ## Free Sauce MCP Suite / Dev Hub
 

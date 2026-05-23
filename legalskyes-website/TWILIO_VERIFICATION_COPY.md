@@ -10,11 +10,11 @@
 `Customer Care, Account Notifications, Conversational Messaging`
 
 ## Proof of consent URL
-Primary: `https://solenterprises.org/legal/twilio-sms/`
+Primary: `https://skyes-over-london-legal.pages.dev/legal/twilio-sms/`
 
-Backup: `https://solenterprises.org/sms-consent/`
+Backup: `https://skyes-over-london-legal.pages.dev/sms-consent/`
 
-Contact form: `https://solenterprises.org/contact/`
+Contact form: `https://skyes-over-london-legal.pages.dev/contact/`
 
 ## Use case description
 Skyes Over London uses SMS to communicate with customers and business contacts who have opted in via text. Messages include appointment confirmations, missed-call follow-ups, service updates, lead-response messages, customer support replies, account notifications, and help requests. We do not purchase contact lists, and we only message users who have directly contacted us or provided consent.

@@ -37,6 +37,20 @@ manifest: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-
 production URL: https://metraiyux-0s-marketing.pages.dev/business-cards.html
 ```
 
+Latest LegalSkyes route correction, after the owner flagged the SOLE legal path returning 404:
+
+```text
+deploymentId: 14855f13-5688-4de8-a86d-665c561823ad
+preview: https://14855f13.metraiyux-0s-marketing.pages.dev
+project: metraiyux-0s-marketing
+source: marketing/metraiyux-0s
+assetCount: 171
+receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-legal-links-receipt.json
+manifest: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-legal-links-manifest.json
+production URL: https://metraiyux-0s-marketing.pages.dev/business-cards.html
+LegalSkyes card route: https://skyes-over-london-legal.pages.dev/legal/
+```
+
 Line `1240` in root `.env` was the token lane that could reach Cloudflare Pages. Do not print or commit the value. The token around line `1236` could read account and Zero Trust resources, but it returned Cloudflare Pages auth errors and was not valid for this deploy lane.
 
 ---
@@ -57,6 +71,7 @@ The current Client Access Studio includes:
 - 1 selected-client Valley Verified priority-access card builder with live business/city/category/contact fields, auto-generated priority codes, a founder photo, the Skye Over London logo, and a QR that opens a prefilled direct email to Gray London Skyes.
 - Do not add `875+`, fake Phoenix-business counts, or any inflated Valley Verified scale claim to this card surface unless the owner gives a verified source of truth.
 - 12 platform cards: MetrAIyux 0S, SkyeMusicNexus, SkyeRouteX, PHX Verified, NorthStar, Free99, LegalSkyes, QuantumSkyes MCP, kAIxu CodeStudio, Agentic Growth Layer, SkyeVaultOS, and Merser.
+- The LegalSkyes platform card display/QR must use `https://skyes-over-london-legal.pages.dev/legal/`, not the SOLE root and not `https://solenterprises.org/legal/`.
 - Print isolation: each card prints alone on a 3.5in by 2in page.
 - Local QR generation from `assets/vendor/qrcode-generator.js`; the old unpkg dependency was removed so production does not fail if the CDN blocks.
 - Desktop card previews fit the requested 600px display target, while mobile computes `--screen-scale` at runtime so cards do not overflow the viewport.
@@ -87,6 +102,18 @@ failures: []
 ```
 
 The proof opened the live production URL, verified expected text, checked responsive layout, edited the Valley Verified card fields, clicked four print buttons with `window.print` trapped, inspected QR canvas pixels, checked for broken images, scrolled the full rendered page on both viewports, saved screenshots at each scroll stop, and recorded zero console errors plus zero failed network requests.
+
+Legal route correction proof:
+
+```text
+proof command: node tools/proof-legal-skyes-policy-routes.mjs
+receipt: test-artifacts/live-browser-verifier/2026-05-23T03-04-19-649Z-legal-skyes-policy-routes/live-browser-verification-report.json
+desktop: 1440x980
+mobile: 390x844
+failures: []
+```
+
+The legal-route proof opened the live Business Cards page, scrolled to the LegalSkyes platform card, verified the `skyes-over-london-legal.pages.dev/legal` display target, inspected the card QR pixels, and confirmed the checked public surfaces no longer route Legal Center traffic to the broken SOLE legal path.
 
 ---
 
