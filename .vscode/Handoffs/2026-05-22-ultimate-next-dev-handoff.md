@@ -1411,3 +1411,47 @@ Git snapshot directive:
 - Do not force-add ignored vault payloads, `.env`, `.dev.vars`, key files, logs, local browser artifacts, archives, or SkyeSecure secret packs.
 - Before commit, check staged files for GitHub-size blockers and obvious credential material.
 - If push fails because the default branch trips, push the snapshot branch and preserve the branch URL in the chat/handoff.
+
+## 2026-05-23 Correction - ZIP Artifact Means Encrypted ZIP Wrapper Until Decrypted
+
+Important owner restore clarification:
+
+- The large downloaded file named `MetrAIyux-0S-full-repo-20260522T234329Z.zip.enc` is not directly unzip-able.
+- It is an OpenSSL encrypted container whose decrypted output is the real repo ZIP: `MetrAIyux-0S-full-repo-20260522T234329Z.zip`.
+- The first byte/range proof for the large artifact showed OpenSSL encrypted payload (`firstByteHex: 53`), not a ZIP header.
+- The direct restore kit proof showed a real ZIP header (`firstByteHex: 50`).
+
+Fresh direct restore kit minted during this correction:
+
+```text
+restore kit file: MetrAIyux-0S-full-repo-direct-restore-kit-20260523T004619Z.zip
+restore kit receipt: cdv_af91f24a2bce34764821a222
+restore kit bytes: 1336
+restore kit sha256: bfc5ea06d96e9626d7527fe8b90291e0d7d5bf24b451409c988c0fd8b3bf3f19
+link receipt: .skyevault-out/full-repo-zip-direct-restore-links-latest.json
+range proof: .skyevault-out/full-repo-zip-direct-restore-links-range-proof.json
+expiresAt: 2026-05-23T03:47:32.488Z
+```
+
+The direct restore kit contains:
+
+```text
+README.txt
+RESTORE.md
+MetrAIyux-0S-artifact-key-material.txt
+```
+
+Restore steps for the next dev or new Codespace:
+
+```bash
+unzip MetrAIyux-0S-full-repo-direct-restore-kit-20260523T004619Z.zip -d restore-kit
+cp restore-kit/MetrAIyux-0S-artifact-key-material.txt .
+openssl enc -d -aes-256-cbc -pbkdf2 -iter 700000 -md sha256 -pass file:./MetrAIyux-0S-artifact-key-material.txt -in ./MetrAIyux-0S-full-repo-20260522T234329Z.zip.enc -out ./MetrAIyux-0S-full-repo-20260522T234329Z.zip
+unzip -q ./MetrAIyux-0S-full-repo-20260522T234329Z.zip -d ./restore-metraiyux-0s
+```
+
+Operational rule after this correction:
+
+- Never tell the owner the `.zip.enc` is the final ZIP.
+- Say: "Download the encrypted artifact plus the direct restore kit. The restore kit unlocks the encrypted artifact into the real repo ZIP."
+- Keep raw signed URLs and key contents out of commits/handoffs. The chat can receive fresh short-lived links only when the owner explicitly asks for them.
