@@ -549,7 +549,7 @@ async function runFullProductionMutationMatrix(page, entry) {
   await post('drops', 'approve-batch', '/api/skymusicnexus/music-drops', { batchId: batch.batchId });
   await post('drops', 'run-approval-brain', '/api/skymusicnexus/music-drops', { batchId: batch.batchId });
   await post('drops', 'build-static-bundle', '/api/skymusicnexus/music-drops', { batchId: batch.batchId });
-  await post('drops', 'publish-batch', '/api/skymusicnexus/music-drops', { batchId: batch.batchId });
+  const publishBatch = await post('drops', 'publish-batch', '/api/skymusicnexus/music-drops', { batchId: batch.batchId });
   const holdDrop = (await post('drops', 'create-drop', '/api/skymusicnexus/music-drops', { artistId, releaseId, title: `Full Matrix Hold Drop ${suffix}` })).drop;
   await post('drops', 'hold-drop', '/api/skymusicnexus/music-drops', { dropId: holdDrop.dropId });
   await post('drops', 'revoke-private-delivery', '/api/skymusicnexus/music-drops', { dropId: holdDrop.dropId });
@@ -619,13 +619,53 @@ async function runFullProductionMutationMatrix(page, entry) {
     familyCount: families.size,
     families: Array.from(families),
     missingFamilies,
+    dropDeploy: {
+      status: publishBatch?.deploy?.status || '',
+      provider: publishBatch?.deploy?.provider || '',
+      mode: publishBatch?.deploy?.mode || '',
+      liveBaseUrl: publishBatch?.deploy?.liveBaseUrl || '',
+      netlifyDeployId: publishBatch?.deploy?.netlifyDeployId || '',
+      skynetDeploymentId: publishBatch?.deploy?.skynetDeploymentId || '',
+      skynetRouteKey: publishBatch?.deploy?.skynetRouteKey || '',
+      skynetMountPath: publishBatch?.deploy?.skynetMountPath || '',
+      fileCount: publishBatch?.deploy?.fileCount || 0
+    },
     providerPublicationBoundary: publication?.publication?.note || '',
     visualsSchema: visuals?.visuals?.schema_version || ''
   };
   addCheck(entry, 'full_music_api_mutation_matrix_covers_all_function_families', missingFamilies.length === 0 && actions.length >= 70, entry.productionMatrix);
+  addCheck(entry, 'drop_publish_returns_skynet_cdn_or_explicit_intent', (
+    (entry.productionMatrix.dropDeploy.status === 'live' && entry.productionMatrix.dropDeploy.provider === 'fs27-skynet')
+    || entry.productionMatrix.dropDeploy.status === 'deploy-intent'
+    || entry.productionMatrix.dropDeploy.status === 'provider-blocked'
+  ), entry.productionMatrix.dropDeploy);
   addCheck(entry, 'provider_publish_boundary_remains_visible', /provider token|provider/i.test(entry.productionMatrix.providerPublicationBoundary), {
     note: entry.productionMatrix.providerPublicationBoundary
   });
+}
+
+async function validatePublicDropDeploy(page, entry) {
+  const liveBaseUrl = entry.productionMatrix?.dropDeploy?.liveBaseUrl || '';
+  if (!liveBaseUrl) {
+    addCheck(entry, 'drop_public_cdn_live_browser_check_skipped_with_explicit_boundary', ['deploy-intent', 'provider-blocked'].includes(entry.productionMatrix?.dropDeploy?.status), entry.productionMatrix?.dropDeploy || {});
+    await page.goto(`${baseUrl}/SkyeMusicNexus/public/command-dashboard.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    return;
+  }
+  await page.goto(liveBaseUrl, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.waitForTimeout(1200);
+  const state = await page.evaluate(() => ({
+    title: document.title,
+    text: document.body.innerText.slice(0, 1200),
+    links: [...document.querySelectorAll('a')].map(a => a.href).slice(0, 12),
+    horizontalOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth
+  }));
+  addCheck(entry, 'drop_public_cdn_live_browser_renders_bundle', /SkyeMusicNexus|Drop Batch|live drop bundle/i.test(state.text), {
+    liveBaseUrl,
+    title: state.title,
+    horizontalOverflow: state.horizontalOverflow
+  });
+  await scrollStops(page, entry, 'drop-public-cdn', 3);
+  await page.goto(`${baseUrl}/SkyeMusicNexus/public/command-dashboard.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 }
 
 async function readStress(page, entry) {
@@ -810,7 +850,8 @@ const nexusRoutes = [
   { path: '/SkyeMusicNexus/public/admin.html', label: 'operator', expects: ['Operator Stage', 'Analytics'], guidance: true },
   { path: '/SkyeMusicNexus/public/exports.html', label: 'exports', expects: ['Export Forge', 'Release Forge handoff'], guidance: true },
   { path: '/SkyeMusicNexus/public/stems.html', label: 'stems', expects: ['Stem Vault', 'Stage stems'], guidance: true },
-  { path: '/SkyeMusicNexus/proof.html', label: 'readiness', expects: ['SkyeMusicNexus Readiness', 'Backend Route Matrix'], guidance: false }
+  { path: '/SkyeMusicNexus/proof.html', label: 'readiness', expects: ['SkyeMusicNexus Readiness', 'Backend Route Matrix'], guidance: false },
+  { path: '/SkyeMusicNexus/skepticks-spectic-override.html', label: 'skeptic-audit', expects: ['Skepticks and SPectic Override', 'Claim Audit Matrix', 'Do Not Overclaim'], guidance: false }
 ];
 
 async function scanNexusRoutes(page, entry, routes) {
@@ -881,6 +922,7 @@ async function runViewport(browser, owner, viewport, viewportLabel, { seed = fal
     if (seed) {
       await seedLiveMusicWorkflow(page, entry);
       await runFullProductionMutationMatrix(page, entry);
+      await validatePublicDropDeploy(page, entry);
     }
     await validateMusicApis(page, entry);
     await readStress(page, entry);

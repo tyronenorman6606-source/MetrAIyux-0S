@@ -9337,6 +9337,261 @@ function musicKey(name) {
 function musicSlug(value, fallback = 'music') {
   return String(value || fallback).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90) || fallback;
 }
+function musicTruthy(value) {
+  return ['1','true','yes','on','live','enabled'].includes(String(value || '').trim().toLowerCase());
+}
+function musicExplicitlyFalse(value) {
+  return ['0','false','no','off','disabled'].includes(String(value || '').trim().toLowerCase());
+}
+function musicPublicFs27Host() {
+  return 'skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+}
+function musicDropEnvStatus(env) {
+  const netlifyToken = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_NETLIFY_AUTH_TOKEN','NETLIFY_AUTH_TOKEN','SKYGATEFS13_NETLIFY_AUTH_TOKEN','SKYGATEFS13_TARGET_NETLIFY_AUTH_TOKEN']);
+  const netlifySiteId = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_NETLIFY_SITE_ID','NETLIFY_SITE_ID','SKYGATEFS13_TARGET_NETLIFY_SITE_ID','SKYEVAULT_DROP_NETLIFY_SITE_ID']);
+  const liveDeployFlag = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_LIVE_DEPLOY','MUSIC_NEXUS_ALLOW_LIVE_DEPLOY','SKYE_MUSIC_NEXUS_LIVE_DEPLOY']);
+  const skynetFlag = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_SKYNET_DEPLOY','MUSIC_NEXUS_SKYNET_DEPLOY','SKYENET_DEPLOY_ENABLED']);
+  const skynetConfigured = Boolean(env.SKYGATEFS27_WORKER?.fetch);
+  const skynetLiveEnabled = skynetConfigured && !musicExplicitlyFalse(skynetFlag);
+  const r2Account = routexFirstEnv(env, ['MUSIC_NEXUS_R2_ACCOUNT_ID','CLOUDFLARE_R2_ACCOUNT_ID','R2_ACCOUNT_ID','CLOUDFLARE_ACCOUNT_ID']);
+  const r2Access = routexFirstEnv(env, ['MUSIC_NEXUS_R2_ACCESS_KEY_ID','STORAGE_ACCESS_KEY_ID','CLOUDFLARE_R2_ACCESS_KEY','R2_ACCESS_KEY_ID','S3_ACCESS_KEY']);
+  const r2Secret = routexFirstEnv(env, ['MUSIC_NEXUS_R2_SECRET_ACCESS_KEY','STORAGE_SECRET_ACCESS_KEY','CLOUDFLARE_R2_SECRET_KEY','R2_SECRET_ACCESS_KEY','S3_SECRET_KEY']);
+  const r2Bucket = routexFirstEnv(env, ['MUSIC_NEXUS_R2_BUCKET','STORAGE_BUCKET','R2_BUCKET','S3_BUCKET','SKYEVAULT_BUCKET']);
+  const r2Configured = Boolean(r2Account && r2Access && r2Secret && r2Bucket);
+  return {
+    skynet:{
+      provider:'fs27-skynet',
+      configured:skynetConfigured,
+      liveDeployEnabled:skynetLiveEnabled,
+      serviceBindingPresent:skynetConfigured,
+      publicHost:musicPublicFs27Host(),
+      routePattern:'/skynet/musicnexus/<batchId>',
+      note:skynetConfigured
+        ? 'MusicNexus drop publish uses the in-house FS27 SkyeNet deploy API, R2 deployment asset bucket, KV route table, and FS27 runtime logging.'
+        : 'SKYGATEFS27_WORKER service binding is missing, so SkyeNet live deploy cannot be called from this Worker.'
+    },
+    netlify:{
+      provider:'netlify',
+      configured:Boolean(netlifyToken && netlifySiteId),
+      liveDeployEnabled:Boolean(netlifyToken && netlifySiteId && musicTruthy(liveDeployFlag)),
+      tokenPresent:Boolean(netlifyToken),
+      siteIdPresent:Boolean(netlifySiteId),
+      liveFlagPresent:Boolean(liveDeployFlag),
+    },
+    email:{configured:Boolean(routexFirstEnv(env, ['RESEND_API_KEY']) && routexFirstEnv(env, ['RESEND_FROM_EMAIL'])), provider:'resend-or-worker-receipt'},
+    privateStorage:{
+      configured:true,
+      mode:'worker-kv',
+      r2CredentialSetPresent:r2Configured,
+      note:r2Configured ? 'R2/S3 credentials are present in the Worker env, but MusicNexus audio uploads currently persist through Worker KV until the R2 asset adapter is promoted.' : 'MusicNexus audio uploads currently persist through Worker KV.'
+    },
+  };
+}
+function musicEscapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+async function musicSha1Hex(body) {
+  const bytes = typeof body === 'string' ? new TextEncoder().encode(body) : body;
+  const digest = await crypto.subtle.digest('SHA-1', bytes);
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+function musicDropContentType(pathname) {
+  const path = String(pathname || '').toLowerCase();
+  if (path.endsWith('.html')) return 'text/html; charset=utf-8';
+  if (path.endsWith('.css')) return 'text/css; charset=utf-8';
+  if (path.endsWith('.js') || path.endsWith('.mjs')) return 'text/javascript; charset=utf-8';
+  if (path.endsWith('.json')) return 'application/json; charset=utf-8';
+  if (path.endsWith('.svg')) return 'image/svg+xml';
+  if (path.endsWith('.png')) return 'image/png';
+  if (path.endsWith('.jpg') || path.endsWith('.jpeg')) return 'image/jpeg';
+  if (path.endsWith('.webp')) return 'image/webp';
+  return 'application/octet-stream';
+}
+function musicDropBundleFiles(batch, state) {
+  const drops = state.drops.items.filter(drop => (batch.dropIds || []).includes(drop.dropId || drop.id));
+  const generatedAt = musicNow();
+  const css = `body{margin:0;background:#05060a;color:#f7fbff;font-family:Inter,system-ui,sans-serif}main{max-width:980px;margin:auto;padding:48px 18px}a{color:#58f5ff}.hero{border:1px solid rgba(255,255,255,.16);border-radius:28px;padding:30px;background:linear-gradient(135deg,rgba(88,245,255,.13),rgba(255,92,215,.10))}h1{font-size:clamp(42px,8vw,96px);line-height:.9;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:22px}.card{border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px;background:rgba(255,255,255,.05)}.pill{display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;color:#ffd166;font-size:12px;text-transform:uppercase}.track{display:grid;gap:6px;margin-top:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04)}footer{margin-top:26px;color:#9ba8ba}`;
+  const manifest = {
+    ok:true,
+    system:'SkyeMusicNexus Drop CDN Bundle',
+    batchId:batch.batchId,
+    generatedAt,
+    dropCount:drops.length,
+    drops:drops.map(drop => ({
+      dropId:drop.dropId,
+      title:drop.title,
+      slug:drop.slug,
+      artistId:drop.artistId,
+      releaseId:drop.releaseId,
+      rightsStatus:drop.rightsStatus,
+      tierPolicy:drop.tierPolicy,
+      tracks:(drop.tracks || []).map(track => ({title:track.title || '', assetId:track.assetId || '', previewUrl:track.previewUrl || track.streamUrl || ''}))
+    })),
+    boundary:'Public drop pages are CDN-published metadata and campaign surfaces. Private delivery and protected stream routes stay behind the 0S/SkyGate session.'
+  };
+  const indexCards = drops.map(drop => `<article class="card"><span class="pill">${musicEscapeHtml(drop.rightsStatus || 'rights')}</span><h2>${musicEscapeHtml(drop.title)}</h2><p>${musicEscapeHtml(drop.story || 'SkyeMusicNexus drop page generated from the 0S Worker deploy lane.')}</p><a href="./${musicEscapeHtml(drop.slug || drop.dropId)}/">Open drop</a></article>`).join('');
+  const files = [
+    {path:'/index.html', body:`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SkyeMusicNexus Drops ${musicEscapeHtml(batch.batchId)}</title><link rel="stylesheet" href="./assets/drop.css"></head><body><main><section class="hero"><span class="pill">SkyeMusicNexus live drop bundle</span><h1>Drop Batch ${musicEscapeHtml(batch.batchId)}</h1><p>${drops.length} public campaign surface(s) published from the gated 0S MusicNexus Worker. Private audio and delivery controls remain behind SkyGate.</p></section><section class="grid">${indexCards || '<article class="card"><h2>No drops in this bundle</h2></article>'}</section><footer>Generated ${generatedAt}. <a href="./drop-manifest.json">Open manifest</a></footer></main></body></html>`},
+    {path:'/assets/drop.css', body:css},
+    {path:'/drop-manifest.json', body:JSON.stringify(manifest, null, 2)}
+  ];
+  for (const drop of drops) {
+    const tracks = (drop.tracks || []).map((track, index) => `<div class="track"><strong>${musicEscapeHtml(track.title || `Track ${index + 1}`)}</strong><span>Asset: ${musicEscapeHtml(track.assetId || 'not attached')}</span><span>Playback/private delivery follows the 0S gate contract.</span></div>`).join('');
+    files.push({
+      path:`/${drop.slug || drop.dropId}/index.html`,
+      body:`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${musicEscapeHtml(drop.title)} - SkyeMusicNexus Drop</title><link rel="stylesheet" href="../assets/drop.css"></head><body><main><section class="hero"><span class="pill">${musicEscapeHtml(drop.tierPolicy || 'drop')}</span><h1>${musicEscapeHtml(drop.title)}</h1><p>${musicEscapeHtml(drop.story || 'Public campaign page generated from the SkyeMusicNexus drop deploy lane.')}</p></section><section class="grid"><article class="card"><h2>Rights and delivery</h2><p>Rights: ${musicEscapeHtml(drop.rightsStatus || 'not stated')}</p><p>Visibility: ${musicEscapeHtml(drop.visibility || 'public')}</p><p>Private stems, masters, and gated stream actions stay inside SkyGate.</p></article><article class="card"><h2>Tracks</h2>${tracks || '<p>No tracks attached.</p>'}</article></section><footer><a href="../">Back to batch</a></footer></main></body></html>`
+    });
+  }
+  return files;
+}
+function musicSkyeNetHeaders(env, contentType = 'application/json') {
+  const token = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_SKYNET_SESSION','MUSIC_NEXUS_SKYNET_SESSION','SKYGATEFS27_DEPLOY_SESSION','SKYGATE_DEPLOY_SESSION']) || '0s-service-skynet';
+  return {
+    authorization:`Bearer ${token}`,
+    'content-type':contentType,
+    'x-0s-customer-id':String(routexFirstEnv(env, ['MUSIC_NEXUS_SKYNET_CUSTOMER_ID','SKYGATEFS27_DEPLOY_CUSTOMER_ID']) || '1'),
+    'x-0s-role':'deployer',
+    'x-metraiyux-session-source':'metraiyux-0s-skymusicnexus-worker'
+  };
+}
+function musicSkyeNetDeploymentId(batchId) {
+  const stamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
+  return musicSlug(`dep-${stamp}-${batchId}`, 'dep');
+}
+async function musicSkyeNetJson(env, path, body) {
+  const response = await skygateRequest(env, path, {
+    method:'POST',
+    headers:musicSkyeNetHeaders(env),
+    body:JSON.stringify(body || {})
+  });
+  const data = await response.json().catch(() => ({}));
+  return {ok:response.ok, status:response.status, data};
+}
+async function musicPublishSkyeNetBundle(env, batch, state) {
+  const envStatus = musicDropEnvStatus(env);
+  const files = musicDropBundleFiles(batch, state);
+  const bytes = files.reduce((sum, file) => sum + new TextEncoder().encode(file.body).byteLength, 0);
+  const projectId = musicSlug(routexFirstEnv(env, ['MUSIC_NEXUS_SKYNET_PROJECT_ID']) || 'skymusicnexus-drops', 'skymusicnexus-drops');
+  const deploymentId = musicSkyeNetDeploymentId(batch.batchId);
+  const mountPath = `/skynet/musicnexus/${musicSlug(batch.batchId, 'batch')}`;
+  const publicHost = musicPublicFs27Host();
+  const liveBaseUrl = `https://${publicHost}${mountPath}/`;
+  const intent = {
+    batchId:batch.batchId,
+    provider:'fs27-skynet',
+    liveDeployEnabled:envStatus.skynet.liveDeployEnabled,
+    serviceBindingPresent:envStatus.skynet.serviceBindingPresent,
+    projectId,
+    deploymentId,
+    mountPath,
+    fileCount:files.length,
+    bytes,
+    createdAt:musicNow()
+  };
+  if (!envStatus.skynet.liveDeployEnabled) return {ok:true, published:false, provider:'fs27-skynet', mode:'deploy-intent', intent, reason:envStatus.skynet.configured ? 'SkyeNet deploy disabled by env flag.' : 'SKYGATEFS27_WORKER service binding missing.'};
+
+  const init = await musicSkyeNetJson(env, '/deploy/init', {
+    project_id:projectId,
+    deployment_id:deploymentId,
+    title:`SkyeMusicNexus drop batch ${batch.batchId}`
+  });
+  if (!init.ok) return {ok:false, published:false, provider:'fs27-skynet', mode:'skynet-api', status:init.status, intent, error:init.data?.error || 'SkyeNet deploy init failed.', deploy:init.data};
+
+  for (const file of files) {
+    const upload = await skygateRequest(env, `/deploy/upload?projectId=${encodeURIComponent(projectId)}&deploymentId=${encodeURIComponent(deploymentId)}&path=${encodeURIComponent(file.path)}`, {
+      method:'PUT',
+      headers:musicSkyeNetHeaders(env, musicDropContentType(file.path)),
+      body:file.body
+    });
+    const uploadData = await upload.json().catch(() => ({}));
+    if (!upload.ok) return {ok:false, published:false, provider:'fs27-skynet', mode:'skynet-api', status:upload.status, intent, error:uploadData?.error || `SkyeNet asset upload failed for ${file.path}.`, deploy:uploadData};
+  }
+
+  const complete = await musicSkyeNetJson(env, '/deploy/complete', {
+    project_id:projectId,
+    deployment_id:deploymentId,
+    files:files.map(file => file.path.replace(/^\/+/, '')),
+    meta:{
+      source:'SkyeMusicNexus',
+      batchId:batch.batchId,
+      privateDelivery:'0S/SkyGate-gated'
+    }
+  });
+  if (!complete.ok) return {ok:false, published:false, provider:'fs27-skynet', mode:'skynet-api', status:complete.status, intent, error:complete.data?.error || 'SkyeNet deploy complete failed.', deploy:complete.data};
+
+  const route = await musicSkyeNetJson(env, '/deploy/route', {
+    hostname:publicHost,
+    mount_path:mountPath,
+    project_id:projectId,
+    deployment_id:deploymentId,
+    public_access:true,
+    default_auth:'public',
+    asset_mode:'r2',
+    asset_prefix:`deployments/${projectId}/${deploymentId}`
+  });
+  if (!route.ok) return {ok:false, published:false, provider:'fs27-skynet', mode:'skynet-api', status:route.status, intent, error:route.data?.error || 'SkyeNet route registration failed.', deploy:route.data};
+
+  return {
+    ok:true,
+    published:true,
+    provider:'fs27-skynet',
+    mode:'skynet-api',
+    projectId,
+    deploymentId,
+    routeKey:route.data?.key || '',
+    mountPath,
+    url:liveBaseUrl,
+    state:'routed',
+    fileCount:files.length,
+    bytes,
+    init:init.data,
+    complete:complete.data,
+    route:route.data
+  };
+}
+async function musicPublishNetlifyBundle(env, batch, state) {
+  const envStatus = musicDropEnvStatus(env);
+  const files = musicDropBundleFiles(batch, state);
+  const intent = {
+    batchId:batch.batchId,
+    liveDeployEnabled:envStatus.netlify.liveDeployEnabled,
+    netlifyConfigured:envStatus.netlify.configured,
+    fileCount:files.length,
+    bytes:files.reduce((sum, file) => sum + new TextEncoder().encode(file.body).byteLength, 0),
+    createdAt:musicNow(),
+  };
+  if (!envStatus.netlify.liveDeployEnabled) return {ok:true, published:false, mode:'deploy-intent', intent, reason:'live deploy disabled'};
+  const token = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_NETLIFY_AUTH_TOKEN','NETLIFY_AUTH_TOKEN','SKYGATEFS13_NETLIFY_AUTH_TOKEN','SKYGATEFS13_TARGET_NETLIFY_AUTH_TOKEN']);
+  const siteId = routexFirstEnv(env, ['MUSIC_NEXUS_DROPS_NETLIFY_SITE_ID','NETLIFY_SITE_ID','SKYGATEFS13_TARGET_NETLIFY_SITE_ID','SKYEVAULT_DROP_NETLIFY_SITE_ID']);
+  if (!token || !siteId) return {ok:false, published:false, mode:'deploy-intent', intent, error:'Netlify token or site ID missing.'};
+  const digests = {};
+  for (const file of files) digests[file.path] = await musicSha1Hex(file.body);
+  const createResponse = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/deploys`, {
+    method:'POST',
+    headers:{authorization:`Bearer ${token}`, 'content-type':'application/json'},
+    body:JSON.stringify({files:digests, draft:false})
+  });
+  const deploy = await createResponse.json().catch(() => ({}));
+  if (!createResponse.ok) return {ok:false, published:false, mode:'netlify-api', status:createResponse.status, intent, error:deploy.message || 'Netlify deploy create failed.'};
+  const required = Array.isArray(deploy.required) ? deploy.required : files.map(file => file.path);
+  const requiredSet = new Set(required);
+  for (const file of files) {
+    if (requiredSet.size && !requiredSet.has(file.path)) continue;
+    const uploadPath = file.path.split('/').map(part => encodeURIComponent(part)).join('/');
+    const upload = await fetch(`https://api.netlify.com/api/v1/deploys/${encodeURIComponent(deploy.id)}/files${uploadPath}`, {
+      method:'PUT',
+      headers:{authorization:`Bearer ${token}`, 'content-type':'application/octet-stream'},
+      body:file.body
+    });
+    if (!upload.ok) return {ok:false, published:false, mode:'netlify-api', status:upload.status, deployId:deploy.id, intent, error:`Netlify file upload failed for ${file.path}.`};
+  }
+  return {ok:true, published:true, mode:'netlify-api', deployId:deploy.id, url:deploy.ssl_url || deploy.deploy_ssl_url || deploy.url || '', state:deploy.state || 'uploaded', fileCount:files.length, bytes:intent.bytes};
+}
+async function musicPublishDropBundle(env, batch, state) {
+  const skynet = await musicPublishSkyeNetBundle(env, batch, state);
+  if (skynet.published || skynet.provider === 'fs27-skynet') return skynet;
+  return musicPublishNetlifyBundle(env, batch, state);
+}
 function musicDefaultState() {
   const now = musicNow();
   return {
@@ -9958,11 +10213,11 @@ async function musicHandleReleases(method, url, state, body, gate) {
   }
   return musicJson({ok:false, error:`Unknown release action: ${action}`}, 400);
 }
-async function musicHandleDrops(method, url, state, body, gate) {
+async function musicHandleDrops(method, url, state, body, gate, env) {
   const params = musicReadQuery(url);
   const action = method === 'GET' ? (params.action || 'hub') : musicBodyAction(body, url);
   if (method === 'GET') {
-    if (action === 'hub') return musicJson({ok:true, ...state.drops, env:{netlify:{configured:false, liveDeployEnabled:false}, privateStorage:{configured:true, mode:'worker-kv'}}});
+    if (action === 'hub') return musicJson({ok:true, ...state.drops, env:musicDropEnvStatus(env)});
     if (action === 'list') return musicJson({ok:true, drops:state.drops.items, total:state.drops.items.length});
     if (action === 'get') {
       const drop = state.drops.items.find(item => item.dropId === params.dropId || item.id === params.id);
@@ -9971,7 +10226,7 @@ async function musicHandleDrops(method, url, state, body, gate) {
     if (action === 'deploy-pool') return musicJson({ok:true, drops:state.drops.items.filter(drop => ['submitted','approved','queued'].includes(drop.status))});
     if (action === 'batch-preview') return musicJson({ok:true, batches:state.drops.batches});
     if (action === 'traffic-estimate') return musicJson({ok:true, estimate:{estimatedCredits:15, estimatedBandwidthGb:0.1, fitsReserve:true}});
-    if (action === 'env-status') return musicJson({ok:true, env:{netlify:{configured:false, liveDeployEnabled:false}, email:{configured:false, provider:'worker-receipt'}, privateStorage:{configured:true, mode:'worker-kv'}}});
+    if (action === 'env-status') return musicJson({ok:true, env:musicDropEnvStatus(env)});
     return musicJson({ok:false, error:`Unknown drop action: ${action}`}, 400);
   }
   if (action === 'track-public-event') {
@@ -10026,14 +10281,47 @@ async function musicHandleDrops(method, url, state, body, gate) {
   }
   if (action === 'build-static-bundle') {
     batch.status = 'bundle_built';
-    batch.outputDir = `/tmp/skymusicnexus/${batch.batchId}`;
-    return musicJson({ok:true, batch, outputDir:batch.outputDir});
+    batch.outputDir = `worker-virtual-bundle:${batch.batchId}`;
+    batch.fileCount = musicDropBundleFiles(batch, state).length;
+    batch.updatedAt = musicNow();
+    return musicJson({ok:true, batch, outputDir:batch.outputDir, fileCount:batch.fileCount});
   }
   if (action === 'publish-batch') {
-    batch.status = 'published_receipt';
-    const deploy = {deployReceiptId:musicId('deploy'), batchId:batch.batchId, status:'queued_for_operator_deploy', createdAt:musicNow()};
+    const deployResult = await musicPublishDropBundle(env, batch, state);
+    const providerBlocked = !deployResult.ok;
+    const deploy = {
+      deployReceiptId:musicId('deploy'),
+      batchId:batch.batchId,
+      status:deployResult.published ? 'live' : deployResult.ok ? 'deploy-intent' : 'provider-blocked',
+      provider:deployResult.provider || 'unknown',
+      mode:deployResult.mode,
+      netlifyDeployId:deployResult.deployId || '',
+      skynetProjectId:deployResult.projectId || '',
+      skynetDeploymentId:deployResult.deploymentId || '',
+      skynetRouteKey:deployResult.routeKey || '',
+      skynetMountPath:deployResult.mountPath || '',
+      liveBaseUrl:deployResult.url || '',
+      providerState:deployResult.state || '',
+      fileCount:deployResult.fileCount || deployResult.intent?.fileCount || 0,
+      bytes:deployResult.bytes || deployResult.intent?.bytes || 0,
+      error:deployResult.error || '',
+      reason:deployResult.reason || '',
+      createdAt:musicNow()
+    };
+    batch.status = deploy.status === 'live' ? 'live' : deploy.status;
+    batch.liveBaseUrl = deploy.liveBaseUrl;
+    batch.netlifyDeployId = deploy.netlifyDeployId;
+    batch.skynetDeploymentId = deploy.skynetDeploymentId;
+    batch.skynetRouteKey = deploy.skynetRouteKey;
+    batch.skynetMountPath = deploy.skynetMountPath;
+    batch.updatedAt = deploy.createdAt;
+    if (deploy.status === 'live') {
+      state.drops.items = state.drops.items.map(item => (batch.dropIds || []).includes(item.dropId || item.id)
+        ? {...item, status:'live', liveBatchId:batch.batchId, liveBaseUrl:deploy.liveBaseUrl, liveAt:deploy.createdAt, updatedAt:deploy.createdAt}
+        : item);
+    }
     state.drops.deploys.unshift(deploy);
-    return musicJson({ok:true, batch, deploy});
+    return musicJson({ok:true, published:deploy.status === 'live', providerBlocked, batch, deploy, deployResult}, 200);
   }
   if (action === 'revoke-private-delivery') {
     drop.status = 'private_delivery_revoked';
@@ -10158,7 +10446,7 @@ async function musicHandleFunction(request, env, url, fnName) {
   else if (fnName === 'music-assets') response = await musicHandleAssets(method, url, state, body, access);
   else if (fnName === 'music-studio') response = await musicHandleStudio(method, state, body, access);
   else if (fnName === 'music-releases') response = await musicHandleReleases(method, url, state, body, access);
-  else if (fnName === 'music-drops') response = await musicHandleDrops(method, url, state, body, access);
+  else if (fnName === 'music-drops') response = await musicHandleDrops(method, url, state, body, access, env);
   else if (fnName === 'music-exchange') response = await musicHandleExchange(method, url, state, body, access);
   else if (fnName === 'music-social') response = await musicHandleSocial(method, url, state, body, access);
   else if (fnName === 'music-payments') response = await musicHandlePayments(method, url, state, body, access);

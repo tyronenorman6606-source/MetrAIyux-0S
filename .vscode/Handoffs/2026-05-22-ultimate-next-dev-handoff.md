@@ -114,13 +114,13 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | --- | --- | --- |
 | Company Knowledge core + loop-in | Live, tested, stress/browser proofed. SkyeHands active references removed from targeted surfaces. | Keep brain/neural maps updated after future changes. Rerun MCP mine when workspace is quiet. |
 | SkyeSol deep scan/company brain | Complete, live Company Knowledge API ingested, browser proof passed, neural maps updated at that time. | Preserve artifacts; split into smaller notes later if useful. |
-| SkyeMusicNexus end-to-end repair | Repaired, deployed, and production-browser checked again on 2026-05-23 after the command-dashboard/observability hardening pass. `npm run 0s:skyemusicnexus:proof` passed locally at 2026-05-23T05:20:06Z with smoke, SkyPay, browser E2E, video proof, and mounted Worker stress. MCP mine passed after the hardening pass with zero failed calls. The successful deploy used the token-shaped value on `.env` line 1240 without printing it; Worker version `78a4aa39-dc5b-4336-bbf3-b7086c5a3e3f` is live at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`. Production browser proof confirmed shared-gate redirects, a full 83-action backend mutation matrix across 13 Nexus function families, live Nexus visuals, audit rows, route-health visuals, walkthrough cards, DAW beta labeling, provider-token boundary visibility, and explicit SaaS fallback labeling. | Keep this lane proof-first. Latest passing headed receipt: `test-artifacts/live-browser-verifier/2026-05-23T05-36-18-695Z-skyemusicnexus-production-command-dashboard/live-browser-verification-report.json`. |
+| SkyeMusicNexus end-to-end repair | Repaired, deployed, and production-browser checked again on 2026-05-23 after the Skepticks/Spectic claim audit and SkyeNet drop-deploy pass. `npm run 0s:skyemusicnexus:proof` passed locally at 2026-05-23T06:19:10Z with smoke, SkyPay, browser E2E, video proof, mounted Worker stress, and the claim audit. MCP mine passed after the pass with zero failed calls. The successful deploy used the token-shaped value on `.env` line 1240 without printing it; Worker version `4f5a8cf7-0303-4424-ae32-6ce57cef7c13` is live at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`. Production browser proof confirmed shared-gate redirects, a full 83-action backend mutation matrix across 13 Nexus function families, live Nexus visuals, audit rows, route-health visuals, walkthrough cards, DAW beta labeling, provider-token boundary visibility, explicit SaaS fallback labeling, and a live FS27 SkyeNet drop route. | Keep this lane proof-first. Latest passing headed receipt: `test-artifacts/live-browser-verifier/2026-05-23T06-28-44-192Z-skyemusicnexus-production-command-dashboard/live-browser-verification-report.json`. Live SkyeNet drop route proved: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet/musicnexus/drop-batch-f806444b-9635-455c-b5f0-a1d9ed73ddbc/`. |
 | 0S pricing/intake router | Live and headed-browser proofed. | Regenerate MCP receipt later; separate SkyePay pricing pass only if requested. |
 | Sign In Pro Free99 demo | Closed end to end, live API and browser proof passed. | Rotate demo code before meetings if needed; do not paste full code. |
 | Legal Skyes AI Operators + Legal Center + 0S terms | Shipped, deployed, live-headed proofed. Public Legal Center links use the LegalSkyes Pages policy hub, and 0S now has its own LegalSkyes umbrella terms route. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
 | Free Sauce MCP suite/dev hub | Built, npm packages published, dev hub deployed, custom headed proof passed. | Add setup pages/status badges if desired. |
 | Drinique MCP comparison | Live, proofed, visible site hash-matches local source. | Optional: redeploy updated JSON receipts, then rerun proof. |
-| FS27 SkyeNet runtime/deploy API | FS27 Worker live; deploy API smoke proved `/skynet-smoke/`. | Main 0S changelog edit is local until deployed/proofed. |
+| FS27 SkyeNet runtime/deploy API | FS27 Worker live; deploy API smoke proved `/skynet-smoke/`; MusicNexus now uses the in-house FS27 SkyeNet lane for public drop campaign bundles. | Keep dynamic function hosting separate: current MusicNexus SkyeNet proof is static bundle deploy + R2/KV route + FS27 runtime logging; MusicNexus app APIs remain on the 0S Worker. |
 | Key Gate 13th + Agentic Growth | Backend/API live; desktop proof passes; mobile proof still failing until local pill-wrap fix is deployed. | Deploy local CSS/JS/proof fix and rerun `npm run proof:key-gate-13th`. |
 | Merser3.1 | npm published, site deployed, stress/diagnostic proof ok; formal headed proof not green yet. | Rerun stabilized proof harness to get `ok: true`. |
 | SkyeVault-Drop/full repo streaming | Worker deployed, dry runs passed; no passing headed proof yet; no small stream/full repo upload yet. | Browser proof first, then small stream proof, then real full repo push. |
@@ -266,6 +266,58 @@ The headed production browser proof passed on desktop `1440x980` and mobile `390
 - the SaaS customer visual page tries live first and clearly labels fallback: `Attempted: live:401, source:200`.
 
 Previous failed deploy/proof receipts remain useful only as history; the current production state is the passing receipt and Worker version above.
+
+Follow-up Skepticks/Spectic + SkyeNet deploy pass completed later on 2026-05-23:
+
+- Added the board-room claim audit surface:
+  - `metraiyux_0s_site/SkyeMusicNexus/skepticks-spectic-override.html`
+  - `metraiyux_0s_site/SkyeMusicNexus/skepticks-spectic-override.js`
+  - `metraiyux_0s_site/SkyeMusicNexus/data/skeptics-override-claims.json`
+  - `metraiyux_0s_site/tests/skyemusicnexus-skeptics-claims-audit.mjs`
+- Added `npm run 0s:skyemusicnexus:claims` and folded it into `npm run 0s:skyemusicnexus:proof`.
+- `music-drops` claim language now requires the FS27 SkyeNet path and no longer treats Netlify as the primary deploy story.
+- `metraiyux_0s_site/cloudflare/worker.js` now publishes drop bundles through the in-house FS27 SkyeNet route first:
+  - service binding: `SKYGATEFS27_WORKER`
+  - deploy init: `POST /deploy/init`
+  - asset upload: `PUT /deploy/upload`
+  - manifest complete: `POST /deploy/complete`
+  - route registration: `POST /deploy/route`
+  - public route pattern: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet/musicnexus/<batchId>/`
+- Netlify finding: a dedicated `skyemusicnexus-drops` Netlify site was created while testing the older path, but the Netlify API returned `403` with `Account credit usage exceeded - new deploys are blocked until credits are added`. Do not claim Netlify autonomous deploy as live for MusicNexus.
+- Current deployed 0S Worker version after the SkyeNet pass and final claim JSON deploy: `4f5a8cf7-0303-4424-ae32-6ce57cef7c13`.
+- Latest local proof:
+  - `npm run 0s:skyemusicnexus:proof` passed at `2026-05-23T06:19:10Z`.
+  - Stress receipt: `metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-2026-05-23T06-19-10-787Z.json`
+  - Stress scope remained 12 workflows, 216 mutation actions, 72 authenticated read-stress requests, and 192 retained audit events.
+  - Claim audit passed with 14 claims, 11 receipts, 9 verified verdicts, 4 stress-backed verdicts, and 1 boundary verdict.
+  - MCP mine passed after changes with 18 resources, 27 tools, 34 calls, and zero failures.
+- Latest passing headed production browser receipt:
+
+```text
+test-artifacts/live-browser-verifier/2026-05-23T06-28-44-192Z-skyemusicnexus-production-command-dashboard/live-browser-verification-report.json
+```
+
+The 2026-05-23T06:21Z headed production browser pass proved:
+
+- unauthenticated `/SkyeMusicNexus/public/command-dashboard.html` and `/SkyeMusicNexus/public/admin.html` redirect to `/admin/login.html` with `x-0s-gate: fs27-required`;
+- unauthenticated `/api/skymusicnexus/visuals` and `/api/skymusicnexus/observability` return gated `401`;
+- shared owner login succeeds;
+- desktop matrix fired 83 backend actions across 13 function families;
+- production drop deploy returned `status: live`, `provider: fs27-skynet`, `mode: skynet-api`, `fileCount: 4`;
+- SkyeNet deployment id: `dep-20260523062911-drop-batch-f806444b-9635-455c-b5f0-a1d9ed73ddbc`;
+- SkyeNet route key: `route:v1:host:skyegatefs27-citadeldb.graylondonskyes.workers.dev:path:/skynet/musicnexus/drop-batch-f806444b-9635-455c-b5f0-a1d9ed73ddbc`;
+- live drop URL opened in the headed browser and a direct HTTP check returned `200`:
+
+```text
+https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet/musicnexus/drop-batch-f806444b-9635-455c-b5f0-a1d9ed73ddbc/
+```
+
+Scope boundary to keep honest in board rooms:
+
+- SkyeNet is a real in-house Cloudflare Worker/R2/KV deploy/runtime lane for first-party static app/drop bundles.
+- FS27 also hosts first-party Netlify-function-equivalent routes inside its Worker.
+- This pass proves static drop campaign-page deployment plus FS27 runtime logging, not arbitrary generated dynamic serverless functions for each drop.
+- MusicNexus private audio, masters, stems, and gated APIs still run through the 0S/SkyGate path; provider social posting, DSP/legal/royalty settlement, and cash payout rails remain separate provider-gated claims.
 
 ## 0S Company Knowledge Layer
 
@@ -787,10 +839,11 @@ Status:
 
 - FS27 runtime ledger foundation is live.
 - Static SkyeNet deploy lane is live-smoke-proven.
+- MusicNexus now uses the FS27 SkyeNet lane for public drop campaign bundles and live-browser proof confirmed the routed bundle at `/skynet/musicnexus/drop-batch-f806444b-9635-455c-b5f0-a1d9ed73ddbc/`.
 - Request logging must remain nonblocking on the hot path.
 - D1 rollup was not enabled because the available token lacked D1 permission.
 - Citadel ingest still needs to be stood up/configured.
-- Main 0S changelog was edited locally for FS27 SkyeNet Deploy, but not confirmed live after the handoff-only stop.
+- Main 0S was redeployed after the MusicNexus SkyeNet integration as Worker version `4f5a8cf7-0303-4424-ae32-6ce57cef7c13`.
 
 Resume if needed:
 
