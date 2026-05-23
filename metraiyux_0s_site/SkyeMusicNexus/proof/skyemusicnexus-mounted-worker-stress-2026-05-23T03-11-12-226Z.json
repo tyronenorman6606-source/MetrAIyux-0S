@@ -1,0 +1,158 @@
+{
+  "ok": true,
+  "app": "SkyeMusicNexus",
+  "mode": "mounted Worker controlled stress",
+  "checkedAt": "2026-05-23T03:11:12.226Z",
+  "iterations": 12,
+  "mutationConcurrency": 1,
+  "readStressRequests": 72,
+  "setupActions": [
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/routes/manifest",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/hub",
+      "status": 401,
+      "ok": false
+    },
+    {
+      "method": "POST",
+      "route": "/api/skymusicnexus/music-artists",
+      "status": 401,
+      "ok": false
+    }
+  ],
+  "totalWorkflowActions": 216,
+  "readStress": {
+    "requests": 72,
+    "failures": 0,
+    "routes": [
+      "/api/skymusicnexus/hub",
+      "/api/skymusicnexus/music-assets?action=list",
+      "/api/skymusicnexus/music-releases?action=list",
+      "/api/skymusicnexus/music-releases?action=rights-audit",
+      "/api/skymusicnexus/music-exchange?action=hub",
+      "/api/skymusicnexus/music-social?action=hub",
+      "/api/skymusicnexus/music-analytics"
+    ]
+  },
+  "retained": {
+    "artists": 12,
+    "releases": 12,
+    "assets": 12,
+    "drops": 12,
+    "feedItems": 12,
+    "streams": 0
+  },
+  "assertions": [
+    "routes manifest stays gate-owned and accurate",
+    "hub rejects unauthenticated access",
+    "writes reject unauthenticated access",
+    "shared FS27/SkyGate token path unlocks music API routes",
+    "artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, and social queue survive repeated serialized mutation stress",
+    "hub, assets, releases, rights, exchange, social, and analytics routes survive concurrent authenticated read stress",
+    "Worker stores stress state in shared KV lane without app-specific passwords"
+  ],
+  "results": [
+    {
+      "index": 0,
+      "artistId": "artist_stress_00",
+      "releaseId": "rel_stress_00",
+      "assetId": "aud_306613bf-2125-4297-b9b1-ff147808c221",
+      "dropId": "drop_42dab0b5-91af-4ce5-b21b-dcff96a11687",
+      "actions": 18
+    },
+    {
+      "index": 1,
+      "artistId": "artist_stress_01",
+      "releaseId": "rel_stress_01",
+      "assetId": "aud_ca6786ec-7ac7-40b0-b35e-57d7829fd28f",
+      "dropId": "drop_89843ba9-578c-4029-be54-ca618d80c815",
+      "actions": 18
+    },
+    {
+      "index": 2,
+      "artistId": "artist_stress_02",
+      "releaseId": "rel_stress_02",
+      "assetId": "aud_8908e50e-ba84-49a8-bebd-c5549b081e82",
+      "dropId": "drop_6933b025-3f0d-4692-9fe5-55ba5871a038",
+      "actions": 18
+    },
+    {
+      "index": 3,
+      "artistId": "artist_stress_03",
+      "releaseId": "rel_stress_03",
+      "assetId": "aud_9ebb66a0-d88b-40df-8722-80c62a2487cc",
+      "dropId": "drop_09b94eaa-ec25-45b1-83ef-5db8a011a4d9",
+      "actions": 18
+    },
+    {
+      "index": 4,
+      "artistId": "artist_stress_04",
+      "releaseId": "rel_stress_04",
+      "assetId": "aud_aee6b51d-af4f-4b77-a8be-82ca79f1cca1",
+      "dropId": "drop_86de6260-c513-409c-8cf3-5618bdd6067c",
+      "actions": 18
+    },
+    {
+      "index": 5,
+      "artistId": "artist_stress_05",
+      "releaseId": "rel_stress_05",
+      "assetId": "aud_da24ad33-f8ee-4187-8b5d-2ae40f268023",
+      "dropId": "drop_ee87c132-b22f-450f-932d-497f9b0dfe48",
+      "actions": 18
+    },
+    {
+      "index": 6,
+      "artistId": "artist_stress_06",
+      "releaseId": "rel_stress_06",
+      "assetId": "aud_e504b9ea-1a0b-4424-9c1f-f6280729829f",
+      "dropId": "drop_c5611594-b421-4be4-8834-fc015139f9d4",
+      "actions": 18
+    },
+    {
+      "index": 7,
+      "artistId": "artist_stress_07",
+      "releaseId": "rel_stress_07",
+      "assetId": "aud_93b83d14-5b59-4476-aae7-3dd4c7724c17",
+      "dropId": "drop_bb4ad700-4d92-45f9-9266-c698a64980a5",
+      "actions": 18
+    },
+    {
+      "index": 8,
+      "artistId": "artist_stress_08",
+      "releaseId": "rel_stress_08",
+      "assetId": "aud_824c96ef-9c0c-42d6-a0c2-27c2e84dc1ca",
+      "dropId": "drop_0490b456-d0dc-469d-b6bf-db65346852a1",
+      "actions": 18
+    },
+    {
+      "index": 9,
+      "artistId": "artist_stress_09",
+      "releaseId": "rel_stress_09",
+      "assetId": "aud_0ab14e21-19ce-48d7-b244-0c93ee8d80d6",
+      "dropId": "drop_0855f370-3d13-4c4d-8c97-66dde47e4e94",
+      "actions": 18
+    },
+    {
+      "index": 10,
+      "artistId": "artist_stress_10",
+      "releaseId": "rel_stress_10",
+      "assetId": "aud_bbaf0a23-f222-4584-a0ee-3dc2cba81de5",
+      "dropId": "drop_b2bb9f83-7927-4e3c-9299-477a65c130ed",
+      "actions": 18
+    },
+    {
+      "index": 11,
+      "artistId": "artist_stress_11",
+      "releaseId": "rel_stress_11",
+      "assetId": "aud_016548bd-eba9-46fd-a550-5c791b31ce10",
+      "dropId": "drop_d772ea6b-6db4-4db0-8844-c0e0c81f6362",
+      "actions": 18
+    }
+  ]
+}

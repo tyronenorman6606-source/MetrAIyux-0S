@@ -17,6 +17,13 @@ function parse(response) {
   return JSON.parse(response.body || "{}");
 }
 
+function readFirstExisting(label, candidates) {
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return fs.readFileSync(candidate, "utf8");
+  }
+  throw new Error(`${label} missing. Checked: ${candidates.join(", ")}`);
+}
+
 async function call(handler, { method = "GET", query = {}, body, authToken } = {}) {
   return handler.handler({
     httpMethod: method,
@@ -62,7 +69,10 @@ const neoJs = fs.readFileSync(path.join(root, "public/neo-nexus.js"), "utf8");
 const neoCss = fs.readFileSync(path.join(root, "public/neo-nexus.css"), "utf8");
 const skyeIdBridge = fs.readFileSync(path.join(root, "../assets/js/skye-id-bridge.js"), "utf8");
 const skyeMailIdGen = fs.readFileSync(path.join(root, "../live/SkyeMail/generators/Skye-ID/index.html"), "utf8");
-const fs27IdGen = fs.readFileSync(path.resolve(root, "../../SkyeGateFS27/generators/Skye-ID/index.html"), "utf8");
+const fs27IdGen = readFirstExisting("FS27 Skye-ID generator", [
+  path.resolve(root, "../skyegate/source/SkyeGateFS27/generators/Skye-ID/index.html"),
+  path.resolve(root, "../../SkyeGateFS27/generators/Skye-ID/index.html"),
+]);
 const assetsSource = fs.readFileSync(path.join(root, "netlify/functions/music-assets.js"), "utf8");
 const socialManifest = fs.readFileSync(path.join(root, "open-source/social-platform-manifest.json"), "utf8");
 assert(indexHtml.includes("Platform Dashboard"), "public/index.html is missing the platform dashboard title");

@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "app": "SkyeMusicNexus",
+  "mode": "mounted Worker controlled stress",
+  "checkedAt": "2026-05-23T03:07:54.124Z",
+  "iterations": 2,
+  "concurrency": 1,
+  "setupActions": [
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/routes/manifest",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/hub",
+      "status": 401,
+      "ok": false
+    },
+    {
+      "method": "POST",
+      "route": "/api/skymusicnexus/music-artists",
+      "status": 401,
+      "ok": false
+    }
+  ],
+  "totalWorkflowActions": 36,
+  "retained": {
+    "artists": 2,
+    "releases": 2,
+    "assets": 2,
+    "drops": 2,
+    "feedItems": 2,
+    "streams": 0
+  },
+  "assertions": [
+    "routes manifest stays gate-owned and accurate",
+    "hub rejects unauthenticated access",
+    "writes reject unauthenticated access",
+    "shared FS27/SkyGate token path unlocks music API routes",
+    "artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, and social queue all survive controlled concurrency",
+    "Worker stores stress state in shared KV lane without app-specific passwords"
+  ],
+  "results": [
+    {
+      "index": 0,
+      "artistId": "artist_stress_00",
+      "releaseId": "rel_stress_00",
+      "assetId": "aud_bb179fce-224e-45f4-8612-9a496c3ed793",
+      "dropId": "drop_abeda7a5-f166-4a3d-93b0-f6c2fad08f45",
+      "actions": 18
+    },
+    {
+      "index": 1,
+      "artistId": "artist_stress_01",
+      "releaseId": "rel_stress_01",
+      "assetId": "aud_6faa7967-4d02-411b-972c-239c91de5bd2",
+      "dropId": "drop_27059841-7847-4299-8f1c-bfb8673c95c9",
+      "actions": 18
+    }
+  ]
+}

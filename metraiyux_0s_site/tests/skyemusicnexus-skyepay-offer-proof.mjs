@@ -1,17 +1,23 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { loadLocalEnv } from "../../SkyeGateFS27/scripts/_local-env.mjs";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 process.env.SKYPAY_ALLOW_PUBLIC_DRY_RUN = "true";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
-const gateRoot = path.join(repoRoot, "SkyeGateFS27");
+const gateRootCandidates = [
+  path.join(repoRoot, "metraiyux_0s_site", "skyegate", "source", "SkyeGateFS27"),
+  path.join(repoRoot, "SkyeGateFS27")
+];
+const gateRoot = gateRootCandidates.find((candidate) => fs.existsSync(path.join(candidate, "scripts", "_local-env.mjs")));
+assert.ok(gateRoot, `SkyeGateFS27 source not found. Checked: ${gateRootCandidates.join(", ")}`);
+const { loadLocalEnv } = await import(pathToFileURL(path.join(gateRoot, "scripts", "_local-env.mjs")).href);
 loadLocalEnv({ root: gateRoot, repoRoot });
 
 const [{ default: offersHandler }, { default: checkoutHandler }] = await Promise.all([
-  import("../../SkyeGateFS27/netlify/functions/skyepay-offers.js"),
-  import("../../SkyeGateFS27/netlify/functions/skyepay-checkout.js")
+  import(pathToFileURL(path.join(gateRoot, "netlify", "functions", "skyepay-offers.js")).href),
+  import(pathToFileURL(path.join(gateRoot, "netlify", "functions", "skyepay-checkout.js")).href)
 ]);
 
 async function jsonResponse(response) {

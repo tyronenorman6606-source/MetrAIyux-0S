@@ -9375,10 +9375,62 @@ async function musicReadState(env) {
   const stored = await kv.get(musicKey('state'), {type:'json'}).catch(() => null);
   return musicNormalizeState(stored);
 }
+function musicMergeRows(existing = [], incoming = [], deleted = []) {
+  const deletedKeys = new Set(deleted.map(String));
+  const keyFor = (item) => {
+    for (const key of ['id','dropId','batchId','approvalId','deployReceiptId','releaseId','artistId','threadId']) {
+      if (item && item[key]) return `${key}:${item[key]}`;
+    }
+    return `row:${JSON.stringify(item)}`;
+  };
+  const map = new Map();
+  for (const row of Array.isArray(existing) ? existing : []) {
+    const key = keyFor(row);
+    if (!deletedKeys.has(key) && !deletedKeys.has(String(row.id || row.dropId || row.batchId || row.releaseId || row.artistId || ''))) map.set(key, row);
+  }
+  for (const row of Array.isArray(incoming) ? incoming : []) {
+    const key = keyFor(row);
+    if (!deletedKeys.has(key) && !deletedKeys.has(String(row.id || row.dropId || row.batchId || row.releaseId || row.artistId || ''))) map.set(key, {...(map.get(key) || {}), ...row});
+  }
+  return Array.from(map.values());
+}
+function musicMergeState(latest, incoming) {
+  const prior = musicNormalizeState(latest);
+  const nextInput = musicNormalizeState(incoming);
+  const deleted = nextInput.__musicDeleted || {};
+  const next = musicNormalizeState({...prior, ...nextInput});
+  next.artists = musicMergeRows(prior.artists, nextInput.artists, deleted.artists);
+  next.assets = musicMergeRows(prior.assets, nextInput.assets, deleted.assets);
+  next.releases = musicMergeRows(prior.releases, nextInput.releases, deleted.releases);
+  next.receipts = musicMergeRows(prior.receipts, nextInput.receipts, deleted.receipts);
+  next.studio.projects = musicMergeRows(prior.studio.projects, nextInput.studio.projects, deleted.studioProjects);
+  next.studio.exports = musicMergeRows(prior.studio.exports, nextInput.studio.exports, deleted.studioExports);
+  next.studio.engines = musicMergeRows(prior.studio.engines, nextInput.studio.engines, deleted.studioEngines);
+  next.drops.items = musicMergeRows(prior.drops.items, nextInput.drops.items, deleted.drops);
+  next.drops.batches = musicMergeRows(prior.drops.batches, nextInput.drops.batches, deleted.dropBatches);
+  next.drops.approvals = musicMergeRows(prior.drops.approvals, nextInput.drops.approvals, deleted.dropApprovals);
+  next.drops.deploys = musicMergeRows(prior.drops.deploys, nextInput.drops.deploys, deleted.dropDeploys);
+  next.drops.traffic = musicMergeRows(prior.drops.traffic, nextInput.drops.traffic, deleted.dropTraffic);
+  next.payments.ledger = musicMergeRows(prior.payments.ledger, nextInput.payments.ledger, deleted.paymentLedger);
+  next.payments.payouts = musicMergeRows(prior.payments.payouts, nextInput.payments.payouts, deleted.payouts);
+  next.exchange.contentRequests = musicMergeRows(prior.exchange.contentRequests, nextInput.exchange.contentRequests, deleted.contentRequests);
+  next.exchange.threads = musicMergeRows(prior.exchange.threads, nextInput.exchange.threads, deleted.threads);
+  next.exchange.communityPosts = musicMergeRows(prior.exchange.communityPosts, nextInput.exchange.communityPosts, deleted.communityPosts);
+  next.exchange.campaigns = musicMergeRows(prior.exchange.campaigns, nextInput.exchange.campaigns, deleted.campaigns);
+  next.social.connectors = musicMergeRows(prior.social.connectors, nextInput.social.connectors, deleted.connectors);
+  next.social.postQueue = musicMergeRows(prior.social.postQueue, nextInput.social.postQueue, deleted.postQueue);
+  next.social.feedItems = musicMergeRows(prior.social.feedItems, nextInput.social.feedItems, deleted.feedItems);
+  next.social.stories = musicMergeRows(prior.social.stories, nextInput.social.stories, deleted.stories);
+  next.social.feedPulls = musicMergeRows(prior.social.feedPulls, nextInput.social.feedPulls, deleted.feedPulls);
+  next.social.moderation = musicMergeRows(prior.social.moderation, nextInput.social.moderation, deleted.moderation);
+  delete next.__musicDeleted;
+  return next;
+}
 async function musicWriteState(env, state) {
   const kv = musicKv(env);
   if (!kv?.put) return false;
-  const next = musicNormalizeState(state);
+  const latest = kv.get ? await kv.get(musicKey('state'), {type:'json'}).catch(() => null) : null;
+  const next = latest ? musicMergeState(latest, state) : musicNormalizeState(state);
   next.updatedAt = musicNow();
   await kv.put(musicKey('state'), JSON.stringify(next));
   return true;
@@ -9606,6 +9658,7 @@ async function musicHandleAssets(method, url, state, body) {
   if (action === 'delete') {
     const id = body.id || params.id;
     state.assets = state.assets.filter(asset => asset.id !== id);
+    state.__musicDeleted = {...(state.__musicDeleted || {}), assets:[`id:${id}`, id]};
     return musicJson({ok:true, deleted:id});
   }
   return musicJson({ok:false, error:`Unknown asset action: ${action}`}, 400);
