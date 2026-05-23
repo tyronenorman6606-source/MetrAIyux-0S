@@ -50,6 +50,10 @@
       answer:"The SaaS products are protected through the SaaS Platform Terms, Service Level and Support Policy, payments/refunds terms, privacy policy, acceptable use rules, and AI terms when automation is involved. That covers access, account control, subscriptions, support, uptime posture, credits, and misuse."
     },
     {
+      keys:["0s","metraiyux","workspace","vault","skyevault","skydrive","skygate","free99","northstar","mcp","download","repo"],
+      answer:"The MetrAIyux 0S umbrella terms live at /legal/metraiyux-0s/. That page covers the shared gate, FS27/SkyGate/Free99/NorthStar access lane, AI operators, SkyeVault/SkyeDrive/SkySecure custody, downloads, client workspaces, mounted apps, MCP tooling, payments, deploy proof, and production automation boundaries."
+    },
+    {
       keys:["privacy","data","california","personal","cookie","tracking"],
       answer:"Privacy is handled through the Enterprise Privacy Policy, Cookie and Tracking Policy, and Data Processing Addendum. Together they explain what data may be collected, how business operations use it, how AI providers may process inputs, and where privacy requests go."
     },

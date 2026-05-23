@@ -117,7 +117,7 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | SkyeMusicNexus end-to-end repair | Repaired, deployed, and headed-browser proofed in production on 2026-05-23. `npm run 0s:skyemusicnexus:proof` passed locally, including smoke, SkyPay, browser E2E, video proof, and the mounted Worker stress test. MCP mine passed before and after repairs with zero failed calls. The successful deploy used the token-shaped value on `.env` line 1240 without printing it; Worker version `231bbefb-4588-4e0d-a695-779f0f0d0065` is live at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`. Production marker check confirmed unauth redirect to shared owner login, authenticated `Command Field`, `Upload Studio`, `Music Player`, `SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false`, and gated hub API `200`. | Keep this lane proof-first. Latest passing headed receipt: `test-artifacts/live-browser-verifier/2026-05-23T04-22-08-755Z-skyemusicnexus-production-headed-pass/live-browser-verification-report.json`. |
 | 0S pricing/intake router | Live and headed-browser proofed. | Regenerate MCP receipt later; separate SkyePay pricing pass only if requested. |
 | Sign In Pro Free99 demo | Closed end to end, live API and browser proof passed. | Rotate demo code before meetings if needed; do not paste full code. |
-| Legal Skyes AI Operators + Legal Center route correction | Shipped, deployed, live-headed proofed. Public Legal Center links now use the LegalSkyes Pages policy hub instead of the broken SOLE legal path. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
+| Legal Skyes AI Operators + Legal Center + 0S terms | Shipped, deployed, live-headed proofed. Public Legal Center links use the LegalSkyes Pages policy hub, and 0S now has its own LegalSkyes umbrella terms route. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
 | Free Sauce MCP suite/dev hub | Built, npm packages published, dev hub deployed, custom headed proof passed. | Add setup pages/status badges if desired. |
 | Drinique MCP comparison | Live, proofed, visible site hash-matches local source. | Optional: redeploy updated JSON receipts, then rerun proof. |
 | FS27 SkyeNet runtime/deploy API | FS27 Worker live; deploy API smoke proved `/skynet-smoke/`. | Main 0S changelog edit is local until deployed/proofed. |
@@ -538,6 +538,54 @@ failures: []
 ```
 
 The proof opened the deployed LegalSkyes hub and marketplace-policy routes, clicked Legal Center and Marketplace Policy links from MetrAIyux and Gray public pages, verified the Business Cards LegalSkyes card display/QR target, scrolled every checked page on desktop and mobile, and confirmed the checked public legal-center surfaces no longer contain `https://solenterprises.org/legal/`.
+
+2026-05-23 MetrAIyux 0S LegalSkyes umbrella terms:
+
+```text
+Production route: https://skyes-over-london-legal.pages.dev/legal/metraiyux-0s/
+Short routes: https://skyes-over-london-legal.pages.dev/0s and https://skyes-over-london-legal.pages.dev/metraiyux-0s
+LegalSkyes Pages deployment: 9293696c-9ff2-4c03-b197-24556cfa37b4
+LegalSkyes preview: https://9293696c.skyes-over-london-legal.pages.dev
+```
+
+Coverage added:
+
+```text
+MetrAIyux 0S operating system
+Mounted platform lanes
+FS27 / SkyGate / Free99 / NorthStar shared gate
+AI operators and human-review boundaries
+SkyeVault / SkyeDrive / SkySecure custody
+Downloads, restore kits, ZIPs, encrypted bundles, receipts, and backups
+Client workspaces, generated artifacts, handoffs, and proof receipts
+MCP tooling, deployed apps, SkyePay, commerce, payments, subscriptions
+Communications, third-party providers, beta/experimental risk, disclaimers, liability, and customer responsibilities
+```
+
+Files:
+
+```text
+legalskyes-website/legal/metraiyux-0s/index.html
+legalskyes-website/legal/index.html
+legalskyes-website/index.html
+legalskyes-website/assets/site.js
+legalskyes-website/_redirects
+legalskyes-website/llms.txt
+legalskyes-website/README_DROP_READY.md
+tools/proof-legal-skyes-0s-terms.mjs
+```
+
+Proof:
+
+```text
+proof command: node tools/proof-legal-skyes-0s-terms.mjs
+receipt: test-artifacts/live-browser-verifier/2026-05-23T04-49-02-061Z-legal-skyes-0s-terms/live-browser-verification-report.json
+desktop: 1440x980
+mobile: 390x844
+failures: []
+```
+
+The proof opened the new 0S policy, verified canonical metadata and protective language, clicked the Legal Hub 0S link, clicked the homepage 0S route tile, checked both short routes, scrolled every checked page on desktop and mobile, and recorded zero failures.
 
 ## Free Sauce MCP Suite / Dev Hub
 
@@ -1766,6 +1814,27 @@ code .
 ```
 
 The repo already clones into one folder named `MetrAIyux-0S/`. Do not move every project into another nested folder inside the repo; many scripts use repo-relative paths.
+
+Owner terminal download/update commands:
+
+```bash
+# First-time full repo clone with Git history:
+mkdir -p ~/Projects
+cd ~/Projects
+git clone --progress https://github.com/tyronenorman6606-source/MetrAIyux-0S.git
+
+# Update an existing local clone:
+cd ~/Projects/MetrAIyux-0S
+git switch main
+git pull --ff-only origin main
+
+# One-off source ZIP from GitHub, tracked files only and no .git history:
+cd ~/Downloads
+curl -L -o MetrAIyux-0S-main.zip https://github.com/tyronenorman6606-source/MetrAIyux-0S/archive/refs/heads/main.zip
+unzip MetrAIyux-0S-main.zip
+```
+
+For the owner's "whole repo" need, prefer `git clone` or `git pull` over putting the workspace inside another folder inside itself. Git clone gives one clean folder and avoids recursive bloat.
 
 ### Safe Commit And Push Flow
 

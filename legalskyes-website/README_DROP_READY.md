@@ -7,6 +7,7 @@ This is a branded static legal center for Skyes Over London LC, ready for Netlif
 2. Attach `solenterprises.org`.
 3. Verify:
    - `https://skyes-over-london-legal.pages.dev/legal/`
+   - `https://skyes-over-london-legal.pages.dev/legal/metraiyux-0s/`
    - `https://skyes-over-london-legal.pages.dev/legal/terms/`
    - `https://skyes-over-london-legal.pages.dev/legal/privacy/`
    - `https://skyes-over-london-legal.pages.dev/legal/ai-terms/`
