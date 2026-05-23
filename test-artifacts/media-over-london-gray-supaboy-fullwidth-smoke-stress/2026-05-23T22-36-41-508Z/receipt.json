@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "generated_at": "2026-05-23T22:36:51.288Z",
+  "proof_type": "http-smoke-and-stress-no-browser",
+  "live_browser_checked_by_codex": false,
+  "owner_will_browser_test": true,
+  "deployment": "0ad69ec9-5dab-4f67-a3b4-65bd711ea467",
+  "live_gray_build": "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+  "live_supaboy_build": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+  "smoke": [
+    {
+      "id": "canonical-media-over-london",
+      "url": "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "status": 200,
+      "ok": true,
+      "bytes": 15044,
+      "duration_ms": 712,
+      "has_orbit_ring": true,
+      "has_gray_iframe": true,
+      "has_supaboy_iframe": true,
+      "gray_before_supaboy": true,
+      "has_fullwidth_stack": true,
+      "gray_higher_price": true,
+      "no_lucifer_first_card": true,
+      "no_fake_sb_logo_ref": true
+    },
+    {
+      "id": "canonical-media-over-london-html",
+      "url": "https://metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "status": 200,
+      "ok": true,
+      "bytes": 15044,
+      "duration_ms": 6401,
+      "has_orbit_ring": true,
+      "has_gray_iframe": true,
+      "has_supaboy_iframe": true,
+      "gray_before_supaboy": true,
+      "has_fullwidth_stack": true,
+      "gray_higher_price": true,
+      "no_lucifer_first_card": true,
+      "no_fake_sb_logo_ref": true
+    },
+    {
+      "id": "preview-media-over-london-html",
+      "url": "https://0ad69ec9.metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "status": 200,
+      "ok": true,
+      "bytes": 15044,
+      "duration_ms": 396,
+      "has_orbit_ring": true,
+      "has_gray_iframe": true,
+      "has_supaboy_iframe": true,
+      "gray_before_supaboy": true,
+      "has_fullwidth_stack": true,
+      "gray_higher_price": true,
+      "no_lucifer_first_card": true,
+      "no_fake_sb_logo_ref": true
+    },
+    {
+      "id": "style-css",
+      "url": "https://metraiyux-0s-marketing.pages.dev/style.css",
+      "status": 200,
+      "ok": true,
+      "bytes": 105165,
+      "duration_ms": 306,
+      "expect_ok": true
+    },
+    {
+      "id": "gray-live-build",
+      "url": "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+      "status": 200,
+      "ok": true,
+      "bytes": 155679,
+      "duration_ms": 186,
+      "expect_ok": true
+    },
+    {
+      "id": "supaboy-live-build",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+      "status": 200,
+      "ok": true,
+      "bytes": 1100,
+      "duration_ms": 384,
+      "expect_ok": true
+    }
+  ],
+  "stress": {
+    "total_requests": 72,
+    "concurrency": 9,
+    "targets": [
+      "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "https://metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "https://metraiyux-0s-marketing.pages.dev/style.css",
+      "https://0ad69ec9.metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+      "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/"
+    ],
+    "failures": [],
+    "p50_ms": 74,
+    "p95_ms": 207,
+    "max_ms": 330
+  }
+}

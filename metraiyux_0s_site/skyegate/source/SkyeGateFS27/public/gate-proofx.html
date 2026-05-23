@@ -142,6 +142,12 @@
           <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Gate</a>
         </article>
         <article class="surface-card">
+          <span class="tag">SkyeNet Artist Build</span>
+          <h3>SupaBoy artist universe</h3>
+          <p>FS27 SkyeNet now serves the SupaBoy rebuild as a live artist-world mount from R2-backed deployment <code>dep_20260523071848</code>, with uppercase and lowercase routes active.</p>
+          <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/" target="_blank" rel="noreferrer">Open SupaBoy</a>
+        </article>
+        <article class="surface-card">
           <span class="tag">Auth</span>
           <h3>Bearer introspection contract</h3>
           <p>Client apps send a bearer token server-side and receive an active/inactive identity result. No client should publish secrets or hard-code owner keys.</p>
@@ -249,6 +255,7 @@
             <tr><td>Platform events</td><td><code>/platform/events</code></td><td>Apps mirror proof, monitor, task, and activity receipts.</td><td>Requires a server-only mirror secret.</td></tr>
             <tr><td>ConnectLog + Relay13</td><td><code>/connectlog-relay13</code> and <code>/platform/events</code></td><td>Gate-owned proof lane for relationship capture, Relay13 workspace messaging, activation proof, and live WebSocket receipts.</td><td>Relay13 API keys and FS27 mirror secrets stay operator-side.</td></tr>
             <tr><td>VantaCore service CRM</td><td><code>/vantacore-crm</code>, <code>/api/vantacore/crm</code>, and <code>/platform/events</code></td><td>Gate-owned CRM workspace for lead capture, pipeline updates, booking, follow-up, review, revenue summary, activity, and activation proof.</td><td>Workspace access is gate-required; provider credentials, tenant authority, and live automations stay owner-approved.</td></tr>
+            <tr><td>SkyeNet artist mount</td><td><code>/SUPABOY/</code> and <code>/supaboy/</code></td><td>Live SupaBoy artist-universe build served from FS27 SkyeNet deployment <code>dep_20260523071848</code>.</td><td>Static artist surface is public; deploy authority and route writes remain FS27/SkyGate controlled.</td></tr>
             <tr><td>Admin events</td><td><code>/admin/platform-events</code></td><td>Operators inspect mirrored history and monitor activity.</td><td>Admin protected.</td></tr>
             <tr><td>App login/session</td><td><code>/auth/app-login</code>, <code>/session/token</code></td><td>Bridges users into downstream apps without sharing owner secrets.</td><td>Configuration and approval required.</td></tr>
             <tr><td>Push/project tracking</td><td>SkyeGate Push routes</td><td>Deployment work can be tracked as a gate-owned surface.</td><td>Provider credentials stay admin controlled.</td></tr>

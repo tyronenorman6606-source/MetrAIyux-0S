@@ -1,7 +1,7 @@
 {
   "id": "metraiyux-0s-operator-command-registry",
   "name": "MetrAIyux 0S Operator Command Registry",
-  "generated_at": "2026-05-18T00:00:00Z",
+  "generated_at": "2026-05-23T07:31:29.805Z",
   "purpose": "Allowlisted local operator commands that the 0S command runner can execute from the repo workspace.",
   "exposure": "repo-local-only",
   "safety_model": [
@@ -232,6 +232,26 @@
       "risk": "low",
       "when_to_run": "Before routing Marketing Made Easy as a gate-accounted 0S suite in buyer or operator contexts.",
       "result": "Refreshes the deep scan receipt and then runs the available smoke proof plan."
+    },
+    {
+      "id": "artist-universe:agent-card",
+      "title": "Show Artist Universe Builder Agent Card",
+      "command": "node tools/artist-universe-agent.mjs card",
+      "cwd": ".",
+      "category": "artist-build-agent",
+      "risk": "low",
+      "when_to_run": "When the 0S needs to load the reusable artist website rebuild agent card before planning or assigning an artist build.",
+      "result": "Prints the machine-readable 0S artist-universe builder agent card."
+    },
+    {
+      "id": "artist-universe:checklist",
+      "title": "Create Artist Universe Build Checklist",
+      "command": "node tools/artist-universe-agent.mjs checklist",
+      "cwd": ".",
+      "category": "artist-build-agent",
+      "risk": "low",
+      "when_to_run": "When starting a new artist zip/reference rebuild and the operator needs the fixed SupaBoy-style workflow checklist.",
+      "result": "Prints a reusable artist-universe build checklist with required receipts and the SupaBoy SkyeNet reference link."
     }
   ]
 }

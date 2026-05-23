@@ -1,5 +1,32 @@
 # SkyeGateFS27 Changelog
 
+## 2026-05-23 - SupaBoy proof surface Cloudflare Worker deploy
+
+- Redeployed `skyegatefs27-citadeldb` with the root `env.txt` Cloudflare lane at lines `1240` and `1241`; secret values stayed redacted.
+- Uploaded the updated `gate-proofx` public asset into the Worker asset bundle so the SupaBoy SkyeNet proof card is now live on the core FS27 proof surface.
+- Current Worker version ID is `e6f3a23d-f985-41cb-a8cf-9d0fae1e74b6`.
+- HTTP proof confirmed `200` for `/SUPABOY/`, `/skynet-supaboy-proof/`, and `/gate-proofx`, with SupaBoy and SkyeNet markers present.
+
+Evidence:
+
+- `test-artifacts/supaboy-fs27-worker-deploy/fs27-worker-deploy-receipt.json`
+- `.1/skynet-supaboy-proof/FS27_SKYNET_PROOF_DEPLOY_RECEIPT.json`
+
+## 2026-05-23 - SupaBoy SkyeNet artist-universe proof mount
+
+- Confirmed the SupaBoy artist-universe rebuild is deployed through FS27 SkyeNet, not Cloudflare Pages.
+- Mounted the live build at `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/` with lowercase fallback `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/supaboy/`.
+- Recorded deployment `dep_20260523071848` for project `supaboy`, with 26 files served from the R2-backed SkyeNet deployment path.
+- Updated the FS27 proof surface and gate map so SkyeNet proof now points to a real artist-universe client build, not only the smoke mount.
+- Linked the reusable Artist Universe Builder Agent into the 0S brain card, knowledge base, live-surface registry, automation routing, and local 0S command registry.
+
+Evidence:
+
+- `.1/supaboy-merser31/FS27_SKYNET_DEPLOY_RECEIPT.json`
+- `test-artifacts/supaboy-fs27-skynet-deploy/fs27-skynet-deploy-receipt.json`
+- `metraiyux_0s_site/brain/artist-universe-builder-agent.json`
+- `.agents/artist-universe-builder/AGENTS.md`
+
 ## 2026-05-20 - Relay13 AI response lanes and backup buckets
 
 - Updated the SkyePay catalog so Relay13 AI is no longer a single 100-draft add-on.

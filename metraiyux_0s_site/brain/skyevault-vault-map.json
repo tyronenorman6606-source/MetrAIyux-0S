@@ -1,6 +1,6 @@
 {
   "schema": "metraiyux.0s.skyevault-map.v1",
-  "generated_at": "2026-05-23T04:51:31.981Z",
+  "generated_at": "2026-05-23T08:57:54.274Z",
   "sources": {
     "remote_ledger": ".skyevault-out/git-remote-ledger.jsonl",
     "upload_ledger": ".skyevault-out/vault-ledger.jsonl",
@@ -9,10 +9,10 @@
   "safety": "public-safe summary: absolute paths, raw tokens, raw session IDs, full receipt IDs, author emails, and private file bodies are not emitted",
   "repo_count": 1,
   "remote_event_count": 235,
-  "upload_event_count": 24,
-  "receipt_count": 26,
-  "total_receipt_bytes": 11277343348,
-  "total_receipt_human": "10.50 GB",
+  "upload_event_count": 25,
+  "receipt_count": 27,
+  "total_receipt_bytes": 13631529158,
+  "total_receipt_human": "12.70 GB",
   "repos": [
     {
       "id": "acme/demo",
@@ -373,6 +373,19 @@
       "sha256_prefix": "21a46bac4f51d8de",
       "archiveFileCount": null,
       "excludedSecrets": null
+    },
+    {
+      "receipt_ref": "receipt_a696c7b0cf6f",
+      "session_ref": "session_f46007c9b9a6",
+      "workspace_id": null,
+      "customer_ref": null,
+      "completedAt": null,
+      "destination": "Primary Production Intake",
+      "fileName": "MetrAIyux-0S-repo-safe-20260523T074845Z.zip",
+      "fileSize": 2354185810,
+      "sha256_prefix": "3d7e12e34577b879",
+      "archiveFileCount": 91467,
+      "excludedSecrets": 67
     }
   ],
   "workspace_maps": [
@@ -897,6 +910,14 @@
       "group": "upload",
       "size": 11,
       "summary": "Primary Production Intake upload 15.49 MB sha256 21a46bac4f51d8de"
+    },
+    {
+      "id": "upload:receipt_a696c7b0cf6f",
+      "label": "MetrAIyux-0S-repo-safe-20260523T074845Z.zip",
+      "type": "vault-upload",
+      "group": "upload",
+      "size": 11,
+      "summary": "Primary Production Intake upload 2.19 GB sha256 3d7e12e34577b879"
     }
   ],
   "links": [
@@ -1277,6 +1298,12 @@
       "target": "upload:receipt_8ef2b4afc20e",
       "type": "upload-receipt",
       "strength": 1
+    },
+    {
+      "source": "skyevault:hub",
+      "target": "upload:receipt_a696c7b0cf6f",
+      "type": "upload-receipt",
+      "strength": 1
     }
   ],
   "chunks": [
@@ -1284,7 +1311,7 @@
       "id": "skyevault-0s-architecture",
       "title": "SkyeVault 0S Neural Map",
       "heading": "Gate controls identity, SkyeVault stores repos, 0S tracks the brain map",
-      "text": "SkyeVault is the Git and vault storage engine. SkyeGateFS27 should authorize users, roles, customers, workspace limits, and audit events. MetrAIyux 0S consumes this SkyeVault map as the neural context for repos, pushes, clones, bundle exports, restore events, and vault uploads. Current map has 1 repos and 26 upload receipts.",
+      "text": "SkyeVault is the Git and vault storage engine. SkyeGateFS27 should authorize users, roles, customers, workspace limits, and audit events. MetrAIyux 0S consumes this SkyeVault map as the neural context for repos, pushes, clones, bundle exports, restore events, and vault uploads. Current map has 1 repos and 27 upload receipts.",
       "source": "brain/skyevault-vault-map.json",
       "tags": [
         "skyevault",
@@ -1541,6 +1568,18 @@
       "title": "SkyeVault Upload Receipt",
       "heading": "metraiyux-0s-local-only-secrets-20260520T015613Z.skyesecrets",
       "text": "Vault receipt receipt_8ef2b4afc20e uploaded metraiyux-0s-local-only-secrets-20260520T015613Z.skyesecrets to Primary Production Intake with size 15.49 MB and sha256 prefix 21a46bac4f51d8de.",
+      "source": "brain/skyevault-vault-map.json",
+      "tags": [
+        "skyevault",
+        "upload",
+        "receipt"
+      ]
+    },
+    {
+      "id": "skyevault-upload-receipt_a696c7b0cf6f",
+      "title": "SkyeVault Upload Receipt",
+      "heading": "MetrAIyux-0S-repo-safe-20260523T074845Z.zip",
+      "text": "Vault receipt receipt_a696c7b0cf6f uploaded MetrAIyux-0S-repo-safe-20260523T074845Z.zip to Primary Production Intake with size 2.19 GB and sha256 prefix 3d7e12e34577b879.",
       "source": "brain/skyevault-vault-map.json",
       "tags": [
         "skyevault",

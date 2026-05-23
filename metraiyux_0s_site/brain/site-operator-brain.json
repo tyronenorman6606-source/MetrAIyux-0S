@@ -5,7 +5,7 @@
   "title": "MetrAIyux 0S business automation Conductor & Website Operations Brain",
   "cabinet": "Site Operations / Autonomous Command",
   "portrait": "assets/executive-team-poster.png",
-  "version": "1.5.0-skyemusicnexus-lite-paid-addons-routing",
+  "version": "1.6.0-artist-universe-builder-agent-routing",
   "total_connected_brains": 16,
   "total_system_brains": 16,
   "mode": "lightweight-router-first",
@@ -82,7 +82,26 @@
     "release forge",
     "royalty ledger",
     "payout review",
-    "music proof"
+    "music proof",
+    "artist website",
+    "artist build",
+    "music artist",
+    "rapper site",
+    "singer site",
+    "band site",
+    "artist universe",
+    "rebuild artist zip",
+    "polished artist build",
+    "merser3.1 artist",
+    "SKrucible artist",
+    "music landing page",
+    "release site",
+    "album rollout",
+    "artist press kit",
+    "booking site",
+    "SupaBoy style build",
+    "skynet artist build",
+    "music project site"
   ],
   "can_answer": [
     "Which cabinet brain should handle an incoming request",
@@ -100,7 +119,10 @@
     "Where to route a user who asks for SkyeProfitConsole, profit packs, margin proof, or Free99 access",
     "How to explain that Free99 means no charge while still requiring a 0S or FS27 gate session",
     "Where to route a user who asks for SkyeMediaCenter, media intake, asset search, publishing, file delivery, or Free99 media access",
-    "Where to route a user who asks for SkyeMusicNexus, artist records, release forge, royalty motion, payout review, analytics, music workflow, Free99 Lite access, paid music ops, or one-song/release-drop add-ons"
+    "Where to route a user who asks for SkyeMusicNexus, artist records, release forge, royalty motion, payout review, analytics, music workflow, Free99 Lite access, paid music ops, or one-song/release-drop add-ons",
+    "How to route an artist zip or boring artist site into the Artist Universe Builder Agent workflow",
+    "Where to find the SupaBoy SkyeNet artist-universe proof link and receipts",
+    "How to require real artist assets, music links, visualizers, interaction proof, and FS27 SkyeNet receipts for artist builds"
   ],
   "must_not_claim": [
     "That it can legally run the company without a human operator",
@@ -113,10 +135,29 @@
   ],
   "routes": [
     {
-      "intent": "buyer_lead",
-      "route_to": "celeste-monroe-brain",
-      "secondary": "adrian-cross-brain",
-      "create_task": "AE discovery follow-up and buyer qualification"
+      "intent": "artist_universe_builder",
+      "route_to": "orion-hayes-brain",
+      "secondary": "valentina-reyes-brain",
+      "create_task": "Invoke the Artist Universe Builder Agent: unpack the artist reference, mine real assets and links, run MCP tooling, build a new artist-specific universe, serve locally, proof, and deploy through FS27 SkyeNet when approved.",
+      "triggers": [
+        "artist website",
+        "artist build",
+        "music artist",
+        "rapper site",
+        "singer site",
+        "band site",
+        "artist universe",
+        "rebuild artist zip",
+        "polished artist build",
+        "merser3.1 artist",
+        "SKrucible artist",
+        "music landing page",
+        "release site",
+        "album rollout",
+        "artist press kit",
+        "booking site",
+        "SupaBoy style build"
+      ]
     },
     {
       "intent": "client_command_deck_sales",

@@ -1,0 +1,129 @@
+{
+  "ok": true,
+  "generated_at": "2026-05-23T23:22:06.217Z",
+  "proof_type": "postdeploy-http-smoke-and-stress-no-browser",
+  "live_browser_checked_by_codex": false,
+  "owner_will_browser_test": true,
+  "pages_deployment": "0a02afee-ab36-4566-86b4-9a4cd573998b",
+  "pages_preview": "https://0a02afee.metraiyux-0s-marketing.pages.dev",
+  "zero_os_worker_version": "060df07a-cdd7-420c-845c-38a359fadf75",
+  "auth": {
+    "key": "FREE99_ADMIN_CODE",
+    "credential_hash": "1face0d671e1",
+    "login_ms": 19235,
+    "token_recorded": false
+  },
+  "live_gray_build": "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+  "live_supaboy_build": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+  "smoke": [
+    {
+      "id": "media-over-london-canonical",
+      "requested_url": "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "final_url": "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 17907,
+      "duration_ms": 3169
+    },
+    {
+      "id": "media-over-london-html-redirect",
+      "requested_url": "https://metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "final_url": "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "status": 200,
+      "ok": true,
+      "redirected": true,
+      "bytes": 17907,
+      "duration_ms": 5456
+    },
+    {
+      "id": "pages-preview-html-redirect",
+      "requested_url": "https://0a02afee.metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "final_url": "https://0a02afee.metraiyux-0s-marketing.pages.dev/media-over-london",
+      "status": 200,
+      "ok": true,
+      "redirected": true,
+      "bytes": 17907,
+      "duration_ms": 6846
+    },
+    {
+      "id": "style-css",
+      "requested_url": "https://metraiyux-0s-marketing.pages.dev/style.css",
+      "final_url": "https://metraiyux-0s-marketing.pages.dev/style.css",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 109142,
+      "duration_ms": 2468
+    },
+    {
+      "id": "marketing-changelog",
+      "requested_url": "https://metraiyux-0s-marketing.pages.dev/CHANGELOG.md",
+      "final_url": "https://metraiyux-0s-marketing.pages.dev/CHANGELOG.md",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 21022,
+      "duration_ms": 218
+    },
+    {
+      "id": "gray-live-build",
+      "requested_url": "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+      "final_url": "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 155679,
+      "duration_ms": 7466
+    },
+    {
+      "id": "supaboy-live-build",
+      "requested_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+      "final_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 1100,
+      "duration_ms": 2523
+    },
+    {
+      "id": "zero-os-changelog-unauth-gate",
+      "requested_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/changelog/index.html",
+      "final_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/changelog/index.html",
+      "status": 302,
+      "ok": true,
+      "redirected": false,
+      "bytes": 0,
+      "duration_ms": 1161,
+      "location": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=%2Fchangelog%2Findex.html"
+    },
+    {
+      "id": "zero-os-changelog-auth",
+      "requested_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/changelog/index.html",
+      "final_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/changelog/index.html",
+      "status": 200,
+      "ok": true,
+      "redirected": false,
+      "bytes": 191794,
+      "duration_ms": 481
+    }
+  ],
+  "stress": {
+    "total_requests": 80,
+    "concurrency": 10,
+    "targets": [
+      "https://metraiyux-0s-marketing.pages.dev/media-over-london",
+      "https://metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "https://metraiyux-0s-marketing.pages.dev/style.css",
+      "https://0a02afee.metraiyux-0s-marketing.pages.dev/media-over-london.html",
+      "https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/",
+      "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+      "https://metraiyux-0s-marketing.pages.dev/CHANGELOG.md",
+      "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/changelog/index.html"
+    ],
+    "failures": [],
+    "p50_ms": 74,
+    "p95_ms": 326,
+    "max_ms": 470
+  }
+}

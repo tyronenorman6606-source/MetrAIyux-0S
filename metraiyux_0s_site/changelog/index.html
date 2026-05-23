@@ -379,7 +379,7 @@
           <div class="proof-stat"><strong>80</strong><span>Verified live surfaces</span></div>
           <div class="proof-stat"><strong>18</strong><span>Cloudflare Pages projects</span></div>
           <div class="proof-stat"><strong>17</strong><span>Cloudflare Workers</span></div>
-          <div class="proof-stat"><strong>58</strong><span>Stripe catalog products</span></div>
+          <div class="proof-stat"><strong>62</strong><span>Stripe catalog products</span></div>
           <div class="proof-stat"><strong>27</strong><span>Gate-deployed platform lanes</span></div>
           <div class="proof-stat"><strong>216</strong><span>MusicNexus workflow actions stress-backed</span></div>
           <div class="proof-stat"><strong>192</strong><span>MusicNexus audit events retained</span></div>
@@ -394,6 +394,125 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="media-over-london-gray-supaboy-fullwidth-build-wall">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Media Build Wall</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Media Over London</span><span>Gray Skyes</span><span>SupaBoy</span><span>Source builds</span><span>HTTP stress</span></div>
+            <h2>Media Over London now leads with the full-width Gray Skyes build and keeps SupaBoy under it.</h2>
+            <p>The hero logo system now rotates client and platform marks around the central Media Over London mark, and the Source Build Wall now presents the work in the sales order requested by the owner: Gray Skyes first as the higher-scope founder/video campaign build, SupaBoy second as the lower-scope artist universe.</p>
+            <ul class="release-points">
+              <li>Gray Skyes is mounted first as a full-width horizontal iframe from <code>https://gray-canonical-v2.metraiyux-0s-marketing.pages.dev/</code>.</li>
+              <li>SupaBoy remains mounted directly underneath as the full-width artist-universe source build from the FS27/SkyeNet Worker path.</li>
+              <li>The visible build values now show Gray Skyes at <code>$1,197+</code> and SupaBoy at <code>$444</code>, with separate Open Build and SkyePay actions.</li>
+              <li>Smoke/stress passed after deploy: 6 production smoke checks, 72 repeated HTTP requests at concurrency 9, p95 <code>207ms</code>, max <code>330ms</code>, zero failures, and live browser proof handed to the owner for the visual pass.</li>
+              <li>Final production documentation/proof is tracked by <code>test-artifacts/media-over-london-gray-supaboy-postdeploy-smoke-stress-latest.json</code>; this changelog module was regenerated and deployed behind the shared FS27/Free99 gate, with the exact live Worker version recorded in the latest receipt.</li>
+            </ul>
+            <div class="receipt-row"><span><code>media-over-london.html</code></span><span><code>style.css</code></span><span>deployment <code>0ad69ec9-5dab-4f67-a3b4-65bd711ea467</code></span><span><code>test-artifacts/media-over-london-gray-supaboy-fullwidth-smoke-stress-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="media-over-london-empire-pallets-logo-correction">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Media Logo</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Media Over London</span><span>Valley Verified</span><span>Empire Pallets</span><span>Logo correction</span></div>
+            <h2>Media Over London now uses a real Valley Verified client logo instead of the placeholder SupaBoy mark.</h2>
+            <p>The client-logo proof row and hero orbit were corrected so the fake SupaBoy SB mark is no longer used. The replacement is the real Empire Pallets logo from the Valley Verified/client-build lane, linked to the Empire Pallets Valley Verified surface.</p>
+            <ul class="release-points">
+              <li>I added <code>/assets/media-over-london/empire-pallets-logo-transparent.png</code> to the marketing deploy bundle.</li>
+              <li>I replaced both <code>supaboy-logo.svg</code> page references with the Empire Pallets asset and updated the alt text and click target.</li>
+              <li>I kept the customer-facing page honest: SupaBoy still appears only where the live source build is actually embedded or linked.</li>
+              <li>Smoke/stress passed after deploy: 6 production smoke checks, 64 repeated HTTP requests at concurrency 8, p95 <code>454ms</code>, max <code>526ms</code>, zero failures, and live browser proof handed to the owner for the visual pass.</li>
+            </ul>
+            <div class="receipt-row"><span><code>media-over-london.html</code></span><span>Empire Pallets logo</span><span>Valley Verified link</span><span><code>test-artifacts/media-over-london-empire-logo-smoke-stress-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="citadeldb-dev-helper-k4i-skynet-url-model">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Helper K4i</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>CitadelDB Dev URL</span><span>Helper K4i</span><span>SkyErrors</span><span>SkyeNet URLs</span><span>Vault handoff</span></div>
+            <h2>CitadelDB now has a 0S-account developer URL, and Helper K4i watches the proof lane.</h2>
+            <p>Developers can use the gated CitadelDB HTTPS database URL from bash or app code, while Helper K4i runs proof scans, records SkyErrors, prepares vault patch plans, and sends owner alerts through the configured mail lane.</p>
+            <ul class="release-points">
+              <li>I added <code>/api/citadel/dev/connection</code>, <code>/api/citadel/dev/rows</code>, <code>/api/citadel/dev/query</code>, and safe <code>/api/citadel/dev/sql</code> for shared-gate database access.</li>
+              <li>I added <code>/api/helper-k4i/status</code>, <code>/api/helper-k4i/scan</code>, <code>/api/helper-k4i/skyerrors</code>, <code>/api/helper-k4i/notify</code>, and <code>/api/helper-k4i/patch-plan</code>.</li>
+              <li>I registered Helper K4i in the 0S brain files so the main automation brain can route proof-health, SkyErrors, CitadelDB, Resend alert, and vault patch-plan work to it.</li>
+              <li>I updated SkyeNet docs and public copy for browser build drops, bash/API pushes, app-builder handoff, path routes, branded subdomain routes, and custom-domain routing.</li>
+              <li>I added the local proof command <code>npm run 0s:helper-k4i:proof</code> alongside the CitadelDB adapter and live D1 sync proofs.</li>
+            </ul>
+            <div class="receipt-row"><span><code>docs/CITADELDB_DEVELOPER_ACCESS.md</code></span><span><code>docs/SKYENET_UPLOAD_URL_MODEL.md</code></span><span><code>metraiyux_0s_site/cloudflare/helper-k4i-adapter.mjs</code></span><span><code>npm run 0s:helper-k4i:proof</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="citadeldb-d1-skynet-skyepay-release">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">CitadelDB D1</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>CitadelDB</span><span>Cloudflare D1</span><span>Neon sync</span><span>SkyeNet</span><span>SkyePay</span><span>Stripe</span></div>
+            <h2>CitadelDB is now a dedicated Cloudflare database lane, and SkyeNet has live paid products.</h2>
+            <p>The main 0S Worker now binds the dedicated Cloudflare D1 database <code>metraiyux-citadeldb</code> as <code>CITADELDB</code>. CitadelDB stores mirror rows, write receipts, and catch-up jobs in D1, with <code>SITE_EVENTS_KV</code> retained only as a receipt mirror/fallback. Neon is treated as an upstream sync source during cutover, not the product.</p>
+            <ul class="release-points">
+              <li>I created and schema-applied <code>metraiyux-citadeldb</code> with <code>citadel_mirror_events</code>, <code>citadel_rows</code>, and <code>citadel_catchup_jobs</code>.</li>
+              <li>I updated <code>/api/citadel/*</code> so payload-backed writes mirror into CitadelDB D1 and receipt-only writes remain visible in the catch-up queue.</li>
+              <li>I updated the CitadelDB dashboard, operations runbook, SkyeNet truth manifest, hybrid architecture doc, valuation brief, and marketing valuation page so the lane no longer reads as local/VPS-only.</li>
+              <li>I added four SkyeNet SkyePay products to the live Stripe catalog: Edge Starter, Edge Growth, Managed Functions, and Sovereign Runtime Reserve.</li>
+              <li>I verified local runtime proof with <code>node metraiyux_0s_site/tests/citadeldb-adapter.test.mjs</code> and <code>npm run audit:citadeldb-runtime</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><code>metraiyux_0s_site/cloudflare/d1/citadeldb-schema.sql</code></span><span><code>metraiyux_0s_site/cloudflare/citadeldb-adapter.mjs</code></span><span><code>test-artifacts/citadeldb-runtime-audit/receipt.json</code></span><span><code>test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyevault-autosync-public-proof-lane">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Vault Autosync Proof</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeVault</span><span>Encrypted repo custody</span><span>Build proof</span><span>Resend controls</span><span>Dashboard toggle</span><span>Git parity</span></div>
+            <h2>The 0S repo now publishes an autosync proof heartbeat for the encrypted full-workspace vault lane.</h2>
+            <p>Added a build-time proof publisher that reads the local SkyeVault autosync receipts, verifies the current repo digest, writes public-safe proof JSON and HTML into the 0S proof surface, and keeps a rolling proof log without exposing passphrases, bearer tokens, file bodies, object URLs, or secret values.</p>
+            <ul class="release-points">
+              <li>The proof lane writes <code>metraiyux_0s_site/proof/skyevault-autosync-proof.json</code>, <code>metraiyux_0s_site/proof/skyevault-autosync-proof-log.json</code>, and <code>metraiyux_0s_site/proof/skyevault-autosync-proof.html</code> from the active autosync state.</li>
+              <li>The 0S Worker deploy script now runs the autosync proof publisher and changelog module generator before deployment so the public proof and generated Worker changelog stay current at build time.</li>
+              <li>The SkyeVault Command Center now includes an autosync proof panel plus owner-gated notification settings at <code>/api/skyevault/autosync-notify-settings</code>, using the shared FS27/SkyGate/Free99 auth lane.</li>
+              <li>The local daemon notification hook can send a deduped Resend email after a successful encrypted source-custody update, while the CLI and dashboard controls can enable, disable, and throttle that lane.</li>
+              <li>The custody contract remains full repo parity: tracked source, untracked source, <code>.git</code>, root env/config files, local-only critical files, and secret-like files go into the encrypted artifact, while bulky production media/build caches stay excluded.</li>
+            </ul>
+            <div class="receipt-row"><span><code>tools/skyevault-autosync-proof-publish.mjs</code></span><span><code>tools/skyevault-autosync-notify-settings.mjs</code></span><span><code>npm run 0s:build:proof</code></span><span><code>npm run vault:autosync:notify:on</code></span><span><code>../proof/skyevault-autosync-proof.html</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyepay-platform-launcher-skyemerit-sale">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Platform Launcher</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyePay</span><span>Platform hub</span><span>SkyeMusicNexus</span><span>SkyeMerit</span><span>Relay13</span><span>Local brain</span><span>Neural map</span></div>
+            <h2>SkyePay now routes buyers through an interactive platform launcher instead of a flat price wall.</h2>
+            <p>The SkyePay surface now has platform sections for SkyeMusicNexus, MetrAIyux 0S Core, Free99, SkyePay + SkyeMerit, Relay13 + ConnectLog, Sovereign Infrastructure, and Marketing + Media Over London. Users click into a platform, get the cards for that lane, search buyer problems or offers, and ask the local 0S brain from the same viewport before checkout.</p>
+            <ul class="release-points">
+              <li>The SkyeMusicNexus landing offers now show a prominent neon <strong>-$2,000 SkyeMerit</strong> launch-sale banner on the launcher, SaaS pricing cards, SkyePay gateway cards, sales router rows, and FS27 checkout offer list.</li>
+              <li>The local brain and live-surface registry were updated with the platform launcher route, artist landing SkyeMerit launch window, and Media Over London marketing lane.</li>
+              <li>The public neural map was regenerated from the updated Obsidian sync layer, adding the SkyePay Platform Launcher note and signals.</li>
+              <li>The launcher proof exercises desktop and mobile, platform clicks, search, local-brain question routing, visible sale banners, and repeated card-render stress.</li>
+              <li>SkyeMusicNexus launch offer stress was rerun against the SkyePay catalog and checkout dry-run path, with Relay13 inbox delivery metadata and SkyeMerit math preserved.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyepay-platform-launcher-proof/2026-05-23T11-29-11-384Z/receipt.json</code></span><span><code>test-artifacts/skyepay-platform-launcher-stress/2026-05-23T11-29-11-384Z/receipt.json</code></span><span><code>test-artifacts/skyepay-platform-launcher-proof/latest.json</code></span><span><code>metraiyux_0s_site/assets/public-neural-map-data.js</code></span><span><code>npm run 0s:skyemusicnexus:artist-landing-stress</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="skye-music-nexus-investor-stress-readiness">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
@@ -431,6 +550,47 @@
             <div class="receipt-row"><span><code>docs/METRAIYUX_0S_REPO_RECOVERY_GUIDE.html</code></span><span><code>npm run vault:push</code></span><span><code>npm run proof:live-browser</code></span><span><code>npm run pages:direct-upload</code></span></div>
           </div>
         </article>
+
+<article class="release-entry" id="supaboy-fs27-worker-proof-deploy">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">SupaBoy FS27 Proof</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SupaBoy</span><span>FS27</span><span>SkyeNet</span><span>Cloudflare Worker</span><span>Proof Surface</span></div>
+            <h2>The SupaBoy artist-universe build is now linked from the live FS27 proof surface.</h2>
+            <p>The core <code>skyegatefs27-citadeldb</code> Worker was redeployed with the SupaBoy SkyeNet proof card in the public gate proof page, while the artist build remains served through the FS27 SkyeNet path.</p>
+            <ul class="release-points">
+              <li>Direct artist build: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/" target="_blank" rel="noopener">/SUPABOY/</a>.</li>
+              <li>Dedicated proof mount: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet-supaboy-proof/" target="_blank" rel="noopener">/skynet-supaboy-proof/</a>.</li>
+              <li>FS27 proof page: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx" target="_blank" rel="noopener">/gate-proofx</a>.</li>
+              <li>Worker version <code>e6f3a23d-f985-41cb-a8cf-9d0fae1e74b6</code> deployed with the root <code>env.txt</code> Cloudflare lane; secret values were not written into the proof.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/supaboy-fs27-worker-deploy/fs27-worker-deploy-receipt.json</code></span><span><code>.1/supaboy-merser31/FS27_SKYNET_DEPLOY_RECEIPT.json</code></span></div>
+          </div>
+        </article>
+
+
+        <article class="release-entry" id="artist-universe-builder-agent">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Artist Builder Agent</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Agent</span><span>Artist Universe</span><span>Zip Intake</span><span>MCP Workflow</span><span>SkyeNet Ready</span><span>Append Only</span></div>
+            <h2>The reusable artist-universe build agent now captures the SupaBoy rebuild process.</h2>
+            <p>A dedicated agent instruction set now turns an artist zip or reference folder into a new polished artist-specific web build: mine the real assets, links, releases, social surfaces, visualizers, and original proof; create a separate build folder; use the local quantumskyes MCP workflow as implementation tooling; serve locally; verify; and deploy through FS27 SkyeNet when requested.</p>
+            <ul class="release-points">
+              <li>The agent forbids generic template copy, public MCP/process narration, dead buttons, invented music links, copied original-site layouts, and untracked edits to the imported reference site.</li>
+              <li>The workflow requires real artist content mapping before coding: hero identity, music/project surfaces, media world, story, live/community, booking, social links, visualizers, and proof receipts.</li>
+              <li>Interaction requirements now include visible state changes, snap-back behavior for viewport-local controls, exit paths for focused media, real link/player surfaces, and preservation of requested neon cursor/scrollbar chrome.</li>
+              <li>Deployment instructions route approved builds through FS27 SkyeNet with local and deployment receipts; SkyeVault pushes must either succeed with auth or write a blocked receipt instead of pretending.</li>
+              <li>This is an agent/process addition only. Existing running proof surfaces and prior changelog entries were not rewritten for this entry.</li>
+            </ul>
+            <div class="receipt-row"><span><code>.agents/artist-universe-builder/AGENTS.md</code></span><span><code>/home/lordkaixu/.codex/skills/artist-universe-builder/SKILL.md</code></span></div>
+          </div>
+        </article>
+
 
         <article class="release-entry" id="fs27-skynet-deploy-api-runtime-ledger">
           <div class="release-meta">
@@ -1275,7 +1435,7 @@
             <h2>I surfaced the full 0S inventory as a live buyer route.</h2>
             <p>This is catch-up accounting from the 2026-05-17 repo scan, not invented historical hash work. The new atlas links the full feature inventory, valuation desk, SkyePay surface, public claims ledger, proof routes, and app lanes so the system is no longer undersold as a handful of pages or one checkout path.</p>
             <ul class="release-points">
-              <li>I added <code>feature-atlas.html</code> as the live feature surface for 875 scanned HTML surfaces, 468 JS/MJS files, 465 Markdown docs, 1493 JSON files, 39 live production surfaces, and 58 Stripe catalog products.</li>
+              <li>I added <code>feature-atlas.html</code> as the live feature surface for 875 scanned HTML surfaces, 468 JS/MJS files, 465 Markdown docs, 1493 JSON files, 39 live production surfaces, and the Stripe catalog product count that now stands at 62 after the SkyeNet paid-lane sync.</li>
               <li>I linked the atlas from the 0S home, valuation surface, SkyePay surface, FS27 SkyePay gateway/store, and the public marketing overview/capabilities/sell-sheet/valuation pages.</li>
               <li>I kept the boundary visible: Free99 means no charge, not no-gate; payment, hiring, legal, public claims, and workspace activation stay approval-gated.</li>
             </ul>

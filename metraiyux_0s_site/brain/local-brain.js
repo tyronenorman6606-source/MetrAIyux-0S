@@ -70,6 +70,13 @@ const localRouteRules = [
     triggers: ['buyer', 'prospect', 'lead', 'sell', 'sales', 'ae', 'discovery', 'close', 'proposal', 'proof router', 'live proof', 'website', 'command deck', 'white label', 'client deployment']
   },
   {
+    intent: 'artist_universe_builder',
+    route_to: 'orion-hayes-brain',
+    secondary: 'valentina-reyes-brain',
+    create_task: 'Invoke the Artist Universe Builder Agent: unpack the artist reference, mine real assets and links, run MCP tooling, build a new artist-specific universe, serve locally, proof, and deploy through FS27 SkyeNet when approved',
+    triggers: ['artist website', 'artist build', 'music artist', 'rapper site', 'singer site', 'band site', 'artist universe', 'rebuild artist zip', 'polished artist build', 'merser3.1 artist', 'skrucible artist', 'music landing page', 'release site', 'album rollout', 'artist press kit', 'booking site', 'supaboy style build', 'skynet artist build']
+  },
+  {
     intent: 'pricing_subscription',
     route_to: 'naomi-sterling-brain',
     secondary: 'celeste-monroe-brain',

@@ -14,6 +14,10 @@ The gate now has a public proof page that translates this architecture into a bu
 - Alias page: `gate-map.html`
 - Current public proof URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html`
 - Actual Netlify gate URL: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/`
+- SupaBoy FS27 SkyeNet artist universe: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/`
+- SupaBoy alternate lowercase mount: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/supaboy/`
+- SupaBoy SkyeNet deployment ID: `dep_20260523071848`
+- SupaBoy proof Worker version ID: `e6f3a23d-f985-41cb-a8cf-9d0fae1e74b6`
 - ConnectLog + Relay13 gate lane: `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/connectlog-relay13`
 - ConnectLog + Relay13 0S proof hub: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html`
 - ConnectLog + Relay13 proof receipt: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/connectlog-relay13-expansion-receipt.html`
@@ -132,6 +136,8 @@ The gate has five big jobs.
 5. Deployment and push tracking
 
    The gate tracks file push jobs, chunked uploads, Netlify deploy projects, GitHub repo/push jobs, file status, billing for push activity, cleanup schedules, and retry schedules.
+
+   SkyeNet static app deployment is also live through the Cloudflare Worker lane. The SupaBoy artist-universe build is served from R2-backed deployment `dep_20260523071848` at `/SUPABOY/` and `/supaboy/`; deploy authority, asset upload, completion, and route registration remain under FS27/SkyGate deployer control.
 
 6. SkyePay closeout and activation
 
