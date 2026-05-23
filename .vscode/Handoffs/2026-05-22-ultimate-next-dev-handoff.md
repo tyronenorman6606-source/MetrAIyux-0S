@@ -129,6 +129,54 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | Devs Playbook marketing key | Source closure/deep smoke done; live deploy/proof still required. | Set marketing secret, deploy, headed proof. |
 | SkyEmail Zoho | Worker deployed with Zoho selected; token refresh works; Zoho Mail resource calls return `404 Invalid Input`; headed proof not green. | Fix Zoho org/account/token details, rerun smoke/deploy/proof. |
 
+## 2026-05-23 Valuation And Marketing Refresh
+
+The public valuation and Gray Skyes marketing copy was refreshed after the SkyeMusicNexus investor-readiness stress pass and contractor onboarding/payment-readiness proof. The current directional deployed-asset band is now:
+
+```text
+$2.35M-$2.95M
+```
+
+This is not a formal appraisal and it does not claim current revenue traction. The buyer/investor framing remains replacement-cost plus production-proof substantiation for a live, pre-commercial 0S asset. The new substantiation added to the marketing/changelog surfaces is:
+
+- SkyeMusicNexus stress: 12 workflow iterations, 72 read-stress requests, 216 workflow actions, retained artist/release/asset/drop/feed state, and 192 audit events.
+- Shared 0S gate: MusicNexus stays behind FS27/SkyGate/Free99 auth and does not introduce app-specific admin passwords.
+- Contractor onboarding and payout readiness: encrypted contractor packets, owner inbox review, Resend notification, approval state, and the hard boundary that real-money payout execution requires completed contractor profiles and owner approval.
+- Updated active marketing posture: 80 live surfaces, 28 platform lanes, 18 Cloudflare Pages projects, and SkyeMusicNexus as a full 0S counterpart alongside SkyeRouteX and SovereignDocs.
+
+Files touched in this refresh:
+
+```text
+marketing/metraiyux-0s/CHANGELOG.md
+marketing/metraiyux-0s/index.html
+marketing/metraiyux-0s/valuation.html
+marketing/metraiyux-0s/valuation-brief.md
+marketing/metraiyux-0s/gray-skyes.html
+marketing/metraiyux-0s/proof.html
+marketing/metraiyux-0s/capabilities.html
+marketing/metraiyux-0s/handout.html
+marketing/metraiyux-0s/the-gap.html
+marketing/metraiyux-0s/sell-sheet.html
+marketing/metraiyux-0s/social.html
+marketing/metraiyux-0s/social-copy.md
+marketing/gray-skyes-canonical-site/*
+metraiyux_0s_site/changelog/index.html
+metraiyux_0s_site/cloudflare/generated-changelog-page.mjs
+metraiyux_0s_site/admin/site-valuation.html
+```
+
+Historical/archive files intentionally still contain old captured copy where the page is preserving previous source packages, research notes, or archive snapshots. Do not "clean" those unless the user asks to rewrite historical archives.
+
+Production closure for this refresh:
+
+- Main 0S Worker deployed as version `dbc8ecb8-8c8b-417d-9f1d-733affc152c0`.
+- MetrAIyux marketing Pages deployed as `b6a7e6ba-6ce9-4708-92cd-e67fffa0f06f`.
+- Gray Skyes founder portfolio Pages deployed as `80c67112-f755-40a4-8313-98fade81be92`.
+- Legacy `metraiyux-marketing` mirror deployed as `3f56802b-a809-4ed6-b715-755c77c2f655`.
+- The valuation pages now include a live Boardroom Valuation Console so browser/manual verification can exercise filters, text inputs, sliders, review-mode cards, and state readouts.
+- The reported contractor inbox 404 was checked against production: unauthenticated GET redirects to the shared owner login, authenticated owner-session fetch returns `200` with `x-0s-surface: marketing-made-easy-contractor-packet-inbox`, and full headed contractor browser proof passed with zero console errors, zero failed requests, and zero HTTP errors. Receipt: `test-artifacts/contractor-onboarding-live-browser-20260523085137/live-browser-report.json`.
+- The extra generic valuation live-browser verifier was stopped at the owner's request because the owner is doing final manual live verification.
+
 ## Priority Resume Play
 
 1. Stabilize the workspace.

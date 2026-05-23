@@ -2,6 +2,12 @@
 
 ## 2026-05-23
 
+- SkyeMusicNexus investor-readiness update is now reflected across the valuation and Gray Skyes marketing surfaces. The platform is described as a stress-backed music-business operating lane: shared FS27/SkyGate gate, upload/storage/stream routes, native DAW beta lane, releases, rights, music drops, exchange/campaign work, social/feed queues, analytics, observability dashboards, and Worker-backed audit events.
+- Directional deployed-asset valuation language was normalized to the current conservative band of **$2.35M-$2.95M**, still explicitly marked as an internal directional valuation rather than a formal appraisal. The increase is tied to verified deployment/stress evidence, not projected revenue.
+- Added the contractor-payout readiness boundary to valuation and marketing copy: the system can collect encrypted contractor packets, notify the owner via Resend, expose owner/admin inbox review, and set payout-profile approval state, while real-money transfer execution remains owner-approved and contractor-information dependent.
+- Gray Skyes founder pages now call out the exact Nexus/RouteX stress facts instead of leaving them vague: 216 MusicNexus workflow actions, 72 authenticated read-stress requests, 192 audit events, live visual KPIs, RouteX provider-call stress, and no separate app-specific admin password.
+- Public-facing proof language was refreshed so MusicNexus is positioned as a real 0S counterpart with RouteX and SovereignDocs, not a loose standalone demo.
+
 - Added `docs/METRAIYUX_0S_REPO_RECOVERY_GUIDE.html`, a standalone owner recovery card for cloning the repo, updating an existing local clone, opening in VS Code, using the snapshot branch, downloading a normal GitHub ZIP, and understanding when Git versus the encrypted SkyeVault full-workspace lane should be used.
 - The recovery card now includes the top-level operator script map for serving, repo health, live browser proof, Cloudflare Pages direct upload, MCP mining, brain/neural-map sync, SkyeVault pushes, Git-shaped vault lanes, audits, and mounted 0S app proof commands.
 - The card is public-safe and intended for unencrypted SkyeVault delivery as a plain `.html` file; it contains no secrets, bearer tokens, signed URLs, admin codes, or unlock material.

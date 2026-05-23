@@ -4,6 +4,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import os from "node:os";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 const require = createRequire(import.meta.url);
 
@@ -68,8 +69,8 @@ const projectName = process.env.PAGES_PROJECT || process.argv[2] || "";
 const distDir = path.resolve(process.env.PAGES_DIR || process.argv[3] || "");
 const branch = process.env.PAGES_BRANCH || "main";
 const apiBase = process.env.CLOUDFLARE_API_BASE_URL || "https://api.cloudflare.com/client/v4";
-const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || "";
-const apiToken = process.env.CLOUDFLARE_API_TOKEN || "";
+let accountId = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || "";
+let apiToken = process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || "";
 const commitMessage = process.env.PAGES_COMMIT_MESSAGE || `Direct upload ${projectName}`;
 const commitHash = process.env.PAGES_COMMIT_HASH || "0000000000000000000000000000000000000000";
 const receiptPath = path.resolve(process.env.PAGES_RECEIPT || `test-artifacts/cloudflare-pages/${projectName || "pages"}-direct-upload-receipt.json`);
@@ -79,7 +80,153 @@ if (!projectName || !distDir || !fs.existsSync(distDir)) {
   console.error("Usage: PAGES_PROJECT=<project> PAGES_DIR=<folder> CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node tools/cloudflare-pages-direct-upload.mjs");
   process.exit(2);
 }
-if (!accountId || !apiToken) throw new Error("Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN.");
+
+function unquote(value) {
+  const text = String(value || "").trim();
+  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+    return text.slice(1, -1);
+  }
+  return text;
+}
+
+function sha12(value) {
+  return createHash("sha256").update(String(value || "")).digest("hex").slice(0, 12);
+}
+
+function tokenShaped(value) {
+  return /^[A-Za-z0-9_.-]{20,}$/.test(String(value || ""));
+}
+
+function addCredentialCandidate(candidates, candidate) {
+  if (!candidate.token || !candidate.account || !tokenShaped(candidate.token)) return;
+  if (candidates.some((item) => item.token === candidate.token && item.account === candidate.account)) return;
+  candidates.push(candidate);
+}
+
+function readCloudflareCredentialCandidates() {
+  const rootEnvPath = path.resolve(process.env.ROOT_ENV_FILE || ".env");
+  const lines = fs.existsSync(rootEnvPath) ? fs.readFileSync(rootEnvPath, "utf8").split(/\r?\n/) : [];
+  const candidates = [];
+  const formal = {};
+
+  addCredentialCandidate(candidates, {
+    source: "process-env:CLOUDFLARE_API_TOKEN",
+    line: null,
+    score: 100,
+    token: process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN,
+    account: process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID
+  });
+
+  lines.forEach((raw, index) => {
+    const line = index + 1;
+    const assignment = raw.trim().match(/^(?:export\s+)?(CLOUDFLARE_API_TOKEN|CLOUDFLARE_ACCOUNT_ID|CF_API_TOKEN|CF_ACCOUNT_ID|METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID)\s*=\s*(.*)$/);
+    if (assignment) formal[assignment[1]] = { value: unquote(assignment[2]), line };
+
+    const proseToken = raw.match(/Your API Token\s*=\s*"([^"]+)"/i);
+    if (!proseToken) return;
+
+    let proseAccount = "";
+    let accountLine = null;
+    for (let offset = 1; offset <= 4; offset += 1) {
+      const accountMatch = (lines[index + offset] || "").match(/Account ID\s*=\s*"([^"]+)"/i);
+      if (accountMatch) {
+        proseAccount = accountMatch[1];
+        accountLine = line + offset;
+        break;
+      }
+    }
+
+    const label = lines.slice(Math.max(0, index - 4), index).reverse().find((item) => item.trim())?.trim() || "root-env-prose-token";
+    addCredentialCandidate(candidates, {
+      source: `root-env-prose:${label.slice(0, 64)}`,
+      line,
+      accountLine,
+      score: /super\s+api\s+token|pages/i.test(label) ? 120 : 60,
+      token: proseToken[1],
+      account: proseAccount
+    });
+  });
+
+  const formalAccount = formal.CLOUDFLARE_ACCOUNT_ID?.value || formal.CF_ACCOUNT_ID?.value || formal.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID?.value;
+  addCredentialCandidate(candidates, {
+    source: "root-env:CLOUDFLARE_API_TOKEN",
+    line: formal.CLOUDFLARE_API_TOKEN?.line,
+    score: 90,
+    token: formal.CLOUDFLARE_API_TOKEN?.value,
+    account: formalAccount
+  });
+  addCredentialCandidate(candidates, {
+    source: "root-env:CF_API_TOKEN",
+    line: formal.CF_API_TOKEN?.line,
+    score: 80,
+    token: formal.CF_API_TOKEN?.value,
+    account: formalAccount
+  });
+
+  return candidates.sort((a, b) => b.score - a.score || (b.line || 0) - (a.line || 0));
+}
+
+async function probeCloudflareCredential(candidate, endpoint) {
+  const response = await fetch(`${apiBase}${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${candidate.token}`,
+      "Content-Type": "application/json"
+    }
+  });
+  const body = await response.json().catch(() => ({}));
+  return {
+    status: response.status,
+    success: Boolean(body.success),
+    errors: Array.isArray(body.errors) ? body.errors.map((error) => ({
+      code: error.code,
+      message: error.message
+    })).slice(0, 3) : []
+  };
+}
+
+async function resolveCloudflareCredentials() {
+  if (accountId && apiToken) return;
+
+  const candidates = readCloudflareCredentialCandidates();
+  const failures = [];
+
+  for (const candidate of candidates) {
+    const verify = await probeCloudflareCredential(candidate, "/user/tokens/verify");
+    const project = await probeCloudflareCredential(candidate, `/accounts/${candidate.account}/pages/projects/${projectName}`);
+    const redacted = {
+      source: candidate.source,
+      line: candidate.line,
+      accountLine: candidate.accountLine,
+      tokenHash: sha12(candidate.token),
+      accountSuffix: String(candidate.account).slice(-6),
+      verify,
+      project
+    };
+
+    if (project.success) {
+      accountId = candidate.account;
+      apiToken = candidate.token;
+      console.log(JSON.stringify({
+        ok: true,
+        using: {
+          source: redacted.source,
+          line: redacted.line,
+          accountLine: redacted.accountLine,
+          tokenHash: redacted.tokenHash,
+          accountSuffix: redacted.accountSuffix,
+          project: projectName,
+          verifyStatus: verify.status,
+          projectStatus: project.status
+        }
+      }, null, 2));
+      return;
+    }
+
+    failures.push(redacted);
+  }
+
+  throw new Error(`No Cloudflare token candidate could access Pages project ${projectName}. ${JSON.stringify({ failures })}`);
+}
 
 const contentTypes = new Map([
   [".avif", "image/avif"],
@@ -214,6 +361,7 @@ async function uploadAssets(fileMap, jwt) {
 
 async function deploy() {
   const startedAt = new Date().toISOString();
+  await resolveCloudflareCredentials();
   const project = await cloudflareFetch(`/accounts/${accountId}/pages/projects/${projectName}`);
   const tokenResponse = await cloudflareFetch(`/accounts/${accountId}/pages/projects/${projectName}/upload-token`);
   const jwt = tokenResponse.jwt;
