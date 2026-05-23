@@ -1,6 +1,6 @@
 # Business Cards v2 — Deploy Handoff
 **Date:** 2026-05-23  
-**Status:** Built locally, blocked on expired CF API tokens
+**Status:** Built in repo, pushed to Git, production deploy blocked on invalid Cloudflare Pages token credentials
 
 ---
 
@@ -20,7 +20,7 @@ Premium redesign with:
 
 Nav link added to `marketing/metraiyux-0s/index.html`.
 
-**v1 is still live** at `https://metraiyux-0s-marketing.pages.dev/business-cards.html` (deployment `6e4ce0e3`)
+**Older v1 card CSS is still live** at `https://metraiyux-0s-marketing.pages.dev/business-cards.html` (deployment `6e4ce0e3`). The repo contains v2.
 
 ---
 
@@ -29,6 +29,19 @@ Nav link added to `marketing/metraiyux-0s/index.html`.
 All CF API token candidates in `.env` were reported as returning 401 or 403 during the business-card deploy attempt. Raw token values were intentionally removed from this handoff. Re-check the local `.env` token labels only; do not paste or commit tokens in docs.
 
 The `skye-secret-rotation` worker auth works fine (`configured: true`) but can only manage Worker secrets, not deploy Pages, and can't expose its own internal token.
+
+2026-05-23 direct verification:
+
+```text
+repo business-cards.html: scale(1.786), 600px display wrapper
+live business-cards.html: scale(1.5), 504px display wrapper
+Wrangler Pages deploy: hung during Pages deploy scan and was stopped
+Cloudflare Pages project token probe: 5 local token candidates checked, all failed with Cloudflare Authentication error
+token results: 401, 403, 401, 401, 403
+raw token values: intentionally not printed or committed
+```
+
+Do not mark v2 production-live until a fresh token with Cloudflare Pages deploy permission is supplied, the Pages deploy succeeds, and a headed live-browser proof confirms the live URL has the `scale(1.786)` / `600px` v2 card CSS.
 
 ---
 
@@ -58,6 +71,7 @@ The `skye-secret-rotation` worker auth works fine (`configured: true`) but can o
 |------|--------|
 | `marketing/metraiyux-0s/business-cards.html` | Full v2 premium rebuild |
 | `marketing/metraiyux-0s/index.html` | Added Business Cards nav link |
+| `marketing/metraiyux-0s/CHANGELOG.md` | Added v2 source-ready / production-blocked changelog |
 | `LIVE_DEPLOYMENT_LEDGER.md` | Added v1 deploy entry (needs v2 entry after deploy) |
 
 ---

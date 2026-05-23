@@ -1518,3 +1518,19 @@ HEADLESS=false BASE_URL=https://skyevault-drop.graylondonskyes.workers.dev node 
 ```
 
 If the Codespace has no display server, wrap the proof command with `xvfb-run -a`. The updated proof script now scrolls desktop/mobile pages, checks split routes, records scroll-stop screenshots, and fails on console errors or failed browser requests.
+
+## 2026-05-23 Business Cards v2 Follow-Up
+
+Source state:
+
+- Business Cards v2 is present in Git at `marketing/metraiyux-0s/business-cards.html`.
+- The marketing changelog now records the v2 source-ready state at `marketing/metraiyux-0s/CHANGELOG.md`.
+- The dedicated deploy handoff is `.vscode/Handoffs/2026-05-23-business-cards-v2-handoff.md`.
+
+Production state:
+
+- Live URL `https://metraiyux-0s-marketing.pages.dev/business-cards.html` still serves the older card CSS (`scale(1.5)` / `504px`).
+- Repo v2 uses `scale(1.786)` / `600px`.
+- Wrangler Pages deploy hung during the Pages upload lane and was stopped.
+- Direct Cloudflare Pages project token probe checked 5 local token candidates; all failed with Cloudflare Authentication error (`401`, `403`, `401`, `401`, `403`).
+- Do not add a v2 live ledger entry until a fresh Cloudflare Pages deploy token is supplied, production deploy succeeds, and headed live-browser proof passes.
