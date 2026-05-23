@@ -1519,26 +1519,36 @@ HEADLESS=false BASE_URL=https://skyevault-drop.graylondonskyes.workers.dev node 
 
 If the Codespace has no display server, wrap the proof command with `xvfb-run -a`. The updated proof script now scrolls desktop/mobile pages, checks split routes, records scroll-stop screenshots, and fails on console errors or failed browser requests.
 
-## 2026-05-23 Business Cards v2 Follow-Up
+## 2026-05-23 Business Cards Client Access Studio Follow-Up
 
 Source state:
 
-- Business Cards v2 is present in Git at `marketing/metraiyux-0s/business-cards.html`.
+- Business Cards Client Access Studio is present in Git at `marketing/metraiyux-0s/business-cards.html`.
 - Local QR generation is vendored at `marketing/metraiyux-0s/assets/vendor/qrcode-generator.js`; the external unpkg dependency was removed after live proof caught the failed CDN request.
-- The marketing changelog now records the deployed v2 production state at `marketing/metraiyux-0s/CHANGELOG.md`.
+- The marketing changelog now records the deployed Client Access Studio production state at `marketing/metraiyux-0s/CHANGELOG.md`.
 - The dedicated deploy handoff is `.vscode/Handoffs/2026-05-23-business-cards-v2-handoff.md`.
+- MCP mining was run before and after the rebuild for `marketing/metraiyux-0s`; both passes reported 18 resources read, 27 tools listed, 30 tool calls, and zero failed calls.
 
 Production state:
 
-- Live URL `https://metraiyux-0s-marketing.pages.dev/business-cards.html` now serves v2.
-- Cloudflare Pages deployment: `f8e8b6e0-2077-42a9-a757-28f191a52cf3`.
-- Preview URL: `https://f8e8b6e0.metraiyux-0s-marketing.pages.dev`.
+- Live URL `https://metraiyux-0s-marketing.pages.dev/business-cards.html` now serves the corrected founder-branded Client Access Studio overwrite.
+- Cloudflare Pages deployment: `ac63a830-4a79-476a-93d2-9ce120e2578a`.
+- Preview URL: `https://ac63a830.metraiyux-0s-marketing.pages.dev`.
 - Final deploy used `tools/cloudflare-pages-direct-upload.mjs` because Wrangler Pages upload was hanging in this Codespace.
 - Root `.env` line `1240` was the token lane that could reach Pages. Do not print or commit the value. The token around line `1236` could read account/Zero Trust resources but was not valid for Pages deployment.
-- Headed live-browser proof passed desktop `1440x980` and mobile `390x844`: production URL opened, expected card text rendered, Valley Verified fields updated in-browser, four print actions fired, QR canvas pixels were nonblank, full-page scroll proof was captured, and there were zero console errors plus zero failed requests.
-- Proof receipt: `test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json`.
-- Deploy receipt: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json`.
-- Manifest: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json`.
+- Headed live-browser proof passed desktop `1440x980` and mobile `390x844`: production URL opened, expected card text rendered, Valley Verified fields updated in-browser, four print actions fired, QR canvas pixels were nonblank, founder/logo images loaded, full-page scroll proof was captured, and there were zero console errors plus zero failed requests.
+- Proof receipt: `test-artifacts/live-browser-verifier/2026-05-23T02-38-26-557Z-business-cards-v2-production-focused/live-browser-verification-report.json`.
+- Deploy receipt: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-receipt.json`.
+- Manifest: `test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-manifest.json`.
+
+What changed after owner rejection of the prior cards:
+
+- Replaced the card surface with a browser card studio instead of a set of near-identical dark templates.
+- Added 3 founder card directions using the real local founder headshot, portrait, founder cutout, Skye Over London logo, and MetrAIyux 0S logos.
+- Rebuilt the Valley Verified card as a selected-client priority-access pass with business/city/category/contact fields, generated access code, founder photo, Skye Over London logo, and a QR that opens a prefilled direct email to Gray London Skyes.
+- Owner correction: do not add `875+`, fake Phoenix-business counts, or inflated Valley Verified scale claims unless a verified source of truth is provided.
+- Rebuilt the 12 platform cards from structured data so future updates only edit the platform array.
+- Added print/PDF actions for single cards, full set, and platform set.
 
 Repeat deploy command shape:
 
@@ -1547,7 +1557,7 @@ CLOUDFLARE_API_TOKEN="$(sed -n '1240p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^
 CLOUDFLARE_ACCOUNT_ID="$(sed -n '1241p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
 PAGES_PROJECT=metraiyux-0s-marketing \
 PAGES_DIR=marketing/metraiyux-0s \
-PAGES_COMMIT_MESSAGE="Business Cards v2 local QR and responsive proof" \
+PAGES_COMMIT_MESSAGE="Overwrite business cards with founder assets" \
 node tools/cloudflare-pages-direct-upload.mjs
 ```
 
@@ -1568,7 +1578,7 @@ npm run brain:sync:obsidian
 npm run vault:0s:map
 ```
 
-Brain/neural-map refresh result: 13 Obsidian notes into 224 local-brain chunks, plus 1 SkyeVault repo / 24 receipts / 62 nodes / 61 links / 1 workspace map.
+Brain/neural-map refresh result after the latest Business Cards Client Access Studio overwrite: 13 Obsidian notes into 224 local-brain chunks, plus 1 SkyeVault repo / 26 receipts / 64 nodes / 63 links / 1 workspace map.
 
 ## 2026-05-23 Next-Agent Operating Playbook - Repo, Production, Vaults, And Local Clone
 
@@ -1698,20 +1708,20 @@ PAGES_COMMIT_MESSAGE="<accurate deploy message>" \
 node tools/cloudflare-pages-direct-upload.mjs
 ```
 
-After deploy, verify production over HTTP and then run headed browser proof. For Business Cards v2:
+After deploy, verify production over HTTP and then run headed browser proof. For Business Cards:
 
 ```bash
 npm run proof:business-cards
 ```
 
-Latest Business Cards v2 production facts:
+Latest Business Cards production facts:
 
 ```text
 production URL: https://metraiyux-0s-marketing.pages.dev/business-cards.html
-deployment: f8e8b6e0-2077-42a9-a757-28f191a52cf3
-preview: https://f8e8b6e0.metraiyux-0s-marketing.pages.dev
-deploy receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json
-browser proof: test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json
+deployment: ac63a830-4a79-476a-93d2-9ce120e2578a
+preview: https://ac63a830.metraiyux-0s-marketing.pages.dev
+deploy receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-receipt.json
+browser proof: test-artifacts/live-browser-verifier/2026-05-23T02-38-26-557Z-business-cards-v2-production-focused/live-browser-verification-report.json
 ```
 
 ### Cloudflare Worker Push Lane

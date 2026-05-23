@@ -1,12 +1,12 @@
-# Business Cards v2 - Production Handoff
+# Business Cards Client Access Studio - Production Handoff
 **Date:** 2026-05-23  
-**Status:** Deployed live, headed-browser proof passed, Git source ready for next dev
+**Status:** Rebuilt over rejected card set, deployed live, headed-browser proof passed, Git source ready for next dev
 
 ---
 
 ## Final Production State
 
-Business Cards v2 is live at:
+The new Business Cards Client Access Studio is live at:
 
 ```text
 https://metraiyux-0s-marketing.pages.dev/business-cards.html
@@ -24,6 +24,19 @@ receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v
 manifest: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json
 ```
 
+Latest corrected deployment after the owner requested real founder photos/logos and no inflated Valley Verified business-count assumptions:
+
+```text
+deploymentId: ac63a830-4a79-476a-93d2-9ce120e2578a
+preview: https://ac63a830.metraiyux-0s-marketing.pages.dev
+project: metraiyux-0s-marketing
+source: marketing/metraiyux-0s
+assetCount: 171
+receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-receipt.json
+manifest: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-manifest.json
+production URL: https://metraiyux-0s-marketing.pages.dev/business-cards.html
+```
+
 Line `1240` in root `.env` was the token lane that could reach Cloudflare Pages. Do not print or commit the value. The token around line `1236` could read account and Zero Trust resources, but it returned Cloudflare Pages auth errors and was not valid for this deploy lane.
 
 ---
@@ -37,14 +50,17 @@ marketing/metraiyux-0s/business-cards.html
 marketing/metraiyux-0s/assets/vendor/qrcode-generator.js
 ```
 
-Business Cards v2 includes:
+The current Client Access Studio includes:
 
-- 2 founder cards: Gold founder edition and Cyan tech edition.
-- 1 Valley Verified client card with live business/city/category form updates.
+- 3 founder card directions: Founder Signature, Executive Intro, and Systems Operator.
+- Founder cards now use the real local image assets: `assets/gray-skyes-headshot.png`, `assets/gray-skyes-portrait.jpg`, `assets/founder-skyes-over-london.png`, `assets/skyes-over-london-deity-logo.png`, `assets/metraiyux-0s-logo-transparent.png`, and `assets/metraiyux-0s-emblem-transparent.png`.
+- 1 selected-client Valley Verified priority-access card builder with live business/city/category/contact fields, auto-generated priority codes, a founder photo, the Skye Over London logo, and a QR that opens a prefilled direct email to Gray London Skyes.
+- Do not add `875+`, fake Phoenix-business counts, or any inflated Valley Verified scale claim to this card surface unless the owner gives a verified source of truth.
 - 12 platform cards: MetrAIyux 0S, SkyeMusicNexus, SkyeRouteX, PHX Verified, NorthStar, Free99, LegalSkyes, QuantumSkyes MCP, kAIxu CodeStudio, Agentic Growth Layer, SkyeVaultOS, and Merser.
 - Print isolation: each card prints alone on a 3.5in by 2in page.
 - Local QR generation from `assets/vendor/qrcode-generator.js`; the old unpkg dependency was removed so production does not fail if the CDN blocks.
 - Desktop card previews fit the requested 600px display target, while mobile computes `--screen-scale` at runtime so cards do not overflow the viewport.
+- Browser controls include `Save PDF`, `Print Card`, `Print Full Set`, and `Print Platform Set`; these use the browser print/PDF dialog.
 
 ---
 
@@ -55,6 +71,16 @@ Headed production proof passed under Chromium with desktop and mobile viewports:
 ```text
 proof command: node tools/proof-business-cards-v2-production.mjs
 receipt: test-artifacts/live-browser-verifier/2026-05-23T01-56-21-087Z-business-cards-v2-production-focused/live-browser-verification-report.json
+desktop: 1440x980
+mobile: 390x844
+failures: []
+```
+
+Latest overwrite proof:
+
+```text
+proof command: npm run proof:business-cards
+receipt: test-artifacts/live-browser-verifier/2026-05-23T02-38-26-557Z-business-cards-v2-production-focused/live-browser-verification-report.json
 desktop: 1440x980
 mobile: 390x844
 failures: []
@@ -92,9 +118,9 @@ CLOUDFLARE_API_TOKEN="$(sed -n '1240p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^
 CLOUDFLARE_ACCOUNT_ID="$(sed -n '1241p' .env | sed -E 's/^[^=]+=//' | sed -E 's/^['\"'\"']|['\"'\"']$//g')" \
 PAGES_PROJECT=metraiyux-0s-marketing \
 PAGES_DIR=marketing/metraiyux-0s \
-PAGES_COMMIT_MESSAGE="Business Cards v2 local QR and responsive proof" \
-PAGES_RECEIPT=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-receipt.json \
-PAGES_MANIFEST=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-v2-responsive-manifest.json \
+PAGES_COMMIT_MESSAGE="Overwrite business cards with founder assets" \
+PAGES_RECEIPT=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-receipt.json \
+PAGES_MANIFEST=test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-cards-founder-assets-manifest.json \
 node tools/cloudflare-pages-direct-upload.mjs
 ```
 
@@ -128,7 +154,7 @@ Brain/neural-map result after the business-card production pass:
 
 ```text
 Obsidian brain sync: 13 notes into 224 local-brain chunks
-SkyeVault 0S neural bridge: 1 repo, 24 receipts, 62 nodes, 61 links, 1 workspace map
+Latest SkyeVault 0S neural bridge after Client Access Studio overwrite: 1 repo, 26 receipts, 64 nodes, 63 links, 1 workspace map
 ```
 
 ---

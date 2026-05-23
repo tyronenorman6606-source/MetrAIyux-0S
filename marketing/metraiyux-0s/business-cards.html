@@ -3,378 +3,862 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Business Cards — MetrAIyux 0S</title>
-  <meta name="description" content="Premium print-ready 3.5″ × 2″ business cards for Gray London Skyes, Valley Verified clients, and every MetrAIyux 0S platform.">
+  <title>Print-Ready Business Cards - MetrAIyux 0S</title>
+  <meta name="description" content="Print-ready business cards for Gray London Skyes, Valley Verified clients, and MetrAIyux 0S platforms.">
   <link rel="icon" href="/assets/favicon-32.png">
   <link rel="stylesheet" href="/style.css">
   <script src="/assets/vendor/qrcode-generator.js"></script>
 
   <style>
-    /* ================================================================
-       BUSINESS CARDS — Premium redesign
-       Card designed at 336×192 px (= 3.5" × 2" at 96 dpi)
-       Displayed on screen at scale(1.786) → 600×343 px visible area
-    ================================================================ */
+    :root {
+      --card-w: 336px;
+      --card-h: 192px;
+      --preview-w: 600px;
+      --preview-h: 343px;
+    }
 
-    /* ── PAGE ── */
-    .page-hero { padding: 96px 0 52px; text-align: center; }
-    .page-hero h1 {
+    .bc-page {
+      padding-bottom: 72px;
+    }
+
+    .bc-hero {
+      width: var(--wrap);
+      margin: 0 auto;
+      padding: 72px 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: end;
+    }
+
+    .bc-kicker {
+      margin: 0 0 12px;
+      font-family: var(--font-label);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bc-hero h1 {
+      margin: 0;
       font-family: var(--font-display);
-      font-size: clamp(2rem, 4.5vw, 3.4rem);
-      font-weight: 900; color: var(--gold);
-      margin: 0 0 14px; letter-spacing: .06em;
-    }
-    .page-hero .sub {
-      color: var(--muted); font-size: 1rem;
-      max-width: 580px; margin: 0 auto 28px; line-height: 1.65;
-    }
-    .print-tip {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: rgba(244,199,91,.07); border: 1px solid rgba(244,199,91,.22);
-      border-radius: 8px; padding: 10px 20px;
-      color: var(--gold); font-size: 12.5px; max-width: 660px;
+      font-size: clamp(2rem, 5vw, 4.6rem);
+      font-weight: 900;
+      line-height: .95;
+      color: var(--ink);
+      text-wrap: balance;
     }
 
-    /* ── SECTIONS ── */
-    .bc-section { padding: 68px 0; border-top: 1px solid var(--line); }
-    .sec-hd { margin-bottom: 44px; }
-    .sec-hd h2 {
-      font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
-      color: var(--ink); margin: 0 0 7px; letter-spacing: .06em;
+    .bc-hero-copy {
+      max-width: 700px;
+      margin: 18px 0 0;
+      color: var(--soft);
+      line-height: 1.55;
+      font-size: 1rem;
     }
-    .sec-hd p { color: var(--muted); font-size: 13px; margin: 0; line-height: 1.6; }
 
-    /* ── CARD GRID ── */
+    .bc-command {
+      display: grid;
+      gap: 10px;
+      min-width: 250px;
+      padding: 14px;
+      border: 1px solid rgba(244,199,91,.26);
+      border-radius: 8px;
+      background: rgba(5,8,12,.74);
+      box-shadow: 0 18px 54px rgba(0,0,0,.34);
+    }
+
+    .bc-command strong {
+      font-family: var(--font-display);
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    .bc-command span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .bc-section {
+      width: var(--wrap);
+      margin: 0 auto;
+      padding: 56px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2vw, 1.65rem);
+      color: var(--ink);
+    }
+
+    .section-head p {
+      margin: 8px 0 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .section-action {
+      flex: 0 0 auto;
+    }
+
     .bc-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
-      gap: 56px 64px;
+      gap: 42px 38px;
     }
-    .bc-wrap { display: flex; flex-direction: column; gap: 16px; }
-    .bc-meta { display: flex; align-items: center; justify-content: space-between; }
-    .bc-label { font-size: 11px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
-    .bc-size  { font-size: 10px; color: rgba(180,175,165,.38); }
-    .bc-actions { display: flex; gap: 12px; align-items: center; }
-    .btn-print {
-      background: rgba(244,199,91,.1); border: 1px solid rgba(244,199,91,.3);
-      color: var(--gold); font-family: var(--font-body); font-size: 13px; font-weight: 600;
-      padding: 8px 20px; border-radius: 6px; cursor: pointer; transition: all .14s;
-    }
-    .btn-print:hover { background: var(--gold); color: #060810; }
 
-    /* ── CARD DISPLAY WRAPPER ── */
+    .bc-wrap {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .bc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 22px;
+    }
+
+    .bc-label {
+      color: var(--soft);
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .bc-size {
+      color: rgba(216,224,234,.48);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
     .bc-display {
-      width: min(600px, 100%); height: 343px;
-      position: relative; overflow: hidden;
-      border-radius: 14px; flex-shrink: 0;
-      box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
+      position: relative;
+      width: min(var(--preview-w), 100%);
+      height: var(--preview-h);
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.52), 0 0 0 1px rgba(255,255,255,.08);
+      background: #030406;
+      contain: layout paint;
     }
 
-    /* ── BUSINESS CARD ── */
     .bc {
-      width: 336px; height: 192px;
-      position: absolute; top: 0; left: 0;
-      transform: scale(var(--screen-scale, 1.786)); transform-origin: top left;
-      border-radius: 8px; overflow: hidden;
-      font-family: var(--font-body); color: #f4f0e8;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--card-w);
+      height: var(--card-h);
+      overflow: hidden;
+      border-radius: 8px;
+      transform: scale(var(--screen-scale, 1.786));
+      transform-origin: top left;
+      color: #f8f5ed;
+      font-family: var(--font-body);
+      isolation: isolate;
+      background: #050608;
     }
 
-    /* Layered background system */
-    .bc-bg, .bc-overlay, .bc-glow-1, .bc-glow-2, .bc-texture {
-      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    .bc::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: .55;
     }
 
-    /* Grid texture — same as main marketing site */
-    .bc-texture {
-      background-image:
-        linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size: 22px 22px;
+    .bc::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .bc-layer,
+    .bc-plate,
+    .bc-rule,
+    .bc-corner,
+    .bc-mark-strip,
+    .bc-logo-watermark,
+    .bc-founder-photo,
+    .vv-rail-logo {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .bc-logo-watermark {
+      object-fit: contain;
+      opacity: .16;
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    .bc-founder-photo {
+      overflow: hidden;
       z-index: 1;
+      border: 1px solid color-mix(in srgb, var(--accent) 46%, transparent);
+      background: rgba(255,255,255,.055);
+      box-shadow: 0 10px 24px rgba(0,0,0,.34);
     }
 
-    /* Full-width top accent line */
-    .bc-line-top {
-      position: absolute; top: 0; left: 0; right: 0; height: 2px; z-index: 5;
+    .bc-founder-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
     }
 
-    /* Left accent rail */
-    .bc-rail {
-      position: absolute; top: 0; left: 0; bottom: 0; width: 2px; z-index: 5;
-    }
-
-    /* Corner bracket marks — all 4 */
-    .bc-mark {
-      position: absolute; width: 12px; height: 12px; z-index: 5;
-    }
-    .bc-mark--tl { top: 10px; left: 10px;  border-top: 1.5px solid; border-left: 1.5px solid; }
-    .bc-mark--tr { top: 10px; right: 10px; border-top: 1.5px solid; border-right: 1.5px solid; }
-    .bc-mark--bl { bottom: 10px; left: 10px;  border-bottom: 1.5px solid; border-left: 1.5px solid; }
-    .bc-mark--br { bottom: 10px; right: 10px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
-
-    /* Card content */
     .bc-inner {
-      position: absolute; inset: 0; z-index: 6;
-      padding: 16px 18px;
-      display: flex; flex-direction: column; justify-content: space-between;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 15px 17px;
+      z-index: 2;
     }
 
-    /* ── CARD ROW: TOP ── */
-    .bc-top { display: flex; align-items: flex-start; justify-content: space-between; }
-    .bc-brand { display: flex; align-items: center; gap: 7px; }
-    .bc-logo  { width: 24px; height: 24px; object-fit: contain; opacity: .9; flex-shrink: 0; }
-    .bc-brand-col { display: flex; flex-direction: column; gap: 1.5px; }
-    .bc-brand-name {
-      font-family: var(--font-display); font-size: 6.5px; font-weight: 700;
-      letter-spacing: .24em; text-transform: uppercase;
-      color: var(--ac); opacity: .65;
-    }
-    .bc-brand-sub {
-      font-size: 5.5px; color: rgba(212,208,200,.32);
-      letter-spacing: .18em; text-transform: uppercase;
+    .bc-top,
+    .bc-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
     }
 
-    /* QR code */
+    .bc-bottom {
+      align-items: end;
+    }
+
+    .bc-brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .bc-logo {
+      width: 25px;
+      height: 25px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .bc-logo.logo-wide {
+      width: 42px;
+      height: 26px;
+    }
+
+    .bc-logo.logo-skyes {
+      width: 35px;
+      height: 25px;
+    }
+
+    .bc-brand-text {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .bc-brand-text strong,
+    .bc-eyebrow,
+    .bc-access,
+    .bc-small {
+      font-family: var(--font-label);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bc-brand-text strong {
+      color: var(--accent);
+      font-size: 7px;
+    }
+
+    .bc-brand-text span {
+      color: rgba(248,245,237,.45);
+      font-size: 5.6px;
+      line-height: 1.2;
+    }
+
     .bc-qr canvas {
       display: block !important;
-      width: 56px !important; height: 56px !important;
+      width: 56px !important;
+      height: 56px !important;
       border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.12);
     }
 
-    /* ── CARD ROW: MID ── */
-    .bc-mid {
-      flex: 1; display: flex; flex-direction: column; justify-content: center;
-      padding: 4px 0;
+    .bc-title-block {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
     }
-    .bc-accent-bar {
-      width: 32px; height: 2px;
-      background: var(--ac); opacity: .85;
-      margin-bottom: 9px;
-      border-radius: 1px;
+
+    .bc-eyebrow {
+      color: var(--accent);
+      font-size: 6px;
     }
+
     .bc-name {
+      margin: 0;
       font-family: var(--font-display);
-      font-size: 23px; font-weight: 900; letter-spacing: .04em; line-height: 1.05;
-      color: #f6f2ea;
-      margin: 0 0 5px;
-      text-shadow: 0 0 38px var(--ac-glow);
+      font-size: 21px;
+      line-height: .98;
+      font-weight: 900;
+      color: var(--name, #fff7df);
+      text-wrap: balance;
     }
+
     .bc-title {
-      font-size: 8px; color: rgba(212,208,200,.52);
-      margin: 0 0 3px; letter-spacing: .14em; text-transform: uppercase;
-    }
-    .bc-tagline {
-      font-size: 7.5px; color: rgba(212,208,200,.33);
-      margin: 0; font-style: italic;
+      margin: 0;
+      color: var(--sub, rgba(248,245,237,.72));
+      font-size: 7.3px;
+      line-height: 1.25;
+      text-transform: uppercase;
     }
 
-    /* Platform variant — name in accent color, bigger */
-    .bc-plat-name {
+    .bc-line {
+      width: 44px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .bc-contact {
+      display: grid;
+      gap: 2.5px;
+      min-width: 0;
+    }
+
+    .bc-contact span {
+      display: block;
+      max-width: 210px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 7px;
+      color: rgba(248,245,237,.78);
+    }
+
+    .bc-contact .bc-url {
+      color: var(--accent);
+    }
+
+    .bc-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 14px;
+      padding: 2px 6px;
+      border: 1px solid color-mix(in srgb, var(--accent) 44%, transparent);
+      border-radius: 4px;
+      color: var(--accent);
+      font-family: var(--font-label);
+      font-size: 6px;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.045);
+      white-space: nowrap;
+    }
+
+    .bc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bc-btn {
+      border: 1px solid rgba(244,199,91,.36);
+      border-radius: 6px;
+      color: var(--gold);
+      background: rgba(244,199,91,.095);
+      padding: 8px 13px;
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .bc-btn:hover,
+    .bc-btn:focus-visible {
+      color: #050608;
+      background: var(--gold);
+      outline: none;
+    }
+
+    .bc-btn.secondary {
+      color: var(--cyan);
+      border-color: rgba(100,217,255,.32);
+      background: rgba(100,217,255,.08);
+    }
+
+    .bc-btn.secondary:hover,
+    .bc-btn.secondary:focus-visible {
+      color: #02060a;
+      background: var(--cyan);
+    }
+
+    .bc-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .bc--founder-night {
+      --accent: #f4c75b;
+      --name: #fff4cf;
+      --sub: rgba(248,245,237,.72);
+      background:
+        linear-gradient(115deg, #050608 0%, #0c0b08 52%, #151006 100%);
+    }
+
+    .bc--founder-night .bc-plate {
+      inset: 0 auto 0 0;
+      width: 96px;
+      background: linear-gradient(180deg, rgba(244,199,91,.92), rgba(151,103,20,.88));
+    }
+
+    .bc--founder-night .bc-mark-strip {
+      top: 14px;
+      left: 12px;
+      width: 72px;
+      height: 122px;
+      border: 1px solid rgba(5,8,12,.45);
+    }
+
+    .bc--founder-night .bc-founder-photo {
+      left: 14px;
+      top: 16px;
+      width: 68px;
+      height: 84px;
+      border-radius: 9px;
+      border-color: rgba(5,8,12,.46);
+      background: rgba(5,8,12,.16);
+    }
+
+    .bc--founder-night .bc-logo-watermark {
+      left: 7px;
+      bottom: 6px;
+      width: 86px;
+      height: 58px;
+      opacity: .48;
+      filter: saturate(1.1) contrast(1.08) drop-shadow(0 4px 10px rgba(0,0,0,.2));
+    }
+
+    .bc--founder-night .bc-monogram {
+      position: absolute;
+      left: 24px;
+      bottom: 13px;
       font-family: var(--font-display);
-      font-size: 25px; font-weight: 900; letter-spacing: .05em; line-height: 1.0;
-      color: var(--ac);
-      margin: 0 0 6px;
-      text-shadow: 0 0 44px var(--ac-glow);
-    }
-    .bc-plat-sub {
-      font-size: 7.5px; color: rgba(212,208,200,.42);
-      letter-spacing: .13em; text-transform: uppercase; margin: 0;
+      font-size: 12px;
+      line-height: .9;
+      font-weight: 900;
+      color: rgba(5,8,12,.78);
+      z-index: 2;
     }
 
-    /* ── CARD ROW: BOTTOM ── */
-    .bc-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
-    .bc-contact { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-    .bc-email { font-family: var(--font-mono); font-size: 8px; color: rgba(212,208,200,.75); }
-    .bc-url   { font-family: var(--font-mono); font-size: 7px; color: var(--ac); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .bc-badge {
-      display: inline-flex; align-items: center; flex-shrink: 0;
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
-      border-radius: 3px; padding: 2.5px 6px;
-      font-size: 6px; color: rgba(212,208,200,.38);
-      letter-spacing: .15em; text-transform: uppercase;
+    .bc--founder-night .bc-inner {
+      padding-left: 112px;
     }
 
-    /* ══════════════════════════════════
-       THEMES
-       --ac = accent color
-       --ac-glow = glow rgba
-    ══════════════════════════════════ */
-
-    /* GOLD */
-    .bc--gold {
-      --ac: #f4c75b; --ac-glow: rgba(244,199,91,.32);
-      --qr-fg: #f4c75b; --qr-bg: #07060a;
+    .bc--founder-paper {
+      --accent: #1d5f74;
+      --name: #0a0c10;
+      --sub: rgba(10,12,16,.68);
+      color: #0a0c10;
+      background:
+        linear-gradient(90deg, #f5efe2 0%, #efe2c9 100%);
     }
-    .bc--gold .bc-bg      { background: linear-gradient(145deg, #09070c 0%, #0f0a02 100%); }
-    .bc--gold .bc-glow-1  { background: radial-gradient(ellipse at 85% 85%, rgba(244,199,91,.11) 0%, transparent 60%); }
-    .bc--gold .bc-glow-2  { background: radial-gradient(ellipse at 15% 15%, rgba(244,199,91,.05) 0%, transparent 50%); }
-    .bc--gold .bc-line-top{ background: linear-gradient(90deg, transparent, rgba(244,199,91,.7) 35%, rgba(244,199,91,.7) 65%, transparent); }
-    .bc--gold .bc-mark    { border-color: rgba(244,199,91,.45); }
 
-    /* CYAN */
-    .bc--cyan {
-      --ac: #64d9ff; --ac-glow: rgba(100,217,255,.35);
-      --qr-fg: #64d9ff; --qr-bg: #020c16;
+    .bc--founder-paper::before {
+      background:
+        linear-gradient(90deg, rgba(10,12,16,.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(10,12,16,.04) 1px, transparent 1px);
+      background-size: 18px 18px;
+      opacity: .45;
     }
-    .bc--cyan .bc-bg      { background: linear-gradient(145deg, #020c16 0%, #030f1a 100%); }
-    .bc--cyan .bc-glow-1  { background: radial-gradient(ellipse at 85% 85%, rgba(100,217,255,.12) 0%, transparent 60%); }
-    .bc--cyan .bc-glow-2  { background: radial-gradient(ellipse at 15% 20%, rgba(100,217,255,.06) 0%, transparent 50%); }
-    .bc--cyan .bc-line-top{ background: linear-gradient(90deg, transparent, rgba(100,217,255,.65) 35%, rgba(100,217,255,.65) 65%, transparent); }
-    .bc--cyan .bc-mark    { border-color: rgba(100,217,255,.42); }
 
-    /* VIOLET */
-    .bc--violet {
-      --ac: #a88cff; --ac-glow: rgba(168,140,255,.35);
-      --qr-fg: #a88cff; --qr-bg: #07040e;
+    .bc--founder-paper .bc-rule {
+      left: 17px;
+      right: 17px;
+      top: 54px;
+      height: 1px;
+      background: rgba(10,12,16,.18);
     }
-    .bc--violet .bc-bg      { background: linear-gradient(145deg, #07040e 0%, #0b0416 100%); }
-    .bc--violet .bc-glow-1  { background: radial-gradient(ellipse at 85% 85%, rgba(168,140,255,.13) 0%, transparent 60%); }
-    .bc--violet .bc-glow-2  { background: radial-gradient(ellipse at 20% 15%, rgba(168,140,255,.06) 0%, transparent 50%); }
-    .bc--violet .bc-line-top{ background: linear-gradient(90deg, transparent, rgba(168,140,255,.65) 35%, rgba(168,140,255,.65) 65%, transparent); }
-    .bc--violet .bc-mark    { border-color: rgba(168,140,255,.42); }
 
-    /* MINT */
-    .bc--mint {
-      --ac: #6ff2c7; --ac-glow: rgba(111,242,199,.3);
-      --qr-fg: #6ff2c7; --qr-bg: #020f0b;
+    .bc--founder-paper .bc-inner {
+      padding-right: 86px;
     }
-    .bc--mint .bc-bg      { background: linear-gradient(145deg, #020f0b 0%, #040f09 100%); }
-    .bc--mint .bc-glow-1  { background: radial-gradient(ellipse at 85% 85%, rgba(111,242,199,.11) 0%, transparent 60%); }
-    .bc--mint .bc-glow-2  { background: radial-gradient(ellipse at 20% 15%, rgba(111,242,199,.05) 0%, transparent 50%); }
-    .bc--mint .bc-line-top{ background: linear-gradient(90deg, transparent, rgba(111,242,199,.62) 35%, rgba(111,242,199,.62) 65%, transparent); }
-    .bc--mint .bc-mark    { border-color: rgba(111,242,199,.4); }
 
-    /* ROSE */
-    .bc--rose {
-      --ac: #ff7a90; --ac-glow: rgba(255,122,144,.32);
-      --qr-fg: #ff7a90; --qr-bg: #110407;
+    .bc--founder-paper .bc-founder-photo {
+      right: 18px;
+      top: 68px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border-color: rgba(29,95,116,.36);
+      background: rgba(10,12,16,.08);
     }
-    .bc--rose .bc-bg      { background: linear-gradient(145deg, #110407 0%, #0e0407 100%); }
-    .bc--rose .bc-glow-1  { background: radial-gradient(ellipse at 85% 85%, rgba(255,122,144,.12) 0%, transparent 60%); }
-    .bc--rose .bc-glow-2  { background: radial-gradient(ellipse at 15% 15%, rgba(255,122,144,.05) 0%, transparent 50%); }
-    .bc--rose .bc-line-top{ background: linear-gradient(90deg, transparent, rgba(255,122,144,.65) 35%, rgba(255,122,144,.65) 65%, transparent); }
-    .bc--rose .bc-mark    { border-color: rgba(255,122,144,.42); }
 
-    /* ══════════════════════════════════
-       VALLEY VERIFIED CARD — Split layout
-    ══════════════════════════════════ */
+    .bc--founder-paper .bc-logo-watermark {
+      right: -10px;
+      bottom: 1px;
+      width: 116px;
+      height: 92px;
+      opacity: .18;
+      mix-blend-mode: multiply;
+    }
+
+    .bc--founder-paper .bc-contact span,
+    .bc--founder-paper .bc-brand-text span {
+      color: rgba(10,12,16,.68);
+    }
+
+    .bc--founder-paper .bc-pill {
+      background: rgba(10,12,16,.045);
+    }
+
+    .bc--founder-systems {
+      --accent: #64d9ff;
+      --name: #eaf9ff;
+      --sub: rgba(220,246,255,.7);
+      background:
+        linear-gradient(135deg, #020811 0%, #061723 58%, #08101a 100%);
+    }
+
+    .bc--founder-systems .bc-plate {
+      right: 0;
+      top: 0;
+      width: 102px;
+      height: 100%;
+      background:
+        linear-gradient(180deg, rgba(100,217,255,.13), rgba(111,242,199,.08)),
+        repeating-linear-gradient(0deg, rgba(100,217,255,.28) 0 1px, transparent 1px 13px);
+      border-left: 1px solid rgba(100,217,255,.22);
+    }
+
+    .bc--founder-systems .bc-inner {
+      padding-right: 112px;
+    }
+
+    .bc--founder-systems .bc-founder-photo {
+      right: 2px;
+      bottom: -6px;
+      width: 100px;
+      height: 148px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .bc--founder-systems .bc-founder-photo img {
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 18px 24px rgba(0,0,0,.46));
+    }
+
+    .bc--founder-systems .bc-logo-watermark {
+      right: -11px;
+      top: 5px;
+      width: 124px;
+      height: 108px;
+      opacity: .18;
+    }
+
     .bc--vv {
-      --ac: #f4c75b; --ac-glow: rgba(244,199,91,.35);
-      --qr-fg: #f4c75b; --qr-bg: #09070c;
-    }
-    /* Two-tone split: gold-tinted left 90px / dark right */
-    .bc--vv .bc-bg {
-      background: linear-gradient(
-        90deg,
-        #110d01 0px, #110d01 90px,
-        #07060b 90px, #07060b 100%
-      );
-    }
-    .bc--vv .bc-glow-1 { background: radial-gradient(ellipse at 90% 80%, rgba(244,199,91,.12) 0%, transparent 55%); }
-    .bc--vv .bc-glow-2 { background: radial-gradient(ellipse at 30% 50%, rgba(244,199,91,.08) 0%, transparent 40%); }
-    .bc--vv .bc-line-top {
-      background: linear-gradient(90deg, rgba(244,199,91,.8) 0px, rgba(244,199,91,.8) 90px, rgba(244,199,91,.25) 90px, transparent 50%);
-    }
-    .bc--vv .bc-mark { border-color: rgba(244,199,91,.45); }
-
-    /* Vertical divider */
-    .bc-vv-divider {
-      position: absolute; top: 0; bottom: 0; left: 90px; width: 1px; z-index: 3;
-      background: linear-gradient(180deg, rgba(244,199,91,.5) 0%, rgba(244,199,91,.12) 100%);
+      --accent: #f4c75b;
+      --name: #fff2c6;
+      --sub: rgba(248,245,237,.74);
+      background: linear-gradient(90deg, #08090b 0 41%, #111006 41% 100%);
     }
 
-    /* Left panel content */
-    .bc-vv-panel {
-      position: absolute; top: 0; left: 0; bottom: 0; width: 90px; z-index: 6;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 10px;
-    }
-    .bc-vv-icon {
-      font-size: 22px; color: #f4c75b; opacity: .85; line-height: 1;
-    }
-    .bc-vv-mark {
-      font-family: var(--font-display); font-size: 7px; font-weight: 900;
-      color: #f4c75b; letter-spacing: .22em; opacity: .75;
-      writing-mode: vertical-rl; text-orientation: mixed;
-      transform: rotate(180deg);
+    .bc--vv .bc-plate {
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 118px;
+      background:
+        linear-gradient(180deg, rgba(244,199,91,.92), rgba(162,107,18,.92));
     }
 
-    /* Override inner to leave room for left panel */
-    .bc--vv .bc-inner { padding-left: 104px; }
-
-    .bc-access-label {
-      font-size: 6px; color: rgba(212,208,200,.35);
-      text-transform: uppercase; letter-spacing: .18em; margin-bottom: 3px;
+    .vv-seal {
+      position: absolute;
+      left: 18px;
+      top: 17px;
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(5,8,12,.48);
+      border-radius: 999px;
+      color: rgba(5,8,12,.84);
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 900;
+      overflow: hidden;
+      background: rgba(5,8,12,.18);
     }
-    .bc-vv-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(244,199,91,.1); border: 1px solid rgba(244,199,91,.28);
-      border-radius: 3px; padding: 2.5px 7px;
-      font-size: 6px; color: rgba(244,199,91,.65);
-      letter-spacing: .14em; text-transform: uppercase;
+
+    .vv-seal img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
     }
 
-    /* ══════════════════════════════════
-       VV BUILDER FORM
-    ══════════════════════════════════ */
+    .vv-rail-logo {
+      left: 12px;
+      bottom: 35px;
+      width: 92px;
+      height: 48px;
+      object-fit: contain;
+      opacity: .84;
+      filter: drop-shadow(0 5px 10px rgba(5,8,12,.2));
+    }
+
+    .vv-rail-text {
+      position: absolute;
+      left: 18px;
+      bottom: 13px;
+      width: 76px;
+      color: rgba(5,8,12,.76);
+      font-family: var(--font-label);
+      font-size: 7.2px;
+      font-weight: 800;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .bc--vv .bc-inner {
+      padding-left: 136px;
+    }
+
+    .bc--platform .bc-logo-watermark {
+      left: 14px;
+      bottom: 14px;
+      width: 116px;
+      height: 74px;
+      opacity: .13;
+      transform: rotate(-5deg);
+      filter: saturate(1.1) contrast(1.08);
+    }
+
+    .bc--platform {
+      --accent: #64d9ff;
+      --name: #f8fbff;
+      --sub: rgba(248,245,237,.7);
+      background: linear-gradient(135deg, #050608, #0a1118 56%, #08090d);
+    }
+
+    .bc--platform.platform-gold { --accent: #f4c75b; }
+    .bc--platform.platform-cyan { --accent: #64d9ff; }
+    .bc--platform.platform-mint { --accent: #6ff2c7; }
+    .bc--platform.platform-violet { --accent: #a88cff; }
+    .bc--platform.platform-rose { --accent: #ff7a90; }
+
+    .bc--platform .bc-plate {
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 34px;
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 35%, transparent), transparent 72%);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+
+    .bc--platform .bc-mark-strip {
+      right: 15px;
+      bottom: 15px;
+      width: 74px;
+      height: 26px;
+      border-top: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    .platform-index {
+      position: absolute;
+      right: 17px;
+      top: 12px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 9px;
+    }
+
     .vv-builder {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 56px; align-items: start;
-    }
-    .vv-form { display: flex; flex-direction: column; gap: 18px; }
-    .f-field { display: flex; flex-direction: column; gap: 6px; }
-    .f-label {
-      font-size: 11px; color: var(--muted);
-      letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
-    }
-    .f-input {
-      background: rgba(255,255,255,.04); border: 1px solid var(--line);
-      border-radius: 6px; padding: 10px 14px;
-      color: var(--ink); font-family: var(--font-body); font-size: 14px;
-      outline: none; transition: border-color .15s;
-    }
-    .f-input:focus { border-color: rgba(244,199,91,.4); }
-    .f-input::placeholder { color: rgba(212,208,200,.2); }
-    .btn-print-vv {
-      background: rgba(244,199,91,.1); border: 1px solid rgba(244,199,91,.3);
-      color: var(--gold); font-family: var(--font-body);
-      font-size: 14px; font-weight: 600;
-      padding: 12px 22px; border-radius: 8px;
-      cursor: pointer; transition: all .15s; margin-top: 4px;
-    }
-    .btn-print-vv:hover { background: var(--gold); color: #060810; }
-    .vv-hint { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.6; }
-    .vv-preview-label {
-      font-size: 11px; color: var(--muted);
-      letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px;
+      grid-template-columns: 310px minmax(0, 1fr);
+      gap: 34px;
+      align-items: start;
     }
 
-    /* ── PRINT ISOLATION ── */
+    .vv-panel {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid rgba(160,205,226,.22);
+      border-radius: 8px;
+      background: rgba(5,8,12,.66);
+      box-shadow: 0 18px 54px rgba(0,0,0,.28);
+    }
+
+    .vv-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .vv-field label {
+      color: var(--muted);
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .vv-field input {
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid rgba(160,205,226,.22);
+      border-radius: 6px;
+      color: var(--ink);
+      background: rgba(255,255,255,.045);
+      outline: none;
+    }
+
+    .vv-field input:focus {
+      border-color: rgba(244,199,91,.56);
+    }
+
+    .vv-code-card {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid rgba(244,199,91,.22);
+      border-radius: 6px;
+      background: rgba(244,199,91,.07);
+    }
+
+    .vv-code-card span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .vv-code-card strong {
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .bc-hero,
+      .section-head,
+      .vv-builder {
+        grid-template-columns: 1fr;
+      }
+
+      .bc-command,
+      .section-action {
+        min-width: 0;
+      }
+
+      .bc-section {
+        padding: 42px 0;
+      }
+
+      .bc-grid {
+        gap: 34px;
+      }
+    }
+
     @media print {
-      @page { size: 3.5in 2in; margin: 0; }
+      @page {
+        size: 3.5in 2in;
+        margin: 0;
+      }
 
-      body.printing * { visibility: hidden; }
+      html,
+      body {
+        width: 3.5in;
+        height: 2in;
+        margin: 0 !important;
+        background: #fff !important;
+      }
+
+      body.printing * {
+        visibility: hidden !important;
+      }
+
+      body.printing .bc.print-active,
+      body.printing .bc.print-active * {
+        visibility: visible !important;
+      }
 
       body.printing .bc.print-active {
-        visibility: visible !important;
         position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 336px !important;
-        height: 192px !important;
+        inset: 0 auto auto 0 !important;
+        width: 3.5in !important;
+        height: 2in !important;
         transform: none !important;
         border-radius: 0 !important;
-        margin: 0 !important;
-        overflow: visible !important;
+        box-shadow: none !important;
       }
-      body.printing .bc.print-active * { visibility: visible !important; }
+
+      body.printing-collection {
+        width: auto;
+        height: auto;
+      }
+
+      body.printing-collection * {
+        visibility: hidden !important;
+      }
+
+      body.printing-collection .bc.print-included,
+      body.printing-collection .bc.print-included * {
+        visibility: visible !important;
+      }
+
+      body.printing-collection .bc.print-included {
+        position: relative !important;
+        inset: auto !important;
+        width: 3.5in !important;
+        height: 2in !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        page-break-after: always;
+        break-after: page;
+      }
     }
   </style>
 </head>
 <body>
-
-<!-- ── NAV ── -->
 <header class="topbar">
   <nav class="nav-shell">
     <a class="brand" href="/">
@@ -391,672 +875,379 @@
   </nav>
 </header>
 
-<!-- ── HERO ── -->
-<section class="page-hero">
-  <div class="wrap">
-    <p style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 14px">Print-Ready · 3.5″ × 2″ Standard</p>
-    <h1>Business Cards</h1>
-    <p class="sub">Premium dark-format cards for every context. Click <strong style="color:var(--ink)">Print Card</strong> → browser dialog → disable headers/footers → print or <em>Save as PDF</em>. Works in Chrome, Edge, and Safari.</p>
-    <div class="print-tip">
-      ◈&nbsp; Pro tip: In the print dialog, set paper size to <strong>Custom — 3.5″ × 2″</strong>, scale to <strong>100%</strong>, and turn off headers/footers for a clean cut.
+<main class="bc-page">
+  <section class="bc-hero">
+    <div>
+      <p class="bc-kicker">Print-Ready Business Cards</p>
+      <h1>Founder cards, client access passes, and platform cards.</h1>
+      <p class="bc-hero-copy">A browser-ready card studio for Gray London Skyes, selected Valley Verified client access, and the live MetrAIyux platform stack. Every card is built at standard 3.5in x 2in print size with a QR code and a dedicated PDF/print action.</p>
     </div>
-  </div>
-</section>
-
-<div class="wrap">
-
-  <!-- ══════════════════════════════════
-       SECTION 1 — PERSONAL CARDS
-  ══════════════════════════════════ -->
-  <section class="bc-section">
-    <div class="sec-hd">
-      <h2>Personal Cards</h2>
-      <p>Gold for in-person founder meetings and investor context. Cyan for developer, tech, and operator audiences. Both link directly to your founder page via QR.</p>
-    </div>
-    <div class="bc-grid">
-
-      <!-- ── PERSONAL GOLD ── -->
-      <div class="bc-wrap">
-        <div class="bc-meta">
-          <span class="bc-label">Gray London Skyes — Gold</span>
-          <span class="bc-size">3.5″ × 2″</span>
-        </div>
-        <div class="bc-display">
-          <div class="bc bc--gold" id="card-personal-gold">
-            <div class="bc-bg"></div>
-            <div class="bc-texture"></div>
-            <div class="bc-glow-1"></div>
-            <div class="bc-glow-2"></div>
-            <div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div>
-            <div class="bc-mark bc-mark--tr"></div>
-            <div class="bc-mark bc-mark--bl"></div>
-            <div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col">
-                    <span class="bc-brand-name">MetrAIyux 0S</span>
-                    <span class="bc-brand-sub">Sovereign Business OS</span>
-                  </div>
-                </div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-name">GRAY LONDON SKYES</h2>
-                <p class="bc-title">Founder &amp; Sole Operator</p>
-                <p class="bc-tagline">28 platforms. Zero funding. Fully live.</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-                <div class="bc-qr">
-                  <canvas data-url="https://metraiyux-0s-marketing.pages.dev/gray-skyes.html"
-                          data-fg="#f4c75b" data-bg="#07060a"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions">
-          <button class="btn-print" onclick="printCard('card-personal-gold')">Print Card</button>
-          <span style="font-size:11px;color:var(--muted)">3.5″ × 2″ exact at 96 dpi</span>
-        </div>
-      </div>
-
-      <!-- ── PERSONAL CYAN ── -->
-      <div class="bc-wrap">
-        <div class="bc-meta">
-          <span class="bc-label">Gray London Skyes — Cyan</span>
-          <span class="bc-size">3.5″ × 2″</span>
-        </div>
-        <div class="bc-display">
-          <div class="bc bc--cyan" id="card-personal-cyan">
-            <div class="bc-bg"></div>
-            <div class="bc-texture"></div>
-            <div class="bc-glow-1"></div>
-            <div class="bc-glow-2"></div>
-            <div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div>
-            <div class="bc-mark bc-mark--tr"></div>
-            <div class="bc-mark bc-mark--bl"></div>
-            <div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col">
-                    <span class="bc-brand-name">MetrAIyux 0S</span>
-                    <span class="bc-brand-sub">Cloudflare · 17 Workers · 58 Products</span>
-                  </div>
-                </div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-name">GRAY LONDON SKYES</h2>
-                <p class="bc-title">Founder &amp; Sole Operator</p>
-                <p class="bc-tagline">17 Workers. 58 live products. 1 person.</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-                <div class="bc-qr">
-                  <canvas data-url="https://metraiyux-0s-marketing.pages.dev/gray-skyes.html"
-                          data-fg="#64d9ff" data-bg="#020c16"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions">
-          <button class="btn-print" onclick="printCard('card-personal-cyan')">Print Card</button>
-        </div>
-      </div>
-
-    </div>
+    <aside class="bc-command" aria-label="Business card production state">
+      <strong>Card Studio</strong>
+      <span>16 cards loaded: 3 founder directions, 1 client access builder, 12 platform cards.</span>
+      <button class="bc-btn secondary" type="button" onclick="printCollection('.bc')">Print Full Set</button>
+    </aside>
   </section>
 
-
-  <!-- ══════════════════════════════════
-       SECTION 2 — VALLEY VERIFIED CLIENT
-  ══════════════════════════════════ -->
-  <section class="bc-section">
-    <div class="sec-hd">
-      <h2>Valley Verified Client Card</h2>
-      <p>Every client gets their own card. The left gold panel carries the Valley Verified mark — the right panel shows their business info and a QR that scans directly to your founder page. Fill in the fields → the card updates live → print.</p>
-    </div>
-
-    <div class="vv-builder">
-
-      <!-- Form -->
-      <div class="vv-form">
-        <div class="f-field">
-          <label class="f-label" for="vv-biz">Business Name</label>
-          <input id="vv-biz" class="f-input" type="text" placeholder="Bob's Smoke Shop" oninput="updateVV()">
-        </div>
-        <div class="f-field">
-          <label class="f-label" for="vv-city">City</label>
-          <input id="vv-city" class="f-input" type="text" placeholder="Litchfield Park" oninput="updateVV()">
-        </div>
-        <div class="f-field">
-          <label class="f-label" for="vv-cat">Category</label>
-          <input id="vv-cat" class="f-input" type="text" placeholder="Retail &amp; Specialty" oninput="updateVV()">
-        </div>
-        <button class="btn-print-vv" onclick="printCard('card-vv')">Print This Client's Card</button>
-        <p class="vv-hint">Each card is unique. Print one per Valley Verified client — their business name is on it and the QR goes directly to you.</p>
-      </div>
-
-      <!-- Live Preview -->
+  <section class="bc-section" aria-labelledby="founderCards">
+    <div class="section-head">
       <div>
-        <div class="vv-preview-label">Live Preview</div>
+        <h2 id="founderCards">Founder Cards</h2>
+        <p>Three finished directions for different rooms: premium founder handoff, clean executive intro, and systems/operator context.</p>
+      </div>
+    </div>
+    <div class="bc-grid" id="founderGrid"></div>
+  </section>
+
+  <section class="bc-section" aria-labelledby="clientCard">
+    <div class="section-head">
+      <div>
+        <h2 id="clientCard">Valley Verified Priority Access Card</h2>
+        <p>Build a client-specific access card with their name, category, city, priority code, and a QR that opens a direct email to Gray London Skyes.</p>
+      </div>
+    </div>
+    <div class="vv-builder">
+      <form class="vv-panel" onsubmit="event.preventDefault(); printCard('card-vv');">
+        <div class="vv-field">
+          <label for="vv-biz">Business name</label>
+          <input id="vv-biz" type="text" value="Bob's Smoke Shop" autocomplete="organization">
+        </div>
+        <div class="vv-field">
+          <label for="vv-city">City</label>
+          <input id="vv-city" type="text" value="Litchfield Park" autocomplete="address-level2">
+        </div>
+        <div class="vv-field">
+          <label for="vv-cat">Category</label>
+          <input id="vv-cat" type="text" value="Retail & Specialty">
+        </div>
+        <div class="vv-field">
+          <label for="vv-contact">Contact name</label>
+          <input id="vv-contact" type="text" value="Owner">
+        </div>
+        <div class="vv-code-card">
+          <span>Priority access code</span>
+          <strong id="vv-code-control">VV-BOBS-LP</strong>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-btn" type="submit" onclick="printCard('card-vv')">Save PDF</button>
+          <button class="bc-btn secondary" type="button" onclick="resetVV()">Reset</button>
+        </div>
+      </form>
+
+      <div class="bc-wrap">
+        <div class="bc-meta">
+          <span class="bc-label">Valley Verified client access pass</span>
+          <span class="bc-size">3.5in x 2in</span>
+        </div>
         <div class="bc-display">
           <div class="bc bc--vv" id="card-vv">
-            <div class="bc-bg"></div>
-            <div class="bc-texture"></div>
-            <div class="bc-glow-1"></div>
-            <div class="bc-glow-2"></div>
-            <div class="bc-line-top"></div>
-            <div class="bc-vv-divider"></div>
-            <div class="bc-vv-panel">
-              <span class="bc-vv-icon">◈</span>
-              <span class="bc-vv-mark">VALLEY VERIFIED</span>
-            </div>
-            <div class="bc-mark bc-mark--tl"></div>
-            <div class="bc-mark bc-mark--tr"></div>
-            <div class="bc-mark bc-mark--bl"></div>
-            <div class="bc-mark bc-mark--br"></div>
+            <div class="bc-plate"></div>
+            <div class="vv-seal"><img src="/assets/gray-skyes-headshot.png" alt=""></div>
+            <img class="vv-rail-logo" src="/assets/skyes-over-london-deity-logo.png" alt="">
+            <div class="vv-rail-text">Priority Access<br>Direct Operator Line</div>
             <div class="bc-inner">
               <div class="bc-top">
-                <span style="font-family:var(--font-display);font-size:6px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,199,91,.55)">Valley Verified Partner</span>
-                <span class="bc-vv-badge">◈ Certified</span>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-name" id="vv-biz-display" style="font-size:17px;color:#f4c75b">BOB'S SMOKE SHOP</h2>
-                <p class="bc-title" id="vv-city-display">Litchfield Park · Retail &amp; Specialty</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-access-label">Direct line to Gray London Skyes</span>
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev/gray-skyes</span>
+                <div class="bc-title-block">
+                  <span class="bc-eyebrow">Valley Verified Access</span>
+                  <span class="bc-pill">Direct Access</span>
                 </div>
                 <div class="bc-qr">
-                  <canvas id="vv-qr" data-url="https://metraiyux-0s-marketing.pages.dev/gray-skyes.html"
-                          data-fg="#f4c75b" data-bg="#09070c"></canvas>
+                  <canvas id="vv-qr" data-url="mailto:graylondonskyes@gmail.com?subject=Valley%20Verified%20Priority%20Access" data-fg="#f4c75b" data-bg="#09070c"></canvas>
                 </div>
+              </div>
+              <div class="bc-title-block">
+                <div class="bc-line"></div>
+                <h2 class="bc-name" id="vv-biz-display">BOB'S SMOKE SHOP</h2>
+                <p class="bc-title" id="vv-city-display">Litchfield Park / Retail & Specialty</p>
+              </div>
+              <div class="bc-bottom">
+                <div class="bc-contact">
+                  <span id="vv-contact-display">Contact: Owner</span>
+                  <span>graylondonskyes@gmail.com</span>
+                  <span class="bc-url">Priority code: <b id="vv-code-display">VV-BOBS-LP</b></span>
+                </div>
+                <span class="bc-pill">Gray London Skyes</span>
               </div>
             </div>
           </div>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-btn" type="button" onclick="printCard('card-vv')">Save PDF</button>
+          <span class="bc-note">QR opens a prefilled priority email for the client.</span>
         </div>
       </div>
     </div>
   </section>
 
-
-  <!-- ══════════════════════════════════
-       SECTION 3 — PLATFORM CARDS
-  ══════════════════════════════════ -->
-  <section class="bc-section">
-    <div class="sec-hd">
-      <h2>Platform Cards</h2>
-      <p>One card per platform. Every card carries the live QR to that platform's URL. Use at events, client meetings, or when pitching a specific product.</p>
+  <section class="bc-section" aria-labelledby="platformCards">
+    <div class="section-head">
+      <div>
+        <h2 id="platformCards">Platform Cards</h2>
+        <p>One clean handoff card per platform, each with a live QR, category, and direct operator contact.</p>
+      </div>
+      <div class="section-action">
+        <button class="bc-btn secondary" type="button" onclick="printCollection('.platform-card .bc')">Print Platform Set</button>
+      </div>
     </div>
-
-    <div class="bc-grid">
-
-      <!-- MetrAIyux 0S -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">MetrAIyux 0S</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--cyan" id="card-0s">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Platform Card</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev" data-fg="#64d9ff" data-bg="#020c16"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">METRAIYUX 0S</h2>
-                <p class="bc-plat-sub">Sovereign Business Operating System</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-0s')">Print Card</button></div>
-      </div>
-
-      <!-- SkyeMusicNexus -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">SkyeMusicNexus</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--violet" id="card-smn">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Launching July 2026</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/flyer-overview.html" data-fg="#a88cff" data-bg="#07040e"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">SKYE MUSIC NEXUS</h2>
-                <p class="bc-plat-sub">Artist Label Platform · IC Model · 100% Owned Masters</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-smn')">Print Card</button></div>
-      </div>
-
-      <!-- SkyeRouteX -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">SkyeRouteX</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--mint" id="card-srx">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Workforce Command</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev/skyeroutex.html" data-fg="#6ff2c7" data-bg="#020f0b"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">SKYEROUTEX</h2>
-                <p class="bc-plat-sub">Workforce Command · IC Routing &amp; Pay · Live Jobs</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev/skyeroutex</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-srx')">Print Card</button></div>
-      </div>
-
-      <!-- PHX Verified Network -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">PHX Verified Network</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--gold" id="card-phx">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Valley Verified</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://phx-verified-network.pages.dev" data-fg="#f4c75b" data-bg="#07060a"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">PHX VERIFIED NETWORK</h2>
-                <p class="bc-plat-sub">Valley Business Verification &amp; Operator Visibility</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">phx-verified-network.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-phx')">Print Card</button></div>
-      </div>
-
-      <!-- NorthStar SignInPro -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">NorthStar SignInPro</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--cyan" id="card-northstar">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Identity Platform</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev" data-fg="#64d9ff" data-bg="#020c16"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">NORTHSTAR SIGNINPRO</h2>
-                <p class="bc-plat-sub">Auth &amp; Identity · FS27 Gate · Session Ownership</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-northstar')">Print Card</button></div>
-      </div>
-
-      <!-- Free99 -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">Free99 Suite</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--mint" id="card-free99">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Operator Tools</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev" data-fg="#6ff2c7" data-bg="#020f0b"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">FREE99 SUITE</h2>
-                <p class="bc-plat-sub">Still2Vid · BrandForge · SkyePics · SovereignDocs</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-free99')">Print Card</button></div>
-      </div>
-
-      <!-- LegalSkyes -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">LegalSkyes</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--gold" id="card-legal">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Skyes Over London</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://skyes-over-london-legal.pages.dev" data-fg="#f4c75b" data-bg="#07060a"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">LEGALSKYES</h2>
-                <p class="bc-plat-sub">AI-Powered Legal Ops · Policy &amp; Contract Lane</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">skyes-over-london-legal.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-legal')">Print Card</button></div>
-      </div>
-
-      <!-- QuantumSkyes -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">QuantumSkyes MCP</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--violet" id="card-quantum">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Design MCP</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://skye-design-mcp.pages.dev" data-fg="#a88cff" data-bg="#07040e"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">QUANTUMSKYES</h2>
-                <p class="bc-plat-sub">Design MCP · Dev Tooling · Gate-Owned Remote Server</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">skye-design-mcp.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-quantum')">Print Card</button></div>
-      </div>
-
-      <!-- kAIxu -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">kAIxu 6.7 CodeStudio</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--cyan" id="card-kaixu">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">AI Code Studio</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev" data-fg="#64d9ff" data-bg="#020c16"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">kAIxu 6.7 CODESTUDIO</h2>
-                <p class="bc-plat-sub">AI Code Generation · Gate-Owned Runtime · Inner Sanctum</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-kaixu')">Print Card</button></div>
-      </div>
-
-      <!-- Agentic Growth Layer -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">Agentic Growth Layer</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--mint" id="card-agl">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Growth Operations</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://agentic-growth-layer.pages.dev" data-fg="#6ff2c7" data-bg="#020f0b"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">AGENTIC GROWTH LAYER</h2>
-                <p class="bc-plat-sub">AI-Driven Growth Ops · Starter · Connected · Operator</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">agentic-growth-layer.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-agl')">Print Card</button></div>
-      </div>
-
-      <!-- SkyeVaultOS -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">SkyeVaultOS</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--rose" id="card-vault">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">SkySecure Lane</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://metraiyux-0s-marketing.pages.dev" data-fg="#ff7a90" data-bg="#110407"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">SKYE VAULT OS</h2>
-                <p class="bc-plat-sub">Encrypted Vault · Shard Storage · FS27 Secure Lane</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">metraiyux-0s-marketing.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-vault')">Print Card</button></div>
-      </div>
-
-      <!-- Merser -->
-      <div class="bc-wrap">
-        <div class="bc-meta"><span class="bc-label">Merser · Skyes Over London</span><span class="bc-size">3.5″ × 2″</span></div>
-        <div class="bc-display">
-          <div class="bc bc--violet" id="card-merser">
-            <div class="bc-bg"></div><div class="bc-texture"></div><div class="bc-glow-1"></div><div class="bc-glow-2"></div><div class="bc-line-top"></div>
-            <div class="bc-mark bc-mark--tl"></div><div class="bc-mark bc-mark--tr"></div><div class="bc-mark bc-mark--bl"></div><div class="bc-mark bc-mark--br"></div>
-            <div class="bc-inner">
-              <div class="bc-top">
-                <div class="bc-brand">
-                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" class="bc-logo">
-                  <div class="bc-brand-col"><span class="bc-brand-name">Skyes Over London</span></div>
-                </div>
-                <div class="bc-qr"><canvas data-url="https://merser.pages.dev" data-fg="#a88cff" data-bg="#07040e"></canvas></div>
-              </div>
-              <div class="bc-mid">
-                <div class="bc-accent-bar"></div>
-                <h2 class="bc-plat-name">MERSER</h2>
-                <p class="bc-plat-sub">World Registry MCP · npm CLI · Source-Pack Protocol</p>
-              </div>
-              <div class="bc-bottom">
-                <div class="bc-contact">
-                  <span class="bc-email">graylondonskyes@gmail.com</span>
-                  <span class="bc-url">merser.pages.dev</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bc-actions"><button class="btn-print" onclick="printCard('card-merser')">Print Card</button></div>
-      </div>
-
-    </div>
+    <div class="bc-grid" id="platformGrid"></div>
   </section>
+</main>
 
-</div><!-- /.wrap -->
-
-<footer style="border-top:1px solid var(--line);padding:32px 0;margin-top:48px;text-align:center">
-  <p style="color:var(--muted);font-size:12px;margin:0">
-    MetrAIyux 0S · Print-Ready Business Cards · 3.5″ × 2″ ·
-    <a href="/" style="color:var(--gold);text-decoration:none">Marketing Hub</a>
-  </p>
+<footer style="border-top:1px solid var(--line);padding:32px 0;text-align:center">
+  <p style="color:var(--muted);font-size:12px;margin:0">MetrAIyux 0S / Print-Ready Business Cards / 3.5in x 2in / <a href="/" style="color:var(--gold)">Marketing Hub</a></p>
 </footer>
 
+<template id="cardWrapTemplate">
+  <article class="bc-wrap">
+    <div class="bc-meta">
+      <span class="bc-label"></span>
+      <span class="bc-size">3.5in x 2in</span>
+    </div>
+    <div class="bc-display"></div>
+    <div class="bc-actions">
+      <button class="bc-btn" type="button">Save PDF</button>
+      <button class="bc-btn secondary" type="button">Print Card</button>
+    </div>
+  </article>
+</template>
+
 <script>
-/* ── GENERATE ALL QR CODES ── */
+const contactEmail = 'graylondonskyes@gmail.com';
+const founderUrl = 'https://metraiyux-0s-marketing.pages.dev/gray-skyes.html';
+const metraiyuxMarkUrl = '/assets/metraiyux-0s-emblem-transparent.png';
+const metraiyuxLogoUrl = '/assets/metraiyux-0s-logo-transparent.png';
+const skyesLogoUrl = '/assets/skyes-over-london-deity-logo.png';
+const founderHeadshotUrl = '/assets/gray-skyes-headshot.png';
+const founderPortraitUrl = '/assets/gray-skyes-portrait.jpg';
+const founderCutoutUrl = '/assets/founder-skyes-over-london.png';
+
+const founderCards = [
+  {
+    id: 'card-personal-gold',
+    label: 'Founder Signature',
+    theme: 'bc--founder-night',
+    eyebrow: 'Skyes Over London',
+    name: 'GRAY LONDON SKYES',
+    title: 'Founder / Sole Operator',
+    tag: 'MetrAIyux 0S / Valley Verified / Live AI systems',
+    url: 'metraiyux-0s-marketing.pages.dev/gray-skyes',
+    qr: founderUrl,
+    fg: '#f4c75b',
+    bg: '#07060a',
+    badge: 'Founder Card',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
+    photo: founderHeadshotUrl,
+    watermark: skyesLogoUrl
+  },
+  {
+    id: 'card-founder-paper',
+    label: 'Executive Intro',
+    theme: 'bc--founder-paper',
+    eyebrow: 'MetrAIyux 0S',
+    name: 'GRAY LONDON SKYES',
+    title: 'Founder, builder, operator',
+    tag: 'Business systems / client platforms / production proof',
+    url: 'metraiyux-0s-marketing.pages.dev',
+    qr: founderUrl,
+    fg: '#1d5f74',
+    bg: '#f5efe2',
+    badge: 'Executive',
+    logo: metraiyuxLogoUrl,
+    logoClass: 'logo-wide',
+    photo: founderPortraitUrl,
+    watermark: metraiyuxLogoUrl
+  },
+  {
+    id: 'card-personal-cyan',
+    label: 'Systems Operator',
+    theme: 'bc--founder-systems',
+    eyebrow: '17 Workers / 58 live products',
+    name: 'GRAY LONDON SKYES',
+    title: 'Cloudflare operator / AI platform builder',
+    tag: 'One-person production stack with live receipts',
+    url: 'metraiyux-0s-marketing.pages.dev',
+    qr: founderUrl,
+    fg: '#64d9ff',
+    bg: '#020811',
+    badge: 'Operator',
+    logo: metraiyuxMarkUrl,
+    logoClass: '',
+    photo: founderCutoutUrl,
+    watermark: metraiyuxLogoUrl
+  }
+];
+
+const platformCards = [
+  ['card-0s', 'MetrAIyux 0S', 'Sovereign business operating system', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / July 2026 launch', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', 'https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/flyer-overview.html', 'platform-violet'],
+  ['card-srx', 'SkyeRouteX', 'Workforce command / IC routing / live jobs', 'metraiyux-0s-marketing.pages.dev/skyeroutex', 'https://metraiyux-0s-marketing.pages.dev/skyeroutex.html', 'platform-mint'],
+  ['card-phx', 'PHX Verified Network', 'Valley visibility network / local business proof', 'phx-verified-network.pages.dev', 'https://phx-verified-network.pages.dev', 'platform-gold'],
+  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate / workspace sessions', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-mint'],
+  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev', 'https://skyes-over-london-legal.pages.dev', 'platform-gold'],
+  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev', 'https://skye-design-mcp.pages.dev/use-mcp.html', 'platform-violet'],
+  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / 0S cockpit / builder lane', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-agl', 'Agentic Growth Layer', 'AI growth operations / starter to operator', 'agentic-growth-layer.pages.dev', 'https://agentic-growth-layer.pages.dev', 'platform-mint'],
+  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / secure receipts', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-rose'],
+  ['card-merser', 'Merser', 'World registry MCP / npm CLI / source packs', 'merser.pages.dev', 'https://merser.pages.dev', 'platform-violet']
+].map(([id, name, title, displayUrl, qr, theme], index) => ({ id, name, title, displayUrl, qr, theme, index: String(index + 1).padStart(2, '0') }));
+
+function cardShell(card, innerHtml) {
+  return `
+    <div class="bc ${card.theme}" id="${card.id}">
+      <div class="bc-plate"></div>
+      <div class="bc-mark-strip"></div>
+      ${innerHtml}
+    </div>
+  `;
+}
+
+function founderCard(card) {
+  const plate = card.theme === 'bc--founder-night' ? '<div class="bc-monogram">GLS</div>' : '';
+  const rule = card.theme === 'bc--founder-paper' ? '<div class="bc-rule"></div>' : '';
+  const photo = card.photo ? `<div class="bc-founder-photo"><img src="${card.photo}" alt=""></div>` : '';
+  const watermark = card.watermark ? `<img class="bc-logo-watermark" src="${card.watermark}" alt="">` : '';
+  const logoClass = card.logoClass ? ` ${card.logoClass}` : '';
+  return cardShell(card, `
+    ${watermark}${photo}
+    ${plate}${rule}
+    <div class="bc-inner">
+      <div class="bc-top">
+        <div class="bc-brand">
+          <img class="bc-logo${logoClass}" src="${card.logo || metraiyuxMarkUrl}" alt="">
+          <div class="bc-brand-text">
+            <strong>${card.eyebrow}</strong>
+            <span>${card.tag}</span>
+          </div>
+        </div>
+        <span class="bc-pill">${card.badge}</span>
+      </div>
+      <div class="bc-title-block">
+        <div class="bc-line"></div>
+        <h2 class="bc-name">${card.name}</h2>
+        <p class="bc-title">${card.title}</p>
+      </div>
+      <div class="bc-bottom">
+        <div class="bc-contact">
+          <span>${contactEmail}</span>
+          <span class="bc-url">${card.url}</span>
+        </div>
+        <div class="bc-qr">
+          <canvas data-url="${card.qr}" data-fg="${card.fg}" data-bg="${card.bg}"></canvas>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function platformCard(card) {
+  const accentMap = {
+    'platform-gold': ['#f4c75b', '#07060a'],
+    'platform-cyan': ['#64d9ff', '#020811'],
+    'platform-mint': ['#6ff2c7', '#020f0b'],
+    'platform-violet': ['#a88cff', '#07040e'],
+    'platform-rose': ['#ff7a90', '#110407']
+  };
+  const colors = accentMap[card.theme] || accentMap['platform-cyan'];
+  return cardShell({ id: card.id, theme: `bc--platform ${card.theme}` }, `
+    <img class="bc-logo-watermark" src="${metraiyuxLogoUrl}" alt="">
+    <span class="platform-index">${card.index}</span>
+    <div class="bc-inner">
+      <div class="bc-top">
+        <div class="bc-brand">
+          <img class="bc-logo" src="${metraiyuxMarkUrl}" alt="">
+          <div class="bc-brand-text">
+            <strong>Platform Card</strong>
+            <span>MetrAIyux 0S live system</span>
+          </div>
+        </div>
+        <div class="bc-qr">
+          <canvas data-url="${card.qr}" data-fg="${colors[0]}" data-bg="${colors[1]}"></canvas>
+        </div>
+      </div>
+      <div class="bc-title-block">
+        <div class="bc-line"></div>
+        <h2 class="bc-name">${card.name.toUpperCase()}</h2>
+        <p class="bc-title">${card.title}</p>
+      </div>
+      <div class="bc-bottom">
+        <div class="bc-contact">
+          <span>${contactEmail}</span>
+          <span class="bc-url">${card.displayUrl}</span>
+        </div>
+        <span class="bc-pill">Live QR</span>
+      </div>
+    </div>
+  `);
+}
+
+function renderCards() {
+  renderCardGroup(document.getElementById('founderGrid'), founderCards, founderCard);
+  renderCardGroup(document.getElementById('platformGrid'), platformCards, platformCard, 'platform-card');
+}
+
+function renderCardGroup(target, cards, renderer, wrapClass) {
+  const template = document.getElementById('cardWrapTemplate');
+  target.innerHTML = '';
+  cards.forEach((card) => {
+    const node = template.content.firstElementChild.cloneNode(true);
+    if (wrapClass) node.classList.add(wrapClass);
+    node.querySelector('.bc-label').textContent = card.label || card.name;
+    node.querySelector('.bc-display').innerHTML = renderer(card);
+    const buttons = node.querySelectorAll('button');
+    buttons[0].setAttribute('onclick', `printCard('${card.id}')`);
+    buttons[1].setAttribute('onclick', `printCard('${card.id}')`);
+    target.appendChild(node);
+  });
+}
+
 function genQR(canvas) {
   if (!canvas || !window.qrcode) return;
-  var url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
-  var fg  = canvas.dataset.fg  || '#f4c75b';
-  var bg  = canvas.dataset.bg  || '#07060a';
-  var qr = qrcode(0, 'M');
+  const url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
+  const fg = canvas.dataset.fg || '#f4c75b';
+  const bg = canvas.dataset.bg || '#07060a';
+  const qr = qrcode(0, 'M');
   qr.addData(url);
   qr.make();
-  var size = 56;
-  var margin = 2;
-  var count = qr.getModuleCount();
-  var cell = size / (count + margin * 2);
-  var ctx = canvas.getContext('2d');
+  const size = 56;
+  const margin = 2;
+  const count = qr.getModuleCount();
+  const cell = size / (count + margin * 2);
+  const ctx = canvas.getContext('2d');
   canvas.width = size;
   canvas.height = size;
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, size, size);
   ctx.fillStyle = fg;
-  for (var row = 0; row < count; row += 1) {
-    for (var col = 0; col < count; col += 1) {
+  for (let row = 0; row < count; row += 1) {
+    for (let col = 0; col < count; col += 1) {
       if (!qr.isDark(row, col)) continue;
-      var x = Math.floor((col + margin) * cell);
-      var y = Math.floor((row + margin) * cell);
-      var nextX = Math.ceil((col + margin + 1) * cell);
-      var nextY = Math.ceil((row + margin + 1) * cell);
+      const x = Math.floor((col + margin) * cell);
+      const y = Math.floor((row + margin) * cell);
+      const nextX = Math.ceil((col + margin + 1) * cell);
+      const nextY = Math.ceil((row + margin + 1) * cell);
       ctx.fillRect(x, y, Math.max(1, nextX - x), Math.max(1, nextY - y));
     }
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  fitCardPreviews();
+function refreshQR() {
   document.querySelectorAll('.bc canvas').forEach(genQR);
-  updateVV();
-});
-window.addEventListener('resize', fitCardPreviews);
+}
 
 function fitCardPreviews() {
-  document.querySelectorAll('.bc-display').forEach(function (wrap) {
-    var width = Math.min(600, Math.max(280, wrap.parentElement.getBoundingClientRect().width));
-    wrap.style.width = width + 'px';
-    wrap.style.height = Math.round(width * 343 / 600) + 'px';
+  document.querySelectorAll('.bc-display').forEach((wrap) => {
+    const available = wrap.parentElement.getBoundingClientRect().width;
+    const width = Math.min(600, Math.max(280, available));
+    wrap.style.width = `${width}px`;
+    wrap.style.height = `${Math.round(width * 343 / 600)}px`;
     wrap.style.setProperty('--screen-scale', String(width / 336));
   });
 }
 
-/* ── PRINT ONE CARD ── */
 function printCard(id) {
-  var card = document.getElementById(id);
+  const card = document.getElementById(id);
   if (!card) return;
   card.classList.add('print-active');
   document.body.classList.add('printing');
@@ -1065,28 +1256,68 @@ function printCard(id) {
   card.classList.remove('print-active');
 }
 
-/* ── VALLEY VERIFIED LIVE UPDATE ── */
-var vvQRTimer;
-function updateVV() {
-  var biz  = (document.getElementById('vv-biz').value  || "BOB'S SMOKE SHOP").toUpperCase();
-  var city = document.getElementById('vv-city').value  || 'Litchfield Park';
-  var cat  = document.getElementById('vv-cat').value   || 'Retail & Specialty';
-
-  document.getElementById('vv-biz-display').textContent  = biz;
-  document.getElementById('vv-city-display').textContent = city + (cat ? ' · ' + cat : '');
-
-  /* Auto-shrink long names */
-  var el = document.getElementById('vv-biz-display');
-  el.style.fontSize = biz.length > 22 ? '13px' : biz.length > 16 ? '15px' : '17px';
-
-  /* Debounce QR regeneration */
-  clearTimeout(vvQRTimer);
-  vvQRTimer = setTimeout(function () {
-    var qr = document.getElementById('vv-qr');
-    if (qr) genQR(qr);
-  }, 300);
+function printCollection(selector) {
+  const cards = [...document.querySelectorAll(selector)];
+  cards.forEach((card) => card.classList.add('print-included'));
+  document.body.classList.add('printing-collection');
+  window.print();
+  document.body.classList.remove('printing-collection');
+  cards.forEach((card) => card.classList.remove('print-included'));
 }
-</script>
 
+function slugPart(value, fallback) {
+  return (value || fallback)
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.slice(0, 4))
+    .join('');
+}
+
+function updateVV() {
+  const biz = document.getElementById('vv-biz').value || "Bob's Smoke Shop";
+  const city = document.getElementById('vv-city').value || 'Litchfield Park';
+  const cat = document.getElementById('vv-cat').value || 'Retail & Specialty';
+  const contact = document.getElementById('vv-contact').value || 'Owner';
+  const cityInitials = city.split(/\s+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 3).toUpperCase() || 'AZ';
+  const code = `VV-${slugPart(biz, 'CLIENT')}-${cityInitials}`;
+  const subject = `Valley Verified Priority Access - ${biz}`;
+  const body = `Business: ${biz}\nCity: ${city}\nCategory: ${cat}\nPriority code: ${code}\n\nI scanned the client access card and need Gray London Skyes.`;
+  const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  document.getElementById('vv-biz-display').textContent = biz.toUpperCase();
+  document.getElementById('vv-city-display').textContent = `${city} / ${cat}`;
+  document.getElementById('vv-contact-display').textContent = `Contact: ${contact}`;
+  document.getElementById('vv-code-display').textContent = code;
+  document.getElementById('vv-code-control').textContent = code;
+  const name = document.getElementById('vv-biz-display');
+  name.style.fontSize = biz.length > 24 ? '13px' : biz.length > 18 ? '15px' : '17px';
+  const qr = document.getElementById('vv-qr');
+  qr.dataset.url = mailto;
+  genQR(qr);
+}
+
+function resetVV() {
+  document.getElementById('vv-biz').value = "Bob's Smoke Shop";
+  document.getElementById('vv-city').value = 'Litchfield Park';
+  document.getElementById('vv-cat').value = 'Retail & Specialty';
+  document.getElementById('vv-contact').value = 'Owner';
+  updateVV();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderCards();
+  refreshQR();
+  fitCardPreviews();
+  updateVV();
+  ['vv-biz', 'vv-city', 'vv-cat', 'vv-contact'].forEach((id) => {
+    document.getElementById(id).addEventListener('input', updateVV);
+  });
+});
+
+window.addEventListener('resize', fitCardPreviews);
+</script>
 </body>
 </html>

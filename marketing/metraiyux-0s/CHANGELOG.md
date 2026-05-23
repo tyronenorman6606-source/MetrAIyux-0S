@@ -2,6 +2,12 @@
 
 ## 2026-05-23
 
+- Business Cards were overwritten with the new founder-branded Client Access Studio at `https://metraiyux-0s-marketing.pages.dev/business-cards.html`.
+- Cloudflare Pages deployment `ac63a830-4a79-476a-93d2-9ce120e2578a` is the corrected live version after the owner requested real founder photos/logos and no inflated Valley Verified business-count claims; preview: `https://ac63a830.metraiyux-0s-marketing.pages.dev`.
+- The new studio ships 3 founder card directions using the local Gray London Skyes portrait/headshot/cutout plus the real Skye Over London and MetrAIyux 0S logo assets, a selected-client Valley Verified priority-access card builder with live business/city/category/contact fields, client-specific priority codes, QR codes that open a prefilled direct email, and 12 platform cards rendered from structured data.
+- The browser actions are now `Save PDF`, `Print Card`, `Print Full Set`, and `Print Platform Set`; each card still prints at standard 3.5in by 2in size through the browser print/PDF dialog.
+- Headed live-browser proof passed desktop `1440x980` and mobile `390x844`, including Valley Verified edits, four print-button interactions, QR canvas pixel checks, founder/logo image load checks, full-page scrolling, screenshots, zero console errors, and zero failed requests. Receipt: `test-artifacts/live-browser-verifier/2026-05-23T02-38-26-557Z-business-cards-v2-production-focused/live-browser-verification-report.json`.
+
 - Business Cards v2 is deployed live at `https://metraiyux-0s-marketing.pages.dev/business-cards.html`.
 - Cloudflare Pages deployment `f8e8b6e0-2077-42a9-a757-28f191a52cf3` refreshed production from `marketing/metraiyux-0s/`; preview: `https://f8e8b6e0.metraiyux-0s-marketing.pages.dev`.
 - The v2 card surface uses a 600px by 343px desktop display wrapper, responsive mobile fitting through `--screen-scale`, premium layered backgrounds, print isolation, local QR generation, two founder cards, a Valley Verified client card, and twelve platform cards.
