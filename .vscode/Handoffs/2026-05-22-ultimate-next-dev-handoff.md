@@ -114,6 +114,7 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | --- | --- | --- |
 | Company Knowledge core + loop-in | Live, tested, stress/browser proofed. SkyeHands active references removed from targeted surfaces. | Keep brain/neural maps updated after future changes. Rerun MCP mine when workspace is quiet. |
 | SkyeSol deep scan/company brain | Complete, live Company Knowledge API ingested, browser proof passed, neural maps updated at that time. | Preserve artifacts; split into smaller notes later if useful. |
+| SkyeMusicNexus end-to-end repair | Local source is repaired and locally proofed. `npm run 0s:skyemusicnexus:proof` passed on 2026-05-23, including smoke, SkyPay, browser E2E, video proof, and the new mounted Worker stress test. MCP mine passed before and after repairs with zero failed calls. Git HEAD and `origin/main` are `4a00fee69a8f4107c2712765f12779833bd1e2c3` (`Preserve SkyeMusicNexus workspace state`). Production deploy is blocked by Cloudflare Worker auth: plain Wrangler had no shell token, and `node tools/run-root-wrangler.mjs deploy --config metraiyux_0s_site/wrangler.toml` failed with Cloudflare auth code `10000`. Authenticated production is still stale and does not contain the repaired `Command Field`, `Upload Studio`, `Music Player`, or `SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false` markers. | Do not call production ready. Restore/rotate a Cloudflare token with Workers deploy permission, redeploy the main 0S Worker/assets, then rerun headed live-browser proof. Latest failed production browser receipt: `test-artifacts/live-browser-verifier/2026-05-23T03-17-33-642Z-skyemusicnexus-production-deploy-blocked/live-browser-verification-report.json`. |
 | 0S pricing/intake router | Live and headed-browser proofed. | Regenerate MCP receipt later; separate SkyePay pricing pass only if requested. |
 | Sign In Pro Free99 demo | Closed end to end, live API and browser proof passed. | Rotate demo code before meetings if needed; do not paste full code. |
 | Legal Skyes AI Operators + Legal Center route correction | Shipped, deployed, live-headed proofed. Public Legal Center links now use the LegalSkyes Pages policy hub instead of the broken SOLE legal path. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
@@ -157,6 +158,85 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
    - `metraiyux_0s_site` had MCP mine hangs in multiple passes.
    - Do not treat hung MCP receipt as a reason to undo proven production work.
    - Use receipts to refresh audit trail once the workspace is quieter.
+
+## SkyeMusicNexus 2026-05-23 Repair Pass
+
+Local target:
+
+```text
+metraiyux_0s_site/SkyeMusicNexus
+```
+
+What was repaired/proved:
+
+- MCP workflow was run before and after the repair:
+  - `npm run mcp:mine -- metraiyux_0s_site/SkyeMusicNexus`
+  - Receipt: `metraiyux_0s_site/SkyeMusicNexus/MCP_TOOLING_RECEIPT.json`
+  - Artifact: `test-artifacts/direct-mcp/SkyeMusicNexus-mcp-tooling-receipt.json`
+- The root SkyeMusicNexus shell now uses the shared gate path instead of static preview bypass:
+  - `window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false`
+  - body markers include `data-platform-hardening="p2-routed"` and `data-platform-id="skye-music-nexus"`
+  - primary labels now include `Command Field`, `Upload Studio`, and `Music Player`
+- The smoke proof no longer assumes the old top-level `SkyeGateFS27/` path; it can resolve the current mounted source path under `metraiyux_0s_site/skyegate/source/SkyeGateFS27`.
+- The SkyePay offer proof now dynamically resolves the current FS27 source path and does not require an app-specific auth lane.
+- `metraiyux_0s_site/cloudflare/worker.js` received a defensive music-state merge/tombstone path so repeated music mutations do not overwrite unrelated rows during the controlled Worker stress proof.
+- New stress command:
+  - `npm run 0s:skyemusicnexus:stress`
+  - Script: `metraiyux_0s_site/tests/skyemusicnexus-mounted-worker-stress.mjs`
+  - Latest canonical proof: `metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-latest.json`
+
+Passing local proof:
+
+```bash
+npm run 0s:skyemusicnexus:proof
+```
+
+The passing proof suite included:
+
+- app smoke
+- SkyPay offer proof
+- Playwright browser integration E2E
+- exchange video proof
+- mounted Worker controlled stress
+
+Stress scope:
+
+- 12 serialized mutation workflows.
+- 216 total workflow actions.
+- 72 concurrent authenticated read-stress requests.
+- Verified unauthenticated hub/write rejection.
+- Verified shared FS27/SkyGate token access.
+- Verified artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, social queue, analytics, and shared-KV state retention.
+
+Production status:
+
+- Repo code is already at `origin/main` on commit `4a00fee69a8f4107c2712765f12779833bd1e2c3`.
+- Direct deploy command failed because this shell had no `CLOUDFLARE_API_TOKEN`.
+- Root wrapper deploy command failed because the available Cloudflare token was rejected for the Worker deploy with auth code `10000`:
+
+```bash
+node tools/run-root-wrangler.mjs deploy --config metraiyux_0s_site/wrangler.toml
+```
+
+- The R2-specific Cloudflare token in `.env` verifies for R2 but returns `403` for Workers, so it cannot deploy the 0S Worker.
+- Authenticated production fetch/browser checks prove the deployed SkyeMusicNexus surface is still stale.
+- No, SkyeMusicNexus has not passed live headed browser verification after deployment because deployment was blocked and production still lacks the repaired markers.
+
+Latest failed production browser receipt:
+
+```text
+test-artifacts/live-browser-verifier/2026-05-23T03-17-33-642Z-skyemusicnexus-production-deploy-blocked/live-browser-verification-report.json
+```
+
+Required next move:
+
+```bash
+# after restoring a Cloudflare token with Workers deploy permission
+node tools/run-root-wrangler.mjs deploy --config metraiyux_0s_site/wrangler.toml
+npm run proof:live-browser -- --url https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/index.html --expect "Upload Studio" --expect "Command Field"
+```
+
+Use a tailored authenticated headed proof if the generic verifier stops at the shared owner gate; the required outcome is desktop and mobile owner-login, app navigation, full-page scroll, console/network inspection, and a passing receipt.
 
 ## 0S Company Knowledge Layer
 
