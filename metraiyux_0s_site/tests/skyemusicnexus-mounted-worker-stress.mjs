@@ -300,6 +300,7 @@ const readStressRoutes = [
   '/api/skymusicnexus/music-social?action=hub',
   '/api/skymusicnexus/music-analytics',
   '/api/skymusicnexus/observability',
+  '/api/skymusicnexus/visuals',
 ];
 const readStress = await Promise.all(Array.from({ length: READ_STRESS_REQUESTS }, async (_, index) => {
   const route = readStressRoutes[index % readStressRoutes.length];
@@ -311,10 +312,15 @@ assert(readStress.every((item) => item.ok), 'read stress returned a failed respo
 const adminHub = (await call('GET', '/api/skymusicnexus/hub', { token: 'admin:music-owner@example.com', admin: true })).payload;
 const analytics = (await call('GET', '/api/skymusicnexus/music-analytics', { token: 'admin:music-owner@example.com', admin: true })).payload;
 const observability = (await call('GET', '/api/skymusicnexus/music-analytics?action=observability', { token: 'admin:music-owner@example.com', admin: true })).payload;
+const visuals = (await call('GET', '/api/skymusicnexus/visuals', { token: 'admin:music-owner@example.com', admin: true })).payload.visuals;
 assert(results.length === ITERATIONS, `expected ${ITERATIONS} stress results, got ${results.length}`);
 assert(analytics.totalReleases >= 1, 'analytics did not retain any stress release records');
 assert(observability.counts.auditEvents >= ITERATIONS, `observability retained too few audit events: ${observability.counts.auditEvents}`);
 assert(observability.latestEvents.length > 0, 'observability did not expose latest audit events');
+assert(visuals.schema_version === 'skye.music.nexus.visuals.v1', 'visuals endpoint returned wrong schema');
+assert(visuals.kpis.length >= 4, 'visuals endpoint did not return KPI cards');
+assert(visuals.route_health.length >= 8, 'visuals endpoint did not return route health rows');
+assert(visuals.audit_events.length > 0, 'visuals endpoint did not return audit events');
 assert(adminHub.storage_mode === 'kv', 'mounted Worker did not use KV storage mode in stress env');
 
 const report = {
@@ -346,14 +352,23 @@ const report = {
     retained: observability.retained,
     latestEvents: observability.latestEvents.slice(0, 12),
   },
+  visuals: {
+    schema: visuals.schema_version,
+    source: visuals.source,
+    kpis: visuals.kpis,
+    routeHealthCount: visuals.route_health.length,
+    flowCount: visuals.flows.length,
+    auditEventCount: visuals.audit_events.length,
+  },
   assertions: [
     'routes manifest stays gate-owned and accurate',
     'hub rejects unauthenticated access',
     'writes reject unauthenticated access',
     'shared FS27/SkyGate token path unlocks music API routes',
     'artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, and social queue survive repeated serialized mutation stress',
-    'hub, assets, releases, rights, exchange, social, analytics, and observability routes survive concurrent authenticated read stress',
+    'hub, assets, releases, rights, exchange, social, analytics, observability, and visuals routes survive concurrent authenticated read stress',
     'successful music mutations append audit events that are visible through the gated observability API',
+    'the SkyeMusicNexus visual dashboard endpoint is live-data-backed with KPI, route-health, workflow, and audit-event sections',
     'Worker stores stress state in shared KV lane without app-specific passwords',
   ],
   results,

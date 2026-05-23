@@ -114,7 +114,7 @@ ps -eo pid,ppid,stat,etime,cmd | rg 'wrangler|proof-|chrome-linux64|chromium|Xvf
 | --- | --- | --- |
 | Company Knowledge core + loop-in | Live, tested, stress/browser proofed. SkyeHands active references removed from targeted surfaces. | Keep brain/neural maps updated after future changes. Rerun MCP mine when workspace is quiet. |
 | SkyeSol deep scan/company brain | Complete, live Company Knowledge API ingested, browser proof passed, neural maps updated at that time. | Preserve artifacts; split into smaller notes later if useful. |
-| SkyeMusicNexus end-to-end repair | Repaired, deployed, and headed-browser proofed in production on 2026-05-23. `npm run 0s:skyemusicnexus:proof` passed locally, including smoke, SkyPay, browser E2E, video proof, and the mounted Worker stress test. MCP mine passed before and after repairs with zero failed calls. The successful deploy used the token-shaped value on `.env` line 1240 without printing it; Worker version `231bbefb-4588-4e0d-a695-779f0f0d0065` is live at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`. Production marker check confirmed unauth redirect to shared owner login, authenticated `Command Field`, `Upload Studio`, `Music Player`, `SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false`, and gated hub API `200`. | Keep this lane proof-first. Latest passing headed receipt: `test-artifacts/live-browser-verifier/2026-05-23T04-22-08-755Z-skyemusicnexus-production-headed-pass/live-browser-verification-report.json`. |
+| SkyeMusicNexus end-to-end repair | Repaired, deployed, and production-browser checked again on 2026-05-23 after the command-dashboard/observability hardening pass. `npm run 0s:skyemusicnexus:proof` passed locally at 2026-05-23T05:20:06Z with smoke, SkyPay, browser E2E, video proof, and mounted Worker stress. MCP mine passed after the hardening pass with zero failed calls. The successful deploy used the token-shaped value on `.env` line 1240 without printing it; Worker version `78a4aa39-dc5b-4336-bbf3-b7086c5a3e3f` is live at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`. Production browser proof confirmed shared-gate redirects, a full 83-action backend mutation matrix across 13 Nexus function families, live Nexus visuals, audit rows, route-health visuals, walkthrough cards, DAW beta labeling, provider-token boundary visibility, and explicit SaaS fallback labeling. | Keep this lane proof-first. Latest passing headed receipt: `test-artifacts/live-browser-verifier/2026-05-23T05-36-18-695Z-skyemusicnexus-production-command-dashboard/live-browser-verification-report.json`. |
 | 0S pricing/intake router | Live and headed-browser proofed. | Regenerate MCP receipt later; separate SkyePay pricing pass only if requested. |
 | Sign In Pro Free99 demo | Closed end to end, live API and browser proof passed. | Rotate demo code before meetings if needed; do not paste full code. |
 | Legal Skyes AI Operators + Legal Center + 0S terms | Shipped, deployed, live-headed proofed. Public Legal Center links use the LegalSkyes Pages policy hub, and 0S now has its own LegalSkyes umbrella terms route. | Keep `solenterprises.org` brand/source links separate from legal-policy links unless the owner explicitly wants that custom domain imported or redirected. |
@@ -208,6 +208,25 @@ Stress scope:
 - Verified shared FS27/SkyGate token access.
 - Verified artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, social queue, analytics, and shared-KV state retention.
 
+Follow-up command-dashboard/observability hardening completed later on 2026-05-23:
+
+- Shared visual dashboard kit now attempts live APIs first and visibly labels fallback state when live data does not answer.
+- Added `SkyeMusicNexus/public/command-dashboard.html` and `SkyeMusicNexus/data/nexus-visuals-demo.json`.
+- Added gated Worker routes:
+  - `/api/skymusicnexus/visuals`
+  - `/api/skymusicnexus/observability`
+  - `/api/skymusicnexus/music-analytics?action=visuals`
+  - `/api/skymusicnexus/music-analytics?action=observability`
+- Music mutations now append retained audit events into shared KV state; the latest local stress retained 192 audit events and the visuals endpoint exposed 4 KPIs, 11 route-health rows, 9 workflow rows, and 50 visible audit rows.
+- Nexus rooms now inject walkthrough cards so each screen tells the user what the room is for and what to do next. The DAW topbar has a visible `DAW beta` pill and quickstart cards. `public/discover.html` no longer forces `SKYE_MUSIC_NEXUS_STATIC_PREVIEW = true` inside the 0S mount.
+- New production browser command:
+
+```bash
+npm run 0s:skyemusicnexus:prod-browser
+```
+
+- Script: `metraiyux_0s_site/tests/skyemusicnexus-production-live-browser.mjs`
+
 Production status:
 
 - Repo code was pushed to `origin/main`; the repair source landed before deployment in commit `4a00fee69a8f4107c2712765f12779833bd1e2c3`, and handoff/brain timestamp updates followed.
@@ -219,7 +238,7 @@ npx wrangler@4.94.0 deploy --config wrangler.toml
 ```
 
 - Run context: `metraiyux_0s_site/` with `CLOUDFLARE_ACCOUNT_ID` set to account `e700b92580cd05de0104128efbd3e676` and `CLOUDFLARE_API_TOKEN` set from `.env` line 1240.
-- Deployed Worker version: `231bbefb-4588-4e0d-a695-779f0f0d0065`.
+- Current deployed Worker version after the command-dashboard hardening pass: `78a4aa39-dc5b-4336-bbf3-b7086c5a3e3f`.
 - Production URL: `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/`
 - Fast authenticated production marker check passed:
   - unauthenticated `/SkyeMusicNexus/index.html` redirects to `/admin/login.html?return=%2FSkyeMusicNexus%2Findex.html`
@@ -232,10 +251,19 @@ npx wrangler@4.94.0 deploy --config wrangler.toml
 Latest passing production browser receipt:
 
 ```text
-test-artifacts/live-browser-verifier/2026-05-23T04-22-08-755Z-skyemusicnexus-production-headed-pass/live-browser-verification-report.json
+test-artifacts/live-browser-verifier/2026-05-23T05-36-18-695Z-skyemusicnexus-production-command-dashboard/live-browser-verification-report.json
 ```
 
-The headed production browser proof passed on desktop `1440x980` and mobile `390x844` with owner login, app-lane navigation, gated API checks, full scroll stops, screenshot proof, no failures, and zero reported console/network blockers.
+The headed production browser proof passed on desktop `1440x980` and mobile `390x844` with owner login, a full desktop backend mutation matrix, authenticated API/read-stress checks, full route scrolling, screenshots, no failures, and zero console/network/HTTP blockers. It recorded 45 desktop checks, 57 mobile checks, 107 desktop actions, 105 desktop API calls, 118 screenshots, and confirmed:
+
+- unauthenticated Nexus and SaaS surfaces redirect through shared owner login or return gated `401`;
+- the production mutation matrix fired 83 backend actions across 13 function families: `platform`, `artists`, `assets`, `studio`, `releases`, `drops`, `exchange`, `social`, `payments`, `provider-hooks`, `analytics`, `visuals`, and `observability`;
+- operator-only release approval/publish, drop approval/publish, payout, provider queue, and moderation actions worked through the shared owner/admin gate;
+- `/api/skymusicnexus/visuals` loads live dashboard data;
+- command dashboard renders 4 KPIs, 11 route cards, 9 flow cards, and 50 audit rows in production;
+- every opened Nexus room has walkthrough guidance or DAW quickstart state;
+- provider publish remains honest when provider tokens are absent: `Attach provider token env to publish.`;
+- the SaaS customer visual page tries live first and clearly labels fallback: `Attempted: live:401, source:200`.
 
 Previous failed deploy/proof receipts remain useful only as history; the current production state is the passing receipt and Worker version above.
 

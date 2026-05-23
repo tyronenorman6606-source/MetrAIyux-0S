@@ -191,6 +191,17 @@
     nav.appendChild(link);
   }
 
+  function ensureCommandDashboardNavLink() {
+    const nav = $('.nexus-nav');
+    if (!nav || nav.querySelector('[data-command-dashboard-link]')) return;
+    const link = document.createElement('a');
+    link.href = window.location.pathname.includes('/public/') ? './command-dashboard.html' : './public/command-dashboard.html';
+    link.dataset.commandDashboardLink = 'true';
+    link.textContent = 'Command Dashboard';
+    if (pageRoom() === 'command-dashboard') link.classList.add('active');
+    nav.appendChild(link);
+  }
+
   function walkthroughGuide() {
     const guides = {
       home: {
@@ -264,6 +275,12 @@
         title: 'Owner/operator work stays behind the shared gate.',
         text: 'This room is for review, payout, analytics, drops, exchange, social queue, and proof inspection. It relies on the 0S/SkyGate auth lane, not a separate app password.',
         steps: ['Review releases and operations state.', 'Inspect analytics and payout queues.', 'Use Readiness for audit events and route proof.'],
+      },
+      'command-dashboard': {
+        micro: 'live command dashboard',
+        title: 'Read the platform from live data first.',
+        text: 'This dashboard tries the live SkyeMusicNexus visuals API first, then clearly labels fallback data if the live endpoint cannot answer. Use it to see analytics, route health, audit events, and workflow counts.',
+        steps: ['Check the data-source line first.', 'Route cards show which APIs have retained events.', 'Audit rows show successful backend mutations by actor, action, route, and status.'],
       },
       exports: {
         micro: 'export walkthrough',
@@ -3008,6 +3025,7 @@
   async function init() {
     ensureMcpChrome();
     ensureProofNavLink();
+    ensureCommandDashboardNavLink();
     injectWalkthroughGuide();
     initCanvas();
     wireChrome();

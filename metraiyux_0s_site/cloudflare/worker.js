@@ -9625,6 +9625,96 @@ function musicObservability(state, env) {
     },
   };
 }
+function musicVisuals(state, env) {
+  const analytics = musicAnalytics(state);
+  const auditByFunction = state.auditEvents.reduce((map, event) => {
+    const key = event.functionName || 'unknown';
+    map[key] = (map[key] || 0) + 1;
+    return map;
+  }, {});
+  const routeHealth = MUSIC_FUNCTIONS.map(fnName => ({
+    id:fnName,
+    route:`${MUSIC_BASE}/${fnName}`,
+    status:fnName === 'skygate-session' ? 'session_route' : 'wired',
+    events:auditByFunction[fnName] || 0,
+    operatorActions:Array.from(MUSIC_OPERATOR_ACTIONS[fnName] || []),
+    auth:fnName === 'skygate-session' ? 'shared_gate_session' : 'shared_gate_required',
+    storage:fnName === 'music-provider-hooks' ? 'provider_boundary' : musicStorageMode(env)
+  }));
+  const flows = [
+    {id:'artist-intake', label:'Artist Intake', screen:'Releases', api:'music-artists', count:analytics.totalArtists, status:analytics.totalArtists ? 'active' : 'ready'},
+    {id:'audio-upload', label:'Audio Upload', screen:'Upload Studio', api:'music-assets', count:analytics.assets, status:analytics.assets ? 'active' : 'ready'},
+    {id:'native-daw', label:'Native DAW Beta', screen:'DAW', api:'music-studio', count:state.studio.projects.length + state.studio.exports.length, status:'beta-labeled'},
+    {id:'release-forge', label:'Release Forge', screen:'Releases', api:'music-releases', count:analytics.totalReleases, status:analytics.totalReleases ? 'active' : 'ready'},
+    {id:'rights-vault', label:'Rights Vault', screen:'Rights', api:'music-releases', count:state.releases.filter(release => musicRights(release.rights || {}).status !== 'needs-clearance').length, status:'rights-visible'},
+    {id:'drop-room', label:'Drop Room', screen:'Drops', api:'music-drops', count:analytics.drops, status:analytics.drops ? 'active' : 'ready'},
+    {id:'exchange', label:'Creator Exchange', screen:'Exchange', api:'music-exchange', count:state.exchange.contentRequests.length + state.exchange.threads.length + state.exchange.campaigns.length, status:'wired'},
+    {id:'feed', label:'Open Social Feed', screen:'Feed', api:'music-social', count:analytics.feedItems, status:'wired'},
+    {id:'operator', label:'Operator Command', screen:'Operator', api:'music-analytics', count:analytics.auditEvents, status:'gated-observable'}
+  ];
+  const eventMix = Object.entries(auditByFunction)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, value]) => ({label, value}))
+    .slice(0, 8);
+  const timeline = state.auditEvents.slice(0, 20).map(event => ({
+    time:event.createdAt,
+    title:`${event.action} via ${event.functionName}`,
+    detail:`${event.method} ${event.route} returned ${event.status}; actor ${event.actor || 'unknown'}; result ${event.result || 'ok'}.`,
+    status:event.ok ? 'recorded' : 'failed',
+    ids:event.ids || {}
+  }));
+  return {
+    ok:true,
+    schema_version:'skye.music.nexus.visuals.v1',
+    generated_at:musicNow(),
+    workspace:{
+      workspace_id:'skye-music-nexus',
+      company_name:'SkyeMusicNexus',
+      plan_id:'0S shared gate lane',
+      status:'live_gated_platform',
+      activation:'0S/SkyGate/Free99 session required before app and API access',
+      storage_mode:musicStorageMode(env)
+    },
+    kpis:[
+      {label:'Artists', value:String(analytics.totalArtists), detail:`${analytics.activeArtists} active`, tone:'cyan'},
+      {label:'Releases', value:String(analytics.totalReleases), detail:`${analytics.liveReleases} live`, tone:'gold'},
+      {label:'Uploads', value:String(analytics.assets), detail:'gated music-assets records', tone:'mint'},
+      {label:'Audit events', value:String(analytics.auditEvents), detail:`latest ${Math.min(50, analytics.auditEvents)} visible`, tone:'violet'}
+    ],
+    progress:[
+      {id:'rights_ready', label:'Rights-ready releases', used:state.releases.filter(release => musicRights(release.rights || {}).status === 'distribution-ready').length, limit:Math.max(1, analytics.totalReleases), unit:'releases', status:'tracked'},
+      {id:'drop_conversion', label:'Drops from releases', used:analytics.drops, limit:Math.max(1, analytics.totalReleases), unit:'drops', status:'tracked'},
+      {id:'audit_retention', label:'Audit retention', used:analytics.auditEvents, limit:MUSIC_AUDIT_LIMIT, unit:'events', status:analytics.auditEvents >= MUSIC_AUDIT_LIMIT * 0.8 ? 'watch' : 'healthy'},
+      {id:'readiness_routes', label:'Route coverage', used:routeHealth.filter(route => route.status).length, limit:routeHealth.length, unit:'routes', status:'healthy'}
+    ],
+    bars:[
+      {label:'Artists', value:analytics.totalArtists, limit:Math.max(12, analytics.totalArtists), unit:'records'},
+      {label:'Assets', value:analytics.assets, limit:Math.max(12, analytics.assets), unit:'records'},
+      {label:'Releases', value:analytics.totalReleases, limit:Math.max(12, analytics.totalReleases), unit:'records'},
+      {label:'Drops', value:analytics.drops, limit:Math.max(12, analytics.drops), unit:'records'},
+      {label:'Events', value:analytics.auditEvents, limit:MUSIC_AUDIT_LIMIT, unit:'events'}
+    ],
+    donut:[
+      {label:'Artists', value:analytics.totalArtists, tone:'cyan'},
+      {label:'Uploads', value:analytics.assets, tone:'mint'},
+      {label:'Releases', value:analytics.totalReleases, tone:'gold'},
+      {label:'Drops', value:analytics.drops, tone:'violet'},
+      {label:'Feed', value:analytics.feedItems, tone:'pink'}
+    ].filter(row => Number(row.value || 0) > 0),
+    timeline:timeline.length ? timeline : [{time:musicNow(), title:'No music actions recorded yet', detail:'The first successful gated mutation will appear here as a live audit event.', status:'ready'}],
+    sovereign_stack:[
+      {label:'Gate', value:'FS27/SkyGate/Free99', status:'required'},
+      {label:'Storage', value:musicStorageMode(env), status:musicStorageMode(env) === 'kv' ? 'durable' : 'not configured'},
+      {label:'DAW', value:'Native DAW', status:'beta-labeled'},
+      {label:'Provider hooks', value:'DSP/social/settlement', status:'boundary until credentials and proof'}
+    ],
+    event_mix:eventMix.length ? eventMix : [{label:'No events yet', value:0}],
+    route_health:routeHealth,
+    flows,
+    audit_events:state.auditEvents.slice(0, 50),
+    source:{preferred_endpoint:`${MUSIC_BASE}/visuals`, fallback:'/SkyeMusicNexus/data/nexus-visuals-demo.json'}
+  };
+}
 function musicSocialSummary(social) {
   return {
     connectors:social.connectors.length,
@@ -10073,7 +10163,7 @@ async function musicHandleFunction(request, env, url, fnName) {
   else if (fnName === 'music-social') response = await musicHandleSocial(method, url, state, body, access);
   else if (fnName === 'music-payments') response = await musicHandlePayments(method, url, state, body, access);
   else if (fnName === 'music-analytics') response = method === 'GET'
-    ? (url.searchParams.get('action') === 'observability' ? musicJson(musicObservability(state, env)) : musicJson({ok:true, ...musicAnalytics(state)}))
+    ? (url.searchParams.get('action') === 'observability' ? musicJson(musicObservability(state, env)) : url.searchParams.get('action') === 'visuals' ? musicJson({ok:true, visuals:musicVisuals(state, env)}) : musicJson({ok:true, ...musicAnalytics(state)}))
     : musicJson({ok:false, error:'Method not allowed'}, 405);
   else if (fnName === 'music-provider-hooks') response = musicJson({ok:true, hooks:[], providerBoundary:'Configure dedicated provider credentials before live music provider webhooks.'});
   else response = musicJson({ok:false, error:'skymusicnexus_function_not_found', fnName}, 404);
@@ -10098,6 +10188,11 @@ async function musicHandleRoute(request, env, url) {
     const gate = await requireMusicGate(request, env, 'SkyeMusicNexus observability');
     if (!gate.ok) return gate.response;
     return musicJson(musicObservability(await musicReadState(env), env));
+  }
+  if (path === '/visuals') {
+    const gate = await requireMusicGate(request, env, 'SkyeMusicNexus visuals');
+    if (!gate.ok) return gate.response;
+    return musicJson({ok:true, visuals:musicVisuals(await musicReadState(env), env)});
   }
   if (path === '/skygate-session') return musicHandleSession(request, env);
   const fnName = path.replace(/^\/+/, '').split('/')[0];

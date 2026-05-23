@@ -29,27 +29,87 @@
     if (unit === "mb") return n >= 1024 ? `${(n / 1024).toFixed(1)} GB` : `${Math.round(n)} MB`;
     return `${n.toLocaleString()}${unit ? ` ${unit}` : ""}`;
   };
+  const sharedGateKeys = [
+    "FREE99_PLATFORM_GATE_SESSION",
+    "METRAIYUX_GATE_SESSION",
+    "SKYGATEFS27_GATE_SESSION",
+    "SKYGATE_USER_TOKEN",
+    "SKYE_GATE_SESSION",
+    "SKYE_MUSIC_NEXUS_GATE_SESSION",
+    "skye_music_nexus_session",
+    "quantumskyes_mcp_owner_token",
+    "adminBrainToken"
+  ];
+  function cleanToken(value) {
+    return String(value || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  }
+  function tokenFromStore(store, key) {
+    try {
+      const raw = store.getItem(key);
+      if (!raw) return "";
+      const parsed = raw.startsWith("{") ? JSON.parse(raw) : null;
+      return cleanToken(parsed && parsed.token ? parsed.token : raw);
+    } catch {
+      return "";
+    }
+  }
+  function sharedGateToken() {
+    for (const key of sharedGateKeys) {
+      const token = tokenFromStore(sessionStorage, key) || tokenFromStore(localStorage, key);
+      if (token) return token;
+    }
+    return "";
+  }
 
   function resolveSources(root) {
     const url = new URL(location.href);
     const workspaceId = root.dataset.workspace || url.searchParams.get("workspace") || url.searchParams.get("workspace_id") || "";
-    const api = workspaceId && root.dataset.api
-      ? root.dataset.api.replace("{workspace_id}", encodeURIComponent(workspaceId))
-      : "";
-    const staticSources = [root.dataset.source, root.dataset.fallback].filter(Boolean);
-    return workspaceId ? [api, ...staticSources].filter(Boolean) : staticSources;
+    const sources = [];
+    if (workspaceId && root.dataset.api) {
+      sources.push({
+        kind: "live",
+        label: "Live API",
+        url: root.dataset.api.replace("{workspace_id}", encodeURIComponent(workspaceId))
+      });
+    }
+    if (root.dataset.source) sources.push({ kind: "source", label: "Static source", url: root.dataset.source });
+    if (root.dataset.fallback && root.dataset.fallback !== root.dataset.source) sources.push({ kind: "fallback", label: "Fallback data", url: root.dataset.fallback });
+    return sources;
   }
 
   async function loadVisualData(root) {
     const sources = resolveSources(root);
+    const attempts = [];
     let lastError = null;
     for (const source of sources) {
       try {
-        const res = await fetch(source, { cache: "no-store" });
+        const headers = {};
+        const token = sharedGateToken();
+        if (source.kind === "live" && token) {
+          headers.authorization = `Bearer ${token}`;
+          headers["x-free99-gate-session"] = token;
+          headers["x-skye-gate-session"] = token;
+          headers["x-skygate-session"] = token;
+        }
+        const res = await fetch(source.url, { cache: "no-store", credentials: "include", headers });
         const data = await res.json();
-        if (res.ok && data && data.ok !== false) return data.visuals || data;
+        attempts.push({ source: source.url, kind: source.kind, status: res.status, ok: res.ok && data?.ok !== false });
+        if (res.ok && data && data.ok !== false) {
+          const visuals = data.visuals || data;
+          return Object.assign({}, visuals, {
+            __visualDataSource: {
+              kind: source.kind,
+              label: source.label,
+              url: source.url,
+              live: source.kind === "live",
+              fallback: source.kind !== "live",
+              attempts
+            }
+          });
+        }
         lastError = data?.error || `status_${res.status}`;
       } catch (error) {
+        attempts.push({ source: source.url, kind: source.kind, ok: false, error: error?.message || String(error) });
         lastError = error?.message || String(error);
       }
     }
@@ -180,6 +240,42 @@
     }).join("");
   }
 
+  function renderRoutes(el, rows) {
+    if (!el) return;
+    el.innerHTML = (rows || []).map((row) => `
+      <article class="visual-route-card">
+        <span>${esc(row.status || "wired")}</span>
+        <strong>${esc(row.id || row.route)}</strong>
+        <code>${esc(row.route || "")}</code>
+        <small>${esc(row.auth || "shared gate")} · ${esc(row.storage || "tracked")} · ${esc(row.events || 0)} events</small>
+      </article>
+    `).join("");
+  }
+
+  function renderFlows(el, rows) {
+    if (!el) return;
+    el.innerHTML = (rows || []).map((row) => `
+      <article class="visual-flow-card">
+        <span>${esc(row.screen || "screen")}</span>
+        <strong>${esc(row.label || row.id)}</strong>
+        <small>${esc(row.api || "")} · ${esc(row.status || "tracked")}</small>
+        <b>${esc(row.count || 0)}</b>
+      </article>
+    `).join("");
+  }
+
+  function renderAudit(el, rows) {
+    if (!el) return;
+    el.innerHTML = (rows || []).map((row) => `
+      <article class="visual-audit-row">
+        <span>${esc(row.status || (row.ok ? "ok" : "event"))}</span>
+        <strong>${esc(row.action || row.title || "event")} ${row.functionName ? `· ${esc(row.functionName)}` : ""}</strong>
+        <code>${esc(row.route || row.detail || "")}</code>
+        <small>${esc(row.createdAt || row.time || "")} ${row.actor ? `· ${esc(row.actor)}` : ""}</small>
+      </article>
+    `).join("");
+  }
+
   async function renderDashboard(root) {
     const status = root.querySelector("[data-visual-status]");
     try {
@@ -193,7 +289,21 @@
       renderTimeline(root.querySelector("[data-visual-timeline]"), data.timeline);
       renderStack(root.querySelector("[data-visual-stack]"), data.sovereign_stack);
       renderEventMix(root.querySelector("[data-visual-event-mix]"), data.event_mix);
-      if (status) status.textContent = `Visual data loaded: ${data.generated_at || new Date().toISOString()}`;
+      renderRoutes(root.querySelector("[data-visual-routes]"), data.route_health);
+      renderFlows(root.querySelector("[data-visual-flows]"), data.flows);
+      renderAudit(root.querySelector("[data-visual-audit]"), data.audit_events);
+      const source = data.__visualDataSource || { kind: "unknown", label: "Unknown source", fallback: true, attempts: [] };
+      root.dataset.visualDataSource = source.kind;
+      root.classList.toggle("visual-dashboard-live", source.live === true);
+      root.classList.toggle("visual-dashboard-fallback", source.fallback === true);
+      if (status) {
+        const attempted = source.attempts && source.attempts.length
+          ? ` Attempted: ${source.attempts.map((item) => `${item.kind}:${item.status || item.error || "failed"}`).join(", ")}.`
+          : "";
+        status.textContent = source.live
+          ? `Live visual data loaded from ${source.url}: ${data.generated_at || new Date().toISOString()}`
+          : `Fallback visual data is being shown from ${source.url}. Live endpoint did not supply this render.${attempted}`;
+      }
     } catch (error) {
       if (status) status.textContent = `Visual data unavailable: ${error.message}`;
       root.classList.add("visual-dashboard-error");

@@ -1471,3 +1471,108 @@ body.one-music-site #toast{
     grid-template-columns:1fr;
   }
 }
+
+.command-dashboard-shell{width:min(1680px,100%)}
+.music-command-visuals.visual-dashboard{display:grid;gap:20px}
+.music-command-visuals .visual-board-head,
+.music-command-visuals .visual-panel,
+.music-command-visuals .visual-kpi,
+.music-command-visuals .visual-route-card,
+.music-command-visuals .visual-flow-card,
+.music-command-visuals .visual-audit-row,
+.music-command-visuals .visual-stack-card{
+  position:relative;
+  z-index:1;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:8px;
+  background:rgba(0,0,0,.34);
+}
+.music-command-visuals .visual-board-head{padding:22px}
+.music-command-visuals .visual-board-head h2{margin:8px 0;font-size:clamp(32px,4vw,62px);line-height:1}
+.music-command-visuals .visual-board-head p{margin:6px 0;color:rgba(255,255,255,.72)}
+.music-command-visuals .visual-status-line{
+  margin:0;
+  border:1px solid rgba(107,232,214,.3);
+  border-radius:8px;
+  padding:13px 14px;
+  color:#c8ffef;
+  background:rgba(107,232,214,.08);
+  font-weight:850;
+}
+.music-command-visuals.visual-dashboard-fallback .visual-status-line{
+  border-color:rgba(242,199,102,.48);
+  color:#ffe5a6;
+  background:rgba(242,199,102,.1);
+}
+.music-command-visuals .visual-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.music-command-visuals .visual-kpi{min-height:132px;padding:17px}
+.music-command-visuals .visual-kpi span,
+.music-command-visuals .visual-stack-card span,
+.music-command-visuals .visual-route-card span,
+.music-command-visuals .visual-flow-card span,
+.music-command-visuals .visual-audit-row span{
+  color:var(--gold);
+  font-size:11px;
+  font-weight:950;
+  text-transform:uppercase;
+}
+.music-command-visuals .visual-kpi strong{display:block;margin:8px 0 4px;color:#fff;font-size:clamp(30px,4vw,58px);line-height:.9}
+.music-command-visuals .visual-kpi small,
+.music-command-visuals .visual-stack-card small,
+.music-command-visuals .visual-route-card small,
+.music-command-visuals .visual-flow-card small,
+.music-command-visuals .visual-audit-row small{color:rgba(255,255,255,.62);line-height:1.35}
+.music-command-visuals .visual-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.music-command-visuals .visual-panel{padding:20px;min-width:0}
+.music-command-visuals .visual-panel h2{margin:0 0 14px;font-size:clamp(24px,2.6vw,40px);line-height:1}
+.music-command-visuals .visual-progress-row{display:grid;gap:8px;margin-bottom:16px}
+.music-command-visuals .visual-progress-head{display:flex;justify-content:space-between;gap:14px;align-items:center}
+.music-command-visuals .visual-progress-track{height:13px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.08);overflow:hidden}
+.music-command-visuals .visual-progress-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--cyan),var(--gold),var(--pink))}
+.music-command-visuals .visual-bars{width:100%;min-height:230px}
+.music-command-visuals .visual-svg-label,
+.music-command-visuals .visual-svg-value{font:700 13px Inter,ui-sans-serif,system-ui;fill:#fff}
+.music-command-visuals .visual-svg-track{fill:rgba(255,255,255,.08)}
+.music-command-visuals .visual-svg-bar{fill:var(--cyan)}
+.music-command-visuals .visual-donut-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.music-command-visuals .visual-donut{width:170px;max-width:100%}
+.music-command-visuals .visual-donut-total{fill:#fff;font:900 22px Inter,ui-sans-serif,system-ui}
+.music-command-visuals .visual-legend{display:grid;gap:8px}
+.music-command-visuals .visual-legend span{display:flex;align-items:center;gap:8px;color:#fff}
+.music-command-visuals .visual-legend i{width:12px;height:12px;border-radius:999px}
+.music-command-visuals .visual-mini-bars{display:grid;gap:10px}
+.music-command-visuals .visual-mini-bar{display:grid;grid-template-columns:130px minmax(0,1fr) 44px;gap:10px;align-items:center}
+.music-command-visuals .visual-mini-bar b{height:12px;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--gold));min-width:3px}
+.music-command-visuals .visual-route-grid,
+.music-command-visuals .visual-flow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.music-command-visuals .visual-route-card,
+.music-command-visuals .visual-flow-card,
+.music-command-visuals .visual-audit-row,
+.music-command-visuals .visual-stack-card{display:grid;gap:7px;padding:14px}
+.music-command-visuals .visual-route-card code,
+.music-command-visuals .visual-audit-row code{
+  color:var(--cyan);
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.music-command-visuals .visual-flow-card b{color:#fff;font-size:32px;line-height:1}
+.music-command-visuals .visual-audit-list,
+.music-command-visuals .visual-timeline{display:grid;gap:10px;max-height:520px;overflow:auto;padding-right:4px}
+.music-command-visuals .visual-timeline-item{border-left:3px solid var(--gold);padding:4px 0 12px 14px}
+.music-command-visuals .visual-timeline-item h3{margin:6px 0 4px}
+.music-command-visuals .visual-stack-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:1180px){
+  .music-command-visuals .visual-kpi-grid,
+  .music-command-visuals .visual-panel-grid,
+  .music-command-visuals .visual-route-grid,
+  .music-command-visuals .visual-flow-grid,
+  .music-command-visuals .visual-stack-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .music-command-visuals .visual-kpi-grid,
+  .music-command-visuals .visual-panel-grid,
+  .music-command-visuals .visual-route-grid,
+  .music-command-visuals .visual-flow-grid,
+  .music-command-visuals .visual-stack-grid,
+  .music-command-visuals .visual-mini-bar{grid-template-columns:1fr}
+}

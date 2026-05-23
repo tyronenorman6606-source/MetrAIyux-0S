@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Command Dashboard</title>
+  <meta name="description" content="Live SkyeMusicNexus analytics, API route health, audit events, workflow state, and dashboard visuals." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="../../assets/js/visual-data-kit.js"></script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="operator" data-room="command-dashboard">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus dashboard"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Command Dashboard</p>
+      <h1>Live analytics, route health, workflow state, and audit events from the music API.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
+      <button class="ghost" data-action="proof-session">Proof Session</button>
+      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
+    <a href="./index.html">Dashboard</a>
+    <a href="./create.html">Create</a>
+    <a href="./daw.html">DAW</a>
+    <a href="./discover.html">Discover</a>
+    <a href="./feed.html">Feed</a>
+    <a href="./upload.html">Upload Studio</a>
+    <a href="./player.html">Music Player</a>
+    <a href="./releases.html">Releases</a>
+    <a href="./rights.html">Rights</a>
+    <a href="./exchange.html">Exchange</a>
+    <a href="./drops.html">Drops</a>
+    <a href="./admin.html">Operator</a>
+    <a class="active" href="./command-dashboard.html">Command Dashboard</a>
+  </nav>
+
+  <main class="nexus-shell command-dashboard-shell">
+    <section class="panel-xl visual-dashboard music-command-visuals"
+      data-visual-dashboard
+      data-workspace="skye-music-nexus"
+      data-api="/api/skymusicnexus/visuals"
+      data-source="../data/nexus-visuals-demo.json"
+      data-fallback="../data/nexus-visuals-demo.json">
+      <div class="visual-board-head" data-visual-workspace></div>
+      <p class="visual-status-line" data-visual-status>Loading live SkyeMusicNexus visual data...</p>
+
+      <div class="visual-kpi-grid" data-visual-kpis></div>
+
+      <div class="visual-panel-grid">
+        <article class="visual-panel">
+          <h2>Workflow Readiness</h2>
+          <div data-visual-progress></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Record Shape</h2>
+          <div data-visual-bars></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Platform Mix</h2>
+          <div data-visual-donut></div>
+        </article>
+        <article class="visual-panel">
+          <h2>Event Mix</h2>
+          <div class="visual-mini-bars" data-visual-event-mix></div>
+        </article>
+      </div>
+
+      <section class="visual-panel">
+        <h2>Front/Back Route Health</h2>
+        <p class="compact">Every row is a browser-facing room/API lane. Live mode shows retained audit-event counts from successful backend mutations.</p>
+        <div class="visual-route-grid" data-visual-routes></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>Human Workflow Map</h2>
+        <div class="visual-flow-grid" data-visual-flows></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>Latest Audit Events</h2>
+        <div class="visual-audit-list" data-visual-audit></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>Timeline</h2>
+        <div class="visual-timeline" data-visual-timeline></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>0S Stack State</h2>
+        <div class="visual-stack-grid" data-visual-stack></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

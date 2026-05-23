@@ -1,0 +1,78 @@
+{
+  "schema_version": "skye.music.nexus.visuals.v1",
+  "generated_at": "2026-05-23T00:00:00.000Z",
+  "workspace": {
+    "workspace_id": "skye-music-nexus",
+    "company_name": "SkyeMusicNexus",
+    "plan_id": "0S shared gate lane",
+    "status": "fallback_demo_dataset",
+    "activation": "Live API data is preferred. This fallback renders only when /api/skymusicnexus/visuals is unavailable.",
+    "storage_mode": "fallback"
+  },
+  "kpis": [
+    {"label": "Artists", "value": "12", "detail": "fallback stress sample", "tone": "cyan"},
+    {"label": "Releases", "value": "12", "detail": "fallback stress sample", "tone": "gold"},
+    {"label": "Uploads", "value": "12", "detail": "fallback stress sample", "tone": "mint"},
+    {"label": "Audit events", "value": "192", "detail": "fallback stress sample", "tone": "violet"}
+  ],
+  "progress": [
+    {"id": "rights_ready", "label": "Rights-ready releases", "used": 6, "limit": 12, "unit": "releases", "status": "tracked"},
+    {"id": "drop_conversion", "label": "Drops from releases", "used": 12, "limit": 12, "unit": "drops", "status": "tracked"},
+    {"id": "audit_retention", "label": "Audit retention", "used": 192, "limit": 300, "unit": "events", "status": "healthy"},
+    {"id": "readiness_routes", "label": "Route coverage", "used": 11, "limit": 11, "unit": "routes", "status": "healthy"}
+  ],
+  "bars": [
+    {"label": "Artists", "value": 12, "limit": 12, "unit": "records"},
+    {"label": "Assets", "value": 12, "limit": 12, "unit": "records"},
+    {"label": "Releases", "value": 12, "limit": 12, "unit": "records"},
+    {"label": "Drops", "value": 12, "limit": 12, "unit": "records"},
+    {"label": "Events", "value": 192, "limit": 300, "unit": "events"}
+  ],
+  "donut": [
+    {"label": "Artists", "value": 12, "tone": "cyan"},
+    {"label": "Uploads", "value": 12, "tone": "mint"},
+    {"label": "Releases", "value": 12, "tone": "gold"},
+    {"label": "Drops", "value": 12, "tone": "violet"},
+    {"label": "Feed", "value": 12, "tone": "pink"}
+  ],
+  "timeline": [
+    {"time": "2026-05-23T00:00:00.000Z", "title": "Fallback dataset loaded", "detail": "The live SkyeMusicNexus visuals endpoint did not answer this render. Production should prefer /api/skymusicnexus/visuals behind the shared gate.", "status": "fallback"},
+    {"time": "2026-05-23T00:00:00.000Z", "title": "Stress sample represented", "detail": "Fallback mirrors the controlled stress shape: artist, upload, stream, studio, release, rights, drop, exchange, feed, social queue, analytics, and observability.", "status": "fallback"}
+  ],
+  "sovereign_stack": [
+    {"label": "Gate", "value": "FS27/SkyGate/Free99", "status": "required"},
+    {"label": "Storage", "value": "Worker KV", "status": "live endpoint required"},
+    {"label": "DAW", "value": "Native DAW", "status": "beta-labeled"},
+    {"label": "Provider hooks", "value": "DSP/social/settlement", "status": "boundary until credentials and proof"}
+  ],
+  "event_mix": [
+    {"label": "music-social", "value": 36},
+    {"label": "music-exchange", "value": 48},
+    {"label": "music-releases", "value": 36},
+    {"label": "music-drops", "value": 24},
+    {"label": "music-assets", "value": 12},
+    {"label": "music-studio", "value": 24},
+    {"label": "music-artists", "value": 12}
+  ],
+  "route_health": [
+    {"id": "music-artists", "route": "/api/skymusicnexus/music-artists", "status": "wired", "events": 12, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-assets", "route": "/api/skymusicnexus/music-assets", "status": "wired", "events": 12, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-studio", "route": "/api/skymusicnexus/music-studio", "status": "wired", "events": 24, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-releases", "route": "/api/skymusicnexus/music-releases", "status": "wired", "events": 36, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-drops", "route": "/api/skymusicnexus/music-drops", "status": "wired", "events": 24, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-exchange", "route": "/api/skymusicnexus/music-exchange", "status": "wired", "events": 48, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-social", "route": "/api/skymusicnexus/music-social", "status": "wired", "events": 36, "auth": "shared_gate_required", "storage": "kv"},
+    {"id": "music-analytics", "route": "/api/skymusicnexus/music-analytics", "status": "wired", "events": 0, "auth": "shared_gate_required", "storage": "kv"}
+  ],
+  "flows": [
+    {"id": "audio-upload", "label": "Audio Upload", "screen": "Upload Studio", "api": "music-assets", "count": 12, "status": "fallback-sample"},
+    {"id": "release-forge", "label": "Release Forge", "screen": "Releases", "api": "music-releases", "count": 12, "status": "fallback-sample"},
+    {"id": "drop-room", "label": "Drop Room", "screen": "Drops", "api": "music-drops", "count": 12, "status": "fallback-sample"},
+    {"id": "operator", "label": "Operator Command", "screen": "Operator", "api": "music-analytics", "count": 192, "status": "fallback-sample"}
+  ],
+  "audit_events": [],
+  "source": {
+    "preferred_endpoint": "/api/skymusicnexus/visuals",
+    "fallback": "/SkyeMusicNexus/data/nexus-visuals-demo.json"
+  }
+}

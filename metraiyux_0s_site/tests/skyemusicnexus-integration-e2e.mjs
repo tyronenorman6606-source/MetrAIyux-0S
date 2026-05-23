@@ -201,6 +201,21 @@ async function main() {
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault", "Readiness + proof"], "artist-stage-desktop.png");
+    await page.goto(`${baseUrl}/SkyeMusicNexus/public/command-dashboard.html?workspace_id=skye-music-nexus`, { waitUntil: "networkidle" });
+    await expectText(page, "Command Dashboard");
+    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 5000 });
+    await expectText(page, "Fallback visual data");
+    await expectText(page, "Front/Back Route Health");
+    await expectText(page, "Latest Audit Events");
+    await assertNoHorizontalScroll(page, "SkyeMusicNexus command dashboard desktop");
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, "command-dashboard-desktop.png"), fullPage: true });
+    assertions.push("Command Dashboard renders KPI, route-health, workflow, and audit sections and clearly labels fallback data when the live visuals endpoint is unavailable in static E2E.");
+    await page.goto(`${baseUrl}/saas/customer-data.html?workspace_id=bob-smoke-shop-preview-001`, { waitUntil: "networkidle" });
+    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 5000 });
+    await expectText(page, "Fallback visual data");
+    await assertNoHorizontalScroll(page, "0S SaaS customer data visual dashboard desktop");
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, "saas-customer-data-fallback-desktop.png"), fullPage: true });
+    assertions.push("0S SaaS customer data visuals try the live endpoint first and clearly label fallback data in static E2E.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/proof.html", "Readiness proof page desktop", ["Production Readiness", "Observable Wiring", "DAW beta", "Observability Matrix"], "readiness-proof-desktop.png");
     assertions.push("Readiness page documents client-facing status, DAW beta boundary, observability, and production proof lanes.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge", "Import audio"], "upload-studio-desktop.png");
@@ -314,6 +329,8 @@ async function main() {
         "sales-router-desktop.png",
         "app-shell-gated-desktop.png",
         "artist-stage-desktop.png",
+        "command-dashboard-desktop.png",
+        "saas-customer-data-fallback-desktop.png",
         "readiness-proof-desktop.png",
         "upload-studio-desktop.png",
         "native-daw-desktop.png",

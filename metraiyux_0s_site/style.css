@@ -2001,3 +2001,18 @@ html {
 @media(max-width:980px){.skyeway-hero{grid-template-columns:1fr;min-height:auto}.skyeway-command{max-width:760px}.skyeway-directory-head{display:grid}.skyeway-controls{grid-template-columns:1fr}}
 @media(max-width:680px){.skyeway-hero{padding:28px 5vw 36px;gap:20px}.skyeway-title{font-size:clamp(3.1rem,18vw,4.8rem);line-height:.96}.skyeway-lede{font-size:16px;line-height:1.48}.skyeway-command-head{display:grid}.skyeway-metrics span{grid-template-columns:58px 1fr}.skyeway-line-list{grid-template-columns:1fr}.skyeway-result-bar{display:grid}.skyeway-pager{justify-content:space-between}.skyeway-pager button{min-width:96px}.skyeway-directory-head .button{width:100%}}
 /* END metraiyux-0s-home-search-and-core-map */
+
+.visual-dashboard[data-visual-data-source="live"] .visual-status-line,
+.visual-dashboard-live .visual-status-line{
+  color:#c8ffef;
+}
+.visual-dashboard[data-visual-data-source="source"] .visual-status-line,
+.visual-dashboard[data-visual-data-source="fallback"] .visual-status-line,
+.visual-dashboard-fallback .visual-status-line{
+  display:block;
+  border:1px solid rgba(243,212,131,.42);
+  border-radius:12px;
+  padding:12px 14px;
+  color:#ffe9a8;
+  background:rgba(243,212,131,.09);
+}
