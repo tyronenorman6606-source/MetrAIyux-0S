@@ -1455,3 +1455,66 @@ Operational rule after this correction:
 - Never tell the owner the `.zip.enc` is the final ZIP.
 - Say: "Download the encrypted artifact plus the direct restore kit. The restore kit unlocks the encrypted artifact into the real repo ZIP."
 - Keep raw signed URLs and key contents out of commits/handoffs. The chat can receive fresh short-lived links only when the owner explicitly asks for them.
+
+## 2026-05-23 Customer-Grade Restore Flow Follow-Up
+
+The restore confusion was converted into a product flow:
+
+- Added `tools/skyevault-restore-encrypted-zip.mjs`, a standalone restore helper that decrypts `.zip.enc` into a real `.zip`, verifies it, and extracts it.
+- Updated `tools/skyevault-full-repo-push.mjs` so ZIP full-repo pushes now build a direct restore kit automatically. The kit includes `README.txt`, `RESTORE.md`, `<repo>-artifact-key-material.txt`, and the restore helper.
+- The full-repo push script attempts to upload that direct restore kit unless `--skip-direct-restore-kit-upload` is passed.
+- Added `SkyeVault-Drop/docs/ENCRYPTED_REPO_ZIP_RESTORE.md`.
+- Added `SkyeVault-Drop/CHANGELOG.md`.
+- Updated `SkyeVault-Drop/public/repo.html`, `SkyeVault-Drop/public/vault.html`, and `SkyeVault-Drop/public/assets/app.js` so customer-facing copy says `.zip.enc` is encrypted and needs the matching restore kit.
+- Updated `SkyeVault-Drop/scripts/live-worker-browser-proof.mjs` to check the restore-flow copy and record console/network evidence.
+
+Customer wording to keep:
+
+```text
+Download two files: the encrypted repo artifact and the direct restore kit. The artifact ends in .zip.enc because it is protected. The restore kit unlocks it into the real .zip, verifies it, and extracts the repo folder.
+```
+
+Direct helper command shape:
+
+```bash
+unzip MetrAIyux-0S-full-repo-direct-restore-kit-<stamp>.zip -d restore-kit
+node restore-kit/skyevault-restore-encrypted-zip.mjs --artifact=./MetrAIyux-0S-full-repo-<stamp>.zip.enc --key-file=./restore-kit/MetrAIyux-0S-artifact-key-material.txt --out-dir=./restore-metraiyux-0s --force
+```
+
+Do not put raw signed links or key material in committed files. The direct restore kit is sensitive because it can unlock the encrypted artifact.
+
+2026-05-23 follow-through checks and production status:
+
+```text
+npm run mcp:mine -- SkyeVault-Drop
+cd SkyeVault-Drop && npm run smoke
+npm run brain:sync:obsidian
+npm run vault:0s:map
+```
+
+Results:
+
+- MCP mining refreshed `SkyeVault-Drop/MCP_TOOLING_RECEIPT.json` with zero failed calls.
+- SkyeVault smoke passed, including the new customer restore checks for `.zip.enc` plus direct restore kit wording.
+- Obsidian brain sync refreshed `metraiyux_0s_site/brain/obsidian-sync.json` with 224 local-brain chunks.
+- SkyeVault neural bridge refreshed `metraiyux_0s_site/brain/skyevault-vault-map.json` and `metraiyux_0s_site/brain/skyevault-workspaces/index.json` with 62 nodes and 61 links.
+- `tools/run-root-wrangler.mjs` was hardened so Worker deploys probe Workers credentials first instead of using a D1-only probe.
+- `SkyeVault-Drop/package.json` now points `cloudflare:check` and `cloudflare:deploy` at the root Wrangler runner so the deploy lane does not depend on a pre-existing `SkyeVault-Drop/node_modules/wrangler/bin/wrangler.js`.
+- Cloudflare dry-run deploy for `SkyeVault-Drop` passed with 30 asset files and the expected `SKYGATEFS27_WORKER` + `ASSETS` bindings.
+
+Production deploy blocker:
+
+- Real Cloudflare deploy to `skyevault-drop` was attempted on 2026-05-23 and blocked by Cloudflare auth.
+- Wrangler returned `Authentication error [code: 10000]` and `Invalid access token [code: 9109]` for the configured API token lane.
+- Do not claim the SkyeVault customer restore UI is production-live until a valid Cloudflare Workers deploy token is supplied and the headed live-browser proof passes.
+- After token repair, run:
+
+```bash
+cd SkyeVault-Drop
+npm run cloudflare:build
+ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.94.0 node ../tools/run-root-wrangler.mjs deploy --dry-run --outdir /tmp/skyevault-wrangler-dry-run
+ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.94.0 node ../tools/run-root-wrangler.mjs deploy
+HEADLESS=false BASE_URL=https://skyevault-drop.graylondonskyes.workers.dev node scripts/run-with-root-env.mjs -- npm run live:browser-proof
+```
+
+If the Codespace has no display server, wrap the proof command with `xvfb-run -a`. The updated proof script now scrolls desktop/mobile pages, checks split routes, records scroll-stop screenshots, and fails on console errors or failed browser requests.

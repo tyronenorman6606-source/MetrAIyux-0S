@@ -900,6 +900,18 @@ html {
   margin-top: 18px;
 }
 
+.command-stack.vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.command-stack.vertical .code-pill {
+  max-width: 100%;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
 .repo-command-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1160,6 +1172,10 @@ html {
 .client-vault-row p {
   margin: 7px 0 0;
   color: var(--muted);
+}
+
+.client-vault-row .vault-restore-note {
+  color: #fff0ba;
 }
 
 .vault-file-actions {

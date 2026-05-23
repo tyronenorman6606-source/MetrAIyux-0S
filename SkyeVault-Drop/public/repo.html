@@ -75,6 +75,29 @@
         </article>
       </section>
 
+      <section id="encrypted-zip-restore" class="section-grid route-section restore-lane">
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Full Workspace Restore</p>
+          <h2>Encrypted artifact plus restore kit.</h2>
+          <p class="muted big-copy">A .zip.enc means encrypted by design. It is not the final ZIP yet; it is the protected wrapper that keeps the repo locked until the direct restore kit unlocks it.</p>
+          <ul class="check-list">
+            <li>Download the large `.zip.enc` artifact.</li>
+            <li>Download the matching direct restore kit ZIP.</li>
+            <li>Run the helper from the restore kit.</li>
+            <li>Open the real `.zip` or extracted repo folder after decrypt finishes.</li>
+          </ul>
+        </article>
+        <article class="panel rich-panel">
+          <p class="eyebrow">One Command Shape</p>
+          <h2>The helper does the decrypt, verify, and unzip steps.</h2>
+          <div class="command-stack vertical" aria-label="Encrypted ZIP restore commands">
+            <span class="code-pill">unzip direct-restore-kit.zip -d restore-kit</span>
+            <span class="code-pill">node restore-kit/skyevault-restore-encrypted-zip.mjs --artifact=repo.zip.enc --key-file=restore-kit/artifact-key-material.txt --out-dir=./restore-repo --force</span>
+          </div>
+          <p class="notice-copy">If a file still ends in `.zip.enc`, it has not been unlocked yet. The real repo ZIP appears only after the restore kit decrypts it.</p>
+        </article>
+      </section>
+
       <section class="surface-grid repo-grid" aria-label="Repo workflow lanes">
         <article class="panel route-card">
           <span class="eyebrow">Archive</span>

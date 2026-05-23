@@ -148,6 +148,15 @@ function sha256File(file) {
   });
 }
 
+function readJsonIfExists(file) {
+  if (!file || !fs.existsSync(file)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   const repo = path.resolve(argValue('--repo', repoRoot));
   const repoName = cleanName(argValue('--repo-name', path.basename(repo)));
@@ -158,6 +167,7 @@ async function main() {
   const zipLevel = Math.max(0, Math.min(9, integerValue('zip-level', archiveFormat === 'zip' ? 0 : 1)));
   const zipUploadConcurrency = archiveFormat === 'zip' ? Math.max(1, Math.min(32, integerValue('zip-upload-concurrency', 8))) : 1;
   const keepZipStage = args.includes('--keep-zip-stage') || env.SKYEVAULT_FULL_REPO_KEEP_ZIP_STAGE === '1';
+  const skipDirectRestoreKitUpload = args.includes('--skip-direct-restore-kit-upload') || env.SKYEVAULT_FULL_REPO_SKIP_DIRECT_RESTORE_KIT_UPLOAD === '1';
   const declaredMaxBytes = Math.floor(maxGb * 1024 * 1024 * 1024);
   const baseUrl = String(env.SKYEVAULT_DROP_URL || env.URL || 'https://skyevault-drop.netlify.app').replace(/\/$/, '');
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
@@ -455,9 +465,16 @@ async function main() {
     ? [
       `# ${repoName} Full Repo ZIP Restore`,
       '',
-      'Download the encrypted ZIP artifact from the SkyeVault receipt/recovery portal, place it next to the key-material file, then run:',
+      'Download both files from the SkyeVault receipt/recovery portal:',
+      '',
+      `1. Encrypted artifact: ${fileName}`,
+      `2. Direct restore kit: ${repoName}-full-repo-direct-restore-kit-${runStamp}.zip`,
+      '',
+      'The `.zip.enc` file is not directly unzip-able. It decrypts into the real ZIP first.',
       '',
       '```bash',
+      `unzip ${repoName}-full-repo-direct-restore-kit-${runStamp}.zip -d restore-kit`,
+      `cp restore-kit/${repoName}-artifact-key-material.txt .`,
       `openssl enc -d -aes-256-cbc -pbkdf2 -iter 700000 -md sha256 -pass file:./${repoName}-artifact-key-material.txt -in ./${fileName} -out ./${restoreArchiveName}`,
       'mkdir -p ./restore-metraiyux-0s',
       `unzip -q ./${restoreArchiveName} -d ./restore-metraiyux-0s`,
@@ -485,6 +502,88 @@ async function main() {
     ''
     ];
   fs.writeFileSync(path.join(outDir, 'RESTORE.md'), restoreLines.join('\n'));
+
+  let directRestoreKit = null;
+  if (archiveFormat === 'zip') {
+    const helperSource = path.join(repoRoot, 'tools', 'skyevault-restore-encrypted-zip.mjs');
+    const kitDir = path.join(outDir, 'direct-restore-kit');
+    const kitName = `${repoName}-full-repo-direct-restore-kit-${runStamp}.zip`;
+    const kitPath = path.join(outDir, kitName);
+    fs.mkdirSync(kitDir, { recursive: true, mode: 0o700 });
+    fs.copyFileSync(keyFile, path.join(kitDir, `${repoName}-artifact-key-material.txt`));
+    fs.copyFileSync(path.join(outDir, 'RESTORE.md'), path.join(kitDir, 'RESTORE.md'));
+    if (fs.existsSync(helperSource)) fs.copyFileSync(helperSource, path.join(kitDir, 'skyevault-restore-encrypted-zip.mjs'));
+    fs.writeFileSync(path.join(kitDir, 'README.txt'), [
+      `${repoName} direct restore kit`,
+      '',
+      `Use this kit with ${fileName}.`,
+      'The artifact is encrypted and must be decrypted before it becomes a normal ZIP.',
+      '',
+      'Fast restore:',
+      '',
+      `node skyevault-restore-encrypted-zip.mjs --artifact=./${fileName} --key-file=./${repoName}-artifact-key-material.txt --out-dir=./restore-metraiyux-0s --force`,
+      '',
+      'Manual restore commands are also in RESTORE.md.',
+      '',
+      'Keep this kit private. It contains the key material needed to unlock the encrypted artifact.',
+      ''
+    ].join('\n'), { mode: 0o600 });
+
+    const zipKit = spawnSync('zip', ['-q', '-9', '-r', kitPath, '.'], { cwd: kitDir, stdio: ['ignore', 'ignore', 'pipe'] });
+    if (zipKit.error) throw zipKit.error;
+    if (zipKit.status) throw new Error(`direct restore kit zip failed with status ${zipKit.status}: ${zipKit.stderr?.toString() || ''}`);
+    directRestoreKit = {
+      fileName: kitName,
+      localPath: kitPath,
+      bytes: fs.statSync(kitPath).size,
+      sha256: await sha256File(kitPath),
+      contains: [
+        'README.txt',
+        'RESTORE.md',
+        `${repoName}-artifact-key-material.txt`,
+        fs.existsSync(helperSource) ? 'skyevault-restore-encrypted-zip.mjs' : ''
+      ].filter(Boolean),
+      upload: {
+        status: skipDirectRestoreKitUpload ? 'skipped' : 'not-attempted'
+      }
+    };
+
+    if (!skipDirectRestoreKitUpload) {
+      const restoreKitLog = path.join(outDir, 'direct-restore-kit-upload.log');
+      const uploadResult = spawnSync(process.execPath, [
+        path.join(repoRoot, 'tools', 'skyevault-repo-push.mjs'),
+        `--upload-archive=${kitPath}`,
+        `--file-count=${directRestoreKit.contains.length}`,
+        '--secret-excludes=0',
+        '--asset-type=Full repo direct restore key kit',
+        `--project-name=${repoName} Full Repo Direct Restore Kit`,
+        `--client-reference=full-repo-direct-restore-kit:${runStamp}`,
+        `--client-name=${sessionBody.clientName}`,
+        `--client-email=${sessionBody.clientEmail}`,
+        '--mime-type=application/zip'
+      ], {
+        cwd: repoRoot,
+        env: {
+          ...process.env,
+          SKYEVAULT_DROP_URL: baseUrl,
+          SKYEVAULT_SKIP_GIT_STATUS: '1',
+          SKYEVAULT_RETURN_DOWNLOAD_LINK: '1'
+        },
+        encoding: 'utf8'
+      });
+      fs.writeFileSync(restoreKitLog, `${uploadResult.stdout || ''}${uploadResult.stderr || ''}`, { mode: 0o600 });
+      const receiptMatch = String(uploadResult.stdout || '').match(/Receipt written: (.+)/);
+      const restoreKitReceipt = readJsonIfExists(receiptMatch?.[1]?.trim() || '');
+      directRestoreKit.upload = {
+        status: uploadResult.status === 0 ? 'uploaded' : `failed:${uploadResult.status}`,
+        receiptId: restoreKitReceipt?.receiptId || '',
+        sessionId: restoreKitReceipt?.sessionId || '',
+        expiresAt: restoreKitReceipt?.download?.expiresAt || '',
+        receiptPath: receiptMatch?.[1]?.trim() || '',
+        logFile: restoreKitLog
+      };
+    }
+  }
 
   const controlPack = path.join(outDir, `${repoName}-skydrive-control-${runStamp}.skyesecrets`);
   const packEnv = { ...process.env, SKYE_SECURE_PASSPHRASE: controlPassphrase, SKYE_SECURE_PEPPER: controlPepper };
@@ -519,6 +618,7 @@ async function main() {
 
   const handoff = {
     ...receipt,
+    directRestoreKit,
     controlPack,
     controlUploadStatus,
     controlPackCodes: path.join(outDir, 'UNLOCK_CODES.txt'),
@@ -533,6 +633,13 @@ async function main() {
     receiptId: completion.receipt?.id || completion.entry?.id || completion.receiptId || '',
     recoveryUrl: completion.download?.recoveryUrl || '',
     downloadUrl: completion.download?.downloadUrl || '',
+    directRestoreKit: directRestoreKit ? {
+      fileName: directRestoreKit.fileName,
+      localPath: directRestoreKit.localPath,
+      bytes: directRestoreKit.bytes,
+      sha256: directRestoreKit.sha256,
+      upload: directRestoreKit.upload
+    } : null,
     controlPack,
     controlUploadStatus
   }, null, 2));

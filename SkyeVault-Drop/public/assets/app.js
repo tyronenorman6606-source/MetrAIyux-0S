@@ -834,6 +834,32 @@ async function clientVaultApi(body) {
   });
 }
 
+function vaultRestoreHint(fileName = '') {
+  const name = String(fileName || '').toLowerCase();
+  if (name.endsWith('.zip.enc')) {
+    return {
+      button: 'Download encrypted artifact',
+      note: 'This is protected repo data. Download the matching direct restore kit, then decrypt it into the real ZIP before unzipping.'
+    };
+  }
+  if (name.includes('direct-restore-kit') && name.endsWith('.zip')) {
+    return {
+      button: 'Download restore kit',
+      note: 'This small ZIP contains the restore guide and key material needed to unlock the encrypted repo artifact.'
+    };
+  }
+  if (name.endsWith('.skyesecrets')) {
+    return {
+      button: 'Download control pack',
+      note: 'This is an encrypted SkyeSecure control pack. Use the owner-approved unlock lane before restoring its contents.'
+    };
+  }
+  return {
+    button: 'Download',
+    note: ''
+  };
+}
+
 function renderClientVaultItems(items = []) {
   state.clientVaultItems = items;
   if (!clientVaultList || !clientVaultCount) return;
@@ -860,14 +886,21 @@ function renderClientVaultItems(items = []) {
     proof.className = 'receipt-id';
     const fp = item.fileFingerprint?.value ? ` · fp ${String(item.fileFingerprint.value).slice(0, 12)}…` : '';
     proof.textContent = `Receipt ${item.id}${item.scan?.status ? ` · scan ${item.scan.status}` : ''}${fp}`;
+    const restoreHint = vaultRestoreHint(item.fileName);
     main.append(title, meta, proof);
+    if (restoreHint.note) {
+      const note = document.createElement('p');
+      note.className = 'vault-restore-note';
+      note.textContent = restoreHint.note;
+      main.append(note);
+    }
 
     const actions = document.createElement('div');
     actions.className = 'vault-file-actions';
     const download = document.createElement('button');
     download.className = 'secondary-btn compact';
     download.type = 'button';
-    download.textContent = 'Download';
+    download.textContent = restoreHint.button;
     download.addEventListener('click', async () => {
       download.disabled = true;
       download.textContent = 'Preparing...';
@@ -879,7 +912,7 @@ function renderClientVaultItems(items = []) {
         showStatus(error.message || 'Could not create download link.', 'error');
       } finally {
         download.disabled = false;
-        download.textContent = 'Download';
+        download.textContent = restoreHint.button;
       }
     });
     actions.append(download);

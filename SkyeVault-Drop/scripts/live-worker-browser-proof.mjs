@@ -23,6 +23,15 @@ const context = await browser.newContext({
 });
 const page = await context.newPage();
 const checks = [];
+const consoleMessages = [];
+const failedRequests = [];
+
+page.on('console', (message) => {
+  if (['error', 'warning'].includes(message.type())) consoleMessages.push({ type: message.type(), text: message.text().slice(0, 500) });
+});
+page.on('requestfailed', (request) => {
+  failedRequests.push({ url: request.url(), failure: request.failure()?.errorText || 'request failed' });
+});
 
 async function check(label, fn) {
   try {
@@ -31,6 +40,63 @@ async function check(label, fn) {
   } catch (error) {
     checks.push({ label, ok: false, error: error.message });
   }
+}
+
+function screenshotName(label, index) {
+  const safe = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 72) || 'viewport';
+  return `live-worker-${safe}-scroll-${index}.png`;
+}
+
+async function scrollAndInspect(label) {
+  const maxY = await page.evaluate(() => Math.max(0, document.documentElement.scrollHeight - window.innerHeight));
+  const stops = [...new Set([0, Math.round(maxY / 2), maxY].filter((value) => Number.isFinite(value) && value >= 0))];
+  const metrics = [];
+
+  for (const [index, y] of stops.entries()) {
+    await page.evaluate((nextY) => window.scrollTo(0, nextY), y);
+    await page.waitForTimeout(250);
+    const viewport = await page.evaluate(() => {
+      const visibleElements = [...document.body.querySelectorAll('*')].filter((node) => {
+        const style = window.getComputedStyle(node);
+        if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false;
+        const rect = node.getBoundingClientRect();
+        return rect.width > 2 && rect.height > 2 && rect.bottom > 0 && rect.top < window.innerHeight;
+      });
+      const visibleText = visibleElements
+        .map((node) => node.innerText || node.getAttribute('aria-label') || node.getAttribute('alt') || '')
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const visualElements = visibleElements.filter((node) => {
+        const style = window.getComputedStyle(node);
+        return ['IMG', 'VIDEO', 'CANVAS', 'SVG'].includes(node.tagName) || style.backgroundImage !== 'none';
+      });
+      return {
+        y: window.scrollY,
+        scrollHeight: document.documentElement.scrollHeight,
+        viewportHeight: window.innerHeight,
+        visibleElementCount: visibleElements.length,
+        visualElementCount: visualElements.length,
+        visibleTextLength: visibleText.length,
+        sampleText: visibleText.slice(0, 160)
+      };
+    });
+
+    if (!viewport.visibleElementCount || (viewport.visibleTextLength < 20 && !viewport.visualElementCount)) {
+      throw new Error(`${label} looked blank at scroll stop ${index}: ${JSON.stringify(viewport)}`);
+    }
+
+    const screenshotPath = path.join(artifactRoot, screenshotName(label, index));
+    await page.screenshot({ path: screenshotPath, fullPage: false });
+    metrics.push({ ...viewport, screenshotPath });
+  }
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return metrics;
 }
 
 await check('public portal and proof reel render', async () => {
@@ -54,7 +120,8 @@ await check('public portal and proof reel render', async () => {
   if (!playback.visible || playback.readyState < 2 || playback.currentTime <= 0 || playback.paused) {
     throw new Error(`Proof reel did not play: ${JSON.stringify(playback)}`);
   }
-  return playback;
+  const scrollStops = await scrollAndInspect('desktop-home');
+  return { playback, scrollStops };
 });
 
 await check('mobile viewport has no horizontal scroll', async () => {
@@ -63,7 +130,8 @@ await check('mobile viewport has no horizontal scroll', async () => {
   await page.screenshot({ path: path.join(artifactRoot, 'live-worker-mobile.png'), fullPage: true });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 2) throw new Error(`Mobile horizontal overflow: ${overflow}px`);
-  return { overflow };
+  const scrollStops = await scrollAndInspect('mobile-home');
+  return { overflow, scrollStops };
 });
 
 await check('split public route pages render without mega-scroll coupling', async () => {
@@ -71,7 +139,7 @@ await check('split public route pages render without mega-scroll coupling', asyn
   const routes = [
     { path: '/upload.html', text: /Drop files into the vault|Start secure upload/i },
     { path: '/vault.html', text: /Open my vault|Find and download stored files/i },
-    { path: '/repo.html', text: /Repo Vault Lane|repo workspace/i },
+    { path: '/repo.html', text: /Repo Vault Lane|Encrypted artifact plus restore kit|zip\.enc/i },
     { path: '/process.html', text: /Proof Route|Send production signal/i }
   ];
   const results = [];
@@ -82,9 +150,23 @@ await check('split public route pages render without mega-scroll coupling', asyn
     if (!response?.ok()) throw new Error(`${route.path} returned ${response?.status()}`);
     if (!route.text.test(body || '')) throw new Error(`${route.path} did not render expected route text.`);
     if (overflow > 2) throw new Error(`${route.path} horizontal overflow: ${overflow}px`);
-    results.push({ path: route.path, status: response.status(), overflow });
+    const scrollStops = await scrollAndInspect(`route-${route.path}`);
+    results.push({ path: route.path, status: response.status(), overflow, scrollStops });
   }
   return results;
+});
+
+await check('repo restore copy explains zip.enc unlock flow', async () => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const response = await page.goto(`${baseUrl}/repo.html#encrypted-zip-restore`, { waitUntil: 'networkidle' });
+  const body = await page.textContent('body');
+  if (!response?.ok()) throw new Error(`/repo.html returned ${response?.status()}`);
+  for (const pattern of [/\.zip\.enc means encrypted/i, /direct restore kit/i, /real ZIP/i]) {
+    if (!pattern.test(body || '')) throw new Error(`Missing restore copy: ${pattern}`);
+  }
+  await page.locator('#encrypted-zip-restore').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.join(artifactRoot, 'live-worker-repo-restore-flow.png'), fullPage: true });
+  return { status: response.status(), hasRestoreFlow: true };
 });
 
 await check('operator session opens admin vault browser', async () => {
@@ -141,6 +223,14 @@ await check('client can list their own vault files', async () => {
   return { count: data.count };
 });
 
+await check('console errors and failed browser requests are clean', async () => {
+  const errors = consoleMessages.filter((item) => item.type === 'error');
+  if (errors.length || failedRequests.length) {
+    throw new Error(JSON.stringify({ errors, failedRequests }).slice(0, 1000));
+  }
+  return { consoleWarnings: consoleMessages.length, failedRequests: failedRequests.length };
+});
+
 const video = page.video();
 await context.close();
 await browser.close();
@@ -151,6 +241,8 @@ const report = {
   baseUrl,
   generatedAt: new Date().toISOString(),
   videoPath,
+  consoleMessages,
+  failedRequests,
   checks
 };
 await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);

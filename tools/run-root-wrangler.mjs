@@ -34,7 +34,33 @@ function valuesFor(pattern) {
     });
 }
 
-async function chooseCloudflareToken(accountId) {
+async function probeToken(accountId, token, probe) {
+  const url = new URL(`https://api.cloudflare.com/client/v4/accounts/${accountId}/${probe.path}`);
+  for (const [key, value] of Object.entries(probe.query || {})) url.searchParams.set(key, value);
+  const res = await fetch(url, {
+    headers: { authorization: `Bearer ${token}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  return res.ok && data.success;
+}
+
+function preferredTokenProbes(args) {
+  const command = args.join(' ');
+  if (/^pages(\s|$)/.test(command)) {
+    return [
+      { label: 'pages', path: 'pages/projects', query: { per_page: '1' } },
+      { label: 'workers', path: 'workers/services', query: { per_page: '1' } },
+      { label: 'd1', path: 'd1/database', query: { per_page: '1' } }
+    ];
+  }
+  return [
+    { label: 'workers', path: 'workers/services', query: { per_page: '1' } },
+    { label: 'd1', path: 'd1/database', query: { per_page: '1' } },
+    { label: 'pages', path: 'pages/projects', query: { per_page: '1' } }
+  ];
+}
+
+async function chooseCloudflareToken(accountId, args) {
   const explicit = process.env.CLOUDFLARE_API_TOKEN;
   if (explicit && process.env.ROOT_WRANGLER_SKIP_PROBE === '1') {
     return { value: explicit, label: 'process.env:CLOUDFLARE_API_TOKEN' };
@@ -45,17 +71,16 @@ async function chooseCloudflareToken(accountId) {
     return { value: explicit || rootEnv.CLOUDFLARE_API_TOKEN || '', label: 'fallback' };
   }
 
+  const probes = preferredTokenProbes(args);
   for (const candidate of candidates) {
-    try {
-      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database?per_page=1`, {
-        headers: { authorization: `Bearer ${candidate.value}` }
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success) {
-        return { value: candidate.value, label: `${candidate.key}@line${candidate.line}` };
+    for (const probe of probes) {
+      try {
+        if (await probeToken(accountId, candidate.value, probe)) {
+          return { value: candidate.value, label: `${candidate.key}@line${candidate.line}:${probe.label}` };
+        }
+      } catch {
+        // Try the next token/probe candidate.
       }
-    } catch {
-      // Try the next token candidate.
     }
   }
 
@@ -63,7 +88,8 @@ async function chooseCloudflareToken(accountId) {
 }
 
 const accountId = rootEnv.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID || rootEnv.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || '';
-const selected = await chooseCloudflareToken(accountId);
+const wranglerArgs = process.argv.slice(2);
+const selected = await chooseCloudflareToken(accountId, wranglerArgs);
 const childEnv = {
   ...process.env,
   ...rootEnv,
@@ -82,7 +108,7 @@ if (!childEnv.CLOUDFLARE_ACCOUNT_ID || !childEnv.CLOUDFLARE_API_TOKEN) {
 
 console.error(`run-root-wrangler: using ${selected.label}`);
 
-const args = ['-y', `wrangler@${wranglerVersion}`, ...process.argv.slice(2)];
+const args = ['-y', `wrangler@${wranglerVersion}`, ...wranglerArgs];
 const child = spawn('npx', args, { env: childEnv, stdio: 'inherit' });
 child.on('exit', (code, signal) => {
   if (signal) {

@@ -133,6 +133,36 @@ node tools/skyevault-cli.mjs clone app ./app
 
 The Git remote stores persistent bare repositories, so a developer download is a full clone of the repo refs that were pushed into the vault. The archive lane remains the safer choice for one-off sanitized source packages.
 
+## Encrypted full-workspace ZIP restore
+
+The full-workspace owner backup lane intentionally returns an encrypted artifact named like:
+
+```text
+MetrAIyux-0S-full-repo-20260522T234329Z.zip.enc
+```
+
+That file is not directly unzip-able. It decrypts into the real repo ZIP only after the customer downloads the matching direct restore kit:
+
+```text
+MetrAIyux-0S-full-repo-direct-restore-kit-<stamp>.zip
+```
+
+Customer restore shape:
+
+```bash
+unzip MetrAIyux-0S-full-repo-direct-restore-kit-<stamp>.zip -d restore-kit
+
+node restore-kit/skyevault-restore-encrypted-zip.mjs \
+  --artifact=./MetrAIyux-0S-full-repo-<stamp>.zip.enc \
+  --key-file=./restore-kit/MetrAIyux-0S-artifact-key-material.txt \
+  --out-dir=./restore-metraiyux-0s \
+  --force
+```
+
+The helper decrypts the `.zip.enc` file, verifies the resulting ZIP, and extracts the repo folder. Operators should say "encrypted artifact plus direct restore kit" instead of calling `.zip.enc` the final ZIP.
+
+Detailed restore notes live in `docs/ENCRYPTED_REPO_ZIP_RESTORE.md`.
+
 ## Required environment variables
 
 ```bash

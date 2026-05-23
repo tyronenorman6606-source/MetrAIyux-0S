@@ -40,6 +40,7 @@ const files = {
   setup: read('internal-pages/setup.html'),
   env: read('.env.example'),
   proof: read('docs/PROOF_LEDGER.md'),
+  encryptedRepoZipRestore: read('docs/ENCRYPTED_REPO_ZIP_RESTORE.md'),
   headers: read('public/_headers'),
   robots: read('public/robots.txt')
 };
@@ -99,7 +100,10 @@ const checks = [
   ['public repo page explains repo snapshot lane', files.repo.includes('repo-snapshots') && files.repo.includes('npm run vault:push')],
   ['admin page explains repo snapshot workflow', files.adminHtml.includes('repo-operator-panel') && files.adminHtml.includes('npm run vault:dry-run')],
   ['setup page includes repo snapshot setup', files.setup.includes('repo-snapshot-setup') && files.setupJs.includes('npm run vault:push')],
-  ['proof ledger records v2.2 repo snapshot lane', files.proof.includes('v2.2') && files.proof.includes('repository snapshot lane')]
+  ['proof ledger records v2.2 repo snapshot lane', files.proof.includes('v2.2') && files.proof.includes('repository snapshot lane')],
+  ['encrypted repo ZIP restore docs exist', files.encryptedRepoZipRestore.includes('.zip.enc') && files.encryptedRepoZipRestore.includes('direct restore kit') && files.encryptedRepoZipRestore.includes('skyevault-restore-encrypted-zip.mjs')],
+  ['public repo page explains encrypted ZIP restore lane', files.repo.includes('encrypted-zip-restore') && files.repo.includes('.zip.enc means encrypted') && files.repo.includes('direct restore kit')],
+  ['client vault labels restore downloads', files.vault.includes('vault-restore-help') && files.app.includes('vaultRestoreHint') && files.app.includes('Download encrypted artifact') && files.app.includes('Download restore kit')]
 ];
 
 let failed = false;
@@ -113,4 +117,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log('\n✅ Closure audit passed: receipt-backed completion, protected operator pages, session manifests, fingerprint proof, recovery, notifications, R2 audit events, pause/restart, submission grouping, abuse controls, health preflight, scheduled maintenance, exports, scanner workflow, notification replay, metadata backup, setup helpers, repo snapshot guidance, client receipt email support, policy enforcement, headers, and surface separation are present.');
+console.log('\n✅ Closure audit passed: receipt-backed completion, protected operator pages, session manifests, fingerprint proof, recovery, notifications, R2 audit events, pause/restart, submission grouping, abuse controls, health preflight, scheduled maintenance, exports, scanner workflow, notification replay, metadata backup, setup helpers, repo snapshot guidance, encrypted ZIP restore guidance, client receipt email support, policy enforcement, headers, and surface separation are present.');

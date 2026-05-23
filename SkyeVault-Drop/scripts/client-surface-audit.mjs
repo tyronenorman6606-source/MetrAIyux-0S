@@ -27,7 +27,9 @@ const checks = [
   ['client supports pausing resumable uploads', upload.includes('pauseUpload') && app.includes('AbortController') && app.includes('error.paused')],
   ['client exports receipt JSON', upload.includes('copyReceipts') && upload.includes('downloadReceipts') && app.includes('receiptExportPayload')],
   ['client enforces visible package limits', app.includes('validateSelectedFiles') && app.includes('maxFilesPerSubmission')],
-  ['client groups multi-file submissions', app.includes('activeSubmissionId') && app.includes('submissionId')]
+  ['client groups multi-file submissions', app.includes('activeSubmissionId') && app.includes('submissionId')],
+  ['repo restore page explains encrypted ZIP unlock flow', repo.includes('encrypted-zip-restore') && repo.includes('.zip.enc means encrypted') && repo.includes('direct restore kit')],
+  ['vault download rows label restore artifacts', vault.includes('vault-restore-help') && app.includes('vaultRestoreHint') && app.includes('Download encrypted artifact') && app.includes('Download restore kit')]
 ];
 
 let failed = false;
@@ -41,4 +43,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log('\n✅ Client surface audit passed: public site, intake metadata, receipt UX, pause/resume, receipt export, package limits, no public operator links, and consent enforcement are present.');
+console.log('\n✅ Client surface audit passed: public site, intake metadata, receipt UX, pause/resume, receipt export, package limits, encrypted ZIP restore guidance, no public operator links, and consent enforcement are present.');

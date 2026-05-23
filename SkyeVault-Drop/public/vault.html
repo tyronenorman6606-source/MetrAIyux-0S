@@ -83,6 +83,24 @@
         </form>
         <div id="clientVaultList" class="client-vault-list" aria-live="polite"></div>
       </section>
+
+      <section class="surface-grid route-section vault-restore-help" aria-label="Encrypted repo restore help">
+        <article class="panel route-card">
+          <span class="eyebrow">Repo Artifact</span>
+          <strong>`.zip.enc` means encrypted.</strong>
+          <p>Download it, but do not try to unzip it directly. It becomes a normal ZIP only after the matching restore kit decrypts it.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Restore Kit</span>
+          <strong>Download the key kit too.</strong>
+          <p>The direct restore kit is a small ZIP with the key material, restore guide, and helper command.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Final Output</span>
+          <strong>Real ZIP, then repo folder.</strong>
+          <p>The helper writes the real repo `.zip`, verifies it, and extracts the workspace into a restore folder.</p>
+        </article>
+      </section>
     </main>
 
     <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
