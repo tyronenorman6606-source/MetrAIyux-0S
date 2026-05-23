@@ -2,6 +2,10 @@
 
 ## 2026-05-23
 
+- Added `docs/METRAIYUX_0S_REPO_RECOVERY_GUIDE.html`, a standalone owner recovery card for cloning the repo, updating an existing local clone, opening in VS Code, using the snapshot branch, downloading a normal GitHub ZIP, and understanding when Git versus the encrypted SkyeVault full-workspace lane should be used.
+- The recovery card now includes the top-level operator script map for serving, repo health, live browser proof, Cloudflare Pages direct upload, MCP mining, brain/neural-map sync, SkyeVault pushes, Git-shaped vault lanes, audits, and mounted 0S app proof commands.
+- The card is public-safe and intended for unencrypted SkyeVault delivery as a plain `.html` file; it contains no secrets, bearer tokens, signed URLs, admin codes, or unlock material.
+
 - LegalSkyes policy-route correction is deployed: Legal Center links now point to `https://skyes-over-london-legal.pages.dev/legal/` instead of the broken `https://solenterprises.org/legal/` path, and Marketplace Policy links point to `https://skyes-over-london-legal.pages.dev/legal/marketplace-commerce/`.
 - Cloudflare Pages deployments: LegalSkyes `56a9197d-6113-470e-8411-63d94a9cb730`, MetrAIyux marketing `14855f13-5688-4de8-a86d-665c561823ad`, and Gray portfolio mirror `e09e7995-ebe9-404a-aee2-e03db06ef678`.
 - Public surfaces corrected: marketing homepage footer, marketing marketplace Legal Center card/footer, marketing ecosystem footer, Business Cards LegalSkyes platform card display/QR, Gray portfolio marketplace Legal Center card/footer, and Gray portfolio ecosystem footer.

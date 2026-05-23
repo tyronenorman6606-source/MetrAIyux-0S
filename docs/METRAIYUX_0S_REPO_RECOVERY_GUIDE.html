@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Offline-safe MetrAIyux 0S repo recovery guide with Git clone, VS Code, pull, ZIP, and vault backup commands.">
+  <title>MetrAIyux 0S Repo Recovery Guide</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b10;
+      --panel: #101722;
+      --panel-2: #151f2d;
+      --line: #2f4054;
+      --text: #f7fbff;
+      --muted: #adbbc9;
+      --gold: #f3d483;
+      --cyan: #60c7ff;
+      --green: #8ef0c4;
+      --red: #ff9d9d;
+      --shadow: 0 28px 90px rgba(0, 0, 0, .45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(96, 199, 255, .17), transparent 32%),
+        radial-gradient(circle at 82% 8%, rgba(243, 212, 131, .12), transparent 34%),
+        linear-gradient(180deg, #080b10 0%, #0c1119 54%, #080b10 100%);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--cyan);
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .03));
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: clamp(24px, 4vw, 46px);
+      display: grid;
+      gap: 22px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 860px;
+      margin-bottom: 12px;
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(24px, 4vw, 36px);
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      color: #ffffff;
+      font-size: 18px;
+    }
+
+    .lede {
+      max-width: 820px;
+      margin-bottom: 0;
+      color: #d9e5ef;
+      font-size: 18px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      min-height: 112px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .2);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 7px;
+      color: #ffffff;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel.full {
+      grid-column: 1 / -1;
+    }
+
+    .command {
+      position: relative;
+      margin: 14px 0 0;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 8px;
+      background: #05080d;
+      overflow: hidden;
+    }
+
+    .command-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    button {
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid rgba(96, 199, 255, .45);
+      border-radius: 6px;
+      background: rgba(96, 199, 255, .11);
+      color: #eaf8ff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: rgba(243, 212, 131, .65);
+      color: #ffffff;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      color: #e8f3ff;
+      font-size: 13px;
+      line-height: 1.55;
+      tab-size: 2;
+      white-space: pre;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: #d8e3ee;
+    }
+
+    li + li {
+      margin-top: 7px;
+    }
+
+    .good {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .warn {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .danger {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .callout {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(243, 212, 131, .28);
+      border-radius: 8px;
+      background: rgba(243, 212, 131, .08);
+      color: #ffeeb8;
+    }
+
+    .mini-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .mini-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 6px;
+      color: #edf8ff;
+      text-decoration: none;
+      background: rgba(255, 255, 255, .055);
+    }
+
+    .footer-note {
+      margin: 26px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .script-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .script-card {
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .18);
+    }
+
+    .script-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .script-card code {
+      color: #e8f3ff;
+      overflow-wrap: anywhere;
+    }
+
+    details {
+      margin-top: 16px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .18);
+      overflow: hidden;
+    }
+
+    summary {
+      padding: 14px 16px;
+      color: #ffffff;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    details .command {
+      margin: 0;
+      border-right: 0;
+      border-bottom: 0;
+      border-left: 0;
+      border-radius: 0;
+    }
+
+    @media (max-width: 860px) {
+      .status-grid,
+      .grid,
+      .script-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 24px;
+      }
+
+      pre {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Owner recovery card · updated May 23, 2026</p>
+        <h1>MetrAIyux 0S repo download, VS Code, and script guide</h1>
+        <p class="lede">Open this file after download whenever you need the clean path back into the full Git repo. The fastest, safest default is Git clone or Git pull. ZIP downloads are only source snapshots and do not include Git history. The operator scripts you will need after cloning are included below too.</p>
+      </div>
+      <div class="status-grid">
+        <div class="stat">
+          <strong>Canonical repo</strong>
+          <span><code>github.com/tyronenorman6606-source/MetrAIyux-0S</code></span>
+        </div>
+        <div class="stat">
+          <strong>Default branch</strong>
+          <span><code>main</code></span>
+        </div>
+        <div class="stat">
+          <strong>Snapshot branch</strong>
+          <span><code>full-workspace-snapshot-20260523-fastzip-contact-handoff</code></span>
+        </div>
+        <div class="stat">
+          <strong>Best local flow</strong>
+          <span><code>git clone</code>, then <code>git pull</code></span>
+        </div>
+      </div>
+      <nav class="mini-nav" aria-label="Guide sections">
+        <a href="#one-command">One Command</a>
+        <a href="#scripts">Scripts</a>
+        <a href="#fresh-clone">Fresh Clone</a>
+        <a href="#update">Update Later</a>
+        <a href="#zip">ZIP Snapshot</a>
+        <a href="#vault">Vault Boundary</a>
+      </nav>
+    </section>
+
+    <section class="grid">
+      <article class="panel full" id="one-command">
+        <p class="eyebrow">Fast lane</p>
+        <h2>One terminal command that clones if missing and pulls if already present</h2>
+        <p>Use this on macOS, Linux, WSL, or a Codespace terminal. It keeps one local folder at <code>~/Projects/MetrAIyux-0S</code> and opens it in VS Code.</p>
+        <div class="command">
+          <div class="command-header"><span>Bash / Zsh / WSL</span><button type="button" data-copy="clone-or-update">Copy</button></div>
+          <pre><code id="clone-or-update">REPO_URL="https://github.com/tyronenorman6606-source/MetrAIyux-0S.git"
+DEST="$HOME/Projects/MetrAIyux-0S"
+mkdir -p "$HOME/Projects"
+if [ -d "$DEST/.git" ]; then
+  cd "$DEST"
+  git switch main
+  git pull --ff-only origin main
+else
+  git clone --progress "$REPO_URL" "$DEST"
+  cd "$DEST"
+fi
+code .</code></pre>
+        </div>
+        <div class="callout"><span class="good">Use this most of the time.</span> It avoids nested folder bloat, keeps Git history intact, and updates cleanly without redownloading the whole project every time.</div>
+      </article>
+
+      <article class="panel full" id="scripts">
+        <p class="eyebrow">After clone</p>
+        <h2>Core repo scripts and operator commands</h2>
+        <p>Run these from the repo root after cloning. Keep secrets out of terminal history when possible, do not paste bearer tokens into docs or chats, and use the shared 0S gate lane for owner access.</p>
+        <div class="script-grid">
+          <div class="script-card">
+            <strong>Local 0S site</strong>
+            <code>npm run skye:serve:site</code>
+          </div>
+          <div class="script-card">
+            <strong>Repo health</strong>
+            <code>npm run repo:health</code><br>
+            <code>npm run repo:health:full</code>
+          </div>
+          <div class="script-card">
+            <strong>Live browser proof</strong>
+            <code>npm run proof:live-browser -- --url &lt;production-url&gt; --expect "&lt;visible text&gt;"</code>
+          </div>
+          <div class="script-card">
+            <strong>Cloudflare Pages direct upload</strong>
+            <code>PAGES_PROJECT=&lt;project&gt; PAGES_DIR=&lt;folder&gt; npm run pages:direct-upload</code>
+          </div>
+          <div class="script-card">
+            <strong>MCP mine before UI work</strong>
+            <code>npm run mcp:mine -- &lt;target-folder&gt;</code><br>
+            <code>npm run mcp:skyesol</code>
+          </div>
+          <div class="script-card">
+            <strong>Brain and neural map</strong>
+            <code>npm run brain:sync:obsidian</code><br>
+            <code>npm run vault:0s:map</code>
+          </div>
+          <div class="script-card">
+            <strong>Safe vault snapshot</strong>
+            <code>npm run vault:dry-run</code><br>
+            <code>npm run vault:push</code>
+          </div>
+          <div class="script-card">
+            <strong>Full encrypted workspace vault</strong>
+            <code>npm run vault:repo:full -- --archive-format=zip --zip-upload-concurrency=8</code>
+          </div>
+          <div class="script-card">
+            <strong>Git-shaped vault lane</strong>
+            <code>npm run vault:git:dry-run</code><br>
+            <code>npm run vault:git:push</code>
+          </div>
+        </div>
+
+        <h3 style="margin-top:20px">Production deploy command shape</h3>
+        <p>Use environment variables for Cloudflare credentials. Do not print tokens, commit them, or paste them into handoffs.</p>
+        <div class="command">
+          <div class="command-header"><span>Cloudflare Pages direct uploader</span><button type="button" data-copy="pages-upload-code">Copy</button></div>
+          <pre><code id="pages-upload-code">CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+CLOUDFLARE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
+PAGES_PROJECT="metraiyux-0s-marketing" \
+PAGES_DIR="marketing/metraiyux-0s" \
+PAGES_COMMIT_MESSAGE="Deploy MetrAIyux 0S update" \
+npm run pages:direct-upload</code></pre>
+        </div>
+
+        <h3 style="margin-top:20px">Common proof and audit runs</h3>
+        <div class="command">
+          <div class="command-header"><span>Proof / audit quick set</span><button type="button" data-copy="proof-code">Copy</button></div>
+          <pre><code id="proof-code">npm run proof:business-cards
+npm run proof:live-browser -- --url https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ --expect "MetrAIyux"
+npm run audit:0s-live-parity
+npm run audit:visual-data-kit
+npm run brain:sync:obsidian
+npm run vault:0s:map</code></pre>
+        </div>
+
+        <h3 style="margin-top:20px">Mounted app proof lanes</h3>
+        <div class="command">
+          <div class="command-header"><span>0S app scripts</span><button type="button" data-copy="app-proof-code">Copy</button></div>
+          <pre><code id="app-proof-code">npm run 0s:connectlog-relay13:proof
+npm run 0s:skyeroutex:proof
+npm run 0s:skyeprofitconsole:proof
+npm run 0s:skyemusicnexus:proof
+npm run 0s:skyesplitengine:proof
+npm run 0s:marketing-made-easy:proof
+npm run 0s:free99-platforms:proof</code></pre>
+        </div>
+
+        <h3 style="margin-top:20px">Show every package script in the cloned repo</h3>
+        <div class="command">
+          <div class="command-header"><span>Script inventory command</span><button type="button" data-copy="script-inventory-code">Copy</button></div>
+          <pre><code id="script-inventory-code">node -e "const p=require('./package.json'); for (const [name,cmd] of Object.entries(p.scripts||{})) console.log(name+' = '+cmd)"</code></pre>
+        </div>
+
+        <details>
+          <summary>Current top-level package scripts captured in this guide</summary>
+          <div class="command">
+            <div class="command-header"><span>package.json scripts snapshot</span><button type="button" data-copy="scripts-snapshot">Copy</button></div>
+            <pre><code id="scripts-snapshot">skye:serve:site = cd metraiyux_0s_site && python3 -m http.server 4173 --bind 127.0.0.1
+skye:control = node tools/skye-crawler-control.mjs
+skyerunners:control = node tools/skyerunners.mjs serve
+skyerunners:map = node tools/skyerunners.mjs map
+skyerunners:status = node tools/skyerunners.mjs status
+skyerunners:run = node tools/skyerunners.mjs run
+skye:crawl = node tools/skye-crawler.mjs
+skye:crawl:static = SKIP_API=1 node tools/skye-crawler.mjs
+skye:crawl:live = BASE_URL=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live node tools/skye-crawler.mjs
+proof:live-browser = node tools/live-browser-verifier-agent.mjs
+proof:business-cards = node tools/proof-business-cards-v2-production.mjs
+pages:direct-upload = node tools/cloudflare-pages-direct-upload.mjs
+repo:health = node scripts/repo-health-check.mjs
+repo:health:full = node scripts/repo-health-check.mjs --full-secret-scan
+repo:snapshot = npm run vault:dry-run
+repo:vault = npm run vault:push
+0s:command = node tools/0s-command-runner.mjs
+0s:valley-verified:proof = npm run 0s:valley-verified:build && npm run 0s:valley-verified:sync
+0s:connectlog-relay13:proof = npm run 0s:connectlog:check && npm run 0s:relay13:smoke
+0s:skyeroutex:proof = npm run 0s:skyeroutex:layout && npm run 0s:skyeroutex:runtime && npm run 0s:skyeroutex:v04 && npm run 0s:skyeroutex:e2e && npm run 0s:skyeroutex:worker-parity && npm run 0s:skyeroutex:worker-stress
+0s:skyeprofitconsole:proof = npm run 0s:skyeprofitconsole:smoke && npm run 0s:skyeprofitconsole:e2e
+0s:skyemusicnexus:proof = npm run 0s:skyemusicnexus:smoke && npm run 0s:skyemusicnexus:skyepay && npm run 0s:skyemusicnexus:e2e && npm run 0s:skyemusicnexus:video && npm run 0s:skyemusicnexus:stress
+0s:skyesplitengine:proof = npm run 0s:skyesplitengine:smoke && npm run 0s:skyesplitengine:e2e
+brain:sync:obsidian = node tools/sync-obsidian-brain.mjs
+obsidian:graph = node tools/generate-obsidian-neural-map.mjs
+obsidian:web-graph = node tools/generate-public-neural-map.mjs
+vault:0s:map = node tools/skyevault-0s-neural-bridge.mjs
+mcp:mine = node tools/use-my-mcp.mjs
+mcp:skyesol = node tools/use-my-mcp.mjs skyesol_current_public_site
+mcp:smoke = cd MCP && npm run smoke:stdio
+audit:commercial-limits = node tools/audit-commercial-plan-limits.mjs
+audit:sovereign-stack = node tools/audit-sovereign-stack.mjs
+audit:visual-data-kit = node tools/audit-visual-data-kit.mjs
+audit:0s-live-parity = node tools/audit-0s-live-deployment-parity.mjs
+0s:free99-platforms:proof = node metraiyux_0s_site/tests/free99-platform-intake-e2e.mjs
+vault:push = node tools/skyevault-repo-push.mjs
+vault:dry-run = node tools/skyevault-repo-push.mjs --dry-run
+vault:repo:full = node tools/skyevault-full-repo-push.mjs
+vault:repo:full:dry-run = node tools/skyevault-full-repo-push.mjs --dry-run
+vault:git:push = node tools/skyevault-git-vault.mjs
+vault:git:dry-run = node tools/skyevault-git-vault.mjs --dry-run
+vault:git:restore = node tools/skyevault-git-vault.mjs
+vault:git:verify = node tools/skyevault-git-vault.mjs
+vault:git:remote = node tools/skyevault-git-remote-server.mjs
+vault:git:remote:proof = node tools/skyevault-git-remote-proof.mjs
+vault:git:remote:inventory = node tools/skyevault-git-remote-maintenance.mjs inventory
+vault:git:remote:snapshot = node tools/skyevault-git-remote-maintenance.mjs snapshot
+vault:git:remote:verify-snapshot = node tools/skyevault-git-remote-maintenance.mjs verify
+vault:git:remote:restore-snapshot = node tools/skyevault-git-remote-maintenance.mjs restore
+vault:repo = node tools/skyevault-repo-workspace.mjs
+vault:secrets:manifest = node tools/skyevault-secret-boundary.mjs
+vault:cli = node tools/skyevault-cli.mjs
+vault:diff = node tools/skyevault-vault-diff.mjs
+vault:ledger = node tools/skyevault-ledger.mjs
+0s:skyemediacenter:smoke = cd metraiyux_0s_site/SkyeMediaCenter && node smoke/skye-media-center-p2-smoke.mjs && node smoke/smoke-proof.mjs && node smoke/cloudflare-worker-production-smoke.mjs
+0s:skyemusicnexus:skyepay = node metraiyux_0s_site/tests/skyemusicnexus-skyepay-offer-proof.mjs
+0s:skyemerit:proof = node tools/audit-skyemerit.mjs
+0s:platform-accounting = node tools/audit-platform-integration-ledger.mjs
+0s:marketing-made-easy:proof = npm run 0s:marketing-made-easy:scan && npm run 0s:marketing-made-easy:smoke
+agentic-growth:test = npm --prefix packages/agentic-growth-layer test
+agentic-growth:browser-proof = npm --prefix packages/agentic-growth-layer run browser-proof
+agentic-growth:0s-proof = node tools/proof-agentic-growth-0s-production.mjs
+agentic-growth:serve = npm --prefix packages/agentic-growth-layer run serve
+agentic-growth:site-data = npm --prefix packages/agentic-growth-layer run build:site-data
+agentic-growth:site = python3 -m http.server 4328 --directory marketing/agentic-growth-layer</code></pre>
+          </div>
+        </details>
+      </article>
+
+      <article class="panel" id="fresh-clone">
+        <p class="eyebrow">Fresh machine</p>
+        <h2>First-time full Git clone</h2>
+        <p>This gives you the tracked repo plus the <code>.git</code> history so VS Code, branches, diffs, and future pulls work normally.</p>
+        <div class="command">
+          <div class="command-header"><span>Terminal</span><button type="button" data-copy="fresh">Copy</button></div>
+          <pre><code id="fresh">mkdir -p ~/Projects
+cd ~/Projects
+git clone --progress https://github.com/tyronenorman6606-source/MetrAIyux-0S.git
+cd MetrAIyux-0S
+code .</code></pre>
+        </div>
+        <div class="command">
+          <div class="command-header"><span>VS Code UI</span><button type="button" data-copy="vscode-ui">Copy URL</button></div>
+          <pre><code id="vscode-ui">https://github.com/tyronenorman6606-source/MetrAIyux-0S.git</code></pre>
+        </div>
+        <ol>
+          <li>Open VS Code.</li>
+          <li>Run <code>Git: Clone</code> from the Command Palette.</li>
+          <li>Paste the repo URL above.</li>
+          <li>Choose a local folder, then open the cloned repo.</li>
+        </ol>
+      </article>
+
+      <article class="panel" id="update">
+        <p class="eyebrow">Existing clone</p>
+        <h2>Update your local repo later</h2>
+        <p>Run this inside the clone when you want the newest committed source of truth.</p>
+        <div class="command">
+          <div class="command-header"><span>Terminal</span><button type="button" data-copy="update-code">Copy</button></div>
+          <pre><code id="update-code">cd ~/Projects/MetrAIyux-0S
+git switch main
+git pull --ff-only origin main
+code .</code></pre>
+        </div>
+        <div class="command">
+          <div class="command-header"><span>Verify</span><button type="button" data-copy="verify-code">Copy</button></div>
+          <pre><code id="verify-code">git status --short --branch
+git remote -v
+git log --oneline -5 --decorate</code></pre>
+        </div>
+      </article>
+
+      <article class="panel" id="snapshot">
+        <p class="eyebrow">Fallback branch</p>
+        <h2>Clone the snapshot branch</h2>
+        <p>The snapshot branch is kept as an extra recovery lane. Use it only if you specifically want that branch checked out from the start.</p>
+        <div class="command">
+          <div class="command-header"><span>Terminal</span><button type="button" data-copy="snapshot-code">Copy</button></div>
+          <pre><code id="snapshot-code">mkdir -p ~/Projects
+cd ~/Projects
+git clone --progress --branch full-workspace-snapshot-20260523-fastzip-contact-handoff https://github.com/tyronenorman6606-source/MetrAIyux-0S.git MetrAIyux-0S-snapshot
+cd MetrAIyux-0S-snapshot
+code .</code></pre>
+        </div>
+      </article>
+
+      <article class="panel" id="zip">
+        <p class="eyebrow">Source ZIP</p>
+        <h2>Download a normal GitHub ZIP</h2>
+        <p>This is useful when you want a quick source snapshot. It is not the same as a full Git clone.</p>
+        <div class="command">
+          <div class="command-header"><span>Terminal</span><button type="button" data-copy="zip-code">Copy</button></div>
+          <pre><code id="zip-code">cd ~/Downloads
+curl -L -o MetrAIyux-0S-main.zip https://github.com/tyronenorman6606-source/MetrAIyux-0S/archive/refs/heads/main.zip
+unzip MetrAIyux-0S-main.zip</code></pre>
+        </div>
+        <ul>
+          <li><span class="warn">GitHub ZIP includes tracked files only.</span></li>
+          <li>It does not include the <code>.git</code> folder, branch history, ignored secrets, local caches, or vault archives.</li>
+          <li>Use <code>git clone</code> when the goal is to keep working on the repo.</li>
+        </ul>
+      </article>
+
+      <article class="panel full" id="vault">
+        <p class="eyebrow">Vault boundary</p>
+        <h2>What Git covers versus what the vault covers</h2>
+        <ul>
+          <li><span class="good">Git is the source of truth for code, docs, public-safe receipts, handoffs, and tracked assets.</span> Use it for every new Codespace and local VS Code setup.</li>
+          <li><span class="warn">Ignored local files are intentionally not in Git.</span> That includes <code>.env</code>, raw provider keys, private keys, local browser caches, dependency folders, large archives, and secret vault material.</li>
+          <li><span class="warn">The full workspace vault lane is different.</span> Encrypted full-repo artifacts ending in <code>.zip.enc</code> need the matching direct restore kit before they become a real ZIP.</li>
+          <li><span class="danger">Do not commit secrets.</span> If the next operator needs private credentials, they must use the shared 0S/FS27/SkyGate/Free99 gate lane or owner-approved vault recovery, not a new app-specific password.</li>
+        </ul>
+        <div class="command">
+          <div class="command-header"><span>Current encrypted full-workspace push command pattern</span><button type="button" data-copy="vault-code">Copy</button></div>
+          <pre><code id="vault-code">SKYEVAULT_DROP_URL=https://skyevault-drop.graylondonskyes.workers.dev \
+node tools/skyevault-full-repo-push.mjs \
+  --archive-format=zip \
+  --max-gb=100 \
+  --zip-upload-concurrency=8 \
+  --out-dir=/tmp/skyevault-full-repo-live</code></pre>
+        </div>
+        <div class="callout">For a clean local developer setup, use Git. For an owner-only disaster backup that includes ignored/untracked workspace material, use the encrypted SkyeVault full-repo lane and keep the restore kit private.</div>
+      </article>
+    </section>
+
+    <p class="footer-note">This file is intentionally standalone and public-safe. It contains no bearer tokens, signed download URLs, provider keys, admin codes, or unlock material.</p>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll("[data-copy]");
+    buttons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copy);
+        if (!target) return;
+        const text = target.textContent.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          const original = button.textContent;
+          button.textContent = "Copied";
+          setTimeout(() => { button.textContent = original; }, 1200);
+        } catch {
+          button.textContent = "Select text";
+          setTimeout(() => { button.textContent = "Copy"; }, 1200);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

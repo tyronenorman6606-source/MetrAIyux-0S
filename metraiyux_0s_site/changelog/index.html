@@ -372,7 +372,7 @@
         </div>
       </div>
       <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
-        <p class="eyebrow">Updated May 22 2026 UTC</p>
+        <p class="eyebrow">Updated May 23 2026 UTC</p>
         <h2>Full production in the changelog.</h2>
         <p>The current production ledger records live surfaces, Cloudflare routes, SkyeNet deploy proof, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, Company Knowledge ingest receipts, SkySecure FS27 Vault proof, and public-safe receipts without exposing private controls.</p>
         <div class="proof-grid">
@@ -392,6 +392,24 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="repo-recovery-guide-vault-html">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-23">May 23, 2026</time>
+            <span class="release-version">Repo Recovery Guide</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Git clone</span><span>VS Code</span><span>Package scripts</span><span>SkyeVault</span><span>Owner recovery</span></div>
+            <h2>The owner repo recovery card is now a standalone HTML guide with scripts included.</h2>
+            <p>Added a public-safe, offline-openable HTML file that explains how to clone the whole MetrAIyux 0S repo, update an existing clone, download a tracked-files-only ZIP, open the repo in VS Code, use the snapshot branch, and understand when Git is the source of truth versus when the encrypted full-workspace vault lane is required.</p>
+            <ul class="release-points">
+              <li>The guide lives at <code>docs/METRAIYUX_0S_REPO_RECOVERY_GUIDE.html</code> and is safe to download/open locally because it contains no secrets, bearer tokens, signed URLs, admin codes, or unlock material.</li>
+              <li>The guide now includes the practical operator script map: local serving, repo health, live browser proof, Cloudflare Pages direct upload shape, MCP mining, brain/neural-map sync, safe vault snapshots, encrypted full-workspace vault pushes, Git-shaped vault lanes, audits, and mounted 0S app proof commands.</li>
+              <li>The unencrypted HTML file is intended to be uploaded as a plain SkyeVault artifact so the owner can download it directly without a <code>.zip.enc</code> restore step.</li>
+            </ul>
+            <div class="receipt-row"><span><code>docs/METRAIYUX_0S_REPO_RECOVERY_GUIDE.html</code></span><span><code>npm run vault:push</code></span><span><code>npm run proof:live-browser</code></span><span><code>npm run pages:direct-upload</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="fs27-skynet-deploy-api-runtime-ledger">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-22">May 22, 2026</time>
