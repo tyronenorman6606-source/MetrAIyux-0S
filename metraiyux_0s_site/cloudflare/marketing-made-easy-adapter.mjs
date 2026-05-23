@@ -7,6 +7,8 @@ const MME_AE_VENDOR_PACKET_PREFIX = 'marketing-made-easy:v1:ae-vendor-packet:';
 const MME_AE_VENDOR_FILE_PREFIX = 'marketing-made-easy:v1:ae-vendor-file:';
 const MME_AE_VENDOR_PAYMENT_PREFIX = 'marketing-made-easy:v1:ae-vendor-payment-profile:';
 const MME_AE_VENDOR_AUDIT_PREFIX = 'marketing-made-easy:v1:ae-vendor-audit:';
+const MME_AE_VENDOR_LOOKUP_PREFIX = 'marketing-made-easy:v1:ae-vendor-lookup:';
+const MME_AE_VENDOR_SUMMARY_PREFIX = 'marketing-made-easy:v1:ae-vendor-summary:';
 const MME_AE_VENDOR_INDEX_KEY = 'marketing-made-easy:v1:ae-vendor-packet-index';
 const MME_STORAGE_TTL = 60 * 60 * 24 * 90;
 const MME_AE_VENDOR_MAX_FILE_BYTES = 8 * 1024 * 1024;
@@ -137,6 +139,10 @@ function mmeNow() {
   return new Date().toISOString();
 }
 
+function mmeDelay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function mmeText(value, max = 4000) {
   return String(value == null ? '' : value).trim().slice(0, max);
 }
@@ -219,6 +225,140 @@ function mmeAeVendorStorageStatus(env) {
     encryption_secret_name: env.AE_VENDOR_PACKET_ENCRYPTION_KEY_BASE64 ? 'AE_VENDOR_PACKET_ENCRYPTION_KEY_BASE64' : (env.CONTRACTOR_PACKET_ENCRYPTION_KEY_BASE64 ? 'CONTRACTOR_PACKET_ENCRYPTION_KEY_BASE64' : null),
     provider: 'cloudflare_worker_kv_encrypted_packet_store'
   };
+}
+
+function mmeAeVendorEmailList(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .filter((item) => mmeValidEmail(item) && !/@metraiyux\.local$/i.test(item));
+}
+
+function mmeAeVendorOwnerRecipients(env) {
+  return mmeUnique([
+    ...mmeAeVendorEmailList(env.AE_VENDOR_PACKET_NOTIFY_EMAIL),
+    ...mmeAeVendorEmailList(env.CONTRACTOR_PACKET_NOTIFY_EMAIL),
+    ...mmeAeVendorEmailList(env.FREE99_DEMO_OWNER_EMAIL),
+    ...mmeAeVendorEmailList(env.RESEND_TO_EMAIL),
+    ...mmeAeVendorEmailList(env.NOTIFY_EMAIL_TO),
+    ...mmeAeVendorEmailList(env.ADMIN_NOTIFY_EMAIL),
+    ...mmeAeVendorEmailList(env.METRAIYUX_ADMIN_EMAILS),
+    ...mmeAeVendorEmailList(env.SKYGATE_ADMIN_EMAILS)
+  ]);
+}
+
+function mmeAeVendorEmailFrom(env) {
+  return String(env.RESEND_FROM_EMAIL || env.NOTIFY_EMAIL_FROM || env.RESEND_FROM || '').trim();
+}
+
+function mmeEscapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function mmeAuthIsOwnerAdmin(auth = {}) {
+  const identity = auth.identity || {};
+  const scopes = Array.isArray(identity.scopes) ? identity.scopes : String(identity.scope || '').split(/\s+/);
+  const role = String(identity.role || auth.role || '').toLowerCase();
+  return Boolean(
+    identity.isAdmin
+    || ['owner', 'founder', 'admin', 'operator', 'deployer', 'house_command'].includes(role)
+    || scopes.map((item) => String(item).toLowerCase()).some((item) => ['admin.read', 'admin.write', 'gateway.invoke'].includes(item))
+  );
+}
+
+async function mmeRequireOwnerAdmin(request, env, helpers, label) {
+  if (helpers.requireOperatorAuth) return helpers.requireOperatorAuth(request, env, label);
+  const auth = await helpers.requireGateAuth(request, env, label);
+  if (!auth.ok) return auth;
+  if (!mmeAuthIsOwnerAdmin(auth)) {
+    return { ok: false, response: mmeJson({ ok: false, error: `Owner/admin session required for ${label}.` }, 403) };
+  }
+  return auth;
+}
+
+async function mmeSendAeVendorOwnerEmail(env, request, packet, auth) {
+  const apiKey = String(env.RESEND_API_KEY || '').trim();
+  const from = mmeAeVendorEmailFrom(env);
+  const to = mmeAeVendorOwnerRecipients(env);
+  if (!apiKey || !from || !to.length) {
+    return {
+      ok: false,
+      skipped: true,
+      provider: 'resend',
+      reason: 'RESEND_API_KEY, RESEND_FROM_EMAIL, and owner recipient are required.'
+    };
+  }
+  const origin = new URL(request.url).origin;
+  const inboxUrl = `${origin}${MME_PUBLIC_BASE}/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html`;
+  const packetUrl = `${origin}${MME_BASE}/ae-vendor-onboarding/packets/${encodeURIComponent(packet.id)}`;
+  const subject = `0S contractor packet pending review: ${packet.contractor.legalName || packet.submissionId}`;
+  const text = [
+    'A contractor onboarding packet is waiting for owner/admin review.',
+    '',
+    `Contractor: ${packet.contractor.legalName}`,
+    `Email: ${packet.contractor.email}`,
+    `Role lane: ${packet.contractor.roleLane || 'not supplied'}`,
+    `Packet ID: ${packet.id}`,
+    `Submission ID: ${packet.submissionId}`,
+    `Payment method: ${packet.paymentProfile.method || 'not supplied'}`,
+    `Encrypted files: ${packet.storage.fileCount}`,
+    '',
+    `Inbox: ${inboxUrl}`,
+    `API packet: ${packetUrl}`,
+    '',
+    'Sensitive W-9, bank, tax, and identity material is intentionally excluded from this email and remains in the encrypted Cloudflare packet store.'
+  ].join('\n');
+  const html = `
+    <h1>Contractor packet pending owner review</h1>
+    <p><strong>Contractor:</strong> ${mmeEscapeHtml(packet.contractor.legalName)}</p>
+    <p><strong>Email:</strong> ${mmeEscapeHtml(packet.contractor.email)}</p>
+    <p><strong>Role lane:</strong> ${mmeEscapeHtml(packet.contractor.roleLane || 'not supplied')}</p>
+    <p><strong>Packet ID:</strong> ${mmeEscapeHtml(packet.id)}</p>
+    <p><strong>Submission ID:</strong> ${mmeEscapeHtml(packet.submissionId)}</p>
+    <p><strong>Payment method:</strong> ${mmeEscapeHtml(packet.paymentProfile.method || 'not supplied')}</p>
+    <p><strong>Encrypted files:</strong> ${mmeEscapeHtml(packet.storage.fileCount)}</p>
+    <p><a href="${mmeEscapeHtml(inboxUrl)}">Open contractor packet inbox</a></p>
+    <p><a href="${mmeEscapeHtml(packetUrl)}">Open packet API record</a></p>
+    <p><strong>Security:</strong> W-9, bank, tax, and identity material is not included in this email. Review restricted material only through the gated 0S packet store.</p>
+  `;
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({ from, to, subject, text, html })
+    });
+    const data = await response.json().catch(() => ({}));
+    return {
+      ok: response.ok,
+      skipped: false,
+      provider: 'resend',
+      status: response.status,
+      id: data.id || null,
+      error: response.ok ? null : (data.error || data.message || `HTTP ${response.status}`),
+      recipientCount: to.length,
+      sentAt: mmeNow()
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      skipped: false,
+      provider: 'resend',
+      status: 0,
+      error: error?.message || String(error),
+      recipientCount: to.length,
+      sentAt: mmeNow()
+    };
+  }
 }
 
 function mmeAeVendorEncryptionRequired(env) {
@@ -420,7 +560,18 @@ async function mmeKvGetJson(kv, key, fallback = null) {
 
 async function mmeKvPutJson(kv, key, value, options = {}) {
   if (!kv?.put) return false;
-  await kv.put(key, JSON.stringify(value), { expirationTtl: MME_STORAGE_TTL, ...options });
+  const body = JSON.stringify(value);
+  const putOptions = { expirationTtl: MME_STORAGE_TTL, ...options };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await kv.put(key, body, putOptions);
+      return true;
+    } catch (error) {
+      const transient = /429|Too Many Requests|internal error|temporarily unavailable/i.test(error?.message || '');
+      if (!transient || attempt === 2) throw error;
+      await mmeDelay(80 * (attempt + 1) + Math.floor(Math.random() * 60));
+    }
+  }
   return true;
 }
 
@@ -430,12 +581,19 @@ async function mmeAeVendorIndex(kv) {
 }
 
 async function mmeAeVendorWriteIndex(kv, summary) {
+  if (kv?.put && summary?.id) {
+    const createdMs = Date.parse(summary.createdAt || '') || Date.now();
+    const inverseTime = String(9999999999999 - createdMs).padStart(13, '0');
+    await mmeKvPutJson(kv, `${MME_AE_VENDOR_SUMMARY_PREFIX}${inverseTime}:${summary.id}`, summary);
+  }
   const index = await mmeAeVendorIndex(kv);
   const next = [
     summary,
     ...index.filter((item) => item.id !== summary.id)
   ].slice(0, 500);
-  await mmeKvPutJson(kv, MME_AE_VENDOR_INDEX_KEY, next);
+  try {
+    await mmeKvPutJson(kv, MME_AE_VENDOR_INDEX_KEY, next);
+  } catch {}
   return next;
 }
 
@@ -443,6 +601,13 @@ async function mmeAeVendorListPackets(env, limit = 100) {
   const kv = mmeKv(env);
   if (!kv) return [];
   const capped = Math.max(1, Math.min(500, Number(limit || 100)));
+  if (kv.list) {
+    const listedSummaries = await kv.list({ prefix: MME_AE_VENDOR_SUMMARY_PREFIX, limit: capped }).catch(() => null);
+    if (listedSummaries?.keys?.length) {
+      const summaries = await Promise.all(listedSummaries.keys.map((key) => mmeKvGetJson(kv, key.name, null)));
+      return summaries.filter(Boolean).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    }
+  }
   if (kv.list) {
     const listed = await kv.list({ prefix: MME_AE_VENDOR_PACKET_PREFIX, limit: capped }).catch(() => null);
     if (listed?.keys?.length) {
@@ -457,6 +622,46 @@ async function mmeAeVendorPacketById(env, id) {
   const safeId = mmeText(id, 160);
   if (!safeId) return null;
   return mmeKvGetJson(mmeKv(env), `${MME_AE_VENDOR_PACKET_PREFIX}${safeId}`, null);
+}
+
+async function mmeAeVendorEmailHash(email) {
+  return (await mmeSha256Hex(new TextEncoder().encode(String(email || '').trim().toLowerCase()))).slice(0, 24);
+}
+
+async function mmeAeVendorFindDuplicate(env, fingerprint, email) {
+  const kv = mmeKv(env);
+  if (!kv) return null;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const emailHash = await mmeAeVendorEmailHash(normalizedEmail);
+  const [fingerprintHit, emailHit] = await Promise.all([
+    mmeKvGetJson(kv, `${MME_AE_VENDOR_LOOKUP_PREFIX}fingerprint:${fingerprint}`, null),
+    mmeKvGetJson(kv, `${MME_AE_VENDOR_LOOKUP_PREFIX}email:${emailHash}`, null)
+  ]);
+  const hit = fingerprintHit || emailHit;
+  if (hit?.packetId) return { id: hit.packetId, submissionId: hit.submissionId, source: hit.source || 'lookup' };
+  return (await mmeAeVendorIndex(kv)).find((packet) => (
+    packet.fingerprint === fingerprint
+    || String(packet.email || packet.contractor?.email || '').trim().toLowerCase() === normalizedEmail
+  )) || null;
+}
+
+async function mmeAeVendorWriteLookup(kv, packet, fingerprint) {
+  const email = String(packet.contractor?.email || packet.email || '').trim().toLowerCase();
+  if (!kv?.put || !email || !fingerprint) return false;
+  const base = {
+    packetId: packet.id,
+    submissionId: packet.submissionId,
+    fingerprint,
+    email,
+    source: 'cloudflare_worker_lookup_index',
+    createdAt: packet.createdAt,
+    updatedAt: packet.updatedAt || packet.createdAt
+  };
+  await Promise.all([
+    mmeKvPutJson(kv, `${MME_AE_VENDOR_LOOKUP_PREFIX}fingerprint:${fingerprint}`, base),
+    mmeKvPutJson(kv, `${MME_AE_VENDOR_LOOKUP_PREFIX}email:${await mmeAeVendorEmailHash(email)}`, base)
+  ]);
+  return true;
 }
 
 async function mmeAeVendorReadFormData(request) {
@@ -539,7 +744,7 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
 
   const fingerprintBytes = new TextEncoder().encode(`${fields.email.toLowerCase()}|${fields.legal_name.toLowerCase()}`);
   const fingerprint = (await mmeSha256Hex(fingerprintBytes)).slice(0, 16);
-  const existing = (await mmeAeVendorListPackets(env, 500)).find((packet) => packet.fingerprint === fingerprint || (packet.email || packet.contractor?.email) === fields.email);
+  const existing = await mmeAeVendorFindDuplicate(env, fingerprint, fields.email);
   if (existing && !fields.allow_duplicate_submission) {
     return mmeJson({
       ok: false,
@@ -683,18 +888,68 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
   };
   await mmeKvPutJson(kv, `${MME_AE_VENDOR_PACKET_PREFIX}${packetId}`, packet);
   await mmeAeVendorWriteIndex(kv, { ...mmeAeVendorSummary(packet), fingerprint });
+  await mmeAeVendorWriteLookup(kv, packet, fingerprint);
   await mmeKvPutJson(kv, `${MME_AE_VENDOR_AUDIT_PREFIX}${packetId}`, packet.audit);
+  const adminNotification = await mmeSendAeVendorOwnerEmail(env, request, packet, auth);
+  packet.adminNotification = {
+    provider: adminNotification.provider,
+    ok: adminNotification.ok,
+    skipped: adminNotification.skipped,
+    status: adminNotification.status || null,
+    id: adminNotification.id || null,
+    error: adminNotification.error || null,
+    reason: adminNotification.reason || null,
+    recipientCount: adminNotification.recipientCount || 0,
+    sentAt: adminNotification.sentAt || mmeNow()
+  };
+  packet.audit.unshift({
+    id: mmeId('ae_vendor_audit'),
+    type: adminNotification.ok ? 'owner_resend_notification_sent' : 'owner_resend_notification_not_sent',
+    actor: '0s-worker',
+    note: adminNotification.ok ? 'Owner/admin packet notification sent through Resend.' : (adminNotification.reason || adminNotification.error || 'Owner/admin packet notification not sent.'),
+    createdAt: packet.adminNotification.sentAt
+  });
+  await mmeKvPutJson(kv, `${MME_AE_VENDOR_PACKET_PREFIX}${packetId}`, packet);
+  await mmeAeVendorWriteIndex(kv, { ...mmeAeVendorSummary(packet), fingerprint });
+  await mmeAeVendorWriteLookup(kv, packet, fingerprint);
+  await mmeKvPutJson(kv, `${MME_AE_VENDOR_AUDIT_PREFIX}${packetId}`, packet.audit);
+  let gateMirror = { ok: false, skipped: true, reason: 'SkyGate mirror helper not configured.' };
   if (helpers.mirrorSkygateEvent) {
-    await helpers.mirrorSkygateEvent(env, {
-      type: 'marketing_made_easy.ae_vendor_packet_submitted',
-      meta: {
-        packet_id: packetId,
-        submission_id: submissionId,
-        workspace_slug: workspaceSlug,
-        role_lane: packet.contractor.roleLane,
-        storage_provider: packet.storage.provider
-      }
-    }, auth.gate || auth);
+    try {
+      gateMirror = await helpers.mirrorSkygateEvent(env, {
+        type: 'marketing_made_easy.ae_vendor_packet_submitted',
+        meta: {
+          packet_id: packetId,
+          submission_id: submissionId,
+          workspace_slug: workspaceSlug,
+          role_lane: packet.contractor.roleLane,
+          storage_provider: packet.storage.provider,
+          owner_resend_notification: packet.adminNotification.ok ? 'sent' : (packet.adminNotification.skipped ? 'skipped' : 'failed')
+        }
+      }, auth.gate || auth);
+    } catch (error) {
+      gateMirror = { ok: false, error: error?.message || 'SkyGate mirror failed.' };
+    }
+  }
+  packet.gateMirror = {
+    ok: Boolean(gateMirror?.ok),
+    skipped: Boolean(gateMirror?.skipped),
+    status: gateMirror?.status || null,
+    error: gateMirror?.error || null,
+    reason: gateMirror?.reason || null
+  };
+  if (!packet.gateMirror.ok) {
+    packet.audit.unshift({
+      id: mmeId('ae_vendor_audit'),
+      type: 'gate_mirror_not_sent',
+      actor: '0s-worker',
+      note: packet.gateMirror.error || packet.gateMirror.reason || 'SkyGate mirror did not acknowledge this packet event.',
+      createdAt: mmeNow()
+    });
+    try {
+      await mmeKvPutJson(kv, `${MME_AE_VENDOR_PACKET_PREFIX}${packetId}`, packet);
+      await mmeKvPutJson(kv, `${MME_AE_VENDOR_AUDIT_PREFIX}${packetId}`, packet.audit);
+    } catch {}
   }
   return mmeJson({
     ok: true,
@@ -705,13 +960,17 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
     storage: packet.storage,
     paymentProfile: packet.paymentProfile,
     payoutLedger: packet.payoutLedger,
+    adminNotification: packet.adminNotification,
+    gateMirror: packet.gateMirror,
     legalAndVendorDocs: packet.legalAndVendorDocs,
     nextStep: 'Admin reviews the Cloudflare packet, verifies W-9/payment destination, then approves the vendor workspace before any client-revenue payout release.',
     ...mmeAeVendorStorageStatus(env)
   }, 201);
 }
 
-async function mmeApproveAeVendorPacket(request, env, auth, packetId) {
+async function mmeApproveAeVendorPacket(request, env, auth, packetId, helpers = {}) {
+  const owner = auth?.ok ? auth : await mmeRequireOwnerAdmin(request, env, helpers, 'Marketing Made Easy AE/vendor approval');
+  if (!owner.ok) return owner.response;
   const storageBlocked = mmeStateRequiresStorage(env);
   if (storageBlocked) return storageBlocked;
   const kv = mmeKv(env);
@@ -737,7 +996,7 @@ async function mmeApproveAeVendorPacket(request, env, auth, packetId) {
     {
       id: mmeId('ae_vendor_audit'),
       type: 'packet_approved',
-      actor: auth.actor || 'skygate-user',
+      actor: owner.actor || 'skygate-user',
       note: mmeText(body.note, 1000),
       createdAt: updatedAt
     }
@@ -1021,6 +1280,9 @@ async function mmeHandleGatedGet(request, env, mount, path, helpers) {
   if (path === '/execution-board') return mmeJson({ ok: true, execution_board: mmeListForWorkspace(buckets.execution, workspaceSlug) });
   if (path === '/dispatch-board') return mmeJson({ ok: true, dispatch_board: mmeListForWorkspace(buckets.dispatch, workspaceSlug) });
   if (path === '/ae-vendor-onboarding/packets' || path === '/contractor-onboarding/packets') {
+    if (!mmeAuthIsOwnerAdmin(auth)) {
+      return mmeJson({ ok: false, error: 'Owner/admin session required to read contractor packet inbox.' }, 403);
+    }
     const limit = Math.min(500, Math.max(1, Number(url.searchParams.get('limit') || 100)));
     return mmeJson({
       ok: true,
@@ -1030,6 +1292,9 @@ async function mmeHandleGatedGet(request, env, mount, path, helpers) {
   }
   const aeVendorPacketMatch = path.match(/^\/(?:ae-vendor-onboarding|contractor-onboarding)\/packets\/([^/]+)$/);
   if (aeVendorPacketMatch) {
+    if (!mmeAuthIsOwnerAdmin(auth)) {
+      return mmeJson({ ok: false, error: 'Owner/admin session required to read contractor packet details.' }, 403);
+    }
     const packet = await mmeAeVendorPacketById(env, decodeURIComponent(aeVendorPacketMatch[1]));
     if (!packet) return mmeJson({ ok: false, error: 'ae_vendor_packet_not_found', packetId: decodeURIComponent(aeVendorPacketMatch[1]) }, 404);
     return mmeJson({ ok: true, packet, ...mmeAeVendorStorageStatus(env) });
@@ -1066,9 +1331,9 @@ async function mmeHandleMutation(request, env, mount, path, helpers) {
   }
   const aeVendorApproveMatch = path.match(/^\/(?:ae-vendor-onboarding|contractor-onboarding)\/packets\/([^/]+)\/approve$/);
   if (aeVendorApproveMatch && request.method === 'POST') {
-    const auth = await helpers.requireGateAuth(request, env, 'Marketing Made Easy AE/vendor approval');
+    const auth = await mmeRequireOwnerAdmin(request, env, helpers, 'Marketing Made Easy AE/vendor approval');
     if (!auth.ok) return auth.response;
-    return mmeApproveAeVendorPacket(request, env, auth, decodeURIComponent(aeVendorApproveMatch[1]));
+    return mmeApproveAeVendorPacket(request, env, auth, decodeURIComponent(aeVendorApproveMatch[1]), helpers);
   }
 
   const body = await request.json().catch(() => ({}));

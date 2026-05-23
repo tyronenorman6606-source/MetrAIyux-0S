@@ -53,13 +53,39 @@ async function postJson(url, body, headers = {}) {
 async function obtainFs27Bearer() {
   const direct = env.SKYEVAULT_ONE_AUTH_BEARER || env.SKYGATE_SESSION_TOKEN || env.FS27_ADMIN_BEARER || '';
   if (direct) return { bearer: direct, source: 'env-bearer', login: null };
-  const password = [
+  const ownerCodes = [
+    env.FREE99_ADMIN_CODE,
+    env.FREE99_ADMIN_PASSWORD,
+    env.FREE99_GATE_CODE,
+    env.FREE99_GATE_PASSWORD,
+    env.OWNER_ADMIN_CODE,
+    env.OWNER_ADMIN_PASSWORD,
+    env.ADMIN_CODE,
     env.ADMIN_PASSWORD,
+    env.FS27_ADMIN_PASSWORD,
+    env.SKYGATEFS27_ADMIN_PASSWORD,
+    env.SKYGATE_ADMIN_PASSWORD,
+    env.SKYGATEFS13_ADMIN_PASSWORD,
+    env.QA_ADMIN_PASSWORD,
+    env.PHC_OPERATOR_PASSWORD
+  ].map((value) => String(value || '').trim()).filter(Boolean);
+  for (const code of [...new Set(ownerCodes)]) {
+    const ownerLogin = await postJson(`${zeroSOrigin}/api/owner/admin-login`, { code });
+    if (ownerLogin.response.ok && (ownerLogin.data.gateToken || ownerLogin.data.gateBearerToken || ownerLogin.data.token)) {
+      return {
+        bearer: ownerLogin.data.gateToken || ownerLogin.data.gateBearerToken || ownerLogin.data.token,
+        source: ownerLogin.data.gateToken || ownerLogin.data.gateBearerToken ? '0s-owner-admin-login-fs27-bearer' : '0s-owner-admin-login-owner-session',
+        login: { ok: true, via: ownerLogin.data.via || '0s-owner-admin-login' }
+      };
+    }
+  }
+  const password = [
     env.FS27_ADMIN_PASSWORD,
     env.SKYGATEFS27_ADMIN_PASSWORD,
     env.SKYGATE_ADMIN_PASSWORD,
     env.SKYEGATE_ADMIN_PASSWORD,
     env.SKYGATEFS13_ADMIN_PASSWORD,
+    env.ADMIN_PASSWORD,
     env.QA_ADMIN_PASSWORD,
     env.PHC_OPERATOR_PASSWORD
   ].map((value) => String(value || '').trim()).find(Boolean) || '';
@@ -149,7 +175,21 @@ const report = {
   checks: {}
 };
 
-const health = await api('/api/marketing-made-easy/ae-vendor-onboarding/health');
+const unauthHealth = await api('/api/marketing-made-easy/ae-vendor-onboarding/health');
+assert.ok([401, 403].includes(unauthHealth.status), `Expected unauthenticated health to be gated, got ${unauthHealth.status}`);
+report.checks.unauthenticated_health_gate = {
+  status: unauthHealth.status,
+  error: unauthHealth.data.error || ''
+};
+
+const { bearer, source, login } = await obtainFs27Bearer();
+const introspection = await introspectBearer(bearer);
+assert.equal(introspection.ok, true, `FS27 bearer did not introspect active: ${JSON.stringify(introspection)}`);
+report.checks.fs27_auth = { source, login, introspection };
+
+const health = await api('/api/marketing-made-easy/ae-vendor-onboarding/health', {
+  headers: authHeaders(bearer)
+});
 assert.equal(health.status, 200);
 assert.equal(health.data.cloudflare_only, true);
 assert.equal(health.data.netlify, false);
@@ -162,16 +202,12 @@ report.checks.health = {
   storage_configured: health.data.storage_configured
 };
 
-const page = await fetch(`${zeroSOrigin}/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html`, { redirect: 'follow' });
-const pageText = await page.text();
-assert.equal(page.status, 200);
-assert.ok(pageText.includes('/api/marketing-made-easy/ae-vendor-onboarding/submit'));
-assert.ok(pageText.includes('Cloudflare encrypted packet store'));
-assert.ok(!pageText.includes('Netlify Function'));
-report.checks.live_page = {
-  status: page.status,
-  cloudflare_action_present: pageText.includes('/api/marketing-made-easy/ae-vendor-onboarding/submit'),
-  stale_netlify_function_copy_present: pageText.includes('Netlify Function')
+const unauthPage = await fetch(`${zeroSOrigin}/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html`, { redirect: 'manual' });
+assert.ok([301, 302, 303, 307, 308].includes(unauthPage.status), `Expected onboarding page to gate-redirect, got ${unauthPage.status}`);
+assert.ok(String(unauthPage.headers.get('location') || '').includes('/admin/login.html'), 'Unauthenticated onboarding page did not redirect to owner login.');
+report.checks.unauthenticated_page_gate = {
+  status: unauthPage.status,
+  location: unauthPage.headers.get('location') || ''
 };
 
 const unauth = await api('/api/marketing-made-easy/ae-vendor-onboarding/submit', {
@@ -181,10 +217,20 @@ const unauth = await api('/api/marketing-made-easy/ae-vendor-onboarding/submit',
 assert.equal(unauth.status, 401);
 report.checks.unauthenticated_submit = { status: unauth.status, error: unauth.data.error || '' };
 
-const { bearer, source, login } = await obtainFs27Bearer();
-const introspection = await introspectBearer(bearer);
-assert.equal(introspection.ok, true, `FS27 bearer did not introspect active: ${JSON.stringify(introspection)}`);
-report.checks.fs27_auth = { source, login, introspection };
+const page = await fetch(`${zeroSOrigin}/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html`, {
+  headers: authHeaders(bearer),
+  redirect: 'follow'
+});
+const pageText = await page.text();
+assert.equal(page.status, 200);
+assert.ok(pageText.includes('/api/marketing-made-easy/ae-vendor-onboarding/submit'));
+assert.ok(pageText.includes('Cloudflare encrypted packet store'));
+assert.ok(!pageText.includes('Netlify Function'));
+report.checks.authenticated_live_page = {
+  status: page.status,
+  cloudflare_action_present: pageText.includes('/api/marketing-made-easy/ae-vendor-onboarding/submit'),
+  stale_netlify_function_copy_present: pageText.includes('Netlify Function')
+};
 
 const smoke = await api('/api/marketing-made-easy/ae-vendor-onboarding/submit', {
   method: 'POST',
@@ -203,6 +249,7 @@ report.checks.authenticated_smoke_submit = {
   status: smoke.status,
   receipt_id: smoke.data.receiptId,
   storage_provider: smoke.data.storage.provider,
+  owner_resend_notification: smoke.data.adminNotification || null,
   raw_payment_values_exposed: smoke.text.includes('111000025') || smoke.text.includes('7770000001')
 };
 

@@ -1998,6 +1998,65 @@ deploy receipt: test-artifacts/cloudflare-pages/metraiyux-0s-marketing-business-
 browser proof: test-artifacts/live-browser-verifier/2026-05-23T02-38-26-557Z-business-cards-v2-production-focused/live-browser-verification-report.json
 ```
 
+### 2026-05-23 SkyeMusicNexus / Contractor Packet / Worker Lane Closure
+
+Current deployed 0S Worker:
+
+```text
+url: https://metraiyux-0s-full-system.graylondonskyes.workers.dev
+worker version: 860357fc-2cad-44c7-8ed1-4394f393076e
+deploy command: npm run 0s:worker:deploy
+deploy token source: root .env Cloudflare super api token block, line 1240, redacted by the runner
+```
+
+What changed:
+
+- `scripts/deploy-0s-worker.mjs` now handles the owner-provided root `.env` prose token block, verifies access to the live Worker service, and deploys without printing the token.
+- Marketing Made Easy contractor packet submissions now use encrypted Cloudflare KV storage, targeted duplicate lookups, per-packet summary records, Resend owner notification, and best-effort nonblocking shared index writes so concurrent live submits do not fail on KV hot-key 429s.
+- Owner/admin packet list/detail/approve APIs require shared 0S owner/admin gate auth.
+- The contractor packet inbox is now also served as a Worker-generated gated HTML surface, because the new Cloudflare Assets entry returned 404 despite upload.
+- RouteX gate readiness links the contractor onboarding/inbox/SovereignDocs paperwork lane.
+- SkyeMusicNexus claims data now states the real payout boundary: contractor payout packets, owner approval, and provider setup are required before cash movement.
+
+Final receipts:
+
+```text
+live API stress: test-artifacts/ae-vendor-onboarding-cloudflare/live-report.json
+headed browser: test-artifacts/contractor-onboarding-live-browser-20260523075700/live-browser-report.json
+browser latest: test-artifacts/contractor-onboarding-live-browser-latest.json
+contractor security: npm run 0s:contractor-onboarding:security
+SkyeMusicNexus claims: npm run 0s:skyemusicnexus:claims
+SkyeMusicNexus mounted stress: metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-2026-05-23T07-32-59-064Z.json
+RouteX mounted stress: metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-mounted-worker-stress-2026-05-23T07-32-59-140Z.json
+```
+
+Final facts from the live API receipt:
+
+```text
+unauthenticated submit: 401
+FS27 bearer introspection: active admin
+storage: cloudflare_worker_kv_encrypted_packet_store
+Resend owner email: sent, id 0443a986-fe60-4ab4-ba17-a564d11624ed
+smoke receipt: ae_vendor_72fbc2279e3849e6b6
+approval: payout_profile_verified_no_external_transfer_created
+external transfer created: false
+live stress: 20 concurrent submits, 20 successes, 0 failures, 20 unique receipts, all listed
+raw payment leak scan: false
+```
+
+Final facts from the headed browser receipt:
+
+```text
+desktop flow: owner login, contractor form, file uploads, submit, inbox, detail, approval, RouteX gate readiness
+mobile flow: owner login, onboarding navigation, inbox navigation
+screenshots: 7
+scroll stops: 20
+console errors: 0
+failed requests: 0
+HTTP errors: 0
+horizontal overflow: 0
+```
+
 ### Cloudflare Worker Push Lane
 
 For Workers, use the repo runner instead of assuming a local package install:

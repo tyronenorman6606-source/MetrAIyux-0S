@@ -6,6 +6,7 @@ import { handleCitadelDbRoute } from './citadeldb-adapter.mjs';
 import { handleCompanyKnowledgeRoute } from './company-knowledge.mjs';
 import adminLoginHtml from './generated-admin-login-page.mjs';
 import changelogHtml from './generated-changelog-page.mjs';
+import contractorPacketInboxHtml from './generated-contractor-packet-inbox-page.mjs';
 // Changelog bundle refresh: 2026-05-20 gate-owned remote QuantumSkyes MCP lane.
 import { handleMarketingMadeEasyRoute } from './marketing-made-easy-adapter.mjs';
 import {
@@ -3513,6 +3514,7 @@ async function handleAppApiRoute(request, env, ctx, url) {
   if (mount.id === 'marketingMadeEasy' && !appExternalConfigured(env, mount)) {
     return handleMarketingMadeEasyRoute(request, env, url, matchedBase, mount, {
       requireGateAuth,
+      requireOperatorAuth,
       mirrorSkygateEvent
     });
   }
@@ -8176,8 +8178,8 @@ function routexFeatureReadiness(env, state) {
       status:routexProviderConnected(config, 'payment') ? 'provider-connected' : 'ledger-only',
       works_now:true,
       works_without_full_onboarding:!routexProviderConnected(config, 'payment'),
-      requires:['Stripe or SkyPay provider credentials for external dispatch', 'Owner-approved business settlement rules before real money movement'],
-      if_missing:'Payment state stays in the gate-owned ledger. Real provider dispatch, capture, refund, or payout workflows will not execute.'
+      requires:['Stripe or SkyPay provider credentials for external dispatch', 'Completed contractor packet with W-9/agreement/payout profile', 'Owner approval before external payout release'],
+      if_missing:'Payment state stays in the gate-owned ledger. External payout release stays blocked until contractor onboarding, owner approval, and payout-provider destination verification are complete.'
     },
     {
       id:'sms_notifications',
@@ -8253,6 +8255,13 @@ async function routexGateDashboardPayload(env, state, actor = null) {
     links:[
       {label:'RouteX product console', href:appRoot},
       {label:'RouteX readiness dashboard', href:readinessPath},
+      {label:'Contractor onboarding packet', href:'/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html'},
+      {label:'Owner contractor packet inbox', href:'/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html'},
+      {label:'Contractor packet encrypted API inbox', href:'/api/marketing-made-easy/ae-vendor-onboarding/packets'},
+      {label:'Contractor packet health JSON', href:'/api/marketing-made-easy/ae-vendor-onboarding/health'},
+      {label:'SovereignDocs contractor packet template', href:'/Free99/apps/sovereigndocs/build/US-AZ/employment-hr/contractor-onboarding-packet/'},
+      {label:'SovereignDocs W-9 request template', href:'/Free99/apps/sovereigndocs/build/US-AZ/tax-records-compliance/w9-request-letter/'},
+      {label:'SovereignDocs 1099 vendor tracker', href:'/Free99/apps/sovereigndocs/build/US-AZ/tax-records-compliance/1099-vendor-tracker/'},
       {label:'0S owner login for RouteX readiness', href:`/admin/login.html?return=${encodeURIComponent(readinessPath)}`},
       {label:'FS27 RouteX gate folder', href:'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/'},
       {label:'FS27 RouteX mirror events JSON', href:'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/admin/platform-routex-events'},
@@ -8284,6 +8293,7 @@ async function routexGateDashboardPayload(env, state, actor = null) {
       {lane:'Owner/operator', must_have:['0S owner session','admin or house_command RouteX role'], unlocks:['Gate dashboard','staged provider/contractor profiles','manual compliance proof','outbox and event review']},
       {lane:'Provider workspace', must_have:['Gate-staged provider profile','company_name','market/job details'], unlocks:['Post jobs','review applicants','approve work','payment state changes']},
       {lane:'Contractor/crew workspace', must_have:['Gate-staged contractor or crew profile','skills/transportation/reliability profile'], unlocks:['Browse jobs','apply','accept assignments','submit proof']},
+      {lane:'Contractor payout activation', must_have:['Completed contractor packet','Uploaded W-9 in encrypted packet store','Signed agreement acceptance','Encrypted payout profile','Owner/admin approval'], unlocks:['Contractor can be marked payout-ready','RouteX/Music/AE payout ledgers can move from hold to provider-ready'], without_it:'Payment ledgers can accrue, but external transfer release remains blocked.'},
       {lane:'SMS notifications', must_have:['Twilio sender configured','recipient phone in gate profile','sms_opt_in true'], unlocks:['External SMS dispatch'], without_it:'Gate notification ledger still records the message.'},
       {lane:'Background checks', must_have:['Checkr, Certn, or signed background webhook configured','subject authorization/disclosure records'], unlocks:['External background-check dispatch'], without_it:'Gate compliance ledger and manual proof records remain available.'},
       {lane:'Proof media/export', must_have:['R2/S3 credentials for external object storage'], unlocks:['Durable proof media and export packets'], without_it:'KV ledger fallback stores metadata when KV is present.'}
@@ -11792,6 +11802,20 @@ export default {
     }
     const earlyZeroOsGate = await enforceZeroOsGate(request, env, url, ctx);
     if (earlyZeroOsGate) return earlyZeroOsGate;
+    if (
+      url.pathname === '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox'
+      || url.pathname === '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox/'
+      || url.pathname === '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html'
+    ) {
+      return new Response(contractorPacketInboxHtml, {
+        status: 200,
+        headers: {
+          'content-type': 'text/html; charset=utf-8',
+          'cache-control': 'no-store',
+          'x-0s-surface': 'marketing-made-easy-contractor-packet-inbox'
+        }
+      });
+    }
     if (url.pathname === '/devs-playbook') {
       const target = new URL('/devs-playbook/', url.origin);
       url.searchParams.forEach((value, key) => target.searchParams.set(key, value));

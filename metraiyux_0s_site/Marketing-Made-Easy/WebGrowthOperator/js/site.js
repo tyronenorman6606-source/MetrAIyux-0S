@@ -70,12 +70,22 @@ document.querySelectorAll('[data-copy-target]').forEach(function(btn){
   started.value = String(Date.now());
   form.appendChild(started);
   function gateToken(){
-    const keys = ['skye_gate_session','skygate_session','skyegate_session','skyeGateSession','skye_gate_token','skygate_token','skyegate_token','metraiyux_gate_session','metraiyux_admin_session'];
+    const keys = ['FREE99_PLATFORM_GATE_SESSION','FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX','FREE99_PLATFORM_GATE_SESSION_MARKETING_MADE_EASY','skye_gate_session','skygate_session','skyegate_session','skyeGateSession','skye_gate_token','skygate_token','skyegate_token','metraiyux_gate_session','metraiyux_admin_session'];
+    function tokenFromValue(value){
+      if(!value) return '';
+      const raw = String(value).trim();
+      try{
+        const parsed = JSON.parse(raw);
+        return String(parsed.token || parsed.session || parsed.bearer || parsed.access_token || '').replace(/^Bearer\s+/i,'').trim();
+      }catch(e){}
+      return raw.replace(/^Bearer\s+/i,'').trim();
+    }
     for(const store of [window.sessionStorage, window.localStorage]){
       try{
         for(const key of keys){
           const value = store.getItem(key);
-          if(value) return value.replace(/^Bearer\s+/i,'').trim();
+          const token = tokenFromValue(value);
+          if(token) return token;
         }
       }catch(e){}
     }
@@ -85,7 +95,8 @@ document.querySelectorAll('[data-copy-target]').forEach(function(btn){
       const name = (pair.shift() || '').trim();
       if(keys.includes(name)){
         const value = decodeURIComponent(pair.join('=').trim());
-        if(value) return value.replace(/^Bearer\s+/i,'').trim();
+        const token = tokenFromValue(value);
+        if(token) return token;
       }
     }
     return '';
