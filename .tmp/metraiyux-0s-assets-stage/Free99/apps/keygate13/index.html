@@ -1,0 +1,342 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KeyGate 13 · Skyes Over London</title>
+  <meta name="theme-color" content="#06050d" />
+  <meta name="description" content="KeyGate 13 — sovereign credential suite. Forge keys, manage env vaults, derive master credentials, generate passwords." />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon-192.png" />
+  <style>
+    :root{--bg:#06050d;--panel:rgba(12,11,22,.84);--border:rgba(255,255,255,.09);--purple:#8d58ff;--gold:#ffd36a;--cyan:#31e7ff;--emerald:#36e8a8;--text:#f6f3ff;--muted:#a4a2bd;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--display:Georgia,"Times New Roman",serif;--body:Inter,system-ui,-apple-system,sans-serif;--shadow:0 24px 80px rgba(0,0,0,.42)}
+    *{box-sizing:border-box}html,body{height:100%;margin:0}
+    body{font-family:var(--body);color:var(--text);background:var(--bg);overflow-x:hidden}
+    .stars{position:fixed;inset:0;pointer-events:none;opacity:.45;background-image:radial-gradient(1px 1px at 9% 16%,rgba(255,255,255,.9),transparent 45%),radial-gradient(1px 1px at 21% 72%,rgba(255,255,255,.8),transparent 45%),radial-gradient(1px 1px at 41% 24%,rgba(255,255,255,.7),transparent 45%),radial-gradient(1px 1px at 63% 64%,rgba(255,255,255,.82),transparent 45%),radial-gradient(1px 1px at 79% 26%,rgba(255,255,255,.75),transparent 45%),radial-gradient(1px 1px at 91% 74%,rgba(255,255,255,.86),transparent 45%),radial-gradient(1px 1px at 35% 88%,rgba(255,255,255,.65),transparent 45%),radial-gradient(1px 1px at 55% 42%,rgba(255,255,255,.7),transparent 45%);animation:drift 20s linear infinite}
+    @keyframes drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-10px,6px,0)}}
+    .bg-glow{position:fixed;inset:0;pointer-events:none;background:radial-gradient(900px 600px at 20% 10%,rgba(141,88,255,.16),transparent 55%),radial-gradient(700px 500px at 80% 20%,rgba(49,231,255,.09),transparent 55%),radial-gradient(800px 600px at 50% 90%,rgba(255,211,106,.07),transparent 55%)}
+
+    .intro{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(3,3,10,.97);transition:opacity .8s ease,visibility .8s ease}
+    .intro.gone{opacity:0;visibility:hidden;pointer-events:none}
+    .intro-card{position:relative;z-index:2;width:min(90vw,680px);text-align:center;padding:32px 24px 28px;border-radius:28px;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(18px);background:linear-gradient(180deg,rgba(20,14,40,.88),rgba(8,7,18,.82));box-shadow:0 30px 100px rgba(0,0,0,.6)}
+    .intro-logo{width:min(52vw,260px);display:block;margin:0 auto 16px;filter:drop-shadow(0 0 24px rgba(255,211,106,.32)) drop-shadow(0 0 50px rgba(141,88,255,.28));animation:logoFloat 3s ease-in-out infinite}
+    @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}}
+    .intro-eyebrow{font:700 11px/1 var(--mono);letter-spacing:.38em;text-transform:uppercase;color:var(--gold);opacity:.9;margin-bottom:12px}
+    .intro-title{margin:0;font-size:clamp(32px,6vw,60px);line-height:1;color:#fff;text-shadow:0 0 30px rgba(255,211,106,.18)}
+    .intro-title span{color:var(--gold)}
+    .intro-sub{margin:12px auto 0;max-width:52ch;color:rgba(240,238,255,.8);font-size:15px;line-height:1.65}
+    .intro-bar{width:min(420px,82%);height:8px;border-radius:999px;margin:22px auto 10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
+    .intro-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--gold) 55%,#f8e7a5);animation:barLoad 2.6s cubic-bezier(.22,.96,.2,1) forwards}
+    @keyframes barLoad{0%{width:0%}100%{width:100%}}
+    .intro-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+    .chip{padding:7px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#d9d7ee;font:700 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .chip.gold{color:var(--gold);border-color:rgba(255,211,106,.22)}
+    .chip.cyan{color:var(--cyan);border-color:rgba(49,231,255,.22)}
+    .chip.emerald{color:var(--emerald);border-color:rgba(54,232,168,.22)}
+    .chip.purple{color:var(--purple);border-color:rgba(141,88,255,.3)}
+    .intro-skip{margin-top:18px;appearance:none;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#fff;padding:11px 20px;border-radius:999px;font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:border-color .18s,transform .18s}
+    .intro-skip:hover{border-color:rgba(255,211,106,.5);transform:translateY(-1px)}
+    .free99-badge{margin-top:14px;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid rgba(54,232,168,.22);background:rgba(54,232,168,.06);color:var(--emerald);font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase}
+
+    .wrap{position:relative;z-index:2;max-width:1300px;margin:0 auto;padding:28px 18px 80px}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand-logo{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,211,106,.22)) drop-shadow(0 0 22px rgba(141,88,255,.2));animation:logoFloat 5s ease-in-out infinite}
+    .brand-copy{}
+    .brand-eyebrow{font:700 10px/1 var(--mono);letter-spacing:.36em;text-transform:uppercase;color:var(--gold);opacity:.88}
+    .brand-name{font:700 clamp(22px,2.6vw,32px)/1.05 var(--display);color:#fff;letter-spacing:-.01em}
+    .brand-sub{font:600 11px/1.25 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .status-row{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 10px rgba(54,232,168,.5)}
+    .pill .dot.gold{background:var(--gold);box-shadow:0 0 10px rgba(255,211,106,.5)}
+
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;margin-bottom:32px;align-items:stretch}
+    .hero-text{padding:40px 38px;background:var(--panel);border:1px solid var(--border);border-radius:26px;backdrop-filter:blur(20px);box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .hero-text::after{content:'';position:absolute;inset:auto -14% -20% auto;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(141,88,255,.18),transparent 70%);pointer-events:none}
+    .hero-kicker{font:700 10px/1.4 var(--mono);letter-spacing:.35em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+    .hero-title{font:700 clamp(38px,5.5vw,72px)/.95 var(--display);color:#fff;margin:0 0 16px;text-shadow:0 10px 40px rgba(0,0,0,.32)}
+    .hero-title em{font-style:italic;color:var(--gold)}
+    .hero-body{font-size:clamp(15px,1.2vw,18px);line-height:1.82;color:#dad6e8;margin:0 0 24px;max-width:56ch}
+    .hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+    .badge{padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#efe9ff;font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .hero-logo-card{background:var(--panel);border:1px solid var(--border);border-radius:26px;backdrop-filter:blur(20px);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;gap:20px;position:relative;overflow:hidden}
+    .hero-logo-card::before{content:'';position:absolute;inset:auto 50% -24% auto;width:200px;height:200px;transform:translateX(50%);border-radius:50%;background:radial-gradient(circle,rgba(141,88,255,.28),transparent 70%);filter:blur(4px)}
+    .hl-logo{position:relative;z-index:2;width:min(42vw,300px);max-height:220px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,211,106,.24)) drop-shadow(0 0 44px rgba(141,88,255,.24));animation:logoFloat 5.8s ease-in-out infinite}
+    .hl-note{font-size:14px;line-height:1.75;color:#d7d5ea;text-align:center;position:relative;z-index:2}
+    .hl-free99{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;border:1px solid rgba(54,232,168,.24);background:rgba(54,232,168,.07);color:var(--emerald);font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;position:relative;z-index:2}
+
+    .section-label{font:700 10px/1 var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+    .surface-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-bottom:32px}
+    .surface-card{display:block;text-decoration:none;padding:26px;background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+    .surface-card::before{content:'';position:absolute;inset:auto auto -28% -12%;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,var(--glow-color, rgba(141,88,255,.12)),transparent 70%);pointer-events:none;transition:opacity .18s}
+    .surface-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.16);box-shadow:0 32px 100px rgba(0,0,0,.5)}
+    .surface-card:hover::before{opacity:1.5}
+    .sc-num{font:700 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .sc-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04)}
+    .sc-name{font:700 clamp(20px,2.2vw,26px)/1.1 var(--display);color:#fff;margin:0 0 10px}
+    .sc-desc{font-size:14px;line-height:1.7;color:#cbc7da;margin:0 0 18px}
+    .sc-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+    .sc-enter{display:inline-flex;align-items:center;gap:8px;font:700 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--text);padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);transition:border-color .18s,background .18s}
+    .surface-card:hover .sc-enter{border-color:rgba(255,211,106,.4);color:var(--gold);background:rgba(255,211,106,.06)}
+
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .info-card{padding:18px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:18px}
+    .info-card-label{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .info-card-value{font:700 20px/1.1 var(--display);color:#fff;margin-bottom:6px}
+    .info-card-copy{font-size:13px;line-height:1.5;color:#cbc7da}
+
+    .footer{margin-top:32px;padding-top:18px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+
+    @media(max-width:980px){.hero{grid-template-columns:1fr}}
+    @media(max-width:640px){.top-bar{flex-direction:column;align-items:flex-start}.hero-text{padding:28px 22px}}
+  </style>
+<link rel="stylesheet" href="assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+</head>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+<div class="stars"></div>
+<div class="bg-glow"></div>
+
+<div class="intro" id="kg13Intro">
+  <div class="intro-card">
+    <div class="intro-eyebrow">Skyes Over London</div>
+    <img class="intro-logo" src="./skyesoverlondondietylogo.png" alt="Skyes Over London" />
+    <h1 class="intro-title neon-gradient-text">Key<span>Gate</span> 13</h1>
+    <p class="intro-sub">Sovereign credential suite. Forge keys, secure your variables, derive master credentials, and generate battle-tested passwords. All in-browser. All yours.</p>
+    <div class="intro-bar"><div class="intro-fill"></div></div>
+    <div class="intro-chips">
+      <span class="chip gold">JWT Forge</span>
+      <span class="chip cyan">Vault</span>
+      <span class="chip purple">HKDF Key Derive</span>
+      <span class="chip emerald">Pass Lab</span>
+    </div>
+    <button class="intro-skip" id="kg13Skip" type="button">Enter Suite</button>
+    <div><div class="free99-badge">Free99 Platform</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="top-bar">
+    <div class="brand">
+      <img class="brand-logo" src="./skyesoverlondondietylogo.png" alt="logo" />
+      <div class="brand-copy">
+        <div class="brand-eyebrow">Skyes Over London</div>
+        <div class="brand-name">KeyGate 13</div>
+        <div class="brand-sub">Sovereign Credential Suite</div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="pill"><span class="dot gold"></span>Free99 Platform</div>
+      <div class="pill" id="netPill"><span class="dot"></span>Offline-first</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-kicker">Production-grade browser crypto</div>
+      <h2 class="hero-title">One suite. <em>Zero</em> nonsense.</h2>
+      <p class="hero-body">KeyGate 13 gives you four sovereign surfaces that handle every credential need from development to production. Nothing leaves the browser unless you export it yourself.</p>
+      <div class="hero-badges">
+        <span class="badge">Web Crypto API</span>
+        <span class="badge">HKDF / PBKDF2</span>
+        <span class="badge">AES-GCM Vault</span>
+        <span class="badge">Ed25519 / RSA / ECDSA</span>
+        <span class="badge">Offline-first PWA</span>
+      </div>
+      <div class="free99-badge" style="display:inline-flex">Free99 Platform · Skyes Over London</div>
+    </div>
+    <div class="hero-logo-card">
+      <img class="hl-logo" src="./skyesoverlondondietylogo.png" alt="Skyes Over London" />
+      <p class="hl-note">Your keys. Your vault. Your machine. The gate is 13 layers deep and it generates everything you need.</p>
+      <div class="hl-free99">Free99 · Always Available</div>
+    </div>
+  </div>
+
+  <div class="section-label">Four Surfaces</div>
+  <div class="surface-grid">
+    <a class="surface-card" href="./forge.html" style="--glow-color:rgba(255,211,106,.14)">
+      <div class="sc-num">Surface 01</div>
+      <div class="sc-icon">🔑</div>
+      <h3 class="sc-name">Key Forge</h3>
+      <p class="sc-desc">Generate HMAC secrets, Ed25519 / RSA / ECDSA PEM keypairs, run OpenSSL-style browser commands, and export full material packages.</p>
+      <div class="sc-chips">
+        <span class="chip gold">HMAC</span>
+        <span class="chip">Ed25519</span>
+        <span class="chip">RSA</span>
+        <span class="chip">OpenSSL Runner</span>
+      </div>
+      <span class="sc-enter">Enter Forge →</span>
+    </a>
+    <a class="surface-card" href="./vault.html" style="--glow-color:rgba(49,231,255,.12)">
+      <div class="sc-num">Surface 02</div>
+      <div class="sc-icon">🗄️</div>
+      <h3 class="sc-name">Variable Vault</h3>
+      <p class="sc-desc">Manage secure environment sets across projects and environments. Import .env / JSON / .skye. Export encrypted packages. Real operator surface.</p>
+      <div class="sc-chips">
+        <span class="chip cyan">Projects</span>
+        <span class="chip">.skye Encrypt</span>
+        <span class="chip">.env Export</span>
+        <span class="chip">Offline</span>
+      </div>
+      <span class="sc-enter">Enter Vault →</span>
+    </a>
+    <a class="surface-card" href="./sovereign-key.html" style="--glow-color:rgba(141,88,255,.16)">
+      <div class="sc-num">Surface 03</div>
+      <div class="sc-icon">🧬</div>
+      <h3 class="sc-name">Sovereign Key</h3>
+      <p class="sc-desc">One master secret → unlimited derived credentials via PBKDF2 + HKDF. Never store 12 secrets again. Gate-compatible derivation with manifest export.</p>
+      <div class="sc-chips">
+        <span class="chip purple">HKDF</span>
+        <span class="chip">PBKDF2</span>
+        <span class="chip">Gate Manifest</span>
+        <span class="chip">Deterministic</span>
+      </div>
+      <span class="sc-enter">Enter Key Derive →</span>
+    </a>
+    <a class="surface-card" href="./passgen.html" style="--glow-color:rgba(54,232,168,.12)">
+      <div class="sc-num">Surface 04</div>
+      <div class="sc-icon">🔐</div>
+      <h3 class="sc-name">Pass Lab</h3>
+      <p class="sc-desc">Battle-tested password generator with full charset control, passphrase mode, entropy meter, and batch output. Cryptographically random. Always.</p>
+      <div class="sc-chips">
+        <span class="chip emerald">Random</span>
+        <span class="chip">Passphrase</span>
+        <span class="chip">Entropy Meter</span>
+        <span class="chip">Batch Gen</span>
+      </div>
+      <span class="sc-enter">Enter Pass Lab →</span>
+    </a>
+  </div>
+
+  <div class="section-label">Suite Specs</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="info-card-label">Crypto Engine</div><div class="info-card-value">Web Crypto</div><div class="info-card-copy">SubtleCrypto + getRandomValues. No native binaries, no backend.</div></div>
+    <div class="info-card"><div class="info-card-label">Key Derivation</div><div class="info-card-value">HKDF</div><div class="info-card-copy">SHA-512 HKDF on top of 600k-iteration PBKDF2 stretch.</div></div>
+    <div class="info-card"><div class="info-card-label">Vault Encryption</div><div class="info-card-value">AES-GCM</div><div class="info-card-copy">256-bit AES-GCM with PBKDF2-derived key. 120k iterations.</div></div>
+    <div class="info-card"><div class="info-card-label">Persistence</div><div class="info-card-value">Local Only</div><div class="info-card-copy">localStorage per-device. Nothing transmitted unless you push it.</div></div>
+    <div class="info-card"><div class="info-card-label">PWA</div><div class="info-card-value">Installable</div><div class="info-card-copy">Service worker caches all surfaces for full offline operation.</div></div>
+    <div class="info-card"><div class="info-card-label">Platform</div><div class="info-card-value">Free99</div><div class="info-card-copy">Skyes Over London · graylondonskyes@gmail.com</div></div>
+  </div>
+
+  <div class="footer">
+    <span>KeyGate 13 · Skyes Over London · Free99 Platform</span>
+    <span>All crypto runs in your browser. No server. No tracking.</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SEEN_KEY = 'kg13_intro_seen';
+  const intro = document.getElementById('kg13Intro');
+  const skip = document.getElementById('kg13Skip');
+  let seen = false;
+  try { seen = !!localStorage.getItem(SEEN_KEY); } catch(_) {}
+  const dismiss = () => {
+    intro.classList.add('gone');
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch(_) {}
+    setTimeout(() => { if (intro.parentNode) intro.parentNode.removeChild(intro); }, 900);
+  };
+  if (skip) skip.addEventListener('click', dismiss);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') dismiss(); });
+  setTimeout(dismiss, seen ? 1000 : 3200);
+
+  const netPill = document.getElementById('netPill');
+  function updateNet() {
+    if (!netPill) return;
+    const online = navigator.onLine;
+    netPill.innerHTML = `<span class="dot${online ? '' : ' gold'}"></span>${online ? 'Online' : 'Offline-first'}`;
+  }
+  updateNet();
+  window.addEventListener('online', updateNet);
+  window.addEventListener('offline', updateNet);
+
+  function mountLivingBackground() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.querySelector('.skyesol-living-field');
+    if (!canvas || !canvas.getContext || reduceMotion) return;
+
+    const ctx = canvas.getContext('2d');
+    const palette = ['rgba(255,211,106,', 'rgba(141,88,255,', 'rgba(49,231,255,'];
+    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+    let width = 0;
+    let height = 0;
+    let particles = [];
+
+    function resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * ratio);
+      canvas.height = Math.floor(height * ratio);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const count = Math.min(120, Math.max(54, Math.floor((width * height) / 17000)));
+      particles = Array.from({ length: count }, (_, index) => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 1.6 + 0.35,
+        a: Math.random() * 0.3 + 0.1,
+        s: Math.random() * 0.3 + 0.08,
+        phase: Math.random() * Math.PI * 2,
+        color: palette[index % palette.length]
+      }));
+    }
+
+    function drawWave(time, yOffset, color, amp, speed) {
+      const gradient = ctx.createLinearGradient(0, yOffset - amp * 2, width, yOffset + amp * 2);
+      gradient.addColorStop(0, 'rgba(0,0,0,0)');
+      gradient.addColorStop(0.5, color);
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      for (let x = 0; x <= width; x += 18) {
+        ctx.lineTo(x, yOffset + Math.sin(x * 0.006 + time * speed) * amp + Math.cos(x * 0.011 - time * speed * 0.7) * amp * 0.45);
+      }
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+
+    function animate(now) {
+      const time = now * 0.001;
+      pointer.x += (pointer.tx - pointer.x) * 0.035;
+      pointer.y += (pointer.ty - pointer.y) * 0.035;
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = 'screen';
+      drawWave(time, height * 0.28 + pointer.y * 12, 'rgba(141,88,255,.10)', 36, 0.34);
+      drawWave(time, height * 0.55 - pointer.y * 10, 'rgba(49,231,255,.08)', 42, 0.24);
+      drawWave(time, height * 0.82, 'rgba(255,211,106,.07)', 28, 0.28);
+      particles.forEach(particle => {
+        const x = particle.x + Math.sin(time * particle.s + particle.phase) * 28 + pointer.x * 10;
+        const y = particle.y + Math.cos(time * particle.s * 0.8 + particle.phase) * 18 + pointer.y * 8;
+        ctx.beginPath();
+        ctx.arc(x, y, particle.r, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color + particle.a + ')';
+        ctx.fill();
+      });
+      ctx.globalCompositeOperation = 'source-over';
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', event => {
+      pointer.tx = (event.clientX / Math.max(width, 1) - 0.5) * 2;
+      pointer.ty = (event.clientY / Math.max(height, 1) - 0.5) * 2;
+    }, { passive: true });
+    resize();
+    requestAnimationFrame(animate);
+  }
+
+  mountLivingBackground();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+})();
+</script>
+</body>
+</html>

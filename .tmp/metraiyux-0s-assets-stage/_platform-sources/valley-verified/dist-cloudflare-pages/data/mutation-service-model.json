@@ -1,0 +1,918 @@
+{
+  "version": "17.0.0",
+  "generated_at": "2026-05-19T05:43:32.106Z",
+  "purpose": "Backend-ready mutation service for Valley Verified action intake, policy enforcement, queueing, review decisions, state projection, event history, webhook outbox, replay, and exportable admin change-sets.",
+  "published_businesses": 19,
+  "code_modules": [
+    "src/server/mutation-service.mjs",
+    "src/server/policy.mjs",
+    "src/server/event-store.mjs",
+    "src/server/webhooks.mjs",
+    "src/server/exporters.mjs",
+    "src/server/router.mjs",
+    "src/server/state-store.mjs",
+    "src/server/storage.mjs"
+  ],
+  "lifecycle": [
+    "upstream_auth_identity",
+    "contract_validation",
+    "policy_enforcement",
+    "canonical_business_check",
+    "idempotent_queue_write",
+    "immutable_event_append",
+    "admin_review",
+    "state_projection",
+    "webhook_outbox",
+    "change_set_export"
+  ],
+  "hard_rules": [
+    "No local auth is implemented; upstream auth headers remain required.",
+    "Static seed records are not pretended to mutate live.",
+    "Admin-only actions require admin role before projection.",
+    "Protected listing identity fields cannot be modified through patch actions.",
+    "Suppression exports are reviewable patches for seed/businesses/suppressions.json."
+  ],
+  "contracts": [
+    {
+      "type": "lead_request",
+      "queue": "lead-requests",
+      "public_intake": true,
+      "roles": [
+        "ae",
+        "admin",
+        "buyer"
+      ],
+      "required": [
+        "buyer_name",
+        "buyer_contact",
+        "city",
+        "category",
+        "details"
+      ]
+    },
+    {
+      "type": "owner_claim",
+      "queue": "owner-claims",
+      "public_intake": true,
+      "roles": [
+        "owner",
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "owner_name",
+        "owner_contact",
+        "claim_type",
+        "proof_summary"
+      ]
+    },
+    {
+      "type": "profile_enrichment",
+      "queue": "profile-enrichment",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "patch",
+        "reason"
+      ]
+    },
+    {
+      "type": "suppression_request",
+      "queue": "suppression-requests",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "reason",
+        "evidence"
+      ]
+    },
+    {
+      "type": "ae_note",
+      "queue": "ae-notes",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "note",
+        "next_action"
+      ]
+    },
+    {
+      "type": "verification_decision",
+      "queue": "verification-decisions",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "decision",
+        "evidence_summary",
+        "reviewer"
+      ]
+    },
+    {
+      "type": "claim_status_update",
+      "queue": "claim-status-updates",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "status",
+        "reviewer"
+      ]
+    },
+    {
+      "type": "lead_status_update",
+      "queue": "lead-status-updates",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "lead_id",
+        "status"
+      ]
+    },
+    {
+      "type": "listing_admin_patch",
+      "queue": "listing-admin-patches",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "patch",
+        "reason"
+      ]
+    },
+    {
+      "type": "suppression_apply",
+      "queue": "suppression-drafts",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "reason",
+        "evidence"
+      ]
+    },
+    {
+      "type": "ae_stage_update",
+      "queue": "ae-stage-updates",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "stage",
+        "next_action"
+      ]
+    },
+    {
+      "type": "sponsor_intent",
+      "queue": "sponsor-intents",
+      "public_intake": true,
+      "roles": [
+        "ae",
+        "admin",
+        "owner"
+      ],
+      "required": [
+        "business_id",
+        "product",
+        "tier",
+        "buyer_contact"
+      ]
+    },
+    {
+      "type": "customer_business_posting",
+      "queue": "customer-business-postings",
+      "public_intake": false,
+      "roles": [
+        "owner",
+        "ae",
+        "admin",
+        "system",
+        "customer"
+      ],
+      "required": [
+        "customer_id",
+        "workspace_id",
+        "business_name",
+        "owner_name",
+        "owner_contact",
+        "city",
+        "category",
+        "posting_reason",
+        "subscription_started_at",
+        "first_paid_invoice_at"
+      ]
+    },
+    {
+      "type": "owner_contact_log",
+      "queue": "owner-contact-logs",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "contact_channel",
+        "outcome",
+        "next_action"
+      ]
+    },
+    {
+      "type": "payment_event",
+      "queue": "payment-events",
+      "public_intake": false,
+      "roles": [
+        "system",
+        "admin"
+      ],
+      "required": [
+        "provider",
+        "provider_event_id",
+        "provider_event_type",
+        "payment_order_id",
+        "payment_status"
+      ]
+    },
+    {
+      "type": "exposure_activation",
+      "queue": "exposure-activations",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "product",
+        "tier",
+        "payment_order_id",
+        "placement_status",
+        "reviewer"
+      ]
+    },
+    {
+      "type": "quote_request",
+      "queue": "quote-requests",
+      "public_intake": true,
+      "roles": [
+        "buyer",
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "buyer_name",
+        "buyer_contact",
+        "city",
+        "category",
+        "details"
+      ]
+    },
+    {
+      "type": "lead_route_decision",
+      "queue": "lead-route-decisions",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "lead_id",
+        "business_ids",
+        "route_reason",
+        "assigned_to"
+      ]
+    },
+    {
+      "type": "ae_assignment",
+      "queue": "ae-assignments",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "assigned_to",
+        "territory",
+        "stage",
+        "next_action"
+      ]
+    },
+    {
+      "type": "owner_message",
+      "queue": "owner-messages",
+      "public_intake": false,
+      "roles": [
+        "ae",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "message_type",
+        "recipient",
+        "body",
+        "channel"
+      ]
+    },
+    {
+      "type": "notification_delivery_event",
+      "queue": "notification-delivery-events",
+      "public_intake": false,
+      "roles": [
+        "system",
+        "admin"
+      ],
+      "required": [
+        "target_id",
+        "channel",
+        "delivery_status",
+        "provider"
+      ]
+    },
+    {
+      "type": "revenue_attribution_event",
+      "queue": "revenue-attribution-events",
+      "public_intake": false,
+      "roles": [
+        "system",
+        "admin"
+      ],
+      "required": [
+        "business_id",
+        "source",
+        "amount_cents",
+        "currency",
+        "event_type"
+      ]
+    },
+    {
+      "type": "admin_review_decision",
+      "queue": "admin-review-decisions",
+      "public_intake": false,
+      "roles": [
+        "admin"
+      ],
+      "required": [
+        "target_action_id",
+        "decision",
+        "reviewer"
+      ]
+    }
+  ],
+  "policy": [
+    {
+      "type": "lead_request",
+      "queue": "lead-requests",
+      "public_intake": true,
+      "contract_roles": [
+        "ae",
+        "admin",
+        "buyer"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_claim",
+      "queue": "owner-claims",
+      "public_intake": true,
+      "contract_roles": [
+        "owner",
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "profile_enrichment",
+      "queue": "profile-enrichment",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "suppression_request",
+      "queue": "suppression-requests",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_note",
+      "queue": "ae-notes",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "verification_decision",
+      "queue": "verification-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "claim_status_update",
+      "queue": "claim-status-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "lead_status_update",
+      "queue": "lead-status-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "listing_admin_patch",
+      "queue": "listing-admin-patches",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "suppression_apply",
+      "queue": "suppression-drafts",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_stage_update",
+      "queue": "ae-stage-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "sponsor_intent",
+      "queue": "sponsor-intents",
+      "public_intake": true,
+      "contract_roles": [
+        "ae",
+        "admin",
+        "owner"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "customer_business_posting",
+      "queue": "customer-business-postings",
+      "public_intake": false,
+      "contract_roles": [
+        "owner",
+        "ae",
+        "admin",
+        "system",
+        "customer"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_contact_log",
+      "queue": "owner-contact-logs",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "payment_event",
+      "queue": "payment-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "system_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "exposure_activation",
+      "queue": "exposure-activations",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "quote_request",
+      "queue": "quote-requests",
+      "public_intake": true,
+      "contract_roles": [
+        "buyer",
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "lead_route_decision",
+      "queue": "lead-route-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_assignment",
+      "queue": "ae-assignments",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_message",
+      "queue": "owner-messages",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "notification_delivery_event",
+      "queue": "notification-delivery-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "revenue_attribution_event",
+      "queue": "revenue-attribution-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "admin_review_decision",
+      "queue": "admin-review-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    }
+  ]
+}

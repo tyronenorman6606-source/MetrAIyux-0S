@@ -1,0 +1,21 @@
+import { readFile, stat } from 'node:fs/promises';
+import path from 'node:path';
+const ROOT = process.cwd();
+const fail = msg => { console.error(`❌ ${msg}`); process.exitCode = 1; };
+const ok = msg => console.log(`✅ ${msg}`);
+async function must(rel){ try{ await stat(path.join(ROOT, rel)); ok(`${rel} exists`); } catch{ fail(`${rel} missing`); } }
+const manifest = JSON.parse(await readFile(path.join(ROOT, 'template-library/manifest.json'), 'utf8'));
+const categories = JSON.parse(await readFile(path.join(ROOT,'template-library/categories.json'),'utf8'));
+const jurisdictions = JSON.parse(await readFile(path.join(ROOT,'template-library/jurisdictions.json'),'utf8'));
+const official = JSON.parse(await readFile(path.join(ROOT,'official-source-library/official-workflows.json'),'utf8'));
+const review = JSON.parse(await readFile(path.join(ROOT,'review-workflow/review-queue-high-risk.json'),'utf8'));
+const gates = JSON.parse(await readFile(path.join(ROOT,'audit/publish-gates.json'),'utf8'));
+if((manifest.records || []).length !== 10200) fail('manifest record count mismatch'); else ok('10,200 manifest records indexed');
+if(categories.length !== 15) fail('category dataset count mismatch'); else ok('15 category records indexed');
+if(jurisdictions.length !== 51) fail('jurisdiction dataset count mismatch'); else ok('51 jurisdiction records indexed');
+if(official.count !== 37 || (official.workflows || []).length !== 37) fail('official workflow count mismatch'); else ok('37 official-source workflows indexed');
+if(review.count !== 6069 || (review.records || []).length < 5000) fail('high-risk review queue count mismatch'); else ok('6,069 high-risk queue records indexed with truncated browser-safe queue file');
+const gateRows = gates.release_gates || gates.gates || [];
+if(!Array.isArray(gateRows) || gateRows.length < 4) fail('publish gates missing gate list'); else ok(`${gateRows.length} publish gates indexed`);
+for(const rel of ['official-sources/index.html','template-governance/index.html','review-queue/index.html','states/arizona/index.html','data/template-quality-report.json']) await must(rel);
+if(!process.exitCode) ok('SovereignDocs v6 dataset smoke passed');

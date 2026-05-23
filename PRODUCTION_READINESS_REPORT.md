@@ -1,12 +1,12 @@
 # Production Readiness Report
 
-Generated: 2026-05-15 UTC
+Snapshot generated: 2026-05-15 UTC. Current deployed 0S/FS27/SovereignDocs status is tracked in `LIVE_DEPLOYMENT_LEDGER.md` and `LIVE_URL_REGISTRY.md`; this report preserves the readiness blockers from that May 15 build pass.
 
 ## Projects
 
-- Node OS: `unpacked-projects/sove-reign13-node-os-v0.3.0-aegis-autonomy/sove-reign13-node-os-v0.3.0-aegis-autonomy`
-- Citadel Forge: `unpacked-projects/soveReign13-citadel-forge-commercial-v1.3.0/soveReign13-citadel-forge-commercial-v1.3.0`
-- Client Drop Vault: `unpacked-projects/client-drop-vault-real-closure-v2.0/client-drop-vault-v2.0`
+- Node OS: retired external import; not required by the current MetrAIyux 0S runtime.
+- Citadel Forge: current FS27 source lives at `metraiyux_0s_site/skyegate/source/SkyeGateFS27`.
+- Client Drop Vault: current vault/drop source is maintained through `SkyeVault-Drop/` and the 0S vault tooling.
 
 ## Status
 
@@ -14,7 +14,7 @@ Generated: 2026-05-15 UTC
 
 Local prep completed. Nix is installed, the flake evaluates, shell/Python checks pass, Aegis/Reliquary smoke passes, and the OpenWebUI unfree package / Docker compatibility / renamed ISO option blockers were fixed.
 
-Not production-pushed yet because the full ISO build and boot proof need more disk than this workspace has available. The workspace currently has about 6 GB free.
+Snapshot blocker: the full ISO build and boot proof needed more disk than the active workspace had available. Treat required free space as a build-host requirement, not a stable workspace fact.
 
 Needs from operator:
 
@@ -28,7 +28,7 @@ Needs from operator:
 
 Local stack is stood up. Postgres, Forgejo, control plane, and portal containers are running. Control-plane health is green against DB and Forgejo. Forgejo admin/API token and control-plane admin API key are configured locally. Account provisioning was made idempotent and tested.
 
-Not production-pushed yet because public domains, auth, billing prices, runner, and backup policy are still placeholders or external-account gates.
+Snapshot blocker: public domains, auth, billing prices, runner, and backup policy still depended on external-account setup.
 
 Needs from operator:
 
@@ -45,7 +45,7 @@ Needs from operator:
 
 Local app checks and smoke pass. Google service-account auth works. Public/admin config load works. Admin Drive config write works. CSP was patched for Cloudflare Turnstile, and scanner mode is set to `manual_review` until a real scanner endpoint is provided.
 
-Not production-pushed yet because the live upload destination proof fails on Google Drive service-account quota.
+Snapshot blocker: the live upload destination proof failed on Google Drive service-account quota.
 
 Needs from operator:
 
@@ -84,7 +84,7 @@ Updated: 2026-05-15 UTC
 - `.env` has the live proof router, FS27 proof URLs, FS27 Worker URL, and latest full-system Worker version recorded.
 - MetrAIyux 0S reports `16` system brains, `8` live surfaces, and D1/KV/Queue/SkyGate connectivity through `/api/site-operator/status`.
 - The live-surface registry lives at `metraiyux_0s_site/brain/live-surface-registry.json`.
-- The FS27 living architecture map lives at `unpacked-projects/skyegatefs27-citadeldb/THE_GATE_MAP.md`.
+- The FS27 living architecture map lives at `metraiyux_0s_site/skyegate/source/SkyeGateFS27/THE_GATE_MAP.md`.
 
 ### Verification
 

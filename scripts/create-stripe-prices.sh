@@ -56,7 +56,7 @@ echo "=== Creating RouteX Workforce Command product ==="
 ROUTEX_PRODUCT=$(stripe_post products \
   -d "name=MetrAIyux 0S - RouteX Workforce Command" \
   -d "description=Owner-approved workforce command lane with SkyeRoutexFlow v0.4.0 local proof and V83 static shell" \
-  -d "metadata[source_folder]=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0" \
+  -d "metadata[source_folder]=metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0" \
   -d "metadata[plan_id]=routex-workforce-command" \
   -d "metadata[offer_family]=metraiyux" \
   -d "metadata[status]=approved" \
@@ -73,7 +73,7 @@ ROUTEX_MONTHLY=$(stripe_post prices \
   -d "recurring[interval]=month" \
   -d "nickname=RouteX Workforce Command monthly" \
   -d "lookup_key=metraiyux_routex_workforce_command_monthly" \
-  -d "metadata[source_folder]=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0" \
+  -d "metadata[source_folder]=metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0" \
   -d "metadata[plan_id]=routex-workforce-command" \
   -d "metadata[offer_family]=metraiyux" \
   -d "metadata[status]=approved" \

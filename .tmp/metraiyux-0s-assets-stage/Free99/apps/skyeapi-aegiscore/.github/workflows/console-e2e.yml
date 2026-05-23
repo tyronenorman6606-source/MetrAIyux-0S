@@ -1,0 +1,33 @@
+name: Console browser smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "apps/console/**"
+      - "tools/smoke-console-browser.mjs"
+      - "package.json"
+      - "pnpm-lock.yaml"
+
+jobs:
+  console-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium for known CI browser environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium || sudo apt-get install -y google-chrome-stable
+      - name: Build console
+        run: pnpm --filter @skyeapi/console build
+      - name: Run console browser smoke
+        run: node tools/smoke-console-browser.mjs

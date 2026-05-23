@@ -1,0 +1,15 @@
+{
+  "version": "19.0.0",
+  "generated_at": "2026-05-19T05:43:32.288Z",
+  "supported_providers": [
+    "stripe",
+    "dry-run/local signed event"
+  ],
+  "verification": [
+    "Stripe t=timestamp,v1=signature HMAC-SHA256 check",
+    "PHX signed webhook HMAC-SHA256 check for non-dry-run local providers"
+  ],
+  "output_action": "payment_event",
+  "output_queue": "payment-events",
+  "state_result": "paid_pending_admin_activation when payment_status is paid"
+}

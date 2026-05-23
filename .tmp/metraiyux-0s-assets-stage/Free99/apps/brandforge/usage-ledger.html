@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moving20s Paid Usage Ledger · 0S</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080b0c;--panel:#101615;--ink:#f8fafc;--muted:#afbac5;--line:rgba(255,255,255,.16);--gold:#f5d36a;--green:#69d99a;--red:#ff7a66}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#080b0c;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:30px 0 56px}
+    header{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:18px}
+    h1{margin:0;font-size:clamp(34px,7vw,70px);line-height:.96;letter-spacing:0}
+    p{color:var(--muted);line-height:1.55}
+    a,button{color:var(--ink);text-decoration:none}
+    button,.button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.07);padding:10px 12px;font-weight:900;cursor:pointer}
+    .button.primary,button.primary{background:var(--gold);border-color:var(--gold);color:#15120a}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    section{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.045);padding:16px}
+    h2{margin:0 0 10px;font-size:20px}
+    .events{display:grid;gap:8px}
+    .event{border:1px solid rgba(255,255,255,.11);border-radius:8px;padding:10px;background:rgba(255,255,255,.035)}
+    code{color:var(--green);white-space:normal}
+    .small{font-size:12px;color:var(--muted)}
+    .bad{color:var(--red)}
+    @media(max-width:820px){header,.grid{display:grid;grid-template-columns:1fr}.actions{display:grid;gap:8px}h1{font-size:42px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="small">0S owner surface · shared gate required</p>
+        <h1>Paid Usage Ledger</h1>
+        <p>BrandForge and JobPing receipts from the mounted Moving20s lanes. Provider usage is recorded in the app ledger, and FS27 audit mirroring is attempted when the mirror secret is configured.</p>
+      </div>
+      <div class="actions">
+        <a class="button" href="/Free99/apps/brandforge/index.html">BrandForge</a>
+        <a class="button" href="/Free99/apps/jobping/index.html">JobPing</a>
+        <button class="primary" type="button" id="refresh">Refresh</button>
+      </div>
+    </header>
+    <div class="grid">
+      <section>
+        <h2>BrandForge</h2>
+        <div id="brandforge" class="events small">Loading...</div>
+      </section>
+      <section>
+        <h2>JobPing</h2>
+        <div id="jobping" class="events small">Loading...</div>
+      </section>
+    </div>
+  </main>
+  <script>
+    (() => {
+      const clean = (value, max = 500) => String(value == null ? "" : value).replace(/\s+/g, " ").trim().slice(0, max);
+      function storedGateToken() {
+        const candidates = [];
+        try {
+          const shared = sessionStorage.getItem("FREE99_PLATFORM_GATE_SESSION") || localStorage.getItem("FREE99_PLATFORM_GATE_SESSION") || "";
+          const parsed = shared ? JSON.parse(shared) : null;
+          if (parsed && parsed.token) candidates.push(parsed.token);
+        } catch {}
+        try { candidates.push(sessionStorage.getItem("adminBrainToken") || ""); } catch {}
+        try { candidates.push(localStorage.getItem("quantumskyes_mcp_owner_token") || ""); } catch {}
+        return candidates.map((value) => clean(value, 4000).replace(/^Bearer\s+/i, "")).find(Boolean) || "";
+      }
+      function authHeaders() {
+        const token = storedGateToken();
+        return token ? { Authorization: `Bearer ${token}` } : {};
+      }
+      async function loadLane(id, url) {
+        const root = document.getElementById(id);
+        root.textContent = "Loading...";
+        const label = id === "jobping" ? "JobPing" : "BrandForge";
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), id === "jobping" ? 6500 : 12000);
+        try {
+          const headers = authHeaders();
+          const response = await fetch(url, { credentials: headers.Authorization ? "omit" : "same-origin", headers, signal: controller.signal });
+          const data = await response.json().catch(() => ({ ok: false, error: "response_unreadable" }));
+          if (!response.ok || !data.ok) {
+            root.innerHTML = `<p class="bad">${label} ledger unavailable: ${clean(data.error || response.status, 260)}</p>`;
+            return;
+          }
+          const events = data.events || [];
+          if (!events.length) {
+            root.innerHTML = "<p>No receipts yet.</p>";
+            return;
+          }
+          root.innerHTML = events.slice(0, 40).map((event) => `
+            <article class="event">
+              <p><strong>${clean(event.type || event.event_type || "event", 180)}</strong></p>
+              <p><code>${clean(event.id || event.receipt_id || event.kv_key || "", 180)}</code></p>
+              <p>${clean(event.created_at || event.event_ts || "", 80)} · ${clean(event.provider_path || event.usage_lane || event.skyepay_lane || "", 160)}</p>
+              <p>${event.billable ? "billable" : "free/core"} · ${event.db_metered ? "FS27 DB/gateway metered" : "0S receipt metered"} · ${clean(event.source || "kv", 80)}</p>
+            </article>
+          `).join("");
+        } catch (error) {
+          const message = error && error.name === "AbortError"
+            ? `${label} ledger request timed out. ${id === "jobping" ? "JobPing runtime remains disabled until rebuild." : "Use refresh to retry."}`
+            : `${label} ledger unavailable: ${clean(error.message || error, 260)}`;
+          root.innerHTML = `<p class="bad">${message}</p>`;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      function refresh() {
+        loadLane("brandforge", "/api/brandforge/ledger");
+        document.getElementById("jobping").innerHTML = "<p>JobPing runtime remains disabled until rebuild. JobPing ledger API stays owner-gated and will be re-enabled with the real platform runtime.</p>";
+      }
+      document.getElementById("refresh").addEventListener("click", refresh);
+      refresh();
+    })();
+  </script>
+</body>
+</html>

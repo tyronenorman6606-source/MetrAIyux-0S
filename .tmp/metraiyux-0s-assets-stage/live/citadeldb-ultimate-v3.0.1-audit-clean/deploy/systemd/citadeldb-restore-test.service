@@ -1,0 +1,8 @@
+[Unit]
+Description=CitadelDB Restore Test Job
+After=citadeldb.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/citadeldb
+ExecStart=/opt/citadeldb/cli/citadel restore-test

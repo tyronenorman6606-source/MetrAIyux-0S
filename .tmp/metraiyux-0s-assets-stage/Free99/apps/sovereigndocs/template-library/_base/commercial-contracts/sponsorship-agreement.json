@@ -1,0 +1,167 @@
+{
+  "base_id": "commercial-contracts/sponsorship-agreement",
+  "slug": "sponsorship-agreement",
+  "title": "Sponsorship Agreement",
+  "category": {
+    "slug": "commercial-contracts",
+    "name": "Commercial Contracts"
+  },
+  "version": "1.0.0-seed",
+  "status": "original_seed_not_attorney_reviewed",
+  "risk_level": "medium",
+  "not_legal_advice": true,
+  "use_case": "Sponsor placement, benefits, deliverables, and brand usage.",
+  "questionnaire": [
+    {
+      "key": "state_full_name",
+      "label": "State Full Name",
+      "type": "system",
+      "required": true
+    },
+    {
+      "key": "state_code",
+      "label": "State Code",
+      "type": "system",
+      "required": true
+    },
+    {
+      "key": "document_title",
+      "label": "Document Title",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "effective_date",
+      "label": "Effective Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "key": "party_one_name",
+      "label": "Party One Legal Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "party_one_address",
+      "label": "Party One Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "key": "party_two_name",
+      "label": "Party Two Legal Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "party_two_address",
+      "label": "Party Two Address",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "key": "county",
+      "label": "County",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "custom_terms",
+      "label": "Additional Custom Terms",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "key": "services_description",
+      "label": "Services / Goods Description",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "key": "payment_terms",
+      "label": "Payment Terms",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "key": "term_length",
+      "label": "Term Length",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "deliverables",
+      "label": "Deliverables",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "key": "termination_notice",
+      "label": "Termination Notice Period",
+      "type": "text",
+      "required": false
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Important Notice",
+      "body": "This template is an original SovereignDocs automation seed. It is not legal advice, is not a substitute for advice from a licensed attorney, and may require state, county, city, agency, court, industry, or transaction-specific review before use."
+    },
+    {
+      "heading": "Parties and Effective Date",
+      "body": "This {{document_title}} is prepared as of {{effective_date}} by and between {{party_one_name}} of {{party_one_address}}{{#if party_two_name}} and {{party_two_name}} of {{party_two_address}}{{/if}}."
+    },
+    {
+      "heading": "Purpose",
+      "body": "The purpose of this document is to create a clear written record for: Sponsor placement, benefits, deliverables, and brand usage. The parties should complete every variable field accurately before signing or relying on this document."
+    },
+    {
+      "heading": "Scope of Work",
+      "body": "The goods, services, deliverables, milestones, or project duties are: {{services_description}}. Deliverables: {{deliverables}}."
+    },
+    {
+      "heading": "Fees and Payment",
+      "body": "Payment terms: {{payment_terms}}. The parties should define invoicing method, taxes, reimbursable expenses, late charges, acceptance process, and disputed invoice handling."
+    },
+    {
+      "heading": "Term and Termination",
+      "body": "Term length: {{term_length}}. Termination notice: {{termination_notice}}. Any transition assistance, final invoice, survival, refund, or cancellation terms should be written here."
+    },
+    {
+      "heading": "Governing Law Placeholder",
+      "body": "Unless a qualified reviewer changes this section, the parties intend this document to be interpreted under the laws of {{state_full_name}}, with any required venue, forum, notice, filing, consumer, court, agency, or local requirement reviewed before use."
+    },
+    {
+      "heading": "Additional Terms",
+      "body": "Additional custom terms: {{custom_terms}}."
+    },
+    {
+      "heading": "Signatures",
+      "body": "The parties sign below to confirm the information supplied in this document is accurate to the best of their knowledge and that they have had the opportunity to seek independent advice before signing.\n\n{{party_one_name}}\nSignature: ______________________________ Date: ______________\n\n{{#if party_two_name}}{{party_two_name}}\nSignature: ______________________________ Date: ______________{{/if}}"
+    }
+  ],
+  "render_markdown": "# Sponsorship Agreement\n\n## Important Notice\nThis template is an original SovereignDocs automation seed. It is not legal advice, is not a substitute for advice from a licensed attorney, and may require state, county, city, agency, court, industry, or transaction-specific review before use.\n\n## Parties and Effective Date\nThis {{document_title}} is prepared as of {{effective_date}} by and between {{party_one_name}} of {{party_one_address}}{{#if party_two_name}} and {{party_two_name}} of {{party_two_address}}{{/if}}.\n\n## Purpose\nThe purpose of this document is to create a clear written record for: Sponsor placement, benefits, deliverables, and brand usage. The parties should complete every variable field accurately before signing or relying on this document.\n\n## Scope of Work\nThe goods, services, deliverables, milestones, or project duties are: {{services_description}}. Deliverables: {{deliverables}}.\n\n## Fees and Payment\nPayment terms: {{payment_terms}}. The parties should define invoicing method, taxes, reimbursable expenses, late charges, acceptance process, and disputed invoice handling.\n\n## Term and Termination\nTerm length: {{term_length}}. Termination notice: {{termination_notice}}. Any transition assistance, final invoice, survival, refund, or cancellation terms should be written here.\n\n## Governing Law Placeholder\nUnless a qualified reviewer changes this section, the parties intend this document to be interpreted under the laws of {{state_full_name}}, with any required venue, forum, notice, filing, consumer, court, agency, or local requirement reviewed before use.\n\n## Additional Terms\nAdditional custom terms: {{custom_terms}}.\n\n## Signatures\nThe parties sign below to confirm the information supplied in this document is accurate to the best of their knowledge and that they have had the opportunity to seek independent advice before signing.\n\n{{party_one_name}}\nSignature: ______________________________ Date: ______________\n\n{{#if party_two_name}}{{party_two_name}}\nSignature: ______________________________ Date: ______________{{/if}}\n",
+  "rights": {
+    "origin": "Original SovereignDocs generated seed template.",
+    "third_party_proprietary_text_used": false,
+    "lawdepot_text_used": false,
+    "license_status": "owned_original_seed_requires_review_before_distribution",
+    "source_basis": "Generated from original category architecture and generic drafting patterns; no third-party proprietary clauses copied."
+  },
+  "review": {
+    "requires_attorney_review": false,
+    "requires_current_law_review": true,
+    "human_review_required": true,
+    "review_notes": "Seed draft. Route to attorney/compliance reviewer before customer-facing legal reliance.",
+    "state_specific_law_included": false
+  },
+  "tags": [
+    "commercial-contracts",
+    "sponsorship-agreement",
+    "original",
+    "template-library",
+    "medium"
+  ],
+  "checksum": "7088af9cefcbfb21"
+}

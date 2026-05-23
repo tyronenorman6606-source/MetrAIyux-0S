@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Drop Deploy Room</title>
+  <meta name="description" content="SkyeMusicNexus drop deploy room for artist pages, release pages, campaign pages, private delivery pages, batch approvals, and Netlify deploy receipts." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="drops">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Drop Deploy Room</p>
+      <h1>Build artist drops, batch deploys, and private delivery pages without leaking the vault.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
+      <button class="ghost" data-action="proof-session">Proof Session</button>
+      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+  <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload Studio</a><a href="./player.html">Music Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a class="active" href="./drops.html">Drops</a><a href="./admin.html">Operator</a></nav>
+
+  <main class="nexus-shell admin-shell">
+    <section class="ops-hero panel-xl">
+      <div>
+        <p class="eyebrow">drop deploy orchestrator / SkyeWebCreatorMax / WebGrowthOperator / Netlify gate</p>
+        <h2>One deploy can carry many artist drops.</h2>
+        <p class="lede">Create single pages, release pages, campaign pages, private delivery pages, artist hubs, and batch hubs. MusicNexus owns auth, rights, tier policy, approval, and receipts.</p>
+      </div>
+      <div id="dropCreditMeter" class="analytics-prism"></div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Credential Readiness</p><h3>Root env, redacted</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <div id="dropEnvStatus" class="result-card compact">Connect SkyGate to read redacted env readiness.</div>
+      </article>
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Traffic</p><h3>Stream and download signals</h3></div><span class="tag">qualified stream rules</span></div>
+        <div id="dropTrafficSummary" class="social-summary"></div>
+      </article>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head">
+          <div><p class="micro">Drop Creator</p><h3>Single, release, campaign, private delivery, or hub</h3></div>
+          <a class="ghost mini" href="./upload.html">Upload audio first</a>
+        </div>
+        <form id="dropCreateForm" class="field-grid">
+          <label>Artist ID<input name="artistId" placeholder="artist id" /></label>
+          <label>Artist name<input name="artistName" placeholder="Gate Signal" /></label>
+          <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+          <label>Title<input name="title" required placeholder="Night Signal" /></label>
+          <label>Drop type<select name="dropType"><option value="single_drop">Single song page</option><option value="release_drop">EP / album page</option><option value="campaign_drop">Campaign page</option><option value="private_delivery">Private delivery</option><option value="hub_drop">Hub drop</option></select></label>
+          <label>Tier<select name="tierPolicy"><option value="free99-lite">Free99 Lite</option><option value="creator">Creator</option><option value="pro-artist">Pro Artist</option><option value="label-command">Label Command</option><option value="managed-music-ops">Managed Music Ops</option></select></label>
+          <label>Visibility<select name="visibility"><option value="public">Public</option><option value="unlisted">Unlisted</option><option value="private">Private</option></select></label>
+          <label>Rights<select name="rightsStatus"><option value="preview-ready">Preview ready</option><option value="distribution-ready">Distribution ready</option><option value="needs-clearance">Needs clearance</option><option value="blocked">Blocked</option></select></label>
+          <label class="wide">Cover art URL<input name="coverArtUrl" placeholder="https://..." /></label>
+          <label class="wide">Story<textarea name="story" rows="4" placeholder="Release story, client delivery note, or campaign copy."></textarea></label>
+          <label class="wide">Tracks<textarea name="tracks" rows="5" placeholder="One track per line: Night Signal | 181 | /.netlify/functions/music-assets?action=stream&id=aud_..."></textarea></label>
+          <label>Download<select name="downloadAllowed"><option value="false">Stream only</option><option value="true">Allow public download</option></select></label>
+          <button class="primary wide" type="submit">Create Drop Draft</button>
+        </form>
+        <div id="dropCreateResult" class="result-card compact">No drop created yet.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Draft Queue</p><h3>Drops and current state</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <div id="dropList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="operator-grid">
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Deploy Pool</p><h3>Submit a drop</h3></div>
+        <form id="dropSubmitForm" class="field-grid thin">
+          <label class="wide">Drop<select name="dropId"></select></label>
+          <button class="secondary wide" type="submit">Submit To Pool</button>
+        </form>
+        <div id="dropSubmitResult" class="result-card compact">Select a draft drop.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Batch Builder</p><h3>Group drops into one deploy</h3></div>
+        <form id="dropBatchForm" class="field-grid thin">
+          <label class="wide">Drop IDs<input name="dropIds" placeholder="Optional comma list. Empty batches all deploy-pool drops." /></label>
+          <button class="primary wide" type="submit">Form Batch</button>
+        </form>
+        <div id="dropBatchResult" class="result-card compact">No batch formed yet.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Approval Inbox</p><h3>Email and receipt</h3></div>
+        <form id="dropApprovalForm" class="field-grid thin">
+          <label class="wide">Batch<select name="batchId"></select></label>
+          <button class="secondary wide" type="submit">Send Approval</button>
+        </form>
+        <div id="dropApprovalResult" class="result-card compact">Approval idle.</div>
+      </article>
+    </section>
+
+    <section class="operator-grid">
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Manual Approval</p><h3>Owner/operator approve</h3></div>
+        <form id="dropManualApproveForm" class="field-grid thin">
+          <label class="wide">Batch<select name="batchId"></select></label>
+          <button class="primary wide" type="submit">Approve Batch</button>
+        </form>
+        <div id="dropManualApproveResult" class="result-card compact">No approval decision yet.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">72-Hour Brain</p><h3>Safe auto approval</h3></div>
+        <form id="dropBrainForm" class="field-grid thin">
+          <label class="wide">Batch<select name="batchId"></select></label>
+          <button class="secondary wide" type="submit">Run Brain</button>
+        </form>
+        <div id="dropBrainResult" class="result-card compact">Brain has not run.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Static Builder</p><h3>WebCreator + Growth packages</h3></div>
+        <form id="dropBuildForm" class="field-grid thin">
+          <label class="wide">Batch<select name="batchId"></select></label>
+          <button class="primary wide" type="submit">Build Static Bundle</button>
+        </form>
+        <div id="dropBuildResult" class="result-card compact">No bundle built yet.</div>
+      </article>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Netlify Publish</p><h3>Deploy intent by default, live only with flag</h3></div><span class="tag">MUSIC_NEXUS_DROPS_ENABLE_LIVE_DEPLOY=1</span></div>
+        <form id="dropPublishForm" class="field-grid thin">
+          <label class="wide">Batch<select name="batchId"></select></label>
+          <button class="primary wide" type="submit">Publish Batch</button>
+        </form>
+        <div id="dropPublishResult" class="result-card compact">Publishing will write a deploy intent unless live deploy is enabled server-side.</div>
+      </article>
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Batch Receipts</p><h3>Approvals and deploy records</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <div id="dropBatchList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="panel-xl">
+      <div class="section-head"><p class="micro">Deploy Receipts</p><h3>Live URL or local deploy intent</h3></div>
+      <div id="dropDeployList" class="constellation-list wide-list"></div>
+    </section>
+  </main>
+
+  <dialog id="operatorDialog" class="operator-dialog">
+    <form method="dialog" id="operatorForm">
+      <h3>Local Operator Login</h3>
+      <label>Email<input name="email" type="email" required /></label>
+      <label>Password<input name="password" type="password" required /></label>
+      <menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu>
+    </form>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

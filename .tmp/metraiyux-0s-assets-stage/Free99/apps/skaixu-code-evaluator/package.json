@@ -1,0 +1,20 @@
+{
+  "name": "skaixu-code-evaluator-platform",
+  "version": "2.6.0-website",
+  "private": true,
+  "description": "Website-upgraded closure-hardened code evaluator platform with public landing surface, operator app separation, proof receipts, seed ETL, workspace history, and gateway-routed evaluation workflows.",
+  "type": "module",
+  "scripts": {
+    "test": "node tools/smoke-check.mjs && node tools/platform-api-smoke.mjs && node tools/platform-hardening-smoke.mjs && node tools/platform-closure-smoke.mjs",
+    "smoke": "node tools/smoke-check.mjs",
+    "smoke:api": "node tools/platform-api-smoke.mjs",
+    "platform:etl": "node -e \"import('./src/platform/seed-etl-worker.mjs').then(m=>m.materializeSeeds({rootDir:process.cwd()})).then(r=>console.log(JSON.stringify({businesses:r.businessDirectory.length,issues:r.validation.issues.length,chunks:r.chunks.length,outDir:r.outDir},null,2)))\"",
+    "test:browser": "node tools/playwright-browser-proof.mjs",
+    "build:proof": "node -e \"import('./src/platform/build-executor.mjs').then(m=>m.executeBuildPlan({rootDir:process.cwd(),stages:['test'],dryRun:false})).then(r=>console.log(JSON.stringify({status:r.status,receiptPath:r.receiptPath},null,2)))\"",
+    "smoke:closure": "node tools/platform-closure-smoke.mjs",
+    "closure:proof": "node -e \"import('./src/platform/platform-closure-orchestrator.mjs').then(m=>m.runPlatformClosure({rootDir:process.cwd()})).then(r=>console.log(JSON.stringify({status:r.status,failed:r.failed,receiptPath:r.receiptPath},null,2)))\""
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

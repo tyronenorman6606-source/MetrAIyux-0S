@@ -1,0 +1,26 @@
+{
+  "workflowId": "welcome-email-flow",
+  "input": {
+    "email": "client@example.com",
+    "name": "Client"
+  },
+  "steps": [
+    {
+      "id": "draft",
+      "capability": "ai.generate_text",
+      "input": {
+        "system": "Write concise transactional product copy. Do not include placeholders.",
+        "prompt": "Write a short welcome email for {{input.name}}."
+      }
+    },
+    {
+      "id": "send",
+      "capability": "email.send",
+      "input": {
+        "to": "{{input.email}}",
+        "subject": "Welcome from SkyeAPI",
+        "body": "{{steps.draft.data.text}}"
+      }
+    }
+  ]
+}

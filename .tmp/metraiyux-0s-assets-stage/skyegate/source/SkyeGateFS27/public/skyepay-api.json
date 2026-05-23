@@ -1,0 +1,51 @@
+{
+  "id": "skyepay-api",
+  "name": "SkyePay API",
+  "version": "1.0.0",
+  "owner": "Skyes Over London LC",
+  "gateway": "SkyeGateFS27",
+  "public_origin": "https://skyesol.netlify.app",
+  "openapi": "/openapi/skyepay.openapi.json",
+  "sdk": "/assets/skyepay-client.js",
+  "docs": "/skyepay-api.html",
+  "store": "/skyepay-store.html",
+  "repo_stripe_catalog": {
+    "source": "metraiyux_0s_site/brain/sales-offer-registry.json",
+    "imported_checkout_offers": 50,
+    "checkout_rule": "approved and approved_floor fixed-amount offers only"
+  },
+  "endpoints": {
+    "offers": {
+      "method": "GET",
+      "path": "/skyepay/offers?client=metraiyux-0s",
+      "raw_path": "/.netlify/functions/skyepay-offers?client=metraiyux-0s"
+    },
+    "checkout": {
+      "method": "POST",
+      "path": "/skyepay/checkout",
+      "raw_path": "/.netlify/functions/skyepay-checkout"
+    },
+    "status": {
+      "method": "GET",
+      "path": "/skyepay/status?session_id={CHECKOUT_SESSION_ID}",
+      "raw_path": "/.netlify/functions/skyepay-status?session_id={CHECKOUT_SESSION_ID}"
+    }
+  },
+  "security": {
+    "card_data": "Stripe Checkout only",
+    "cors": "same-origin or SKYPAY_ALLOWED_ORIGINS",
+    "activation": "owner-approved offers stay paid_pending_owner_approval until an authenticated FS27 admin approves and unlocks them",
+    "idempotency": "send idempotency_key on checkout creation",
+    "free_trials": "subscription offers can start with trial_period_days and $0 due today",
+    "stripe_lookup_keys": "checkout prefers dashboard Stripe Price lookup keys, then falls back to metadata-preserving price_data",
+    "gate_policy": "approved orders write caps, default rate limits, device policy, model/provider allowlists, and vault limits into FS27 customer policy"
+  },
+  "example_checkout_body": {
+    "client_slug": "metraiyux-0s",
+    "offer_id": "metraiyux-routex-workforce-command",
+    "customer_name": "Client Owner",
+    "customer_email": "owner@example.com",
+    "company_name": "Client Company",
+    "idempotency_key": "client-company-starter-2026-05-17"
+  }
+}

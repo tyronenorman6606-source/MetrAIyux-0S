@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "result": {
+    "ok": true,
+    "capability": "workflow.run",
+    "provider": "unknown",
+    "proofId": "proof_e9b92c493a7d478eb1b0",
+    "data": {
+      "workflowId": "smoke-workflow-dryrun",
+      "stepCount": 2,
+      "steps": [
+        {
+          "id": "draft",
+          "capability": "ai.generate_text",
+          "ok": true,
+          "provider": "openai-compatible",
+          "proofId": "proof_dryrun_7f0c8d824d5a44d39b02",
+          "dryRun": true,
+          "data": {
+            "inputKeys": [
+              "prompt"
+            ]
+          }
+        },
+        {
+          "id": "send",
+          "capability": "email.send",
+          "ok": true,
+          "provider": "resend",
+          "proofId": "proof_dryrun_afad89a832fc4dedab0a",
+          "dryRun": true,
+          "data": {
+            "inputKeys": [
+              "to",
+              "subject",
+              "body"
+            ]
+          }
+        }
+      ],
+      "final": {
+        "inputKeys": [
+          "to",
+          "subject",
+          "body"
+        ]
+      }
+    },
+    "secrets_exposed": false
+  },
+  "secrets_exposed": false
+}

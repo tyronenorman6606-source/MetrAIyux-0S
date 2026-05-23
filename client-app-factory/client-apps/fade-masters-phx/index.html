@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fade Masters PHX | Booking App</title>
+  <meta name="description" content="Book a cut, join the walk-in queue, choose services, and send a real Fade Masters PHX appointment request into the shop lane.">
+  <meta name="theme-color" content="#06080d">
+  <meta property="og:title" content="Fade Masters PHX | Booking App">
+  <meta property="og:description" content="Service menu, booking request, walk-in queue, and receipt flow for Fade Masters PHX.">
+  <meta property="og:image" content="assets/brand/fade-masters-phx-brand-logo.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --fm-bg: #07090d;
+      --fm-panel: rgba(255,255,255,.07);
+      --fm-panel-strong: rgba(255,255,255,.12);
+      --fm-line: rgba(255,255,255,.16);
+      --fm-ink: #f7fbff;
+      --fm-muted: #b7c4ca;
+      --fm-gold: #f4c66a;
+      --fm-cyan: #51d6ff;
+      --fm-red: #ff5a5f;
+      --fm-green: #64f0a4;
+    }
+
+    body.fade-app {
+      margin: 0;
+      color: var(--fm-ink);
+      background:
+        linear-gradient(140deg, rgba(81,214,255,.12), transparent 34%),
+        linear-gradient(220deg, rgba(244,198,106,.13), transparent 30%),
+        linear-gradient(180deg, #0a0d12, #05070a 52%, #020304),
+        var(--fm-bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    body.intro-active {
+      overflow: hidden;
+    }
+
+    body.intro-active .fm-shell,
+    body.intro-lock .fm-shell {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    body.intro-complete .fm-shell {
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    .fm-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      min-height: 100svh;
+      overflow: hidden;
+      padding: clamp(22px, 5vw, 72px);
+      background: #030507;
+      color: var(--fm-ink);
+      transition: opacity .72s cubic-bezier(.16, 1, .3, 1), visibility .72s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .fm-intro[hidden] {
+      display: none;
+    }
+
+    .fm-intro.is-exiting {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .fm-intro-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .74;
+      filter: saturate(1.1) contrast(1.08);
+    }
+
+    .fm-intro::before,
+    .fm-intro::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .fm-intro::before {
+      z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.8), rgba(0,0,0,.18) 48%, rgba(0,0,0,.84)),
+        radial-gradient(circle at 36% 28%, rgba(244,198,106,.18), transparent 34rem),
+        radial-gradient(circle at 78% 46%, rgba(81,214,255,.16), transparent 30rem);
+    }
+
+    .fm-intro::after {
+      z-index: 2;
+      opacity: .18;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 72px);
+      animation: fmIntroGrid 9s linear infinite;
+    }
+
+    .fm-intro-stage {
+      position: relative;
+      z-index: 3;
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: minmax(260px, .72fr) minmax(0, 1fr);
+      gap: clamp(18px, 4vw, 48px);
+      align-items: center;
+    }
+
+    .fm-intro-logo {
+      width: min(430px, 88vw);
+      filter:
+        drop-shadow(0 0 34px rgba(244,198,106,.52))
+        drop-shadow(0 0 22px rgba(81,214,255,.28));
+      animation: fmIntroLogo 1.4s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    .fm-intro-copy {
+      display: grid;
+      gap: 16px;
+    }
+
+    .fm-intro-copy h2 {
+      margin: 0;
+      max-width: 760px;
+      color: #fff5c8;
+      font-size: clamp(42px, 7vw, 96px);
+      line-height: .92;
+      text-shadow: 0 0 26px rgba(244,198,106,.28);
+    }
+
+    .fm-intro-copy p {
+      max-width: 640px;
+      margin: 0;
+      color: #d9e7ec;
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.42;
+    }
+
+    .fm-intro-telemetry,
+    .fm-signinpro-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fm-intro-telemetry b,
+    .fm-signinpro-strip span {
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.34);
+      color: #fff;
+    }
+
+    .fm-intro-enter {
+      justify-self: start;
+      min-height: 46px;
+      border: 1px solid rgba(244,198,106,.7);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #071016;
+      background: linear-gradient(135deg, #f4c66a, #51d6ff);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .fm-shell {
+      min-height: 100vh;
+      background: linear-gradient(90deg, rgba(0,0,0,.74), rgba(0,0,0,.36) 54%, rgba(0,0,0,.7));
+    }
+
+    .fm-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(16px, 4vw, 44px);
+      border-bottom: 1px solid var(--fm-line);
+      background: rgba(5,7,10,.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .fm-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      color: var(--fm-ink);
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .fm-brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 16px rgba(244,198,106,.32));
+      flex: 0 0 auto;
+    }
+
+    .fm-brand span {
+      overflow-wrap: anywhere;
+    }
+
+    .fm-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .fm-nav a,
+    .fm-btn,
+    .fm-icon-btn {
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      color: var(--fm-ink);
+      text-decoration: none;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .fm-nav a {
+      padding: 9px 11px;
+      font-size: 13px;
+    }
+
+    .fm-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 12px 14px;
+    }
+
+    .fm-btn.primary {
+      border-color: rgba(244,198,106,.7);
+      background: linear-gradient(135deg, #f4c66a, #51d6ff);
+      color: #071016;
+    }
+
+    .fm-btn.danger {
+      border-color: rgba(255,90,95,.7);
+      color: #fff;
+      background: rgba(255,90,95,.18);
+    }
+
+    .fm-icon-btn {
+      width: 42px;
+      height: 42px;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .fm-app {
+      display: grid;
+      gap: 22px;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 46px);
+    }
+
+    #services,
+    #media,
+    #book,
+    #queue,
+    #receipt {
+      scroll-margin-top: 92px;
+    }
+
+    .fm-hero {
+      display: grid;
+      grid-template-columns: minmax(0, .96fr) minmax(330px, .72fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .fm-panel {
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, var(--fm-panel-strong), rgba(255,255,255,.045));
+      box-shadow: 0 28px 80px rgba(0,0,0,.36);
+    }
+
+    .fm-media-stage {
+      position: relative;
+      min-height: 260px;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .fm-media-stage video,
+    .fm-media-stage img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      opacity: .86;
+    }
+
+    .fm-media-caption {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      background: rgba(0,0,0,.54);
+      backdrop-filter: blur(12px);
+    }
+
+    .fm-photo-strip {
+      display: grid;
+      gap: 14px;
+    }
+
+    .fm-photo-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .fm-photo-heading p:last-child {
+      max-width: 620px;
+      margin: 0;
+      color: var(--fm-muted);
+      line-height: 1.5;
+    }
+
+    .fm-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fm-photo {
+      margin: 0;
+      min-height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background: rgba(0,0,0,.32);
+    }
+
+    .fm-photo img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .fm-photo figcaption {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      color: var(--fm-muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .fm-photo figcaption strong,
+    .fm-photo figcaption a {
+      color: #fff;
+    }
+
+    .fm-signinpro-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .fm-signinpro-panel a {
+      color: #fff;
+    }
+
+    .fm-hero-copy,
+    .fm-live-board,
+    .fm-booking,
+    .fm-ledger,
+    .fm-card,
+    .fm-queue {
+      padding: clamp(16px, 3vw, 24px);
+    }
+
+    .fm-eyebrow {
+      margin: 0 0 10px;
+      color: var(--fm-cyan);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(38px, 7vw, 84px);
+      line-height: .96;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.04;
+    }
+
+    h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .fm-hero-copy p,
+    .fm-card p,
+    .fm-live-board p,
+    .fm-ledger p,
+    .fm-queue p {
+      color: var(--fm-muted);
+      line-height: 1.5;
+    }
+
+    .fm-hero-brand {
+      width: min(720px, 100%);
+      height: auto;
+      margin: -8px 0 18px;
+      object-fit: contain;
+      object-position: left center;
+      filter:
+        drop-shadow(0 0 28px rgba(244,198,106,.28))
+        drop-shadow(0 0 24px rgba(81,214,255,.16));
+    }
+
+    .fm-mark-watermark {
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      width: 128px;
+      opacity: .14;
+      pointer-events: none;
+      filter: drop-shadow(0 0 18px rgba(244,198,106,.34));
+    }
+
+    .fm-hero-actions,
+    .fm-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .fm-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .fm-status-grid div,
+    .fm-northstar-signal,
+    .fm-summary-line {
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(0,0,0,.28);
+    }
+
+    .fm-status-grid strong,
+    .fm-summary-line strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .fm-status-grid span,
+    .fm-northstar-signal span,
+    .fm-summary-line span {
+      color: var(--fm-muted);
+      font-size: 12px;
+    }
+
+    .fm-northstar-console {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .fm-northstar-signal {
+      display: grid;
+      gap: 5px;
+      min-height: 92px;
+    }
+
+    .fm-northstar-signal strong {
+      color: #fff;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .fm-live-board {
+      display: grid;
+      gap: 14px;
+    }
+
+    .fm-board-visual {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      min-height: 260px;
+      padding: 16px;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(81,214,255,.15), rgba(244,198,106,.09)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0, rgba(255,255,255,.035) 1px, transparent 1px, transparent 38px),
+        rgba(0,0,0,.36);
+    }
+
+    .fm-board-row,
+    .fm-board-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(2,5,9,.64);
+    }
+
+    .fm-board-row strong,
+    .fm-board-pill strong {
+      color: #fff;
+    }
+
+    .fm-board-row span,
+    .fm-board-pill span {
+      color: var(--fm-muted);
+      font-size: 12px;
+    }
+
+    .fm-board-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .fm-board-pill {
+      min-height: 86px;
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .fm-board-lane {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .fm-board-lane a {
+      display: grid;
+      place-items: center;
+      min-height: 54px;
+      border: 1px solid rgba(81,214,255,.45);
+      border-radius: 8px;
+      color: #071016;
+      text-decoration: none;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f4c66a, #51d6ff);
+    }
+
+    .fm-board-lane a:hover,
+    .fm-board-lane a:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(81,214,255,.18);
+    }
+
+    .fm-service-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fm-service {
+      position: relative;
+      min-height: 166px;
+      padding: 16px;
+      text-align: left;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      color: var(--fm-ink);
+      background: rgba(255,255,255,.07);
+      cursor: pointer;
+    }
+
+    .fm-service[aria-pressed="true"] {
+      border-color: rgba(81,214,255,.9);
+      box-shadow: 0 0 0 2px rgba(81,214,255,.16) inset;
+    }
+
+    .fm-service strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 7px;
+    }
+
+    .fm-service span {
+      display: block;
+      color: var(--fm-muted);
+      line-height: 1.38;
+    }
+
+    .fm-service .meta {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--fm-gold);
+      font-weight: 900;
+    }
+
+    .fm-main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(320px, .48fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .fm-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .fm-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--fm-muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background: rgba(0,0,0,.36);
+      color: #fff;
+      font: inherit;
+      padding: 12px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .fm-barbers,
+    .fm-times {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .fm-chip {
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.07);
+      color: var(--fm-ink);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .fm-chip[aria-pressed="true"] {
+      border-color: var(--fm-gold);
+      background: rgba(244,198,106,.18);
+    }
+
+    .fm-summary {
+      display: grid;
+      gap: 10px;
+      position: sticky;
+      top: 88px;
+    }
+
+    .fm-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(81,214,255,.12);
+      border: 1px solid rgba(81,214,255,.3);
+    }
+
+    .fm-total strong {
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .fm-receipt {
+      min-height: 96px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding: 12px;
+      border: 1px solid var(--fm-line);
+      border-radius: 8px;
+      background: rgba(0,0,0,.32);
+      color: #dce9ee;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .fm-ledger-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .fm-ledger-item {
+      display: grid;
+      gap: 4px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--fm-line);
+      background: rgba(0,0,0,.3);
+    }
+
+    .fm-ledger-item strong {
+      color: #fff;
+    }
+
+    .fm-ledger-item span {
+      color: var(--fm-muted);
+      font-size: 13px;
+    }
+
+    .fm-secondary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fm-card {
+      min-height: 210px;
+    }
+
+    .fm-card ul {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+      color: var(--fm-muted);
+    }
+
+    .fm-card li::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 8px;
+      border-radius: 99px;
+      background: var(--fm-cyan);
+      vertical-align: 1px;
+    }
+
+    .fm-warning {
+      color: #ffe1a6;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .fm-hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 980px) {
+      .fm-hero,
+      .fm-intro-stage,
+      .fm-main-grid,
+      .fm-photo-grid,
+      .fm-northstar-console,
+      .fm-secondary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fm-service-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .fm-photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .fm-summary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .fm-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .fm-brand img {
+        width: 38px;
+        height: 38px;
+      }
+
+      .fm-hero-brand {
+        width: min(520px, 100%);
+        margin-top: 0;
+      }
+
+      .fm-intro {
+        align-items: end;
+      }
+
+      .fm-intro-logo {
+        width: min(310px, 76vw);
+      }
+
+      .fm-nav {
+        justify-content: flex-start;
+      }
+
+      .fm-service-grid,
+      .fm-photo-grid,
+      .fm-form-grid,
+      .fm-status-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: clamp(34px, 13vw, 52px);
+      }
+    }
+
+    @keyframes fmIntroGrid {
+      from { transform: translate3d(0,0,0); }
+      to { transform: translate3d(-72px,-72px,0); }
+    }
+
+    @keyframes fmIntroLogo {
+      from { opacity: 0; transform: translateY(18px) scale(.94); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fm-intro::after,
+      .fm-intro-logo {
+        animation: none;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Barbershop",
+      "name": "Fade Masters PHX",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Phoenix",
+        "addressRegion": "AZ",
+        "postalCode": "85003",
+        "addressCountry": "US"
+      },
+      "areaServed": "Phoenix, AZ",
+      "openingHours": "Mo-Su 08:00-24:00",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/fade-masters-phx/"
+    }
+  </script>
+</head>
+<body class="fade-app skyesol-living-page intro-active intro-lock">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <section class="fm-intro" data-fm-intro aria-label="Fade Masters PHX opening sequence">
+    <video class="fm-intro-video" autoplay muted playsinline preload="auto" poster="assets/media/fade-masters-shop-poster.jpg">
+      <source src="assets/media/fade-masters-intro.mp4" type="video/mp4">
+    </video>
+    <div class="fm-intro-stage">
+      <img class="fm-intro-logo" src="assets/brand/fade-masters-phx-brand-logo.svg" alt="Fade Masters PHX">
+      <div class="fm-intro-copy">
+        <p class="fm-eyebrow">SignInPro-powered barber intake</p>
+        <h2>Chair flow, walk-ins, and receipts open first.</h2>
+        <p>Booking and queue requests mirror into the Fade Masters SignInPro workspace so the shop has a real check-in lane behind the public app.</p>
+        <div class="fm-intro-telemetry" aria-hidden="true">
+          <b>Book</b><b>Queue</b><b>Check-in</b><b>Receipt</b>
+        </div>
+        <button class="fm-intro-enter" type="button" data-fm-enter-intro>Enter booking lane</button>
+      </div>
+    </div>
+  </section>
+  <div class="fm-shell">
+    <header class="fm-topbar">
+      <a class="fm-brand" href="#book" aria-label="Fade Masters PHX booking app">
+        <img src="assets/brand/fade-masters-phx-brand-mark.svg" alt="" aria-hidden="true">
+        <span>Fade Masters PHX</span>
+      </a>
+      <nav class="fm-nav" aria-label="Fade Masters app navigation">
+        <a href="#services" data-fm-scroll-target="#services">Services</a>
+        <a href="#media" data-fm-scroll-target="#media">Media</a>
+        <a href="#book" data-fm-scroll-target="#book">Book</a>
+        <a href="#queue" data-fm-scroll-target="#queue">Walk-in</a>
+        <a href="#northstar" data-fm-scroll-target="#northstar">NorthStar</a>
+        <a href="#receipt" data-fm-scroll-target="#receipt">Receipts</a>
+        <a href="/valley-verified/business/fade-masters-phx/">Valley</a>
+      </nav>
+    </header>
+
+    <main class="fm-app">
+      <section class="fm-hero" aria-labelledby="fade-app-title">
+        <div class="fm-panel fm-hero-copy">
+          <img class="fm-hero-brand" src="assets/brand/fade-masters-phx-brand-logo.svg" alt="Fade Masters PHX">
+          <p class="fm-eyebrow">Phoenix barbershop booking lane</p>
+          <h1 id="fade-app-title" class="neon-gradient-text">Pick the cut, lock the time, send the request.</h1>
+          <p>Choose services, pick a preferred time, add notes, and send the request to the shop queue. You get a receipt immediately; final chair time is confirmed by the operator.</p>
+          <div class="fm-hero-actions">
+            <a class="fm-btn primary" href="#book" data-fm-scroll-target="#book">Start booking</a>
+            <a class="fm-btn" href="#queue" data-fm-scroll-target="#queue">Join walk-in queue</a>
+            <a class="fm-btn" href="/northstar/?workspace=fade-masters-phx&client=fade-masters-phx">Open NorthStar</a>
+            <button class="fm-btn" type="button" data-fm-share>Share app</button>
+          </div>
+          <div class="fm-status-grid" aria-label="Booking status">
+            <div><strong>8 AM-12 AM</strong><span>Daily request window</span></div>
+            <div><strong>Phoenix 85003</strong><span>Public service area on file</span></div>
+            <div><strong>NorthStar core</strong><span data-fm-core-status>Checking SignInPro runtime</span></div>
+            <div><strong>Receipt backup</strong><span>This browser keeps a copy and mirrors the workspace record</span></div>
+          </div>
+        </div>
+        <aside class="fm-panel fm-live-board">
+          <div class="fm-board-visual" aria-label="Fade Masters booking board">
+            <img class="fm-mark-watermark" src="assets/brand/fade-masters-phx-brand-mark.svg" alt="" aria-hidden="true">
+            <div class="fm-board-row"><strong>Booking board</strong><span>shop lane ready</span></div>
+            <div class="fm-board-grid">
+              <div class="fm-board-pill"><strong>6 services</strong><span>priced and timed</span></div>
+              <div class="fm-board-pill"><strong>2 lanes</strong><span>appointments and walk-ins</span></div>
+              <div class="fm-board-pill"><strong>Receipts</strong><span>saved per device</span></div>
+              <div class="fm-board-pill"><strong>Acceptance</strong><span>operator confirms final slot</span></div>
+            </div>
+            <div class="fm-board-lane" aria-label="Quick booking board actions">
+              <a href="#book" data-fm-scroll-target="#book">Book</a>
+              <a href="#queue" data-fm-scroll-target="#queue">Queue</a>
+              <a href="#receipt" data-fm-scroll-target="#receipt">Receipt</a>
+            </div>
+          </div>
+          <div>
+            <p class="fm-eyebrow">Live board</p>
+            <h2 id="fm-today-title">Today</h2>
+            <p id="fm-open-status">Checking booking window...</p>
+          </div>
+        </aside>
+      </section>
+
+      <section id="media" class="fm-panel fm-media-stage" aria-label="Fade Masters PHX open-source barber media">
+        <video autoplay muted loop playsinline preload="metadata" poster="assets/media/fade-masters-shop-poster.jpg">
+          <source src="assets/media/fade-masters-intro.mp4" type="video/mp4">
+        </video>
+        <div class="fm-media-caption">
+          <strong>Open-source barber media reel</strong>
+          <span>Public-domain and Creative Commons images, rebuilt into the intro video and poster.</span>
+        </div>
+      </section>
+
+      <section class="fm-photo-strip" aria-labelledby="media-title">
+        <div class="fm-photo-heading">
+          <div>
+            <p class="fm-eyebrow">Fade and service visual library</p>
+            <h2 id="media-title">The app is using the new HD barber image pack.</h2>
+          </div>
+          <p>The reel above is made from barber-chair, clipper, fade, beard-shave, mirror, and storefront cuts from the supplied image pack. Attributions stay bundled and visible.</p>
+        </div>
+        <div class="fm-photo-grid">
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/01_barber-chair-haircut-usaf-public-domain_hero_1920x1080.jpg" alt="A close fade haircut in a barber chair" loading="lazy" decoding="async">
+            <figcaption><strong>Chair fade cut</strong><span>U.S. Air Force / Staff Sgt. Sean Martin, public domain.</span><a href="https://commons.wikimedia.org/wiki/File:Barber_shop_grand_opening_(8489381).jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/04_comb-clipper-back-view-man-barbershop-nenad-stojkovic-ccby2_hero_1920x1080.jpg" alt="Comb and clippers shaping the back of a fresh cut" loading="lazy" decoding="async">
+            <figcaption><strong>Clipper detail</strong><span>Nenad Stojkovic, CC BY 2.0. Cropped for this app.</span><a href="https://commons.wikimedia.org/wiki/File:Barber_cutting_hair_with_comb._Back_view_of_man_in_barber_shop.jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/05_comb-clipper-back-view-young-man-barbershop-nenad-stojkovic-ccby2_hero_1920x1080.jpg" alt="A barber using clippers and a comb on a young man's haircut" loading="lazy" decoding="async">
+            <figcaption><strong>Fade service</strong><span>Nenad Stojkovic, CC BY 2.0. Cropped for this app.</span><a href="https://commons.wikimedia.org/wiki/File:Barber_cutting_hair_with_comb._Back_view_of_young_man_in_barber_shop.jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/06_trendy-haircut-barbershop-mirror-nenad-stojkovic-ccby2_hero_1920x1080.jpg" alt="A barber finishing a modern haircut in a mirror station" loading="lazy" decoding="async">
+            <figcaption><strong>Mirror station</strong><span>Nenad Stojkovic, CC BY 2.0. Cropped for this app.</span><a href="https://commons.wikimedia.org/wiki/File:Young_men_with_trendy_haircut_at_barber_shop.jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/03_straight-razor-beard-shave-nenad-stojkovic-ccby2_hero_1920x1080.jpg" alt="Straight razor beard shave service close-up" loading="lazy" decoding="async">
+            <figcaption><strong>Razor service</strong><span>Nenad Stojkovic, CC BY 2.0. Cropped for this app.</span><a href="https://commons.wikimedia.org/wiki/File:Attractive_hairdresser_is_shaving_male_beard_with_the_knife.jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+          <figure class="fm-photo">
+            <img src="assets/media/fade-masters-phx-open-source-hd-image-pack/03_HERO_CROPS_1920x1080/09_barber-shop-storefront-night-billie-grace-ward-ccby2_hero_1920x1080.jpg" alt="Barber shop storefront at night" loading="lazy" decoding="async">
+            <figcaption><strong>Shop front</strong><span>Billie Grace Ward, CC BY 2.0. Cropped for this app.</span><a href="https://commons.wikimedia.org/wiki/File:Barber_Shop_(27896619788).jpg" target="_blank" rel="noreferrer">Source</a></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="northstar" class="fm-panel fm-booking fm-signinpro-panel" aria-labelledby="signinpro-title">
+        <p class="fm-eyebrow">NorthStar / SignInPro runtime</p>
+        <h2 id="signinpro-title">Customer requests become SignInPro check-ins.</h2>
+        <p>The public booking and queue forms load the NorthStar core, create SignInPro-compatible guest records, and write the Fade Masters workspace state that the operator opens from the NorthStar app.</p>
+        <div class="fm-signinpro-strip" aria-label="SignInPro wiring status">
+          <span>Workspace: fade-masters-phx</span>
+          <span>State: signinpro_workspace_state_v4:fade-masters-phx</span>
+          <span>Route: /northstar/</span>
+          <span>API: /api/northstar</span>
+        </div>
+        <div class="fm-northstar-console" aria-label="NorthStar handoff status">
+          <div class="fm-northstar-signal"><span>Runtime</span><strong data-fm-runtime-status>Loading</strong></div>
+          <div class="fm-northstar-signal"><span>Workspace key</span><strong data-fm-workspace-key>Pending</strong></div>
+          <div class="fm-northstar-signal"><span>Mirrored records</span><strong data-fm-mirror-count>0</strong></div>
+          <div class="fm-northstar-signal"><span>Remote sync</span><strong data-fm-remote-status>Waiting for operator session</strong></div>
+        </div>
+        <div class="fm-action-row">
+          <a class="fm-btn primary" href="/northstar/?workspace=fade-masters-phx&client=fade-masters-phx">Open Fade Masters NorthStar</a>
+          <button class="fm-btn" type="button" data-fm-signinpro-proof>Show local SignInPro mirror</button>
+        </div>
+      </section>
+
+      <section id="services" class="fm-panel fm-booking" aria-labelledby="services-title">
+        <p class="fm-eyebrow">Service menu</p>
+        <h2 id="services-title">Choose one or more services.</h2>
+        <div class="fm-service-grid" data-fm-services></div>
+      </section>
+
+      <section class="fm-main-grid" id="book">
+        <form class="fm-panel fm-booking fm-form" data-fm-booking-form>
+          <div>
+            <p class="fm-eyebrow">Appointment request</p>
+            <h2>Send a real request.</h2>
+            <p class="fm-warning">This requests a time; final chair time is confirmed by the shop.</p>
+          </div>
+
+          <div class="fm-form-grid">
+            <label>Name
+              <input name="name" autocomplete="name" required placeholder="Your name">
+            </label>
+            <label>Mobile
+              <input name="phone" autocomplete="tel" inputmode="tel" required placeholder="Best callback number">
+            </label>
+            <label>Date
+              <input name="date" type="date" required>
+            </label>
+            <label>Time
+              <select name="time" required data-fm-time-select></select>
+            </label>
+          </div>
+
+          <label>Barber preference
+            <div class="fm-barbers" data-fm-barbers></div>
+            <input type="hidden" name="barber" data-fm-barber-input value="First available">
+          </label>
+
+          <label>Notes
+            <textarea name="notes" placeholder="Cut details, beard notes, design reference, accessibility needs, or timing constraints"></textarea>
+          </label>
+
+          <div class="fm-action-row">
+            <button class="fm-btn primary" type="submit">Request appointment</button>
+            <button class="fm-btn" type="button" data-fm-copy-summary>Copy summary</button>
+            <button class="fm-btn danger" type="button" data-fm-clear>Clear</button>
+          </div>
+        </form>
+
+        <aside class="fm-panel fm-summary" aria-live="polite">
+          <div>
+            <p class="fm-eyebrow">Current ticket</p>
+            <h2>Booking summary</h2>
+          </div>
+          <div class="fm-summary-line"><strong data-fm-service-count>0 services</strong><span data-fm-selected-services>No services selected</span></div>
+          <div class="fm-summary-line"><strong data-fm-duration>0 min</strong><span>Estimated chair time</span></div>
+          <div class="fm-total"><span>Estimated total</span><strong data-fm-total>$0</strong></div>
+          <div class="fm-receipt" id="receipt" data-fm-receipt>No request sent yet.</div>
+        </aside>
+      </section>
+
+      <section class="fm-main-grid" id="queue">
+        <form class="fm-panel fm-queue fm-form" data-fm-queue-form>
+          <div>
+            <p class="fm-eyebrow">SignInPro walk-in kiosk</p>
+            <h2>Join the walk-in queue.</h2>
+            <p>Use this when the customer is already close by and wants a quick callback or queue hold.</p>
+          </div>
+          <div class="fm-form-grid">
+            <label>Name
+              <input name="name" autocomplete="name" required placeholder="Your name">
+            </label>
+            <label>Mobile
+              <input name="phone" autocomplete="tel" inputmode="tel" required placeholder="Best callback number">
+            </label>
+          </div>
+          <label>Need
+            <select name="need">
+              <option>First available haircut</option>
+              <option>Fade only</option>
+              <option>Lineup only</option>
+              <option>Beard trim</option>
+              <option>Kids cut</option>
+            </select>
+          </label>
+          <button class="fm-btn primary" type="submit">Join queue</button>
+        </form>
+
+        <aside class="fm-panel fm-ledger">
+          <p class="fm-eyebrow">Local receipts</p>
+          <h2>Requests on this device</h2>
+          <p>These are the receipts created from this browser. Live submissions also send a structured ticket to the shop lane.</p>
+          <div class="fm-ledger-list" data-fm-ledger></div>
+        </aside>
+      </section>
+
+      <section class="fm-secondary-grid" aria-label="Operational app features">
+        <article class="fm-panel fm-card">
+          <p class="fm-eyebrow">Customer</p>
+          <h3>Useful before arrival</h3>
+          <ul>
+            <li>Service estimate before submitting</li>
+            <li>Barber preference captured</li>
+            <li>Copyable appointment receipt</li>
+          </ul>
+        </article>
+        <article class="fm-panel fm-card">
+          <p class="fm-eyebrow">Shop</p>
+          <h3>Cleaner intake</h3>
+          <ul>
+            <li>Structured notes instead of random DMs</li>
+            <li>Queue and appointment requests separated</li>
+            <li>Ticket mirrors into the NorthStar workspace</li>
+          </ul>
+        </article>
+        <article class="fm-panel fm-card">
+          <p class="fm-eyebrow">Confirmation</p>
+          <h3>Clear next step</h3>
+          <ul>
+            <li>Receipt created immediately</li>
+            <li>Operator accepts the final slot</li>
+            <li>Request history stays visible</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/northstar/assets/core.js"></script>
+  <script src="/northstar/assets/workspace-client.js"></script>
+  <script src="script.js"></script>
+  <script src="fade-booking.js"></script>
+</body>
+</html>

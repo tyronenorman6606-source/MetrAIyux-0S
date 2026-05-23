@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeMusicNexus — Launching July 2026 | Skyes Over London LC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:  #f6c961;
+      --cyan:  #66e5ff;
+      --mint:  #8ff3c7;
+      --coral: #ff8f70;
+      --ink:   #f0f4ff;
+      --muted: rgba(220, 232, 255, .62);
+      --line:  rgba(255,255,255,.1);
+      --panel: rgba(10, 15, 28, .72);
+      --panel-strong: rgba(6, 10, 20, .9);
+    }
+
+    html, body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 15% 5%,  rgba(102,229,255,.12), transparent 35rem),
+        radial-gradient(circle at 85% 10%, rgba(246,201,97,.14),  transparent 28rem),
+        radial-gradient(circle at 50% 80%, rgba(143,243,199,.07), transparent 40rem),
+        linear-gradient(165deg, #02050b 0%, #060c18 40%, #0b0f1c 100%);
+      min-height: 100vh;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .poster {
+      width: 100%;
+      max-width: 860px;
+      position: relative;
+    }
+
+    /* noise texture overlay */
+    .poster::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      position: relative;
+      text-align: center;
+      padding: 3.5rem 2rem 2.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(246,201,97,.12);
+      border: 1px solid rgba(246,201,97,.3);
+      border-radius: 40px;
+      padding: 5px 16px 5px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.6rem;
+    }
+
+    .brand-kicker span.dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.7); }
+    }
+
+    .wordmark {
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--gold) 0%, #fff8e2 40%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: .6rem;
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: .04em;
+      margin-bottom: 1.8rem;
+    }
+
+    .launch-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(255,143,112,.18) 0%, rgba(246,201,97,.14) 100%);
+      border: 1px solid rgba(255,143,112,.45);
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--coral);
+    }
+
+    .launch-badge .arrow { color: var(--gold); }
+
+    /* ─── SECTION WRAPPER ─── */
+    .section {
+      position: relative;
+      padding: 2.4rem 2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(102,229,255,.4), transparent);
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .8rem;
+    }
+
+    /* ─── FREE PACKAGE ─── */
+    .free-package {
+      background: linear-gradient(135deg, rgba(143,243,199,.07) 0%, rgba(102,229,255,.05) 100%);
+      border: 1px solid rgba(143,243,199,.2);
+      border-radius: 16px;
+      padding: 2rem 2rem 1.5rem;
+    }
+
+    .free-headline {
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      color: var(--mint);
+      margin-bottom: .4rem;
+    }
+
+    .free-sub {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 1.6rem;
+      line-height: 1.5;
+    }
+
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .benefit-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.1rem 1.1rem .9rem;
+    }
+
+    .benefit-icon {
+      font-size: 1.4rem;
+      margin-bottom: .5rem;
+    }
+
+    .benefit-name {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: .2rem;
+    }
+
+    .benefit-desc {
+      font-size: .73rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .value-tag {
+      display: inline-block;
+      margin-top: .5rem;
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(246,201,97,.12);
+      border: 1px solid rgba(246,201,97,.25);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* ─── STEPS ─── */
+    .steps {
+      display: grid;
+      gap: .9rem;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      transition: border-color .2s;
+    }
+
+    .step:hover { border-color: rgba(102,229,255,.3); }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(246,201,97,.2), rgba(102,229,255,.15));
+      border: 1px solid rgba(246,201,97,.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: .05em;
+    }
+
+    .step-body { flex: 1; }
+
+    .step-name {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: .2rem;
+    }
+
+    .step-detail {
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .step-tag {
+      display: inline-block;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: .35rem;
+    }
+
+    .tag-cyan  { background: rgba(102,229,255,.12); color: var(--cyan); border: 1px solid rgba(102,229,255,.25); }
+    .tag-gold  { background: rgba(246,201,97,.12);  color: var(--gold); border: 1px solid rgba(246,201,97,.25); }
+    .tag-mint  { background: rgba(143,243,199,.1);  color: var(--mint); border: 1px solid rgba(143,243,199,.25); }
+    .tag-coral { background: rgba(255,143,112,.12); color: var(--coral); border: 1px solid rgba(255,143,112,.25); }
+
+    /* ─── PLATFORM FEATURES ─── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: .8rem;
+    }
+
+    .feature-pill {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .feature-pill-icon {
+      font-size: 1.5rem;
+      margin-bottom: .4rem;
+    }
+
+    .feature-pill-name {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: .15rem;
+    }
+
+    .feature-pill-sub {
+      font-size: .66rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ─── LEGAL STRIP ─── */
+    .legal-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: .8rem;
+    }
+
+    .legal-block {
+      background: rgba(246,201,97,.05);
+      border: 1px solid rgba(246,201,97,.15);
+      border-radius: 10px;
+      padding: 1.1rem;
+    }
+
+    .legal-block-name {
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: .4rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .legal-block-desc {
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      text-align: center;
+      padding: 2.8rem 2rem 2.2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cta-headline {
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      margin-bottom: .6rem;
+    }
+
+    .cta-sub {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 1.8rem;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--gold) 0%, #ffdc8a 50%, var(--gold) 100%);
+      color: #06090f;
+      font-weight: 900;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 0 32px rgba(246,201,97,.35);
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 48px rgba(246,201,97,.55);
+    }
+
+    .cta-url {
+      display: block;
+      font-size: .75rem;
+      color: var(--cyan);
+      font-family: 'Courier New', monospace;
+      opacity: .7;
+      margin-top: .5rem;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      text-align: center;
+      padding: 1.6rem 2rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .footer-brand {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .footer-sep {
+      width: 4px; height: 4px;
+      background: rgba(255,255,255,.2);
+      border-radius: 50%;
+    }
+
+    .footer-note {
+      font-size: .68rem;
+      color: rgba(220,232,255,.35);
+    }
+
+    /* ─── QR placeholder ─── */
+    .qr-area {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      margin-top: 1.2rem;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .qr-box {
+      flex-shrink: 0;
+      width: 64px; height: 64px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    .qr-text { flex: 1; }
+    .qr-label { font-size: .7rem; font-weight: 700; color: var(--gold); margin-bottom: .2rem; text-transform: uppercase; letter-spacing: .08em; }
+    .qr-url   { font-size: .68rem; color: var(--cyan); font-family: 'Courier New', monospace; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="poster">
+
+    <!-- ═══ HEADER ═══ -->
+    <div class="header">
+      <div class="brand-kicker">
+        <span class="dot"></span>
+        Skyes Over London LC · SOL Enterprises · Arizona
+      </div>
+      <div class="wordmark">SKYE MUSIC NEXUS</div>
+      <div class="tagline">Your music. Your storefront. Your empire.</div>
+      <div class="launch-badge">
+        <span class="arrow">▶</span>
+        LAUNCHING JULY 2026
+      </div>
+    </div>
+
+    <!-- ═══ FREE FOUNDING ARTIST PACKAGE ═══ -->
+    <div class="section">
+      <div class="section-label">Founding Artist Initiative</div>
+      <div class="free-package">
+        <div class="free-headline">Free Founding Artist Package</div>
+        <div class="free-sub">
+          To mark the July launch, we're giving every qualifying artist a complete digital infrastructure kit at zero cost.
+          Sign up for the 0S, join the waitlist — we handle the rest.
+        </div>
+        <div class="benefit-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">🌐</div>
+            <div class="benefit-name">Custom Landing Page</div>
+            <div class="benefit-desc">A full artist portfolio page built, designed, and deployed for you. Your storefront. Your brand.</div>
+            <span class="value-tag">$99+ value — FREE</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">⚡</div>
+            <div class="benefit-name">2-Month Content Engine</div>
+            <div class="benefit-desc">Release captions, social hooks, short-form clip briefs, and campaign content generated for 60 days.</div>
+            <span class="value-tag">$498+ value — FREE</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🏪</div>
+            <div class="benefit-name">Managed Storefront</div>
+            <div class="benefit-desc">We operate your music storefront. You focus on making music. We handle the ops, releases, and platform.</div>
+            <span class="value-tag">Managed by SOL</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">📋</div>
+            <div class="benefit-name">IC Legal Framework</div>
+            <div class="benefit-desc">Independent contractor agreement. You own your music. Full legal coverage via LegalSkyes + SOVEREIGN docs.</div>
+            <span class="value-tag">Fully protected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HOW IT WORKS ═══ -->
+    <div class="section">
+      <div class="section-label">End-to-End Artist Journey</div>
+      <div class="section-title">How It Works</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <div class="step-name">Sign Up for the 0S (Free)</div>
+            <div class="step-detail">Create your free MetrAIyux 0S account. This is your gate into the entire Skye ecosystem — music platform, storefront, legal tools, and more.</div>
+            <span class="step-tag tag-cyan">Gate Session · No charge</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <div class="step-name">Join the Founding Artist Waitlist</div>
+            <div class="step-detail">Once in the 0S, you'll request a spot on the founding artist waitlist. Spots are limited. July 2026 cohort only.</div>
+            <span class="step-tag tag-gold">Limited Spots · July 2026</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <div class="step-name">IC Onboarding via SkyeRoutexFlow</div>
+            <div class="step-detail">We run your onboarding through SkyeRoutexFlow — our workforce command system. You'll complete your independent contractor agreement, all the legal docs are backed by LegalSkyes and SOVEREIGN docs.</div>
+            <span class="step-tag tag-mint">IC Agreement · Legally sound</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <div class="step-name">We Build Your Artist Portfolio + Page</div>
+            <div class="step-detail">Our team builds your landing page, artist profile, rights vault, and content engine. You review, we deploy. Your storefront goes live on our managed infrastructure.</div>
+            <span class="step-tag tag-cyan">Built for you · No tech skills needed</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <div class="step-name">Drop Music. We Manage the Operations.</div>
+            <div class="step-detail">Upload your music to the platform. We handle release workflows, rights tracking, metadata, content scheduling, and storefront ops. You stay in your creative lane.</div>
+            <span class="step-tag tag-gold">Release ops managed by SOL</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <div class="step-name">Get Paid via SkyePay</div>
+            <div class="step-detail">Revenue goes through SkyePay — Skye's native payment and royalty system. Payout review, royalty ledger, and IC payment records are all tracked in your dashboard.</div>
+            <span class="step-tag tag-coral">Real payouts · Royalty ledger · IC-safe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PLATFORM CAPABILITIES ═══ -->
+    <div class="section">
+      <div class="section-label">Platform Capabilities</div>
+      <div class="section-title">What's Inside SkyeMusicNexus</div>
+      <div class="feature-grid">
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🎚️</div>
+          <div class="feature-pill-name">Native DAW Room</div>
+          <div class="feature-pill-sub">Full in-browser recording studio with transport, tracks, mixer, and WAV export</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🎵</div>
+          <div class="feature-pill-name">Upload Studio</div>
+          <div class="feature-pill-sub">Gated audio uploads with secure vault playback and release handoff</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🔒</div>
+          <div class="feature-pill-name">Rights Vault</div>
+          <div class="feature-pill-sub">Rights notes, takedown holds, and legal-safe distribution boundaries</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">📊</div>
+          <div class="feature-pill-name">Royalty Ledger</div>
+          <div class="feature-pill-sub">Transparent royalty tracking, split notes, and payout review queue</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🚀</div>
+          <div class="feature-pill-name">Release Workflows</div>
+          <div class="feature-pill-sub">Approval-gated release ops, metadata QA, and release capsule management</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">📱</div>
+          <div class="feature-pill-name">Content Engine</div>
+          <div class="feature-pill-sub">Social captions, clip briefs, campaign sprints, and creator handoff packs</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">👤</div>
+          <div class="feature-pill-name">Artist Profiles</div>
+          <div class="feature-pill-sub">Full artist identity, bio, links, Skye-ID, and discovery surface</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">💳</div>
+          <div class="feature-pill-name">SkyePay</div>
+          <div class="feature-pill-sub">Native payment system for IC payouts, royalties, and storefront revenue</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LEGAL & STRUCTURE ═══ -->
+    <div class="section">
+      <div class="section-label">Legal Structure</div>
+      <div class="section-title">You're Protected. We're Legit.</div>
+      <div class="legal-strip">
+        <div class="legal-block">
+          <div class="legal-block-name">Independent Contractor Status</div>
+          <div class="legal-block-desc">Founding artists onboard as ICs — not employees. You control your music, your schedule, and your catalog. We manage the platform ops.</div>
+        </div>
+        <div class="legal-block">
+          <div class="legal-block-name">LegalSkyes Framework</div>
+          <div class="legal-block-desc">30+ policies covering the full Skye ecosystem — from contractor agreements to rights compliance. Deployed at solenterprises.org.</div>
+        </div>
+        <div class="legal-block">
+          <div class="legal-block-name">SOVEREIGN Docs</div>
+          <div class="legal-block-desc">Sovereign documentation layer that backs IC agreements, proof receipts, and platform authority — all owned by Skyes Over London LC.</div>
+        </div>
+        <div class="legal-block">
+          <div class="legal-block-name">SkyeRoutexFlow Workforce</div>
+          <div class="legal-block-desc">Our internal workforce command system handles IC onboarding, agreements, and compliance. Every artist runs through the same proven pipeline.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CTA ═══ -->
+    <div class="cta-section">
+      <div class="section-label" style="justify-content: center;">Act Before July</div>
+      <div class="cta-headline">Ready to Be a Founding Artist?</div>
+      <div class="cta-sub">Sign up for the 0S — it's free. Then request your spot on the founding artist waitlist. We do the rest.</div>
+      <a class="cta-btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html">
+        Join the Founding Artist Waitlist →
+      </a>
+      <div class="qr-area">
+        <div class="qr-box">📲</div>
+        <div class="qr-text">
+          <div class="qr-label">Sign up at</div>
+          <div class="qr-url">metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <div class="footer">
+      <span class="footer-brand">Skyes Over London LC</span>
+      <span class="footer-sep"></span>
+      <span class="footer-brand">SOL Enterprises</span>
+      <span class="footer-sep"></span>
+      <span class="footer-brand">Arizona</span>
+      <span class="footer-sep"></span>
+      <span class="footer-brand">solenterprises.org</span>
+      <br style="width:100%">
+      <span class="footer-note">SkyeMusicNexus is a platform owned and operated by Skyes Over London LC. Independent contractor relationships governed by IC agreements under Arizona law. All music rights remain with the artist. Platform subject to gate session and IC onboarding approval. July 2026 founding cohort is limited.</span>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+MyDrive proof notes
+
+Static checks completed:
+✅ index.html module script passes `node --check` after extraction.
+✅ sw.js passes `node --check`.
+✅ No Firebase SDK/imports or remote cloud database code remain.
+✅ No third-party UI/library CDN scripts remain.
+✅ Only hardcoded outbound HTTPS endpoint is https://api.resend.com/emails for explicit recovery-code sending.
+✅ Backup Center functions are present: buildBackupPackage, validateBackupPackage, exportBackupReceipt, verifyBackupFromInput.
+
+Core local features implemented:
+✅ local IndexedDB database: MyDrive_Local_Encrypted_Vault_v1
+✅ passphrase setup/unlock using PBKDF2-derived wrapping key
+✅ raw 256-bit data key wrapped by passphrase envelope
+✅ AES-GCM encrypted item metadata and encrypted item contents
+✅ local file and folder import
+✅ secure notes
+✅ password records with generator/copy
+✅ recovery-code generation, rotation, download, print, copy, and optional Resend send
+✅ recovery-code unlock with mandatory passphrase rotation
+✅ encrypted JSON backup export/import
+✅ SHA-256 backup integrity seal for v2 backup packages
+✅ separate backup receipt JSON export
+✅ backup verification flow
+✅ lock and local purge controls
+
+Browser smoke note:
+☐ A headless Chromium browser smoke test was attempted in this container, but Chromium navigation is blocked by the environment policy with ERR_BLOCKED_BY_ADMINISTRATOR for both localhost and file URLs. Static JavaScript syntax checks and source scans passed.

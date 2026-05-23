@@ -1,0 +1,301 @@
+.proof-ecology-page {
+  background: #03070d;
+}
+
+.proof-ecology-hero {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 150px 24px 72px;
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(320px, .45fr);
+  gap: 40px;
+  align-items: end;
+}
+
+.proof-ecology-hero h1 {
+  max-width: 940px;
+  margin: 0 0 22px;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 6.7rem);
+  line-height: .98;
+  letter-spacing: 0;
+}
+
+.proof-ecology-hero .hero-sub {
+  max-width: 760px;
+  color: var(--soft);
+}
+
+.proof-ecology-console {
+  border: 1px solid rgba(100, 217, 255, .24);
+  background: linear-gradient(160deg, rgba(100, 217, 255, .10), rgba(244, 199, 91, .055));
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 22px 90px rgba(0, 0, 0, .34);
+}
+
+.proof-ecology-console dl {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.proof-ecology-console div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+}
+
+.proof-ecology-console dt {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.proof-ecology-console dd {
+  margin: 0;
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 22px;
+}
+
+.proof-ecology-console p {
+  margin: 18px 0 0;
+  color: var(--soft);
+  font-size: 13px;
+}
+
+.proof-ecology-band {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 24px 72px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.proof-ecology-band div,
+.proof-ecology-controls,
+.proof-ecology-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .025);
+  border-radius: 8px;
+}
+
+.proof-ecology-band div {
+  padding: 22px;
+}
+
+.proof-ecology-band span,
+.proof-ecology-card .proof-path,
+.proof-ecology-card .proof-date,
+.proof-ecology-card .proof-chip,
+.proof-ecology-meta {
+  font-family: var(--font-mono);
+}
+
+.proof-ecology-band span {
+  display: block;
+  color: var(--cyan);
+  font-size: 12px;
+  margin-bottom: 18px;
+}
+
+.proof-ecology-band strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.proof-ecology-band p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.proof-ecology-controls {
+  margin: 34px 0 18px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 190px 240px;
+  gap: 14px;
+  align-items: end;
+}
+
+.proof-ecology-controls label {
+  display: grid;
+  gap: 8px;
+}
+
+.proof-ecology-controls span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.proof-ecology-controls input,
+.proof-ecology-controls select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(0, 0, 0, .34);
+  color: var(--soft);
+  border-radius: 6px;
+  padding: 12px 12px;
+  font: inherit;
+}
+
+.proof-ecology-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0 0 18px;
+}
+
+.proof-ecology-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.proof-ecology-card {
+  padding: 20px;
+  min-height: 292px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.proof-ecology-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  opacity: .78;
+}
+
+.proof-ecology-card[data-status="attention"]::before {
+  background: linear-gradient(90deg, var(--rose), var(--gold));
+}
+
+.proof-ecology-card[data-status="recorded"]::before,
+.proof-ecology-card[data-status="mixed"]::before {
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+}
+
+.proof-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.proof-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, .12);
+  color: var(--cyan);
+  background: rgba(100, 217, 255, .08);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.proof-chip[data-status="pass"] {
+  color: var(--mint);
+  background: rgba(111, 242, 199, .08);
+}
+
+.proof-chip[data-status="attention"] {
+  color: var(--rose);
+  background: rgba(255, 107, 139, .08);
+}
+
+.proof-ecology-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  line-height: 1.25;
+}
+
+.proof-ecology-card p {
+  margin: 0;
+  color: var(--soft);
+  line-height: 1.62;
+  font-size: 13px;
+}
+
+.proof-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.proof-metrics span {
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.proof-path {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.proof-date {
+  color: var(--gold);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.proof-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.proof-links a {
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 1060px) {
+  .proof-ecology-hero,
+  .proof-ecology-band,
+  .proof-ecology-grid,
+  .proof-ecology-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .proof-ecology-controls label:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .proof-ecology-hero,
+  .proof-ecology-band,
+  .proof-ecology-grid,
+  .proof-ecology-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .proof-ecology-hero {
+    padding-top: 128px;
+  }
+}

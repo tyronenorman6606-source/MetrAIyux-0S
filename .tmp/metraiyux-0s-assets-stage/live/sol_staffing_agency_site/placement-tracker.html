@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Placement Tracker | Skyes Over London Staffing</title>
+  <meta name="description" content="Internal placement tracker for candidate submissions, interviews, offers, starts, replacements, and outcomes." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Delivery Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Placement Tracker</p>
+      <h1>Track submissions, interviews, starts, replacements, and outcomes.</h1>
+      <p class="lead">The placement tracker defines how candidate movement should be logged after a recruiter submits a candidate to an account owner or employer.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Delivery Control</div><h2>No mystery placements.</h2><p>Every candidate should have role, client, owner, stage, and next action.</p></aside>
+  </div>
+</section>
+<section class="section-pad table-wrap reveal">
+  <table class="ops-table">
+    <thead><tr><th>Candidate</th><th>Client</th><th>Role</th><th>Stage</th><th>Next Action</th></tr></thead>
+    <tbody>
+      <tr><td>Example Candidate</td><td>Example Client</td><td>Admin Assistant</td><td>Submitted</td><td>Await employer feedback</td></tr>
+      <tr><td>Example Candidate 2</td><td>Example Client</td><td>Warehouse Associate</td><td>Start Scheduled</td><td>Confirm first-day instructions</td></tr>
+      <tr><td>Example Candidate 3</td><td>Example Prime</td><td>Contact Support</td><td>Screening</td><td>Confirm availability and background requirements</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Placement Log</p><h2>Log candidate movement.</h2><p>Internal placement form.</p></div>
+  <form class="contact-form reveal" name="placement-log" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="placement-log" />
+    <label>Candidate<input name="candidate" required /></label>
+    <label>Client<input name="client" required /></label>
+    <label>Role<input name="role" required /></label>
+    <label>Stage<select name="stage"><option>Screening</option><option>Submitted</option><option>Interview</option><option>Offer</option><option>Start Scheduled</option><option>Started</option><option>Replacement Needed</option><option>Ended</option></select></label>
+    <label>Owner<input name="owner" /></label>
+    <label>Notes<textarea name="notes" rows="7" placeholder="Feedback, start details, risks, next action, quality notes"></textarea></label>
+    <button class="btn primary" type="submit">Log Placement Update</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

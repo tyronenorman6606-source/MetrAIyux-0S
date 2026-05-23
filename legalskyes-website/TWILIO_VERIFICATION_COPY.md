@@ -10,12 +10,14 @@
 `Customer Care, Account Notifications, Conversational Messaging`
 
 ## Proof of consent URL
-Primary: `https://solenterprises.org/sms-consent/`
+Primary: `https://solenterprises.org/legal/twilio-sms/`
 
-Backup: `https://solenterprises.org/contact/`
+Backup: `https://solenterprises.org/sms-consent/`
+
+Contact form: `https://solenterprises.org/contact/`
 
 ## Use case description
-Skyes Over London / SOLEnterprises uses SMS to communicate with customers and business contacts who have opted in by submitting a website form, texting our business number, calling and requesting follow-up, booking a service, or asking for customer support. Messages may include appointment confirmations, missed-call follow-ups, service updates, customer support replies, account notifications, and help requests. We do not purchase contact lists and we do not send SMS campaigns to people who have not directly contacted us or provided consent.
+Skyes Over London uses SMS to communicate with customers and business contacts who have opted in via text. Messages include appointment confirmations, missed-call follow-ups, service updates, lead-response messages, customer support replies, account notifications, and help requests. We do not purchase contact lists, and we only message users who have directly contacted us or provided consent.
 
 ## Sample message
 Hi {{first_name}}, this is Skyes Over London / SOLEnterprises following up on your request. Reply YES to continue, HELP for help, or STOP to unsubscribe. Msg & data rates may apply.

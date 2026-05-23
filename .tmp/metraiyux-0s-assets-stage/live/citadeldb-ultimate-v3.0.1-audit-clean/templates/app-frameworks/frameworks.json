@@ -1,0 +1,38 @@
+{
+  "node-express": {
+    "name": "Node / Express",
+    "env": "DATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "npm install pg",
+    "snippet": "import pg from 'pg';\n\nconst pool = new pg.Pool({\n  connectionString: process.env.DATABASE_URL,\n  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false\n});\n\nconst result = await pool.query('select now() as connected_at');\nconsole.log(result.rows[0]);\n"
+  },
+  "nextjs-prisma": {
+    "name": "Next.js / Prisma",
+    "env": "DATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "npm install prisma @prisma/client && npx prisma init",
+    "snippet": "// prisma/schema.prisma\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// Then run:\nnpx prisma migrate deploy\n"
+  },
+  "python-sqlalchemy": {
+    "name": "Python / SQLAlchemy",
+    "env": "DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "pip install sqlalchemy psycopg[binary]",
+    "snippet": "from sqlalchemy import create_engine, text\nimport os\n\nengine = create_engine(os.environ[\"DATABASE_URL\"])\nwith engine.connect() as conn:\n    print(conn.execute(text(\"select now()\")).first())\n"
+  },
+  "django": {
+    "name": "Django",
+    "env": "DATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "pip install dj-database-url psycopg[binary]",
+    "snippet": "# settings.py\nimport dj_database_url\nDATABASES = {\n    \"default\": dj_database_url.config(conn_max_age=600)\n}\n"
+  },
+  "rails": {
+    "name": "Ruby on Rails",
+    "env": "DATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "bundle add pg",
+    "snippet": "# config/database.yml\nproduction:\n  url: <%= ENV[\"DATABASE_URL\"] %>\n"
+  },
+  "laravel": {
+    "name": "Laravel",
+    "env": "DB_CONNECTION=pgsql\nDATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE",
+    "install": "composer require",
+    "snippet": "# .env\nDB_CONNECTION=pgsql\nDATABASE_URL=postgres://USER:PASSWORD@HOST:6432/DATABASE\n\n# Then run:\nphp artisan migrate --force\n"
+  }
+}

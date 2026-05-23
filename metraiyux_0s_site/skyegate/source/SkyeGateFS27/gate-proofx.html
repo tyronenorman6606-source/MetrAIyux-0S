@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeGateFS27 Proof Surface</title>
+  <meta name="description" content="Public proof surface for SkyeGateFS27: bearer introspection, mirrored platform events, admin-controlled keys, and the MetrAIyux 0S command deck integration.">
+  <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SkyeGateFS27 Proof Surface">
+  <meta property="og:description" content="The gate behind deployable autonomous business command decks: auth, event evidence, key issuance, monitoring, and client-safe control.">
+  <meta property="og:image" content="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png">
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#05050c;
+      --panel:#0c1020;
+      --panel2:#11182c;
+      --text:#f7f5ff;
+      --muted:#b8bdd4;
+      --gold:#ffd86d;
+      --violet:#9d61ff;
+      --cyan:#31e5ff;
+      --mint:#75ffd2;
+      --line:rgba(255,255,255,.14);
+      --shadow:0 32px 100px rgba(0,0,0,.45);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scrollbar-width:auto;scrollbar-color:var(--gold) rgba(5,5,12,.96)}
+    *::-webkit-scrollbar{width:20px;height:20px}
+    *::-webkit-scrollbar-track{border-left:1px solid rgba(49,229,255,.32);background:linear-gradient(180deg,rgba(255,216,109,.18),transparent 20%,rgba(49,229,255,.15) 48%,rgba(157,97,255,.16) 74%,rgba(117,255,210,.13)),rgba(5,5,12,.96);box-shadow:inset 0 0 18px rgba(49,229,255,.32),inset 0 0 34px rgba(255,216,109,.18)}
+    *::-webkit-scrollbar-thumb{border:4px solid rgba(5,5,12,.96);border-radius:999px;background:radial-gradient(circle at 50% 11%,#fff 0 4px,transparent 5px),radial-gradient(circle at 50% 31%,var(--gold) 0 4px,transparent 5px),radial-gradient(circle at 50% 52%,var(--cyan) 0 4px,transparent 5px),radial-gradient(circle at 50% 72%,var(--violet) 0 4px,transparent 5px),radial-gradient(circle at 50% 91%,var(--mint) 0 4px,transparent 5px),linear-gradient(180deg,var(--gold),var(--cyan),var(--violet));box-shadow:0 0 14px rgba(49,229,255,.75),0 0 26px rgba(255,216,109,.48),inset 0 0 12px rgba(255,255,255,.42)}
+    body{margin:0;color:var(--text);background:radial-gradient(circle at 18% 6%,rgba(255,216,109,.18),transparent 31%),radial-gradient(circle at 82% 0%,rgba(49,229,255,.17),transparent 34%),radial-gradient(circle at 68% 48%,rgba(157,97,255,.14),transparent 42%),var(--bg);line-height:1.65;overflow-x:hidden}
+    a{color:inherit}
+    .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 5vw;background:rgba(5,5,12,.82);border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(18px)}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:900;letter-spacing:.04em}
+    .brand img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(49,229,255,.58))}
+    nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    nav a,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;text-decoration:none;background:rgba(255,255,255,.045);font-weight:800;font-size:14px}
+    nav a:hover,.btn:hover{border-color:rgba(255,216,109,.55);background:rgba(255,216,109,.09)}
+    .btn.primary{background:linear-gradient(135deg,var(--gold),var(--cyan));border-color:transparent;color:#071018}
+    .hero{min-height:86vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);align-items:center;gap:44px;padding:72px 5vw 52px}
+    .eyebrow{margin:0 0 12px;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+    h1,h2,h3{margin:0 0 16px;line-height:1.06}
+    h1{font-size:clamp(44px,7vw,92px);letter-spacing:-.055em}
+    h2{font-size:clamp(30px,4vw,54px);letter-spacing:-.035em}
+    h3{font-size:22px}
+    p{margin:0 0 14px}
+    .lede{max-width:850px;color:#e4e7f8;font-size:clamp(18px,2.2vw,24px)}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0}
+    .proof-card,.panel,.map-node,.surface-card,.score-card{border:1px solid var(--line);background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.028));box-shadow:var(--shadow);border-radius:24px}
+    .proof-card{padding:26px;position:relative;overflow:hidden}
+    .proof-card:before{content:"";position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(255,216,109,.28),transparent 34%,rgba(49,229,255,.2));opacity:.75;pointer-events:none}
+    .proof-card>*{position:relative}
+    .proof-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}
+    .proof-grid div{padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(0,0,0,.22)}
+    .proof-grid strong{display:block;color:var(--gold);font-size:26px;line-height:1}
+    .section{padding:72px 5vw;border-top:1px solid rgba(255,255,255,.08)}
+    .section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:24px}
+    .wide{max-width:980px;color:#d9def1;font-size:19px}
+    .surface-grid,.value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:28px}
+    .surface-card,.panel,.score-card{padding:24px}
+    .surface-card h3,.panel h3,.score-card h3{color:#fff}
+    .surface-card p,.panel p,.score-card p,li{color:var(--muted)}
+    .tag{display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid rgba(255,216,109,.34);border-radius:999px;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,216,109,.07);margin:0 6px 8px 0}
+    .arch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:30px}
+    .map-node{padding:18px;min-height:185px;position:relative}
+    .map-node:after{content:"";position:absolute;right:-16px;top:50%;width:16px;height:2px;background:linear-gradient(90deg,var(--gold),var(--cyan))}
+    .map-node:last-child:after{display:none}
+    .map-node b{display:block;color:var(--gold);margin-bottom:8px}
+    .split{display:grid;grid-template-columns:1fr .85fr;gap:24px;align-items:start}
+    table{width:100%;border-collapse:collapse;min-width:820px;background:rgba(0,0,0,.18)}
+    th,td{padding:14px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.1)}
+    th{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.13em}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:22px}
+    .proof-choice{display:grid;gap:12px}
+    .proof-choice label{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(0,0,0,.18);cursor:pointer}
+    .proof-choice input{margin-top:6px;accent-color:var(--gold)}
+    .result{margin-top:18px;padding:18px;border-radius:18px;background:rgba(49,229,255,.08);border:1px solid rgba(49,229,255,.25);min-height:120px}
+    details{border:1px solid var(--line);border-radius:20px;padding:18px 20px;background:rgba(255,255,255,.04);margin:14px 0}
+    summary{cursor:pointer;font-weight:900;color:var(--gold)}
+    code{font-family:"Fira Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#eafcff;background:rgba(0,0,0,.28);padding:2px 6px;border-radius:7px}
+    footer{padding:38px 5vw;border-top:1px solid rgba(255,255,255,.08);color:var(--muted)}
+    @media(max-width:980px){.hero,.split{grid-template-columns:1fr}.arch{grid-template-columns:1fr 1fr}.map-node:after{display:none}.section-head{display:block}}
+    @media(max-width:640px){.topbar{position:static;align-items:flex-start;flex-direction:column}.proof-grid,.arch{grid-template-columns:1fr}h1{font-size:42px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27 logo">
+      <span>SkyeGateFS27</span>
+    </a>
+    <nav aria-label="Proof navigation">
+      <a href="#architecture">Map</a>
+      <a href="#live">Live Proof</a>
+      <a href="#buyer-fit">Buyer Fit</a>
+      <a href="THE_GATE_MAP.md">Gate Map</a>
+      <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Actual Gate</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Public proof surface</p>
+        <h1>The gate behind deployable command decks.</h1>
+        <p class="lede"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeGateFS27</span> is the control plane that lets a client website become more than a brochure. It can issue and validate access, mirror platform events, track deployment work, centralize vendor keys, and hand a business owner a command deck that feels operated instead of merely hosted.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Actual Gate</a>
+          <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">See <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span></a>
+          <a class="btn" href="THE_GATE_MAP.md">Read the Deep Map</a>
+        </div>
+      </div>
+      <aside class="proof-card" aria-label="Live architecture summary">
+        <p class="eyebrow">What this proves</p>
+        <h2>One gate, many client systems.</h2>
+        <p>FS27 is built to sit behind multiple deployments. Each website or command deck can ask the gate who a user is, send operational evidence back to the gate, and keep owner/admin secrets out of the public surface.</p>
+        <div class="proof-grid">
+          <div><strong>Auth</strong><span>Bearer introspection and session bridge</span></div>
+          <div><strong>Events</strong><span>Mirrored proof and monitor activity</span></div>
+          <div><strong>Keys</strong><span>Admin-managed app and vendor lanes</span></div>
+          <div><strong>Sales</strong><span>Proof links for client demos</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="live" class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Live proof links</p>
+          <h2>Sendable surfaces, separated by audience.</h2>
+        </div>
+        <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/.netlify/functions/health" target="_blank" rel="noreferrer">Open Health Check</a>
+      </div>
+      <div class="surface-grid">
+        <article class="surface-card">
+          <span class="tag">Gate</span>
+          <h3>Actual FS27 control plane</h3>
+          <p>The public entry to the gate. Admin access, user key request, dashboard, smoke test, monitor, and platform-control surfaces live behind this project.</p>
+          <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Gate</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Auth</span>
+          <h3>Bearer introspection contract</h3>
+          <p>Client apps send a bearer token server-side and receive an active/inactive identity result. No client should publish secrets or hard-code owner keys.</p>
+          <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/.netlify/functions/auth-introspect" target="_blank" rel="noreferrer">Open Function Route</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Events</span>
+          <h3>Platform event mirror</h3>
+          <p>Deployed apps can mirror approvals, tasks, user activity, smoke tests, and operating receipts into the gate through a server-only mirror secret.</p>
+          <a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/platform/events" target="_blank" rel="noreferrer">Open Event Ingress</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Command Deck</span>
+          <h3>MetrAIyux 0S integration</h3>
+          <p>The live MetrAIyux 0S deployment uses FS27 as the auth and evidence bridge for a 17-brain <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">autonomous business</span> command system.</p>
+          <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noreferrer">Open Full System</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Relationship Gate</span>
+          <h3>ConnectLog + Relay13 lane</h3>
+          <p>FS27 now tracks the ConnectLog relationship OS and Relay13 messaging Worker as a gate-owned expansion lane with mirrored proof events, live Worker links, and a strict no-public-secret boundary.</p>
+          <a class="btn" href="connectlog-relay13-gate.html">Open Gate Lane</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Service CRM Gate</span>
+          <h3>VantaCore service CRM lane</h3>
+          <p>FS27 now owns the VantaCore service-business CRM workspace and boundary for lead firewall, booking, follow-up, review, revenue intelligence, tenant isolation, and provider-approved customer activation.</p>
+          <a class="btn" href="vantacore-crm-dashboard.html">Open CRM Workspace</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Brains</span>
+          <h3>Public brain wall</h3>
+          <p>The buyer-safe brain roster shows portraits, resumes, operating-room screenshots, and direct proof routes without exposing private admin controls.</p>
+          <a class="btn" href="https://metraiyux-0s-public-spectacle.pages.dev/brain-system.html#operating-brain-rooms" target="_blank" rel="noreferrer">Open Brain Wall</a>
+        </article>
+        <article class="surface-card">
+          <span class="tag">Ecosystem</span>
+          <h3>Skye ecosystem portal</h3>
+          <p>The portal gives qualified visitors a clean way to move between the public overview, full command deck, legal center, file vault, and FS27 proof surface.</p>
+          <a class="btn" href="https://metraiyux-ecosystem-portal.pages.dev/" target="_blank" rel="noreferrer">Open Portal</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <p class="eyebrow">Architecture made legible</p>
+      <h2>A client website can become a controlled business surface.</h2>
+      <p class="wide">The public website handles attention. The command deck handles work. FS27 handles the gate: identity, event evidence, vendor posture, deployment tracking, and admin-owned controls. That separation is the product.</p>
+      <div class="arch" role="list">
+        <article class="map-node" role="listitem">
+          <b>Client website</b>
+          <p>A public site, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">client portal</span>, or proof page explains the offer and captures intent without exposing private setup instructions.</p>
+        </article>
+        <article class="map-node" role="listitem">
+          <b>MetrAIyux command deck</b>
+          <p>The <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">17-brain layer</span> routes sales, client success, staffing, tech, compliance, proof, and founder strategy into clear next actions.</p>
+        </article>
+        <article class="map-node" role="listitem">
+          <b>SkyeGateFS27</b>
+          <p>The gate validates tokens, accepts mirrored events, manages platform keys, tracks deploy/push work, and centralizes admin control.</p>
+        </article>
+        <article class="map-node" role="listitem">
+          <b>ConnectLog + Relay13</b>
+          <p>Relationship capture, scoped messaging workspaces, activation proof, and live WebSocket evidence report back to the gate through the platform event mirror.</p>
+        </article>
+        <article class="map-node" role="listitem">
+          <b>Proof and revenue loop</b>
+          <p>Prospects see live surfaces, admins see receipts, and client deployments can be sold as infrastructure instead of one-off websites.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">What can be sold</p>
+        <h2>Not just a site. A serious operating layer.</h2>
+        <p class="wide">This is the angle for client work: anyone can publish a homepage, but most companies still have no controlled intake, no authenticated command deck, no proof trail, no AI-safe routing, and no clean way to hand work from a buyer conversation into delivery.</p>
+        <div class="value-grid">
+          <article class="panel"><h3>Founder-led companies</h3><p>Turn the founder's messy operating reality into a command deck with intake, priorities, proof, and follow-up lanes.</p></article>
+          <article class="panel"><h3>Service businesses</h3><p>Give sales, delivery, client success, and admin work a shared place to route actions and preserve accountability.</p></article>
+          <article class="panel"><h3>Companies without a site</h3><p>Launch the public site and the behind-the-scenes <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span> together so the business starts with structure.</p></article>
+          <article class="panel"><h3>Existing websites</h3><p>Drop in a command deck that gives the old site a live business brain, proof router, and authenticated admin surface.</p></article>
+        </div>
+      </div>
+      <aside class="panel">
+        <p class="eyebrow">Public/private boundary</p>
+        <h3>What this page says out loud</h3>
+        <ul>
+          <li>The gate can validate users and accept mirrored proof events.</li>
+          <li>MetrAIyux 0S can route buyer and operator intent across 17 brains.</li>
+          <li>Client deployments can be packaged as sovereign web infrastructure.</li>
+          <li>Admin tokens, mirror secrets, database URLs, and private playbooks stay out of public pages.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Integration contract</p>
+      <h2>The public shape of the gate.</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Surface</th><th>Path</th><th>Public meaning</th><th>Boundary</th></tr></thead>
+          <tbody>
+            <tr><td>Auth introspection</td><td><code>/auth-introspect</code> or <code>/.netlify/functions/auth-introspect</code></td><td>Apps verify bearer tokens through the gate.</td><td>Requires server-side token handling.</td></tr>
+            <tr><td>Platform events</td><td><code>/platform/events</code></td><td>Apps mirror proof, monitor, task, and activity receipts.</td><td>Requires a server-only mirror secret.</td></tr>
+            <tr><td>ConnectLog + Relay13</td><td><code>/connectlog-relay13</code> and <code>/platform/events</code></td><td>Gate-owned proof lane for relationship capture, Relay13 workspace messaging, activation proof, and live WebSocket receipts.</td><td>Relay13 API keys and FS27 mirror secrets stay operator-side.</td></tr>
+            <tr><td>VantaCore service CRM</td><td><code>/vantacore-crm</code>, <code>/api/vantacore/crm</code>, and <code>/platform/events</code></td><td>Gate-owned CRM workspace for lead capture, pipeline updates, booking, follow-up, review, revenue summary, activity, and activation proof.</td><td>Workspace access is gate-required; provider credentials, tenant authority, and live automations stay owner-approved.</td></tr>
+            <tr><td>Admin events</td><td><code>/admin/platform-events</code></td><td>Operators inspect mirrored history and monitor activity.</td><td>Admin protected.</td></tr>
+            <tr><td>App login/session</td><td><code>/auth/app-login</code>, <code>/session/token</code></td><td>Bridges users into downstream apps without sharing owner secrets.</td><td>Configuration and approval required.</td></tr>
+            <tr><td>Push/project tracking</td><td>SkyeGate Push routes</td><td>Deployment work can be tracked as a gate-owned surface.</td><td>Provider credentials stay admin controlled.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="buyer-fit" class="section split">
+      <div>
+        <p class="eyebrow">Buyer fit</p>
+        <h2>Use this to qualify a company quickly.</h2>
+        <p class="wide">A strong fit is a business that needs more than a nice homepage: they need better intake, sales follow-up, internal routing, proof, admin visibility, or a client portal that actually moves work.</p>
+      </div>
+      <aside class="score-card">
+        <h3>Proof-fit pulse</h3>
+        <div class="proof-choice" id="proofFit">
+          <label><input type="checkbox" value="2"> The company has no website or the current site does not help run the business.</label>
+          <label><input type="checkbox" value="2"> Leads, client requests, or delivery tasks get lost across texts, inboxes, and memory.</label>
+          <label><input type="checkbox" value="2"> The owner wants AI help but cannot let customers touch private admin systems.</label>
+          <label><input type="checkbox" value="2"> They need proof trails for work, approvals, events, smoke tests, or client handoff.</label>
+          <label><input type="checkbox" value="2"> They would pay for a serious business command deck, not a disposable web template.</label>
+        </div>
+        <div class="result" id="fitResult">Select what is true. The page will route the conversation.</div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Deep map</p>
+      <h2>The full architecture file remains the living source.</h2>
+      <details open>
+        <summary>What THE_GATE_MAP.md covers</summary>
+        <p>The living map documents the Netlify lane, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> lane, token introspection, session bridge, OAuth/OIDC/JWKS, platform event mirror, admin event review, push/project tracking, database tables, environment contract, MetrAIyux integration, consumer integration model, security boundaries, usage flows, verification commands, and update rules.</p>
+      </details>
+      <details>
+        <summary>How this connects back to the actual gate</summary>
+        <p>This proof page is the public explanation layer. The live FS27 gate remains the operational layer at <code>https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/</code>. MetrAIyux 0S consumes that gate through bearer introspection and mirrored platform events.</p>
+      </details>
+      <details>
+        <summary>How to use it in a sales conversation</summary>
+        <p>Start with the buyer's operating pain, not with infrastructure. Show the public command deck, show the gate proof surface, then explain that the buyer can receive a branded website plus an authenticated command deck with <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, routing, and admin control.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>SkyeGateFS27 proof surface. Public architecture explanation only. Secrets, admin credentials, private customer data, and deployment playbooks stay inside protected operator channels.</p>
+  </footer>
+
+  <script>
+    const fit = document.getElementById('proofFit');
+    const out = document.getElementById('fitResult');
+    function renderFit(){
+      const score = [...fit.querySelectorAll('input:checked')].reduce((n, el) => n + Number(el.value || 0), 0);
+      if (score >= 8) out.innerHTML = '<strong>Strong fit.</strong><br>This buyer should see MetrAIyux 0S and a client-specific command deck proposal. Lead with operating control, proof receipts, admin separation, and deployment speed.';
+      else if (score >= 4) out.innerHTML = '<strong>Worth discovery.</strong><br>Show the proof surface, then ask where work gets lost now: leads, client requests, staffing, delivery, or approvals.';
+      else out.innerHTML = '<strong>Light fit so far.</strong><br>Keep the conversation focused on the website first, then introduce the command deck only if they care about workflow, auth, proof, or sales follow-up.';
+    }
+    fit?.addEventListener('change', renderFit);
+  </script>
+</body>
+</html>

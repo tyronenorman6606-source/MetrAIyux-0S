@@ -1,5 +1,7 @@
 (() => {
-  const apiPath = "api/review-submissions";
+  const legacyApiPath = "api/review-submissions";
+  const contactIntakeApi = window.SOL_CONTACT_INTAKE_API || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/api/contact/intake";
+  const contactAdminApi = window.SOL_CONTACT_ADMIN_API || contactIntakeApi;
   const offlineKey = "solReviewOfflineSubmissions";
   const tokenKey = "solReviewAdminToken";
 
@@ -60,16 +62,28 @@
       setStatus(status, "Sending your review to the 0S QA queue...", "neutral");
 
       try {
-        const response = await fetch(apiPath, {
+        payload.kind = "review";
+        payload.source_app = "skyes-over-london-reviews";
+        payload.source_url = location.href;
+
+        let response = await fetch(contactIntakeApi, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload),
         });
-        const result = await response.json();
+        let result = await response.json();
+        if (!response.ok || !result.ok) {
+          response = await fetch(legacyApiPath, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          result = await response.json();
+        }
         if (!response.ok || !result.ok) throw new Error(result.message || result.error || "Submission failed");
 
         form.reset();
-        setStatus(status, `Submitted. 0S QA receipt: ${result.submissionId}`, "success");
+        setStatus(status, `Submitted. FS27/0S QA receipt: ${result.submissionId}`, "success");
       } catch (error) {
         const offline = readOffline();
         offline.push({
@@ -98,6 +112,22 @@
     return {
       "content-type": "application/json",
       authorization: `Bearer ${token}`,
+      "x-admin-password": token,
+    };
+  }
+
+  function normalizeItem(item = {}) {
+    return {
+      id: item.id || item.submissionId || "",
+      reviewerName: item.reviewerName || item.name || "Review client",
+      reviewerEmail: item.reviewerEmail || item.email || "",
+      role: item.role || "",
+      company: item.company || "",
+      service: item.service || "Service lane",
+      status: item.status || "",
+      createdAt: item.createdAt || item.created_at || "",
+      reviewText: item.reviewText || item.message || "",
+      publicNameConsent: Boolean(item.publicNameConsent || item.public_name_consent),
     };
   }
 
@@ -111,11 +141,11 @@
     }
 
     if (!items.length) {
-      list.innerHTML = `<div class="submission-card"><b>No review submissions yet.</b><p>The live queue is ready once Cloudflare KV is bound and clients start using the intake form.</p></div>`;
+      list.innerHTML = `<div class="submission-card"><b>No review submissions yet.</b><p>The FS27 contact-intake lane is ready once clients start using the intake form.</p></div>`;
       return;
     }
 
-    list.innerHTML = items.map((item) => `
+    list.innerHTML = items.map(normalizeItem).map((item) => `
       <article class="submission-card" data-submission-id="${escapeHtml(item.id)}">
         <div class="submission-card-head">
           <div>
@@ -144,7 +174,7 @@
   }
 
   async function loadQueue(token) {
-    const response = await fetch(apiPath, { headers: headers(token) });
+    const response = await fetch(`${contactAdminApi}?kind=review`, { headers: headers(token) });
     const result = await response.json();
     if (!response.ok || !result.ok) throw new Error(result.message || result.error || "Queue load failed");
     renderQueue(result.submissions || [], result.summary);
@@ -165,7 +195,7 @@
     $("[data-load-review-queue]")?.addEventListener("click", async () => {
       const token = getToken();
       if (!token) {
-        setStatus(status, "Enter the 0S review admin token first.", "warning");
+        setStatus(status, "Enter the FS27 admin password or session token first.", "warning");
         return;
       }
       localStorage.setItem(tokenKey, token);
@@ -189,7 +219,7 @@
 
       setStatus(status, `${button.dataset.reviewAction} review ${id}...`, "neutral");
       try {
-        const response = await fetch(apiPath, {
+        const response = await fetch(contactAdminApi, {
           method: "PATCH",
           headers: headers(token),
           body: JSON.stringify({ action: button.dataset.reviewAction, id, qaNotes }),
@@ -207,7 +237,7 @@
       const token = getToken();
       setStatus(status, "Checking for five approved reviews...", "neutral");
       try {
-        const response = await fetch(apiPath, {
+        const response = await fetch(contactAdminApi, {
           method: "PATCH",
           headers: headers(token),
           body: JSON.stringify({ action: "mark_batch_ready" }),
@@ -238,6 +268,41 @@
     });
   }
 
+  function bindContactIntakeForm() {
+    const form = $("[data-contact-intake-form]");
+    if (!form) return;
+
+    const status = $("[data-contact-submit-status]");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      payload.kind = form.dataset.contactKind || payload.kind || "service_request";
+      payload.consent = formData.get("consent") === "on";
+      payload.source_app = "skyes-over-london-reviews";
+      payload.source_url = location.href;
+
+      setStatus(status, "Routing this through FS27 contact intake...", "neutral");
+      try {
+        const response = await fetch(contactIntakeApi, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.message || result.error || "Submission failed");
+        form.reset();
+        setStatus(status, `Received. FS27 intake receipt: ${result.submissionId}`, "success");
+      } catch (error) {
+        const mailto = `mailto:skyesoverlondon@gmail.com?subject=${encodeURIComponent("Skyes Over London service request fallback")}&body=${encodeURIComponent("The 0S intake lane did not accept my request. Please contact me.\\n\\n" + JSON.stringify(payload, null, 2))}`;
+        setStatus(status, `The live intake lane did not accept this yet. Use the fallback email link below. ${error.message}`, "warning");
+        const fallback = $("[data-contact-mailto-fallback]");
+        if (fallback) fallback.href = mailto;
+      }
+    });
+  }
+
   bindSubmitForm();
+  bindContactIntakeForm();
   bindOperatorQueue();
 })();

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Public production proof for the MetrAIyux 0S company knowledge layer, Cloudflare R2 storage, KV metadata, shared FS27 gate, and SaaS tenant knowledge boundary.">
+  <title>Company Knowledge Layer Proof · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .knowledge-proof-hero {
+      min-height: min(760px, calc(100vh - 48px));
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .72fr);
+      gap: clamp(28px, 6vw, 92px);
+      align-items: center;
+      padding-top: clamp(72px, 10vw, 128px);
+      padding-bottom: clamp(56px, 8vw, 104px);
+    }
+    .knowledge-proof-hero .hero-copy {
+      max-width: 920px;
+    }
+    .proof-ledger-panel {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(9, 16, 30, .78);
+      box-shadow: 0 24px 80px rgba(0,0,0,.32);
+      padding: clamp(22px, 4vw, 34px);
+      border-radius: 8px;
+    }
+    .proof-ledger-panel h2,
+    .proof-ledger-panel h3 {
+      margin-top: 0;
+    }
+    .proof-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .proof-metric {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255,255,255,.045);
+      min-height: 112px;
+    }
+    .proof-metric strong {
+      display: block;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1;
+      color: #f7d27b;
+    }
+    .proof-metric span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255,255,255,.78);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .proof-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      overflow-wrap: anywhere;
+    }
+    .proof-table th,
+    .proof-table td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      padding: 12px 10px;
+    }
+    .proof-table th {
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .proof-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(120, 230, 178, .34);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #9df0bf;
+      background: rgba(70, 180, 112, .12);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .proof-status.pending {
+      color: #f7d27b;
+      border-color: rgba(247, 210, 123, .34);
+      background: rgba(247, 210, 123, .1);
+    }
+    .proof-copy {
+      max-width: 980px;
+      color: rgba(255,255,255,.78);
+      line-height: 1.75;
+    }
+    .knowledge-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .knowledge-flow article {
+      min-height: 150px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      padding: 18px;
+      background: rgba(255,255,255,.04);
+    }
+    .knowledge-flow strong {
+      display: block;
+      color: #f7d27b;
+      margin-bottom: 8px;
+    }
+    .proof-json-box {
+      white-space: pre-wrap;
+      overflow: auto;
+      max-height: 360px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.26);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    @media (max-width: 900px) {
+      .knowledge-proof-hero,
+      .proof-metrics,
+      .knowledge-flow {
+        grid-template-columns: 1fr;
+      }
+      .knowledge-proof-hero {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../feature-atlas.html">Feature Atlas</a>
+      <a href="../sales/live-proof-router.html">Proof Router</a>
+      <a href="../admin/company-knowledge.html">Owner Console</a>
+      <a href="../saas/company-knowledge.html">SaaS Console</a>
+      <a href="../ecosystem.html">Ecosystem</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section knowledge-proof-hero commercial-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Cloudflare-backed company memory</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>Company Knowledge Layer Production Proof</h1>
+        <p class="hero-copy">The 0S now has a literal company knowledge base. Founder/admin knowledge and customer company knowledge share one API pattern, one FS27/SkyGate/Free99 auth lane, Cloudflare R2 object storage for bodies, KV metadata for indexes, and proof-safe context retrieval for the brains.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="../admin/company-knowledge.html">Open Owner Console</a>
+          <a class="button" href="../saas/company-knowledge.html">Open SaaS Console</a>
+          <a class="button" href="../proof/live-company-knowledge-stress-latest.json">Stress Receipt JSON</a>
+          <a class="button" href="../proof/live-company-knowledge-browser-latest.json">Browser Receipt JSON</a>
+        </div>
+      </div>
+      <aside class="proof-ledger-panel">
+        <span class="proof-status" data-proof-ok>Loading proof receipt</span>
+        <h2>Production receipt</h2>
+        <p>The public receipt contains no private knowledge, credentials, cookies, tokens, or customer data. It proves the storage and gate path with synthetic records only.</p>
+        <table class="proof-table" aria-label="Company knowledge production proof summary">
+          <tbody>
+            <tr><th>Primary store</th><td data-storage-primary>Cloudflare R2</td></tr>
+            <tr><th>Metadata</th><td data-storage-meta>Cloudflare KV</td></tr>
+            <tr><th>Gate</th><td>FS27 / SkyGate / Free99 shared session</td></tr>
+            <tr><th>Stress run</th><td data-stress-generated>Waiting for receipt</td></tr>
+          </tbody>
+        </table>
+      </aside>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">What is live</p>
+      <h2>The 0S has platform memory, and customers can create their own company memory under the same gate.</h2>
+      <p class="proof-copy">The owner surface writes the actual MetrAIyux 0S knowledge base. The SaaS surface uses the same contract for tenant-scoped company knowledge. Search and context endpoints return citations so a brain or operator can see which note fed the answer. Drive remains a backup reference lane because Cloudflare storage is the production primary.</p>
+      <div class="proof-metrics">
+        <article class="proof-metric"><strong data-requests-total>0</strong><span>stress requests recorded</span></article>
+        <article class="proof-metric"><strong data-requests-ok>0</strong><span>successful auth, write, read, search, and cleanup calls</span></article>
+        <article class="proof-metric"><strong data-p95>0ms</strong><span>p95 production API latency during stress</span></article>
+        <article class="proof-metric"><strong data-checks>0/0</strong><span>proof checks passed</span></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">System path</p>
+      <h2>Knowledge moves through the same 0S architecture, not a side password or loose app lane.</h2>
+      <div class="knowledge-flow">
+        <article><strong>1. Gate</strong><span>Admin and SaaS calls require the shared FS27/SkyGate/Free99 session headers and cookies.</span></article>
+        <article><strong>2. Scope</strong><span>Platform memory is owner/admin only. Tenant memory is limited to the matching workspace and client identifiers.</span></article>
+        <article><strong>3. Store</strong><span>Large knowledge bodies write to Cloudflare R2. Metadata, counts, and search indexes live in KV.</span></article>
+        <article><strong>4. Cite</strong><span>Context packs include item IDs, source kinds, hashes, and snippets so answers stay traceable.</span></article>
+        <article><strong>5. Mirror</strong><span>Audit mirroring is best effort and cannot break the primary R2/KV write path under load.</span></article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Public boundary</p>
+        <h2>This page proves the lane exists. It does not expose the knowledge.</h2>
+        <p class="proof-copy">Actual company notes, tenant records, vault references, and generated context stay behind the 0S gate. The public JSON only reports pass/fail, latency, storage mode, synthetic stress item IDs, and receipt locations.</p>
+      </div>
+      <aside class="proof-ledger-panel">
+        <h3>Latest public receipt</h3>
+        <pre class="proof-json-box" data-proof-json>Loading public proof JSON...</pre>
+      </aside>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S · Company Knowledge Layer · Cloudflare R2 + KV with FS27 shared gate authority.</p></footer>
+  <script src="../script.js"></script>
+  <script>
+    (async function () {
+      const jsonBox = document.querySelector('[data-proof-json]');
+      const status = document.querySelector('[data-proof-ok]');
+      const safeText = (value, fallback) => String(value == null || value === '' ? fallback : value);
+      try {
+        const response = await fetch('../proof/live-company-knowledge-stress-latest.json', { cache: 'no-store' });
+        const proof = await response.json();
+        const checks = Array.isArray(proof.checks) ? proof.checks : [];
+        const passed = checks.filter((check) => check.ok).length;
+        const total = checks.length;
+        document.querySelector('[data-storage-primary]').textContent = safeText(proof.storage && proof.storage.primary, 'Cloudflare R2');
+        document.querySelector('[data-storage-meta]').textContent = safeText(proof.storage && proof.storage.metadata, 'Cloudflare KV');
+        document.querySelector('[data-stress-generated]').textContent = safeText(proof.generatedAt, 'Receipt pending');
+        document.querySelector('[data-requests-total]').textContent = safeText(proof.requestSummary && proof.requestSummary.total, '0');
+        document.querySelector('[data-requests-ok]').textContent = safeText(proof.requestSummary && proof.requestSummary.ok, '0');
+        document.querySelector('[data-p95]').textContent = safeText(proof.latencyMs && proof.latencyMs.p95, '0') + 'ms';
+        document.querySelector('[data-checks]').textContent = passed + '/' + total;
+        status.textContent = proof.ok ? 'Stress proof passed' : 'Stress proof needs review';
+        status.classList.toggle('pending', !proof.ok);
+        jsonBox.textContent = JSON.stringify({
+          ok: proof.ok,
+          generatedAt: proof.generatedAt,
+          requestSummary: proof.requestSummary,
+          latencyMs: proof.latencyMs,
+          checks: proof.checks,
+          boundary: proof.boundary
+        }, null, 2);
+      } catch (error) {
+        status.textContent = 'Receipt unavailable';
+        status.classList.add('pending');
+        jsonBox.textContent = 'Public proof JSON could not be loaded yet: ' + error.message;
+      }
+    })();
+  </script>
+</body>
+</html>

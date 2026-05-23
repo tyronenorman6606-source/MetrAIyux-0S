@@ -1,0 +1,23 @@
+{
+  "id": "skyerunners-omega-overlay",
+  "updated_at": "2026-05-20T00:00:00.000Z",
+  "purpose": "Attach Omega/0meg4kAI security control to SkyeRunners without regenerating the large runner map.",
+  "omega_runner": {
+    "id": "skyerunner-omega-security",
+    "name": "Omega Security Runner",
+    "lane": "security-governance",
+    "primary_brain": "0meg4kai-security-brain",
+    "secondary_brain": "victor-saint-brain",
+    "mission": "Guard runner tasks, gate-card inheritance, tenant boundaries, auth headers, and approval risk before any runner work mutates production or customer-impacting systems.",
+    "default_command": "repo-health",
+    "gate_cards_required": [
+      "0s-core",
+      "fs27",
+      "0meg4kai",
+      "skyerunners",
+      "omega"
+    ]
+  },
+  "event_bridge": "../assets/js/0s-gate-card-bridge.js",
+  "source_map": "skyerunners.json"
+}

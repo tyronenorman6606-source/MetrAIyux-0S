@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "version": "5.9.0",
+  "buildId": "notheater-5.9.0",
+  "closureWork": [
+    "Implemented selectable storage backends for JSON, SQLite via better-sqlite3, Postgres/Neon via pg, and Cloudflare D1 via REST query API.",
+    "Added storage verification route that writes audit state through the active adapter.",
+    "Registered provider-pack routes as first-class executable actions inside the action registry.",
+    "Removed obsolete legacy step methods from PlatformEngine so workflow execution is registry-driven only.",
+    "Added webhook dispatch rules and replay-to-workflow dispatch behavior.",
+    "Added queue lock extension and dead-letter retry paths.",
+    "Expanded OpenAPI and request validation coverage for new routes.",
+    "Fixed visual graph runner duplicate step recording."
+  ],
+  "proofCommands": [
+    "npm run check",
+    "npm run smoke:fixture"
+  ],
+  "knownOpenItems": [
+    "SQLite/Postgres/D1 adapters require their live env and optional dependency/API access before live backend proof can be claimed.",
+    "Browser Chromium proof remains environment-dependent if local policy blocks localhost/headless access."
+  ]
+}

@@ -1,0 +1,320 @@
+{
+  "version": "2.0.0-upgraded",
+  "count": 6,
+  "questionnaires": {
+    "business-formation-governance": {
+      "id": "q-business-formation-governance",
+      "title": "Business Formation & Governance Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "entity-basics",
+          "title": "Entity basics",
+          "fields": [
+            "entity_name",
+            "entity_type",
+            "state_code",
+            "principal_office",
+            "registered_agent_name",
+            "management_structure"
+          ]
+        },
+        {
+          "id": "ownership",
+          "title": "Ownership and authority",
+          "fields": [
+            "owners",
+            "ownership_percentages",
+            "manager_names",
+            "approval_action"
+          ]
+        },
+        {
+          "id": "records",
+          "title": "Company records",
+          "fields": [
+            "meeting_date",
+            "effective_date",
+            "minutes_required",
+            "filing_required"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "entity_type": "LLC"
+          },
+          "require": [
+            "management_structure",
+            "registered_agent_name"
+          ]
+        },
+        {
+          "if": {
+            "entity_type": "Corporation"
+          },
+          "require": [
+            "directors",
+            "officers",
+            "share_classes"
+          ]
+        },
+        {
+          "if": {
+            "filing_required": true
+          },
+          "show": [
+            "official_filing_source",
+            "filing_deadline",
+            "filing_fee"
+          ]
+        }
+      ]
+    },
+    "real-estate-property": {
+      "id": "q-real-estate-property",
+      "title": "Real Estate & Property Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "property",
+          "fields": [
+            "property_address",
+            "county",
+            "property_type",
+            "occupancy_type"
+          ]
+        },
+        {
+          "id": "payment",
+          "fields": [
+            "rent_amount",
+            "deposit_amount",
+            "due_date",
+            "late_fee"
+          ]
+        },
+        {
+          "id": "state-sensitive",
+          "fields": [
+            "notice_period",
+            "required_disclosures",
+            "inspection_rules"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "property_type": "Residential"
+          },
+          "require": [
+            "required_disclosures",
+            "habitability_notice"
+          ]
+        },
+        {
+          "if": {
+            "deposit_amount": {
+              "gt": 0
+            }
+          },
+          "show": [
+            "security_deposit_review_warning"
+          ]
+        }
+      ]
+    },
+    "employment-hr": {
+      "id": "q-employment-hr",
+      "title": "Employment & HR Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "worker",
+          "fields": [
+            "worker_name",
+            "worker_type",
+            "role",
+            "work_location"
+          ]
+        },
+        {
+          "id": "terms",
+          "fields": [
+            "pay_rate",
+            "schedule",
+            "term",
+            "benefits",
+            "classification_basis"
+          ]
+        },
+        {
+          "id": "risk",
+          "fields": [
+            "restrictive_covenants",
+            "confidentiality",
+            "ip_assignment",
+            "background_check"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "worker_type": "Contractor"
+          },
+          "show": [
+            "independent_contractor_warning",
+            "tax_form_w9_workflow"
+          ]
+        },
+        {
+          "if": {
+            "restrictive_covenants": true
+          },
+          "require": [
+            "jurisdiction_restrictive_covenant_review"
+          ]
+        }
+      ]
+    },
+    "ip-technology": {
+      "id": "q-ip-technology",
+      "title": "IP & Technology Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "asset",
+          "fields": [
+            "asset_type",
+            "owner",
+            "recipient",
+            "existing_ip"
+          ]
+        },
+        {
+          "id": "scope",
+          "fields": [
+            "rights_granted",
+            "territory",
+            "duration",
+            "exclusivity"
+          ]
+        },
+        {
+          "id": "official",
+          "fields": [
+            "trademark_search_needed",
+            "patent_filing_needed",
+            "uspto_workflow"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "trademark_search_needed": true
+          },
+          "show": [
+            "uspto_trademark_center_workflow"
+          ]
+        },
+        {
+          "if": {
+            "patent_filing_needed": true
+          },
+          "show": [
+            "uspto_patent_forms_workflow"
+          ]
+        }
+      ]
+    },
+    "tax-records-compliance": {
+      "id": "q-tax-records-compliance",
+      "title": "Tax Records & Compliance Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "tax-context",
+          "fields": [
+            "taxpayer_type",
+            "form_needed",
+            "tax_year",
+            "payer_name",
+            "recipient_name"
+          ]
+        },
+        {
+          "id": "routing",
+          "fields": [
+            "irs_official_form",
+            "instructions_link",
+            "filing_method"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "form_needed": "W-9"
+          },
+          "show": [
+            "irs_w9_workflow"
+          ]
+        },
+        {
+          "if": {
+            "form_needed": "SS-4"
+          },
+          "show": [
+            "irs_ss4_workflow"
+          ]
+        }
+      ]
+    },
+    "court-admin-worksheets": {
+      "id": "q-court-admin-worksheets",
+      "title": "Court/Admin Worksheet Wizard",
+      "branching_version": "2.0.0-upgraded",
+      "steps": [
+        {
+          "id": "court-context",
+          "fields": [
+            "court_type",
+            "case_type",
+            "jurisdiction",
+            "local_court"
+          ]
+        },
+        {
+          "id": "official-form",
+          "fields": [
+            "official_form_category",
+            "court_finder_needed",
+            "local_rules_warning"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "court_type": "Federal"
+          },
+          "show": [
+            "uscourts_national_forms_workflow"
+          ]
+        },
+        {
+          "if": {
+            "local_court": true
+          },
+          "show": [
+            "local_forms_required_warning"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -6,7 +6,7 @@
   "strategy": {
     "runtime": "static PWA",
     "secure_runtime": "bundled _shared/skye/skyeSecure.js",
-    "bridge": "static-only local fallback records; remote SuperIDE API opt-in via window.SKYE_REMOTE_API_ENABLED or body[data-skye-remote-api=on]",
+    "bridge": "0S/SkyGate bridge-backed session, gate-card auth headers, and local evidence records; remote API calls require active gate context",
     "docx": "not claimed; OpenXML import/export is a future lane"
   },
   "entry_points": [

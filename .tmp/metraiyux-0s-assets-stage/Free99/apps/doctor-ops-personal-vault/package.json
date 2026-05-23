@@ -1,0 +1,14 @@
+{
+  "name": "doctor-ops-personal-vault",
+  "version": "6.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "server": "node server/doctor-ops-server.mjs",
+    "seed:index": "node scripts/build-seed-index.mjs",
+    "smoke": "node proof/smoke-static.mjs && node proof/config-runtime-smoke.mjs && node proof/api-smoke.mjs",
+    "proof:static": "node proof/smoke-static.mjs",
+    "proof:runtime": "node proof/config-runtime-smoke.mjs",
+    "proof:api": "node proof/api-smoke.mjs"
+  }
+}

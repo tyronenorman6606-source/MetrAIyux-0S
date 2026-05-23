@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeRoutex Workforce Command API App</title>
+  <meta name="description" content="Static-safe entry for the SkyeRoutex Workforce Command browser API console.">
+  <link rel="stylesheet" href="./platform.css">
+  <script defer src="./platform.js"></script>
+</head>
+<body data-platform-hardening="p1-routed" data-page="app.html" data-platform-id="skyeroutex-workforce-command">
+  <aside class="rail">
+    <a class="brand" href="./index.html">
+      <img src="./assets/platform-mark.svg" alt="">
+      <span>SkyeRoutex Workforce Command</span>
+    </a>
+    <nav>
+      <a href="./index.html"><span>command</span><strong>Command</strong></a>
+      <a href="./dashboard.html"><span>dashboard</span><strong>Dashboard</strong></a>
+      <a href="./workflows.html"><span>flow</span><strong>Workflows</strong></a>
+      <a href="./records.html"><span>records</span><strong>Records</strong></a>
+      <a href="./proof.html"><span>proof</span><strong>Proof</strong></a>
+      <a href="./runtime.html"><span>runtime</span><strong>Runtime</strong></a>
+      <a href="./settings.html"><span>settings</span><strong>Settings</strong></a>
+      <a class="active" href="./app.html"><span>app</span><strong>API App</strong></a>
+    </nav>
+  </aside>
+  <main class="surface">
+    <header class="topbar">
+      <div>
+        <p class="kicker">live API console</p>
+        <h1>API App</h1>
+        <p>The functional workforce command panel is served by the Node runtime. This static-safe entry keeps the 0S crawl clean while pointing operators to the live path.</p>
+      </div>
+      <a class="primary" href="./public/index.html">Open Static Panel Shell</a>
+    </header>
+    <section class="hero">
+      <div>
+        <p class="kicker">runtime required for actions</p>
+        <h2>Run the platform server, then open the runtime root for end-to-end actions.</h2>
+      </div>
+      <div class="metrics">
+        <strong>20</strong><span>smokes</span>
+        <strong>0.4.0</strong><span>api</span>
+        <strong>local</strong><span>proof</span>
+      </div>
+    </section>
+    <section class="split">
+      <article class="panel">
+        <h3>Local command</h3>
+        <p>From this folder, run <code>npm start</code>. The Node server serves <code>public/index.html</code> at the runtime root and mounts the <code>/api/*</code> routes used by the browser panel.</p>
+        <a href="./docs/DEPLOYMENT.md">Open deployment notes</a>
+      </article>
+      <article class="panel">
+        <h3>Static preview</h3>
+        <p>The static panel shell can render inside the 0S folder, but live login, market, job, assignment, proof, export, and provider actions remain API-gated.</p>
+        <a href="./public/index.html">Open static panel shell</a>
+      </article>
+      <article class="panel">
+        <h3>Proof suite</h3>
+        <p>Use <code>npm run smoke:all</code> for the local proof pass. It drives API flows, browser panels, provider guards, storage, migrations, integrity, and deploy readiness.</p>
+        <a href="./proof.html">Open proof surface</a>
+      </article>
+      <article class="panel">
+        <h3>Runtime contract</h3>
+        <p>The same-folder runtime contract records the app boundary, static surfaces, and endpoint expectations for 0S handoff.</p>
+        <a href="./src/runtime-contract.json">Open runtime contract</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

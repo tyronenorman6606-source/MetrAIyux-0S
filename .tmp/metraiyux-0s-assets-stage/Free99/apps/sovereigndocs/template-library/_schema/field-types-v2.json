@@ -1,0 +1,65 @@
+{
+  "text": {
+    "kind": "string",
+    "minLength": 1,
+    "sanitize": [
+      "trim",
+      "collapseWhitespace"
+    ]
+  },
+  "textarea": {
+    "kind": "string",
+    "sanitize": [
+      "trim"
+    ]
+  },
+  "date": {
+    "kind": "date",
+    "format": "YYYY-MM-DD"
+  },
+  "money": {
+    "kind": "decimal",
+    "min": 0,
+    "currency": "USD"
+  },
+  "email": {
+    "kind": "string",
+    "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+  },
+  "phone": {
+    "kind": "string",
+    "pattern": "^[+()0-9 .-]{7,}$"
+  },
+  "state": {
+    "kind": "enum",
+    "source": "template-library/jurisdictions.json"
+  },
+  "address": {
+    "kind": "object",
+    "fields": [
+      "line1",
+      "city",
+      "state",
+      "postal_code"
+    ]
+  },
+  "signature": {
+    "kind": "string",
+    "minLength": 2,
+    "requires_signature_block": true
+  },
+  "ein_optional": {
+    "kind": "string",
+    "pattern": "^$|^[0-9]{2}-?[0-9]{7}$"
+  },
+  "county": {
+    "kind": "string",
+    "minLength": 2,
+    "jurisdiction_sensitive": true
+  },
+  "court_name": {
+    "kind": "string",
+    "minLength": 3,
+    "official_source_recommended": true
+  }
+}

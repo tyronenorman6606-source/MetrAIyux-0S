@@ -16,10 +16,10 @@ Skyes Over London LC public site was unpacked from the deployment archive, deep-
 
 ## Local Surface
 
-- Site folder: `unpacked-projects/skyes-over-london-lc/`
-- Homepage: `unpacked-projects/skyes-over-london-lc/index.html`
-- Contact route: `unpacked-projects/skyes-over-london-lc/pages/contact.html`
-- MCP receipt: `unpacked-projects/skyes-over-london-lc/MCP_TOOLING_RECEIPT.json`
+- Site folder: `metraiyux_0s_site/_platform-sources/skyes-over-london-lc/`
+- Homepage: `metraiyux_0s_site/_platform-sources/skyes-over-london-lc/index.html`
+- Contact route: `metraiyux_0s_site/_platform-sources/skyes-over-london-lc/pages/contact.html`
+- MCP receipt: `metraiyux_0s_site/_platform-sources/skyes-over-london-lc/MCP_TOOLING_RECEIPT.json`
 - Direct MCP receipt artifact: `test-artifacts/direct-mcp/skyes-over-london-lc-mcp-tooling-receipt.json`
 
 ## Browser QA
@@ -31,7 +31,7 @@ Skyes Over London LC public site was unpacked from the deployment archive, deep-
 
 ## MCP Result
 
-- Command: `npm run mcp:mine -- unpacked-projects/skyes-over-london-lc`
+- Command: `npm run mcp:mine -- metraiyux_0s_site/_platform-sources/skyes-over-london-lc`
 - Result: `ok: true`
 - Failed MCP calls: `[]`
 - Design direction: `editorial-proof-atlas` with company-attached public proof language.

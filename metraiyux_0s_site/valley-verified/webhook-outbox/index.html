@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Webhook Outbox | Valley Verified</title><meta name="description" content="Signed webhook outbox jobs for Valley Verified owner claims, leads, approvals, and state projections."><meta name="robots" content="noindex,nofollow,noarchive"><link rel="canonical" href="https://valleyverified.local/"><link rel="stylesheet" href="/valley-verified/assets/styles.css"><link rel="stylesheet" href="/valley-verified/assets/valley-brain.css"/></head><body class="internal-page"><header class="topbar"><a class="brand" href="/valley-verified/"><span class="logo-orb"></span><span>Valley Verified</span></a><nav><a href="/valley-verified/directory/">Directory</a><a href="/valley-verified/ae-command/">AE</a><a href="/valley-verified/backend/">Backend</a><a href="/valley-verified/data/">Data</a></nav></header><main><section class="hero glass subhero"><div><p class="eyebrow">Webhook outbox</p><h1>Provider-ready notifications without fake sending.</h1><p class="hero-text">The code now creates signed pending webhook jobs for CRM, AE, owner, lead, and billing integrations. It does not claim messages were delivered until providers are wired.</p><div class="hero-actions"><a class="btn primary" href="/valley-verified/data/webhook-outbox-template.json">Open outbox template</a><a class="btn" href="/valley-verified/lead-inbox/">Lead inbox</a></div></div><aside class="hero-card"><div class="metric"><span>outbox</span><small>mode</small></div><div class="metric"><span>HMAC</span><small>signature</small></div></aside></section><section class="section glass"><p class="eyebrow">Job shape</p><h2>Signed pending job</h2><pre class="code-output small-code">{
+  &quot;job_id&quot;: &quot;webhook-&lt;sha256&gt;&quot;,
+  &quot;status&quot;: &quot;pending&quot;,
+  &quot;target&quot;: &quot;platform-webhook&quot;,
+  &quot;event_type&quot;: &quot;action.queued&quot;,
+  &quot;attempts&quot;: 0,
+  &quot;headers&quot;: {
+    &quot;x-phx-event&quot;: &quot;action.queued&quot;,
+    &quot;x-phx-signature&quot;: &quot;hmac-sha256&quot;
+  },
+  &quot;body&quot;: {
+    &quot;action_id&quot;: &quot;...&quot;,
+    &quot;action_type&quot;: &quot;owner_claim&quot;,
+    &quot;payload&quot;: {
+      &quot;queue&quot;: &quot;owner-claims&quot;,
+      &quot;risk_level&quot;: &quot;medium&quot;
+    }
+  }
+}</pre></section></main><footer class="footer"><p>Valley Verified Network · v17 code infrastructure surface · upstream auth expected.</p></footer><script src="/valley-verified/assets/app.js" defer></script><script type="module" src="/valley-verified/assets/valley-brain.js"></script></body></html>

@@ -1,0 +1,13 @@
+name = "skye-secret-rotation"
+main = "worker.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+SKYGATEFS27_ORIGIN = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
+ALLOWED_WORKER_NAMES = "metraiyux-0s-full-system,skyegatefs27-citadeldb,admin-automation-brain,sovereign-13-site-operator-quantum,relay13-core,sovereign-saas-provisioning-worker,omeg4kai-security-gateway,crown-site-operator,sovereign-13-cabinet-nexus-operator,sovereign-13-cabinet-sentinel-operator"
+
+# Required secrets — set via: npx wrangler secret put <NAME>
+# CLOUDFLARE_API_TOKEN  — CF API token with Workers Scripts:Edit + Workers Scripts:Read
+# CLOUDFLARE_ACCOUNT_ID — your Cloudflare account ID
+# FREE99_ROTATION_CODE  — a separate PIN/code that guards this surface (distinct from the main gate password)
+# SKYGATEFS27_ORIGIN can be overridden as a secret if desired

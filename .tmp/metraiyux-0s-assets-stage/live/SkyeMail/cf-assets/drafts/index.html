@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Drafts — SkyeMail Vault</title>
+</head>
+<body data-page-id="drafts" data-page-name="Drafts" data-page-hint="Saved draft lane">
+<div class="wrap">
+  <div id="pageTopbar"></div>
+  <div class="layout">
+    <aside class="rail" id="leftRail"></aside>
+    <main class="main">
+
+      <section class="hero">
+        <section class="card">
+          <div class="badge" id="mailboxBadge">Checking mailbox connection…</div>
+          <h1 class="h1">Drafts</h1>
+          <p class="sub">Open, continue, and delete real Gmail drafts from the <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span>.</p>
+          <div class="btnrow">
+            <a class="btn gold" href="compose.html">New Draft</a>
+            <button class="btn" id="refreshBtn" type="button">Refresh Drafts</button>
+          </div>
+        </section>
+        <aside class="card"><div class="notice">Drafts open directly inside the compose lane so you can keep editing and either save or send.</div><div class="mini" id="statusText" style="margin-top:12px">Waiting for draft load…</div></aside>
+      </section>
+      <section class="card">
+        <div class="searchbar">
+          <div><label for="q">Search drafts</label><input id="q" type="text" placeholder="draft subject or recipient" /></div>
+          <div><label>&nbsp;</label><button class="btn gold" id="applyBtn" type="button">Apply</button></div>
+          <div><label>&nbsp;</label><button class="btn" id="clearBtn" type="button">Clear</button></div>
+        </div>
+        <div class="hr"></div>
+        <div class="mailtable" id="draftList"><div class="empty">Loading drafts…</div></div>
+        <div class="pagination"><button class="btn" id="prevBtn" type="button">Previous</button><button class="btn" id="nextBtn" type="button">Next</button></div>
+      </section>
+
+    </main>
+  </div>
+  <div id="appFooter"></div>
+</div>
+<script defer src="/assets/drafts-page.js"></script>
+</body>
+</html>

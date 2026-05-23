@@ -29,6 +29,7 @@ SkyeRunners are repo-aware worker agents for MetrAIyux 0S. They do not replace t
 - Brain Sync Runner refreshes Obsidian sync, private neural map, public-safe neural map, SkyeVault repo memory, and SkyeRunners chunks.
 - Bug Hunter runs repo health and proof checks, then records defect candidates and missing-evidence notes.
 - Vault Watch keeps SkyeVault repo/change memory attached to 0S without exposing workspace secrets.
+- SkySecure Health Runner watches the FS27 -> SkyeVault -> SkySecure proof lane, verifies encrypted-pack receipts, and records missing live evidence before client trust depends on it.
 
 ## Approval Boundary
 
@@ -50,6 +51,21 @@ Proof files:
 - `test-artifacts/skye-crawler-report.json`
 - `metraiyux_0s_site/brain/skyerunners.json`
 
+## Latest SkySecure Live Proof
+
+The 2026-05-19 production proof recorded:
+
+- FS27 Worker version `72ced023-345a-4a26-88fc-f48afa0f7d2e`.
+- Encrypted dummy `.skyesecrets` pack uploaded to SkyeVault.
+- FS27 registered the SkyeVault receipt and SHA-256 in the SkySecure metadata lane.
+- SkyeRunners observer grant was created for `skyerunners-health`.
+- FS27 proof route returned Neon-backed counts for packs, grants, and events.
+
+Proof files:
+
+- `test-artifacts/skye-secure-live-production-proof/live-production-proof-report.json`
+- `metraiyux_0s_site/proof-vault/skye-secure-fs27-vault-proof.html`
+
 ## Operator Commands
 
 Use the repo-local command runner or package scripts:
@@ -60,6 +76,7 @@ npm run skyerunners:control
 npm run skyerunners:run -- knowledge-refresh
 npm run skyerunners:run -- repo-health
 npm run skyerunners:run -- crawler-static
+npm run skyerunners:run -- skysecure-live-proof
 ```
 
 ## Routing Rule

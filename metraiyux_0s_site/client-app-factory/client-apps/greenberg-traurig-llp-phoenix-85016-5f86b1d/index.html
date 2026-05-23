@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Greenberg Traurig, LLP | Legal Review Workspace App</title>
+<meta name="description" content="Greenberg Traurig, LLP candidate legal review workspace app for Valley Verified and SovereignDocs."/>
+<style>
+:root{color-scheme:dark;--bg:#080b0c;--panel:#111818;--line:rgba(255,255,255,.14);--text:#f8fbf6;--muted:#aebbb6;--accent:#73ff92;--accent2:#7ae7ff}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 5%,rgba(122,231,255,.13),transparent 34%),linear-gradient(135deg,#080b0c,#101513 58%,#0b0b10);color:var(--text);line-height:1.5}.shell{width:min(1180px,calc(100% - 32px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0}.brand{display:flex;flex-direction:column;text-decoration:none;color:var(--text)}.brand strong{font-size:17px}.brand span,.muted{color:var(--muted)}nav{display:flex;gap:10px;flex-wrap:wrap}a.button,button{border:1px solid var(--line);border-radius:8px;padding:11px 14px;background:#162020;color:var(--text);text-decoration:none;font-weight:700;cursor:pointer}.button.primary,button.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#06100d;border:0}.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:24px;align-items:stretch;padding:46px 0 24px}.panel{border:1px solid var(--line);background:rgba(17,24,24,.82);border-radius:8px;padding:22px;box-shadow:0 18px 70px rgba(0,0,0,.28)}h1{font-size:clamp(40px,6vw,78px);line-height:.96;margin:10px 0;letter-spacing:0}h2{font-size:28px;margin:0 0 10px}.eyebrow{letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-size:12px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}.metric{border:1px solid var(--line);border-radius:8px;padding:16px;background:#0d1313}.metric strong{display:block;font-size:24px}.notice{border-left:4px solid var(--accent);padding:14px 16px;background:rgba(245,211,106,.1);border-radius:8px}.app{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0 42px}label{display:grid;gap:6px;margin:10px 0;color:var(--muted);font-weight:700}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:#071010;color:var(--text);padding:11px;font:inherit}textarea{min-height:120px}pre{white-space:pre-wrap;overflow:auto;background:#050909;border:1px solid var(--line);border-radius:8px;padding:14px}.list{display:grid;gap:8px}.list span{border:1px solid var(--line);border-radius:8px;padding:10px;background:#0b1010}@media(max-width:860px){.hero,.app{grid-template-columns:1fr}.grid{grid-template-columns:1fr}nav{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<header class="shell top"><a class="brand" href="/valley-verified/legal-review-lane/greenberg-traurig-phoenix/"><strong>Greenberg Traurig, LLP</strong><span>candidate legal review workspace</span></a><nav><a class="button" href="/valley-verified/legal-review-lane/greenberg-traurig-phoenix/">Landing</a><a class="button" href="/northstar/?workspace=greenberg-traurig-phoenix-legal-review">SignIn Pro</a><a class="button" href="/Free99/apps/sovereigndocs/partner-workbench/?workspace=greenberg-traurig-phoenix-legal-review&amp;partner=greenberg-traurig-phoenix">SovereignDocs</a><a class="button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=sovereigndocs-legal-review-lane">SkyePay</a></nav></header>
+<main class="shell">
+<section class="hero">
+<div class="panel"><p class="eyebrow">Valley Verified legal lane</p><h1>Greenberg Traurig, LLP</h1><p>Enterprise and business counsel candidate for commercial litigation, securities, M&amp;A, finance, IP, employment, and real estate lanes.</p><p class="notice"><strong>Boundary:</strong> This is a candidate workspace. Do not claim partnership, legal approval, or attorney review until outreach, bar/license verification, conflict rules, MSA/NDA, and payout setup are complete.</p></div>
+<aside class="panel"><p class="eyebrow">Workspace packet</p><div class="grid"><div class="metric"><strong>Phoenix</strong><span>market</span></div><div class="metric"><strong>85016</strong><span>zip</span></div><div class="metric"><strong>pending</strong><span>activation</span></div></div><p>2375 East Camelback Road, Suite 800, Phoenix, AZ 85016</p><p><a href="https://www.gtlaw.com/en/locations/phoenix">https://www.gtlaw.com/en/locations/phoenix</a></p></aside>
+</section>
+<section class="app">
+<form class="panel" id="tracker"><p class="eyebrow">Local review tracker</p><h2>Log candidate routing notes</h2><label>Matter / packet ID<input name="packetId" required placeholder="sd_review_..."></label><label>Status<select name="status"><option>checkout_required</option><option>paid_held_in_escrow</option><option>submitted_pending_triage</option><option>routed_to_partner</option><option>partner_review_returned</option><option>payout_pending_owner_release</option></select></label><label>Operator note<textarea name="note" placeholder="Routing, conflict, or partner-return note"></textarea></label><button class="primary" type="submit">Save local note</button></form>
+<section class="panel"><p class="eyebrow">Local notes</p><h2>Workspace audit scratchpad</h2><pre id="output">No local notes yet.</pre></section>
+</section>
+<section class="panel"><p class="eyebrow">Review scopes</p><div class="list"><span>enterprise business documents</span><span>M&amp;A and finance packet triage</span><span>commercial litigation</span><span>IP and employment documents</span><span>real estate packets</span></div></section>
+</main>
+<script type="application/json" id="site-data">{
+  &quot;id&quot;: &quot;greenberg-traurig-llp-phoenix-85016-5f86b1d&quot;,
+  &quot;slug&quot;: &quot;greenberg-traurig-phoenix&quot;,
+  &quot;name&quot;: &quot;Greenberg Traurig, LLP&quot;,
+  &quot;city&quot;: &quot;Phoenix&quot;,
+  &quot;state&quot;: &quot;AZ&quot;,
+  &quot;zip&quot;: &quot;85016&quot;,
+  &quot;phone&quot;: &quot;(602) 445-8000&quot;,
+  &quot;officialWebsite&quot;: &quot;https://www.gtlaw.com/en/locations/phoenix&quot;,
+  &quot;officialSource&quot;: &quot;https://www.gtlaw.com/en/locations/phoenix&quot;,
+  &quot;address&quot;: &quot;2375 East Camelback Road, Suite 800, Phoenix, AZ 85016&quot;,
+  &quot;practiceSummary&quot;: &quot;Enterprise and business counsel candidate for commercial litigation, securities, M&amp;A, finance, IP, employment, and real estate lanes.&quot;,
+  &quot;reviewScopes&quot;: [
+    &quot;enterprise business documents&quot;,
+    &quot;M&amp;A and finance packet triage&quot;,
+    &quot;commercial litigation&quot;,
+    &quot;IP and employment documents&quot;,
+    &quot;real estate packets&quot;
+  ],
+  &quot;accent&quot;: &quot;#73ff92&quot;,
+  &quot;partnerId&quot;: &quot;legal_partner_candidate_greenberg_traurig_phoenix&quot;,
+  &quot;workspaceSlug&quot;: &quot;greenberg-traurig-phoenix-legal-review&quot;,
+  &quot;appUrl&quot;: &quot;/client-app-factory/client-apps/greenberg-traurig-llp-phoenix-85016-5f86b1d/&quot;,
+  &quot;signinProUrl&quot;: &quot;/northstar/?workspace=greenberg-traurig-phoenix-legal-review&quot;,
+  &quot;sovereignDocsWorkspaceUrl&quot;: &quot;/Free99/apps/sovereigndocs/partner-workbench/?workspace=greenberg-traurig-phoenix-legal-review&amp;partner=greenberg-traurig-phoenix&quot;,
+  &quot;legalLandingUrl&quot;: &quot;/valley-verified/legal-review-lane/greenberg-traurig-phoenix/&quot;,
+  &quot;valleyVerifiedUrl&quot;: &quot;/valley-verified/business/greenberg-traurig-llp-phoenix-85016-5f86b1d/&quot;,
+  &quot;skyePayReviewUrl&quot;: &quot;https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=sovereigndocs-legal-review-lane&quot;,
+  &quot;publicStatus&quot;: &quot;candidate_only_pending_outreach_bar_check_conflict_check_and_msa&quot;,
+  &quot;activationRequired&quot;: [
+    &quot;firm outreach accepted&quot;,
+    &quot;State Bar / licensing verification&quot;,
+    &quot;conflict intake rules&quot;,
+    &quot;fee schedule&quot;,
+    &quot;MSA / NDA / data terms&quot;,
+    &quot;SkyePay payout destination&quot;
+  ]
+}</script>
+<script>
+const key='legal-review-workspace:greenberg-traurig-phoenix:notes';
+const output=document.getElementById('output');
+const read=()=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return []}};
+const draw=()=>{const rows=read();output.textContent=rows.length?JSON.stringify(rows,null,2):'No local notes yet.'};
+document.getElementById('tracker').addEventListener('submit',event=>{event.preventDefault();const form=new FormData(event.currentTarget);const rows=read();rows.unshift({packetId:form.get('packetId'),status:form.get('status'),note:form.get('note'),at:new Date().toISOString(),workspace:'greenberg-traurig-phoenix-legal-review'});localStorage.setItem(key,JSON.stringify(rows.slice(0,50)));event.currentTarget.reset();draw();});
+draw();
+</script>
+</body>
+</html>

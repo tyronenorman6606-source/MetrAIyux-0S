@@ -1,0 +1,35 @@
+{
+  "name": "valley-verified-network-platform",
+  "version": "23.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Valley Verified Network platform v23: production-candidate seeded Arizona marketplace with public website layer, simplified marketplace navigation, full static business profiles, optimized artifacts, runtime persistence wiring, and upstream-auth-ready operations.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "seed": "node scripts/build.mjs --data-only",
+    "smoke": "node scripts/smoke.mjs",
+    "verify": "npm run build && npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke && npm run gate-auth-smoke",
+    "dry-run": "node scripts/import-dry-run.mjs",
+    "production-check": "npm run dry-run && npm run verify",
+    "action-smoke": "node scripts/action-smoke.mjs",
+    "codecheck": "npm run smoke && npm run action-smoke && npm run state-smoke && npm run mutation-smoke && npm run v18-smoke && npm run v19-smoke && npm run v20-smoke && npm run v21-smoke && npm run v22-smoke && npm run v23-smoke && npm run gate-auth-smoke",
+    "state-smoke": "node scripts/state-smoke.mjs",
+    "mutation-smoke": "node scripts/mutation-smoke.mjs",
+    "v18-smoke": "node scripts/v18-smoke.mjs",
+    "v19-smoke": "node scripts/v19-smoke.mjs",
+    "v20-smoke": "node scripts/v20-smoke.mjs",
+    "v21-smoke": "node scripts/v21-smoke.mjs",
+    "build:core": "node scripts/build-core.mjs",
+    "build:enhance": "node scripts/v17-enhance.mjs && node scripts/v18-enhance.mjs && node scripts/v19-enhance.mjs && node scripts/v20-enhance.mjs && node scripts/v21-enhance.mjs && node scripts/v22-enhance.mjs && node scripts/v23-enhance.mjs",
+    "build:v21-enhance": "node scripts/v21-enhance.mjs",
+    "build:v22-enhance": "node scripts/v22-enhance.mjs",
+    "v22-smoke": "node scripts/v22-smoke.mjs",
+    "v23-smoke": "node scripts/v23-smoke.mjs",
+    "gate-auth-smoke": "node scripts/gate-auth-smoke.mjs",
+    "build:v23-enhance": "node scripts/v23-enhance.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {}
+}

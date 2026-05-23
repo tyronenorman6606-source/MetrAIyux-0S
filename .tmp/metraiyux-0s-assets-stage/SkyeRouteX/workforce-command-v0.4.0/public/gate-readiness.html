@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeRouteX Gate Readiness</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="brand">SkyeRouteX <span>Gate Readiness</span></div>
+    <a href="./index.html">Command</a>
+    <a href="./gate-readiness.html">Gate Status</a>
+    <a href="#matrix">Feature Matrix</a>
+    <a href="#gate-links">Gate Links</a>
+    <a href="#records">Records</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">FS27 / SkyGate / Free99 owned lane</p>
+      <h1>What works now, what needs onboarding, and where the gate tracks it.</h1>
+      <p>RouteX is mounted behind the shared 0S gate. Jobs, assignments, proof, payments, notifications, compliance, and runtime events all report their readiness here so operators and customers can see which features are active and which provider/onboarding pieces still need to be supplied.</p>
+      <div class="grid metrics" id="summary-metrics">
+        <div><strong>...</strong><span>loading</span></div>
+      </div>
+    </section>
+
+    <section class="panel command-panel" id="gate-links">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Gate dashboard links</p>
+          <h2>Actual control surfaces for this app</h2>
+        </div>
+        <button id="btn-refresh" type="button">Refresh Readiness</button>
+      </div>
+      <div class="grid two">
+        <div class="card list-card">
+          <h3>Shared Auth Contract</h3>
+          <div id="auth-contract" class="list"></div>
+        </div>
+        <div class="card list-card">
+          <h3>Dashboard Links</h3>
+          <div id="link-list" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel command-panel" id="matrix">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Feature matrix</p>
+          <h2>What will and will not work before full onboarding</h2>
+        </div>
+      </div>
+      <div id="feature-matrix" class="grid two"></div>
+    </section>
+
+    <section class="panel command-panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Onboarding checklist</p>
+          <h2>Inputs that unlock each lane</h2>
+        </div>
+      </div>
+      <div id="onboarding-matrix" class="grid two"></div>
+    </section>
+
+    <section class="panel command-panel" id="records">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Live records</p>
+          <h2>Gate-owned RouteX state</h2>
+        </div>
+      </div>
+      <div class="grid three">
+        <div class="card list-card"><h3>Notifications</h3><div id="notifications" class="list"></div></div>
+        <div class="card list-card"><h3>Compliance</h3><div id="compliance" class="list"></div></div>
+        <div class="card list-card"><h3>Gate Mirrors</h3><div id="gate-mirrors" class="list"></div></div>
+      </div>
+      <div class="grid two">
+        <div class="card list-card"><h3>Runtime Events</h3><div id="runtime-events" class="list"></div></div>
+        <div class="card list-card"><h3>Integration Outbox</h3><div id="outbox" class="list"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="../../../assets/js/metraiyux-api-bases.js"></script>
+  <script>
+    window.SKYEROUTEX_API_BASE = window.MetrAIyuxApi ? window.MetrAIyuxApi.path('routex') : '/api/routex';
+  </script>
+  <script src="gate-readiness.js" type="module"></script>
+</body>
+</html>

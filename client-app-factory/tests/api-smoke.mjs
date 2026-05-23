@@ -56,6 +56,23 @@ const payment = await request("/api/factory/skyepay", {
   body: { clientId: "empire-pallets" }
 });
 
+const aiPlans = await request("/api/factory/ai-response/plans");
+const aiRoute = await request("/api/factory/ai-response/route", {
+  method: "POST",
+  body: {
+    planId: "relay13-managed-ai-inbox",
+    usedThisMonth: 1000,
+    message: { routine: true, text: "Can I get a quote and availability?" }
+  }
+});
+const aiStress = await request("/api/factory/ai-response/stress", {
+  method: "POST",
+  body: {
+    planId: "relay13-ai-response-plus",
+    messageCount: 525
+  }
+});
+
 const proof = await request("/api/factory/proof", {
   method: "POST",
   body: { clientId: "empire-pallets" }
@@ -70,6 +87,9 @@ const assertions = {
   generatedManifest: generated.manifest?.publishFolder?.includes("client-apps/empire-pallets"),
   workspaceLinked: workspace.record?.completedStates?.includes("workspace-linked"),
   paymentLinked: payment.record?.completedStates?.includes("payment-lane-linked"),
+  aiPlansLoaded: aiPlans.plans?.length === 3,
+  aiBackupAllowed: aiRoute.result?.status === "backup_bucket_ai_allowed" && aiRoute.result?.managedAction === "triage_draft_allowlisted_send_and_log",
+  aiStressCapped: aiStress.result?.primaryAi === 425 && aiStress.result?.backupAi === 76 && aiStress.result?.localManualQueue === 24 && aiStress.result?.leadLossRisk === false,
   proofRecorded: proof.record?.completedStates?.includes("browser-proofed"),
   ledgerWritten: ledger.ledger?.length >= 5
 };

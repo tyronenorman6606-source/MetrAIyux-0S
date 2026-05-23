@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Government Opportunity Tracker | Skyes Over London Staffing</title>
+  <meta name="description" content="Internal government opportunity tracker for agency, municipal, and prime contractor staffing pursuits." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Internal Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Gov Pursuit Tracker</p>
+      <h1>Track agency, municipal, and prime-contractor staffing opportunities.</h1>
+      <p class="lead">This page is an internal operating surface for opportunity triage. Replace static examples with real CRM/database records when connected.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Internal Use</div><h2>Do not publish sensitive pursuit notes.</h2><p>Keep pricing, strategy, partner notes, and compliance gaps internal.</p></aside>
+  </div>
+</section>
+<section class="section-pad table-wrap reveal">
+  <table class="ops-table">
+    <thead><tr><th>Opportunity</th><th>Buyer</th><th>Type</th><th>Status</th><th>Next Action</th></tr></thead>
+    <tbody>
+      <tr><td>Administrative support pool</td><td>Municipal / Agency</td><td>Market research</td><td>Research</td><td>Verify scope and NAICS</td></tr>
+      <tr><td>Prime staffing support</td><td>Prime Contractor</td><td>Subcontracting</td><td>Qualify</td><td>Request subcontract package</td></tr>
+      <tr><td>Contact-center surge staffing</td><td>Public Program</td><td>RFQ candidate</td><td>Watch</td><td>Confirm staffing capacity</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Add Opportunity</p><h2>Capture a pursuit lead.</h2><p>Use this form for internal opportunity capture until a CRM is connected.</p></div>
+  <form class="contact-form reveal" name="government-opportunity" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="government-opportunity" />
+    <label>Opportunity Name<input name="opportunity" required /></label>
+    <label>Buyer / Prime<input name="buyer" required /></label>
+    <label>Solicitation Link<input name="link" /></label>
+    <label>Due Date<input name="due_date" /></label>
+    <label>Status<select name="status"><option>Research</option><option>Qualify</option><option>Go / No-Go</option><option>Proposal</option><option>Submitted</option><option>No Bid</option></select></label>
+    <label>Notes<textarea name="notes" rows="7" placeholder="Scope, NAICS, deadline, compliance, required docs, next action"></textarea></label>
+    <button class="btn primary" type="submit">Add Opportunity</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

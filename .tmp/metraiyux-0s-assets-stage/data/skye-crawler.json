@@ -1,0 +1,71 @@
+{
+  "id": "skye-crawler",
+  "name": "SkyeCrawler",
+  "version": "1.0.0",
+  "purpose": "Operator-grade end-to-end crawl and user-flow proof system for MetrAIyux 0S.",
+  "owner_lane": "Operator Command Center",
+  "primary_script": "../../tools/skye-crawler.mjs",
+  "control_bridge": "../../tools/skye-crawler-control.mjs",
+  "control_command": "npm run skye:control",
+  "control_endpoint": "http://127.0.0.1:4175",
+  "default_site_dir": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
+  "modes": [
+    {
+      "id": "static-surface-crawl",
+      "command": "npm run skye:crawl:static",
+      "server": "npm run skye:serve:site",
+      "base_url": "http://127.0.0.1:4173/",
+      "use_when": "Checking static pages, local links, browser runtime, mobile layout, and browser-local tools."
+    },
+    {
+      "id": "worker-or-live-crawl",
+      "command": "npm run skye:crawl:worker",
+      "server": "npx wrangler dev --ip 127.0.0.1 --port 4174 --persist-to /tmp/metraiyux-wrangler-state",
+      "base_url": "http://127.0.0.1:4174/",
+      "use_when": "Checking Cloudflare Worker asset serving, headers, API routes, and the same browser user flows."
+    },
+    {
+      "id": "skyepay-fs27-payment-lane",
+      "command": "npm run skye:crawl:skyepay",
+      "server": "cd SkyeGateFS27 && npm run dev:skyepay",
+      "base_url": "http://127.0.0.1:4197/",
+      "use_when": "Checking SkyePay public app load, local assets, offer catalog, CORS hardening, invalid-email rejection, dry-run checkout, public status safety, motion stack source, and desktop/mobile browser checkout proof."
+    }
+  ],
+  "coverage": [
+    "HTML inventory",
+    "HTTP page load checks",
+    "Local href/src resolution",
+    "Worker API status and route checks",
+    "Desktop browser runtime sweep",
+    "Mobile browser runtime sample",
+    "Local Brain question flow",
+    "Persona Brain selection and question flow",
+    "Live Proof Router signal selection",
+    "Staffing Margin calculator",
+    "Admin local save/clear tool",
+    "SaaS signup receipt flow",
+    "Client OS onboarding save flow",
+    "SkyePay FS27 payment-lane profile",
+    "SkyePay CORS and public status hardening probes",
+    "SkyePay desktop/mobile dry-run checkout proof",
+    "ConnectLog landing/app/Relay13 panel browser proof",
+    "Relay13 public/admin preview browser proof",
+    "Screenshot evidence capture",
+    "SkyeProfitConsole Free99 gate overlay and runtime 401 proof"
+  ],
+  "latest_known_receipts": {
+    "static_report": "/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-report.json",
+    "static_artifacts": "/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler/",
+    "static_result": "14 checks, 0 failures, 0 warnings",
+    "worker_baseline_report": "/workspaces/MetrAIyux-0S/test-artifacts/metraiyux-worker-local-e2e-report.json",
+    "worker_baseline_result": "15 checks, 0 failures, 0 warnings",
+    "skyepay_report": "/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay-report.json",
+    "skyepay_artifacts": "/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-skyepay/",
+    "skyepay_result": "16 checks, 0 failures, 0 warnings",
+    "connectlog_relay13_report": "/workspaces/MetrAIyux-0S/test-artifacts/connectlog-relay13-e2e-report.json",
+    "connectlog_relay13_artifacts": "/workspaces/MetrAIyux-0S/test-artifacts/connectlog-relay13/",
+    "skyeprofitconsole_artifacts": "/workspaces/MetrAIyux-0S/test-artifacts/skyeprofitconsole/"
+  },
+  "operator_rule": "Run SkyeCrawler before a customer handoff, after navigation changes, after Worker/API changes, and before public proof claims are updated. Run the SkyeProfitConsole proof suite before claiming the Free99 profit platform works end to end."
+}

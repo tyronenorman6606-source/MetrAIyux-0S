@@ -1,0 +1,32 @@
+{
+  "package": "relay13-core",
+  "checked_at": "2026-05-08T16:15:00Z",
+  "result": "passed",
+  "implemented": [
+    "single Cloudflare Worker platform",
+    "multi-workspace configuration isolation",
+    "hash-only scoped API keys",
+    "embeddable widget script",
+    "admin dashboard",
+    "D1 indexed persistence",
+    "Durable Object live conversation rooms",
+    "widget config release ledger",
+    "job ledger for admin-directed commands",
+    "text-only V1"
+  ],
+  "excluded_by_design": [
+    "Workers for Platforms",
+    "client-deployed scripts",
+    "attachments",
+    "preloaded conversations",
+    "preloaded messages"
+  ],
+  "live_gates_remaining": [
+    "create Cloudflare D1 database",
+    "paste D1 database_id into wrangler.toml",
+    "set PLATFORM_ADMIN_TOKEN secret",
+    "apply remote migration",
+    "deploy Worker",
+    "browser-prove widget-to-admin live messaging"
+  ]
+}

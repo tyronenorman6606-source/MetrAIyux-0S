@@ -1,0 +1,39 @@
+{
+  "id": "google_ops",
+  "title": "Google Ops",
+  "lane": "docs_calendar",
+  "requiredSecrets": [
+    "GOOGLE_SERVICE_ACCOUNT_JSON"
+  ],
+  "routes": [
+    "drive.save",
+    "calendar.book"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#GoogleOpsAdapter",
+  "description": "Executable provider pack for Google Ops routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "drive-save",
+    "calendar-book",
+    "sheet-append"
+  ],
+  "metering": {
+    "unit": "ops_write",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "docs_calendar",
+    "google_ops"
+  ],
+  "executableActions": [
+    {
+      "route": "drive.save",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "calendar.book",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Neural Map</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .vault-map-shell { display: grid; gap: 1rem; }
+    .vault-map-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .vault-stat { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); border-radius: .75rem; padding: 1rem; }
+    .vault-stat span { display: block; color: rgba(255,255,255,.66); font-size: .82rem; }
+    .vault-stat strong { display: block; margin-top: .35rem; font-size: 1.7rem; }
+    .vault-map-canvas-wrap { border: 1px solid rgba(255,255,255,.14); border-radius: .75rem; min-height: 420px; background: #070910; overflow: hidden; }
+    #vaultMapCanvas { width: 100%; height: 420px; display: block; }
+    .vault-table { width: 100%; border-collapse: collapse; }
+    .vault-table th, .vault-table td { border-bottom: 1px solid rgba(255,255,255,.12); padding: .75rem; text-align: left; vertical-align: top; }
+    .vault-table th { color: rgba(255,255,255,.68); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+    .vault-table code { overflow-wrap: anywhere; }
+    .workspace-map-button { border: 1px solid rgba(125,220,138,.32); background: rgba(125,220,138,.08); color: #f7fff5; border-radius: .45rem; padding: .45rem .65rem; cursor: pointer; }
+    .workspace-map-button:hover { border-color: rgba(125,220,138,.72); }
+    @media (max-width: 900px) { .vault-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .vault-map-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">Admin Automation OS</span></a>
+  <nav><a href="../index.html">Home</a><a href="index.html">Admin Hub</a><a href="automation-brain.html">Main Brain Chat</a><a href="../local-brain.html">Local Brain</a></nav>
+</header>
+<main class="site-shell admin-shell vault-map-shell">
+  <section class="admin-hero">
+    <p class="eyebrow">SkyeVault x 0S</p>
+    <h1>SkyeVault Neural Map</h1>
+    <p class="hero-lede">Gate owns access, SkyeVault owns repo storage, and 0S owns the map of what changed.</p>
+    <div id="vaultMapStatus" class="mode-banner"><span class="status-pill">Loading vault map</span></div>
+  </section>
+
+  <section class="vault-map-grid" aria-label="SkyeVault map summary">
+    <article class="vault-stat"><span>Repos</span><strong id="repoCount">0</strong></article>
+    <article class="vault-stat"><span>Receipts</span><strong id="receiptCount">0</strong></article>
+    <article class="vault-stat"><span>Graph Nodes</span><strong id="nodeCount">0</strong></article>
+    <article class="vault-stat"><span>Stored</span><strong id="storedBytes">0 B</strong></article>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Vault Graph</h2>
+    <div class="vault-map-canvas-wrap"><canvas id="vaultMapCanvas"></canvas></div>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Workspace Maps</h2>
+    <table class="vault-table">
+      <thead><tr><th>Workspace</th><th>Map File</th><th>Scope</th></tr></thead>
+      <tbody id="workspaceRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Repos</h2>
+    <table class="vault-table">
+      <thead><tr><th>Workspace / Repo</th><th>Activity</th><th>Latest Head</th></tr></thead>
+      <tbody id="repoRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Recent Uploads</h2>
+    <table class="vault-table">
+      <thead><tr><th>Receipt</th><th>File</th><th>Size</th></tr></thead>
+      <tbody id="uploadRows"></tbody>
+    </table>
+  </section>
+</main>
+<footer class="footer"><p>MetrAIyux 0S command system - SkyeVault neural-map bridge.</p></footer>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  let activeMap = null;
+
+  function setStatus(text, ok = true) {
+    $('vaultMapStatus').innerHTML = '<span class="status-pill">' + esc(text) + '</span>';
+    $('vaultMapStatus').style.borderColor = ok ? 'rgba(125,220,138,.45)' : 'rgba(255,140,122,.45)';
+  }
+
+  function safeFilePart(value) {
+    return String(value || 'default').trim().replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100) || 'default';
+  }
+
+  function bytes(value) {
+    const size = Number(value || 0);
+    if (!size) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const index = Math.min(Math.floor(Math.log(size) / Math.log(1024)), units.length - 1);
+    return (size / 1024 ** index).toFixed(index ? 2 : 0) + ' ' + units[index];
+  }
+
+  function initialMapPath() {
+    const workspace = new URLSearchParams(location.search).get('workspace');
+    if (!workspace) return '../brain/skyevault-vault-map.json';
+    return '../brain/skyevault-workspaces/' + safeFilePart(workspace) + '.json';
+  }
+
+  function drawGraph(map) {
+    const canvas = $('vaultMapCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    const nodes = (map.nodes || []).map((node, index) => {
+      const angle = (index / Math.max(1, map.nodes.length)) * Math.PI * 2;
+      const radius = Math.min(rect.width, rect.height) * (node.type === 'vault-hub' ? 0 : .32);
+      return {
+        ...node,
+        x: rect.width / 2 + Math.cos(angle) * radius,
+        y: rect.height / 2 + Math.sin(angle) * radius
+      };
+    });
+    const byId = new Map(nodes.map((node) => [node.id, node]));
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(125,220,138,.24)';
+    (map.links || []).forEach((link) => {
+      const a = byId.get(link.source);
+      const b = byId.get(link.target);
+      if (!a || !b) return;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+    nodes.forEach((node) => {
+      const size = Math.max(5, Math.min(18, Number(node.size || 8)));
+      ctx.beginPath();
+      ctx.fillStyle = node.type === 'vault-hub' ? '#7ddc8a' : node.type === 'repo' ? '#87cefa' : node.type === 'commit' ? '#f2c66d' : '#d9e5d4';
+      ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+      ctx.fill();
+      if (node.type === 'vault-hub' || node.type === 'repo') {
+        ctx.fillStyle = 'rgba(255,255,255,.9)';
+        ctx.font = '12px ui-sans-serif, system-ui';
+        ctx.fillText(node.label || node.id, node.x + size + 5, node.y + 4);
+      }
+    });
+  }
+
+  function selectWorkspace(workspaceId) {
+    const safe = safeFilePart(workspaceId);
+    const url = new URL(location.href);
+    url.searchParams.set('workspace', safe);
+    history.pushState({}, '', url);
+    loadMap('../brain/skyevault-workspaces/' + safe + '.json');
+  }
+
+  function render(map) {
+    activeMap = map;
+    $('repoCount').textContent = map.repo_count || 0;
+    $('receiptCount').textContent = map.receipt_count ?? map.upload_count ?? ((map.uploads || []).length);
+    $('nodeCount').textContent = (map.nodes || []).length;
+    $('storedBytes').textContent = map.total_receipt_human || bytes((map.uploads || []).reduce((sum, upload) => sum + Number(upload.fileSize || 0), 0));
+    if (map.workspace_maps && map.workspace_maps.length) {
+      $('workspaceRows').innerHTML = map.workspace_maps.map((workspace) => '<tr><td><strong>' + esc(workspace.workspace_id) + '</strong></td><td><button class="workspace-map-button" type="button" data-workspace="' + esc(workspace.workspace_id) + '">' + esc(workspace.file) + '</button></td><td>' + esc((workspace.repo_count || 0) + ' repos, ' + (workspace.node_count || 0) + ' nodes') + '</td></tr>').join('');
+      document.querySelectorAll('.workspace-map-button').forEach((button) => button.addEventListener('click', () => selectWorkspace(button.dataset.workspace)));
+    } else if (map.workspace_id) {
+      $('workspaceRows').innerHTML = '<tr><td><strong>' + esc(map.workspace_id) + '</strong></td><td><code>brain/skyevault-workspaces/' + esc(safeFilePart(map.workspace_id)) + '.json</code></td><td>' + esc((map.repo_count || 0) + ' repos, ' + ((map.nodes || []).length) + ' nodes') + '</td></tr>';
+    } else {
+      $('workspaceRows').innerHTML = '<tr><td colspan="3">No workspace maps generated yet.</td></tr>';
+    }
+    $('repoRows').innerHTML = (map.repos || []).map((repo) => '<tr><td><strong>' + esc(repo.workspace_id + '/' + repo.repo_id) + '</strong></td><td>' + esc((repo.ref_updates || 0) + ' ref updates, ' + (repo.requests || 0) + ' requests, ' + (repo.exports || 0) + ' exports') + '</td><td><code>' + esc(repo.latest_head || 'empty') + '</code><br>' + esc(repo.latest_subject || '') + '</td></tr>').join('') || '<tr><td colspan="3">No repos yet.</td></tr>';
+    $('uploadRows').innerHTML = (map.uploads || []).slice(-12).reverse().map((upload) => '<tr><td><code>' + esc(upload.receipt_ref) + '</code></td><td>' + esc(upload.fileName || 'vault upload') + '<br><code>' + esc(upload.sha256_prefix || '') + '</code></td><td>' + esc(upload.fileSize ? new Intl.NumberFormat().format(upload.fileSize) + ' bytes' : '0 B') + '</td></tr>').join('') || '<tr><td colspan="3">No uploads yet.</td></tr>';
+    drawGraph(map);
+    setStatus('Ready - ' + (map.workspace_id ? 'workspace ' + map.workspace_id : (map.safety || 'map loaded')));
+  }
+
+  function loadMap(path) {
+    setStatus('Loading vault map');
+    return fetch(path)
+    .then((res) => {
+      if (!res.ok) throw new Error('Map not generated');
+      return res.json();
+    })
+    .then(render)
+    .catch((error) => setStatus(error.message, false));
+  }
+
+  loadMap(initialMapPath());
+
+  window.addEventListener('resize', () => {
+    if (activeMap) drawGraph(activeMap);
+  });
+</script>
+<script src="../script.js"></script>
+</body>
+</html>

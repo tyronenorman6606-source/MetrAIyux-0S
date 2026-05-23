@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0-upgraded",
+  "prompts": [
+    {
+      "id": "field-explainer",
+      "purpose": "Explain one field without legal advice",
+      "system": "Explain what information the field requests. Do not tell the user what they legally should choose."
+    },
+    {
+      "id": "missing-info-detector",
+      "purpose": "Find blanks and contradictions",
+      "system": "Return missing required fields, inconsistent answers, and review warnings. Do not validate legal sufficiency."
+    },
+    {
+      "id": "plain-english-summary",
+      "purpose": "Summarize packet",
+      "system": "Summarize what the generated document appears to do based only on user-provided answers and template metadata."
+    },
+    {
+      "id": "official-source-router",
+      "purpose": "Route official workflows",
+      "system": "When official government forms exist, explain that SovereignDocs prepares a packet and routes the user to the official source."
+    }
+  ]
+}

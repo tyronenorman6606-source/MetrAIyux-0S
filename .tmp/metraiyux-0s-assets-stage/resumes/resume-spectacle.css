@@ -1,0 +1,591 @@
+:root {
+  --resume-bg: #040508;
+  --resume-ink: #f7f1e3;
+  --resume-muted: #b9b2a5;
+  --resume-gold: #f4c75b;
+  --resume-gold-hot: #ffe59d;
+  --resume-cyan: #7ee7ff;
+  --resume-violet: #a88cff;
+  --resume-mint: #6ff2c7;
+  --resume-line: rgba(244, 199, 91, .18);
+  --resume-glass: rgba(8, 11, 18, .72);
+}
+
+html {
+  scrollbar-width: auto;
+  scrollbar-color: var(--resume-cyan) rgba(4, 5, 8, .96);
+}
+
+body.resume-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 199, 91, .2), transparent 34%),
+    radial-gradient(circle at 86% 12%, rgba(126, 231, 255, .2), transparent 32%),
+    radial-gradient(circle at 72% 72%, rgba(168, 140, 255, .16), transparent 38%),
+    linear-gradient(135deg, #040508 0%, #081018 54%, #030407 100%);
+  color: var(--resume-ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+body.resume-page::before,
+body.resume-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body.resume-page::before {
+  z-index: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .9), transparent 78%);
+}
+
+body.resume-page::after {
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .045), transparent 18%, rgba(255, 255, 255, .025) 50%, transparent 86%);
+  mix-blend-mode: soft-light;
+}
+
+body.resume-page::-webkit-scrollbar,
+body.resume-page *::-webkit-scrollbar {
+  width: 20px;
+  height: 20px;
+}
+
+body.resume-page::-webkit-scrollbar-track,
+body.resume-page *::-webkit-scrollbar-track {
+  border-left: 1px solid rgba(126, 231, 255, .32);
+  background:
+    linear-gradient(180deg, rgba(244, 199, 91, .16), transparent 18%, rgba(126, 231, 255, .16) 46%, rgba(168, 140, 255, .18) 76%, rgba(111, 242, 199, .12)),
+    rgba(4, 5, 8, .96);
+  box-shadow:
+    inset 0 0 18px rgba(126, 231, 255, .34),
+    inset 0 0 30px rgba(244, 199, 91, .14);
+}
+
+body.resume-page::-webkit-scrollbar-thumb,
+body.resume-page *::-webkit-scrollbar-thumb {
+  border: 4px solid rgba(4, 5, 8, .96);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 12%, #fff 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 32%, var(--resume-gold-hot) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 52%, var(--resume-cyan) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 72%, var(--resume-violet) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 90%, var(--resume-mint) 0 4px, transparent 5px),
+    linear-gradient(180deg, var(--resume-gold-hot), var(--resume-cyan), var(--resume-violet));
+  box-shadow:
+    0 0 14px rgba(126, 231, 255, .82),
+    0 0 26px rgba(244, 199, 91, .48),
+    inset 0 0 12px rgba(255, 255, 255, .48);
+}
+
+.resume-shell {
+  position: relative;
+  z-index: 2;
+  width: min(1240px, calc(100% - 40px));
+  max-width: none;
+  margin: 0 auto;
+  padding: 54px 0 64px;
+}
+
+.resume-shell::before {
+  content: "MetrAIyux 0S / Cabinet Resume";
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  margin: 0 0 18px;
+  padding: 6px 12px;
+  border: 1px solid rgba(126, 231, 255, .22);
+  border-radius: 999px;
+  color: var(--resume-cyan);
+  background: rgba(126, 231, 255, .06);
+  box-shadow: 0 0 28px rgba(126, 231, 255, .16);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.resume-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  gap: 34px;
+  align-items: stretch;
+  padding: clamp(20px, 4vw, 42px);
+  min-height: min(72vh, 760px);
+  border: 1px solid rgba(244, 199, 91, .2);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(10, 13, 21, .96), rgba(7, 12, 19, .82)),
+    radial-gradient(circle at 92% 16%, rgba(126, 231, 255, .18), transparent 34%);
+  box-shadow:
+    0 46px 140px rgba(0, 0, 0, .52),
+    inset 0 1px rgba(255, 255, 255, .08);
+}
+
+.resume-hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: -40% 46% auto -18%;
+  height: 600px;
+  transform: rotate(-12deg);
+  background: linear-gradient(90deg, transparent, rgba(244, 199, 91, .16), rgba(126, 231, 255, .08), transparent);
+  animation: resume-light-sweep 12s ease-in-out infinite alternate;
+}
+
+.resume-hero::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: 28px;
+  bottom: 28px;
+  width: min(340px, 40vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(126, 231, 255, .18);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 34%, rgba(126, 231, 255, .08) 35% 36%, transparent 37% 54%, rgba(244, 199, 91, .1) 55% 56%, transparent 57%),
+    conic-gradient(from 110deg, rgba(244, 199, 91, .42), transparent 18%, rgba(126, 231, 255, .42), transparent 56%, rgba(168, 140, 255, .36), transparent 82%, rgba(244, 199, 91, .42));
+  filter: blur(.2px);
+  opacity: .74;
+  animation: resume-orbit-spin 22s linear infinite;
+}
+
+.resume-three-field {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: .88;
+  mix-blend-mode: screen;
+}
+
+.resume-hero > img {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
+  max-height: 620px;
+  object-fit: cover;
+  border: 1px solid rgba(244, 199, 91, .34);
+  border-radius: 8px;
+  box-shadow:
+    0 28px 84px rgba(0, 0, 0, .48),
+    0 0 0 8px rgba(255, 255, 255, .03),
+    0 0 42px rgba(126, 231, 255, .16);
+  filter: saturate(1.05) contrast(1.04);
+}
+
+.resume-directory-hero > img.resume-brain-mark {
+  object-fit: contain;
+  padding: clamp(24px, 4vw, 46px);
+  background:
+    radial-gradient(circle at 50% 48%, rgba(126, 231, 255, .2), transparent 40%),
+    radial-gradient(circle at 54% 52%, rgba(244, 199, 91, .16), transparent 54%),
+    linear-gradient(145deg, rgba(255, 255, 255, .06), rgba(4, 5, 8, .42));
+}
+
+.resume-hero > div {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.resume-page .eyebrow {
+  width: fit-content;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(244, 199, 91, .22);
+  border-radius: 999px;
+  color: var(--resume-gold-hot);
+  background: rgba(244, 199, 91, .08);
+  letter-spacing: .12em;
+}
+
+.resume-hero h1 {
+  margin: 0;
+  max-width: 900px;
+  color: #fff8e8;
+  font-size: clamp(48px, 8vw, 104px);
+  line-height: .96;
+  letter-spacing: 0;
+  text-shadow:
+    0 0 28px rgba(244, 199, 91, .2),
+    0 0 44px rgba(126, 231, 255, .16);
+}
+
+.resume-hero h2 {
+  margin: 0;
+  max-width: 760px;
+  color: var(--resume-cyan);
+  font-size: clamp(21px, 2.6vw, 34px);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.resume-hero p:not(.eyebrow) {
+  max-width: 820px;
+  margin: 0;
+  color: rgba(247, 241, 227, .82);
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.66;
+}
+
+.resume-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 0;
+}
+
+.resume-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid rgba(126, 231, 255, .2);
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(126, 231, 255, .07);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .06);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.resume-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.resume-grid .panel {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--resume-line);
+  border-radius: 8px;
+  color: var(--resume-ink);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .028)),
+    rgba(5, 7, 12, .7);
+  box-shadow:
+    0 24px 90px rgba(0, 0, 0, .34),
+    inset 0 1px rgba(255, 255, 255, .07);
+  backdrop-filter: blur(18px);
+}
+
+.resume-grid .panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--resume-gold), var(--resume-cyan), transparent);
+  opacity: .72;
+}
+
+.resume-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.resume-grid h2 {
+  margin: 0 0 18px;
+  color: var(--resume-gold-hot);
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.resume-grid h3 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: clamp(18px, 2vw, 24px);
+  letter-spacing: 0;
+}
+
+.resume-grid p,
+.resume-grid li {
+  color: rgba(247, 241, 227, .82);
+}
+
+.resume-grid p {
+  margin: 0 0 14px;
+}
+
+.resume-grid ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resume-grid li {
+  position: relative;
+  min-height: 36px;
+  padding: 8px 10px 8px 34px;
+  border: 1px solid rgba(126, 231, 255, .12);
+  border-radius: 7px;
+  background: rgba(126, 231, 255, .045);
+}
+
+.resume-grid li::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--resume-gold);
+  box-shadow: 0 0 14px rgba(244, 199, 91, .72);
+}
+
+.timeline-item {
+  position: relative;
+  margin: 18px 0 0;
+  padding: 18px 18px 18px 24px;
+  border: 1px solid rgba(244, 199, 91, .14);
+  border-left: 3px solid var(--resume-gold);
+  border-radius: 0 8px 8px 0;
+  background: rgba(4, 5, 8, .42);
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 24px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--resume-cyan);
+  box-shadow: 0 0 18px rgba(126, 231, 255, .82);
+}
+
+.timeline-item .muted,
+.resume-grid .muted {
+  color: var(--resume-cyan);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.resume-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid rgba(244, 199, 91, .16);
+}
+
+.resume-footer a,
+.resume-footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: 1px solid rgba(244, 199, 91, .24);
+  border-radius: 7px;
+  color: var(--resume-ink);
+  background: rgba(255, 255, 255, .045);
+  box-shadow: 0 0 24px rgba(126, 231, 255, .12);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.resume-footer button {
+  color: #111;
+  border-color: transparent;
+  background: linear-gradient(135deg, #f8df96, var(--resume-gold));
+}
+
+.resume-footer a:hover,
+.resume-footer button:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes resume-light-sweep {
+  0% {
+    transform: translate3d(-8%, -2%, 0) rotate(-12deg);
+    opacity: .58;
+  }
+  100% {
+    transform: translate3d(16%, 6%, 0) rotate(-8deg);
+    opacity: .92;
+  }
+}
+
+@keyframes resume-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 920px) {
+  .resume-shell {
+    width: min(100% - 28px, 1240px);
+    padding-top: 30px;
+  }
+
+  .resume-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .resume-hero > img {
+    min-height: 320px;
+    max-height: 520px;
+  }
+
+  .resume-directory-hero > img.resume-brain-mark {
+    min-height: 300px;
+    max-height: 420px;
+  }
+
+  .resume-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .resume-shell {
+    width: min(100% - 22px, 1240px);
+  }
+
+  .resume-hero {
+    padding: 16px;
+  }
+
+  .resume-hero > img {
+    min-height: 280px;
+  }
+
+  .resume-three-field {
+    opacity: .68;
+  }
+
+  .resume-meta span,
+  .resume-footer a,
+  .resume-footer button {
+    width: 100%;
+  }
+
+  .resume-footer {
+    display: grid;
+  }
+}
+
+@media print {
+  html,
+  body.resume-page {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body.resume-page::before,
+  body.resume-page::after,
+  .resume-hero::before,
+  .resume-hero::after,
+  .resume-three-field,
+  .resume-grid .panel::before {
+    display: none !important;
+  }
+
+  .resume-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .resume-shell::before,
+  .resume-footer {
+    display: none;
+  }
+
+  .resume-hero,
+  .resume-grid .panel {
+    break-inside: avoid;
+    border: 1px solid #bbb;
+    box-shadow: none;
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  .resume-hero h1,
+  .resume-hero h2,
+  .resume-hero p,
+  .resume-grid h2,
+  .resume-grid h3,
+  .resume-grid p,
+  .resume-grid li,
+  .resume-grid .muted {
+    color: #111 !important;
+    text-shadow: none;
+  }
+}
+
+/* Magic UI text highlighter treatment */
+.magic-highlighter,
+.magic-highlight,
+.magic-underline,
+[data-highlight] {
+  --highlighter-color: #87cefa;
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.magic-highlighter[data-highlight="highlight"],
+.magic-highlight,
+[data-highlight="highlight"] {
+  border-radius: .18em;
+  padding: 0 .12em;
+  background:
+    linear-gradient(104deg,
+      transparent .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) calc(100% - .08em),
+      transparent calc(100% - .08em));
+  text-shadow: 0 .08em .22em rgba(0, 0, 0, .16);
+}
+
+.magic-highlighter[data-highlight="underline"],
+.magic-underline,
+[data-highlight="underline"] {
+  text-decoration-line: underline;
+  text-decoration-color: var(--highlighter-color);
+  text-decoration-thickness: .16em;
+  text-underline-offset: .13em;
+  text-decoration-skip-ink: none;
+}
+
+@supports not (color: color-mix(in srgb, white 50%, transparent)) {
+  .magic-highlighter[data-highlight="highlight"],
+  .magic-highlight,
+  [data-highlight="highlight"] {
+    background: linear-gradient(104deg, transparent .08em, var(--highlighter-color) .08em, var(--highlighter-color) calc(100% - .08em), transparent calc(100% - .08em));
+  }
+}
+

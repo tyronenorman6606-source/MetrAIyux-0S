@@ -1,0 +1,686 @@
+{
+  "ok": true,
+  "checkedAt": "2026-05-21T13:12:04.536Z",
+  "artifactDir": "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-mounted-worker-stress-2026-05-21T13-12-04-536Z",
+  "mountedSurface": "/api/routex",
+  "authMode": "shared FS27/SkyGate/Free99 bearer through requireGateAuth",
+  "stressType": "mounted Worker full path execution with provider fetch mocks",
+  "scenarios": [
+    {
+      "complianceMode": "certn",
+      "iterations": 5,
+      "apiActions": 105,
+      "workflows": 5,
+      "providerSummary": {
+        "stripe_payment_intents": 22,
+        "twilio_messages": 10,
+        "mapbox_geocodes": 4,
+        "mapbox_directions": 5,
+        "r2_puts": 12,
+        "certn_invites": 6,
+        "background_webhooks": 0,
+        "unexpected": 0
+      },
+      "integrationStatuses": [
+        {
+          "name": "database",
+          "status": "connected",
+          "driver": "worker-kv-document",
+          "note": "0S Worker KV document is the mounted RouteX system record."
+        },
+        {
+          "name": "proof_storage",
+          "status": "connected",
+          "driver": "r2",
+          "note": "Proof media/export objects write to r2."
+        },
+        {
+          "name": "payment_provider",
+          "status": "connected",
+          "driver": "stripe",
+          "note": "Payment provider dispatch is enabled through stripe; local ledger remains authoritative."
+        },
+        {
+          "name": "notification_provider",
+          "status": "connected",
+          "driver": "twilio",
+          "note": "Notification dispatch is enabled through twilio."
+        },
+        {
+          "name": "route_intelligence",
+          "status": "connected",
+          "driver": "mapbox",
+          "note": "Route stops can call live Mapbox geocoding/directions."
+        },
+        {
+          "name": "identity_compliance",
+          "status": "connected",
+          "driver": "certn",
+          "note": "Background/compliance dispatch is enabled through certn."
+        },
+        {
+          "name": "skyehands_runtime",
+          "status": "queued",
+          "driver": "0s-worker-runtime-events",
+          "note": "Audit/runtime events are mirrored into the Worker integration outbox."
+        }
+      ],
+      "counts": {
+        "runtime_events": 86,
+        "compliance_checks": 6,
+        "notifications": 10,
+        "payment_ledger": 10,
+        "integration_outbox": 157,
+        "integration_outbox_pending": 102
+      },
+      "workflowBoard": {
+        "total": 15,
+        "queued": 0,
+        "assigned": 0,
+        "active": 0,
+        "blocked": 0,
+        "completed": 15,
+        "retry": 0,
+        "dead": 0,
+        "unassigned": 10,
+        "job": 5,
+        "job_assignment": 5,
+        "route_job": 5
+      },
+      "workflowTimeline": {
+        "total": 5,
+        "queued": 0,
+        "assigned": 0,
+        "active": 0,
+        "blocked": 0,
+        "completed": 5,
+        "retry": 0,
+        "dead": 0,
+        "job": 5,
+        "job_assignment": 0,
+        "route_job": 0
+      },
+      "storage": {
+        "driver": "r2",
+        "durable": true,
+        "external_object_storage_configured": true,
+        "bucket": "skyeroutex-stress",
+        "proof_media_count": 6,
+        "proof_media_external_count": 6,
+        "export_packet_count": 6,
+        "export_packet_external_count": 6,
+        "integration_outbox_count": 157
+      },
+      "payments": 10,
+      "outboxRows": 157,
+      "externalRows": 55,
+      "failedExternalRows": 0,
+      "disabledLocalSignupStatus": 503
+    },
+    {
+      "complianceMode": "background-webhook",
+      "iterations": 2,
+      "apiActions": 51,
+      "workflows": 2,
+      "providerSummary": {
+        "stripe_payment_intents": 10,
+        "twilio_messages": 4,
+        "mapbox_geocodes": 2,
+        "mapbox_directions": 2,
+        "r2_puts": 6,
+        "certn_invites": 0,
+        "background_webhooks": 3,
+        "unexpected": 0
+      },
+      "integrationStatuses": [
+        {
+          "name": "database",
+          "status": "connected",
+          "driver": "worker-kv-document",
+          "note": "0S Worker KV document is the mounted RouteX system record."
+        },
+        {
+          "name": "proof_storage",
+          "status": "connected",
+          "driver": "r2",
+          "note": "Proof media/export objects write to r2."
+        },
+        {
+          "name": "payment_provider",
+          "status": "connected",
+          "driver": "stripe",
+          "note": "Payment provider dispatch is enabled through stripe; local ledger remains authoritative."
+        },
+        {
+          "name": "notification_provider",
+          "status": "connected",
+          "driver": "twilio",
+          "note": "Notification dispatch is enabled through twilio."
+        },
+        {
+          "name": "route_intelligence",
+          "status": "connected",
+          "driver": "mapbox",
+          "note": "Route stops can call live Mapbox geocoding/directions."
+        },
+        {
+          "name": "identity_compliance",
+          "status": "connected",
+          "driver": "background-webhook",
+          "note": "Background/compliance dispatch is enabled through background-webhook."
+        },
+        {
+          "name": "skyehands_runtime",
+          "status": "queued",
+          "driver": "0s-worker-runtime-events",
+          "note": "Audit/runtime events are mirrored into the Worker integration outbox."
+        }
+      ],
+      "counts": {
+        "runtime_events": 38,
+        "compliance_checks": 3,
+        "notifications": 4,
+        "payment_ledger": 4,
+        "integration_outbox": 70,
+        "integration_outbox_pending": 45
+      },
+      "workflowBoard": {
+        "total": 6,
+        "queued": 0,
+        "assigned": 0,
+        "active": 0,
+        "blocked": 0,
+        "completed": 6,
+        "retry": 0,
+        "dead": 0,
+        "unassigned": 4,
+        "job": 2,
+        "job_assignment": 2,
+        "route_job": 2
+      },
+      "workflowTimeline": {
+        "total": 2,
+        "queued": 0,
+        "assigned": 0,
+        "active": 0,
+        "blocked": 0,
+        "completed": 2,
+        "retry": 0,
+        "dead": 0,
+        "job": 2,
+        "job_assignment": 0,
+        "route_job": 0
+      },
+      "storage": {
+        "driver": "r2",
+        "durable": true,
+        "external_object_storage_configured": true,
+        "bucket": "skyeroutex-stress",
+        "proof_media_count": 3,
+        "proof_media_external_count": 3,
+        "export_packet_count": 3,
+        "export_packet_external_count": 3,
+        "integration_outbox_count": 70
+      },
+      "payments": 4,
+      "outboxRows": 70,
+      "externalRows": 25,
+      "failedExternalRows": 0,
+      "disabledLocalSignupStatus": 503
+    }
+  ],
+  "providerCalls": {
+    "stripe_payment_intents": 32,
+    "twilio_messages": 14,
+    "mapbox_geocodes": 6,
+    "mapbox_directions": 7,
+    "r2_puts": 18,
+    "certn_invites": 6,
+    "background_webhooks": 3,
+    "unexpected": 0
+  },
+  "providerCallCount": 86,
+  "providerCallUrls": [
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.068,33.451",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/proof_media/prf_126c69fa-2278-460d-a577-511a59d62a32.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/JOB_PACKET_job_ad3ee55a-f1b2-42ab-b247-b498f2b94e1d_1779369124671.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Phoenix%20Convention%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Footprint%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.074,33.448",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/proof_media/prf_adbcfd13-87e6-43d2-9f9d-50487f314d8b.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/JOB_PACKET_job_e2b46143-0539-46bb-9954-e5c51e9e7652_1779369124725.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.068,33.451",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/proof_media/prf_ccfe2bf9-9916-4a5f-beaf-675dd573f435.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/JOB_PACKET_job_a562f0ea-86fb-44fd-bff1-fcda7065f080_1779369124774.json",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Phoenix%20Convention%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Footprint%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.074,33.448",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/proof_media/prf_24615c65-00ec-4b56-9fd2-93d185ea35d0.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/JOB_PACKET_job_b9dc83d4-a16b-4d32-8cb5-dcdaa380bc3b_1779369124828.json",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.068,33.451",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/proof_media/prf_d1460b2c-22aa-4345-8bcb-23bb26802058.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/JOB_PACKET_job_e0bed0f9-ba8a-4bad-aeaf-3a164d513e9f_1779369124902.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/manual_compliance_proof/cmp_6b1f1c6d-46af-49eb-b379-9b7615be3493.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/certn/api/v1/hr/applications/invite/",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-certn/exports/MARKET_REPORT_Phoenix_Arizona_1779369124913.json",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.068,33.451",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/background-webhook",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/proof_media/prf_ff3dc852-0ffe-48d2-b792-3c772636d7b6.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/exports/JOB_PACKET_job_ce5e287d-8670-48b9-b826-e78304dff039_1779369124984.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Phoenix%20Convention%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/geocoding/v5/mapbox.places/Footprint%20Center%2C%20Phoenix%2C%20AZ.json",
+      "search": "?access_token=stress-mapbox-token&limit=1"
+    },
+    {
+      "method": "GET",
+      "url": "https://provider-stress.local/mapbox/directions/v5/mapbox/driving/-112.074,33.448;-112.074,33.448",
+      "search": "?access_token=stress-mapbox-token&overview=false&steps=false"
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/background-webhook",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/twilio/2010-04-01/Accounts/ACstress000000000000000000000000000000/Messages.json",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/proof_media/prf_888c196a-8cac-407e-9dcf-94e310e02d79.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/exports/JOB_PACKET_job_52d4cb04-a924-42d6-aaa6-78385fe6e925_1779369125024.json",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/stripe/v1/payment_intents",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/manual_compliance_proof/cmp_563a0220-3a54-4b9a-9999-08683ad8796c.txt",
+      "search": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://provider-stress.local/background-webhook",
+      "search": ""
+    },
+    {
+      "method": "PUT",
+      "url": "https://provider-stress.local/r2/skyeroutex-stress/stress-background-webhook/exports/MARKET_REPORT_Phoenix_Arizona_1779369125033.json",
+      "search": ""
+    }
+  ],
+  "assertions": [
+    "app-local signup is disabled when shared gate is present",
+    "market, job, route, application, roster, assignment, contractor progress, route stops, proof media, approval, dispute, freeze, rating, workflow board, exports, manual compliance, storage, integrations, and outbox paths executed",
+    "Stripe-compatible payment path fired and returned provider ids",
+    "Twilio-compatible notification path fired and returned message ids",
+    "Mapbox-compatible directions/geocode path fired and enriched route jobs",
+    "R2/S3-compatible object storage path fired for proof media and exports",
+    "Certn background invite path fired",
+    "generic signed background-check webhook path fired as the cheaper/flexible alternative lane",
+    "external provider outbox rows finished dispatched with no failed external rows"
+  ]
+}

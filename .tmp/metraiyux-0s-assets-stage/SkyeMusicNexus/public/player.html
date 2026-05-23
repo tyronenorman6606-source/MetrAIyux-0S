@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Music Player</title>
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist">
+  <canvas id="pulse-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <div class="top-title"><p class="micro">SkyeMusicNexus // Music Player</p><h1>Play cleared uploads and generated proofs from the release queue.</h1></div>
+    <div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div>
+  </header>
+  <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload Studio</a><a class="active" href="./player.html">Music Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a></nav>
+  <main class="nexus-shell">
+    <section class="playback-deck panel-xl" id="playbackDeck">
+      <div class="section-head">
+        <div><p class="micro">Stream Deck</p><h3>Play the gated queue.</h3></div>
+        <span class="tag" id="playbackMode">preview audio</span>
+      </div>
+      <div class="player-grid player-grid-expanded">
+        <div class="now-playing">
+          <p class="micro">Now Playing</p>
+          <strong id="nowTrack">No track loaded</strong>
+          <span id="nowRelease">Forge or publish a release to fill the queue.</span>
+          <div class="player-progress"><i id="playerProgress"></i></div>
+          <div class="player-controls"><button class="primary" type="button" data-player-action="play">Play</button><button class="ghost" type="button" data-player-action="stop">Stop</button><button class="secondary" type="button" data-player-action="next">Next</button></div>
+          <div id="playerStatus" class="result-card compact">Playback idle.</div>
+        </div>
+        <div id="playerQueue" class="player-queue"></div>
+      </div>
+    </section>
+    <section class="panel-xl">
+      <div class="section-head"><div><p class="micro">Uploaded Audio Vault</p><h3>Audio for release previews</h3></div><a class="ghost mini button-link" href="./upload.html">Upload more</a></div>
+      <div id="assetList" class="asset-list"></div>
+    </section>
+  </main>
+  <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

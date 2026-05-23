@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Command Center</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <link rel="stylesheet" href="/assets/css/0s-runtime-truth.css" data-runtime-truth-style>
+  <script defer src="/assets/js/0s-runtime-truth.js" data-surface-id="skyevault-command-center" data-repair-href="/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md#phase-4-ui-truth-layer"></script>
+  <style>
+    .vault-command-shell{display:grid;gap:18px}
+    .vault-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr) auto;gap:12px;align-items:end}
+    .vault-toolbar button{min-height:46px}
+    .vault-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .vault-metric{border:1px solid rgba(255,255,255,.13);border-radius:14px;background:rgba(255,255,255,.045);padding:14px}
+    .vault-metric b{display:block;color:#ffe9a8;font-size:1.35rem}
+    .vault-table-wrap{overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(0,0,0,.2)}
+    .vault-table{width:100%;border-collapse:collapse;min-width:980px}
+    .vault-table th,.vault-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:12px;text-align:left;vertical-align:top}
+    .vault-table th{color:#ffe9a8;font-size:.82rem;text-transform:uppercase;letter-spacing:0}
+    .vault-table td p{margin:.2rem 0;color:#c8d7ef}
+    .vault-row-actions{display:flex;flex-wrap:wrap;gap:8px}
+    .vault-row-actions a,.vault-row-actions button{border-radius:999px;padding:8px 10px;border:1px solid rgba(255,215,128,.32);background:rgba(255,255,255,.06);color:#ffe9a8;font:inherit;font-weight:850;text-decoration:none;cursor:pointer}
+    .vault-row-actions button.primary{background:linear-gradient(135deg,#f4c76b,#8bd3ff);border:0;color:#07111d}
+    .vault-status{white-space:pre-wrap}
+    .vault-filter-row{display:grid;grid-template-columns:minmax(220px,1fr) minmax(160px,.5fr) auto;gap:12px;align-items:end}
+    .vault-user-guide{display:grid;gap:12px;border:1px solid rgba(139,211,255,.28);border-radius:8px;background:rgba(139,211,255,.07);padding:14px;margin-top:14px}
+    .vault-user-guide h2,.vault-pack-handoff h3{margin:0;color:#f8df96;letter-spacing:0}
+    .vault-user-guide ol,.vault-pack-handoff ol{margin:0;padding-left:1.15rem;color:#dbe8f7;line-height:1.55}
+    .vault-user-guide li,.vault-pack-handoff li{margin:.25rem 0}
+    .vault-guide-actions,.vault-handoff-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .vault-guide-actions a,.vault-handoff-actions a,.vault-handoff-actions button{border-radius:8px;border:1px solid rgba(255,215,128,.35);background:rgba(255,255,255,.06);color:#ffe9a8;padding:10px 12px;font:inherit;font-weight:900;text-decoration:none;cursor:pointer}
+    .vault-guide-actions a.primary,.vault-handoff-actions a.primary{background:#f4c76b;color:#07111d;border-color:#f4c76b}
+    .vault-pack-handoff{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid rgba(111,242,199,.35);border-radius:8px;background:rgba(111,242,199,.08);padding:14px;margin:14px 0}
+    .vault-pack-handoff p{margin:.25rem 0;color:#dbe8f7}
+    .vault-pack-handoff strong{color:#fff;overflow-wrap:anywhere}
+    .vault-row-note{display:block;color:#b7c7dc;font-size:.82rem;line-height:1.35;margin-top:5px}
+    @media(max-width:860px){.vault-toolbar,.vault-filter-row{grid-template-columns:1fr}.vault-table{min-width:760px}}
+    @media(max-width:760px){.vault-pack-handoff{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">SkyeVault Command Center</span>
+    </a>
+    <nav>
+      <a href="index.html">Admin Hub</a>
+      <a href="automation-brain.html">Main Brain Chat</a>
+      <a href="../skye-secure-secret-packs/app.html">SkyeSecure</a>
+      <a href="../account/skyevault-workspace.html">Workspace Map</a>
+    </nav>
+  </header>
+
+  <main class="site-shell admin-shell vault-command-shell">
+    <section class="admin-panel">
+      <p class="eyebrow">FS27 one-auth vault lane</p>
+      <h1>Receipt Custody Dashboard</h1>
+      <div class="vault-toolbar">
+        <label>Vault origin
+          <input id="vaultOrigin" autocomplete="off" value="https://skyevault-drop.graylondonskyes.workers.dev">
+        </label>
+        <label>FS27 bearer session
+          <input id="fs27Token" type="password" autocomplete="off" placeholder="Uses saved admin session when blank">
+        </label>
+        <button id="loadVault" class="admin-btn" type="button">Load Receipts</button>
+      </div>
+      <details>
+        <summary>Legacy admin token fallback</summary>
+        <label>SkyeVault admin token
+          <input id="legacyAdminToken" type="password" autocomplete="off" placeholder="Only used when no FS27 bearer is active">
+        </label>
+      </details>
+      <div id="skygateAuthStatus"></div>
+      <div id="vaultStatus" class="receipt-box vault-status">Waiting for vault session.</div>
+      <div class="vault-user-guide" aria-label="Secure pack handoff guide">
+        <h2>How secure packs move</h2>
+        <ol>
+          <li>Load receipts to see what SkyeVault is holding for the signed-in workspace.</li>
+          <li>If the object is a <strong>.skyesecrets</strong> pack, download it first. Your browser saves the encrypted file.</li>
+          <li>Open the decrypt console, choose that downloaded file, inspect it, then enter the recipient passphrase and pepper if the sender used one.</li>
+          <li>If nobody gave you a passphrase or pepper, stop there. The vault can prove custody, but it cannot read the encrypted contents for you.</li>
+        </ol>
+        <div class="vault-guide-actions">
+          <a class="primary" href="../skye-secure-secret-packs/app.html" target="_blank" rel="noopener">Open Decrypt Console</a>
+          <a href="../skye-secure-platform/index.html" target="_blank" rel="noopener">View Safe Metadata Console</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="vaultWorkspace" class="admin-panel hidden">
+      <div class="content-lane-toolbar">
+        <div>
+          <p class="eyebrow">Active actor</p>
+          <h2 id="vaultActor">No actor loaded</h2>
+          <p id="vaultActorDetail" class="mini-note"></p>
+        </div>
+        <div class="button-row">
+          <button id="exportLedger" class="admin-btn secondary" type="button">Export Ledger JSON</button>
+          <button id="exportAll" class="admin-btn secondary" type="button">Export All JSON</button>
+        </div>
+      </div>
+
+      <div class="vault-metrics">
+        <article class="vault-metric"><span>Total receipts</span><b id="metricReceipts">0</b></article>
+        <article class="vault-metric"><span>Vault bytes</span><b id="metricBytes">0 B</b></article>
+        <article class="vault-metric"><span>Secret packs</span><b id="metricSecrets">0</b></article>
+        <article class="vault-metric"><span>Latest receipt</span><b id="metricLatest">None</b></article>
+      </div>
+
+      <div class="vault-filter-row">
+        <label>Search receipts
+          <input id="vaultSearchInput" autocomplete="off" placeholder="Receipt, file, workspace, client, project">
+        </label>
+        <label>Object type
+          <select id="vaultTypeFilter">
+            <option value="">All objects</option>
+            <option value="secret">Secret packs</option>
+            <option value="archive">Archives</option>
+          </select>
+        </label>
+        <button id="clearVaultFilters" class="admin-btn secondary" type="button">Clear</button>
+      </div>
+
+      <div id="secretPackHandoff" class="vault-pack-handoff hidden" aria-live="polite">
+        <div>
+          <p class="eyebrow">Secure pack next step</p>
+          <h3 id="secretPackHandoffTitle">Open the decrypt console after download</h3>
+          <p id="secretPackHandoffDetail">Choose the downloaded .skyesecrets file in the SkyeSecure Console. The passphrase is not stored in this dashboard.</p>
+          <ol>
+            <li>Keep the downloaded <strong>.skyesecrets</strong> file.</li>
+            <li>Open the decrypt console and select that exact file.</li>
+            <li>Use the recipient ID shown in the pack and the passphrase/pepper supplied out-of-band.</li>
+          </ol>
+        </div>
+        <div class="vault-handoff-actions">
+          <a id="secretPackUnlockLink" class="primary" href="../skye-secure-secret-packs/app.html" target="_blank" rel="noopener">Open Decrypt Console</a>
+          <button id="secretPackHandoffDismiss" type="button">Got it</button>
+        </div>
+      </div>
+
+      <div class="vault-table-wrap">
+        <table class="vault-table">
+          <thead>
+            <tr>
+              <th>Receipt</th>
+              <th>Object</th>
+              <th>Workspace</th>
+              <th>Client</th>
+              <th>Proof</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="vaultRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="vaultEventsPanel" class="admin-panel hidden">
+      <h2>Recent Custody Events</h2>
+      <div id="vaultEvents" class="side-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer"><p>MetrAIyux 0S command system · Vault custody runs through FS27 bearer auth, signed receipt downloads, and SkyeSecure unlock handoff.</p></footer>
+  <script src="../script.js"></script>
+  <script src="skygate-auth-bridge.js"></script>
+  <script src="skyevault-command-center.js"></script>
+</body>
+</html>

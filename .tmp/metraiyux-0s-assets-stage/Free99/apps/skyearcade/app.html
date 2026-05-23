@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05030b" />
+    <meta
+      name="description"
+      content="Play SkyeArcade: Sovereign Vault, a ten-game browser arcade platform v1.8 by Skyes Over London with a campaign map, level packs, cosmetics, save slots, analytics, weekly conquest, daily streak rewards, Crown Prestige, bridge events, Crown Trials, bosses, local saves, achievements, and no auth requirement."
+    />
+    <title>Play SkyeArcade: Sovereign Vault | Ten-Game Browser Arcade</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/skyearcade-icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/skyearcade-icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="../../free99-gate.js" data-platform-id="skyearcade" data-platform-name="SkyeArcade Sovereign Vault" data-billing-mode="paid_or_member_add_on" data-price-label="Paid/member add-on candidate" data-app-root="/Free99/apps/skyearcade/"></script>
+</head>
+  <body>
+    <div class="atmosphere" aria-hidden="true">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+      <div class="scanline"></div>
+    </div>
+
+    <main id="app" class="app-shell">
+      <noscript>SkyeArcade needs JavaScript enabled to run the game vault.</noscript>
+    </main>
+
+    <template id="card-template">
+      <button class="game-card" type="button">
+        <span class="game-card__number"></span>
+        <span class="game-card__logo"><img alt="" loading="lazy" /></span>
+        <span class="game-card__shine"></span>
+        <span class="game-card__title"></span>
+        <span class="game-card__genre"></span>
+        <span class="game-card__summary"></span>
+        <span class="game-card__meta"></span>
+      </button>
+    </template>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

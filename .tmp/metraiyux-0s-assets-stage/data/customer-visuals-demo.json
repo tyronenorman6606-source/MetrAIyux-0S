@@ -1,0 +1,58 @@
+{
+  "schema_version": "0s.customer_visuals.v1",
+  "generated_at": "2026-05-17T08:00:00.000Z",
+  "workspace": {
+    "workspace_id": "bob-smoke-shop-preview-001",
+    "company_name": "Bob's Smoke Shop Private Preview",
+    "plan_id": "starter-command",
+    "status": "preview_workspace_claimed",
+    "activation": "paid_status_then_owner_approval_activation"
+  },
+  "kpis": [
+    {"label": "AI cap", "value": "$250", "detail": "$42.15 metered", "tone": "gold"},
+    {"label": "Requests today", "value": "118", "detail": "600/day plan limit", "tone": "cyan"},
+    {"label": "Vault usage", "value": "312 MB", "detail": "1 GB plan limit", "tone": "mint"},
+    {"label": "Open commands", "value": "7", "detail": "3 approval-sensitive", "tone": "violet"}
+  ],
+  "progress": [
+    {"id": "ai_spend", "label": "AI spend cap", "used": 42.15, "limit": 250, "unit": "usd", "status": "healthy"},
+    {"id": "daily_requests", "label": "Daily request limit", "used": 118, "limit": 600, "unit": "requests", "status": "healthy"},
+    {"id": "vault_storage", "label": "Vault storage", "used": 312, "limit": 1024, "unit": "mb", "status": "healthy"},
+    {"id": "vault_files", "label": "Vault files", "used": 84, "limit": 250, "unit": "files", "status": "watch"}
+  ],
+  "bars": [
+    {"label": "AI", "value": 42.15, "limit": 250, "unit": "usd"},
+    {"label": "Requests", "value": 118, "limit": 600, "unit": "requests"},
+    {"label": "Storage", "value": 312, "limit": 1024, "unit": "mb"},
+    {"label": "Files", "value": 84, "limit": 250, "unit": "files"}
+  ],
+  "donut": [
+    {"label": "Completed", "value": 18, "tone": "mint"},
+    {"label": "Queued", "value": 7, "tone": "cyan"},
+    {"label": "Approval", "value": 3, "tone": "gold"},
+    {"label": "Blocked", "value": 1, "tone": "danger"}
+  ],
+  "timeline": [
+    {"time": "2026-05-17T06:40:00.000Z", "title": "SkyePay checkout confirmed", "detail": "Paid status recorded and owner approval requested.", "status": "completed"},
+    {"time": "2026-05-17T06:43:00.000Z", "title": "Workspace claimed", "detail": "Customer command room opened after approval.", "status": "completed"},
+    {"time": "2026-05-17T06:48:00.000Z", "title": "SkyeMail key card issued", "detail": "Vault passphrase setup required.", "status": "watch"},
+    {"time": "2026-05-17T06:55:00.000Z", "title": "Customer command routed", "detail": "Marketing update routed to approval lane.", "status": "approval"}
+  ],
+  "sovereign_stack": [
+    {"label": "Database", "value": "CitadelDB or Neon", "status": "owner choice"},
+    {"label": "Vault", "value": "SkyeVault", "status": "selected"},
+    {"label": "Email", "value": "SkyeMail", "status": "provisioning"},
+    {"label": "Gate", "value": "FS27", "status": "mirroring"}
+  ],
+  "event_mix": [
+    {"label": "Workspace", "value": 5},
+    {"label": "Billing", "value": 2},
+    {"label": "Command", "value": 9},
+    {"label": "Vault", "value": 4},
+    {"label": "Mail", "value": 3}
+  ],
+  "source": {
+    "preferred_endpoint": "/api/saas/customer-visuals?workspace_id=bob-smoke-shop-preview-001",
+    "static_fallback": "/data/customer-visuals-demo.json"
+  }
+}

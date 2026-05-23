@@ -1,0 +1,48 @@
+name = "sovereign-saas-provisioning-worker"
+main = "src/index.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+PUBLIC_APP_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
+SKYMAIL_API_URL = "https://skyemail-platform.graylondonskyes.workers.dev"
+SKYMAIL_PUBLIC_URL = "https://skyemail-platform.graylondonskyes.workers.dev"
+RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@solenterprises.org>"
+ADMIN_APPROVAL_EMAIL = "graylondonskyes@gmail.com"
+
+SAAS_PUBLIC_URL = "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev"
+FS27_URL = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"
+
+# Production secrets (set via wrangler secret put):
+# wrangler secret put SKYMAIL_SERVICE_TOKEN
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put ADMIN_TOKEN
+# wrangler secret put MDP_KEYCARD_WEBHOOK_URL
+# wrangler secret put MDP_KEYCARD_WEBHOOK_SECRET
+# wrangler secret put STRIPE_SECRET_KEY
+# wrangler secret put STRIPE_WEBHOOK_SECRET
+# Optional SkyeMerit delivery hooks:
+# wrangler secret put RELAY13_SKYEMERIT_URL
+# wrangler secret put RELAY13_API_TOKEN
+# wrangler secret put CONNECTLOG_SKYEMERIT_URL
+# wrangler secret put CONNECTLOG_API_TOKEN
+
+[[kv_namespaces]]
+binding = "SAAS_KV"
+id = "c3ff2ce5e6c5493997193a14af5d60e4"
+
+[[d1_databases]]
+binding = "SAAS_DB"
+database_name = "metraiyux-saas-db"
+database_id = "23fe7fca-5f9d-4aec-9bed-3ecd5784c0bc"
+
+[[queues.producers]]
+binding = "SAAS_QUEUE"
+queue = "sovereign-saas-queue"
+
+[[services]]
+binding = "SKYMAIL_WORKER"
+service = "skyemail-platform"
+
+[[services]]
+binding = "FS27_WORKER"
+service = "skyegatefs27-citadeldb"

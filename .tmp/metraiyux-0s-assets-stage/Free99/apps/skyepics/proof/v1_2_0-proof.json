@@ -1,0 +1,41 @@
+{
+  "app": "SkyePics App",
+  "version": "1.2.0",
+  "closurePass": "local-first vault operations",
+  "noSaaS": true,
+  "noExternalDatabase": true,
+  "implemented": [
+    "camera capture into encrypted local vault",
+    "local image import",
+    "Web Crypto PBKDF2 + AES-GCM encryption",
+    "Origin Private File System encrypted media storage",
+    "encrypted manifest and secret records",
+    "client-side OCR lane",
+    "secret/key/password/database URL/private key detector",
+    "manual editor for corrected secrets",
+    "developer metadata fields",
+    "privacy shield",
+    "inactivity auto-lock",
+    "clipboard clear attempt after copy",
+    "bulk OCR candidate save",
+    "backup v3 checksum",
+    "backup verify before restore",
+    "redacted recovery receipt",
+    "password rotation",
+    "vault health check",
+    "persistent storage request",
+    "PWA shell"
+  ],
+  "proofCommands": [
+    "npm install",
+    "npm test",
+    "npm run smoke",
+    "npm run build"
+  ],
+  "knownLimits": [
+    "camera hardware permission cannot be physically tested inside this sandbox",
+    "browser storage can be wiped by user/browser cleanup, so encrypted backups remain mandatory",
+    "OCR output must be manually verified",
+    "clipboard clearing can be blocked by browser policy"
+  ]
+}

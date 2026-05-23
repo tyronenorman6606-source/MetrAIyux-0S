@@ -8,10 +8,16 @@
   <link rel="icon" href="/assets/favicon-32.png">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="skyesol-living-page">
+<body class="skyesol-living-page" data-experience-mode="operator">
 <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
   <canvas class="command-canvas living-background" data-living-background aria-hidden="true"></canvas>
   <div class="motion-chrome scroll-progress" data-motion-chrome aria-hidden="true"><span></span></div>
+  <div class="experience-dock" data-experience-dock aria-label="Experience controls">
+    <button type="button" data-experience-mode-option="safe">Safe</button>
+    <button type="button" data-experience-mode-option="operator" aria-pressed="true">Operator</button>
+    <button type="button" data-experience-mode-option="immersion">Immersion</button>
+    <a href="#command-room">Command Room</a>
+  </div>
 
   <!-- Ticker -->
   <div class="ticker-strip" aria-hidden="true">
@@ -27,7 +33,7 @@
         <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
         MetrAIyux 0S
       </a>
-      <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+      <button class="menu-button" type="button" data-menu-button data-menu-toggle aria-label="Open navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
       <div class="nav-search" role="search">
@@ -40,9 +46,14 @@
         <a href="sell-sheet.html">Sell Sheet</a>
         <a href="white-label.html">White Label</a>
         <a href="proof.html">Live Proof</a>
+        <a href="proof-ecology.html">Proof Ecology</a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/company-knowledge-layer-proof.html" target="_blank" rel="noopener">Company Knowledge</a>
         <a href="valuation.html">Valuation</a>
         <a href="the-gap.html">No Competitors</a>
         <a href="social.html">Social</a>
+        <a href="business-cards.html">Business Cards</a>
+        <a href="#developer-access">Dev Access</a>
+        <a href="dev-free-sauce.html">Dev Free Sauce</a>
         <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
         <a class="nav-cta" href="#pricing">Pricing</a>
       </div>
@@ -54,23 +65,63 @@
     <!-- ============ HERO ============ -->
     <section class="hero-section">
       <div class="hero-inner">
-        <p class="eyebrow reveal">Business <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Operating System</span></p>
-        <h1 class="hero-headline reveal">
-          The sovereign OS.<br><em>Built to run.</em>
-        </h1>
-        <p class="hero-sub reveal">
-          Command routing, approval gates, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, multi-tenant workspaces, Free99 gated app lanes, SkyePay activation, SkyeMail, CitadelDB, SkyeBox, and Git-level SkyeVault repo infrastructure — deployed on Cloudflare's global edge.
-        </p>
-        <div class="cta-row reveal">
-          <a class="btn-primary" href="#pricing">See Plans &amp; Pricing</a>
-          <a class="btn-ghost" href="flyer.html" target="_blank">One-Page Overview &rarr;</a>
-          <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html" target="_blank" rel="noopener">Full Feature Atlas &rarr;</a>
-          <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">View the Live System &rarr;</a>
-          <a class="btn-ghost" href="ecosystem.html">Ecosystem Map &rarr;</a>
-        </div>
+        <div class="immersive-hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow reveal">Business <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Operating System</span></p>
+            <h1 class="hero-headline reveal neon-gradient-text">
+              The sovereign OS.<br><em>Built to run.</em>
+            </h1>
+            <p class="hero-sub reveal">
+              Command routing, approval gates, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, multi-tenant workspaces, Free99 gated app lanes, SkyePay activation, SkyeMail, CitadelDB, SkyeBox, and Git-level SkyeVault repo infrastructure — deployed on Cloudflare's global edge.
+            </p>
+            <div class="cta-row reveal">
+              <a class="btn-primary" href="#command-room">Enter Command Room</a>
+              <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">View Live System &rarr;</a>
+              <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html" target="_blank" rel="noopener">Feature Atlas &rarr;</a>
+              <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/company-knowledge-layer-proof.html" target="_blank" rel="noopener">Knowledge Proof &rarr;</a>
+              <a class="btn-ghost" href="#pricing">Plans &amp; Pricing</a>
+            </div>
+            <div class="hero-quick-links reveal" aria-label="Fast routes">
+              <a href="proof.html">Proof</a>
+              <a href="proof-ecology.html">Proof Ecology</a>
+              <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/company-knowledge-layer-proof.html" target="_blank" rel="noopener">Knowledge</a>
+              <a href="capabilities.html">Capabilities</a>
+              <a href="ecosystem.html">Ecosystem</a>
+              <a href="flyer.html" target="_blank">One-page brief</a>
+            </div>
+          </div>
 
-        <!-- Sovereign Stack Orbit — SkyeUI OrbitRings -->
-        <div id="orbit-hero" style="margin:48px auto 0;width:320px;height:320px;opacity:0;transition:opacity 0.8s ease 0.4s;"></div>
+          <div class="command-device reveal" data-command-device data-world-stage tabindex="0" aria-label="Interactive MetrAIyux 0S command room">
+            <div class="device-orbit" aria-hidden="true"></div>
+            <div class="device-shell">
+              <div class="device-bar">
+                <span>0S live command room</span>
+                <span data-mode-label>Operator mode</span>
+              </div>
+              <div class="device-screen">
+                <video class="device-video" src="/assets/metraiyux-live-scroll-reel.mp4" poster="/assets/metraiyux-live-scroll-poster.png" autoplay muted loop playsinline preload="metadata"></video>
+                <div class="device-scrim" aria-hidden="true"></div>
+                <div class="device-core">
+                  <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+                  <div>
+                    <span class="device-status">Global edge online</span>
+                    <strong data-route-title>FS27 / SkyGate</strong>
+                    <p data-route-copy>Shared 0S gate access, Free99 session handoff, and owner/operator surfaces routed through the same credential lane.</p>
+                  </div>
+                </div>
+                <button class="route-node is-active" type="button" data-route-key="gate" style="--x:16%;--y:30%;">Gate</button>
+                <button class="route-node" type="button" data-route-key="relay" style="--x:72%;--y:22%;">Relay13</button>
+                <button class="route-node" type="button" data-route-key="pay" style="--x:80%;--y:62%;">SkyePay</button>
+                <button class="route-node" type="button" data-route-key="vault" style="--x:18%;--y:70%;">Vault</button>
+                <button class="route-node" type="button" data-route-key="proof" style="--x:52%;--y:78%;">Proof</button>
+              </div>
+              <div class="device-footer">
+                <a class="device-link" data-route-link href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html" target="_blank" rel="noopener">Open selected lane</a>
+                <span>Drag the room to inspect</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -97,6 +148,127 @@
         <span>CitadelDB sovereign database — K8s HA Postgres, WAL streaming, point-in-time restore, operator job queue</span>
       </div>
     </div>
+
+    <!-- ============ COMMAND ROOM ============ -->
+    <section class="section command-room" id="command-room">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Interactive System Map</p>
+          <h2>Pick a lane. See what it does. Open the real surface.</h2>
+        </div>
+        <p>The site now behaves like a buyer-facing control room instead of a passive poster. Each object below maps to a live route, a clear operator function, and a proof-backed business use.</p>
+      </div>
+      <div class="command-room-layout">
+        <div class="artifact-grid reveal" aria-label="MetrAIyux 0S operating lanes">
+          <button class="artifact-card is-active" type="button" data-artifact-key="gate">
+            <span>01</span>
+            <strong>FS27 / SkyGate</strong>
+            <small>Shared 0S credential lane</small>
+          </button>
+          <button class="artifact-card" type="button" data-artifact-key="relay">
+            <span>02</span>
+            <strong>Relay13</strong>
+            <small>Client request inbox</small>
+          </button>
+          <button class="artifact-card" type="button" data-artifact-key="pay">
+            <span>03</span>
+            <strong>SkyePay</strong>
+            <small>Approved checkout activation</small>
+          </button>
+          <button class="artifact-card" type="button" data-artifact-key="vault">
+            <span>04</span>
+            <strong>SkyeVault</strong>
+            <small>Repo and secret-pack custody</small>
+          </button>
+          <button class="artifact-card" type="button" data-artifact-key="proof">
+            <span>05</span>
+            <strong>Live Proof</strong>
+            <small>Receipts, builds, and evidence</small>
+          </button>
+          <button class="artifact-card" type="button" data-artifact-key="clients">
+            <span>06</span>
+            <strong>Client Apps</strong>
+            <small>Phone-ready intake surfaces</small>
+          </button>
+        </div>
+
+        <aside class="artifact-inspector reveal" data-artifact-inspector aria-live="polite">
+          <div class="inspector-screen">
+            <p class="eyebrow">Selected Lane</p>
+            <h3 data-artifact-title>FS27 / SkyGate</h3>
+            <p data-artifact-copy>Shared login and session handoff for the platform, owner surfaces, and mounted app lanes. New apps should plug into this gate instead of inventing isolated passwords.</p>
+            <dl class="inspector-stats">
+              <div><dt>Status</dt><dd data-artifact-status>Gate-owned</dd></div>
+              <div><dt>Use</dt><dd data-artifact-use>Access control</dd></div>
+              <div><dt>Proof</dt><dd data-artifact-proof>Session introspection</dd></div>
+            </dl>
+            <div class="cta-row">
+              <a class="btn-primary" data-artifact-link href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html" target="_blank" rel="noopener">Open Lane</a>
+              <a class="btn-ghost" href="proof.html">Read Proof</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ DEVELOPER ACCESS ============ -->
+    <section class="section developer-access" id="developer-access">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Developer Access</p>
+          <h2>Public routes, local MCP, remote MCP, and proof commands.</h2>
+        </div>
+        <p>This is the handoff lane for builders who need to use the system instead of just reading the pitch. Local work uses the repo MCP. Remote work goes through the gate-owned QuantumSkyes endpoint.</p>
+      </div>
+      <div class="developer-access-grid reveal">
+        <article class="dev-access-panel dev-access-panel--wide">
+          <div class="dev-panel-topline">
+            <span>Local MCP config</span>
+            <a href="https://skye-design-mcp.pages.dev/use-mcp.html" target="_blank" rel="noopener">Remote guide</a>
+          </div>
+          <pre><code>{
+  "mcpServers": {
+    "quantumskyes": {
+      "command": "node",
+      "args": ["/workspaces/MetrAIyux-0S/MCP/stdio-server.mjs"]
+    }
+  }
+}</code></pre>
+        </article>
+        <article class="dev-access-panel">
+          <p class="eyebrow">Public URLs</p>
+          <ul class="dev-link-list">
+            <li><a href="https://metraiyux-0s-marketing.pages.dev/" target="_blank" rel="noopener">Marketing command room</a></li>
+            <li><a href="https://merser.pages.dev/" target="_blank" rel="noopener">Merser by Skyes Over London</a></li>
+            <li><a href="https://www.npmjs.com/package/@skyes0verl0nd0n/merser" target="_blank" rel="noopener">@skyes0verl0nd0n/merser on npm</a></li>
+            <li><a href="dev-free-sauce.html">Dev Free Sauce release page</a></li>
+            <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Full 0S system</a></li>
+            <li><a href="https://skye-design-mcp.pages.dev/use-mcp.html" target="_blank" rel="noopener">QuantumSkyes MCP guide</a></li>
+            <li><a href="https://skye-design-mcp.pages.dev/health" target="_blank" rel="noopener">MCP health proof</a></li>
+          </ul>
+        </article>
+        <article class="dev-access-panel dev-access-panel--wide">
+          <p class="eyebrow">CLI lane</p>
+          <pre><code>npx @skyes0verl0nd0n/merser --health
+npx @skyes0verl0nd0n/merser --stdio
+npx --package @skyes0verl0nd0n/merser Merser --version
+npm run mcp:mine -- &lt;target-folder&gt;
+cd /workspaces/MetrAIyux-0S/.vscode/MCP4 &amp;&amp; npm run start:http
+cd /workspaces/MetrAIyux-0S/.vscode/MCP4 &amp;&amp; npm run stress
+npm run proof:live-browser -- --url &lt;production-url&gt; --expect "&lt;visible text&gt;"
+npm run mcp:smoke:remote
+MCP_TRANSPORT=remote QUANTUMSKYES_MCP_TOKEN="$MCP_GATE_SESSION" npm run mcp:mine:remote -- &lt;target-folder&gt;</code></pre>
+        </article>
+        <article class="dev-access-panel">
+          <p class="eyebrow">Access rule</p>
+          <p>Remote MCP access is gate-owned. Use a valid 0S/FS27/NorthStar bearer session from the shared gate flow or an owner-issued bearer. Do not print or commit bearer tokens.</p>
+          <div class="cta-row">
+            <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html" target="_blank" rel="noopener">Owner Login</a>
+            <a class="btn-ghost" href="https://skye-design-mcp.pages.dev/mcp" target="_blank" rel="noopener">MCP Endpoint</a>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <!-- ============ CLIENT OPERATING LOOP ============ -->
     <section class="section" id="client-operating-loop">
@@ -390,6 +562,13 @@
             </div>
           </div>
           <div class="stack-layer">
+            <div class="stack-layer-id">Company Memory</div>
+            <div>
+              <h3>Company Knowledge — Cloudflare R2 + KV</h3>
+              <p>Founder-owned 0S memory and tenant-scoped SaaS company knowledge now live behind the shared FS27 gate. Object bodies store in R2, searchable metadata lives in KV, and the public proof page shows stress receipts without exposing private knowledge.</p>
+            </div>
+          </div>
+          <div class="stack-layer">
             <div class="stack-layer-id">Payment Rail</div>
             <div>
               <h3>SkyePay — 58 Live Stripe Products</h3>
@@ -567,7 +746,7 @@
       </div>
       <div class="client-proof-grid reveal">
         <article class="client-proof-card">
-          <video autoplay muted loop playsinline controls preload="metadata" poster="https://bobs-smoke-shop.pages.dev/assets/videos/bobs-live-homepage-poster.jpg">
+          <video muted loop playsinline controls preload="none" poster="https://bobs-smoke-shop.pages.dev/assets/videos/bobs-live-homepage-poster.jpg">
             <source src="https://bobs-smoke-shop.pages.dev/assets/videos/bobs-live-homepage-loop.mp4" type="video/mp4">
           </video>
           <div>
@@ -578,7 +757,7 @@
           </div>
         </article>
         <article class="client-proof-card">
-          <video autoplay muted loop playsinline controls preload="metadata" poster="https://empire-pallets.pages.dev/assets/media/empire-hero-poster.jpg">
+          <video muted loop playsinline controls preload="none" poster="https://empire-pallets.pages.dev/assets/media/empire-hero-poster.jpg">
             <source src="https://empire-pallets.pages.dev/assets/media/empire-hero.mp4" type="video/mp4">
           </video>
           <div>
@@ -731,6 +910,165 @@
       });
     })();
 
+    // Experience modes, route inspector, and draggable command room
+    (function() {
+      const routeData = {
+        gate: {
+          title: 'FS27 / SkyGate',
+          copy: 'Shared 0S gate access, Free99 session handoff, and owner/operator surfaces routed through the same credential lane.',
+          href: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html',
+          status: 'Gate-owned',
+          use: 'Access control',
+          proof: 'Session introspection'
+        },
+        relay: {
+          title: 'Relay13',
+          copy: 'Client requests, paid AI response buckets, manual fallback, and owner-visible message lanes under the same operating account.',
+          href: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-what-you-get.html',
+          status: 'Live lane',
+          use: 'Client inbox',
+          proof: 'Captured request trail'
+        },
+        pay: {
+          title: 'SkyePay',
+          copy: 'Stripe-backed activation for add-ons, service packages, and AI response lanes with owner approval still intact.',
+          href: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s-skm&offer=relay13-ai-response-starter',
+          status: 'Checkout ready',
+          use: 'Revenue activation',
+          proof: 'Live product catalog'
+        },
+        vault: {
+          title: 'SkyeVault',
+          copy: 'Git-level repo infrastructure, ignored-secret metadata, grants, and SkyeSecure custody tied to the broader 0S owner workflow.',
+          href: 'capabilities.html#sovereign-infrastructure',
+          status: 'Proof-backed',
+          use: 'Repo custody',
+          proof: 'Vault lifecycle events'
+        },
+        proof: {
+          title: 'Live Proof',
+          copy: 'Public evidence surfaces for deployed workers, client builds, restore posture, proof receipts, and buyer-readable operating credibility.',
+          href: 'proof.html',
+          status: 'Published',
+          use: 'Buyer trust',
+          proof: 'Live receipts'
+        },
+        clients: {
+          title: 'Client Apps',
+          copy: 'Phone-ready business apps that capture requests, route them into FS27 and Relay13, and keep paid AI optional instead of automatic.',
+          href: '#client-operating-loop',
+          status: 'Deployable',
+          use: 'Client workflow',
+          proof: 'Live build examples'
+        }
+      };
+
+      const modeButtons = document.querySelectorAll('[data-experience-mode-option]');
+      const modeLabel = document.querySelector('[data-mode-label]');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      function setMode(mode) {
+        const chosen = reduceMotion.matches && mode === 'immersion' ? 'safe' : mode;
+        document.body.dataset.experienceMode = chosen;
+        document.body.classList.toggle('motion-paused', chosen === 'safe' || reduceMotion.matches);
+        if (modeLabel) modeLabel.textContent = chosen.charAt(0).toUpperCase() + chosen.slice(1) + ' mode';
+        modeButtons.forEach(button => {
+          const pressed = button.dataset.experienceModeOption === chosen;
+          button.setAttribute('aria-pressed', String(pressed));
+        });
+        try { sessionStorage.setItem('metraiyux-experience-mode', chosen); } catch {}
+      }
+
+      modeButtons.forEach(button => {
+        button.addEventListener('click', () => setMode(button.dataset.experienceModeOption || 'operator'));
+      });
+      let initialMode = 'operator';
+      try { initialMode = sessionStorage.getItem('metraiyux-experience-mode') || initialMode; } catch {}
+      if (reduceMotion.matches) initialMode = 'safe';
+      setMode(initialMode);
+      reduceMotion.addEventListener?.('change', () => setMode(document.body.dataset.experienceMode || 'operator'));
+
+      function updateSelected(key) {
+        const data = routeData[key] || routeData.gate;
+        document.querySelectorAll('[data-route-key]').forEach(node => {
+          node.classList.toggle('is-active', node.dataset.routeKey === key);
+        });
+        document.querySelectorAll('[data-artifact-key]').forEach(card => {
+          card.classList.toggle('is-active', card.dataset.artifactKey === key);
+        });
+        const title = document.querySelector('[data-route-title]');
+        const copy = document.querySelector('[data-route-copy]');
+        const routeLink = document.querySelector('[data-route-link]');
+        const artifactTitle = document.querySelector('[data-artifact-title]');
+        const artifactCopy = document.querySelector('[data-artifact-copy]');
+        const artifactLink = document.querySelector('[data-artifact-link]');
+        const artifactStatus = document.querySelector('[data-artifact-status]');
+        const artifactUse = document.querySelector('[data-artifact-use]');
+        const artifactProof = document.querySelector('[data-artifact-proof]');
+        if (title) title.textContent = data.title;
+        if (copy) copy.textContent = data.copy;
+        if (routeLink) routeLink.href = data.href;
+        if (artifactTitle) artifactTitle.textContent = data.title;
+        if (artifactCopy) artifactCopy.textContent = data.copy;
+        if (artifactLink) artifactLink.href = data.href;
+        if (artifactStatus) artifactStatus.textContent = data.status;
+        if (artifactUse) artifactUse.textContent = data.use;
+        if (artifactProof) artifactProof.textContent = data.proof;
+      }
+
+      document.querySelectorAll('[data-route-key]').forEach(node => {
+        node.addEventListener('click', () => updateSelected(node.dataset.routeKey));
+      });
+      document.querySelectorAll('[data-artifact-key]').forEach(card => {
+        card.addEventListener('click', () => updateSelected(card.dataset.artifactKey));
+      });
+      updateSelected('gate');
+
+      const stage = document.querySelector('[data-world-stage]');
+      if (!stage) return;
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let rotX = -3;
+      let rotY = 5;
+
+      function applyTilt(x, y) {
+        rotX = Math.max(-12, Math.min(12, x));
+        rotY = Math.max(-16, Math.min(16, y));
+        stage.style.setProperty('--tilt-x', rotX + 'deg');
+        stage.style.setProperty('--tilt-y', rotY + 'deg');
+      }
+      applyTilt(rotX, rotY);
+
+      stage.addEventListener('pointerdown', event => {
+        if (event.target.closest('button, a')) return;
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        stage.classList.add('is-dragging');
+        stage.setPointerCapture?.(event.pointerId);
+      });
+      stage.addEventListener('pointermove', event => {
+        if (!dragging || document.body.dataset.experienceMode === 'safe') return;
+        applyTilt(rotX + (event.clientY - startY) * -0.035, rotY + (event.clientX - startX) * 0.04);
+        startX = event.clientX;
+        startY = event.clientY;
+      });
+      function endDrag(event) {
+        dragging = false;
+        stage.classList.remove('is-dragging');
+        if (event && typeof event.pointerId !== 'undefined') stage.releasePointerCapture?.(event.pointerId);
+      }
+      stage.addEventListener('pointerup', endDrag);
+      stage.addEventListener('pointercancel', endDrag);
+      stage.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') applyTilt(rotX, rotY - 2);
+        if (event.key === 'ArrowRight') applyTilt(rotX, rotY + 2);
+        if (event.key === 'ArrowUp') applyTilt(rotX - 2, rotY);
+        if (event.key === 'ArrowDown') applyTilt(rotX + 2, rotY);
+      });
+    })();
+
     // Reveal on scroll
     (function() {
       const items = document.querySelectorAll('.reveal');
@@ -776,14 +1114,16 @@
       const canvas = document.querySelector('.command-canvas.living-background');
       if (!canvas || !canvas.getContext) return;
       const ctx = canvas.getContext('2d');
-      const particles = Array.from({ length: 72 }, (_, i) => ({
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const particleCount = window.innerWidth < 760 ? 36 : 72;
+      const particles = Array.from({ length: particleCount }, (_, i) => ({
         x: Math.random(), y: Math.random(),
         speed: 0.00045 + Math.random() * 0.0007,
         phase: i * 0.72,
         color: i % 5 === 0 ? '#f8cb5e' : i % 3 === 0 ? '#a88cff' : '#64d9ff'
       }));
       function resize() {
-        const r = window.devicePixelRatio || 1;
+        const r = Math.min(window.devicePixelRatio || 1, 1.5);
         canvas.width = Math.floor(window.innerWidth * r);
         canvas.height = Math.floor(window.innerHeight * r);
         canvas.style.width = window.innerWidth + 'px';
@@ -793,6 +1133,10 @@
       function draw(time) {
         const w = window.innerWidth, h = window.innerHeight;
         ctx.clearRect(0, 0, w, h);
+        if (document.hidden || reduceMotion.matches || document.body.dataset.experienceMode === 'safe') {
+          requestAnimationFrame(draw);
+          return;
+        }
         ctx.lineWidth = 1;
         particles.forEach((p, i) => {
           p.y -= p.speed * 2.4;
@@ -830,11 +1174,11 @@
     document.addEventListener('DOMContentLoaded', function () {
       // Meteors across the hero background
       var heroSec = document.querySelector('.hero-section');
-      if (heroSec) SkyeUI.Meteors(heroSec, { count: 16, color: 'rgba(168,140,255,0.5)' });
+      if (heroSec && window.SkyeUI) SkyeUI.Meteors(heroSec, { count: 16, color: 'rgba(168,140,255,0.5)' });
 
       // Sovereign Stack OrbitRings
       var orbitEl = document.getElementById('orbit-hero');
-      if (orbitEl) {
+      if (orbitEl && window.SkyeUI) {
         SkyeUI.OrbitRings(
           orbitEl,
           '<img src="/assets/metraiyux-0s-emblem-transparent.png" alt="0S" style="width:72px;height:72px;object-fit:contain;border-radius:50%;">',
@@ -864,16 +1208,14 @@
         setTimeout(function () { orbitEl.style.opacity = '1'; }, 600);
       }
 
-      // Text blur-in on hero headline (by word)
-      var hl = document.querySelector('.hero-headline');
-      if (hl) SkyeUI.TextBlurIn(hl, { stagger: 90, delay: 100 });
+      // Keep the hero headline intact; the gradient text treatment is the motion-safe display effect.
 
       // Keep pricing cards static so the featured plan ribbon does not get
       // replaced by animated border pseudo-elements.
 
       // Border beam on proof metrics
       document.querySelectorAll('.metric').forEach(function (el, i) {
-        SkyeUI.BorderBeam(el, { color: '#6ff2c7', size: 50, duration: 2800, delay: i * 250 });
+        if (window.SkyeUI) SkyeUI.BorderBeam(el, { color: '#6ff2c7', size: 50, duration: 2800, delay: i * 250 });
       });
     });
   </script>

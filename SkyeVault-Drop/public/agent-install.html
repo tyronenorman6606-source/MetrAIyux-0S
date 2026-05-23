@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeVault-Drop AI Install</title>
+    <meta name="description" content="AI-readable SkyeVault-Drop installation guide for Cloudflare R2 full repo vault pushes, secret packs, owner gate auth, and metered customer plans." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body class="client-site route-install">
+    <div class="spectacle-field" aria-hidden="true"></div>
+    <main class="site-shell">
+      <nav class="client-nav" aria-label="SkyeVault navigation">
+        <a class="nav-brand sky-brand" href="/" aria-label="SkyeVault-Drop home">
+          <img src="/assets/skyes-over-london-deity-logo.png" alt="" loading="lazy" decoding="async" />
+          <span>
+            <strong>Skyes Over London</strong>
+            <small id="navBrandName">Drop Vault</small>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a href="/upload.html">Upload</a>
+          <a href="/vault.html">My Vault</a>
+          <a href="/repo.html">Repo Vault</a>
+          <a class="nav-cta" href="/agent-install.html">AI Install</a>
+          <a href="/process.html">Process</a>
+          <a href="/">Home</a>
+        </div>
+      </nav>
+
+      <aside class="vault-sidecar" aria-label="Vault routes">
+        <div class="sidecar-brand">
+          <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
+          <div>
+            <strong>AI Install</strong>
+            <span>Agent-ready setup path</span>
+          </div>
+        </div>
+        <a href="/upload.html"><span>01</span> Secure intake</a>
+        <a href="/vault.html"><span>02</span> My vault files</a>
+        <a href="/repo.html"><span>03</span> Repo workspace</a>
+        <a href="/process.html"><span>04</span> Proof route</a>
+        <a href="/agent-install.html"><span>05</span> AI install guide</a>
+        <div class="sidecar-proof">
+          <strong>Gate owned</strong>
+          <p>Owner unlock stays in the shared FS27/SkyGate/Free99 lane. Provider keys stay server-side.</p>
+        </div>
+      </aside>
+
+      <section class="page-hero compact-page-hero route-section">
+        <div>
+          <p class="eyebrow">Agent-readable install</p>
+          <h1 class="page-title">Tell your AI to read this page, then wire the vault.</h1>
+          <p class="muted big-copy">This is the simple path for full repo pushes, Cloudflare R2 multipart streaming, SkyeSecure control packs, owner unlimited access, and customer repo plans.</p>
+        </div>
+        <a class="primary-btn link-btn" href="/repo.html">Open repo lane</a>
+      </section>
+
+      <section class="section-grid route-section install-grid" aria-label="SkyeVault AI installation steps">
+        <article class="panel rich-panel">
+          <p class="eyebrow">Use this prompt</p>
+          <h2>Agent instruction block</h2>
+          <pre class="agent-prompt"><code>Read this SkyeVault-Drop AI Install page.
+Use the repo's existing FS27/SkyGate/Free99 owner auth lane.
+Do not invent app-specific passwords or expose provider keys in the UI.
+Run the local checks, then wire Cloudflare R2 streaming full repo pushes.
+Use npm run vault:repo:full:dry-run before any real push.
+Use npm run vault:repo:full for the encrypted artifact plus SkyeSecure control pack.
+Keep heavy archives and temporary artifacts in /tmp, not the repo workspace.
+Return the receipt paths, secret-pack path, restore steps, and any failed checks.</code></pre>
+        </article>
+
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Install commands</p>
+          <h2>Local setup</h2>
+          <div class="command-stack tall-stack" aria-label="Install commands">
+            <span class="code-pill">cd /workspaces/MetrAIyux-0S</span>
+            <span class="code-pill">npm install</span>
+            <span class="code-pill">cd SkyeVault-Drop &amp;&amp; npm install</span>
+            <span class="code-pill">npm run check</span>
+            <span class="code-pill">npm run cloudflare:check</span>
+            <span class="code-pill">cd ..</span>
+            <span class="code-pill">npm run vault:repo:full:dry-run -- --max-gb=100 --out-dir=/tmp/skyevault-full-repo-dry-run</span>
+            <span class="code-pill">npm run vault:repo:full -- --max-gb=100 --out-dir=/tmp/skyevault-full-repo</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="surface-grid install-surface-grid" aria-label="SkyeVault integration contract">
+        <article class="panel route-card">
+          <span class="eyebrow">Secrets</span>
+          <strong>Names only</strong>
+          <p>Required env names: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_CONFIG_PREFIX, SKYEVAULT_PORTAL_KEY.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Auth</span>
+          <strong>Shared gate</strong>
+          <p>Owner access must accept Authorization, x-admin-token, x-free99-admin-code, x-free99-gate-session, x-skye-gate-session, cookies, and the owner admin session helper.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Plans</span>
+          <strong>Metered repo pushes</strong>
+          <p>Owner/admin/free99 is unlimited. Customer plans include repo-50gb and repo-100gb with push-window counters and declared-size enforcement.</p>
+        </article>
+        <article class="panel route-card">
+          <span class="eyebrow">Outputs</span>
+          <strong>Receipts and packs</strong>
+          <p>Real runs produce SKYDRIVE_UPLOAD_RECEIPT.json, RESTORE.md, UNLOCK_CODES.txt, and a SkyeSecure .skyesecrets control pack with local unlock codes.</p>
+        </article>
+      </section>
+
+      <section class="section-grid route-section install-grid" aria-label="SkyeVault API endpoints and restore path">
+        <article class="panel rich-panel">
+          <p class="eyebrow">API lane</p>
+          <h2>Existing endpoints the agent should use</h2>
+          <ul class="check-list">
+            <li><span class="code-inline">/api/upload-session</span> starts a receipt-backed R2 session.</li>
+            <li><span class="code-inline">/api/upload-part-url</span> mints batched presigned URLs for streaming multipart uploads.</li>
+            <li><span class="code-inline">/api/upload-complete</span> finalizes the R2 upload and ledger receipt.</li>
+            <li><span class="code-inline">/api/client-vault</span> returns protected client recovery entries.</li>
+          </ul>
+        </article>
+        <article class="panel rich-panel accent-panel">
+          <p class="eyebrow">Restore</p>
+          <h2>What a dev gets back</h2>
+          <ul class="check-list">
+            <li>Artifact receipt and R2 object identity for the encrypted full repo stream.</li>
+            <li>Secret-pack receipt for the small SkyeSecure control pack.</li>
+            <li>Local-only unlock material for the admin, never printed into a public page.</li>
+            <li>Restore instructions for fetching, decrypting, decompressing, and extracting into a clean workspace.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <div id="status" class="status-card hidden" role="status" aria-live="polite"></div>
+    <script src="/assets/vendor/gsap.min.js" defer></script>
+    <script src="/assets/vendor/lenis.min.js" defer></script>
+    <script src="/assets/vault-motion.js" defer></script>
+    <script src="/assets/app.js" type="module"></script>
+  </body>
+</html>

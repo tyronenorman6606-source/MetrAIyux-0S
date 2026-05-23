@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyeGateFS27 — Key Generator & Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #05040a;
+      --bg2:       #0c0b15;
+      --card:      rgba(255,255,255,0.04);
+      --border:    rgba(255,255,255,0.10);
+      --purple:    #8A4FFF;
+      --purple-lo: rgba(138,79,255,0.15);
+      --gold:      #ffd700;
+      --gold-lo:   rgba(255,215,0,0.12);
+      --gold-dim:  #ffd36a;
+      --cyan:      #27f2ff;
+      --green:     #22d88f;
+      --red:       #ff4f6a;
+      --orange:    #ff9f1c;
+      --text:      #f0eeff;
+      --muted:     rgba(240,238,255,0.45);
+      --mono:      'Fira Code', monospace;
+      --sans:      'Inter', system-ui, sans-serif;
+      --r:         12px;
+      --r-sm:      8px;
+    }
+
+    html, body { background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+    body {
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(138,79,255,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(39,242,255,0.06) 0%, transparent 60%);
+      min-height: 100vh;
+    }
+
+    /* ── topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5,4,10,0.92); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 22px; gap: 12px; flex-wrap: wrap;
+    }
+    .topbar-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 13px; letter-spacing: 0.08em; color: var(--gold);
+    }
+    .topbar-brand .sep { color: var(--muted); font-weight: 400; font-size: 11px; }
+    .topbar-links { display: flex; align-items: center; gap: 12px; font-size: 11px; }
+    .topbar-links a { color: var(--muted); text-decoration: none; }
+    .topbar-links a:hover { color: var(--text); }
+    .topbar-mode {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .topbar-mode.admin { background: var(--gold-lo); color: var(--gold); }
+    .topbar-mode.worker { background: var(--purple-lo); color: var(--purple); }
+
+    .sdot {
+      width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+      background: var(--muted);
+    }
+    .sdot.ok  { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+    .sdot.err { background: var(--red);    box-shadow: 0 0 6px var(--red); }
+
+    /* ── login ── */
+    #loginGate { max-width: 480px; margin: 72px auto 0; padding: 0 16px; }
+    .login-logo {
+      font-family: var(--mono); font-size: 24px; color: var(--gold);
+      letter-spacing: 0.1em; text-align: center; margin-bottom: 6px;
+    }
+    .login-sub {
+      text-align: center; color: var(--muted); font-size: 12px; margin-bottom: 28px;
+    }
+    .mode-tabs {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid var(--border); border-radius: var(--r) var(--r) 0 0; overflow: hidden;
+      margin-bottom: 0;
+    }
+    .mode-tab {
+      padding: 11px; text-align: center; cursor: pointer;
+      font-size: 12px; font-weight: 700; color: var(--muted);
+      background: rgba(255,255,255,0.02); border: none;
+      transition: all .15s; font-family: var(--sans);
+    }
+    .mode-tab.active { background: var(--purple-lo); color: var(--gold); }
+    .mode-tab:first-child { border-right: 1px solid var(--border); }
+    .login-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-top: none; border-radius: 0 0 var(--r) var(--r); padding: 22px;
+    }
+    .login-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 14px; }
+    .login-hint a { color: var(--gold-dim); text-decoration: none; }
+
+    /* ── layout ── */
+    .wrap {
+      max-width: 1380px; margin: 0 auto; padding: 22px 18px;
+      display: grid; grid-template-columns: 360px 1fr; gap: 18px; align-items: start;
+    }
+    @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } }
+
+    /* ── card ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 20px;
+    }
+    .card + .card { margin-top: 14px; }
+    .card-title {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--gold-dim);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pill {
+      background: var(--gold-lo); color: var(--gold);
+      border-radius: 20px; padding: 2px 8px; font-size: 10px;
+      font-weight: 800; letter-spacing: 0.1em;
+    }
+    .pill-purple { background: var(--purple-lo); color: var(--purple); }
+    .pill-green  { background: rgba(34,216,143,0.12); color: var(--green); }
+
+    /* ── stat row (admin overview) ── */
+    .stat-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 12px 14px;
+      text-align: center;
+    }
+    .stat-val { font-size: 22px; font-weight: 800; color: var(--gold); font-family: var(--mono); }
+    .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── form ── */
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .field { margin-bottom: 12px; }
+    input, select, textarea {
+      width: 100%; padding: 9px 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--text); font-family: var(--sans);
+      font-size: 13px; outline: none; transition: border-color .15s;
+    }
+    input:focus, select:focus { border-color: var(--purple); }
+    input::placeholder { color: var(--muted); }
+    select option { background: #1a1530; }
+    .cols  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    /* ── buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: var(--r-sm);
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; transition: all .15s; text-decoration: none;
+    }
+    .btn-block { width: 100%; justify-content: center; }
+    .btn-primary { background: linear-gradient(135deg, var(--purple), #5a2db5); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.12); }
+    .btn-gold { background: linear-gradient(135deg, #c8a200, #a87800); color: #000; font-weight: 800; }
+    .btn-gold:hover { filter: brightness(1.15); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { border-color: var(--purple); color: var(--gold); }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn-danger { background: rgba(255,79,106,0.15); border: 1px solid rgba(255,79,106,0.35); color: var(--red); }
+    .btn-danger:hover { background: rgba(255,79,106,0.25); }
+    .btn-safe { background: rgba(34,216,143,0.12); border: 1px solid rgba(34,216,143,0.30); color: var(--green); }
+    .btn-safe:hover { background: rgba(34,216,143,0.22); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none !important; }
+
+    /* ── key display ── */
+    .keybox {
+      background: rgba(138,79,255,0.08); border: 1px solid rgba(138,79,255,0.40);
+      border-radius: var(--r); padding: 16px; margin-top: 14px;
+    }
+    .keybox-hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .keybox-title { font-size: 12px; font-weight: 800; color: var(--gold); }
+    .keybox-warn  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .keyvalue {
+      display: block; width: 100%;
+      font-family: var(--mono); font-size: 12px; color: var(--cyan);
+      word-break: break-all; background: rgba(0,0,0,0.35);
+      border-radius: 6px; padding: 10px; line-height: 1.6; user-select: all;
+    }
+    .keybox-meta { margin-top: 10px; font-size: 11px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+    .keybox-meta b { color: var(--text); }
+
+    /* ── table ── */
+    .tablewrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th {
+      text-align: left; padding: 8px 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .1s; }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    tbody td { padding: 10px; vertical-align: top; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+    .badge-active  { background: rgba(34,216,143,0.15); color: var(--green); }
+    .badge-revoked { background: rgba(255,79,106,0.15); color: var(--red); }
+    .badge-admin   { background: rgba(255,215,0,0.12); color: var(--gold); }
+    .badge-owner   { background: rgba(255,159,28,0.15); color: var(--orange); }
+    .badge-deployer{ background: var(--purple-lo); color: var(--purple); }
+    .badge-viewer  { background: rgba(39,242,255,0.1); color: var(--cyan); }
+
+    .mono  { font-family: var(--mono); }
+    .muted { color: var(--muted); }
+    .small { font-size: 11px; }
+    .key-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+    .inline-key {
+      font-family: var(--mono); font-size: 11px; color: var(--cyan);
+      word-break: break-all; margin-top: 6px;
+      background: rgba(0,0,0,0.25); border-radius: 4px; padding: 6px 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .inline-key span { flex: 1; user-select: all; }
+
+    /* ── gate status bar ── */
+    .gate-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      font-size: 11px;
+    }
+    .gate-bar code {
+      font-family: var(--mono); font-size: 10px; color: var(--cyan);
+      background: rgba(0,0,0,0.3); padding: 2px 7px; border-radius: 4px;
+    }
+
+    /* ── section row ── */
+    .section-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+    /* ── toast ── */
+    #toast {
+      position: fixed; bottom: 22px; right: 22px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .tmsg {
+      background: rgba(18,16,28,0.97); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 12px 16px; font-size: 13px;
+      max-width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      animation: slideUp .2s ease;
+    }
+    .tmsg.ok   { border-color: rgba(34,216,143,0.4); color: var(--green); }
+    .tmsg.err  { border-color: rgba(255,79,106,0.4); color: var(--red); }
+    .tmsg.info { border-color: rgba(138,79,255,0.4); color: var(--gold-dim); }
+    @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── misc ── */
+    .empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    details summary { font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; }
+    .spin {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid var(--border); border-top-color: var(--purple);
+      border-radius: 50%; animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .cust-search { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════ TOPBAR ══════ -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <span style="color:var(--purple)">⬡</span>
+    <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SKYEGATEFS27</span>
+    <span class="sep">/ KEY GENERATOR &amp; MANAGER</span>
+    <span class="topbar-mode" id="modeChip" style="display:none;"></span>
+  </div>
+  <div class="topbar-links">
+    <span class="sdot" id="connDot"></span>
+    <span id="connLabel" style="color:var(--muted);">offline</span>
+    <span id="authedAs" style="color:var(--gold-dim); font-weight:700;"></span>
+    <a href="index.html">Full Admin Panel</a>
+    <a href="dashboard.html">User Dashboard</a>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn" style="display:none;">Logout</button>
+  </div>
+</div>
+
+<!-- ══════ LOGIN GATE ══════ -->
+<div id="loginGate" style="padding-bottom:60px;">
+  <div class="login-logo">⬡ SKYEGATEFS27</div>
+  <div class="login-sub">Key Generator &amp; Manager — Mint, Manage, Rotate</div>
+
+  <div class="field" style="margin-bottom:16px;">
+    <label>Gate Base URL <span style="font-weight:400;">(leave blank for this origin)</span></label>
+    <input id="gateUrl" type="url" placeholder="https://skyesol.netlify.app" autocomplete="off" />
+  </div>
+
+  <!-- auth mode tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabAdmin" onclick="switchTab('admin')">🔑 Admin Password</button>
+    <button class="mode-tab" id="tabWorker" onclick="switchTab('worker')">⬡ Gate Key (kx_live_)</button>
+  </div>
+
+  <div class="login-card">
+    <!-- admin password panel -->
+    <div id="panelAdmin">
+      <div class="field">
+        <label>Admin Password <span style="font-weight:400;">(ADMIN_PASSWORD env var)</span></label>
+        <div style="display:flex; gap:8px;">
+          <input id="loginPass" type="password" placeholder="Enter ADMIN_PASSWORD" autocomplete="current-password" style="flex:1;" />
+          <button class="btn btn-gold" id="loginBtn">Enter</button>
+        </div>
+      </div>
+      <p class="login-hint">Full access: all customers, all keys, create, mint, revoke, rotate.</p>
+    </div>
+
+    <!-- gate key panel -->
+    <div id="panelWorker" style="display:none;">
+      <div class="field">
+        <label>Your Gate Key <span style="font-weight:400;">(kx_live_...)</span></label>
+        <div style="display:flex; gap:8px;">
+          <input id="loginKey" type="password" placeholder="kx_live_..." autocomplete="off" style="flex:1; font-family:var(--mono); font-size:12px;" />
+          <button class="btn btn-gold" id="loginKeyBtn">Enter</button>
+        </div>
+      </div>
+      <p class="login-hint">
+        Worker mode: mint &amp; manage keys for your assigned customer.
+        No access to other customers.<br />
+        Need a key? Ask your admin or <a href="index.html">log into the admin panel</a>.
+      </p>
+    </div>
+  </div>
+
+  <p style="font-size:10px; color:var(--muted); text-align:center; margin-top:14px;">
+    Credentials are held in sessionStorage only and cleared on tab close.
+  </p>
+</div>
+
+<!-- ══════ MAIN APP ══════ -->
+<div id="appWrap" class="wrap" style="display:none;">
+
+  <!-- ── LEFT COLUMN ── -->
+  <div>
+
+    <!-- gate status -->
+    <div class="card" style="margin-bottom:14px;">
+      <div class="gate-bar">
+        <span class="sdot ok"></span>
+        <span style="color:var(--green); font-weight:800; font-size:11px;">CONNECTED</span>
+        <span style="color:var(--muted);">→</span>
+        <code id="gateDisplay"></code>
+        <span id="modeLabel" style="font-size:11px;"></span>
+      </div>
+    </div>
+
+    <!-- admin: overview stats -->
+    <div id="adminOverview" class="card" style="display:none; margin-bottom:14px;">
+      <div class="card-title">Overview</div>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val" id="statCusts">—</div>
+          <div class="stat-lbl">Customers</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statActive">—</div>
+          <div class="stat-lbl">Active</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statKeys">—</div>
+          <div class="stat-lbl">Total Keys</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statNetlify">—</div>
+          <div class="stat-lbl">Netlify Linked</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- customer picker (admin only) -->
+    <div class="card" id="custPickerCard">
+      <div class="card-title">
+        <span>Customer</span>
+        <span class="pill" id="custCount">0</span>
+      </div>
+
+      <div class="field cust-search">
+        <input id="custSearch" placeholder="Search by email or ID…" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label>Select Customer</label>
+        <select id="custSelect" size="1">
+          <option value="">— choose —</option>
+        </select>
+      </div>
+
+      <div id="custInfo" style="display:none; font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:10px;"></div>
+
+      <!-- admin only: create customer -->
+      <div id="createCustSection">
+        <hr />
+        <details>
+          <summary>+ Create new customer</summary>
+          <div style="margin-top:12px;">
+            <div class="field">
+              <label>Email</label>
+              <input id="newCustEmail" placeholder="user@company.com" type="email" />
+            </div>
+            <div class="cols">
+              <div class="field">
+                <label>Plan</label>
+                <input id="newCustPlan" value="starter" />
+              </div>
+              <div class="field">
+                <label>Cap (cents)</label>
+                <input id="newCustCap" type="number" value="2000" />
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-block" id="createCustBtn">Create Customer</button>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- mint form -->
+    <div class="card">
+      <div class="card-title">⚡ Mint New Key</div>
+
+      <div class="field">
+        <label>Label</label>
+        <input id="mintLabel" placeholder="e.g. prod-api-01" maxlength="60" />
+      </div>
+
+      <div class="cols">
+        <div class="field">
+          <label>Role</label>
+          <select id="mintRole">
+            <option value="deployer" selected>deployer</option>
+            <option value="viewer">viewer (read-only)</option>
+            <option value="admin">admin</option>
+            <option value="owner">owner</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Monthly Cap (¢)</label>
+          <input id="mintCap" type="number" placeholder="blank = ∞" min="0" />
+        </div>
+      </div>
+
+      <div class="cols3">
+        <div class="field">
+          <label>RPM Limit</label>
+          <input id="mintRpm" type="number" placeholder="∞" min="1" />
+        </div>
+        <div class="field">
+          <label>RPD Limit</label>
+          <input id="mintRpd" type="number" placeholder="∞" min="1" />
+        </div>
+        <div class="field">
+          <label>Max Devices</label>
+          <input id="mintDevices" type="number" placeholder="∞" min="1" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Allowed Providers <span style="font-weight:400;">(comma-sep, blank = all)</span></label>
+        <input id="mintProviders" placeholder="openai, anthropic, gemini" />
+      </div>
+
+      <div class="field">
+        <label>Allowed Models <span style="font-weight:400;">(JSON, blank = all)</span></label>
+        <input id="mintModels" placeholder='{"openai":["gpt-4o"]}' style="font-family:var(--mono); font-size:12px;" />
+      </div>
+
+      <button class="btn btn-primary btn-block" id="mintBtn" disabled>Mint Key</button>
+
+      <div id="mintResult"></div>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT COLUMN ── -->
+  <div>
+    <div class="card">
+      <div class="section-row">
+        <div class="card-title" style="margin-bottom:0;">
+          Keys
+          <span class="pill" id="keysCount">0</span>
+          <span class="pill pill-purple" id="revokedCount" style="display:none;"></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span id="keysSpinner" style="display:none;"><span class="spin"></span></span>
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-size:11px; color:var(--muted); margin:0;">
+            <input type="checkbox" id="showRevoked" style="width:auto;" /> Show revoked
+          </label>
+          <button class="btn btn-ghost btn-sm" id="refreshKeysBtn">↺ Refresh</button>
+        </div>
+      </div>
+
+      <div id="keyListWrap">
+        <div class="empty">Select a customer to load keys.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── state ── */
+  let authMode    = 'admin';   // 'admin' | 'worker'
+  let adminPass   = '';
+  let workerKey   = '';
+  let gateBase    = '';
+  let customers   = [];
+  let keyRows     = [];
+  let selectedCid = null;
+  let workerCid   = null;
+
+  /* ── helpers ── */
+  function $(id) { return document.getElementById(id); }
+
+  function toast(msg, type = 'info', ttl = 4500) {
+    const el = document.createElement('div');
+    el.className = `tmsg ${type}`;
+    el.textContent = msg;
+    $('toast').appendChild(el);
+    setTimeout(() => el.remove(), ttl);
+  }
+  window.toast = toast;
+
+  function fmtDate(s) {
+    if (!s) return '—';
+    return new Date(s).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+  function fmtCap(c) { return c == null ? '∞' : `$${(c/100).toFixed(2)}`; }
+  function escH(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escA(s) { return String(s ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+  function roleBadge(role) {
+    const cls = { admin:'badge-admin', owner:'badge-owner', deployer:'badge-deployer', viewer:'badge-viewer' }[role] || 'badge-deployer';
+    return `<span class="badge ${cls}">${escH(role || 'deployer')}</span>`;
+  }
+
+  /* ── headers ── */
+  function headers() {
+    const h = { 'Content-Type': 'application/json' };
+    if (authMode === 'admin')  h['x-admin-password'] = adminPass;
+    if (authMode === 'worker') h['Authorization'] = `Bearer ${workerKey}`;
+    return h;
+  }
+
+  /* ── API ── */
+  async function api(path, opts = {}) {
+    const res = await fetch(gateBase + path, {
+      method: opts.method || 'GET',
+      headers: headers(),
+      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  }
+
+  /* ── tab switcher ── */
+  window.switchTab = function(tab) {
+    authMode = tab;
+    $('panelAdmin').style.display  = tab === 'admin'  ? '' : 'none';
+    $('panelWorker').style.display = tab === 'worker' ? '' : 'none';
+    $('tabAdmin').classList.toggle('active',  tab === 'admin');
+    $('tabWorker').classList.toggle('active', tab === 'worker');
+  };
+
+  /* ── login: admin password ── */
+  async function doAdminLogin() {
+    const pass = $('loginPass').value.trim();
+    const base = $('gateUrl').value.trim().replace(/\/$/, '');
+    if (!pass) { toast('Enter admin password', 'err'); return; }
+    adminPass = pass;
+    gateBase  = base || window.location.origin;
+    try {
+      await api('/.netlify/functions/admin-customers');
+      sessionStorage.setItem('gf_pass', adminPass);
+      sessionStorage.setItem('gf_mode', 'admin');
+      localStorage.setItem('gf_base', gateBase);
+      initAdminApp();
+    } catch (e) {
+      adminPass = '';
+      toast('Login failed: ' + e.message, 'err');
+    }
+  }
+
+  /* ── login: worker gate key ── */
+  async function doWorkerLogin() {
+    const key  = $('loginKey').value.trim();
+    const base = $('gateUrl').value.trim().replace(/\/$/, '');
+    if (!key || !key.startsWith('kx_live_')) { toast('Enter a valid kx_live_ key', 'err'); return; }
+    workerKey = key;
+    gateBase  = base || window.location.origin;
+    authMode  = 'worker';
+    try {
+      // introspect the key to find the customer
+      const data = await api('/.netlify/functions/auth-introspect', {
+        method: 'POST', body: { token: workerKey }
+      });
+      if (!data.active) throw new Error('Key is inactive or revoked');
+      workerCid = data.customer_id;
+      sessionStorage.setItem('gf_key',  workerKey);
+      sessionStorage.setItem('gf_mode', 'worker');
+      sessionStorage.setItem('gf_wcid', String(workerCid));
+      localStorage.setItem('gf_base', gateBase);
+      initWorkerApp(data);
+    } catch (e) {
+      workerKey = '';
+      toast('Key login failed: ' + e.message, 'err');
+    }
+  }
+
+  /* ── init: admin ── */
+  function initAdminApp() {
+    $('loginGate').style.display = 'none';
+    $('appWrap').style.display   = '';
+    $('connDot').className = 'sdot ok';
+    $('connLabel').textContent = 'connected';
+    $('gateDisplay').textContent = gateBase;
+    $('modeLabel').innerHTML = '<span style="color:var(--gold); font-weight:800;">ADMIN MODE</span> — full access';
+    $('modeChip').textContent = 'ADMIN';
+    $('modeChip').className = 'topbar-mode admin';
+    $('modeChip').style.display = '';
+    $('logoutBtn').style.display = '';
+    $('adminOverview').style.display = '';
+    $('createCustSection').style.display = '';
+    loadCustomers();
+  }
+
+  /* ── init: worker ── */
+  function initWorkerApp(introspect) {
+    authMode  = 'worker';
+    $('loginGate').style.display = 'none';
+    $('appWrap').style.display   = '';
+    $('connDot').className = 'sdot ok';
+    $('connLabel').textContent = 'connected';
+    $('gateDisplay').textContent = gateBase;
+    $('authedAs').textContent = introspect.email ? `— ${introspect.email}` : '';
+    $('modeLabel').innerHTML = '<span style="color:var(--purple); font-weight:800;">WORKER MODE</span> — your customer only';
+    $('modeChip').textContent = 'WORKER';
+    $('modeChip').className = 'topbar-mode worker';
+    $('modeChip').style.display = '';
+    $('logoutBtn').style.display = '';
+    $('adminOverview').style.display = 'none';
+    $('createCustSection').style.display = 'none';
+    $('custSearch').style.display = 'none';
+    $('custCount').textContent = '1';
+
+    // auto-populate customer select with single entry
+    const sel = $('custSelect');
+    sel.innerHTML = '';
+    const opt = document.createElement('option');
+    opt.value = workerCid;
+    opt.textContent = `${introspect.email || 'Your account'} (id:${workerCid})`;
+    sel.appendChild(opt);
+    sel.disabled = true;
+    selectedCid = workerCid;
+    $('mintBtn').disabled = false;
+
+    const info = $('custInfo');
+    info.style.display = '';
+    info.innerHTML = `Customer ID: <b style="color:var(--text)">${workerCid}</b> &nbsp;|&nbsp; Email: <b style="color:var(--text)">${escH(introspect.email || '—')}</b>`;
+
+    loadKeys(workerCid);
+  }
+
+  /* ── customers ── */
+  async function loadCustomers() {
+    try {
+      const data = await api('/.netlify/functions/admin-customers');
+      customers = data.customers || [];
+      renderCustomerSelect();
+      updateOverview();
+    } catch (e) {
+      toast('Failed to load customers: ' + e.message, 'err');
+    }
+  }
+
+  function updateOverview() {
+    $('statCusts').textContent  = customers.length;
+    $('statActive').textContent  = customers.filter(c => c.is_active).length;
+    $('statKeys').textContent    = customers.reduce((n, c) => n + (parseInt(c.active_keys) || 0), 0);
+    $('statNetlify').textContent = customers.filter(c => c.has_netlify_token).length;
+    $('custCount').textContent   = customers.length;
+  }
+
+  function renderCustomerSelect(filter = '') {
+    const sel = $('custSelect');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— choose —</option>';
+    const lf = filter.toLowerCase();
+    customers
+      .filter(c => !lf || c.email.toLowerCase().includes(lf) || String(c.id).includes(lf))
+      .forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.email}  [${c.plan_name}]  #${c.id}`;
+        sel.appendChild(opt);
+      });
+    if (prev) sel.value = prev;
+  }
+
+  $('custSearch').addEventListener('input', function () {
+    renderCustomerSelect(this.value);
+  });
+
+  $('custSelect').addEventListener('change', function () {
+    const cid = parseInt(this.value, 10) || null;
+    selectedCid = cid;
+    $('mintBtn').disabled = !cid;
+    if (cid) {
+      const c = customers.find(x => x.id === cid);
+      if (c) {
+        const info = $('custInfo');
+        info.style.display = '';
+        info.innerHTML =
+          `Plan: <b style="color:var(--text)">${escH(c.plan_name)}</b> &nbsp;|&nbsp; ` +
+          `Cap: <b style="color:var(--gold)">${fmtCap(c.monthly_cap_cents)}</b> &nbsp;|&nbsp; ` +
+          `Active keys: <b style="color:var(--green)">${c.active_keys ?? '?'}</b> &nbsp;|&nbsp; ` +
+          `Status: <b style="color:${c.is_active ? 'var(--green)' : 'var(--red)'}">${c.is_active ? 'active' : 'disabled'}</b>`;
+      }
+      loadKeys(cid);
+    } else {
+      $('custInfo').style.display = 'none';
+      $('keyListWrap').innerHTML = '<div class="empty">Select a customer to load keys.</div>';
+      $('keysCount').textContent = '0';
+      $('revokedCount').style.display = 'none';
+    }
+  });
+
+  /* ── create customer ── */
+  $('createCustBtn').addEventListener('click', async () => {
+    const email = $('newCustEmail').value.trim();
+    if (!email) { toast('Email required', 'err'); return; }
+    const plan = $('newCustPlan').value.trim() || 'starter';
+    const cap  = parseInt($('newCustCap').value, 10) || 2000;
+    $('createCustBtn').disabled = true;
+    try {
+      const data = await api('/.netlify/functions/admin-customers', {
+        method: 'POST', body: { email, plan_name: plan, monthly_cap_cents: cap }
+      });
+      toast(`Customer created: ${data.customer.email}`, 'ok');
+      $('newCustEmail').value = '';
+      await loadCustomers();
+      $('custSelect').value = data.customer.id;
+      $('custSelect').dispatchEvent(new Event('change'));
+    } catch (e) {
+      toast('Create failed: ' + e.message, 'err');
+    } finally {
+      $('createCustBtn').disabled = false;
+    }
+  });
+
+  /* ── mint ── */
+  $('mintBtn').addEventListener('click', async () => {
+    const cid = authMode === 'worker' ? workerCid : selectedCid;
+    if (!cid) return;
+
+    const label   = $('mintLabel').value.trim() || 'key';
+    const role    = $('mintRole').value;
+    const capV    = $('mintCap').value.trim();
+    const rpmV    = $('mintRpm').value.trim();
+    const rpdV    = $('mintRpd').value.trim();
+    const devV    = $('mintDevices').value.trim();
+    const provV   = $('mintProviders').value.trim();
+    const modV    = $('mintModels').value.trim();
+
+    // worker can only create deployer or viewer keys
+    if (authMode === 'worker' && !['deployer','viewer'].includes(role)) {
+      toast('Worker mode: only deployer or viewer roles allowed', 'err'); return;
+    }
+
+    let parsedModels = null;
+    if (modV) { try { parsedModels = JSON.parse(modV); } catch { toast('Invalid JSON in models field', 'err'); return; } }
+
+    const payload = {
+      customer_id:       cid,
+      label, role,
+      monthly_cap_cents: capV ? parseInt(capV) : null,
+      rpm_limit:         rpmV ? parseInt(rpmV) : null,
+      rpd_limit:         rpdV ? parseInt(rpdV) : null,
+      max_devices:       devV ? parseInt(devV) : null,
+      allowed_providers: provV || null,
+      allowed_models:    parsedModels
+    };
+
+    const btn = $('mintBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> Minting…';
+
+    try {
+      const data = await api('/.netlify/functions/admin-keys', { method: 'POST', body: payload });
+      const k = data.api_key;
+      showMintedKey(k);
+      toast(`Key minted — ends …${k.key_last4}`, 'ok');
+      ['mintLabel','mintCap','mintRpm','mintRpd','mintDevices','mintProviders','mintModels']
+        .forEach(id => $(id).value = '');
+      loadKeys(cid);
+    } catch (e) {
+      toast('Mint failed: ' + e.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Mint Key';
+    }
+  });
+
+  function showMintedKey(k) {
+    const r = $('mintResult');
+    r.innerHTML = `
+      <div class="keybox">
+        <div class="keybox-hd">
+          <div>
+            <div class="keybox-title">⚡ Key Minted — Copy Now</div>
+            <div class="keybox-warn">Shown once. Not stored in plaintext. Copy immediately.</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="copyKey(this)">Copy</button>
+        </div>
+        <code class="keyvalue" id="mintedVal">${escH(k.key)}</code>
+        <div class="keybox-meta">
+          <span>ID: <b>${k.id}</b></span>
+          <span>Last 4: <b class="mono">…${escH(k.key_last4)}</b></span>
+          <span>Label: <b>${escH(k.label)}</b></span>
+          <span>Created: <b>${fmtDate(k.created_at)}</b></span>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%; margin-top:10px;"
+          onclick="this.closest('.keybox').remove()">Dismiss</button>
+      </div>`;
+  }
+
+  window.copyKey = function(btn) {
+    const val = btn.closest('.keybox').querySelector('.keyvalue').textContent;
+    navigator.clipboard.writeText(val).then(() => toast('Copied!', 'ok'));
+  };
+
+  /* ── key list ── */
+  async function loadKeys(cid) {
+    $('keysSpinner').style.display = '';
+    try {
+      const data = await api(`/.netlify/functions/admin-keys?customer_id=${cid}`);
+      keyRows = data.keys || [];
+      renderKeyList();
+    } catch (e) {
+      toast('Failed to load keys: ' + e.message, 'err');
+    } finally {
+      $('keysSpinner').style.display = 'none';
+    }
+  }
+
+  function renderKeyList() {
+    const showRevoked = $('showRevoked').checked;
+    const visible = showRevoked ? keyRows : keyRows.filter(k => !k.revoked_at);
+    const active  = keyRows.filter(k => !k.revoked_at).length;
+    const revoked = keyRows.filter(k =>  k.revoked_at).length;
+
+    $('keysCount').textContent = `${active} active`;
+    if (revoked > 0) {
+      $('revokedCount').style.display = '';
+      $('revokedCount').textContent = `${revoked} revoked`;
+    } else {
+      $('revokedCount').style.display = 'none';
+    }
+
+    if (!visible.length) {
+      $('keyListWrap').innerHTML = `<div class="empty">${showRevoked ? 'No keys found.' : 'No active keys. Check "Show revoked" to see all.'}</div>`;
+      return;
+    }
+
+    const isAdmin = authMode === 'admin';
+    const rows = visible.map(k => {
+      const rev = !!k.revoked_at;
+      const statusBadge = rev
+        ? `<span class="badge badge-revoked">revoked</span>`
+        : `<span class="badge badge-active">active</span>`;
+      const cap = fmtCap(k.monthly_cap_cents);
+      const rpm = k.rpm_limit ?? '∞';
+
+      const revealBtn = k.can_reveal && isAdmin
+        ? `<button class="btn btn-ghost btn-sm" onclick="revealKey(${k.id}, this)">Reveal</button>`
+        : (isAdmin ? `<button class="btn btn-ghost btn-sm" disabled title="No vault — rotate to get a revealable key">No vault</button>` : '');
+
+      const revokeBtn = isAdmin
+        ? `<button class="btn ${rev ? 'btn-safe' : 'btn-danger'} btn-sm" onclick="toggleRevoke(${k.id}, ${rev})">${rev ? 'Unrevoke' : 'Revoke'}</button>`
+        : '';
+
+      const rotateBtn = isAdmin && !rev
+        ? `<button class="btn btn-ghost btn-sm" onclick="rotateKey(${k.id})">Rotate</button>`
+        : '';
+
+      return `<tr id="keyrow-${k.id}" style="${rev ? 'opacity:0.55;' : ''}">
+        <td><span class="mono muted small">${k.id}</span></td>
+        <td>
+          <div style="font-weight:600; font-size:12px;">${escH(k.label || '—')}</div>
+          <div class="mono muted small">…${escH(k.key_last4)}</div>
+        </td>
+        <td>${roleBadge(k.role)}</td>
+        <td>${statusBadge}</td>
+        <td class="muted small">${cap} / ${rpm}rpm</td>
+        <td class="muted small">${fmtDate(k.created_at)}</td>
+        <td>
+          <div class="key-actions">
+            ${revealBtn}${rotateBtn}${revokeBtn}
+          </div>
+          <div id="revealbox-${k.id}"></div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    $('keyListWrap').innerHTML = `
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Label / Last4</th><th>Role</th>
+            <th>Status</th><th>Cap / RPM</th><th>Created</th><th>Actions</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  $('showRevoked').addEventListener('change', renderKeyList);
+
+  /* ── key actions ── */
+  window.revealKey = async function (kid, btn) {
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const data = await api(`/.netlify/functions/admin-keys?reveal_key_id=${kid}`);
+      const box = $(`revealbox-${kid}`);
+      box.innerHTML = `
+        <div class="inline-key">
+          <span>${escH(data.key)}</span>
+          <button class="btn btn-ghost btn-sm"
+            onclick="navigator.clipboard.writeText('${escA(data.key)}').then(()=>toast('Copied!','ok'))">Copy</button>
+        </div>`;
+      btn.textContent = 'Hide';
+      btn.disabled = false;
+      btn.onclick = () => { box.innerHTML = ''; btn.textContent = 'Reveal'; btn.onclick = () => revealKey(kid, btn); };
+    } catch (e) {
+      toast('Reveal failed: ' + e.message, 'err');
+      btn.disabled = false; btn.textContent = 'Reveal';
+    }
+  };
+
+  window.toggleRevoke = async function (kid, isRevoked) {
+    if (!isRevoked && !confirm(`Revoke key ${kid}? It stops working immediately.`)) return;
+    try {
+      await api(`/.netlify/functions/admin-keys?key_id=${kid}`, {
+        method: 'PATCH', body: { revoked: !isRevoked }
+      });
+      toast(`Key ${kid} ${isRevoked ? 'unrevoked' : 'revoked'}`, 'ok');
+      loadKeys(authMode === 'worker' ? workerCid : selectedCid);
+    } catch (e) {
+      toast('Failed: ' + e.message, 'err');
+    }
+  };
+
+  window.rotateKey = async function (kid) {
+    if (!confirm(`Rotate key ${kid}? Old key revoked, new key issued with same settings.`)) return;
+    try {
+      const data = await api(`/.netlify/functions/admin-keys?rotate_key_id=${kid}`, { method: 'PUT', body: null });
+      showMintedKey(data.new_key);
+      toast(`Rotated → …${data.new_key.key_last4}`, 'ok');
+      loadKeys(selectedCid);
+    } catch (e) {
+      toast('Rotate failed: ' + e.message, 'err');
+    }
+  };
+
+  /* ── refresh ── */
+  $('refreshKeysBtn').addEventListener('click', () => {
+    const cid = authMode === 'worker' ? workerCid : selectedCid;
+    if (cid) loadKeys(cid);
+  });
+
+  /* ── logout ── */
+  $('logoutBtn').addEventListener('click', () => {
+    ['gf_pass','gf_key','gf_mode','gf_wcid'].forEach(k => sessionStorage.removeItem(k));
+    adminPass = workerKey = gateBase = '';
+    selectedCid = workerCid = null;
+    authMode = 'admin';
+    $('loginGate').style.display = '';
+    $('appWrap').style.display   = 'none';
+    $('connDot').className = 'sdot';
+    $('connLabel').textContent = 'offline';
+    $('authedAs').textContent = '';
+    $('modeChip').style.display = 'none';
+    $('logoutBtn').style.display = 'none';
+    $('loginPass').value = '';
+    $('loginKey').value  = '';
+  });
+
+  /* ── wire up login buttons ── */
+  $('loginBtn').addEventListener('click', doAdminLogin);
+  $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doAdminLogin(); });
+  $('loginKeyBtn').addEventListener('click', doWorkerLogin);
+  $('loginKey').addEventListener('keydown',  e => { if (e.key === 'Enter') doWorkerLogin(); });
+
+  /* ── restore session ── */
+  const savedBase = localStorage.getItem('gf_base') || '';
+  const savedMode = sessionStorage.getItem('gf_mode');
+  $('gateUrl').value = savedBase;
+
+  if (savedMode === 'admin') {
+    adminPass = sessionStorage.getItem('gf_pass') || '';
+    gateBase  = savedBase || window.location.origin;
+    if (adminPass) initAdminApp();
+  } else if (savedMode === 'worker') {
+    workerKey = sessionStorage.getItem('gf_key') || '';
+    workerCid = parseInt(sessionStorage.getItem('gf_wcid') || '0', 10) || null;
+    gateBase  = savedBase || window.location.origin;
+    authMode  = 'worker';
+    if (workerKey && workerCid) {
+      // re-verify
+      api('/.netlify/functions/auth-introspect', { method: 'POST', body: { token: workerKey } })
+        .then(d => initWorkerApp(d))
+        .catch(() => { sessionStorage.removeItem('gf_mode'); });
+    }
+  }
+})();
+</script>
+</body>
+</html>

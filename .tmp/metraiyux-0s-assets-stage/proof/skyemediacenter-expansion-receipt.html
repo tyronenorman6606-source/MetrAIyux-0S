@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the MetrAIyux 0S SkyeMediaCenter Free99 gated expansion.">
+  <title>SkyeMediaCenter Expansion Receipt · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../live/skye-media-center-operator-proof.html">Media Hub</a>
+      <a href="../SkyeMediaCenter/index.html">App</a>
+      <a href="proof-center.html">Proof Center</a>
+      <a href="../pricing/index.html">Pricing</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero">
+      <p class="eyebrow">Expansion receipt</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>SkyeMediaCenter was imported as a Free99, gated feature.</h1>
+      <p class="hero-copy">This receipt records the extracted folder, removed archive, app/function checks, 0S wiring, public price-card update, and the auth boundary that keeps no-charge access from becoming anonymous access.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="../live/skye-media-center-operator-proof.html">Open expansion hub</a>
+        <a class="button" href="../SkyeMediaCenter/index.html">Open gated app</a>
+        <a class="button" href="../saas/pricing.html#skyemediacenter-free99">Open Free99 card</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="table-wrap">
+        <table class="upgrade-table">
+          <tr><th>Check</th><th>Status</th><th>Evidence</th></tr>
+          <tr><td>Archive unpacked</td><td>Passed</td><td><code>metraiyux_0s_site/SkyeMediaCenter/</code> now contains the imported P3 experiential media app.</td></tr>
+          <tr><td>Zip removed</td><td>Passed</td><td><code>SkyeMediaCenter_P3_Experiential_App.zip</code> was deleted after extraction.</td></tr>
+          <tr><td>Gate session</td><td>Passed</td><td>The app loads <code>gate-session.js</code>, waits for a 0S/FS27/SkyGate session, and labels the feature Free99 with no charge.</td></tr>
+          <tr><td>Function boundary</td><td>Passed</td><td><code>media-assets</code>, <code>media-search</code>, <code>media-file</code>, <code>media-publish</code>, and <code>media-stats</code> reject ungated requests for app data and actions.</td></tr>
+          <tr><td>App smoke</td><td>Passed</td><td><code>node smoke/skye-media-center-p2-smoke.mjs</code> checks routed app surfaces, gate wiring, required assets, and runtime files.</td></tr>
+          <tr><td>End-to-end smoke</td><td>Passed</td><td><code>node smoke/smoke-proof.mjs</code> checks local identity bootstrap, invalid login rejection, login/revoke, gated list/search/file rules, authenticated upload, review, execution, dispatch, search, publish, stats, archive, and workflow timeline.</td></tr>
+          <tr><td>Browser proof</td><td>Passed</td><td>Playwright recorded the media hub, gate overlay, token-cleared app path, and pricing card; the WebM proof player verified playback with <code>readyState >= 2</code>, <code>currentTime > 0</code>, <code>paused === false</code>, and visible video controls.</td></tr>
+          <tr><td>0S wiring</td><td>Passed</td><td>Home, SaaS, pricing, proof, operator, admin, surface registry, sales registry, LLM notes, sitemap, and plan data reference the new platform.</td></tr>
+          <tr><td>Commercial posture</td><td>Passed</td><td>The rate card says Free99, $0/month, $0 setup, no charge, and Gate session required.</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Boundary</h2>
+      <p class="wide">SkyeMediaCenter proves static UI wiring and local function behavior. It does not claim hosted deployment behavior, external SkyGate/JWKS handoff, durable production media storage, or multi-operator hosted synchronization until those provider variables, storage strategy, and deployment checks exist.</p>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S proof routes. Public proof is shareable; private controls stay gated.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

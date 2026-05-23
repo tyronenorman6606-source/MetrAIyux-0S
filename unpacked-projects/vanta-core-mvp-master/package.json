@@ -1,0 +1,45 @@
+{
+  "name": "vanta-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "tsx src/db/seed.ts",
+    "test:reports": "tsx scripts/test-reports.ts",
+    "test:conversion": "tsx scripts/test-conversion-flows.ts",
+    "preflight": "node scripts/deployment-preflight.js",
+    "preflight:strict": "node scripts/deployment-preflight.js --strict",
+    "job:run": "tsx scripts/run-job.ts",
+    "test:smoke": "tsx scripts/final-smoke-test.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.2",
+    "framer-motion": "^12.39.0",
+    "lucide-react": "^0.460.0",
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tsx": "^4.21.0",
+    "zod": "^4.4.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "8.5.14"
+  }
+}

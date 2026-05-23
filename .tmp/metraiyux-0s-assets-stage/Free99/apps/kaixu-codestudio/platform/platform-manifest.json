@@ -1,0 +1,634 @@
+{
+  "schema": "kaixu-platform-executable-v2",
+  "generatedAt": "2026-05-10T23:39:00Z",
+  "build": {
+    "app": "kAIxu CodeStudio Pro",
+    "version": "5.9.1",
+    "buildId": "platform591-website-20260510"
+  },
+  "providers": [
+    {
+      "id": "stripe",
+      "title": "Stripe Payments",
+      "lane": "payments",
+      "enabled": false,
+      "secretRef": "vault:stripe:primary",
+      "requiredSecrets": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET"
+      ],
+      "routes": [
+        "checkout.create",
+        "invoice.send",
+        "webhook.payment"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#StripeAdapter"
+    },
+    {
+      "id": "resend",
+      "title": "Resend Email",
+      "lane": "email",
+      "enabled": false,
+      "secretRef": "vault:resend:primary",
+      "requiredSecrets": [
+        "RESEND_API_KEY"
+      ],
+      "routes": [
+        "email.send",
+        "email.sequence",
+        "webhook.email"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#ResendAdapter"
+    },
+    {
+      "id": "twilio",
+      "title": "Twilio Messaging",
+      "lane": "sms_voice",
+      "enabled": false,
+      "secretRef": "vault:twilio:primary",
+      "requiredSecrets": [
+        "TWILIO_ACCOUNT_SID",
+        "TWILIO_AUTH_TOKEN",
+        "TWILIO_FROM"
+      ],
+      "routes": [
+        "sms.send",
+        "voice.call",
+        "webhook.message"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#TwilioAdapter"
+    },
+    {
+      "id": "cloudflare",
+      "title": "Cloudflare Platform",
+      "lane": "infra",
+      "enabled": false,
+      "secretRef": "vault:cloudflare:primary",
+      "requiredSecrets": [
+        "CLOUDFLARE_ACCOUNT_ID",
+        "CLOUDFLARE_API_TOKEN"
+      ],
+      "routes": [
+        "account.verify",
+        "d1.query"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#CloudflareAdapter"
+    },
+    {
+      "id": "neon",
+      "title": "Neon Postgres",
+      "lane": "database",
+      "enabled": false,
+      "secretRef": "vault:neon:primary",
+      "requiredSecrets": [
+        "DATABASE_URL or NEON_SQL_HTTP_URL"
+      ],
+      "routes": [
+        "db.query"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#NeonAdapter"
+    },
+    {
+      "id": "netlify",
+      "title": "Netlify Deploy",
+      "lane": "deploy",
+      "enabled": false,
+      "secretRef": "vault:netlify:primary",
+      "requiredSecrets": [
+        "NETLIFY_AUTH_TOKEN",
+        "NETLIFY_SITE_ID",
+        "NETLIFY_BUILD_HOOK_URL optional"
+      ],
+      "routes": [
+        "site.status",
+        "deploy.trigger"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#NetlifyAdapter"
+    },
+    {
+      "id": "openai_gateway",
+      "title": "Kaixu AI Gateway",
+      "lane": "ai",
+      "enabled": true,
+      "secretRef": "vault:kaixu_gateway:primary",
+      "requiredSecrets": [
+        "KAIXU_GATEWAY_URL+KAIXU_GATEWAY_SUBKEY or OPENAI_API_KEY"
+      ],
+      "routes": [
+        "ai.chat",
+        "ai.summarize",
+        "ai.classify"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#AIGatewayAdapter"
+    },
+    {
+      "id": "google_ops",
+      "title": "Google Ops",
+      "lane": "docs_calendar",
+      "enabled": false,
+      "secretRef": "vault:google_ops:primary",
+      "requiredSecrets": [
+        "GOOGLE_SERVICE_ACCOUNT_JSON"
+      ],
+      "routes": [
+        "drive.save",
+        "calendar.book"
+      ],
+      "backend": "server/adapters/provider-registry.mjs#GoogleOpsAdapter"
+    }
+  ],
+  "policyRules": [
+    {
+      "id": "pol_ai_tokens",
+      "enabled": true,
+      "scope": "ai",
+      "action": "max_tokens_per_call",
+      "limit": 1200,
+      "effect": "cap",
+      "requiresApproval": false
+    },
+    {
+      "id": "pol_sms_destinations",
+      "enabled": true,
+      "scope": "sms_voice",
+      "action": "sms_destinations",
+      "limit": "us_ca_only",
+      "effect": "restrict",
+      "requiresApproval": false
+    },
+    {
+      "id": "pol_costly_calls",
+      "enabled": true,
+      "scope": "payments",
+      "action": "refund_or_charge_over_500",
+      "limit": 500,
+      "effect": "approval_required",
+      "requiresApproval": true
+    },
+    {
+      "id": "pol_db_writes",
+      "enabled": true,
+      "scope": "database",
+      "action": "destructive_write",
+      "limit": "blocked_without_approval",
+      "effect": "block",
+      "requiresApproval": true
+    },
+    {
+      "id": "pol_webhook_replay",
+      "enabled": true,
+      "scope": "webhooks",
+      "action": "replay_live_event",
+      "limit": "local_only",
+      "effect": "restrict",
+      "requiresApproval": true
+    }
+  ],
+  "workflows": [
+    {
+      "id": "send_invoice",
+      "templateId": "send_invoice",
+      "title": "Send invoice",
+      "category": "Money",
+      "requiredProviders": [
+        "stripe",
+        "resend"
+      ],
+      "steps": [
+        "create_checkout_session",
+        "email_payment_link",
+        "write_receipt"
+      ],
+      "output": "payment_link",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    },
+    {
+      "id": "qualify_lead",
+      "templateId": "qualify_lead",
+      "title": "Qualify lead",
+      "category": "Sales",
+      "requiredProviders": [
+        "openai_gateway",
+        "neon"
+      ],
+      "steps": [
+        "normalize_lead",
+        "score_fit",
+        "write_crm_note"
+      ],
+      "output": "lead_score",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    },
+    {
+      "id": "book_appointment",
+      "templateId": "book_appointment",
+      "title": "Book appointment",
+      "category": "Ops",
+      "requiredProviders": [
+        "google_ops",
+        "resend"
+      ],
+      "steps": [
+        "check_calendar",
+        "create_event",
+        "email_confirmation"
+      ],
+      "output": "calendar_event",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    },
+    {
+      "id": "checkout_email_link",
+      "templateId": "checkout_email_link",
+      "title": "Checkout + email link",
+      "category": "Sales",
+      "requiredProviders": [
+        "stripe",
+        "resend"
+      ],
+      "steps": [
+        "create_checkout_session",
+        "email_link",
+        "audit_receipt"
+      ],
+      "output": "checkout_url",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    },
+    {
+      "id": "db_query_ai_summary",
+      "templateId": "db_query_ai_summary",
+      "title": "DB query + AI summary",
+      "category": "Data",
+      "requiredProviders": [
+        "neon",
+        "openai_gateway"
+      ],
+      "steps": [
+        "run_readonly_query",
+        "summarize_rows",
+        "export_summary"
+      ],
+      "output": "summary_markdown",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    },
+    {
+      "id": "legal_review_intake",
+      "templateId": "legal_review_intake",
+      "title": "Document review intake",
+      "category": "Partner review",
+      "requiredProviders": [
+        "google_ops",
+        "resend"
+      ],
+      "steps": [
+        "capture_submission",
+        "save_to_drive",
+        "notify_partner_queue"
+      ],
+      "output": "review_packet",
+      "runner": "server/platform-engine.mjs#runWorkflow"
+    }
+  ],
+  "projects": [
+    {
+      "id": "default",
+      "name": "Default Workspace",
+      "slug": "default",
+      "status": "active",
+      "ownerRef": "upstream:owner",
+      "budget": {
+        "monthlyCapCents": 50000,
+        "hardStop": true
+      },
+      "roles": {
+        "owner": [
+          "owner"
+        ],
+        "admin": [
+          "admin"
+        ],
+        "operator": [
+          "operator"
+        ],
+        "viewer": [
+          "viewer"
+        ]
+      },
+      "createdAt": "2026-05-10T23:39:00Z",
+      "updatedAt": "2026-05-10T23:39:00Z"
+    }
+  ],
+  "projectProviderInstalls": [],
+  "workflowRunHistory": [],
+  "approvalQueue": [],
+  "upstreamClaimsSample": {
+    "sub": "upstream-user",
+    "email": "operator@example.com",
+    "roles": [
+      "owner"
+    ],
+    "projectRoles": {
+      "default": [
+        "owner",
+        "admin"
+      ]
+    },
+    "source": "upstream-auth"
+  },
+  "releaseGates": [
+    {
+      "id": "gate_provider_manifest",
+      "title": "Provider manifests generated",
+      "done": true
+    },
+    {
+      "id": "gate_policy_manifest",
+      "title": "Policy manifest generated",
+      "done": true
+    },
+    {
+      "id": "gate_workflow_manifest",
+      "title": "Workflow templates materialized",
+      "done": true
+    },
+    {
+      "id": "gate_webhook_replay",
+      "title": "Webhook replay receipts exported",
+      "done": true
+    },
+    {
+      "id": "gate_claims",
+      "title": "Upstream identity claims sample saved",
+      "done": true
+    },
+    {
+      "id": "gate_vault",
+      "title": "Vault created for gateway/provider secret refs",
+      "done": false
+    },
+    {
+      "id": "gate_workspace_export",
+      "title": "Workspace export downloaded",
+      "done": false
+    },
+    {
+      "id": "gate_sandbox_run",
+      "title": "Sandbox run tested from Terminal",
+      "done": false
+    },
+    {
+      "id": "gate_backend_engine",
+      "title": "Executable backend engine files present",
+      "done": true
+    },
+    {
+      "id": "gate_backend_http",
+      "title": "Backend HTTP routes implemented",
+      "done": true
+    },
+    {
+      "id": "gate_backend_smoke",
+      "title": "Backend fixture smoke produced receipts",
+      "done": true
+    },
+    {
+      "id": "gate_live_backend",
+      "title": "Live provider secrets connected and verified",
+      "done": false
+    },
+    {
+      "id": "gate_project_control_plane",
+      "title": "Persistent project/tenancy control plane implemented",
+      "done": true
+    },
+    {
+      "id": "gate_project_provider_installs",
+      "title": "Provider packs install per project with secret refs",
+      "done": true
+    },
+    {
+      "id": "gate_workflow_run_history",
+      "title": "Workflow execution history persisted",
+      "done": true
+    },
+    {
+      "id": "gate_approval_queue",
+      "title": "Approval queue generated for blocked policy actions",
+      "done": true
+    },
+    {
+      "id": "gate_persisted_webhooks",
+      "title": "Webhook inbox persists across backend runs",
+      "done": true
+    }
+  ],
+  "backend": {
+    "baseUrl": "http://localhost:7137",
+    "engine": "server/platform-engine.mjs",
+    "httpServer": "server/http-server.mjs",
+    "dataStore": "server/lib/data-store.mjs",
+    "receiptDir": "./receipts",
+    "dataDir": "./data",
+    "routes": [
+      "GET /api/health",
+      "GET /api/platform/manifest",
+      "GET /api/platform/receipts",
+      "GET /api/platform/providers/probe",
+      "GET /api/platform/provider-packs",
+      "GET /api/platform/projects",
+      "POST /api/platform/projects",
+      "GET /api/platform/projects/:projectId/providers",
+      "POST /api/platform/projects/:projectId/providers/:providerId",
+      "POST /api/platform/projects/:projectId/provider-packs/:packId/install",
+      "POST /api/platform/projects/:projectId/providers/:providerId/rotate",
+      "GET /api/platform/runs",
+      "GET /api/platform/webhooks",
+      "GET /api/platform/approvals",
+      "POST /api/platform/approvals/:approvalId/resolve",
+      "GET /api/platform/jobs",
+      "POST /api/platform/jobs",
+      "POST /api/platform/jobs/:jobId/run",
+      "POST /api/platform/jobs/drain",
+      "GET /api/platform/schedules",
+      "POST /api/platform/schedules",
+      "POST /api/platform/schedules/tick",
+      "GET /api/platform/meters",
+      "GET /api/platform/provider-router",
+      "POST /api/platform/provider-router/optimize",
+      "GET /api/platform/invoices",
+      "POST /api/platform/projects/:projectId/invoices/generate",
+      "GET /api/platform/workflow-builder/graphs",
+      "POST /api/platform/workflow-builder/graphs",
+      "POST /api/platform/projects/:projectId/export",
+      "POST /api/platform/import",
+      "GET /api/platform/bundles",
+      "POST /api/platform/preflight",
+      "POST /api/platform/workflows/:templateId/run",
+      "POST /api/platform/webhooks/ingest",
+      "POST /api/platform/webhooks/:eventId/replay",
+      "POST /api/platform/smoke"
+    ],
+    "modes": {
+      "fixture": "exercises adapters, projects, provider installs, workflow history, approvals, and webhooks with explicit fixture receipts",
+      "live": "calls configured provider APIs and blocks when secrets are missing"
+    }
+  },
+  "noTheaterCodeLanes": [
+    "persistent_project_store",
+    "per_project_provider_installs",
+    "workflow_run_history",
+    "approval_queue",
+    "persisted_webhook_queue",
+    "role_enforced_upstream_claims",
+    "fixture_and_live_mode_receipts",
+    "workflow_graph_compile_receipts",
+    "provider_route_decisions",
+    "meter_backed_invoice_generation",
+    "chromium_click_smoke_harness"
+  ],
+  "version": "5.9.0",
+  "buildId": "notheater-5.9.0",
+  "updatedAt": "2026-05-10T23:58:00.000Z",
+  "durableOps": [
+    "provider_pack_files",
+    "job_queue",
+    "scheduled_workflow_tick",
+    "usage_metering",
+    "project_export_import_bundles",
+    "visual_workflow_graph_builder",
+    "provider_route_optimizer",
+    "usage_invoice_generator"
+  ],
+  "backendRoutes": [
+    "GET /api/health",
+    "GET /api/platform/manifest",
+    "GET /api/platform/receipts",
+    "GET /api/platform/providers/probe",
+    "GET /api/platform/provider-packs",
+    "GET /api/platform/projects",
+    "POST /api/platform/projects",
+    "GET /api/platform/projects/:projectId/providers",
+    "POST /api/platform/projects/:projectId/providers/:providerId",
+    "POST /api/platform/projects/:projectId/provider-packs/:packId/install",
+    "POST /api/platform/projects/:projectId/providers/:providerId/rotate",
+    "GET /api/platform/runs",
+    "GET /api/platform/webhooks",
+    "GET /api/platform/approvals",
+    "POST /api/platform/approvals/:approvalId/resolve",
+    "GET /api/platform/jobs",
+    "POST /api/platform/jobs",
+    "POST /api/platform/jobs/:jobId/run",
+    "POST /api/platform/jobs/drain",
+    "GET /api/platform/schedules",
+    "POST /api/platform/schedules",
+    "POST /api/platform/schedules/tick",
+    "GET /api/platform/meters",
+    "GET /api/platform/provider-router",
+    "POST /api/platform/provider-router/optimize",
+    "GET /api/platform/invoices",
+    "POST /api/platform/projects/:projectId/invoices/generate",
+    "GET /api/platform/workflow-builder/graphs",
+    "POST /api/platform/workflow-builder/graphs",
+    "POST /api/platform/projects/:projectId/export",
+    "POST /api/platform/import",
+    "GET /api/platform/bundles",
+    "POST /api/platform/preflight",
+    "POST /api/platform/workflows/:templateId/run",
+    "POST /api/platform/webhooks/ingest",
+    "POST /api/platform/webhooks/:eventId/replay",
+    "POST /api/platform/smoke"
+  ],
+  "visualGraphRunner": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/workflow-builder/graphs/:id/run"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "auditTrail": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/audit"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "incidentCenter": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/incidents",
+      "/api/platform/incidents/:id/resolve"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "entitlementGates": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/entitlements",
+      "/api/platform/entitlements/check"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "formsAndRecords": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/forms",
+      "/api/platform/forms/:id/submit",
+      "/api/platform/records/:collection"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "projectScorecard": {
+    "implemented": true,
+    "routes": [
+      "/api/platform/scorecard"
+    ],
+    "proof": "platform/proof/backend-smoke-report.json"
+  },
+  "engineCapabilities": [
+    "action_registry_workflows",
+    "executable_provider_pack_actions",
+    "signed_upstream_claims",
+    "webhook_signature_verification",
+    "webhook_idempotency",
+    "storage_adapter_contracts",
+    "locked_retry_queue",
+    "openapi_route_schemas",
+    "operator_command_center"
+  ],
+  "closurePasses": [
+    {
+      "version": "5.9.0",
+      "implemented": [
+        "real_storage_adapters",
+        "registered_provider_pack_actions",
+        "webhook_dispatch_rules",
+        "queue_lock_extension",
+        "dead_letter_retry",
+        "expanded_openapi_validation",
+        "platform_console_storage_dispatch_deadletter_controls"
+      ],
+      "proof": [
+        "npm run check",
+        "npm run smoke:fixture"
+      ],
+      "browserProof": "blocked_by_sandbox_chromium_policy_not_marked_passed"
+    },
+    {
+      "version": "5.9.1",
+      "scope": "website surface closure",
+      "proof": "platform/proof/website-5.9.1-report.json"
+    }
+  ],
+  "websiteSurface": {
+    "version": "5.9.1",
+    "entry": "index.html",
+    "style": "dashboard.css",
+    "script": "dashboard.js",
+    "discoveryFiles": [
+      "robots.txt",
+      "sitemap.xml",
+      "llms.txt",
+      "index.md"
+    ],
+    "purpose": "premium public landing page that routes into the platform app and presents implemented platform lanes without exposing a dense operator dump as the first view"
+  }
+}

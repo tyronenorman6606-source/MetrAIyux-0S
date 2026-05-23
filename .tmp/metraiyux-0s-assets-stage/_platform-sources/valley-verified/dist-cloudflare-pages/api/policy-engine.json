@@ -1,0 +1,572 @@
+{
+  "version": "17.0.0",
+  "generated_at": "2026-05-19T05:43:32.106Z",
+  "policy": [
+    {
+      "type": "lead_request",
+      "queue": "lead-requests",
+      "public_intake": true,
+      "contract_roles": [
+        "ae",
+        "admin",
+        "buyer"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_claim",
+      "queue": "owner-claims",
+      "public_intake": true,
+      "contract_roles": [
+        "owner",
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "profile_enrichment",
+      "queue": "profile-enrichment",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "suppression_request",
+      "queue": "suppression-requests",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_note",
+      "queue": "ae-notes",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "verification_decision",
+      "queue": "verification-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "claim_status_update",
+      "queue": "claim-status-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "lead_status_update",
+      "queue": "lead-status-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "listing_admin_patch",
+      "queue": "listing-admin-patches",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "suppression_apply",
+      "queue": "suppression-drafts",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_stage_update",
+      "queue": "ae-stage-updates",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "sponsor_intent",
+      "queue": "sponsor-intents",
+      "public_intake": true,
+      "contract_roles": [
+        "ae",
+        "admin",
+        "owner"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "customer_business_posting",
+      "queue": "customer-business-postings",
+      "public_intake": false,
+      "contract_roles": [
+        "owner",
+        "ae",
+        "admin",
+        "system",
+        "customer"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_contact_log",
+      "queue": "owner-contact-logs",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "ae_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "payment_event",
+      "queue": "payment-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "system_or_admin",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "exposure_activation",
+      "queue": "exposure-activations",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "quote_request",
+      "queue": "quote-requests",
+      "public_intake": true,
+      "contract_roles": [
+        "buyer",
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "public_intake_queued",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "lead_route_decision",
+      "queue": "lead-route-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "ae_assignment",
+      "queue": "ae-assignments",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "owner_message",
+      "queue": "owner-messages",
+      "public_intake": false,
+      "contract_roles": [
+        "ae",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "notification_delivery_event",
+      "queue": "notification-delivery-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "revenue_attribution_event",
+      "queue": "revenue-attribution-events",
+      "public_intake": false,
+      "contract_roles": [
+        "system",
+        "admin"
+      ],
+      "policy_lane": "standard_review",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    },
+    {
+      "type": "admin_review_decision",
+      "queue": "admin-review-decisions",
+      "public_intake": false,
+      "contract_roles": [
+        "admin"
+      ],
+      "policy_lane": "admin_only",
+      "protected_patch_fields": [
+        "id",
+        "source_id",
+        "source_hash",
+        "canonical_id",
+        "canonical_identity_key",
+        "identity",
+        "verification_score",
+        "moderation_flags",
+        "source_batch_id",
+        "created_at"
+      ],
+      "max_payload_bytes": 64000
+    }
+  ],
+  "protected_patch_fields": [
+    "id",
+    "source_id",
+    "source_hash",
+    "canonical_id",
+    "canonical_identity_key",
+    "identity",
+    "verification_score",
+    "moderation_flags",
+    "source_batch_id",
+    "created_at"
+  ],
+  "role_lanes": {
+    "admin_only": [
+      "suppression_request",
+      "suppression_apply",
+      "verification_decision",
+      "claim_status_update",
+      "listing_admin_patch",
+      "admin_review_decision"
+    ],
+    "ae_or_admin": [
+      "profile_enrichment",
+      "ae_note",
+      "ae_stage_update",
+      "owner_contact_log",
+      "lead_status_update"
+    ],
+    "gated_customer": [
+      "customer_business_posting"
+    ],
+    "public_queued": [
+      "lead_request",
+      "owner_claim",
+      "sponsor_intent"
+    ]
+  }
+}

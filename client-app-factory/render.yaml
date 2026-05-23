@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: client-app-factory-api
+    runtime: docker
+    dockerfilePath: ./client-app-factory/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "4199"

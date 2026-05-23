@@ -1,0 +1,19 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SovereignDocs API",
+    "version": "11.0.0",
+    "description": "Document automation, official-source prep, partner-review routing, commercial order tracking, and governed export API. SovereignDocs is not a law firm and does not provide legal advice."
+  },
+  "paths": {
+    "/api/health": { "get": { "summary": "API health and source-truth summary", "responses": { "200": { "description": "OK" } } } },
+    "/api/session": { "get": { "summary": "Current upstream session", "responses": { "200": { "description": "Session" } } } },
+    "/api/templates/search": { "get": { "summary": "Paginated template search", "parameters": [ { "name":"q", "in":"query", "schema":{"type":"string"} }, { "name":"category", "in":"query", "schema":{"type":"string"} }, { "name":"state", "in":"query", "schema":{"type":"string"} }, { "name":"risk", "in":"query", "schema":{"type":"string"} }, { "name":"page", "in":"query", "schema":{"type":"integer"} } ], "responses": { "200": { "description": "Search results" } } } },
+    "/api/documents/assemble": { "post": { "summary": "Assemble a governed draft or prep worksheet", "responses": { "200": { "description": "Assembly result" }, "403": { "description": "Boundary/gate failure" } } } },
+    "/api/documents/export-docx": { "post": { "summary": "Export DOCX when policy gates allow", "responses": { "200": { "description": "DOCX file" }, "403": { "description": "Boundary/gate failure" } } } },
+    "/api/legal-review/submit": { "post": { "summary": "Submit a draft/prep packet to legal partner review queue", "responses": { "201": { "description": "Submission receipt" }, "403": { "description": "Acknowledgment failure" } } } },
+    "/api/business-formation/intake": { "post": { "summary": "Create business formation prep packet and order", "responses": { "201": { "description": "Order receipt" } } } },
+    "/api/billing/checkout-intent": { "post": { "summary": "Create payment checkout intent when provider is configured", "responses": { "200": { "description": "Checkout intent or dev-disabled response" }, "503": { "description": "Provider missing in production" } } } },
+    "/api/esign/envelopes/create": { "post": { "summary": "Create signature packet or provider envelope when configured", "responses": { "201": { "description": "Envelope receipt" } } } }
+  }
+}

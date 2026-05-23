@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - One Music Style Preview</title>
+  <link rel="stylesheet" href="../../one-music-gh-pages/style.css" />
+  <link rel="stylesheet" href="./one-music-style-preview.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-mode="artist-preview" class="skyesol-living-page one-music-nexus-preview">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="skyesol-scanline" aria-hidden="true"></div>
+
+  <header class="om-header">
+    <a class="om-brand" href="./index.html">
+      <span class="om-brand-mark">SMN</span>
+      <span>SkyeMusicNexus</span>
+    </a>
+    <nav aria-label="Preview rooms">
+      <a href="./upload.html">Upload</a>
+      <a href="./player.html">Player</a>
+      <a href="./releases.html">Releases</a>
+      <a href="./exchange.html">Exchange</a>
+    </nav>
+    <a class="om-btn ghost" href="./index.html">Back to current app</a>
+  </header>
+
+  <main>
+    <section class="om-hero">
+      <div class="om-hero-bg" aria-hidden="true"></div>
+      <div class="om-hero-copy">
+        <p class="om-kicker">MCP-styled One Music direction</p>
+        <h1>Release-ready artist platform.</h1>
+        <p>Same SkyeMusicNexus gate, upload, rights, player, and exchange logic, now shown with bolder artist media, sharper editorial hierarchy, album-store rhythm, and a larger studio drop moment.</p>
+        <div class="om-actions">
+          <a class="om-btn primary" href="./upload.html">Open Upload Studio</a>
+          <a class="om-btn" href="./player.html">Open Player</a>
+        </div>
+      </div>
+      <aside class="om-release-card" aria-label="Preview release card">
+        <img src="../../one-music-gh-pages/img/bg-img/a1.jpg" alt="Album cover direction preview">
+        <div>
+          <span>Latest Drop</span>
+          <strong>Gate Signal Preview</strong>
+          <p>rights-ready preview packet</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="om-command-band" aria-label="MusicNexus operating lanes">
+      <article>
+        <span>01</span>
+        <h2>Upload Studio</h2>
+        <p>Big song drop area, artist ID bridge, gated storage, generated track line.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h2>Rights Vault</h2>
+        <p>Ownership, preview-use, distribution, takedown, and release safety gates.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h2>Artist Exchange</h2>
+        <p>Content requests, inbox threads, community signals, achievements, campaigns.</p>
+      </article>
+    </section>
+
+    <section class="om-upload-stage" aria-label="Large song drop preview">
+      <div>
+        <p class="om-kicker">Upload Studio</p>
+        <h2>Drop songs here.</h2>
+        <p>This direction makes the upload moment the product hero. The real app still writes through the gated MusicNexus upload function.</p>
+      </div>
+      <label class="om-drop-zone">
+        <input type="file" accept="audio/*" aria-label="Preview audio drop target">
+        <span>Audio</span>
+        <strong>Drag a song into the release lane</strong>
+        <small>WAV, MP3, FLAC, M4A, OGG, WebM</small>
+      </label>
+    </section>
+
+    <section class="om-album-grid" aria-label="Album store preview">
+      <div class="om-section-head">
+        <p class="om-kicker">Artist catalog</p>
+        <h2>Album-store energy, platform controls underneath.</h2>
+      </div>
+      <article>
+        <img src="../../one-music-gh-pages/img/bg-img/a2.jpg" alt="Album artwork direction one">
+        <h3>Midnight Signal</h3>
+        <p>Single Song Drop - $199 lane</p>
+      </article>
+      <article>
+        <img src="../../one-music-gh-pages/img/bg-img/a8.jpg" alt="Album artwork direction two">
+        <h3>Neon Weather</h3>
+        <p>Release Content Kit - gated request</p>
+      </article>
+      <article>
+        <img src="../../one-music-gh-pages/img/bg-img/a11.jpg" alt="Album artwork direction three">
+        <h3>Relay Bounce</h3>
+        <p>Community Campaign Sprint</p>
+      </article>
+    </section>
+
+    <section class="om-player-strip" aria-label="Player direction">
+      <img src="../../one-music-gh-pages/img/bg-img/s1.jpg" alt="Track thumbnail">
+      <div>
+        <span>Now Playing</span>
+        <strong>Gate Signal Preview</strong>
+      </div>
+      <div class="om-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <a class="om-btn primary" href="./player.html">Play in real deck</a>
+    </section>
+  </main>
+
+  <script>
+    document.querySelectorAll('.om-drop-zone input').forEach((input) => {
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        const label = input.closest('.om-drop-zone');
+        if (label && file) label.querySelector('strong').textContent = file.name;
+      });
+    });
+  </script>
+</body>
+</html>

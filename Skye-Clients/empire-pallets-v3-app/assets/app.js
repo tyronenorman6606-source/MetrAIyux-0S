@@ -484,6 +484,19 @@ $$("[data-calc]").forEach((form) => {
   update();
 });
 
+const CLIENT_APP_INTAKE_ENDPOINT = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/.netlify/functions/client-app-intake';
+const CLIENT_APP_INTAKE_CONFIG = {
+  source_app: 'empire-pallets',
+  workspace_id: 'empire-pallets-preview-001',
+  business_name: 'Empire Pallets',
+  app_url: 'https://empire-pallets.pages.dev/'
+};
+function intakeFormData(form) {
+  const data = Object.fromEntries(new FormData(form).entries());
+  if (!data.source) data.source = params.get('source') || 'app';
+  data.submittedAt = new Date().toISOString();
+  return data;
+}
 function encodeFormData(form) {
   const data = new FormData(form);
   if (!data.get("source")) data.set("source", params.get("source") || "app");
@@ -495,25 +508,26 @@ $$("[data-record-form]").forEach((form) => {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const result = $("[data-form-result]", form);
-    const payload = encodeFormData(form);
+    const data = intakeFormData(form);
+    const payload = new URLSearchParams(data).toString();
     const submitButton = form.querySelector("button[type='submit']");
     submitButton?.setAttribute("disabled", "true");
-    if (result) result.textContent = "Sending the request into the Empire Pallets app lane...";
+    if (result) result.textContent = "Sending the request into the Empire Pallets 0S lead lane...";
 
     try {
-      const response = await fetch("/", {
+      const response = await fetch(CLIENT_APP_INTAKE_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: payload
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...CLIENT_APP_INTAKE_CONFIG, ...data, page_url: location.href })
       });
       if (!response.ok) throw new Error(`Form returned ${response.status}`);
-      if (result) result.textContent = "Request received. Empire Pallets can review the details and respond with the right next step.";
+      if (result) result.textContent = "Request received. Empire Pallets can review it in the 0S lead lane and respond with the right next step.";
       form.reset();
     } catch {
       const previewRecords = JSON.parse(localStorage.getItem("empirePreviewRequests") || "[]");
       previewRecords.push(Object.fromEntries(new URLSearchParams(payload).entries()));
       localStorage.setItem("empirePreviewRequests", JSON.stringify(previewRecords.slice(-10)));
-      if (result) result.textContent = "Preview saved this request locally. The deployed app lane sends it directly to Empire Pallets.";
+      if (result) result.textContent = "Network fallback saved this request locally. Reopen online and submit again to push it into the 0S lead lane.";
     } finally {
       submitButton?.removeAttribute("disabled");
     }

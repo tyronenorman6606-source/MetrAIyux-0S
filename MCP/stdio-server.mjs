@@ -2,7 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -10,8 +10,9 @@ import { z } from 'zod';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const mcpRoot = __dirname;
 const parent = path.dirname(mcpRoot);
-const repoRoot = process.env.REPO_ROOT
-  ? path.resolve(process.env.REPO_ROOT)
+const runtimeProcess = globalThis.process || { env: {}, argv: [] };
+const repoRoot = runtimeProcess.env.REPO_ROOT
+  ? path.resolve(runtimeProcess.env.REPO_ROOT)
   : path.basename(parent) === 'mcp_design_reference'
     ? path.resolve(mcpRoot, '..', '..')
     : path.resolve(mcpRoot, '..');
@@ -2135,6 +2136,7 @@ function luxuryAudit({ source = '', level = 'full' } = {}) {
   };
 }
 
+export function createQuantumSkyesMcpServer() {
 const server = new McpServer({
   name: 'quantumskyes-design-mcp',
   version: '0.5.0'
@@ -2805,7 +2807,19 @@ server.registerTool('production_ledger', {
   return { content: [{ type: 'text', text }] };
 });
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
-process.stdin.resume();
-setInterval(() => {}, 1 << 30);
+return server;
+}
+
+export async function runStdioServer() {
+  const server = createQuantumSkyesMcpServer();
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  process.stdin.resume();
+  setInterval(() => {}, 1 << 30);
+}
+
+const isDirectRun = runtimeProcess.argv?.[1] && import.meta.url === pathToFileURL(runtimeProcess.argv[1]).href;
+
+if (isDirectRun) {
+  await runStdioServer();
+}

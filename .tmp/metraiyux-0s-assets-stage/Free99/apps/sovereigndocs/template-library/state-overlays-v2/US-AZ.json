@@ -1,0 +1,78 @@
+{
+  "jurisdiction_id": "US-AZ",
+  "state_code": "AZ",
+  "state_name": "Arizona",
+  "version": "2.0.0-upgraded",
+  "status": "state_overlay_source_scaffold",
+  "overlay_policy": "Use this file to attach verified official state/county/city/court/agency sources and state-specific clauses. Do not mark state_specific_law_included true until a qualified reviewer verifies it.",
+  "default_review_level": "requires_current_law_review",
+  "official_source_targets": [
+    {
+      "target": "secretary_of_state_business_forms",
+      "verified_url": "https://azcc.gov/corporations/forms/llc-forms",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Corporation Commission LLC forms page; ACC, not Secretary of State, is the relevant official business entity source for many Arizona corporation/LLC filings. Source triaged only; no legal sufficiency review."
+    },
+    {
+      "target": "state_court_forms",
+      "verified_url": "https://www.azcourts.gov/selfservicecenter/forms",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Judicial Branch Self-Service Center court forms and instructions. Court site itself recommends attorney review for filings."
+    },
+    {
+      "target": "state_department_of_revenue_forms",
+      "verified_url": "https://azdor.gov/forms/tpt-forms",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Department of Revenue TPT forms page and business tax filing resources."
+    },
+    {
+      "target": "state_dmv_forms",
+      "verified_url": "https://azdot.gov/mvd/forms-library",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Department of Transportation MVD official forms library."
+    },
+    {
+      "target": "state_labor_workforce_forms",
+      "verified_url": null,
+      "last_verified": null,
+      "reviewer": null,
+      "notes": "Not source-triaged in this review pass. Keep disabled until Arizona DES/Industrial Commission/labor source is verified."
+    },
+    {
+      "target": "state_landlord_tenant_resources",
+      "verified_url": "https://housing.az.gov/general-public/arizona-residential-landlord-and-tenant-act",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Department of Housing Residential Landlord and Tenant Act resource; page fetch may block automated review, so validate manually before publish."
+    },
+    {
+      "target": "state_health_advance_directive_resources",
+      "verified_url": "https://azsos.gov/services/advance-directives",
+      "last_verified": "2026-05-10",
+      "reviewer": "automated_source_triage_chatgpt_not_attorney_review",
+      "notes": "Arizona Secretary of State advance directives page states registry moved to AzHDR; use only as routing metadata, not as a current form substitute."
+    },
+    {
+      "target": "state_vital_records_forms",
+      "verified_url": null,
+      "last_verified": null,
+      "reviewer": null,
+      "notes": "Not source-triaged in this review pass. Keep disabled until Arizona vital records source is verified."
+    }
+  ],
+  "state_specific_rules": [],
+  "required_disclosures": [],
+  "filing_routes": [],
+  "review": {
+    "state_specific_law_included": false,
+    "human_review_required": true,
+    "attorney_review_recommended": true,
+    "source_triage_completed_for_selected_targets": true,
+    "source_triage_date": "2026-05-10",
+    "publish_decision": "source_routes_can_be_used_for internal review prep only; do not claim Arizona legal validity yet"
+  }
+}

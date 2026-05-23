@@ -1,0 +1,27 @@
+{
+  "name": "quantumskyes-mcp-control-room",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --import remix/node-tsx server.ts",
+    "start": "node --import remix/node-tsx server.ts",
+    "test": "node --import remix/node-tsx --test",
+    "typecheck": "tsc --noEmit",
+    "proof:local": "node scripts/proof-operator-console.mjs"
+  },
+  "engines": {
+    "node": ">=24.3.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "gsap": "latest",
+    "lenis": "latest",
+    "remix": "^3.0.0-beta.1",
+    "three": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "pngjs": "^7.0.0",
+    "typescript": "latest"
+  }
+}

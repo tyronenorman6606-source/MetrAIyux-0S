@@ -1,0 +1,68 @@
+{
+  "platformId": "skye-music-nexus",
+  "title": "SkyeMusicNexus Native Creation Studio",
+  "generatedAt": "2026-05-18",
+  "dropInFiles": [
+    "public/create.html",
+    "public/daw.html",
+    "public/nexus-daw.css",
+    "public/nexus-daw.js",
+    "public/open-source-studio.css",
+    "public/open-source-studio.js",
+    "../netlify/functions/music-studio.js",
+    "src/open-source-studio-contract.json",
+    "open-source/open-source-manifest.json"
+  ],
+  "mountTarget": "SkyeMusicNexus/public/create.html",
+  "newModules": [
+    "Native Creation Hub",
+    "SkyeMusicNexus Native DAW",
+    "Stem Vault Staging",
+    "Studio Session Ledger",
+    "Sample Pack Rail",
+    "Export Manifest Queue",
+    "Release Forge Handoff"
+  ],
+  "nativeDaw": {
+    "path": "public/daw.html",
+    "script": "public/nexus-daw.js",
+    "style": "public/nexus-daw.css",
+    "capabilities": [
+      "fullscreen first-party DAW shell",
+      "transport",
+      "tempo and key controls",
+      "arrangement timeline",
+      "track mute solo arm controls",
+      "audio clip import decode preview",
+      "mixer levels",
+      "drum pads",
+      "synth keys",
+      "physical computer keyboard notes",
+      "region select split duplicate delete quantize",
+      "undo redo edit history",
+      "loop and metronome toggles",
+      "local loop pack insertion",
+      "microphone recording path",
+      "Web MIDI connection path",
+      "browser WAV mixdown export",
+      "project save",
+      "release manifest export"
+    ]
+  },
+  "functionBoundary": {
+    "newFunction": "netlify/functions/music-studio.js",
+    "auth": "requires bearer/x-skygate-session token",
+    "storage": "proof ledger in MUSIC_NEXUS_DATA_DIR by default; move to Citadel/SkyeVault/R2 for durable production",
+    "noClaims": [
+      "does not perform live DSP distribution",
+      "does not settle real royalties",
+      "does not provide legal review",
+      "does not move real payouts"
+    ]
+  },
+  "forbidden": [
+    "third-party DAW iframe on public/daw.html",
+    "vendored third-party DAW source inside open-source/vendor",
+    "external DAW bridge branding"
+  ]
+}

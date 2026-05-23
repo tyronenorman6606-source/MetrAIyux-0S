@@ -1,0 +1,183 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Key Gate 13th | 0S Operator</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="FS27-gated provider credential custody for 0S apps and Agentic Growth.">
+  <link rel="icon" href="/agentic-growth-layer/assets/favicon-32.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/key-gate-13th/">
+      <span class="mark">13</span>
+      <span>Key Gate 13th</span>
+    </a>
+    <nav class="topnav" aria-label="Key Gate navigation">
+      <a href="#keys">Keys</a>
+      <a href="#project">Agentic bind</a>
+      <a href="#audit">Audit</a>
+      <a href="/agentic-growth-layer/">Agentic Growth</a>
+      <a href="/api/0s/route-manifest">0S Manifest</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="command">
+      <div>
+        <p class="eyebrow">FS27 gated custody</p>
+        <h1 class="neon-gradient-text">Provider keys locked behind the 0S gate.</h1>
+      </div>
+      <div class="status-grid" aria-label="Runtime status">
+        <article><span>Auth</span><strong id="authState">Checking</strong></article>
+        <article><span>Encryption</span><strong id="cryptoState">Checking</strong></article>
+        <article><span>Storage</span><strong id="storageState">Checking</strong></article>
+        <article><span>Agentic</span><strong id="agenticState">Refs only</strong></article>
+      </div>
+    </section>
+
+    <section class="workspace" id="keys">
+      <form class="panel" id="secretForm" autocomplete="off">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Credential vault</p>
+            <h2>Add or rotate a provider key</h2>
+          </div>
+          <span class="pill" id="selectedSecret">No key selected</span>
+        </div>
+
+        <div class="form-grid">
+          <label>Workspace
+            <input id="workspaceId" name="workspaceId" value="0s-primary-workspace">
+          </label>
+          <label>Provider
+            <select id="vendorKey" name="vendorKey"></select>
+          </label>
+          <label>Label
+            <input id="label" name="label" value="Client provider key">
+          </label>
+          <label>Allowed apps
+            <input id="allowedApps" name="allowedApps" value="key-gate-13th, agentic-growth-layer">
+          </label>
+          <label class="wide text-secret">Secret
+            <textarea id="secretValue" name="secretValue" spellcheck="false" placeholder="Paste once. It will not be returned."></textarea>
+          </label>
+          <div class="wide split-secret" hidden>
+            <label>Login
+              <input id="credentialLogin" name="credentialLogin" autocomplete="off">
+            </label>
+            <label>Password
+              <input id="credentialPassword" name="credentialPassword" type="password" autocomplete="new-password">
+            </label>
+          </div>
+          <label class="wide">Scopes
+            <input id="scopes" name="scopes" value="agentic-growth:source-pull">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit">Encrypt key</button>
+          <button type="button" id="rotateSecret">Rotate selected</button>
+          <button type="button" id="testSecret">Test selected</button>
+          <button class="danger" type="button" id="revokeSecret">Revoke selected</button>
+        </div>
+      </form>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Connected keys</p>
+            <h2>Masked provider inventory</h2>
+          </div>
+          <button type="button" id="refreshSecrets">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Label</th>
+                <th>Status</th>
+                <th>Last4</th>
+                <th>Test</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="secretRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="workspace lower" id="project">
+      <form class="panel" id="projectForm">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Agentic binding</p>
+            <h2>Bind refs to a site monitor</h2>
+          </div>
+          <span class="pill">Owner review</span>
+        </div>
+        <div class="form-grid">
+          <label>Project name
+            <input id="projectName" value="Agentic Website Monitor">
+          </label>
+          <label>Domain
+            <input id="projectDomain" value="example.com">
+          </label>
+          <label>GSC ref
+            <select id="gscRef"></select>
+          </label>
+          <label>SEMrush ref
+            <select id="semrushRef"></select>
+          </label>
+          <label>DataForSEO ref
+            <select id="dataForSeoRef"></select>
+          </label>
+          <label>Cadence
+            <select id="cadence">
+              <option value="weekly">Weekly</option>
+              <option value="daily">Daily</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </label>
+        </div>
+        <div class="actions">
+          <button class="primary" type="submit">Save monitor</button>
+          <button type="button" id="refreshProjects">Refresh monitors</button>
+        </div>
+      </form>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Scheduled monitors</p>
+            <h2>Agentic project ledger</h2>
+          </div>
+        </div>
+        <div id="projectList" class="list"></div>
+      </section>
+    </section>
+
+    <section class="panel audit-panel" id="audit">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Audit</p>
+          <h2>Custody events</h2>
+        </div>
+        <button type="button" id="refreshAudit">Refresh audit</button>
+      </div>
+      <div id="auditList" class="list"></div>
+    </section>
+
+    <aside class="toast" id="toast" role="status" aria-live="polite"></aside>
+  </main>
+
+  <script src="/assets/js/metraiyux-api-bases.js"></script>
+  <script src="./operator.js"></script>
+</body>
+</html>

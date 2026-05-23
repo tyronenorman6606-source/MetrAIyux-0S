@@ -135,7 +135,7 @@ export function normalizeConfig(input = {}) {
 export function normalizeChunkSize(value) {
   const mb = Number(value || DEFAULT_CHUNK_MB);
   if (!Number.isFinite(mb)) return DEFAULT_CHUNK_MB;
-  const clamped = Math.min(128, Math.max(1, mb));
+  const clamped = Math.min(512, Math.max(1, mb));
   const bytes = Math.floor(clamped * 1024 * 1024);
   const multiple = 256 * 1024;
   return Math.max(1, Math.floor(bytes / multiple) * multiple / 1024 / 1024);

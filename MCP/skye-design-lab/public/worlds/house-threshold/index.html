@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>House Threshold World | QuantumSkyes MCP</title>
+  <style>
+    :root {
+      --bg: #070806;
+      --ink: #fff6dd;
+      --soft: rgba(255, 246, 221, .72);
+      --gold: #f0c56a;
+      --cyan: #5ceaff;
+      --leaf: #74f2a4;
+      --fire: #ff704f;
+      --line: rgba(240, 197, 106, .22);
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      scrollbar-width: auto;
+      scrollbar-gutter: stable;
+      scrollbar-color: var(--cyan) rgba(7, 8, 6, .9);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(900px 620px at 72% 12%, rgba(92, 234, 255, .15), transparent 62%),
+        radial-gradient(740px 520px at 16% 20%, rgba(240, 197, 106, .14), transparent 60%),
+        linear-gradient(180deg, rgba(7, 8, 6, .08), rgba(7, 8, 6, .95)),
+        #070806;
+    }
+
+    ::-webkit-scrollbar { width: 16px; height: 16px; }
+    ::-webkit-scrollbar-track { background: rgba(7, 8, 6, .9); border-left: 1px solid var(--line); }
+    ::-webkit-scrollbar-thumb {
+      min-height: 96px;
+      border: 4px solid rgba(7, 8, 6, .96);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--gold), var(--cyan), var(--leaf));
+      box-shadow: 0 0 24px rgba(92, 234, 255, .56);
+    }
+
+    #world-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .motion-rail {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 90;
+      width: 100%;
+      height: 4px;
+      transform: scaleX(0);
+      transform-origin: left center;
+      background: linear-gradient(90deg, var(--gold), var(--cyan), var(--leaf), var(--fire));
+      box-shadow: 0 0 24px rgba(92, 234, 255, .52);
+      pointer-events: none;
+    }
+
+    .cursor-trail {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 80;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(92, 234, 255, .76);
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(240, 197, 106, .34), transparent 42%), radial-gradient(circle, rgba(92, 234, 255, .26), transparent 66%);
+      box-shadow: 0 0 26px rgba(92, 234, 255, .52);
+      opacity: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    header, main { position: relative; z-index: 2; }
+
+    header {
+      position: fixed;
+      inset: 0 0 auto;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px clamp(18px, 4vw, 54px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 8, 6, .72);
+      backdrop-filter: blur(18px);
+      z-index: 50;
+    }
+
+    a { color: inherit; }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+    }
+
+    .brand span {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: rgba(240, 197, 106, .12);
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: var(--soft);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+      align-items: center;
+      gap: clamp(28px, 6vw, 86px);
+      padding: clamp(8rem, 13vw, 12rem) clamp(18px, 6vw, 86px) clamp(5rem, 8vw, 7rem);
+    }
+
+    .copy { max-width: 960px; }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      margin: 14px 0 0;
+      letter-spacing: 0;
+      line-height: .92;
+    }
+
+    h1 {
+      max-width: 980px;
+      font-size: clamp(3rem, 8vw, 8rem);
+      text-shadow: 0 0 20px rgba(240, 197, 106, .28), 0 0 54px rgba(92, 234, 255, .16);
+    }
+
+    h1 span {
+      position: relative;
+      display: inline-block;
+    }
+
+    h1 span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: .08em;
+      height: .08em;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--cyan), transparent);
+      animation: textScan 3.8s cubic-bezier(.16, 1, .3, 1) infinite;
+    }
+
+    @keyframes textScan {
+      0%, 100% { transform: scaleX(.14); opacity: .3; transform-origin: left; }
+      50% { transform: scaleX(1); opacity: .92; transform-origin: left; }
+      51% { transform-origin: right; }
+    }
+
+    .copy > p:last-of-type, .section-copy {
+      max-width: 720px;
+      color: var(--soft);
+      font-size: clamp(1rem, 1.35vw, 1.2rem);
+      line-height: 1.65;
+    }
+
+    .threshold-stage {
+      position: relative;
+      min-height: 610px;
+      display: grid;
+      place-items: end center;
+      perspective: 1100px;
+    }
+
+    .walkway {
+      position: absolute;
+      bottom: 0;
+      width: min(88%, 440px);
+      height: 54%;
+      transform: perspective(800px) rotateX(68deg);
+      transform-origin: bottom;
+      border-left: 1px solid rgba(240, 197, 106, .26);
+      border-right: 1px solid rgba(240, 197, 106, .26);
+      background:
+        linear-gradient(90deg, transparent, rgba(240, 197, 106, .13), transparent),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.06) 0 1px, transparent 1px 84px);
+    }
+
+    .house {
+      position: relative;
+      width: min(100%, 390px);
+      min-height: 510px;
+      display: grid;
+      place-items: center;
+      transform-style: preserve-3d;
+      transition: transform .5s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .facade {
+      width: min(100%, 360px);
+      min-height: 476px;
+      padding: 34px;
+      display: grid;
+      align-content: end;
+      gap: 18px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(240, 197, 106, .15), rgba(92, 234, 255, .08)),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      box-shadow: 0 34px 90px rgba(0,0,0,.42), inset 0 0 60px rgba(240, 197, 106, .08);
+    }
+
+    .door {
+      min-height: 320px;
+      padding: 24px;
+      display: grid;
+      align-content: space-between;
+      border: 1px solid rgba(92, 234, 255, .3);
+      background:
+        radial-gradient(circle at 80% 20%, rgba(92, 234, 255, .28), transparent 22%),
+        linear-gradient(180deg, rgba(8,12,12,.88), rgba(13,13,10,.96));
+      box-shadow: inset 0 0 34px rgba(92, 234, 255, .08);
+      transform-origin: left center;
+      transition: transform .8s cubic-bezier(.16, 1, .3, 1), filter .8s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    body.unlocked .door {
+      transform: rotateY(-18deg) translateX(-8px);
+      filter: brightness(1.18);
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    button, .enter-world {
+      min-height: 44px;
+      border: 1px solid rgba(240, 197, 106, .22);
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button:hover, .enter-world:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 22px rgba(92, 234, 255, .18);
+    }
+
+    .pin-status {
+      min-height: 22px;
+      color: var(--soft);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .enter-world {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      color: #100f09;
+      background: linear-gradient(135deg, var(--gold), #fff0b8);
+      text-decoration: none;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: .5;
+    }
+
+    body.unlocked .enter-world {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .rooms, .proof {
+      padding: clamp(5rem, 9vw, 8rem) clamp(18px, 6vw, 86px);
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .room-card, .proof-ledger {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      padding: 24px;
+      min-height: 220px;
+      opacity: .58;
+      transform: translateY(26px);
+      transition: opacity .6s cubic-bezier(.16, 1, .3, 1), transform .6s cubic-bezier(.16, 1, .3, 1), border-color .6s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    body.unlocked .room-card {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: rgba(92, 234, 255, .24);
+    }
+
+    .room-card span, .proof-ledger span {
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+
+    .room-card strong {
+      display: block;
+      margin-top: 18px;
+      font-size: 1.35rem;
+    }
+
+    .room-card p, .proof-ledger strong {
+      color: var(--soft);
+      line-height: 1.55;
+    }
+
+    .proof-ledger {
+      display: grid;
+      gap: 10px;
+      opacity: 1;
+      transform: none;
+      list-style: none;
+      margin: 28px 0 0;
+    }
+
+    .proof-ledger li {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    @media (max-width: 860px) {
+      nav { display: none; }
+      .hero { grid-template-columns: 1fr; padding-top: 112px; }
+      .threshold-stage { min-height: 520px; }
+      .room-grid { grid-template-columns: 1fr; }
+      .proof-ledger li { grid-template-columns: 1fr; gap: 6px; }
+    }
+
+    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .cursor-trail { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="world-canvas" data-mcp-living-background aria-hidden="true"></canvas>
+  <div class="motion-rail" data-mcp-motion-chrome aria-hidden="true"></div>
+  <div class="cursor-trail" data-mcp-cursor-trail aria-hidden="true"></div>
+  <header>
+    <a class="brand" href="/">
+      <span>QS</span>
+      <strong>House Threshold World</strong>
+    </a>
+    <nav aria-label="House world navigation">
+      <a href="#entry">Entry</a>
+      <a href="#rooms">Rooms</a>
+      <a href="#proof">Proof</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero" id="entry">
+      <div class="copy">
+        <p class="eyebrow">Live generated world demo</p>
+        <h1 data-mcp-text-scan><span>Walk up.</span> Enter the owner door.</h1>
+        <p>This is the house-threshold pattern as an actual same-domain world: sidewalk, door, keypad ritual, unlock state, first-room reveal, and proof ledger.</p>
+      </div>
+      <div class="threshold-stage" aria-label="Sidewalk to front door with keypad">
+        <div class="walkway" aria-hidden="true"></div>
+        <div class="house">
+          <div class="facade">
+            <div class="door">
+              <div>
+                <p class="eyebrow">Owner threshold</p>
+                <h2>Door-code entry</h2>
+                <p class="pin-status" data-pin-status>Enter demo ritual code 1379</p>
+              </div>
+              <div class="keypad" aria-label="Door keypad">
+                <button type="button" data-key="1">1</button>
+                <button type="button" data-key="2">2</button>
+                <button type="button" data-key="3">3</button>
+                <button type="button" data-key="4">4</button>
+                <button type="button" data-key="5">5</button>
+                <button type="button" data-key="6">6</button>
+                <button type="button" data-key="7">7</button>
+                <button type="button" data-key="8">8</button>
+                <button type="button" data-key="9">9</button>
+                <button type="button" data-key="Clear">Clear</button>
+                <button type="button" data-key="0">0</button>
+                <button type="button" data-key="Enter">Enter</button>
+              </div>
+              <a class="enter-world" href="#rooms">Enter first room</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="rooms" id="rooms">
+      <p class="eyebrow">Room reveal</p>
+      <h2>Unlock once. Walk the actual offer.</h2>
+      <p class="section-copy">This is the shift from page to place: the visitor passes a stateful threshold, then sees the foyer, proof room, and build room as navigable product architecture.</p>
+      <div class="room-grid">
+        <article class="room-card">
+          <span>01</span>
+          <strong>Foyer</strong>
+          <p>The first room tells the visitor what this world is, who owns the key, and why the entry ritual matters.</p>
+        </article>
+        <article class="room-card">
+          <span>02</span>
+          <strong>Proof room</strong>
+          <p>MCP resources, gate health, browser evidence, and signup ownership are part of the room, not footnotes.</p>
+        </article>
+        <article class="room-card">
+          <span>03</span>
+          <strong>Build room</strong>
+          <p>The operator can use the MCP console to generate, mine, audit, and prove new worlds from archetypes.</p>
+        </article>
+      </div>
+    </section>
+    <section class="proof" id="proof">
+      <p class="eyebrow">Build receipt</p>
+      <h2>Every world leaves evidence.</h2>
+      <p class="section-copy">This public artifact exists on the same domain as the production MCP endpoint so the capability is visible and testable.</p>
+      <ul class="proof-ledger">
+        <li><span>Endpoint</span><strong>https://skye-design-mcp.pages.dev/mcp</strong></li>
+        <li><span>Access</span><strong>0S gate-owned bearer session with email capture</strong></li>
+        <li><span>Pattern</span><strong>House threshold: sidewalk, door, keypad, room reveal</strong></li>
+        <li><span>Operator</span><strong>MCP/operator-console-remix /api/build creates portable world artifacts</strong></li>
+      </ul>
+    </section>
+  </main>
+  <script>
+    const state = { pin: "", pointerX: 0, pointerY: 0 };
+    const body = document.body;
+    const rail = document.querySelector(".motion-rail");
+    const trail = document.querySelector(".cursor-trail");
+    const house = document.querySelector(".house");
+    const status = document.querySelector("[data-pin-status]");
+    const canvas = document.querySelector("#world-canvas");
+    const ctx = canvas.getContext("2d");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.6);
+      canvas.width = Math.floor(window.innerWidth * ratio);
+      canvas.height = Math.floor(window.innerHeight * ratio);
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function draw(now) {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const t = now * .001;
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "screen";
+      for (let i = 0; i < 3; i += 1) {
+        const y = height * (.24 + i * .24) + Math.sin(t * (.45 + i * .08)) * 28 + state.pointerY * 18;
+        const gradient = ctx.createLinearGradient(0, y - 90, width, y + 90);
+        gradient.addColorStop(0, "rgba(240,197,106,0)");
+        gradient.addColorStop(.48, i === 1 ? "rgba(92,234,255,.10)" : "rgba(240,197,106,.10)");
+        gradient.addColorStop(1, "rgba(116,242,164,0)");
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        for (let x = 0; x <= width; x += 22) {
+          ctx.lineTo(x, y + Math.sin(x * .008 + t + i) * (36 - i * 5));
+        }
+        ctx.lineTo(width, height);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      if (!reduceMotion) requestAnimationFrame(draw);
+    }
+
+    function updateScroll() {
+      const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      rail.style.transform = "scaleX(" + Math.min(window.scrollY / max, 1) + ")";
+    }
+
+    function unlock() {
+      body.classList.add("unlocked");
+      status.textContent = "Unlocked. Room state is open.";
+      window.setTimeout(() => document.querySelector("#rooms").scrollIntoView({ behavior: "smooth" }), 380);
+    }
+
+    document.querySelectorAll("[data-key]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.key;
+        if (key === "Clear") {
+          state.pin = "";
+          status.textContent = "Cleared. Enter demo ritual code 1379";
+          return;
+        }
+        if (key === "Enter") {
+          if (state.pin === "1379") unlock();
+          else {
+            status.textContent = "Code refused. Try the demo ritual again.";
+            state.pin = "";
+          }
+          return;
+        }
+        state.pin = (state.pin + key).slice(-4);
+        status.textContent = "Code entered: " + "•".repeat(state.pin.length);
+      });
+    });
+
+    window.addEventListener("pointermove", (event) => {
+      state.pointerX = event.clientX / window.innerWidth - .5;
+      state.pointerY = event.clientY / window.innerHeight - .5;
+      if (trail && !reduceMotion) {
+        trail.style.opacity = "1";
+        trail.style.transform = "translate(" + (event.clientX - 19) + "px, " + (event.clientY - 19) + "px)";
+      }
+      if (house && !reduceMotion) {
+        house.style.transform = "rotateY(" + state.pointerX * 8 + "deg) rotateX(" + state.pointerY * -5 + "deg)";
+      }
+    }, { passive: true });
+
+    window.addEventListener("pointerleave", () => {
+      if (trail) trail.style.opacity = "0";
+    });
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    window.addEventListener("resize", () => { resize(); updateScroll(); });
+    resize();
+    updateScroll();
+    if (!reduceMotion) requestAnimationFrame(draw);
+  </script>
+</body>
+</html>

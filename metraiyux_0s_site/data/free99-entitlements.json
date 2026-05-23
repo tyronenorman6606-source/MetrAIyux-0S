@@ -1,0 +1,124 @@
+{
+  "version": "2026-05-21-free99-paid-cost-boundary",
+  "source_of_truth": [
+    "metraiyux_0s_site/Free99/app-manifest.json",
+    "metraiyux_0s_site/data/plans.json",
+    "metraiyux_0s_site/brain/sales-offer-registry.json",
+    "STRIPE_PRODUCT_PRICE_CATALOG.md"
+  ],
+  "rule": "Free99 means no-charge gated access to safe local or low-cost surfaces. It never means anonymous access, free AI/provider spend, free hosted custody, free external sends, or free white-label resale.",
+  "shared_gate_required": true,
+  "accepted_gate_headers": [
+    "Authorization",
+    "x-admin-token",
+    "x-free99-admin-code",
+    "x-free99-gate-session",
+    "x-skye-gate-session",
+    "cookie",
+    "/api/owner/admin-login"
+  ],
+  "free99_core_platforms": [
+    {
+      "platform_id": "signinpro-northstar",
+      "name": "Sign In Pro by NorthStar",
+      "boundary": "business demo lane with two-day rotating demo code, signup tracking, and demo-only shared gate session; owner/admin scope stays separate"
+    },
+    {
+      "platform_id": "skyeopsconsole",
+      "name": "SkyeOpsConsole v2.13",
+      "boundary": "offline operations console; no provider-cost lane"
+    },
+    {
+      "platform_id": "still2vid-forge",
+      "name": "Still2Vid Forge v4",
+      "boundary": "browser-local motion export from user-provided, live-surface, open-source, or AI-receipted assets"
+    },
+    {
+      "platform_id": "mydrive-offline-vault",
+      "name": "MyDrive Offline Encrypted Vault",
+      "boundary": "local encrypted vault; hosted backup or recovery is paid scope"
+    },
+    {
+      "platform_id": "skyepics",
+      "name": "SkyePics Vault",
+      "boundary": "local encrypted photo/OCR vault; hosted sync or AI helper is paid scope"
+    },
+    {
+      "platform_id": "brandforge",
+      "name": "BrandForge Campaign Studio",
+      "boundary": "local campaign intelligence only; provider-backed generation requires SkyPay AI entitlement"
+    },
+    {
+      "platform_id": "social-batch-factory",
+      "name": "Social Batch Factory",
+      "boundary": "browser-local batch assets and exports only; AI copy generation requires paid capped entitlement"
+    },
+    {
+      "platform_id": "keygate13",
+      "name": "KeyGate 13",
+      "boundary": "browser-local key forge, variable vault, HKDF derivation, password generation, and local exports only; hosted custody, provider actions, and recovery are paid/approved scope"
+    },
+    {
+      "platform_id": "skyeprofitconsole",
+      "name": "SkyeProfitConsole",
+      "boundary": "profit planning, proof, and exports; no live money movement"
+    },
+    {
+      "platform_id": "skyemediacenter",
+      "name": "SkyeMediaCenter",
+      "boundary": "gated media intake and proof; provider publishing requires configured paid/approved credentials"
+    },
+    {
+      "platform_id": "skye-split-engine",
+      "name": "Skye Split Engine",
+      "boundary": "split reports and ledgers; no payroll, tax filing, banking, or legal substitute"
+    },
+    {
+      "platform_id": "skye-content-forge",
+      "name": "Skye Content Forge",
+      "boundary": "drafting, local export, and proof; provider publishing or paid generation requires entitlement"
+    },
+    {
+      "platform_id": "skyemusicnexus-lite",
+      "name": "SkyeMusicNexus Lite",
+      "boundary": "one artist profile, one draft release preview, and proof-only upload; serious music ops are paid"
+    }
+  ],
+  "paid_required_for": [
+    "kAIxU or any other AI/model call",
+    "provider-backed generation, embedding, transcription, image, video, or campaign copy work",
+    "hosted storage, backup, recovery, profile sync, or durable custody beyond local browser storage",
+    "external publishing, social posting, distributor/DSP handoff, route provider actions, payment movement, identity checks, email, SMS, or notification provider sends",
+    "paid platform imports such as SkyeAPI + AegisCore, SovereignDocs, CodeStudio, Code Evaluator, SkyeVaultPro, Doctor Ops, Documorph, SkyeArcade, SkyeBox hosted recovery, JobPing runtime, and kAIxU Storefront checkout use",
+    "white-label resale, customer tenant provisioning, custom domain mirroring, branded client portals, or selling access to the 0S as if it were the buyer's own platform"
+  ],
+  "paid_lanes": [
+    {
+      "id": "metraiyux-core",
+      "label": "Primary 0S SaaS plans",
+      "price_path": "Starter $397/mo + $1,500 setup through Enterprise $3,997/mo + $15,000 setup",
+      "route": "metraiyux_0s_site/sales/pricing-offer-router.html#metraiyux-0s-plans"
+    },
+    {
+      "id": "ai-usage-packs",
+      "label": "AI and usage packs",
+      "price_path": "SkyeCard AI Boost, SkyeGateFS27 usage top-up, kAIxU Starter/Team/Scale, and metered kAIxU rates",
+      "route": "metraiyux_0s_site/sales/pricing-offer-router.html#ai-usage-packs"
+    },
+    {
+      "id": "white-label-enterprise",
+      "label": "White-label / resale / tenant platform use",
+      "price_path": "Enterprise / Managed Gate or custom quote; never Free99",
+      "route": "metraiyux_0s_site/sales/pricing-offer-router.html#white-label-enterprise"
+    }
+  ],
+  "default_paid_platform_posture": "pending owner-approved SKU, bundle entitlement, or quote before usage is enabled",
+  "metering_contract": {
+    "scope": "per_platform_per_capability",
+    "required_fields": [
+      "platform_id",
+      "usage_lane"
+    ],
+    "cost_rule": "Every billable action must carry platform_id and usage_lane so FS27 can separate caps, rate limits, invoices, and owner review by product surface."
+  }
+}

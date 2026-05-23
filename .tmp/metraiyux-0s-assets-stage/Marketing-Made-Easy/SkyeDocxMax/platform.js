@@ -1,0 +1,1 @@
+fetch('./PLATFORM_TRUTH.json').then((response)=>response.json()).then((truth)=>{document.querySelectorAll('[data-truth]').forEach((node)=>{node.textContent=JSON.stringify(truth,null,2)})}).catch(()=>{document.querySelectorAll('[data-truth]').forEach((node)=>{node.textContent='Truth marker unavailable in this context.'})});

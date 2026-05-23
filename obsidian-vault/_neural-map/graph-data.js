@@ -1,9 +1,9 @@
 window.METRAIYUX_OBSIDIAN_GRAPH = {
-  "generated_at": "2026-05-18T00:43:16.672Z",
+  "generated_at": "2026-05-22T23:11:28.525Z",
   "vault": "obsidian-vault",
-  "node_count": 125,
-  "link_count": 181,
-  "notes": 16,
+  "node_count": 148,
+  "link_count": 213,
+  "notes": 18,
   "nodes": [
     {
       "id": "note:00-command-center/0S Command Runner.md",
@@ -78,6 +78,41 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
         "operator",
         "brain",
         "qa"
+      ]
+    },
+    {
+      "id": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "label": "Skyes Over London Deep Scan Knowledge Pack - 2026-05-21",
+      "type": "note",
+      "group": "command",
+      "brain": true,
+      "path": "obsidian-vault/00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "size": 16,
+      "tags": [
+        "company-knowledge",
+        "skyesol",
+        "skyes-over-london",
+        "deep-scan",
+        "source-map",
+        "operating-system-company",
+        "product-ecosystem"
+      ]
+    },
+    {
+      "id": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "label": "Skyes Over London LC Company Dossier",
+      "type": "note",
+      "group": "command",
+      "brain": true,
+      "path": "obsidian-vault/00-command-center/Skyes Over London LC Company Dossier.md",
+      "size": 16,
+      "tags": [
+        "company-knowledge",
+        "skyesol",
+        "skyes-over-london",
+        "solenterprises",
+        "strategy",
+        "product-ecosystem"
       ]
     },
     {
@@ -371,6 +406,15 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
+      "id": "source:metraiyux-0s-site-platform-sources",
+      "label": "_platform-sources/",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/_platform-sources/",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "source:metraiyux-0s-site-live",
       "label": "live/",
       "type": "source",
@@ -403,6 +447,15 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "type": "source",
       "group": "source",
       "path": "metraiyux_0s_site/brain/live-surface-registry.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc",
+      "label": "skyes-over-london-lc/",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/_platform-sources/skyes-over-london-lc/",
       "size": 10,
       "tags": []
     },
@@ -553,6 +606,168 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "type": "source",
       "group": "source",
       "path": "test-artifacts/skye-crawler-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-skye-secure-live-production-proof-live-production-proof-report-json",
+      "label": "skye-secure-live-production-proof/live-production-proof-report.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/skye-secure-live-production-proof/live-production-proof-report.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-proof-vault-skye-secure-fs27-vault-proof-html",
+      "label": "proof-vault/skye-secure-fs27-vault-proof.html",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/proof-vault/skye-secure-fs27-vault-proof.html",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "tag:company-knowledge",
+      "label": "#company-knowledge",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "company-knowledge"
+      ]
+    },
+    {
+      "id": "tag:skyesol",
+      "label": "#skyesol",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "skyesol"
+      ]
+    },
+    {
+      "id": "tag:skyes-over-london",
+      "label": "#skyes-over-london",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "skyes-over-london"
+      ]
+    },
+    {
+      "id": "tag:deep-scan",
+      "label": "#deep-scan",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "deep-scan"
+      ]
+    },
+    {
+      "id": "tag:source-map",
+      "label": "#source-map",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "source-map"
+      ]
+    },
+    {
+      "id": "tag:operating-system-company",
+      "label": "#operating-system-company",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "operating-system-company"
+      ]
+    },
+    {
+      "id": "tag:product-ecosystem",
+      "label": "#product-ecosystem",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "product-ecosystem"
+      ]
+    },
+    {
+      "id": "source:docs-gateway-bind-md",
+      "label": "docs/Gateway-Bind.md",
+      "type": "source",
+      "group": "source",
+      "path": "docs/Gateway-Bind.md",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:ops-state",
+      "label": "ops/state",
+      "type": "source",
+      "group": "source",
+      "path": "ops/state",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:docs-pricing-trust",
+      "label": "pricing/trust:",
+      "type": "source",
+      "group": "source",
+      "path": "docs/pricing/trust:",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:docs-netlify-functions-env-allowlist-md",
+      "label": "docs/netlify-functions-env-allowlist.md",
+      "type": "source",
+      "group": "source",
+      "path": "docs/netlify-functions-env-allowlist.md",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "tag:solenterprises",
+      "label": "#solenterprises",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "solenterprises"
+      ]
+    },
+    {
+      "id": "tag:strategy",
+      "label": "#strategy",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "strategy"
+      ]
+    },
+    {
+      "id": "source:tools-kits",
+      "label": "tools/kits",
+      "type": "source",
+      "group": "source",
+      "path": "tools/kits",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:docs-functions-endpoints-map-json",
+      "label": "docs/functions-endpoints-map.json",
+      "type": "source",
+      "group": "source",
+      "path": "docs/functions-endpoints-map.json",
       "size": 10,
       "tags": []
     },
@@ -843,7 +1058,7 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "label": "proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json",
       "type": "source",
       "group": "source",
-      "path": "metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json",
+      "path": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json",
       "size": 10,
       "tags": []
     },
@@ -1078,16 +1293,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
-      "id": "tag:skyes-over-london",
-      "label": "#skyes-over-london",
-      "type": "tag",
-      "group": "tag",
-      "size": 13,
-      "tags": [
-        "skyes-over-london"
-      ]
-    },
-    {
       "id": "tag:mcp",
       "label": "#mcp",
       "type": "tag",
@@ -1106,6 +1311,33 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": [
         "vault"
       ]
+    },
+    {
+      "id": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-index-html",
+      "label": "skyes-over-london-lc/index.html",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/_platform-sources/skyes-over-london-lc/index.html",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-pages-contact-html",
+      "label": "pages/contact.html",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/_platform-sources/skyes-over-london-lc/pages/contact.html",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-mcp-tooling-receipt-json",
+      "label": "skyes-over-london-lc/MCP_TOOLING_RECEIPT.json",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/_platform-sources/skyes-over-london-lc/MCP_TOOLING_RECEIPT.json",
+      "size": 10,
+      "tags": []
     },
     {
       "id": "source:test-artifacts-direct-mcp-skyes-over-london-lc-mcp-tooling-receipt-json",
@@ -1352,6 +1584,12 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     },
     {
       "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-platform-sources",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
       "target": "source:metraiyux-0s-site-live",
       "type": "source",
       "strength": 0.8
@@ -1371,6 +1609,12 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:00-command-center/ChatGPT Project Handoff.md",
       "target": "source:metraiyux-0s-site-brain-live-surface-registry-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/ChatGPT Project Handoff.md",
+      "target": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc",
       "type": "source",
       "strength": 0.8
     },
@@ -1557,6 +1801,162 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:00-command-center/SkyeRunners.md",
       "target": "source:test-artifacts-skye-crawler-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:test-artifacts-skye-secure-live-production-proof-live-production-proof-report-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/SkyeRunners.md",
+      "target": "source:metraiyux-0s-site-proof-vault-skye-secure-fs27-vault-proof-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:command",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:company-knowledge",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyesol",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyes-over-london",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:deep-scan",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:source-map",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:operating-system-company",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:product-ecosystem",
+      "target": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "target": "source:docs-gateway-bind-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "target": "source:ops-state",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "target": "source:docs-pricing-trust",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London Deep Scan Knowledge Pack - 2026-05-21.md",
+      "target": "source:docs-netlify-functions-env-allowlist-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:command",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:company-knowledge",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyesol",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:skyes-over-london",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:solenterprises",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:strategy",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:product-ecosystem",
+      "target": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "target": "source:tools-kits",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "target": "source:docs-gateway-bind-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/Skyes Over London LC Company Dossier.md",
+      "target": "source:docs-functions-endpoints-map-json",
       "type": "source",
       "strength": 0.8
     },
@@ -2105,6 +2505,30 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "target": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
       "type": "tag",
       "strength": 1.5
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-index-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-pages-contact-html",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",
+      "target": "source:metraiyux-0s-site-platform-sources-skyes-over-london-lc-mcp-tooling-receipt-json",
+      "type": "source",
+      "strength": 0.8
     },
     {
       "source": "note:20-proof/Skyes Over London LC Proof Atlas Receipt - 2026-05-17.md",

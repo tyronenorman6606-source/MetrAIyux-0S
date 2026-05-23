@@ -21,6 +21,7 @@ This is a repo-local operator system. It does not replace human approval, does n
 - Brain Sync Runner: refreshes Obsidian export, private neural map, public-safe map, SkyeVault map, and SkyeRunners map.
 - Bug Hunter: runs repo health and proof checks, then ledgers likely defects or missing evidence.
 - Vault Watch: keeps SkyeVault repo/change memory attached to 0S without exposing workspace secrets.
+- SkySecure Health Runner: watches the FS27 -> SkyeVault -> SkySecure proof lane, verifies encrypted-pack receipts, and keeps the 0S proof lane honest.
 
 ## Commands
 
@@ -65,6 +66,19 @@ Check bridge status:
 ```bash
 npm run skyerunners:status
 ```
+
+Run the live SkySecure proof after FS27 and SkyeVault are deployed:
+
+```bash
+npm run skyerunners:run -- skysecure-live-proof
+```
+
+Latest live SkySecure proof, generated on 2026-05-19:
+
+- FS27 Worker version: `72ced023-345a-4a26-88fc-f48afa0f7d2e`
+- Report: `test-artifacts/skye-secure-live-production-proof/live-production-proof-report.json`
+- 0S proof lane: `metraiyux_0s_site/proof-vault/skye-secure-fs27-vault-proof.html`
+- Result: encrypted dummy pack uploaded to SkyeVault, FS27 metadata registered, SkyeRunners observer grant created, FS27 proof route returned Neon-backed counts.
 
 ## Approval Boundary
 

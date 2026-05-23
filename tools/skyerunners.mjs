@@ -22,13 +22,15 @@ let activeRun = null;
 
 const RESOURCE_POLICY = {
   mode: 'operator-directed-full-proof',
-  plain_english: 'SkyeRunners are allowed to run complete local proof and repo-awareness passes when the operator asks. Paid API use, production deploys, billing changes, credential changes, and irreversible actions still require explicit operator approval.',
+  plain_english: 'SkyeRunners are allowed to run complete live system proof and repo-awareness passes when the operator asks. Paid API use, production deploys, billing changes, credential changes, and irreversible actions still require explicit operator approval.',
   spend_position: 'No tiny arbitrary local QA cap; spend-bearing or production-mutating work is approval-gated and ledgered before it happens.',
   hard_boundaries: [
     'Only commands in this SkyeRunners allowlist can run through the local bridge.',
     'External provider spend is not triggered by this bridge by default.',
     'Production deploy, billing, credential, legal, hiring, payment, or customer-impacting actions must be routed through owner approval.',
-    'Runner receipts must name the command, target, exit code, artifact path, and follow-up bug notes.'
+    'Runner receipts must name the command, target, exit code, artifact path, and follow-up bug notes.',
+    'SkySecure live proofs may use the dedicated FS27 SkySecure write secret only for encrypted dummy packs, metadata receipts, and health grants; never for plaintext secret export.',
+    'VaultOS about-to-delete proofs are live system proofs with explicit execution scope. They may scan, encrypt, bundle, attach, reload, diff, and restore into test-artifacts or /tmp only; they must not delete the original candidate folder or imply that a Cloudflare Worker mounted the private /workspaces filesystem.'
   ]
 };
 
@@ -79,9 +81,19 @@ const RUNNERS = [
     lane: 'repo-memory',
     primary_brain: 'orion-hayes-brain',
     secondary_brain: '0meg4kai-security-brain',
-    mission: 'Keep SkyeVault repo/change memory attached to the 0S brain without exposing workspace secrets.',
-    uses: ['SkyeVault 0S bridge', 'workspace maps', 'vault ledgers'],
-    default_command: 'vault-map'
+    mission: 'Keep SkyeVault repo/change memory, VaultOS scans, restore points, and delete-candidate guardrails attached to the 0S brain without exposing workspace secrets.',
+    uses: ['SkyeVault 0S bridge', 'workspace maps', 'vault ledgers', 'SkyeVaultOS proof receipts'],
+    default_command: 'vaultos-proof'
+  },
+  {
+    id: 'skyerunner-skysecure-health',
+    name: 'SkySecure Health Runner',
+    lane: 'vault-security',
+    primary_brain: '0meg4kai-security-brain',
+    secondary_brain: 'victor-saint-brain',
+    mission: 'Watch the FS27 -> SkyeVault -> SkySecure proof lane, verify encrypted-pack receipts, check VaultOS command parity, and surface missing live evidence before clients rely on it.',
+    uses: ['SkySecure proof receipts', 'FS27 SkySecure API', 'SkyeVault encrypted receipts', 'VaultOS live system proof', '0S proof lane'],
+    default_command: 'skysecure-live-proof'
   }
 ];
 
@@ -145,6 +157,24 @@ const COMMANDS = {
     spend_profile: 'local-only',
     result: 'Refreshes metraiyux_0s_site/brain/skyevault-vault-map.json.',
     steps: [{ label: 'SkyeVault 0S map', command: 'npm', args: ['run', 'vault:0s:map'] }]
+  },
+  'skysecure-live-proof': {
+    id: 'skysecure-live-proof',
+    title: 'Run SkySecure FS27/SkyeVault Live Proof',
+    lane: 'vault-security',
+    risk: 'high',
+    spend_profile: 'network-production-write',
+    result: 'Builds a dummy encrypted .skyesecrets pack, uploads it to SkyeVault, registers safe metadata in FS27 SkySecure, grants SkyeRunners observer access, and writes a production proof report.',
+    steps: [{ label: 'SkySecure live FS27 vault proof', command: 'npm', args: ['run', 'skye-secure:live-proof'] }]
+  },
+  'vaultos-proof': {
+    id: 'vaultos-proof',
+    title: 'Run SkyeVaultOS About-To-Delete Proof',
+    lane: 'vault-security',
+    risk: 'high',
+    spend_profile: 'local-heavy-proof',
+    result: 'Runs live system proof with explicit execution scope: scans the /about to delete folder, creates an encrypted VaultOS pack set, verifies, diffs, dry-reloads, reloads into isolated proof storage, creates a restore point, tests grant/revoke/audit, proves bash-native ls/tree/cat-meta/manifest, bundles the vault, attaches it into a fresh vault, reloads from that bundle, and browser-tests the VaultOS console.',
+    steps: [{ label: 'VaultOS live system about-to-delete proof', command: 'npm', args: ['run', 'vaultos:proof'] }]
   },
   'mcp-mine-0s': {
     id: 'mcp-mine-0s',
@@ -340,6 +370,61 @@ function readReport(file) {
   };
 }
 
+function readSkySecureLiveProof(file) {
+  const report = readJson(file);
+  if (!report) return { exists: false, path: rel(file) };
+  return {
+    exists: true,
+    path: rel(file),
+    ok: report.ok === true,
+    generated_at: report.generatedAt || null,
+    hierarchy: report.hierarchy?.chain || null,
+    proof_lane: report.fs27?.proofLane || null,
+    fs27_base: report.fs27Base || null,
+    metraiyux0s_base: report.metraiyux0sBase || null,
+    pack_id: report.pack?.packId || null,
+    pack_sha256: report.pack?.packSha256 || null,
+    vault_receipt_id: report.vaultReceipt?.receiptId || null,
+    vault_destination: report.vaultReceipt?.destination || null,
+    counts: report.counts || {},
+    checks: report.checks || {}
+  };
+}
+
+function readVaultOSProof(file) {
+  const report = readJson(file);
+  if (!report) return { exists: false, path: rel(file) };
+  const fs27SyncReport = readJson(path.join(path.dirname(file), 'fs27-sync-live.json'));
+  const fs27SyncOk = report.commandProof?.fs27Sync
+    ? report.commandProof.fs27Sync.ok === true
+    : fs27SyncReport?.ok === true;
+  return {
+    exists: true,
+    path: rel(file),
+    ok: report.ok === true,
+    generated_at: report.generatedAt || null,
+    hierarchy: report.hierarchy || null,
+    real_folder: report.realFolder?.path || null,
+    real_folder_preserved: report.realFolder?.preserved === true,
+    file_count: report.realFolder?.fileCount || 0,
+    total_bytes: report.realFolder?.totalBytes || 0,
+    pack_id: report.vault?.packId || null,
+    object_sha256: report.vault?.objectSha256 || null,
+    restore_point_id: report.vault?.restorePointId || null,
+    command_count: report.commandProof?.commandsCovered?.length || 0,
+    commands_covered: report.commandProof?.commandsCovered || [],
+    manifest_path: report.commandProof?.manifestPath || null,
+    bundle_dir: report.commandProof?.bundleDir || null,
+    attached_vault_dir: report.commandProof?.attachedVaultDir || null,
+    source_diff_ok: report.commandProof?.sourceDiff?.ok === true,
+    reload_diff_ok: report.commandProof?.reloadDiff?.ok === true,
+    bundle_reload_diff_ok: report.commandProof?.bundleReloadDiff?.ok === true,
+    fs27_sync_ok: fs27SyncOk,
+    fs27_sync_count: fs27SyncReport?.syncedCount || report.commandProof?.fs27Sync?.syncedCount || 0,
+    console_ok: report.consoleProof?.ok === true
+  };
+}
+
 function commandSummary(command) {
   return {
     id: command.id,
@@ -370,9 +455,20 @@ function buildGraph(summary, queue) {
   addNode(nodes, { id: 'brain:local', label: '0S Local Brain', type: 'brain', group: 'brain', size: 22 });
   addNode(nodes, { id: 'admin:control', label: 'Admin Control', type: 'admin', group: 'admin', size: 20, path: 'metraiyux_0s_site/admin/skyerunners.html' });
   addNode(nodes, { id: 'ops:state', label: 'ops/skyerunners', type: 'state', group: 'ops', size: 18, path: 'ops/skyerunners' });
+  addNode(nodes, { id: 'fs27:skysecure', label: 'FS27 SkySecure API', type: 'control-plane', group: 'vault-security', size: 22, path: 'SkyeGateFS27/netlify/functions/skysecure-api.js' });
+  addNode(nodes, { id: 'skyevault:custody', label: 'SkyeVault Ciphertext Custody', type: 'vault', group: 'vault-security', size: 20, path: 'SkyeVault-Drop' });
+  addNode(nodes, { id: 'vaultos:console', label: 'SkyeVaultOS Console', type: 'console', group: 'vault-security', size: 20, path: 'metraiyux_0s_site/skye-vault-os/index.html' });
+  addNode(nodes, { id: 'proof:skysecure-live', label: 'SkySecure Live Proof', type: 'proof', group: 'vault-security', size: 18, path: 'test-artifacts/skye-secure-live-production-proof/live-production-proof-report.json' });
+  addNode(nodes, { id: 'proof:vaultos-about-delete', label: 'VaultOS About-To-Delete Proof', type: 'proof', group: 'vault-security', size: 18, path: 'test-artifacts/vaultos-about-to-delete-proof/vaultos-about-to-delete-proof-report.json' });
   addLink(links, 'skyerunners:hub', 'brain:local', 'feeds', 2);
   addLink(links, 'skyerunners:hub', 'admin:control', 'controls', 2);
   addLink(links, 'skyerunners:hub', 'ops:state', 'ledgers', 1.7);
+  addLink(links, 'skyerunners:hub', 'fs27:skysecure', 'health-checks', 1.8);
+  addLink(links, 'fs27:skysecure', 'skyevault:custody', 'registers-receipts-from', 1.7);
+  addLink(links, 'fs27:skysecure', 'vaultos:console', 'publishes-command-proof-for', 1.5);
+  addLink(links, 'fs27:skysecure', 'proof:skysecure-live', 'proves', 1.6);
+  addLink(links, 'vaultos:console', 'proof:vaultos-about-delete', 'renders', 1.5);
+  addLink(links, 'skyevault:custody', 'proof:vaultos-about-delete', 'custodies-encrypted-object-for', 1.4);
 
   for (const runner of RUNNERS) {
     const runnerNode = `runner:${runner.id}`;
@@ -457,6 +553,24 @@ function chunksFor(payload) {
       heading: 'Current proof state',
       text: `Latest static crawler report: ${payload.current_state.reports.static.exists ? `${payload.current_state.reports.static.checks} checks, ${payload.current_state.reports.static.failures} failures, ${payload.current_state.reports.static.warnings} warnings` : 'not found'}. Repo dirty state: ${payload.current_state.git.status.total} working tree changes. Queue: ${payload.current_state.queue.total} queued SkyeRunners task files. Ledger entries: ${payload.current_state.ledger_count}.`,
       source: 'brain/skyerunners.json'
+    },
+    {
+      id: 'skyerunners-skysecure-live-proof',
+      title: 'SkyeRunners Repo Agent Map',
+      heading: 'SkySecure live proof lane',
+      text: payload.current_state.skysecure_live.exists
+        ? `SkySecure live proof is ${payload.current_state.skysecure_live.ok ? 'passing' : 'not passing'} for ${payload.current_state.skysecure_live.hierarchy || 'FS27 -> SkyeVault -> SkySecure'}. Proof lane ${payload.current_state.skysecure_live.proof_lane || 'unknown'} registered pack ${payload.current_state.skysecure_live.pack_id || 'unknown'} with SkyeVault receipt ${payload.current_state.skysecure_live.vault_receipt_id || 'unknown'} and FS27 counts ${JSON.stringify(payload.current_state.skysecure_live.counts || {})}.`
+        : 'SkySecure live proof report is not present yet. Run npm run skye-secure:live-proof after FS27 and SkyeVault are deployed.',
+      source: 'brain/skyerunners.json'
+    },
+    {
+      id: 'skyerunners-vaultos-proof',
+      title: 'SkyeRunners Repo Agent Map',
+      heading: 'SkyeVaultOS live system about-to-delete proof lane',
+      text: payload.current_state.vaultos_about_delete.exists
+        ? `SkyeVaultOS live system proof is ${payload.current_state.vaultos_about_delete.ok ? 'passing' : 'not passing'} for ${payload.current_state.vaultos_about_delete.real_folder || '/about to delete'}. It preserved the source folder, encrypted ${payload.current_state.vaultos_about_delete.file_count} files, produced restore point ${payload.current_state.vaultos_about_delete.restore_point_id || 'unknown'}, covered ${payload.current_state.vaultos_about_delete.command_count || 0} commands, wrote manifest ${payload.current_state.vaultos_about_delete.manifest_path || 'unknown'}, bundled to ${payload.current_state.vaultos_about_delete.bundle_dir || 'unknown'}, attached into ${payload.current_state.vaultos_about_delete.attached_vault_dir || 'unknown'}, and has source/reload/bundle reload diff checks ${payload.current_state.vaultos_about_delete.source_diff_ok && payload.current_state.vaultos_about_delete.reload_diff_ok && payload.current_state.vaultos_about_delete.bundle_reload_diff_ok ? 'passing' : 'not passing'}. Execution scope remains CLI/app filesystem operations plus deployed FS27 and 0S proof surfaces.`
+        : 'SkyeVaultOS live system proof report is not present yet. Run npm run vaultos:proof before deleting the /about to delete folder.',
+      source: 'brain/skyerunners.json'
     }
   ];
 }
@@ -521,6 +635,8 @@ async function buildKnowledgeMap() {
         worker: readReport(path.join(ROOT_DIR, 'test-artifacts', 'skye-crawler-worker-report.json')),
         live: readReport(path.join(ROOT_DIR, 'test-artifacts', 'skye-crawler-live-report.json'))
       },
+      skysecure_live: readSkySecureLiveProof(path.join(ROOT_DIR, 'test-artifacts', 'skye-secure-live-production-proof', 'live-production-proof-report.json')),
+      vaultos_about_delete: readVaultOSProof(path.join(ROOT_DIR, 'test-artifacts', 'vaultos-about-to-delete-proof', 'vaultos-about-to-delete-proof-report.json')),
       queue: {
         total: queue.length,
         latest: queue.slice(0, 12)

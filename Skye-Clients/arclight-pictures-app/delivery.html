@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delivery Receipt — ArcLight Pictures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #FF8C00;
+      --amber-dim: rgba(255,140,0,0.12);
+      --amber-border: rgba(255,140,0,0.22);
+      --neon: #39FF14;
+      --neon-dim: rgba(57,255,20,0.1);
+      --bg: #06050A;
+      --surface: rgba(255,255,255,0.03);
+      --surface-hot: rgba(255,140,0,0.04);
+      --ink: #F0EBE3;
+      --muted: #4A4038;
+      --muted-2: #7A6A5A;
+    }
+    html, body { width: 100%; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+    /* LAYERS */
+    canvas#ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.45; }
+    .grain { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px; }
+    .scanline { position: fixed; inset: 0; pointer-events: none; z-index: 2; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+
+    .doc { position: relative; z-index: 3; max-width: 780px; margin: 0 auto; padding: 0 24px 100px; }
+
+    /* TOP BAR */
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; border-bottom: 1px solid rgba(255,140,0,0.14); margin-bottom: 0; }
+    .tb-left { display: flex; align-items: center; gap: 10px; }
+    .tb-orb { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber), 0 0 24px rgba(255,140,0,0.4); animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .tb-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 0.1em; }
+    .tb-right { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted-2); letter-spacing: 0.08em; text-align: right; line-height: 1.8; }
+
+    /* HERO */
+    .hero { padding: 64px 0 0; }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(57,255,20,0.3); background: rgba(57,255,20,0.06); color: var(--neon); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; padding: 6px 16px; border-radius: 2px; margin-bottom: 32px; text-transform: uppercase; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 8px var(--neon); animation: pulse 1.8s ease-in-out infinite; }
+    .hero-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 6.4rem); line-height: 0.88; text-transform: uppercase; letter-spacing: -0.01em; color: #fff; margin-bottom: 4px; }
+    .hero-name .accent { color: var(--amber); text-shadow: 0 0 60px rgba(255,140,0,0.4); }
+    .hero-sub-name { font-family: 'Oswald', sans-serif; font-weight: 300; font-size: clamp(1rem, 3vw, 1.6rem); text-transform: uppercase; letter-spacing: 0.32em; color: var(--muted-2); margin-bottom: 28px; }
+    .hero-desc { font-size: 15px; color: var(--muted-2); line-height: 1.65; max-width: 520px; margin-bottom: 36px; }
+
+    /* URL STRIP */
+    .url-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 64px; }
+    .url-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 8px 16px; border-radius: 2px; text-decoration: none; transition: background 0.15s; }
+    .url-tag:hover { background: rgba(255,140,0,0.2); }
+    .url-tag .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 6px var(--neon); }
+
+    /* DIVIDER */
+    .rule { width: 100%; height: 1px; background: linear-gradient(90deg, var(--amber), rgba(255,140,0,0.1), transparent); margin: 0 0 44px; }
+
+    /* SECTION EYEBROW */
+    .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.26em; color: var(--muted-2); text-transform: uppercase; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; }
+    .eyebrow::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
+
+    /* MANIFEST */
+    .manifest { border: 1px solid rgba(255,140,0,0.12); border-radius: 4px; overflow: hidden; margin-bottom: 44px; }
+    .manifest-head { display: flex; padding: 10px 18px; background: rgba(255,140,0,0.06); border-bottom: 1px solid rgba(255,140,0,0.12); }
+    .manifest-head span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.18em; text-transform: uppercase; }
+    .manifest-head .mh-count { margin-left: auto; }
+    .m-row { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
+    .m-row:last-child { border-bottom: none; }
+    .m-row:hover { background: rgba(255,140,0,0.025); }
+    .m-check { width: 18px; height: 18px; border-radius: 50%; background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.28); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .m-check svg { width: 9px; height: 9px; stroke: var(--neon); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .m-name { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); flex: 1; }
+    .m-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--neon); letter-spacing: 0.14em; background: rgba(57,255,20,0.07); border: 1px solid rgba(57,255,20,0.2); padding: 3px 10px; border-radius: 2px; white-space: nowrap; }
+    .m-badge.amber { color: var(--amber); background: var(--amber-dim); border-color: var(--amber-border); }
+    .m-row.highlight { background: var(--surface-hot); }
+    .m-row.highlight .m-name { color: var(--amber); }
+    .m-row.highlight .m-check { background: rgba(255,140,0,0.08); border-color: rgba(255,140,0,0.35); }
+    .m-row.highlight .m-check svg { stroke: var(--amber); }
+
+    /* CAP GRID */
+    .cap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; margin-bottom: 44px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+    @media (max-width: 480px) { .cap-grid { grid-template-columns: 1fr; } }
+    .cap { background: var(--surface); padding: 20px 18px; }
+    .cap-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: var(--amber); text-transform: uppercase; margin-bottom: 8px; }
+    .cap p { font-size: 13px; color: var(--muted-2); line-height: 1.6; }
+
+    /* ABOUT BLOCK */
+    .about { position: relative; border: 1px solid rgba(255,140,0,0.18); border-left: 3px solid var(--amber); border-radius: 4px; padding: 26px 24px; margin-bottom: 44px; background: rgba(255,140,0,0.03); }
+    .about-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: var(--amber); text-transform: uppercase; margin-bottom: 12px; }
+    .about p { font-size: 14px; color: var(--ink); line-height: 1.7; }
+
+    /* NEXT */
+    .next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 56px; }
+    @media (max-width: 480px) { .next-grid { grid-template-columns: 1fr; } }
+    .next-card { background: var(--surface); padding: 22px 18px; }
+    .n-num { font-family: 'Oswald', sans-serif; font-size: 3rem; font-weight: 700; color: var(--amber); opacity: 0.15; line-height: 1; margin-bottom: 10px; }
+    .n-title { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); margin-bottom: 7px; }
+    .next-card p { font-size: 12px; color: var(--muted-2); line-height: 1.55; }
+
+    /* FOOTER SEAL */
+    .seal { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 28px 0; border-top: 1px solid rgba(255,140,0,0.14); }
+    .seal-brand { display: flex; flex-direction: column; gap: 3px; }
+    .seal-brand .s-name { font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
+    .seal-brand .s-entity { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted-2); letter-spacing: 0.16em; text-transform: uppercase; }
+    .seal-right { text-align: right; }
+    .seal-right a { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); text-decoration: none; letter-spacing: 0.06em; display: block; }
+    .seal-right span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; display: block; margin-top: 3px; }
+  </style>
+</head>
+<body>
+<canvas id="ambient"></canvas>
+<div class="grain"></div>
+<div class="scanline"></div>
+
+<div class="doc">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-orb"></div>
+      <span class="tb-id">MX0S · DELIVERY RECEIPT · CLIENT-2026-05</span>
+    </div>
+    <div class="tb-right">
+      Tucson, AZ<br>
+      May 2026
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="status-pill"><span class="status-dot"></span>All systems live</div>
+    <h1 class="hero-name">ArcLight <span class="accent">Pictures</span><br>App</h1>
+    <p class="hero-sub-name">Digital Presence · Delivered</p>
+    <p class="hero-desc">ArcLight Pictures now has a full client workspace running on enterprise infrastructure. Service pages, service-area proof, a shareable flyer, and a workspace handoff lane are ready for company use.</p>
+    <div class="url-strip">
+      <a class="url-tag" href="https://arclight-pictures.pages.dev" target="_blank" rel="noopener"><span class="live-dot"></span>arclight-pictures.pages.dev</a>
+      <a class="url-tag" href="https://arclight-pictures.pages.dev/flyer.html" target="_blank" rel="noopener"><span class="live-dot"></span>Digital Flyer</a>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="eyebrow">Delivery Manifest — 10 items</div>
+  <div class="manifest">
+    <div class="manifest-head">
+      <span>Item</span>
+      <span class="mh-count">Status</span>
+    </div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Homepage</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Services Page</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Project Highlights Page</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Gallery</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Blog</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">FAQ Page</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Contact Page</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Local SEO Page</div><div class="m-badge">INDEXED</div></div>
+    <div class="m-row"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Digital Flyer — Shareable</div><div class="m-badge">LIVE</div></div>
+    <div class="m-row highlight"><div class="m-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div class="m-name">Workspace Preview Room</div><div class="m-badge amber">LIVE</div></div>
+  </div>
+
+  <div class="eyebrow">What you now have</div>
+  <div class="cap-grid">
+    <div class="cap"><div class="cap-label">24 / 7 Uptime</div><p>Pages load any hour with no downtime, no server management, and no maintenance required on your end.</p></div>
+    <div class="cap"><div class="cap-label">Mobile-Ready</div><p>Every page renders on phone, tablet, and desktop. Customers from Instagram or Google get a real experience.</p></div>
+    <div class="cap"><div class="cap-label">Local Search Targeting</div><p>The SEO page targets Tucson, Southern Arizona, production-related service terms, and project inquiry intent built to surface in local search.</p></div>
+    <div class="cap"><div class="cap-label">Shareable Flyer</div><p>A live web flyer you can text, DM, or print-to-PDF. Hours, categories, phone number, and call-to-action.</p></div>
+    <div class="cap"><div class="cap-label">Cloudflare Edge Network</div><p>Same infrastructure used by Fortune 500 companies. Not shared hosting — global edge delivery from day one.</p></div>
+    <div class="cap"><div class="cap-label">Workspace Handoff</div><p>The workspace includes a dedicated review room, QR route, and delivery path so ArcLight can review updates before launch.</p></div>
+  </div>
+
+  <div class="eyebrow">About the operator</div>
+  <div class="about">
+    <div class="about-label">MetrAIyux 0S / Skyes Over London LC</div>
+    <p>MetrAIyux 0S is an AI-operated business infrastructure platform. We build complete business operating systems: digital presence, proof infrastructure, automated routing, and operator tooling deployed on enterprise-grade cloud infrastructure. This ArcLight build is set up as a real client-facing company app with public pages and a private review lane.</p>
+  </div>
+
+  <div class="eyebrow">What's next</div>
+  <div class="next-grid">
+    <div class="next-card"><div class="n-num">01</div><div class="n-title">Client Media Swap</div><p>Load approved ArcLight reels, stills, and logos so the public build reflects the actual body of work end to end.</p></div>
+    <div class="next-card"><div class="n-num">02</div><div class="n-title">Inquiry Flow</div><p>Connect the public contact lane, workspace room, and proof loop so project intake and revision traffic stay in one system.</p></div>
+    <div class="next-card"><div class="n-num">03</div><div class="n-title">Platform Upgrade</div><p>Add booking, vault delivery, intake routing, and automated client follow-up through the MetrAIyux 0S platform.</p></div>
+  </div>
+
+  <div class="seal">
+    <div class="seal-brand">
+      <span class="s-name">MetrAIyux 0S</span>
+      <span class="s-entity">By Skyes Over London LC</span>
+    </div>
+    <div class="seal-right">
+      <a href="https://metraiyux.com" target="_blank" rel="noopener">metraiyux.com</a>
+      <span>graylondonskyes@gmail.com</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('ambient');
+  if (!c || !c.getContext) return;
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const P = Array.from({length:55}, () => ({
+    x: Math.random(), y: Math.random(),
+    r: 60 + Math.random()*120,
+    vy: 0.00012 + Math.random()*0.00025,
+    vx: (Math.random()-.5)*0.00015,
+    a: 0.035 + Math.random()*0.065,
+    warm: Math.random() > 0.5,
+  }));
+  function frame(){
+    ctx.clearRect(0,0,c.width,c.height);
+    P.forEach(p => {
+      p.y -= p.vy; p.x += p.vx;
+      if(p.y < -0.2){ p.y = 1.1; p.x = Math.random(); }
+      const gx = p.x*c.width, gy = p.y*c.height;
+      const g = ctx.createRadialGradient(gx,gy,0,gx,gy,p.r);
+      g.addColorStop(0, p.warm ? `rgba(255,120,0,${p.a})` : `rgba(60,40,60,${p.a})`);
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(gx,gy,p.r,0,Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

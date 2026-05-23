@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for SkyeMerit wallet, protected discount math, operator issue control, and SkyePay integration inside MetrAIyux 0S.">
+  <title>SkyeMerit Expansion Receipt - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="../index.html">Home</a><a href="../saas/skyemerit.html">Wallet</a><a href="../operator/skyemerit-admin.html">Operator</a><a href="index.html">Proof</a></nav>
+  </header>
+  <main class="portal-shell">
+    <section class="hero slim">
+      <p class="eyebrow">Proof receipt</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent logo">
+      <h1>SkyeMerit is wired as a protected first-time merit lane, not a coupon free-for-all.</h1>
+      <p class="hero-copy">SkyeMerit gives first-time users a no-charge merit pack, a $6 premium kAIxu credit, and capped discount math that can lower eligible SkyePay spend without bypassing FS27, owner approval, or gate-session rules.</p>
+      <div class="hero-actions"><a class="button primary" href="../saas/skyemerit.html">Open SkyeMerit Wallet</a><a class="button" href="../operator/skyemerit-admin.html">Open Operator Control</a><a class="button" href="../saas/skyepay.html?client=metraiyux-0s&offer=metraiyux-growth-cabinet&skyemerit_code=SKYEMERIT-FIRST-BEST">Preview SkyePay</a></div>
+    </section>
+
+    <section class="section">
+      <h2>Verification Summary</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Customer wallet</td><td>Passed</td><td><code>saas/skyemerit.html</code> exposes the wallet, first-time pack, kAIxu credit, protected rule calculator, and SkyePay entry.</td></tr>
+            <tr><td>Operator control</td><td>Passed</td><td><code>operator/skyemerit-admin.html</code> exposes the admin-token issue surface and static payload review path.</td></tr>
+            <tr><td>FS27 SkyePay integration</td><td>Passed</td><td>FS27 checkout applies SkyeMerit metadata and disables Stripe promotion-code stacking when a merit applies.</td></tr>
+            <tr><td>0S Worker integration</td><td>Passed</td><td>The SaaS provisioning Worker exposes <code>/api/saas/skyemerit/catalog</code>, <code>/api/saas/skyemerit/preview</code>, and <code>/api/saas/skyemerit/issue</code>.</td></tr>
+            <tr><td>Protected math</td><td>Passed</td><td><code>SKYEMERIT-SKYELINE-22</code> on a $13,000 checkout discounts only the $7,000 eligible band: $1,540 off and $11,460 due.</td></tr>
+            <tr><td>Sales/accounting surfaces</td><td>Passed</td><td>Pricing, SaaS pricing, live-surface registry, sales offer registry, operator hub, LLM context, proof routes, and live proof router all account for SkyeMerit.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Commercial Boundary</p>
+        <h2>Free99 means no charge to receive the pack.</h2>
+        <p class="wide">It does not mean anonymous access, uncapped coupons, cash payout, or a way around owner-approved activation. SkyeMerit lowers only eligible spend bands, records metadata for SkyePay, and keeps the gate in control.</p>
+      </div>
+      <aside class="operator-warning">
+        <h3>Proof Command</h3>
+        <p>Run <code>npm run 0s:skyemerit:proof</code> after edits to SkyeMerit, SkyePay, pricing, or SaaS onboarding.</p>
+      </aside>
+    </section>
+  </main>
+  <footer><p>SkyeMerit proof receipt for MetrAIyux 0S expansion accounting.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

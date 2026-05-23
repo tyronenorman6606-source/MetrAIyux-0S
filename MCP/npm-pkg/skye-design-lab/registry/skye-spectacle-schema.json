@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Skye Spectacle Registry",
+  "type": "object",
+  "required": ["name", "version", "globalRules", "tokens", "patterns"],
+  "properties": {
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "purpose": { "type": "string" },
+    "sourceReferences": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "globalRules": {
+      "type": "object",
+      "required": ["forbiddenPatterns", "requiredChecks"],
+      "properties": {
+        "forbiddenPatterns": { "type": "array", "items": { "type": "string" } },
+        "requiredChecks": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "tokens": { "type": "object" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "recommendedStack", "compositionRules", "qualityGate"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "bestFor": { "type": "array", "items": { "type": "string" } },
+          "description": { "type": "string" },
+          "recommendedStack": { "type": "array", "items": { "type": "string" } },
+          "compositionRules": { "type": "array", "items": { "type": "string" } },
+          "qualityGate": { "type": "string" }
+        }
+      }
+    }
+  }
+}

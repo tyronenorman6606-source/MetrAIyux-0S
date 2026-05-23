@@ -1,0 +1,38 @@
+{
+  "name": "SkyeMusicNexus Native Creation Stack",
+  "purpose": "Track the first-party Nexus DAW, stem, export, discovery, and feed rooms after third-party DAW vendor code was removed.",
+  "nativeModules": [
+    {
+      "name": "SkyeMusicNexus Native DAW",
+      "path": "public/daw.html",
+      "scripts": ["public/nexus-daw.js"],
+      "styles": ["public/nexus-daw.css"],
+      "role": "fullscreen first-party DAW: transport, timeline, clips, tracks, pads, keys, mixer, physical keyboard, region editing, undo/redo, metronome, loop packs, mic/Web MIDI hooks, browser WAV mixdown, project save, and export manifest"
+    },
+    {
+      "name": "Stem Vault",
+      "path": "public/stems.html",
+      "role": "first-party stem, bounce, master, and reference staging"
+    },
+    {
+      "name": "Export Forge",
+      "path": "public/exports.html",
+      "role": "first-party project packet, proof export queue, and Release Forge handoff"
+    },
+    {
+      "name": "Discover",
+      "path": "public/discover.html",
+      "role": "first-party playlist and release discovery surface"
+    },
+    {
+      "name": "Feed",
+      "path": "public/feed.html",
+      "role": "first-party social feed plus gated provider connector proof"
+    }
+  ],
+  "removedVendorBoundary": [
+    "No vendored third-party browser DAW source remains in this Nexus folder.",
+    "No DAW iframe bridge is part of the native DAW route.",
+    "The DAW route must remain SkyeMusicNexus branded and first-party."
+  ]
+}

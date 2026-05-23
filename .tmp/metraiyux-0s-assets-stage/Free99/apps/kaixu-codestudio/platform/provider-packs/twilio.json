@@ -1,0 +1,47 @@
+{
+  "id": "twilio",
+  "title": "Twilio Messaging",
+  "lane": "sms_voice",
+  "requiredSecrets": [
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "TWILIO_FROM"
+  ],
+  "routes": [
+    "sms.send",
+    "voice.call",
+    "webhook.message"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#TwilioAdapter",
+  "description": "Executable provider pack for Twilio Messaging routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "sms",
+    "voice",
+    "message-webhooks"
+  ],
+  "metering": {
+    "unit": "message_or_call",
+    "defaultCostCents": 1
+  },
+  "policyTags": [
+    "sms_voice",
+    "twilio"
+  ],
+  "executableActions": [
+    {
+      "route": "sms.send",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "voice.call",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "webhook.message",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

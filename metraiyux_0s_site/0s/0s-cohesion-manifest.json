@@ -1,0 +1,58 @@
+{
+  "id": "metraiyux-0s-cohesion",
+  "updated_at": "2026-05-20T00:00:00.000Z",
+  "canonical_auth_layer": {
+    "name": "0S SkyGate",
+    "surface": "../skyegate/index.html",
+    "bridge": "../assets/js/0s-gate-card-bridge.js",
+    "session_keys": [
+      "METRAIYUX_GATE_SESSION",
+      "SKYGATEFS27_GATE_SESSION",
+      "SKYGATE_USER_TOKEN",
+      "adminBrainToken",
+      "adminSecuritySession",
+      "saas_client_session"
+    ]
+  },
+  "security_layer": {
+    "name": "0meg4kAI",
+    "surface": "../admin/0meg4kai-security.html",
+    "role": "security, QA, tenant isolation, approval risk, and Omega runner guard",
+    "event_type": "0meg4kai_scan"
+  },
+  "runner_layer": {
+    "name": "SkyeRunners",
+    "surface": "../admin/skyerunners.html",
+    "map": "../brain/skyerunners.json",
+    "omega_overlay": "../brain/skyerunners-omega-overlay.json",
+    "role": "repo-aware runner orchestration with 0meg4kAI as security secondary for risky lanes",
+    "event_types": [
+      "skyerunner_run_started",
+      "skyerunner_task_queued"
+    ]
+  },
+  "capability_layer": {
+    "name": "SkyeAPI + AegisCore",
+    "surface": "../Free99/apps/skyeapi-aegiscore/apps/console/index.html",
+    "worker": "../Free99/apps/skyeapi-aegiscore/apps/gateway-worker/src/index.ts",
+    "role": "provider-secret authority and AI/provider capability broker behind 0S gate cards",
+    "auth_rule": "browser console uses MetrAIyuxGateBridge headers; backend admin and capability calls accept 0S/SkyGate gate-card context"
+  },
+  "document_layer": {
+    "name": "SkyeDocxMax / SovereignDocs",
+    "surfaces": [
+      "../Marketing-Made-Easy/SkyeDocxMax/editor.html",
+      "../Free99/apps/sovereigndocs/skye-docx-max/app/index.html"
+    ],
+    "role": "document workspace, document AI, suite handoffs, and drive/mail/chat routing",
+    "auth_rule": "shared auth modules resolve through the 0S/SkyGate bridge, not local document tokens"
+  },
+  "required_gate_cards": [
+    "0s-core",
+    "fs27",
+    "0meg4kai",
+    "skyerunners",
+    "omega"
+  ],
+  "rule": "Apps inherit the 0S/SkyGate session and gate cards. They do not ask users for independent provider keys or overwrite the gate."
+}

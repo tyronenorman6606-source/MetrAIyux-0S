@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-05-15T05:13:24.834187Z",
+  "site_type": "staffing_agency_business_os_static_site",
+  "internal_pages_to_lock": [
+    "ae-command.html",
+    "proposal-builder.html",
+    "sales-scripts.html",
+    "employer-portal.html",
+    "government-opportunities.html",
+    "deployment-command.html",
+    "operations-hub.html",
+    "forms-directory.html",
+    "vendor-packet.html",
+    "email-sequences.html",
+    "recruiter-desk.html",
+    "training-academy.html",
+    "bill-rate-calculator.html",
+    "timesheet-invoice-control.html",
+    "risk-register.html",
+    "crm-pipeline.html",
+    "placement-tracker.html",
+    "agreement-packet.html",
+    "brain-command.html"
+  ],
+  "production_gates": [
+    "connect forms to backend or Netlify Forms",
+    "secure internal pages behind auth",
+    "replace placeholder domain in sitemap and robots",
+    "verify legal entity and government identifiers",
+    "do not advertise fake jobs",
+    "do not collect sensitive candidate documents through public static forms"
+  ],
+  "last_expansion": "sales_delivery_automation_scaffold",
+  "local_brain": {
+    "enabled": true,
+    "mode": "static_js_json_localstorage",
+    "public_page": "brain.html",
+    "internal_page": "brain-command.html",
+    "corpus": "brain/brain-corpus.json",
+    "future_function_stub": "netlify/functions/brain.js",
+    "truth_label": "not a true LLM until provider/GPU endpoint is connected"
+  }
+}

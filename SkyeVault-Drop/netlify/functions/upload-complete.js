@@ -24,6 +24,9 @@ function verifyFingerprint(body, appProperties, manifest) {
 
   const expected = manifestFingerprint || bodyFingerprint || null;
   if (!expected) return null;
+  if (manifest?.policy?.streamingMultipart === true && !driveFingerprint?.value && bodyFingerprint?.value) {
+    return bodyFingerprint;
+  }
   if (!driveFingerprint?.value) fail('Vault object is missing the expected file fingerprint metadata.', 403);
   if (String(driveFingerprint.value).toLowerCase() !== String(expected.value || '').toLowerCase()) {
     fail('Vault object fingerprint metadata does not match the upload manifest.', 409);
@@ -37,14 +40,23 @@ function verifyFingerprint(body, appProperties, manifest) {
 function verifyManifest(body, manifestRecord, verifiedFile) {
   if (!manifestRecord?.manifest) fail('Upload session manifest was not found. Completion is blocked to avoid untracked vault objects.', 409);
   const manifest = manifestRecord.manifest;
+  const streamingMultipart = manifest.policy?.streamingMultipart === true;
   const declaredSize = Number(body.fileSize || 0);
   const manifestSize = Number(manifest.file?.size || 0);
   const actualSize = Number(verifiedFile.size || 0);
   if (manifest.sessionId !== cleanText(body.sessionId, 120)) fail('Upload manifest session does not match completion request.', 403);
   if (manifest.destination?.id !== cleanText(body.destinationId, 120)) fail('Upload manifest destination does not match completion request.', 403);
   if (manifest.file?.name && safeFileName(manifest.file.name) !== safeFileName(body.fileName || verifiedFile.name)) fail('Upload manifest file name does not match completion request.', 409);
-  if (manifestSize && actualSize && manifestSize !== actualSize) fail('Vault object size does not match the upload manifest.', 409);
-  if (declaredSize && manifestSize && declaredSize !== manifestSize) fail('Completion file size does not match the upload manifest.', 409);
+  if (manifestSize && actualSize && (streamingMultipart ? actualSize > manifestSize : manifestSize !== actualSize)) {
+    fail(streamingMultipart
+      ? 'Vault object size exceeds the declared streaming upload ceiling.'
+      : 'Vault object size does not match the upload manifest.', 409);
+  }
+  if (declaredSize && manifestSize && (streamingMultipart ? declaredSize > manifestSize : declaredSize !== manifestSize)) {
+    fail(streamingMultipart
+      ? 'Completion file size exceeds the declared streaming upload ceiling.'
+      : 'Completion file size does not match the upload manifest.', 409);
+  }
   if (manifest.status === 'complete' && manifest.receiptId) return manifest;
   return manifest;
 }

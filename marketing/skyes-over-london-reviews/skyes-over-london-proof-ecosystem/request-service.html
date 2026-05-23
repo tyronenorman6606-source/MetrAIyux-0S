@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Request Service - Skyes Over London</title>
+  <meta name="description" content="Route a Skyes Over London service request into FS27 contact intake for private 0S operator handling." />
+  <link rel="stylesheet" href="assets/proof-ecosystem.css" />
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="Skyes Over London service request navigation">
+      <a href="index.html">Proof Hub</a>
+      <a href="skyes-over-london-reviews-expanded.html">Review Wall</a>
+      <a href="request-service.html" class="active">Request Service</a>
+      <a href="submit-review.html">Leave a Review</a>
+    </nav>
+
+    <section class="hero">
+      <p class="eyebrow">FS27 Contact Intake</p>
+      <h2><span>Request work without leaving the 0S lane.</span></h2>
+      <p class="hero-copy">
+        This request goes into the private FS27 contact-intake queue for operator triage, Relay13/ConnectLog routing when provider keys are active, and a Resend/Gmail backup receipt. It is not published to the public review wall or shared with the client base.
+      </p>
+      <div class="metrics">
+        <div class="metric"><b>FS27</b><span>owns the intake record and admin access.</span></div>
+        <div class="metric"><b>0S</b><span>routes the request to the right operator lane.</span></div>
+        <div class="metric"><b>Relay</b><span>context is prepared for Relay13/ConnectLog.</span></div>
+        <div class="metric"><b>Mail</b><span>Resend/Gmail stay as backup notification.</span></div>
+      </div>
+    </section>
+
+    <section class="section live-review-layout">
+      <div>
+        <p class="eyebrow">Service Request</p>
+        <h2>Tell the 0S what needs to happen.</h2>
+        <p class="section-lede">
+          Keep it practical: what you need built, fixed, automated, reviewed, launched, or staffed. The admin queue handles the rest.
+        </p>
+      </div>
+
+      <form class="live-review-form" data-contact-intake-form data-contact-kind="service_request">
+        <input class="hidden" name="website" tabindex="-1" autocomplete="off" />
+        <label>
+          Name
+          <input name="name" autocomplete="name" required />
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          Phone
+          <input name="phone" autocomplete="tel" />
+        </label>
+        <label>
+          Company
+          <input name="company" autocomplete="organization" />
+        </label>
+        <label>
+          Role / title
+          <input name="role" placeholder="Owner, operator, founder..." />
+        </label>
+        <label>
+          Service lane
+          <select name="service" required>
+            <option>Website Development</option>
+            <option>Staffing Solutions / AE Network</option>
+            <option>Automation</option>
+            <option>AI Systems / Local Brain</option>
+            <option>Deployment Support</option>
+            <option>Client Portals / Upload Flow</option>
+            <option>Government Contracting Readiness</option>
+            <option>Business Operations</option>
+            <option>Local SEO</option>
+            <option>Sales Funnels / Pitch Engines</option>
+            <option>Brand Strategy</option>
+          </select>
+        </label>
+        <label class="wide-field">
+          Request
+          <textarea name="message" rows="7" minlength="8" required placeholder="What do you need Skyes Over London to help with?"></textarea>
+        </label>
+        <label class="wide-field">
+          Private context for 0S
+          <textarea name="proofNotes" rows="3" placeholder="Optional: deadline, proof link, budget context, or what should stay private."></textarea>
+        </label>
+        <label class="check-field wide-field">
+          <input name="consent" type="checkbox" required />
+          I want this routed privately through the 0S/FS27 intake lane.
+        </label>
+        <div class="submission-controls wide-field">
+          <button type="submit">Send to FS27 Intake</button>
+          <a class="button-fallback" data-contact-mailto-fallback href="mailto:skyesoverlondon@gmail.com">Fallback Email</a>
+        </div>
+        <p class="submission-status wide-field" data-contact-submit-status aria-live="polite">Ready to route privately.</p>
+      </form>
+    </section>
+  </main>
+  <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
+  <script type="module" src="assets/proof-three-scene.js"></script>
+  <script src="assets/proof-ecosystem.js"></script>
+  <script src="assets/review-submissions.js"></script>
+</body>
+</html>

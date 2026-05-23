@@ -1,0 +1,19 @@
+{
+  "name": "skye-content-forge-publisher",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Live/local Skyes Over London AI content repurposing, scheduling, persistence, GitHub backup, Netlify, Cloudflare, Drive, and social API command center.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "scheduler:once": "node scripts/run-scheduler-once.mjs",
+    "smoke": "node scripts/smoke-local.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@netlify/functions": "^4.0.0"
+  }
+}

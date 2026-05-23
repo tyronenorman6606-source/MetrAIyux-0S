@@ -1,0 +1,25 @@
+name = "sovereign-13-site-operator-quantum"
+main = "site-operator-worker.js"
+compatibility_date = "2026-05-15"
+
+# Create these when ready:
+# wrangler kv namespace create SITE_OPERATOR_KV
+# wrangler queues create site-operator-queue
+
+[[kv_namespaces]]
+binding = "SITE_OPERATOR_KV"
+id = "136ec0bf5fcf4df69fce5500045906dd"
+
+[[d1_databases]]
+binding = "SITE_OPERATOR_DB"
+database_name = "metraiyux-site-operator-db"
+database_id = "5fd86765-4564-4076-b747-976dcbe9b64a"
+
+[[queues.producers]]
+binding = "SITE_OPERATOR_QUEUE"
+queue = "site-operator-queue"
+
+# kAIxu 6.7 — live inference brain, co-located with site-operator
+[[services]]
+binding = "KAIXU_BRAIN"
+service = "kaixu-6-7-brain"

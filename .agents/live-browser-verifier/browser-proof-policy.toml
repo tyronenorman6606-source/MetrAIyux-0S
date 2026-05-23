@@ -1,0 +1,115 @@
+[proof]
+required = true
+mode = "headed-live-browser"
+production_url_only = true
+headless_allowed = false
+localhost_counts_as_production = false
+text_smoke_only_allowed = false
+screenshot_only_allowed = false
+
+[human_interaction]
+click_primary_navigation = true
+click_primary_ctas = true
+open_menus = true
+exercise_forms_when_present = true
+exercise_workspace_handoffs_when_present = true
+exercise_tabs_filters_toggles_when_present = true
+exercise_plan_or_pricing_flows_when_present = true
+exercise_download_export_copy_or_save_controls_when_present = true
+exercise_error_and_disabled_states_when_present = true
+minimum_actions_per_viewport = 12
+minimum_distinct_controls_per_viewport = 8
+
+[browser_stress]
+required = true
+mode = "headed-human-style-repeated-interaction"
+minimum_cycles_per_viewport = 3
+minimum_total_actions_per_viewport = 24
+minimum_form_edits_per_viewport = 3
+minimum_state_change_assertions_per_viewport = 8
+scroll_after_each_cycle = true
+repeat_core_workflow_until_stable = true
+export_or_download_flow_required_when_present = true
+payment_or_entitlement_flow_required_when_present = true
+do_not_complete_real_payment_without_user_approval = true
+capture_screenshot_after_each_cycle = true
+console_network_check_after_each_cycle = true
+fail_on_uncaught_exception = true
+fail_on_unhandled_rejection = true
+
+[regression_loop]
+required = true
+run_until_pass_or_blocked = true
+max_fix_verify_cycles = 5
+rerun_after_every_code_change = true
+rerun_after_deploy = true
+do_not_final_until_clean_or_blocked = true
+blocked_requires_specific_reason = true
+blocked_requires_latest_receipt = true
+
+[viewports.desktop]
+width = 1440
+height = 980
+
+[viewports.mobile]
+width = 390
+height = 844
+
+[visual_scroll_gate]
+full_page_scroll_required = true
+include_hero = true
+include_each_major_section = true
+include_each_anchor_target = true
+include_bottom = true
+use_human_wheel_scroll = true
+blank_viewport_is_failure = true
+blank_section_detection_required = true
+minimum_visible_text_chars_without_media = 30
+minimum_visible_elements_without_text_or_media = 6
+inspect_loaded_images = true
+inspect_loaded_video = true
+inspect_canvas_presence = true
+inspect_svg_presence = true
+inspect_css_background_media = true
+inspect_viewport_pixel_variance = true
+broken_visible_media_is_failure = true
+low_variance_blank_viewport_is_failure = true
+large_sticky_overlay_is_failure = true
+minimum_meaningful_elements_without_text_or_media = 4
+
+[receipt]
+path = "test-artifacts/live-browser-verifier/"
+include_urls = true
+include_statuses = true
+include_viewports = true
+include_actions = true
+include_route_or_tab_states = true
+include_scroll_stops = true
+include_per_stop_screenshots = true
+include_stress_cycles = true
+include_state_change_assertions = true
+include_downloads_or_exports = true
+include_payment_or_entitlement_flow = true
+include_visual_nonblank_metrics = true
+include_console_errors = true
+include_failed_network_requests = true
+include_failures = true
+
+[final_answer]
+must_name_receipt_when_passed = true
+must_say_not_ready_when_unpassed = true
+must_not_present_live_links_as_ready_without_pass = true
+must_use_clickable_markdown_links = true
+plain_url_only_allowed = false
+
+[handoff_format]
+required_for = [
+  "production_urls",
+  "mcp_endpoints",
+  "deployed_sites",
+  "proof_receipts",
+  "local_files",
+  "dev_access_handoffs"
+]
+local_file_link_format = "markdown_link_with_absolute_path_and_optional_line"
+scope_guard = "When a user asks about MCP, production, Dev Access, deployment, proof, or prior handoff links, answer that lane directly instead of assuming the currently focused editor file is the target."

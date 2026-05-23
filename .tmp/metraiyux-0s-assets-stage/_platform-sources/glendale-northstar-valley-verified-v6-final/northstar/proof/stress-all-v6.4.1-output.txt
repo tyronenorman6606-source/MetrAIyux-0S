@@ -1,0 +1,336 @@
+
+> signinpro-northstar-workspace-closure@6.4.0 stress:all
+> npm run closure:all && npm run stress:local
+
+
+> signinpro-northstar-workspace-closure@6.4.0 closure:all
+> npm run schema:verify && npm run smoke:core && npm run smoke:security && npm run smoke:functions && npm run closure:local
+
+
+> signinpro-northstar-workspace-closure@6.4.0 schema:verify
+> node scripts/schema-verify.mjs
+
+{
+  "workspaces": true,
+  "workspace_users": true,
+  "workspace_settings": true,
+  "workspace_states": true,
+  "attendees": true,
+  "workspace_audit_events": true,
+  "workspace_login_attempts": true,
+  "workspace_invites": true,
+  "workspace_backups": true,
+  "workspaceOperationalSummary": true,
+  "attendeesCompositePrimaryKey": true,
+  "workspaceStatePrimaryKey": true
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:core
+> node proof/core-smoke.test.cjs
+
+core smoke passed: 6.4.0-workspace-closure attendees: 1
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:security
+> node scripts/security-static-smoke.mjs
+
+{
+  "missing": [],
+  "csrfServer": true,
+  "rolePermissions": true,
+  "loginAttempts": true,
+  "workspaceSettings": true,
+  "workspaceBackups": true,
+  "clientCsrfHeader": true,
+  "rlsDatabaseGuard": true
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:functions
+> node scripts/static-workspace-smoke.mjs
+
+{
+  "ok": true,
+  "checked": 22
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 closure:local
+> node scripts/closure-local-proof.mjs
+
+{
+  "ok": true,
+  "build": "6.4.0-workspace-closure",
+  "generatedAt": "2026-05-19T22:10:19.796Z",
+  "assertions": [
+    {
+      "name": "core version is closure build",
+      "ok": true,
+      "detail": "6.4.0-workspace-closure"
+    },
+    {
+      "name": "workspace storage prefix is v4",
+      "ok": true,
+      "detail": "signinpro_workspace_state_v4"
+    },
+    {
+      "name": "three workspaces provisioned locally",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "name": "tenant one state has only updated tenant one attendee",
+      "ok": true,
+      "detail": "[\"Carol Updated\"]"
+    },
+    {
+      "name": "tenant two state has only tenant two attendee",
+      "ok": true,
+      "detail": "[\"Bob Tenant Two\"]"
+    },
+    {
+      "name": "attendee mirror deletes removed local attendees",
+      "ok": true,
+      "detail": "[\"Carol Updated\"]"
+    },
+    {
+      "name": "tenant one cannot see tenant two attendee mirror",
+      "ok": true,
+      "detail": "tenant filter by workspaceId"
+    },
+    {
+      "name": "tenant two cannot see tenant one attendee mirror",
+      "ok": true,
+      "detail": "tenant filter by workspaceId"
+    },
+    {
+      "name": "manual backup snapshots are workspace scoped",
+      "ok": true,
+      "detail": "{\"one\":2,\"two\":1,\"future\":0}"
+    },
+    {
+      "name": "owner permission can provision future companies",
+      "ok": true,
+      "detail": "future-proof-company"
+    },
+    {
+      "name": "admin menu has provision tab renderer",
+      "ok": true,
+      "detail": "renderProvision + form present"
+    },
+    {
+      "name": "app has no stale escapeHtml call",
+      "ok": true,
+      "detail": "esc() is the active HTML escape helper"
+    },
+    {
+      "name": "client has real operator provision call",
+      "ok": true,
+      "detail": "operatorProvision uses API endpoint and bearer token"
+    },
+    {
+      "name": "sync sends manual backup flag",
+      "ok": true,
+      "detail": "makeBackup true reaches API"
+    },
+    {
+      "name": "workspace sync mirrors deletions to attendee table",
+      "ok": true,
+      "detail": "delete removed attendees by workspace"
+    },
+    {
+      "name": "operator provision writes workspace user settings state audit",
+      "ok": true,
+      "detail": "all core tables touched"
+    },
+    {
+      "name": "seed file contains client workspaces",
+      "ok": true,
+      "detail": "11"
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "assertions": 17,
+    "failures": 0,
+    "localWorkspaces": 3,
+    "tenantOneAttendees": 1,
+    "tenantTwoAttendees": 1,
+    "tenantOneBackups": 2,
+    "tenantTwoBackups": 1
+  }
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 stress:local
+> node scripts/stress-local-proof.mjs
+
+{
+  "ok": true,
+  "build": "6.4.0-workspace-closure",
+  "generatedAt": "2026-05-19T22:10:22.815Z",
+  "durationMs": 2071,
+  "parameters": {
+    "workspaces": 72,
+    "attendeesPerWorkspace": 150,
+    "trimmedAttendeesPerWorkspace": 117
+  },
+  "totals": {
+    "initialAttendeesGenerated": 10800,
+    "postTrimAttendeeRows": 8424,
+    "backups": 144,
+    "auditEvents": 216,
+    "csvBytesGenerated": 1287648,
+    "uniqueStateHashes": 144,
+    "sharedCompositeAttendeeRows": 72
+  },
+  "assertions": [
+    {
+      "name": "baseline closure build version retained",
+      "ok": true,
+      "detail": "6.4.0-workspace-closure"
+    },
+    {
+      "name": "workspace storage prefix retained v4",
+      "ok": true,
+      "detail": "signinpro_workspace_state_v4"
+    },
+    {
+      "name": "all stress workspaces provisioned",
+      "ok": true,
+      "detail": "72"
+    },
+    {
+      "name": "all stress users provisioned",
+      "ok": true,
+      "detail": "72"
+    },
+    {
+      "name": "all stress states stored one per workspace",
+      "ok": true,
+      "detail": "72"
+    },
+    {
+      "name": "duplicate emails blocked in every workspace",
+      "ok": true,
+      "detail": "72/72"
+    },
+    {
+      "name": "event id collisions did not occur inside workspaces",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "total initial attendees generated",
+      "ok": true,
+      "detail": "10800"
+    },
+    {
+      "name": "attendee mirror deletion kept only trimmed rows",
+      "ok": true,
+      "detail": "8424/8424"
+    },
+    {
+      "name": "manual backups created twice per workspace",
+      "ok": true,
+      "detail": "144"
+    },
+    {
+      "name": "audit events created for provision and sync activity",
+      "ok": true,
+      "detail": "216"
+    },
+    {
+      "name": "state hashes vary after workspace/state changes",
+      "ok": true,
+      "detail": "144"
+    },
+    {
+      "name": "CSV export generated non-empty output across stress states",
+      "ok": true,
+      "detail": "1287648"
+    },
+    {
+      "name": "malicious/control note sanitizer executed",
+      "ok": true,
+      "detail": "10800"
+    },
+    {
+      "name": "same attendee id can exist safely in separate workspace partitions",
+      "ok": true,
+      "detail": "72"
+    },
+    {
+      "name": "no cross-workspace attendee leakage under read filters",
+      "ok": true,
+      "detail": "all filtered reads scoped by workspaceId"
+    },
+    {
+      "name": "viewer cannot write workspace state",
+      "ok": true,
+      "detail": "write permission denied"
+    },
+    {
+      "name": "viewer can read workspace audit",
+      "ok": true,
+      "detail": "audit read allowed"
+    },
+    {
+      "name": "viewer cannot access backups",
+      "ok": true,
+      "detail": "backup permission denied"
+    },
+    {
+      "name": "owner has provision permission",
+      "ok": true,
+      "detail": "read,write,settings,users,audit,backup,provision"
+    },
+    {
+      "name": "operator lacks provision permission",
+      "ok": true,
+      "detail": "read,write,audit,backup"
+    },
+    {
+      "name": "password hash verifies correct password",
+      "ok": true,
+      "detail": "pbkdf2$sha256$260000"
+    },
+    {
+      "name": "password hash rejects wrong password",
+      "ok": true,
+      "detail": "wrong password rejected"
+    },
+    {
+      "name": "signed session cookie verifies",
+      "ok": true,
+      "detail": "stress-d86874bd43d929624e3145d9"
+    },
+    {
+      "name": "tampered session cookie rejected",
+      "ok": true,
+      "detail": "tamper rejected"
+    },
+    {
+      "name": "POST without CSRF is blocked",
+      "ok": true,
+      "detail": "missing csrf rejected"
+    },
+    {
+      "name": "POST with matching CSRF passes",
+      "ok": true,
+      "detail": "csrf accepted"
+    },
+    {
+      "name": "slugify removes unsafe company characters",
+      "ok": true,
+      "detail": "future-company-workspace"
+    },
+    {
+      "name": "safeText strips control characters and limits length",
+      "ok": true,
+      "detail": "A A A A A A A A A A A A A"
+    },
+    {
+      "name": "runtime/security paths have no TODO/FIXME/stub/not-implemented markers",
+      "ok": true,
+      "detail": "[]"
+    }
+  ],
+  "failures": []
+}

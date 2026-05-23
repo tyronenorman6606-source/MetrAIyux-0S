@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin, cleanText, safeFileName } from './_lib/security.js';
+import { requireAdminAccess, cleanText, safeFileName } from './_lib/security.js';
 import { loadLedger, writeAuditEventSafe } from './_lib/config.js';
 import { createDownloadUrl, getDriveFileMetadata } from './_lib/google-drive.js';
 
@@ -39,7 +39,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event);
     const receiptId = cleanText(body.receiptId, 120);
     if (!receiptId) fail('Receipt ID is required.');
@@ -63,6 +63,11 @@ export async function handler(event) {
       expires: expiresInSeconds
     });
     await writeAuditEventSafe('admin-vault-download-link-created', {
+      actor: admin.actor,
+      authType: admin.type,
+      workspaceId: admin.workspaceId || entry.workspaceId || '',
+      customerId: admin.customerId || entry.customerId || '',
+      gateCardId: admin.gateCardId,
       receiptId: entry.id,
       sessionId: entry.sessionId,
       clientEmail: entry.clientEmail || '',
@@ -73,6 +78,7 @@ export async function handler(event) {
 
     return json(200, {
       ok: true,
+      actor: admin,
       item: safeEntry(entry),
       downloadUrl,
       expiresAt: new Date(Date.now() + expiresInSeconds * 1000).toISOString()

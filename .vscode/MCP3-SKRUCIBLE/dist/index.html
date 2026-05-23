@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-forge-mode="refined" data-mcp-neon-scrollbar>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>SKRUCIBLE MCP — Design Rendering OS by SkyesOverLondon</title>
+    <meta name="description" content="SKRUCIBLE is an MCP server and live design lab built on React Three Fiber, custom GLSL shaders, Rapier physics, Tone.js, and GSAP. Connect Claude or Cursor to pull real component recipes — glass, shader, spring, physics, audio. Built by SkyesOverLondon." />
+    <meta name="keywords" content="MCP server, Model Context Protocol, React Three Fiber, GLSL shader, WebGL design system, Rapier physics React, Tone.js audio reactive, GSAP scroll, design MCP, SkyesOverLondon, SKRUCIBLE" />
+    <meta name="author" content="SkyesOverLondon" />
+    <link rel="canonical" href="https://skrucible.pages.dev/" />
+
+    <!-- Favicon + PWA -->
+    <link rel="icon" type="image/png" href="/deity-logo.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#b47dff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SKRUCIBLE" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://skrucible.pages.dev/" />
+    <meta property="og:title" content="SKRUCIBLE MCP — Design Rendering OS by SkyesOverLondon" />
+    <meta property="og:description" content="An MCP server and live design lab running at the WebGL rendering layer. Glass refraction, GLSL plasma shaders, Rapier rigid-body physics, Tone.js audio synthesis, GSAP scroll. Connect to Claude or Cursor — no token required." />
+    <meta property="og:image" content="https://skrucible.pages.dev/deity-logo.png" />
+    <meta property="og:site_name" content="SKRUCIBLE" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SKRUCIBLE MCP — Design Rendering OS" />
+    <meta name="twitter:description" content="MCP server + interactive design lab built on React Three Fiber, GLSL shaders, Rapier physics, Tone.js. Pull component recipes directly into Claude or Cursor." />
+    <meta name="twitter:image" content="https://skrucible.pages.dev/deity-logo.png" />
+    <meta name="twitter:creator" content="@SkyesOverLondon" />
+
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SKRUCIBLE MCP",
+      "alternateName": "SKRUCIBLE",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Design System, MCP Server, WebGL Toolkit",
+      "operatingSystem": "Web",
+      "url": "https://skrucible.pages.dev",
+      "image": "https://skrucible.pages.dev/deity-logo.png",
+      "description": "SKRUCIBLE is a Model Context Protocol (MCP) server and interactive design lab built by SkyesOverLondon. It runs on React Three Fiber, Three.js, custom GLSL shaders, Rapier WASM physics, Tone.js audio synthesis, GSAP, Lenis, Pixi.js, and Framer Motion — and serves those implementations as callable MCP tools for AI coding agents.",
+      "featureList": [
+        "MCP server with 8 callable tools",
+        "React Three Fiber component recipes",
+        "Custom GLSL shader (PlasmaMaterial)",
+        "MeshTransmissionMaterial glass refraction",
+        "Rapier WASM rigid-body physics",
+        "Tone.js audio synthesis and FFT visualization",
+        "GSAP ScrollTrigger + Lenis smooth scroll",
+        "Pixi.js 2D GPU particle overlay",
+        "Anime.js morphing animation",
+        "Raw/Refined dual-mode design system",
+        "Zustand state management",
+        "Framer Motion cursor chrome",
+        "Progressive Web App (PWA) installable"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "SkyesOverLondon",
+        "url": "https://skrucible.pages.dev"
+      },
+      "provider": {
+        "@type": "Person",
+        "name": "SkyesOverLondon"
+      },
+      "softwareVersion": "1.0.3",
+      "releaseNotes": "Initial public release. MCP endpoint: https://skrucible.pages.dev/mcp"
+    }
+    </script>
+
+    <!-- PWA service worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="/assets/index-DnjFrRBI.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DA_fXb2x.css">
+  </head>
+  <body class="skyesol-living-page">
+    <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+    <div class="skyesol-grain" aria-hidden="true"></div>
+    <div class="skyesol-scanline" aria-hidden="true"></div>
+    <div id="root"></div>
+  </body>
+</html>

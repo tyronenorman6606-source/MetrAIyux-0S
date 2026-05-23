@@ -1,0 +1,160 @@
+{
+  "generated_at": "2026-05-10T19:06:52.125Z",
+  "package": "sovereigndocs_template_library_v2_1_confidence_review",
+  "audit_scope": [
+    "file integrity",
+    "manifest consistency",
+    "template metadata",
+    "questionnaire/section presence",
+    "rights flags",
+    "risk/status flags",
+    "official workflow posture",
+    "state overlay posture",
+    "publish gate decision"
+  ],
+  "counters": {
+    "total_records": 10200,
+    "duplicate_ids": 0,
+    "duplicate_paths": 0,
+    "missing_files": 0,
+    "bad_json": 0,
+    "missing_required_fields": {},
+    "statuses": {
+      "original_seed_not_attorney_reviewed": 10200
+    },
+    "risk_levels": {
+      "high": 6069,
+      "medium": 3723,
+      "low": 408
+    },
+    "categories": {
+      "business-formation-governance": 765,
+      "commercial-contracts": 1020,
+      "employment-hr": 918,
+      "real-estate-property": 918,
+      "personal-family": 612,
+      "estate-life-planning": 612,
+      "finance-lending": 663,
+      "ip-technology": 969,
+      "website-digital-commerce": 714,
+      "notices-letters": 816,
+      "vehicle-personal-property": 459,
+      "healthcare-caregiving": 408,
+      "nonprofit-community": 459,
+      "court-admin-worksheets": 408,
+      "tax-records-compliance": 459
+    },
+    "jurisdictions": {
+      "US-AL": 200,
+      "US-AK": 200,
+      "US-AZ": 200,
+      "US-AR": 200,
+      "US-CA": 200,
+      "US-CO": 200,
+      "US-CT": 200,
+      "US-DE": 200,
+      "US-DC": 200,
+      "US-FL": 200,
+      "US-GA": 200,
+      "US-HI": 200,
+      "US-ID": 200,
+      "US-IL": 200,
+      "US-IN": 200,
+      "US-IA": 200,
+      "US-KS": 200,
+      "US-KY": 200,
+      "US-LA": 200,
+      "US-ME": 200,
+      "US-MD": 200,
+      "US-MA": 200,
+      "US-MI": 200,
+      "US-MN": 200,
+      "US-MS": 200,
+      "US-MO": 200,
+      "US-MT": 200,
+      "US-NE": 200,
+      "US-NV": 200,
+      "US-NH": 200,
+      "US-NJ": 200,
+      "US-NM": 200,
+      "US-NY": 200,
+      "US-NC": 200,
+      "US-ND": 200,
+      "US-OH": 200,
+      "US-OK": 200,
+      "US-OR": 200,
+      "US-PA": 200,
+      "US-RI": 200,
+      "US-SC": 200,
+      "US-SD": 200,
+      "US-TN": 200,
+      "US-TX": 200,
+      "US-UT": 200,
+      "US-VT": 200,
+      "US-VA": 200,
+      "US-WA": 200,
+      "US-WV": 200,
+      "US-WI": 200,
+      "US-WY": 200
+    },
+    "unresolved_hard_placeholders": 0,
+    "records_with_not_legal_advice": 10200,
+    "records_with_lawdepot_text_claim_false": 10200,
+    "records_with_sections": 10200,
+    "records_with_questionnaires": 10200,
+    "min_sections": 9,
+    "max_sections": 9,
+    "min_questions": 14,
+    "max_questions": 15
+  },
+  "overlayAudit": {
+    "overlay_count": 51,
+    "overlays_with_verified_source_targets": 1,
+    "overlays_with_state_specific_law_included": 0,
+    "overlays_requiring_human_review": 51
+  },
+  "officialAudit": {
+    "official_workflow_count": 37,
+    "official_workflows_with_url": 37,
+    "official_workflows_copy_official_text": 0,
+    "official_workflows_require_source_verification_before_publish": 37
+  },
+  "bundleAudit": {
+    "bundle_count": 10
+  },
+  "gates": {
+    "safe_to_seed_database": true,
+    "safe_to_market_as_attorney_reviewed": false,
+    "safe_to_market_as_state_specific_legally_validated": false,
+    "safe_to_market_as_official_form_filing_engine": false,
+    "safe_to_publish_as_draft_document_automation_with_review_badges": true,
+    "must_hide_high_risk_until_reviewed": true,
+    "must_label_all_generated_templates": "Draft automation template — not attorney reviewed"
+  },
+  "findings": [
+    {
+      "severity": "critical",
+      "area": "legal_readiness",
+      "finding": "All generated templates are still unreviewed seed templates.",
+      "required_action": "Do not publish as reviewed/legal/state-compliant. Use draft-only badges and review gates."
+    },
+    {
+      "severity": "critical",
+      "area": "jurisdiction_overlays",
+      "finding": "No state overlay claims verified state-specific law.",
+      "required_action": "Populate official state/county/court/agency sources and reviewer signoff before enabling state-specific claims."
+    },
+    {
+      "severity": "high",
+      "area": "official_sources",
+      "finding": "Official workflows correctly route to official sources, but still require source verification before publish.",
+      "required_action": "Verify each official URL/source at release time and store timestamp + reviewer."
+    },
+    {
+      "severity": "high",
+      "area": "risk_queue",
+      "finding": "6069 high-risk generated records require attorney/current-law review before normal user release.",
+      "required_action": "Keep high-risk templates behind admin/review mode or show strong warnings."
+    }
+  ]
+}

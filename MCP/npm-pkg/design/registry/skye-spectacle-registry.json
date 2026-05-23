@@ -1,0 +1,222 @@
+{
+  "name": "skye-spectacle-design-registry",
+  "version": "0.2.0",
+  "purpose": "Pattern registry for premium Skye/Spectacle web generation through MCP.",
+  "forbiddenPatterns": [
+    "Giant left-column hero text walls",
+    "Disconnected logo/image beside unrelated hero copy",
+    "Public MCP smoke proof copy",
+    "Internal build/debug/test output on public pages",
+    "Negative letter spacing",
+    "Card grid as the core first impression",
+    "Mobile horizontal overflow",
+    "Hero subject accidentally below the first mobile viewport",
+    "Advanced-stack claims without source imports",
+    "Repeated dark SaaS/card-dashboard template with only copy changed",
+    "Rounded-square initial badge or CSS logo tile used instead of an existing logo asset",
+    "CSS-only screenshot fade described as an animated video",
+    "Static landing-page screenshot called proof for an app workflow",
+    "Ignoring requested Framer Motion, Three.js, screenshot, cursor, neon text, or scrollbar effects"
+  ],
+  "qualityGates": [
+    "Desktop browser screenshot at 1440x1000",
+    "Mobile browser screenshot at 390x844",
+    "No horizontal scroll",
+    "Headline reads horizontally and intentionally",
+    "CTA visible in first viewport",
+    "Main subject visible in first viewport",
+    "No internal proof/debug wording in public copy",
+    "design_stack_audit passes when advanced stack is required",
+    "design_performance_audit passes when advanced motion, WebGL, screenshots, or scroll effects are used",
+    "Visual output is distinct from the last generated page",
+    "Requested cursor, scrollbar, screenshot, and text effects are visible in browser",
+    "design_logo_audit passes when a logo, wordmark, nav brand, or brand mark appears",
+    "Animated workflow proof is a real browser-action MP4/WebM when Playwright/ffmpeg are available",
+    "design_e2e_proof_audit passes when copy claims signup, auth, routing, restore, monitoring, deploy, filtering, handoff, or other app behavior",
+    "Founder-built product copy uses first-person operator/company voice"
+  ],
+  "effectStandards": {
+    "framerMotion": "Use framer-motion when requested by name; motion/react is acceptable only when that is the project standard.",
+    "surfaceScreenshots": "Use actual screenshots of product/app/site surfaces when they are the strongest proof subject. If workflow proof is requested or copy says the app does XYZ, record the browser doing XYZ, encode a real MP4/WebM reel with Playwright/ffmpeg, run design_e2e_proof_audit, and verify playback.",
+    "textEffects": "Glow, neon, shimmer, split-line, and chromatic text effects are allowed when they support hierarchy.",
+    "cursorTrail": "Pointer-reactive cursor trail is allowed on premium desktop experiences with fallback on mobile.",
+    "scrollbar": "Scroll-led pages should use a thicker visible branded scrollbar with a slightly opaque track and neon thumb highlights when requested."
+  },
+  "logoStandards": {
+    "rule": "Use approved logo, mark, emblem, and wordmark assets before generating a new mark.",
+    "tool": "design_logo_audit",
+    "reject": [
+      "Text-only initials in rounded gradient boxes",
+      "CSS-generated brand marks pretending to be finished logos",
+      "Random shields, cubes, sparks, or circuit icons not present in the logo manifest",
+      "Replacing a transparent/floating logo asset with a generic badge"
+    ]
+  },
+  "contentStandards": {
+    "firstPersonOperatorVoice": "Founder-built systems should use Gray's first-person builder/operator/company POV: I built, I use, I route, I show, I keep, plus we/our when referring to brains, agents, networks, gates, proof layers, and the company machine.",
+    "reject": [
+      "Generic agency voice: we help, our solutions, best-in-class, innovative solutions",
+      "Neutral platform copy when the public page should feel personally built",
+      "Vague benefits without concrete rooms, gates, receipts, command decks, workspaces, or operating brains"
+    ],
+    "tool": "design_content_audit"
+  },
+  "advancedStackGate": {
+    "rule": "If a brief requires Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing, generated source must import and use those tools.",
+    "tool": "design_stack_audit",
+    "reject": [
+      "Package installed but never imported",
+      "Copy says Three.js, GSAP, Lenis, or motion but source does not import it",
+      "Static card/dashboard template used where a living scene or scroll funnel was requested"
+    ]
+  },
+  "performanceGate": {
+    "rule": "Advanced motion must feel crisp: explicit Lenis tuning, capped WebGL DPR, capped particles, lazy decoded screenshots, and mobile/reduced-motion fallbacks.",
+    "tool": "design_performance_audit",
+    "reject": [
+      "Lenis lerp below 0.12",
+      "Default Canvas DPR above 1.5",
+      "Large particle counts without compact/mobile reduction",
+      "Below-fold screenshots without loading=\"lazy\" and decoding=\"async\"",
+      "Cursor trails, fixed overlays, or scroll scenes without mobile/reduced-motion fallback"
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "dark": "#08080f",
+      "darker": "#030306",
+      "text": "#f4f0e8",
+      "muted": "#aaa49a",
+      "gold": "#f4c75b",
+      "goldSoft": "#f8df96",
+      "cyan": "#7ee7ff",
+      "violet": "#8b5cf6",
+      "fire": "#e84c30"
+    },
+    "typography": {
+      "displaySerif": "Playfair Display or high-contrast editorial serif",
+      "label": "Bebas Neue or compact uppercase display",
+      "body": "DM Sans or clean system sans",
+      "code": "Fira Code or ui-monospace"
+    }
+  },
+  "designVarietySystem": {
+    "rule": "Do not treat SkyeSol spectacle as the only look. Choose a distinct design DNA before implementation.",
+    "requiredDna": [
+      "archetype",
+      "firstViewportStructure",
+      "visualSubject",
+      "motionLanguage",
+      "proofFormat",
+      "paletteDiscipline",
+      "typographyPosture",
+      "conversionPath"
+    ],
+    "archetypes": [
+      "cinematic-command",
+      "app-operating-surface",
+      "editorial-proof-atlas",
+      "kinetic-process-funnel",
+      "spatial-product-lab",
+      "founder-authority",
+      "minimal-luxury",
+      "field-report"
+    ],
+    "antiSamenessGate": [
+      "Reject if the new page repeats the prior hero structure, palette, proof layout, and card rhythm.",
+      "Reject if SkyeSol living background is the entire visual idea.",
+      "Reject if all products become dark command-card dashboards.",
+      "Require a chosen archetype from design_variety_plan before coding."
+    ]
+  },
+  "patterns": [
+    {
+      "id": "full-width-command-hero",
+      "name": "Full Width Command Hero",
+      "useWhen": "The product needs a premium first impression with a direct title across the page.",
+      "rules": [
+        "Headline spans the composition, not a skinny left column",
+        "Short support line sits below or beside CTA",
+        "Visual scene supports the title rather than competing with it",
+        "No paragraph stack in first viewport"
+      ]
+    },
+    {
+      "id": "cinematic-object-scene",
+      "name": "Cinematic Object Scene",
+      "useWhen": "The product can be represented as a 3D object, command chamber, proof artifact, dashboard, founder portrait, or operational symbol.",
+      "rules": [
+        "One subject dominates",
+        "Motion is subtle and high-quality",
+        "Mobile keeps the subject visible",
+        "Scene supports product understanding"
+      ]
+    },
+    {
+      "id": "scrolling-proof-funnel",
+      "name": "Scrolling Proof Funnel",
+      "useWhen": "A buyer needs to understand a process: signup, setup, proof, handoff, payment, access.",
+      "rules": [
+        "Each scroll stage has one job",
+        "Pinned motion only when it clarifies",
+        "Proof is client-safe and concise",
+        "No raw logs on public pages"
+      ]
+    },
+    {
+      "id": "founder-authority-scene",
+      "name": "Founder Authority Scene",
+      "useWhen": "A founder/operator identity is central to trust.",
+      "rules": [
+        "Use transparent founder media unboxed when possible",
+        "Pair with proof metrics",
+        "Use editorial headings",
+        "Avoid over-carded layouts"
+      ]
+    },
+    {
+      "id": "app-first-surface",
+      "name": "App First Surface",
+      "useWhen": "The deliverable is a tool/app, not a brochure.",
+      "rules": [
+        "Show the actual working surface first",
+        "Use toolbars, tabs, controls, and status indicators",
+        "Do not make a fake marketing hero",
+        "Prioritize usefulness over decoration"
+      ]
+    },
+    {
+      "id": "editorial-proof-atlas",
+      "name": "Editorial Proof Atlas",
+      "useWhen": "The page needs proof, receipts, screenshots, and trust evidence presented with magazine-level hierarchy.",
+      "rules": [
+        "Use a light or warm palette when the last page was dark",
+        "Lead with one large proof/media subject",
+        "Keep evidence sparse and readable",
+        "No repeated dashboard/card rhythm"
+      ]
+    },
+    {
+      "id": "spatial-product-lab",
+      "name": "Spatial Product Lab",
+      "useWhen": "The product can be inspected like an object or system core.",
+      "rules": [
+        "Use one WebGL product object",
+        "Pair with controls/spec chips",
+        "Avoid generic SaaS metrics cards",
+        "Use a palette distinct from the previous surface"
+      ]
+    },
+    {
+      "id": "kinetic-process-funnel",
+      "name": "Kinetic Process Funnel",
+      "useWhen": "The conversion story is a sequence: intake, gate, provision, proof, handoff.",
+      "rules": [
+        "Each stage gets a full section",
+        "Use GSAP/Lenis only to clarify progression",
+        "One action per stage",
+        "Mobile must remain scrollable and readable"
+      ]
+    }
+  ]
+}

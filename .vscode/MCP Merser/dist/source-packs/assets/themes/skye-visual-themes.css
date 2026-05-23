@@ -1,0 +1,331 @@
+/*
+  MetrAIyux 0S · Skye Visual Standard Theme Kit v4
+  Drop this file after site.css, then set <html data-skye-theme="sovereign-aurora">.
+  The kit is intentionally CSS-variable first so components, inline SVG, and image frames can share the same visual language.
+*/
+:root{
+  --skye-primary:var(--blue,#20b7ff);
+  --skye-primary-2:var(--blue-2,#80dcff);
+  --skye-accent:var(--gold,#f7c95b);
+  --skye-accent-2:var(--gold-2,#ffeb9a);
+  --skye-aura:var(--cyan,#42fff1);
+  --skye-bg-1:rgba(32,183,255,.22);
+  --skye-bg-2:rgba(247,201,91,.18);
+  --skye-bg-3:rgba(66,255,241,.10);
+  --skye-theme-gradient:linear-gradient(135deg,var(--skye-accent),var(--skye-primary),var(--skye-aura));
+  --skye-theme-shadow:rgba(32,183,255,.28);
+  --skye-image-filter:saturate(1.18) contrast(1.12) brightness(1.02);
+  --skye-frame-radius:28px;
+  --skye-grid-glow:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+}
+html{background:var(--void,#04050b)}
+body{
+  background:
+    radial-gradient(circle at 18% 12%, var(--skye-bg-1), transparent 32%),
+    radial-gradient(circle at 86% 8%, var(--skye-bg-2), transparent 30%),
+    radial-gradient(circle at 72% 82%, var(--skye-bg-3), transparent 34%),
+    linear-gradient(135deg,var(--void,#04050b) 0%,var(--void-2,#080b18) 50%,#02030a 100%);
+}
+.skye-theme-aware,.glass-card,.big-panel,.proof-card,.display,.selector,.command-card,.cta-box{transition:background .28s ease,border-color .28s ease,box-shadow .28s ease,color .28s ease,filter .28s ease}
+.brand-mark,.logo-float,.skye-logo-float{filter:drop-shadow(0 0 16px var(--skye-theme-shadow)) drop-shadow(0 0 24px color-mix(in srgb,var(--skye-accent) 44%,transparent));}
+.pill.primary,.command-input button,.selector button i,.quote-icon,.step b,.card-number i{background:var(--skye-theme-gradient)!important;color:#02040a!important}
+.eyebrow,.section-kicker,.proof-card a,.route-label{color:var(--skye-primary-2)!important;border-color:color-mix(in srgb,var(--skye-primary) 32%,transparent)!important;background:color-mix(in srgb,var(--skye-primary) 10%,transparent)!important}
+.nav-links a:hover,.nav-links a.active{background:color-mix(in srgb,var(--skye-primary) 14%,transparent)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--skye-primary) 20%,transparent),0 0 30px color-mix(in srgb,var(--skye-primary) 16%,transparent)!important}
+h1 .fill,.display h3 .fill,.skye-gradient-text{background:linear-gradient(100deg,#fff,var(--soft,#dbe9ff) 36%,var(--skye-accent-2) 68%,var(--skye-primary-2));background-clip:text;-webkit-background-clip:text;color:transparent}
+
+.skye-theme-dock{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;align-items:center;gap:8px;padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(2,4,12,.72);backdrop-filter:blur(22px);box-shadow:0 22px 70px rgba(0,0,0,.38)}
+.skye-theme-dock button{width:30px;height:30px;border-radius:999px;border:1px solid rgba(255,255,255,.16);padding:0;cursor:pointer;background:var(--swatch);box-shadow:0 0 20px color-mix(in srgb,var(--swatch) 45%,transparent);position:relative}
+.skye-theme-dock button[aria-pressed=true]{outline:2px solid var(--skye-accent);outline-offset:3px}
+.skye-theme-dock strong{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 4px 0 8px;white-space:nowrap}
+
+.skye-theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.skye-theme-card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));padding:22px;min-height:250px;box-shadow:0 26px 80px rgba(0,0,0,.30)}
+.skye-theme-card:before{content:"";position:absolute;inset:-1px;background:radial-gradient(circle at 18% 0,var(--skye-bg-1),transparent 38%),radial-gradient(circle at 88% 0,var(--skye-bg-2),transparent 36%);z-index:-1}
+.skye-theme-card h3{margin:18px 0 8px;font-size:1.22rem;letter-spacing:-.03em}.skye-theme-card p{margin:0;color:var(--muted);line-height:1.55}.skye-theme-card code{display:inline-flex;margin-top:15px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);color:var(--skye-primary-2);font-size:.78rem}
+.skye-swatch-row{display:flex;gap:8px}.skye-swatch{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,.18);box-shadow:0 12px 28px rgba(0,0,0,.25)}
+
+.skye-component-surface{position:relative;border:1px solid color-mix(in srgb,var(--skye-primary) 28%,transparent);border-radius:var(--skye-frame-radius);background:radial-gradient(circle at 20% 0,var(--skye-bg-1),transparent 32%),linear-gradient(180deg,var(--panel,rgba(8,13,31,.72)),rgba(255,255,255,.03));box-shadow:0 28px 90px rgba(0,0,0,.38),0 0 70px var(--skye-theme-shadow);overflow:hidden}
+.skye-component-surface:after{content:"";position:absolute;inset:0;background-image:var(--skye-grid-glow);background-size:42px 42px;mask-image:radial-gradient(circle at center,black 0%,transparent 78%);opacity:.46;pointer-events:none}.skye-component-surface>*{position:relative;z-index:1}
+.skye-copy-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid color-mix(in srgb,var(--skye-primary) 28%,transparent);border-radius:999px;background:rgba(255,255,255,.06);color:var(--ink,#f7fbff);min-height:42px;padding:0 15px;cursor:pointer;box-shadow:0 16px 42px rgba(0,0,0,.22);transition:.2s ease}.skye-copy-btn:hover{transform:translateY(-2px);box-shadow:0 22px 60px var(--skye-theme-shadow)}.skye-copy-btn.primary{background:var(--skye-theme-gradient);color:#02040a;font-weight:900}
+
+.skye-image-frame{--radius:32px;position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid color-mix(in srgb,var(--skye-primary) 24%,transparent);background:radial-gradient(circle at 20% 0,var(--skye-bg-1),transparent 36%),linear-gradient(135deg,var(--void),var(--void-2));box-shadow:0 28px 90px rgba(0,0,0,.42),0 0 70px var(--skye-theme-shadow);isolation:isolate}.skye-image-frame img,.skye-image-frame video,.skye-image-frame svg{display:block;width:100%;height:100%;object-fit:cover;filter:var(--skye-image-filter)}
+.skye-image-frame:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.18),transparent 32%,color-mix(in srgb,var(--skye-primary) 14%,transparent) 60%,transparent);mix-blend-mode:screen;opacity:.75;z-index:2;pointer-events:none}.skye-image-frame:after{content:"";position:absolute;inset:0;background-image:var(--skye-grid-glow);background-size:36px 36px;mask-image:linear-gradient(to bottom,black,transparent 72%);opacity:.38;z-index:3;pointer-events:none}
+.skye-image-frame.float img,.skye-image-frame.float svg{object-fit:contain;padding:12%;filter:var(--skye-image-filter) drop-shadow(0 0 24px var(--skye-theme-shadow)) drop-shadow(0 0 20px color-mix(in srgb,var(--skye-accent) 48%,transparent))}.skye-image-frame.no-crop img{object-fit:contain;background:radial-gradient(circle at center,var(--skye-bg-1),transparent 58%)}
+.skye-image-caption{position:absolute;left:16px;right:16px;bottom:16px;z-index:4;padding:12px 14px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(2,4,12,.62);backdrop-filter:blur(18px);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.skye-img-prism{filter:var(--skye-image-filter) hue-rotate(0deg)}.skye-img-crown{filter:saturate(1.28) contrast(1.16) brightness(1.07)}.skye-img-proof{filter:saturate(.96) contrast(1.20) brightness(1.04)}.skye-img-night{filter:saturate(1.14) contrast(1.24) brightness(.92)}
+
+.mx-inline-svg [fill="#20b7ff"],.mx-inline-svg [stroke="#20b7ff"]{color:var(--skye-primary)}
+
+@media(max-width:1000px){.skye-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.skye-theme-dock{left:13px;right:13px;justify-content:center;overflow:auto;border-radius:24px}.skye-theme-dock strong{display:none}}
+@media(max-width:640px){.skye-theme-grid{grid-template-columns:1fr}.skye-theme-dock button{width:26px;height:26px}}
+
+:root[data-skye-theme="sovereign-aurora"],
+[data-skye-theme="sovereign-aurora"]{
+  --skye-theme-name:"Sovereign Aurora";
+  --void:#04050b;
+  --void-2:#080b18;
+  --ink:#f7fbff;
+  --muted:#a8b6ce;
+  --soft:#dbe9ff;
+  --gold:#f7c95b;
+  --gold-2:#ffeb9a;
+  --blue:#20b7ff;
+  --blue-2:#80dcff;
+  --cyan:#42fff1;
+  --panel:rgba(8,13,31,.72);
+  --panel-2:rgba(10,18,44,.88);
+  --line:rgba(32,183,255,0.22);
+  --line-2:rgba(247,201,91,0.3);
+  --success:#66ffb8;
+  --danger:#ff5d7e;
+  --skye-primary:#20b7ff;
+  --skye-primary-2:#80dcff;
+  --skye-accent:#f7c95b;
+  --skye-accent-2:#ffeb9a;
+  --skye-aura:#42fff1;
+  --skye-bg-1:rgba(32,183,255,.22);
+  --skye-bg-2:rgba(247,201,91,.18);
+  --skye-bg-3:rgba(66,255,241,.10);
+  --skye-theme-gradient:linear-gradient(135deg,#f7c95b 0%,#20b7ff 54%,#42fff1 100%);
+  --skye-theme-shadow:rgba(32,183,255,.28);
+  --skye-image-filter:saturate(1.18) contrast(1.12) brightness(1.02);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(32,183,255,.28);
+}
+
+
+:root[data-skye-theme="royal-violet"],
+[data-skye-theme="royal-violet"]{
+  --skye-theme-name:"Royal Violet";
+  --void:#05020c;
+  --void-2:#120521;
+  --ink:#fbf7ff;
+  --muted:#c2acd7;
+  --soft:#efe2ff;
+  --gold:#f8c75d;
+  --gold-2:#ffe6a3;
+  --blue:#9b5cff;
+  --blue-2:#caa8ff;
+  --cyan:#5be7ff;
+  --panel:rgba(20,7,38,.74);
+  --panel-2:rgba(30,10,56,.88);
+  --line:rgba(155,92,255,0.22);
+  --line-2:rgba(248,199,93,0.3);
+  --success:#69ffc7;
+  --danger:#ff5ab3;
+  --skye-primary:#9b5cff;
+  --skye-primary-2:#caa8ff;
+  --skye-accent:#f8c75d;
+  --skye-accent-2:#ffe6a3;
+  --skye-aura:#5be7ff;
+  --skye-bg-1:rgba(155,92,255,.24);
+  --skye-bg-2:rgba(248,199,93,.20);
+  --skye-bg-3:rgba(91,231,255,.10);
+  --skye-theme-gradient:linear-gradient(135deg,#f8c75d 0%,#9b5cff 58%,#5be7ff 100%);
+  --skye-theme-shadow:rgba(155,92,255,.32);
+  --skye-image-filter:saturate(1.2) contrast(1.14) brightness(1.04);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(155,92,255,.32);
+}
+
+
+:root[data-skye-theme="solar-crown"],
+[data-skye-theme="solar-crown"]{
+  --skye-theme-name:"Solar Crown";
+  --void:#070501;
+  --void-2:#151003;
+  --ink:#fffaf0;
+  --muted:#d6c393;
+  --soft:#fff0c4;
+  --gold:#20b7ff;
+  --gold-2:#9ee7ff;
+  --blue:#ffb000;
+  --blue-2:#ffd66b;
+  --cyan:#fff1a8;
+  --panel:rgba(27,19,4,.76);
+  --panel-2:rgba(38,28,5,.88);
+  --line:rgba(255,176,0,0.22);
+  --line-2:rgba(32,183,255,0.3);
+  --success:#a9ff7a;
+  --danger:#ff6b6b;
+  --skye-primary:#ffb000;
+  --skye-primary-2:#ffd66b;
+  --skye-accent:#20b7ff;
+  --skye-accent-2:#9ee7ff;
+  --skye-aura:#fff1a8;
+  --skye-bg-1:rgba(255,176,0,.25);
+  --skye-bg-2:rgba(32,183,255,.16);
+  --skye-bg-3:rgba(255,241,168,.12);
+  --skye-theme-gradient:linear-gradient(135deg,#fff1a8 0%,#ffb000 50%,#20b7ff 100%);
+  --skye-theme-shadow:rgba(255,176,0,.30);
+  --skye-image-filter:saturate(1.24) contrast(1.17) brightness(1.08);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(255,176,0,.30);
+}
+
+
+:root[data-skye-theme="citadel-emerald"],
+[data-skye-theme="citadel-emerald"]{
+  --skye-theme-name:"Citadel Emerald";
+  --void:#020806;
+  --void-2:#061511;
+  --ink:#f4fffb;
+  --muted:#9cc9bd;
+  --soft:#d8fff3;
+  --gold:#f7c95b;
+  --gold-2:#ffefad;
+  --blue:#28f0a1;
+  --blue-2:#8affd5;
+  --cyan:#22d3ff;
+  --panel:rgba(6,26,20,.76);
+  --panel-2:rgba(7,38,30,.88);
+  --line:rgba(40,240,161,0.22);
+  --line-2:rgba(247,201,91,0.3);
+  --success:#66ffb8;
+  --danger:#ff627d;
+  --skye-primary:#28f0a1;
+  --skye-primary-2:#8affd5;
+  --skye-accent:#f7c95b;
+  --skye-accent-2:#ffefad;
+  --skye-aura:#22d3ff;
+  --skye-bg-1:rgba(40,240,161,.21);
+  --skye-bg-2:rgba(247,201,91,.16);
+  --skye-bg-3:rgba(34,211,255,.10);
+  --skye-theme-gradient:linear-gradient(135deg,#28f0a1 0%,#22d3ff 55%,#f7c95b 100%);
+  --skye-theme-shadow:rgba(40,240,161,.28);
+  --skye-image-filter:saturate(1.16) contrast(1.15) brightness(1.03);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(40,240,161,.28);
+}
+
+
+:root[data-skye-theme="blood-moon"],
+[data-skye-theme="blood-moon"]{
+  --skye-theme-name:"Blood Moon";
+  --void:#080205;
+  --void-2:#19040c;
+  --ink:#fff6f9;
+  --muted:#d6a9b8;
+  --soft:#ffdce8;
+  --gold:#f7c95b;
+  --gold-2:#ffe291;
+  --blue:#ff2d64;
+  --blue-2:#ff7aa0;
+  --cyan:#9b5cff;
+  --panel:rgba(35,5,15,.76);
+  --panel-2:rgba(50,6,22,.88);
+  --line:rgba(255,45,100,0.22);
+  --line-2:rgba(247,201,91,0.3);
+  --success:#66ffb8;
+  --danger:#ff315d;
+  --skye-primary:#ff2d64;
+  --skye-primary-2:#ff7aa0;
+  --skye-accent:#f7c95b;
+  --skye-accent-2:#ffe291;
+  --skye-aura:#9b5cff;
+  --skye-bg-1:rgba(255,45,100,.25);
+  --skye-bg-2:rgba(247,201,91,.18);
+  --skye-bg-3:rgba(155,92,255,.12);
+  --skye-theme-gradient:linear-gradient(135deg,#ff2d64 0%,#9b5cff 56%,#f7c95b 100%);
+  --skye-theme-shadow:rgba(255,45,100,.32);
+  --skye-image-filter:saturate(1.26) contrast(1.16) brightness(1.03);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(255,45,100,.32);
+}
+
+
+:root[data-skye-theme="arctic-neon"],
+[data-skye-theme="arctic-neon"]{
+  --skye-theme-name:"Arctic Neon";
+  --void:#02070c;
+  --void-2:#061423;
+  --ink:#f4fbff;
+  --muted:#a9c6db;
+  --soft:#dff6ff;
+  --gold:#ffffff;
+  --gold-2:#d9fbff;
+  --blue:#00d5ff;
+  --blue-2:#97efff;
+  --cyan:#7b61ff;
+  --panel:rgba(5,22,36,.76);
+  --panel-2:rgba(7,35,58,.88);
+  --line:rgba(0,213,255,0.22);
+  --line-2:rgba(255,255,255,0.3);
+  --success:#7cffd2;
+  --danger:#ff6c8f;
+  --skye-primary:#00d5ff;
+  --skye-primary-2:#97efff;
+  --skye-accent:#ffffff;
+  --skye-accent-2:#d9fbff;
+  --skye-aura:#7b61ff;
+  --skye-bg-1:rgba(0,213,255,.24);
+  --skye-bg-2:rgba(255,255,255,.12);
+  --skye-bg-3:rgba(123,97,255,.12);
+  --skye-theme-gradient:linear-gradient(135deg,#ffffff 0%,#00d5ff 55%,#7b61ff 100%);
+  --skye-theme-shadow:rgba(0,213,255,.31);
+  --skye-image-filter:saturate(1.12) contrast(1.12) brightness(1.08);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(0,213,255,.31);
+}
+
+
+:root[data-skye-theme="ghost-steel"],
+[data-skye-theme="ghost-steel"]{
+  --skye-theme-name:"Ghost Steel";
+  --void:#030609;
+  --void-2:#0b1017;
+  --ink:#f8fbff;
+  --muted:#aab4c1;
+  --soft:#e7eef7;
+  --gold:#20b7ff;
+  --gold-2:#91e5ff;
+  --blue:#b6c7da;
+  --blue-2:#f4f8ff;
+  --cyan:#f7c95b;
+  --panel:rgba(16,22,31,.78);
+  --panel-2:rgba(24,32,43,.9);
+  --line:rgba(182,199,218,0.22);
+  --line-2:rgba(32,183,255,0.3);
+  --success:#8bffc7;
+  --danger:#ff738d;
+  --skye-primary:#b6c7da;
+  --skye-primary-2:#f4f8ff;
+  --skye-accent:#20b7ff;
+  --skye-accent-2:#91e5ff;
+  --skye-aura:#f7c95b;
+  --skye-bg-1:rgba(182,199,218,.18);
+  --skye-bg-2:rgba(32,183,255,.14);
+  --skye-bg-3:rgba(247,201,91,.10);
+  --skye-theme-gradient:linear-gradient(135deg,#f4f8ff 0%,#b6c7da 45%,#20b7ff 100%);
+  --skye-theme-shadow:rgba(182,199,218,.24);
+  --skye-image-filter:saturate(.98) contrast(1.18) brightness(1.06);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(182,199,218,.24);
+}
+
+
+:root[data-skye-theme="obsidian-dragon"],
+[data-skye-theme="obsidian-dragon"]{
+  --skye-theme-name:"Obsidian Dragon";
+  --void:#050305;
+  --void-2:#130707;
+  --ink:#fff8f4;
+  --muted:#d0aaa0;
+  --soft:#ffe2d8;
+  --gold:#f7c95b;
+  --gold-2:#ffe47e;
+  --blue:#ff5a1f;
+  --blue-2:#ff9a6d;
+  --cyan:#20b7ff;
+  --panel:rgba(27,8,8,.78);
+  --panel-2:rgba(41,10,8,.9);
+  --line:rgba(255,90,31,0.22);
+  --line-2:rgba(247,201,91,0.3);
+  --success:#66ffb8;
+  --danger:#ff3c3c;
+  --skye-primary:#ff5a1f;
+  --skye-primary-2:#ff9a6d;
+  --skye-accent:#f7c95b;
+  --skye-accent-2:#ffe47e;
+  --skye-aura:#20b7ff;
+  --skye-bg-1:rgba(255,90,31,.26);
+  --skye-bg-2:rgba(247,201,91,.18);
+  --skye-bg-3:rgba(32,183,255,.10);
+  --skye-theme-gradient:linear-gradient(135deg,#ff5a1f 0%,#f7c95b 50%,#20b7ff 100%);
+  --skye-theme-shadow:rgba(255,90,31,.32);
+  --skye-image-filter:saturate(1.32) contrast(1.18) brightness(1.04);
+  --shadow:0 30px 90px rgba(0,0,0,.46),0 0 70px rgba(255,90,31,.32);
+}

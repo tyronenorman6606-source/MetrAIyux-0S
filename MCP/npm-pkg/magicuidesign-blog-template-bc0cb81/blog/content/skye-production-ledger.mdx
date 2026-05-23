@@ -1,0 +1,38 @@
+---
+title: "How the Skye MCP production ledger became a reusable proof surface"
+description: "A field note on turning Cloudflare deployment evidence, browser QA, and MCP design receipts into public-safe production proof."
+date: "2026-05-17"
+tags: ["Skye MCP", "Production", "Browser Proof"]
+featured: true
+readTime: "6 min read"
+author: "arghya"
+thumbnail: "/blog-og-image.png"
+---
+
+The latest MCP production ledger gives the Skye surfaces a cleaner public record:
+24 live production deployment surfaces, 13 Cloudflare Pages projects, 11
+Workers, and 36 verified HTTP checks.
+
+## What changed
+
+I use the ledger as a source of truth before I make public claims. The production
+row is not decoration; it tells me which surfaces are live, which routes were
+checked, and where the proof receipts live.
+
+- SkyeGateFS27 / SkyePay now exposes 61 Stripe-backed offers.
+- Skyes Over London Reviews now has a Three.js review atlas with 115 clickable cards.
+- The browser proof reels and JSON receipts are saved in `test-artifacts`.
+- The Skye Design MCP remains the pattern source for motion chrome, proof panels, and quality gates.
+
+## Why it matters
+
+The useful part is repeatability. A changelog, blog, or portfolio can now carry
+the same proof shape: a production count, a specific route, a browser receipt,
+and a clear handoff state.
+
+## Reusable UI pieces
+
+This template now uses the Skye MCP chrome pattern: neon scrollbar, scroll
+progress, living canvas background, shimmer text, and reduced-motion fallbacks.
+Those effects are not the claim. They frame the actual claim: production has
+been checked and the evidence has a place to live.

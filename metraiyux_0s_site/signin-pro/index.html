@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SignIn Pro by NorthStar | MetrAIyux 0S</title>
+  <meta name="description" content="SignIn Pro by NorthStar Office & Accounting, mounted inside the MetrAIyux 0S workspace lane.">
+  <link rel="canonical" href="/northstar/">
+  <style>
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#07040f;color:#f7f2e8;font-family:Arial,sans-serif}
+    main{max-width:620px;padding:32px;text-align:center}
+    a{color:#87d8ff}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Opening SignIn Pro by NorthStar.</h1>
+    <p>This 0S mount forwards to the shared SignIn Pro workspace lane.</p>
+    <p><a id="fallback" href="/northstar/">Open SignIn Pro</a></p>
+  </main>
+  <script>
+    const target = `/northstar/index.html${location.search || ""}${location.hash || ""}`;
+    document.getElementById("fallback").href = target;
+    location.replace(target);
+  </script>
+</body>
+</html>

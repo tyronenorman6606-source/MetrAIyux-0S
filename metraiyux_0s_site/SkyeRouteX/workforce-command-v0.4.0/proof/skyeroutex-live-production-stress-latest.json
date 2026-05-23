@@ -1,0 +1,584 @@
+{
+  "ok": true,
+  "generated_at": "2026-05-21T17:00:23.788Z",
+  "baseUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  "appUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/",
+  "gateDashboardUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/",
+  "proofType": "live headed production browser plus mounted Worker path execution plus FS27 gate dashboard",
+  "entries": [
+    {
+      "name": "desktop-live-production-path",
+      "ok": true,
+      "actions": [
+        "unlocked shared owner session and opened /SkyeRouteX/workforce-command-v0.4.0/public/",
+        "clicked visible text: Provider Panel",
+        "clicked visible text: Contractor Panel",
+        "clicked visible text: House Command",
+        "POST /api/routex/auth/signup -> 503",
+        "GET /api/routex/manifest -> 200",
+        "GET /api/routex/me -> 200",
+        "POST /api/routex/admin/gate-users -> 201",
+        "POST /api/routex/admin/gate-users -> 201",
+        "POST /api/routex/markets -> 201",
+        "POST /api/routex/jobs -> 201",
+        "POST /api/routex/house-command/assign -> 201",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/confirm -> 200",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/on-the-way -> 200",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/check-in -> 200",
+        "GET /api/routex/route-jobs -> 200",
+        "POST /api/routex/route-jobs/route_345f349a-63dc-400f-8260-8968a9279ddb/complete-stop -> 200",
+        "POST /api/routex/route-jobs/route_345f349a-63dc-400f-8260-8968a9279ddb/complete-stop -> 200",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/check-out -> 200",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/proof -> 201",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/approve -> 200",
+        "POST /api/routex/payments/pay_575b5a4a-0ccf-4b0f-a9f0-c9daba4f04f9/provider-status -> 200",
+        "POST /api/routex/payments/pay_575b5a4a-0ccf-4b0f-a9f0-c9daba4f04f9/capture -> 409",
+        "POST /api/routex/assignments/asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275/dispute -> 201",
+        "POST /api/routex/house-command/resolve-dispute -> 200",
+        "GET /api/routex/payments/ledger -> 200",
+        "POST /api/routex/house-command/freeze-payment -> 200",
+        "POST /api/routex/ratings -> 201",
+        "POST /api/routex/house-command/workflow-board/job/job_39825f99-eb44-4a03-a3e8-16465a6562a8 -> 200",
+        "POST /api/routex/compliance/manual-checks -> 201",
+        "GET /api/routex/jobs/job_39825f99-eb44-4a03-a3e8-16465a6562a8/export-packet -> 200",
+        "GET /api/routex/house-command/market-report?city=Phoenix&state=Arizona -> 200",
+        "GET /api/routex/storage/status -> 200",
+        "GET /api/routex/integrations/status -> 200",
+        "GET /api/routex/integrations/outbox -> 200",
+        "GET /api/routex/compliance/provider-readiness -> 200",
+        "GET /api/routex/compliance/checks -> 200",
+        "POST /api/routex/compliance/checks/cmp_2463bde0-29fe-4c51-99a2-11c1a3f1d8ec/order-background -> 409",
+        "GET /api/routex/gate-dashboard -> 200",
+        "POST /api/routex/notifications/not_e34c8786-5840-45af-913f-b18d029babf4/provider-status -> 200",
+        "clicked visible text: Refresh Readiness"
+      ],
+      "statuses": [
+        {
+          "name": "unauth_app_redirects_to_shared_owner_login",
+          "ok": true,
+          "state": {
+            "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Fpublic%2F",
+            "status": 200
+          }
+        },
+        {
+          "name": "owner_login_page_opened",
+          "ok": true,
+          "state": {
+            "status": 200
+          }
+        },
+        {
+          "name": "app_uses_worker_gate_without_client_gate_script",
+          "ok": true,
+          "state": {
+            "free99GateScriptLoaded": false,
+            "free99PlatformGateGlobal": false
+          }
+        },
+        {
+          "name": "app_local_signup_disabled_under_shared_gate",
+          "ok": true,
+          "state": {
+            "ok": false,
+            "productionGate": true,
+            "sharedAuth": true,
+            "error": "Production SkyeRouteX sessions must come from FS27/SkyGate. App-local signup is disabled on the mounted 0S route."
+          }
+        },
+        {
+          "name": "manifest_reports_routex_base",
+          "ok": true,
+          "state": {
+            "base": "/api/routex",
+            "version": "0.4.0-0s-worker-parity"
+          }
+        },
+        {
+          "name": "owner_session_returns_admin_or_house_role",
+          "ok": true,
+          "state": {
+            "role": "admin",
+            "id": "fs27-admin"
+          }
+        },
+        {
+          "name": "owner_staged_gate_owned_provider_and_contractor_profiles",
+          "ok": true,
+          "state": {
+            "provider": "gate-provider-routex-provider-live-1779382835725@stress.local",
+            "contractor": "gate-contractor-routex-contractor-live-1779382835725@stress.local"
+          }
+        },
+        {
+          "name": "live_job_creation_called_mapbox_and_stripe",
+          "ok": true,
+          "state": {
+            "routeProvider": "mapbox",
+            "routeDispatch": "dispatched",
+            "paymentDriver": "stripe",
+            "paymentDispatch": "dispatched",
+            "paymentExternalStatus": "requires_payment_method"
+          }
+        },
+        {
+          "name": "house_command_assigned_staged_gate_contractor",
+          "ok": true,
+          "state": {
+            "assignment": "asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275"
+          }
+        },
+        {
+          "name": "route_job_visible_with_stops",
+          "ok": true,
+          "state": {
+            "route": "route_345f349a-63dc-400f-8260-8968a9279ddb",
+            "stops": 2
+          }
+        },
+        {
+          "name": "proof_media_stored_in_r2_and_payment_state_dispatched",
+          "ok": true,
+          "state": {
+            "mediaStatus": "stored",
+            "storageDriver": "r2",
+            "paymentDispatch": "dispatched"
+          }
+        },
+        {
+          "name": "provider_approval_moved_payment_to_payout_eligible",
+          "ok": true,
+          "state": {
+            "paymentStatus": "payout_eligible",
+            "dispatch": "dispatched"
+          }
+        },
+        {
+          "name": "stripe_live_payment_intent_receipt_retrieved",
+          "ok": true,
+          "state": {
+            "payment_id": "pay_575b5a4a-0ccf-4b0f-a9f0-c9daba4f04f9",
+            "payment_intent_id": "pi_3TZZxlHEgCmnlKPJ03o3YBbu",
+            "stripe_status": "requires_payment_method",
+            "livemode": true,
+            "amount_capturable": 0,
+            "amount_received": 0
+          }
+        },
+        {
+          "name": "stripe_capture_path_reaches_provider_or_truthfully_blocks",
+          "ok": true,
+          "state": {
+            "ok": false,
+            "capture_attempted": false,
+            "capture_ready": false,
+            "stripe_status": "requires_payment_method",
+            "error": "Stripe PaymentIntent is requires_payment_method, not requires_capture."
+          }
+        },
+        {
+          "name": "dispute_resolution_dispatched_payment_provider",
+          "ok": true,
+          "state": {
+            "dispatch": "dispatched"
+          }
+        },
+        {
+          "name": "payment_freeze_dispatched_payment_provider",
+          "ok": true,
+          "state": {
+            "status": "held",
+            "dispatch": "dispatched"
+          }
+        },
+        {
+          "name": "manual_compliance_proof_stored_in_r2",
+          "ok": true,
+          "state": {
+            "mediaStatus": "stored",
+            "provider": "0s-gate-manual-compliance-ledger"
+          }
+        },
+        {
+          "name": "export_packet_and_market_report_stored_in_r2",
+          "ok": true,
+          "state": {
+            "packet": "stored",
+            "marketReport": "stored"
+          }
+        },
+        {
+          "name": "live_integrations_report_connected_for_configured_providers",
+          "ok": true,
+          "state": {
+            "payment": {
+              "name": "payment_provider",
+              "status": "connected",
+              "driver": "stripe",
+              "note": "Payment provider dispatch is enabled through stripe; the 0S/SkyGate ledger remains authoritative."
+            },
+            "route": {
+              "name": "route_intelligence",
+              "status": "connected",
+              "driver": "mapbox",
+              "note": "Route stops can call live Mapbox geocoding/directions."
+            },
+            "storage": {
+              "name": "proof_storage",
+              "status": "connected",
+              "driver": "r2",
+              "note": "Proof media/export objects write to r2."
+            },
+            "notification": {
+              "name": "notification_provider",
+              "status": "connected",
+              "driver": "twilio",
+              "note": "Notification provider twilio is ready; recipients are resolved from gate-owned user profiles with SMS consent."
+            },
+            "compliance": {
+              "name": "identity_compliance",
+              "status": "gate-compliance-ledger",
+              "driver": "0s-gate-compliance-ledger",
+              "note": "Shared gate identity plus gate-owned manual compliance proof records; no separate RouteX password lane."
+            }
+          }
+        },
+        {
+          "name": "recipient_and_background_gaps_are_not_hidden",
+          "ok": true,
+          "state": {
+            "notification": {
+              "name": "notification_provider",
+              "status": "connected",
+              "driver": "twilio",
+              "note": "Notification provider twilio is ready; recipients are resolved from gate-owned user profiles with SMS consent."
+            },
+            "compliance": {
+              "name": "identity_compliance",
+              "status": "gate-compliance-ledger",
+              "driver": "0s-gate-compliance-ledger",
+              "note": "Shared gate identity plus gate-owned manual compliance proof records; no separate RouteX password lane."
+            },
+            "liveSmsRecipientProvided": true
+          }
+        },
+        {
+          "name": "background_provider_ordering_blocker_is_explicit",
+          "ok": true,
+          "state": {
+            "configured": false,
+            "driver": "manual-government-check",
+            "accepted_options": [
+              {
+                "driver": "checkr",
+                "configured": false,
+                "missing": [
+                  "CHECKR_API_KEY",
+                  "CHECKR_PACKAGE"
+                ]
+              },
+              {
+                "driver": "certn",
+                "configured": false,
+                "missing": [
+                  "CERTN_API_KEY",
+                  "CERTN_OWNER_ID"
+                ]
+              },
+              {
+                "driver": "background-webhook",
+                "configured": false,
+                "missing": [
+                  "BACKGROUND_CHECK_WEBHOOK_ENDPOINT or COMPLIANCE_WEBHOOK_ENDPOINT",
+                  "BACKGROUND_CHECK_WEBHOOK_SIGNING_SECRET or COMPLIANCE_WEBHOOK_SIGNING_SECRET"
+                ]
+              }
+            ],
+            "note": "External background ordering is blocked until Checkr, Certn, or a signed background-check webhook is configured. Manual gate compliance proof remains available."
+          }
+        },
+        {
+          "name": "background_ordering_refuses_to_fake_without_provider_credentials",
+          "ok": true,
+          "state": {
+            "compliance_check_id": "cmp_2463bde0-29fe-4c51-99a2-11c1a3f1d8ec",
+            "response": {
+              "configured": false,
+              "driver": "manual-government-check",
+              "accepted_options": [
+                {
+                  "driver": "checkr",
+                  "configured": false,
+                  "missing": [
+                    "CHECKR_API_KEY",
+                    "CHECKR_PACKAGE"
+                  ]
+                },
+                {
+                  "driver": "certn",
+                  "configured": false,
+                  "missing": [
+                    "CERTN_API_KEY",
+                    "CERTN_OWNER_ID"
+                  ]
+                },
+                {
+                  "driver": "background-webhook",
+                  "configured": false,
+                  "missing": [
+                    "BACKGROUND_CHECK_WEBHOOK_ENDPOINT or COMPLIANCE_WEBHOOK_ENDPOINT",
+                    "BACKGROUND_CHECK_WEBHOOK_SIGNING_SECRET or COMPLIANCE_WEBHOOK_SIGNING_SECRET"
+                  ]
+                }
+              ],
+              "note": "External background ordering is blocked until Checkr, Certn, or a signed background-check webhook is configured. Manual gate compliance proof remains available."
+            }
+          }
+        },
+        {
+          "name": "storage_status_counts_external_objects",
+          "ok": true,
+          "state": {
+            "driver": "r2",
+            "durable": true,
+            "external_object_storage_configured": true,
+            "bucket": "skyeroutex-proof-vault",
+            "proof_media_count": 30,
+            "proof_media_external_count": 30,
+            "export_packet_count": 30,
+            "export_packet_external_count": 30,
+            "integration_outbox_count": 583
+          }
+        },
+        {
+          "name": "twilio_live_message_provider_status_retrieved",
+          "ok": true,
+          "state": {
+            "notification_id": "not_e34c8786-5840-45af-913f-b18d029babf4",
+            "message_sid": "SM56994488501f3197ed3e9ef57df4964b",
+            "carrier_status": "undelivered",
+            "error_code": 30032,
+            "error_message": null
+          }
+        },
+        {
+          "name": "gate_dashboard_exposes_shared_auth_and_feature_dependencies",
+          "ok": true,
+          "state": {
+            "authContract": {
+              "owner": "FS27/SkyGate/Free99",
+              "routex_local_passwords_allowed": false,
+              "accepted_headers": [
+                "Authorization",
+                "x-admin-token",
+                "x-free99-admin-code",
+                "x-free99-gate-session",
+                "x-skye-gate-session",
+                "x-skygate-session",
+                "cookies",
+                "/api/owner/admin-login"
+              ],
+              "worker_helpers": [
+                "enforceZeroOsGate",
+                "requireGateAuth",
+                "requireOperatorAuth",
+                "shared owner-admin session helpers"
+              ],
+              "staged_profile_endpoint": "/api/routex/admin/gate-users",
+              "note": "RouteX stores app-specific role/profile metadata only after the shared gate authorizes the user. The app does not issue a separate client/admin password."
+            },
+            "gateMirrorEvents": 60,
+            "links": [
+              "/SkyeRouteX/workforce-command-v0.4.0/public/",
+              "/SkyeRouteX/workforce-command-v0.4.0/public/gate-readiness.html",
+              "/admin/login.html?return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Fpublic%2Fgate-readiness.html",
+              "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/",
+              "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/admin/platform-routex-events",
+              "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/admin/platform-events?app_id=metraiyux-0s",
+              "/api/routex/admin/users",
+              "/api/routex/integrations/status",
+              "/api/routex/integrations/outbox",
+              "/api/routex/runtime/events",
+              "/api/routex/compliance/checks",
+              "/api/routex/storage/status"
+            ],
+            "featureIds": [
+              "shared_gate_auth",
+              "job_board_assignment",
+              "payment_dispatch",
+              "sms_notifications",
+              "route_intelligence",
+              "proof_storage",
+              "background_checks",
+              "gate_event_mirror"
+            ]
+          }
+        },
+        {
+          "name": "configured_external_outbox_rows_dispatched_for_live_job",
+          "ok": true,
+          "state": {
+            "failures": []
+          }
+        },
+        {
+          "name": "readiness_uses_worker_gate_without_client_gate_script",
+          "ok": true,
+          "state": {
+            "free99GateScriptLoaded": false,
+            "free99PlatformGateGlobal": false
+          }
+        }
+      ],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 503 ()",
+        "Failed to load resource: the server responded with a status of 409 ()",
+        "Failed to load resource: the server responded with a status of 409 ()"
+      ],
+      "failedRequests": [],
+      "httpErrors": [],
+      "screenshots": [
+        "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-app-after-owner-login.png",
+        "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-gate-readiness.png",
+        "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-live-integrations-json.png"
+      ],
+      "liveWorkflow": {
+        "provider_id": "gate-provider-routex-provider-live-1779382835725@stress.local",
+        "contractor_id": "gate-contractor-routex-contractor-live-1779382835725@stress.local",
+        "market_id": "mkt_6337c966-7592-40d2-afa4-71728b6f5e5f",
+        "job_id": "job_39825f99-eb44-4a03-a3e8-16465a6562a8",
+        "route_job_id": "route_345f349a-63dc-400f-8260-8968a9279ddb",
+        "assignment_id": "asg_87bd590f-f9ac-4635-a2f9-7dc7d1bce275",
+        "payment_rows_for_job": 2,
+        "stripe_payment_intent_status": "requires_payment_method",
+        "stripe_capture_status": "blocked_not_capturable",
+        "twilio_carrier_status": "undelivered",
+        "background_provider_configured": false,
+        "configuredProviderStatuses": {
+          "payment_provider": "connected",
+          "route_intelligence": "connected",
+          "proof_storage": "connected",
+          "notification_provider": "connected",
+          "identity_compliance": "gate-compliance-ledger"
+        },
+        "routex_gate_folder": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/"
+      },
+      "ignoredConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 503 ()",
+        "Failed to load resource: the server responded with a status of 409 ()",
+        "Failed to load resource: the server responded with a status of 409 ()"
+      ],
+      "materialConsoleErrors": []
+    },
+    {
+      "name": "mobile-live-production-view",
+      "ok": true,
+      "actions": [
+        "opened mobile app with reused shared owner session bearer",
+        "clicked visible text: Provider Panel",
+        "GET /api/routex/storage/status -> 200"
+      ],
+      "statuses": [
+        {
+          "name": "mobile_uses_worker_gate_without_client_gate_script",
+          "ok": true,
+          "state": {
+            "free99GateScriptLoaded": false,
+            "free99PlatformGateGlobal": false
+          }
+        },
+        {
+          "name": "mobile_app_loads_without_horizontal_overflow",
+          "ok": true,
+          "state": {
+            "href": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/"
+          }
+        },
+        {
+          "name": "mobile_owner_session_can_read_storage_status",
+          "ok": true,
+          "state": {
+            "storage": {
+              "driver": "r2",
+              "durable": true,
+              "external_object_storage_configured": true,
+              "bucket": "skyeroutex-proof-vault",
+              "proof_media_count": 30,
+              "proof_media_external_count": 30,
+              "export_packet_count": 30,
+              "export_packet_external_count": 30,
+              "integration_outbox_count": 585
+            }
+          }
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "screenshots": [
+        "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/mobile-routex-app-after-owner-login.png"
+      ],
+      "ignoredConsoleErrors": [],
+      "materialConsoleErrors": []
+    },
+    {
+      "name": "fs27-gate-dashboard-view",
+      "ok": true,
+      "actions": [],
+      "statuses": [
+        {
+          "name": "fs27_gate_folder_loads",
+          "ok": true,
+          "state": {
+            "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/",
+            "status": 200
+          }
+        },
+        {
+          "name": "fs27_gate_dashboard_unlocks_with_shared_owner_code",
+          "ok": true,
+          "state": {
+            "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/apps/skyeroutex/"
+          }
+        },
+        {
+          "name": "fs27_gate_dashboard_renders_feature_matrix_and_records",
+          "ok": true,
+          "state": {
+            "hasGateMirrors": true,
+            "hasNotifications": true,
+            "hasBackground": true
+          }
+        }
+      ],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "failedRequests": [],
+      "httpErrors": [],
+      "screenshots": [
+        "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-fs27-routex-gate-dashboard.png"
+      ],
+      "ignoredConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "materialConsoleErrors": []
+    }
+  ],
+  "screenshots": [
+    "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-app-after-owner-login.png",
+    "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-gate-readiness.png",
+    "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-routex-live-integrations-json.png",
+    "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/mobile-routex-app-after-owner-login.png",
+    "/workspaces/MetrAIyux-0S/test-artifacts/skyeroutex-live-production-stress-2026-05-21T17-00-23-699Z/desktop-fs27-routex-gate-dashboard.png"
+  ],
+  "deployment": {
+    "workerVersion": "2a0cfa84-4e3b-449d-a75c-86bd44661f47",
+    "gateWorkerVersion": "6950fcba-0e98-4071-81f3-46fd81c9066c"
+  },
+  "knownMissingProviderCredentials": {
+    "SKYEROUTEX_LIVE_SMS_TO_for_real_live_sms_send": false,
+    "CHECKR_or_CERTN_or_BACKGROUND_WEBHOOK": true,
+    "STRIPE_LIVE_PROOF_PAYMENT_METHOD_for_capture_proof": true
+  }
+}

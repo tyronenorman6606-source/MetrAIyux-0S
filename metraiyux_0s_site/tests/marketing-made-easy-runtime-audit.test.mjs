@@ -44,7 +44,7 @@ async function assertExists(path) {
 
 test('MME-01 inventories every Marketing Made Easy surface and its local runtime truth', async () => {
   const audit = await readJson('MME_RUNTIME_AUDIT.json');
-  assert.equal(audit.decision, 'local_static_proof_only_until_dedicated_backend');
+  assert.equal(audit.decision, 'mounted_same_domain_platform_adapter');
   assert.equal(audit.productionApiBase, '/api/marketing-made-easy');
   assert.match(audit.rootApiPolicy, /\/api\/runtime\/\*/);
   assert.equal(audit.apps.length, EXPECTED_APPS.length);
@@ -52,7 +52,8 @@ test('MME-01 inventories every Marketing Made Easy surface and its local runtime
 
   for (const app of audit.apps) {
     assert.equal(app.publicApiMounted, false, app.id);
-    assert.match(app.mode, /local|static/, app.id);
+    assert.match(app.mode, /mounted_module|local|static/, app.id);
+    assert.equal(app.mountedUnderPlatform, true, app.id);
     assert.equal(typeof app.operatorTruth, 'string', app.id);
     assert.ok(app.operatorTruth.length > 20, app.id);
     await assertExists(app.publicEntry);
@@ -66,19 +67,19 @@ test('MME-02 labels same-folder runtimes as local/static proof in the hub and Wo
   const html = await readFile(new URL('index.html', MME_ROOT), 'utf8');
   assert.match(html, /MME_RUNTIME_AUDIT\.json/);
   assert.match(html, /\/api\/marketing-made-easy\/health/);
-  assert.match(html, /local_static_proof_only/);
-  assert.match(html, /not public 0S APIs/);
+  assert.match(html, /mounted platform/i);
+  assert.match(html, /one gate lane/i);
 
   const healthRes = await siteWorker.fetch(req('/api/marketing-made-easy/health'), env(), ctx());
-  assert.equal(healthRes.status, 503);
+  assert.equal(healthRes.status, 200);
   const health = await healthRes.json();
   assert.equal(health.app_id, 'marketingMadeEasy');
-  assert.equal(health.mounted, false);
-  assert.equal(health.runtime_mode, 'local_static_proof_only');
-  assert.equal(health.production_api_base, '/api/marketing-made-easy');
-  assert.equal(health.local_runtime_audit, '/Marketing-Made-Easy/MME_RUNTIME_AUDIT.json');
+  assert.equal(health.mounted, true);
+  assert.equal(health.runtime_mode, 'northstar_style_mounted_platform');
+  assert.equal(health.base, '/api/marketing-made-easy');
+  assert.equal(health.platform_shell, '/Marketing-Made-Easy/index.html');
   assert.match(health.root_runtime_blocked, /\/api\/runtime\/\*/);
-  assert.match(health.source_blocked, /netlify\/functions/);
+  assert.equal(health.gate_owned, true);
 
   const collisionRes = await siteWorker.fetch(req('/api/runtime/status'), env(), ctx());
   assert.equal(collisionRes.status, 409);

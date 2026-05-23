@@ -1,0 +1,22 @@
+{
+  "name": "skyepics-app",
+  "version": "1.7.0",
+  "private": true,
+  "type": "module",
+  "description": "SkyePics local-only encrypted camera vault with cinematic intro, spectacular brand landing, client-side OCR, encrypted backup/restore, integrity ledgers, and built-in tutorial guidance.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build && node scripts/finalize-dist.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "smoke": "node scripts/smoke.mjs",
+    "test": "node scripts/unit.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tesseract.js": "latest"
+  },
+  "devDependencies": {}
+}

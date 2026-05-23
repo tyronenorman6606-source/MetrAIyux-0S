@@ -100,6 +100,48 @@ const offers = [
     includes: "connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map"
   },
   {
+    planId: "agentic-growth-starter",
+    productName: "Agentic Growth Layer - Starter",
+    description: "No-domain and preview-site agentic growth cycles: seed keyword fallback, competitor mapping, site inventory intake, service/location/FAQ/CTA draft tasks, static patch manifests, and proof-safe review gates.",
+    sourceFolder: "packages/agentic-growth-layer",
+    offerFamily: "agentic_growth",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "Agentic Growth Starter setup", lookupKey: "agentic_growth_starter_setup", amount: 150000 },
+      { kind: "monthly", nickname: "Agentic Growth Starter monthly", lookupKey: "agentic_growth_starter_monthly", amount: 49700, interval: "month" }
+    ],
+    includes: "no_domain_preview_growth_cycles_seed_keywords_competitor_mapping_static_patch_manifests"
+  },
+  {
+    planId: "agentic-growth-connected",
+    productName: "Agentic Growth Layer - Connected",
+    description: "Connected agentic growth monitoring for live client sites: GSC, SEMrush, live SERP, keyword, and crawl ingestion with prioritized developer-agent tasks, experiment ledger, static patch manifests, and monthly proof packet.",
+    sourceFolder: "packages/agentic-growth-layer",
+    offerFamily: "agentic_growth",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "Agentic Growth Connected setup", lookupKey: "agentic_growth_connected_setup", amount: 350000 },
+      { kind: "monthly", nickname: "Agentic Growth Connected monthly", lookupKey: "agentic_growth_connected_monthly", amount: 149700, interval: "month" }
+    ],
+    includes: "gsc_semrush_dataforseo_serp_pull_prioritized_tasks_experiment_ledger_proof_packet"
+  },
+  {
+    planId: "agentic-growth-operator",
+    productName: "Agentic Growth Layer - Operator",
+    description: "Managed operator lane for approved auto-apply adapters, live browser proof receipts, monthly site improvement cadence, source-pull hardening, and owner-reviewed publishing policy.",
+    sourceFolder: "packages/agentic-growth-layer",
+    offerFamily: "agentic_growth",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "Agentic Growth Operator setup", lookupKey: "agentic_growth_operator_setup", amount: 750000 },
+      { kind: "monthly", nickname: "Agentic Growth Operator monthly", lookupKey: "agentic_growth_operator_monthly", amount: 299700, interval: "month" }
+    ],
+    includes: "managed_adapter_auto_apply_policy_live_browser_proof_monthly_growth_ledger"
+  },
+  {
     planId: "houseoperations-command",
     productName: "MetrAIyux 0S - HouseOperations Command",
     description: "Paid HouseOperations command room with task, vendor, owner-alert, proof, tutorial, local SkyeBox vault, and FS27 PIN Gate handoff boundaries.",
@@ -267,7 +309,7 @@ async function ensureProduct(offer, existingPrices) {
     statement_descriptor: offer.productName.startsWith("SkyeGate") ? "SKYEGATEFS27" : "METRAIYUX0S",
     "metadata[source_folder]": offer.sourceFolder,
     "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
-    "metadata[offer_family]": offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux",
+    "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
     "metadata[status]": "approved",
     "metadata[brain_owner]": offer.brainOwner,
@@ -284,7 +326,7 @@ async function updateProduct(productIdValue, offer) {
     description: offer.description,
     "metadata[source_folder]": offer.sourceFolder,
     "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
-    "metadata[offer_family]": offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux",
+    "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
     "metadata[status]": "approved",
     "metadata[brain_owner]": offer.brainOwner,
@@ -315,7 +357,7 @@ async function createPrice(productIdValue, offer, spec) {
     transfer_lookup_key: "true",
     "metadata[source_folder]": offer.sourceFolder,
     "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
-    "metadata[offer_family]": offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux",
+    "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
     "metadata[status]": "approved",
     "metadata[brain_owner]": offer.brainOwner,

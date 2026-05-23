@@ -1,0 +1,76 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Relay13 Console</title>
+  <meta name="description" content="Relay13 operator console for workspaces, API keys, widget publishing, and real messaging threads.">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <main class="admin relay-console-app" data-admin-room="inbox">
+    <header class="operator-topbar">
+      <div class="brand"><img class="brand-logo" src="../assets/relay13-logo-transparent.png" alt="Relay13 logo"><div><h1 class="neon-gradient-text"><span class="gold">Relay13</span> <span class="grad">Console</span></h1><p>Owned universal messaging control.</p></div></div>
+      <nav class="operator-nav" aria-label="Relay13 console workspaces">
+        <a class="room-tab active" href="inbox.html">Inbox</a>
+        <a class="room-tab" href="connect.html">Connect</a>
+        <a class="room-tab" href="setup.html">Setup</a>
+        <a class="room-tab" href="release.html">Release</a>
+      </nav>
+      <a class="btn ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-operator-tutorial.html" target="_blank" rel="noopener">Tutorial</a>
+    </header>
+
+    <section class="admin-page inbox-page" data-admin-room="inbox">
+      <div class="inbox-workspace">
+        <aside class="mailbox-column">
+          <div class="mailbox-title">
+            <p class="eyebrow">Mailbox</p>
+            <h2>Real conversations</h2>
+            <p class="micro">Pick a workspace, filter the queue, and open a thread. This column is the mailbox, not a settings drawer.</p>
+          </div>
+          <label class="micro">Workspace</label>
+          <select id="workspaceSelect" class="input"></select>
+          <div class="row"><select id="statusFilter" class="input"><option value="">All</option><option value="open">Open</option><option value="pending">Pending</option><option value="closed">Closed</option></select><button id="refresh" class="btn ghost">Refresh</button></div>
+          <div class="folder-strip" aria-label="Inbox folders"><span>Inbox</span><span>Unread</span><span>Pending</span><span>Closed</span></div>
+          <div id="conversationList" class="conv-list"></div>
+        </aside>
+
+        <section class="conversation-column">
+          <header class="top"><div><strong id="threadTitle">Select a conversation</strong><span id="liveStatus" class="status bad">idle</span></div><div class="workspace-tools"><select id="threadStatus" class="input"><option value="open">open</option><option value="pending">pending</option><option value="closed">closed</option></select><input id="assignedTo" class="input" placeholder="Assigned to"><button id="saveThread" class="btn">Save</button><button id="queueJob" class="btn ghost">Queue release job</button></div></header>
+          <section class="thread"><div id="messages" class="messages"><div class="empty"><strong>No thread selected.</strong><span>Select a real conversation created by the widget or API.</span></div></div><form id="replyForm" class="composer"><textarea id="replyText" placeholder="Reply as operator…" disabled></textarea><button id="replyButton" class="btn" disabled>Send reply</button></form></section>
+        </section>
+
+        <aside id="profile" class="profile context-column"><p class="micro">Conversation profile loads here.</p></aside>
+      </div>
+    </section>
+
+    <section class="admin-page connect-page" data-admin-room="connect">
+      <div class="workspace-page-grid">
+        <section class="panel stack"><strong>Platform access</strong><p class="micro">Platform access uses the active 0S/SkyGate session and gate-card headers.</p><button id="saveToken" class="btn">Load platform</button><button id="bootstrap" class="btn ghost">Bootstrap default workspace</button><span class="micro">The inbox only fills from real widget/API conversations.</span></section>
+        <section class="panel stack"><strong>Workspace creation</strong><div class="row"><input id="workspaceName" class="input" placeholder="New workspace name"><button id="createWorkspace" class="btn">Create</button></div><p class="micro">Create the workspace here, then return to Inbox to work live threads.</p></section>
+        <section class="stats" id="stats"></section>
+      </div>
+    </section>
+
+    <section class="admin-page setup-page" data-admin-room="setup">
+      <div class="workspace-page-grid">
+        <section class="panel stack"><strong>Allowed widget domains</strong><div class="row"><input id="domainName" class="input" placeholder="clientdomain.com"><button id="addDomain" class="btn">Allow</button></div><div id="domainList" class="micro">No workspace selected.</div></section>
+        <section class="panel stack"><strong>System guardrails</strong><div id="guardrailPanel" class="micro">No workspace selected.</div><button id="enforceGuardrails" class="btn ghost">Enforce app-knowledge mode</button></section>
+        <section class="panel stack"><strong>API keys</strong><input id="keyName" class="input" placeholder="Key name"><button id="createKey" class="btn">Create scoped key</button><div id="newKey" class="install"></div></section>
+      </div>
+    </section>
+
+    <section class="admin-page release-page" data-admin-room="release">
+      <div class="workspace-page-grid release-grid">
+        <section class="panel stack"><strong>Widget release</strong><input id="brandName" class="input" placeholder="Brand name"><input id="welcomeText" class="input" placeholder="Welcome text"><button id="publishWidget" class="btn">Publish config</button><pre id="installSnippet" class="install"></pre></section>
+        <section class="panel stack"><strong>Client handoff</strong><ol class="micro-list"><li>Publish widget config.</li><li>Copy the install snippet.</li><li>Give the client the tutorial link.</li><li>Verify the first real thread in Inbox.</li></ol><a class="btn ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-client-tutorial.html" target="_blank" rel="noopener">Client Tutorial</a></section>
+      </div>
+    </section>
+  </main>
+  <script src="../../../assets/js/metraiyux-api-bases.js?v=relay13-api-base"></script>
+  <script src="../../../../assets/js/0s-gate-card-bridge.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

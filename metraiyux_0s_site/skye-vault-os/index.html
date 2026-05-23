@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeVaultOS / SkySecure Vault Console for scan, offload, inventory, search, diff, verify, reload, restore-point, grant, revoke, and live system proof with FS27 metadata routes.">
+  <title>SkyeVaultOS - SkySecure Vault Console</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --vault-bg: #040706;
+      --vault-panel: rgba(8, 16, 14, .92);
+      --vault-line: rgba(229, 236, 226, .16);
+      --vault-ink: #f7fff6;
+      --vault-muted: #adc0b6;
+      --vault-gold: #f2d384;
+      --vault-mint: #70f0bf;
+      --vault-cyan: #50d4ff;
+      --vault-rose: #ff8d9b;
+    }
+
+    body.vaultos-page {
+      color: var(--vault-ink);
+      background:
+        linear-gradient(180deg, rgba(4, 7, 6, .48), rgba(4, 7, 6, .98)),
+        url("../assets/metraiyux-0s-logo-gold-blue-poster.png") center top / cover fixed,
+        var(--vault-bg);
+    }
+
+    .vaultos-shell {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 6.4rem 0 5rem;
+    }
+
+    .vaultos-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .vaultos-title h1 {
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      line-height: .94;
+      letter-spacing: 0;
+      margin: .3rem 0 .8rem;
+    }
+
+    .vaultos-title p {
+      color: #ddede4;
+      line-height: 1.64;
+      max-width: 860px;
+      margin: 0;
+      font-size: 1.04rem;
+    }
+
+    .vaultos-panel,
+    .vaultos-card {
+      border: 1px solid var(--vault-line);
+      border-radius: 8px;
+      background: var(--vault-panel);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+    }
+
+    .vaultos-card {
+      padding: 1rem;
+    }
+
+    .vaultos-card b,
+    .vaultos-panel h2,
+    .vaultos-panel h3 {
+      letter-spacing: 0;
+      color: #fff;
+    }
+
+    .vaultos-card b {
+      display: block;
+      margin-bottom: .35rem;
+      color: var(--vault-gold);
+    }
+
+    .vaultos-card span,
+    .vaultos-muted {
+      color: var(--vault-muted);
+      line-height: 1.55;
+    }
+
+    .vaultos-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .vaultos-chain {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 1rem;
+    }
+
+    .vaultos-pill,
+    .vaultos-command {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border: 1px solid rgba(112, 240, 191, .34);
+      border-radius: 8px;
+      padding: .28rem .5rem;
+      background: rgba(112, 240, 191, .09);
+      color: #edfff8;
+      font-size: .78rem;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .vaultos-command {
+      border-color: rgba(80, 212, 255, .3);
+      background: rgba(80, 212, 255, .08);
+    }
+
+    .vaultos-controls {
+      padding: 1rem;
+      display: grid;
+      gap: .85rem;
+    }
+
+    .vaultos-field {
+      display: grid;
+      gap: .35rem;
+      color: var(--vault-muted);
+      font-size: .84rem;
+      font-weight: 850;
+    }
+
+    .vaultos-field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .38);
+      color: var(--vault-ink);
+      padding: .65rem .72rem;
+      font: inherit;
+    }
+
+    .vaultos-button {
+      min-height: 46px;
+      border: 1px solid rgba(242, 211, 132, .76);
+      border-radius: 8px;
+      background: var(--vault-gold);
+      color: #10120b;
+      font-weight: 950;
+      cursor: pointer;
+      padding: .75rem .95rem;
+    }
+
+    .vaultos-metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .vaultos-metric {
+      min-height: 92px;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 8px;
+      padding: .85rem;
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .vaultos-metric b {
+      display: block;
+      color: #fff;
+      font-size: clamp(1rem, 2vw, 1.38rem);
+      overflow-wrap: anywhere;
+    }
+
+    .vaultos-metric span {
+      display: block;
+      margin-top: .3rem;
+      color: var(--vault-muted);
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+
+    .vaultos-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .55fr);
+      gap: 16px;
+    }
+
+    .vaultos-panel {
+      padding: 1rem;
+      min-width: 0;
+    }
+
+    .vaultos-panel h2,
+    .vaultos-panel h3 {
+      margin: 0 0 .8rem;
+      font-size: 1.1rem;
+    }
+
+    .vaultos-type-grid,
+    .vaultos-command-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .vaultos-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--vault-line);
+      border-radius: 8px;
+      margin-top: .9rem;
+    }
+
+    .vaultos-table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+    }
+
+    .vaultos-table th,
+    .vaultos-table td {
+      padding: .75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .vaultos-table th {
+      color: var(--vault-gold);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .vaultos-table td {
+      color: #e5f3ec;
+      line-height: 1.5;
+      font-size: .9rem;
+    }
+
+    .vaultos-status {
+      margin-top: .9rem;
+      color: var(--vault-muted);
+      min-height: 24px;
+    }
+
+    .vaultos-alert {
+      border-color: rgba(255, 141, 155, .34);
+      background: rgba(255, 141, 155, .08);
+    }
+
+    .vaultos-kbd {
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #dffcf1;
+      background: rgba(0, 0, 0, .33);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      padding: .75rem;
+      font-size: .82rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 980px) {
+      .vaultos-hero,
+      .vaultos-grid,
+      .vaultos-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .vaultos-shell {
+        width: min(100% - 22px, 1280px);
+        padding-top: 5.6rem;
+      }
+    }
+  </style>
+</head>
+<body class="vaultos-page skyesol-living-page">
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="motion-progress scroll-progress motion-chrome" aria-hidden="true"><i></i></div>
+  <div class="motion-cursor-glow pointer-reactive motion-chrome" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">MetrAIyux 0S</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../skyeway.html">0s SkyeWay</a>
+      <a href="../skye-secure-secret-packs.html">SkyeSecure</a>
+      <a href="../skye-secure-platform/index.html">Platform Console</a>
+      <a href="../proof-vault/skye-secure-fs27-vault-proof.html">Live Proof</a>
+    </nav>
+  </header>
+
+  <main class="vaultos-shell">
+    <section class="vaultos-hero" aria-labelledby="vaultos-title">
+      <div class="vaultos-title">
+        <p class="eyebrow">Sovereign vault operating layer</p>
+        <h1 id="vaultos-title">SkyeVaultOS</h1>
+        <p>SkySecure Vault Console sits under FS27 and SkyeVault so ignored secrets, delete-candidate folders, developer handoffs, restore points, grants, revokes, diffs, reloads, bundles, drive handoffs, and audit receipts stay visible without pushing plaintext into Git. The current evidence is live system proof: filesystem work ran through the CLI/app proof lane, and FS27 plus 0S publish the deployed proof, command, inventory, search, restore-point, audit, health, and console routes.</p>
+        <div class="vaultos-chain" aria-label="custody hierarchy">
+          <span class="vaultos-pill">FS27</span>
+          <span class="vaultos-pill">SkyeVault</span>
+          <span class="vaultos-pill">SkySecure</span>
+          <span class="vaultos-pill">VaultOS Console</span>
+          <span class="vaultos-pill">Built by Gray London Skyes</span>
+        </div>
+      </div>
+      <aside class="vaultos-panel vaultos-controls" aria-label="VaultOS receipt loader">
+        <label class="vaultos-field" for="scanFile">Scan receipt<input id="scanFile" type="file" accept=".json,application/json"></label>
+        <label class="vaultos-field" for="indexFile">Vault index<input id="indexFile" type="file" accept=".json,application/json"></label>
+        <label class="vaultos-field" for="policyFile">Access policy<input id="policyFile" type="file" accept=".json,application/json"></label>
+        <label class="vaultos-field" for="auditFile">Audit log<input id="auditFile" type="file" accept=".jsonl,.json,text/plain,application/json"></label>
+        <label class="vaultos-field" for="restoreFile">Restore point<input id="restoreFile" type="file" accept=".json,application/json"></label>
+        <label class="vaultos-field" for="manifestFile">Vault manifest / bundle receipt<input id="manifestFile" type="file" accept=".json,application/json"></label>
+        <button id="loadButton" class="vaultos-button" type="button">Load VaultOS Receipts</button>
+        <button id="liveButton" class="vaultos-button" type="button">Load Live FS27 Metadata</button>
+        <div id="status" class="vaultos-status">No receipts or live FS27 metadata loaded.</div>
+      </aside>
+    </section>
+
+    <section class="vaultos-metrics" aria-label="VaultOS proof metrics">
+      <div class="vaultos-metric"><b id="fileCount">0</b><span>scanned files</span></div>
+      <div class="vaultos-metric"><b id="totalBytes">0 B</b><span>plain bytes inventoried</span></div>
+      <div class="vaultos-metric"><b id="objectCount">0</b><span>encrypted objects</span></div>
+      <div class="vaultos-metric"><b id="packSetCount">0</b><span>pack sets</span></div>
+      <div class="vaultos-metric"><b id="auditCount">0</b><span>audit events</span></div>
+      <div class="vaultos-metric"><b id="restoreName">None</b><span>restore point</span></div>
+    </section>
+
+    <section class="vaultos-grid">
+      <article class="vaultos-panel">
+        <h2>Command Coverage</h2>
+        <div class="vaultos-command-grid" id="commands"></div>
+        <div class="vaultos-table-wrap">
+          <table class="vaultos-table" id="objects">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Pack</th>
+                <th>Files</th>
+                <th>Plain Bytes</th>
+                <th>Types</th>
+                <th>Object SHA-256</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="vaultos-stack">
+        <section class="vaultos-card">
+          <b>Protected Root</b>
+          <span id="protectedRoot">Load the real scan or restore point receipt.</span>
+        </section>
+        <section class="vaultos-card vaultos-alert">
+          <b>Delete Gate</b>
+          <span id="deleteGate">Deletion stays blocked until scan, offload, verify, diff, reload, restore-point, grant/revoke, and audit receipts exist.</span>
+        </section>
+        <section class="vaultos-card">
+          <b>FS27 Metadata Route</b>
+          <span><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/proof" target="_blank" rel="noopener noreferrer">/skysecure/vaultos/proof</a></span>
+        </section>
+        <section class="vaultos-card">
+          <b>Drive Bundle Commands</b>
+          <span><code>manifest</code>, <code>bundle</code>, <code>attach</code>, <code>fs27-sync</code>, <code>ls</code>, <code>tree</code>, and <code>cat-meta</code> make the vault inspectable and reloadable from bash.</span>
+        </section>
+      </aside>
+    </section>
+
+    <section class="vaultos-panel" style="margin-top:16px">
+      <h2>Live FS27 Vault API</h2>
+      <div class="vaultos-table-wrap">
+        <table class="vaultos-table" id="liveApi">
+          <thead>
+            <tr>
+              <th>Route</th>
+              <th>Status</th>
+              <th>Objects</th>
+              <th>Files</th>
+              <th>Scope</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="vaultos-grid" style="margin-top:16px">
+      <article class="vaultos-panel">
+        <h2>Inventory Types</h2>
+        <div class="vaultos-type-grid" id="types"></div>
+        <div class="vaultos-table-wrap">
+          <table class="vaultos-table" id="audit">
+            <thead>
+              <tr>
+                <th>Recorded</th>
+                <th>Action</th>
+                <th>Actor</th>
+                <th>Pack</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+      <aside class="vaultos-panel">
+        <h3>Access Policy</h3>
+        <div class="vaultos-table-wrap">
+          <table class="vaultos-table" id="policy" style="min-width:560px">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Roles</th>
+                <th>Grants</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </aside>
+    </section>
+
+    <section class="vaultos-panel" style="margin-top:16px">
+      <h2>Operator Commands</h2>
+      <code class="vaultos-kbd">npm run vaultos -- scan --root="about to delete"
+npm run vaultos -- offload --root="about to delete" --passphrase-env=VAULTOS_PASSPHRASE --pepper-env=VAULTOS_PEPPER
+npm run vaultos -- diff --pack-id=&lt;pack&gt; --root=&lt;reload-root&gt; --passphrase-env=VAULTOS_PASSPHRASE
+npm run vaultos -- restore-point --scan=&lt;scan-receipt&gt; --name=about-to-delete-before-delete
+npm run vaultos -- manifest --output=test-artifacts/vaultos-about-to-delete-proof/vaultos-manifest.json
+npm run vaultos -- bundle --to=/path/to/SkyeVaultOS-bundle --force
+npm run vaultos -- attach --from=/path/to/SkyeVaultOS-bundle --vault-dir=.skyevault-out/fs27/skyevault/skysecure-vaultos
+npm run vaultos -- fs27-sync --secret-env=FS27_SKYESECURE_WRITE_SECRET
+npm run vaultos:proof</code>
+    </section>
+  </main>
+
+  <footer>
+    <p>MetrAIyux 0S - SkyeVaultOS - <a href="../skyeway.html">0s SkyeWay</a> - <a href="../changelog/">Changelog</a> - <a href="../operator/platform-integration-ledger.html">Platform Ledger</a></p>
+  </footer>
+
+  <script>
+    const commandNames = ['scan', 'offload', 'inventory', 'search', 'diff', 'verify', 'reload', 'restore-point', 'grant', 'revoke', 'audit'];
+    const supportCommands = ['ls', 'tree', 'cat-meta', 'manifest', 'bundle', 'attach', 'fs27-sync'];
+    const fs27Base = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+    const state = { scan: null, index: null, policy: null, audit: [], restore: null, manifest: null, live: null };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function fmtBytes(bytes) {
+      const value = Number(bytes || 0);
+      if (value < 1024) return `${value} B`;
+      const units = ['KB', 'MB', 'GB', 'TB'];
+      let size = value / 1024;
+      let index = 0;
+      while (size >= 1024 && index < units.length - 1) {
+        size /= 1024;
+        index += 1;
+      }
+      return `${size.toFixed(size >= 10 ? 1 : 2)} ${units[index]}`;
+    }
+
+    function safeText(value, fallback = '') {
+      return String(value ?? fallback);
+    }
+
+    async function readFile(input, parser = 'json') {
+      const file = input.files && input.files[0];
+      if (!file) return null;
+      const text = await file.text();
+      if (parser === 'jsonl') {
+        return text.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
+      }
+      return JSON.parse(text);
+    }
+
+    function typeText(types = {}) {
+      return Object.entries(types)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 8)
+        .map(([type, count]) => `${type}:${count}`)
+        .join(' ');
+    }
+
+    function renderCommands() {
+      $('#commands').innerHTML = [...commandNames, ...supportCommands].map((name) => `<span class="vaultos-command" data-command-pill>${name}</span>`).join('');
+    }
+
+    function renderMetrics() {
+      const scanSummary = state.scan?.summary || state.restore?.scanSummary || state.manifest?.latestScan?.summary || {};
+      const objects = state.index?.objects || state.manifest?.objects || state.live?.inventory?.packs || [];
+      const packSets = state.manifest?.packSets || state.live?.inventory?.summary?.pack_sets || [];
+      const liveSummary = state.live?.inventory?.summary || {};
+      const computedFiles = objects.reduce((sum, object) => sum + Number(object.fileCount || object.file_count || 0), 0);
+      const computedPlainBytes = objects.reduce((sum, object) => sum + Number(object.plaintextBytes || object.plaintext_bytes || 0), 0);
+      $('#fileCount').textContent = safeText(scanSummary.fileCount || liveSummary.file_count || computedFiles || 0);
+      $('#totalBytes').textContent = fmtBytes(scanSummary.totalBytes || liveSummary.plaintext_bytes || computedPlainBytes || 0);
+      $('#objectCount').textContent = safeText(objects.length);
+      $('#packSetCount').textContent = safeText(packSets.length);
+      $('#auditCount').textContent = safeText(state.audit.length || state.manifest?.audit?.count || state.live?.audit?.count || 0);
+      $('#restoreName').textContent = state.restore?.name || state.restore?.id || state.manifest?.restorePoints?.[0]?.id || state.live?.restorePoints?.restore_points?.[0]?.id || 'None';
+      const root = state.scan?.root || state.restore?.root || state.manifest?.latestScan?.root || objects[0]?.original_root || 'Load the real scan, manifest, restore point, or live FS27 metadata.';
+      $('#protectedRoot').textContent = root;
+      const hasPack = objects.length > 0;
+      const hasRestore = Boolean(state.restore?.id || state.manifest?.restorePoints?.length || state.live?.restorePoints?.count);
+      const hasAudit = state.audit.length >= 1 || state.manifest?.audit?.count >= 1 || state.live?.audit?.count >= 1;
+      $('#deleteGate').textContent = hasPack && hasRestore && hasAudit
+        ? 'Protected. Delete review can use the VaultOS receipts instead of guessing.'
+        : 'Deletion stays blocked until the VaultOS receipt set is complete.';
+    }
+
+    function renderObjects() {
+      const objects = state.index?.objects || state.manifest?.objects || state.live?.inventory?.packs || [];
+      const rows = objects.map((object) => `
+        <tr>
+          <td>${safeText(object.projectName || object.project_name || object.source?.originalRoot || object.original_root || 'VaultOS object')}</td>
+          <td>${safeText(object.packId || object.pack_id)}</td>
+          <td>${safeText(object.fileCount || object.file_count)}</td>
+          <td>${fmtBytes(object.plaintextBytes || object.plaintext_bytes)}</td>
+          <td>${typeText(object.types || object.source?.types || {})}</td>
+          <td>${safeText(object.objectSha256 || object.object_sha256).slice(0, 18)}...</td>
+        </tr>
+      `).join('');
+      $('#objects tbody').innerHTML = rows || '<tr><td colspan="6">No encrypted objects loaded.</td></tr>';
+    }
+
+    function renderTypes() {
+      const scanTypes = state.scan?.summary?.types || state.restore?.scanSummary?.types || state.manifest?.types || state.live?.inventory?.summary?.types || {};
+      const indexTypes = (state.index?.objects || []).reduce((acc, object) => {
+        for (const [type, count] of Object.entries(object.types || object.source?.types || {})) acc[type] = (acc[type] || 0) + count;
+        return acc;
+      }, {});
+      const types = Object.keys(scanTypes).length ? scanTypes : indexTypes;
+      $('#types').innerHTML = Object.entries(types)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .map(([type, count]) => `<span class="vaultos-pill">${type}:${count}</span>`)
+        .join('') || '<span class="vaultos-muted">No type inventory loaded.</span>';
+    }
+
+    function renderPolicy() {
+      const subjects = Object.values(state.policy?.subjects || {});
+      $('#policy tbody').innerHTML = subjects.map((subject) => `
+        <tr>
+          <td>${safeText(subject.displayName || subject.id)}</td>
+          <td>${(subject.roles || []).join(', ') || 'none'}</td>
+          <td>${safeText((subject.grants || []).length)}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="3">No access policy loaded.</td></tr>';
+    }
+
+    function renderAudit() {
+      const auditEvents = state.audit.length ? state.audit : (state.manifest?.audit?.latest || state.live?.audit?.events || []);
+      const rows = auditEvents.slice(-28).reverse().map((event) => `
+        <tr>
+          <td>${safeText(event.recordedAt || event.created_at)}</td>
+          <td>${safeText(event.action)}</td>
+          <td>${safeText(event.actor)}</td>
+          <td>${safeText(event.packId || event.pack_id || '')}</td>
+        </tr>
+      `).join('');
+      $('#audit tbody').innerHTML = rows || '<tr><td colspan="4">No audit events loaded.</td></tr>';
+    }
+
+    function renderLiveApi() {
+      const live = state.live || {};
+      const rows = [
+        ['/skysecure/vaultos/inventory', live.inventory, live.inventory?.summary?.pack_count, live.inventory?.summary?.file_count, live.inventory?.proof_scope],
+        ['/skysecure/vaultos/search?q=vaultos', live.search, live.search?.match_count, '', live.search?.plaintext_boundary],
+        ['/skysecure/vaultos/restore-points', live.restorePoints, live.restorePoints?.count, '', 'restore-point metadata'],
+        ['/skysecure/vaultos/audit', live.audit, live.audit?.count, '', 'safe audit metadata']
+      ].map(([route, payload, objects, files, scope]) => `
+        <tr>
+          <td><a href="${fs27Base}${route}" target="_blank" rel="noopener noreferrer">${route}</a></td>
+          <td>${payload?.ok ? 'live' : 'not loaded'}</td>
+          <td>${safeText(objects || 0)}</td>
+          <td>${safeText(files || 0)}</td>
+          <td>${safeText(scope || '')}</td>
+        </tr>
+      `).join('');
+      $('#liveApi tbody').innerHTML = rows;
+    }
+
+    function renderAll() {
+      renderCommands();
+      renderMetrics();
+      renderObjects();
+      renderTypes();
+      renderPolicy();
+      renderAudit();
+      renderLiveApi();
+    }
+
+    async function loadReceipts() {
+      try {
+        state.scan = await readFile($('#scanFile'));
+        state.index = await readFile($('#indexFile'));
+        state.policy = await readFile($('#policyFile'));
+        state.audit = await readFile($('#auditFile'), 'jsonl') || [];
+        state.restore = await readFile($('#restoreFile'));
+        const rawManifest = await readFile($('#manifestFile'));
+        state.manifest = rawManifest?.manifest || rawManifest;
+        renderAll();
+        const project = state.index?.objects?.[0]?.projectName || state.manifest?.objects?.[0]?.projectName || 'VaultOS receipts';
+        $('#status').textContent = `${project} loaded.`;
+      } catch (error) {
+        $('#status').textContent = `Receipt load failed: ${error.message}`;
+      }
+    }
+
+    async function loadLiveMetadata() {
+      try {
+        const [inventory, search, restorePoints, audit] = await Promise.all([
+          fetch(`${fs27Base}/skysecure/vaultos/inventory`).then((res) => res.json()),
+          fetch(`${fs27Base}/skysecure/vaultos/search?q=vaultos`).then((res) => res.json()),
+          fetch(`${fs27Base}/skysecure/vaultos/restore-points`).then((res) => res.json()),
+          fetch(`${fs27Base}/skysecure/vaultos/audit`).then((res) => res.json())
+        ]);
+        state.live = { inventory, search, restorePoints, audit };
+        renderAll();
+        $('#status').textContent = `Live FS27 metadata loaded: ${inventory.summary?.pack_count || 0} objects, ${audit.count || 0} audit events.`;
+      } catch (error) {
+        $('#status').textContent = `Live metadata load failed: ${error.message}`;
+      }
+    }
+
+    $('#loadButton').addEventListener('click', loadReceipts);
+    $('#liveButton').addEventListener('click', loadLiveMetadata);
+    renderAll();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

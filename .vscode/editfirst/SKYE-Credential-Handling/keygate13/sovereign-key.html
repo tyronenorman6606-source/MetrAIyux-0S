@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeyGate 13 · Key Derive</title>
+  <meta name="theme-color" content="#06050d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="shortcut icon" href="./icon-192.png" />
+  <style>
+    :root{
+      --bg:#06050d;
+      --panel:rgba(13,12,24,.84);
+      --border:rgba(255,255,255,.09);
+      --purple:#8d58ff;
+      --gold:#ffd36a;
+      --cyan:#31e7ff;
+      --emerald:#4ade80;
+      --text:#f6f3ff;
+      --muted:#a4a2bd;
+      --danger:#ff6d8d;
+      --shadow:0 24px 80px rgba(0,0,0,.42);
+      --glass-blur:blur(22px);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+      --display: Georgia, 'Times New Roman', serif;
+      --body: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --nav-h:60px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--body);padding-bottom:var(--nav-h)}
+
+    #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .bg-shade{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 22% 18%,rgba(141,88,255,.14),transparent 38%),radial-gradient(circle at 80% 14%,rgba(255,211,106,.10),transparent 32%),radial-gradient(circle at 50% 96%,rgba(49,231,255,.08),transparent 30%)}
+
+    .page{position:relative;z-index:2;min-height:100%;display:flex;flex-direction:column}
+
+    /* Header */
+    .surface-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;margin:12px 12px 0;background:rgba(10,9,19,.72);border:1px solid var(--border);backdrop-filter:var(--glass-blur);border-radius:22px;box-shadow:var(--shadow);flex-wrap:wrap}
+    .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-logo{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(255,211,106,.2)) drop-shadow(0 0 18px rgba(141,88,255,.22));animation:brandFloat 5.8s ease-in-out infinite}
+    @keyframes brandFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+    .brand-copy{min-width:0}
+    .eyebrow{font:700 10px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--gold);opacity:.86}
+    .brand-title{font:700 clamp(15px,2vw,21px)/1.05 var(--display);color:#fff}
+    .brand-sub{font:600 11px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+    .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .pill{padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--muted);font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase}
+    .pill.online{color:#8cf0b8}.pill.offline{color:#f1c66d}
+    .free99-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.22);color:var(--emerald);font:700 10px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase}
+    .free99-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,.6);animation:pulseDot 2s ease-in-out infinite}
+    @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+    /* Buttons */
+    button{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;border-radius:11px;border:1px solid rgba(255,255,255,.08);padding:11px 14px;cursor:pointer;transition:all .18s;background:rgba(255,255,255,.04);color:var(--text)}
+    .btn-primary{background:linear-gradient(135deg,rgba(141,88,255,.95),rgba(117,55,235,.92));color:#fff;border-color:rgba(141,88,255,.7);box-shadow:0 12px 28px rgba(141,88,255,.24)}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 34px rgba(141,88,255,.3)}
+    .btn-gold{background:rgba(255,211,106,.1);color:var(--gold);border-color:rgba(255,211,106,.34)}
+    .btn-gold:hover{background:rgba(255,211,106,.16)}
+    .btn-danger{background:rgba(255,109,141,.10);color:#ff8aa5;border-color:rgba(255,109,141,.34)}
+    .btn-danger:hover{background:rgba(255,109,141,.16)}
+    .btn-ghost{background:rgba(255,255,255,.04);color:var(--text)}
+    .btn-ghost:hover{border-color:rgba(49,231,255,.38);color:var(--cyan)}
+    .btn-sm{padding:8px 12px;font-size:10px}
+    .btn-lock{display:flex;align-items:center;gap:7px;padding:10px 16px;background:rgba(255,109,141,.10);color:#ff8aa5;border:1px solid rgba(255,109,141,.34);border-radius:11px;font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .18s}
+    .btn-lock:hover{background:rgba(255,109,141,.18)}
+    .btn-lock .lock-icon{font-size:14px}
+
+    /* Layout */
+    .content{flex:1;padding:20px 16px 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr;gap:20px;max-width:1400px;margin:0 auto;width:100%}
+    .full-col{grid-column:1/-1}
+    .panel{background:var(--panel);border:1px solid var(--border);backdrop-filter:var(--glass-blur);box-shadow:var(--shadow);border-radius:24px;padding:24px}
+    .panel-title{font:700 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+
+    /* Master gate */
+    .master-gate{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:end}
+    .field-group{display:flex;flex-direction:column;gap:8px;min-width:0}
+    .field-label{font:700 10px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+    .field-input{width:100%;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:13px 16px;color:#fff;font:600 14px/1.4 var(--mono);outline:none;transition:border .18s}
+    .field-input:focus{border-color:rgba(141,88,255,.5);box-shadow:0 0 0 3px rgba(141,88,255,.12)}
+    .field-input::placeholder{color:#6a6880}
+    select.field-input{cursor:pointer}
+    .field-input.salt-input{font-size:12px;letter-spacing:.06em}
+
+    /* Status ring */
+    .status-ring{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase}
+    .status-ring.locked{background:rgba(255,109,141,.08);border:1px solid rgba(255,109,141,.24);color:#ff8aa5}
+    .status-ring.unlocked{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.24);color:var(--emerald)}
+    .status-ring.computing{background:rgba(141,88,255,.08);border:1px solid rgba(141,88,255,.24);color:var(--purple)}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+    .status-dot.pulse{animation:pulseDot 1s ease-in-out infinite}
+
+    /* Security info bar */
+    .security-bar{display:flex;flex-wrap:wrap;gap:10px;padding:14px 18px;border-radius:16px;background:rgba(141,88,255,.06);border:1px solid rgba(141,88,255,.14)}
+    .sec-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.07);color:#cbc8e0;font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .sec-chip .chip-icon{color:var(--gold);font-size:11px}
+
+    /* Slot builder */
+    .slot-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+    .slot-row{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;align-items:end;padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .slot-row:focus-within{border-color:rgba(141,88,255,.28);background:rgba(141,88,255,.04)}
+    .slot-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+    .slot-add-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+    /* Output surface */
+    .output-shell{display:flex;flex-direction:column;gap:16px}
+    .output-block{background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px 22px;font:600 13px/2 var(--mono);color:#9ff0cb;white-space:pre-wrap;word-break:break-all;cursor:pointer;min-height:120px;transition:border .18s}
+    .output-block:hover{border-color:rgba(74,222,128,.28);color:#cbffe4}
+    .output-block.empty{color:#585670;font-style:italic;cursor:default}
+    .output-block.empty:hover{border-color:rgba(255,255,255,.07)}
+    .output-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+    /* Slot credential row */
+    .cred-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+    .cred-name{font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .cred-value{font:600 13px/1.4 var(--mono);color:#e2def8;word-break:break-all}
+    .cred-copy{padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--muted);cursor:pointer;font:700 10px/1 var(--mono);letter-spacing:.12em;transition:all .18s}
+    .cred-copy:hover{color:var(--gold);border-color:rgba(255,211,106,.34)}
+    .cred-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+
+    /* Spinner */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(141,88,255,.3);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Toast */
+    .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(14px);opacity:0;pointer-events:none;padding:13px 18px;border-radius:999px;background:rgba(10,9,19,.92);border:1px solid rgba(255,255,255,.10);box-shadow:var(--shadow);color:#fff;font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;z-index:200;transition:opacity .2s,transform .2s}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* KG13 nav */
+    .kg13-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(5,6,18,.94);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);display:flex;justify-content:space-around;align-items:center;padding:10px 0;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+    .kg13-nav a{color:rgba(255,255,255,.5);text-decoration:none;font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;padding:8px 10px;border-radius:10px;transition:all .18s}
+    .kg13-nav a:hover{color:var(--gold);background:rgba(255,211,106,.08)}
+    .kg13-nav a.active{color:var(--gold);background:rgba(255,211,106,.10);border:1px solid rgba(255,211,106,.22)}
+
+    /* Intro */
+    #kg13-intro{position:fixed;inset:0;z-index:150;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#03030a}
+    #kg13-intro-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .intro-overlay{position:absolute;inset:0;pointer-events:none}
+    .intro-grain{opacity:.08;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");background-size:240px 240px}
+    .intro-lines{opacity:.06;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.05),rgba(255,255,255,.05) 1px,transparent 3px,transparent 6px)}
+    .intro-vignette{background:radial-gradient(circle at center,transparent 40%,rgba(0,0,0,.78) 100%)}
+    .intro-stage{position:relative;z-index:2;width:min(100%,900px);padding:40px 20px;display:flex;flex-direction:column;align-items:center;text-align:center}
+    .intro-company{font:700 11px/1 var(--mono);letter-spacing:.35em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:14px}
+    .intro-wordmark{font:700 clamp(48px,10vw,130px)/.92 var(--display);margin:0;color:var(--gold);text-shadow:0 0 36px rgba(255,211,106,.2)}
+    .intro-rule{width:min(300px,68vw);height:1px;margin:20px auto 18px;background:linear-gradient(90deg,transparent,rgba(141,88,255,.75) 18%,rgba(255,211,106,.96) 50%,rgba(49,231,255,.75) 82%,transparent)}
+    .intro-tagline{font-size:clamp(13px,1.7vw,17px);color:rgba(255,255,255,.65);letter-spacing:.08em;margin:0 0 12px}
+    .intro-appname{font:700 clamp(11px,1.2vw,14px)/1 var(--mono);letter-spacing:.28em;text-transform:uppercase;color:rgba(255,211,106,.9);margin:0 0 20px}
+    .intro-logo{width:min(190px,36vw);height:auto;object-fit:contain;filter:drop-shadow(0 0 28px rgba(255,211,106,.14)) drop-shadow(0 0 40px rgba(141,88,255,.18));animation:brandFloat 5.8s ease-in-out infinite}
+    #kg13-intro.exit{animation:introFade .8s ease forwards}
+    @keyframes introFade{to{opacity:0;visibility:hidden;pointer-events:none}}
+    .intro-skip{position:absolute;top:20px;right:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font:700 10px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;padding:9px 13px;border-radius:10px;cursor:pointer;z-index:3;transition:all .18s}
+    .intro-skip:hover{color:#fff;border-color:rgba(255,211,106,.38)}
+
+    @media(max-width:900px){.content{grid-template-columns:1fr}.full-col{grid-column:1}.master-gate{grid-template-columns:1fr auto}.slot-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}.slot-actions{grid-column:1/-1}}
+    @media(max-width:600px){.master-gate{grid-template-columns:1fr}.slot-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="bg-shade"></div>
+
+  <div id="kg13-intro" role="status" aria-label="KeyGate 13 loading">
+    <canvas id="kg13-intro-canvas"></canvas>
+    <div class="intro-overlay intro-grain"></div>
+    <div class="intro-overlay intro-lines"></div>
+    <div class="intro-overlay intro-vignette"></div>
+    <button class="intro-skip" onclick="skipIntro()">Skip</button>
+    <div class="intro-stage">
+      <div class="intro-company">Skyes Over London LC</div>
+      <h1 class="intro-wordmark">KeyGate 13</h1>
+      <div class="intro-rule"></div>
+      <p class="intro-tagline">Sovereign Credential Infrastructure</p>
+      <p class="intro-appname">Key Derive</p>
+      <img class="intro-logo" src="./skyesoverlondondietylogo.png" alt="Skyes Over London logo" />
+    </div>
+  </div>
+
+  <div class="page">
+    <header class="surface-header">
+      <div class="brand-wrap">
+        <img class="brand-logo" src="./skyesoverlondondietylogo.png" alt="Skyes Over London logo" />
+        <div class="brand-copy">
+          <div class="eyebrow">KeyGate 13 · Free99 Platform</div>
+          <div class="brand-title">Key Derive</div>
+          <div class="brand-sub">HKDF sovereign master-key derivation</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div id="network-pill" class="pill offline">Offline-first</div>
+        <span class="free99-badge"><span class="free99-dot"></span>Free99</span>
+        <div id="status-ring" class="status-ring locked">
+          <span class="status-dot"></span>
+          <span id="status-text">Locked</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Master Secret Gate -->
+      <div class="panel full-col">
+        <div class="panel-head">
+          <div class="panel-title">Master Secret Gate</div>
+          <button class="btn-lock" id="lock-btn" onclick="lockMaster()" style="display:none">
+            <span class="lock-icon">🔒</span>Lock &amp; Clear
+          </button>
+        </div>
+
+        <div class="security-bar" style="margin-bottom:20px">
+          <span class="sec-chip"><span class="chip-icon">⚡</span>PBKDF2-SHA512 · 600k iterations</span>
+          <span class="sec-chip"><span class="chip-icon">🔑</span>HKDF-SHA512 per slot</span>
+          <span class="sec-chip"><span class="chip-icon">🛡️</span>Never persisted</span>
+          <span class="sec-chip"><span class="chip-icon">🔒</span>Web Crypto API</span>
+          <span class="sec-chip"><span class="chip-icon">📡</span>100% offline</span>
+        </div>
+
+        <div class="master-gate">
+          <div class="field-group">
+            <label class="field-label" for="master-secret">Master Secret (never stored)</label>
+            <input class="field-input" type="password" id="master-secret" placeholder="Enter your one master secret…" autocomplete="off" autocorrect="off" spellcheck="false" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="user-salt">Personal Salt (public, saved)</label>
+            <input class="field-input salt-input" type="text" id="user-salt" placeholder="e.g. my-project-2025" autocomplete="off" spellcheck="false" />
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="field-label">&nbsp;</div>
+            <button class="btn-primary" id="derive-btn" onclick="deriveAll()">
+              <span id="derive-btn-text">Derive All</span>
+            </button>
+          </div>
+        </div>
+
+        <p style="margin:14px 0 0;font-size:13px;line-height:1.7;color:#8f8ca7">
+          Your master secret is only ever held in JS memory during derivation. It is never written to localStorage, cookies, or any storage. After deriving, use <strong style="color:#f6f3ff">Lock &amp; Clear</strong> to wipe it from memory. The personal salt and slot configuration are saved — not the secret.
+        </p>
+      </div>
+
+      <!-- Slot Builder -->
+      <div class="panel" style="grid-row:span 1">
+        <div class="panel-head">
+          <div class="panel-title">Credential Slots</div>
+          <span style="font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--muted)" id="slot-count">0 slots</span>
+        </div>
+
+        <div id="slot-list" class="slot-list"></div>
+
+        <div class="slot-add-bar">
+          <button class="btn-ghost btn-sm" onclick="addSlot('API_KEY','hmac-hex-32')">+ API Key</button>
+          <button class="btn-ghost btn-sm" onclick="addSlot('JWT_SECRET','hmac-hex-64')">+ JWT Secret</button>
+          <button class="btn-ghost btn-sm" onclick="addSlot('DB_PASSWORD','password-full')">+ DB Password</button>
+          <button class="btn-ghost btn-sm" onclick="addSlot('WEBHOOK_SECRET','hmac-base64url-32')">+ Webhook</button>
+          <button class="btn-ghost btn-sm" onclick="addSlot('CUSTOM_KEY','hmac-hex-32')">+ Custom</button>
+        </div>
+
+        <p style="margin:16px 0 0;font-size:12px;line-height:1.65;color:#6a6880">
+          Slot names become HKDF info strings. Same master secret + salt + slot name → same credential every time.
+        </p>
+      </div>
+
+      <!-- Output -->
+      <div class="panel" style="grid-row:span 1">
+        <div class="panel-head">
+          <div class="panel-title">Derived Credentials</div>
+          <button class="btn-ghost btn-sm" onclick="copyEnvBlock()">Copy .env</button>
+        </div>
+
+        <div class="output-shell">
+          <div id="cred-list" class="cred-list">
+            <div style="padding:24px;border-radius:16px;border:1px dashed rgba(255,255,255,.10);background:rgba(255,255,255,.02);text-align:center;font-size:14px;color:#585670">
+              Add slots and derive to see credentials here.
+            </div>
+          </div>
+
+          <div class="output-actions" style="margin-top:8px">
+            <button class="btn-primary btn-sm" onclick="deriveAll()">Derive</button>
+            <button class="btn-ghost btn-sm" onclick="exportEnv()">Export .env</button>
+            <button class="btn-ghost btn-sm" onclick="pushToVault()">Push to Vault</button>
+            <button class="btn-ghost btn-sm" onclick="exportManifest()">Export Manifest</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <nav class="kg13-nav">
+    <a href="./index.html">Suite</a>
+    <a href="./forge.html">Forge</a>
+    <a href="./vault.html">Vault</a>
+    <a href="./sovereign-key.html" class="active">Key Derive</a>
+    <a href="./passgen.html">Pass Lab</a>
+  </nav>
+
+  <script>
+  (function(){
+    'use strict';
+
+    const SLOTS_KEY = 'sovereign.masterkey.slots.v1';
+    const SALT_KEY = 'sovereign.masterkey.salt.v1';
+    const INBOX_KEY = 'sovereign.variables.inbox.v1';
+    const KDF_SALT_PREFIX = 'keygate13::sovereign::v1::2025::';
+    const PBKDF2_ITERS = 600000;
+
+    let masterIkm = null; // Uint8Array | null — cleared on lock
+    let derivedCredentials = {}; // { slotName: hexOrB64String }
+    let toastTimer = null;
+    let slots = [];
+
+    /* ── Persistence ── */
+    function loadSlots(){
+      try {
+        const raw = localStorage.getItem(SLOTS_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) slots = parsed;
+      } catch(e){}
+    }
+
+    function saveSlots(){
+      localStorage.setItem(SLOTS_KEY, JSON.stringify(slots));
+    }
+
+    function loadSalt(){
+      return localStorage.getItem(SALT_KEY) || '';
+    }
+
+    function saveSalt(s){
+      localStorage.setItem(SALT_KEY, s);
+    }
+
+    /* ── Toast ── */
+    function showToast(msg){
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>el.classList.remove('show'), 2000);
+    }
+
+    /* ── Status ring ── */
+    function setStatus(state, text){
+      const ring = document.getElementById('status-ring');
+      const label = document.getElementById('status-text');
+      const dot = ring.querySelector('.status-dot');
+      if (ring) ring.className = `status-ring ${state}`;
+      if (label) label.textContent = text;
+      if (dot) dot.classList.toggle('pulse', state === 'computing');
+    }
+
+    /* ── Crypto helpers ── */
+    function hexFrom(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+    function base64urlFrom(bytes){
+      const b64 = btoa(String.fromCharCode(...bytes));
+      return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    }
+
+    const CHARSET_FULL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
+    const CHARSET_ALPHANUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const CHARSET_HEX = '0123456789abcdef';
+
+    function bytesToCharset(bytes, charset, length){
+      const cs = charset || CHARSET_ALPHANUM;
+      const len = Math.max(8, Math.min(128, length || 32));
+      let out = '';
+      for (let i = 0; i < len; i++) out += cs[bytes[i % bytes.length] % cs.length];
+      return out;
+    }
+
+    async function hkdfExpand(ikm, saltBytes, info, lengthBytes){
+      const ikmKey = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'HKDF', hash: 'SHA-512', salt: saltBytes, info: new TextEncoder().encode(info) },
+        ikmKey, lengthBytes * 8
+      );
+      return new Uint8Array(bits);
+    }
+
+    async function deriveIkm(masterSecret, userSalt){
+      const enc = new TextEncoder();
+      const saltStr = KDF_SALT_PREFIX + (userSalt || 'default');
+      const material = await crypto.subtle.importKey('raw', enc.encode(masterSecret), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: enc.encode(saltStr), iterations: PBKDF2_ITERS, hash: 'SHA-512' },
+        material, 512
+      );
+      return new Uint8Array(bits);
+    }
+
+    function formatCredential(bytes, type, config){
+      switch(type){
+        case 'hmac-hex-64': return hexFrom(bytes.slice(0,64));
+        case 'hmac-hex-32': return hexFrom(bytes.slice(0,32));
+        case 'hmac-base64url-64': return base64urlFrom(bytes.slice(0,64));
+        case 'hmac-base64url-32': return base64urlFrom(bytes.slice(0,32));
+        case 'password-full': return bytesToCharset(bytes, CHARSET_FULL, config?.length || 32);
+        case 'password-alphanum': return bytesToCharset(bytes, CHARSET_ALPHANUM, config?.length || 32);
+        case 'api-key': {
+          const prefix = config?.prefix || 'key';
+          const len = config?.length || 32;
+          return prefix + '_' + bytesToCharset(bytes, CHARSET_ALPHANUM, len);
+        }
+        case 'hex-custom': {
+          const len = Math.max(8, Math.min(128, config?.length || 32));
+          return hexFrom(bytes.slice(0, Math.ceil(len/2))).slice(0, len);
+        }
+        case 'base64url': return base64urlFrom(bytes.slice(0, config?.length || 32));
+        default: return hexFrom(bytes.slice(0,32));
+      }
+    }
+
+    /* ── Derive all credentials ── */
+    async function deriveAll(){
+      const secretInput = document.getElementById('master-secret');
+      const saltInput = document.getElementById('user-salt');
+      const masterSecret = secretInput?.value || '';
+      if (!masterSecret || masterSecret.length < 4){
+        showToast('Enter a master secret (min 4 chars).');
+        return;
+      }
+      if (slots.length === 0){
+        showToast('Add at least one credential slot.');
+        return;
+      }
+
+      const userSalt = saltInput?.value.trim() || 'default';
+      saveSalt(userSalt);
+
+      setStatus('computing', 'Deriving…');
+      const btn = document.getElementById('derive-btn-text');
+      if (btn) btn.innerHTML = '<span class="spinner"></span>Working…';
+
+      try {
+        // Step 1 — PBKDF2 stretch
+        masterIkm = await deriveIkm(masterSecret, userSalt);
+
+        // Step 2 — HKDF per slot
+        const saltBytes = new TextEncoder().encode(userSalt);
+        derivedCredentials = {};
+
+        for (const slot of slots){
+          const infoStr = `${slot.name}::${slot.type}`;
+          const slotBytes = await hkdfExpand(masterIkm, saltBytes, infoStr, 64);
+          derivedCredentials[slot.name] = formatCredential(slotBytes, slot.type, slot.config);
+        }
+
+        setStatus('unlocked', 'Derived');
+        document.getElementById('lock-btn').style.display = 'flex';
+        renderCredentials();
+        showToast(`${slots.length} credential${slots.length===1?'':'s'} derived.`);
+      } catch(err){
+        setStatus('locked', 'Error');
+        showToast('Derivation failed: ' + (err.message || String(err)));
+        console.error(err);
+      } finally {
+        if (btn) btn.textContent = 'Derive All';
+      }
+    }
+
+    function lockMaster(){
+      if (masterIkm) { masterIkm.fill(0); masterIkm = null; }
+      derivedCredentials = {};
+      const secretInput = document.getElementById('master-secret');
+      if (secretInput) secretInput.value = '';
+      document.getElementById('lock-btn').style.display = 'none';
+      setStatus('locked', 'Locked');
+      renderCredentials();
+      showToast('Cleared from memory.');
+    }
+
+    /* ── Slot management ── */
+    const TYPE_OPTIONS = [
+      { value:'hmac-hex-64', label:'HMAC Hex 64-byte' },
+      { value:'hmac-hex-32', label:'HMAC Hex 32-byte' },
+      { value:'hmac-base64url-64', label:'HMAC Base64URL 64-byte' },
+      { value:'hmac-base64url-32', label:'HMAC Base64URL 32-byte' },
+      { value:'password-full', label:'Password (symbols)' },
+      { value:'password-alphanum', label:'Password (alphanum)' },
+      { value:'api-key', label:'API Key (prefix_key)' },
+      { value:'base64url', label:'Base64URL' },
+      { value:'hex-custom', label:'Hex (custom length)' },
+    ];
+
+    function uid(){ return `slot_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
+
+    function addSlot(name, type){
+      slots.push({ id: uid(), name: name || 'SLOT_NAME', type: type || 'hmac-hex-32', config: { length: 32, prefix: 'key' } });
+      saveSlots();
+      renderSlots();
+    }
+
+    function removeSlot(id){
+      slots = slots.filter(s => s.id !== id);
+      saveSlots();
+      renderSlots();
+    }
+
+    function updateSlot(id, field, value){
+      const slot = slots.find(s => s.id === id);
+      if (!slot) return;
+      if (field === 'name') slot.name = value.replace(/[^A-Za-z0-9_]/g,'_').toUpperCase() || 'SLOT';
+      else if (field === 'type') slot.type = value;
+      else if (field === 'config.length') slot.config.length = parseInt(value,10) || 32;
+      else if (field === 'config.prefix') slot.config.prefix = value;
+      saveSlots();
+    }
+
+    function renderSlots(){
+      const list = document.getElementById('slot-list');
+      const count = document.getElementById('slot-count');
+      if (!list) return;
+      if (count) count.textContent = `${slots.length} slot${slots.length===1?'':'s'}`;
+
+      if (!slots.length){
+        list.innerHTML = `<div style="padding:20px;text-align:center;font-size:14px;color:#585670;border:1px dashed rgba(255,255,255,.10);border-radius:14px">No slots yet. Add one below.</div>`;
+        return;
+      }
+
+      list.innerHTML = slots.map(slot => {
+        const typeOpts = TYPE_OPTIONS.map(o => `<option value="${o.value}" ${slot.type===o.value?'selected':''}>${o.label}</option>`).join('');
+        const showLength = ['password-full','password-alphanum','api-key','hex-custom','base64url'].includes(slot.type);
+        const showPrefix = slot.type === 'api-key';
+        return `<div class="slot-row">
+          <div class="field-group">
+            <label class="field-label">Name / ENV key</label>
+            <input class="field-input" type="text" value="${slot.name}" oninput="updateSlot('${slot.id}','name',this.value)" placeholder="API_KEY" style="font-size:12px" spellcheck="false" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Credential type</label>
+            <select class="field-input" onchange="updateSlot('${slot.id}','type',this.value);renderSlots()">${typeOpts}</select>
+          </div>
+          ${showLength ? `<div class="field-group">
+            <label class="field-label">${showPrefix?'Length':'Length'}</label>
+            <input class="field-input" type="number" min="8" max="128" value="${slot.config?.length||32}" oninput="updateSlot('${slot.id}','config.length',this.value)" style="width:90px" />
+          </div>` : '<div></div>'}
+          ${showPrefix ? `<div class="field-group">
+            <label class="field-label">Prefix</label>
+            <input class="field-input" type="text" value="${slot.config?.prefix||'key'}" oninput="updateSlot('${slot.id}','config.prefix',this.value)" style="width:90px;font-size:12px" spellcheck="false" />
+          </div>` : '<div></div>'}
+          <div class="slot-actions">
+            <button class="btn-danger btn-sm" onclick="removeSlot('${slot.id}')">Remove</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* ── Credential output ── */
+    function renderCredentials(){
+      const list = document.getElementById('cred-list');
+      if (!list) return;
+      const keys = Object.keys(derivedCredentials);
+      if (!keys.length){
+        list.innerHTML = `<div style="padding:24px;border-radius:16px;border:1px dashed rgba(255,255,255,.10);background:rgba(255,255,255,.02);text-align:center;font-size:14px;color:#585670">Add slots and derive to see credentials here.</div>`;
+        return;
+      }
+      list.innerHTML = keys.map(k => `
+        <div class="cred-row">
+          <div class="cred-name">${k}</div>
+          <div class="cred-value">${derivedCredentials[k]}</div>
+          <button class="cred-copy" onclick="copyCred('${k}')">Copy</button>
+        </div>
+      `).join('');
+    }
+
+    async function copyCred(name){
+      const v = derivedCredentials[name];
+      if (!v){ showToast('Nothing to copy.'); return; }
+      try { await navigator.clipboard.writeText(v); showToast(`${name} copied.`); }
+      catch(e){ showToast('Copy failed.'); }
+    }
+
+    function getEnvBlock(){
+      return Object.entries(derivedCredentials).map(([k,v])=>`${k}=${v}`).join('\n');
+    }
+
+    async function copyEnvBlock(){
+      const block = getEnvBlock();
+      if (!block){ showToast('Derive first.'); return; }
+      try { await navigator.clipboard.writeText(block); showToast('Env block copied.'); }
+      catch(e){ showToast('Copy failed.'); }
+    }
+
+    function downloadBlob(blob, name){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+    }
+
+    function exportEnv(){
+      const block = getEnvBlock();
+      if (!block){ showToast('Derive first.'); return; }
+      const saltInput = document.getElementById('user-salt');
+      const salt = (saltInput?.value||'sovereign').replace(/\s+/g,'-');
+      downloadBlob(new Blob([block],{type:'text/plain;charset=utf-8'}),`${salt}-derived.env`);
+      showToast('.env exported.');
+    }
+
+    function pushToVault(){
+      const entries = Object.entries(derivedCredentials);
+      if (!entries.length){ showToast('Derive first.'); return; }
+      const saltInput = document.getElementById('user-salt');
+      const salt = saltInput?.value.trim() || 'sovereign-key';
+      const content = getEnvBlock();
+      const queueEntry = {
+        id: `kg13-sk-${Date.now()}`,
+        source: 'KeyGate13::KeyDerive',
+        title: `Sovereign Key — ${salt}`,
+        project_name: `Key Derive: ${salt}`,
+        environment_name: 'Derived',
+        content,
+        created_at: new Date().toISOString()
+      };
+      try {
+        const raw = localStorage.getItem('sovereign.variables.inbox.v1');
+        const queue = raw ? JSON.parse(raw) : [];
+        queue.push(queueEntry);
+        localStorage.setItem('sovereign.variables.inbox.v1', JSON.stringify(queue));
+        showToast(`Pushed ${entries.length} cred${entries.length===1?'':'s'} to Vault.`);
+      } catch(e){
+        showToast('Push failed: ' + e.message);
+      }
+    }
+
+    function exportManifest(){
+      const saltInput = document.getElementById('user-salt');
+      const salt = saltInput?.value.trim() || 'default';
+      const manifest = {
+        kg13_version: 1,
+        exported_at: new Date().toISOString(),
+        surface: 'KeyDerive',
+        user_salt: salt,
+        kdf: 'PBKDF2-SHA512',
+        kdf_iterations: PBKDF2_ITERS,
+        hkdf_hash: 'SHA-512',
+        slots: slots.map(s=>({
+          name: s.name,
+          type: s.type,
+          config: s.config,
+          info_string: `${s.name}::${s.type}`
+        }))
+      };
+      downloadBlob(new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'}),`kg13-key-manifest-${salt}.json`);
+      showToast('Manifest exported (no secrets).');
+    }
+
+    /* ── Background star canvas ── */
+    function initBgCanvas(){
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w=0,h=0,dpr=1,stars=[];
+      function resize(){
+        dpr = Math.min(window.devicePixelRatio||1,2);
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = w*dpr; canvas.height = h*dpr;
+        canvas.style.width = w+'px'; canvas.style.height = h+'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        stars = Array.from({length:Math.max(140,Math.floor(w/9))},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.2,a:Math.random()*.7+.08,s:Math.random()*.14+.03,p:Math.random()*Math.PI*2}));
+      }
+      function frame(t){
+        ctx.clearRect(0,0,w,h);
+        const bg = ctx.createLinearGradient(0,0,0,h);
+        bg.addColorStop(0,'#03030a'); bg.addColorStop(1,'#06060f');
+        ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+        stars.forEach(s=>{
+          s.y += s.s; if(s.y>h+2)s.y=-2;
+          ctx.fillStyle = `rgba(255,255,255,${s.a*(.55+.45*Math.sin((t||0)*.0015+s.p))})`;
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(frame);
+      }
+      resize(); window.addEventListener('resize',resize); requestAnimationFrame(frame);
+    }
+
+    /* ── Intro ── */
+    function initIntro(){
+      const intro = document.getElementById('kg13-intro');
+      const canvas = document.getElementById('kg13-intro-canvas');
+      if (!intro||!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w=0,h=0,dpr=1,stars=[];
+      function resize(){
+        dpr=Math.min(window.devicePixelRatio||1,2); w=window.innerWidth; h=window.innerHeight;
+        canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        stars=Array.from({length:Math.max(160,Math.floor(w/8))},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+.25,a:Math.random()*.8+.08,s:Math.random()*.18+.04,p:Math.random()*Math.PI*2}));
+      }
+      function frame(t){
+        ctx.clearRect(0,0,w,h);
+        const bg=ctx.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#02020a'); bg.addColorStop(1,'#060712');
+        ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+        [['141,88,255',w*.22,h*.22,w*.28,.18],['255,211,106',w*.82,h*.18,w*.22,.12],['49,231,255',w*.5,h*.88,w*.3,.07]].forEach(([c,x,y,r,a])=>{
+          const g=ctx.createRadialGradient(x,y,0,x,y,r);
+          g.addColorStop(0,`rgba(${c},${a})`); g.addColorStop(.5,`rgba(${c},${a*.35})`); g.addColorStop(1,`rgba(${c},0)`);
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+        });
+        stars.forEach(s=>{ s.y+=s.s; if(s.y>h+2)s.y=-2; ctx.fillStyle=`rgba(255,255,255,${s.a*(.55+.45*Math.sin((t||0)*.0015+s.p))})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
+        if(!intro.classList.contains('exit')) requestAnimationFrame(frame);
+      }
+      resize(); window.addEventListener('resize',resize); requestAnimationFrame(frame);
+      const seen = localStorage.getItem('kg13_intro_seen');
+      const delay = seen ? 900 : 3000;
+      localStorage.setItem('kg13_intro_seen','1');
+      setTimeout(()=>dismissIntro(), delay);
+    }
+
+    function dismissIntro(){
+      const intro = document.getElementById('kg13-intro');
+      if (!intro||intro.classList.contains('exit')) return;
+      intro.classList.add('exit');
+      setTimeout(()=>intro.remove(),850);
+    }
+
+    window.skipIntro = dismissIntro;
+
+    /* ── Network pill ── */
+    function updateNetworkPill(){
+      const el = document.getElementById('network-pill');
+      if (!el) return;
+      el.className = `pill ${navigator.onLine?'online':'offline'}`;
+      el.textContent = navigator.onLine ? 'Online lanes available' : 'Offline-first';
+    }
+
+    /* ── Enter on master field ── */
+    function setupEnterKey(){
+      const input = document.getElementById('master-secret');
+      if (input) input.addEventListener('keydown', e=>{ if(e.key==='Enter') deriveAll(); });
+    }
+
+    /* ── Init ── */
+    function setup(){
+      initBgCanvas();
+      loadSlots();
+      const savedSalt = loadSalt();
+      const saltInput = document.getElementById('user-salt');
+      if (saltInput && savedSalt) saltInput.value = savedSalt;
+      renderSlots();
+      renderCredentials();
+      initIntro();
+      setupEnterKey();
+      window.addEventListener('online', updateNetworkPill);
+      window.addEventListener('offline', updateNetworkPill);
+      updateNetworkPill();
+
+      if ('serviceWorker' in navigator){
+        window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); },{once:true});
+      }
+    }
+
+    Object.assign(window,{ deriveAll, lockMaster, addSlot, removeSlot, updateSlot, renderSlots, copyEnvBlock, copyCred, exportEnv, pushToVault, exportManifest });
+
+    document.addEventListener('DOMContentLoaded', setup);
+  })();
+  </script>
+</body>
+</html>

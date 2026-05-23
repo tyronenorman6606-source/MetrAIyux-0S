@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyeMusicNexus — End-to-End Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f4c75b;
+    --cyan: #64d9ff;
+    --mint: #6ff2c7;
+    --violet: #a88cff;
+    --rose: #ff6b9d;
+    --bg: #05080c;
+    --bg2: #0a0f18;
+    --bg3: #0f1520;
+    --border: rgba(100,217,255,0.15);
+    --text: #e8edf5;
+    --muted: #6b7a8f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: 3px auto auto auto auto auto auto auto;
+    overflow: hidden;
+  }
+
+  /* ── ROW 1: accent bar ── */
+  .accent-bar {
+    background: linear-gradient(90deg, var(--violet), var(--cyan), var(--mint), var(--gold));
+  }
+
+  /* ── ROW 2: header ── */
+  .header {
+    background: var(--bg);
+    padding: 18px 36px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .wordmark { display: flex; flex-direction: column; gap: 2px; }
+  .wordmark-top {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .wordmark-main {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    background: linear-gradient(90deg, var(--cyan), var(--mint));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-badges { display: flex; gap: 10px; align-items: center; }
+  .badge {
+    font-family: 'Fira Code', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+  .badge-launch {
+    background: linear-gradient(135deg, var(--gold), #e8a820);
+    color: #05080c;
+  }
+  .badge-sol {
+    border: 1px solid var(--violet);
+    color: var(--violet);
+  }
+  .badge-free {
+    border: 1px solid var(--mint);
+    color: var(--mint);
+  }
+
+  /* ── ROW 3: hero ── */
+  .hero {
+    background: linear-gradient(135deg, #060c1a 0%, #0a0818 40%, #050d10 100%);
+    padding: 28px 36px 22px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(100,217,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 20%;
+    width: 320px; height: 200px;
+    background: radial-gradient(circle, rgba(168,140,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hero-headline {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    max-width: 600px;
+  }
+  .hero-headline span { color: var(--cyan); }
+  .hero-sub {
+    font-size: 13px;
+    color: rgba(232,237,245,0.75);
+    line-height: 1.55;
+    max-width: 560px;
+  }
+  .hero-sub strong { color: var(--mint); font-weight: 500; }
+
+  /* ── ROW 4: lifecycle strip ── */
+  .lifecycle {
+    background: var(--bg2);
+    padding: 14px 36px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lifecycle-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .lifecycle-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .lifecycle-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+  .lifecycle-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -8px;
+    top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .ls-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 900;
+  }
+  .ls-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-align: center;
+    color: rgba(232,237,245,0.8);
+  }
+  .ls-desc {
+    font-size: 8px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.3;
+    max-width: 80px;
+  }
+
+  /* ── ROW 5: 3-column grid ── */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    flex: 1;
+  }
+  .col {
+    padding: 18px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .col:last-child { border-right: none; }
+  .col-header {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* col 1 — artist journey */
+  .col-header.cyan { color: var(--cyan); border-color: rgba(100,217,255,0.3); }
+  .journey-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .ji-num {
+    font-family: 'Fira Code', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    min-width: 16px;
+    padding-top: 1px;
+  }
+  .ji-body {}
+  .ji-title {
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 1px;
+    color: var(--text);
+  }
+  .ji-desc {
+    font-size: 8.5px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .ji-tag {
+    display: inline-block;
+    font-family: 'Fira Code', monospace;
+    font-size: 7px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-top: 2px;
+    border: 1px solid rgba(111,242,199,0.3);
+    color: var(--mint);
+  }
+
+  /* col 2 — platform layers */
+  .col-header.violet { color: var(--violet); border-color: rgba(168,140,255,0.3); }
+  .layer {
+    margin-bottom: 9px;
+    padding: 7px 10px;
+    background: var(--bg3);
+    border-left: 2px solid;
+    border-radius: 0 2px 2px 0;
+  }
+  .layer-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+  .layer-desc {
+    font-size: 8px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+  .layer.l-cyan { border-color: var(--cyan); }
+  .layer.l-cyan .layer-title { color: var(--cyan); }
+  .layer.l-violet { border-color: var(--violet); }
+  .layer.l-violet .layer-title { color: var(--violet); }
+  .layer.l-mint { border-color: var(--mint); }
+  .layer.l-mint .layer-title { color: var(--mint); }
+  .layer.l-gold { border-color: var(--gold); }
+  .layer.l-gold .layer-title { color: var(--gold); }
+  .layer.l-rose { border-color: var(--rose); }
+  .layer.l-rose .layer-title { color: var(--rose); }
+
+  /* col 3 — legal + money */
+  .col-header.gold { color: var(--gold); border-color: rgba(244,199,91,0.3); }
+  .lm-block { margin-bottom: 12px; }
+  .lm-block-title {
+    font-family: 'Fira Code', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .lm-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 5px;
+    font-size: 9px;
+    color: rgba(232,237,245,0.8);
+    line-height: 1.3;
+  }
+  .lm-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .dot-gold { background: var(--gold); }
+  .dot-violet { background: var(--violet); }
+  .dot-mint { background: var(--mint); }
+  .dot-cyan { background: var(--cyan); }
+  .payout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .payout-card {
+    background: var(--bg3);
+    padding: 6px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .payout-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .payout-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--mint);
+  }
+  .payout-val.gold { color: var(--gold); }
+
+  /* ── ROW 6: stats strip ── */
+  .stats-strip {
+    background: linear-gradient(90deg, rgba(10,15,24,0.95), rgba(15,21,32,0.95));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat { text-align: center; }
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .stat-lbl {
+    font-family: 'Fira Code', monospace;
+    font-size: 7.5px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .stat-val.cyan { color: var(--cyan); }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.mint { color: var(--mint); }
+  .stat-val.violet { color: var(--violet); }
+  .stat-val.rose { color: var(--rose); }
+  .stats-sep { width: 1px; height: 32px; background: var(--border); }
+
+  /* ── ROW 7: CTA ── */
+  .cta-strip {
+    background: linear-gradient(135deg, #070d1a, #0a0614);
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cta-left { flex: 1; }
+  .cta-eyebrow {
+    font-family: 'Fira Code', monospace;
+    font-size: 8px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cta-headline {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .cta-url {
+    font-family: 'Fira Code', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  .cta-right { display: flex; gap: 8px; flex-direction: column; align-items: flex-end; }
+  .proof-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .proof-tag {
+    font-family: 'Fira Code', monospace;
+    font-size: 7px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid;
+    letter-spacing: 0.06em;
+  }
+  .pt-cyan { color: var(--cyan); border-color: rgba(100,217,255,0.35); }
+  .pt-mint { color: var(--mint); border-color: rgba(111,242,199,0.35); }
+  .pt-gold { color: var(--gold); border-color: rgba(244,199,91,0.35); }
+  .pt-violet { color: var(--violet); border-color: rgba(168,140,255,0.35); }
+
+  /* ── ROW 8: footer ── */
+  .footer {
+    background: var(--bg);
+    padding: 8px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(100,217,255,0.08);
+  }
+  .footer-left {
+    font-family: 'Fira Code', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .footer-right {
+    font-family: 'Fira Code', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-align: right;
+  }
+
+  /* print */
+  @media print {
+    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none; }
+  }
+  @page { size: letter portrait; margin: 0; }
+
+  /* save button */
+  .save-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: linear-gradient(135deg, var(--cyan), var(--mint));
+    color: #05080c;
+    border: none;
+    padding: 8px 18px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    z-index: 100;
+  }
+  .save-btn:hover { opacity: 0.9; }
+</style>
+</head>
+<body>
+
+<!-- ROW 1: accent bar -->
+<div class="accent-bar"></div>
+
+<!-- ROW 2: header -->
+<header class="header">
+  <div class="wordmark">
+    <span class="wordmark-top">SOL Enterprises / Skyes Over London LC</span>
+    <span class="wordmark-main">SkyeMusicNexus</span>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-sol">MetrAIyux 0S</span>
+    <span class="badge badge-free">FREE TIER AVAILABLE</span>
+    <span class="badge badge-launch">JULY 2026 LAUNCH</span>
+  </div>
+</header>
+
+<!-- ROW 3: hero -->
+<section class="hero">
+  <div class="hero-label">// End-to-End Platform Overview</div>
+  <h1 class="hero-headline">
+    One System.<br>
+    <span>Every Layer</span> of Your Music Career.
+  </h1>
+  <p class="hero-sub">
+    SkyeMusicNexus is a full-stack music infrastructure built inside MetrAIyux 0S — covering
+    <strong>creation</strong>, <strong>rights</strong>, <strong>distribution</strong>, <strong>payouts</strong>, and
+    <strong>content</strong> in a single autonomous OS. Founding artists get a full setup for free.
+  </p>
+</section>
+
+<!-- ROW 4: lifecycle strip -->
+<section class="lifecycle">
+  <div class="lifecycle-label">// Artist Lifecycle — How It Works End to End</div>
+  <div class="lifecycle-row">
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--cyan)">01</span>
+      <span class="ls-title">Signup + Gate</span>
+      <span class="ls-desc">Create 0S account, pass SkyeGate FS27 free tier</span>
+    </div>
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--violet)">02</span>
+      <span class="ls-title">IC Onboarding</span>
+      <span class="ls-desc">SkyeRoutexFlow — IC agreement, SOVEREIGN docs</span>
+    </div>
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--mint)">03</span>
+      <span class="ls-title">Landing Page</span>
+      <span class="ls-desc">Your artist storefront live inside the Nexus</span>
+    </div>
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--gold)">04</span>
+      <span class="ls-title">Upload + Rights</span>
+      <span class="ls-desc">Studio upload, rights vault, metadata lock</span>
+    </div>
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--rose)">05</span>
+      <span class="ls-title">Content Engine</span>
+      <span class="ls-desc">2-month automated content pipeline — managed</span>
+    </div>
+    <div class="lifecycle-step">
+      <span class="ls-num" style="color:var(--mint)">06</span>
+      <span class="ls-title">Royalties + Pay</span>
+      <span class="ls-desc">SkyePay payouts — royalty ledger, artist-owned</span>
+    </div>
+  </div>
+</section>
+
+<!-- ROW 5: 3-col body -->
+<section class="body-grid">
+
+  <!-- COL 1: Artist Journey -->
+  <div class="col">
+    <div class="col-header cyan">// Artist Journey</div>
+
+    <div class="journey-item">
+      <span class="ji-num">01</span>
+      <div class="ji-body">
+        <div class="ji-title">Join the Waitlist</div>
+        <div class="ji-desc">Sign up for MetrAIyux 0S free tier. Founding artist slots are limited — first-come access to the full free bundle.</div>
+        <span class="ji-tag">FREE</span>
+      </div>
+    </div>
+
+    <div class="journey-item">
+      <span class="ji-num">02</span>
+      <div class="ji-body">
+        <div class="ji-title">SkyeRoutexFlow IC Agreement</div>
+        <div class="ji-desc">Onboard as an independent contractor via SkyeRoutexFlow. LegalSkyes 30+ policies + SOVEREIGN docs protect your rights.</div>
+        <span class="ji-tag">IC NOT EMPLOYEE</span>
+      </div>
+    </div>
+
+    <div class="journey-item">
+      <span class="ji-num">03</span>
+      <div class="ji-body">
+        <div class="ji-title">Free Landing Page Built</div>
+        <div class="ji-desc">SOL Enterprises builds your artist storefront inside the Nexus. Full bio, links, music catalog, booking — managed.</div>
+        <span class="ji-tag">MANAGED FOR YOU</span>
+      </div>
+    </div>
+
+    <div class="journey-item">
+      <span class="ji-num">04</span>
+      <div class="ji-body">
+        <div class="ji-title">Upload to the Studio</div>
+        <div class="ji-desc">DAW room, upload studio, rights vault. Your masters locked to your profile, metadata registered.</div>
+        <span class="ji-tag">YOU OWN IT</span>
+      </div>
+    </div>
+
+    <div class="journey-item">
+      <span class="ji-num">05</span>
+      <div class="ji-body">
+        <div class="ji-title">Content Engine (2 Months)</div>
+        <div class="ji-desc">Automated content machine runs for 60 days — posts, releases, promo — all handled. Founding artist exclusive.</div>
+        <span class="ji-tag">FREE 2 MONTHS</span>
+      </div>
+    </div>
+
+    <div class="journey-item">
+      <span class="ji-num">06</span>
+      <div class="ji-body">
+        <div class="ji-title">Royalties via SkyePay</div>
+        <div class="ji-desc">Every stream, sale, and licensing event routes through the royalty ledger. SkyePay sends your cut — no middleman.</div>
+        <span class="ji-tag">DIRECT PAYOUT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 2: Platform Layers -->
+  <div class="col">
+    <div class="col-header violet">// Platform Architecture</div>
+
+    <div class="layer l-cyan">
+      <div class="layer-title">SkyeGate FS27 — Access Control</div>
+      <div class="layer-desc">Gate-protected entry. Free99 tier grants full artist access with an authenticated 0S session. Zero anonymous entry.</div>
+    </div>
+
+    <div class="layer l-violet">
+      <div class="layer-title">MetrAIyux 0S — Autonomous OS</div>
+      <div class="layer-desc">The underlying company OS. Workers, bindings, secrets, all running on Cloudflare edge. SOL Enterprises infrastructure.</div>
+    </div>
+
+    <div class="layer l-mint">
+      <div class="layer-title">Upload Studio + DAW Room</div>
+      <div class="layer-desc">Browser-based recording, mixing references, file upload. Direct to the rights vault on save. No third-party DAW needed.</div>
+    </div>
+
+    <div class="layer l-gold">
+      <div class="layer-title">Rights Vault + Royalty Ledger</div>
+      <div class="layer-desc">Every asset registered at upload. Royalty splits defined in the ledger. Immutable record — artist-controlled.</div>
+    </div>
+
+    <div class="layer l-rose">
+      <div class="layer-title">Content Engine — Automated</div>
+      <div class="layer-desc">AI-assisted 2-month content pipeline. Generates posts, release announcements, promo assets. Managed by SOL team.</div>
+    </div>
+
+    <div class="layer l-violet">
+      <div class="layer-title">SkyeRoutexFlow — Workforce</div>
+      <div class="layer-desc">IC onboarding and contractor management system. Agreement templates, SOVEREIGN docs, policy compliance built in.</div>
+    </div>
+
+    <div class="layer l-cyan">
+      <div class="layer-title">SkyePay — Native Payments</div>
+      <div class="layer-desc">Royalty settlement engine. Pulls from ledger, calculates splits, routes payouts. Stripe-backed, no manual reconciliation.</div>
+    </div>
+
+    <div class="layer l-mint">
+      <div class="layer-title">Release Workflows</div>
+      <div class="layer-desc">Single + album release pipelines, distribution routing, metadata submission, DSP delivery — all inside the 0S.</div>
+    </div>
+  </div>
+
+  <!-- COL 3: Legal + Money -->
+  <div class="col">
+    <div class="col-header gold">// Legal Framework + Pricing</div>
+
+    <div class="lm-block">
+      <div class="lm-block-title">// IC Legal Framework</div>
+      <div class="lm-item"><span class="lm-dot dot-gold"></span>LegalSkyes — 30+ platform policies covering IP, IC status, liability, and data at solenterprises.org</div>
+      <div class="lm-item"><span class="lm-dot dot-violet"></span>SOVEREIGN Documents — Foundational authority layer backing all IC agreements and platform governance</div>
+      <div class="lm-item"><span class="lm-dot dot-mint"></span>SkyeRoutexFlow — Contractor onboarding, agreement execution, workforce tracking all in one system</div>
+      <div class="lm-item"><span class="lm-dot dot-cyan"></span>Artist-owned masters — You retain 100% ownership. SOL manages, not owns. IC not employment.</div>
+    </div>
+
+    <div class="lm-block">
+      <div class="lm-block-title">// Tier Pricing</div>
+      <div class="payout-grid">
+        <div class="payout-card">
+          <div class="payout-label">Free Founding</div>
+          <div class="payout-val gold">$0</div>
+        </div>
+        <div class="payout-card">
+          <div class="payout-label">Free Value Included</div>
+          <div class="payout-val">$597<span style="font-size:8px;color:var(--muted)">+</span></div>
+        </div>
+        <div class="payout-card">
+          <div class="payout-label">Studio Tier</div>
+          <div class="payout-val" style="color:var(--cyan)">$497<span style="font-size:8px;color:var(--muted)">/mo</span></div>
+        </div>
+        <div class="payout-card">
+          <div class="payout-label">Label Tier</div>
+          <div class="payout-val" style="color:var(--violet)">$1,497<span style="font-size:8px;color:var(--muted)">/mo</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lm-block">
+      <div class="lm-block-title">// What You Get Free</div>
+      <div class="lm-item"><span class="lm-dot dot-mint"></span>Artist landing page — built and managed by SOL Enterprises</div>
+      <div class="lm-item"><span class="lm-dot dot-cyan"></span>2-month content engine — 60 days automated content pipeline</div>
+      <div class="lm-item"><span class="lm-dot dot-gold"></span>SkyeRoutexFlow IC onboarding — full legal framework at no cost</div>
+      <div class="lm-item"><span class="lm-dot dot-violet"></span>Rights vault + royalty ledger — your music registered from day one</div>
+      <div class="lm-item"><span class="lm-dot dot-mint"></span>Founding artist status — locked in before general availability</div>
+    </div>
+
+    <div class="lm-block">
+      <div class="lm-block-title">// Artist Protection</div>
+      <div class="lm-item"><span class="lm-dot dot-cyan"></span>No publishing rights transfer — SOL never claims your catalog</div>
+      <div class="lm-item"><span class="lm-dot dot-gold"></span>No exclusivity clauses — work with anyone else simultaneously</div>
+      <div class="lm-item"><span class="lm-dot dot-violet"></span>Transparent royalty splits — all splits defined in ledger, auditable</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ROW 6: stats strip -->
+<div class="stats-strip">
+  <div class="stat"><div class="stat-val cyan">$0</div><div class="stat-lbl">Founding Artist Cost</div></div>
+  <div class="stats-sep"></div>
+  <div class="stat"><div class="stat-val gold">$597+</div><div class="stat-lbl">Free Value Bundle</div></div>
+  <div class="stats-sep"></div>
+  <div class="stat"><div class="stat-val mint">2 Mo</div><div class="stat-lbl">Content Engine</div></div>
+  <div class="stats-sep"></div>
+  <div class="stat"><div class="stat-val violet">30+</div><div class="stat-lbl">Legal Policies</div></div>
+  <div class="stats-sep"></div>
+  <div class="stat"><div class="stat-val rose">100%</div><div class="stat-lbl">Artist-Owned</div></div>
+  <div class="stats-sep"></div>
+  <div class="stat"><div class="stat-val cyan">IC</div><div class="stat-lbl">Not Employee</div></div>
+</div>
+
+<!-- ROW 7: CTA -->
+<section class="cta-strip">
+  <div class="cta-left">
+    <div class="cta-eyebrow">// Founding Artist Waitlist — July 2026</div>
+    <div class="cta-headline">Claim Your Free Setup<br>Before Spots Close</div>
+    <div style="margin-top:6px;">
+      <span style="font-family:'Fira Code',monospace;font-size:8px;color:var(--muted);">SIGN UP → </span>
+      <a class="cta-url" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html">metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html</a>
+    </div>
+    <div style="margin-top:3px;">
+      <span style="font-family:'Fira Code',monospace;font-size:8px;color:var(--muted);">CONTACT → </span>
+      <span style="font-family:'Fira Code',monospace;font-size:8px;color:var(--cyan);">graylondonskyes@gmail.com</span>
+    </div>
+  </div>
+  <div class="cta-right">
+    <div class="proof-tags">
+      <span class="proof-tag pt-mint">Free Landing Page</span>
+      <span class="proof-tag pt-cyan">Free Content Engine</span>
+      <span class="proof-tag pt-gold">No Ownership Transfer</span>
+      <span class="proof-tag pt-violet">IC Status Protected</span>
+    </div>
+    <div class="proof-tags">
+      <span class="proof-tag pt-cyan">SkyePay Payouts</span>
+      <span class="proof-tag pt-mint">LegalSkyes Backed</span>
+      <span class="proof-tag pt-gold">SOVEREIGN Framework</span>
+    </div>
+  </div>
+</section>
+
+<!-- ROW 8: footer -->
+<footer class="footer">
+  <div class="footer-left">
+    SkyeMusicNexus is a MetrAIyux 0S property · SOL Enterprises / Skyes Over London LC · Arizona · solenterprises.org<br>
+    Artists onboard as independent contractors via SkyeRoutexFlow. IC status is not employment. All rights retained by artist.
+  </div>
+  <div class="footer-right">
+    LegalSkyes 30+ Policies · SOVEREIGN Docs · SkyeRoutexFlow IC<br>
+    © 2026 Skyes Over London LC · All Rights Reserved
+  </div>
+</footer>
+
+<button class="save-btn no-print" onclick="window.print()">Save as PDF</button>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "name": "v15-product-smoke",
+  "version": "0.17.0",
+  "checks": [
+    "root package version is 0.17.0",
+    "gateway version module reports 0.17.0 and gateway_modules marker",
+    "HTTP response/CORS helpers are split from gateway index",
+    "Worker ops-store helpers are split from gateway index",
+    "gateway index uses modules instead of embedded helper classes",
+    "worker HTTP behavioral smoke covers expanded closure endpoints",
+    "proof-fast rebuilds public surfaces and includes v15 gate while proof-regression keeps historical coverage available",
+    "README carries 0.17.0 truth marker"
+  ],
+  "proofType": "source and contract proof for closure hardening plus expanded behavioral smoke coverage",
+  "does_not_prove": [
+    "deployed Cloudflare behavior",
+    "live provider delivery",
+    "real payment capture",
+    "browser E2E in this sandbox"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T01:06:34.867Z"
+}

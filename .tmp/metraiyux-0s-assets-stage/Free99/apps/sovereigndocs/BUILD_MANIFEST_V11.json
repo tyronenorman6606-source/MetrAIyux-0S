@@ -1,0 +1,35 @@
+{
+  "name": "SovereignDocs v11 Repo-Ready Activation Build",
+  "version": "11.0.0",
+  "sourceTruth": "template-library/manifest.json",
+  "templateRecords": 10200,
+  "categories": 15,
+  "jurisdictions": 51,
+  "officialWorkflows": 37,
+  "focus": [
+    "fix v10 handoff trash",
+    "production auth hardening",
+    "public link/copy cleanup",
+    "legal partner review operational lane",
+    "payment/email/storage/signature provider adapters",
+    "runtime data cleanup",
+    "repo CI/devcontainer/docker/openapi handoff"
+  ],
+  "proof": {
+    "npmRunSmokeAll": "passed",
+    "internalLinkCheck": "passed",
+    "publicOverclaimScan": "passed",
+    "publicCopyScan": "passed",
+    "v11RepoReadinessSmoke": "passed"
+  },
+  "notIncludedAsLiveProof": [
+    "live upstream auth deployment",
+    "live Neon/D1 runtime persistence",
+    "live R2/S3 storage write",
+    "live Stripe checkout session",
+    "live email delivery",
+    "live external e-sign send",
+    "live partner roster/contracts",
+    "deployed browser click proof"
+  ]
+}

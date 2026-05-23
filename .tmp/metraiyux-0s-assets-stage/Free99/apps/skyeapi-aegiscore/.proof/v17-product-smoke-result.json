@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "version": "0.17.0",
+  "name": "v17-brand-integration-smoke",
+  "checks": {
+    "packageVersion": true,
+    "websiteUsesWideLogo": true,
+    "websiteUsesBrandMark": true,
+    "websiteUsesOgPng": true,
+    "websiteCssHasBrandClasses": true,
+    "consoleUsesBrandAssets": true,
+    "consoleCssHasBrandClasses": true,
+    "consoleBuildCopiesAssets": true,
+    "websiteBuildEnforcesAssets": true,
+    "proofIncludesV17": true,
+    "readmeBrandSection": true,
+    "claimsBrandSection": true,
+    "assetsPresent": true,
+    "assetsNonTiny": true
+  },
+  "assets": {
+    "apps/website/public/assets/skyeapi-aegiscore-logo-wide.png": 737646,
+    "apps/website/public/assets/skyeapi-aegiscore-mark.png": 305418,
+    "apps/website/public/favicon.png": 44155,
+    "apps/website/public/apple-touch-icon.png": 38767,
+    "apps/website/public/og.png": 543852,
+    "apps/console/assets/skyeapi-aegiscore-logo-wide.png": 737646,
+    "apps/console/assets/skyeapi-aegiscore-mark.png": 305418,
+    "apps/website/dist/assets/skyeapi-aegiscore-logo-wide.png": 737646,
+    "apps/website/dist/assets/skyeapi-aegiscore-mark.png": 305418,
+    "apps/website/dist/console/assets/skyeapi-aegiscore-logo-wide.png": 737646
+  },
+  "proves": [
+    "generated SkyeAPI + AegisCore logo assets are included in source public assets",
+    "website header, hero, favicon, Apple icon, and OpenGraph image reference the brand assets",
+    "console source and console build include brand assets",
+    "website build enforces branded asset presence"
+  ],
+  "does_not_prove": [
+    "brand trademark clearance",
+    "hosted CDN cache behavior",
+    "browser visual pixel perfection"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T01:06:35.395Z"
+}

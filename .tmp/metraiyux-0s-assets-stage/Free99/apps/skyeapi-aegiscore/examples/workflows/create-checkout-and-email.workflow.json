@@ -1,0 +1,32 @@
+{
+  "workflowId": "create-checkout-and-email",
+  "input": {
+    "email": "client@example.com",
+    "productName": "SkyeAPI Builder Plan",
+    "amountCents": 4900,
+    "successUrl": "https://example.com/success",
+    "cancelUrl": "https://example.com/cancel"
+  },
+  "steps": [
+    {
+      "id": "checkout",
+      "capability": "billing.create_checkout",
+      "input": {
+        "successUrl": "{{input.successUrl}}",
+        "cancelUrl": "{{input.cancelUrl}}",
+        "amountCents": "{{input.amountCents}}",
+        "currency": "usd",
+        "productName": "{{input.productName}}"
+      }
+    },
+    {
+      "id": "send_link",
+      "capability": "email.send",
+      "input": {
+        "to": "{{input.email}}",
+        "subject": "Your checkout link",
+        "body": "Complete checkout here: {{steps.checkout.data.url}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "started_at": "2026-05-17T18:11:20.533Z",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "native_providers_initialize_with_required_credentials",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "stripe_payment_intent_request_contract_is_real_http",
+      "data": {
+        "url": "/v1/payment_intents"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "twilio_message_request_contract_is_real_http",
+      "data": {
+        "url": "/2010-04-01/Accounts/AC_native_provider_contract/Messages.json"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "mapbox_directions_request_contract_is_real_http",
+      "data": {
+        "url": "/directions/v5/mapbox/driving/-112.074,33.448;-112.05,33.45"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "checkr_invitation_request_contract_is_real_http",
+      "data": {
+        "url": "/v1/invitations"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "local_ledgers_record_native_provider_drivers",
+      "data": {}
+    }
+  ],
+  "status": "FAIL",
+  "failed_at": "2026-05-17T18:11:20.622Z",
+  "failure": "stripe_fails_closed_without_secret did not fail closed",
+  "data": {
+    "message": "NOTIFICATION_PROVIDER=notification-webhook requires NOTIFICATION_WEBHOOK_ENDPOINT.",
+    "expect": "STRIPE_SECRET_KEY"
+  }
+}

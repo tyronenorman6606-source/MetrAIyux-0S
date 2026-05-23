@@ -18,5 +18,9 @@ run_worker_first = [
 [observability]
 enabled = true
 
+[[services]]
+binding = "SKYGATEFS27_WORKER"
+service = "skyegatefs27-citadeldb"
+
 [triggers]
 crons = ["0 3 * * *"]

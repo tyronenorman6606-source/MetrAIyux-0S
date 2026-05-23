@@ -1,0 +1,61 @@
+name = "skyegatefs27-citadeldb"
+main = "cloudflare/worker.mjs"
+compatibility_date = "2026-05-15"
+compatibility_flags = ["nodejs_compat"]
+keep_vars = true
+workers_dev = true
+
+[vars]
+RELAY13_0S_API_BASE_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/relay13"
+CONTACT_INTAKE_0S_ORIGIN = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
+CONTACT_INTAKE_RELAY13_WORKSPACE = "connectlog-main"
+
+[[services]]
+binding = "RELAY13_WORKER"
+service = "relay13-core"
+
+[[services]]
+binding = "METRAIYUX_0S_WORKER"
+service = "metraiyux-0s-full-system"
+
+[[analytics_engine_datasets]]
+binding = "REQUEST_ANALYTICS"
+dataset = "fs27_runtime_requests"
+
+[[queues.producers]]
+binding = "REQUEST_EVENT_QUEUE"
+queue = "fs27-runtime-events"
+
+[[queues.consumers]]
+queue = "fs27-runtime-events"
+max_batch_size = 100
+max_batch_timeout = 5
+max_retries = 5
+dead_letter_queue = "fs27-runtime-events-dlq"
+
+[[r2_buckets]]
+binding = "REQUEST_LOG_BUCKET"
+bucket_name = "fs27-runtime-request-logs"
+
+[[r2_buckets]]
+binding = "DEPLOYMENT_ASSET_BUCKET"
+bucket_name = "zero-os-deploy-artifacts"
+
+[[kv_namespaces]]
+binding = "ROUTING_KV"
+id = "62d5bbc0c9e946b489dc44507fb8c40b"
+
+# Create and bind after the D1 database exists:
+# npx wrangler d1 create fs27-runtime-rollups
+# [[d1_databases]]
+# binding = "RUNTIME_ROLLUP_DB"
+# database_name = "fs27-runtime-rollups"
+# database_id = "<runtime-rollup-d1-id>"
+
+[assets]
+directory = "public"
+binding = "ASSETS"
+run_worker_first = true
+
+[observability]
+enabled = true

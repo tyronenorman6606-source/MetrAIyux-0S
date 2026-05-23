@@ -1,0 +1,40 @@
+<svg class="mx2-inline-svg" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="mx2-sales-signal-title mx2-sales-signal-desc">
+  <title id="mx2-sales-signal-title">Sales Signal</title>
+  <desc id="mx2-sales-signal-desc">Sales Signal icon for MetrAIyux 0S revenue assets.</desc>
+  <defs>
+    <radialGradient id="mx2-sales-signal-aura" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#f7c95b" stop-opacity="0.56"/>
+      <stop offset="60%" stop-color="#66ffb8" stop-opacity="0.21"/>
+      <stop offset="100%" stop-color="#f7c95b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mx2-sales-signal-edge" x1="82" y1="66" x2="430" y2="444" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96"/>
+      <stop offset="28%" stop-color="#66ffb8" stop-opacity="0.95"/>
+      <stop offset="64%" stop-color="#f7c95b" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#071026" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="mx2-sales-signal-glass" x1="98" y1="70" x2="414" y2="438" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f7fbff" stop-opacity="0.62"/>
+      <stop offset="44%" stop-color="#f7c95b" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#050713" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="mx2-sales-signal-glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 .13 0 0 0 0 .72 0 0 0 0 1 0 0 0 .7 0" result="blueGlow"/>
+      <feMerge><feMergeNode in="blueGlow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="256" r="222" fill="url(#mx2-sales-signal-aura)" opacity="0.96"/>
+  <circle cx="256" cy="256" r="180" fill="#050713" fill-opacity="0.38" stroke="#f7c95b" stroke-opacity="0.30" stroke-width="2"/>
+  <path d="M79 286c74-102 159-153 255-153 55 0 96 13 133 38" fill="none" stroke="#66ffb8" stroke-opacity="0.23" stroke-width="9" stroke-linecap="round"/>
+  <path d="M76 327c92 42 188 43 288 4 35-14 62-31 82-50" fill="none" stroke="#f7c95b" stroke-opacity="0.23" stroke-width="7" stroke-linecap="round"/>
+  <g filter="url(#mx2-sales-signal-glow)">
+    <circle cx="256" cy="256" r="110" fill="none" stroke="url(#mx2-sales-signal-edge)" stroke-width="28" stroke-linecap="round" stroke-dasharray="180 46"/>
+    <path d="M212 258l30 31 65-79" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g opacity="0.92">
+    <rect x="210" y="422" width="92" height="34" rx="17" fill="#050713" fill-opacity="0.58" stroke="#66ffb8" stroke-opacity="0.45"/>
+    <text x="256" y="445" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="2" fill="#f7fbff">SS</text>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess } from './_lib/security.js';
 import { loadConfig, saveConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 
 function dashboardLimit(defaultValue = 40, maxValue = 80) {
@@ -14,7 +14,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
 
     if (event.httpMethod === 'GET') {
       const includeLedger = event.queryStringParameters?.ledger === 'true';
@@ -27,19 +27,34 @@ export async function handler(event) {
       const ledger = includeLedger ? await loadLedger(ledgerLimit) : null;
       const sessions = includeSessions ? await loadSessionManifests(activityLimit) : null;
       const events = includeEvents ? await loadAuditEvents(activityLimit) : null;
-      return json(200, { ok: true, source, configFileId, warning, config, ledger, sessions, events }, noStoreCors(event));
+      await writeAuditEventSafe('admin-config-viewed', {
+        actor: admin.actor,
+        authType: admin.type,
+        workspaceId: admin.workspaceId,
+        customerId: admin.customerId,
+        gateCardId: admin.gateCardId,
+        includeLedger,
+        includeSessions,
+        includeEvents
+      });
+      return json(200, { ok: true, actor: admin, source, configFileId, warning, config, ledger, sessions, events }, noStoreCors(event));
     }
 
     const body = await readJson(event);
-    const result = await saveConfig(body.config || body, 'admin');
+    const result = await saveConfig(body.config || body, admin.actor || 'admin');
     const audit = await writeAuditEventSafe('admin-config-saved', {
+      actor: admin.actor,
+      authType: admin.type,
+      workspaceId: admin.workspaceId,
+      customerId: admin.customerId,
+      gateCardId: admin.gateCardId,
       destinations: result.config.destinations.map((destination) => ({ id: destination.id, name: destination.name, enabled: destination.enabled, role: destination.role })),
       routingMode: result.config.routingMode,
       chunkSizeMb: result.config.chunkSizeMb,
       maxFilesPerSubmission: result.config.maxFilesPerSubmission,
       maxTotalSubmissionGb: result.config.maxTotalSubmissionGb
     });
-    return json(200, { ok: true, ...result, audit }, noStoreCors(event));
+    return json(200, { ok: true, actor: admin, ...result, audit }, noStoreCors(event));
   } catch (error) {
     return json(error.statusCode || 500, { ok: false, error: error.message, google: error.google || undefined }, noStoreCors(event));
   }

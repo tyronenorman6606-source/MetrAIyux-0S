@@ -1,0 +1,45 @@
+{
+  "id": "resend",
+  "title": "Resend Email",
+  "lane": "email",
+  "requiredSecrets": [
+    "RESEND_API_KEY"
+  ],
+  "routes": [
+    "email.send",
+    "email.sequence",
+    "webhook.email"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#ResendAdapter",
+  "description": "Executable provider pack for Resend Email routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "transactional-email",
+    "sequence-email",
+    "delivery-webhooks"
+  ],
+  "metering": {
+    "unit": "email",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "email",
+    "resend"
+  ],
+  "executableActions": [
+    {
+      "route": "email.send",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "email.sequence",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "webhook.email",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

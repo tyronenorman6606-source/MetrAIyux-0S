@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard | Skyes Over London Staffing OS</title>
+  <meta name="description" content="Authenticated admin dashboard for staffing records, uploads, and live brain operations." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Authenticated Skyegate FS27 admin surface.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Staffing OS Admin</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./operations-hub.html">Operations</a>
+      <a href="./crm-pipeline.html">CRM</a>
+      <a href="./placement-tracker.html">Placements</a>
+      <a href="./brain-command.html">Brain Command</a>
+      <button class="btn ghost small-btn" id="logoutBtn" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section-pad compact-section">
+      <div class="section-head reveal">
+        <p class="eyebrow">Live Operating Layer</p>
+        <h2>Records, uploads, and the GPU/Ollama brain behind Skyegate auth.</h2>
+        <p id="authStatus">Checking Skyegate FS27 session...</p>
+      </div>
+
+      <div class="dashboard-grid reveal" id="summaryCards"></div>
+    </section>
+
+    <section class="section-pad admin-grid compact-section">
+      <article class="admin-panel reveal">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Database</p>
+            <h3>Records</h3>
+          </div>
+          <select id="collectionSelect" aria-label="Choose collection"></select>
+        </div>
+        <div class="table-wrap">
+          <table class="ops-table" id="recordsTable">
+            <thead><tr><th>Created</th><th>Title</th><th>Contact</th><th>Status</th><th>Type</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="admin-panel reveal">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Secure Files</p>
+            <h3>Upload Vault</h3>
+          </div>
+        </div>
+        <form id="uploadForm" class="stack-form">
+          <label>Label<input name="label" placeholder="Resume, MSA, timesheet, procurement packet" /></label>
+          <label>Linked Record ID<input name="record_id" placeholder="Optional record id" /></label>
+          <label>Document<input name="document" type="file" required /></label>
+          <button class="btn primary" type="submit">Upload Secure File</button>
+          <p id="uploadStatus" class="form-status"></p>
+        </form>
+        <div class="file-list" id="fileList"></div>
+      </article>
+
+      <article class="admin-panel reveal">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Live Brain</p>
+            <h3>GPU / Ollama Endpoint</h3>
+          </div>
+        </div>
+        <form id="brainLiveForm" class="stack-form">
+          <label>Prompt<textarea name="prompt" rows="6" placeholder="Ask the private staffing brain about a live workflow, intake issue, risk, or AE/candidate operation."></textarea></label>
+          <button class="btn primary" type="submit">Ask Live Brain</button>
+        </form>
+        <pre class="mini-code" id="brainLiveOutput">Waiting for prompt.</pre>
+      </article>
+
+      <article class="admin-panel reveal">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Manual Entry</p>
+            <h3>Create Record</h3>
+          </div>
+        </div>
+        <form id="manualRecordForm" class="stack-form">
+          <label>Collection<select name="collection" id="manualCollection"></select></label>
+          <label>Title<input name="title" required placeholder="Company, candidate, risk, or job title" /></label>
+          <label>Contact<input name="contact" placeholder="Email, phone, or owner" /></label>
+          <label>Notes<textarea name="notes" rows="5" placeholder="Operational notes"></textarea></label>
+          <button class="btn primary" type="submit">Create Record</button>
+          <p id="manualStatus" class="form-status"></p>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing OS</strong>
+      <p>Records and documents are scoped behind Skyegate FS27 auth. Configure storage and retention before collecting regulated documents.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./privacy.html">Privacy</a>
+      <a href="./system-overview.html">System</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+  <script src="./assets/staffing-os.js"></script>
+</body>
+</html>

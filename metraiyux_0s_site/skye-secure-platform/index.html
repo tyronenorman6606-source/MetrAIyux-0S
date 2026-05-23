@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeSecure Platform Console for vault inventory, access policy, audit logs, and offload/reload proof.">
+  <title>SkyeSecure Platform Console - Vault Inventory and Access</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --platform-bg: #05090d;
+      --platform-panel: rgba(6, 14, 20, .9);
+      --platform-line: rgba(255,255,255,.14);
+      --platform-ink: #f5fbff;
+      --platform-muted: #aebec6;
+      --platform-gold: #f3d483;
+      --platform-green: #6ff2c7;
+      --platform-cyan: #35b7ff;
+    }
+
+    body.platform-page {
+      color: var(--platform-ink);
+      background: linear-gradient(180deg, #071017 0%, var(--platform-bg) 100%);
+    }
+
+    .platform-shell {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 6.5rem 0 5rem;
+    }
+
+    .platform-hero {
+      display: grid;
+      grid-template-columns: 1fr minmax(280px, 420px);
+      gap: 2rem;
+      align-items: end;
+      border-bottom: 1px solid var(--platform-line);
+      padding-bottom: 2rem;
+    }
+
+    .platform-hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.8rem);
+      line-height: .94;
+      letter-spacing: 0;
+      margin: .35rem 0 .85rem;
+    }
+
+    .platform-hero p {
+      max-width: 780px;
+      color: #d7e5eb;
+      font-size: 1.08rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .platform-card,
+    .platform-panel {
+      border: 1px solid var(--platform-line);
+      border-radius: 8px;
+      background: var(--platform-panel);
+      padding: 1rem;
+    }
+
+    .platform-card b {
+      display: block;
+      color: var(--platform-gold);
+      margin-bottom: .35rem;
+    }
+
+    .platform-card span,
+    .platform-muted {
+      color: var(--platform-muted);
+      line-height: 1.55;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(340px, .6fr);
+      gap: 16px;
+      margin-top: 1.25rem;
+    }
+
+    .platform-panel h2 {
+      margin: 0 0 1rem;
+      font-size: 1.2rem;
+      letter-spacing: 0;
+    }
+
+    .platform-controls {
+      display: grid;
+      gap: .85rem;
+    }
+
+    .platform-field {
+      display: grid;
+      gap: .35rem;
+      color: var(--platform-muted);
+      font-size: .9rem;
+      font-weight: 850;
+    }
+
+    .platform-field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      background: rgba(0,0,0,.36);
+      color: var(--platform-ink);
+      padding: .7rem .8rem;
+      font: inherit;
+    }
+
+    .platform-button {
+      min-height: 44px;
+      border: 1px solid rgba(243,212,131,.65);
+      border-radius: 8px;
+      background: var(--platform-gold);
+      color: #081017;
+      padding: .7rem .9rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .platform-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 1.25rem;
+    }
+
+    .metric {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: .85rem;
+      background: rgba(255,255,255,.04);
+      min-height: 84px;
+    }
+
+    .metric b {
+      display: block;
+      color: #fff;
+      font-size: 1.25rem;
+      overflow-wrap: anywhere;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--platform-muted);
+      font-size: .82rem;
+      margin-top: .3rem;
+    }
+
+    .platform-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--platform-line);
+      border-radius: 8px;
+      margin-top: .9rem;
+    }
+
+    .platform-table {
+      min-width: 920px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .platform-table th,
+    .platform-table td {
+      padding: .8rem;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .platform-table th {
+      color: var(--platform-gold);
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .platform-table td {
+      color: #dbeaf0;
+    }
+
+    .platform-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border: 1px solid rgba(111,242,199,.35);
+      border-radius: 8px;
+      padding: .25rem .45rem;
+      color: #e5fff7;
+      background: rgba(111,242,199,.08);
+      margin: .12rem;
+      font-size: .78rem;
+      font-weight: 850;
+    }
+
+    .platform-empty {
+      border: 1px dashed rgba(255,255,255,.18);
+      border-radius: 8px;
+      color: var(--platform-muted);
+      padding: 1rem;
+      margin-top: .85rem;
+    }
+
+    @media (max-width: 920px) {
+      .platform-hero,
+      .platform-grid,
+      .platform-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="platform-page skyesol-living-page">
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="motion-progress scroll-progress motion-chrome" aria-hidden="true"><i></i></div>
+  <div class="motion-cursor-glow pointer-reactive motion-chrome" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">MetrAIyux 0S</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../skye-secure-secret-packs.html">SkyeSecure</a>
+      <a href="../skye-secure-secret-packs/app.html">Pack Console</a>
+      <a href="../skye-vault-os/">VaultOS</a>
+      <a href="../account/skyevault-workspace.html?workspace=acme">Workspace Vault</a>
+      <a href="../proof-vault/skye-secure-fs27-vault-proof.html">Live Proof</a>
+    </nav>
+  </header>
+
+  <main class="platform-shell">
+    <section class="platform-hero" aria-labelledby="platform-title">
+      <div>
+        <p class="eyebrow">Vault-aware platform layer</p>
+        <h1 id="platform-title">SkyeSecure Platform Console</h1>
+        <p>Load a vault index, access policy, audit log, manifest, or live FS27 metadata generated by the CLI. Search encrypted objects, inspect safe metadata, review role grants, and prove offload/reload custody without exposing secret values. The live FS27 proof lane now registers encrypted-pack metadata, VaultOS inventory, restore points, audit events, and SkyeVault receipts.</p>
+      </div>
+      <aside class="platform-card">
+        <b>Metadata review boundary</b>
+        <span>This console reads safe JSON evidence selected by the operator. The production route stores pack metadata only; decrypt, reload, bundle, attach, and restore operations stay in the CLI or pack console while FS27 publishes proof, inventory, search, restore-point, and audit metadata.</span>
+      </aside>
+    </section>
+
+    <section class="platform-panel" style="margin-top:16px">
+      <h2>Live FS27 Metadata APIs</h2>
+      <div class="platform-controls">
+        <a class="platform-button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/proof" target="_blank" rel="noopener">Proof</a>
+        <a class="platform-button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/inventory" target="_blank" rel="noopener">Inventory</a>
+        <a class="platform-button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/search?q=vaultos" target="_blank" rel="noopener">Search</a>
+        <a class="platform-button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/restore-points" target="_blank" rel="noopener">Restore Points</a>
+        <a class="platform-button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/audit" target="_blank" rel="noopener">Audit</a>
+      </div>
+      <p class="platform-empty">Current live proof covers 18 VaultOS commands, 1,833 scanned files, four encrypted VaultOS objects, portable bundle export, attach into a fresh vault, source diff, reload diff, bundle reload diff, restore-point creation, FS27 sync, and desktop/mobile console proof.</p>
+    </section>
+
+    <section class="platform-grid" aria-label="Load vault evidence">
+      <article class="platform-panel">
+        <h2>Evidence Files</h2>
+        <div class="platform-controls">
+          <label class="platform-field" for="indexFile">
+            Vault index JSON
+            <input id="indexFile" type="file" accept=".json,application/json">
+          </label>
+          <label class="platform-field" for="policyFile">
+            Access policy JSON
+            <input id="policyFile" type="file" accept=".json,application/json">
+          </label>
+          <label class="platform-field" for="auditFile">
+            Audit log JSONL
+            <input id="auditFile" type="file" accept=".jsonl,.txt,application/json">
+          </label>
+          <button class="platform-button" id="loadButton" type="button">Load Evidence</button>
+        </div>
+      </article>
+
+      <article class="platform-panel">
+        <h2>Search</h2>
+        <div class="platform-controls">
+          <label class="platform-field" for="queryInput">
+            Query
+            <input id="queryInput" type="search" placeholder="client, repo, pack, source">
+          </label>
+          <label class="platform-field" for="typeInput">
+            Type
+            <input id="typeInput" type="search" placeholder="environment, credential, text">
+          </label>
+          <button class="platform-button" id="searchButton" type="button">Search Vault</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="summary" class="platform-summary">
+      <div class="platform-empty">No vault evidence loaded.</div>
+    </section>
+
+    <section class="platform-panel" style="margin-top:16px">
+      <h2>Objects</h2>
+      <div id="objects"><div class="platform-empty">Load a vault index to inspect encrypted objects.</div></div>
+    </section>
+
+    <section class="platform-grid" aria-label="Access and audit">
+      <article class="platform-panel">
+        <h2>Access Policy</h2>
+        <div id="policy"><div class="platform-empty">No access policy loaded.</div></div>
+      </article>
+      <article class="platform-panel">
+        <h2>Audit Events</h2>
+        <div id="audit"><div class="platform-empty">No audit log loaded.</div></div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>SkyeSecure Platform Console reviews safe vault metadata, policy, and audit evidence. Live proof is backed by FS27 health/proof/inventory/search/restore-point/audit routes, SkyeVault ciphertext custody, and the public 0S proof-vault receipt.</p>
+  </footer>
+  <script src="../script.js"></script>
+  <script src="../assets/skye-secure-platform.js"></script>
+</body>
+</html>

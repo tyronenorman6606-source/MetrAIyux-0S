@@ -12,6 +12,7 @@
     <nav class="nav" aria-label="0S review QA navigation">
       <a href="index.html">Proof Hub</a>
       <a href="skyes-over-london-reviews-expanded.html">Review Wall</a>
+      <a href="request-service.html">Request Service</a>
       <a href="submit-review.html">Client Intake</a>
       <a href="operator-review-queue.html" class="active">0S QA Queue</a>
     </nav>
@@ -34,8 +35,8 @@
       <h2>Connect to the live queue.</h2>
       <div class="operator-token-row">
         <label>
-          0S review admin token
-          <input data-review-admin-token type="password" autocomplete="off" placeholder="SOL_REVIEW_ADMIN_TOKEN" />
+          FS27 admin password or session token
+          <input data-review-admin-token type="password" autocomplete="off" placeholder="FS27 admin password or bearer session" />
         </label>
       </div>
       <p class="submission-status" data-review-qa-status aria-live="polite">Waiting for the operator token.</p>
@@ -48,7 +49,7 @@
       <div class="submission-list" data-review-queue-list>
         <div class="submission-card">
           <b>Load the queue to begin.</b>
-          <p>Submissions are stored in the Cloudflare KV namespace bound as SOL_REVIEW_QUEUE.</p>
+          <p>Submissions are stored in FS27 contact intake and stay private until the operator approves a batch for publication.</p>
         </div>
       </div>
     </section>

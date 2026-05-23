@@ -56,7 +56,7 @@ Latest capture: 2026-05-17 UTC.
 - `test-artifacts/connectlog-production-infra-copy/2026-05-17T20-00-53-608Z/browser-qa.json`
 - `test-artifacts/connectlog-public-copy-fix/browser-qa.json`
 - `test-artifacts/connectlog-public-copy-fix/connectlog-app-deployment-section.png`
-- `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json`
+- `metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json`
 - `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`
 - `test-artifacts/stripe-sync/metraiyux-stripe-live-checkout-proof.json`
 - `test-artifacts/connectlog-relay13-production-proof.json`
@@ -89,7 +89,7 @@ Latest capture: 2026-05-17 UTC.
 10. Use `test-artifacts/stripe-sync/metraiyux-stripe-live-checkout-proof.json` as the Stripe sync proof: current lookup keys, stale prices archived, SkyePay Starter monthly checkout, SaaS Growth setup checkout, and Growth monthly metadata all passed.
 11. Use `test-artifacts/connectlog-production-infra-copy/2026-05-17T20-00-53-608Z/browser-qa.json` as the current public production-infrastructure copy proof: 0S home, ConnectLog app, landing, hub, receipt, proof center, Cabinet Brain, and FS27 gate passed desktop/mobile browser checks with no weak local/offline/internal wording, no console errors, no horizontal overflow, and 120 live stress reads across 0S, Relay13, and FS27 with no failures.
 12. Use `test-artifacts/stress/connectlog-relay13-skyepay-live/stress-report.json` as the controlled live stress proof for 0S, ConnectLog, Relay13, FS27 SkyePay, SaaS status, and the public ledger.
-13. Use `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json` as the SkyeRouteX lock/contention stress proof.
+13. Use `metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/STRESS_CONCURRENCY_2026-05-17T19-06-19-103Z.json` as the SkyeRouteX lock/contention stress proof.
 14. Use `test-artifacts/valley-verified-longform-prod/production-browser-qa-report.json` as the Valley Verified insights proof: `/insights/`, all seven longform operating articles, and the renderer-backed Bob's Smoke Shop business URL all returned HTTP `200` on desktop/mobile with no browser 404s, no console errors, no horizontal overflow, seven major platform tiles, source notes, diagnostics, worksheets, mistake sections, and canonical `SOLEnterprises` spelling verified.
 
 ## Rule

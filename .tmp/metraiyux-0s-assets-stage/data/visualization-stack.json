@@ -1,0 +1,28 @@
+{
+  "effective_date": "2026-05-17",
+  "goal": "Convert customer, workspace, billing, AI usage, vault, mail, and FS27 event data into visual dashboards across MetrAIyux 0S.",
+  "selected_runtime": {
+    "id": "0s-native-visual-data-kit",
+    "type": "native_svg_css_javascript",
+    "file": "/assets/js/visual-data-kit.js",
+    "reason": "Works in static preview, Cloudflare Pages, and Workers without a bundler or runtime dependency. Safe for go-live."
+  },
+  "0s_visual_surfaces": [
+    "saas/customer-data.html",
+    "saas/customer-dashboard.html",
+    "saas/billing.html",
+    "saas/skyepay.html",
+    "operator/index.html",
+    "future FS27 mirrored customer views"
+  ],
+  "data_contract": {
+    "workspace": "workspace id, company name, plan, status, activation path",
+    "kpis": "small top-line cards",
+    "progress": "used/limit rows for AI, requests, vault, files, devices",
+    "bars": "comparative normalized usage bars",
+    "donut": "workflow or event status mix",
+    "timeline": "recent customer-visible events",
+    "sovereign_stack": "CitadelDB, SkyeVault, SkyeMail, FS27 lane state",
+    "event_mix": "FS27 mirrored event category counts"
+  }
+}

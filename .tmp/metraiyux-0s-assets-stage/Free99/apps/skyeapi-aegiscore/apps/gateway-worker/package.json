@@ -1,0 +1,24 @@
+{
+  "name": "@skyeapi/gateway-worker",
+  "version": "0.17.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@skyeapi/core": "workspace:*",
+    "@neondatabase/serverless": "^0.10.4",
+    "aws4fetch": "^1.0.20",
+    "@skyeapi/ops": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.99.0"
+  }
+}

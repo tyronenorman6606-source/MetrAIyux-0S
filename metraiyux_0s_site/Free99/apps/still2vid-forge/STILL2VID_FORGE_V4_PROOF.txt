@@ -1,0 +1,22 @@
+Still2Vid Forge v4 closure proof
+
+Built from the uploaded still2vid HTML into a one-file offline animator/fix generator.
+
+Validated:
+- JavaScript syntax check passed with node --check.
+- DOM control audit passed: every id in the runtime control registry exists in the HTML.
+- Browser smoke passed in Chromium after loading a generated PNG through the real file input path.
+- Auto Fix button executed.
+- Generate Fixes produced 10 real fix cards.
+- Glitch Impact preset executed.
+- New layer effects controls rendered and updated canvas output.
+- Stage canvas produced non-empty rendered output.
+- Frame ZIP exporter created an 8-frame PNG zip, and unzip -t reported no errors.
+
+Architecture:
+- Single HTML file.
+- No backend.
+- No auth.
+- No database.
+- No SaaS wrapper.
+- Browser-native canvas rendering and MediaRecorder video export.

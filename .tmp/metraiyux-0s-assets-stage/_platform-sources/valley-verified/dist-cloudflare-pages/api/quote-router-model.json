@@ -1,0 +1,133 @@
+{
+  "version": "20.0.0",
+  "generated_at": "2026-05-19T05:43:32.403Z",
+  "endpoint": "/.netlify/functions/phx-lead",
+  "operations": [
+    "GET service model",
+    "POST operation=quote_request",
+    "POST operation=route_quote"
+  ],
+  "input_fields": [
+    "buyer_name",
+    "buyer_contact",
+    "city",
+    "category",
+    "details",
+    "timeline",
+    "budget",
+    "business_ids"
+  ],
+  "output_actions": [
+    "quote_request",
+    "lead_route_decision"
+  ],
+  "sample": {
+    "lead_id": "lead-7c5a5fff2affa409c6a263b8",
+    "selected": [
+      {
+        "business_id": "fade-masters-phx",
+        "name": "Fade Masters PHX",
+        "city": "Phoenix",
+        "category": "Haircuts",
+        "score": 115,
+        "reasons": [
+          "same city",
+          "category/niche match",
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests",
+          "high verification score"
+        ],
+        "contact_ready": true,
+        "url": "/business/fade-masters-phx/"
+      },
+      {
+        "business_id": "empire-pallets-phoenix",
+        "name": "Empire Pallets",
+        "city": "Phoenix",
+        "category": "Business Services",
+        "score": 74,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/empire-pallets-phoenix/"
+      },
+      {
+        "business_id": "amazon-phoenix-major-employer-adc4ff0",
+        "name": "Amazon",
+        "city": "Phoenix",
+        "category": "Major Employers",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/amazon-phoenix-major-employer-adc4ff0/"
+      },
+      {
+        "business_id": "american-express-phoenix-legal-financial-services-accebed",
+        "name": "American Express",
+        "city": "Phoenix",
+        "category": "Legal And Financial",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/american-express-phoenix-legal-financial-services-accebed/"
+      },
+      {
+        "business_id": "avnet-phoenix-contractor-home-service-014d78b",
+        "name": "Avnet",
+        "city": "Phoenix",
+        "category": "Home Services",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/business/avnet-phoenix-contractor-home-service-014d78b/"
+      }
+    ],
+    "decision": {
+      "lead_id": "lead-7c5a5fff2affa409c6a263b8",
+      "business_ids": [
+        "fade-masters-phx",
+        "empire-pallets-phoenix",
+        "amazon-phoenix-major-employer-adc4ff0",
+        "american-express-phoenix-legal-financial-services-accebed",
+        "avnet-phoenix-contractor-home-service-014d78b",
+        "banner-health-phoenix-healthcare-wellness-e134708",
+        "dignity-health-phoenix-healthcare-wellness-449a910",
+        "freeport-mcmoran-phoenix-major-employer-5d1daf7"
+      ],
+      "route_reason": "Top 8 matches by city/category/contact readiness/verification signals.",
+      "assigned_to": "ae-phoenix-haircuts",
+      "city": "Phoenix",
+      "category": "Haircuts",
+      "score_summary": "fade-masters-phx:115|empire-pallets-phoenix:74|amazon-phoenix-major-employer-adc4ff0:66|american-express-phoenix-legal-financial-services-accebed:66|avnet-phoenix-contractor-home-service-014d78b:66|banner-health-phoenix-healthcare-wellness-e134708:66|dignity-health-phoenix-healthcare-wellness-449a910:66|freeport-mcmoran-phoenix-major-employer-5d1daf7:66",
+      "sla": "next_business_day",
+      "notes": "Route candidates require AE/admin approval before owner delivery."
+    }
+  }
+}

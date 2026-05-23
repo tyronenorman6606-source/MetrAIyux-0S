@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devs Playbook Gate | MetrAIyux 0S</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{color-scheme:dark;--bg:#07100f;--panel:#101818;--line:rgba(255,255,255,.14);--text:#f8fbff;--muted:#a7b5b5;--gold:#f4d57b;--cyan:#7ae7ff;--bad:#ff7188}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100svh;background:linear-gradient(145deg,#050908,#0d1716 62%,#111008);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    main{width:min(920px,calc(100% - 32px));margin:0 auto;padding:48px 0 76px}
+    .shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);gap:16px;align-items:start}
+    .panel{border:1px solid var(--line);border-radius:8px;background:rgba(16,24,24,.9);padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+    .eyebrow{margin:0 0 10px;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    h1{margin:0 0 12px;font-size:clamp(38px,7vw,66px);line-height:.98;letter-spacing:0}
+    h2{margin:0 0 10px;font-size:24px;letter-spacing:0}
+    p{margin:0 0 14px;color:var(--muted)}
+    form{display:grid;gap:12px;margin-top:18px}
+    label{display:grid;gap:7px;color:#e5eeee;font-weight:850}
+    input{width:100%;border:1px solid var(--line);border-radius:8px;background:#071111;color:var(--text);padding:13px 14px;font:inherit}
+    button,a.button{border:1px solid var(--line);border-radius:8px;background:#182525;color:var(--text);padding:12px 14px;font:inherit;font-weight:900;text-decoration:none;cursor:pointer}
+    button.primary,a.primary{border:0;background:linear-gradient(135deg,var(--gold),var(--cyan));color:#061110}
+    code{display:inline-block;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(0,0,0,.28);padding:4px 7px;color:#bff5ff;word-break:break-all}
+    .status{min-height:48px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.045);padding:12px 14px;color:var(--muted)}
+    .status.ok{border-color:rgba(122,231,255,.45);color:#ddfbff}
+    .status.bad{border-color:rgba(255,113,136,.55);color:#ffdce4}
+    .note{border-left:4px solid var(--gold);background:rgba(244,213,123,.08);border-radius:8px;padding:12px 14px;color:#eadfbd}
+    @media(max-width:820px){main{padding-top:28px}.shell{grid-template-columns:1fr}h1{font-size:42px}}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="shell">
+      <div class="panel">
+        <p class="eyebrow">Marketing key gate</p>
+        <h1>Devs Playbook access.</h1>
+        <p>Enter an email to open the playbook. The gate records the access under the campaign key <code id="key-label">skdevpbk</code>.</p>
+        <form id="gate-form" autocomplete="on">
+          <label>Email
+            <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </label>
+          <label>Name
+            <input name="name" autocomplete="name" placeholder="Optional">
+          </label>
+          <label>Company
+            <input name="company" autocomplete="organization" placeholder="Optional">
+          </label>
+          <button class="primary" type="submit">Open Playbook</button>
+          <div id="status" class="status" role="status">Waiting for email gate.</div>
+        </form>
+      </div>
+      <aside class="panel">
+        <p class="eyebrow">Tracking</p>
+        <h2>Every signup gets tagged.</h2>
+        <p>The Worker stores the record in the <code>marketing_keys</code> ledger with a gate user shaped like <code>emailname-skdevpbk</code>.</p>
+        <p class="note">This gate does not create owner/admin access and does not unlock the rest of the 0S.</p>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const key = cleanKey(params.get('key') || 'skdevpbk');
+    const returnTo = safeReturnPath(params.get('return') || '/devs-playbook/');
+    const form = document.getElementById('gate-form');
+    const statusBox = document.getElementById('status');
+    document.getElementById('key-label').textContent = key;
+
+    function cleanKey(value) {
+      return String(value || 'skdevpbk').toLowerCase().replace(/[^a-z0-9_-]+/g, '').slice(0, 48) || 'skdevpbk';
+    }
+
+    function safeReturnPath(value) {
+      const text = String(value || '').trim();
+      if (!text || !text.startsWith('/') || text.startsWith('//') || /^\/api\//i.test(text) || /^\/admin(?:\/|$)/i.test(text)) return '/devs-playbook/';
+      return text;
+    }
+
+    function setStatus(message, kind) {
+      statusBox.textContent = message;
+      statusBox.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setStatus('Registering email gate...', '');
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.marketing_key = key;
+      payload.tracking_tag = key;
+      payload.source = 'devs-playbook';
+      payload.returnTo = returnTo;
+      payload.user_agent = navigator.userAgent || '';
+      try {
+        const response = await fetch('/api/marketing-keys/signup', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {'content-type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Email gate failed.');
+        setStatus('Gate accepted for ' + (data.gate_user && data.gate_user.id ? data.gate_user.id : key) + '.', 'ok');
+        setTimeout(() => location.assign(data.returnTo || returnTo), 220);
+      } catch (error) {
+        setStatus(error.message || 'Could not open playbook.', 'bad');
+      }
+    });
+  </script>
+</body>
+</html>

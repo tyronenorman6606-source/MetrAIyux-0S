@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="route map icon">
+  <defs>
+    <radialGradient id="hot" cx="32%" cy="20%" r="80%"><stop offset="0" stop-color="white"/><stop offset=".25" stop-color="#8a35ff"/><stop offset=".65" stop-color="#35f7ff"/><stop offset="1" stop-color="#a6ff4d"/></radialGradient>
+    <linearGradient id="face" x1="18" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse"><stop stop-color="#8a35ff"/><stop offset=".42" stop-color="#35f7ff"/><stop offset="1" stop-color="#a6ff4d"/></linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="blur"/><feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.5 0 1 0 0 0.2 0 0 1 0 1 0 0 0 .75 0" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="64" cy="108" rx="39" ry="10" fill="rgba(0,0,0,.34)"/>
+  <g filter="url(#glow)" transform="rotate(-6 64 64)">
+    <circle cx="18" cy="22" r="16" fill="#35f7ff" opacity=".45"/>
+    <circle cx="84" cy="28" r="18" fill="#8a35ff" opacity=".34"/>
+    <circle cx="64" cy="64" r="42" fill="url(#face)" stroke="rgba(255,255,255,.55)" stroke-width="3"/><path d="M24 64h80M64 22c15 16 15 68 0 84M64 22c-15 16-15 68 0 84M33 43c17 10 45 10 62 0M33 85c17-10 45-10 62 0" stroke="white" stroke-width="4" opacity=".66" fill="none"/>
+    <path d="M35 31c18-12 40-13 59 0" stroke="white" stroke-width="5" stroke-linecap="round" opacity=".28"/>
+  </g>
+</svg>

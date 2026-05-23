@@ -12,18 +12,20 @@ Each category is now its own page. Each page has:
 4. public-facing review presentation across the full ecosystem.
 5. Contact CTAs using the business emails selected for this package.
 
-The proof wall also has a live submission loop:
+The proof wall also has a live submission and service-request loop:
 
 1. Clients use `submit-review.html`.
-2. The Cloudflare Pages Function at `functions/api/review-submissions.js` stores submissions in the KV binding `SOL_REVIEW_QUEUE`.
-3. The 0S operator uses `operator-review-queue.html` with `SOL_REVIEW_ADMIN_TOKEN` to approve or reject reviews.
-4. When five approved unpublished reviews exist, the operator marks a production batch ready and exports it.
-5. `tools/publish-live-review-batch.mjs --source=<exported-batch.json>` merges exactly five approved reviews into `data/reviews.public.json` and regenerates the wall/detail pages.
+2. Service prospects use `request-service.html`.
+3. The primary live lane is SkyeGateFS27 contact intake at `/api/contact/intake`, which stores private submissions, prepares Relay13/ConnectLog context, and sends Resend/Gmail backup notification.
+4. The 0S operator uses `operator-review-queue.html` with the FS27 admin password or bearer session to approve or reject reviews.
+5. When five approved unpublished reviews exist, the operator marks a production batch ready and exports it.
+6. `tools/publish-live-review-batch.mjs --source=<exported-batch.json>` merges exactly five approved reviews into `data/reviews.public.json` and regenerates the wall/detail pages.
 
 ## Pages created
 
 - `index.html` — proof ecosystem hub.
 - `submit-review.html` — client-facing live review intake.
+- `request-service.html` — public service request form routed into private FS27 contact intake.
 - `operator-review-queue.html` — 0S QA queue for approving reviews before production.
 - `categories/website-development.html` — Website Development (39 reviews)
 - `categories/staffing-ae-network.html` — Staffing Solutions / AE Network (14 reviews)
@@ -45,15 +47,14 @@ The proof wall also has a live submission loop:
 
 ## Live queue setup
 
-Bind a Cloudflare KV namespace to the Pages project as:
+The current primary lane is FS27:
 
-- `SOL_REVIEW_QUEUE`
+- `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/api/contact/intake`
+- Admin review queue uses the FS27 admin password/session, not a separate review password.
+- Resend/Gmail is backup notification, not the source of truth.
+- Relay13/ConnectLog handoff is attempted when the Relay13 API key is configured; otherwise the FS27 intake record remains the private admin queue.
 
-Set an operator token as:
-
-- `SOL_REVIEW_ADMIN_TOKEN`
-
-Without the KV binding, the intake page still saves local unsynced submissions for export during local testing, but live public submissions will not persist on Cloudflare.
+The older Cloudflare Pages KV function under `functions/api/review-submissions.js` remains as a legacy fallback for local/package continuity.
 
 ## Publish command
 

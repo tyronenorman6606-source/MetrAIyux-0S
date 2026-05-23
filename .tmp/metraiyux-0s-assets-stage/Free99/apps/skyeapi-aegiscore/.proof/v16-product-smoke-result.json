@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "version": "0.17.0",
+  "name": "v16-public-website-product-smoke",
+  "checks": {
+    "packageVersion": true,
+    "websiteWorkspace": true,
+    "buildPipelineIncludesWebsite": true,
+    "proofIncludesWebsite": true,
+    "websiteHasConsoleHandoff": true,
+    "websiteBuildCopiesConsole": true,
+    "publicClaimsUpdated": true,
+    "readmeUpdated": true
+  },
+  "proves": [
+    "website is a first-class workspace package",
+    "website build bundles the console behind /console/",
+    "default proof includes website smoke",
+    "public claims register documents the website claim boundary"
+  ],
+  "does_not_prove": [
+    "hosted domain availability",
+    "search ranking",
+    "live provider success",
+    "payment capture"
+  ],
+  "secrets_exposed": false,
+  "generatedAt": "2026-05-11T01:06:35.130Z"
+}

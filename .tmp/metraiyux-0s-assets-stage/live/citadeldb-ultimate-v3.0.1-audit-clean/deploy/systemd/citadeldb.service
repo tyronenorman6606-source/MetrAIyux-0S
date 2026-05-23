@@ -1,0 +1,15 @@
+[Unit]
+Description=CitadelDB Ultimate VPS Stack
+Requires=docker.service
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/citadeldb
+RemainAfterExit=yes
+ExecStart=/usr/bin/docker compose -f deploy/vps-postgres/docker-compose.yml -f deploy/vps-postgres/docker-compose.production.yml up -d
+ExecStop=/usr/bin/docker compose -f deploy/vps-postgres/docker-compose.yml -f deploy/vps-postgres/docker-compose.production.yml down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

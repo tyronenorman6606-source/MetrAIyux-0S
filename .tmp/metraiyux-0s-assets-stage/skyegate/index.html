@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0S SkyGate Platform</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --panel: #0d1420;
+      --panel-2: #111827;
+      --line: rgba(255,255,255,.14);
+      --text: #f7fbff;
+      --muted: #a8b3c2;
+      --cyan: #44d9ff;
+      --gold: #ffd166;
+      --green: #6ee7b7;
+      --red: #fb7185;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    a { color: inherit; }
+    .gate-shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 40px; }
+    .topbar, .hero, .panel, .event-row {
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      box-shadow: 0 24px 80px rgba(0,0,0,.28);
+    }
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      backdrop-filter: blur(16px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 950; letter-spacing: 0; }
+    .brand img { width: 34px; height: 34px; object-fit: contain; }
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    .nav a, button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font: inherit;
+      font-weight: 850;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button.primary, .nav a.primary { border-color: transparent; background: var(--gold); color: #15100a; }
+    .hero {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 18px;
+      padding: clamp(22px, 4vw, 46px);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .eyebrow { margin: 0 0 10px; color: var(--cyan); text-transform: uppercase; font-size: 12px; font-weight: 950; letter-spacing: .12em; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 840px; margin-bottom: 14px; font-size: clamp(38px, 8vw, 82px); line-height: .92; letter-spacing: 0; }
+    h2 { font-size: clamp(24px, 4vw, 38px); line-height: 1; letter-spacing: 0; }
+    p { color: var(--muted); line-height: 1.6; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .status-stack { display: grid; gap: 10px; }
+    .status-pill {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .status-pill strong { color: var(--text); }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .panel { border-radius: 8px; padding: 18px; min-height: 140px; }
+    .panel strong { display: block; margin-bottom: 8px; color: var(--text); font-size: 18px; }
+    .panel small { display: block; color: var(--muted); line-height: 1.5; }
+    .section { margin-top: 18px; }
+    .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .65fr); gap: 16px; }
+    .event-list { display: grid; gap: 10px; max-height: 430px; overflow: auto; padding-right: 4px; }
+    .event-row { border-radius: 8px; padding: 12px; }
+    .event-row b { display: block; margin-bottom: 4px; }
+    .event-row code { color: var(--green); white-space: pre-wrap; word-break: break-word; }
+    .source-list { display: grid; gap: 8px; color: var(--muted); font-size: 14px; }
+    .source-list code { color: var(--gold); }
+    @media (max-width: 880px) {
+      .hero, .split, .grid { grid-template-columns: 1fr; }
+      .topbar { position: static; align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gate-shell">
+    <header class="topbar">
+      <a class="brand" href="../0s/index.html">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="">
+        <span>0S SkyGate</span>
+      </a>
+      <nav class="nav" aria-label="SkyGate routes">
+        <a class="primary" href="../0s/index.html">0S Launcher</a>
+        <a href="../admin/0meg4kai-security.html">0meg4kAI</a>
+        <a href="../admin/skyerunners.html">SkyeRunners</a>
+        <a href="./source/SkyeGateFS27/index.html">Gate Source</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">mega auth layer inside the 0S</p>
+          <h1>SkyGate controls the platform from inside MetrAIyux 0S.</h1>
+          <p>This surface reads the active 0S/SkyGate session, shows gate cards, watches bridge events, and anchors 0meg4kAI plus SkyeRunners behind the same auth lane. Apps should inherit this context instead of asking for independent keys.</p>
+          <div class="hero-actions">
+            <button class="primary" type="button" id="refreshGate">Refresh Gate</button>
+            <button type="button" id="recordHeartbeat">Record Live Check</button>
+            <button type="button" id="seedLocalProof">Local Proof Session</button>
+          </div>
+        </div>
+        <aside class="status-stack" aria-label="Gate status">
+          <div class="status-pill"><span>Session</span><strong id="sessionState">Checking</strong></div>
+          <div class="status-pill"><span>Actor</span><strong id="sessionActor">Unknown</strong></div>
+          <div class="status-pill"><span>Gate cards</span><strong id="cardCount">0</strong></div>
+          <div class="status-pill"><span>Events</span><strong id="eventCount">0</strong></div>
+        </aside>
+      </section>
+
+      <section class="section">
+        <h2>Gate Cards</h2>
+        <div class="grid" id="gateCards"></div>
+      </section>
+
+      <section class="section split">
+        <div>
+          <h2>Live Gate Event Ledger</h2>
+          <p>Bridge-aware apps record readiness, AI calls, 0meg4kAI scans, and SkyeRunner actions here. This is browser-local proof plumbing until the deployed worker ingest is connected to every lane.</p>
+          <div class="event-list" id="eventList"></div>
+        </div>
+        <aside class="panel">
+          <h2>Single Gate Source</h2>
+          <p>The former repo-root gate source now lives under 0S. This folder is the one local SkyGate source of truth, and platform apps inherit it as a dependency instead of operating as external auth islands.</p>
+          <div class="source-list">
+            <span><code>source/SkyeGateFS27/</code> canonical 0S gate source</span>
+            <span><code>source/SkyeGateFS27/package.json</code> dependency contract</span>
+            <span><code>source/SkyeGateFS27/cloudflare/worker.mjs</code> worker source</span>
+            <span><code>source/SkyeGateFS27/netlify/functions/</code> auth functions</span>
+            <span><code>../assets/js/0s-gate-card-bridge.js</code> shared 0S bridge</span>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/0s-gate-card-bridge.js"></script>
+  <script src="./gate-platform.js"></script>
+</body>
+</html>

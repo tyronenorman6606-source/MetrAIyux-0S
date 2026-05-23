@@ -27,6 +27,35 @@ This factory should turn a client packet, asset folder, live URL, intake record,
 
 Client-facing language should say app, client app, operating surface, preview, workspace, infrastructure, AI, automation, or sovereign technology. Do not sell the work as just a website.
 
+## UI / UX Rebuild Directive
+
+The factory is not allowed to collapse the whole workflow into one crowded admin dashboard. If three broad surfaces contain twelve decisions, split them into twelve focused pages. Each page should answer one operator question and move the user to the next step.
+
+Required route-first workflow:
+
+1. `clients/` - choose a Valley Verified client.
+2. `client/` - confirm the imported business record.
+3. `surfaces/` - inspect live source surfaces.
+4. `brand/` - confirm logo, colors, typography, and identity gaps.
+5. `media/` - gather or generate client-specific media.
+6. `design/` - choose the experience direction.
+7. `builder/` - run the build.
+8. `generated-apps/` - preview generated routes.
+9. `proofs/` - review browser proof and QA.
+10. `workspace/` - prepare the client workspace handoff.
+11. `payment/` - connect continuation, trial, and payment lanes.
+12. `deployments/` - prepare launch and deployment verification.
+13. `auren/` - ask the assistant for diagnosis and repair guidance.
+
+UX rules:
+
+- No command-first, Docker-first, terminal-first, or generic dashboard framing.
+- No unlabeled walls of cards. Use bounded lists, focused forms, route labels, and plain next-step language.
+- The default client picker must show a short starter list and search, not dump the entire Valley catalog.
+- Every page must make its current step obvious in the left rail and page title.
+- Raw payloads belong behind Details. The primary UI must be usable without reading JSON.
+- The static shell must load Valley clients from data fallback without 404 noise; the live server must run the backend generation path.
+
 ## Core Architecture
 
 The Design Lab is inside the MCP layer, and the MCP layer is inside the Client App Factory.

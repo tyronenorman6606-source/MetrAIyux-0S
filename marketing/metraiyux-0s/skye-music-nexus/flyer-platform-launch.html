@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeMusicNexus — Platform Launch · July 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #05080c;
+      --card:  #0c1018;
+      --card2: #0f1520;
+      --gold:  #f4c75b;
+      --cyan:  #64d9ff;
+      --mint:  #6ff2c7;
+      --violet:#a88cff;
+      --ink:   #f4f0e8;
+      --soft:  rgba(244,240,232,.72);
+      --dim:   rgba(244,240,232,.42);
+      --line:  rgba(255,255,255,.07);
+      --lgold: rgba(244,199,91,.22);
+      --lcyan: rgba(100,217,255,.18);
+    }
+    html, body {
+      background: #0a0d12;
+      font-family: "Space Grotesk", sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    @page { size: letter portrait; margin: 0; }
+    @media screen {
+      body { display:flex; flex-direction:column; align-items:center; padding:28px 20px 60px; gap:14px; }
+      .save-btn {
+        background:var(--gold); color:#05080c;
+        font-family:"Space Grotesk",sans-serif; font-weight:700; font-size:13px;
+        padding:9px 22px; border:none; border-radius:6px; cursor:pointer;
+        align-self:flex-end;
+      }
+      .page { box-shadow: 0 16px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.05); }
+    }
+    @media print { .save-btn { display:none; } }
+
+    .page {
+      width:8.5in; height:11in;
+      background:var(--bg); overflow:hidden; position:relative;
+      display:grid;
+      grid-template-rows: 3px auto auto auto 1fr auto auto;
+      padding:.42in .52in .32in;
+      row-gap:0;
+    }
+    .page::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 55% 28% at 88% 2%,  rgba(244,199,91,.08) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 8%  95%, rgba(100,217,255,.05) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 22% at 50% 52%, rgba(168,140,255,.03) 0%, transparent 70%);
+    }
+
+    /* ACCENT */
+    .accent { background:linear-gradient(90deg,var(--gold) 0%,var(--cyan) 55%,transparent 100%); margin-bottom:.2in; }
+
+    /* HEADER */
+    .hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.14in; }
+    .brand-wordmark { font-family:"Orbitron",sans-serif; font-weight:900; font-size:27px; letter-spacing:.04em; color:var(--ink); line-height:1; }
+    .brand-wordmark em { color:var(--gold); font-style:normal; }
+    .brand-tag { font-size:8.5px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-top:5px; font-family:"Fira Code",monospace; }
+    .launch-flag { text-align:right; border:1px solid rgba(244,199,91,.35); border-radius:6px; padding:7px 13px; background:rgba(244,199,91,.06); }
+    .lf-label { font-size:7.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); font-family:"Fira Code",monospace; }
+    .lf-date { font-family:"Orbitron",sans-serif; font-weight:900; font-size:17px; color:var(--gold); line-height:1.1; margin-top:3px; }
+
+    /* HERO */
+    .hero { margin-bottom:.13in; }
+    .hero-h { font-family:"Orbitron",sans-serif; font-weight:900; font-size:30px; line-height:1.08; letter-spacing:.01em; color:var(--ink); margin-bottom:8px; }
+    .hero-h .g { color:var(--gold); }
+    .hero-p { font-size:12px; color:var(--soft); line-height:1.65; max-width:6.8in; }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(6,1fr); border:1px solid var(--lgold); border-radius:7px; overflow:hidden; background:rgba(244,199,91,.04); margin-bottom:.15in; }
+    .st { padding:10px 4px; text-align:center; border-right:1px solid rgba(244,199,91,.1); }
+    .st:last-child { border-right:none; }
+    .st-n { font-family:"Orbitron",sans-serif; font-weight:900; font-size:17px; color:var(--gold); display:block; line-height:1; }
+    .st-n.c { color:var(--cyan); } .st-n.m { color:var(--mint); }
+    .st-l { font-size:7.5px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; display:block; margin-top:4px; font-family:"Fira Code",monospace; }
+
+    /* 3-COL BODY */
+    .body-cols { display:grid; grid-template-columns:1.1fr 1.1fr 0.8fr; gap:.13in; min-height:0; }
+    .sec-title { font-size:8px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); border-bottom:1px solid var(--lgold); padding-bottom:5px; margin-bottom:8px; font-family:"Fira Code",monospace; }
+    .sec-title.c { color:var(--cyan); border-bottom-color:var(--lcyan); }
+
+    /* Free items */
+    .free-items { display:flex; flex-direction:column; gap:5px; margin-bottom:.09in; }
+    .fi { display:flex; align-items:flex-start; gap:8px; background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:7px 9px; }
+    .fi-ico { font-size:13px; flex-shrink:0; margin-top:1px; }
+    .fi-name { font-size:10.5px; font-weight:700; color:var(--ink); line-height:1.2; }
+    .fi-val { font-size:8.5px; color:var(--gold); font-family:"Fira Code",monospace; margin-top:2px; }
+    .fi-desc { font-size:9.5px; color:var(--soft); margin-top:2px; line-height:1.4; }
+
+    /* Steps */
+    .steps { display:flex; flex-direction:column; gap:5px; }
+    .step { display:flex; gap:7px; align-items:flex-start; }
+    .step-n { flex-shrink:0; width:20px; height:20px; border-radius:50%; border:1px solid var(--lgold); background:rgba(244,199,91,.08); display:flex; align-items:center; justify-content:center; font-family:"Orbitron",sans-serif; font-weight:900; font-size:6.5px; color:var(--gold); }
+    .step-name { font-size:10px; font-weight:700; color:var(--ink); line-height:1.2; }
+    .step-sub { font-size:8.5px; color:var(--dim); line-height:1.38; margin-top:1px; }
+    .step-tag { display:inline-block; margin-top:2px; font-size:7px; font-family:"Fira Code",monospace; color:var(--cyan); background:rgba(100,217,255,.07); border:1px solid rgba(100,217,255,.2); border-radius:3px; padding:1px 5px; }
+
+    /* Feature cards */
+    .features { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+    .fc { background:var(--card); border:1px solid var(--line); border-radius:6px; padding:8px 9px; display:flex; flex-direction:column; gap:4px; }
+    .fc-top { display:flex; align-items:center; gap:6px; }
+    .fc-ico { font-size:13px; flex-shrink:0; }
+    .fc-name { font-family:"Orbitron",sans-serif; font-weight:700; font-size:7px; color:var(--ink); letter-spacing:.03em; display:block; line-height:1.2; }
+    .fc-stat { font-family:"Fira Code",monospace; font-size:7px; color:var(--gold); display:block; margin-top:1px; }
+    .fc-desc { font-size:9px; color:var(--dim); line-height:1.42; }
+
+    /* Legal items */
+    .legal-items { display:flex; flex-direction:column; gap:5px; }
+    .li { background:rgba(244,199,91,.05); border:1px solid rgba(244,199,91,.12); border-radius:6px; padding:7px 9px; }
+    .li-name { font-size:9px; font-weight:700; color:var(--gold); margin-bottom:2px; }
+    .li-desc { font-size:8.5px; color:var(--soft); line-height:1.42; }
+
+    /* Tier items */
+    .tier { border-left:2px solid var(--lgold); padding:5px 0 5px 8px; margin-bottom:5px; }
+    .tier-name { font-size:9px; font-weight:700; color:var(--ink); }
+    .tier-price { font-family:"Fira Code",monospace; font-size:8.5px; color:var(--gold); }
+    .tier-desc { font-size:8px; color:var(--dim); line-height:1.38; margin-top:1px; }
+
+    /* BOTTOM */
+    .bot { display:grid; grid-template-columns:1fr auto; gap:.14in; margin-top:.1in; align-items:end; }
+    .proof-label { font-size:7.5px; font-family:"Fira Code",monospace; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-bottom:5px; }
+    .proof-mini { display:flex; flex-wrap:wrap; gap:4px; }
+    .proof-tag { font-size:8px; color:var(--soft); background:var(--card); border:1px solid var(--line); border-radius:3px; padding:2px 7px; display:flex; align-items:center; gap:4px; }
+    .proof-tag::before { content:"✓"; color:var(--mint); font-size:7.5px; font-weight:700; }
+    .cta { background:rgba(244,199,91,.07); border:1px solid var(--lgold); border-radius:7px; padding:11px 13px; min-width:2.35in; display:flex; flex-direction:column; gap:5px; }
+    .cta-h { font-family:"Orbitron",sans-serif; font-weight:900; font-size:8.5px; color:var(--gold); letter-spacing:.1em; }
+    .cta-row { font-size:8.5px; color:var(--soft); display:flex; gap:5px; align-items:flex-start; line-height:1.4; }
+    .cta-row strong { color:var(--ink); }
+    .cta-url { font-family:"Fira Code",monospace; font-size:7.5px; color:var(--cyan); word-break:break-all; }
+    .cta-divider { border:none; border-top:1px solid rgba(244,199,91,.12); }
+    .cta-note { font-size:7.5px; color:var(--dim); line-height:1.42; }
+
+    /* FOOTER */
+    .ft { border-top:1px solid var(--line); padding-top:7px; display:flex; justify-content:space-between; align-items:center; margin-top:.09in; }
+    .ft-l { font-family:"Fira Code",monospace; font-size:7px; color:var(--dim); }
+    .ft-r { font-size:7.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); }
+    .ft-r span { color:var(--gold); }
+  </style>
+</head>
+<body>
+  <button class="save-btn" onclick="window.print()">Save as PDF</button>
+  <div class="page">
+
+    <div class="accent"></div>
+
+    <div class="hd">
+      <div>
+        <div class="brand-wordmark">SKYE <em>MUSIC</em> NEXUS</div>
+        <div class="brand-tag">by Skyes Over London LC · SOL Enterprises · Arizona</div>
+      </div>
+      <div class="launch-flag">
+        <div class="lf-label">Platform Launches</div>
+        <div class="lf-date">JULY 2026</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-h">Music Operations<br>For <span class="g">Independent Artists</span></div>
+      <div class="hero-p">Full-stack music platform inside MetrAIyux 0S — native DAW room, upload studio, rights vault, royalty ledger, release workflows, 2-month content engine, and IC-backed storefront management. Built and operated by Skyes Over London LC. You make music. We run the ops. Your catalog stays yours.</div>
+    </div>
+
+    <div class="stats">
+      <div class="st"><span class="st-n">$597<span style="font-size:11px">+</span></span><span class="st-l">Free Package Value</span></div>
+      <div class="st"><span class="st-n">$497</span><span class="st-l">Studio Plan /mo</span></div>
+      <div class="st"><span class="st-n">$1,497</span><span class="st-l">Label Command /mo</span></div>
+      <div class="st"><span class="st-n c">2 Mo</span><span class="st-l">Free Content Engine</span></div>
+      <div class="st"><span class="st-n">30<span style="font-size:11px">+</span></span><span class="st-l">Legal Policies</span></div>
+      <div class="st"><span class="st-n m">100%</span><span class="st-l">Artist-Owned Music</span></div>
+    </div>
+
+    <div class="body-cols">
+
+      <!-- LEFT: Free Package + Journey -->
+      <div>
+        <div class="sec-title">Free Founding Artist Package</div>
+        <div class="free-items">
+          <div class="fi">
+            <span class="fi-ico">🌐</span>
+            <div>
+              <div class="fi-name">Custom Artist Landing Page</div>
+              <div class="fi-val">$99+ value · Built & deployed for you</div>
+              <div class="fi-desc">Full portfolio page — bio, links, Skye-ID, releases. We build it. You own it.</div>
+            </div>
+          </div>
+          <div class="fi">
+            <span class="fi-ico">⚡</span>
+            <div>
+              <div class="fi-name">2-Month Content Engine</div>
+              <div class="fi-val">$498+ value · 60 days of release content</div>
+              <div class="fi-desc">Captions, short-form hooks, clip briefs, and campaign packs tailored to your drops.</div>
+            </div>
+          </div>
+          <div class="fi">
+            <span class="fi-ico">🏪</span>
+            <div>
+              <div class="fi-name">Managed Storefront</div>
+              <div class="fi-val">SOL-operated · You stay creative</div>
+              <div class="fi-desc">We handle release workflows, rights, metadata, and platform ops. You make music.</div>
+            </div>
+          </div>
+          <div class="fi">
+            <span class="fi-ico">📋</span>
+            <div>
+              <div class="fi-name">IC Legal Framework</div>
+              <div class="fi-val">LegalSkyes · SOVEREIGN docs · Arizona law</div>
+              <div class="fi-desc">Full independent contractor agreement. Legally sound. Your catalog stays yours.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title" style="margin-top:.09in">End-to-End Artist Journey</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">01</div>
+            <div><div class="step-name">Sign Up for the 0S (Free)</div><div class="step-sub">Free gate account. Entry into the full Skye ecosystem.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-n">02</div>
+            <div><div class="step-name">Join the Founding Artist Waitlist</div><div class="step-sub">Request your founding spot inside the 0S. Limited cohort.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-n">03</div>
+            <div><div class="step-name">IC Onboarding via SkyeRoutexFlow</div><div class="step-sub">IC agreement, compliance docs — all handled.<br><span class="step-tag">SkyeRoutexFlow · LegalSkyes backed</span></div></div>
+          </div>
+          <div class="step">
+            <div class="step-n">04</div>
+            <div><div class="step-name">We Build Your Page + Content Engine</div><div class="step-sub">Portfolio, landing page, and 60-day content runway built for you.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-n">05</div>
+            <div><div class="step-name">Drop Music. We Manage Ops.</div><div class="step-sub">Upload to the platform. We handle release workflow, rights, metadata.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-n">06</div>
+            <div><div class="step-name">Get Paid via SkyePay</div><div class="step-sub">Royalty ledger, payout queue, IC payment records tracked.<br><span class="step-tag">SkyePay · Royalty Ledger · IC-safe</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER: Platform Features -->
+      <div>
+        <div class="sec-title c">Platform Features</div>
+        <div class="features">
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">🎚️</span><div><span class="fc-name">Native DAW Room</span><span class="fc-stat">In-browser studio</span></div></div>
+            <div class="fc-desc">Full transport, tracks, mixer, WAV export. Physical keyboard, region edits, loop packs.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">🎵</span><div><span class="fc-name">Upload Studio</span><span class="fc-stat">Gated audio vault</span></div></div>
+            <div class="fc-desc">Drag-drop upload, secure vault playback, track preview, release handoff.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">🔒</span><div><span class="fc-name">Rights Vault</span><span class="fc-stat">Rights + takedown holds</span></div></div>
+            <div class="fc-desc">Rights attestation, takedown holds, and legal-safe distribution boundaries.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">📊</span><div><span class="fc-name">Royalty Ledger</span><span class="fc-stat">Splits + payout queue</span></div></div>
+            <div class="fc-desc">Transparent royalty tracking, split notes, and gated payout review.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">🚀</span><div><span class="fc-name">Release Workflows</span><span class="fc-stat">Approval-gated ops</span></div></div>
+            <div class="fc-desc">Metadata QA, release capsule management, approval workflows, ops queue.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">📱</span><div><span class="fc-name">Content Engine</span><span class="fc-stat">Social + campaigns</span></div></div>
+            <div class="fc-desc">Captions, clip briefs, campaign sprints, and creator packs per release.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">👤</span><div><span class="fc-name">Artist Profiles</span><span class="fc-stat">Identity + discovery</span></div></div>
+            <div class="fc-desc">Artist identity, bio, links, Skye-ID bridge, and discovery surface.</div>
+          </div>
+          <div class="fc">
+            <div class="fc-top"><span class="fc-ico">💳</span><div><span class="fc-name">SkyePay</span><span class="fc-stat">IC payouts · royalties</span></div></div>
+            <div class="fc-desc">Native payment for IC payouts, storefront revenue, and royalty settlement.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Legal + Tiers -->
+      <div>
+        <div class="sec-title">Legal Framework</div>
+        <div class="legal-items">
+          <div class="li">
+            <div class="li-name">IC Status</div>
+            <div class="li-desc">Independent contractor — not an employee. Your catalog, your rights. Always.</div>
+          </div>
+          <div class="li">
+            <div class="li-name">LegalSkyes</div>
+            <div class="li-desc">30+ policies at solenterprises.org. Every IC agreement runs through this framework.</div>
+          </div>
+          <div class="li">
+            <div class="li-name">SOVEREIGN Docs</div>
+            <div class="li-desc">Backs every IC agreement, proof receipt, and platform authority claim.</div>
+          </div>
+          <div class="li">
+            <div class="li-name">SkyeRoutexFlow</div>
+            <div class="li-desc">Workforce command system. IC onboarding, agreements, and compliance for all founding artists.</div>
+          </div>
+        </div>
+
+        <div class="sec-title" style="margin-top:.09in">Paid Platform Tiers</div>
+        <div class="tier" style="border-color:var(--cyan)">
+          <div class="tier-name">Studio</div>
+          <div class="tier-price">$497/mo · +$1,500 setup</div>
+          <div class="tier-desc">5 artists, 25 releases, upload studio, royalty ledger, payout queue.</div>
+        </div>
+        <div class="tier" style="border-color:var(--violet)">
+          <div class="tier-name">Label Command</div>
+          <div class="tier-price">$1,497/mo · +$6,500 setup</div>
+          <div class="tier-desc">25 artists, 150 releases, approval workflows, rights audit, analytics.</div>
+        </div>
+        <div class="tier" style="border-color:var(--mint)">
+          <div class="tier-name">Managed Music Ops</div>
+          <div class="tier-price">$3,997/mo · +$15,000 setup</div>
+          <div class="tier-desc">Custom limits, managed onboarding, team roles, client-facing ops room.</div>
+        </div>
+        <div class="tier" style="border-color:rgba(255,255,255,.12)">
+          <div class="tier-name" style="color:var(--dim)">SkyeMusicNexus Lite</div>
+          <div class="tier-price" style="color:var(--mint)">Free99 · Gate session required</div>
+          <div class="tier-desc">1 artist profile, 1 draft release, sample royalty and analytics view.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot">
+      <div>
+        <div class="proof-label">Platform Stack</div>
+        <div class="proof-mini">
+          <span class="proof-tag">Cloudflare Workers</span>
+          <span class="proof-tag">SkyeVault / R2</span>
+          <span class="proof-tag">SkyeGate FS27</span>
+          <span class="proof-tag">MetrAIyux 0S</span>
+          <span class="proof-tag">SkyePay</span>
+          <span class="proof-tag">D1 Database</span>
+          <span class="proof-tag">Rights Vault</span>
+          <span class="proof-tag">Royalty Ledger</span>
+          <span class="proof-tag">kAIxu AI</span>
+          <span class="proof-tag">Relay13 Inbox</span>
+        </div>
+      </div>
+      <div class="cta">
+        <div class="cta-h">Join the Founding Artist Waitlist</div>
+        <div class="cta-row">🌐&nbsp;<span class="cta-url">metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html</span></div>
+        <div class="cta-row">✉&nbsp;<strong>grayskyes@solenterprises.org</strong></div>
+        <hr class="cta-divider">
+        <div class="cta-note">Sign up free. Request your founding artist spot from inside the 0S. We onboard via SkyeRoutexFlow. Founding cohort is limited — July 2026 launch only.</div>
+      </div>
+    </div>
+
+    <div class="ft">
+      <div class="ft-l">Skyes Over London LC · SOL Enterprises · Arizona · solenterprises.org · IC agreements governed by Arizona law · Artist music rights remain with the artist</div>
+      <div class="ft-r">SkyeMusicNexus &nbsp;·&nbsp; <span>July 2026</span> &nbsp;·&nbsp; © 2026</div>
+    </div>
+
+  </div>
+</body>
+</html>

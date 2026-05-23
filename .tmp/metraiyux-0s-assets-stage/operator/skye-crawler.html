@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeCrawler operator console for end-to-end user-flow crawling, runtime proof, mobile checks, Worker API smoke, and launch readiness receipts.">
+  <title>SkyeCrawler · Operator Command Center</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">SkyeCrawler</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="index.html">Operator</a>
+      <a href="../proof/skye-crawler-receipt.html">Proof Receipt</a>
+      <a href="../proof/proof-center.html">Proof Center</a>
+      <a href="../local-brain.html">Brain</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero slim">
+      <div class="hero-copy">
+        <p class="eyebrow">Operator QA system</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>SkyeCrawler</h1>
+        <p class="hero-lede">A repeatable end-to-end crawler that uses the system like an actual user before the work reaches a paying customer.</p>
+        <div class="hero-actions">
+          <button class="button primary" type="button" data-skye-run="static">Run Static Crawl</button>
+          <button class="button" type="button" data-skye-status>Check Runner</button>
+          <a class="button primary" href="../data/skye-crawler.json">Open Registry JSON</a>
+          <a class="button" href="../proof/skye-crawler-receipt.html">View Latest Receipt</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="metric-row">
+        <article class="metric"><strong>524</strong><span>HTML surfaces crawled in the current full-site proof</span></article>
+        <article class="metric"><strong>556</strong><span>local href/src references resolved</span></article>
+        <article class="metric"><strong>14</strong><span>operator checks in the latest local proof pass</span></article>
+        <article class="metric"><strong>0</strong><span>failures and warnings in the last completed SkyeCrawler run</span></article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Local runner</p>
+        <h2>Run SkyeCrawler from this operator page.</h2>
+        <p class="wide">Start the local control bridge once, then use the buttons here to launch the crawl and watch the receipt status.</p>
+        <pre class="receipt-box">cd /workspaces/MetrAIyux-0S
+npm run skye:control</pre>
+        <div class="hero-actions">
+          <button class="button primary" type="button" data-skye-run="static">Run Static Crawl</button>
+          <button class="button" type="button" data-skye-run="worker">Run Worker Crawl</button>
+          <button class="button" type="button" data-skye-run="live">Run Live Crawl</button>
+          <button class="button" type="button" data-skye-status>Refresh Status</button>
+        </div>
+      </div>
+      <aside class="panel">
+        <h3>Runner status</h3>
+      <p id="skyeRunnerState">Runner status has not been checked in this browser session.</p>
+      <pre id="skyeCrawlerConsole" class="receipt-box">Start the local control bridge, then use Refresh Status or Run Static Crawl.
+
+cd /workspaces/MetrAIyux-0S
+npm run skye:control</pre>
+      </aside>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Run modes</p>
+        <h2>Use static mode for page truth and Worker mode for deployed behavior.</h2>
+        <p class="wide">Static mode catches bad links, missing assets, browser runtime errors, mobile overflow, and broken local tool flows. Worker mode adds Cloudflare headers, asset routing, API status, route receipts, and the same human-facing browser flows.</p>
+      </div>
+      <aside class="panel">
+        <h3>Operator rule</h3>
+        <p>Run SkyeCrawler before customer handoff, after navigation changes, after Worker/API changes, and before updating public proof claims.</p>
+      </aside>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Commands</p>
+      <div class="route-grid">
+        <article class="route-card">
+          <h3>Static Crawl</h3>
+          <p>Serve the folder as a static site, then run the crawler without API expectations.</p>
+          <pre class="receipt-box">cd /workspaces/MetrAIyux-0S
+npm run skye:serve:site
+
+npm run skye:crawl:static</pre>
+        </article>
+        <article class="route-card">
+          <h3>Worker Crawl</h3>
+          <p>Run the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> locally with persistence outside the served site folder.</p>
+          <pre class="receipt-box">cd /workspaces/MetrAIyux-0S/metraiyux_0s_site
+npx wrangler dev --ip 127.0.0.1 --port 4174 --persist-to /tmp/metraiyux-wrangler-state
+
+cd /workspaces/MetrAIyux-0S
+npm run skye:crawl:worker</pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Coverage</p>
+      <div class="process-grid">
+        <article class="process-step"><h3>Inventory</h3><p>Counts site HTML, loads every page, and checks local links/assets.</p></article>
+        <article class="process-step"><h3>Runtime</h3><p>Runs Chromium sweeps on desktop and mobile viewports, capturing console errors, page errors, failed local requests, blank pages, and overflow.</p></article>
+        <article class="process-step"><h3>User Flows</h3><p>Clicks through <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Local Brain</span>, Persona Brain, Live Proof Router, calculator, admin save/clear, SaaS signup, and client onboarding.</p></article>
+        <article class="process-step"><h3>Proof</h3><p>Writes JSON reports and screenshot artifacts into `test-artifacts/` for release review and customer-safe evidence.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer><p>SkyeCrawler is an operator QA lane inside MetrAIyux 0S. It proves the system before a customer has to discover the breakage.</p></footer>
+  <script>
+    (() => {
+      const API = 'http://127.0.0.1:4175';
+      const state = document.getElementById('skyeRunnerState');
+      const consoleBox = document.getElementById('skyeCrawlerConsole');
+      let pollTimer = null;
+
+      function esc(value) {
+        return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      }
+
+      function write(text) {
+        if (consoleBox) consoleBox.textContent = text;
+      }
+
+      function renderStatus(data) {
+        const report = data.reports?.static || data.lastRun?.reportSummary || {};
+        const lines = [];
+        lines.push(data.active ? `Running: ${data.activeRun.mode} (${data.activeRun.id})` : 'Idle');
+        if (data.lastRun) lines.push(`Last run: ${data.lastRun.mode} exit ${data.lastRun.exitCode}`);
+        if (report.exists) lines.push(`Report: ${report.path}`);
+        if (report.exists) lines.push(`Result: ${report.ok ? 'PASS' : 'CHECK'} · ${report.checks} checks · ${report.failures} failures · ${report.warnings} warnings`);
+        if (report.checkpoint?.stage) lines.push(`Checkpoint: ${report.checkpoint.stage}`);
+        if (data.logs?.length) {
+          lines.push('');
+          lines.push(...data.logs.slice(-28).map(item => item.line));
+        }
+        if (state) state.textContent = data.active ? 'SkyeCrawler is running.' : 'SkyeCrawler runner is ready.';
+        write(lines.join('\n'));
+        if (data.active && !pollTimer) pollTimer = setInterval(refreshStatus, 2500);
+        if (!data.active && pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
+
+      async function refreshStatus() {
+        try {
+          const res = await fetch(`${API}/status`, { cache: 'no-store' });
+          renderStatus(await res.json());
+        } catch {
+          if (state) state.textContent = 'Local runner is offline.';
+          write('Start the local runner, then use this page:\n\ncd /workspaces/MetrAIyux-0S\nnpm run skye:control');
+        }
+      }
+
+      async function run(mode) {
+        write(`Starting SkyeCrawler ${mode} run...`);
+        try {
+          const res = await fetch(`${API}/run`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ mode })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            write(data.error || `Runner returned ${res.status}`);
+            return;
+          }
+          renderStatus(await fetch(`${API}/status`, { cache: 'no-store' }).then(r => r.json()));
+        } catch {
+          if (state) state.textContent = 'Local runner is offline.';
+          write('Start the local runner first:\n\ncd /workspaces/MetrAIyux-0S\nnpm run skye:control');
+        }
+      }
+
+      document.querySelectorAll('[data-skye-run]').forEach(button => {
+        button.addEventListener('click', () => run(button.getAttribute('data-skye-run') || 'static'));
+      });
+      document.querySelectorAll('[data-skye-status]').forEach(button => {
+        button.addEventListener('click', refreshStatus);
+      });
+    })();
+  </script>
+<script src="../script.js"></script></body>
+</html>

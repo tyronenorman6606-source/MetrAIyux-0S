@@ -1,0 +1,2 @@
+export const name='storage.routes'; export const area='storage'; export const owns=['artifact metadata','storage posture']; export const routes=['GET /api/v17/storage/status'];
+export async function handle(ctx){ const { method,url,sendJSON }=ctx; if(method==='GET' && url.pathname==='/api/v17/storage/status') return sendJSON(200,{ok:true,mode:process.env.SOVEREIGNDOCS_STORAGE_MODE||'local-dev',providerReady:['r2','s3'].includes(process.env.SOVEREIGNDOCS_STORAGE_MODE||''),boundary:'Storage adapter status only; no fake production storage claim.'}); return {handled:false}; }

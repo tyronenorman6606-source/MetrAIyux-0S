@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="SkyeGateFS27 PIN gate for generated Gate ID, PIN unlock, and one-time recovery codes.">
+  <title>PIN Gate · SkyeGateFS27</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body{background:#07080d;color:#f8f7ff;font-family:Inter,system-ui,sans-serif;margin:0}
+    .pin-shell{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 48px}
+    .pin-hero,.pin-card{border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(14,18,28,.84);box-shadow:0 24px 90px rgba(0,0,0,.36)}
+    .pin-hero{padding:28px;margin-bottom:16px;display:grid;gap:16px}
+    .pin-hero h1{font-size:clamp(2.6rem,7vw,6.5rem);line-height:.92;margin:0;letter-spacing:-.03em}
+    .pin-hero p{max-width:820px;color:rgba(248,247,255,.72);line-height:1.6;margin:0}
+    .pin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .pin-card{padding:18px;display:grid;gap:12px;align-content:start}
+    .pin-card h2{margin:0;font-size:1.1rem}.pin-card p{margin:0;color:rgba(248,247,255,.66);line-height:1.5}
+    label{display:grid;gap:6px;color:rgba(248,247,255,.72);font-size:.86rem}
+    input,textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:#090b12;color:#fff;padding:12px;font:inherit}
+    textarea{min-height:100px}
+    button,.pin-link{border:1px solid rgba(255,255,255,.15);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;padding:11px 15px;font-weight:800;text-decoration:none;cursor:pointer}
+    button.primary,.pin-link.primary{background:linear-gradient(135deg,#ffe5a0,#f0b84f);color:#160f04;border-color:rgba(255,255,255,.34)}
+    .result{white-space:pre-wrap;overflow:auto;max-height:280px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#05060a;padding:12px;color:#b9ffdf;font-size:.82rem}
+    .code-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .code-list code{display:block;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px;color:#ffe5a0;background:rgba(255,255,255,.04)}
+    nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    @media(max-width:900px){.pin-grid{grid-template-columns:1fr}.pin-hero h1{font-size:3rem}.code-list{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="pin-shell">
+    <section class="pin-hero">
+      <div>
+        <p style="text-transform:uppercase;letter-spacing:.12em;color:#ffe5a0;font-size:.78rem">SkyeGateFS27 auth lane</p>
+        <h1>Generated Gate ID. Human PIN. Real recovery codes.</h1>
+      </div>
+      <p>This lane lets an already-authenticated user create a short numeric Gate ID plus PIN credential. FS27 stores only hashed PIN material and hashed recovery codes. Recovery delivery uses the configured email webhook; local/dev mode returns preview codes once so the flow can be tested honestly.</p>
+      <nav>
+        <a class="pin-link primary" href="index.html">Back to FS27</a>
+        <a class="pin-link" href="gate-map.html">Gate map</a>
+        <a class="pin-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/HouseOperations/index.html">HouseOperations</a>
+      </nav>
+    </section>
+
+    <section class="pin-grid">
+      <form class="pin-card" id="setupForm">
+        <h2>Create PIN gate</h2>
+        <p>Paste a current SkyeGate session token, choose a 4-12 digit PIN, and FS27 issues the generated Gate ID plus one-time recovery codes.</p>
+        <label>Bearer session token<textarea name="token" autocomplete="off" placeholder="eyJ..."></textarea></label>
+        <label>PIN<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,12}" placeholder="4-12 digits" required></label>
+        <label>Label<input name="label" placeholder="Primary phone PIN"></label>
+        <button class="primary" type="submit">Issue Gate ID + Recovery Codes</button>
+      </form>
+
+      <form class="pin-card" id="loginForm">
+        <h2>PIN login</h2>
+        <p>Enter the generated Gate ID and PIN, or paste the combined digits as one credential.</p>
+        <label>Gate ID<input name="gate_id" inputmode="numeric" placeholder="10 digit Gate ID"></label>
+        <label>PIN<input name="pin" type="password" inputmode="numeric" placeholder="PIN"></label>
+        <label>Combined credential<input name="credential" inputmode="numeric" placeholder="Gate ID followed by PIN"></label>
+        <button class="primary" type="submit">Unlock with PIN</button>
+      </form>
+
+      <form class="pin-card" id="recoveryForm">
+        <h2>Recovery login</h2>
+        <p>Recovery codes are one-time use. After this works, rotate the PIN or issue a fresh recovery set.</p>
+        <label>Gate ID<input name="gate_id" inputmode="numeric" placeholder="10 digit Gate ID" required></label>
+        <label>Recovery code<input name="recovery_code" placeholder="XXXX-XXXX-XXXX" required></label>
+        <button class="primary" type="submit">Use Recovery Code</button>
+      </form>
+
+      <form class="pin-card" id="rotateForm">
+        <h2>Rotate recovery codes</h2>
+        <p>Paste a current SkyeGate session token and either a Gate ID or credential ID. FS27 invalidates the old code set and sends a fresh one-time batch.</p>
+        <label>Bearer session token<textarea name="token" autocomplete="off" placeholder="eyJ..."></textarea></label>
+        <label>Gate ID<input name="gate_id" inputmode="numeric" placeholder="10 digit Gate ID"></label>
+        <label>Credential ID<input name="credential_id" placeholder="optional UUID"></label>
+        <button class="primary" type="submit">Rotate Codes</button>
+      </form>
+    </section>
+
+    <section class="pin-card" style="margin-top:14px">
+      <h2>Result</h2>
+      <div id="codes" class="code-list"></div>
+      <pre id="result" class="result">Waiting for a gate action.</pre>
+    </section>
+  </main>
+
+  <script>
+    const result = document.querySelector('#result');
+    const codes = document.querySelector('#codes');
+
+    function endpoint(path) {
+      return path;
+    }
+
+    function show(data) {
+      result.textContent = JSON.stringify(data, null, 2);
+      const list = data?.recovery_codes || [];
+      codes.innerHTML = list.map((code) => `<code>${String(code).replace(/[&<>"']/g, '')}</code>`).join('');
+    }
+
+    async function post(path, body, token = '') {
+      const res = await fetch(endpoint(path), {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({ error: 'Invalid JSON response' }));
+      show({ status: res.status, ok: res.ok, ...data });
+      if (data?.session?.token) localStorage.setItem('SKYGATEFS27_SESSION_TOKEN', data.session.token);
+    }
+
+    document.querySelector('#setupForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const body = Object.fromEntries(new FormData(event.currentTarget).entries());
+      post('/auth/pin/setup', { pin: body.pin, label: body.label }, body.token || localStorage.getItem('SKYGATEFS27_SESSION_TOKEN') || '');
+    });
+
+    document.querySelector('#loginForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      post('/auth/pin/login', Object.fromEntries(new FormData(event.currentTarget).entries()));
+    });
+
+    document.querySelector('#recoveryForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      post('/auth/recovery/login', Object.fromEntries(new FormData(event.currentTarget).entries()));
+    });
+
+    document.querySelector('#rotateForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const body = Object.fromEntries(new FormData(event.currentTarget).entries());
+      post('/auth/recovery/rotate', { gate_id: body.gate_id, credential_id: body.credential_id }, body.token || localStorage.getItem('SKYGATEFS27_SESSION_TOKEN') || '');
+    });
+  </script>
+</body>
+</html>

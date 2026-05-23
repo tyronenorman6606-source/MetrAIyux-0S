@@ -1,0 +1,23 @@
+{
+  "name": "signinpro-northstar-workspace-closure",
+  "version": "6.4.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "schema:print": "cat database/schema.sql",
+    "seed:workspaces": "node scripts/provision-workspaces.mjs",
+    "smoke:functions": "node scripts/static-workspace-smoke.mjs",
+    "smoke:security": "node scripts/security-static-smoke.mjs",
+    "schema:verify": "node scripts/schema-verify.mjs",
+    "closure:local": "node scripts/closure-local-proof.mjs",
+    "closure:all": "npm run schema:verify && npm run smoke:core && npm run smoke:security && npm run smoke:functions && npm run closure:local",
+    "admin:provision": "node scripts/provision-workspaces.mjs",
+    "admin:provision:seed": "node scripts/provision-workspaces.mjs --input assets/data/seed-workspaces.json --out provisioned-workspaces.secret.json",
+    "smoke:core": "node proof/core-smoke.test.cjs",
+    "stress:local": "node scripts/stress-local-proof.mjs",
+    "stress:all": "npm run closure:all && npm run stress:local"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "latest"
+  }
+}

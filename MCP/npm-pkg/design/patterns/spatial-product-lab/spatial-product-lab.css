@@ -1,0 +1,81 @@
+.spatial-lab {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  align-items: end;
+  padding: clamp(8rem, 15vw, 14rem) clamp(2rem, 6vw, 6rem) clamp(4rem, 8vw, 7rem);
+  color: #edf6ef;
+  background: #06100e;
+}
+
+.spatial-lab__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.spatial-lab__copy {
+  position: relative;
+  z-index: 2;
+  max-width: 920px;
+}
+
+.spatial-lab__copy p {
+  color: #72f7c8;
+  font: 900 .82rem/1 ui-monospace, monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.spatial-lab h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(3.7rem, 8vw, 8.6rem);
+  line-height: .92;
+  letter-spacing: 0;
+}
+
+.spatial-lab__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem;
+  margin-top: 2rem;
+}
+
+.spatial-lab__controls span {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 3rem;
+  padding: .75rem 1rem;
+  border: 1px solid rgba(114, 247, 200, .24);
+  background: rgba(6, 16, 14, .66);
+  backdrop-filter: blur(14px);
+}
+
+.spatial-lab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(6, 16, 14, .94), rgba(6, 16, 14, .24) 60%, rgba(6, 16, 14, .82));
+}
+
+@media (max-width: 760px) {
+  .spatial-lab {
+    min-height: 880px;
+    align-items: start;
+  }
+
+  .spatial-lab__scene {
+    top: 220px;
+    height: 520px;
+  }
+
+  .spatial-lab::after {
+    background: linear-gradient(180deg, rgba(6, 16, 14, .94), rgba(6, 16, 14, .18) 48%, rgba(6, 16, 14, .92));
+  }
+}

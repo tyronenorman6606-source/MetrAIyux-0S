@@ -1,0 +1,1 @@
+Complimentary Empire Pallets logo concept prepared for proposal discussion. SVG is transparent and can float on dark/light surfaces. Final use should be approved by Empire Pallets ownership.

@@ -1,0 +1,12 @@
+{
+  "type": "rubric",
+  "name": "Security and Overclaim Risk Rubric",
+  "version": "1.0.0",
+  "riskSignals": [
+    { "id": "secret-pattern", "severity": "critical", "description": "Hardcoded provider keys, private keys, or AWS credentials." },
+    { "id": "direct-provider-call", "severity": "high", "description": "Browser calls directly to OpenAI, Anthropic, Gemini, or other AI providers instead of kAIxuGateway13." },
+    { "id": "dangerous-execution", "severity": "high", "description": "eval, Function constructor, shell execution, or unsafe generated code execution." },
+    { "id": "public-overclaim", "severity": "medium", "description": "Landing/public copy claims production, enterprise, compliance, billing, marketplace, verified network, or guarantee without code-backed proof." },
+    { "id": "missing-proof", "severity": "medium", "description": "No tests, no proof ledger, no route inventory, no env inventory, or no operator handoff." }
+  ]
+}

@@ -1,0 +1,1067 @@
+[
+  {
+    "id": "fbb9f2d9-854f-4e62-97fd-1d656df8c97d",
+    "type": "legal_plan_intent",
+    "serviceId": "business-command",
+    "risk": "medium",
+    "jurisdiction": null,
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "planId": "business-command",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "acceptPartnerPlanBoundary": true,
+      "plan": {
+        "id": "business-command",
+        "name": "Business Command",
+        "priceMonthly": 49,
+        "included": [
+          "formation prep lanes",
+          "business document packets",
+          "compliance tracker",
+          "license register",
+          "order tracking",
+          "partner review submission access"
+        ],
+        "partnerReviewCredits": 1,
+        "bestFor": "small businesses and agencies"
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "0ffa454a-0fee-4042-be5b-6349bbc4930d",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "legal_plan_intent intake created",
+        "createdAt": "2026-05-10T20:02:16.101Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:02:16.101Z",
+    "updatedAt": "2026-05-10T20:02:16.101Z"
+  },
+  {
+    "id": "6f64d16a-c9ee-4615-9001-048d4b0a7dff",
+    "type": "estate_planning_intake",
+    "serviceId": "will-worksheet",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "will-worksheet",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "name": "Smoke User"
+      },
+      "packetMarkdown": "# SovereignDocs Estate/Life Planning Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: will-worksheet\n- Service name: Will Worksheet + Draft Packet\n- Risk: high\n\n## User facts\n\n- name: Smoke User\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "0a873d8d-1673-417c-a6a8-cdd7229ddac4",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "estate_planning_intake intake created",
+        "createdAt": "2026-05-10T20:02:16.090Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:02:16.090Z",
+    "updatedAt": "2026-05-10T20:02:16.090Z"
+  },
+  {
+    "id": "404400ee-b6e5-41e6-bcec-db2c17cc68fb",
+    "type": "trademark_ip_intake",
+    "serviceId": "trademark-search-worksheet",
+    "risk": "high",
+    "jurisdiction": "US",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "trademark-search-worksheet",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "mark": "SovereignDocs",
+        "goodsServices": "software platform"
+      },
+      "packetMarkdown": "# SovereignDocs Trademark/IP Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: trademark-search-worksheet\n- Service name: Trademark Search Worksheet\n- Risk: high\n\n## User facts\n\n- mark: SovereignDocs\n- goodsServices: software platform\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n",
+      "officialSource": "USPTO Trademark Center / official USPTO guidance"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "852157c5-bbc5-4272-91d2-ddbfacc41519",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "trademark_ip_intake intake created",
+        "createdAt": "2026-05-10T20:02:16.078Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:02:16.078Z",
+    "updatedAt": "2026-05-10T20:02:16.078Z"
+  },
+  {
+    "id": "67d4560a-5864-40e7-a78b-65039e51f89b",
+    "type": "compliance_monitor",
+    "serviceId": "business-compliance-monitor",
+    "risk": "medium",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "state": "AZ",
+      "entityType": "LLC",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "monitor": {
+        "state": "AZ",
+        "entityType": "LLC",
+        "items": [
+          {
+            "id": "AZ-entity-standing-review",
+            "state": "AZ",
+            "name": "Entity good-standing review",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit"
+            ],
+            "cadence": "at least annually",
+            "lane": "compliance_monitor",
+            "risk": "medium",
+            "sourcePolicy": "Verify with current state agency before relying on deadlines or fees.",
+            "sovereignDocsAction": "track, remind, collect facts, prepare checklist"
+          },
+          {
+            "id": "AZ-registered-agent-confirmation",
+            "state": "AZ",
+            "name": "Registered/statutory agent confirmation",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit",
+              "Foreign Entity"
+            ],
+            "cadence": "ongoing",
+            "lane": "registered_agent_referral",
+            "risk": "medium",
+            "sourcePolicy": "Registered agent requirements and terminology vary by state.",
+            "sovereignDocsAction": "collect agent data, route referral or official-source checklist"
+          },
+          {
+            "id": "AZ-business-license-register",
+            "state": "AZ",
+            "name": "Business license / permit register",
+            "entityTypes": [
+              "All"
+            ],
+            "cadence": "renewal-dependent",
+            "lane": "license_register",
+            "risk": "medium",
+            "sourcePolicy": "License requirements depend on location, activity, and agency. Verify local/county/city requirements.",
+            "sovereignDocsAction": "create license inventory, renewal reminders, upload vault"
+          }
+        ],
+        "boundary": "Calendar items are reminders and checklists only. Verify current deadlines, fees, and requirements with the official agency or configured partner."
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "920a0ff3-bb06-4036-881b-a74b8e8086d3",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "compliance_monitor intake created",
+        "createdAt": "2026-05-10T20:02:16.058Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:02:16.058Z",
+    "updatedAt": "2026-05-10T20:02:16.058Z"
+  },
+  {
+    "id": "03febe9b-785b-4b83-b8ec-9def1a864d77",
+    "type": "business_formation_intake",
+    "serviceId": "llc-formation-prep",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": "founder@example.com",
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "llc-formation-prep",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "contact": {
+        "email": "founder@example.com"
+      },
+      "answers": {
+        "businessName": "Smoke Sovereign LLC",
+        "state": "AZ",
+        "entityType": "LLC",
+        "owners": "One member",
+        "businessPurpose": "Document automation testing",
+        "registeredAgent": "To be selected"
+      },
+      "packetMarkdown": "# LLC Formation Prep\n\nSovereignDocs prepared this intake packet for self-help organization, official-source routing, and optional partner review. This is not legal advice, not a filing, and not an approval guarantee.\n\n## Business facts\n- Proposed business name: Smoke Sovereign LLC\n- State / jurisdiction: AZ\n- Entity type: LLC\n- Owners / members / shareholders: One member\n- Business purpose: Document automation testing\n- Registered/statutory agent: To be selected\n\n## Deliverables requested\n- formation intake packet\n- operating agreement draft\n- statutory/registered agent worksheet\n- EIN official-source route\n- state filing checklist\n- partner review option\n\n## Official-source policy\nstate filing happens through current Secretary of State / Corporation Commission source or configured partner workflow\n\n## Submitter\n- Upstream user: local-operator\n- Contact email: founder@example.com",
+      "officialSourcePolicy": "state filing happens through current Secretary of State / Corporation Commission source or configured partner workflow",
+      "deliverables": [
+        "formation intake packet",
+        "operating agreement draft",
+        "statutory/registered agent worksheet",
+        "EIN official-source route",
+        "state filing checklist",
+        "partner review option"
+      ],
+      "lastTransitionPayload": {}
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "8e91cf4c-5380-432d-bc66-f86e4faa06df",
+        "type": "draft_packet_created",
+        "actor": "local-operator",
+        "note": "business_formation_intake intake created",
+        "createdAt": "2026-05-10T20:02:16.018Z"
+      },
+      {
+        "id": "d363bcd0-9bec-4604-be5b-f57d5ce64c26",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "smoke transition",
+        "payload": {},
+        "createdAt": "2026-05-10T20:02:16.131Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:02:16.018Z",
+    "updatedAt": "2026-05-10T20:02:16.131Z"
+  },
+  {
+    "id": "0462d162-0db6-42c1-8e5a-6a7580cef8f2",
+    "type": "legal_plan_intent",
+    "serviceId": "business-command",
+    "risk": "medium",
+    "jurisdiction": null,
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "planId": "business-command",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "acceptPartnerPlanBoundary": true,
+      "plan": {
+        "id": "business-command",
+        "name": "Business Command",
+        "priceMonthly": 49,
+        "included": [
+          "formation prep lanes",
+          "business document packets",
+          "compliance tracker",
+          "license register",
+          "order tracking",
+          "partner review submission access"
+        ],
+        "partnerReviewCredits": 1,
+        "bestFor": "small businesses and agencies"
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "4ccc4102-76e2-468e-91b9-f11d55ae4986",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "legal_plan_intent intake created",
+        "createdAt": "2026-05-10T20:01:02.239Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:01:02.239Z",
+    "updatedAt": "2026-05-10T20:01:02.239Z"
+  },
+  {
+    "id": "349c92b5-7294-4558-9c76-fb08b5cca361",
+    "type": "estate_planning_intake",
+    "serviceId": "will-worksheet",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "will-worksheet",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "name": "Smoke User"
+      },
+      "packetMarkdown": "# SovereignDocs Estate/Life Planning Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: will-worksheet\n- Service name: Will Worksheet + Draft Packet\n- Risk: high\n\n## User facts\n\n- name: Smoke User\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "1a7183c7-b4ca-40c3-a8c7-e9b4484f5576",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "estate_planning_intake intake created",
+        "createdAt": "2026-05-10T20:01:02.228Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:01:02.228Z",
+    "updatedAt": "2026-05-10T20:01:02.228Z"
+  },
+  {
+    "id": "feee237c-2084-4e7a-8bf9-8297df8d777a",
+    "type": "trademark_ip_intake",
+    "serviceId": "trademark-search-worksheet",
+    "risk": "high",
+    "jurisdiction": "US",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "trademark-search-worksheet",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "mark": "SovereignDocs",
+        "goodsServices": "software platform"
+      },
+      "packetMarkdown": "# SovereignDocs Trademark/IP Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: trademark-search-worksheet\n- Service name: Trademark Search Worksheet\n- Risk: high\n\n## User facts\n\n- mark: SovereignDocs\n- goodsServices: software platform\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n",
+      "officialSource": "USPTO Trademark Center / official USPTO guidance"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "1fb67bb6-2a56-455c-aa6d-d21c1ec03552",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "trademark_ip_intake intake created",
+        "createdAt": "2026-05-10T20:01:02.218Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:01:02.218Z",
+    "updatedAt": "2026-05-10T20:01:02.218Z"
+  },
+  {
+    "id": "1ad6c54a-d698-4d47-b7c5-f67c31e85d7f",
+    "type": "compliance_monitor",
+    "serviceId": "business-compliance-monitor",
+    "risk": "medium",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "state": "AZ",
+      "entityType": "LLC",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "monitor": {
+        "state": "AZ",
+        "entityType": "LLC",
+        "items": [
+          {
+            "id": "AZ-entity-standing-review",
+            "state": "AZ",
+            "name": "Entity good-standing review",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit"
+            ],
+            "cadence": "at least annually",
+            "lane": "compliance_monitor",
+            "risk": "medium",
+            "sourcePolicy": "Verify with current state agency before relying on deadlines or fees.",
+            "sovereignDocsAction": "track, remind, collect facts, prepare checklist"
+          },
+          {
+            "id": "AZ-registered-agent-confirmation",
+            "state": "AZ",
+            "name": "Registered/statutory agent confirmation",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit",
+              "Foreign Entity"
+            ],
+            "cadence": "ongoing",
+            "lane": "registered_agent_referral",
+            "risk": "medium",
+            "sourcePolicy": "Registered agent requirements and terminology vary by state.",
+            "sovereignDocsAction": "collect agent data, route referral or official-source checklist"
+          },
+          {
+            "id": "AZ-business-license-register",
+            "state": "AZ",
+            "name": "Business license / permit register",
+            "entityTypes": [
+              "All"
+            ],
+            "cadence": "renewal-dependent",
+            "lane": "license_register",
+            "risk": "medium",
+            "sourcePolicy": "License requirements depend on location, activity, and agency. Verify local/county/city requirements.",
+            "sovereignDocsAction": "create license inventory, renewal reminders, upload vault"
+          }
+        ],
+        "boundary": "Calendar items are reminders and checklists only. Verify current deadlines, fees, and requirements with the official agency or configured partner."
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "d191ee03-1669-45e8-8649-131c2d0a24d4",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "compliance_monitor intake created",
+        "createdAt": "2026-05-10T20:01:02.183Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:01:02.183Z",
+    "updatedAt": "2026-05-10T20:01:02.183Z"
+  },
+  {
+    "id": "d3d176c2-16e1-40dc-92fc-b04b9b639991",
+    "type": "business_formation_intake",
+    "serviceId": "llc-formation-prep",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": "founder@example.com",
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "llc-formation-prep",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "contact": {
+        "email": "founder@example.com"
+      },
+      "answers": {
+        "businessName": "Smoke Sovereign LLC",
+        "state": "AZ",
+        "entityType": "LLC",
+        "owners": "One member",
+        "businessPurpose": "Document automation testing",
+        "registeredAgent": "To be selected"
+      },
+      "packetMarkdown": "# LLC Formation Prep\n\nSovereignDocs prepared this intake packet for self-help organization, official-source routing, and optional partner review. This is not legal advice, not a filing, and not an approval guarantee.\n\n## Business facts\n- Proposed business name: Smoke Sovereign LLC\n- State / jurisdiction: AZ\n- Entity type: LLC\n- Owners / members / shareholders: One member\n- Business purpose: Document automation testing\n- Registered/statutory agent: To be selected\n\n## Deliverables requested\n- formation intake packet\n- operating agreement draft\n- statutory/registered agent worksheet\n- EIN official-source route\n- state filing checklist\n- partner review option\n\n## Official-source policy\nstate filing happens through current Secretary of State / Corporation Commission source or configured partner workflow\n\n## Submitter\n- Upstream user: local-operator\n- Contact email: founder@example.com",
+      "officialSourcePolicy": "state filing happens through current Secretary of State / Corporation Commission source or configured partner workflow",
+      "deliverables": [
+        "formation intake packet",
+        "operating agreement draft",
+        "statutory/registered agent worksheet",
+        "EIN official-source route",
+        "state filing checklist",
+        "partner review option"
+      ],
+      "lastTransitionPayload": {}
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "67720998-7e84-44e9-aadd-7dd4ff24e411",
+        "type": "draft_packet_created",
+        "actor": "local-operator",
+        "note": "business_formation_intake intake created",
+        "createdAt": "2026-05-10T20:01:02.169Z"
+      },
+      {
+        "id": "9c2e2aa0-1b48-4ada-91b7-9b987a4ccfe6",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "smoke transition",
+        "payload": {},
+        "createdAt": "2026-05-10T20:01:02.269Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:01:02.169Z",
+    "updatedAt": "2026-05-10T20:01:02.269Z"
+  },
+  {
+    "id": "9a46f285-0a10-43f5-87f6-a4cc44b7ba32",
+    "type": "legal_plan_intent",
+    "serviceId": "business-command",
+    "risk": "medium",
+    "jurisdiction": null,
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "planId": "business-command",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "acceptPartnerPlanBoundary": true,
+      "plan": {
+        "id": "business-command",
+        "name": "Business Command",
+        "priceMonthly": 49,
+        "included": [
+          "formation prep lanes",
+          "business document packets",
+          "compliance tracker",
+          "license register",
+          "order tracking",
+          "partner review submission access"
+        ],
+        "partnerReviewCredits": 1,
+        "bestFor": "small businesses and agencies"
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "8eb2e22c-e429-474c-8be6-36cca6ecba05",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "legal_plan_intent intake created",
+        "createdAt": "2026-05-10T20:00:46.668Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:00:46.668Z",
+    "updatedAt": "2026-05-10T20:00:46.668Z"
+  },
+  {
+    "id": "7cc06e0c-7e25-4dbe-9442-6368208bef8d",
+    "type": "estate_planning_intake",
+    "serviceId": "will-worksheet",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "partner_review_requested",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "will-worksheet",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "name": "Smoke User"
+      },
+      "packetMarkdown": "# SovereignDocs Estate/Life Planning Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: will-worksheet\n- Service name: Will Worksheet + Draft Packet\n- Risk: high\n\n## User facts\n\n- name: Smoke User\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "8d9bcc3b-66f3-4485-a53f-38520c3b32c5",
+        "type": "partner_review_requested",
+        "actor": "local-operator",
+        "note": "estate_planning_intake intake created",
+        "createdAt": "2026-05-10T20:00:46.661Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:00:46.661Z",
+    "updatedAt": "2026-05-10T20:00:46.661Z"
+  },
+  {
+    "id": "f9e223b3-97cf-4909-8618-2ba79514db88",
+    "type": "trademark_ip_intake",
+    "serviceId": "trademark-search-worksheet",
+    "risk": "high",
+    "jurisdiction": "US",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "trademark-search-worksheet",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "answers": {
+        "mark": "SovereignDocs",
+        "goodsServices": "software platform"
+      },
+      "packetMarkdown": "# SovereignDocs Trademark/IP Intake Packet\n\nThis packet organizes user facts for document automation, official-source routing, and optional partner review. SovereignDocs is not a law firm and does not provide legal advice.\n\n## Service\n\n- Service ID: trademark-search-worksheet\n- Service name: Trademark Search Worksheet\n- Risk: high\n\n## User facts\n\n- mark: SovereignDocs\n- goodsServices: software platform\n\n## Contact\n\n- Upstream user: local-operator\n- Email: [not supplied]\n\n## Boundary\n\nNo guarantee of approval, acceptance, filing, legal sufficiency, partner acceptance, or outcome.\n",
+      "officialSource": "USPTO Trademark Center / official USPTO guidance"
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "0a825286-73a0-496e-9a39-3b7b784591d0",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "trademark_ip_intake intake created",
+        "createdAt": "2026-05-10T20:00:46.648Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:00:46.648Z",
+    "updatedAt": "2026-05-10T20:00:46.648Z"
+  },
+  {
+    "id": "0bfa732a-87f0-4f06-a4a5-a83b657ba0f8",
+    "type": "compliance_monitor",
+    "serviceId": "business-compliance-monitor",
+    "risk": "medium",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "state": "AZ",
+      "entityType": "LLC",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "monitor": {
+        "state": "AZ",
+        "entityType": "LLC",
+        "items": [
+          {
+            "id": "AZ-entity-standing-review",
+            "state": "AZ",
+            "name": "Entity good-standing review",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit"
+            ],
+            "cadence": "at least annually",
+            "lane": "compliance_monitor",
+            "risk": "medium",
+            "sourcePolicy": "Verify with current state agency before relying on deadlines or fees.",
+            "sovereignDocsAction": "track, remind, collect facts, prepare checklist"
+          },
+          {
+            "id": "AZ-registered-agent-confirmation",
+            "state": "AZ",
+            "name": "Registered/statutory agent confirmation",
+            "entityTypes": [
+              "LLC",
+              "Corporation",
+              "Nonprofit",
+              "Foreign Entity"
+            ],
+            "cadence": "ongoing",
+            "lane": "registered_agent_referral",
+            "risk": "medium",
+            "sourcePolicy": "Registered agent requirements and terminology vary by state.",
+            "sovereignDocsAction": "collect agent data, route referral or official-source checklist"
+          },
+          {
+            "id": "AZ-business-license-register",
+            "state": "AZ",
+            "name": "Business license / permit register",
+            "entityTypes": [
+              "All"
+            ],
+            "cadence": "renewal-dependent",
+            "lane": "license_register",
+            "risk": "medium",
+            "sourcePolicy": "License requirements depend on location, activity, and agency. Verify local/county/city requirements.",
+            "sovereignDocsAction": "create license inventory, renewal reminders, upload vault"
+          }
+        ],
+        "boundary": "Calendar items are reminders and checklists only. Verify current deadlines, fees, and requirements with the official agency or configured partner."
+      }
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "cb7eab41-ed1e-44dd-8eaa-a870b8616224",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "compliance_monitor intake created",
+        "createdAt": "2026-05-10T20:00:46.625Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:00:46.625Z",
+    "updatedAt": "2026-05-10T20:00:46.625Z"
+  },
+  {
+    "id": "29fb5cdd-9cf4-4750-a4bb-cbca4a5f17dd",
+    "type": "business_formation_intake",
+    "serviceId": "llc-formation-prep",
+    "risk": "high",
+    "jurisdiction": "AZ",
+    "status": "official_source_ready",
+    "user": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": "founder@example.com",
+      "organization": "SovereignDocs Workspace",
+      "orgId": "local",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "payload": {
+      "serviceId": "llc-formation-prep",
+      "state": "AZ",
+      "acceptBoundary": true,
+      "acceptNoGuarantee": true,
+      "acceptExternalOfficialSource": true,
+      "acceptUserFactsResponsibility": true,
+      "contact": {
+        "email": "founder@example.com"
+      },
+      "answers": {
+        "businessName": "Smoke Sovereign LLC",
+        "state": "AZ",
+        "entityType": "LLC",
+        "owners": "One member",
+        "businessPurpose": "Document automation testing",
+        "registeredAgent": "To be selected"
+      },
+      "packetMarkdown": "# LLC Formation Prep\n\nSovereignDocs prepared this intake packet for self-help organization, official-source routing, and optional partner review. This is not legal advice, not a filing, and not an approval guarantee.\n\n## Business facts\n- Proposed business name: Smoke Sovereign LLC\n- State / jurisdiction: AZ\n- Entity type: LLC\n- Owners / members / shareholders: One member\n- Business purpose: Document automation testing\n- Registered/statutory agent: To be selected\n\n## Deliverables requested\n- formation intake packet\n- operating agreement draft\n- statutory/registered agent worksheet\n- EIN official-source route\n- state filing checklist\n- partner review option\n\n## Official-source policy\nstate filing happens through current Secretary of State / Corporation Commission source or configured partner workflow\n\n## Submitter\n- Upstream user: local-operator\n- Contact email: founder@example.com",
+      "officialSourcePolicy": "state filing happens through current Secretary of State / Corporation Commission source or configured partner workflow",
+      "deliverables": [
+        "formation intake packet",
+        "operating agreement draft",
+        "statutory/registered agent worksheet",
+        "EIN official-source route",
+        "state filing checklist",
+        "partner review option"
+      ],
+      "lastTransitionPayload": {}
+    },
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noSovereignDocsLawFirm": true,
+      "noApprovalGuarantee": true,
+      "noFilingGuarantee": true,
+      "noPartnerOutcomeGuarantee": true,
+      "userResponsibleForFacts": true,
+      "officialSourcesMayChange": true
+    },
+    "boundary": "SovereignDocs tracks intake, document automation, official-source prep, and partner routing only. It does not guarantee approval, acceptance, filing, compliance, legal sufficiency, or partner outcome.",
+    "events": [
+      {
+        "id": "28c1dcbb-d372-449a-9d91-0df457447885",
+        "type": "draft_packet_created",
+        "actor": "local-operator",
+        "note": "business_formation_intake intake created",
+        "createdAt": "2026-05-10T20:00:46.615Z"
+      },
+      {
+        "id": "ca4595e5-43d7-41b5-a2a8-cc12b647c7c3",
+        "type": "official_source_ready",
+        "actor": "local-operator",
+        "note": "smoke transition",
+        "payload": {},
+        "createdAt": "2026-05-10T20:00:46.682Z"
+      }
+    ],
+    "createdAt": "2026-05-10T20:00:46.615Z",
+    "updatedAt": "2026-05-10T20:00:46.682Z"
+  }
+]

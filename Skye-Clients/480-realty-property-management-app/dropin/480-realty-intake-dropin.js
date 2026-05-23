@@ -1,0 +1,1 @@
+(() => { window.480_realtyDropIn = { business: "480 Realty & Property Management", openIntake: () => { location.href = '/quote.html'; } }; })();

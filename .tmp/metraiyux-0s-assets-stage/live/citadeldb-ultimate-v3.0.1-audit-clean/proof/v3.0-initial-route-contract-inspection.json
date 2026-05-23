@@ -1,0 +1,1460 @@
+{
+  "routeCount": 68,
+  "mutatingCount": 29,
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "firstLine": "app.get('/health', async (_req, res) => {",
+      "requiresAdmin": false,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", res) => {\n  try {\n    const result = await query(pool, 'SELECT now() AS server_time, current_database() AS database_name');\n    res.json({\n      ok: true,\n      service: 'citadeldb-gateway',\n      version: '2.9.0',\n      mode: process.env.CITADEL_MODE || 'vps-postgres',\n      database: result.rows[0].database_name,\n      serverTime: result.rows[0].server_time\n    });\n  } catch (error) {\n    res.status(500).json({ ok: false, error: error.message });\n  }\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps",
+      "firstLine": "app.get('/admin/apps', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name, engine, status, created_at\n     FROM citadel.apps\n     ORDER BY created_at DESC`\n  );\n  res.json({ ok: true, apps: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps",
+      "firstLine": "app.post('/admin/apps', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    app: z.string().min(2).max(80),\n    engine: z.enum(['vps-postgres', 'cloudnativepg', 'supabase-pack', 'neon-lab']).optional()\n  }).parse(req.body);\n\n  const slug = appSlug(body.app);\n  const engine = body.engine || process.env.CITADEL_MODE || 'vps-postgres';\n  const dbName = `${process.env.APP_DB_NAME_PREFIX || 'app_'}${slug}`;\n  const roleName = `${process.env.APP_DB_ROLE_PREFIX || 'app_'}${slug}_user`;\n  const password = crypto.randomBytes(32).toString('base64url');\n  const client = await pool.connect();\n  let txStarted = false;\n\n  try {\n    const roleExists = await client.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [roleName]);\n    if (roleExists.rowCount === 0) {\n      await client.query(`CREATE ROLE ${sqlIdent(roleName)} LOGIN PASSWORD ${sqlLiteral(password)} NOSUPERUSER NOCREATEDB NOCREATEROLE`);\n    }\n\n    const dbExists"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups",
+      "firstLine": "app.get('/admin/backups', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT backup_kind, backup_path, database_name, size_bytes, checksum,\n            created_at, restore_tested_at, restore_test_status, notes\n     FROM citadel.backup_receipts\n     ORDER BY created_at DESC\n     LIMIT 100`\n  );\n  res.json({ ok: true, backups: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/receipt",
+      "firstLine": "app.post('/admin/backups/receipt', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    backupKind: z.string().min(2),\n    backupPath: z.string().min(2),\n    databaseName: z.string().min(1),\n    sizeBytes: z.number().int().nonnegative().optional(),\n    checksum: z.string().optional(),\n    notes: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.backup_receipts\n      (backup_kind, backup_path, database_name, size_bytes, checksum, notes)\n     VALUES ($1, $2, $3, $4, $5, $6)\n     RETURNING id, created_at`,\n    [\n      body.backupKind,\n      body.backupPath,\n      body.databaseName,\n      body.sizeBytes || null,\n      body.checksum || null,\n      body.notes || null\n    ]\n  );\n\n  res.status(201).json({ ok: true, receipt: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/restores",
+      "firstLine": "app.get('/admin/restores', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT backup_checksum, source_backup_path, target_database, started_at,\n            finished_at, success, error, metadata\n     FROM citadel.restore_receipts\n     ORDER BY started_at DESC\n     LIMIT 100`\n  );\n  res.json({ ok: true, restores: result.rows });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit",
+      "firstLine": "app.get('/admin/audit', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const limit = Math.min(Number(req.query.limit || 50), 200);\n  const result = await query(\n    pool,\n    `SELECT actor, action, target, metadata, created_at\n     FROM citadel.audit_events\n     ORDER BY created_at DESC\n     LIMIT $1`,\n    [limit]\n  );\n  res.json({ ok: true, events: result.rows });\n});\n\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/capacity",
+      "firstLine": "app.get('/admin/capacity', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const [dbSize, activity, connections] = await Promise.all([\n    query(pool, `SELECT pg_database_size(current_database()) AS bytes`),\n    query(pool, `SELECT count(*) FILTER (WHERE state = 'active') AS active,\n                        count(*) FILTER (WHERE state = 'idle') AS idle,\n                        count(*) AS total\n                 FROM pg_stat_activity\n                 WHERE datname = current_database()`),\n    query(pool, `SHOW max_connections`)\n  ]);\n\n  res.json({\n    ok: true,\n    databaseBytes: Number(dbSize.rows[0].bytes),\n    activity: activity.rows[0],\n    maxConnections: connections.rows[0].max_connections\n  });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/readiness",
+      "firstLine": "app.get('/admin/readiness', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const checks = [];\n\n  const tables = await query(pool, `\n    SELECT table_name FROM information_schema.tables\n    WHERE table_schema = 'citadel'\n    ORDER BY table_name\n  `);\n  checks.push({ name: 'citadel schema tables', ok: tables.rows.length >= 7, detail: tables.rows.map(r => r.table_name) });\n\n  const backups = await query(pool, `SELECT count(*)::int AS count FROM citadel.backup_receipts`);\n  checks.push({ name: 'backup receipts present', ok: backups.rows[0].count > 0, detail: backups.rows[0] });\n\n  const restores = await query(pool, `SELECT count(*)::int AS count FROM citadel.restore_receipts WHERE success = true`);\n  checks.push({ name: 'successful restore receipts present', ok: restores.rows[0].count > 0, detail: restores.rows[0] });\n\n  const apps = await query(pool, `SELECT count(*)::int AS count FROM citadel.apps`);\n  checks.push({ name: 'app database "
+    },
+    {
+      "method": "POST",
+      "path": "/admin/migrations/receipt",
+      "firstLine": "app.post('/admin/migrations/receipt', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    appSlug: z.string().min(2),\n    databaseName: z.string().min(1),\n    migrationFile: z.string().min(1),\n    checksum: z.string().min(8),\n    success: z.boolean(),\n    error: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.migration_receipts\n      (app_slug, database_name, migration_file, checksum, success, error)\n     VALUES ($1, $2, $3, $4, $5, $6)\n     RETURNING id, applied_at`,\n    [\n      body.appSlug,\n      body.databaseName,\n      body.migrationFile,\n      body.checksum,\n      body.success,\n      body.error || null\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'migration_receipt', $1, $2::jsonb)`,\n    [body.appSlug, JSON.stringify({ migrationFile: body.migrationFile, success: body.su"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/migrations",
+      "firstLine": "app.get('/admin/migrations', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, migration_file, checksum, applied_at, success, error\n     FROM citadel.migration_receipts\n     ORDER BY applied_at DESC\n     LIMIT 200`\n  );\n  res.json({ ok: true, migrations: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/restore/receipt",
+      "firstLine": "app.post('/admin/restore/receipt', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    backupChecksum: z.string().optional(),\n    sourceBackupPath: z.string().min(1),\n    targetDatabase: z.string().min(1),\n    success: z.boolean(),\n    error: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.restore_receipts\n      (backup_checksum, source_backup_path, target_database, finished_at, success, error, metadata)\n     VALUES ($1, $2, $3, now(), $4, $5, $6::jsonb)\n     RETURNING id, started_at, finished_at`,\n    [\n      body.backupChecksum || null,\n      body.sourceBackupPath,\n      body.targetDatabase,\n      body.success,\n      body.error || null,\n      JSON.stringify(body.metadata || {})\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'rest"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/service-catalog",
+      "firstLine": "app.get('/admin/service-catalog', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const apps = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name, engine, status, created_at\n     FROM citadel.apps\n     ORDER BY app_slug ASC`\n  );\n\n  const backups = await query(\n    pool,\n    `SELECT database_name, max(created_at) AS last_backup_at,\n            max(restore_tested_at) AS last_restore_test_at\n     FROM citadel.backup_receipts\n     GROUP BY database_name`\n  );\n\n  const backupMap = new Map(backups.rows.map(row => [row.database_name, row]));\n\n  res.json({\n    ok: true,\n    services: apps.rows.map(app => ({\n      ...app,\n      backup: backupMap.get(app.database_name) || null\n    }))\n  });\n});\n\n\nconst allowedJobTypes = new Set([\n  'health',\n  'backup-now',\n  'backup-encrypted',\n  'restore-test',\n  'smoke-all',\n  'object-backup-sync',\n  'validate-env',\n  'policy-check',\n  'backup-manifest',\n  'branch-clone',\n  'app-write-smoke'\n]);"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs",
+      "firstLine": "app.post('/admin/jobs', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    jobType: z.string().min(2),\n    payload: z.record(z.any()).optional(),\n    requestedBy: z.string().optional(),\n    maxAttempts: z.number().int().min(1).max(3).optional()\n  }).parse(req.body);\n\n  if (!allowedJobTypes.has(body.jobType)) {\n    return res.status(400).json({\n      ok: false,\n      error: `Job type not allowed: ${body.jobType}`,\n      allowedJobTypes: Array.from(allowedJobTypes)\n    });\n  }\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ($1, $2::jsonb, $3, $4)\n     RETURNING id, job_type, status, requested_at`,\n    [\n      body.jobType,\n      JSON.stringify(body.payload || {}),\n      body.requestedBy || 'operator-dashboard',\n      body.maxAttempts || 1\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs",
+      "firstLine": "app.get('/admin/jobs', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const limit = Math.min(Number(req.query.limit || 100), 300);\n  const result = await query(\n    pool,\n    `SELECT id, job_type, status, payload, requested_by, requested_at, claimed_at,\n            started_at, finished_at, attempts, max_attempts, receipt_path, output_tail, error\n     FROM citadel.operator_jobs\n     ORDER BY requested_at DESC\n     LIMIT $1`,\n    [limit]\n  );\n  res.json({ ok: true, jobs: result.rows });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/jobs/:id",
+      "firstLine": "app.get('/admin/jobs/:id', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const result = await query(\n    pool,\n    `SELECT id, job_type, status, payload, requested_by, requested_at, claimed_at,\n            started_at, finished_at, attempts, max_attempts, receipt_path, output_tail, error\n     FROM citadel.operator_jobs\n     WHERE id = $1`,\n    [req.params.id]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'Job not found' });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/claim",
+      "firstLine": "app.post('/admin/jobs/claim', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    workerId: z.string().min(2)\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `WITH next_job AS (\n       SELECT id FROM citadel.operator_jobs\n       WHERE status = 'queued'\n         AND attempts < max_attempts\n       ORDER BY requested_at ASC\n       FOR UPDATE SKIP LOCKED\n       LIMIT 1\n     )\n     UPDATE citadel.operator_jobs j\n     SET status = 'claimed',\n         claimed_at = now(),\n         attempts = attempts + 1,\n         payload = j.payload || jsonb_build_object('workerId', $1)\n     FROM next_job\n     WHERE j.id = next_job.id\n     RETURNING j.id, j.job_type, j.status, j.payload, j.attempts, j.max_attempts`,\n    [body.workerId]\n  );\n\n  if (result.rowCount === 0) {\n    return res.json({ ok: true, job: null });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/start",
+      "firstLine": "app.post('/admin/jobs/:id/start', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = 'running', started_at = now()\n     WHERE id = $1 AND status IN ('claimed', 'queued')\n     RETURNING id, job_type, status, started_at`,\n    [req.params.id]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(409).json({ ok: false, error: 'Job could not be started' });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/finish",
+      "firstLine": "app.post('/admin/jobs/:id/finish', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    success: z.boolean(),\n    receiptPath: z.string().optional(),\n    outputTail: z.string().optional(),\n    error: z.string().optional(),\n    commandName: z.string().optional(),\n    checksum: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const status = body.success ? 'succeeded' : 'failed';\n\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = $2,\n         finished_at = now(),\n         receipt_path = $3,\n         output_tail = $4,\n         error = $5\n     WHERE id = $1\n     RETURNING id, job_type, status, finished_at, receipt_path`,\n    [\n      req.params.id,\n      status,\n      body.receiptPath || null,\n      body.outputTail || null,\n      body.error || null\n    ]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'J"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/command-receipts",
+      "firstLine": "app.get('/admin/command-receipts', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT id, job_id, command_name, receipt_path, success, checksum, created_at, metadata\n     FROM citadel.command_receipts\n     ORDER BY created_at DESC\n     LIMIT 200`\n  );\n  res.json({ ok: true, receipts: result.rows });\n});\n\n\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/policy-findings",
+      "firstLine": "app.get('/admin/policy-findings', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT policy_name, severity, status, target, detail, detected_at, resolved_at\n     FROM citadel.policy_findings\n     ORDER BY detected_at DESC\n     LIMIT 200`\n  );\n  res.json({ ok: true, findings: result.rows });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tenants",
+      "firstLine": "app.get('/admin/tenants', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT tenant_slug, display_name, owner_contact, status, created_at, metadata\n     FROM citadel.tenants\n     ORDER BY tenant_slug ASC`\n  );\n  res.json({ ok: true, tenants: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tenants",
+      "firstLine": "app.post('/admin/tenants', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    tenantSlug: z.string().min(2),\n    displayName: z.string().min(1),\n    ownerContact: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const slug = body.tenantSlug.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.tenants (tenant_slug, display_name, owner_contact, metadata)\n     VALUES ($1, $2, $3, $4::jsonb)\n     ON CONFLICT (tenant_slug)\n     DO UPDATE SET display_name = EXCLUDED.display_name,\n                   owner_contact = EXCLUDED.owner_contact,\n                   metadata = EXCLUDED.metadata\n     RETURNING tenant_slug, display_name, owner_contact, status, created_at`,\n    [slug, body.displayName, body.ownerContact || null, JSON.stringify(body.metadata || {})]\n  );\n\n  await query(\n    pool,\n    `INSERT I"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/connection",
+      "firstLine": "app.get('/admin/apps/:appSlug/connection', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name, engine, status, created_at\n     FROM citadel.apps\n     WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'App not found' });\n  }\n\n  const appRow = result.rows[0];\n  const host = process.env.CITADEL_DOMAIN || '127.0.0.1';\n  const port = process.env.PGBOUNCER_PORT || 6432;\n\n  res.json({\n    ok: true,\n    app: appRow,\n    connection: {\n      provider: 'postgres',\n      host,\n      port,\n      database: appRow.database_name,\n      username: appRow.role_name,\n      password: 'shown only when first provisioned or after credential rotation',\n      envTemplate: `DATABASE_PROVIDER=postgres\\nDATABASE_URL=postgres://${appRow.role_name}:APP_PASSWORD@${host}:${port}/${appRow.d"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/write-smoke-job",
+      "firstLine": "app.post('/admin/apps/:appSlug/write-smoke-job', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'App not found' });\n  }\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ('app-write-smoke', $1::jsonb, 'operator-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [JSON.stringify({ appSlug: slug, databaseName: result.rows[0].database_name })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/ai/status",
+      "firstLine": "app.get('/admin/ai/status', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  res.json({ ok: true, providers: availableProviders() });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/ai/debug",
+      "firstLine": "app.post('/admin/ai/debug', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'ai_debug' });\n  if (!gate) return;\n  const body = z.object({\n    provider: z.enum(['openai', 'gemini']),\n    question: z.string().min(4).max(4000),\n    appSlug: z.string().optional()\n  }).parse(req.body);\n\n  if (!aiEnabled()) {\n    return res.status(400).json({\n      ok: false,\n      error: 'AI_ASSISTANT_ENABLED is not true. Set it in .env before using AI debug.'\n    });\n  }\n\n  let app = null;\n  if (body.appSlug) {\n    const slug = appSlug(body.appSlug);\n    const appResult = await query(\n      pool,\n      `SELECT app_slug, database_name, role_name, engine, status, created_at\n       FROM citadel.apps WHERE app_slug = $1`,\n      [slug]\n    );\n    app = appResult.rows[0] || null;\n  }\n\n  const [readiness, capacity, recentJobs, recentBackups, recentRestores] = await Promise.all([\n    query("
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/rotate-credential",
+      "firstLine": "app.post('/admin/apps/:appSlug/rotate-credential', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": true,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.appSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'credential_rotation', projectSlug });\n  if (!gate) return;\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const password = generateAppPassword();\n  await query(pool, `ALTER ROLE ${sqlIdent(appRow.role_name)} WITH PASSWORD ${sqlLiteral(password)}`);\n\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n  const databaseUrl = buildDatabaseUrl({ role: appRow.role_name, password, host: parts.host,"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/database/test-url",
+      "firstLine": "app.post('/admin/database/test-url', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({ databaseUrl: z.string().min(12).max(4000), write: z.boolean().optional().default(false) }).parse(req.body);\n  const result = await testDatabaseUrl(body.databaseUrl, { write: body.write });\n\n  await query(pool, `INSERT INTO citadel.audit_events (actor, action, target, metadata) VALUES ('gateway', $1, 'database-url-test', $2::jsonb)`,\n    [body.write ? 'database_url_write_smoke' : 'database_url_connection_test', JSON.stringify({ ok: result.ok, elapsedMs: result.elapsedMs, write: body.write })]);\n\n  res.json({ ok: result.ok, result, redactedDatabaseUrl: redactSecrets(body.databaseUrl) });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/setup-packet",
+      "firstLine": "app.get('/admin/apps/:appSlug/setup-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n\n  const markdown = `# ${appRow.app_slug} CitadelDB Setup Packet\n\n## What this is\n\nThis app has a private database in CitadelDB.\n\n## App database\n\n- App: ${appRow.app_slug}\n- Database: ${appRow.database_name}\n- Username: ${appRow.role_name}\n- Host: ${parts.host}\n- Port: ${parts.port}\n\n## Paste into the app\n\n\\`\\`\\`env\nDATABASE_PROVIDER=postgres\nDATABASE_URL=postgres://${appRow.role_name}:APP_PASSWORD@${parts.host"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/guided/setup-checklist",
+      "firstLine": "app.get('/admin/guided/setup-checklist', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const checks = [];\n  const has = (name) => Boolean(process.env[name]);\n\n  checks.push({ key: 'postgres_password', label: 'Postgres admin password configured', ok: has('POSTGRES_PASSWORD'), why: 'Required to control the CitadelDB database server.' });\n  checks.push({ key: 'gateway_token', label: 'Gateway admin token configured', ok: has('GATEWAY_ADMIN_TOKEN'), why: 'Required to protect the command API.' });\n  checks.push({ key: 'backup_password', label: 'Backup encryption password configured', ok: has('BACKUP_ENCRYPTION_PASSWORD'), why: 'Required for encrypted backups.' });\n  checks.push({ key: 'ai_enabled', label: 'AI assistant enabled only if wanted', ok: process.env.AI_ASSISTANT_ENABLED === 'true' ? Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) : true, why: 'AI debug needs at least one provider key if enabled."
+    },
+    {
+      "method": "POST",
+      "path": "/admin/guided/proof-action",
+      "firstLine": "app.post('/admin/guided/proof-action', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'guided_proof_action' });\n  if (!gate) return;\n\n  const body = z.object({\n    action: z.enum(['backup-now', 'restore-test', 'policy-check', 'backup-manifest', 'object-backup-sync', 'validate-env'])\n  }).parse(req.body);\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ($1, '{}'::jsonb, 'guided-ops-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [body.action]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'guided_proof_action_enqueued', $1, $2::jsonb)`,\n    [body.action, JSON.stringify({ jobId: job.rows[0].id })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/guided/diagnostic-bundle",
+      "firstLine": "app.get('/admin/guided/diagnostic-bundle', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const limit = Math.min(Number(process.env.DIAGNOSTIC_BUNDLE_MAX_EVENTS || 50), 200);\n  const [apps, jobs, backups, restores, audits, policy] = await Promise.all([\n    query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps ORDER BY created_at DESC LIMIT $1`, [limit]),\n    query(pool, `SELECT id, job_type, status, attempts, requested_at, started_at, finished_at, error FROM citadel.operator_jobs ORDER BY requested_at DESC LIMIT $1`, [limit]),\n    query(pool, `SELECT backup_kind, database_name, backup_path, created_at, restore_test_status FROM citadel.backup_receipts ORDER BY created_at DESC LIMIT $1`, [limit]),\n    query(pool, `SELECT target_database, success, started_at, finished_at, error FROM citadel.restore_receipts ORDER BY started_at DESC LIMIT $1`, [limit]),\n    query(pool, `SELECT actor, action, target, metadat"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/setup/env-readiness",
+      "firstLine": "app.get('/admin/setup/env-readiness', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const required = [\n    { key: 'POSTGRES_PASSWORD', label: 'Database admin password', why: 'Controls the CitadelDB Postgres admin role.' },\n    { key: 'GATEWAY_ADMIN_TOKEN', label: 'Gateway admin token', why: 'Protects the CitadelDB command API.' },\n    { key: 'BACKUP_ENCRYPTION_PASSWORD', label: 'Backup encryption password', why: 'Encrypts backup archives.' }\n  ];\n\n  const optional = [\n    { key: 'OPENAI_API_KEY', label: 'OpenAI key', why: 'Enables OpenAI debug assistant.' },\n    { key: 'GEMINI_API_KEY', label: 'Gemini key', why: 'Enables Gemini debug assistant.' },\n    { key: 'GOOGLE_API_KEY', label: 'Google API key', why: 'Alternative Gemini API key env.' },\n    { key: 'S3_ACCESS_KEY_ID', label: 'Object storage access key', why: 'Needed for offsite backup sync.' },\n    { key: 'S3_SECRET_ACCESS_KEY', label: 'Object storage secret key', why: 'Needed for offsite"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/setup/generate-secrets",
+      "firstLine": "app.post('/admin/setup/generate-secrets', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": true,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'setup_generate_secrets' });\n  if (!gate) return;\n  const secrets = {\n    POSTGRES_PASSWORD: crypto.randomBytes(48).toString('base64url'),\n    GATEWAY_ADMIN_TOKEN: crypto.randomBytes(48).toString('hex'),\n    BACKUP_ENCRYPTION_PASSWORD: crypto.randomBytes(64).toString('base64url')\n  };\n\n  const envBlock = Object.entries(secrets).map(([key, value]) => `${key}=${value}`).join('\\n');\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'setup_secrets_generated', 'setup-wizard', $1::jsonb)`,\n    [JSON.stringify({ keys: Object.keys(secrets) })]\n  );\n\n  res.json({\n    ok: true,\n    secrets,\n    envBlock,\n    warning: 'Generated secrets are returned once for operator convenience. Paste them into .env and store them in a secure "
+    },
+    {
+      "method": "GET",
+      "path": "/admin/setup/plan",
+      "firstLine": "app.get('/admin/setup/plan', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const readiness = {\n    postgresPassword: Boolean(process.env.POSTGRES_PASSWORD),\n    gatewayToken: Boolean(process.env.GATEWAY_ADMIN_TOKEN),\n    backupPassword: Boolean(process.env.BACKUP_ENCRYPTION_PASSWORD),\n    aiConfigured: Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY),\n    objectBackupConfigured: Boolean(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY && process.env.S3_BUCKET)\n  };\n\n  const plan = `# CitadelDB Setup Plan\n\n## 1. Configure required secrets\n\nRequired:\n\n- POSTGRES_PASSWORD: ${readiness.postgresPassword ? 'configured' : 'missing'}\n- GATEWAY_ADMIN_TOKEN: ${readiness.gatewayToken ? 'configured' : 'missing'}\n- BACKUP_ENCRYPTION_PASSWORD: ${readiness.backupPassword ? 'configured' : 'missing'}\n\n## 2. Start stack\n\n\\`\\`\\`bash\nmake prod-up\n\\`\\`\\`\n\n## 3. First proof pass\n\n\\`\\`\\`bash\n./s"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/onboarding-packet",
+      "firstLine": "app.get('/admin/apps/:appSlug/onboarding-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const framework = String(req.query.framework || 'node-express');\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name, engine, status, created_at\n     FROM citadel.apps WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n  let frameworkDoc = 'Framework template not found.';\n  const templatePath = new URL(`../../../templates/app-frameworks/${framework}.md`, import.meta.url);\n  try {\n    if (existsSync(templatePath)) frameworkDoc = readFileSync(templatePath, 'utf8');\n  } catch {}\n\n  const packet = `# ${appRow.app_slug} App Onboarding Packet\n\n#"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/proof-packet",
+      "firstLine": "app.get('/admin/apps/:appSlug/proof-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const [appResult, jobs, backups, restores, audits] = await Promise.all([\n    query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps WHERE app_slug = $1`, [slug]),\n    query(pool, `SELECT id, job_type, status, requested_at, finished_at, error FROM citadel.operator_jobs WHERE payload::text ILIKE $1 ORDER BY requested_at DESC LIMIT 30`, [`%${slug}%`]),\n    query(pool, `SELECT backup_kind, database_name, backup_path, created_at, restore_test_status FROM citadel.backup_receipts WHERE database_name ILIKE $1 ORDER BY created_at DESC LIMIT 30`, [`%${slug}%`]),\n    query(pool, `SELECT target_database, success, started_at, finished_at, error FROM citadel.restore_receipts WHERE target_database ILIKE $1 ORDER BY started_at DESC LIMIT 30`, [`%${slug}%`]),\n    query(pool, `SELECT actor, "
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/migration-plan",
+      "firstLine": "app.get('/admin/apps/:appSlug/migration-plan', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const framework = String(req.query.framework || 'node-express');\n  const source = String(req.query.source || 'existing DATABASE_URL');\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n  const steps = [\n    { order: 1, label: 'Freeze risky writes or schedule maintenance window', proof: 'operator note / release window' },\n    { order: 2, label: `Export data from ${source}`, proof: 'source export file or dump receipt' },\n    { order: 3, label: `Import into ${ap"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/lifecycle-action",
+      "firstLine": "app.post('/admin/apps/:appSlug/lifecycle-action', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": true,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'app_lifecycle_action', projectSlug: slug });\n  if (!gate) return;\n\n  const body = z.object({\n    action: z.enum(['migration-rehearsal', 'app-backup-now', 'app-restore-test', 'app-diagnostic-bundle', 'app-cutover-note'])\n  }).parse(req.body);\n\n  const result = await query(pool, `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const jobTypeMap = {\n    'migration-rehearsal': 'validate-env',\n    'app-backup-now': 'backup-now',\n    'app-restore-test': 'restore-test',\n    'app-diagnostic-bundle': 'policy-check',\n    'app-cutover-note': 'validate-env'\n  };\n  const jobType = job"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/rollback-packet",
+      "firstLine": "app.get('/admin/apps/:appSlug/rollback-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const packet = `# ${appRow.app_slug} Rollback Packet\n\n## Purpose\n\nThis packet exists so the operator can reverse a bad app database cutover.\n\n## App\n\n- App: ${appRow.app_slug}\n- CitadelDB database: ${appRow.database_name}\n- CitadelDB role: ${appRow.role_name}\n\n## Rollback triggers\n\n\u2610 app cannot connect  \n\u2610 app can connect but cannot write  \n\u2610 migrations failed  \n\u2610 critical production behavior broke  \n\u2610 backup/restore proof missing  \n\u2610 data mismatch found  \n\n## Rollback steps\n\n1. Stop new deploy or disable traffic if needed.\n2. Restore pre"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/apps/:appSlug/lifecycle-packet",
+      "firstLine": "app.get('/admin/apps/:appSlug/lifecycle-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": true,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const framework = String(req.query.framework || 'node-express');\n  const source = String(req.query.source || 'existing DATABASE_URL');\n\n  const [appResult, jobs, backups, restores, audits] = await Promise.all([\n    query(pool, `SELECT app_slug, database_name, role_name, engine, status, created_at FROM citadel.apps WHERE app_slug = $1`, [slug]),\n    query(pool, `SELECT id, job_type, status, payload, requested_at, finished_at, error FROM citadel.operator_jobs WHERE payload::text ILIKE $1 ORDER BY requested_at DESC LIMIT 30`, [`%${slug}%`]),\n    query(pool, `SELECT backup_kind, database_name, backup_path, checksum, created_at, restore_test_status FROM citadel.backup_receipts WHERE database_name ILIKE $1 ORDER BY created_at DESC LIMIT 30`, [`%${slug}%`]),\n    query(pool, `SELECT target_database, source_backup_path, success"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects",
+      "firstLine": "app.get('/admin/self-service/projects', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(pool, `SELECT project_slug, project_name, owner_ref, status, max_databases, max_query_ms, created_at FROM self_service.projects ORDER BY created_at DESC`);\n  res.json({ ok: true, projects: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects",
+      "firstLine": "app.post('/admin/self-service/projects', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    projectSlug: z.string().min(2).max(60),\n    projectName: z.string().min(2).max(120),\n    ownerRef: z.string().min(1).max(120).optional(),\n    maxDatabases: z.number().int().min(1).max(100).optional()\n  }).parse(req.body);\n\n  const slug = appSlug(body.projectSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO self_service.projects (project_slug, project_name, owner_ref, max_databases)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (project_slug) DO UPDATE SET project_name = EXCLUDED.project_name\n     RETURNING project_slug, project_name, owner_ref, status, max_databases, max_query_ms, created_at`,\n    [slug, body.projectName, body.ownerRef || 'operator', body.maxDatabases || 5]\n  );\n\n  res.status(201).json({ ok: true, project: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug",
+      "firstLine": "app.get('/admin/self-service/projects/:projectSlug', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.projectSlug);\n  const [project, dbs, history] = await Promise.all([\n    query(pool, `SELECT project_slug, project_name, owner_ref, status, max_databases, max_query_ms, created_at FROM self_service.projects WHERE project_slug = $1`, [slug]),\n    query(pool, `SELECT project_slug, app_slug, database_name, role_name, status, created_at FROM self_service.project_databases WHERE project_slug = $1 ORDER BY created_at DESC`, [slug]),\n    query(pool, `SELECT id, app_slug, database_name, sql_preview, statement_kind, success, row_count, elapsed_ms, error, created_at FROM self_service.query_history WHERE project_slug = $1 ORDER BY created_at DESC LIMIT 50`, [slug])\n  ]);\n\n  if (project.rowCount === 0) return res.status(404).json({ ok: false, error: 'Project not found' });\n\n  res.json({ ok: true, project: project.rows[0], databases: dbs.rows, "
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const body = z.object({\n    appSlug: z.string().min(2).max(60),\n    engine: z.string().optional().default('vps-postgres')\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_database_provision', projectSlug });\n  if (!gate) return;\n\n  const project = await query(pool, `SELECT project_slug, max_databases FROM self_service.projects WHERE project_slug = $1`, [projectSlug]);\n  if (project.rowCount === 0) return res.status(404).json({ ok: false, error: 'Project not found' });\n\n  const count = await query(pool, `SELECT count(*)::int AS count FROM self_service.project_databases WHERE project_slug = $1`, [projectSlug]);\n  if (count.rows[0].count >= project.rows[0].max_databases) {\n    return res.status(400).json({ ok: false, error: 'Project database quot"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/sql', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    sql: z.string().min(1).max(20000)\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_sql_execute', projectSlug });\n  if (!gate) return;\n\n  const policy = validateSqlForConsole(body.sql);\n  if (!policy.ok) {\n    await query(\n      pool,\n      `INSERT INTO self_service.query_history (project_slug, app_slug, database_name, sql_preview, statement_kind, success, error)\n       VALUES ($1, $2, 'unknown', $3, 'BLOCKED', false, $4)`,\n      [projectSlug, app, sqlPreview(body.sql), policy.error]\n    );\n    return res.status(400).json({ ok: false, error: policy.error });\n  }\n\n  const started = Date.now();\n  const client = new Client({ connec"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/plans",
+      "firstLine": "app.get('/admin/platform/plans', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(pool, `SELECT plan_slug, plan_name, monthly_price_cents, max_projects, max_databases, max_query_executions_month, max_storage_mb, max_team_members FROM platform.plans ORDER BY monthly_price_cents ASC`);\n  res.json({ ok: true, plans: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/accounts",
+      "firstLine": "app.post('/admin/platform/accounts', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    accountRef: z.string().min(2).max(120),\n    displayName: z.string().min(2).max(160),\n    email: z.string().email().optional(),\n    upstreamSubject: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.accounts (account_ref, display_name, email, upstream_subject)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (account_ref) DO UPDATE SET display_name = EXCLUDED.display_name, email = EXCLUDED.email\n     RETURNING account_ref, display_name, email, status, upstream_subject, created_at`,\n    [body.accountRef, body.displayName, body.email || null, body.upstreamSubject || null]\n  );\n\n  res.status(201).json({ ok: true, account: result.rows[0] });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams",
+      "firstLine": "app.post('/admin/platform/teams', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    teamName: z.string().min(2).max(160),\n    ownerAccountRef: z.string().min(2).max(120),\n    planSlug: z.string().optional().default('starter')\n  }).parse(req.body);\n\n  const slug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO platform.teams (team_slug, team_name, owner_account_ref, plan_slug)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (team_slug) DO UPDATE SET team_name = EXCLUDED.team_name, plan_slug = EXCLUDED.plan_slug\n     RETURNING team_slug, team_name, owner_account_ref, plan_slug, status, created_at`,\n    [slug, body.teamName, body.ownerAccountRef, body.planSlug]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO platform.team_members (team_slug, account_ref, role)\n     VALUES ($1, $2, 'owner')\n     ON CONFLICT (team_slug, account_ref) DO UPDATE SET rol"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/teams",
+      "firstLine": "app.get('/admin/platform/teams', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(\n    pool,\n    `SELECT t.team_slug, t.team_name, t.owner_account_ref, t.plan_slug, t.status, t.created_at,\n            p.plan_name, p.max_projects, p.max_databases, p.max_query_executions_month, p.max_storage_mb\n     FROM platform.teams t\n     JOIN platform.plans p ON p.plan_slug = t.plan_slug\n     ORDER BY t.created_at DESC`\n  );\n  res.json({ ok: true, teams: result.rows });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/platform/teams/:teamSlug/usage",
+      "firstLine": "app.get('/admin/platform/teams/:teamSlug/usage', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const [team, projects, dbs, queries] = await Promise.all([\n    query(pool, `SELECT t.*, p.plan_name, p.max_projects, p.max_databases, p.max_query_executions_month, p.max_storage_mb FROM platform.teams t JOIN platform.plans p ON p.plan_slug = t.plan_slug WHERE t.team_slug = $1`, [teamSlug]),\n    query(pool, `SELECT count(*)::int AS count FROM platform.project_ownership WHERE team_slug = $1`, [teamSlug]),\n    query(pool, `SELECT count(*)::int AS count FROM self_service.project_databases d JOIN platform.project_ownership o ON o.project_slug = d.project_slug WHERE o.team_slug = $1`, [teamSlug]),\n    query(pool, `SELECT count(*)::int AS count FROM self_service.query_history h JOIN platform.project_ownership o ON o.project_slug = h.project_slug WHERE o.team_slug = $1 AND h.created_at >= date_trunc('month', now())`, [tea"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+      "firstLine": "app.post('/admin/platform/teams/:teamSlug/projects/:projectSlug/attach', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const projectSlug = appSlug(req.params.projectSlug);\n  const current = await query(pool, `SELECT count(*)::int AS count FROM platform.project_ownership WHERE team_slug = $1`, [teamSlug]);\n  const quota = await checkTeamQuota({ pool, query, teamSlug, quotaKey: 'projects', currentValue: current.rows[0].count });\n  if (!quota.allowed) return res.status(400).json({ ok: false, error: 'Project quota reached', quota });\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.project_ownership (team_slug, project_slug)\n     VALUES ($1, $2)\n     ON CONFLICT (team_slug, project_slug) DO NOTHING\n     RETURNING team_slug, project_slug, created_at`,\n    [teamSlug, projectSlug]\n  );\n\n  res.status(201).json({ ok: true, attachment: result.rows[0] || { team_slug: teamSlug, project_slug: projectSlug, existing: true }, qu"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/schema",
+      "firstLine": "app.get('/admin/self-service/projects/:projectSlug/databases/:appSlug/schema', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT database_name FROM self_service.project_databases WHERE project_slug = $1 AND app_slug = $2`, [projectSlug, app]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'Database not found' });\n\n  res.json({\n    ok: true,\n    projectSlug,\n    appSlug: app,\n    note: 'Schema introspection requires a user DATABASE_URL so CitadelDB can connect as the app role. Use /tables with databaseUrl POST in dashboard.'\n  });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/tables', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_list', projectSlug });\n  if (!gate) return;\n  const body = z.object({ databaseUrl: z.string().min(12).max(4000) }).parse(req.body);\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const tables = await client.query(`\n      SELECT table_schema, table_name\n      FROM information_schema.tables\n      WHERE table_schema NOT IN ('pg_catalog','information_schema')\n      ORDER BY table_schema, table_name\n      LIMIT 250\n    `);\n    res.json({ ok: true, tables: tables.rows });\n  } catch (error) {\n    res.status(500).json({ ok: false, error: redactSecrets(error.message) });\n  } finally {\n    try { await client.end("
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_preview', projectSlug });\n  if (!gate) return;\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    schema: z.string().min(1).max(80).default('public'),\n    table: z.string().min(1).max(120),\n    limit: z.number().int().min(1).max(100).optional().default(50)\n  }).parse(req.body);\n\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const rows = await client.query(`SELECT * FROM ${sqlIdent(body.schema)}.${sqlIdent(body.table)} LIMIT ${Number(body.limit)}`);\n    res.json({ ok: true, fields: rows.fields?.map(f => f.name) || [], rows: rows.rows, rowCount: rows.rowCount });\n  } catch (erro"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/entitlements/:teamSlug",
+      "firstLine": "app.get('/admin/commercial/entitlements/:teamSlug', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const entitlement = await getEntitlement({ pool, query, teamSlug });\n\n  await query(\n    pool,\n    `INSERT INTO commercial.entitlement_checks (team_slug, allowed, reason, plan_slug, subscription_status, metadata)\n     VALUES ($1, $2, $3, $4, $5, $6::jsonb)`,\n    [\n      teamSlug,\n      entitlement.allowed,\n      entitlement.reason,\n      entitlement.subscription?.plan_slug || null,\n      entitlement.subscription?.status || null,\n      JSON.stringify({ source: 'admin_entitlement_check' })\n    ]\n  );\n\n  res.json({ ok: true, entitlement });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/commercial/subscriptions",
+      "firstLine": "app.post('/admin/commercial/subscriptions', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    planSlug: z.string().min(2).max(80),\n    status: z.string().min(2).max(80).default('active'),\n    providerSubscriptionId: z.string().optional()\n  }).parse(req.body);\n\n  const teamSlug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO commercial.subscriptions (team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, raw_event)\n     VALUES ($1, 'manual', $2, $3, $4, now(), now() + interval '30 days', '{}'::jsonb)\n     ON CONFLICT (provider, provider_subscription_id) DO UPDATE SET status = EXCLUDED.status, plan_slug = EXCLUDED.plan_slug, updated_at = now()\n     RETURNING team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, updated_at`,\n    [teamSlug, body.provi"
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "firstLine": "app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {",
+      "requiresAdmin": false,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": "), async (req, res) => {\n  const payload = req.rawBody || (req.body instanceof Buffer ? req.body.toString('utf8') : JSON.stringify(req.body || {}));\n  const signature = req.headers['stripe-signature'];\n  const verification = verifyStripeSignature({ payload, signature, secret: process.env.STRIPE_WEBHOOK_SECRET });\n\n  if (!verification.ok) return res.status(400).json({ ok: false, error: verification.error });\n\n  let event;\n  try { event = JSON.parse(payload); } catch { return res.status(400).json({ ok: false, error: 'Invalid JSON payload' }); }\n\n  const eventId = event.id || `evt_${Date.now()}`;\n  const eventType = event.type || 'unknown';\n  const obj = event.data?.object || {};\n  const teamSlug = obj.metadata?.teamSlug || obj.metadata?.team_slug || null;\n  const accountRef = obj.metadata?.accountRef || obj.metadata?.account_ref || null;\n\n  await query(\n    pool,\n    `INSERT INTO commercia"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/events",
+      "firstLine": "app.get('/admin/commercial/events', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const result = await query(pool, `SELECT provider_event_id, event_type, team_slug, account_ref, processed, created_at FROM commercial.payment_events ORDER BY created_at DESC LIMIT 100`);\n  res.json({ ok: true, events: result.rows });\n});\n"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": true,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'branch_request', projectSlug });\n  if (!gate) return;\n  const parentApp = appSlug(req.params.appSlug);\n  const body = z.object({\n    branchSlug: z.string().min(2).max(80),\n    sourceKind: z.enum(['snapshot', 'pitr', 'logical_dump']).optional().default('snapshot'),\n    sourceReference: z.string().optional()\n  }).parse(req.body);\n\n  const branchSlug = appSlug(body.branchSlug);\n  const targetDatabaseName = `branch_${projectSlug}_${branchSlug}`.slice(0, 60);\n  const ctx = upstreamContext(req);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.database_branches (project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, requested_by)\n     VALUES ($1, $2, $3, $4, $5, $6, $7)\n     RETU"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/branches",
+      "firstLine": "app.get('/admin/self-service/projects/:projectSlug/branches', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const result = await query(pool, `SELECT project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, status, requested_by, created_at, completed_at, error FROM platform.database_branches WHERE project_slug = $1 ORDER BY created_at DESC`, [projectSlug]);\n  res.json({ ok: true, branches: result.rows });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/commercial/readiness",
+      "firstLine": "app.get('/admin/commercial/readiness', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const checks = [\n    { key: 'stripe_secret', ok: Boolean(process.env.STRIPE_SECRET_KEY), label: 'Stripe secret key configured' },\n    { key: 'stripe_webhook_secret', ok: Boolean(process.env.STRIPE_WEBHOOK_SECRET), label: 'Stripe webhook secret configured' },\n    { key: 'active_subscription_required', ok: String(process.env.REQUIRE_ACTIVE_SUBSCRIPTION || 'false') === 'true', label: 'Active subscription enforcement enabled' },\n    { key: 'upstream_account_header', ok: Boolean(process.env.UPSTREAM_ACCOUNT_HEADER || 'x-citadel-account'), label: 'Upstream account header configured' },\n    { key: 'upstream_team_header', ok: Boolean(process.env.UPSTREAM_TEAM_HEADER || 'x-citadel-team'), label: 'Upstream team header configured' }\n  ];\n  res.json({ ok: true, complete: checks.filter(c => c.ok).length, total: checks.length, checks });\n});\n\n\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/live-gates/protected-routes",
+      "firstLine": "app.get('/admin/live-gates/protected-routes', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  res.json({\n    ok: true,\n    protectedRoutes,\n    guarded: protectedRoutes.filter(r => r.status === 'guarded').length,\n    needsPolicyReview: protectedRoutes.filter(r => r.status === 'needs-policy-review').length\n  });\n});\n"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/live-gates/status",
+      "firstLine": "app.get('/admin/live-gates/status', requireAdmin, async (_req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (_req, res) => {\n  const [routeEvents, usageEvents, branches, checks] = await Promise.all([\n    query(pool, `SELECT route_key, allowed, reason, team_slug, account_ref, created_at FROM live_gate.route_gate_events ORDER BY created_at DESC LIMIT 50`),\n    query(pool, `SELECT team_slug, project_slug, app_slug, metric_key, metric_value, created_at FROM live_gate.usage_events ORDER BY created_at DESC LIMIT 50`),\n    query(pool, `SELECT project_slug, branch_slug, parent_app_slug, target_database_name, source_kind, status, created_at, completed_at, error FROM live_gate.branch_receipts ORDER BY created_at DESC LIMIT 50`),\n    query(pool, `SELECT gate_key, status, evidence, created_at FROM live_gate.live_gate_checks ORDER BY created_at DESC LIMIT 50`)\n  ]);\n\n  res.json({\n    ok: true,\n    config: {\n      enforceEntitlementsOnSelfService: String(process.env.ENFORCE_ENTITLEMENTS_ON_SELF_SERV"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/live-gates/check",
+      "firstLine": "app.post('/admin/live-gates/check', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const checks = [\n    { gateKey: 'subscription_enforcement_config', status: String(process.env.ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE' },\n    { gateKey: 'upstream_team_context_config', status: String(process.env.ENFORCE_UPSTREAM_TEAM_CONTEXT || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_UPSTREAM_TEAM_CONTEXT' },\n    { gateKey: 'stripe_webhook_secret', status: process.env.STRIPE_WEBHOOK_SECRET ? 'pass' : 'open', evidence: 'STRIPE_WEBHOOK_SECRET' },\n    { gateKey: 'usage_metering_config', status: String(process.env.USAGE_METERING_ENABLED || 'true') === 'true' ? 'pass' : 'open', evidence: 'USAGE_METERING_ENABLED' },\n    { gateKey: 'branch_worker_config', status: String(process.env.BRANCH_WORKER_ENABLED || 'false') === 'true' ? 'pass' : 'open', evidence: 'BRANCH_WOR"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/self-service/projects/:projectSlug/branches/:branchSlug/proof-packet",
+      "firstLine": "app.get('/admin/self-service/projects/:projectSlug/branches/:branchSlug/proof-packet', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": false,
+      "hasZodParse": false,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const branchSlug = appSlug(req.params.branchSlug);\n  const [branch, receipts, events] = await Promise.all([\n    query(pool, `SELECT project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, status, requested_by, created_at, completed_at, error FROM platform.database_branches WHERE project_slug = $1 AND branch_slug = $2`, [projectSlug, branchSlug]),\n    query(pool, `SELECT project_slug, branch_slug, parent_app_slug, target_database_name, source_kind, source_reference, status, receipt_kind, proof, created_at, completed_at, error FROM live_gate.branch_receipts WHERE project_slug = $1 AND branch_slug = $2 ORDER BY created_at DESC`, [projectSlug, branchSlug]),\n    query(pool, `SELECT project_slug, branch_slug, event_kind, metadata, created_at FROM platform.branch_events WHER"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+      "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt', requireAdmin, async (req, res) => {",
+      "requiresAdmin": true,
+      "mutating": true,
+      "hasZodParse": true,
+      "hasAuditInsert": false,
+      "hasCommercialGate": false,
+      "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const branchSlug = appSlug(req.params.branchSlug);\n  const body = z.object({\n    receiptKind: z.enum(['branch_source_snapshot_or_pitr', 'branch_restore', 'branch_connection_test', 'branch_write_smoke']),\n    status: z.enum(['passed', 'failed', 'open']).default('open'),\n    proof: z.record(z.any()).optional().default({})\n  }).parse(req.body);\n\n  const branch = await query(pool, `SELECT target_database_name, source_kind, source_reference FROM platform.database_branches WHERE project_slug = $1 AND branch_slug = $2`, [projectSlug, branchSlug]);\n  if (branch.rowCount === 0) return res.status(404).json({ ok: false, error: 'Branch not found' });\n\n  const receipt = await query(\n    pool,\n    `INSERT INTO live_gate.branch_receipts (project_slug, branch_slug, parent_app_slug,"
+    }
+  ],
+  "problems": {
+    "mutating_without_admin": [
+      {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "firstLine": "app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {",
+        "requiresAdmin": false,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": "), async (req, res) => {\n  const payload = req.rawBody || (req.body instanceof Buffer ? req.body.toString('utf8') : JSON.stringify(req.body || {}));\n  const signature = req.headers['stripe-signature'];\n  const verification = verifyStripeSignature({ payload, signature, secret: process.env.STRIPE_WEBHOOK_SECRET });\n\n  if (!verification.ok) return res.status(400).json({ ok: false, error: verification.error });\n\n  let event;\n  try { event = JSON.parse(payload); } catch { return res.status(400).json({ ok: false, error: 'Invalid JSON payload' }); }\n\n  const eventId = event.id || `evt_${Date.now()}`;\n  const eventType = event.type || 'unknown';\n  const obj = event.data?.object || {};\n  const teamSlug = obj.metadata?.teamSlug || obj.metadata?.team_slug || null;\n  const accountRef = obj.metadata?.accountRef || obj.metadata?.account_ref || null;\n\n  await query(\n    pool,\n    `INSERT INTO commercia"
+      }
+    ],
+    "mutating_without_zod_or_reason": [
+      {
+        "method": "POST",
+        "path": "/admin/jobs/:id/start",
+        "firstLine": "app.post('/admin/jobs/:id/start', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = 'running', started_at = now()\n     WHERE id = $1 AND status IN ('claimed', 'queued')\n     RETURNING id, job_type, status, started_at`,\n    [req.params.id]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(409).json({ ok: false, error: 'Job could not be started' });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/apps/:appSlug/write-smoke-job",
+        "firstLine": "app.post('/admin/apps/:appSlug/write-smoke-job', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'App not found' });\n  }\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ('app-write-smoke', $1::jsonb, 'operator-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [JSON.stringify({ appSlug: slug, databaseName: result.rows[0].database_name })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/apps/:appSlug/rotate-credential",
+        "firstLine": "app.post('/admin/apps/:appSlug/rotate-credential', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": true,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.appSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'credential_rotation', projectSlug });\n  if (!gate) return;\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const password = generateAppPassword();\n  await query(pool, `ALTER ROLE ${sqlIdent(appRow.role_name)} WITH PASSWORD ${sqlLiteral(password)}`);\n\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n  const databaseUrl = buildDatabaseUrl({ role: appRow.role_name, password, host: parts.host,"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/setup/generate-secrets",
+        "firstLine": "app.post('/admin/setup/generate-secrets', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": true,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'setup_generate_secrets' });\n  if (!gate) return;\n  const secrets = {\n    POSTGRES_PASSWORD: crypto.randomBytes(48).toString('base64url'),\n    GATEWAY_ADMIN_TOKEN: crypto.randomBytes(48).toString('hex'),\n    BACKUP_ENCRYPTION_PASSWORD: crypto.randomBytes(64).toString('base64url')\n  };\n\n  const envBlock = Object.entries(secrets).map(([key, value]) => `${key}=${value}`).join('\\n');\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'setup_secrets_generated', 'setup-wizard', $1::jsonb)`,\n    [JSON.stringify({ keys: Object.keys(secrets) })]\n  );\n\n  res.json({\n    ok: true,\n    secrets,\n    envBlock,\n    warning: 'Generated secrets are returned once for operator convenience. Paste them into .env and store them in a secure "
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+        "firstLine": "app.post('/admin/platform/teams/:teamSlug/projects/:projectSlug/attach', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const projectSlug = appSlug(req.params.projectSlug);\n  const current = await query(pool, `SELECT count(*)::int AS count FROM platform.project_ownership WHERE team_slug = $1`, [teamSlug]);\n  const quota = await checkTeamQuota({ pool, query, teamSlug, quotaKey: 'projects', currentValue: current.rows[0].count });\n  if (!quota.allowed) return res.status(400).json({ ok: false, error: 'Project quota reached', quota });\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.project_ownership (team_slug, project_slug)\n     VALUES ($1, $2)\n     ON CONFLICT (team_slug, project_slug) DO NOTHING\n     RETURNING team_slug, project_slug, created_at`,\n    [teamSlug, projectSlug]\n  );\n\n  res.status(201).json({ ok: true, attachment: result.rows[0] || { team_slug: teamSlug, project_slug: projectSlug, existing: true }, qu"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/live-gates/check",
+        "firstLine": "app.post('/admin/live-gates/check', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const checks = [\n    { gateKey: 'subscription_enforcement_config', status: String(process.env.ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE' },\n    { gateKey: 'upstream_team_context_config', status: String(process.env.ENFORCE_UPSTREAM_TEAM_CONTEXT || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_UPSTREAM_TEAM_CONTEXT' },\n    { gateKey: 'stripe_webhook_secret', status: process.env.STRIPE_WEBHOOK_SECRET ? 'pass' : 'open', evidence: 'STRIPE_WEBHOOK_SECRET' },\n    { gateKey: 'usage_metering_config', status: String(process.env.USAGE_METERING_ENABLED || 'true') === 'true' ? 'pass' : 'open', evidence: 'USAGE_METERING_ENABLED' },\n    { gateKey: 'branch_worker_config', status: String(process.env.BRANCH_WORKER_ENABLED || 'false') === 'true' ? 'pass' : 'open', evidence: 'BRANCH_WOR"
+      }
+    ],
+    "mutating_without_audit": [
+      {
+        "method": "POST",
+        "path": "/admin/backups/receipt",
+        "firstLine": "app.post('/admin/backups/receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    backupKind: z.string().min(2),\n    backupPath: z.string().min(2),\n    databaseName: z.string().min(1),\n    sizeBytes: z.number().int().nonnegative().optional(),\n    checksum: z.string().optional(),\n    notes: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.backup_receipts\n      (backup_kind, backup_path, database_name, size_bytes, checksum, notes)\n     VALUES ($1, $2, $3, $4, $5, $6)\n     RETURNING id, created_at`,\n    [\n      body.backupKind,\n      body.backupPath,\n      body.databaseName,\n      body.sizeBytes || null,\n      body.checksum || null,\n      body.notes || null\n    ]\n  );\n\n  res.status(201).json({ ok: true, receipt: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs/claim",
+        "firstLine": "app.post('/admin/jobs/claim', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    workerId: z.string().min(2)\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `WITH next_job AS (\n       SELECT id FROM citadel.operator_jobs\n       WHERE status = 'queued'\n         AND attempts < max_attempts\n       ORDER BY requested_at ASC\n       FOR UPDATE SKIP LOCKED\n       LIMIT 1\n     )\n     UPDATE citadel.operator_jobs j\n     SET status = 'claimed',\n         claimed_at = now(),\n         attempts = attempts + 1,\n         payload = j.payload || jsonb_build_object('workerId', $1)\n     FROM next_job\n     WHERE j.id = next_job.id\n     RETURNING j.id, j.job_type, j.status, j.payload, j.attempts, j.max_attempts`,\n    [body.workerId]\n  );\n\n  if (result.rowCount === 0) {\n    return res.json({ ok: true, job: null });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs/:id/start",
+        "firstLine": "app.post('/admin/jobs/:id/start', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = 'running', started_at = now()\n     WHERE id = $1 AND status IN ('claimed', 'queued')\n     RETURNING id, job_type, status, started_at`,\n    [req.params.id]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(409).json({ ok: false, error: 'Job could not be started' });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/apps/:appSlug/write-smoke-job",
+        "firstLine": "app.post('/admin/apps/:appSlug/write-smoke-job', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'App not found' });\n  }\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ('app-write-smoke', $1::jsonb, 'operator-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [JSON.stringify({ appSlug: slug, databaseName: result.rows[0].database_name })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects",
+        "firstLine": "app.post('/admin/self-service/projects', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    projectSlug: z.string().min(2).max(60),\n    projectName: z.string().min(2).max(120),\n    ownerRef: z.string().min(1).max(120).optional(),\n    maxDatabases: z.number().int().min(1).max(100).optional()\n  }).parse(req.body);\n\n  const slug = appSlug(body.projectSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO self_service.projects (project_slug, project_name, owner_ref, max_databases)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (project_slug) DO UPDATE SET project_name = EXCLUDED.project_name\n     RETURNING project_slug, project_name, owner_ref, status, max_databases, max_query_ms, created_at`,\n    [slug, body.projectName, body.ownerRef || 'operator', body.maxDatabases || 5]\n  );\n\n  res.status(201).json({ ok: true, project: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const body = z.object({\n    appSlug: z.string().min(2).max(60),\n    engine: z.string().optional().default('vps-postgres')\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_database_provision', projectSlug });\n  if (!gate) return;\n\n  const project = await query(pool, `SELECT project_slug, max_databases FROM self_service.projects WHERE project_slug = $1`, [projectSlug]);\n  if (project.rowCount === 0) return res.status(404).json({ ok: false, error: 'Project not found' });\n\n  const count = await query(pool, `SELECT count(*)::int AS count FROM self_service.project_databases WHERE project_slug = $1`, [projectSlug]);\n  if (count.rows[0].count >= project.rows[0].max_databases) {\n    return res.status(400).json({ ok: false, error: 'Project database quot"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/sql', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    sql: z.string().min(1).max(20000)\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_sql_execute', projectSlug });\n  if (!gate) return;\n\n  const policy = validateSqlForConsole(body.sql);\n  if (!policy.ok) {\n    await query(\n      pool,\n      `INSERT INTO self_service.query_history (project_slug, app_slug, database_name, sql_preview, statement_kind, success, error)\n       VALUES ($1, $2, 'unknown', $3, 'BLOCKED', false, $4)`,\n      [projectSlug, app, sqlPreview(body.sql), policy.error]\n    );\n    return res.status(400).json({ ok: false, error: policy.error });\n  }\n\n  const started = Date.now();\n  const client = new Client({ connec"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/accounts",
+        "firstLine": "app.post('/admin/platform/accounts', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    accountRef: z.string().min(2).max(120),\n    displayName: z.string().min(2).max(160),\n    email: z.string().email().optional(),\n    upstreamSubject: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.accounts (account_ref, display_name, email, upstream_subject)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (account_ref) DO UPDATE SET display_name = EXCLUDED.display_name, email = EXCLUDED.email\n     RETURNING account_ref, display_name, email, status, upstream_subject, created_at`,\n    [body.accountRef, body.displayName, body.email || null, body.upstreamSubject || null]\n  );\n\n  res.status(201).json({ ok: true, account: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/teams",
+        "firstLine": "app.post('/admin/platform/teams', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    teamName: z.string().min(2).max(160),\n    ownerAccountRef: z.string().min(2).max(120),\n    planSlug: z.string().optional().default('starter')\n  }).parse(req.body);\n\n  const slug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO platform.teams (team_slug, team_name, owner_account_ref, plan_slug)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (team_slug) DO UPDATE SET team_name = EXCLUDED.team_name, plan_slug = EXCLUDED.plan_slug\n     RETURNING team_slug, team_name, owner_account_ref, plan_slug, status, created_at`,\n    [slug, body.teamName, body.ownerAccountRef, body.planSlug]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO platform.team_members (team_slug, account_ref, role)\n     VALUES ($1, $2, 'owner')\n     ON CONFLICT (team_slug, account_ref) DO UPDATE SET rol"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+        "firstLine": "app.post('/admin/platform/teams/:teamSlug/projects/:projectSlug/attach', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const projectSlug = appSlug(req.params.projectSlug);\n  const current = await query(pool, `SELECT count(*)::int AS count FROM platform.project_ownership WHERE team_slug = $1`, [teamSlug]);\n  const quota = await checkTeamQuota({ pool, query, teamSlug, quotaKey: 'projects', currentValue: current.rows[0].count });\n  if (!quota.allowed) return res.status(400).json({ ok: false, error: 'Project quota reached', quota });\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.project_ownership (team_slug, project_slug)\n     VALUES ($1, $2)\n     ON CONFLICT (team_slug, project_slug) DO NOTHING\n     RETURNING team_slug, project_slug, created_at`,\n    [teamSlug, projectSlug]\n  );\n\n  res.status(201).json({ ok: true, attachment: result.rows[0] || { team_slug: teamSlug, project_slug: projectSlug, existing: true }, qu"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/tables', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_list', projectSlug });\n  if (!gate) return;\n  const body = z.object({ databaseUrl: z.string().min(12).max(4000) }).parse(req.body);\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const tables = await client.query(`\n      SELECT table_schema, table_name\n      FROM information_schema.tables\n      WHERE table_schema NOT IN ('pg_catalog','information_schema')\n      ORDER BY table_schema, table_name\n      LIMIT 250\n    `);\n    res.json({ ok: true, tables: tables.rows });\n  } catch (error) {\n    res.status(500).json({ ok: false, error: redactSecrets(error.message) });\n  } finally {\n    try { await client.end("
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_preview', projectSlug });\n  if (!gate) return;\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    schema: z.string().min(1).max(80).default('public'),\n    table: z.string().min(1).max(120),\n    limit: z.number().int().min(1).max(100).optional().default(50)\n  }).parse(req.body);\n\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const rows = await client.query(`SELECT * FROM ${sqlIdent(body.schema)}.${sqlIdent(body.table)} LIMIT ${Number(body.limit)}`);\n    res.json({ ok: true, fields: rows.fields?.map(f => f.name) || [], rows: rows.rows, rowCount: rows.rowCount });\n  } catch (erro"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/commercial/subscriptions",
+        "firstLine": "app.post('/admin/commercial/subscriptions', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    planSlug: z.string().min(2).max(80),\n    status: z.string().min(2).max(80).default('active'),\n    providerSubscriptionId: z.string().optional()\n  }).parse(req.body);\n\n  const teamSlug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO commercial.subscriptions (team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, raw_event)\n     VALUES ($1, 'manual', $2, $3, $4, now(), now() + interval '30 days', '{}'::jsonb)\n     ON CONFLICT (provider, provider_subscription_id) DO UPDATE SET status = EXCLUDED.status, plan_slug = EXCLUDED.plan_slug, updated_at = now()\n     RETURNING team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, updated_at`,\n    [teamSlug, body.provi"
+      },
+      {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "firstLine": "app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {",
+        "requiresAdmin": false,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": "), async (req, res) => {\n  const payload = req.rawBody || (req.body instanceof Buffer ? req.body.toString('utf8') : JSON.stringify(req.body || {}));\n  const signature = req.headers['stripe-signature'];\n  const verification = verifyStripeSignature({ payload, signature, secret: process.env.STRIPE_WEBHOOK_SECRET });\n\n  if (!verification.ok) return res.status(400).json({ ok: false, error: verification.error });\n\n  let event;\n  try { event = JSON.parse(payload); } catch { return res.status(400).json({ ok: false, error: 'Invalid JSON payload' }); }\n\n  const eventId = event.id || `evt_${Date.now()}`;\n  const eventType = event.type || 'unknown';\n  const obj = event.data?.object || {};\n  const teamSlug = obj.metadata?.teamSlug || obj.metadata?.team_slug || null;\n  const accountRef = obj.metadata?.accountRef || obj.metadata?.account_ref || null;\n\n  await query(\n    pool,\n    `INSERT INTO commercia"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": true,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'branch_request', projectSlug });\n  if (!gate) return;\n  const parentApp = appSlug(req.params.appSlug);\n  const body = z.object({\n    branchSlug: z.string().min(2).max(80),\n    sourceKind: z.enum(['snapshot', 'pitr', 'logical_dump']).optional().default('snapshot'),\n    sourceReference: z.string().optional()\n  }).parse(req.body);\n\n  const branchSlug = appSlug(body.branchSlug);\n  const targetDatabaseName = `branch_${projectSlug}_${branchSlug}`.slice(0, 60);\n  const ctx = upstreamContext(req);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.database_branches (project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, requested_by)\n     VALUES ($1, $2, $3, $4, $5, $6, $7)\n     RETU"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/live-gates/check",
+        "firstLine": "app.post('/admin/live-gates/check', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const checks = [\n    { gateKey: 'subscription_enforcement_config', status: String(process.env.ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE' },\n    { gateKey: 'upstream_team_context_config', status: String(process.env.ENFORCE_UPSTREAM_TEAM_CONTEXT || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_UPSTREAM_TEAM_CONTEXT' },\n    { gateKey: 'stripe_webhook_secret', status: process.env.STRIPE_WEBHOOK_SECRET ? 'pass' : 'open', evidence: 'STRIPE_WEBHOOK_SECRET' },\n    { gateKey: 'usage_metering_config', status: String(process.env.USAGE_METERING_ENABLED || 'true') === 'true' ? 'pass' : 'open', evidence: 'USAGE_METERING_ENABLED' },\n    { gateKey: 'branch_worker_config', status: String(process.env.BRANCH_WORKER_ENABLED || 'false') === 'true' ? 'pass' : 'open', evidence: 'BRANCH_WOR"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const branchSlug = appSlug(req.params.branchSlug);\n  const body = z.object({\n    receiptKind: z.enum(['branch_source_snapshot_or_pitr', 'branch_restore', 'branch_connection_test', 'branch_write_smoke']),\n    status: z.enum(['passed', 'failed', 'open']).default('open'),\n    proof: z.record(z.any()).optional().default({})\n  }).parse(req.body);\n\n  const branch = await query(pool, `SELECT target_database_name, source_kind, source_reference FROM platform.database_branches WHERE project_slug = $1 AND branch_slug = $2`, [projectSlug, branchSlug]);\n  if (branch.rowCount === 0) return res.status(404).json({ ok: false, error: 'Branch not found' });\n\n  const receipt = await query(\n    pool,\n    `INSERT INTO live_gate.branch_receipts (project_slug, branch_slug, parent_app_slug,"
+      }
+    ],
+    "mutating_without_gate": [
+      {
+        "method": "POST",
+        "path": "/admin/apps",
+        "firstLine": "app.post('/admin/apps', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    app: z.string().min(2).max(80),\n    engine: z.enum(['vps-postgres', 'cloudnativepg', 'supabase-pack', 'neon-lab']).optional()\n  }).parse(req.body);\n\n  const slug = appSlug(body.app);\n  const engine = body.engine || process.env.CITADEL_MODE || 'vps-postgres';\n  const dbName = `${process.env.APP_DB_NAME_PREFIX || 'app_'}${slug}`;\n  const roleName = `${process.env.APP_DB_ROLE_PREFIX || 'app_'}${slug}_user`;\n  const password = crypto.randomBytes(32).toString('base64url');\n  const client = await pool.connect();\n  let txStarted = false;\n\n  try {\n    const roleExists = await client.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [roleName]);\n    if (roleExists.rowCount === 0) {\n      await client.query(`CREATE ROLE ${sqlIdent(roleName)} LOGIN PASSWORD ${sqlLiteral(password)} NOSUPERUSER NOCREATEDB NOCREATEROLE`);\n    }\n\n    const dbExists"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/backups/receipt",
+        "firstLine": "app.post('/admin/backups/receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    backupKind: z.string().min(2),\n    backupPath: z.string().min(2),\n    databaseName: z.string().min(1),\n    sizeBytes: z.number().int().nonnegative().optional(),\n    checksum: z.string().optional(),\n    notes: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.backup_receipts\n      (backup_kind, backup_path, database_name, size_bytes, checksum, notes)\n     VALUES ($1, $2, $3, $4, $5, $6)\n     RETURNING id, created_at`,\n    [\n      body.backupKind,\n      body.backupPath,\n      body.databaseName,\n      body.sizeBytes || null,\n      body.checksum || null,\n      body.notes || null\n    ]\n  );\n\n  res.status(201).json({ ok: true, receipt: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/migrations/receipt",
+        "firstLine": "app.post('/admin/migrations/receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    appSlug: z.string().min(2),\n    databaseName: z.string().min(1),\n    migrationFile: z.string().min(1),\n    checksum: z.string().min(8),\n    success: z.boolean(),\n    error: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.migration_receipts\n      (app_slug, database_name, migration_file, checksum, success, error)\n     VALUES ($1, $2, $3, $4, $5, $6)\n     RETURNING id, applied_at`,\n    [\n      body.appSlug,\n      body.databaseName,\n      body.migrationFile,\n      body.checksum,\n      body.success,\n      body.error || null\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'migration_receipt', $1, $2::jsonb)`,\n    [body.appSlug, JSON.stringify({ migrationFile: body.migrationFile, success: body.su"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/restore/receipt",
+        "firstLine": "app.post('/admin/restore/receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    backupChecksum: z.string().optional(),\n    sourceBackupPath: z.string().min(1),\n    targetDatabase: z.string().min(1),\n    success: z.boolean(),\n    error: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.restore_receipts\n      (backup_checksum, source_backup_path, target_database, finished_at, success, error, metadata)\n     VALUES ($1, $2, $3, now(), $4, $5, $6::jsonb)\n     RETURNING id, started_at, finished_at`,\n    [\n      body.backupChecksum || null,\n      body.sourceBackupPath,\n      body.targetDatabase,\n      body.success,\n      body.error || null,\n      JSON.stringify(body.metadata || {})\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'rest"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs",
+        "firstLine": "app.post('/admin/jobs', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    jobType: z.string().min(2),\n    payload: z.record(z.any()).optional(),\n    requestedBy: z.string().optional(),\n    maxAttempts: z.number().int().min(1).max(3).optional()\n  }).parse(req.body);\n\n  if (!allowedJobTypes.has(body.jobType)) {\n    return res.status(400).json({\n      ok: false,\n      error: `Job type not allowed: ${body.jobType}`,\n      allowedJobTypes: Array.from(allowedJobTypes)\n    });\n  }\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ($1, $2::jsonb, $3, $4)\n     RETURNING id, job_type, status, requested_at`,\n    [\n      body.jobType,\n      JSON.stringify(body.payload || {}),\n      body.requestedBy || 'operator-dashboard',\n      body.maxAttempts || 1\n    ]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs/claim",
+        "firstLine": "app.post('/admin/jobs/claim', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    workerId: z.string().min(2)\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `WITH next_job AS (\n       SELECT id FROM citadel.operator_jobs\n       WHERE status = 'queued'\n         AND attempts < max_attempts\n       ORDER BY requested_at ASC\n       FOR UPDATE SKIP LOCKED\n       LIMIT 1\n     )\n     UPDATE citadel.operator_jobs j\n     SET status = 'claimed',\n         claimed_at = now(),\n         attempts = attempts + 1,\n         payload = j.payload || jsonb_build_object('workerId', $1)\n     FROM next_job\n     WHERE j.id = next_job.id\n     RETURNING j.id, j.job_type, j.status, j.payload, j.attempts, j.max_attempts`,\n    [body.workerId]\n  );\n\n  if (result.rowCount === 0) {\n    return res.json({ ok: true, job: null });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs/:id/start",
+        "firstLine": "app.post('/admin/jobs/:id/start', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = 'running', started_at = now()\n     WHERE id = $1 AND status IN ('claimed', 'queued')\n     RETURNING id, job_type, status, started_at`,\n    [req.params.id]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(409).json({ ok: false, error: 'Job could not be started' });\n  }\n\n  res.json({ ok: true, job: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/jobs/:id/finish",
+        "firstLine": "app.post('/admin/jobs/:id/finish', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    success: z.boolean(),\n    receiptPath: z.string().optional(),\n    outputTail: z.string().optional(),\n    error: z.string().optional(),\n    commandName: z.string().optional(),\n    checksum: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const status = body.success ? 'succeeded' : 'failed';\n\n  const result = await query(\n    pool,\n    `UPDATE citadel.operator_jobs\n     SET status = $2,\n         finished_at = now(),\n         receipt_path = $3,\n         output_tail = $4,\n         error = $5\n     WHERE id = $1\n     RETURNING id, job_type, status, finished_at, receipt_path`,\n    [\n      req.params.id,\n      status,\n      body.receiptPath || null,\n      body.outputTail || null,\n      body.error || null\n    ]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'J"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/tenants",
+        "firstLine": "app.post('/admin/tenants', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    tenantSlug: z.string().min(2),\n    displayName: z.string().min(1),\n    ownerContact: z.string().optional(),\n    metadata: z.record(z.any()).optional()\n  }).parse(req.body);\n\n  const slug = body.tenantSlug.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');\n\n  const result = await query(\n    pool,\n    `INSERT INTO citadel.tenants (tenant_slug, display_name, owner_contact, metadata)\n     VALUES ($1, $2, $3, $4::jsonb)\n     ON CONFLICT (tenant_slug)\n     DO UPDATE SET display_name = EXCLUDED.display_name,\n                   owner_contact = EXCLUDED.owner_contact,\n                   metadata = EXCLUDED.metadata\n     RETURNING tenant_slug, display_name, owner_contact, status, created_at`,\n    [slug, body.displayName, body.ownerContact || null, JSON.stringify(body.metadata || {})]\n  );\n\n  await query(\n    pool,\n    `INSERT I"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/apps/:appSlug/write-smoke-job",
+        "firstLine": "app.post('/admin/apps/:appSlug/write-smoke-job', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(\n    pool,\n    `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`,\n    [slug]\n  );\n\n  if (result.rowCount === 0) {\n    return res.status(404).json({ ok: false, error: 'App not found' });\n  }\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ('app-write-smoke', $1::jsonb, 'operator-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [JSON.stringify({ appSlug: slug, databaseName: result.rows[0].database_name })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/database/test-url",
+        "firstLine": "app.post('/admin/database/test-url', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": true,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({ databaseUrl: z.string().min(12).max(4000), write: z.boolean().optional().default(false) }).parse(req.body);\n  const result = await testDatabaseUrl(body.databaseUrl, { write: body.write });\n\n  await query(pool, `INSERT INTO citadel.audit_events (actor, action, target, metadata) VALUES ('gateway', $1, 'database-url-test', $2::jsonb)`,\n    [body.write ? 'database_url_write_smoke' : 'database_url_connection_test', JSON.stringify({ ok: result.ok, elapsedMs: result.elapsedMs, write: body.write })]);\n\n  res.json({ ok: result.ok, result, redactedDatabaseUrl: redactSecrets(body.databaseUrl) });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects",
+        "firstLine": "app.post('/admin/self-service/projects', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    projectSlug: z.string().min(2).max(60),\n    projectName: z.string().min(2).max(120),\n    ownerRef: z.string().min(1).max(120).optional(),\n    maxDatabases: z.number().int().min(1).max(100).optional()\n  }).parse(req.body);\n\n  const slug = appSlug(body.projectSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO self_service.projects (project_slug, project_name, owner_ref, max_databases)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (project_slug) DO UPDATE SET project_name = EXCLUDED.project_name\n     RETURNING project_slug, project_name, owner_ref, status, max_databases, max_query_ms, created_at`,\n    [slug, body.projectName, body.ownerRef || 'operator', body.maxDatabases || 5]\n  );\n\n  res.status(201).json({ ok: true, project: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/accounts",
+        "firstLine": "app.post('/admin/platform/accounts', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    accountRef: z.string().min(2).max(120),\n    displayName: z.string().min(2).max(160),\n    email: z.string().email().optional(),\n    upstreamSubject: z.string().optional()\n  }).parse(req.body);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.accounts (account_ref, display_name, email, upstream_subject)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (account_ref) DO UPDATE SET display_name = EXCLUDED.display_name, email = EXCLUDED.email\n     RETURNING account_ref, display_name, email, status, upstream_subject, created_at`,\n    [body.accountRef, body.displayName, body.email || null, body.upstreamSubject || null]\n  );\n\n  res.status(201).json({ ok: true, account: result.rows[0] });\n});\n"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/teams",
+        "firstLine": "app.post('/admin/platform/teams', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    teamName: z.string().min(2).max(160),\n    ownerAccountRef: z.string().min(2).max(120),\n    planSlug: z.string().optional().default('starter')\n  }).parse(req.body);\n\n  const slug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO platform.teams (team_slug, team_name, owner_account_ref, plan_slug)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (team_slug) DO UPDATE SET team_name = EXCLUDED.team_name, plan_slug = EXCLUDED.plan_slug\n     RETURNING team_slug, team_name, owner_account_ref, plan_slug, status, created_at`,\n    [slug, body.teamName, body.ownerAccountRef, body.planSlug]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO platform.team_members (team_slug, account_ref, role)\n     VALUES ($1, $2, 'owner')\n     ON CONFLICT (team_slug, account_ref) DO UPDATE SET rol"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+        "firstLine": "app.post('/admin/platform/teams/:teamSlug/projects/:projectSlug/attach', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const teamSlug = appSlug(req.params.teamSlug);\n  const projectSlug = appSlug(req.params.projectSlug);\n  const current = await query(pool, `SELECT count(*)::int AS count FROM platform.project_ownership WHERE team_slug = $1`, [teamSlug]);\n  const quota = await checkTeamQuota({ pool, query, teamSlug, quotaKey: 'projects', currentValue: current.rows[0].count });\n  if (!quota.allowed) return res.status(400).json({ ok: false, error: 'Project quota reached', quota });\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.project_ownership (team_slug, project_slug)\n     VALUES ($1, $2)\n     ON CONFLICT (team_slug, project_slug) DO NOTHING\n     RETURNING team_slug, project_slug, created_at`,\n    [teamSlug, projectSlug]\n  );\n\n  res.status(201).json({ ok: true, attachment: result.rows[0] || { team_slug: teamSlug, project_slug: projectSlug, existing: true }, qu"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/commercial/subscriptions",
+        "firstLine": "app.post('/admin/commercial/subscriptions', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const body = z.object({\n    teamSlug: z.string().min(2).max(80),\n    planSlug: z.string().min(2).max(80),\n    status: z.string().min(2).max(80).default('active'),\n    providerSubscriptionId: z.string().optional()\n  }).parse(req.body);\n\n  const teamSlug = appSlug(body.teamSlug);\n  const result = await query(\n    pool,\n    `INSERT INTO commercial.subscriptions (team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, raw_event)\n     VALUES ($1, 'manual', $2, $3, $4, now(), now() + interval '30 days', '{}'::jsonb)\n     ON CONFLICT (provider, provider_subscription_id) DO UPDATE SET status = EXCLUDED.status, plan_slug = EXCLUDED.plan_slug, updated_at = now()\n     RETURNING team_slug, provider, provider_subscription_id, plan_slug, status, current_period_start, current_period_end, updated_at`,\n    [teamSlug, body.provi"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/live-gates/check",
+        "firstLine": "app.post('/admin/live-gates/check', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": false,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const checks = [\n    { gateKey: 'subscription_enforcement_config', status: String(process.env.ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_ENTITLEMENTS_ON_SELF_SERVICE' },\n    { gateKey: 'upstream_team_context_config', status: String(process.env.ENFORCE_UPSTREAM_TEAM_CONTEXT || 'false') === 'true' ? 'pass' : 'open', evidence: 'ENFORCE_UPSTREAM_TEAM_CONTEXT' },\n    { gateKey: 'stripe_webhook_secret', status: process.env.STRIPE_WEBHOOK_SECRET ? 'pass' : 'open', evidence: 'STRIPE_WEBHOOK_SECRET' },\n    { gateKey: 'usage_metering_config', status: String(process.env.USAGE_METERING_ENABLED || 'true') === 'true' ? 'pass' : 'open', evidence: 'USAGE_METERING_ENABLED' },\n    { gateKey: 'branch_worker_config', status: String(process.env.BRANCH_WORKER_ENABLED || 'false') === 'true' ? 'pass' : 'open', evidence: 'BRANCH_WOR"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+        "firstLine": "app.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt', requireAdmin, async (req, res) => {",
+        "requiresAdmin": true,
+        "mutating": true,
+        "hasZodParse": true,
+        "hasAuditInsert": false,
+        "hasCommercialGate": false,
+        "handlerPreview": ", async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const branchSlug = appSlug(req.params.branchSlug);\n  const body = z.object({\n    receiptKind: z.enum(['branch_source_snapshot_or_pitr', 'branch_restore', 'branch_connection_test', 'branch_write_smoke']),\n    status: z.enum(['passed', 'failed', 'open']).default('open'),\n    proof: z.record(z.any()).optional().default({})\n  }).parse(req.body);\n\n  const branch = await query(pool, `SELECT target_database_name, source_kind, source_reference FROM platform.database_branches WHERE project_slug = $1 AND branch_slug = $2`, [projectSlug, branchSlug]);\n  if (branch.rowCount === 0) return res.status(404).json({ ok: false, error: 'Branch not found' });\n\n  const receipt = await query(\n    pool,\n    `INSERT INTO live_gate.branch_receipts (project_slug, branch_slug, parent_app_slug,"
+      }
+    ]
+  },
+  "mutatingRoutes": [
+    {
+      "method": "POST",
+      "path": "/admin/apps",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/receipt",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/migrations/receipt",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/restore/receipt",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/claim",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/start",
+      "admin": true,
+      "zod": false,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/finish",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tenants",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/write-smoke-job",
+      "admin": true,
+      "zod": false,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/ai/debug",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/rotate-credential",
+      "admin": true,
+      "zod": false,
+      "audit": true,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/database/test-url",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/guided/proof-action",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/setup/generate-secrets",
+      "admin": true,
+      "zod": false,
+      "audit": true,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/lifecycle-action",
+      "admin": true,
+      "zod": true,
+      "audit": true,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/accounts",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+      "admin": true,
+      "zod": false,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/commercial/subscriptions",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "admin": false,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/live-gates/check",
+      "admin": true,
+      "zod": false,
+      "audit": false,
+      "gate": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+      "admin": true,
+      "zod": true,
+      "audit": false,
+      "gate": false
+    }
+  ]
+}

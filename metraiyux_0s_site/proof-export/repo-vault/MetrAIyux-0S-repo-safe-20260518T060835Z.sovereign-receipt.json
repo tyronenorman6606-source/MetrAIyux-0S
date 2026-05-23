@@ -1,0 +1,87 @@
+{
+  "schema": "skyevault.repo-safe-push-receipt.v1",
+  "createdAt": "2026-05-18T06:23:28.055Z",
+  "status": "pushed-and-pruned",
+  "archive": {
+    "localPath": "/tmp/skyevault-repo-push/archives/MetrAIyux-0S-repo-safe-20260518T060835Z.zip",
+    "fileName": "MetrAIyux-0S-repo-safe-20260518T060835Z.zip",
+    "bytes": 741402790,
+    "sha256": "8790f1610fad12733db7ea711092e2abbf3e6c781957096bffd9ed93ff9395fc",
+    "fileCount": 66827,
+    "secretLookingFilesExcluded": 42
+  },
+  "skyeVault": {
+    "vaultApi": "https://skyevault-drop.netlify.app",
+    "receiptId": "cdv_79ea39b1416dd46a17e16e68",
+    "sessionId": "cdv_6e60954c813036996426882803062e0cea18",
+    "destination": "Primary Production Intake",
+    "repoId": "MetrAIyux-0S",
+    "object": {
+      "bucket": "client-drop-vault",
+      "key": "client-uploads/primary/cdv_6e60954c813036996426882803062e0cea18/MetrAIyux-0S-repo-safe-20260518T060835Z.zip",
+      "size": 741402790,
+      "mimeType": "application/zip"
+    },
+    "download": {
+      "url": "https://e700b92580cd05de0104128efbd3e676.r2.cloudflarestorage.com/client-drop-vault/client-uploads/primary/cdv_6e60954c813036996426882803062e0cea18/MetrAIyux-0S-repo-safe-20260518T060835Z.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=93c09713877b3cd3343c6fc01e60867b%2F20260518%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260518T062327Z&X-Amz-Expires=604800&X-Amz-Signature=de9166001938b77b407a112ce6a3afa5dcf5e56bb8e1b1c2f7e1a92d70e85d9b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22MetrAIyux-0S-repo-safe-20260518T060835Z.zip%22&response-content-type=application%2Fzip",
+      "expiresAt": "2026-05-25T06:23:28.055Z",
+      "expiresInSeconds": 604800,
+      "verification": {
+        "status": 206,
+        "contentType": "application/zip",
+        "contentRange": "bytes 0-0/741402790",
+        "contentLength": "1",
+        "firstByteCount": 1
+      }
+    },
+    "recoveryPortal": "https://skyevault-drop.netlify.app/#client-vault"
+  },
+  "retention": {
+    "receiptPath": ".skyevault-out/skyevault-repo-safe-retention-20260518T062200Z.json",
+    "beforeCount": 14,
+    "afterCount": 3,
+    "deletedCount": 11,
+    "kept": [
+      {
+        "receiptId": "cdv_79ea39b1416dd46a17e16e68",
+        "completedAt": "2026-05-18T06:19:14.622Z",
+        "fileName": "MetrAIyux-0S-repo-safe-20260518T060835Z.zip",
+        "objectKey": "client-uploads/primary/cdv_6e60954c813036996426882803062e0cea18/MetrAIyux-0S-repo-safe-20260518T060835Z.zip"
+      },
+      {
+        "receiptId": "cdv_39d9161ede4afce69fbc38eb",
+        "completedAt": "2026-05-17T21:12:10.643Z",
+        "fileName": "MetrAIyux-0S-repo-safe-20260517T210808Z.zip",
+        "objectKey": "client-uploads/primary/cdv_612e426b76467b2b798750898409d244373d/MetrAIyux-0S-repo-safe-20260517T210808Z.zip"
+      },
+      {
+        "receiptId": "cdv_24dc95d888f8dda988396aaa",
+        "completedAt": "2026-05-17T14:14:56.269Z",
+        "fileName": "MetrAIyux-0S-repo-safe-20260517T141341Z.zip",
+        "objectKey": "client-uploads/primary/cdv_dda782283f5331eb22485e27f2d3cc7cff49/MetrAIyux-0S-repo-safe-20260517T141341Z.zip"
+      }
+    ]
+  },
+  "workflowProof": {
+    "note": "Verified with unzip -Z1 piped through rg after archive creation.",
+    "samplePaths": [
+      "metraiyux_0s_site/skye-content-repurposer-local/.github/workflows/skye-content-automation.yml",
+      "metraiyux_0s_site/Free99/apps/sovereigndocs/.github/workflows/sovereigndocs-ci.yml",
+      "metraiyux_0s_site/Free99/apps/skyeapi-aegiscore/.github/workflows/console-e2e.yml",
+      "metraiyux_0s_site/SkyeMusicNexus/workflows.html",
+      "metraiyux_0s_site/Free99/apps/skyeapi-aegiscore/examples/workflows/qualify-lead.workflow.json"
+    ]
+  },
+  "sourceReceipts": {
+    "uploadReceiptPath": ".skyevault-out/skyevault-receipt-cdv_79ea39b1416dd46a17e16e68.json",
+    "retentionReceiptPath": ".skyevault-out/skyevault-repo-safe-retention-20260518T062200Z.json",
+    "proofRetentionReceiptPath": "metraiyux_0s_site/proof-export/repo-vault/skyevault-repo-safe-retention-20260518T062200Z.json"
+  },
+  "helperPatch": {
+    "files": [
+      "tools/skyevault-repo-push.mjs",
+      "SkyeVault-Drop/netlify/functions/_lib/google-drive.js"
+    ],
+    "reason": "Allow rsync vanished-file warning during generated-output churn and support repo-safe retention pruning."
+  }
+}

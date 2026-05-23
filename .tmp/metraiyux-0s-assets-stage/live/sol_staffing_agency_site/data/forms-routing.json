@@ -1,0 +1,35 @@
+{
+  "forms": [
+    {
+      "name": "staffing-request",
+      "owner": "AE desk",
+      "destination": "CRM/email",
+      "sensitivity": "business"
+    },
+    {
+      "name": "candidate-application",
+      "owner": "candidate desk",
+      "destination": "ATS/database",
+      "sensitivity": "candidate personal information"
+    },
+    {
+      "name": "government-inquiry",
+      "owner": "gov pursuit owner",
+      "destination": "CRM/procurement log",
+      "sensitivity": "business/procurement"
+    },
+    {
+      "name": "vendor-intake",
+      "owner": "operations",
+      "destination": "vendor register",
+      "sensitivity": "business/vendor"
+    },
+    {
+      "name": "proposal-intake",
+      "owner": "proposal owner",
+      "destination": "proposal queue",
+      "sensitivity": "business"
+    }
+  ],
+  "production_note": "Do not collect sensitive documents through unsecured static forms. Add auth, secure upload, and database scoping before live sensitive workflows."
+}

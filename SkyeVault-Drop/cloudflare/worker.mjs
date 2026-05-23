@@ -14,6 +14,7 @@ import { handler as publicConfig } from '../netlify/functions/public-config.js';
 import { handler as setupDiagnostics } from '../netlify/functions/setup-diagnostics.js';
 import { handler as setupFolderHelper } from '../netlify/functions/setup-folder-helper.js';
 import { handler as uploadComplete } from '../netlify/functions/upload-complete.js';
+import { handler as uploadPartUrl } from '../netlify/functions/upload-part-url.js';
 import { handler as uploadSession } from '../netlify/functions/upload-session.js';
 import { handler as uploadStatus } from '../netlify/functions/upload-status.js';
 import { hasValidOperatorSession } from '../netlify/functions/_lib/security.js';
@@ -36,6 +37,7 @@ const HANDLERS = {
   'setup-diagnostics': setupDiagnostics,
   'setup-folder-helper': setupFolderHelper,
   'upload-complete': uploadComplete,
+  'upload-part-url': uploadPartUrl,
   'upload-session': uploadSession,
   'upload-status': uploadStatus
 };
@@ -60,6 +62,7 @@ const SECURITY_HEADERS = {
 };
 
 function bindEnv(env, request) {
+  globalThis.__SKYEVAULT_WORKER_ENV = env || {};
   if (!globalThis.process) globalThis.process = { env: {} };
   if (!globalThis.process.env) globalThis.process.env = {};
   for (const [key, value] of Object.entries(env || {})) {

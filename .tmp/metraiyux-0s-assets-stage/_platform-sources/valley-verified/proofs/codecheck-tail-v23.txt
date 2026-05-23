@@ -1,0 +1,255 @@
+
+> phx-verified-network-platform@23.0.0 state-smoke
+> node scripts/state-smoke.mjs
+
+✅ state projection records claim lifecycle
+✅ verification decision updates claim state
+✅ state projection records buyer lead
+✅ state projection records listing patches
+✅ state projection records suppression drafts
+✅ state projection records AE stage
+✅ state projection appends immutable events
+✅ file state store persists JSON snapshot
+✅ file state store writes JSONL event log
+✅ D1 schema includes action table
+✅ D1 schema includes listing state table
+✅ database contract exposes runtime tables
+✅ adapter checklist exposes integration requirements
+
+13 state checks passed.
+
+> phx-verified-network-platform@23.0.0 mutation-smoke
+> node scripts/mutation-smoke.mjs
+
+✅ policy matrix covers action contracts
+✅ owner claim passes policy for owner role
+✅ AE cannot apply suppression policy
+✅ protected patch fields are rejected
+✅ mutation service queues buyer lead
+✅ queue summary counts queued action
+✅ event ledger records queued action
+✅ webhook outbox receives queued-action job
+✅ queued claim includes policy risk label
+✅ approval projects claim into runtime state
+✅ event ledger records approval
+✅ admin change-set exports suppression ids
+✅ admin change-set exports claim updates
+✅ admin change-set CSV renders suppression lane
+✅ suppression file generator preserves suppression id
+✅ event replay applies queued actions
+✅ event replay reconstructs lead state
+✅ event replay writes replay events
+✅ webhook signatures are stable for object/string body
+✅ webhook job includes HMAC signature and pending status
+✅ rejection records review decision state
+
+21 mutation service checks passed.
+
+> phx-verified-network-platform@23.0.0 v18-smoke
+> node scripts/v18-smoke.mjs
+
+✅ JsonPlatformAdapter stores first action
+✅ JsonPlatformAdapter enforces action idempotency
+✅ JsonPlatformAdapter reads stored action by id
+✅ JsonPlatformAdapter lists stored actions
+✅ JsonPlatformAdapter persists runtime state
+✅ JsonPlatformAdapter appends and filters events
+✅ AdapterActionStore bridges adapter to mutation stores
+✅ D1PlatformAdapter writes phx_actions SQL
+✅ Webhook job signature verifies
+✅ Webhook outbox dry-run processor records receipt
+✅ Webhook receipt file is written
+✅ Exposure order does not fake completed billing
+✅ Exposure order creates sponsor_intent action envelope
+✅ Admin API rejects missing upstream identity
+✅ Admin API exposes exposure catalog to upstream identity
+✅ Admin API queues exposure order intent
+✅ Admin API returns protected admin operations for admin role
+✅ v18 smoke passed: 17 checks passed
+
+> phx-verified-network-platform@23.0.0 v19-smoke
+> node scripts/v19-smoke.mjs
+
+✅ Payment service page exists
+✅ Admin console page exists
+✅ Admin console browser asset exists
+✅ Payment service model export exists
+✅ Payment service API export exists
+✅ Dry-run checkout session is created but unpaid
+✅ Checkout creation does not fake paid status
+✅ Checkout links to sponsor_intent action
+✅ Stripe webhook signature verifier accepts valid signature
+✅ Stripe webhook signature verifier rejects invalid signature
+✅ PHX payment signature verifier accepts valid signature
+✅ PHX payment signature verifier rejects invalid signature
+✅ Payment webhook creates payment_event action
+✅ Payment event action stores in payment-events queue
+✅ State projector records payment event
+✅ Payment event marks sponsor intent paid pending admin activation
+✅ Exposure activation action projects active placement state
+✅ Admin API create_checkout_session returns accepted
+✅ Payment Netlify function exposes service model
+✅ Payment checkout endpoint rejects missing upstream identity
+✅ Payment webhook endpoint accepts dry-run provider event for proof
+✅ v19 smoke passed: 21 checks passed
+
+> phx-verified-network-platform@23.0.0 v20-smoke
+> node scripts/v20-smoke.mjs
+
+✅ Lead routing service module exists
+✅ Owner messaging service module exists
+✅ Revenue attribution service module exists
+✅ Lead Netlify function exists
+✅ Quote router page exists
+✅ Lead routing service model exists
+✅ Lead routing API model exists
+✅ Owner messaging model exists
+✅ Revenue attribution model exists
+✅ Route engine selects candidate businesses
+✅ Route decision includes selected business ids
+✅ Route scores are positive
+✅ Quote request action is created
+✅ Lead route decision action is created
+✅ AE assignment action is created
+✅ Owner message template renders variables
+✅ Owner message action is created
+✅ Notification delivery event action is created
+✅ Revenue attribution action is created
+✅ Revenue attribution summary nets payment
+✅ State projector records quote_request
+✅ State projector records lead_route_decision
+✅ State projector records AE assignment
+✅ State projector records owner message
+✅ State projector records notification delivery event
+✅ State projector records revenue attribution event
+✅ Lead endpoint rejects missing upstream identity
+✅ Lead endpoint exposes service model
+✅ Lead endpoint routes quote request locally with proof env
+✅ Admin API exposes lead routing service
+✅ Admin API route_lead creates route decision
+✅ Admin API drafts owner message action
+✅ v20 smoke passed: 32 checks passed
+
+> phx-verified-network-platform@23.0.0 v21-smoke
+> node scripts/v21-smoke.mjs
+
+✅ seed report is upgraded to v21 or later
+✅ profile mode is full-static
+✅ static profile count equals business count
+✅ canonical routing declares full-static mode
+✅ canonical routing covers every business
+✅ first business has static HTML
+✅ last business has static HTML
+✅ first static profile has unique canonical URL
+✅ last static profile has unique canonical URL
+✅ static profile includes LocalBusiness structured data
+✅ static profile includes owner claim and quote actions
+✅ old profile shard payload directory is removed
+✅ business dataset is compacted below 15MB
+✅ API business mirror is compacted below 15MB
+✅ deploy size report records full static profile count
+✅ deploy size report proves compaction reduced output
+✅ enrichment queue export exists
+✅ lead records model export exists
+✅ payment activation model export exists
+✅ notification worker model export exists
+✅ claim submission model export exists
+✅ build module map exists
+✅ protected admin app page exists
+✅ protected admin page rejects local proof-control pattern
+✅ protected admin app calls runtime with credentials
+✅ route manifest records v21 profile strategy
+✅ v21 readiness records modular build runner
+✅ runtime factory creates JSON adapter
+✅ Neon adapter class is exported
+✅ D1 adapter class remains exported
+✅ runtime adapter persists and reads action envelopes
+✅ lead record service handles assignment, status, and owner contact attempts
+✅ lead record API model exposes routed status
+✅ Stripe product/price resolver uses env mapping
+✅ payment webhook event action is buildable
+✅ admin exposure activation action is buildable
+✅ payment activation model requires admin approval
+✅ notification worker supports dry-run delivery receipt
+✅ notification receipt converts to delivery event action
+✅ notification worker API model exposes signed jobs
+✅ owner-facing claim submission builds persistent owner_claim action
+✅ claim submission service does not auto-verify owners
+✅ v21 smoke passed: 42 checks passed
+
+> phx-verified-network-platform@23.0.0 v22-smoke
+> node scripts/v22-smoke.mjs
+
+✅ seed report upgraded to v22
+✅ v22 readiness records runtime context wiring
+✅ runtime wiring covers phx-claim
+✅ artifact manifest documents manifest API policy
+✅ route manifest records v22 runtime context
+✅ API business mirror is manifest-only with correct count
+✅ API search mirror is manifest-only
+✅ lite business dataset covers every business
+✅ API business manifest is below 1KB
+✅ API search manifest is below 1KB
+✅ v22 deploy report proves additional size reduction
+✅ runtime wiring page exists
+✅ persistence health page exists
+✅ artifact manifest page exists
+✅ phx-action.mjs uses shared runtime context
+✅ phx-admin.mjs uses shared runtime context
+✅ phx-payment.mjs uses shared runtime context
+✅ phx-lead.mjs uses shared runtime context
+✅ phx-claim.mjs uses shared runtime context
+✅ phx-claim no longer passes raw headers to requireUpstreamActor
+✅ protected admin replay operation matches admin API
+✅ JSON adapter round-trip proves persistence and idempotency
+✅ D1 adapter round-trip proves action/state path with fake binding
+✅ Neon adapter round-trip proves action/state path with fake client
+✅ runtime context summary reports JSON adapter
+✅ schema bundle exposes D1 and Neon schemas
+✅ D1 adapter exposes event, receipt, and summary methods
+✅ Neon adapter exposes event listing method
+✅ claim endpoint rejects missing upstream identity
+✅ claim endpoint accepts upstream owner identity
+✅ admin endpoint rejects missing upstream identity
+✅ v22 smoke passed: 31 checks passed
+
+> phx-verified-network-platform@23.0.0 v23-smoke
+> node scripts/v23-smoke.mjs
+
+✅ homepage rewritten as public website
+✅ homepage has buyer CTA
+✅ homepage has owner CTA
+✅ homepage has data honesty section
+✅ public homepage no longer exposes crowded AE command nav
+✅ public homepage has guardrail footer
+✅ /about/ exists
+✅ /about/ carries PHX Verified copy
+✅ /about/ has footer
+✅ /how-it-works/ exists
+✅ /how-it-works/ carries PHX Verified copy
+✅ /how-it-works/ has footer
+✅ /for-businesses/ exists
+✅ /for-businesses/ carries PHX Verified copy
+✅ /for-businesses/ has footer
+✅ /advertise/ exists
+✅ /advertise/ carries PHX Verified copy
+✅ /advertise/ has footer
+✅ /network/ exists
+✅ /network/ carries PHX Verified copy
+✅ /network/ has footer
+✅ /contact/ exists
+✅ /contact/ carries PHX Verified copy
+✅ /contact/ has footer
+✅ directory header uses simplified public nav
+✅ directory no longer shows dense operator nav chain
+✅ website-content JSON is v23
+✅ website-content includes owner route
+✅ website-content preserves claim guardrail
+✅ v23 readiness JSON exists
+✅ v23 cleaned generated headers
+✅ sitemap includes /about/
+✅ sitemap includes /advertise/
+✅ llms.txt includes public website context
+✅ seed report promoted to v23
+✅ seed report records website rewrite
+v23 website smoke passed: 36 checks passed

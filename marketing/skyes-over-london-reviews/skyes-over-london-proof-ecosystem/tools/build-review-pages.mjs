@@ -35,7 +35,7 @@ const categoryByFile = {
 const infrastructure = {
   reviews: {
     label: 'Skyes Reviews Wall',
-    url: 'https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded',
+    url: 'https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded.html',
     note: 'The full review wall and 3D review atlas.',
   },
   legal: {

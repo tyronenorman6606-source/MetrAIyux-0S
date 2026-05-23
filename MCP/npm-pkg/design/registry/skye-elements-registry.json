@@ -1,0 +1,276 @@
+{
+  "name": "skye-elements-registry",
+  "version": "0.3.0",
+  "purpose": "Composable design elements for Skye/Spectacle MCP generation. Elements are referenced by namespace so sources can be combined without turning into a Frankenstein page.",
+  "compositionPolicy": {
+    "rule": "Use one primary visual language per page, then add supporting elements only when they serve the same story.",
+    "forbidden": [
+      "Mixing unrelated hero styles from multiple products",
+      "Using an asset because it exists instead of because it clarifies the offer",
+      "Stacking every animation library on one page",
+      "Combining dark luxury, playful SaaS, brutalist, and app UI styles in the same viewport",
+      "Treating screenshots, logos, and 3D objects as interchangeable decorations",
+      "Claiming advanced open-source tooling without real imports",
+      "Reusing the same dark card/dashboard template with a different brand name",
+      "Defaulting a changelog, blog, portfolio, proof-note, or editorial surface into an app-first command surface"
+    ],
+    "required": [
+      "Choose one primary pattern",
+      "Choose one subject type",
+      "Choose one motion language",
+      "Choose one conversion path",
+      "Run design_stack_audit when advanced tooling is required",
+      "Run design_performance_audit when advanced motion, WebGL, screenshots, or scroll effects are used",
+      "Run browser QA after implementation"
+    ]
+  },
+  "namespaces": {
+    "skye.core": "Foundational Skye/Spectacle palette, typography, spacing, and proof language.",
+    "skye.luxury": "$50K-grade bespoke elements: editorial typography, strategic whitespace, choreographed motion, and singular visual thesis.",
+    "skye.motion": "Motion and scroll choreography patterns.",
+    "skye.fx": "Premium cursor, scrollbar, neon text, shimmer, and interaction polish.",
+    "skye.webgl": "Three.js/WebGL scene patterns.",
+    "skye.proof": "Client-safe proof panels and operator evidence patterns.",
+    "skye.brand": "Logo, wordmark, identity asset discipline, and anti-generic-brand rules.",
+    "skyesol.reference": "Read-only extracted SkyeSol assets and style notes.",
+    "skye.templates": "First-class revised changelog, blog, and portfolio template packs wired into the MCP.",
+    "client.surface": "App-first surfaces, dashboards, command centers, and control panels."
+  },
+  "elements": [
+    {
+      "id": "skye.core.full-width-design-hero",
+      "type": "hero",
+      "tier": "primary",
+      "description": "A wide first viewport with a singular visual thesis, short support copy, obvious CTA, and one design/proof/media subject. This is the default public-site hero, not an app dashboard.",
+      "useWhen": "The product needs a premium public, editorial, changelog, blog, portfolio, proof, or brand first impression and must avoid left-column text walls.",
+      "requiredPairings": ["skye.luxury.singular-visual-thesis", "skye.proof.quality-gates", "skye.motion.reveal-system"],
+      "doNotPairWith": ["client.surface.app-first-command-center", "skye.core.split-logo-hero"]
+    },
+    {
+      "id": "skye.core.full-width-command-hero",
+      "type": "hero",
+      "tier": "primary",
+      "description": "A wide first viewport with headline across the page, short support copy, obvious CTA, and one explicit command-surface visual.",
+      "useWhen": "Only use when the user explicitly asks for a command room, dashboard, admin surface, app shell, control plane, or operational console.",
+      "requiredPairings": ["skye.proof.quality-gates", "skye.motion.reveal-system"],
+      "doNotPairWith": ["skye.core.split-logo-hero", "skye.templates.changelog-shell", "skye.templates.blog-field-notes-shell", "skye.templates.portfolio-operator-shell"]
+    },
+    {
+      "id": "skye.templates.changelog-shell",
+      "type": "template",
+      "tier": "primary",
+      "description": "Revised Magic UI changelog template with Skye MCP chrome, production-ledger release entries, MDX content, and proof-focused timeline structure.",
+      "useWhen": "The user asks for a changelog, release receipt, production ledger, release timeline, update feed, or proof chronology.",
+      "requiredPairings": ["skye.core.full-width-design-hero", "skye.fx.neon-motion-chrome", "skyesol.reference.living-aurora-background"],
+      "doNotPairWith": ["client.surface.app-first-command-center"]
+    },
+    {
+      "id": "skye.templates.blog-field-notes-shell",
+      "type": "template",
+      "tier": "primary",
+      "description": "Revised Magic UI blog template with Skye MCP chrome, production field-note content, article cards, tags, and editorial proof structure.",
+      "useWhen": "The user asks for a blog, field notes, content engine, article library, or technical proof narrative.",
+      "requiredPairings": ["skye.core.full-width-design-hero", "skye.fx.neon-motion-chrome", "skye.luxury.editorial-headline-system"],
+      "doNotPairWith": ["client.surface.app-first-command-center"]
+    },
+    {
+      "id": "skye.templates.portfolio-operator-shell",
+      "type": "template",
+      "tier": "primary",
+      "description": "Revised Magic UI portfolio template with Skye MCP chrome, operator profile content, production proof section, and resume/case-study structure.",
+      "useWhen": "The user asks for a portfolio, operator profile, resume, proof-of-work site, founder page, or case-study index.",
+      "requiredPairings": ["skye.core.full-width-design-hero", "skye.fx.neon-motion-chrome", "skyesol.reference.transparent-founder-scene"],
+      "doNotPairWith": ["client.surface.app-first-command-center"]
+    },
+    {
+      "id": "client.surface.app-first-command-center",
+      "type": "hero",
+      "tier": "primary",
+      "description": "The app/tool UI is the first screen, with real controls, tabs, status, and workflow density.",
+      "useWhen": "The user asked for an app, dashboard, database command center, editor, game, or internal tool.",
+      "requiredPairings": ["skye.proof.status-strip", "skye.core.compact-navigation"],
+      "doNotPairWith": ["skye.core.marketing-only-hero"]
+    },
+    {
+      "id": "skye.webgl.living-command-field",
+      "type": "visual-system",
+      "tier": "enhancement",
+      "description": "A restrained WebGL/Three.js ambient scene: particles, depth, glow, camera parallax, and product symbolism.",
+      "useWhen": "The product benefits from a sense of living infrastructure or spatial control.",
+      "requiredPairings": ["skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.motion.heavy-scroll-jacking"]
+    },
+    {
+      "id": "skyesol.reference.living-aurora-background",
+      "type": "visual-system",
+      "tier": "primary",
+      "description": "SkyeSol alive background: transparent fixed canvas, aurora wave bands, gold/violet/cyan particles, pointer parallax, scanline, grain, capped DPR, and reduced-motion/mobile fallback.",
+      "useWhen": "The user asks for SkyeSol-style living backgrounds, alive pages, spectacle atmosphere, or command-chamber energy.",
+      "requiredPairings": ["skye.fx.neon-motion-chrome", "skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.core.static-gradient-only", "skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.motion.scroll-proof-funnel",
+      "type": "scroll-story",
+      "tier": "primary",
+      "description": "A scroll-led story that stages signup, setup, proof, handoff, and conversion with one clear action per stage.",
+      "useWhen": "A buyer must understand a process or trust path before signup.",
+      "requiredPairings": ["skye.proof.operator-proof-panel"],
+      "doNotPairWith": ["skye.core.long-copy-sections"]
+    },
+    {
+      "id": "skye.proof.operator-proof-panel",
+      "type": "proof",
+      "tier": "support",
+      "description": "Client-safe trust evidence: checks, receipts, status, timestamps, proof labels, and handoff state.",
+      "useWhen": "The page needs proof without exposing internal smoke logs or raw debug output.",
+      "requiredPairings": ["skye.proof.public-copy-filter"],
+      "doNotPairWith": ["skye.proof.raw-smoke-output"]
+    },
+    {
+      "id": "skyesol.reference.transparent-founder-scene",
+      "type": "authority",
+      "tier": "primary",
+      "description": "Transparent founder media staged as an authority object, paired with proof metrics and editorial copy.",
+      "useWhen": "Founder/operator trust is part of the sale.",
+      "requiredPairings": ["skye.core.editorial-headline", "skye.proof.metric-row"],
+      "doNotPairWith": ["skye.core.avatar-card"]
+    },
+    {
+      "id": "skye.motion.reveal-system",
+      "type": "motion",
+      "tier": "support",
+      "description": "Subtle entrance, hover, and section reveal motion with reduced-motion fallback.",
+      "useWhen": "Almost every premium page, unless motion is disabled.",
+      "requiredPairings": [],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.fx.cursor-trail",
+      "type": "interaction-effect",
+      "tier": "enhancement",
+      "description": "Pointer-reactive glow/cursor trail for premium pages, with mobile and reduced-motion fallback.",
+      "useWhen": "The user asks for cursor trail, high-end interaction polish, or spectacle feel.",
+      "requiredPairings": ["skye.motion.reveal-system"],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.fx.neon-scrollbar",
+      "type": "scroll-effect",
+      "tier": "enhancement",
+      "description": "Optional branded scrollbar with an always-visible, slightly opaque neon track and glowing thumb treatment for vertical and horizontal scroll surfaces.",
+      "useWhen": "The user asks for a visible custom scrollbar, or a long scroll/table/nav experience needs persistent position feedback.",
+      "requiredPairings": [],
+      "implementationPattern": "adaptive-neon-scrollbar",
+      "doNotPairWith": ["skye.core.hidden-browser-chrome", "skye.fx.hover-only-scrollbar"]
+    },
+    {
+      "id": "skye.fx.neon-motion-chrome",
+      "type": "interaction-effect",
+      "tier": "enhancement",
+      "description": "Full-page premium browser chrome: Legal Skyes-style neon scrollbar, top scroll progress rail, pointer-reactive glow, scanline texture, shimmer text, and magnetic hover utility classes.",
+      "useWhen": "The user asks for the legal page scrollbar style, stronger motion polish, neon UI chrome, scroll-progress feedback, or a page that should feel designed instead of merely styled.",
+      "requiredPairings": ["skye.motion.reveal-system", "skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.core.hidden-browser-chrome", "skye.motion.everything-animates"]
+    },
+    {
+      "id": "skye.fx.text-effects",
+      "type": "typography-effect",
+      "tier": "enhancement",
+      "description": "Glow, shimmer, split-line, reveal, or chromatic text treatments used as hierarchy, not clutter.",
+      "useWhen": "The art direction needs neon/glowing/premium display text effects.",
+      "requiredPairings": ["skye.core.full-width-design-hero"],
+      "doNotPairWith": ["skye.motion.everything-animates"]
+    },
+    {
+      "id": "client.surface.actual-screenshot-stage",
+      "type": "surface-proof",
+      "tier": "primary",
+      "description": "Use browser/app/product screenshots as the actual visual subject when the surface itself matters.",
+      "useWhen": "The product has a real app, dashboard, website, or generated surface that needs to be shown.",
+      "requiredPairings": ["skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.random-stock-visual"]
+    },
+    {
+      "id": "client.surface.actual-video-reel",
+      "type": "surface-proof",
+      "tier": "primary",
+      "description": "A real MP4/WebM reel recorded from actual browser/app workflows and rendered as the first proof subject.",
+      "useWhen": "The user asks for screenshots animated into video-style proof, the surface needs to feel live, or the copy claims the app does a workflow.",
+      "requiredPairings": ["client.surface.actual-screenshot-stage", "skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.fake-ui-preview"]
+    },
+    {
+      "id": "skye.brand.existing-logo-system",
+      "type": "brand-identity",
+      "tier": "required",
+      "description": "Use approved logo, mark, emblem, and wordmark assets before inventing any new mark.",
+      "useWhen": "Every branded public page, nav, hero, favicon, app shell, or client surface.",
+      "requiredPairings": ["skye.proof.quality-gates"],
+      "doNotPairWith": ["skye.core.generated-initial-badge", "skye.core.random-stock-visual"]
+    },
+    {
+      "id": "skye.proof.quality-gates",
+      "type": "qa",
+      "tier": "required",
+      "description": "Desktop/mobile browser screenshots, no mobile horizontal scroll, visible subject, visible CTA, clean public copy.",
+      "useWhen": "Every generated public page or app surface.",
+      "requiredPairings": [],
+      "doNotPairWith": []
+    },
+    {
+      "id": "skye.luxury.editorial-headline-system",
+      "type": "typography",
+      "tier": "primary",
+      "description": "Architecturally-scaled display headline with intentional tracking, tight line-height, weight contrast between display and body, and no system font fallback. Hero text at clamp(3.5rem, 8vw, 9rem), letter-spacing -0.02em to -0.04em, line-height 0.9–1.05.",
+      "useWhen": "Any $50K-grade surface where the headline must read as designed, not defaulted.",
+      "requiredPairings": ["skye.luxury.strategic-whitespace", "skye.motion.staggered-reveal-choreography"],
+      "doNotPairWith": ["skye.core.system-font-hero", "skye.core.uniform-weight-page"]
+    },
+    {
+      "id": "skye.luxury.strategic-whitespace",
+      "type": "layout",
+      "tier": "primary",
+      "description": "First viewport with ≥30% negative space. Section padding ≥10rem desktop / ≥6rem mobile. Hero inner padding ≥8rem. Content never touches viewport edge. Grid margins minimum 4rem horizontal. This is the single biggest differentiator between a $5K and a $50K site.",
+      "useWhen": "Any premium/luxury build. Required for $50K design standard compliance.",
+      "requiredPairings": ["skye.luxury.editorial-headline-system"],
+      "doNotPairWith": ["skye.core.dense-card-grid", "skye.core.feature-checklist-hero"]
+    },
+    {
+      "id": "skye.motion.staggered-reveal-choreography",
+      "type": "motion",
+      "tier": "primary",
+      "description": "Elements reveal in deliberate order with custom cubic-bezier easing: headline (i=0, delay 0ms) → subtext (i=1, delay 80ms) → CTA (i=2, delay 160ms) → supporting visual (i=3, delay 240ms). Never simultaneous. Duration 400ms–700ms. Easing: expo-out or circ-out, never default ease.",
+      "useWhen": "All $50K surfaces and any surface where entrance motion was requested. Required for design_luxury_audit to pass.",
+      "requiredPairings": ["skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.motion.everything-at-once", "skye.motion.default-ease"]
+    },
+    {
+      "id": "skye.luxury.bespoke-interaction-layer",
+      "type": "interaction",
+      "tier": "enhancement",
+      "description": "At least one hover state, cursor treatment, or transition that could not come from a UI kit: magnetic button pull, cursor-reactive glow with custom spring, text-reveal on hover, tilt/parallax surface, or animated underline with intentional draw timing.",
+      "useWhen": "Any surface targeting $50K quality where premium interactive feel is a requirement.",
+      "requiredPairings": ["skye.motion.reduced-motion-fallback"],
+      "doNotPairWith": ["skye.core.default-hover-underline"]
+    },
+    {
+      "id": "skye.luxury.singular-visual-thesis",
+      "type": "composition",
+      "tier": "required",
+      "description": "One dominant visual idea drives every decision on the page: a WebGL product object, a founder authority scene, a cinematic proof tunnel, an editorial full-bleed image, or an interactive app surface. Not a list of features. Not a card grid. One idea, fully committed to.",
+      "useWhen": "Every $50K-grade page. If there is no singular visual thesis, the page is not ready to build.",
+      "requiredPairings": ["skye.luxury.editorial-headline-system", "skye.luxury.strategic-whitespace"],
+      "doNotPairWith": ["skye.core.feature-checklist-hero", "skye.core.dense-card-grid", "skye.core.split-copy-image-generic"]
+    },
+    {
+      "id": "skye.luxury.custom-easing-signature",
+      "type": "motion",
+      "tier": "enhancement",
+      "description": "A project-wide CSS custom property for easing that is not the browser default. Use --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1) or similar. Applied consistently across all transitions. This single change makes motion feel intentional vs. assembled.",
+      "useWhen": "Every $50K surface. Required for design_luxury_audit choreography check to pass.",
+      "requiredPairings": ["skye.motion.staggered-reveal-choreography"],
+      "doNotPairWith": []
+    }
+  ]
+}

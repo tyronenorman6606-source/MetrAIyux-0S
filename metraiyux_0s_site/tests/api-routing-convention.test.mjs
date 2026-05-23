@@ -18,6 +18,21 @@ function env(overrides = {}) {
   };
 }
 
+function gateWorker() {
+  return {
+    async fetch(request) {
+      const body = await request.json().catch(() => ({}));
+      return Response.json({
+        active: body.token === 'gate-token',
+        sub: 'api-route-test',
+        email: 'api-route-test@example.invalid',
+        role: 'admin',
+        scope: 'admin.read admin.write gateway.invoke'
+      });
+    }
+  };
+}
+
 function req(path, options = {}) {
   return new Request(`https://metraiyux.example${path}`, options);
 }
@@ -36,9 +51,12 @@ test('API-01/API-05 exposes the full-system route manifest and API base decision
   assert.equal(data.api_bases.profit, '/api/profit');
   assert.equal(data.api_bases.houseops, '/api/houseops');
   assert.equal(data.api_bases.houseoperations, '/api/houseops');
+  assert.equal(data.api_bases.keyGate13th, '/api/key-gate-13th');
+  assert.equal(data.api_bases.key_gate_13th, '/api/key-gate-13th');
   assert.equal(data.apps.some((app) => app.id === 'sovereigndocs' && app.health === '/api/sovereigndocs/health'), true);
   assert.equal(data.apps.some((app) => app.id === 'profit' && app.health === '/api/profit/health'), true);
   assert.equal(data.apps.some((app) => app.id === 'houseops' && app.health === '/api/houseops/health'), true);
+  assert.equal(data.apps.some((app) => app.id === 'keyGate13th' && app.health === '/api/key-gate-13th/health'), true);
 });
 
 test('API-02 publishes a browser API base helper', async () => {
@@ -47,6 +65,7 @@ test('API-02 publishes a browser API base helper', async () => {
   assert.match(source, /sovereigndocs:\s*'\/api\/sovereigndocs'/);
   assert.match(source, /profit:\s*'\/api\/profit'/);
   assert.match(source, /houseops:\s*'\/api\/houseops'/);
+  assert.match(source, /keyGate13th:\s*'\/api\/key-gate-13th'/);
   assert.match(source, /window\.MetrAIyuxApi/);
 });
 
@@ -102,7 +121,9 @@ test('API-03 legacy root app APIs return a collision diagnostic instead of falli
 test('API-01 namespaced app routes rewrite to configured service bindings', async () => {
   const calls = [];
   const res = await siteWorker.fetch(
-    req('/api/sovereigndocs/v18/workspace/dashboard?role=admin'),
+    req('/api/sovereigndocs/v18/workspace/dashboard?role=admin', {
+      headers: { authorization: 'Bearer gate-token' }
+    }),
     env({
       SOVEREIGNDOCS_WORKER: {
         async fetch(request) {
@@ -110,7 +131,8 @@ test('API-01 namespaced app routes rewrite to configured service bindings', asyn
           calls.push({ path: url.pathname, search: url.search });
           return Response.json({ ok: true, path: url.pathname, search: url.search });
         }
-      }
+      },
+      SKYGATEFS27_WORKER: gateWorker()
     }),
     ctx()
   );
@@ -130,6 +152,7 @@ test('API-06 representative app API probes do not produce unexpected 404s', asyn
     '/api/skymusicnexus/music-assets',
     '/api/profit/status',
     '/api/houseops/status',
+    '/api/key-gate-13th/health',
     '/api/marketing-made-easy/runtime/status',
     '/api/relay13/v1/connectlog/health'
   ];

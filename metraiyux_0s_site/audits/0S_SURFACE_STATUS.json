@@ -1,15 +1,35 @@
 {
   "schema": "metraiyux-0s-surface-status.v1",
-  "updatedAt": "2026-05-20",
+  "updatedAt": "2026-05-20T03:57:26Z",
   "sourceAudit": "/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md",
-  "allowedStatusTags": ["LIVE", "GATED", "LOCAL", "STATIC", "BROKEN", "EXPOSED", "PARTIAL", "PROOF_ONLY"],
-  "badgeLabels": ["Production live", "Gate required", "Local only", "Static proof", "Backend missing", "Proof only", "Partial"],
+  "allowedStatusTags": [
+    "LIVE",
+    "GATED",
+    "LOCAL",
+    "STATIC",
+    "BROKEN",
+    "EXPOSED",
+    "PARTIAL",
+    "PROOF_ONLY"
+  ],
+  "badgeLabels": [
+    "Production live",
+    "Gate required",
+    "Local only",
+    "Static proof",
+    "Backend missing",
+    "Proof only",
+    "Partial"
+  ],
   "surfaces": [
     {
       "id": "home-shell",
       "name": "Home / main 0S shell",
       "publicRoute": "/",
-      "statusTags": ["STATIC", "PARTIAL"],
+      "statusTags": [
+        "STATIC",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Static proof",
       "apiBase": null,
       "proof": "Route atlas and proof shell; not every linked route is implied live."
@@ -18,7 +38,10 @@
       "id": "launcher",
       "name": "0S Launcher",
       "publicRoute": "/0s/index.html",
-      "statusTags": ["STATIC", "PARTIAL"],
+      "statusTags": [
+        "STATIC",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Static proof",
       "apiBase": null,
       "proof": "Desktop shell, app atlas, command palette, and window wrapper."
@@ -27,7 +50,10 @@
       "id": "admin-os",
       "name": "Admin OS / Main Brain",
       "publicRoute": "/admin/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/admin",
       "healthPath": "/api/admin/status",
@@ -37,54 +63,86 @@
       "id": "site-operator-api",
       "name": "Site Operator API",
       "publicRoute": "/operator/index.html",
-      "statusTags": ["LIVE", "PARTIAL"],
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Partial",
       "apiBase": "/api/site-operator",
       "healthPath": "/api/site-operator/status",
-      "proof": "Status/ledger live; mutation auth repairs covered by SEC-04."
+      "proof": "Status/ledger live; no-auth task mutations now return 401 and mutating routes require the shared operator/gate lane."
     },
     {
       "id": "saas-skyemerit",
       "name": "SaaS / SkyeMerit",
       "publicRoute": "/saas/index.html",
-      "statusTags": ["LIVE", "PARTIAL"],
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Partial",
       "apiBase": "/api/saas",
       "healthPath": "/api/saas/status",
       "proof": "/api/saas/status live; public signup validation/rate limiting covered by SEC-07/SEC-08."
     },
     {
+      "id": "client-app-factory",
+      "name": "Client App Factory",
+      "publicRoute": "/client-app-factory/index.html",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "apiBase": "/api/client-app-factory",
+      "healthPath": "/api/client-app-factory/health",
+      "proof": "Same-domain factory adapter serves intake, Valley import, generation state, reports, and generated runtime app routing; live control-plane read/write routes now reject missing auth while health stays mounted."
+    },
+    {
       "id": "crown-nexus-sentinel-omega",
       "name": "Crown/Nexus/Sentinel/Omega proxies",
       "publicRoute": "/api/0s/route-manifest",
-      "statusTags": ["LIVE", "PARTIAL"],
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Partial",
       "apiBase": "/api/crown, /api/nexus, /api/sentinel, /api/omega",
-      "proof": "Status routes live; proxy mutation auth covered by SEC-05."
+      "proof": "Status routes live; Crown task mutations now reject missing auth and the shared gate/operator lane fronts mutating proxy routes."
     },
     {
       "id": "sovereigndocs",
       "name": "SovereignDocs",
       "publicRoute": "/Free99/apps/sovereigndocs/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/sovereigndocs",
-      "proof": "SD-01 through SD-05 closed with namespaced route registry, source blocking, UI base wiring, workflow proof, and storage labeling."
+      "proof": "Namespaced /api/sovereigndocs routes are mounted; health is live; control-plane reads/writes now reject missing auth; workflow and source-block proofs are closed."
     },
     {
       "id": "kaixu-codestudio",
       "name": "kAIxu CodeStudio",
       "publicRoute": "/Free99/apps/kaixu-codestudio/index.html",
-      "statusTags": ["LOCAL", "PARTIAL"],
-      "runtimeBadge": "Local only",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
       "apiBase": "/api/kaixu-codestudio",
-      "proof": "Same-domain control-plane adapter queues provider execution behind operator auth."
+      "healthPath": "/api/kaixu-codestudio/health",
+      "proof": "Mounted same-domain control-plane adapter serves health, status, manifest, storage, provider-pack catalog, and operator-gated mutation routes on the main 0S domain."
     },
     {
       "id": "skymusicnexus",
       "name": "SkyeMusicNexus",
       "publicRoute": "/SkyeMusicNexus/index.html",
-      "statusTags": ["LIVE", "PARTIAL"],
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Partial",
       "apiBase": "/api/skymusicnexus",
       "proof": "MUSIC-01 through MUSIC-03 prove mapped functions, source blocking, and core music flows."
@@ -93,7 +151,10 @@
       "id": "skyemediacenter",
       "name": "SkyeMediaCenter",
       "publicRoute": "/SkyeMediaCenter/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/media",
       "proof": "MEDIA-01 through MEDIA-03 prove gated upload/search/review/execution/dispatch/publish/stats/file flows."
@@ -102,7 +163,10 @@
       "id": "skyeprofitconsole",
       "name": "SkyeProfitConsole",
       "publicRoute": "/SkyeProfitConsole/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/profit",
       "proof": "PROFIT-01 through PROFIT-03 prove runtime health, source blocking, packs, splits, proof, exports, audit, execution, and dispatch."
@@ -111,16 +175,22 @@
       "id": "skyeroutex",
       "name": "SkyeRouteX",
       "publicRoute": "/SkyeRouteX/index.html",
-      "statusTags": ["LIVE", "PARTIAL"],
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
       "runtimeBadge": "Partial",
       "apiBase": "/api/routex",
-      "proof": "ROUTEX-01 through ROUTEX-04 prove namespaced workforce contracts, collision diagnostics, source blocking, and provider/contractor/assignment/proof/payment/export flows."
+      "proof": "ROUTEX-01 through ROUTEX-04 prove namespaced workforce contracts, collision diagnostics, source blocking, and provider/contractor/assignment/proof/payment/export flows; mounted production now disables app-local signup/login and uses the shared gate lane."
     },
     {
       "id": "houseoperations",
       "name": "HouseOperations",
       "publicRoute": "/HouseOperations/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/houseops",
       "proof": "HOUSE-01/HOUSE-02 prove task, vendor, schedule, alert, assignment, proof, gate packet, export, and audit routes."
@@ -129,25 +199,35 @@
       "id": "skyesplitengine",
       "name": "SkyeSplitEngine",
       "publicRoute": "/SkyeSplitEngine/index.html",
-      "statusTags": ["LOCAL", "GATED"],
-      "runtimeBadge": "Local only",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
       "apiBase": null,
-      "proof": "SPLIT-01/SPLIT-02 preserve local-first truth and prove gated transaction, backup/restore, CSV export/import, and no data loss."
+      "proof": "Gate-owned local-first runtime: SPLIT-01/SPLIT-02 preserve the exportable browser model while proving gated transaction creation, backup/restore, CSV export/import, and no data loss."
     },
     {
       "id": "marketing-made-easy",
-      "name": "Marketing Made Easy suite",
+      "name": "Marketing Made Easy platform",
       "publicRoute": "/Marketing-Made-Easy/index.html",
-      "statusTags": ["LOCAL", "STATIC"],
-      "runtimeBadge": "Static proof",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
       "apiBase": "/api/marketing-made-easy",
-      "proof": "MME-01 through MME-03 inventory eight apps, label same-folder runtimes as local_static_proof_only, and block runtime/function/config source."
+      "healthPath": "/api/marketing-made-easy/health",
+      "proof": "Mounted NorthStar-style platform shell: health and manifest are live on the main 0S domain, the shell routes into 8 internal module rooms, and session/workspace/brief control lanes sit behind the shared FS27/SkyGate auth lane while root /api/runtime/* remains blocked as a collision diagnostic."
     },
     {
       "id": "connectlog-relay13",
       "name": "ConnectLog + Relay13",
       "publicRoute": "/connectlog-v7.7-relay13-operator-proof/app.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/relay13",
       "proof": "RELAY-01 through RELAY-03 prove 0S Relay13 namespace wiring, source blocking, card exchange, conversation creation, inbox, widget, guardrail, and WebSocket forwarding; live 0S mount refreshed 2026-05-20."
@@ -156,7 +236,10 @@
       "id": "valley-verified",
       "name": "Valley Verified",
       "publicRoute": "/valley-verified/",
-      "statusTags": ["STATIC", "PROOF_ONLY"],
+      "statusTags": [
+        "STATIC",
+        "PROOF_ONLY"
+      ],
       "runtimeBadge": "Proof only",
       "apiBase": null,
       "proof": "VALLEY-01 through VALLEY-03 record public/static directory plus external/gate-owned proof-only admin in VALLEY_RUNTIME_DECISION.json."
@@ -165,16 +248,21 @@
       "id": "northstar",
       "name": "NorthStar SignInPro",
       "publicRoute": "/northstar/index.html",
-      "statusTags": ["LIVE", "GATED"],
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
       "runtimeBadge": "Gate required",
       "apiBase": "/api/northstar",
-      "proof": "Mounted app and API health/login/session/workspace routes are live; Valley overrides hand off into workspace slugs."
+      "proof": "Mounted app and API health/login/session/workspace routes are live; Valley overrides hand off into workspace slugs; this is the canonical shared-gate platform pattern for mounted 0S apps."
     },
     {
       "id": "blog-proof-docs",
       "name": "Blog / proof / docs / SEO pages",
       "publicRoute": "/blog/",
-      "statusTags": ["STATIC"],
+      "statusTags": [
+        "STATIC"
+      ],
       "runtimeBadge": "Static proof",
       "apiBase": null,
       "proof": "Static content lanes do not require live app runtime."

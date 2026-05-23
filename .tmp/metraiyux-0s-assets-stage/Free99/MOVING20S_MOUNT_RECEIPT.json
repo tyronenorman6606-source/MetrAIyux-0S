@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "receipt": "moving20s-free99-mount",
+  "created_at": "2026-05-20T00:00:00.000Z",
+  "source_folder": ".vscode/Moving20s",
+  "zip_cleanup": "all provided zip archives extracted into metraiyux_0s_site/Free99/apps and removed from .vscode/Moving20s",
+  "gate": "FS27/SkyGate/Free99 shared gate via the main Worker enforceZeroOsGate only; no mounted-app client gate overlay",
+  "apps": [
+    {
+      "platform_id": "mydrive-offline-vault",
+      "billing": "free99",
+      "mount": "metraiyux_0s_site/Free99/apps/mydrive-offline-vault",
+      "source_sha256": "88412e5578d61dad744065756d52dfbab635bcdb06ab16a21b51ff7e233f974d"
+    },
+    {
+      "platform_id": "skyepics",
+      "billing": "free99",
+      "mount": "metraiyux_0s_site/Free99/apps/skyepics",
+      "source_sha256": "eed9b53bd4fe4bee8a7f4cc8426303bd79fa23e5293fd01baa232c94af0ffa79"
+    },
+    {
+      "platform_id": "brandforge",
+      "billing": "free99_core_plus_skyepay_ai",
+      "mount": "metraiyux_0s_site/Free99/apps/brandforge",
+      "source_sha256": "9a29e68e10923c3b116dd9639f85477dcdf67a1c12797b39080edf2216aeb723",
+      "paid_lane": "brandforge-ai-generation",
+      "runtime_note": "Free99 local intelligence remains no-charge under the shared gate; provider-backed generation requires SkyPay checkout, entitlement claim, and usage receipt metering."
+    },
+    {
+      "platform_id": "jobping",
+      "billing": "paid_skyepay_priced",
+      "mount": "metraiyux_0s_site/Free99/apps/jobping",
+      "source_sha256": "8ec4cabdbe1ae315db1dd5f9e6635d7e2b5535f591dd6c348fa9e23d18c82861",
+      "paid_lane": "jobping-runtime",
+      "runtime_note": "No hidden complete JobPing product runtime was found in the repo. The mounted surface is a shared-gate pricing placeholder with health, entitlement, and ledger routes only; checkout, triage, and AI match execution are disabled until the real rebuilt runtime is mounted and proven."
+    }
+  ]
+}

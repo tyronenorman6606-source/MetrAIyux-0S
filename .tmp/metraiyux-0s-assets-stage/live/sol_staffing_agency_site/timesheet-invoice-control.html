@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Timesheet & Invoice Control | Skyes Over London Staffing</title>
+  <meta name="description" content="Timesheet and invoice control page for staffing agencies managing worker hours, client approvals, disputes, and billing handoff." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Finance Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Timesheet & Invoice Control</p>
+      <h1>Control hours, approvals, disputes, and billing handoff.</h1>
+      <p class="lead">This page defines the static workflow for timesheets and invoices until a real payroll/billing system is connected.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Cashflow Discipline</div><h2>Hours must be controlled.</h2><p>Staffing billing fails when approvals are vague. Name the approver, deadline, and dispute process.</p></aside>
+  </div>
+</section>
+<section class="section-pad">
+  <div class="cards three">
+    <article class="service-card reveal"><h3>Worker Submission</h3><p>Worker reports hours by day, location, role, supervisor, breaks, and notes.</p></article>
+    <article class="service-card reveal"><h3>Client Approval</h3><p>Client confirms hours, disputes hours, or requests correction before billing deadline.</p></article>
+    <article class="service-card reveal"><h3>Invoice Handoff</h3><p>Approved time routes to billing with client, assignment, bill rate, overtime, and terms.</p></article>
+  </div>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Timesheet Submission</p><h2>Static timesheet form.</h2><p>Use only for low-risk testing. Production should connect to payroll/timekeeping.</p></div>
+  <form class="contact-form reveal" name="timesheet-submission" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="timesheet-submission" />
+    <label>Worker Name<input name="worker_name" required /></label>
+    <label>Client / Site<input name="client_site" required /></label>
+    <label>Week Ending<input name="week_ending" type="date" /></label>
+    <label>Total Hours<input name="total_hours" type="number" step="0.1" /></label>
+    <label>Supervisor<input name="supervisor" /></label>
+    <label>Hours Breakdown<textarea name="hours_breakdown" rows="7" placeholder="Mon, Tue, Wed, Thu, Fri, Sat, Sun hours; breaks; notes"></textarea></label>
+    <button class="btn primary" type="submit">Submit Timesheet</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

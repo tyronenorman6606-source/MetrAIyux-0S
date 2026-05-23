@@ -56,7 +56,7 @@
     try {
       const h = readHash();
       const token = String(h.get("fs27_token") || "").trim();
-      if (!token) throw new Error("Missing FS27 token from the gate.");
+      if (!token) throw new Error("Missing 0S/SkyGate session from the gate.");
       const claim = {
         source: "skyegatefs27",
         gate_card_id: h.get("gate_card_id") || "",

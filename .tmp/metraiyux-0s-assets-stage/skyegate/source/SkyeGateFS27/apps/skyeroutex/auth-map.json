@@ -1,0 +1,69 @@
+{
+  "app_id": "skyeroutex",
+  "app_name": "SkyeRouteX Workforce Command",
+  "owner": "FS27/SkyGate/Free99",
+  "billing_mode": "free99",
+  "access_rule": "A valid FS27/SkyGate/Free99 session unlocks the platform surface. RouteX does not sell or issue a separate app password.",
+  "local_app_passwords_allowed": false,
+  "mounted_0s_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/",
+  "readiness_api": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/routex/gate-dashboard",
+  "mirror_receipts_api": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/admin/platform-routex-events",
+  "profile_staging_api": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/routex/admin/gate-users",
+  "accepted_auth_headers": [
+    "Authorization",
+    "x-admin-token",
+    "x-free99-admin-code",
+    "x-free99-gate-session",
+    "x-skye-gate-session",
+    "x-skygate-session",
+    "cookie: skye_gate_session",
+    "cookie: skygate_session",
+    "cookie: metraiyux_admin_session"
+  ],
+  "gate_session_sources": [
+    "/api/owner/admin-login",
+    "FS27/SkyGate token introspection",
+    "0S owner-admin signed bearer",
+    "Free99 platform gate session"
+  ],
+  "routex_gate_owned_records": [
+    "users and role/profile metadata",
+    "notification ledger and SMS opt-in state",
+    "compliance checks and manual proof records",
+    "runtime/audit mirror events",
+    "payment ledger state",
+    "integration outbox state",
+    "proof media/export storage receipts"
+  ],
+  "feature_dependencies": {
+    "job_board_assignment": [
+      "0S gate session",
+      "KV state",
+      "gate-staged provider/contractor profiles"
+    ],
+    "sms_notifications": [
+      "Twilio sender credentials",
+      "gate profile phone",
+      "sms_opt_in true"
+    ],
+    "route_intelligence": [
+      "Mapbox token for live geocode/directions"
+    ],
+    "proof_storage": [
+      "R2/S3 credentials for durable object storage"
+    ],
+    "payment_dispatch": [
+      "Stripe/SkyPay provider credentials",
+      "owner-approved settlement rules"
+    ],
+    "background_checks": [
+      "Checkr, Certn, or signed background-check webhook"
+    ],
+    "gate_event_mirror": [
+      "FS27 platform event mirror secret",
+      "RouteX audit event created by a shared gate session"
+    ]
+  },
+  "platform_family": "Skye CIP / Skyeknowlogy Free99 developer platform",
+  "access_intent": "Developers receive FS27/SkyGate access and then enter RouteX through the shared 0S gate; RouteX does not issue a second app login."
+}

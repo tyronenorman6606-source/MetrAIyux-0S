@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-05-15T19:25:55.934Z",
+  "app_id": "metraiyux-0s",
+  "app_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site",
+  "gate_project_path": "/workspaces/MetrAIyux-0S",
+  "gate_env_var": "SKYGATEFS27_ORIGIN",
+  "summary": {
+    "scanned_files": 752,
+    "legacy_endpoint_count": 2,
+    "auth_indicator_count": 0,
+    "netlify_redirect_count": 0
+  },
+  "legacy_endpoints": [
+    "/auth/introspect",
+    "/auth/provider"
+  ],
+  "endpoint_hits": [
+    {
+      "file": "METRAIYUX_0S_REBRAND_UPGRADE_MANIFEST.md",
+      "value": "/auth/provider"
+    },
+    {
+      "file": "admin/skygate-auth-bridge.js",
+      "value": "/auth/introspect"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "/auth/introspect"
+    }
+  ],
+  "auth_indicators": [],
+  "auth_indicator_hits": [],
+  "netlify_redirect_hits": [],
+  "gate_env_hits": [
+    {
+      "file": "admin/skygate-auth-bridge.js",
+      "value": "/auth-introspect"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "SKYGATEFS27_ORIGIN"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "SKYGATEFS27_ORIGIN"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "SKYGATE_ORIGIN"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "SKYGATE_EVENT_MIRROR_SECRET"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "SKYGATEFS27_EVENT_MIRROR_SECRET"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "/auth-introspect"
+    },
+    {
+      "file": "cloudflare/worker.js",
+      "value": "/platform/events"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "SKYGATEFS27_ORIGIN"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "SKYGATEFS27_ORIGIN"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "SKYGATE_ORIGIN"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "/auth-introspect"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "SKYGATE_EVENT_MIRROR_SECRET"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "SKYGATEFS27_EVENT_MIRROR_SECRET"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/src/worker.js",
+      "value": "/platform/events"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/wrangler.toml",
+      "value": "SKYGATEFS27_ORIGIN"
+    },
+    {
+      "file": "cloudflare-admin-automation-worker/wrangler.toml",
+      "value": "SKYGATE_EVENT_MIRROR_SECRET"
+    },
+    {
+      "file": "wrangler.toml",
+      "value": "SKYGATEFS27_ORIGIN"
+    }
+  ],
+  "recommendations": [
+    "Route primary identity through SkyeGateFS27 `/auth/*`, `/oauth/*`, and `/.well-known/*`.",
+    "Set SKYGATEFS27_ORIGIN in the consumer runtime so same-origin adapters can call the deployed SkyeGateFS27/FS27 gate.",
+    "Mirror login, token issuance, admin commands, approval decisions, gateway use, and GitHub/Netlify push actions into the parent gate audit/usage tables through `/platform/events`."
+  ]
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
-import { createReadStream } from "node:fs";
+import { createReadStream, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -9,17 +9,147 @@ import {
   createIntake,
   ensureStorage,
   generateApp,
+  importValleyBusiness,
   linkSkyePay,
+  listValleyBusinesses,
   listRecords,
   readLedger,
   readRecord,
   recordProof,
-  runFactoryPass,
   runScanner
 } from "./scripts/factory-engine.mjs";
+import { runFactoryCore } from "./scripts/factory-core.mjs";
+import { runFactoryEnhance } from "./scripts/factory-enhance.mjs";
+import { runFactoryPipeline } from "./scripts/factory-pipeline.mjs";
+import { runFactoryVerify } from "./scripts/factory-verify.mjs";
+import { generateFactoryAurenReply } from "../metraiyux_0s_site/cloudflare/factory-auren-core.mjs";
+import {
+  buildAiResponseMonitorSnapshot,
+  evaluateAiResponseUsage,
+  listAiResponseLanes,
+  simulateAiResponseLoad
+} from "../metraiyux_0s_site/cloudflare/relay13-ai-lanes.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const factoryRoot = path.resolve(path.dirname(__filename));
+const repoRoot = path.resolve(factoryRoot, "..");
+
+function loadRepoEnv() {
+  const envPath = path.join(repoRoot, ".env");
+  try {
+    const raw = requireText(envPath);
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+      const index = trimmed.indexOf("=");
+      const key = trimmed.slice(0, index).trim();
+      if (!key || process.env[key]) continue;
+      let value = trimmed.slice(index + 1).trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      process.env[key] = value;
+    }
+  } catch {
+    // Local env is optional in deployed environments.
+  }
+
+  if (process.env.OPENAI_API_KEY && !process.env.VANTA_ALLOW_LIVE_AI && !process.env.VANTA_DISABLE_LIVE_AI) {
+    process.env.VANTA_ALLOW_LIVE_AI = "1";
+  }
+}
+
+function requireText(filePath) {
+  return readFileSync(filePath, "utf8");
+}
+
+function aiAvailability() {
+  const hasApiKey = Boolean(process.env.OPENAI_API_KEY);
+  const allow = String(process.env.VANTA_ALLOW_LIVE_AI ?? "0") === "1";
+  const disable = String(process.env.VANTA_DISABLE_LIVE_AI ?? "0") === "1";
+  return {
+    configured: hasApiKey,
+    liveAvailable: hasApiKey && allow && !disable,
+    model: process.env.OPENAI_MODEL || "gpt-4.1-mini"
+  };
+}
+
+function identityImagePrompt(payload = {}) {
+  const services = Array.isArray(payload.services) ? payload.services.slice(0, 8).join(", ") : "";
+  const sources = Array.isArray(payload.sourceUrls) ? payload.sourceUrls.slice(0, 3).join(", ") : "";
+  return [
+    `Create one original, professional brand identity image for ${payload.displayName || payload.clientId || "a client business"}.`,
+    payload.industry ? `Industry: ${payload.industry}.` : "",
+    services ? `Services/context: ${services}.` : "",
+    sources ? `Reference URLs for context only: ${sources}.` : "",
+    "Make it a usable logo/mark source image, not initials, not a plain text wordmark, not a placeholder badge.",
+    "No fake company initials. No mock UI. Transparent background. Square composition. Clean enough to be animated as a logo in Still2Vid."
+  ].filter(Boolean).join(" ");
+}
+
+async function generateIdentityImage(payload = {}) {
+  const ai = aiAvailability();
+  if (!ai.liveAvailable) {
+    throw new Error("AI identity generation is not configured. Set OPENAI_API_KEY and VANTA_ALLOW_LIVE_AI=1.");
+  }
+  const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
+  const baseUrl = String(process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
+  const prompt = identityImagePrompt(payload);
+  const response = await fetch(`${baseUrl}/images/generations`, {
+    method: "POST",
+    headers: {
+      "authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+      background: "transparent",
+      output_format: "png"
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error?.message || `OpenAI image generation failed with ${response.status}`);
+  }
+  const base64 = data.data?.[0]?.b64_json || "";
+  if (!base64) throw new Error("OpenAI image response did not include b64_json.");
+  const clientId = payload.clientId || "skye-app-template";
+  const fileName = `${clientId}-ai-identity.png`;
+  const provenance = `ai-generated:openai:${model}:${new Date().toISOString()}`;
+  const record = await catalogAsset({
+    clientId,
+    fileName,
+    mimeType: "image/png",
+    base64,
+    provenance,
+    rights: "AI-generated by operator request; review before public brand use"
+  }).catch(() => null);
+  return {
+    ok: true,
+    fileName,
+    mimeType: "image/png",
+    dataUrl: `data:image/png;base64,${base64}`,
+    record,
+    receipt: {
+      provider: "openai-images-api",
+      model,
+      sourceUrl: `${baseUrl}/images/generations`,
+      summary: provenance,
+      prompt,
+      generatedAt: new Date().toISOString(),
+      usage: data.usage || null
+    }
+  };
+}
+
+loadRepoEnv();
 const port = Number(process.env.PORT || process.argv[2] || 4199);
 const host = process.env.HOST || "0.0.0.0";
 const jsonLimit = 18 * 1024 * 1024;
@@ -112,6 +242,7 @@ async function handleApi(req, res, pathname) {
       service: "client-app-factory",
       storage: "ready",
       records: (await listRecords()).length,
+      ai: aiAvailability(),
       checkedAt: new Date().toISOString()
     });
   }
@@ -120,6 +251,18 @@ async function handleApi(req, res, pathname) {
     return sendJson(res, 200, {
       ok: true,
       records: await listRecords()
+    });
+  }
+
+  if (req.method === "GET" && pathname === "/api/factory/valley/businesses") {
+    const url = new URL(req.url || "/", `http://${req.headers.host || "127.0.0.1"}`);
+    return sendJson(res, 200, {
+      ok: true,
+      businesses: await listValleyBusinesses({
+        query: url.searchParams.get("q") || "",
+        featuredOnly: url.searchParams.get("featured") === "1",
+        onlyWithWebsite: url.searchParams.get("website") !== "0"
+      })
     });
   }
 
@@ -145,11 +288,23 @@ async function handleApi(req, res, pathname) {
     });
   }
 
+  if (req.method === "POST" && pathname === "/api/factory/valley/import") {
+    const imported = await importValleyBusiness(await readBody(req));
+    return sendJson(res, 200, {
+      ok: true,
+      ...imported
+    });
+  }
+
   if (req.method === "POST" && pathname === "/api/factory/assets") {
     return sendJson(res, 200, {
       ok: true,
       record: await catalogAsset(await readBody(req))
     });
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/identity-image") {
+    return sendJson(res, 200, await generateIdentityImage(await readBody(req)));
   }
 
   if (req.method === "POST" && pathname === "/api/factory/scan") {
@@ -166,6 +321,18 @@ async function handleApi(req, res, pathname) {
     });
   }
 
+  if (req.method === "POST" && pathname === "/api/factory/core") {
+    return sendJson(res, 200, await runFactoryCore(await readBody(req)));
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/enhance") {
+    return sendJson(res, 200, await runFactoryEnhance(await readBody(req)));
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/verify") {
+    return sendJson(res, 200, await runFactoryVerify(await readBody(req)));
+  }
+
   if (req.method === "POST" && pathname === "/api/factory/workspace") {
     return sendJson(res, 200, {
       ok: true,
@@ -180,6 +347,29 @@ async function handleApi(req, res, pathname) {
     });
   }
 
+  if (req.method === "GET" && pathname === "/api/factory/ai-response/plans") {
+    return sendJson(res, 200, {
+      ok: true,
+      plans: listAiResponseLanes()
+    });
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/ai-response/route") {
+    const body = await readBody(req);
+    return sendJson(res, 200, {
+      ok: true,
+      result: evaluateAiResponseUsage(body),
+      monitor: buildAiResponseMonitorSnapshot(body)
+    });
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/ai-response/stress") {
+    return sendJson(res, 200, {
+      ok: true,
+      result: simulateAiResponseLoad(await readBody(req))
+    });
+  }
+
   if (req.method === "POST" && pathname === "/api/factory/proof") {
     return sendJson(res, 200, {
       ok: true,
@@ -188,7 +378,32 @@ async function handleApi(req, res, pathname) {
   }
 
   if (req.method === "POST" && pathname === "/api/factory/run") {
-    return sendJson(res, 200, await runFactoryPass(await readBody(req)));
+    return sendJson(res, 200, await runFactoryPipeline(await readBody(req)));
+  }
+
+  if (req.method === "POST" && pathname === "/api/factory/assistant") {
+    const body = await readBody(req);
+    const record = body.record || (body.clientId ? await readRecord(body.clientId) : null) || null;
+    if (!record) throw new Error("Assistant needs a client record or clientId.");
+    const reply = await generateFactoryAurenReply({
+      message: body.message || "",
+      room: body.room || "auren",
+      record,
+      reports: {
+        scan: body.scanReport || null,
+        verification: body.verificationReport || null,
+        pipeline: body.pipelineSnapshot || null
+      },
+      allowLiveAi: body.allowLiveAi === true,
+      env: {
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+        OPENAI_BASE_URL: process.env.OPENAI_BASE_URL,
+        OPENAI_MODEL: process.env.OPENAI_MODEL,
+        VANTA_ALLOW_LIVE_AI: process.env.VANTA_ALLOW_LIVE_AI,
+        VANTA_DISABLE_LIVE_AI: process.env.VANTA_DISABLE_LIVE_AI
+      }
+    });
+    return sendJson(res, 200, reply);
   }
 
   return sendError(res, 404, new Error(`Unknown API route: ${req.method} ${pathname}`));

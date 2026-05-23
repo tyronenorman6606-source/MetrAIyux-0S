@@ -1,0 +1,581 @@
+{
+  "schema": "metraiyux-0s-qa-route-audit.v1",
+  "date": "2026-05-19",
+  "generatedAt": "2026-05-20T00:38:27.173Z",
+  "checks": [
+    "QA-01",
+    "QA-04",
+    "QA-05"
+  ],
+  "routeCount": 21,
+  "screenshotCount": 42,
+  "unexpectedApi404s": [],
+  "surfaces": [
+    {
+      "surfaceId": "home-shell",
+      "route": "/index.html",
+      "endpoint": null,
+      "authMode": "no workflow auth",
+      "storageMode": "static proof/data",
+      "statusTags": [
+        "STATIC",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Static proof",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/home-shell-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/home-shell-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "launcher",
+      "route": "/0s/index.html",
+      "endpoint": null,
+      "authMode": "no workflow auth",
+      "storageMode": "static proof/data",
+      "statusTags": [
+        "STATIC",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Static proof",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/launcher-0s-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/launcher-0s-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "admin-os",
+      "route": "/admin/index.html",
+      "endpoint": "/api/admin/status",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/admin-os-admin-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/admin-os-admin-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "site-operator-api",
+      "route": "/operator/index.html",
+      "endpoint": "/api/site-operator/status",
+      "authMode": "public read, protected writes",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/site-operator-api-operator-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/site-operator-api-operator-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "saas-skyemerit",
+      "route": "/saas/index.html",
+      "endpoint": "/api/saas/status",
+      "authMode": "public read, protected writes",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/saas-skyemerit-saas-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/saas-skyemerit-saas-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "saas-skyemerit",
+      "route": "/saas/skyemerit.html",
+      "endpoint": "/api/saas/status",
+      "authMode": "public read, protected writes",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/saas-skyemerit-saas-skyemerit-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/saas-skyemerit-saas-skyemerit-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "sovereigndocs",
+      "route": "/Free99/apps/sovereigndocs/index.html",
+      "endpoint": "/api/sovereigndocs/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/sovereigndocs-free99-apps-sovereigndocs-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/sovereigndocs-free99-apps-sovereigndocs-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "sovereigndocs",
+      "route": "/Free99/apps/sovereigndocs/closure-dashboard/index.html",
+      "endpoint": "/api/sovereigndocs/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/sovereigndocs-free99-apps-sovereigndocs-closure-dashboard-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/sovereigndocs-free99-apps-sovereigndocs-closure-dashboard-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "kaixu-codestudio",
+      "route": "/Free99/apps/kaixu-codestudio/index.html",
+      "endpoint": "/api/kaixu-codestudio/health",
+      "authMode": "local device only",
+      "storageMode": "browser-local/exportable",
+      "statusTags": [
+        "LOCAL",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Local only",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/kaixu-codestudio-free99-apps-kaixu-codestudio-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/kaixu-codestudio-free99-apps-kaixu-codestudio-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "skymusicnexus",
+      "route": "/SkyeMusicNexus/index.html",
+      "endpoint": "/api/skymusicnexus/health",
+      "authMode": "public read, protected writes",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skymusicnexus-skyemusicnexus-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skymusicnexus-skyemusicnexus-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "skyemediacenter",
+      "route": "/SkyeMediaCenter/index.html",
+      "endpoint": "/api/media/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyemediacenter-skyemediacenter-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyemediacenter-skyemediacenter-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "skyeprofitconsole",
+      "route": "/SkyeProfitConsole/index.html",
+      "endpoint": "/api/profit/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyeprofitconsole-skyeprofitconsole-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyeprofitconsole-skyeprofitconsole-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "skyeroutex",
+      "route": "/SkyeRouteX/index.html",
+      "endpoint": "/api/routex/health",
+      "authMode": "public read, protected writes",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "PARTIAL"
+      ],
+      "runtimeBadge": "Partial",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyeroutex-skyeroutex-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyeroutex-skyeroutex-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "houseoperations",
+      "route": "/HouseOperations/index.html",
+      "endpoint": "/api/houseops/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/houseoperations-houseoperations-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/houseoperations-houseoperations-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "skyesplitengine",
+      "route": "/SkyeSplitEngine/index.html",
+      "endpoint": null,
+      "authMode": "gate/session required",
+      "storageMode": "browser-local/exportable",
+      "statusTags": [
+        "LOCAL",
+        "GATED"
+      ],
+      "runtimeBadge": "Local only",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyesplitengine-skyesplitengine-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/skyesplitengine-skyesplitengine-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "marketing-made-easy",
+      "route": "/Marketing-Made-Easy/index.html",
+      "endpoint": "/api/marketing-made-easy/health",
+      "authMode": "local device only",
+      "storageMode": "browser-local/exportable",
+      "statusTags": [
+        "LOCAL",
+        "STATIC"
+      ],
+      "runtimeBadge": "Static proof",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/marketing-made-easy-marketing-made-easy-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/marketing-made-easy-marketing-made-easy-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "connectlog-relay13",
+      "route": "/connectlog-v7.7-relay13-operator-proof/app.html",
+      "endpoint": "/api/relay13/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/connectlog-relay13-connectlog-v7-7-relay13-operator-proof-app-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/connectlog-relay13-connectlog-v7-7-relay13-operator-proof-app-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "connectlog-relay13",
+      "route": "/relay13-core-v1.7-connectlog-operator-proof/public/index.html",
+      "endpoint": "/api/relay13/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/connectlog-relay13-relay13-core-v1-7-connectlog-operator-proof-public-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/connectlog-relay13-relay13-core-v1-7-connectlog-operator-proof-public-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "valley-verified",
+      "route": "/valley-verified/index.html",
+      "endpoint": null,
+      "authMode": "no workflow auth",
+      "storageMode": "static proof/data",
+      "statusTags": [
+        "STATIC",
+        "PROOF_ONLY"
+      ],
+      "runtimeBadge": "Proof only",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/valley-verified-valley-verified-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/valley-verified-valley-verified-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    },
+    {
+      "surfaceId": "northstar",
+      "route": "/northstar/index.html",
+      "endpoint": "/api/northstar/health",
+      "authMode": "gate/session required",
+      "storageMode": "worker/kv/provider path",
+      "statusTags": [
+        "LIVE",
+        "GATED"
+      ],
+      "runtimeBadge": "Gate required",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/northstar-northstar-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/northstar-northstar-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": 0
+      }
+    },
+    {
+      "surfaceId": "blog-proof-docs",
+      "route": "/blog/index.html",
+      "endpoint": null,
+      "authMode": "no workflow auth",
+      "storageMode": "static proof/data",
+      "statusTags": [
+        "STATIC"
+      ],
+      "runtimeBadge": "Static proof",
+      "result": "passed",
+      "desktop": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/blog-proof-docs-blog-index-html-desktop-1440x1000.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      },
+      "mobile": {
+        "responseStatus": 200,
+        "screenshot": "/workspaces/MetrAIyux-0S/test-artifacts/0s-qa-route-audit/screenshots/blog-proof-docs-blog-index-html-mobile-390x844.png",
+        "api404s": [],
+        "pageErrors": [],
+        "horizontalOverflowPx": -15
+      }
+    }
+  ]
+}

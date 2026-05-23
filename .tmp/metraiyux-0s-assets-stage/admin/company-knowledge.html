@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0S Company Knowledge</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="admin-brain.css">
+  <style>
+    .knowledge-shell{display:grid;gap:18px}
+    .knowledge-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(180px,.6fr) auto auto;gap:12px;align-items:end}
+    .knowledge-grid{display:grid;grid-template-columns:minmax(280px,.75fr) minmax(0,1.25fr);gap:18px;align-items:start}
+    .knowledge-form{display:grid;gap:12px}
+    .knowledge-form textarea{min-height:180px}
+    .knowledge-table-wrap{overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(0,0,0,.22)}
+    .knowledge-table{width:100%;min-width:780px;border-collapse:collapse}
+    .knowledge-table th,.knowledge-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;vertical-align:top}
+    .knowledge-table th{font-size:.78rem;text-transform:uppercase;color:#ffe8a6;letter-spacing:0}
+    .knowledge-table td span{display:block;color:#aebed6;font-size:.84rem;margin-top:4px;overflow-wrap:anywhere}
+    .knowledge-row-button{border:1px solid rgba(255,215,128,.35);border-radius:8px;background:rgba(255,255,255,.06);color:#ffe8a6;padding:8px 10px;font:inherit;font-weight:850;cursor:pointer}
+    .knowledge-row-button.danger{border-color:rgba(255,138,138,.45);color:#ffb8b8}
+    .knowledge-status{white-space:pre-wrap;border:1px solid rgba(143,255,210,.32);border-radius:8px;padding:12px;background:rgba(143,255,210,.07)}
+    .knowledge-status.warning{border-color:rgba(255,138,138,.55);background:rgba(255,138,138,.08)}
+    .knowledge-hit{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.045);padding:12px;margin:10px 0}
+    .knowledge-hit h3{margin:.1rem 0 .4rem;color:#ffe8a6;font-size:1rem}
+    .knowledge-hit p{margin:.25rem 0;color:#dbe8f7}
+    .knowledge-hit small{color:#9fb0c8}
+    .knowledge-context{min-height:180px;white-space:pre-wrap;overflow:auto;border:1px solid rgba(139,211,255,.28);border-radius:8px;background:rgba(139,211,255,.06);padding:12px;color:#eaf4ff}
+    @media(max-width:980px){.knowledge-grid,.knowledge-toolbar{grid-template-columns:1fr}.knowledge-table{min-width:680px}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">0S Company Knowledge</span>
+    </a>
+    <nav>
+      <a href="index.html">Admin Hub</a>
+      <a href="automation-brain.html">Main Brain Chat</a>
+      <a href="skyevault-command-center.html">SkyeVault</a>
+      <a href="../saas/company-knowledge.html">Tenant View</a>
+    </nav>
+  </header>
+
+  <main class="site-shell admin-shell knowledge-shell">
+    <section class="admin-panel">
+      <p class="eyebrow">Gate-owned knowledge base</p>
+      <h1>Company Knowledge Layer</h1>
+      <div class="knowledge-toolbar">
+        <label>Worker origin
+          <input id="knowledgeEndpoint" autocomplete="off" placeholder="https://metraiyux-0s-full-system.graylondonskyes.workers.dev">
+        </label>
+        <label>Gate bearer
+          <input id="knowledgeToken" type="password" autocomplete="off" placeholder="Uses saved owner session when blank">
+        </label>
+        <button id="loadKnowledgeBases" class="admin-btn" type="button">Load Bases</button>
+        <button id="loadKnowledgeItems" class="admin-btn secondary" type="button">Load Items</button>
+      </div>
+      <div id="knowledgeStatus" class="knowledge-status">Waiting for shared gate session.</div>
+    </section>
+
+    <section class="knowledge-grid">
+      <form id="knowledgeBaseForm" class="admin-panel knowledge-form">
+        <p class="eyebrow">Base</p>
+        <h2>Scope</h2>
+        <label>Owner scope
+          <select id="knowledgeBaseScope">
+            <option value="platform">Actual 0S</option>
+            <option value="tenant">Tenant company</option>
+          </select>
+        </label>
+        <label>Base ID
+          <input id="knowledgeBaseId" value="metraiyux-0s" autocomplete="off">
+        </label>
+        <label>Client ID
+          <input id="knowledgeClientId" value="metraiyux-0s" autocomplete="off">
+        </label>
+        <label>Workspace ID
+          <input id="knowledgeWorkspaceId" value="metraiyux-0s-owner" autocomplete="off">
+        </label>
+        <label>Name
+          <input id="knowledgeBaseName" value="MetrAIyux 0S Company Knowledge" autocomplete="off">
+        </label>
+        <label>Description
+          <textarea id="knowledgeBaseDescription">Founder-owned 0S knowledge for company facts, operating doctrine, vault references, and brain context.</textarea>
+        </label>
+        <button class="admin-btn" type="submit">Save Base</button>
+      </form>
+
+      <form id="knowledgeItemForm" class="admin-panel knowledge-form">
+        <p class="eyebrow">Drop knowledge</p>
+        <h2>Item</h2>
+        <label>Base ID
+          <input id="knowledgeItemBaseId" value="metraiyux-0s" autocomplete="off">
+        </label>
+        <label>Title
+          <input id="knowledgeItemTitle" autocomplete="off" placeholder="Operating fact, policy, client note, vault receipt">
+        </label>
+        <label>Content
+          <textarea id="knowledgeItemContent" placeholder="Paste the fact, note, doc excerpt, policy, offer, receipt summary, or context the 0S should remember."></textarea>
+        </label>
+        <label>Tags
+          <input id="knowledgeItemTags" autocomplete="off" placeholder="pricing, gate, skyevault, policy">
+        </label>
+        <div class="knowledge-toolbar">
+          <label>Source
+            <select id="knowledgeSourceKind">
+              <option value="manual_drop">Manual drop</option>
+              <option value="skyevault_receipt">SkyeVault receipt</option>
+              <option value="drive_backup">Drive backup reference</option>
+              <option value="obsidian_sync">Obsidian sync</option>
+            </select>
+          </label>
+          <label>Vault receipt
+            <input id="knowledgeVaultReceiptId" autocomplete="off">
+          </label>
+          <label>Drive file
+            <input id="knowledgeDriveFileId" autocomplete="off">
+          </label>
+          <button class="admin-btn" type="submit">Save Item</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-panel">
+      <h2>Knowledge Bases</h2>
+      <div class="knowledge-table-wrap">
+        <table class="knowledge-table">
+          <thead><tr><th>Base</th><th>Scope</th><th>Client</th><th>Items</th><th>Updated</th></tr></thead>
+          <tbody id="knowledgeBaseRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <h2>Items</h2>
+      <div class="knowledge-table-wrap">
+        <table class="knowledge-table">
+          <thead><tr><th>Item</th><th>Tags</th><th>Storage</th><th>Updated</th><th>Action</th></tr></thead>
+          <tbody id="knowledgeItemRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="knowledge-grid">
+      <form id="knowledgeSearchForm" class="admin-panel knowledge-form">
+        <p class="eyebrow">Context</p>
+        <h2>Search</h2>
+        <label>Query
+          <input id="knowledgeQuery" autocomplete="off" placeholder="What should the brain know right now?">
+        </label>
+        <button class="admin-btn" type="submit">Build Context</button>
+        <button id="exportKnowledgeContext" class="admin-btn secondary" type="button">Export Context</button>
+      </form>
+      <section class="admin-panel">
+        <h2>Context Pack</h2>
+        <pre id="knowledgeContext" class="knowledge-context"></pre>
+        <div id="knowledgeSearchRows"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer"><p>MetrAIyux 0S command system · Company knowledge uses the shared FS27/SkyGate/Free99 gate session.</p></footer>
+  <script src="../script.js"></script>
+  <script src="skygate-auth-bridge.js"></script>
+  <script src="../assets/js/company-knowledge-console.js" data-mode="admin"></script>
+</body>
+</html>
+

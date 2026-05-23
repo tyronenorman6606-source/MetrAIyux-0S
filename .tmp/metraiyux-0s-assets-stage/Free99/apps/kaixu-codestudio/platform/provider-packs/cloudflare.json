@@ -1,0 +1,41 @@
+{
+  "id": "cloudflare",
+  "title": "Cloudflare Platform",
+  "lane": "infra",
+  "requiredSecrets": [
+    "CLOUDFLARE_ACCOUNT_ID",
+    "CLOUDFLARE_API_TOKEN"
+  ],
+  "routes": [
+    "account.verify",
+    "d1.query"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#CloudflareAdapter",
+  "description": "Executable provider pack for Cloudflare Platform routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "r2",
+    "d1",
+    "queues",
+    "workers"
+  ],
+  "metering": {
+    "unit": "edge_operation",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "infra",
+    "cloudflare"
+  ],
+  "executableActions": [
+    {
+      "route": "account.verify",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    },
+    {
+      "route": "d1.query",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

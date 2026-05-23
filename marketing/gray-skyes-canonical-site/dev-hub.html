@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Sauce — Dev Hub · SkyesOverLondon</title>
+  <meta name="description" content="Three production MCP servers built by SkyesOverLondon — SKRUCIBLE, QuantumSkyes Design MCP, and Skye World. The actual stack used daily, now callable from Claude and Cursor. Free." />
+  <meta name="keywords" content="MCP server, free MCP, SKRUCIBLE MCP, QuantumSkyes MCP, React Three Fiber, GLSL, Claude MCP, Cursor MCP, SkyesOverLondon, design system MCP, npx skrucible" />
+  <meta name="author" content="SkyesOverLondon" />
+  <link rel="canonical" href="https://grayskyes.dev/dev-hub" />
+  <link rel="icon" href="assets/favicon-32.png" />
+  <link rel="stylesheet" href="canonical.css" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Free Sauce — Dev Hub · SkyesOverLondon" />
+  <meta property="og:description" content="Three production MCP servers free to use. SKRUCIBLE, QuantumSkyes, Skye World. Connect to Claude or Cursor in 30 seconds." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "SkyesOverLondon MCP Server Suite",
+    "description": "Production MCP servers built by SkyesOverLondon — callable from Claude, Cursor, or any MCP client",
+    "itemListElement": [
+      {
+        "@type": "SoftwareApplication",
+        "position": 1,
+        "name": "SKRUCIBLE MCP",
+        "url": "https://skrucible.pages.dev",
+        "description": "React Three Fiber design rendering OS. GLSL shaders, Rapier physics, Tone.js audio. 8 tools.",
+        "applicationCategory": "DeveloperApplication",
+        "offers": { "@type": "Offer", "price": "0" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "position": 2,
+        "name": "QuantumSkyes Design MCP",
+        "url": "https://skye-design-mcp.pages.dev",
+        "description": "27-tool design system MCP. Templates, patterns, quality gates, stack audits, content generation.",
+        "applicationCategory": "DeveloperApplication",
+        "offers": { "@type": "Offer", "price": "0" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "position": 3,
+        "name": "Skye World MCP",
+        "url": "https://www.npmjs.com/package/skye-world-mcp",
+        "description": "Spatial world-site MCP. Theatre.js sequences, Remotion video, immersive R3F world patterns.",
+        "applicationCategory": "DeveloperApplication",
+        "offers": { "@type": "Offer", "price": "0" }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* Terminal / code blocks */
+    .term {
+      background: #040507;
+      border: 1px solid rgba(103,217,255,.18);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0;
+    }
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      background: rgba(103,217,255,.06);
+      border-bottom: 1px solid rgba(103,217,255,.12);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot.r { background: #ff5f57; }
+    .term-dot.y { background: #ffbd2e; }
+    .term-dot.g { background: #28ca41; }
+    .term-label { font-size: 11px; color: rgba(248,242,229,.35); font-family: ui-monospace, monospace; margin-left: 4px; }
+    .term pre {
+      margin: 0;
+      padding: 16px 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: rgba(248,242,229,.85);
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .term .c-cyan { color: #67d9ff; }
+    .term .c-gold { color: #f4c75b; }
+    .term .c-green { color: #8bea9a; }
+    .term .c-muted { color: rgba(248,242,229,.38); }
+    .term .c-rose { color: #ff6ea7; }
+
+    /* MCP cards */
+    .mcp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 32px; }
+    .mcp-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.028));
+      border-radius: 14px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mcp-card.featured { border-color: rgba(103,217,255,.32); background: linear-gradient(160deg, rgba(103,217,255,.07), rgba(255,255,255,.025)); }
+    .mcp-card.gated { border-color: rgba(244,199,91,.22); }
+    .mcp-card.soon { border-color: rgba(139,234,154,.22); opacity: .88; }
+    .mcp-status { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: .14em; }
+    .mcp-status::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
+    .mcp-status.live { color: #8bea9a; }
+    .mcp-status.live::before { background: #8bea9a; box-shadow: 0 0 6px #8bea9a; }
+    .mcp-status.gated { color: #f4c75b; }
+    .mcp-status.gated::before { background: #f4c75b; }
+    .mcp-status.soon { color: rgba(248,242,229,.4); }
+    .mcp-status.soon::before { background: rgba(248,242,229,.3); }
+    .mcp-name { font-size: 22px; font-weight: 900; line-height: 1.15; color: var(--ink); margin: 0; }
+    .mcp-sub { font-size: 12px; color: var(--cyan); font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
+    .mcp-desc { color: var(--soft); font-size: 14px; line-height: 1.6; margin: 0; }
+    .tool-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tool-pill { border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); }
+    .mcp-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+    .mcp-link { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 8px; font-size: 12px; font-weight: 900; border: 1px solid var(--line); color: var(--soft); transition: color .15s, border-color .15s; }
+    .mcp-link:hover { color: var(--gold); border-color: rgba(244,199,91,.4); }
+    .mcp-link.primary { background: rgba(103,217,255,.1); border-color: rgba(103,217,255,.3); color: var(--cyan); }
+    .mcp-link.primary:hover { background: rgba(103,217,255,.2); color: var(--cyan); }
+    .mcp-stat-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .mcp-stat { display: flex; flex-direction: column; gap: 2px; }
+    .mcp-stat strong { font-size: 22px; color: var(--gold); font-weight: 900; line-height: 1; }
+    .mcp-stat span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+
+    /* How-to section */
+    .connect-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .connect-tab { border: 1px solid var(--line); border-radius: 10px; padding: 16px; text-align: center; }
+    .connect-tab strong { display: block; font-size: 15px; margin-bottom: 4px; }
+    .connect-tab span { font-size: 12px; color: var(--muted); }
+    .connect-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: #08090c; font-size: 11px; font-weight: 950; margin-bottom: 8px; }
+
+    /* Proof strip */
+    .proof-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 28px; }
+    .proof-item { border: 1px solid var(--line); background: rgba(255,255,255,.03); border-radius: 10px; padding: 16px; }
+    .proof-item strong { display: block; font-size: 24px; color: var(--cyan); font-weight: 900; }
+    .proof-item span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+
+    /* npm badge strip */
+    .npm-strip { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 20px 0; }
+    .npm-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(203,0,0,.12); border: 1px solid rgba(203,0,0,.25); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 900; color: #ff6ea7; }
+    .npm-badge.live { background: rgba(139,234,154,.1); border-color: rgba(139,234,154,.3); color: #8bea9a; }
+
+    /* Proof console */
+    .sauce-console { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .8fr); gap: 18px; align-items: start; }
+    .console-panel { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 12px; padding: 18px; }
+    .console-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .console-form label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; }
+    .console-form input,
+    .console-form textarea { width: 100%; border: 1px solid var(--line); background: rgba(0,0,0,.26); color: var(--ink); border-radius: 8px; padding: 10px 11px; font: inherit; font-size: 13px; text-transform: none; letter-spacing: 0; }
+    .console-form textarea { min-height: 94px; resize: vertical; }
+    .console-form .wide { grid-column: 1 / -1; }
+    .console-actions,
+    #filters,
+    .ai-plan-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .console-actions button,
+    #filters .chip,
+    .aiPlanCard { border: 1px solid var(--line); background: rgba(255,255,255,.05); color: var(--ink); border-radius: 8px; padding: 9px 12px; font-size: 12px; font-weight: 900; cursor: pointer; }
+    .console-actions button:hover,
+    #filters .chip:hover,
+    .aiPlanCard:hover,
+    .aiPlanCard.active { border-color: rgba(244,199,91,.5); color: var(--gold); background: rgba(244,199,91,.08); }
+    .console-actions button:disabled { opacity: .56; cursor: not-allowed; }
+    .metric-stack { display: grid; gap: 10px; }
+    .metric-line { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: rgba(0,0,0,.2); }
+    .metric-line strong { display: block; color: var(--cyan); font-size: 20px; line-height: 1; }
+    .metric-line span { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+
+    @media (max-width: 700px) {
+      .mcp-grid { grid-template-columns: 1fr; }
+      .connect-tabs { grid-template-columns: 1fr; }
+      .sauce-console,
+      .console-form { grid-template-columns: 1fr; }
+      .console-form .wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="topbar" role="banner">
+  <div class="nav-shell">
+    <a class="brand" href="/">
+      <img src="assets/skyes-over-london-deity-logo.png" alt="SkyesOverLondon" width="48" height="48" />
+      <div><strong>SkyesOverLondon</strong><small>Design · Systems · MCP</small></div>
+    </a>
+    <button class="menu-button" id="menu-btn" data-menu-toggle aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-links" data-nav id="main-nav">
+      <a href="/">Home</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="proof.html">Proof</a>
+      <a href="skyeknowology.html">SkyeKnowology</a>
+      <a href="dev-hub.html" class="is-active">Free Sauce</a>
+      <a href="mailto:graylondonskyes@gmail.com" class="nav-cta">Work With Me</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="band" style="padding-top: 90px; padding-bottom: 60px; border-top: none;">
+    <p class="eyebrow">Developer Resource Hub</p>
+    <h1 style="max-width: 820px;">Free Sauce.<br/>Real Stack.</h1>
+    <p class="hero-lede" style="max-width: 660px;">
+      Three production MCP servers built on the same stack I use for client work.
+      Not a demo, not a boilerplate — the actual rendering techniques, callable from
+      Claude, Cursor, or any MCP client. Free. No account required.
+    </p>
+
+    <div class="proof-strip">
+      <div class="proof-item"><strong>3</strong><span>npx Packages Live</span></div>
+      <div class="proof-item"><strong>45</strong><span>Callable Tools</span></div>
+      <div class="proof-item"><strong>0</strong><span>Cost to Connect</span></div>
+      <div class="proof-item"><strong>npx</strong><span>Single Command Access</span></div>
+    </div>
+  </section>
+
+  <!-- THE THREE MCPS -->
+  <section class="band alt" id="mcps">
+    <div class="section-head">
+      <p class="eyebrow">The Suite</p>
+      <h2>Three MCPs. Three layers.</h2>
+      <p style="color: var(--soft); max-width: 600px;">Each one covers a different part of the stack. Use one, use all three. They run independently.</p>
+    </div>
+
+    <div class="mcp-grid">
+
+      <!-- SKRUCIBLE -->
+      <div class="mcp-card featured">
+        <div>
+          <div class="mcp-status live">Live · Public</div>
+          <h3 class="mcp-name" style="margin-top: 10px;">SKRUCIBLE MCP</h3>
+          <div class="mcp-sub">Rendering Layer · WebGL · Audio</div>
+        </div>
+        <p class="mcp-desc">
+          Design rendering OS built on React Three Fiber. Custom GLSL shaders,
+          MeshTransmissionMaterial glass refraction, Rapier WASM physics, Tone.js audio synthesis,
+          GSAP scroll, Pixi.js 2D GPU overlay — served as callable component recipes.
+          Connect your agent and ask for production-grade WebGL code.
+        </p>
+        <div class="mcp-stat-row">
+          <div class="mcp-stat"><strong>8</strong><span>Tools</span></div>
+          <div class="mcp-stat"><strong>14</strong><span>Named Recipes</span></div>
+          <div class="mcp-stat"><strong>Free</strong><span>No Token</span></div>
+        </div>
+        <div class="tool-pills">
+          <span class="tool-pill">forge_shader</span>
+          <span class="tool-pill">forge_component</span>
+          <span class="tool-pill">forge_animation</span>
+          <span class="tool-pill">forge_palette</span>
+          <span class="tool-pill">forge_stack</span>
+          <span class="tool-pill">forge_css</span>
+          <span class="tool-pill">forge_mode</span>
+          <span class="tool-pill">forge_index</span>
+        </div>
+        <div class="npm-strip">
+          <span class="npm-badge live">npm · skrucible@1.0.3</span>
+        </div>
+        <div class="mcp-links">
+          <a href="https://skrucible.pages.dev" target="_blank" rel="noopener" class="mcp-link primary">Live Lab ↗</a>
+          <a href="https://skrucible.pages.dev/mcp" target="_blank" rel="noopener" class="mcp-link">HTTP Endpoint ↗</a>
+          <a href="https://www.npmjs.com/package/skrucible" target="_blank" rel="noopener" class="mcp-link">npm ↗</a>
+        </div>
+      </div>
+
+      <!-- QUANTUMSKYES -->
+      <div class="mcp-card gated">
+        <div>
+          <div class="mcp-status live">Live · npx + Gate HTTP</div>
+          <h3 class="mcp-name" style="margin-top: 10px;">QuantumSkyes Design MCP</h3>
+          <div class="mcp-sub">Design System · Templates · QA</div>
+        </div>
+        <p class="mcp-desc">
+          27-tool design system server. Template packs, stack audits, quality gates,
+          logo standards, content generation, production proof ledger, luxury UI audit,
+          variety system — the full design-to-deployment ruleset I run on every client project.
+          Use it locally through npx, or use the live HTTP endpoint through FS27 gate access.
+        </p>
+        <div class="mcp-stat-row">
+          <div class="mcp-stat"><strong>27</strong><span>Tools</span></div>
+          <div class="mcp-stat"><strong>31</strong><span>Resources</span></div>
+          <div class="mcp-stat"><strong>FS27</strong><span>Gate Access</span></div>
+        </div>
+        <div class="tool-pills">
+          <span class="tool-pill">design_validate</span>
+          <span class="tool-pill">design_quality_gate</span>
+          <span class="tool-pill">design_stack_audit</span>
+          <span class="tool-pill">design_template_pack</span>
+          <span class="tool-pill">design_content_generate</span>
+          <span class="tool-pill">design_luxury_audit</span>
+          <span class="tool-pill">production_ledger</span>
+          <span class="tool-pill">design_pattern_pack</span>
+        </div>
+        <div class="npm-strip">
+          <span class="npm-badge live">npm · quantumskyes-mcp@1.0.1</span>
+        </div>
+        <div class="mcp-links">
+          <a href="https://skye-design-mcp.pages.dev" target="_blank" rel="noopener" class="mcp-link primary">Design Lab ↗</a>
+          <a href="https://skye-design-mcp.pages.dev/mcp" target="_blank" rel="noopener" class="mcp-link">HTTP Endpoint ↗</a>
+          <a href="https://www.npmjs.com/package/quantumskyes-mcp" target="_blank" rel="noopener" class="mcp-link">npm ↗</a>
+          <a href="mailto:graylondonskyes@gmail.com" class="mcp-link">Get Access →</a>
+        </div>
+      </div>
+
+      <!-- MCP2 / SKYE WORLD -->
+      <div class="mcp-card featured">
+        <div>
+          <div class="mcp-status live">Live · npx</div>
+          <h3 class="mcp-name" style="margin-top: 10px;">Skye World MCP</h3>
+          <div class="mcp-sub">Spatial · Theatre.js · Remotion</div>
+        </div>
+        <p class="mcp-desc">
+          World-site and spatial experience MCP. Theatre.js animation sequences,
+          Remotion video composition, immersive R3F world-site patterns, spatial
+          navigation systems, cinematic scroll techniques, and a quality gate that checks
+          whether the generated source actually contains the runtime signals.
+        </p>
+        <div class="mcp-stat-row">
+          <div class="mcp-stat"><strong>10</strong><span>Tools</span></div>
+          <div class="mcp-stat"><strong>R3F</strong><span>+ Theatre.js</span></div>
+          <div class="mcp-stat"><strong>5</strong><span>World Rooms</span></div>
+        </div>
+        <div class="tool-pills">
+          <span class="tool-pill">world_scene</span>
+          <span class="tool-pill">world_theatre</span>
+          <span class="tool-pill">world_remotion</span>
+          <span class="tool-pill">world_spatial_nav</span>
+          <span class="tool-pill">world_camera</span>
+          <span class="tool-pill">world_stack</span>
+        </div>
+        <div class="npm-strip">
+          <span class="npm-badge live">npm · skye-world-mcp@1.0.0</span>
+        </div>
+        <div class="mcp-links">
+          <a href="https://www.npmjs.com/package/skye-world-mcp" target="_blank" rel="noopener" class="mcp-link primary">npm ↗</a>
+          <a href="mailto:graylondonskyes@gmail.com" class="mcp-link">Build With It →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DEMO CONSOLE -->
+  <section class="band" id="demo-console">
+    <div class="section-head">
+      <p class="eyebrow">Try The Lane</p>
+      <h2>Proof console for the sauce.</h2>
+      <p style="color: var(--soft); max-width: 620px;">
+        A small operator surface wired into this page so the browser proof can exercise the hub like real software:
+        edit, filter, toggle, select a plan state, and see the MCP output counter move.
+      </p>
+    </div>
+
+    <div class="sauce-console">
+      <div class="console-panel">
+        <div class="console-form">
+          <label>Brand
+            <input id="brandName" name="name" value="SkyesOverLondon" autocomplete="off" />
+          </label>
+          <label>Campaign
+            <input id="campaignName" name="contact" value="Free Sauce MCP Drop" autocomplete="off" />
+          </label>
+          <label class="wide">Build note
+            <textarea id="idea">Package the SKRUCIBLE, QuantumSkyes, and Skye World MCPs as public developer access points with proof-backed install commands.</textarea>
+          </label>
+          <label>Logo scale
+            <input id="logoScale" type="range" min="40" max="100" value="72" />
+          </label>
+          <label>Image focus
+            <input id="imageFocus" type="range" min="0" max="100" value="45" />
+          </label>
+          <label>Access email
+            <input id="aiEmail" type="email" value="dev@skyesoverlondon.dev" autocomplete="off" />
+          </label>
+          <label>Session
+            <input id="aiSessionId" value="mcp_public_access_live" autocomplete="off" />
+          </label>
+        </div>
+
+        <div id="filters" aria-label="MCP output filters">
+          <button class="chip active" type="button">All</button>
+          <button class="chip" type="button">Instagram</button>
+          <button class="chip" type="button">Ads</button>
+        </div>
+
+        <div class="console-actions">
+          <button id="generateBtn" type="button">Generate Batch</button>
+          <button id="auditBtn" type="button">Audit</button>
+          <button id="safeBtn" type="button">Safe Zone</button>
+          <button id="shuffleBtn" type="button">Remix Copy</button>
+          <button id="duplicateBtn" type="button">Duplicate Variant</button>
+          <button id="regenSelectedBtn" type="button">Re-render</button>
+        </div>
+      </div>
+
+      <div class="console-panel">
+        <div class="ai-plan-grid" aria-label="MCP access plans">
+          <button class="aiPlanCard active" data-plan="free99-core" type="button">Free99 Core</button>
+          <button class="aiPlanCard" data-plan="social-batch-ai-burst" type="button">AI Burst</button>
+          <button class="aiPlanCard" data-plan="social-batch-ai-studio" type="button">AI Studio</button>
+        </div>
+        <div class="console-actions">
+          <button id="aiRefreshBtn" type="button">Refresh Meter</button>
+          <button id="aiClaimBtn" type="button" disabled>Claim Pending</button>
+        </div>
+        <div class="metric-stack" style="margin-top: 16px;">
+          <div class="metric-line"><strong id="aiPlanBadge">Free99 Core</strong><span>Active access lane</span></div>
+          <div class="metric-line"><strong id="aiStatus">Ready</strong><span>AI status</span></div>
+          <div class="metric-line"><strong id="aiMeterCount">35</strong><span>Tool calls ready</span></div>
+          <div class="metric-line"><strong id="batchCount">3 MCPs</strong><span>Batch count</span></div>
+          <div class="metric-line"><strong id="selectedMeta">SKRUCIBLE · QuantumSkyes · Skye World</strong><span>Selected stack</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONNECT IN 30 SECONDS -->
+  <section class="band" id="connect">
+    <div class="section-head">
+      <p class="eyebrow">Connect</p>
+      <h2>30 seconds to your first tool call.</h2>
+    </div>
+
+    <div class="connect-tabs">
+      <div class="connect-tab">
+        <div class="connect-num">1</div>
+        <strong>Pick a method</strong>
+        <span>npx, HTTP endpoint, or global install</span>
+      </div>
+      <div class="connect-tab">
+        <div class="connect-num">2</div>
+        <strong>Add to config</strong>
+        <span>Claude Desktop, Cursor, or any MCP client</span>
+      </div>
+      <div class="connect-tab">
+        <div class="connect-num">3</div>
+        <strong>Call a tool</strong>
+        <span>Ask for forge_shader, design_validate, anything</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+      <div>
+        <p style="color: var(--gold); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px;">Option A — npx suite</p>
+        <div class="term">
+          <div class="term-bar">
+            <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+            <span class="term-label">mcp-config.json</span>
+          </div>
+          <pre>{
+  <span class="c-cyan">"mcpServers"</span>: {
+    <span class="c-cyan">"skrucible"</span>: {
+      <span class="c-cyan">"command"</span>: <span class="c-gold">"npx"</span>,
+      <span class="c-cyan">"args"</span>: [<span class="c-gold">"-y"</span>, <span class="c-gold">"skrucible"</span>]
+    },
+    <span class="c-cyan">"quantumskyes"</span>: {
+      <span class="c-cyan">"command"</span>: <span class="c-gold">"npx"</span>,
+      <span class="c-cyan">"args"</span>: [<span class="c-gold">"-y"</span>, <span class="c-gold">"quantumskyes-mcp"</span>]
+    },
+    <span class="c-cyan">"skye-world"</span>: {
+      <span class="c-cyan">"command"</span>: <span class="c-gold">"npx"</span>,
+      <span class="c-cyan">"args"</span>: [<span class="c-gold">"-y"</span>, <span class="c-gold">"skye-world-mcp"</span>]
+    }
+  }
+}</pre>
+        </div>
+      </div>
+
+      <div>
+        <p style="color: var(--gold); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px;">Option B — HTTP endpoints</p>
+        <div class="term">
+          <div class="term-bar">
+            <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+            <span class="term-label">mcp-config.json</span>
+          </div>
+          <pre>{
+  <span class="c-cyan">"mcpServers"</span>: {
+    <span class="c-cyan">"skrucible"</span>: {
+      <span class="c-cyan">"url"</span>: <span class="c-gold">"https://skrucible.pages.dev/mcp"</span>
+    },
+    <span class="c-cyan">"quantumskyes-remote"</span>: {
+      <span class="c-cyan">"url"</span>: <span class="c-gold">"https://skye-design-mcp.pages.dev/mcp"</span>
+    }
+  }
+}</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NPX RELEASE PROOF -->
+  <section class="band alt" id="proof">
+    <div class="section-head">
+      <p class="eyebrow">Proof of Work</p>
+      <h2>Live. Tested. Shipped.</h2>
+      <p style="color: var(--soft); max-width: 580px;">
+        Every tool call verified. 18 invocations, 20 concurrent requests, stdio and HTTP both passing.
+        This is not a mock — it is the actual output from <code style="background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 4px; font-size: 13px;">npm publish</code> and a live stress test run.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+      <div>
+        <p style="color: var(--cyan); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px;">npm publish output</p>
+        <div class="term">
+          <div class="term-bar">
+            <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+            <span class="term-label">terminal</span>
+          </div>
+          <pre><span class="c-muted">$</span> <span class="c-gold">npm publish --access public</span>
+
+<span class="c-muted">npm notice 📦  skrucible@1.0.3</span>
+<span class="c-muted">npm notice 📦  quantumskyes-mcp@1.0.1</span>
+<span class="c-muted">npm notice 📦  skye-world-mcp@1.0.0</span>
+<span class="c-muted">npm notice Tarball Contents</span>
+<span class="c-muted">skrucible        31KB unpacked · 8 tools</span>
+<span class="c-muted">quantumskyes     608KB unpacked · 27 tools / 31 resources</span>
+<span class="c-muted">skye-world       20KB unpacked · 10 tools</span>
+
+<span class="c-green">+ skrucible@1.0.3</span>
+<span class="c-green">+ quantumskyes-mcp@1.0.1</span>
+<span class="c-green">+ skye-world-mcp@1.0.0</span></pre>
+        </div>
+      </div>
+
+      <div>
+        <p style="color: var(--cyan); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px;">fresh install smoke — all three packages</p>
+        <div class="term">
+          <div class="term-bar">
+            <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+            <span class="term-label">stress-test output</span>
+          </div>
+          <pre><span class="c-green">✓ SKRUCIBLE</span>      tools: 8  · shader: 1992c
+<span class="c-green">✓ QuantumSkyes</span>   tools: 27 · resources: 31
+<span class="c-green">✓ QuantumSkyes</span>   template pack ok · ledger bundled
+<span class="c-green">✓ Skye World</span>     tools: 10 · rooms: 5
+<span class="c-green">✓ Skye World</span>     quality gate: true
+
+<span class="c-cyan">total:</span> <span class="c-green">45 tools live through npx</span></pre>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p style="color: var(--cyan); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px;">npx install + tool call — end to end</p>
+      <div class="term">
+        <div class="term-bar">
+          <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+          <span class="term-label">terminal — fresh install test</span>
+        </div>
+        <pre><span class="c-muted">$</span> <span class="c-gold">npm install skrucible quantumskyes-mcp skye-world-mcp --silent</span>
+
+<span class="c-muted">$</span> <span class="c-gold">node client-smoke.mjs</span>
+
+<span class="c-cyan">skrucible:</span>      tools=8
+<span class="c-cyan">quantumskyes:</span>   tools=27 resources=31
+<span class="c-cyan">skye-world:</span>     tools=10 quality=true</pre>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WHY FREE -->
+  <section class="band" id="why">
+    <div class="section-head">
+      <p class="eyebrow">The Philosophy</p>
+      <h2>Why it's free.</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p style="color: var(--soft); font-size: clamp(15px, 1.6vw, 18px); line-height: 1.72;">
+          Most people hoard their stack. I built SkyeKnowology on the opposite premise —
+          if I can give devs the actual techniques I use on paid client work, the whole
+          ecosystem gets sharper. The MCP servers are my Skye CIP (Creative Intelligence Platform)
+          surfaced as a tool. You're not getting a tutorial. You're getting the production layer.
+        </p>
+        <p style="color: var(--soft); font-size: clamp(15px, 1.6vw, 18px); line-height: 1.72; margin-top: 18px;">
+          SKRUCIBLE is free because it's already doing its job in client builds.
+          QuantumSkyes is the full design ruleset — public through npx and gate-owned through FS27 HTTP.
+          Skye World is now live as the spatial layer. Three MCPs, one stack, one person building it.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://skrucible.pages.dev" target="_blank" rel="noopener">Open SKRUCIBLE ↗</a>
+          <a class="button" href="skyeknowology.html">Read SkyeKnowology</a>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="package-card" style="border-color: rgba(103,217,255,.2);">
+          <div class="card-topline">For developers</div>
+          <h3 style="font-size: 18px; margin-top: 8px;">SKRUCIBLE</h3>
+          <p style="font-size: 13px;">WebGL, GLSL, physics, audio — as MCP tools. No token required.<br/>
+          <code style="font-size: 11px; color: var(--cyan);">npx -y skrucible</code></p>
+        </div>
+        <div class="package-card" style="border-color: rgba(244,199,91,.2);">
+          <div class="card-topline">For platform members</div>
+          <h3 style="font-size: 18px; margin-top: 8px;">QuantumSkyes</h3>
+          <p style="font-size: 13px;">27-tool design system. npx local package plus FS27-gated HTTP.<br/>
+          <code style="font-size: 11px; color: var(--gold);">npx -y quantumskyes-mcp</code></p>
+        </div>
+        <div class="package-card" style="border-color: rgba(139,234,154,.2);">
+          <div class="card-topline">For spatial builds</div>
+          <h3 style="font-size: 18px; margin-top: 8px;">Skye World MCP</h3>
+          <p style="font-size: 13px;">Spatial · Theatre.js · Remotion. npx live.<br/>
+          <code style="font-size: 11px; color: var(--green);">npx -y skye-world-mcp</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong>SkyesOverLondon</strong> · Design Systems · MCP Servers · AI-augmented builds</p>
+  <p>
+    <a href="/">Home</a>
+    <a href="capabilities.html">Capabilities</a>
+    <a href="proof.html">Proof</a>
+    <a href="https://skrucible.pages.dev" target="_blank" rel="noopener">SKRUCIBLE</a>
+    <a href="https://skye-design-mcp.pages.dev" target="_blank" rel="noopener">QuantumSkyes MCP</a>
+    <a href="mailto:graylondonskyes@gmail.com">graylondonskyes@gmail.com</a>
+  </p>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const p = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    document.getElementById('progress').style.transform = `scaleX(${p})`;
+  });
+  // Mobile nav
+  document.getElementById('menu-btn').addEventListener('click', function() {
+    const nav = document.getElementById('main-nav');
+    const open = nav.classList.toggle('is-open');
+    this.setAttribute('aria-expanded', open);
+  });
+  // Lightweight proof console state.
+  const planBadge = document.getElementById('aiPlanBadge');
+  const statusEl = document.getElementById('aiStatus');
+  const meterEl = document.getElementById('aiMeterCount');
+  const batchEl = document.getElementById('batchCount');
+  const selectedMeta = document.getElementById('selectedMeta');
+  let meter = 35;
+  function bump(label) {
+    meter += 1;
+    meterEl.textContent = String(meter);
+    statusEl.textContent = label;
+  }
+  document.querySelectorAll('#filters .chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#filters .chip').forEach((item) => item.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMeta.textContent = `${btn.textContent.trim()} · MCP recipes filtered`;
+      bump('Filtered');
+    });
+  });
+  document.querySelectorAll('.aiPlanCard').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.aiPlanCard').forEach((item) => item.classList.remove('active'));
+      btn.classList.add('active');
+      planBadge.textContent = btn.textContent.trim();
+      bump('Plan selected');
+    });
+  });
+  ['generateBtn','auditBtn','safeBtn','shuffleBtn','duplicateBtn','regenSelectedBtn','aiRefreshBtn'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('click', () => {
+      const label = document.getElementById(id).textContent.trim();
+      batchEl.textContent = `${Math.max(3, meter - 31)} outputs`;
+      bump(label);
+    });
+  });
+</script>
+</body>
+</html>

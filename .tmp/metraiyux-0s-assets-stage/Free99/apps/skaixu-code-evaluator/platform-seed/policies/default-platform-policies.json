@@ -1,0 +1,49 @@
+{
+  "type": "policy-pack",
+  "name": "Default Platform Policy Gates",
+  "version": "1.0.0",
+  "policies": [
+    {
+      "id": "no-direct-provider-browser",
+      "severity": "critical",
+      "scope": "code",
+      "label": "Block direct model-provider browser endpoints",
+      "test": "direct-provider"
+    },
+    {
+      "id": "no-hardcoded-secrets",
+      "severity": "critical",
+      "scope": "code",
+      "label": "Block hardcoded credentials/secrets",
+      "test": "secrets"
+    },
+    {
+      "id": "require-seed-manifest",
+      "severity": "high",
+      "scope": "data",
+      "label": "Require platform seed manifest or data folder",
+      "test": "seed-manifest"
+    },
+    {
+      "id": "require-tests-or-smoke",
+      "severity": "high",
+      "scope": "quality",
+      "label": "Require test/smoke validation surface",
+      "test": "tests"
+    },
+    {
+      "id": "patch-preflight",
+      "severity": "critical",
+      "scope": "patch",
+      "label": "Patch bundles must pass preflight before apply",
+      "test": "patch-preflight"
+    },
+    {
+      "id": "role-gate-shared-sync",
+      "severity": "medium",
+      "scope": "ops",
+      "label": "Shared API sync must honor upstream roles",
+      "test": "role-gate"
+    }
+  ]
+}

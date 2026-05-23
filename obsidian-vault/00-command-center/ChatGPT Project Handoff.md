@@ -33,7 +33,7 @@ SkyeGateFS27 is the gate layer: identity, user/dashboard actions, event proof, k
 - `obsidian-vault/` is the private operator memory layer. Notes with `brain: true` export into `metraiyux_0s_site/brain/obsidian-sync.json` and into the public-safe neural map. The private graph lives in `obsidian-vault/_neural-map/`.
 - `client-app-factory/` is the client deployment engine for generated apps. It includes the factory server, scan engine, app generation, proof ledger, browser proof, service worker, manifest, storage records, and API/browser smoke tests.
 - `marketing/` holds public spectacle/marketing surfaces, MetrAIyux marketing, review wall assets, and related deployable buyer-facing pages.
-- `metraiyux-portal/`, `SkyeVault-Drop/`, `unpacked-projects/`, and `metraiyux_0s_site/live/` hold ecosystem portals, vault/drop systems, imported product packages, live surface source packages, and proof-heavy product work.
+- `metraiyux-portal/`, `SkyeVault-Drop/`, `metraiyux_0s_site/_platform-sources/`, and `metraiyux_0s_site/live/` hold ecosystem portals, vault/drop systems, imported product packages, live surface source packages, and proof-heavy product work.
 
 ## Brain Architecture
 
@@ -104,7 +104,7 @@ Key live Workers:
 - SkyePay production proof in the ledger says the store returned 61 offers, 50 repo-registry checkout imports, no horizontal overflow, and a live Stripe Checkout `cs_live` handoff. Bob's client lane was intentionally simplified to one free tester-week handoff without public store/ledger/catalog language.
 - Skyes Over London Reviews proof says the production page returned HTTP 200, had no console errors, no horizontal overflow, no fake `Approved` text, no `Name Withheld` text, no synthetic/placeholder/client-approval status text, 115 review cards, 115 full detail pages, a live desktop/mobile Three.js atlas, 6 infrastructure links on the first detail page, and `window.__skyeReviewAtlas.active === true`.
 - Review routing rule: prospects asking for reviews/social proof go to the public review wall; clients who want to leave feedback go to `submit-review.html`; publication is not proof until 0S QA confirms consent, public-name preference, category fit, and proof safety, then five approved unpublished reviews are batched for production.
-- MCP design/proof receipts are present for recent work including `marketing/metraiyux-0s/`, `unpacked-projects/over3arth/`, `metraiyux_0s_site/`, `MCP/`, `empire-pallets-v3-app/`, `bobs-smoke-shop-mcp-redo/`, `MCP/skye-design-lab/`, `unpacked-projects/skyes-over-london-lc/`, `SkyeGateFS27/`, and `client-app-factory/`.
+- MCP design/proof receipts are present for recent work including `marketing/metraiyux-0s/`, `retired over3arth import `, `metraiyux_0s_site/`, `MCP/`, `empire-pallets-v3-app/`, `bobs-smoke-shop-mcp-redo/`, `MCP/skye-design-lab/`, `metraiyux_0s_site/_platform-sources/skyes-over-london-lc/`, `SkyeGateFS27/`, and `client-app-factory/`.
 - Skyes Over London LC proof atlas receipt on 2026-05-17 records MCP audit success, desktop/mobile browser QA, a SkyeVault package receipt, and a scanner exclusion for `login.html` because it matched a Google API key pattern.
 
 ## Known Boundaries And Blockers

@@ -1,0 +1,29 @@
+# Production reverse proxy example.
+# Replace domains and point DNS A/AAAA records to your server.
+
+{$HUB_HOST} {
+  reverse_proxy hub:80
+}
+
+# Operator-only attached app hosts. Put these behind SSO, VPN, Caddy basic_auth,
+# Cloudflare Access, or another admin gate before exposing them publicly.
+{$FREESCOUT_HOST} {
+  reverse_proxy freescout:80
+}
+
+{$ESPOCRM_HOST} {
+  reverse_proxy espocrm:80
+}
+
+{$INVOICESHELF_HOST} {
+  reverse_proxy invoiceshelf:80
+}
+
+{$FORMBRICKS_HOST} {
+  reverse_proxy formbricks:3000
+}
+
+# Optional direct brain-service health endpoint. Most deployments should access brain through the hub at /brain.html and /api/brain/.
+# brain.example.com {
+#   reverse_proxy brain-service:8099
+# }

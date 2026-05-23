@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SovereignDocs Template Record",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "category",
+    "jurisdiction",
+    "questionnaire",
+    "sections",
+    "render_markdown",
+    "rights",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "base_id": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "category": {
+      "type": "object"
+    },
+    "jurisdiction": {
+      "type": "object"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "risk_level": {
+      "type": "string"
+    },
+    "not_legal_advice": {
+      "type": "boolean"
+    },
+    "questionnaire": {
+      "type": "array"
+    },
+    "sections": {
+      "type": "array"
+    },
+    "render_markdown": {
+      "type": "string"
+    },
+    "rights": {
+      "type": "object"
+    },
+    "review": {
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+name = "sovereign-13-cabinet-sentinel-operator"
+main = "sentinel-worker.js"
+compatibility_date = "2026-05-15"
+
+[[kv_namespaces]]
+binding = "SENTINEL_LEDGER"
+id = "438cd79eb2584bb1bb45cf3a47857d89"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "metraiyux-sentinel-db"
+database_id = "277e8014-7558-4c7c-835a-af205acb1aef"
+
+[[queues.producers]]
+binding = "SENTINEL_QUEUE"
+queue = "sentinel-business-events"

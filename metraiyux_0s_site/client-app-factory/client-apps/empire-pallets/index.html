@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Empire Pallets | Phoenix Pallet Operations App</title>
+  <meta name="description" content="Empire Pallets mobile-ready app for pallet quotes, recycling, pickup, drop trailer programs, heat treatment, and commercial pallet supply in Phoenix.">
+  <meta name="theme-color" content="#090d0b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="canonical" href="https://empire-pallets.pages.dev/">
+  <style>
+    body.intro-active{overflow:hidden;background:#020302}
+    body.intro-active>:not(.app-intro):not(script):not(style){visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+  </style>
+  <link rel="stylesheet" href="assets/styles.css">
+  <!-- MCP stack proof: assets/mcp-motion-stack.js uses import gsap from "gsap"; import { ScrollTrigger } from "gsap/ScrollTrigger"; import Lenis from "lenis"; assets/app.js calls gsap.registerPlugin(ScrollTrigger) and new Lenis({ lerp: 0.14, wheelMultiplier: 0.8, smoothWheel: true }). -->
+  <script type="importmap">{"imports":{"gsap":"https://esm.sh/gsap@3.12.5","gsap/ScrollTrigger":"https://esm.sh/gsap@3.12.5/ScrollTrigger","lenis":"https://esm.sh/lenis@1.1.20"}}</script>
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body class="intro-active skyesol-living-page">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <section class="app-intro" data-app-intro aria-label="Empire Pallets opening sequence">
+    <video class="intro-video" data-intro-video autoplay muted playsinline preload="auto" poster="assets/media/empire-hero-poster.jpg">
+      <source src="assets/media/empire-hero.mp4" type="video/mp4">
+    </video>
+    <div class="intro-vignette" aria-hidden="true"></div>
+    <div class="intro-scan" aria-hidden="true"></div>
+    <div class="intro-yard-door intro-yard-door-left" aria-hidden="true"></div>
+    <div class="intro-yard-door intro-yard-door-right" aria-hidden="true"></div>
+    <div class="intro-yard-grid" aria-hidden="true"></div>
+    <div class="intro-dock-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="intro-brand-rail" aria-hidden="true">
+      <span>New Pallets</span>
+      <span>Used Pallets</span>
+      <span>Removal</span>
+      <span>Drop Trailers</span>
+    </div>
+    <div class="intro-stage">
+      <div class="intro-mark">
+        <div class="intro-photo-stack" aria-hidden="true">
+          <img src="assets/media/new-pallets-service.png" alt="">
+          <img src="assets/media/recycled-pallets-service.png" alt="">
+          <img src="assets/media/drop-trailer-service.png" alt="">
+        </div>
+        <div class="intro-yard-system" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <img class="intro-logo" src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
+        <div class="intro-route-line" aria-hidden="true"><span></span></div>
+        <div class="intro-loader" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="intro-pulse" aria-hidden="true"></div>
+      </div>
+      <div class="intro-copy" aria-live="polite">
+        <span>631 S 31st Ave / Phoenix yard</span>
+        <h2 class="intro-line-title">Empire <span class="line-shadow-text line-shadow-gold" data-line-shadow="Pallets">Pallets</span></h2>
+        <p>The yard opens first: supply lanes, pickup routes, trailer programs, and heat-treatment requests lock in before the app comes online.</p>
+        <div class="intro-telemetry" aria-hidden="true">
+          <b><small>01</small>New</b>
+          <b><small>02</small>Used</b>
+          <b><small>03</small>Pickup</b>
+          <b><small>04</small>Trailer</b>
+        </div>
+        <div class="intro-meter" aria-hidden="true"><span></span></div>
+        <button class="intro-enter" type="button" data-enter-intro disabled>Loading Yard</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="progressbar" aria-hidden="true"></div>
+  <div class="header-alert"><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Commercial pallet supply</span>, pickup, recycling, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">heat-treatment support</span>, and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">drop-trailer programs</span> in Phoenix. <a href="quote.html">Start a quote</a></div>
+
+  <header class="top">
+    <div class="wrap nav">
+      <a class="brand" href="" aria-label="Empire Pallets app home">
+        <img class="logo" src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
+      </a>
+      <button class="btn hamb" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav class="links" id="primary-nav" aria-label="Primary navigation">
+        <a href="services.html">Services</a>
+        <a href="programs.html">Programs</a>
+        <a href="industries.html">Industries</a>
+        <a href="scan.html">Scan</a>
+        <a href="preview.html">Preview</a><a href="https://valley-verified.pages.dev/business/empire-pallets-phoenix/" target="_blank" rel="noopener">Valley Verified</a><a class="quote" href="quote.html">Request Quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <video data-hero-video autoplay muted loop playsinline preload="auto" poster="assets/media/empire-hero-poster.jpg">
+          <source src="assets/media/empire-hero.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="wrap hero-inner">
+        <div class="hero-copy" data-reveal>
+          <div class="eyebrow">Phoenix pallet supply and recycling</div>
+          <h1 class="text-shimmer hero-line-title neon-gradient-text">Empire <span class="line-shadow-text line-shadow-gold" data-line-shadow="Pallets">Pallets</span></h1>
+          <p>A mobile-ready pallet operations app for quote requests, pickup details, delivery lanes, drop trailers, heat treatment, and commercial service programs across Phoenix.</p>
+          <div class="hero-actions">
+            <a class="btn primary neon-magnetic" href="quote.html">Start Quote</a>
+            <a class="btn green" href="scan.html">Open Scan Route</a>
+            <a class="btn dark" href="tel:4806626551">Call 480-662-6551</a>
+            <a class="btn dark" href="https://valley-verified.pages.dev/business/empire-pallets-phoenix/" target="_blank" rel="noopener">Valley Verified Post</a>
+            <button class="btn dark" type="button" data-share-site data-share-title="Empire Pallets operations app" data-share-url="https://empire-pallets.pages.dev/">Share App</button>
+          </div>
+          <div class="social-share-strip" aria-label="Share Empire Pallets app">
+            <span>Share Empire:</span>
+            <a href="mailto:?subject=Empire%20Pallets%20operations%20app&body=Empire%20Pallets%20operations%20app%20https%3A%2F%2Fempire-pallets.pages.dev%2F">Email</a>
+            <a href="sms:?&body=Empire%20Pallets%20operations%20app%20https%3A%2F%2Fempire-pallets.pages.dev%2F">Text</a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fempire-pallets.pages.dev%2F" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fempire-pallets.pages.dev%2F" target="_blank" rel="noopener">Facebook</a>
+            <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fempire-pallets.pages.dev%2F&text=Empire%20Pallets%20operations%20app" target="_blank" rel="noopener">X</a>
+          </div>
+        </div>
+
+        <div class="hero-dock" data-reveal>
+          <a class="dock-tile" data-quick-service="New Manufactured Pallets" href="quote.html?service=New%20Manufactured%20Pallets">
+            <strong>New pallets</strong>
+            <span>Custom and standard builds for commercial volume.</span>
+          </a>
+          <a class="dock-tile" data-quick-service="Used Recycled Pallets" href="quote.html?service=Used%20Recycled%20Pallets">
+            <strong>Recycled supply</strong>
+            <span>Refurbished options for cost-conscious buyers.</span>
+          </a>
+          <a class="dock-tile" data-quick-service="Pallet Recycling and Removal" href="quote.html?service=Pallet%20Recycling%20and%20Removal">
+            <strong>Removal</strong>
+            <span>Pickup and recycling for excess or broken pallets.</span>
+          </a>
+          <a class="dock-tile" data-quick-service="Drop Trailer Service" href="quote.html?service=Drop%20Trailer%20Service">
+            <strong>Drop trailer</strong>
+            <span>High-volume collection programs with route details.</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="quick">
+      <div class="wrap">
+        <form action="quote.html">
+          <select name="service" aria-label="Service needed">
+            <option>New Manufactured Pallets</option>
+            <option>Used Recycled Pallets</option>
+            <option>Pallet Recycling and Removal</option>
+            <option>Drop Trailer Service</option>
+            <option>Heat Treatment and Certification</option>
+            <option>Custom Pallet Design</option>
+          </select>
+          <input name="quantity" aria-label="Estimated quantity">
+          <input name="zip" aria-label="City or ZIP">
+          <button class="btn primary neon-magnetic">Start Quote</button>
+        </form>
+      </div>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <div>
+            <div class="eyebrow">Commercial service lanes</div>
+            <h2>Every pallet need gets a <span class="line-shadow-text line-shadow-green" data-line-shadow="direct route">direct route</span>.</h2>
+          </div>
+          <p>The app asks for the details <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Empire Pallets</span> needs before scheduling: pallet type, quantity, route, dock access, forklift access, trailer room, timing, and recurring demand.</p>
+        </div>
+
+        <div class="grid cols3">
+          <a class="service-card" data-reveal data-quick-service="New Manufactured Pallets" href="new-pallets.html">
+            <img src="assets/media/new-pallets-service.png" alt="Close view of new pallet lumber texture">
+            <div class="service-card-body">
+              <span class="badge">Supply</span>
+              <h3>New manufactured pallets</h3>
+              <p>Standard and custom pallet builds for size, weight, storage, and shipping requirements.</p>
+            </div>
+          </a>
+          <a class="service-card" data-reveal data-quick-service="Used Recycled Pallets" href="recycled-pallets.html">
+            <img src="assets/media/recycled-pallets-service.png" alt="Weathered recycled pallets ready for reuse">
+            <div class="service-card-body">
+              <span class="badge">Value</span>
+              <h3>Used recycled pallets</h3>
+              <p><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Quality-inspected</span> refurbished pallets for buyers who need supply without new-build cost.</p>
+            </div>
+          </a>
+          <a class="service-card" data-reveal data-quick-service="Pallet Recycling and Removal" href="pallet-recycling.html">
+            <img src="assets/media/recycling-service.png" alt="Scrap wood and pallet recycling material">
+            <div class="service-card-body">
+              <span class="badge">Removal</span>
+              <h3><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Pallet recycling</span> and pickup</h3>
+              <p>Collection, sorting, reuse, recycling, and disposal support for old or broken pallets.</p>
+            </div>
+          </a>
+          <a class="service-card" data-reveal data-quick-service="Heat Treatment and Certification" href="heat-treatment.html">
+            <img src="assets/media/heat-treatment-service.png" alt="Branded pallet stamp detail for heat treatment support">
+            <div class="service-card-body">
+              <span class="badge">Export</span>
+              <h3>Heat treatment</h3>
+              <p>ISPM-15 support for buyers preparing pallets and shipments for export requirements.</p>
+            </div>
+          </a>
+          <a class="service-card" data-reveal data-quick-service="Drop Trailer Service" href="drop-trailer.html">
+            <img src="assets/media/drop-trailer-service.png" alt="Flatbed trailer loaded with pallets">
+            <div class="service-card-body">
+              <span class="badge">Volume</span>
+              <h3>Drop trailer programs</h3>
+              <p>53-foot dry van drop-off and pickup lanes for high-volume pallet generators.</p>
+            </div>
+          </a>
+          <a class="service-card" data-reveal data-quick-service="Custom Pallet Design" href="custom-pallets.html">
+            <img src="assets/media/custom-pallets-service.png" alt="Pallet production line for custom builds">
+            <div class="service-card-body">
+              <span class="badge">Custom</span>
+              <h3>Custom pallet design</h3>
+              <p>Consultation, prototyping, and build planning for unusual dimensions or freight needs.</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview-strip">
+      <div class="wrap split">
+        <div data-reveal>
+          <div class="eyebrow">QR-ready handoff</div>
+          <h2>Open the app from the <span class="line-shadow-text line-shadow-gold" data-line-shadow="yard">yard</span>, office, or buyer table.</h2>
+          <p>Scan routing gives Empire Pallets a clean mobile entry for quote requests, preview access, install prompts, and future workspace tools.</p>
+          <div class="hero-actions">
+            <a class="btn primary neon-magnetic" href="scan.html">Open Scan Route</a>
+            <button class="btn" type="button" data-install-app>Install App</button>
+          </div>
+        </div>
+        <div class="panel qr-lockup" data-reveal>
+          <img src="assets/empire-pallets-scan-qr.svg" alt="QR code for the Empire Pallets scan route">
+          <div>
+            <span class="badge">App QR</span>
+            <h3>Built for in-person preview.</h3>
+            <p>Use this QR lane for the client handoff, in-store/yard testing, or printed preview material once the final deployment URL is assigned.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap gallery-band">
+        <div class="media-stack" data-parallax data-reveal>
+          <img src="assets/media/phoenix-yard-hero.png" alt="Phoenix pallet yard aerial view">
+          <img src="assets/media/warehouse-forklift-hero.png" alt="Indoor warehouse forklift with pallets">
+        </div>
+        <div class="panel neon-glow-panel" data-reveal>
+          <div class="eyebrow">Quote intelligence</div>
+          <h2>Cleaner requests. <span class="line-shadow-text line-shadow-green" data-line-shadow="Faster response.">Faster response.</span></h2>
+          <p>The buyer path collects the details that usually cause back-and-forth: quantity, pallet grade, service type, ZIP, delivery or pickup timing, dock access, forklift access, trailer room, and recurring need.</p>
+          <div class="route-board">
+            <div class="route-row">
+              <b>01</b>
+              <div><strong>Pick the lane</strong><p>Supply, removal, heat treatment, drop trailer, or custom build.</p></div>
+            </div>
+            <div class="route-row">
+              <b>02</b>
+              <div><strong>Add route details</strong><p>Quantity, ZIP, timing, forklift/dock access, and recurring demand.</p></div>
+            </div>
+            <div class="route-row">
+              <b>03</b>
+              <div><strong>Empire responds</strong><p>The team can confirm availability, route fit, pickup, delivery, or next steps.</p></div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn primary neon-magnetic" href="quote.html">Open Quote Form</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap split">
+        <div class="panel neon-glow-panel" data-reveal>
+          <span class="badge">Quick fit estimator</span>
+          <h3>Estimate the request lane</h3>
+          <form data-calc>
+            <label>Service type
+              <select name="calcService">
+                <option>new pallets</option>
+                <option>recycled pallets</option>
+                <option>pallet removal</option>
+                <option>drop trailer loads</option>
+                <option>heat-treated pallets</option>
+              </select>
+            </label>
+            <label>Estimated quantity
+              <input name="qty" type="number" min="0" inputmode="numeric">
+            </label>
+            <div class="notice" data-calc-output></div>
+          </form>
+        </div>
+        <div data-reveal>
+          <div class="eyebrow">Private preview</div>
+          <h2>Empire gets a free tester <span class="line-shadow-text line-shadow-gold" data-line-shadow="workspace">workspace</span> with the app preview.</h2>
+          <p>This preview lane gives the client a simple way to test the app, see the included usage, and decide if they want to keep the workspace after the free trial. No payment is required during the preview window.</p>
+          <div class="preview-metrics">
+            <div class="metric"><strong>7 days</strong><span>Free tester workspace during preview.</span></div>
+            <div class="metric"><strong>7 scans</strong><span>App, PWA, QR, SEO, links, images, and copy checks.</span></div>
+            <div class="metric"><strong>25</strong><span>Workspace commands for fixes, offers, content, and proof.</span></div>
+            <div class="metric"><strong>6 months</strong><span>Discounted continuation if the app earns the spot.</span></div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn primary neon-magnetic" href="preview.html">Open Private Preview</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="install-banner" data-install-banner>
+    <strong>Install the Empire Pallets app</strong>
+    <span>Use the browser install option on mobile, or keep this route as the QR-ready app entry.</span>
+    <button class="btn primary neon-magnetic" type="button" data-install-app>Install App</button>
+    <button class="btn dark" type="button" data-dismiss-install>Dismiss</button>
+  </div>
+
+  <div class="floating-call">
+    <a class="btn dark" href="tel:4806626551">Call</a>
+    <a class="btn primary neon-magnetic" href="quote.html">Quote</a>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>
+        <img class="logo" src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
+        <p>Reliable pallet supply, recycling, removal, custom design, heat-treatment support, and trailer programs for Phoenix-area businesses.</p>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p><b>Phone:</b> <a href="tel:4806626551">480-662-6551</a><br><b>Email:</b> <a href="mailto:sales@empirepalletsaz.com">sales@empirepalletsaz.com</a><br><b>Address:</b> 631 S 31st Ave, Phoenix, AZ 85009</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

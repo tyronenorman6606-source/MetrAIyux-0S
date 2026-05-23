@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support Request | Skye Business Command Center</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <nav class="nav"><a class="brand" href="/customer-portal.html"><span class="orb"></span><span>Skye Support</span></a><div class="navlinks"><a href="/customer-portal.html">Portal</a><a href="/intake.html">Intake</a><a href="/billing.html">Billing</a></div></nav>
+    <section class="hero compact">
+      <p class="eyebrow">Branded support front door</p>
+      <h1>Tell us what needs attention.</h1>
+      <p class="lead">This is the customer-facing layer. In production, submissions should create or route an internal support ticket without showing customers the support desk software.</p>
+    </section>
+    <form class="panel" data-portal-form="support">
+      <div class="grid two">
+        <label>Company name<input name="company" required placeholder="Company name"></label>
+        <label>Your email<input name="email" type="email" required placeholder="name@company.com"></label>
+        <label>Request type<select name="type"><option>General support</option><option>Billing question</option><option>New workflow request</option><option>Urgent issue</option></select></label>
+        <label>Priority<select name="priority"><option>Normal</option><option>High</option><option>Critical</option></select></label>
+      </div>
+      <label>What happened?<textarea name="details" required placeholder="Describe the request, issue, or change needed."></textarea></label>
+      <div class="actions"><button class="btn primary" type="submit">Submit request</button><a class="btn ghost" href="/customer-portal.html">Back to portal</a></div>
+      <p class="proof-strip" data-form-result hidden></p>
+    </form>
+  </main>
+  <script src="/assets/customer-portal.js"></script>
+</body>
+</html>

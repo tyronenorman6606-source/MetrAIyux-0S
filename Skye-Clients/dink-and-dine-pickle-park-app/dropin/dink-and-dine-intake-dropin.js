@@ -1,0 +1,1 @@
+(() => { window.dink_and_dineDropIn = { business: "Dink & Dine Pickle Park", openIntake: () => { location.href = '/quote.html'; } }; })();

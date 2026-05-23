@@ -39,11 +39,11 @@
     },
     {
       keys:["ai","agent","autonomous","model","output","prompt"],
-      answer:"The AI layer is covered by AI Product Terms and AI Transparency. The core idea is simple: AI output needs human review, high-risk decisions are restricted, autonomous workflows need approval boundaries, and customer prompts or outputs are handled under the privacy and service terms. Start at /legal/ai-terms/."
+      answer:"The AI layer is covered by AI Product Terms, AI Transparency, and the AI Operators Disclosure & Use Notice at /legal/ai-operators/. The core idea is simple: kAIxu and related operators are AI systems under human oversight; AI output needs human review, high-risk decisions are restricted, autonomous workflows need approval boundaries, and customer prompts or outputs are handled under the privacy and service terms."
     },
     {
       keys:["sms","twilio","text","call","consent","stop","help"],
-      answer:"SMS consent lives at /legal/sms-communications/ and the shortcut /sms-consent/. It publishes business messaging consent, STOP/HELP language, call and text notices, and carrier-friendly proof that users can find before they opt in."
+      answer:"Twilio SMS consent lives at /legal/twilio-sms/. The general SMS policy is at /legal/sms-communications/ and the shortcut /sms-consent/. The Twilio page publishes 0S signup consent, STOP/HELP language, data-use notice, gate links, and carrier-friendly proof before users opt in."
     },
     {
       keys:["saas","platform","subscription","dashboard","vanta","skyehands","metraiyux"],

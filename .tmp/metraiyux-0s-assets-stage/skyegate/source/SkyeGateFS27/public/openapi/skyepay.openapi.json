@@ -1,0 +1,210 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SkyePay API",
+    "version": "1.0.0",
+    "description": "SkyePay is the SkyeGateFS27 payment gateway for public offers, zero-up-front subscription trials, Stripe Checkout creation, safe public order status, owner approval, vault access policy, and workspace activation."
+  },
+  "servers": [
+    {
+      "url": "https://skyesol.netlify.app",
+      "description": "Primary public SkyePay origin"
+    },
+    {
+      "url": "http://127.0.0.1:4197",
+      "description": "Local SkyePay proof server"
+    }
+  ],
+  "paths": {
+    "/skyepay/offers": {
+      "get": {
+        "operationId": "listSkyePayOffers",
+        "summary": "List SkyePay offers and client preview metadata.",
+        "parameters": [
+          {
+            "name": "client",
+            "in": "query",
+            "schema": { "type": "string", "default": "metraiyux-0s" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Offer catalog",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OffersResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skyepay/checkout": {
+      "post": {
+        "operationId": "createSkyePayCheckout",
+        "summary": "Create a Stripe Checkout Session through SkyePay.",
+        "description": "Card data stays in Stripe Checkout. FS27 records the order and keeps activation pending until owner approval.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CheckoutRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutResponse" }
+              }
+            }
+          },
+          "400": { "description": "Invalid request" },
+          "403": { "description": "Dry-run disabled or origin rejected by browser CORS" },
+          "501": { "description": "Stripe is not configured" }
+        }
+      }
+    },
+    "/skyepay/status": {
+      "get": {
+        "operationId": "getSkyePayStatus",
+        "summary": "Read safe public order status after checkout return.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "demo_session",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public safe order state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusResponse" }
+              }
+            }
+          },
+          "400": { "description": "Missing session_id or demo_session" },
+          "404": { "description": "Order not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OffersResponse": {
+        "type": "object",
+        "required": ["ok", "product", "client", "offers"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "product": { "type": "string", "const": "SkyePay" },
+          "gate": { "type": "string" },
+          "stripe_backed": { "type": "boolean" },
+          "owner_approval_required": { "type": "boolean" },
+          "repo_stripe_catalog": {
+            "type": "object",
+            "properties": {
+              "source": { "type": "string" },
+              "imported_checkout_offers": { "type": "integer" },
+              "checkout_rule": { "type": "string" },
+              "excluded_from_instant_checkout": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "client": { "type": "object" },
+          "offers": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Offer" }
+          }
+        }
+      },
+      "Offer": {
+        "type": "object",
+        "required": ["id", "title", "setup_cents", "recurring_cents", "currency"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "setup_cents": { "type": "integer" },
+          "recurring_cents": { "type": "integer" },
+          "trial_days": { "type": "integer" },
+          "zero_upfront_trial": { "type": "boolean" },
+          "today_cents": { "type": "integer" },
+          "post_trial_cents": { "type": "integer" },
+          "store_category": { "type": "string" },
+          "price_label": { "type": ["string", "null"] },
+          "catalog_source": { "type": ["string", "null"] },
+          "source_folder": { "type": ["string", "null"] },
+          "source_file": { "type": ["string", "null"] },
+          "brain_owner": { "type": ["string", "null"] },
+          "rate_limits": { "type": ["object", "null"] },
+          "gate_policy": { "type": ["object", "null"] },
+          "currency": { "type": "string" },
+          "mode": { "type": "string", "enum": ["payment", "subscription"] },
+          "owner_approval_required": { "type": "boolean" }
+        }
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "required": ["customer_email"],
+        "properties": {
+          "client_slug": { "type": "string", "default": "metraiyux-0s" },
+          "offer_id": { "type": "string", "default": "metraiyux-starter-command" },
+          "customer_name": { "type": "string" },
+          "customer_email": { "type": "string", "format": "email" },
+          "company_name": { "type": "string" },
+          "idempotency_key": { "type": "string" },
+          "dry_run": { "type": "boolean", "description": "Local proof only unless SKYPAY_ALLOW_PUBLIC_DRY_RUN is enabled." }
+        }
+      },
+      "CheckoutResponse": {
+        "type": "object",
+        "required": ["ok", "id", "url", "approval_status"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "id": { "type": "string" },
+          "order_id": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "payment_status": { "type": "string" },
+          "approval_status": { "type": "string" },
+          "owner_approval_required": { "type": "boolean" },
+          "activation_path": { "type": ["string", "null"] },
+          "client": { "type": "object" }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "required": ["ok", "order"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "dry_run": { "type": "boolean" },
+          "order": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "client_slug": { "type": "string" },
+              "workspace_slug": { "type": "string" },
+              "offer_id": { "type": "string" },
+              "payment_status": { "type": "string" },
+              "approval_status": { "type": "string" },
+              "owner_status": { "type": "string" },
+              "provisioning_status": { "type": "string" },
+              "offer": { "type": ["object", "null"] },
+              "customer_hint": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

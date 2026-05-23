@@ -1,0 +1,35 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: skye_caddy
+    depends_on:
+      - hub
+      - freescout
+      - espocrm
+      - invoiceshelf
+      - formbricks
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      HUB_HOST: ${HUB_HOST}
+      PUBLIC_SUPPORT_EMAIL: ${PUBLIC_SUPPORT_EMAIL:-}
+      FREESCOUT_HOST: ${FREESCOUT_HOST}
+      ESPOCRM_HOST: ${ESPOCRM_HOST}
+      INVOICESHELF_HOST: ${INVOICESHELF_HOST}
+      FORMBRICKS_HOST: ${FORMBRICKS_HOST}
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  caddy_data:
+  caddy_config:

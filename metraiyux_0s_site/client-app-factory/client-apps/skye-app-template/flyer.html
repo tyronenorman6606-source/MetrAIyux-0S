@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SKye App Template — Client City, ST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #FF8C00;
+      --amber-dim: rgba(255,140,0,0.18);
+      --neon: #39FF14;
+      --bg: #080608;
+      --card: rgba(255,255,255,0.035);
+      --border: rgba(255,140,0,0.18);
+      --ink: #f0ece8;
+      --muted: #7a6a5a;
+    }
+
+    html, body {
+      width: 100%; min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    canvas#ambient {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    .flyer {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto;
+      padding: 0 0 64px;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      padding: 52px 24px 36px;
+      position: relative;
+    }
+    .header::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    }
+    .badge-21 {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.35);
+      color: var(--amber); font-family: 'Oswald', sans-serif;
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 4px; margin-bottom: 22px;
+    }
+    .logo-wrap { margin-bottom: 18px; }
+    .logo-wrap img { width: 130px; height: auto; filter: drop-shadow(0 0 24px rgba(255,140,0,0.45)); }
+    .shop-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.8rem, 8vw, 4.4rem); font-weight: 700;
+      letter-spacing: 0.04em; line-height: 0.93; text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 0 60px rgba(255,140,0,0.4), 0 0 120px rgba(255,140,0,0.15);
+    }
+    .shop-name span { color: var(--amber); }
+    .tagline {
+      font-size: 12px; color: var(--muted);
+      letter-spacing: 0.16em; text-transform: uppercase; margin-top: 10px;
+    }
+
+    /* HOURS */
+    .hours-band {
+      background: linear-gradient(135deg, rgba(255,140,0,0.1), rgba(255,140,0,0.04));
+      border-top: 1px solid rgba(255,140,0,0.28);
+      border-bottom: 1px solid rgba(255,140,0,0.28);
+      padding: 18px 24px; text-align: center;
+    }
+    .hours-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.24em; color: var(--amber); text-transform: uppercase; margin-bottom: 5px; }
+    .hours-time { font-family: 'Oswald', sans-serif; font-size: clamp(1.6rem, 5vw, 2.6rem); font-weight: 600; color: #fff; letter-spacing: 0.06em; }
+    .hours-time em { color: var(--amber); font-style: normal; }
+
+    /* CATEGORIES */
+    .section-label {
+      font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.26em;
+      color: var(--muted); text-transform: uppercase; text-align: center;
+      padding: 30px 24px 18px;
+    }
+    .categories {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px;
+    }
+    @media (max-width: 400px) { .categories { grid-template-columns: repeat(2, 1fr); } }
+    .cat {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 18px 12px; text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cat:hover { border-color: rgba(255,140,0,0.45); background: rgba(255,140,0,0.06); }
+    .cat-icon { font-size: 26px; margin-bottom: 9px; display: block; }
+    .cat-name { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+
+    /* SPECIALS */
+    .specials-box {
+      margin: 24px 20px 0;
+      background: rgba(57,255,20,0.04); border: 1px solid rgba(57,255,20,0.2);
+      border-radius: 10px; padding: 20px 24px; text-align: center;
+    }
+    .specials-box .s-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.22em; color: var(--neon); text-transform: uppercase; margin-bottom: 8px; }
+    .specials-box p { font-size: 14px; color: #b8b0a8; line-height: 1.65; }
+    .specials-box strong { color: #fff; }
+
+    /* CONTACT */
+    .contact {
+      margin: 16px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    @media (max-width: 380px) { .contact { grid-template-columns: 1fr; } }
+    .contact-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px 16px;
+    }
+    .c-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 0.22em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .c-val { font-family: 'Oswald', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+    .c-val a { color: var(--amber); text-decoration: none; }
+    .c-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* CTA */
+    .cta-row { text-align: center; padding: 26px 20px 0; }
+    .btn-call {
+      display: inline-block; background: var(--amber); color: #000;
+      font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+      padding: 16px 52px; border-radius: 6px;
+      box-shadow: 0 0 36px rgba(255,140,0,0.5), 0 4px 16px rgba(0,0,0,0.4);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .btn-call:hover { box-shadow: 0 0 56px rgba(255,140,0,0.7); transform: translateY(-2px); }
+
+    /* SOCIAL */
+    .social { text-align: center; padding: 18px 24px 0; font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+    .social strong { color: var(--amber); }
+
+    /* FOOTER */
+    .footer-note { text-align: center; padding: 20px 24px 0; font-size: 11px; color: #3e3430; line-height: 1.7; }
+
+    .glow-rule { width: calc(100% - 40px); height: 1px; background: linear-gradient(90deg, transparent, rgba(255,140,0,0.25), transparent); margin: 24px auto 0; }
+  </style>
+</head>
+<body>
+  <canvas id="ambient"></canvas>
+
+  <div class="flyer">
+
+    <header class="header">
+      <div class="badge-21">⚠&nbsp; Private preview Only</div>
+      <div class="logo-wrap">
+        <img src="assets/brand/skye-app-template-brand-mark.svg" alt="SKye App Template">
+      </div>
+      <h1 class="shop-name">Client <span>Brand</span></h1>
+      <p class="tagline">Client City, ST 00000 · Client City, ST</p>
+    </header>
+
+    <div class="hours-band">
+      <div class="hours-label">Open Every Day</div>
+      <div class="hours-time">8:00 AM &ndash; <em>Midnight</em></div>
+    </div>
+
+    <div class="section-label">What We Carry</div>
+
+    <div class="categories">
+      <div class="cat"><span class="cat-icon">🔥</span><div class="cat-name">Featured</div></div>
+      <div class="cat"><span class="cat-icon">💨</span><div class="cat-name">Service Packages</div></div>
+      <div class="cat"><span class="cat-icon">🚬</span><div class="cat-name">Premium Collection</div></div>
+      <div class="cat"><span class="cat-icon">🪬</span><div class="cat-name">Experience Setup</div></div>
+      <div class="cat"><span class="cat-icon">🍬</span><div class="cat-name">Add-On Products</div></div>
+      <div class="cat"><span class="cat-icon">🌿</span><div class="cat-name">Specialty</div></div>
+      <div class="cat"><span class="cat-icon">🪵</span><div class="cat-name">Core Inventory</div></div>
+      <div class="cat"><span class="cat-icon">🧪</span><div class="cat-name">Accessories</div></div>
+      <div class="cat"><span class="cat-icon">⚡</span><div class="cat-name">Tools</div></div>
+    </div>
+
+    <div class="specials-box">
+      <div class="s-label">✦ In-Store Specials</div>
+      <p>Ask about today's deals when you stop in or <strong>call ahead — stock and pricing change daily.</strong> We always have something new.</p>
+    </div>
+
+    <div class="contact">
+      <div class="contact-card">
+        <div class="c-label">Call Us</div>
+        <div class="c-val"><a href="tel:0000000000">(000) 000-0000</a></div>
+        <div class="c-sub">Call or text for availability and specials</div>
+      </div>
+      <div class="contact-card">
+        <div class="c-label">Find Us</div>
+        <div class="c-val">Main Street</div>
+        <div class="c-sub">Client City, ST 00000<br>Client City, ST 00000</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn-call" href="tel:0000000000">Call Now &mdash; (000) 000-0000</a>
+    </div>
+
+    <div class="social">
+      Instagram <strong>@clientbrand</strong> &nbsp;&bull;&nbsp; Snapchat <strong>client_preview</strong>
+    </div>
+
+    <div class="glow-rule"></div>
+
+    <div class="footer-note">
+      Product availability, pricing, and brands may vary.<br>
+      Call or visit for current in-store selection and specials.
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      const c = document.getElementById('ambient');
+      if (!c || !c.getContext) return;
+      const ctx = c.getContext('2d');
+      function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      const P = Array.from({ length: 60 }, () => ({
+        x: Math.random(), y: Math.random(),
+        r: 70 + Math.random() * 130,
+        vy: 0.00015 + Math.random() * 0.0003,
+        vx: (Math.random() - 0.5) * 0.00018,
+        a: 0.04 + Math.random() * 0.07,
+        warm: Math.random() > 0.65,
+      }));
+      function frame() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        P.forEach(p => {
+          p.y -= p.vy; p.x += p.vx;
+          if (p.y < -0.2) { p.y = 1.1; p.x = Math.random(); }
+          const gx = p.x * c.width, gy = p.y * c.height;
+          const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, p.r);
+          g.addColorStop(0, p.warm ? `rgba(255,120,0,${p.a})` : `rgba(80,60,80,${p.a})`);
+          g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(gx, gy, p.r, 0, Math.PI * 2); ctx.fill();
+        });
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1271 @@
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  Billboard,
+  CameraControls,
+  Environment,
+  Float,
+  Grid,
+  Html,
+  Line,
+  Sparkles as DreiSparkles,
+  Stars,
+  Text,
+} from "@react-three/drei";
+import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import * as THREE from "three";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import { getProject } from "@theatre/core";
+import { Player } from "@remotion/player";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import {
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { animate as motionAnimate, motion as motionDom } from "motion/react";
+import {
+  BadgeCheck,
+  Compass,
+  Hand,
+  LockKeyhole,
+  Map,
+  Maximize2,
+  MousePointer2,
+  MousePointerClick,
+  Move3D,
+  PanelRightOpen,
+  Pause,
+  Play,
+  Route,
+  ScanLine,
+  Search,
+  Sparkles,
+  Video,
+} from "lucide-react";
+import "./styles.css";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const WORLD_LIMIT = 6.4;
+const ROOM_Y = 0.48;
+
+const ROOMS = [
+  {
+    id: "gate",
+    code: "02",
+    title: "Gate Threshold",
+    short: "visual entry ritual",
+    body: "The first world rule is that entry is a place, not a button. This threshold keeps the shared 0S gate language visible without adding a new auth lane.",
+    color: "#f4c75b",
+    accent: "#6cf2ff",
+    geometry: "door",
+    defaultPosition: [-4.8, ROOM_Y, -2.8],
+    route: "FS27 / SkyGate / Free99",
+    actions: ["keypad ritual", "session handoff", "owner-safe copy"],
+  },
+  {
+    id: "forge",
+    code: "07",
+    title: "Recipe Forge",
+    short: "MCP stack builder",
+    body: "This chamber turns MCP recipes into runtime obligations: WebGL scene, scroll choreography, motion chrome, Theatre direction, and browser-checked behavior.",
+    color: "#ff5d73",
+    accent: "#f4c75b",
+    geometry: "forge",
+    defaultPosition: [4.9, ROOM_Y, -2.4],
+    route: "recipes / audits / pattern packs",
+    actions: ["mine target", "choose stack", "apply patterns"],
+  },
+  {
+    id: "cinema",
+    code: "13",
+    title: "Motion Cinema",
+    short: "Remotion world reel",
+    body: "The world carries a live Remotion Player so the motion lane becomes timed media instead of a decorative claim.",
+    color: "#8ff0a4",
+    accent: "#6cf2ff",
+    geometry: "cinema",
+    defaultPosition: [4.5, ROOM_Y, 3.25],
+    route: "timed world reel",
+    actions: ["timeline", "poster", "autoplay loop"],
+  },
+  {
+    id: "vault",
+    code: "27",
+    title: "Receipt Vault",
+    short: "live QA evidence",
+    body: "Every serious world needs receipts. This vault tracks canvas frames, drag events, runtime stack flags, console health, network health, and deployment evidence.",
+    color: "#6cf2ff",
+    accent: "#ff5d73",
+    geometry: "vault",
+    defaultPosition: [-4.6, ROOM_Y, 3.35],
+    route: "evidence vault / browser gate",
+    actions: ["desktop check", "mobile check", "network scan"],
+  },
+  {
+    id: "deck",
+    code: "99",
+    title: "World Deck",
+    short: "operator route map",
+    body: "The deck is the map, search, inspector, and camera rail. It lets an operator move through the site like a place instead of reading stacked sections.",
+    color: "#c99bff",
+    accent: "#8ff0a4",
+    geometry: "deck",
+    defaultPosition: [0.2, ROOM_Y, 5.25],
+    route: "world object navigation",
+    actions: ["minimap", "search", "camera focus"],
+  },
+];
+
+const ROOM_BY_ID = Object.fromEntries(ROOMS.map((room) => [room.id, room]));
+const initialPositions = Object.fromEntries(ROOMS.map((room) => [room.id, room.defaultPosition]));
+
+const theatreProject = getProject("MCP2 Immersive Study World", {
+  state: {
+    sheetsById: {},
+    definitionVersion: "0.4.0",
+    revisionHistory: ["mcp2-immersive-study-runtime"],
+  },
+});
+const theatreSheet = theatreProject.sheet("world director");
+const theatreWorld = theatreSheet.object("visible scene values", {
+  corePulse: 0.78,
+  roomFloat: 0.36,
+  routeGlow: 0.68,
+  cameraHeight: 4.2,
+});
+
+function clonePositions(positions) {
+  return Object.fromEntries(Object.entries(positions).map(([key, value]) => [key, [...value]]));
+}
+
+function ensureRuntime() {
+  if (typeof window === "undefined") return {};
+  window.__MCP2_RUNTIME__ ||= {
+    name: "MCP2 Immersive Study World",
+    react: Boolean(React.version),
+    framerMotion: true,
+    motion: true,
+    gsap: false,
+    lenis: false,
+    three: true,
+    r3f: true,
+    drei: true,
+    postprocessing: true,
+    theatre: false,
+    remotion: false,
+    livingBackground: true,
+    cameraMoved: false,
+    canvasReady: false,
+    canvasFrames: 0,
+    activeRoom: "gate",
+    drawerOpen: "gate",
+    dragEvents: 0,
+    lastDrag: null,
+    gateOpen: false,
+    minimapReady: false,
+    searchReady: false,
+    scrollProgress: 0,
+    chamberPositions: clonePositions(initialPositions),
+    chamberScreenPositions: {},
+    startedAt: new Date().toISOString(),
+  };
+  return window.__MCP2_RUNTIME__;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function roomPosition(positions, roomId) {
+  return positions[roomId] || ROOM_BY_ID[roomId]?.defaultPosition || [0, ROOM_Y, 0];
+}
+
+function useTheatreValues() {
+  const [values, setValues] = useState(() => ({ ...theatreWorld.value }));
+
+  useEffect(() => {
+    const runtime = ensureRuntime();
+    runtime.theatre = true;
+    runtime.theatreValues = { ...theatreWorld.value };
+    const unsubscribe = theatreWorld.onValuesChange((nextValues) => {
+      runtime.theatreValues = { ...nextValues };
+      setValues({ ...nextValues });
+    });
+    return unsubscribe;
+  }, []);
+
+  return values;
+}
+
+function useMcpScrollEngine(setActiveRoom) {
+  useEffect(() => {
+    const runtime = ensureRuntime();
+    runtime.gsap = true;
+
+    const lenis = new Lenis({
+      lerp: 0.12,
+      smoothWheel: true,
+      wheelMultiplier: 0.88,
+      touchMultiplier: 1.1,
+    });
+
+    runtime.lenis = true;
+    runtime.lenisOptions = { lerp: 0.12, smoothWheel: true };
+
+    const updateLenis = (time) => {
+      lenis.raf(time * 1000);
+    };
+
+    lenis.on("scroll", (event) => {
+      runtime.scrollProgress = event.progress || window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1);
+      ScrollTrigger.update();
+      document.documentElement.style.setProperty("--scroll-progress", runtime.scrollProgress.toFixed(4));
+    });
+
+    gsap.ticker.add(updateLenis);
+    gsap.ticker.lagSmoothing(0);
+
+    const triggers = ROOMS.map((room) =>
+      ScrollTrigger.create({
+        trigger: `[data-scroll-room="${room.id}"]`,
+        start: "top 58%",
+        end: "bottom 42%",
+        onEnter: () => setActiveRoom(room.id),
+        onEnterBack: () => setActiveRoom(room.id),
+        onUpdate: (self) => {
+          if (self.isActive) {
+            runtime.activeScrollRoom = room.id;
+            runtime.scrollBeatProgress = Number(self.progress.toFixed(3));
+          }
+        },
+      }),
+    );
+
+    const heroTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".world-viewport",
+        start: "top top",
+        end: "+=150%",
+        scrub: 0.8,
+      },
+    });
+
+    heroTimeline
+      .to(".world-title", { yPercent: -14, opacity: 0.54, ease: "none" }, 0)
+      .to(".world-hud", { y: -28, ease: "none" }, 0)
+      .to(".gate-console", { y: 34, opacity: 0.72, ease: "none" }, 0);
+
+    ScrollTrigger.refresh();
+
+    return () => {
+      triggers.forEach((trigger) => trigger.kill());
+      heroTimeline.kill();
+      gsap.ticker.remove(updateLenis);
+      lenis.destroy();
+    };
+  }, [setActiveRoom]);
+}
+
+function MotionChrome({ paused }) {
+  const pointerX = useMotionValue(-240);
+  const pointerY = useMotionValue(-240);
+  const springX = useSpring(pointerX, { stiffness: 230, damping: 32, mass: 0.35 });
+  const springY = useSpring(pointerY, { stiffness: 230, damping: 32, mass: 0.35 });
+  const { scrollYProgress } = useScroll();
+  const progressScale = useSpring(scrollYProgress, { stiffness: 180, damping: 30 });
+  const scanShift = useTransform(scrollYProgress, [0, 1], ["0%", "82%"]);
+
+  useEffect(() => {
+    const onPointerMove = (event) => {
+      if (event.pointerType && event.pointerType !== "mouse") return;
+      pointerX.set(event.clientX);
+      pointerY.set(event.clientY);
+    };
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onPointerMove);
+  }, [pointerX, pointerY]);
+
+  return (
+    <>
+      <motion.div className="top-progress" style={{ scaleX: progressScale }} aria-hidden="true" />
+      <motion.div
+        className="cursor-aura"
+        style={{ x: springX, y: springY, opacity: paused ? 0 : 1 }}
+        aria-hidden="true"
+      />
+      <motion.div className="scanline-layer" style={{ backgroundPositionX: scanShift }} aria-hidden="true" />
+    </>
+  );
+}
+
+function DirectorPulse() {
+  useEffect(() => {
+    const runtime = ensureRuntime();
+    runtime.motion = true;
+    const controls = motionAnimate(
+      ".runtime-pip",
+      { opacity: [0.55, 1, 0.55], scale: [1, 1.12, 1] },
+      { duration: 2.4, repeat: Infinity, easing: "ease-in-out" },
+    );
+    return () => controls.stop();
+  }, []);
+
+  return (
+    <motionDom.div className="motion-runtime-chip" animate={{ y: [0, -3, 0] }} transition={{ duration: 3.2, repeat: Infinity }}>
+      <span className="runtime-pip" />
+      Motion live
+    </motionDom.div>
+  );
+}
+
+function CameraDirector({ activeRoom, positions, theatreValues }) {
+  const controls = useRef(null);
+  const lastTarget = useRef(activeRoom);
+
+  useEffect(() => {
+    if (!controls.current) return;
+    const runtime = ensureRuntime();
+    const target = activeRoom === "core" ? [0, 0.8, 0] : roomPosition(positions, activeRoom);
+    const [x, y, z] = target;
+    const height = Number(theatreValues.cameraHeight || 4.2);
+    const distance = activeRoom === "core" ? 8.8 : 6.4;
+    const side = activeRoom === "vault" || activeRoom === "gate" ? -1 : 1;
+    controls.current.setLookAt(x + side * 3.5, y + height, z + distance, x, y + 0.45, z, true);
+    runtime.cameraMoved = true;
+    runtime.activeRoom = activeRoom;
+    lastTarget.current = activeRoom;
+  }, [activeRoom, positions, theatreValues.cameraHeight]);
+
+  return (
+    <CameraControls
+      ref={controls}
+      makeDefault
+      minDistance={3.4}
+      maxDistance={15}
+      dollySpeed={0.75}
+      truckSpeed={0.7}
+      draggingSmoothTime={0.08}
+    />
+  );
+}
+
+function CentralCore({ active, onSelect, theatreValues }) {
+  const group = useRef(null);
+  const colorA = useMemo(() => new THREE.Color("#f4c75b"), []);
+  const colorB = useMemo(() => new THREE.Color("#6cf2ff"), []);
+
+  useFrame((state, delta) => {
+    const runtime = ensureRuntime();
+    runtime.canvasFrames += 1;
+    runtime.canvasReady = true;
+    if (!group.current) return;
+    const pulse = Number(theatreValues.corePulse || 0.78);
+    group.current.rotation.y += delta * (0.22 + pulse * 0.18);
+    group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.42) * 0.1;
+    group.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 1.4) * 0.025 * pulse);
+  });
+
+  return (
+    <group
+      ref={group}
+      name="MCP2 central world anchor"
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect("core");
+      }}
+      onPointerOver={(event) => event.stopPropagation()}
+    >
+      <Float speed={1.15} rotationIntensity={0.2} floatIntensity={0.25}>
+        <mesh>
+          <icosahedronGeometry args={[1.08, 2]} />
+          <meshStandardMaterial
+            color={active ? colorA : "#fff7df"}
+            emissive={active ? colorB : "#f4c75b"}
+            emissiveIntensity={active ? 1.35 : 0.62}
+            roughness={0.18}
+            metalness={0.74}
+          />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.55, 0.018, 12, 144]} />
+          <meshBasicMaterial color="#6cf2ff" transparent opacity={0.75} />
+        </mesh>
+        <mesh rotation={[0.65, 0.15, 0.2]}>
+          <torusGeometry args={[2.05, 0.014, 12, 144]} />
+          <meshBasicMaterial color="#ff5d73" transparent opacity={0.5} />
+        </mesh>
+        <mesh rotation={[0, 0.9, 1.1]}>
+          <torusGeometry args={[2.55, 0.01, 12, 144]} />
+          <meshBasicMaterial color="#8ff0a4" transparent opacity={0.42} />
+        </mesh>
+        <Billboard position={[0, 1.72, 0]}>
+          <Text
+            fontSize={0.23}
+            color="#fff7df"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.008}
+            outlineColor="#020204"
+          >
+            MCP2 WORLD ANCHOR
+          </Text>
+        </Billboard>
+      </Float>
+    </group>
+  );
+}
+
+function RoomShape({ room, active, dragging }) {
+  const materialColor = active || dragging ? room.color : "#fff7df";
+  const emissive = dragging ? room.accent : active ? room.color : room.accent;
+  const opacity = dragging ? 0.95 : 0.72;
+
+  if (room.geometry === "door") {
+    return (
+      <>
+        <mesh position={[0, 0.56, 0]}>
+          <boxGeometry args={[1.05, 1.7, 0.22]} />
+          <meshStandardMaterial color={materialColor} emissive={emissive} emissiveIntensity={0.45} roughness={0.18} metalness={0.62} />
+        </mesh>
+        <mesh position={[0, 1.55, 0]}>
+          <torusGeometry args={[0.63, 0.025, 10, 80, Math.PI]} />
+          <meshBasicMaterial color={room.accent} transparent opacity={opacity} />
+        </mesh>
+      </>
+    );
+  }
+
+  if (room.geometry === "forge") {
+    return (
+      <>
+        <mesh rotation={[0, 0, Math.PI / 4]}>
+          <octahedronGeometry args={[0.88, 1]} />
+          <meshStandardMaterial color={materialColor} emissive={emissive} emissiveIntensity={0.52} roughness={0.2} metalness={0.7} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.06, 0.03, 12, 92]} />
+          <meshBasicMaterial color={room.accent} transparent opacity={opacity} />
+        </mesh>
+      </>
+    );
+  }
+
+  if (room.geometry === "cinema") {
+    return (
+      <>
+        <mesh position={[0, 0.36, 0]}>
+          <boxGeometry args={[1.55, 0.92, 0.24]} />
+          <meshStandardMaterial color={materialColor} emissive={emissive} emissiveIntensity={0.45} roughness={0.23} metalness={0.68} />
+        </mesh>
+        <mesh position={[0, 0.36, -0.16]}>
+          <planeGeometry args={[1.18, 0.54]} />
+          <meshBasicMaterial color="#020204" transparent opacity={0.9} />
+        </mesh>
+        <mesh position={[0, 0.36, -0.18]}>
+          <planeGeometry args={[0.86, 0.24]} />
+          <meshBasicMaterial color={room.accent} transparent opacity={0.48} />
+        </mesh>
+      </>
+    );
+  }
+
+  if (room.geometry === "vault") {
+    return (
+      <>
+        <mesh>
+          <dodecahedronGeometry args={[0.9, 0]} />
+          <meshStandardMaterial color={materialColor} emissive={emissive} emissiveIntensity={0.56} roughness={0.14} metalness={0.78} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.62, 0.035, 12, 80]} />
+          <meshBasicMaterial color={room.color} transparent opacity={opacity} />
+        </mesh>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <mesh>
+        <cylinderGeometry args={[0.78, 1.02, 0.62, 6]} />
+        <meshStandardMaterial color={materialColor} emissive={emissive} emissiveIntensity={0.46} roughness={0.22} metalness={0.66} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.22, 0.022, 10, 96]} />
+        <meshBasicMaterial color={room.accent} transparent opacity={opacity} />
+      </mesh>
+    </>
+  );
+}
+
+function DraggableChamber({
+  room,
+  position,
+  active,
+  draggingId,
+  setDraggingId,
+  setPositions,
+  onSelect,
+  theatreValues,
+}) {
+  const group = useRef(null);
+  const dragOffset = useRef(new THREE.Vector3());
+  const dragStart = useRef(new THREE.Vector3());
+  const dragMoved = useRef(false);
+  const dragPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), -ROOM_Y));
+  const baseColor = useMemo(() => new THREE.Color(room.color), [room.color]);
+  const accentColor = useMemo(() => new THREE.Color(room.accent), [room.accent]);
+  const { camera, size } = useThree();
+  const projectedPosition = useMemo(() => new THREE.Vector3(), []);
+  const dragging = draggingId === room.id;
+
+  const planePoint = useCallback(
+    (event) => {
+      const hit = new THREE.Vector3();
+      dragPlane.current.constant = -position[1];
+      event.ray.intersectPlane(dragPlane.current, hit);
+      return hit;
+    },
+    [position],
+  );
+
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    const floatAmount = Number(theatreValues.roomFloat || 0.36);
+    group.current.position.set(position[0], position[1], position[2]);
+    group.current.position.y += dragging ? 0.18 : Math.sin(state.clock.elapsedTime * 1.25 + room.code) * 0.09 * floatAmount;
+    group.current.rotation.y += delta * (dragging ? 0.34 : 0.11);
+    group.current.scale.lerp(new THREE.Vector3(active ? 1.15 : 1, active ? 1.15 : 1, active ? 1.15 : 1), 0.08);
+    projectedPosition.copy(group.current.position).project(camera);
+    const runtime = ensureRuntime();
+    runtime.chamberScreenPositions ||= {};
+    runtime.chamberScreenPositions[room.id] = {
+      x: Number(((projectedPosition.x * 0.5 + 0.5) * size.width).toFixed(1)),
+      y: Number(((-projectedPosition.y * 0.5 + 0.5) * size.height).toFixed(1)),
+      visible: projectedPosition.z > -1 && projectedPosition.z < 1,
+    };
+  });
+
+  const handlePointerDown = (event) => {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    const hit = planePoint(event);
+    dragStart.current.copy(hit);
+    dragOffset.current.set(position[0] - hit.x, 0, position[2] - hit.z);
+    dragMoved.current = false;
+    setDraggingId(room.id);
+    onSelect(room.id, { drawer: false });
+    event.target.setPointerCapture(event.pointerId);
+    const runtime = ensureRuntime();
+    runtime.lastDrag = { id: room.id, phase: "start", x: position[0], z: position[2] };
+  };
+
+  const handlePointerMove = (event) => {
+    if (draggingId !== room.id) return;
+    event.stopPropagation();
+    const hit = planePoint(event);
+    const dx = hit.x - dragStart.current.x;
+    const dz = hit.z - dragStart.current.z;
+    if (Math.hypot(dx, dz) > 0.04) dragMoved.current = true;
+    const next = [
+      clamp(hit.x + dragOffset.current.x, -WORLD_LIMIT, WORLD_LIMIT),
+      position[1],
+      clamp(hit.z + dragOffset.current.z, -WORLD_LIMIT, WORLD_LIMIT),
+    ];
+    setPositions((current) => {
+      const updated = { ...current, [room.id]: next };
+      const runtime = ensureRuntime();
+      runtime.dragEvents += 1;
+      runtime.lastDrag = { id: room.id, phase: "move", x: Number(next[0].toFixed(3)), z: Number(next[2].toFixed(3)) };
+      runtime.chamberPositions = clonePositions(updated);
+      return updated;
+    });
+  };
+
+  const handlePointerUp = (event) => {
+    if (draggingId !== room.id) return;
+    event.stopPropagation();
+    event.target.releasePointerCapture(event.pointerId);
+    setDraggingId(null);
+    const runtime = ensureRuntime();
+    runtime.lastDrag = { id: room.id, phase: "end", moved: dragMoved.current };
+    if (!dragMoved.current) onSelect(room.id, { drawer: true });
+  };
+
+  return (
+    <group>
+      <Line
+        points={[
+          [0, 0.16, 0],
+          [position[0], 0.18, position[2]],
+        ]}
+        color={room.color}
+        lineWidth={active ? 2.1 : 0.9}
+        transparent
+        opacity={active ? 0.72 : 0.25}
+      />
+      <group
+        ref={group}
+        name={`${room.title} draggable chamber`}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (!dragMoved.current) onSelect(room.id, { drawer: true });
+        }}
+        onPointerOver={(event) => {
+          event.stopPropagation();
+          document.body.classList.add("world-grab-ready");
+        }}
+        onPointerOut={() => document.body.classList.remove("world-grab-ready")}
+      >
+        <RoomShape room={room} active={active} dragging={dragging} />
+        <mesh position={[0, -0.52, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.72, 1.02, 84]} />
+          <meshBasicMaterial color={active ? baseColor : accentColor} transparent opacity={dragging ? 0.62 : active ? 0.44 : 0.18} />
+        </mesh>
+        <Billboard position={[0, 1.32, 0]}>
+          <Text
+            fontSize={0.18}
+            color="#fff7df"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={1.95}
+            outlineWidth={0.008}
+            outlineColor="#020204"
+          >
+            {room.title}
+          </Text>
+          <Text
+            position={[0, -0.24, 0]}
+            fontSize={0.1}
+            color={room.accent}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.006}
+            outlineColor="#020204"
+          >
+            drag / inspect / route
+          </Text>
+        </Billboard>
+        <Html
+          position={[0, -0.94, 0]}
+          center
+          distanceFactor={9}
+          className="world-object-label"
+          data-room-id={room.id}
+          pointerEvents="none"
+        >
+          <span>{room.code}</span>
+        </Html>
+      </group>
+    </group>
+  );
+}
+
+function GroundRoute({ theatreValues }) {
+  const ring = useRef(null);
+
+  useFrame((state) => {
+    if (!ring.current) return;
+    const glow = Number(theatreValues.routeGlow || 0.68);
+    ring.current.rotation.z = state.clock.elapsedTime * 0.04;
+    ring.current.material.opacity = 0.1 + Math.sin(state.clock.elapsedTime * 1.2) * 0.04 + glow * 0.12;
+  });
+
+  return (
+    <>
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.03, 0]}>
+        <ringGeometry args={[2.2, 6.55, 160]} />
+        <meshBasicMaterial color="#6cf2ff" transparent opacity={0.18} side={THREE.DoubleSide} />
+      </mesh>
+      <Grid
+        position={[0, -0.08, 0]}
+        args={[15, 15]}
+        cellSize={0.7}
+        cellThickness={0.42}
+        sectionSize={3.5}
+        sectionThickness={0.8}
+        fadeDistance={16}
+        fadeStrength={1}
+        infiniteGrid={false}
+        cellColor="#314150"
+        sectionColor="#f4c75b"
+      />
+    </>
+  );
+}
+
+function WorldScene({
+  activeRoom,
+  positions,
+  setPositions,
+  draggingId,
+  setDraggingId,
+  onSelect,
+  theatreValues,
+}) {
+  return (
+    <div className="canvas-stage" data-three-world>
+      <Canvas
+        className="world-canvas"
+        camera={{ position: [0, 6.4, 9.8], fov: 46, near: 0.1, far: 80 }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        onCreated={({ gl, scene }) => {
+          gl.setClearColor(new THREE.Color("#020204"), 0);
+          scene.fog = new THREE.FogExp2("#020204", 0.035);
+          const runtime = ensureRuntime();
+          runtime.canvasReady = true;
+        }}
+        onPointerMissed={() => onSelect("core", { drawer: false })}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.34} />
+          <directionalLight position={[4, 8, 6]} intensity={1.42} color="#fff7df" />
+          <pointLight position={[-4, 3, -3]} intensity={2.2} color="#f4c75b" />
+          <pointLight position={[3, 2.6, 4]} intensity={2.1} color="#6cf2ff" />
+          <Stars radius={60} depth={18} count={900} factor={3.3} saturation={0.2} fade speed={0.45} />
+          <DreiSparkles count={72} scale={[13, 3, 13]} size={2.4} speed={0.22} color="#fff7df" opacity={0.38} />
+          <GroundRoute theatreValues={theatreValues} />
+          <CentralCore active={activeRoom === "core"} onSelect={onSelect} theatreValues={theatreValues} />
+          {ROOMS.map((room) => (
+            <DraggableChamber
+              key={room.id}
+              room={room}
+              position={roomPosition(positions, room.id)}
+              active={activeRoom === room.id}
+              draggingId={draggingId}
+              setDraggingId={setDraggingId}
+              setPositions={setPositions}
+              onSelect={onSelect}
+              theatreValues={theatreValues}
+            />
+          ))}
+          <CameraDirector activeRoom={activeRoom} positions={positions} theatreValues={theatreValues} />
+          <Environment preset="night" />
+          <EffectComposer multisampling={0}>
+            <Bloom intensity={0.88} luminanceThreshold={0.18} luminanceSmoothing={0.35} mipmapBlur />
+            <Vignette eskil={false} offset={0.12} darkness={0.62} />
+          </EffectComposer>
+        </Suspense>
+      </Canvas>
+    </div>
+  );
+}
+
+function GateConsole({ gateSequence, gateOpen, onDigit, onReset, onOpen }) {
+  const keys = ["2", "7", "0", "S"];
+  return (
+    <motion.aside
+      className="gate-console"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <div className="panel-label">
+        <LockKeyhole size={15} />
+        Shared 0S gate ritual
+      </div>
+      <div className="gate-readout" data-gate-open={gateOpen ? "true" : "false"}>
+        <span>{gateOpen ? "WORLD OPEN" : gateSequence.padEnd(4, "•")}</span>
+      </div>
+      <div className="gate-keys" aria-label="visual gate keypad">
+        {keys.map((key) => (
+          <button key={key} type="button" onClick={() => onDigit(key)} aria-label={`press ${key}`}>
+            {key}
+          </button>
+        ))}
+      </div>
+      <div className="gate-actions">
+        <button type="button" onClick={onOpen}>
+          <Play size={14} />
+          Open
+        </button>
+        <button type="button" onClick={onReset}>
+          Reset
+        </button>
+      </div>
+    </motion.aside>
+  );
+}
+
+function MiniMap({ positions, activeRoom, onSelect }) {
+  useEffect(() => {
+    ensureRuntime().minimapReady = true;
+  }, []);
+
+  return (
+    <div className="minimap" aria-label="MCP2 world minimap">
+      <div className="minimap-grid" />
+      <button
+        type="button"
+        className={`minimap-core ${activeRoom === "core" ? "is-active" : ""}`}
+        onClick={() => onSelect("core", { drawer: true })}
+        aria-label="Focus central world anchor"
+      />
+      {ROOMS.map((room) => {
+        const [x, , z] = roomPosition(positions, room.id);
+        const left = ((x + WORLD_LIMIT) / (WORLD_LIMIT * 2)) * 100;
+        const top = ((z + WORLD_LIMIT) / (WORLD_LIMIT * 2)) * 100;
+        return (
+          <button
+            key={room.id}
+            type="button"
+            className={`minimap-dot ${activeRoom === room.id ? "is-active" : ""}`}
+            data-room-id={room.id}
+            style={{ left: `${left}%`, top: `${top}%`, "--room-color": room.color }}
+            onClick={() => onSelect(room.id, { drawer: true })}
+            aria-label={`Focus ${room.title}`}
+          >
+            <span>{room.code}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function RoomSearch({ query, setQuery, filteredRooms, onSelect }) {
+  useEffect(() => {
+    ensureRuntime().searchReady = true;
+  }, []);
+
+  return (
+    <div className={`room-search ${query.trim() ? "has-query" : ""}`}>
+      <label htmlFor="room-search-input">
+        <Search size={15} />
+        Search rooms
+      </label>
+      <input
+        id="room-search-input"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="gate, vault, motion..."
+      />
+      <div className="search-results" aria-label="room search results">
+        {filteredRooms.map((room) => (
+          <button key={room.id} type="button" onClick={() => onSelect(room.id, { drawer: true })}>
+            <span style={{ background: room.color }} />
+            {room.title}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RoomDrawer({ activeRoom, drawerRoom, onClose, onSelect, positions, dragEvents }) {
+  const room = drawerRoom === "core" ? null : ROOM_BY_ID[drawerRoom] || ROOM_BY_ID[activeRoom];
+  const isCore = drawerRoom === "core" || !room;
+  const pos = isCore ? [0, 0, 0] : roomPosition(positions, room.id);
+
+  useEffect(() => {
+    const runtime = ensureRuntime();
+    runtime.drawerOpen = drawerRoom;
+  }, [drawerRoom]);
+
+  return (
+    <motion.aside
+      className="room-drawer"
+      key={drawerRoom}
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 30 }}
+      transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+      data-room-id={drawerRoom}
+    >
+      <div className="drawer-head">
+        <div>
+          <span>{isCore ? "00" : room.code}</span>
+          <h2>{isCore ? "Central MCP Anchor" : room.title}</h2>
+        </div>
+        <button type="button" onClick={onClose} aria-label="Close inspector">
+          ×
+        </button>
+      </div>
+      <p>
+        {isCore
+          ? "This is the physical center of the website. Orbit, zoom, drag rooms around it, use the minimap to move, and let scroll beats retarget the camera."
+          : room.body}
+      </p>
+      <dl className="room-stats">
+        <div>
+          <dt>Position</dt>
+          <dd>
+            x {pos[0].toFixed(2)} / z {pos[2].toFixed(2)}
+          </dd>
+        </div>
+        <div>
+          <dt>Runtime drags</dt>
+          <dd>{dragEvents}</dd>
+        </div>
+        <div>
+          <dt>Route</dt>
+          <dd>{isCore ? "camera / map / world shell" : room.route}</dd>
+        </div>
+      </dl>
+      <div className="drawer-actions">
+        {(isCore ? ["orbit camera", "inspect rooms", "scroll director"] : room.actions).map((action) => (
+          <button key={action} type="button" onClick={() => onSelect(isCore ? "gate" : room.id, { drawer: false })}>
+            <Route size={14} />
+            {action}
+          </button>
+        ))}
+      </div>
+    </motion.aside>
+  );
+}
+
+function RuntimePanel({ activeRoom, gateOpen, dragEvents, paused, onPauseToggle }) {
+  return (
+    <div className="runtime-panel">
+      <div className="panel-label">
+        <BadgeCheck size={15} />
+        Runtime stack
+      </div>
+      <div className="runtime-grid">
+        {["React", "R3F", "Drei", "Three", "GSAP", "Lenis", "Theatre", "Remotion"].map((label) => (
+          <span key={label}>
+            <i />
+            {label}
+          </span>
+        ))}
+      </div>
+      <div className="runtime-current">
+        <strong>{gateOpen ? "Open" : "Ritual waiting"}</strong>
+        <span>{activeRoom === "core" ? "central anchor" : ROOM_BY_ID[activeRoom]?.title}</span>
+      </div>
+      <div className="runtime-controls">
+        <DirectorPulse />
+        <button type="button" onClick={onPauseToggle}>
+          {paused ? <Play size={14} /> : <Pause size={14} />}
+          {paused ? "Resume" : "Pause"}
+        </button>
+      </div>
+      <div className="drag-counter">
+        <Hand size={14} />
+        {dragEvents} drag events recorded
+      </div>
+    </div>
+  );
+}
+
+function WorldReel({ activeRoom }) {
+  const frame = useCurrentFrame();
+  const step = Math.floor(frame / 28) % ROOMS.length;
+  const room = ROOM_BY_ID[activeRoom] || ROOMS[step];
+  const sweep = interpolate(frame % 90, [0, 45, 90], [0, 1, 0]);
+
+  return (
+    <AbsoluteFill className="reel-frame">
+      <div className="reel-orbit" style={{ transform: `rotate(${frame * 1.8}deg)` }} />
+      <div className="reel-map">
+        {ROOMS.map((item, index) => (
+          <span
+            key={item.id}
+            style={{
+              "--room-color": item.color,
+              transform: `rotate(${index * 72}deg) translateX(${58 + sweep * 12}px)`,
+            }}
+          />
+        ))}
+      </div>
+      <div className="reel-copy">
+        <b>{room.code}</b>
+        <strong>{room.title}</strong>
+        <small>{room.short}</small>
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+function RemotionPanel({ activeRoom }) {
+  useEffect(() => {
+    ensureRuntime().remotion = true;
+  }, []);
+
+  return (
+    <div className="remotion-panel">
+      <div className="panel-label">
+        <Video size={15} />
+        Remotion world reel
+      </div>
+      <Player
+        component={WorldReel}
+        inputProps={{ activeRoom }}
+        durationInFrames={150}
+        compositionWidth={640}
+        compositionHeight={360}
+        fps={30}
+        autoPlay
+        loop
+        initiallyMuted
+        acknowledgeRemotionLicense
+        controls={false}
+        style={{ width: "100%", height: "auto" }}
+      />
+    </div>
+  );
+}
+
+function WorldHud({
+  activeRoom,
+  drawerRoom,
+  positions,
+  query,
+  setQuery,
+  filteredRooms,
+  onSelect,
+  onCloseDrawer,
+  dragEvents,
+  gateOpen,
+  paused,
+  onPauseToggle,
+}) {
+  return (
+    <div className="world-hud">
+      <header className="world-title">
+        <p className="eyebrow">
+          <Sparkles size={15} />
+          MCP2 immersive study lane
+        </p>
+        <h1 className="effect-text-shimmer">World-Site Study</h1>
+        <p className="world-lede">
+          Drag the chambers, orbit the room, search the map, inspect an object, or scroll the camera path.
+        </p>
+        <div className="world-actions">
+          <button type="button" onClick={() => onSelect("core", { drawer: true })}>
+            <Compass size={16} />
+            Focus core
+          </button>
+          <button type="button" onClick={() => onSelect(activeRoom, { drawer: true })}>
+            <PanelRightOpen size={16} />
+            Inspect room
+          </button>
+          <a href="#scroll-path">
+            <ScanLine size={16} />
+            Scroll path
+          </a>
+        </div>
+      </header>
+
+      <aside className={`left-rail ${query.trim() ? "has-search-query" : ""}`}>
+        <div className="rail-panel">
+          <div className="panel-label">
+            <Map size={15} />
+            World map
+          </div>
+          <MiniMap positions={positions} activeRoom={activeRoom} onSelect={onSelect} />
+          <p className="mini-help">
+            <Move3D size={14} />
+            Drag a chamber in the 3D room; its dot moves here.
+          </p>
+        </div>
+        <RoomSearch query={query} setQuery={setQuery} filteredRooms={filteredRooms} onSelect={onSelect} />
+      </aside>
+
+      <aside className="right-rail">
+        <RuntimePanel
+          activeRoom={activeRoom}
+          gateOpen={gateOpen}
+          dragEvents={dragEvents}
+          paused={paused}
+          onPauseToggle={onPauseToggle}
+        />
+        <RemotionPanel activeRoom={activeRoom} />
+      </aside>
+
+      {drawerRoom && (
+        <RoomDrawer
+          activeRoom={activeRoom}
+          drawerRoom={drawerRoom}
+          onClose={onCloseDrawer}
+          onSelect={onSelect}
+          positions={positions}
+          dragEvents={dragEvents}
+        />
+      )}
+
+      <div className="gesture-strip" aria-hidden="true">
+        <span>
+          <MousePointer2 size={15} />
+          orbit
+        </span>
+        <span>
+          <MousePointerClick size={15} />
+          select
+        </span>
+        <span>
+          <Maximize2 size={15} />
+          zoom
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ScrollChapters({ activeRoom, onSelect }) {
+  return (
+    <section className="scroll-path" id="scroll-path" aria-label="MCP2 world scroll path">
+      <div className="scroll-intro">
+        <span>World path</span>
+        <h2>Content is placed in rooms. The scroll only retargets the camera.</h2>
+      </div>
+      {ROOMS.map((room, index) => (
+        <article
+          key={room.id}
+          className={`scroll-beat ${activeRoom === room.id ? "is-active" : ""}`}
+          data-scroll-room={room.id}
+          style={{ "--room-color": room.color, "--room-accent": room.accent }}
+        >
+          <span>{room.code}</span>
+          <div>
+            <h3>{room.title}</h3>
+            <p>{room.body}</p>
+            <button type="button" onClick={() => onSelect(room.id, { drawer: true })}>
+              <Route size={15} />
+              Enter chamber
+            </button>
+          </div>
+          <i>{String(index + 1).padStart(2, "0")}</i>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function App() {
+  const [positions, setPositions] = useState(() => clonePositions(initialPositions));
+  const [activeRoom, setActiveRoom] = useState("gate");
+  const [drawerRoom, setDrawerRoom] = useState("gate");
+  const [draggingId, setDraggingId] = useState(null);
+  const [query, setQuery] = useState("");
+  const [gateSequence, setGateSequence] = useState("");
+  const [gateOpen, setGateOpen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [dragEvents, setDragEvents] = useState(0);
+  const theatreValues = useTheatreValues();
+
+  useMcpScrollEngine(setActiveRoom);
+
+  useEffect(() => {
+    const runtime = ensureRuntime();
+    runtime.chamberPositions = clonePositions(positions);
+    runtime.activeRoom = activeRoom;
+    runtime.gateOpen = gateOpen;
+    runtime.drawerOpen = drawerRoom;
+  }, [positions, activeRoom, gateOpen, drawerRoom]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setDragEvents(ensureRuntime().dragEvents || 0);
+    }, 180);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("motion-paused", paused);
+    return () => document.body.classList.remove("motion-paused");
+  }, [paused]);
+
+  const filteredRooms = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return ROOMS;
+    return ROOMS.filter((room) =>
+      [room.title, room.short, room.body, room.route, room.code].some((value) => value.toLowerCase().includes(normalized)),
+    );
+  }, [query]);
+
+  const selectRoom = useCallback((roomId, options = { drawer: true }) => {
+    const nextRoom = roomId || "core";
+    setActiveRoom(nextRoom);
+    if (options.drawer) setDrawerRoom(nextRoom);
+    const runtime = ensureRuntime();
+    runtime.activeRoom = nextRoom;
+    runtime.drawerOpen = options.drawer ? nextRoom : runtime.drawerOpen;
+  }, []);
+
+  const pressGateKey = useCallback(
+    (key) => {
+      const next = `${gateSequence}${key}`.slice(-4);
+      setGateSequence(next);
+      if (next === "270S") {
+        setGateOpen(true);
+        setActiveRoom("core");
+        setDrawerRoom("core");
+        ensureRuntime().gateOpen = true;
+      }
+    },
+    [gateSequence],
+  );
+
+  const openGate = useCallback(() => {
+    setGateSequence("270S");
+    setGateOpen(true);
+    selectRoom("core", { drawer: true });
+    ensureRuntime().gateOpen = true;
+  }, [selectRoom]);
+
+  const resetWorld = useCallback(() => {
+    const next = clonePositions(initialPositions);
+    setPositions(next);
+    setGateSequence("");
+    setGateOpen(false);
+    setActiveRoom("gate");
+    setDrawerRoom("gate");
+    const runtime = ensureRuntime();
+    runtime.gateOpen = false;
+    runtime.chamberPositions = clonePositions(next);
+    runtime.lastDrag = { id: "all", phase: "reset" };
+  }, []);
+
+  return (
+    <main className="immersive-app" data-paused={paused ? "true" : "false"}>
+      <MotionChrome paused={paused} />
+      <section className="world-viewport" id="world">
+        <WorldScene
+          activeRoom={activeRoom}
+          positions={positions}
+          setPositions={setPositions}
+          draggingId={draggingId}
+          setDraggingId={setDraggingId}
+          onSelect={selectRoom}
+          theatreValues={theatreValues}
+        />
+        <WorldHud
+          activeRoom={activeRoom}
+          drawerRoom={drawerRoom}
+          positions={positions}
+          query={query}
+          setQuery={setQuery}
+          filteredRooms={filteredRooms}
+          onSelect={selectRoom}
+          onCloseDrawer={() => setDrawerRoom(null)}
+          dragEvents={dragEvents}
+          gateOpen={gateOpen}
+          paused={paused}
+          onPauseToggle={() => setPaused((value) => !value)}
+        />
+        <GateConsole
+          gateSequence={gateSequence}
+          gateOpen={gateOpen}
+          onDigit={pressGateKey}
+          onReset={resetWorld}
+          onOpen={openGate}
+        />
+      </section>
+      <ScrollChapters activeRoom={activeRoom} onSelect={selectRoom} />
+    </main>
+  );
+}
+
+export default App;

@@ -20,7 +20,19 @@ const existingSecretExcludeCount = Number(argValue('--secret-excludes') || 0);
 const uploadAssetType = argValue('--asset-type');
 const uploadProjectName = argValue('--project-name');
 const uploadClientReference = argValue('--client-reference');
+const uploadClientName = argValue('--client-name');
+const uploadClientEmail = argValue('--client-email');
 const uploadNotes = argValue('--notes');
+const uploadMimeType = argValue('--mime-type') || 'application/zip';
+const uploadWorkspaceId = argValue('--workspace-id');
+const uploadCustomerId = argValue('--customer-id');
+const uploadRepoId = argValue('--repo-id');
+const uploadGateCardId = argValue('--gate-card-id');
+const uploadApiKeyId = argValue('--api-key-id');
+const uploadGateRole = argValue('--gate-role');
+const uploadDeveloperId = argValue('--developer-id');
+const uploadDeveloperName = argValue('--developer-name');
+const uploadDestinationId = argValue('--destination-id');
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
@@ -279,15 +291,18 @@ async function uploadArchive(archive, archiveHash, summary) {
   const origin = String(env.SKYEVAULT_UPLOAD_ORIGIN || 'https://client-drop-vault-r2.netlify.app').replace(/\/$/, '');
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   if (!portalKey) throw new Error('Missing CLIENT_PORTAL_KEY or SKYEVAULT_PORTAL_KEY.');
-  const workspaceId = String(env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim();
-  const customerId = String(env.SKYEVAULT_CUSTOMER_ID || env.SKYEVAULT_GATE_CUSTOMER_ID || env.SKYEVAULT_ACCOUNT_ID || '').trim();
-  const repoId = String(env.SKYEVAULT_REPO_ID || repoName).trim();
-  const gateCardId = String(env.SKYEVAULT_GATE_CARD_ID || '').trim();
-  const apiKeyId = String(env.SKYEVAULT_API_KEY_ID || env.SKYEVAULT_GATE_API_KEY_ID || '').trim();
-  const gateRole = String(env.SKYEVAULT_GATE_ROLE || env.SKYEVAULT_ROLE || '').trim();
-  const developerId = String(env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
-  const developerName = String(env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
-  const destinationId = String(env.SKYEVAULT_DESTINATION_ID || '').trim();
+  const gateBearer = env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || '';
+  const free99AdminCode = env.FREE99_ADMIN_CODE || env.SKYEVAULT_FREE99_ADMIN_CODE || '';
+  const adminToken = env.SKYEVAULT_ADMIN_TOKEN || env.ADMIN_TOKEN || '';
+  const workspaceId = String(uploadWorkspaceId || env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim();
+  const customerId = String(uploadCustomerId || env.SKYEVAULT_CUSTOMER_ID || env.SKYEVAULT_GATE_CUSTOMER_ID || env.SKYEVAULT_ACCOUNT_ID || '').trim();
+  const repoId = String(uploadRepoId || env.SKYEVAULT_REPO_ID || repoName).trim();
+  const gateCardId = String(uploadGateCardId || env.SKYEVAULT_GATE_CARD_ID || '').trim();
+  const apiKeyId = String(uploadApiKeyId || env.SKYEVAULT_API_KEY_ID || env.SKYEVAULT_GATE_API_KEY_ID || '').trim();
+  const gateRole = String(uploadGateRole || env.SKYEVAULT_GATE_ROLE || env.SKYEVAULT_ROLE || '').trim();
+  const developerId = String(uploadDeveloperId || env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
+  const developerName = String(uploadDeveloperName || env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
+  const destinationId = String(uploadDestinationId || env.SKYEVAULT_DESTINATION_ID || '').trim();
   const quotas = quotaFromEnv(env);
   const retryOptions = {
     retries: numberEnv(env, 'SKYEVAULT_UPLOAD_RETRIES', 3),
@@ -300,10 +315,12 @@ async function uploadArchive(archive, archiveHash, summary) {
   const now = Date.now();
   const branch = gitValue(['branch', '--show-current']);
   const commit = gitValue(['rev-parse', '--short', 'HEAD']);
-  const dirtyCount = gitValue(['status', '--short'], '').split(/\r?\n/).filter(Boolean).length;
+  const dirtyCount = ['1', 'true', 'yes', 'on'].includes(String(env.SKYEVAULT_SKIP_GIT_STATUS || '').trim().toLowerCase())
+    ? 'skipped'
+    : gitValue(['status', '--short', '--untracked-files=no'], '').split(/\r?\n/).filter(Boolean).length;
   const body = {
-    clientName: env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
-    clientEmail: env.SKYEVAULT_CLIENT_EMAIL || 'operator@example.com',
+    clientName: uploadClientName || env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
+    clientEmail: uploadClientEmail || env.SKYEVAULT_CLIENT_EMAIL || 'operator@example.com',
     projectName: uploadProjectName || env.SKYEVAULT_PROJECT_NAME || `${repoName} repository safe vault snapshot`,
     clientReference: uploadClientReference || `repo:${branch}@${commit}`,
     assetType: uploadAssetType || env.SKYEVAULT_ASSET_TYPE || 'Repository safe archive',
@@ -324,7 +341,7 @@ async function uploadArchive(archive, archiveHash, summary) {
     portalKey,
     fileName,
     fileSize: archiveSize,
-    mimeType: 'application/zip',
+    mimeType: uploadMimeType,
     fileFingerprint: {
       algorithm: 'SHA-256',
       mode: 'full',
@@ -341,9 +358,17 @@ async function uploadArchive(archive, archiveHash, summary) {
   };
 
   const api = async (apiPath, payload) => {
+    const headers = { 'content-type': 'application/json', 'x-portal-key': portalKey, origin };
+    if (gateBearer) {
+      headers.authorization = /^Bearer\s+/i.test(gateBearer) ? gateBearer : `Bearer ${gateBearer}`;
+      headers['x-skye-gate-session'] = gateBearer.replace(/^Bearer\s+/i, '');
+      headers['x-free99-gate-session'] = gateBearer.replace(/^Bearer\s+/i, '');
+    }
+    if (free99AdminCode) headers['x-free99-admin-code'] = free99AdminCode;
+    if (adminToken) headers['x-admin-token'] = adminToken;
     const { response, text } = await fetchTextWithRetry(`${baseUrl}${apiPath}`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-portal-key': portalKey, origin },
+      headers,
       body: JSON.stringify(payload)
     }, { ...retryOptions, label: apiPath });
     let data = {};
@@ -399,7 +424,7 @@ async function uploadArchive(archive, archiveHash, summary) {
     parts: completedParts,
     name: fileName,
     size: String(archiveSize),
-    mimeType: 'application/zip'
+    mimeType: uploadMimeType
   };
   const completion = await api('/api/upload-complete', {
     ...body,
@@ -451,6 +476,8 @@ async function uploadArchive(archive, archiveHash, summary) {
     assetType: body.assetType,
     projectName: body.projectName,
     clientReference: body.clientReference,
+    clientName: body.clientName,
+    clientEmail: body.clientEmail,
     workspaceId,
     customerId,
     repoId,
@@ -458,6 +485,7 @@ async function uploadArchive(archive, archiveHash, summary) {
     apiKeyId,
     gateRole,
     developerId,
+    developerName,
     gitBranch: branch,
     gitCommit: commit,
     dirtyCount,
@@ -528,6 +556,8 @@ function uploadLedgerEvent(receipt, summary, receiptPath) {
     assetType: receipt.assetType,
     projectName: receipt.projectName,
     clientReference: receipt.clientReference,
+    clientName: receipt.clientName,
+    clientEmail: receipt.clientEmail,
     workspaceId: receipt.workspaceId,
     customerId: receipt.customerId,
     repoId: receipt.repoId,
@@ -535,6 +565,7 @@ function uploadLedgerEvent(receipt, summary, receiptPath) {
     apiKeyId: receipt.apiKeyId,
     gateRole: receipt.gateRole,
     developerId: receipt.developerId,
+    developerName: receipt.developerName,
     gitBranch: receipt.gitBranch,
     gitCommit: receipt.gitCommit,
     dirtyCount: receipt.dirtyCount,

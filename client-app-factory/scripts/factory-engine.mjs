@@ -20,7 +20,10 @@ export const ledgerDir = path.join(storageRoot, "ledger");
 export const eventLedgerPath = path.join(ledgerDir, "factory-events.json");
 export const proofLedgerPath = path.join(storageRoot, "proof-ledger.json");
 
-const seedRecordPath = path.join(factoryRoot, "data/empire-pallets-record.json");
+const defaultClientId = "skye-app-template";
+const defaultSourceFolder = path.join(factoryRoot, "templates", "SKyeAppTemplate");
+const seedRecordPath = path.join(factoryRoot, "data/skye-app-template-record.json");
+const valleyBusinessesPath = path.join(repoRoot, "metraiyux_0s_site", "valley-verified", "data", "businesses.json");
 const publicClientAppsDir = path.join(factoryRoot, "client-apps");
 const textExtensions = new Set([".html", ".css", ".js", ".mjs", ".json", ".webmanifest", ".xml", ".txt", ".toml"]);
 const mediaExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".mp4", ".webm", ".mov"]);
@@ -116,6 +119,92 @@ function normalizeArray(value) {
   return [];
 }
 
+function uniqueStrings(values = []) {
+  return Array.from(new Set(normalizeArray(values)));
+}
+
+function pickFirst(values = []) {
+  return Array.isArray(values) ? values.find((value) => Boolean(String(value || "").trim())) || "" : "";
+}
+
+function buildPreviewCode(displayName = "", fallback = "preview") {
+  const initials = String(displayName)
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("")
+    .slice(0, 6);
+  return `${initials || safeName(fallback).replace(/-/g, "").slice(0, 6).toUpperCase() || "CLIENT"}-7DAY`;
+}
+
+function buildIndustryLabel(business = {}) {
+  return [business.category, business.niche, business.subcategory]
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .filter((item, index, list) => list.indexOf(item) === index)
+    .join(" · ");
+}
+
+function inferServicesFromBusiness(business = {}) {
+  const niche = `${business.niche || ""} ${business.subcategory || ""} ${business.category || ""}`.toLowerCase();
+  if (/(trading card|tcg|gaming|collectible|pokemon|magic)/.test(niche)) {
+    return [
+      "Featured inventory and sealed product",
+      "Singles, binders, and deck essentials",
+      "League nights and event promotions",
+      "Preorders, drops, and community updates",
+      "Workspace preview and QR handoff"
+    ];
+  }
+  if (/(pallet|industrial|logistics|recycling|warehouse|fleet)/.test(niche)) {
+    return [
+      "Core supply and recycled stock",
+      "Custom runs and recurring orders",
+      "Pickup, drop trailer, and dispatch lanes",
+      "Operational proof and quote routing",
+      "Workspace preview and QR handoff"
+    ];
+  }
+  if (/(barber|salon|beauty|hair)/.test(niche)) {
+    return [
+      "Booking-first homepage",
+      "Service menu and pricing lanes",
+      "Gallery, reviews, and local SEO",
+      "Offers, bundles, and event promos",
+      "Workspace preview and QR handoff"
+    ];
+  }
+  if (/(restaurant|food|cafe|coffee|bakery)/.test(niche)) {
+    return [
+      "Menu highlights and featured drops",
+      "Hours, directions, and contact flow",
+      "Specials, gallery, and local SEO",
+      "Event promos and community updates",
+      "Workspace preview and QR handoff"
+    ];
+  }
+  return [
+    "Homepage and service positioning",
+    "Inventory, offers, or capability highlights",
+    "Gallery, FAQ, and contact routes",
+    "Workspace preview and QR handoff",
+    "Local SEO and conversion support"
+  ];
+}
+
+function buildLocationFromBusiness(business = {}) {
+  const city = String(business.city || "").trim();
+  const state = String(business.state || "").trim().toUpperCase();
+  const postalCode = String(business.zip || "").trim();
+  return {
+    address: "",
+    street: "",
+    city,
+    state,
+    postalCode
+  };
+}
+
 function normalizeRecord(record = {}) {
   const displayName = record.displayName || record.clientName || "Client App";
   const clientId = slugify(record.clientId || displayName);
@@ -136,10 +225,16 @@ function normalizeRecord(record = {}) {
     publicRoutes: normalizeArray(record.publicRoutes),
     privateRoutes: normalizeArray(record.privateRoutes),
     workspacePlan: record.workspacePlan || {},
+    previewConfig: record.previewConfig || {},
     trialUsage: record.trialUsage || {},
     paymentPlan: record.paymentPlan || {},
+    brandProfile: record.brandProfile || {},
+    designProfile: record.designProfile || {},
+    valleySync: record.valleySync || {},
     deploymentTargets: Array.isArray(record.deploymentTargets) ? record.deploymentTargets : [],
     generatedApps: Array.isArray(record.generatedApps) ? record.generatedApps : [],
+    enhancementReports: normalizeArray(record.enhancementReports),
+    verificationReports: normalizeArray(record.verificationReports),
     proofArtifacts: normalizeArray(record.proofArtifacts),
     mcpReceipts: normalizeArray(record.mcpReceipts),
     scannerReports: normalizeArray(record.scannerReports),
@@ -178,7 +273,7 @@ export async function ensureStorage() {
     await writeJson(proofLedgerPath, []);
   }
 
-  const seedRecordFile = path.join(recordsDir, "empire-pallets.json");
+  const seedRecordFile = path.join(recordsDir, `${defaultClientId}.json`);
   if (!(await exists(seedRecordFile)) && (await exists(seedRecordPath))) {
     const seed = normalizeRecord(await readJson(seedRecordPath, {}));
     await writeJson(seedRecordFile, seed);
@@ -221,12 +316,175 @@ export async function listRecords() {
   return records.sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
-export async function readRecord(clientId = "empire-pallets") {
+export async function listValleyBusinesses(options = {}) {
+  const payload = await readJson(valleyBusinessesPath, { businesses: [] });
+  const businesses = Array.isArray(payload?.businesses) ? payload.businesses : [];
+  const onlyWithWebsite = options.onlyWithWebsite ?? false;
+  const query = String(options.query || "").trim().toLowerCase();
+  const featuredOnly = options.featuredOnly ?? false;
+
+  const filtered = businesses.filter((business) => {
+    if (featuredOnly && !business.featured) return false;
+    if (onlyWithWebsite && !(business.website || business.source_url)) return false;
+    if (!query) return true;
+    const haystack = [
+      business.id,
+      business.name,
+      business.category,
+      business.niche,
+      business.subcategory,
+      business.city,
+      business.state,
+      business.website
+    ].join(" ").toLowerCase();
+    return haystack.includes(query);
+  });
+
+  return filtered
+    .map((business) => ({
+      ...business,
+      source_surface: business.website || business.source_url || "",
+      has_live_surface: Boolean(business.website || business.source_url),
+      verification_score: Number(business.verification_score || 0)
+    }))
+    .sort((a, b) => {
+      if (Boolean(a.featured) !== Boolean(b.featured)) return a.featured ? -1 : 1;
+      if ((b.verification_score || 0) !== (a.verification_score || 0)) return (b.verification_score || 0) - (a.verification_score || 0);
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+}
+
+export async function getValleyBusiness(businessId) {
+  const targetId = slugify(businessId || "");
+  const businesses = await listValleyBusinesses();
+  const match = businesses.find((business) => slugify(business.id || business.name) === targetId);
+  if (!match) throw new Error(`Valley business not found: ${businessId}`);
+  return match;
+}
+
+export async function importValleyBusiness(payload = {}) {
+  await ensureStorage();
+  const business = await getValleyBusiness(payload.businessId || payload.clientId || payload.id);
+  const clientId = slugify(payload.clientId || business.id || business.name);
+  const templateSeed = normalizeRecord(await readJson(seedRecordPath, {}));
+  const storedRecord = await readJson(path.join(recordsDir, `${clientId}.json`), null);
+  const packagedRecord = await readJson(path.join(factoryRoot, "data", `${clientId}-record.json`), null);
+  const existing = storedRecord || packagedRecord || null;
+  const seededFromTemplate = !existing;
+  const base = normalizeRecord(existing || {
+    ...templateSeed,
+    clientId,
+    displayName: business.name,
+    completedStates: [],
+    generatedApps: [],
+    enhancementReports: [],
+    verificationReports: [],
+    scannerReports: [],
+    proofArtifacts: [],
+    ledger: []
+  });
+  const sourceUrl = pickFirst([
+    payload.sourceUrl,
+    business.website,
+    business.source_url,
+    business.booking_url,
+    business.landing_page_url
+  ]);
+  const valleyProfileUrl = pickFirst([business.landing_page_url, business.url ? `https://metraiyux-0s-full-system.graylondonskyes.workers.dev${business.url}` : ""]);
+  const displayName = payload.displayName || business.name || base.displayName;
+  const next = markState({
+    ...base,
+    clientId,
+    displayName,
+    industry: buildIndustryLabel(business) || base.industry,
+    contacts: [{
+      name: `${displayName} Team`,
+      phone: business.phone || base.contacts?.[0]?.phone || "",
+      email: business.email || base.contacts?.[0]?.email || ""
+    }],
+    locations: [buildLocationFromBusiness(business)],
+    services: seededFromTemplate ? inferServicesFromBusiness(business) : (base.services?.length ? base.services : inferServicesFromBusiness(business)),
+    sourceUrls: uniqueStrings([sourceUrl, business.website, business.source_url, ...base.sourceUrls]),
+    sourceFolders: base.sourceFolders?.length ? base.sourceFolders : [defaultSourceFolder],
+    assetFolders: base.assetFolders?.length ? base.assetFolders : [path.join(defaultSourceFolder, "assets")],
+    logoAssets: seededFromTemplate ? [] : base.logoAssets,
+    mediaAssets: seededFromTemplate ? [] : base.mediaAssets,
+    assetVault: seededFromTemplate ? [] : base.assetVault,
+    publicRoutes: base.publicRoutes?.length ? base.publicRoutes : templateSeed.publicRoutes,
+    privateRoutes: base.privateRoutes?.length ? base.privateRoutes : templateSeed.privateRoutes,
+    previewConfig: {
+      accessCode: base.previewConfig?.accessCode || buildPreviewCode(displayName, clientId),
+      workspaceId: base.previewConfig?.workspaceId || `${clientId}-preview-001`,
+      workspaceName: base.previewConfig?.workspaceName || `${displayName} Preview Workspace`,
+      workspaceSlug: base.previewConfig?.workspaceSlug || clientId
+    },
+    brandProfile: {
+      ...(base.brandProfile || {}),
+      city: business.city || base.brandProfile?.city || "",
+      state: business.state || base.brandProfile?.state || "",
+      postalCode: business.zip || base.brandProfile?.postalCode || "",
+      publicUrl: business.website || base.brandProfile?.publicUrl || sourceUrl
+    },
+    valleySync: {
+      ...(base.valleySync || {}),
+      businessId: business.id,
+      profilePath: business.url || base.valleySync?.profilePath || "",
+      profileUrl: valleyProfileUrl || base.valleySync?.profileUrl || "",
+      landingPageUrl: business.landing_page_url || base.valleySync?.landingPageUrl || "",
+      directorySource: "valley-verified"
+    },
+    paymentPlan: {
+      provider: seededFromTemplate ? "SkyePay" : (base.paymentPlan?.provider || "SkyePay"),
+      mode: seededFromTemplate ? "preview-first" : (base.paymentPlan?.mode || "preview-first"),
+      lane: seededFromTemplate ? `../SkyeGateFS27/skyepay.html?client=${clientId}` : (base.paymentPlan?.lane || `../SkyeGateFS27/skyepay.html?client=${clientId}`),
+      status: seededFromTemplate ? "intake-ready" : (base.paymentPlan?.status || "preview-first")
+    },
+    workspacePlan: {
+      freeTesterDays: Number(base.workspacePlan?.freeTesterDays ?? 7),
+      includedScans: Number(base.workspacePlan?.includedScans ?? 7),
+      includedCommands: Number(base.workspacePlan?.includedCommands ?? 25),
+      continuationDiscountMonths: Number(base.workspacePlan?.continuationDiscountMonths ?? 6)
+    },
+    trialUsage: seededFromTemplate
+      ? { scansUsed: 0, commandsUsed: 0, status: "intake-ready" }
+      : (base.trialUsage || {}),
+    deploymentTargets: seededFromTemplate
+      ? [{
+          provider: "Local factory package",
+          publishFolder: "",
+          packagedPreviewFolder: path.join(factoryRoot, "client-apps", clientId),
+          finalQrTarget: `client-apps/${clientId}/index.html`,
+          status: "intake-ready"
+        }]
+      : base.deploymentTargets,
+    generatedApps: seededFromTemplate ? [] : base.generatedApps,
+    enhancementReports: seededFromTemplate ? [] : base.enhancementReports,
+    verificationReports: seededFromTemplate ? [] : base.verificationReports,
+    scannerReports: seededFromTemplate ? [] : base.scannerReports,
+    proofArtifacts: seededFromTemplate ? [] : base.proofArtifacts,
+    mcpReceipts: seededFromTemplate ? [] : base.mcpReceipts,
+    completedStates: seededFromTemplate ? [] : base.completedStates,
+    notes: [base.notes, `Imported from Valley Verified on ${new Date().toISOString()} from ${business.id}.`, business.price_note || ""]
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+      .filter((item, index, list) => list.indexOf(item) === index)
+      .join("\n\n")
+  }, "intake-created");
+
+  const event = await appendEvent(clientId, "intake-created", `Imported ${displayName} from Valley Verified`, {
+    artifact: business.url || business.landing_page_url || business.website || "",
+    valleyBusinessId: business.id
+  });
+  const record = await saveRecord(next, event);
+  return { record, business };
+}
+
+export async function readRecord(clientId = defaultClientId) {
   await ensureStorage();
   const id = slugify(clientId);
   const record = await readJson(path.join(recordsDir, `${id}.json`), null);
   if (record) return normalizeRecord(record);
-  if (id === "empire-pallets" && (await exists(seedRecordPath))) {
+  if (id === defaultClientId && (await exists(seedRecordPath))) {
     return normalizeRecord(await readJson(seedRecordPath, {}));
   }
   throw new Error(`Client record not found: ${id}`);
@@ -321,17 +579,32 @@ export async function catalogAsset(payload = {}) {
   return saveRecord(next, event);
 }
 
-export async function runScanner(clientId = "empire-pallets") {
+export async function runScanner(clientId = defaultClientId) {
   const record = await readRecord(clientId);
+  if (record.clientId === defaultClientId) {
+    const report = {
+      ok: false,
+      skipped: true,
+      reason: "Template base skips the Empire-specific factory scanner."
+    };
+    const next = markState(record, "source-scanned");
+    const event = await appendEvent(record.clientId, "source-scanned", `Skipped scanner for ${record.displayName}`, report);
+    return { record: await saveRecord(next, event), report };
+  }
   const scannerPath = path.join(factoryRoot, "scripts/factory-scan.mjs");
-  await execFileAsync(process.execPath, [scannerPath], { cwd: repoRoot, maxBuffer: 1024 * 1024 * 12 });
-  const report = await readJson(path.join(factoryRoot, "data/empire-scan-report.json"), {});
+  const reportRelativePath = `client-app-factory/data/${record.clientId}-scan-report.json`;
+  await execFileAsync(process.execPath, [scannerPath, record.clientId], { cwd: repoRoot, maxBuffer: 1024 * 1024 * 12 });
+  const report = await readJson(path.join(factoryRoot, "data", `${record.clientId}-scan-report.json`), {});
   const scanPath = path.join(scansDir, `${record.clientId}-${Date.now()}-scan.json`);
   await writeJson(scanPath, report);
 
   let next = markState(record, "source-scanned");
   next = report.ok ? markState(next, "scanner-proofed") : next;
-  next.scannerReports = Array.from(new Set([...(next.scannerReports || []), path.relative(repoRoot, scanPath).replaceAll(path.sep, "/")]));
+  next.scannerReports = Array.from(new Set([
+    ...(next.scannerReports || []),
+    reportRelativePath,
+    path.relative(repoRoot, scanPath).replaceAll(path.sep, "/")
+  ]));
   const event = await appendEvent(record.clientId, report.ok ? "scanner-proofed" : "source-scanned", `Scanner ${report.ok ? "passed" : "recorded"} for ${record.displayName}`, {
     artifact: path.relative(repoRoot, scanPath).replaceAll(path.sep, "/"),
     ok: Boolean(report.ok)
@@ -388,9 +661,9 @@ async function copyClientApp(sourceFolder, destination) {
 }
 
 export async function generateApp(payload = {}) {
-  const clientId = slugify(payload.clientId || "empire-pallets");
+  const clientId = slugify(payload.clientId || defaultClientId);
   const record = await readRecord(clientId);
-  const sourceFolder = path.resolve(payload.sourceFolder || record.sourceFolders?.[0] || path.join(repoRoot, "empire-pallets-v3-app"));
+  const sourceFolder = path.resolve(payload.sourceFolder || record.sourceFolders?.[0] || defaultSourceFolder);
   const storageAppDir = safeJoin(generatedDir, clientId);
   const publicAppDir = safeJoin(publicClientAppsDir, clientId);
 
@@ -420,25 +693,30 @@ export async function generateApp(payload = {}) {
   let next = markState(record, "app-generated");
   next.publicRoutes = routes.publicRoutes;
   next.privateRoutes = routes.privateRoutes;
+  const nextGeneratedApp = {
+    generatedAt: new Date().toISOString(),
+    sourceFolder,
+    storageFolder: storageAppDir,
+    publishFolder: publicAppDir,
+    routes
+  };
   next.generatedApps = [
-    {
-      generatedAt: new Date().toISOString(),
-      sourceFolder,
-      storageFolder: storageAppDir,
-      publishFolder: publicAppDir,
-      routes
-    },
-    ...(next.generatedApps || [])
+    nextGeneratedApp,
+    ...(next.generatedApps || []).filter((entry) => entry.publishFolder !== publicAppDir)
   ].slice(0, 12);
+
+  const nextDeploymentTarget = {
+    provider: "Local factory package",
+    publishFolder: publicAppDir,
+    packagedPreviewFolder: publicAppDir,
+    finalQrTarget: manifest.finalQrTarget,
+    status: "generated-preview-ready"
+  };
   next.deploymentTargets = [
-    {
-      provider: "Local factory package",
-      publishFolder: publicAppDir,
-      packagedPreviewFolder: publicAppDir,
-      finalQrTarget: manifest.finalQrTarget,
-      status: "generated-preview-ready"
-    },
-    ...(next.deploymentTargets || [])
+    nextDeploymentTarget,
+    ...(next.deploymentTargets || []).filter((entry) => {
+      return !(entry.publishFolder === publicAppDir && entry.finalQrTarget === manifest.finalQrTarget);
+    })
   ].slice(0, 8);
   const event = await appendEvent(clientId, "app-generated", `Generated deployable app package for ${record.displayName}`, {
     artifact: path.relative(repoRoot, publicAppDir).replaceAll(path.sep, "/"),
@@ -448,7 +726,7 @@ export async function generateApp(payload = {}) {
 }
 
 export async function provisionWorkspace(payload = {}) {
-  const clientId = slugify(payload.clientId || "empire-pallets");
+  const clientId = slugify(payload.clientId || defaultClientId);
   const record = await readRecord(clientId);
   const next = markState({
     ...record,
@@ -472,7 +750,7 @@ export async function provisionWorkspace(payload = {}) {
 }
 
 export async function linkSkyePay(payload = {}) {
-  const clientId = slugify(payload.clientId || "empire-pallets");
+  const clientId = slugify(payload.clientId || defaultClientId);
   const record = await readRecord(clientId);
   const next = markState({
     ...record,
@@ -492,21 +770,26 @@ export async function linkSkyePay(payload = {}) {
 }
 
 export async function recordProof(payload = {}) {
-  const clientId = slugify(payload.clientId || "empire-pallets");
+  const clientId = slugify(payload.clientId || defaultClientId);
   const record = await readRecord(clientId);
   const proofFiles = [
     "test-artifacts/client-app-factory/browser-proof.json",
     "client-app-factory/assets/proof/client-app-factory-workflow.webm",
     "client-app-factory/MCP_TOOLING_RECEIPT.json",
     "client-app-factory/APP_PATH_MANIFEST.json",
-    "client-app-factory/data/empire-scan-report.json",
+    `client-app-factory/data/${clientId}-scan-report.json`,
+    "client-app-factory/data/factory-scan-report.json",
     "client-app-factory/assets/proof/client-app-factory-desktop.png",
-    "client-app-factory/assets/proof/client-app-factory-mobile.png"
+    "client-app-factory/assets/proof/client-app-factory-mobile.png",
+    `client-app-factory/client-apps/${clientId}/CLIENT_IDENTITY_MAP.json`,
+    `client-app-factory/client-apps/${clientId}/CLIENT_ENHANCEMENT_REPORT.json`,
+    `client-app-factory/client-apps/${clientId}/CLIENT_VERIFICATION_REPORT.json`,
+    `client-app-factory/client-apps/${clientId}/VALLEY_SYNC_PAYLOAD.json`
   ].filter((relative) => existsSync(path.join(repoRoot, relative)));
 
   let next = markState(record, "browser-proofed");
   if (proofFiles.some((file) => file.includes("MCP_TOOLING_RECEIPT"))) next = markState(next, "mcp-after-green");
-  if (proofFiles.some((file) => file.includes("empire-scan-report"))) next = markState(next, "scanner-proofed");
+  if (proofFiles.some((file) => /scan-report\.json$/i.test(file))) next = markState(next, "scanner-proofed");
   next = markState(next, "preview-ready");
   next.proofArtifacts = Array.from(new Set([...(next.proofArtifacts || []), ...proofFiles]));
   const event = await appendEvent(clientId, "browser-proofed", `Recorded browser proof ledger for ${record.displayName}`, {
@@ -516,35 +799,11 @@ export async function recordProof(payload = {}) {
 }
 
 export async function runFactoryPass(payload = {}) {
-  const clientId = slugify(payload.clientId || "empire-pallets");
-  let record = await readRecord(clientId);
-  if (!record.completedStates?.includes("intake-created")) {
-    record = await createIntake({ ...record, clientId });
-  }
-  if (existsSync(path.join(factoryRoot, "MCP_TOOLING_RECEIPT.json"))) {
-    const mcpEvent = await appendEvent(clientId, "mcp-before-run", `MCP receipt attached before factory run for ${record.displayName}`, {
-      artifact: "client-app-factory/MCP_TOOLING_RECEIPT.json"
-    });
-    record = await saveRecord(markState(record, "mcp-before-run"), mcpEvent);
-  }
-  const scan = await runScanner(clientId);
-  const generated = await generateApp({ clientId, sourceFolder: payload.sourceFolder });
-  const workspace = await provisionWorkspace({ clientId, ...payload.workspacePlan });
-  const payment = await linkSkyePay({ clientId, ...payload.paymentPlan });
-  const proof = await recordProof({ clientId });
-  return {
-    ok: true,
-    clientId,
-    record: proof,
-    scan: scan.report,
-    generated: generated.manifest,
-    workspace: workspace.workspacePlan,
-    payment: payment.paymentPlan,
-    ledger: await readLedger(clientId)
-  };
+  const { runFactoryPipeline } = await import("./factory-pipeline.mjs");
+  return runFactoryPipeline(payload);
 }
 
 if (process.argv[1] === __filename) {
-  const result = await runFactoryPass({ clientId: process.argv[2] || "empire-pallets" });
+  const result = await runFactoryPass({ clientId: process.argv[2] || defaultClientId });
   console.log(JSON.stringify(result, null, 2));
 }

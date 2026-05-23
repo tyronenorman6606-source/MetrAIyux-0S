@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Request a Quote | Empire Pallets</title>
+  <meta name="description" content="Request pallet supply, recycling, pickup, heat treatment, drop trailer, or custom pallet support from Empire Pallets in Phoenix.">
+  <meta name="theme-color" content="#090d0b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="canonical" href="https://empire-pallets.pages.dev/quote.html">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script type="importmap">{"imports":{"gsap":"https://esm.sh/gsap@3.12.5","gsap/ScrollTrigger":"https://esm.sh/gsap@3.12.5/ScrollTrigger","lenis":"https://esm.sh/lenis@1.1.20"}}</script>
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body>
+  <div class="progressbar" aria-hidden="true"></div>
+  <div class="header-alert">Send the route, access, quantity, and timing details <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Empire Pallets</span> needs. <a href="tel:4806626551">Call 480-662-6551</a></div>
+
+  <header class="top">
+    <div class="wrap nav">
+      <a class="brand" href="" aria-label="Empire Pallets app home">
+        <img class="logo" src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
+      </a>
+      <button class="btn hamb" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav class="links" id="primary-nav" aria-label="Primary navigation">
+        <a href="services.html">Services</a>
+        <a href="programs.html">Programs</a>
+        <a href="industries.html">Industries</a>
+        <a href="scan.html">Scan</a>
+        <a href="preview.html">Preview</a><a href="https://valley-verified.pages.dev/business/empire-pallets-phoenix/" target="_blank" rel="noopener">Valley Verified</a><a class="quote" href="quote.html">Request Quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap split">
+        <div class="hero-copy" data-reveal>
+          <div class="eyebrow">Quote lane</div>
+          <h1 class="text-shimmer neon-gradient-text">Send the details that help Empire respond <span class="line-shadow-text line-shadow-green" data-line-shadow="fast">fast</span>.</h1>
+          <p>Use this app route for new pallets, recycled pallets, recycling/removal, heat treatment, drop trailer programs, custom builds, delivery, and pickup questions.</p>
+          <div class="notice"><b>Best request:</b> Include service type, quantity, timing, city or ZIP, dock access, forklift access, trailer room, and whether this is one-time or recurring.</div>
+        </div>
+
+        <form class="card formgrid" name="empire-quote" method="POST" data-netlify="true" data-record-form data-reveal>
+          <input type="hidden" name="form-name" value="empire-quote">
+          <input type="hidden" name="source" value="quote-app">
+
+          <label>Company name
+            <input name="company" autocomplete="organization" required>
+          </label>
+          <label>Contact name
+            <input name="contact" autocomplete="name" required>
+          </label>
+          <label>Email
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label>Phone
+            <input name="phone" autocomplete="tel" inputmode="tel" required>
+          </label>
+          <label class="full">Service needed
+            <select name="service">
+              <option>New Manufactured Pallets</option>
+              <option>Used Recycled Pallets</option>
+              <option>Pallet Recycling and Removal</option>
+              <option>Heat Treatment and Certification</option>
+              <option>Drop Trailer Service</option>
+              <option>Custom Pallet Design</option>
+              <option>Not sure / multiple services</option>
+            </select>
+          </label>
+          <label>Estimated quantity
+            <input name="quantity" inputmode="numeric" aria-label="Estimated quantity">
+          </label>
+          <label>City / ZIP
+            <input name="area" autocomplete="postal-code" aria-label="City or ZIP">
+          </label>
+          <label>Timing
+            <select name="timing">
+              <option>Quote only</option>
+              <option>ASAP</option>
+              <option>This week</option>
+              <option>Recurring weekly</option>
+              <option>Recurring monthly</option>
+              <option>Specific date</option>
+            </select>
+          </label>
+          <label>Access details
+            <select name="access">
+              <option>Dock access</option>
+              <option>Forklift available</option>
+              <option>No forklift</option>
+              <option>Trailer space available</option>
+              <option>Need pickup guidance</option>
+            </select>
+          </label>
+          <label>Dock / forklift access
+            <select name="dockForklift">
+              <option>Not sure</option>
+              <option>Dock available</option>
+              <option>Forklift available</option>
+              <option>Dock and forklift available</option>
+              <option>Ground unload only</option>
+              <option>Trailer space available</option>
+            </select>
+          </label>
+          <label>Recurring need?
+            <select name="recurring">
+              <option>One-time request</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+              <option>Seasonal / as-needed</option>
+            </select>
+          </label>
+          <label class="full">Requirements
+            <textarea name="requirements" aria-label="Requirements"></textarea>
+          </label>
+          <button class="btn primary neon-magnetic" type="submit">Send Quote Request</button>
+          <span class="form-result full" data-form-result></span>
+        </form>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap grid cols3">
+        <div class="card" data-reveal>
+          <span class="badge">Supply</span>
+          <h3>Buying pallets?</h3>
+          <p>Share new, recycled, custom, heat-treated, quantity, grade, and delivery timing.</p>
+        </div>
+        <div class="card" data-reveal>
+          <span class="badge">Removal</span>
+          <h3>Clearing pallets?</h3>
+          <p>Share approximate count, condition, access, and whether removal is one-time or recurring.</p>
+        </div>
+        <div class="card" data-reveal>
+          <span class="badge">Volume</span>
+          <h3>Need a trailer lane?</h3>
+          <p>Share trailer space, pickup cadence, forklift/dock access, and expected weekly or monthly volume.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="floating-call">
+    <a class="btn dark" href="tel:4806626551">Call</a>
+    <a class="btn primary neon-magnetic" href="quote.html">Quote</a>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>
+        <img class="logo" src="assets/empire-pallets-logo-transparent.png" alt="Empire Pallets">
+        <p>Reliable pallet supply, recycling, removal, custom design, heat-treatment support, and trailer programs for Phoenix-area businesses.</p>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p><b>Phone:</b> <a href="tel:4806626551">480-662-6551</a><br><b>Email:</b> <a href="mailto:sales@empirepalletsaz.com">sales@empirepalletsaz.com</a><br><b>Address:</b> 631 S 31st Ave, Phoenix, AZ 85009</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

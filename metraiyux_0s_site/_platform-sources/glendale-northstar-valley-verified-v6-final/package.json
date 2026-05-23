@@ -1,0 +1,17 @@
+{
+  "name": "valley-verified-northstar-frontdoors",
+  "version": "6.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "smoke": "python3 internal/final_public_audit.py",
+    "smoke:core": "cd northstar && npm run smoke:core",
+    "schema:verify": "cd northstar && npm run schema:verify",
+    "admin:provision": "cd northstar && npm run admin:provision",
+    "admin:provision:seed": "cd northstar && npm run admin:provision:seed"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "latest"
+  }
+}

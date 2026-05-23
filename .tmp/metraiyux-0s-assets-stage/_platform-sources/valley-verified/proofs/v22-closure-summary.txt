@@ -1,0 +1,38 @@
+Valley Verified v22/v23 cleaned closure proof
+
+Package version: 23.2.0
+Published businesses: 19
+Raw seed records loaded: 19
+Blank phone/email/website records: 0
+Active demo seed rows: 0
+Full static business profiles: 19
+Dist size after v22/v23 compaction: 3.9 MB
+
+Passed proof:
+- npm run codecheck
+- npm run v22-smoke: 33 checks passed
+- base smoke: 1,013 checks passed
+- action smoke: 11 checks passed
+- state smoke: 13 checks passed
+- mutation smoke: 21 checks passed
+- v18 runtime smoke: 17 checks passed
+- v19 payment smoke: 21 checks passed
+- v20 lead/AE/revenue smoke: 32 checks passed
+- v21 profile/static smoke: 51 checks passed
+- v23 website smoke: 101 checks passed
+
+v22 code closure completed:
+- Shared runtime context for all Netlify runtime functions.
+- phx-claim upstream auth bug fixed.
+- protected admin replay operation fixed.
+- JSON/D1/Neon persistence round-trip proof added.
+- D1 event/list/receipt/summary methods added.
+- Neon event listing added.
+- API mirrors changed to manifest-only instead of duplicated massive payloads.
+- Heavy operator exports compacted while preserving count/proof coverage.
+- Runtime wiring, persistence health, artifact manifest, and v22 closure surfaces added.
+
+Boundary still open:
+- Live production D1/Neon binding proof requires the actual deployed runtime binding.
+- Live Stripe webhook activation requires real Stripe env/endpoint proof.
+- Live email/SMS provider delivery requires provider credentials and deployed worker proof.

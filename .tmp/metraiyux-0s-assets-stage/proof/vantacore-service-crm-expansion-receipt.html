@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the VantaCore service CRM ownership lane inside MetrAIyux 0S and SkyeGateFS27.">
+  <title>VantaCore Service CRM Receipt - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="../index.html">Home</a><a href="../live/vantacore-service-crm-operator-proof.html">VantaCore Hub</a><a href="proof-center.html">Proof Center</a><a href="../changelog/index.html">Changelog</a></nav>
+  </header>
+
+  <main class="portal-shell">
+    <section class="hero slim">
+      <p class="eyebrow">Proof receipt</p>
+      <h1>VantaCore is integrated as a controlled 0S/FS27 CRM workspace.</h1>
+      <p class="hero-copy">This receipt records the inherited-auth fix, the actual dashboard, the live proof, what is already covered by the 0S, and what must remain owner-approved before provider automations control live customer operations.</p>
+      <div class="hero-actions"><a class="button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/vantacore-crm" target="_blank" rel="noreferrer">Open Actual CRM Workspace</a><a class="button" href="../live/vantacore-service-crm-operator-proof.html">Open 0S Hub</a><a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/vantacore-service-crm" target="_blank" rel="noreferrer">Open FS27 Owner Surface</a></div>
+    </section>
+
+    <section class="section">
+      <h2>Fix summary</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Area</th><th>Status</th><th>What changed</th></tr></thead>
+          <tbody>
+            <tr><td>Gate ownership</td><td>Fixed</td><td>Dashboard and protected API routes now inherit FS27/0S/SkyGate session handling instead of opening as a standalone customer system.</td></tr>
+            <tr><td>Vanta auth layer</td><td>Removed</td><td>No Vanta login form, password reset, saved-session button, admin login, or password-header shortcut remains on the CRM workspace/API.</td></tr>
+            <tr><td>FS27 session bridge</td><td>Added</td><td>The FS27 admin login publishes the central token into session-scoped inherited gate keys so same-origin lanes can open without another login.</td></tr>
+            <tr><td>Tenant isolation</td><td>Fixed</td><td>Tenant guard helpers fail closed when tenant context is missing, preventing cross-tenant write assumptions.</td></tr>
+            <tr><td>Provider control</td><td>Proven</td><td>FS27 Worker version <code>ad14aab5-e12e-4e17-a8eb-8b2424b823e6</code> exposes provider readiness, action receipts, and dry-run controls for Twilio, Resend, Google Calendar, SkyePay/Stripe, NorthStar handoff, storage, and rollback receipts.</td></tr>
+            <tr><td>Webhook safety</td><td>Fixed</td><td>Stripe, Twilio, and Resend webhook paths use signed request checks instead of trusting public posts.</td></tr>
+            <tr><td>Actual CRM workspace</td><td>Added</td><td>FS27 now exposes an auth-required workspace and persisted `/api/vantacore/crm` routes for lead capture, pipeline updates, bookings, follow-ups, reviews, summary, and activity.</td></tr>
+            <tr><td>0S control</td><td>Integrated</td><td>The full 0S now routes to the actual workspace, proof-safe hub, registry entry, and FS27-owned surface.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Verification summary</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Result</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>FS27 build</td><td>Passed</td><td><code>npm run build</code> completed from the moved FS27 source with the root env aliases loaded safely.</td></tr>
+            <tr><td>Live deployment</td><td>Passed</td><td>Functional proof ran against FS27 Worker version <code>57d80970-d429-4036-a60d-50c8ec66d479</code>; later documentation deploys keep the same owned-lane source and boundary.</td></tr>
+            <tr><td>Auth boundary</td><td>Passed</td><td>No-auth and direct Vanta password-header requests to `/api/vantacore/crm/summary` returned <code>401</code>; central FS27 login returned <code>200</code>.</td></tr>
+            <tr><td>Persisted CRM API</td><td>Passed</td><td>Inherited FS27 authority completed 8 live write cycles: intake, lead patch, booking, follow-up, review, summary, and activity.</td></tr>
+            <tr><td>Live stress</td><td>Passed</td><td>96 concurrent live reads across summary, leads, bookings, follow-ups, reviews, and activity returned <code>200</code>.</td></tr>
+            <tr><td>Actual CRM browser workflow</td><td>Passed</td><td>Playwright proved locked/no-session behavior, inherited session unlock, lead capture, pipeline update, booking, follow-up, review, desktop/mobile screenshots, no page errors, and no horizontal overflow.</td></tr>
+            <tr><td>Actual FS27 admin login</td><td>Passed</td><td>Playwright logged into the live FS27 admin UI with the root env admin password, confirmed the inherited session bridge, loaded the admin customer table route, and opened VantaCore from that same session.</td></tr>
+            <tr><td>Mobile UX</td><td>Passed</td><td>Final browser proof checked that the mobile headline no longer overlaps the tenant label.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="eyebrow">Overlap review</p>
+        <h2>Why keep this if the 0S already has related systems?</h2>
+        <p class="wide">Keep VantaCore only as the service-business operator lane: lead firewall, missed-call recovery, booking/follow-up, review routing, revenue intelligence, and white-label service CRM packaging. Do not use it to duplicate ConnectLog + Relay13 messaging, NEXUS records, SkyeMail mailbox, SkyePay billing, RouteX/HouseOps dispatch, or FS27 auth. Those remain the parent systems.</p>
+      </div>
+      <aside class="operator-warning">
+        <h3>Activation rule</h3>
+        <p>Customer-impacting provider writes stay explicit: the selected stack is configured and dry-run proven through FS27 receipts, while public review routing remains private-feedback-first until a real Google/Skye Reviews destination URL is configured.</p>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>Current evidence files</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <tbody>
+            <tr><td>Live API stress</td><td><code>test-artifacts/vantacore-owned-lane-live-2026-05-20/live-api-stress-report.json</code></td></tr>
+            <tr><td>Live browser E2E</td><td><code>test-artifacts/vantacore-owned-lane-live-2026-05-20/live-browser-e2e-report.json</code></td></tr>
+            <tr><td>FS27 admin login bridge</td><td><code>test-artifacts/vantacore-owned-lane-live-2026-05-20/fs27-admin-login-bridge-report.json</code></td></tr>
+            <tr><td>Provider control proof</td><td><code>test-artifacts/vantacore-provider-control-2026-05-20/live-provider-control-report.json</code></td></tr>
+            <tr><td>Provider readiness proof</td><td><code>test-artifacts/vantacore-provider-control-2026-05-20/live-provider-readiness-current.json</code></td></tr>
+            <tr><td>Overlap audit</td><td><code>metraiyux_0s_site/audits/VANTACORE_OWNED_LANE_LIVE_PROOF_AND_OVERLAP_2026-05-20.md</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer><p>VantaCore service CRM receipt generated for the MetrAIyux 0S and SkyeGateFS27 ownership pass.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

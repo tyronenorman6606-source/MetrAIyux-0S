@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeRouteX Gate Dashboard | SkyeGateFS27</title>
+  <meta name="description" content="FS27 gate-owned auth, onboarding, and readiness dashboard for SkyeRouteX Workforce Command." />
+  <style>
+    :root{--bg:#070812;--panel:rgba(255,255,255,.075);--panel2:rgba(255,255,255,.11);--line:rgba(255,255,255,.16);--text:#f8fbff;--muted:#b8c2d8;--gold:#ffd45a;--cyan:#4dd9ff;--ok:#66f2a5;--bad:#ff6a83}
+    *{box-sizing:border-box}
+    html,body{margin:0;max-width:100%;overflow-x:hidden}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 12% 0%,rgba(77,217,255,.2),transparent 35%),radial-gradient(circle at 86% 8%,rgba(255,212,90,.14),transparent 32%),linear-gradient(135deg,#06070d,#111426 70%,#06070d);color:var(--text);min-height:100vh}
+    a{color:inherit}
+    .nav{position:sticky;top:0;z-index:10;display:flex;gap:18px;align-items:center;padding:18px 28px;border-bottom:1px solid var(--line);background:rgba(6,7,13,.82);backdrop-filter:blur(14px)}
+    .brand{font-weight:900;margin-right:auto}.brand span{color:var(--gold)}
+    .nav a{color:var(--muted);text-decoration:none;font-size:14px}.nav a:hover{color:var(--text)}
+    main{width:min(1240px,94vw);margin:auto;padding:44px 0 80px}
+    .hero,.panel,.card{border:1px solid var(--line);background:var(--panel);box-shadow:0 24px 80px rgba(0,0,0,.34)}
+    .hero{border-radius:8px;padding:42px;background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.03))}
+    .kicker{color:var(--cyan);text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:800}
+    h1{font-size:clamp(34px,5vw,62px);line-height:1;margin:12px 0 18px;letter-spacing:0}h2{margin:0;font-size:28px}h3{margin:0 0 10px}
+    p,.meta{color:var(--muted);line-height:1.65}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:1fr 1fr 1fr}
+    .metrics{margin-top:28px}.metrics div,.card{border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.22);padding:18px}.metrics strong{display:block;font-size:28px;color:var(--gold)}.metrics span{color:var(--muted)}
+    .panel{border-radius:8px;padding:22px;margin-top:22px}.head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.28);color:var(--text)}
+    button,.button{border:1px solid rgba(255,212,90,.42);border-radius:8px;background:linear-gradient(135deg,rgba(255,212,90,.2),rgba(77,217,255,.12));color:var(--text);font-weight:800;min-height:42px;padding:10px 13px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.list{display:grid;gap:10px;max-height:520px;overflow:auto}.item{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(0,0,0,.23);padding:13px;overflow-wrap:anywhere}.pill{display:inline-block;border:1px solid rgba(77,217,255,.28);border-radius:999px;padding:4px 8px;margin:3px;color:var(--cyan);font-size:12px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+    @media(max-width:900px){.grid,.two,.three{grid-template-columns:1fr}.hero{padding:26px}.head{display:grid}.nav{flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">SkyeGateFS27 <span>RouteX</span></div>
+    <a href="/dashboard.html">Gate Home</a>
+    <a href="/admin/platform-routex-events">RouteX Events</a>
+    <a href="/admin/platform-events?app_id=metraiyux-0s">All 0S Events</a>
+    <a href="/apps/skyeroutex/auth-map.json">Auth Map</a>
+    <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/">0S App</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="kicker">Actual gate folder for this app</p>
+      <h1>SkyeRouteX auth, onboarding, and provider readiness.</h1>
+      <p>This dashboard lives in the gate folder for RouteX and reads the 0S-mounted RouteX readiness API through the shared owner/admin gate. No RouteX-local password is created here.</p>
+      <div class="grid metrics" id="metrics"><div><strong>...</strong><span>waiting for gate</span></div></div>
+    </section>
+
+    <section class="panel" id="login-panel">
+      <div class="head">
+        <div><p class="kicker">Shared owner gate</p><h2>Open RouteX gate status</h2></div>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Owner/Admin Code</h3>
+          <p>Use the existing 0S/Free99 owner admin credential. This form exchanges it with the 0S gate and stores only the returned bearer in this browser tab.</p>
+          <input id="owner-code" type="password" autocomplete="current-password" placeholder="0S owner/admin code" />
+          <div class="actions">
+            <button id="login-btn" type="button">Unlock dashboard</button>
+            <button id="refresh-btn" type="button">Refresh</button>
+          </div>
+          <p class="meta" id="status-text">Waiting for owner session.</p>
+        </div>
+        <div class="card">
+          <h3>Gate Rule</h3>
+          <p>RouteX must use the shared FS27/SkyGate/Free99 session. Provider, contractor, notification, compliance, runtime, and payment rows are reflected through the gate-owned ledgers and mirror events.</p>
+          <div class="actions">
+            <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=/SkyeRouteX/workforce-command-v0.4.0/public/gate-readiness.html">0S Login</a>
+            <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/gate-readiness.html">0S Readiness</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="head"><div><p class="kicker">Feature matrix</p><h2>What works with what</h2></div></div>
+      <div class="grid two" id="features"></div>
+    </section>
+
+    <section class="panel">
+      <div class="head"><div><p class="kicker">Gate records</p><h2>Visual tracking</h2></div></div>
+      <div class="grid three">
+        <div class="card"><h3>Notifications</h3><div class="list" id="notifications"></div></div>
+        <div class="card"><h3>Compliance</h3><div class="list" id="compliance"></div></div>
+        <div class="card"><h3>Gate Mirrors</h3><div class="list" id="mirrors"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./skyeroutex-gate-dashboard.js"></script>
+</body>
+</html>

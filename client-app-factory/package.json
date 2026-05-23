@@ -3,10 +3,17 @@
   "type": "module",
   "scripts": {
     "serve": "node server.mjs",
+    "serve:mounted": "node scripts/dev-mounted-server.mjs 4319 http://127.0.0.1:4199",
     "scan": "node scripts/factory-scan.mjs",
-    "factory": "node scripts/factory-engine.mjs empire-pallets",
+    "factory:core": "node scripts/factory-core.mjs skye-app-template",
+    "factory:enhance": "node scripts/factory-enhance.mjs skye-app-template",
+    "factory:verify": "node scripts/factory-verify.mjs skye-app-template",
+    "factory": "node scripts/factory-pipeline.mjs skye-app-template",
+    "publish:0s-shell": "node scripts/publish-0s-shell.mjs",
     "api-smoke": "node tests/api-smoke.mjs http://127.0.0.1:4199",
     "smoke": "node tests/smoke.mjs",
-    "proof": "node tests/browser-proof.mjs http://127.0.0.1:4199"
+    "stress:ai": "node tests/ai-response-lanes-stress.mjs",
+    "proof": "node tests/browser-proof.mjs http://127.0.0.1:4199",
+    "proof:mounted": "node tests/proof-mounted.mjs"
   }
 }

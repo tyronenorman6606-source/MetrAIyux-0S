@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Candidate Application | Skyes Over London Staffing</title>
+  <meta name="description" content="Candidate application and talent pool intake for staffing opportunities." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Staffing Division</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Candidate Application</p>
+      <h1>Submit your profile for staffing opportunities.</h1>
+      <p class="lead">Use this form for active roles, candidate pools, temporary work, temp-to-hire, direct-hire interest, and project crew opportunities.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Application Standard</div><h2>Be specific.</h2><p>Clear experience, availability, commute limits, pay expectations, and schedule fit help placement teams move faster.</p></aside>
+  </div>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Application Form</p><h2>Candidate profile intake.</h2><p>Attach upload is not built into this static package. Use the message field for resume link or connect a file-upload backend later.</p></div>
+  <form class="contact-form reveal" name="candidate-application" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="candidate-application" />
+    <label>Full Name<input name="name" required /></label>
+    <label>Email<input name="email" type="email" required /></label>
+    <label>Phone<input name="phone" required /></label>
+    <label>City / Area<input name="area" required /></label>
+    <label>Desired Role<input name="desired_role" placeholder="Role title or job pool" /></label>
+    <label>Work Type<select name="work_type"><option>Temporary</option><option>Temp-to-hire</option><option>Direct hire</option><option>Project work</option><option>Any strong fit</option></select></label>
+    <label>Availability<input name="availability" placeholder="Start date, shifts, days, commute range" /></label>
+    <label>Pay Expectation<input name="pay_expectation" placeholder="Hourly or salary expectation" /></label>
+    <label>Experience<textarea name="experience" rows="7" placeholder="Work history, skills, tools, certifications, resume link, references if appropriate"></textarea></label>
+    <button class="btn primary" type="submit">Submit Application</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#12051f" />
+  <title>MyDrive · Local Encrypted Vault</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <style>
+    :root {
+      --bg: #05030a;
+      --panel: rgba(13, 8, 24, 0.74);
+      --panel2: rgba(255,255,255,0.055);
+      --line: rgba(255,255,255,0.11);
+      --line2: rgba(201, 166, 255, 0.25);
+      --text: #f4efff;
+      --muted: #9c91b8;
+      --gold: #ffd166;
+      --violet: #9b5cff;
+      --cyan: #38e8ff;
+      --green: #61ffab;
+      --red: #ff5773;
+      --shadow: 0 20px 70px rgba(0,0,0,0.45);
+      --radius: 24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top left, rgba(125,76,255,0.32), transparent 36%), radial-gradient(circle at bottom right, rgba(255,209,102,0.18), transparent 34%), #05030a;
+      color: var(--text);
+      font-family: var(--sans);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .backdrop {
+      position: fixed; inset: 0; overflow: hidden; pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(circle at center, black 20%, transparent 84%);
+    }
+    .orb { position: absolute; border-radius: 999px; filter: blur(14px); opacity: 0.45; animation: drift 12s ease-in-out infinite alternate; }
+    .orb.one { width: 280px; height: 280px; background: rgba(155,92,255,0.32); top: 8%; left: 6%; }
+    .orb.two { width: 220px; height: 220px; background: rgba(56,232,255,0.18); bottom: 10%; right: 12%; animation-delay: -5s; }
+    .orb.three { width: 170px; height: 170px; background: rgba(255,209,102,0.18); top: 16%; right: 26%; animation-delay: -9s; }
+    @keyframes drift { from { transform: translate3d(-20px, 18px, 0) scale(1); } to { transform: translate3d(35px, -28px, 0) scale(1.12); } }
+    .app { position: relative; z-index: 1; display: grid; grid-template-columns: 330px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(8,5,18,0.86), rgba(5,3,10,0.78));
+      backdrop-filter: blur(22px);
+      padding: 22px;
+      display: flex; flex-direction: column; min-width: 0;
+      box-shadow: 20px 0 60px rgba(0,0,0,0.28);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .logo {
+      width: 54px; height: 54px; border-radius: 20px; display: grid; place-items: center;
+      background: conic-gradient(from 160deg, var(--gold), var(--violet), #1b1033, var(--cyan), var(--gold));
+      box-shadow: 0 0 34px rgba(155,92,255,0.45), inset 0 0 18px rgba(255,255,255,0.2);
+      position: relative; isolation: isolate;
+    }
+    .logo:before { content: ""; position: absolute; inset: 7px; border-radius: 15px; background: #080412; z-index: -1; }
+    .logo svg { width: 31px; height: 31px; filter: drop-shadow(0 0 10px rgba(255,209,102,0.9)); }
+    .brand h1 { font-family: var(--serif); margin: 0; letter-spacing: 0.14em; text-transform: uppercase; font-size: 20px; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); border-radius: 999px; color: var(--muted); font-size: 11px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
+    .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--green); box-shadow: 0 0 14px var(--green); }
+    .nav { margin-top: 22px; display: grid; gap: 9px; }
+    .nav button, .primary, .ghost, .danger, .small-action, .chip {
+      border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: rgba(255,255,255,0.055);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .nav button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; text-align: left; font-weight: 800; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .nav button:hover, .nav button.active, .primary:hover, .ghost:hover, .small-action:hover, .chip:hover { transform: translateY(-1px); border-color: rgba(255,209,102,0.42); background: rgba(255,255,255,0.09); box-shadow: 0 12px 36px rgba(0,0,0,0.18); }
+    .nav .ico, .small-action .ico { width: 21px; height: 21px; display: grid; place-items: center; color: var(--gold); }
+    .sidebar-section { margin-top: 22px; padding: 16px; border: 1px solid var(--line); background: rgba(255,255,255,0.035); border-radius: 22px; }
+    .sidebar-section h3 { margin: 0 0 9px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-family: var(--mono); }
+    .sidebar-section p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 12px; }
+    .sidebar-footer { margin-top: auto; display: grid; gap: 9px; }
+    .main { min-width: 0; display: grid; grid-template-rows: auto 1fr; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 22px; padding: 22px 28px; border-bottom: 1px solid var(--line); backdrop-filter: blur(20px); background: rgba(5,3,10,0.28); }
+    .headline h2 { margin: 0; font-family: var(--serif); font-size: clamp(26px, 4vw, 54px); letter-spacing: 0.02em; }
+    .headline p { margin: 8px 0 0; color: var(--muted); max-width: 760px; line-height: 1.45; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+    .primary { background: linear-gradient(135deg, rgba(255,209,102,0.98), rgba(155,92,255,0.84)); color: #090312; border-color: rgba(255,209,102,0.55); font-weight: 950; padding: 12px 16px; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+    .ghost { padding: 12px 14px; font-weight: 850; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+    .danger { padding: 12px 14px; color: #ffdce3; border-color: rgba(255,87,115,0.38); background: rgba(255,87,115,0.07); font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+    .danger:hover { background: rgba(255,87,115,0.16); transform: translateY(-1px); }
+    .content { overflow-y: auto; padding: 28px; }
+    .grid { display: grid; gap: 18px; }
+    .stats { grid-template-columns: repeat(4, minmax(160px, 1fr)); margin-bottom: 22px; }
+    .card {
+      border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+      border-radius: var(--radius); box-shadow: var(--shadow); backdrop-filter: blur(18px); overflow: hidden;
+    }
+    .stat { padding: 18px; position: relative; }
+    .stat:after { content: ""; position: absolute; inset: auto 14px 0 14px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,209,102,0.55), transparent); }
+    .stat b { display: block; font-size: 25px; font-family: var(--serif); }
+    .stat span { display: block; margin-top: 5px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .vault-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+    .item-card { padding: 16px; min-height: 184px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+    .item-card:hover { border-color: rgba(255,209,102,0.36); background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.035)); }
+    .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .item-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 18px; background: rgba(155,92,255,0.13); border: 1px solid rgba(155,92,255,0.27); font-size: 24px; }
+    .item-actions { display: flex; gap: 7px; }
+    .round { width: 36px; height: 36px; border-radius: 13px; border: 1px solid var(--line); background: rgba(0,0,0,0.22); color: var(--text); display: grid; place-items: center; }
+    .round:hover { border-color: rgba(255,209,102,0.55); transform: translateY(-1px); }
+    .item-card h3 { margin: 0; font-size: 15px; line-height: 1.25; word-break: break-word; }
+    .meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
+    .tag { font-size: 10px; color: var(--muted); border: 1px solid var(--line); background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 999px; font-family: var(--mono); }
+    .empty { padding: 80px 22px; text-align: center; color: var(--muted); border: 1px dashed rgba(255,255,255,0.16); border-radius: 28px; background: rgba(255,255,255,0.025); }
+    .empty strong { display: block; color: var(--text); font-family: var(--serif); font-size: 28px; margin-bottom: 8px; }
+    .drop-zone { border: 1px dashed rgba(255,209,102,0.34); padding: 18px; border-radius: 24px; background: rgba(255,209,102,0.04); color: var(--muted); text-align: center; }
+    .drop-zone.drag { background: rgba(155,92,255,0.16); border-color: var(--gold); color: var(--text); }
+    .search-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .input, .textarea, .select {
+      width: 100%; border: 1px solid var(--line); border-radius: 16px; background: rgba(0,0,0,0.28); color: var(--text); padding: 13px 14px; outline: none;
+    }
+    .textarea { min-height: 130px; resize: vertical; line-height: 1.55; }
+    .input:focus, .textarea:focus, .select:focus { border-color: rgba(255,209,102,0.62); box-shadow: 0 0 0 3px rgba(255,209,102,0.08); }
+    .search-row .input { max-width: 420px; }
+    .label { display: block; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .form-grid .wide { grid-column: 1 / -1; }
+    .modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+    .modal.active { display: flex; }
+    .modal-card { width: min(860px, 100%); max-height: 88vh; overflow-y: auto; border: 1px solid var(--line2); background: linear-gradient(180deg, rgba(17,10,31,0.97), rgba(6,3,13,0.98)); border-radius: 30px; box-shadow: 0 30px 100px rgba(0,0,0,0.62); padding: 24px; }
+    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+    .modal-header h3 { margin: 0; font-family: var(--serif); font-size: 28px; }
+    .modal-header p { margin: 6px 0 0; color: var(--muted); line-height: 1.45; }
+    .close { border: 1px solid var(--line); background: rgba(255,255,255,0.05); color: var(--text); border-radius: 14px; width: 40px; height: 40px; }
+    .recovery-codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+    .code { padding: 12px; border-radius: 14px; border: 1px solid rgba(255,209,102,0.25); background: rgba(255,209,102,0.055); font-family: var(--mono); font-weight: 800; letter-spacing: 0.08em; text-align: center; color: #fff4cd; user-select: all; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { padding: 16px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,0.035); }
+    .panel h4 { margin: 0 0 10px; color: var(--gold); font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    .toast { position: fixed; left: 50%; top: 18px; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; z-index: 120; padding: 12px 16px; border: 1px solid rgba(255,209,102,0.42); border-radius: 999px; background: rgba(5,3,10,0.9); color: #fff2c7; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; transition: .25s ease; box-shadow: 0 18px 60px rgba(0,0,0,0.45); }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    .lock-screen { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top, rgba(155,92,255,0.26), transparent 42%), rgba(5,3,10,0.86); backdrop-filter: blur(15px); }
+    .lock-card { width: min(880px, 100%); border: 1px solid var(--line2); border-radius: 32px; background: linear-gradient(180deg, rgba(14,8,26,0.98), rgba(6,3,13,0.98)); box-shadow: 0 30px 100px rgba(0,0,0,0.66); padding: 30px; }
+    .lock-head { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; margin-bottom: 22px; }
+    .lock-head h1 { margin: 0; font-family: var(--serif); font-size: clamp(34px, 6vw, 74px); letter-spacing: 0.02em; }
+    .lock-head p { margin: 5px 0 0; color: var(--muted); line-height: 1.45; }
+    .tabs { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tab { padding: 10px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--muted); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    .tab.active { color: #090312; background: var(--gold); border-color: var(--gold); }
+    .settings-table { width: 100%; border-collapse: collapse; }
+    .settings-table td { padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); color: var(--muted); }
+    .settings-table td:last-child { text-align: right; color: var(--text); font-family: var(--mono); font-size: 12px; }
+    .preview-box { white-space: pre-wrap; word-break: break-word; border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: rgba(0,0,0,0.24); color: #ede8ff; line-height: 1.5; }
+    .tiny { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .loader { height: 4px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; margin-top: 14px; }
+    .loader span { display: block; width: 40%; height: 100%; background: linear-gradient(90deg, var(--violet), var(--gold)); animation: load 1.1s ease-in-out infinite; }
+    @keyframes load { 0% { transform: translateX(-120%); } 100% { transform: translateX(260%); } }
+
+    .offline-hero {
+      position: relative; overflow: hidden; padding: 22px; margin-bottom: 20px;
+      border: 1px solid rgba(255,209,102,0.26); border-radius: 28px;
+      background: radial-gradient(circle at 8% 0%, rgba(255,209,102,0.16), transparent 34%), radial-gradient(circle at 92% 10%, rgba(56,232,255,0.13), transparent 32%), linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028));
+      box-shadow: var(--shadow);
+    }
+    .offline-hero:before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent); transform: translateX(-110%); animation: scanline 6s ease-in-out infinite; pointer-events: none; }
+    @keyframes scanline { 0%, 45% { transform: translateX(-110%); } 80%, 100% { transform: translateX(110%); } }
+    .offline-hero h3 { margin: 0; font-family: var(--serif); font-size: clamp(26px, 3.6vw, 48px); letter-spacing: .02em; }
+    .offline-hero p { margin: 10px 0 0; color: var(--muted); max-width: 980px; line-height: 1.55; }
+    .feature-matrix { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 10px; margin-top: 18px; }
+    .feature-tile { border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,0.19); padding: 13px; }
+    .feature-tile b { display: block; color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .feature-tile span { display: block; color: var(--text); margin-top: 7px; font-size: 13px; line-height: 1.35; }
+    .backup-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .integrity-box { border: 1px dashed rgba(255,209,102,0.32); border-radius: 18px; padding: 13px; background: rgba(255,209,102,0.045); color: var(--muted); line-height: 1.48; }
+    .code-small { font-family: var(--mono); font-size: 11px; color: #fff1bc; word-break: break-all; }
+    .security-grid { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 14px; }
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .app { grid-template-columns: 1fr; height: auto; min-height: 100vh; }
+      .sidebar { position: relative; border-right: 0; border-bottom: 1px solid var(--line); }
+      .nav { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .toolbar { justify-content: flex-start; }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .split, .form-grid, .feature-matrix, .security-grid { grid-template-columns: 1fr; }
+      .form-grid .wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop"><div class="orb one"></div><div class="orb two"></div><div class="orb three"></div></div>
+
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-card">
+      <div class="lock-head">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><path d="M32 4 54 18v28L32 60 10 46V18L32 4Z" stroke="#ffd166" stroke-width="3"/><path d="M32 13 45 21v18L32 51 19 39V21l13-8Z" stroke="#9b5cff" stroke-width="3"/><path d="M32 19v26M20 25l24 14M44 25 20 39" stroke="#38e8ff" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h1>MyDrive</h1>
+          <p>Offline-first is the security model: files, folders, notes, passwords, private records, recovery kits, and encrypted JSON backups stay under your browser/device control. No Firebase. No cloud sync. Resend is only an optional manual recovery-code sender.</p>
+        </div>
+      </div>
+      <div class="tabs" id="lockTabs">
+        <button class="tab active" data-locktab="unlock">Unlock</button>
+        <button class="tab" data-locktab="setup">Create Vault</button>
+        <button class="tab" data-locktab="recover">Recovery Code</button>
+        <button class="tab" data-locktab="import">Import Backup</button>
+      </div>
+      <div id="unlockPane">
+        <div class="form-grid">
+          <div class="wide"><label class="label">Vault passphrase</label><input class="input" id="unlockPass" type="password" autocomplete="current-password" placeholder="Enter your vault passphrase" /></div>
+          <div><button class="primary" id="unlockBtn">Unlock MyDrive</button></div>
+          <div><button class="ghost" id="demoSafetyBtn">Run Local Safety Check</button></div>
+        </div>
+      </div>
+      <div id="setupPane" class="hidden">
+        <div class="form-grid">
+          <div><label class="label">Vault name</label><input class="input" id="setupName" value="MyDrive Local Vault" /></div>
+          <div><label class="label">Recovery email</label><input class="input" id="setupEmail" type="email" placeholder="you@example.com" /></div>
+          <div><label class="label">Passphrase</label><input class="input" id="setupPass" type="password" autocomplete="new-password" /></div>
+          <div><label class="label">Confirm passphrase</label><input class="input" id="setupPass2" type="password" autocomplete="new-password" /></div>
+          <div class="wide panel"><h4>Recovery code policy</h4><p class="tiny">MyDrive creates one-time recovery codes that can unwrap the local data key and force you to set a new passphrase. Store them somewhere safe. You can also send them through Resend from this local browser.</p></div>
+          <div><button class="primary" id="setupBtn">Create Encrypted Vault</button></div>
+          <div><button class="ghost" id="genStrongPassBtn">Generate Passphrase</button></div>
+        </div>
+      </div>
+      <div id="recoverPane" class="hidden">
+        <div class="form-grid">
+          <div class="wide"><label class="label">One-time recovery code</label><input class="input" id="recoveryCodeInput" autocomplete="one-time-code" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" /></div>
+          <div><label class="label">New passphrase</label><input class="input" id="recoveryNewPass" type="password" autocomplete="new-password" /></div>
+          <div><label class="label">Confirm new passphrase</label><input class="input" id="recoveryNewPass2" type="password" autocomplete="new-password" /></div>
+          <div class="wide"><button class="primary" id="recoverBtn">Recover + Rotate Passphrase</button></div>
+        </div>
+      </div>
+      <div id="importPane" class="hidden">
+        <div class="panel"><h4>Import encrypted MyDrive backup</h4><p class="tiny">This restores the encrypted vault package. You still need the vault passphrase or a recovery code afterward.</p></div>
+        <div style="height:12px"></div>
+        <input class="input" type="file" id="importBackupInput" accept=".json,application/json" />
+        <div style="height:12px"></div>
+        <button class="primary" id="importBackupBtn">Import Backup Package</button>
+      </div>
+      <div id="lockProgress" class="loader hidden"><span></span></div>
+    </div>
+  </div>
+
+  <div class="app" id="appShell" aria-hidden="true">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 4 54 18v28L32 60 10 46V18L32 4Z" stroke="#ffd166" stroke-width="3"/><path d="M32 13 45 21v18L32 51 19 39V21l13-8Z" stroke="#9b5cff" stroke-width="3"/><path d="M32 19v26M20 25l24 14M44 25 20 39" stroke="#38e8ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div><h1>MyDrive</h1><p>Offline encrypted vault</p></div>
+      </div>
+      <div class="status-pill"><span class="dot"></span><span id="vaultStatus">Locked</span></div>
+      <nav class="nav" id="nav">
+        <button class="active" data-view="all"><span class="ico">◆</span> All Items</button>
+        <button data-view="files"><span class="ico">▣</span> Files</button>
+        <button data-view="notes"><span class="ico">✎</span> Notes</button>
+        <button data-view="secrets"><span class="ico">◈</span> Passwords</button>
+        <button data-view="recovery"><span class="ico">✦</span> Recovery</button>
+        <button data-view="backup"><span class="ico">▤</span> Backup</button>
+        <button data-view="settings"><span class="ico">⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-section">
+        <h3>Offline architecture</h3>
+        <p>The point is local control: MyDrive encrypts the payload and item metadata before IndexedDB ever stores it. Your passphrase is never saved.</p>
+      </div>
+      <div class="sidebar-section">
+        <h3>Network rule</h3>
+        <p>No Firebase, no cloud backend, no telemetry, no remote file storage. Optional Resend is a manual recovery-code sender only.</p>
+      </div>
+      <div class="sidebar-footer">
+        <button class="ghost" id="exportBackupBtn">Export Encrypted JSON</button>
+        <button class="danger" id="lockBtn">Lock Vault</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="headline"><h2 id="viewTitle">All Items</h2><p id="viewSubtitle">Drop files, save notes, store passwords, import folders, export encrypted JSON backups, and keep the whole vault under local control.</p></div>
+        <div class="toolbar">
+          <button class="primary" id="addFileBtn">Add Files</button>
+          <button class="ghost" id="addFolderBtn">Add Folder</button>
+          <button class="ghost" id="addNoteBtn">New Note</button>
+          <button class="ghost" id="addSecretBtn">New Password</button>
+          <button class="ghost" id="sendCodesTopBtn">Send Codes</button>
+          <input type="file" id="filePicker" multiple class="hidden" />
+          <input type="file" id="folderPicker" multiple webkitdirectory directory class="hidden" />
+        </div>
+      </header>
+      <section class="content">
+        <div class="grid stats">
+          <div class="card stat"><b id="statItems">0</b><span>Total encrypted items</span></div>
+          <div class="card stat"><b id="statFiles">0</b><span>Encrypted files</span></div>
+          <div class="card stat"><b id="statSize">0 B</b><span>Original file size</span></div>
+          <div class="card stat"><b id="statCodes">0</b><span>Recovery codes left</span></div>
+        </div>
+        <div id="dropZone" class="drop-zone">Drop files or folders here. MyDrive encrypts them before local storage. 🔐</div>
+        <div style="height:18px"></div>
+        <div class="search-row"><input id="searchInput" class="input" placeholder="Search decrypted names, tags, notes..." /><select id="sortSelect" class="select" style="max-width:220px"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option><option value="kind">Type</option></select></div>
+        <div id="viewMount"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="itemModal"><div class="modal-card"><div class="modal-header"><div><h3 id="itemModalTitle">New Item</h3><p id="itemModalSub">Secure local entry.</p></div><button class="close" data-close="itemModal">×</button></div><div id="itemModalBody"></div></div></div>
+  <div class="modal" id="previewModal"><div class="modal-card"><div class="modal-header"><div><h3 id="previewTitle">Preview</h3><p id="previewSub">Decrypted in memory only.</p></div><button class="close" data-close="previewModal">×</button></div><div id="previewBody"></div></div></div>
+  <div class="modal" id="recoveryModal"><div class="modal-card"><div class="modal-header"><div><h3>Recovery Kit</h3><p>Generate, download, print, or send one-time recovery codes through Resend.</p></div><button class="close" data-close="recoveryModal">×</button></div><div id="recoveryBody"></div></div></div>
+  <div class="modal" id="settingsModal"><div class="modal-card"><div class="modal-header"><div><h3>MyDrive Settings</h3><p>Local-only vault controls and Resend recovery sender.</p></div><button class="close" data-close="settingsModal">×</button></div><div id="settingsBody"></div></div></div>
+
+  <div class="toast" id="toast">Ready</div>
+
+<script type="module">
+'use strict';
+
+const DB_NAME = 'MyDrive_Local_Encrypted_Vault_v1';
+const DB_VERSION = 1;
+const STORE_META = 'meta';
+const STORE_ITEMS = 'items';
+const STORE_BACKUPS = 'backups';
+const ITERATIONS = 310000;
+const RECOVERY_ITERATIONS = 240000;
+const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+
+let db = null;
+let vaultMeta = null;
+let vaultKeyRaw = null;
+let vaultKey = null;
+let session = { unlocked: false, currentView: 'all', items: [], setupCodes: [] };
+
+const $ = (id) => document.getElementById(id);
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+const icons = {
+  file: '▣', image: '◉', text: '✎', archive: '▧', note: '✎', secret: '◈', recovery: '✦'
+};
+
+function notify(message) {
+  const toast = $('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(notify._t);
+  notify._t = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function showProgress(on) { $('lockProgress').classList.toggle('hidden', !on); }
+function nowISO() { return new Date().toISOString(); }
+function uuid() { return crypto.randomUUID ? crypto.randomUUID() : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)); }
+function bytesToB64(bytes) { let s = ''; const arr = bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes; for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]); return btoa(s); }
+function b64ToBytes(b64) { const bin = atob(b64); const out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+function bytesToHex(bytes) { return [...bytes].map(b => b.toString(16).padStart(2, '0')).join(''); }
+function formatBytes(bytes) { if (!bytes) return '0 B'; const units = ['B','KB','MB','GB','TB']; const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1); return `${(bytes / Math.pow(1024, i)).toFixed(i ? 2 : 0)} ${units[i]}`; }
+function escapeHTML(str = '') { return String(str).replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s])); }
+function normalizeCode(code) { return String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/(.{4})/g, '$1-').replace(/-$/, ''); }
+function originalCodeString(raw) { return raw.match(/.{1,4}/g).join('-'); }
+function randomCode() { const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; const bytes = crypto.getRandomValues(new Uint8Array(20)); let out = ''; for (const b of bytes) out += alphabet[b % alphabet.length]; return originalCodeString(out); }
+function strongPhrase() { const words = ['crown','ember','signal','violet','orbit','mirror','forge','dragon','river','cipher','gold','lunar','vault','needle','storm','atlas','nova','sable','tower','matrix']; const picks = crypto.getRandomValues(new Uint8Array(6)); return [...picks].map((n, i) => words[n % words.length] + (i === 5 ? String(100 + n) : '')).join('-'); }
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (event) => {
+      const database = event.target.result;
+      if (!database.objectStoreNames.contains(STORE_META)) database.createObjectStore(STORE_META, { keyPath: 'id' });
+      if (!database.objectStoreNames.contains(STORE_ITEMS)) {
+        const itemStore = database.createObjectStore(STORE_ITEMS, { keyPath: 'id' });
+        itemStore.createIndex('kind', 'kind', { unique: false });
+        itemStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+      }
+      if (!database.objectStoreNames.contains(STORE_BACKUPS)) database.createObjectStore(STORE_BACKUPS, { keyPath: 'id' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function txStore(storeName, mode = 'readonly') { return db.transaction(storeName, mode).objectStore(storeName); }
+function idbGet(storeName, id) { return new Promise((resolve, reject) => { const r = txStore(storeName).get(id); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }); }
+function idbGetAll(storeName) { return new Promise((resolve, reject) => { const r = txStore(storeName).getAll(); r.onsuccess = () => resolve(r.result || []); r.onerror = () => reject(r.error); }); }
+function idbPut(storeName, item) { return new Promise((resolve, reject) => { const r = txStore(storeName, 'readwrite').put(item); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
+function idbDelete(storeName, id) { return new Promise((resolve, reject) => { const r = txStore(storeName, 'readwrite').delete(id); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
+function idbClear(storeName) { return new Promise((resolve, reject) => { const r = txStore(storeName, 'readwrite').clear(); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
+
+async function sha256(data) {
+  const bytes = typeof data === 'string' ? enc.encode(data) : data;
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+}
+
+async function deriveKey(secret, saltB64, iterations = ITERATIONS) {
+  const salt = b64ToBytes(saltB64);
+  const material = await crypto.subtle.importKey('raw', enc.encode(secret), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, material, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+async function aesEncrypt(key, value, asBytes = false) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const data = asBytes ? value : enc.encode(JSON.stringify(value));
+  const cipher = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, data));
+  return { iv: bytesToB64(iv), cipher: bytesToB64(cipher) };
+}
+
+async function aesDecrypt(key, envelope, asBytes = false) {
+  const iv = b64ToBytes(envelope.iv);
+  const cipher = b64ToBytes(envelope.cipher);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+  if (asBytes) return new Uint8Array(plain);
+  return JSON.parse(dec.decode(plain));
+}
+
+async function importVaultKey(raw) { return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']); }
+async function wrapRawKey(rawKey, wrappingKey) { return aesEncrypt(wrappingKey, rawKey, true); }
+async function unwrapRawKey(envelope, wrappingKey) { return aesDecrypt(wrappingKey, envelope, true); }
+
+async function makeRecoveryEnvelopes(rawKey, codes, saltB64) {
+  const envelopes = [];
+  for (const code of codes) {
+    const clean = normalizeCode(code);
+    const digest = bytesToHex(await sha256('mydrive-recovery-id:' + clean));
+    const key = await deriveKey('mydrive-recovery-wrap:' + clean, saltB64, RECOVERY_ITERATIONS);
+    envelopes.push({ id: digest, used: false, createdAt: nowISO(), envelope: await wrapRawKey(rawKey, key) });
+  }
+  return envelopes;
+}
+
+async function consumeRecoveryCode(code) {
+  const clean = normalizeCode(code);
+  if (!vaultMeta?.recovery?.length) throw new Error('No recovery codes exist for this vault.');
+  const digest = bytesToHex(await sha256('mydrive-recovery-id:' + clean));
+  const rec = vaultMeta.recovery.find(r => r.id === digest && !r.used);
+  if (!rec) throw new Error('Recovery code invalid or already used.');
+  const key = await deriveKey('mydrive-recovery-wrap:' + clean, vaultMeta.salt, RECOVERY_ITERATIONS);
+  const raw = await unwrapRawKey(rec.envelope, key);
+  rec.used = true;
+  rec.usedAt = nowISO();
+  return raw;
+}
+
+async function saveVaultMeta() { vaultMeta.updatedAt = nowISO(); await idbPut(STORE_META, vaultMeta); }
+
+async function createVault() {
+  const name = $('setupName').value.trim() || 'MyDrive Local Vault';
+  const email = $('setupEmail').value.trim();
+  const pass = $('setupPass').value;
+  const pass2 = $('setupPass2').value;
+  if (pass.length < 12) return notify('Use at least 12 characters.');
+  if (pass !== pass2) return notify('Passphrases do not match.');
+  showProgress(true);
+  try {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const raw = crypto.getRandomValues(new Uint8Array(32));
+    const wrapping = await deriveKey(pass, bytesToB64(salt), ITERATIONS);
+    const codes = Array.from({ length: 12 }, () => randomCode());
+    const recovery = await makeRecoveryEnvelopes(raw, codes, bytesToB64(salt));
+    vaultMeta = {
+      id: 'vault',
+      product: 'MyDrive',
+      version: 1,
+      name,
+      recoveryEmail: email,
+      salt: bytesToB64(salt),
+      iterations: ITERATIONS,
+      recoveryIterations: RECOVERY_ITERATIONS,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      passphraseEnvelope: await wrapRawKey(raw, wrapping),
+      recovery,
+      settingsEnvelope: null
+    };
+    await idbPut(STORE_META, vaultMeta);
+    vaultKeyRaw = raw;
+    vaultKey = await importVaultKey(raw);
+    session.unlocked = true;
+    session.setupCodes = codes;
+    await saveSettings({ resendFrom: '', resendApiKey: '', rememberResendKey: false });
+    openApp();
+    showRecoveryKit(codes, true);
+    notify('Vault created. Recovery codes generated.');
+  } catch (error) {
+    console.error(error);
+    notify('Vault setup failed.');
+  } finally { showProgress(false); }
+}
+
+async function unlockVault() {
+  if (!vaultMeta) return notify('No vault exists yet.');
+  const pass = $('unlockPass').value;
+  if (!pass) return notify('Enter the vault passphrase.');
+  showProgress(true);
+  try {
+    const wrapping = await deriveKey(pass, vaultMeta.salt, vaultMeta.iterations || ITERATIONS);
+    const raw = await unwrapRawKey(vaultMeta.passphraseEnvelope, wrapping);
+    vaultKeyRaw = raw;
+    vaultKey = await importVaultKey(raw);
+    session.unlocked = true;
+    $('unlockPass').value = '';
+    openApp();
+    notify('MyDrive unlocked.');
+  } catch (error) {
+    console.warn(error);
+    notify('Wrong passphrase or damaged vault metadata.');
+  } finally { showProgress(false); }
+}
+
+async function recoverVault() {
+  const code = $('recoveryCodeInput').value;
+  const pass = $('recoveryNewPass').value;
+  const pass2 = $('recoveryNewPass2').value;
+  if (!code) return notify('Enter a recovery code.');
+  if (pass.length < 12) return notify('New passphrase needs at least 12 characters.');
+  if (pass !== pass2) return notify('New passphrases do not match.');
+  showProgress(true);
+  try {
+    const raw = await consumeRecoveryCode(code);
+    const wrapping = await deriveKey(pass, vaultMeta.salt, vaultMeta.iterations || ITERATIONS);
+    vaultMeta.passphraseEnvelope = await wrapRawKey(raw, wrapping);
+    await saveVaultMeta();
+    vaultKeyRaw = raw;
+    vaultKey = await importVaultKey(raw);
+    session.unlocked = true;
+    $('recoveryCodeInput').value = '';
+    $('recoveryNewPass').value = '';
+    $('recoveryNewPass2').value = '';
+    openApp();
+    notify('Recovery accepted. Passphrase rotated.');
+  } catch (error) {
+    console.warn(error);
+    notify(error.message || 'Recovery failed.');
+  } finally { showProgress(false); }
+}
+
+async function saveSettings(settings) {
+  if (!vaultKey) return;
+  vaultMeta.settingsEnvelope = await aesEncrypt(vaultKey, settings);
+  await saveVaultMeta();
+}
+
+async function loadSettings() {
+  if (!vaultMeta?.settingsEnvelope || !vaultKey) return { resendFrom: '', resendApiKey: '', rememberResendKey: false };
+  try { return await aesDecrypt(vaultKey, vaultMeta.settingsEnvelope); }
+  catch { return { resendFrom: '', resendApiKey: '', rememberResendKey: false }; }
+}
+
+async function encryptMeta(meta) { return aesEncrypt(vaultKey, meta); }
+async function decryptMeta(record) { return aesDecrypt(vaultKey, record.metaEnvelope); }
+async function encryptBytes(bytes) { return aesEncrypt(vaultKey, bytes, true); }
+async function decryptBytes(envelope) { return aesDecrypt(vaultKey, envelope, true); }
+
+function classifyFile(file) {
+  const name = file.name.toLowerCase();
+  const type = file.type || '';
+  if (type.startsWith('image/')) return 'image';
+  if (type.startsWith('text/') || /\.(txt|md|json|csv|html|css|js|ts|py|log|xml|yaml|yml)$/i.test(name)) return 'text';
+  if (/\.(zip|rar|7z|tar|gz|tgz)$/i.test(name)) return 'archive';
+  return 'file';
+}
+
+async function addFiles(fileList) {
+  if (!session.unlocked) return notify('Unlock first.');
+  const incoming = Array.from(fileList || []).filter(Boolean);
+  if (!incoming.length) return;
+  notify(`Encrypting ${incoming.length} item${incoming.length === 1 ? '' : 's'}...`);
+  for (const file of incoming) {
+    const rel = file.webkitRelativePath || file.filepath || file.name;
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const meta = {
+      id: uuid(), kind: classifyFile(file), name: rel, mime: file.type || 'application/octet-stream',
+      size: file.size || 0, createdAt: nowISO(), updatedAt: nowISO(), tags: [], search: rel.toLowerCase()
+    };
+    const record = { id: meta.id, kind: 'sealed', updatedAt: meta.updatedAt, metaEnvelope: await encryptMeta(meta), dataEnvelope: await encryptBytes(bytes) };
+    await idbPut(STORE_ITEMS, record);
+  }
+  await loadItems();
+  render();
+  notify('Encrypted into local MyDrive.');
+}
+
+async function saveNote(existingId = null) {
+  const title = $('noteTitle').value.trim() || 'Untitled note';
+  const body = $('noteBody').value;
+  const tags = $('noteTags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const meta = { id: existingId || uuid(), kind: 'note', name: title, mime: 'text/plain', size: enc.encode(body).length, createdAt: existingId ? $('noteCreatedAt').value : nowISO(), updatedAt: nowISO(), tags, search: `${title} ${tags.join(' ')} ${body}`.toLowerCase() };
+  const bytes = enc.encode(JSON.stringify({ title, body, tags }));
+  await idbPut(STORE_ITEMS, { id: meta.id, kind: 'sealed', updatedAt: meta.updatedAt, metaEnvelope: await encryptMeta(meta), dataEnvelope: await encryptBytes(bytes) });
+  closeModal('itemModal');
+  await loadItems();
+  render();
+  notify('Secure note saved.');
+}
+
+async function saveSecret(existingId = null) {
+  const title = $('secretTitle').value.trim() || 'Untitled password';
+  const username = $('secretUser').value.trim();
+  const password = $('secretPass').value;
+  const url = $('secretUrl').value.trim();
+  const notes = $('secretNotes').value;
+  const tags = $('secretTags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const payload = { title, username, password, url, notes, tags };
+  const meta = { id: existingId || uuid(), kind: 'secret', name: title, mime: 'application/mydrive-secret', size: enc.encode(JSON.stringify(payload)).length, createdAt: existingId ? $('secretCreatedAt').value : nowISO(), updatedAt: nowISO(), tags, search: `${title} ${username} ${url} ${tags.join(' ')} ${notes}`.toLowerCase() };
+  await idbPut(STORE_ITEMS, { id: meta.id, kind: 'sealed', updatedAt: meta.updatedAt, metaEnvelope: await encryptMeta(meta), dataEnvelope: await encryptBytes(enc.encode(JSON.stringify(payload))) });
+  closeModal('itemModal');
+  await loadItems();
+  render();
+  notify('Password record saved.');
+}
+
+async function loadItems() {
+  const records = await idbGetAll(STORE_ITEMS);
+  const out = [];
+  for (const record of records) {
+    try {
+      const meta = await decryptMeta(record);
+      out.push({ ...meta, _record: record });
+    } catch (error) {
+      out.push({ id: record.id, kind: 'sealed', name: '[decrypt failed]', updatedAt: record.updatedAt, size: 0, tags: [], broken: true, _record: record });
+    }
+  }
+  session.items = out;
+}
+
+async function getPayload(item) {
+  const record = item._record || await idbGet(STORE_ITEMS, item.id);
+  const bytes = await decryptBytes(record.dataEnvelope);
+  if (item.kind === 'note' || item.kind === 'secret') return JSON.parse(dec.decode(bytes));
+  return bytes;
+}
+
+async function downloadItem(id) {
+  const item = session.items.find(i => i.id === id);
+  if (!item || item.broken) return notify('Item unavailable.');
+  const bytes = await getPayload(item);
+  const blob = new Blob([bytes], { type: item.mime || 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = item.name.split('/').pop() || item.name;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  notify('Decrypted download started.');
+}
+
+async function previewItem(id) {
+  const item = session.items.find(i => i.id === id);
+  if (!item || item.broken) return notify('Item unavailable.');
+  $('previewTitle').textContent = item.name;
+  $('previewSub').textContent = `${item.kind.toUpperCase()} · ${formatBytes(item.size)} · decrypted in memory`;
+  const body = $('previewBody');
+  body.innerHTML = '<div class="loader"><span></span></div>';
+  openModal('previewModal');
+  try {
+    const payload = await getPayload(item);
+    if (item.kind === 'note') {
+      body.innerHTML = `<div class="preview-box">${escapeHTML(payload.body || '')}</div><div style="height:12px"></div><button class="primary" id="editNoteFromPreview">Edit Note</button>`;
+      $('editNoteFromPreview').onclick = () => { closeModal('previewModal'); openNoteModal(item.id, payload); };
+    } else if (item.kind === 'secret') {
+      body.innerHTML = `<div class="form-grid"><div><label class="label">Username</label><div class="preview-box">${escapeHTML(payload.username || '')}</div></div><div><label class="label">Password</label><div class="preview-box" id="secretPassPreview">••••••••••••</div></div><div class="wide"><label class="label">URL</label><div class="preview-box">${escapeHTML(payload.url || '')}</div></div><div class="wide"><label class="label">Notes</label><div class="preview-box">${escapeHTML(payload.notes || '')}</div></div><button class="primary" id="copyPasswordBtn">Copy Password</button><button class="ghost" id="editSecretFromPreview">Edit Record</button></div>`;
+      $('copyPasswordBtn').onclick = async () => { await navigator.clipboard.writeText(payload.password || ''); notify('Password copied.'); };
+      $('secretPassPreview').onclick = () => { $('secretPassPreview').textContent = payload.password || ''; };
+      $('editSecretFromPreview').onclick = () => { closeModal('previewModal'); openSecretModal(item.id, payload); };
+    } else if (item.kind === 'image') {
+      const blob = new Blob([payload], { type: item.mime || 'image/png' });
+      const url = URL.createObjectURL(blob);
+      body.innerHTML = `<img src="${url}" alt="${escapeHTML(item.name)}" style="max-width:100%;border-radius:20px;border:1px solid var(--line)" /><div style="height:12px"></div><button class="primary" id="downloadPreviewBtn">Download</button>`;
+      $('downloadPreviewBtn').onclick = () => downloadItem(id);
+    } else if (item.kind === 'text' && item.size < 1048576) {
+      body.innerHTML = `<div class="preview-box">${escapeHTML(dec.decode(payload))}</div><div style="height:12px"></div><button class="primary" id="downloadPreviewBtn">Download</button>`;
+      $('downloadPreviewBtn').onclick = () => downloadItem(id);
+    } else {
+      body.innerHTML = `<div class="panel"><h4>Encrypted file ready</h4><p class="tiny">This file is not previewed directly. Download creates a decrypted copy in your browser downloads.</p></div><div style="height:12px"></div><button class="primary" id="downloadPreviewBtn">Download Decrypted File</button>`;
+      $('downloadPreviewBtn').onclick = () => downloadItem(id);
+    }
+  } catch (error) {
+    console.error(error);
+    body.innerHTML = '<div class="panel"><h4>Decrypt failed</h4><p class="tiny">The item could not be decrypted with this vault key.</p></div>';
+  }
+}
+
+async function deleteItem(id) {
+  const item = session.items.find(i => i.id === id);
+  if (!item) return;
+  if (!confirm(`Delete ${item.name}? This removes the encrypted local copy.`)) return;
+  await idbDelete(STORE_ITEMS, id);
+  await loadItems();
+  render();
+  notify('Item deleted.');
+}
+
+function openNoteModal(existingId = null, payload = null) {
+  const existing = existingId ? session.items.find(i => i.id === existingId) : null;
+  $('itemModalTitle').textContent = existingId ? 'Edit Secure Note' : 'New Secure Note';
+  $('itemModalSub').textContent = 'Encrypted locally before storage.';
+  $('itemModalBody').innerHTML = `<div class="form-grid"><input type="hidden" id="noteCreatedAt" value="${escapeHTML(existing?.createdAt || nowISO())}"><div class="wide"><label class="label">Title</label><input class="input" id="noteTitle" value="${escapeHTML(payload?.title || existing?.name || '')}" /></div><div class="wide"><label class="label">Note body</label><textarea class="textarea" id="noteBody">${escapeHTML(payload?.body || '')}</textarea></div><div class="wide"><label class="label">Tags, comma separated</label><input class="input" id="noteTags" value="${escapeHTML((payload?.tags || existing?.tags || []).join(', '))}" /></div><button class="primary" id="saveNoteBtn">Save Note</button><button class="ghost" data-close="itemModal">Cancel</button></div>`;
+  $('saveNoteBtn').onclick = () => saveNote(existingId);
+  wireCloseButtons();
+  openModal('itemModal');
+}
+
+function openSecretModal(existingId = null, payload = null) {
+  const existing = existingId ? session.items.find(i => i.id === existingId) : null;
+  $('itemModalTitle').textContent = existingId ? 'Edit Password Record' : 'New Password Record';
+  $('itemModalSub').textContent = 'Username, password, URL, notes, and tags are encrypted together.';
+  $('itemModalBody').innerHTML = `<div class="form-grid"><input type="hidden" id="secretCreatedAt" value="${escapeHTML(existing?.createdAt || nowISO())}"><div><label class="label">Title</label><input class="input" id="secretTitle" value="${escapeHTML(payload?.title || existing?.name || '')}" /></div><div><label class="label">Username / email</label><input class="input" id="secretUser" value="${escapeHTML(payload?.username || '')}" /></div><div><label class="label">Password</label><input class="input" id="secretPass" value="${escapeHTML(payload?.password || '')}" /></div><div style="display:flex;align-items:end"><button class="ghost" id="genPasswordBtn" type="button">Generate</button></div><div class="wide"><label class="label">URL</label><input class="input" id="secretUrl" value="${escapeHTML(payload?.url || '')}" /></div><div class="wide"><label class="label">Private notes</label><textarea class="textarea" id="secretNotes">${escapeHTML(payload?.notes || '')}</textarea></div><div class="wide"><label class="label">Tags, comma separated</label><input class="input" id="secretTags" value="${escapeHTML((payload?.tags || existing?.tags || []).join(', '))}" /></div><button class="primary" id="saveSecretBtn">Save Password</button><button class="ghost" data-close="itemModal">Cancel</button></div>`;
+  $('genPasswordBtn').onclick = () => { $('secretPass').value = cryptoRandomPassword(); };
+  $('saveSecretBtn').onclick = () => saveSecret(existingId);
+  wireCloseButtons();
+  openModal('itemModal');
+}
+
+function cryptoRandomPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*()-_=+[]{}';
+  const bytes = crypto.getRandomValues(new Uint8Array(28));
+  return [...bytes].map(b => chars[b % chars.length]).join('');
+}
+
+function filteredItems() {
+  const q = $('searchInput').value.trim().toLowerCase();
+  const sort = $('sortSelect').value;
+  let items = session.items.filter(item => {
+    if (session.currentView === 'files' && ['note','secret'].includes(item.kind)) return false;
+    if (session.currentView === 'notes' && item.kind !== 'note') return false;
+    if (session.currentView === 'secrets' && item.kind !== 'secret') return false;
+    if (q && !(`${item.name} ${(item.tags || []).join(' ')} ${item.search || ''}`.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  items.sort((a,b) => {
+    if (sort === 'oldest') return new Date(a.updatedAt) - new Date(b.updatedAt);
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    if (sort === 'kind') return a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name);
+    return new Date(b.updatedAt) - new Date(a.updatedAt);
+  });
+  return items;
+}
+
+function itemIcon(kind) { return icons[kind] || icons.file; }
+
+function offlineHeroHTML() {
+  return `<section class="offline-hero"><h3>Offline-first is the power move.</h3><p>MyDrive is built for the private stash: documents, client files, screenshots, credentials, notes, recovery kits, and whatever else you need locked down locally. The app does not sync your vault to somebody else’s backend. It seals data first, stores it locally second, and exports encrypted JSON backups when you need portability.</p><div class="feature-matrix"><div class="feature-tile"><b>No Firebase</b><span>No remote database or cloud sync lane.</span></div><div class="feature-tile"><b>Sealed records</b><span>Files and metadata are encrypted before storage.</span></div><div class="feature-tile"><b>Portable JSON</b><span>Backups are encrypted packages, not plaintext dumps.</span></div><div class="feature-tile"><b>Manual recovery</b><span>Codes can be copied, printed, downloaded, or sent by Resend.</span></div></div></section>`;
+}
+
+function stableStringify(value) {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
+  return '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + stableStringify(value[key])).join(',') + '}';
+}
+
+async function sha256String(text) {
+  const hash = await crypto.subtle.digest('SHA-256', enc.encode(text));
+  return bytesToHex(new Uint8Array(hash));
+}
+
+function backupCoreFrom(data) {
+  const copy = JSON.parse(JSON.stringify(data));
+  delete copy.integrity;
+  return copy;
+}
+
+async function buildBackupPackage() {
+  const items = await idbGetAll(STORE_ITEMS);
+  const files = session.items.filter(i => !['note','secret'].includes(i.kind));
+  const core = {
+    product: 'MyDrive',
+    schema: 'mydrive.encrypted-backup',
+    schemaVersion: 2,
+    exportedAt: nowISO(),
+    database: DB_NAME,
+    securityModel: {
+      posture: 'offline-first-local-vault',
+      contentStorage: 'IndexedDB local browser database',
+      itemEncryption: 'AES-GCM via Web Crypto; random IV per object',
+      keyWrapping: `PBKDF2 ${vaultMeta?.iterations || ITERATIONS} iterations for passphrase envelope`,
+      recoveryWrapping: `PBKDF2 ${vaultMeta?.recoveryIterations || RECOVERY_ITERATIONS} iterations for one-time recovery envelopes`,
+      plaintextExport: false,
+      cloudSync: false,
+      firebase: false,
+      optionalNetwork: 'Resend email API only when user manually sends recovery codes'
+    },
+    summary: {
+      encryptedRecords: items.length,
+      decryptedIndexAtExport: session.items.length,
+      fileRecords: files.length,
+      noteRecords: session.items.filter(i => i.kind === 'note').length,
+      passwordRecords: session.items.filter(i => i.kind === 'secret').length,
+      originalFileBytes: files.reduce((sum, item) => sum + (item.size || 0), 0),
+      recoveryCodesLeft: (vaultMeta?.recovery || []).filter(r => !r.used).length
+    },
+    vaultMeta,
+    items
+  };
+  const hash = await sha256String(stableStringify(core));
+  return { ...core, integrity: { algorithm: 'SHA-256', hash, sealedAt: nowISO(), covers: 'backup package excluding integrity field' } };
+}
+
+async function validateBackupPackage(data) {
+  if (!data || data.product !== 'MyDrive' || !data.vaultMeta || !Array.isArray(data.items)) throw new Error('Not a MyDrive backup package.');
+  if (data.integrity?.hash) {
+    const computed = await sha256String(stableStringify(backupCoreFrom(data)));
+    if (computed !== data.integrity.hash) throw new Error('Backup integrity check failed. The JSON may be edited, truncated, or corrupted.');
+    return { ok: true, computed, expected: data.integrity.hash, version: data.schemaVersion || 1 };
+  }
+  return { ok: true, computed: null, expected: null, version: data.schemaVersion || 1, legacy: true };
+}
+
+function downloadJSON(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+async function exportBackupReceipt() {
+  const backup = await buildBackupPackage();
+  const receipt = {
+    product: 'MyDrive',
+    type: 'backup-receipt-no-vault-secrets',
+    createdAt: nowISO(),
+    backupExportedAt: backup.exportedAt,
+    schemaVersion: backup.schemaVersion,
+    summary: backup.summary,
+    integrity: backup.integrity,
+    note: 'This receipt does not contain vault records. Keep it beside the encrypted backup JSON to verify which package is current.'
+  };
+  downloadJSON(`MyDrive_Backup_Receipt_${new Date().toISOString().slice(0,10)}.json`, receipt);
+  notify('Backup receipt exported.');
+}
+function viewCopy(view) {
+  const map = {
+    all: ['All Items', 'Everything in your local encrypted safe.'],
+    files: ['Files', 'Encrypted documents, media, archives, folders, and raw uploads.'],
+    notes: ['Notes', 'Encrypted private notes and text records.'],
+    secrets: ['Passwords', 'Encrypted credentials and sensitive records.'],
+    recovery: ['Recovery', 'Rotate recovery codes, download a kit, or send codes through Resend.'],
+    backup: ['Backup', 'Encrypted JSON export/import, integrity checks, and backup receipts.'],
+    settings: ['Settings', 'Local vault diagnostics, backup, Resend sender, and purge controls.']
+  };
+  return map[view] || map.all;
+}
+
+function render() {
+  const [title, subtitle] = viewCopy(session.currentView);
+  $('viewTitle').textContent = title;
+  $('viewSubtitle').textContent = subtitle;
+  $('dropZone').classList.toggle('hidden', ['recovery','settings','backup'].includes(session.currentView));
+  const files = session.items.filter(i => !['note','secret'].includes(i.kind));
+  $('statItems').textContent = session.items.length;
+  $('statFiles').textContent = files.length;
+  $('statSize').textContent = formatBytes(files.reduce((sum, item) => sum + (item.size || 0), 0));
+  $('statCodes').textContent = (vaultMeta?.recovery || []).filter(r => !r.used).length;
+  if (session.currentView === 'recovery') return renderRecoveryView();
+  if (session.currentView === 'backup') return renderBackupView();
+  if (session.currentView === 'settings') return renderSettingsView();
+  const items = filteredItems();
+  const lead = session.currentView === 'all' ? offlineHeroHTML() : '';
+  if (!items.length) {
+    $('viewMount').innerHTML = `${lead}<div class="empty"><strong>Nothing here yet.</strong><span>Add files, notes, passwords, or drag folders into MyDrive.</span></div>`;
+    return;
+  }
+  $('viewMount').innerHTML = `${lead}<div class="grid vault-grid">${items.map(item => `<article class="card item-card"><div class="item-top"><div class="item-icon">${itemIcon(item.kind)}</div><div class="item-actions"><button class="round" title="Preview" data-preview="${item.id}">⌕</button>${item.kind !== 'note' && item.kind !== 'secret' ? `<button class="round" title="Download" data-download="${item.id}">⇩</button>` : ''}<button class="round" title="Delete" data-delete="${item.id}">×</button></div></div><div><h3>${escapeHTML(item.name)}</h3><p class="tiny">${escapeHTML(item.kind.toUpperCase())} · ${formatBytes(item.size || 0)} · ${new Date(item.updatedAt).toLocaleString()}</p></div><div class="meta">${(item.tags || []).slice(0,5).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join('') || `<span class="tag">encrypted</span>`}</div></article>`).join('')}</div>`;
+  document.querySelectorAll('[data-preview]').forEach(btn => btn.onclick = () => previewItem(btn.dataset.preview));
+  document.querySelectorAll('[data-download]').forEach(btn => btn.onclick = () => downloadItem(btn.dataset.download));
+  document.querySelectorAll('[data-delete]').forEach(btn => btn.onclick = () => deleteItem(btn.dataset.delete));
+}
+
+function renderRecoveryView() {
+  const unused = (vaultMeta?.recovery || []).filter(r => !r.used).length;
+  const used = (vaultMeta?.recovery || []).filter(r => r.used).length;
+  $('viewMount').innerHTML = `<div class="split"><div class="panel"><h4>Recovery status</h4><table class="settings-table"><tr><td>Recovery email</td><td>${escapeHTML(vaultMeta.recoveryEmail || 'not set')}</td></tr><tr><td>Unused codes</td><td>${unused}</td></tr><tr><td>Used codes</td><td>${used}</td></tr><tr><td>Code behavior</td><td>one-time key unwrap</td></tr></table></div><div class="panel"><h4>Actions</h4><p class="tiny">Rotation invalidates the previous recovery set and generates fresh codes. You get one chance to copy/download/send them.</p><div style="height:12px"></div><button class="primary" id="rotateCodesBtn">Rotate Recovery Codes</button><div style="height:10px"></div><button class="ghost" id="openSendCodesBtn">Send Current Session Codes</button></div></div>`;
+  $('rotateCodesBtn').onclick = rotateRecoveryCodes;
+  $('openSendCodesBtn').onclick = () => showRecoveryKit(session.setupCodes, false);
+}
+
+async function rotateRecoveryCodes() {
+  if (!vaultKeyRaw) return notify('Unlock first.');
+  if (!confirm('Rotate recovery codes? Old unused recovery codes will stop working.')) return;
+  const codes = Array.from({ length: 12 }, () => randomCode());
+  vaultMeta.recovery = await makeRecoveryEnvelopes(vaultKeyRaw, codes, vaultMeta.salt);
+  await saveVaultMeta();
+  session.setupCodes = codes;
+  render();
+  showRecoveryKit(codes, false);
+  notify('Recovery codes rotated.');
+}
+
+function recoveryEmailText(codes) {
+  return `MyDrive Recovery Kit\n\nVault: ${vaultMeta.name}\nCreated: ${new Date().toLocaleString()}\n\nThese one-time recovery codes can unlock your local MyDrive vault and rotate your passphrase. Store them offline too.\n\n${codes.map((c,i) => `${String(i+1).padStart(2,'0')}. ${c}`).join('\n')}\n\nSecurity note: MyDrive stores encrypted data locally. Resend is only used for this outbound email because you triggered it.`;
+}
+
+function showRecoveryKit(codes = [], firstRun = false) {
+  const hasCodes = Array.isArray(codes) && codes.length;
+  $('recoveryBody').innerHTML = `<div class="panel"><h4>${hasCodes ? 'Fresh recovery codes' : 'No fresh codes in current session'}</h4><p class="tiny">${hasCodes ? 'Copy, download, print, or send these now. For security, MyDrive does not store the readable code text after this session.' : 'Rotate recovery codes to generate a new readable kit, then send/download it.'}</p></div>${hasCodes ? `<div class="recovery-codes">${codes.map(c => `<div class="code">${escapeHTML(c)}</div>`).join('')}</div><div class="toolbar" style="justify-content:flex-start"><button class="primary" id="downloadCodesBtn">Download Kit</button><button class="ghost" id="copyCodesBtn">Copy Codes</button><button class="ghost" id="printCodesBtn">Print</button><button class="ghost" id="sendCodesBtn">Send via Resend</button></div>` : `<div style="height:12px"></div><button class="primary" id="rotateFromModalBtn">Rotate Codes Now</button>`}<div id="resendPanel" class="hidden" style="margin-top:16px"></div>`;
+  if (hasCodes) {
+    $('downloadCodesBtn').onclick = () => downloadText('MyDrive_Recovery_Kit.txt', recoveryEmailText(codes));
+    $('copyCodesBtn').onclick = async () => { await navigator.clipboard.writeText(recoveryEmailText(codes)); notify('Recovery kit copied.'); };
+    $('printCodesBtn').onclick = () => printRecovery(codes);
+    $('sendCodesBtn').onclick = () => renderResendPanel(codes);
+  } else {
+    $('rotateFromModalBtn').onclick = rotateRecoveryCodes;
+  }
+  openModal('recoveryModal');
+  if (firstRun && hasCodes) setTimeout(() => renderResendPanel(codes), 300);
+}
+
+async function renderResendPanel(codes) {
+  const settings = await loadSettings();
+  const panel = $('resendPanel');
+  panel.classList.remove('hidden');
+  panel.innerHTML = `<div class="panel"><h4>Send recovery codes with Resend</h4><p class="tiny">This is the only network action in MyDrive. Your Resend API key is used from this local browser. Leave “remember key” off to keep it session-only.</p><div style="height:12px"></div><div class="form-grid"><div><label class="label">To email</label><input class="input" id="resendTo" value="${escapeHTML(vaultMeta.recoveryEmail || '')}" /></div><div><label class="label">From email</label><input class="input" id="resendFrom" placeholder="MyDrive <onboarding@resend.dev>" value="${escapeHTML(settings.resendFrom || '')}" /></div><div class="wide"><label class="label">Resend API key</label><input class="input" id="resendKey" type="password" placeholder="re_..." value="${settings.rememberResendKey ? escapeHTML(settings.resendApiKey || '') : ''}" /></div><div><label class="label">Remember encrypted key in vault</label><select class="select" id="rememberResend"><option value="no">No, session only</option><option value="yes" ${settings.rememberResendKey ? 'selected' : ''}>Yes, encrypted locally</option></select></div><div style="display:flex;align-items:end"><button class="primary" id="actuallySendCodesBtn">Send Recovery Email</button></div></div><div style="height:10px"></div><div id="resendResult" class="tiny"></div></div>`;
+  $('actuallySendCodesBtn').onclick = () => sendRecoveryViaResend(codes);
+}
+
+async function sendRecoveryViaResend(codes) {
+  const to = $('resendTo').value.trim();
+  const from = $('resendFrom').value.trim() || 'MyDrive <onboarding@resend.dev>';
+  const apiKey = $('resendKey').value.trim();
+  const remember = $('rememberResend').value === 'yes';
+  if (!to || !apiKey) return notify('Email and Resend API key required.');
+  $('resendResult').textContent = 'Sending through Resend...';
+  try {
+    const res = await fetch(RESEND_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [to], subject: `MyDrive Recovery Kit · ${vaultMeta.name}`, text: recoveryEmailText(codes) })
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json?.message || `Resend rejected request (${res.status})`);
+    vaultMeta.recoveryEmail = to;
+    if (remember) await saveSettings({ resendFrom: from, resendApiKey: apiKey, rememberResendKey: true });
+    else await saveSettings({ resendFrom: from, resendApiKey: '', rememberResendKey: false });
+    await saveVaultMeta();
+    $('resendResult').textContent = `Sent. Resend id: ${json.id || 'accepted'}`;
+    notify('Recovery email sent.');
+  } catch (error) {
+    console.error(error);
+    $('resendResult').innerHTML = `Send failed: ${escapeHTML(error.message)}<br><br>Fallback: copy/download the kit from this same modal. The vault itself is still local and encrypted.`;
+    notify('Resend send failed.');
+  }
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+function printRecovery(codes) {
+  const win = window.open('', '_blank', 'noopener,noreferrer');
+  if (!win) return notify('Popup blocked.');
+  win.document.write(`<pre style="font:16px ui-monospace,monospace;white-space:pre-wrap">${escapeHTML(recoveryEmailText(codes))}</pre>`);
+  win.document.close(); win.focus(); win.print();
+}
+
+async function renderBackupView() {
+  const history = await idbGetAll(STORE_BACKUPS).catch(() => []);
+  const latest = history.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+  $('viewMount').innerHTML = `<div class="offline-hero"><h3>Encrypted JSON backups are the escape hatch.</h3><p>Backup does not mean uploading your vault anywhere. MyDrive packages the sealed IndexedDB records and vault metadata into a portable JSON file. The contents remain encrypted and still require your passphrase or recovery code after import.</p><div class="feature-matrix"><div class="feature-tile"><b>Format</b><span>Human-inspectable JSON package.</span></div><div class="feature-tile"><b>Secrets</b><span>No plaintext file contents, notes, passwords, or names.</span></div><div class="feature-tile"><b>Integrity</b><span>SHA-256 seal detects corruption/editing.</span></div><div class="feature-tile"><b>Restore</b><span>Import JSON, then unlock normally.</span></div></div></div><div class="split"><div class="panel"><h4>Backup actions</h4><p class="tiny">Use this before browser resets, device moves, major edits, or purges. Store copies on a USB drive, external disk, or your own private storage.</p><div class="backup-actions"><button class="primary" id="backupExportNowBtn">Export Encrypted JSON</button><button class="ghost" id="backupReceiptBtn">Export Receipt JSON</button><button class="ghost" id="backupImportBtn">Import Backup JSON</button><button class="ghost" id="backupVerifyBtn">Verify Backup JSON</button></div><input class="hidden" id="backupImportPicker" type="file" accept=".json,application/json" /><input class="hidden" id="backupVerifyPicker" type="file" accept=".json,application/json" /></div><div class="panel"><h4>Latest backup receipt</h4>${latest ? `<table class="settings-table"><tr><td>Created</td><td>${escapeHTML(new Date(latest.createdAt).toLocaleString())}</td></tr><tr><td>Records</td><td>${escapeHTML(latest.summary?.encryptedRecords ?? 'unknown')}</td></tr><tr><td>SHA-256</td><td class="code-small">${escapeHTML(latest.integrity?.hash || latest.id || 'unknown')}</td></tr></table>` : `<p class="tiny">No backup receipt stored yet. Export one now and MyDrive will keep a local receipt entry.</p>`}</div><div class="panel"><h4>What the JSON contains</h4><div class="integrity-box">The backup includes encrypted item envelopes, encrypted item metadata, vault key wrapping metadata, recovery envelopes, settings envelope, and an integrity hash. It does not expose readable vault contents.</div></div><div class="panel"><h4>Restore rule</h4><div class="integrity-box">Import replaces the current local vault in this browser. Export first if this browser already has a vault you care about.</div></div></div>`;
+  $('backupExportNowBtn').onclick = exportBackup;
+  $('backupReceiptBtn').onclick = exportBackupReceipt;
+  $('backupImportBtn').onclick = () => $('backupImportPicker').click();
+  $('backupVerifyBtn').onclick = () => $('backupVerifyPicker').click();
+  $('backupImportPicker').onchange = importBackupFromInput;
+  $('backupVerifyPicker').onchange = () => verifyBackupFromInput('backupVerifyPicker');
+}
+
+async function renderSettingsView() {
+  const settings = await loadSettings();
+  const storage = navigator.storage?.estimate ? await navigator.storage.estimate() : { usage: 0, quota: 0 };
+  $('viewMount').innerHTML = `<div class="offline-hero"><h3>Offline is the architecture.</h3><p>MyDrive is intentionally not a cloud drive. The browser stores sealed vault records locally, the passphrase unlocks only an encrypted vault key, and backup leaves as an encrypted JSON package you control.</p><div class="feature-matrix"><div class="feature-tile"><b>Storage</b><span>IndexedDB on this device/browser.</span></div><div class="feature-tile"><b>Encryption</b><span>AES-GCM with random IV per sealed object.</span></div><div class="feature-tile"><b>Key wrapping</b><span>PBKDF2-derived passphrase wrapper.</span></div><div class="feature-tile"><b>Cloud</b><span>None for vault data. Resend only when triggered.</span></div></div></div><div class="split"><div class="panel"><h4>Vault diagnostics</h4><table class="settings-table"><tr><td>Name</td><td>${escapeHTML(vaultMeta.name)}</td></tr><tr><td>Database</td><td>${DB_NAME}</td></tr><tr><td>Storage used</td><td>${formatBytes(storage.usage || 0)}</td></tr><tr><td>Storage quota</td><td>${formatBytes(storage.quota || 0)}</td></tr><tr><td>Encryption</td><td>AES-GCM / PBKDF2</td></tr><tr><td>Cloud sync</td><td>disabled</td></tr><tr><td>Firebase</td><td>not present</td></tr></table></div><div class="panel"><h4>Resend settings</h4><div class="form-grid"><div class="wide"><label class="label">Recovery email</label><input class="input" id="settingsRecoveryEmail" value="${escapeHTML(vaultMeta.recoveryEmail || '')}" /></div><div class="wide"><label class="label">Default from email</label><input class="input" id="settingsResendFrom" value="${escapeHTML(settings.resendFrom || '')}" placeholder="MyDrive <onboarding@resend.dev>" /></div><div class="wide"><button class="primary" id="saveSettingsBtn">Save Settings</button></div></div></div><div class="panel"><h4>Backup</h4><p class="tiny">Exports encrypted metadata and encrypted content as a JSON package with a SHA-256 integrity seal. No plaintext goodies are exported.</p><div class="backup-actions"><button class="primary" id="settingsExportBtn">Export Encrypted JSON</button><button class="ghost" id="settingsBackupViewBtn">Open Backup Center</button></div></div><div class="panel"><h4>Danger zone</h4><p class="tiny">This clears the local browser database for MyDrive on this device. Export an encrypted JSON backup first.</p><div style="height:12px"></div><button class="danger" id="purgeBtn">Purge Local Vault</button></div></div>`;
+  $('saveSettingsBtn').onclick = async () => {
+    const prior = await loadSettings();
+    vaultMeta.recoveryEmail = $('settingsRecoveryEmail').value.trim();
+    await saveSettings({ ...prior, resendFrom: $('settingsResendFrom').value.trim() });
+    await saveVaultMeta();
+    notify('Settings saved.');
+  };
+  $('settingsExportBtn').onclick = exportBackup;
+  $('settingsBackupViewBtn').onclick = () => setView('backup');
+  $('purgeBtn').onclick = purgeVault;
+}
+
+async function exportBackup() {
+  const backup = await buildBackupPackage();
+  downloadJSON(`MyDrive_Encrypted_Backup_${new Date().toISOString().slice(0,10)}.json`, backup);
+  await idbPut(STORE_BACKUPS, { id: backup.integrity.hash, createdAt: backup.exportedAt, summary: backup.summary, integrity: backup.integrity });
+  notify('Encrypted JSON backup exported.');
+}
+
+async function importBackupData(data, { fromUnlocked = false } = {}) {
+  const validation = await validateBackupPackage(data);
+  const existingItems = await idbGetAll(STORE_ITEMS);
+  if (existingItems.length && !confirm('Importing this backup replaces the current local MyDrive vault in this browser. Export first if you need the current state. Continue?')) return false;
+  await idbClear(STORE_META);
+  await idbClear(STORE_ITEMS);
+  await idbClear(STORE_BACKUPS);
+  await idbPut(STORE_META, data.vaultMeta);
+  for (const item of data.items) await idbPut(STORE_ITEMS, item);
+  if (data.integrity?.hash) await idbPut(STORE_BACKUPS, { id: data.integrity.hash, createdAt: data.exportedAt || nowISO(), summary: data.summary || {}, integrity: data.integrity });
+  vaultMeta = data.vaultMeta;
+  vaultKeyRaw = null;
+  vaultKey = null;
+  session.unlocked = false;
+  session.items = [];
+  session.setupCodes = [];
+  if (fromUnlocked) lockApp();
+  setLockTab('unlock');
+  notify(validation.legacy ? 'Legacy backup imported. Unlock it now.' : 'Verified backup imported. Unlock it now.');
+  return true;
+}
+
+async function importBackupFromInput() {
+  const file = $('importBackupInput').files?.[0] || $('backupImportPicker')?.files?.[0];
+  if (!file) return notify('Choose a MyDrive backup JSON.');
+  showProgress(true);
+  try {
+    const data = JSON.parse(await file.text());
+    await importBackupData(data, { fromUnlocked: !!session.unlocked });
+  } catch (error) {
+    console.error(error);
+    notify(error.message || 'Import failed.');
+  } finally { showProgress(false); }
+}
+
+async function verifyBackupFromInput(inputId = 'backupVerifyPicker') {
+  const file = $(inputId)?.files?.[0];
+  if (!file) return notify('Choose a backup JSON to verify.');
+  try {
+    const data = JSON.parse(await file.text());
+    const validation = await validateBackupPackage(data);
+    const summary = data.summary || { encryptedRecords: data.items?.length || 0 };
+    const detail = validation.legacy
+      ? 'Legacy MyDrive backup detected. Structure is valid, but it has no v2 SHA-256 seal.'
+      : `Integrity verified. SHA-256: ${validation.computed}`;
+    alert(`✅ Backup package valid\n\nVersion: ${validation.version}\nRecords: ${summary.encryptedRecords ?? data.items.length}\nExported: ${data.exportedAt || 'unknown'}\n\n${detail}`);
+    notify(validation.legacy ? 'Legacy backup structure valid.' : 'Backup integrity verified.');
+  } catch (error) {
+    console.error(error);
+    notify(error.message || 'Backup verification failed.');
+  }
+}
+
+async function purgeVault() {
+  if (!confirm('Purge all MyDrive local vault data from this browser? Export a backup first if needed.')) return;
+  await idbClear(STORE_META);
+  await idbClear(STORE_ITEMS);
+  await idbClear(STORE_BACKUPS);
+  location.reload();
+}
+
+async function runSafetyCheck() {
+  const checks = [];
+  checks.push(['IndexedDB available', !!window.indexedDB]);
+  checks.push(['Web Crypto available', !!crypto.subtle]);
+  checks.push(['No Firebase namespace', typeof window.firebase === 'undefined' && typeof window.fb === 'undefined' && typeof window.cloudDB === 'undefined']);
+  checks.push(['Service worker support', 'serviceWorker' in navigator]);
+  checks.push(['Encrypted storage functions ready', typeof aesEncrypt === 'function' && typeof aesDecrypt === 'function']);
+  checks.push(['JSON backup builder ready', typeof buildBackupPackage === 'function']);
+  checks.push(['Resend is explicit only', RESEND_ENDPOINT.includes('api.resend.com')]);
+  notify(checks.every(c => c[1]) ? 'Local safety check passed.' : 'Safety check found issues.');
+  alert(checks.map(([name, ok]) => `${ok ? '✅' : '☐'} ${name}`).join('\n'));
+}
+
+function openApp() {
+  $('lockScreen').classList.add('hidden');
+  $('appShell').setAttribute('aria-hidden', 'false');
+  $('vaultStatus').textContent = 'Unlocked · local only';
+  loadItems().then(render);
+}
+
+function lockApp() {
+  vaultKeyRaw = null; vaultKey = null; session.unlocked = false; session.items = []; session.setupCodes = [];
+  $('appShell').setAttribute('aria-hidden', 'true');
+  $('lockScreen').classList.remove('hidden');
+  $('vaultStatus').textContent = 'Locked';
+  setLockTab('unlock');
+  notify('Vault locked.');
+}
+
+function openModal(id) { $(id).classList.add('active'); }
+function closeModal(id) { $(id).classList.remove('active'); }
+function wireCloseButtons() { document.querySelectorAll('[data-close]').forEach(btn => btn.onclick = () => closeModal(btn.dataset.close)); }
+
+function setLockTab(tab) {
+  document.querySelectorAll('[data-locktab]').forEach(btn => btn.classList.toggle('active', btn.dataset.locktab === tab));
+  ['unlock','setup','recover','import'].forEach(name => $(`${name}Pane`).classList.toggle('hidden', name !== tab));
+}
+
+function setView(view) {
+  session.currentView = view;
+  document.querySelectorAll('#nav button').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+  render();
+}
+
+async function init() {
+  db = await openDatabase();
+  vaultMeta = await idbGet(STORE_META, 'vault');
+  if (!vaultMeta) setLockTab('setup'); else setLockTab('unlock');
+  wireCloseButtons();
+  $('setupBtn').onclick = createVault;
+  $('unlockBtn').onclick = unlockVault;
+  $('recoverBtn').onclick = recoverVault;
+  $('importBackupBtn').onclick = importBackupFromInput;
+  $('demoSafetyBtn').onclick = runSafetyCheck;
+  $('genStrongPassBtn').onclick = () => { const pass = strongPhrase(); $('setupPass').value = pass; $('setupPass2').value = pass; notify('Generated strong passphrase. Copy it.'); };
+  document.querySelectorAll('[data-locktab]').forEach(btn => btn.onclick = () => setLockTab(btn.dataset.locktab));
+  document.querySelectorAll('#nav button').forEach(btn => btn.onclick = () => setView(btn.dataset.view));
+  $('addFileBtn').onclick = () => $('filePicker').click();
+  $('filePicker').onchange = (e) => addFiles(e.target.files);
+  $('addFolderBtn').onclick = () => $('folderPicker').click();
+  $('folderPicker').onchange = (e) => addFiles(e.target.files);
+  $('addNoteBtn').onclick = () => openNoteModal();
+  $('addSecretBtn').onclick = () => openSecretModal();
+  $('sendCodesTopBtn').onclick = () => showRecoveryKit(session.setupCodes, false);
+  $('exportBackupBtn').onclick = exportBackup;
+  $('lockBtn').onclick = lockApp;
+  $('searchInput').oninput = render;
+  $('sortSelect').onchange = render;
+  $('unlockPass').addEventListener('keydown', e => { if (e.key === 'Enter') unlockVault(); });
+  const drop = $('dropZone');
+  ['dragenter','dragover'].forEach(type => drop.addEventListener(type, e => { e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(type => drop.addEventListener(type, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', async e => {
+    const files = await collectDroppedFiles(e.dataTransfer);
+    addFiles(files);
+  });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+}
+
+async function collectDroppedFiles(dataTransfer) {
+  const items = Array.from(dataTransfer.items || []);
+  const collected = [];
+  async function traverse(entry, path = '') {
+    if (!entry) return;
+    if (entry.isFile) {
+      await new Promise(resolve => entry.file(file => { try { Object.defineProperty(file, 'filepath', { value: path + file.name }); } catch {} collected.push(file); resolve(); }, resolve));
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      let entries = [];
+      while (true) {
+        const batch = await new Promise(resolve => reader.readEntries(resolve, () => resolve([])));
+        if (!batch.length) break;
+        entries = entries.concat(batch);
+      }
+      for (const child of entries) await traverse(child, path + entry.name + '/');
+    }
+  }
+  for (const item of items) {
+    const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+    if (entry) await traverse(entry);
+    else if (item.kind === 'file') { const file = item.getAsFile(); if (file) collected.push(file); }
+  }
+  if (!collected.length) return Array.from(dataTransfer.files || []);
+  return collected;
+}
+
+init().catch(error => { console.error(error); notify('MyDrive failed to initialize.'); });
+</script>
+</body>
+</html>

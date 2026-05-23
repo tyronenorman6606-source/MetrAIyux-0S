@@ -1,0 +1,168 @@
+{
+  "started_at": "2026-05-17T22:09:34.809Z",
+  "smoke": "live-env-readiness",
+  "root_env": {
+    "loaded": true,
+    "path_found": true,
+    "applied_keys_count": 469,
+    "skipped_control_keys": [
+      "NODE_ENV",
+      "PORT"
+    ]
+  },
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "root_env_file_loaded",
+      "critical": true,
+      "data": {
+        "path_found": true
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "database_live_url_available",
+      "critical": true,
+      "data": {
+        "configured": true,
+        "driver": "postgres"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "stripe_checkout_and_webhook_available",
+      "critical": true,
+      "data": {
+        "secret_present": true,
+        "webhook_secret_present": true,
+        "provider": "stripe"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "object_storage_r2_available",
+      "critical": false,
+      "data": {
+        "configured": true,
+        "driver": "r2",
+        "impact": "Live proof-media object storage needs STORAGE_BUCKET/S3_BUCKET plus the R2 keys before production proof upload is fully live."
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "twilio_notification_env_available",
+      "critical": false,
+      "data": {
+        "configured": true,
+        "provider": "twilio"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "identity_compliance_manual_or_provider_available",
+      "critical": false,
+      "data": {
+        "configured": true,
+        "provider": "manual-government-check",
+        "mode": "az_llc_admin_assist",
+        "operating_state": "AZ",
+        "impact": "manual-government-check is accepted for the Arizona LLC admin-assist/proof-vault lane; Checkr or compliance-webhook remains optional."
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "starter-command_plan_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "paid_pending_owner_approval"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "metraiyux-starter-command_skyepay_offer_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "paid_pending_owner_approval"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "growth-cabinet_plan_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_route_scope"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "metraiyux-growth-cabinet_skyepay_offer_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_route_scope"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "routex-workforce-command_plan_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_route_scope"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "metraiyux-routex-workforce-command_skyepay_offer_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_route_scope"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "autonomous-office_plan_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_sovereign_stack_review"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "metraiyux-autonomous-office_skyepay_offer_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_sovereign_stack_review"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "enterprise-command_plan_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_gate_scope"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "metraiyux-enterprise-command_skyepay_offer_owner_approval_policy",
+      "critical": true,
+      "data": {
+        "owner_approval_required": true,
+        "activation_path": "owner_approved_after_gate_scope"
+      }
+    }
+  ],
+  "warnings": [],
+  "customer_ready_for_paid_owner_approval_queue": true,
+  "customer_ready_for_full_live_route_ops": true,
+  "status": "PASS",
+  "completed_at": "2026-05-17T22:09:34.809Z"
+}

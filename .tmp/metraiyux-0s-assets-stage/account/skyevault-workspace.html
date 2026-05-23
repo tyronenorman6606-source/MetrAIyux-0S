@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Workspace</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .vault-account-shell { display: grid; gap: 1rem; }
+    .vault-account-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .vault-account-card { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); border-radius: .5rem; padding: 1rem; }
+    .vault-account-card span { display: block; color: rgba(255,255,255,.66); font-size: .82rem; }
+    .vault-account-card strong { display: block; margin-top: .35rem; font-size: 1.5rem; }
+    .vault-table { width: 100%; border-collapse: collapse; }
+    .vault-table th, .vault-table td { border-bottom: 1px solid rgba(255,255,255,.12); padding: .75rem; text-align: left; vertical-align: top; }
+    .vault-table th { color: rgba(255,255,255,.68); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+    .vault-table code { overflow-wrap: anywhere; }
+    @media (max-width: 900px) { .vault-account-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .vault-account-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">SkyeVault Account</span></a>
+  <nav><a href="../index.html">Home</a><a href="../admin/skyevault-neural-map.html">Operator Map</a></nav>
+</header>
+<main class="site-shell vault-account-shell">
+  <section class="admin-hero">
+    <p class="eyebrow">Workspace Vault</p>
+    <h1 id="workspaceTitle">SkyeVault Workspace</h1>
+    <p class="hero-lede">Repos, uploads, bundle exports, and neural-map changes for this workspace only.</p>
+    <div id="workspaceStatus" class="mode-banner"><span class="status-pill">Loading workspace</span></div>
+  </section>
+
+  <section class="vault-account-grid" aria-label="Workspace summary">
+    <article class="vault-account-card"><span>Repos</span><strong id="repoCount">0</strong></article>
+    <article class="vault-account-card"><span>Uploads</span><strong id="uploadCount">0</strong></article>
+    <article class="vault-account-card"><span>Graph Nodes</span><strong id="nodeCount">0</strong></article>
+    <article class="vault-account-card"><span>Tracked Bytes</span><strong id="storedBytes">0 B</strong></article>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Repos</h2>
+    <table class="vault-table">
+      <thead><tr><th>Repo</th><th>Activity</th><th>Latest Head</th></tr></thead>
+      <tbody id="repoRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Recent Uploads</h2>
+    <table class="vault-table">
+      <thead><tr><th>Receipt</th><th>File</th><th>Archive</th></tr></thead>
+      <tbody id="uploadRows"></tbody>
+    </table>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Neural Change Timeline</h2>
+    <table class="vault-table">
+      <thead><tr><th>Node</th><th>Type</th><th>Summary</th></tr></thead>
+      <tbody id="nodeRows"></tbody>
+    </table>
+  </section>
+</main>
+<footer class="footer"><p>MetrAIyux 0S command system - account-scoped SkyeVault workspace.</p></footer>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  function safeFilePart(value) {
+    return String(value || 'default').trim().replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100) || 'default';
+  }
+  function bytes(value) {
+    const size = Number(value || 0);
+    if (!size) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const index = Math.min(Math.floor(Math.log(size) / Math.log(1024)), units.length - 1);
+    return (size / 1024 ** index).toFixed(index ? 2 : 0) + ' ' + units[index];
+  }
+  function setStatus(text, ok = true) {
+    $('workspaceStatus').innerHTML = '<span class="status-pill">' + esc(text) + '</span>';
+    $('workspaceStatus').style.borderColor = ok ? 'rgba(125,220,138,.45)' : 'rgba(255,140,122,.45)';
+  }
+  function render(map) {
+    $('workspaceTitle').textContent = 'SkyeVault Workspace: ' + map.workspace_id;
+    $('repoCount').textContent = map.repo_count || 0;
+    $('uploadCount').textContent = map.upload_count || 0;
+    $('nodeCount').textContent = (map.nodes || []).length;
+    $('storedBytes').textContent = bytes((map.uploads || []).reduce((sum, upload) => sum + Number(upload.fileSize || 0), 0));
+    $('repoRows').innerHTML = (map.repos || []).map((repo) => '<tr><td><strong>' + esc(repo.repo_id) + '</strong></td><td>' + esc((repo.ref_updates || 0) + ' ref updates, ' + (repo.requests || 0) + ' Git requests, ' + (repo.exports || 0) + ' exports') + '</td><td><code>' + esc(repo.latest_head || 'empty') + '</code><br>' + esc(repo.latest_subject || '') + '</td></tr>').join('') || '<tr><td colspan="3">No repos in this workspace yet.</td></tr>';
+    $('uploadRows').innerHTML = (map.uploads || []).slice(-20).reverse().map((upload) => '<tr><td><code>' + esc(upload.receipt_ref) + '</code></td><td>' + esc(upload.fileName || 'vault upload') + '</td><td>' + esc(bytes(upload.fileSize)) + '<br><code>' + esc(upload.sha256_prefix || '') + '</code></td></tr>').join('') || '<tr><td colspan="3">No uploads stamped to this workspace yet.</td></tr>';
+    $('nodeRows').innerHTML = (map.nodes || []).slice(-40).map((node) => '<tr><td><code>' + esc(node.label || node.id) + '</code></td><td>' + esc(node.type || '') + '</td><td>' + esc(node.summary || '') + '</td></tr>').join('');
+    setStatus('Ready - account scoped map loaded');
+  }
+  const workspace = safeFilePart(new URLSearchParams(location.search).get('workspace') || 'acme');
+  fetch('../brain/skyevault-workspaces/' + workspace + '.json')
+    .then((res) => {
+      if (!res.ok) throw new Error('Workspace map not generated');
+      return res.json();
+    })
+    .then(render)
+    .catch((error) => setStatus(error.message, false));
+</script>
+<script src="../script.js"></script>
+</body>
+</html>

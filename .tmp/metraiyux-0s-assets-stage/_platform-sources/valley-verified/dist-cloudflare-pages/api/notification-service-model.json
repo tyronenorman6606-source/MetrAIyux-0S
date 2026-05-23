@@ -1,0 +1,18 @@
+{
+  "version": "18.0.0",
+  "generated_at": "2026-05-19T05:43:32.188Z",
+  "service": "notification-service",
+  "mode": "signed_webhook_delivery_with_dry_run_default",
+  "functions": [
+    "verifyWebhookJob",
+    "deliverWebhookJob",
+    "processWebhookOutbox",
+    "resolveWebhookTarget"
+  ],
+  "environment": [
+    "PHX_WEBHOOK_SECRET",
+    "PHX_WEBHOOK_URL",
+    "PHX_WEBHOOK_<TARGET>_URL"
+  ],
+  "rule": "Outbox jobs are created by mutations; delivery receipts are recorded separately so provider failures never corrupt action state."
+}

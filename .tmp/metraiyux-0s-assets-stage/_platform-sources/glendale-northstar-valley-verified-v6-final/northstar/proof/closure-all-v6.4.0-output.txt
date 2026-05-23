@@ -1,0 +1,155 @@
+
+> signinpro-northstar-workspace-closure@6.4.0 closure:all
+> npm run schema:verify && npm run smoke:core && npm run smoke:security && npm run smoke:functions && npm run closure:local
+
+
+> signinpro-northstar-workspace-closure@6.4.0 schema:verify
+> node scripts/schema-verify.mjs
+
+{
+  "workspaces": true,
+  "workspace_users": true,
+  "workspace_settings": true,
+  "workspace_states": true,
+  "attendees": true,
+  "workspace_audit_events": true,
+  "workspace_login_attempts": true,
+  "workspace_invites": true,
+  "workspace_backups": true,
+  "workspaceOperationalSummary": true,
+  "attendeesCompositePrimaryKey": true,
+  "workspaceStatePrimaryKey": true
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:core
+> node proof/core-smoke.test.cjs
+
+core smoke passed: 6.4.0-workspace-closure attendees: 1
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:security
+> node scripts/security-static-smoke.mjs
+
+{
+  "missing": [],
+  "csrfServer": true,
+  "rolePermissions": true,
+  "loginAttempts": true,
+  "workspaceSettings": true,
+  "workspaceBackups": true,
+  "clientCsrfHeader": true,
+  "rlsDatabaseGuard": true
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 smoke:functions
+> node scripts/static-workspace-smoke.mjs
+
+{
+  "ok": true,
+  "checked": 22
+}
+
+> signinpro-northstar-workspace-closure@6.4.0 closure:local
+> node scripts/closure-local-proof.mjs
+
+{
+  "ok": true,
+  "build": "6.4.0-workspace-closure",
+  "generatedAt": "2026-05-19T21:52:15.327Z",
+  "assertions": [
+    {
+      "name": "core version is closure build",
+      "ok": true,
+      "detail": "6.4.0-workspace-closure"
+    },
+    {
+      "name": "workspace storage prefix is v4",
+      "ok": true,
+      "detail": "signinpro_workspace_state_v4"
+    },
+    {
+      "name": "three workspaces provisioned locally",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "name": "tenant one state has only updated tenant one attendee",
+      "ok": true,
+      "detail": "[\"Carol Updated\"]"
+    },
+    {
+      "name": "tenant two state has only tenant two attendee",
+      "ok": true,
+      "detail": "[\"Bob Tenant Two\"]"
+    },
+    {
+      "name": "attendee mirror deletes removed local attendees",
+      "ok": true,
+      "detail": "[\"Carol Updated\"]"
+    },
+    {
+      "name": "tenant one cannot see tenant two attendee mirror",
+      "ok": true,
+      "detail": "tenant filter by workspaceId"
+    },
+    {
+      "name": "tenant two cannot see tenant one attendee mirror",
+      "ok": true,
+      "detail": "tenant filter by workspaceId"
+    },
+    {
+      "name": "manual backup snapshots are workspace scoped",
+      "ok": true,
+      "detail": "{\"one\":2,\"two\":1,\"future\":0}"
+    },
+    {
+      "name": "owner permission can provision future companies",
+      "ok": true,
+      "detail": "future-proof-company"
+    },
+    {
+      "name": "admin menu has provision tab renderer",
+      "ok": true,
+      "detail": "renderProvision + form present"
+    },
+    {
+      "name": "app has no stale escapeHtml call",
+      "ok": true,
+      "detail": "esc() is the active HTML escape helper"
+    },
+    {
+      "name": "client has real operator provision call",
+      "ok": true,
+      "detail": "operatorProvision uses API endpoint and bearer token"
+    },
+    {
+      "name": "sync sends manual backup flag",
+      "ok": true,
+      "detail": "makeBackup true reaches API"
+    },
+    {
+      "name": "workspace sync mirrors deletions to attendee table",
+      "ok": true,
+      "detail": "delete removed attendees by workspace"
+    },
+    {
+      "name": "operator provision writes workspace user settings state audit",
+      "ok": true,
+      "detail": "all core tables touched"
+    },
+    {
+      "name": "seed file contains client workspaces",
+      "ok": true,
+      "detail": "11"
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "assertions": 17,
+    "failures": 0,
+    "localWorkspaces": 3,
+    "tenantOneAttendees": 1,
+    "tenantTwoAttendees": 1,
+    "tenantOneBackups": 2,
+    "tenantTwoBackups": 1
+  }
+}

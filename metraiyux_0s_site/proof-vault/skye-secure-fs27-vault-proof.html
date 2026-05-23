@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkySecure FS27 Vault Proof | MetrAIyux 0S</title>
+  <meta name="description" content="Live production proof receipt for the FS27 -> SkyeVault -> SkySecure -> SkyeVaultOS encrypted custody lane, metadata APIs, bundle attach, reload diff, and restore proof.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="index.html">Proof Vault</a><a href="../skye-secure-secret-packs.html">SkySecure</a><a href="../skye-vault-os/">VaultOS</a><a href="../skye-secure-platform/index.html">Platform Console</a></nav>
+  </header>
+  <main>
+    <section class="hero slim">
+      <div>
+        <p class="eyebrow">Production proof lane</p>
+        <h1>SkySecure and VaultOS are live under SkyeVault, under FS27.</h1>
+        <p class="hero-lede">This receipt now covers both live proof layers: the May 19, 2026 SkySecure encrypted secret-pack proof and the May 20, 2026 SkyeVaultOS delete-candidate proof. FS27 owns the metadata/API control plane, SkyeVault owns ciphertext custody, SkySecure owns pack lifecycle, and VaultOS proves scan, offload, bundle, attach, reload, diff, restore-point, grant, revoke, and audit before deletion.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Authority chain</p>
+      <h2>FS27 -> SkyeVault -> SkySecure -> SkyeVaultOS</h2>
+      <div class="route-grid">
+        <article class="route-card"><h3>FS27 control</h3><p>Live routes are deployed for SkySecure health/proof, pack metadata, grants, events, and VaultOS proof, commands, inventory, search, restore-points, and audit metadata.</p></article>
+        <article class="route-card"><h3>SkyeVault custody</h3><p>Packs and VaultOS objects are encrypted before custody handoff. FS27 publishes safe metadata, object pointers, hashes, counts, and restore evidence, not plaintext secret values.</p></article>
+        <article class="route-card"><h3>SkySecure lifecycle</h3><p>Encrypted-pack registration, observer grants, event logging, and VaultOS FS27 sync are written through the FS27 SkySecure lane.</p></article>
+        <article class="route-card"><h3>VaultOS lifecycle</h3><p>The unified CLI and 0S console prove scan, offload, inventory, search, diff, verify, reload, restore-point, grant, revoke, audit, ls, tree, cat-meta, manifest, bundle, attach, and fs27-sync.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Live result</p>
+      <h2>What passed</h2>
+      <div class="cabinet-map">
+        <div><h3>FS27 health</h3><p><code>GET /skysecure/health</code> returned 200 and the hierarchy <code>FS27 -> SkyeVault -> SkySecure</code>.</p></div>
+        <div><h3>Access boundary</h3><p><code>GET /skysecure/packs</code> rejected anonymous access with 401 while public VaultOS metadata routes stayed read-only and secret-free.</p></div>
+        <div><h3>Secret-pack proof</h3><p>Encrypted pack <code>live-proof.skyesecrets</code> uploaded to SkyeVault receipt <code>cdv_17ba705a7887f6d8dbdd933d</code>; FS27 reported 3 packs, 3 active grants, and 9 events.</p></div>
+        <div><h3>VaultOS scan</h3><p>The real <code>/workspaces/MetrAIyux-0S/about to delete</code> folder was preserved, scanned as 1,833 files and 503,761,494 plaintext bytes, then encrypted into four VaultOS objects.</p></div>
+        <div><h3>Restore proof</h3><p>Restore point <code>restore_about-to-delete-before-any-delete_20260520T002709Z</code> was created before deletion, with source diff, reload diff, and bundle reload diff all passing.</p></div>
+        <div><h3>Drive bundle</h3><p>The vault was exported as a portable bundle, attached into a fresh vault, and reloaded back into proof storage with 1,833 verified files, 0 missing, 0 changed, and 0 extra.</p></div>
+        <div><h3>FS27 metadata APIs</h3><p>Live inventory, search, restore-point, and audit APIs returned deployed metadata for four VaultOS objects, one pack set, four audit events, and the synced restore evidence.</p></div>
+        <div><h3>0S browser proof</h3><p>The SkyeVaultOS console rendered on desktop and mobile, loaded live FS27 metadata, showed the 1,833-file count, and reported no browser console errors.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Production routes</p>
+      <h2>Live surfaces checked</h2>
+      <div class="tool-panel">
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/health" target="_blank" rel="noopener">FS27 SkySecure health</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/proof" target="_blank" rel="noopener">FS27 SkySecure proof</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/proof" target="_blank" rel="noopener">FS27 VaultOS proof</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/commands" target="_blank" rel="noopener">FS27 VaultOS commands</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/inventory" target="_blank" rel="noopener">FS27 VaultOS inventory</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/search?q=vaultos" target="_blank" rel="noopener">FS27 VaultOS search</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/restore-points" target="_blank" rel="noopener">FS27 VaultOS restore points</a></p>
+        <p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skysecure/vaultos/audit" target="_blank" rel="noopener">FS27 VaultOS audit</a></p>
+        <p><a href="../skye-secure-secret-packs.html">0S SkySecure product page</a></p>
+        <p><a href="../skye-secure-secret-packs/app.html">0S SkySecure packer/unlocker</a></p>
+        <p><a href="../skye-secure-platform/index.html">0S SkySecure platform console</a></p>
+        <p><a href="../skye-vault-os/">0S SkyeVaultOS console</a></p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Proof commands</p>
+      <h2>Receipt artifacts</h2>
+      <div class="tool-panel">
+        <p><code>npm run skye-secure:live-proof</code></p>
+        <p><code>npm run vaultos:proof</code></p>
+        <p><code>npm run vaultos -- fs27-sync --vault-dir=/tmp/skye-vault-os-about-to-delete-proof/vault --secret-env=FS27_SKYESECURE_WRITE_SECRET</code></p>
+        <p>Secret-pack artifact: <code>test-artifacts/skye-secure-live-production-proof/live-production-proof-report.json</code></p>
+        <p>VaultOS artifact: <code>test-artifacts/vaultos-about-to-delete-proof/vaultos-about-to-delete-proof-report.json</code></p>
+        <p>VaultOS manifest: <code>test-artifacts/vaultos-about-to-delete-proof/receipts/vaultos-manifest.json</code></p>
+        <p>FS27 sync receipt: <code>test-artifacts/vaultos-about-to-delete-proof/fs27-sync-live.json</code></p>
+        <p>Current live deployments checked after route wiring: FS27 Worker version <code>9dc7c0c5-ff84-4d69-b3ab-623346403781</code> and 0S Worker version <code>f59a74b5-9afb-4aea-89c6-f556e1c6ba28</code>.</p>
+      </div>
+    </section>
+  </main>
+  <footer><p>SkySecure production receipt. Public summary only; write secrets, admin credentials, passphrases, plaintext files, and encrypted download links are not published.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

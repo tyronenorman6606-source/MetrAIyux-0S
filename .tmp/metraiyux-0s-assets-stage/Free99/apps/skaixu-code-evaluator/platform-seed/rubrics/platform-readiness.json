@@ -1,0 +1,23 @@
+{
+  "type": "rubric",
+  "name": "Platform Readiness Rubric",
+  "version": "1.0.0",
+  "scoring": {
+    "routing_and_surface": 15,
+    "state_and_persistence": 15,
+    "seed_pipeline": 15,
+    "proof_ledgers": 15,
+    "security_and_gateway_control": 15,
+    "tests_and_repeatable_checks": 15,
+    "documentation_and_operator_handoff": 10
+  },
+  "checks": [
+    "Can load folder, files, zip, and pasted source without server-side auth.",
+    "Can persist and reload workspaces locally with project contents, report output, patch output, proof ledger, and seed registry.",
+    "Can ingest seed files from platform-seed/ manifest, uploaded seed folders, and seed zips.",
+    "Can generate deterministic proof ledgers without AI/provider calls.",
+    "Can export proof pack for operator handoff.",
+    "Uses kAIxuGateway13 only for model calls; no direct OpenAI/Anthropic/Gemini browser calls.",
+    "Has a repeatable smoke script that validates inline JavaScript and seed manifest references."
+  ]
+}

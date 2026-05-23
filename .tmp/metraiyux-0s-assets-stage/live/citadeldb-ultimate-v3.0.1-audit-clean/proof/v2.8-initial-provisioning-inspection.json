@@ -1,0 +1,27 @@
+{
+  "create_database_snippets": [
+    "g}_user`;\n  const password = crypto.randomBytes(32).toString('base64url');\n\n  const client = await pool.connect();\n\n  try {\n    await client.query('BEGIN');\n\n    const roleExists = await client.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [roleName]);\n    if (roleExists.rowCount === 0) {\n      await client.query(`CREATE ROLE ${sqlIdent(roleName)} LOGIN PASSWORD ${sqlLiteral(password)} NOSUPERUSER NOCREATEDB NOCREATEROLE`);\n    }\n\n    const dbExists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);\n    if (dbExists.rowCount === 0) {\n      await client.query(`CREATE DATABASE ${sqlIdent(dbName)} OWNER ${sqlIdent(roleName)}`);\n    }\n\n    await client.query(\n      `INSERT INTO citadel.apps (app_slug, database_name, role_name, engine)\n       VALUES ($1, $2, $3, $4)\n       ON CONFLICT (app_slug)\n       DO UPDATE SET database_name = EXCLUDED.database_name,\n                     role_name = EXCLUDED.role_name,\n                     engine = EXCLUDED.engine,\n                     status = 'active'`,\n      [slug, dbName, roleName, engine]\n    );\n\n    await client.query(\n      `INSERT INTO citadel.app_credentials (app_slug, role_name, secret_hint)\n       VALUES ($1, $2, $3)`,",
+    "== 0) return res.status(404).json({ ok: false, error: 'Project not found' });\n\n  const count = await query(pool, `SELECT count(*)::int AS count FROM self_service.project_databases WHERE project_slug = $1`, [projectSlug]);\n  if (count.rows[0].count >= project.rows[0].max_databases) {\n    return res.status(400).json({ ok: false, error: 'Project database quota reached' });\n  }\n\n  const app = appSlug(`${projectSlug}-${body.appSlug}`);\n  const databaseName = `app_${app}`.slice(0, 60);\n  const roleName = `app_${app}_user`.slice(0, 60);\n  const password = generateAppPassword();\n\n  await query(pool, `CREATE DATABASE ${sqlIdent(databaseName)}`);\n  await query(pool, `CREATE ROLE ${sqlIdent(roleName)} WITH LOGIN PASSWORD ${sqlLiteral(password)}`);\n  await query(pool, `GRANT ALL PRIVILEGES ON DATABASE ${sqlIdent(databaseName)} TO ${sqlIdent(roleName)}`);\n\n  await query(\n    pool,\n    `INSERT INTO citadel.apps (app_slug, database_name, role_name, engine, status)\n     VALUES ($1, $2, $3, $4, 'active')\n     ON CONFLICT (app_slug) DO UPDATE SET status = 'active'\n     RETURNING app_slug, database_name, role_name, engine, status, created_at`,\n    [app, databaseName, roleName, body.engine || 'vps-postgres']\n  );\n\n "
+  ],
+  "migration_files": [
+    "001_base_citadel_core.sql",
+    "002_operator_jobs.sql",
+    "003_tenant_registry.sql",
+    "004_self_service_console.sql",
+    "005_platform_accounts_billing_usage.sql",
+    "006_commercial_control_plane.sql",
+    "007_live_gate_hardening.sql"
+  ],
+  "init_files_before": [
+    "001_base_citadel_core.sql",
+    "004_self_service_console.sql",
+    "005_platform_accounts_billing_usage.sql",
+    "006_commercial_control_plane.sql",
+    "007_live_gate_hardening.sql"
+  ],
+  "missing_init_before": [
+    "002_operator_jobs.sql",
+    "003_tenant_registry.sql"
+  ],
+  "gateway_allowed_job_block": "const allowedJobTypes = new Set([\n  'health',\n  'backup-now',\n  'backup-encrypted',\n  'restore-test',\n  'smoke-all',\n  'object-backup-sync',\n  'validate-env',\n  'app-write-smoke'\n]);"
+}

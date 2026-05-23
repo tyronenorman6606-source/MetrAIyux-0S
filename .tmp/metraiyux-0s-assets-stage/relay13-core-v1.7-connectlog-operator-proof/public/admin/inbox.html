@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relay13 Admin Inbox</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="skyesol-living-page">
+  <div class="admin-inbox-app">
+    <header class="operator-topbar admin-mail-topbar">
+      <div class="brand"><img class="brand-logo" src="../assets/relay13-logo-transparent.png" alt="" /><div><h1>Relay13 Inbox</h1><p>Operator command mailbox</p></div></div>
+      <nav class="operator-nav" aria-label="Relay13 admin pages">
+        <a class="room-tab active" href="inbox.html">Inbox</a>
+        <a class="room-tab" href="connect.html">Connect</a>
+        <a class="room-tab" href="setup.html">Setup</a>
+        <a class="room-tab" href="release.html">Release</a>
+      </nav>
+      <a class="btn" href="index.html">Open live console</a>
+    </header>
+
+    <main class="admin-mail-main">
+      <section class="admin-mail-command" aria-label="Admin inbox command bar">
+        <div>
+          <p class="eyebrow">Mailbox first</p>
+          <h1>Live operator inbox</h1>
+          <p>Open the queue, read the thread, save the person, and send the next action without leaving the surface.</p>
+        </div>
+        <label class="admin-mail-search">
+          <span>Search conversations</span>
+          <input type="search" placeholder="Search workspace, owner, status" aria-label="Search admin inbox" />
+        </label>
+        <div class="admin-mail-actions">
+          <button type="button" data-admin-filter="New">New</button>
+          <button type="button" data-admin-filter="Pending">Pending</button>
+          <button type="button" data-admin-filter="Owner Gray">Assigned to me</button>
+        </div>
+      </section>
+
+      <nav class="admin-mobile-jumps" aria-label="Mobile admin inbox rooms">
+        <a href="#admin-mail-list">Inbox</a>
+        <a href="#admin-mail-thread">Thread</a>
+        <a href="#admin-mail-context">Context</a>
+      </nav>
+
+      <section class="admin-mail-shell">
+        <aside class="admin-mail-rail" aria-label="Admin folders">
+          <div class="admin-mail-identity">
+            <span>R13</span>
+            <div><strong>Gray operator</strong><small>3 active workspaces</small></div>
+          </div>
+          <div class="admin-folder-group">
+            <p>Folders</p>
+            <a class="active" href="#" data-admin-filter="All"><span>Inbox</span><b>24</b></a>
+            <a href="#" data-admin-filter="Unread"><span>Unread</span><b>8</b></a>
+            <a href="#" data-admin-filter="Pending"><span>Pending</span><b>5</b></a>
+            <a href="#" data-admin-filter="Closed"><span>Closed today</span><b>11</b></a>
+          </div>
+          <div class="admin-folder-group">
+            <p>Workspaces</p>
+            <a href="#" data-admin-filter="MetrAIyux 0S"><span>MetrAIyux 0S</span><b>12</b></a>
+            <a href="#" data-admin-filter="SkyeSol"><span>SkyeSol</span><b>7</b></a>
+            <a href="#" data-admin-filter="Client launch"><span>Client launch</span><b>5</b></a>
+          </div>
+        </aside>
+
+        <section id="admin-mail-list" class="admin-thread-list" aria-label="Admin thread list">
+          <header class="admin-pane-head">
+            <div><p class="eyebrow">Queue</p><h2>Needs operator</h2></div>
+            <button type="button" data-admin-action="refresh">Refresh</button>
+          </header>
+          <article class="admin-mail-row selected unread" data-admin-thread="website" data-tags="New Unread Widget Owner Gray MetrAIyux 0S" role="button" tabindex="0">
+            <span class="admin-dot"></span>
+            <div>
+              <div class="admin-row-line"><strong>Website request</strong><time>Now</time></div>
+              <h3>Visitor sent a launch question from widget</h3>
+              <p>They need private access, pricing, and a direct reply in the same chat thread.</p>
+              <div class="admin-row-tags"><span>New</span><span>Widget</span><span>Owner: Gray</span></div>
+            </div>
+          </article>
+          <article class="admin-mail-row unread" data-admin-thread="card" data-tags="New Unread Buyer High intent Owner Gray MetrAIyux 0S" role="button" tabindex="0">
+            <span class="admin-dot cyan"></span>
+            <div>
+              <div class="admin-row-line"><strong>Card scan</strong><time>6m</time></div>
+              <h3>Buyer scan came in with phone and budget</h3>
+              <p>Create the customer record and attach a quote link before responding.</p>
+              <div class="admin-row-tags"><span>Buyer</span><span>High intent</span></div>
+            </div>
+          </article>
+          <article class="admin-mail-row" data-admin-thread="support" data-tags="Pending Access SkyeSol" role="button" tabindex="0">
+            <span class="admin-dot green"></span>
+            <div>
+              <div class="admin-row-line"><strong>Client support</strong><time>21m</time></div>
+              <h3>Workspace invite did not reach the contact</h3>
+              <p>Resend the invite and mark the old token as replaced.</p>
+              <div class="admin-row-tags"><span>Pending</span><span>Access</span></div>
+            </div>
+          </article>
+          <article class="admin-mail-row" data-admin-thread="release" data-tags="Queued Release Client launch Pending" role="button" tabindex="0">
+            <span class="admin-dot muted"></span>
+            <div>
+              <div class="admin-row-line"><strong>Release job</strong><time>1h</time></div>
+              <h3>Widget config verify job is waiting</h3>
+              <p>The next response should include the install snippet and client tutorial link.</p>
+              <div class="admin-row-tags"><span>Queued</span><span>Release</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section id="admin-mail-thread" class="admin-reading-pane" aria-label="Admin selected thread">
+          <header class="admin-reading-head">
+            <div>
+              <p class="eyebrow">Selected thread</p>
+              <h2>Visitor sent a launch question from widget</h2>
+              <p>Open - MetrAIyux 0S - widget /pricing</p>
+            </div>
+            <div class="admin-reading-actions">
+              <button type="button" data-admin-action="reply">Reply</button>
+              <button type="button" data-admin-action="assign">Assign</button>
+              <button type="button" data-admin-action="close">Close</button>
+            </div>
+          </header>
+          <div class="admin-message-log">
+            <article class="admin-chat-msg them"><strong>Visitor</strong><p>I saw the platform and need a private room. Can I get the quick version of what I am buying?</p><span>2:08 PM</span></article>
+            <article class="admin-chat-msg me"><strong>Operator</strong><p>You get a messaging workspace, a private handoff room, and a thread tied to your contact record. I am sending that now.</p><span>2:09 PM</span></article>
+            <article class="admin-chat-msg them"><strong>Visitor</strong><p>Send the room and the first step. I am on desktop now but need it clean on mobile too.</p><span>2:10 PM</span></article>
+          </div>
+          <form class="admin-reply-box">
+            <div><span>Operator reply</span><button type="button" data-admin-action="insert-tutorial">Insert tutorial</button><button type="button" data-admin-action="attach-room">Attach room</button></div>
+            <textarea aria-label="Operator reply">Here is the private room, the setup tutorial, and the next action. Reply here and the thread stays attached to your record.</textarea>
+            <footer><button type="button" data-admin-action="save-draft">Save draft</button><button class="send" type="button" data-admin-action="send">Send</button></footer>
+          </form>
+        </section>
+
+        <aside id="admin-mail-context" class="admin-context-panel" aria-label="Admin context panel">
+          <section>
+            <p class="eyebrow">Profile</p>
+            <h2>Website visitor</h2>
+            <p>Unknown contact from widget. Needs education, private access, and a clean next action.</p>
+            <dl>
+              <div><dt>Workspace</dt><dd>MetrAIyux 0S</dd></div>
+              <div><dt>Source</dt><dd>/pricing widget</dd></div>
+              <div><dt>Status</dt><dd>Open</dd></div>
+              <div><dt>Owner</dt><dd>Unassigned</dd></div>
+            </dl>
+          </section>
+          <section>
+            <p class="eyebrow">Checklist</p>
+            <ol>
+              <li>Explain what they get</li>
+              <li>Send private room</li>
+              <li>Save contact</li>
+              <li>Attach tutorial</li>
+            </ol>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <div class="admin-inbox-toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="static-inbox.js"></script>
+</body>
+</html>

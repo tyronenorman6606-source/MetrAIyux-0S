@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JobPing Production Intake | 0S</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090d0d;--panel:#121717;--ink:#f8fafc;--muted:#b9c3ca;--line:rgba(255,255,255,.15);--gold:#f4cf6a;--red:#ff7f6e;--green:#78daa3}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#090d0d;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:30px 0 56px}
+    header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start;margin-bottom:16px}
+    .eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0}
+    h1{margin:0;font-size:clamp(40px,8vw,76px);line-height:.95;letter-spacing:0}
+    h2{margin:0 0 10px;font-size:20px;letter-spacing:0}
+    p,li{color:var(--muted);line-height:1.55}
+    a{color:var(--ink);text-decoration:none}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+    section,.panel{border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.03));padding:16px}
+    .status{display:grid;gap:9px}
+    .row{display:flex;justify-content:space-between;gap:14px;border-top:1px solid rgba(255,255,255,.1);padding-top:9px;color:var(--muted)}
+    .row strong{color:var(--ink)}
+    code{color:var(--green);white-space:normal}
+    .button{display:inline-flex;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.07);color:var(--ink);padding:10px 12px;font-weight:900}
+    .warn{border-color:rgba(255,127,110,.42);background:rgba(255,127,110,.08)}
+    .ok{border-color:rgba(120,218,163,.42);background:rgba(120,218,163,.08)}
+    ul{margin:8px 0 0;padding-left:18px}
+    @media(max-width:820px){header,.grid{grid-template-columns:1fr}.row{display:grid;gap:4px}h1{font-size:44px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">0S shared gate · JobPing pricing lane</p>
+        <h1>JobPing is not mounted as a complete runtime yet.</h1>
+        <p>This page replaces the fake workspace. The 0S path and SkyPay offer exist, but the repo does not contain the real JobPing application source/runtime needed to sell or run it in production.</p>
+      </div>
+      <a class="button" href="/Free99/index.html">Free99 hub</a>
+    </header>
+
+    <div class="grid">
+      <section class="warn">
+        <h2>What I found</h2>
+        <div class="status">
+          <div class="row"><strong>Mounted path</strong><code>/Free99/apps/jobping/</code></div>
+          <div class="row"><strong>Pricing offer</strong><code>jobping-runtime</code></div>
+          <div class="row"><strong>Auth owner</strong><code>FS27 / SkyGate / Free99</code></div>
+          <div class="row"><strong>Real app source</strong><code>not found in this repo scan</code></div>
+          <div class="row"><strong>Production status</strong><code>blocked until real runtime package is supplied</code></div>
+        </div>
+      </section>
+
+      <section class="ok">
+        <h2>What is still valid</h2>
+        <p>The surface is mounted behind the shared 0S gate. It must keep using the existing FS27/SkyGate/Free99 session and must not introduce a JobPing-specific password, admin login, or client gate.</p>
+        <p>The SkyPay offer can stay reserved for JobPing, but checkout and AI execution should stay disabled until the real product runtime is present and verified.</p>
+      </section>
+    </div>
+
+    <section style="margin-top:14px">
+      <h2>Needed before JobPing can be pushed live for serious use</h2>
+      <ul>
+        <li>Actual JobPing source repo or complete deployable build, not partial generated static fragments.</li>
+        <li>Runtime entrypoints, asset manifest, and route map for the imported app.</li>
+        <li>Database schema, migrations, seed/test data, and a backup/restore path.</li>
+        <li>Shared 0S auth adapter using the gate session helpers only.</li>
+        <li>SkyPay product/price mapping plus confirmed payment webhook or claim flow for JobPing entitlement.</li>
+        <li>Metered AI route wired through the existing 0S provider gateway with receipts, usage, and failure states.</li>
+        <li>Job source/provider integrations, email/SMS notification provider contracts, and background worker or queue behavior.</li>
+        <li>Owner ledger view for JobPing checkouts, AI usage, failures, and entitlement claims.</li>
+        <li>Fresh-user login proof, paid entitlement proof, desktop/mobile browser proof, console/network proof, and rollback notes.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:14px">
+      <h2>Runtime endpoints</h2>
+      <p>The fake triage and fake paid match UI have been removed. The Worker now reports JobPing as a missing-runtime lane instead of pretending the imported product exists.</p>
+      <p><a class="button" href="/api/jobping/health">View JobPing health JSON</a></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "SovereignDocs v9 Legal Partner Review + Enforcement Build",
+  "version": "9.0.0",
+  "sourceTruth": "template-library/manifest.json from v2.1 confidence-review pack",
+  "templateRecords": 10200,
+  "legalPartnerReview": true,
+  "noBuiltInAuth": true,
+  "upstreamAuth": "signed upstream session adapter; production can require SOVEREIGNDOCS_REQUIRE_UPSTREAM_AUTH=1",
+  "newApiRoutes": [
+    "GET /api/legal-partners/network",
+    "GET /api/legal-review/service-plans",
+    "GET /api/legal-review/statuses",
+    "POST /api/legal-review/submit",
+    "GET /api/legal-review/submissions",
+    "GET /api/legal-review/submissions/:id",
+    "POST /api/legal-review/submissions/:id/route",
+    "POST /api/legal-review/submissions/:id/partner-update"
+  ],
+  "publicBoundary": "SovereignDocs is not a law firm, does not provide legal advice, and does not guarantee partner acceptance or outcome.",
+  "proofScript": "npm run smoke:v9"
+}

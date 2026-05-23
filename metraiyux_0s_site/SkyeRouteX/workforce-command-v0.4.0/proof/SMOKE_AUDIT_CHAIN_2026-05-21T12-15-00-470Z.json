@@ -1,0 +1,45 @@
+{
+  "started_at": "2026-05-21T12:15:00.183Z",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "generated_multiple_audit_events",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "audit_integrity_endpoint_reports_valid_chain",
+      "data": {
+        "ok": true,
+        "event_count": 4,
+        "head_hash": "bce11d3bc7b46362ff073eb94453ab6528f953a54b5d7def57f71c99b7f32ac9",
+        "failures": []
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "local_audit_verifier_matches_endpoint",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "tamper_detection_catches_mutated_event",
+      "data": {
+        "ok": false,
+        "event_count": 4,
+        "head_hash": "bce11d3bc7b46362ff073eb94453ab6528f953a54b5d7def57f71c99b7f32ac9",
+        "failures": [
+          {
+            "index": 1,
+            "id": "aud_6fa4fcb55f7c0e71da",
+            "type": "event_hash_mismatch",
+            "expected": "6bd8853a96b5708f86111d565ed25e6ff35e0d29922dc7d19ac9bac2bcd5e97c",
+            "actual": "1819fe173d3251e0fbbf5f2a16005461aa0a5e4b1be1581a2646bb129133faf8"
+          }
+        ]
+      }
+    }
+  ],
+  "completed_at": "2026-05-21T12:15:00.470Z",
+  "status": "PASS"
+}

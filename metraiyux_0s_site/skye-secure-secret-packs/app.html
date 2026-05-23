@@ -1,0 +1,496 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyeSecure Secret Packs standalone local packer and unlocker for encrypted developer handoff files.">
+  <title>SkyeSecure Console - Local Secret Pack Create and Restore</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --unlock-bg: #05090d;
+      --unlock-panel: rgba(7, 15, 20, .9);
+      --unlock-line: rgba(255,255,255,.14);
+      --unlock-ink: #f5fbff;
+      --unlock-muted: #aebec6;
+      --unlock-gold: #f3d483;
+      --unlock-cyan: #35b7ff;
+      --unlock-green: #6ff2c7;
+      --unlock-red: #ff8b8b;
+    }
+
+    body.unlock-page {
+      background: linear-gradient(180deg, #071017 0%, var(--unlock-bg) 100%);
+      color: var(--unlock-ink);
+    }
+
+    .unlock-shell {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 6.4rem 0 5rem;
+    }
+
+    .unlock-hero {
+      display: grid;
+      grid-template-columns: 1fr minmax(260px, 380px);
+      gap: 2rem;
+      align-items: end;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--unlock-line);
+    }
+
+    .unlock-hero h1 {
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      line-height: .94;
+      letter-spacing: 0;
+      margin: .35rem 0 .85rem;
+    }
+
+    .unlock-hero p {
+      max-width: 780px;
+      color: #d7e5eb;
+      font-size: 1.08rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .unlock-status-card {
+      border: 1px solid rgba(243,212,131,.35);
+      border-radius: 8px;
+      padding: 1rem;
+      background: rgba(243,212,131,.08);
+    }
+
+    .unlock-status-card b {
+      display: block;
+      color: var(--unlock-gold);
+      margin-bottom: .35rem;
+    }
+
+    .unlock-status-card span {
+      color: var(--unlock-muted);
+      line-height: 1.5;
+    }
+
+    .unlock-handoff {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(260px, .45fr);
+      gap: 16px;
+      align-items: start;
+      border: 1px solid rgba(111,242,199,.35);
+      border-radius: 8px;
+      background: rgba(111,242,199,.08);
+      padding: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .unlock-handoff h2 {
+      margin: .2rem 0 .55rem;
+      letter-spacing: 0;
+    }
+
+    .unlock-handoff p,
+    .unlock-help {
+      color: #d7e5eb;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .unlock-handoff ol {
+      margin: .8rem 0 0;
+      padding-left: 1.15rem;
+      color: #d7e5eb;
+      line-height: 1.55;
+    }
+
+    .unlock-handoff li {
+      margin: .25rem 0;
+    }
+
+    .unlock-handoff-note {
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 8px;
+      background: rgba(0,0,0,.24);
+      padding: .9rem;
+    }
+
+    .unlock-handoff-note b {
+      display: block;
+      color: var(--unlock-gold);
+      margin-bottom: .35rem;
+    }
+
+    .unlock-help {
+      font-size: .92rem;
+      margin-bottom: .8rem;
+    }
+
+    .unlock-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(320px, .55fr);
+      gap: 16px;
+      margin-top: 1.25rem;
+    }
+
+    .unlock-panel {
+      border: 1px solid var(--unlock-line);
+      border-radius: 8px;
+      background: var(--unlock-panel);
+      padding: 1rem;
+    }
+
+    .unlock-panel h2 {
+      margin: 0 0 1rem;
+      font-size: 1.2rem;
+      letter-spacing: 0;
+    }
+
+    .unlock-controls {
+      display: grid;
+      gap: .85rem;
+    }
+
+    .unlock-field {
+      display: grid;
+      gap: .35rem;
+      color: var(--unlock-muted);
+      font-size: .9rem;
+      font-weight: 800;
+    }
+
+    .unlock-field input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      background: rgba(0,0,0,.38);
+      color: var(--unlock-ink);
+      min-height: 44px;
+      padding: .7rem .8rem;
+      font: inherit;
+    }
+
+    .unlock-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .55rem;
+      margin-top: .25rem;
+    }
+
+    .unlock-button {
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      color: var(--unlock-ink);
+      padding: .7rem .9rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .unlock-button.primary {
+      border-color: rgba(243,212,131,.72);
+      background: var(--unlock-gold);
+      color: #081017;
+    }
+
+    .unlock-button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .unlock-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .unlock-metric {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: .85rem;
+      background: rgba(255,255,255,.04);
+      min-height: 84px;
+    }
+
+    .unlock-metric b {
+      display: block;
+      color: #fff;
+      font-size: 1.2rem;
+      overflow-wrap: anywhere;
+    }
+
+    .unlock-metric span {
+      display: block;
+      color: var(--unlock-muted);
+      font-size: .82rem;
+      margin-top: .28rem;
+    }
+
+    .unlock-message {
+      margin-top: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(53,183,255,.35);
+      background: rgba(53,183,255,.08);
+      padding: .85rem;
+      color: #dff4ff;
+      overflow-wrap: anywhere;
+    }
+
+    .unlock-message.error {
+      border-color: rgba(255,139,139,.5);
+      background: rgba(255,139,139,.09);
+      color: #ffe2e2;
+    }
+
+    .unlock-message.success {
+      border-color: rgba(111,242,199,.45);
+      background: rgba(111,242,199,.08);
+      color: #e5fff7;
+    }
+
+    .unlock-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--unlock-line);
+      border-radius: 8px;
+      margin-top: .85rem;
+    }
+
+    .unlock-table {
+      min-width: 760px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .unlock-table th,
+    .unlock-table td {
+      padding: .8rem;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    .unlock-table th {
+      color: var(--unlock-gold);
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .unlock-table td {
+      color: #dbeaf0;
+      overflow-wrap: anywhere;
+    }
+
+    .unlock-empty {
+      border: 1px dashed rgba(255,255,255,.18);
+      border-radius: 8px;
+      color: var(--unlock-muted);
+      padding: 1rem;
+      margin-top: .85rem;
+    }
+
+    @media (max-width: 920px) {
+      .unlock-hero,
+      .unlock-handoff,
+      .unlock-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .unlock-shell {
+        width: min(100% - 22px, 1240px);
+        padding-top: 5rem;
+      }
+
+      .unlock-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+</head>
+<body class="unlock-page skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="motion-progress scroll-progress motion-chrome" aria-hidden="true"><i></i></div>
+  <div class="motion-cursor-glow pointer-reactive motion-chrome" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">MetrAIyux 0S</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../skye-secure-secret-packs.html">SkyeSecure</a>
+      <a href="../account/skyevault-workspace.html?workspace=acme">Workspace Vault</a>
+      <a href="../proof-vault/skye-secure-fs27-vault-proof.html">SkySecure Proof</a>
+    </nav>
+  </header>
+
+  <main class="unlock-shell">
+    <section class="unlock-hero" aria-labelledby="unlock-title">
+      <div>
+        <p class="eyebrow">Standalone local packer and unlocker</p>
+        <h1 id="unlock-title" class="neon-gradient-text">SkyeSecure Console</h1>
+        <p>Use this page when you have a downloaded `.skyesecrets` file. The file opens here, the passphrase unlock happens here, and restored files download from this browser only.</p>
+      </div>
+      <aside class="unlock-status-card">
+        <b>Local crypto plus proven handoff</b>
+        <span>Selected files, packs, passphrases, and peppers stay inside this browser session. SkyeVault proves custody and download access; it does not store the plaintext or the pack passphrase.</span>
+      </aside>
+    </section>
+
+    <section class="unlock-handoff" aria-label="Secure pack unlock guide">
+      <div>
+        <p class="eyebrow">If you came from SkyeVault</p>
+        <h2 id="handoffTitle">Open the downloaded secure pack here</h2>
+        <p id="handoffDetail">Choose the `.skyesecrets` file you just downloaded, inspect it, then enter the recipient passphrase. If the pack says pepper is required, enter that too.</p>
+        <ol>
+          <li>Click <strong>Pack file</strong> and select the downloaded `.skyesecrets` file.</li>
+          <li>Click <strong>Inspect</strong> to see the safe manifest and the recipient IDs.</li>
+          <li>Enter the matching recipient ID, passphrase, and optional pepper.</li>
+          <li>Click <strong>Unlock</strong>. Restored file downloads appear only after the cryptographic checks pass.</li>
+        </ol>
+      </div>
+      <aside class="unlock-handoff-note">
+        <b>No passphrase?</b>
+        <p>If you did not create the pack and nobody gave you the passphrase, this browser cannot decrypt it. Ask the sender/admin for the pack passphrase and pepper, or use the operator CLI lane for packs created with public-key recipients.</p>
+      </aside>
+    </section>
+
+    <section class="unlock-grid" aria-label="Create controls">
+      <article class="unlock-panel">
+        <h2>Create Pack</h2>
+        <p class="unlock-help">Only use this side when you are making a new encrypted pack. The passphrase you type here is the passphrase the receiver will need later.</p>
+        <div class="unlock-controls">
+          <label class="unlock-field" for="sourceFiles">
+            Source files
+            <input id="sourceFiles" type="file" multiple webkitdirectory>
+          </label>
+          <div class="unlock-grid" style="margin-top:0">
+            <label class="unlock-field" for="createRecipientId">
+              Recipient ID
+              <input id="createRecipientId" type="text" autocomplete="off" value="owner">
+            </label>
+            <label class="unlock-field" for="createWorkspace">
+              Workspace
+              <input id="createWorkspace" type="text" autocomplete="off" placeholder="client-workspace">
+            </label>
+          </div>
+          <div class="unlock-grid" style="margin-top:0">
+            <label class="unlock-field" for="createPassphrase">
+              Passphrase
+              <input id="createPassphrase" type="password" autocomplete="new-password">
+            </label>
+            <label class="unlock-field" for="createPepper">
+              Pepper
+              <input id="createPepper" type="password" autocomplete="off">
+            </label>
+          </div>
+          <label class="unlock-field" for="createPassphraseHint">
+            Passphrase hint / handoff note
+            <input id="createPassphraseHint" type="text" autocomplete="off" placeholder="Where the receiver should get the passphrase">
+          </label>
+          <div class="unlock-grid" style="margin-top:0">
+            <label class="unlock-field" for="createRepo">
+              Repo
+              <input id="createRepo" type="text" autocomplete="off" placeholder="MetrAIyux-0S">
+            </label>
+            <label class="unlock-field" for="createProject">
+              Project
+              <input id="createProject" type="text" autocomplete="off" placeholder="Client secret handoff">
+            </label>
+          </div>
+          <label class="unlock-field" for="createClient">
+            Client
+            <input id="createClient" type="text" autocomplete="off" placeholder="Client name">
+          </label>
+          <div class="unlock-actions">
+            <button class="unlock-button primary" id="createPackButton" type="button">Create .skyesecrets</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="unlock-panel">
+        <h2>Create Receipt</h2>
+        <div id="createReceipt" class="unlock-summary">
+          <div class="unlock-empty">No pack created in this session.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="unlock-grid" aria-label="Unlock controls">
+      <article class="unlock-panel">
+        <h2>Open Pack</h2>
+        <p class="unlock-help">Use this side for a pack downloaded from SkyeVault. Browsers cannot auto-load a local download, so you must choose the file manually.</p>
+        <div class="unlock-controls">
+          <label class="unlock-field" for="packFile">
+            Pack file
+            <input id="packFile" type="file" accept=".skyesecrets,application/vnd.skyesecure.secret-pack">
+          </label>
+          <div class="unlock-actions">
+            <button class="unlock-button" id="inspectButton" type="button" disabled>Inspect</button>
+            <button class="unlock-button" id="clearButton" type="button">Clear</button>
+          </div>
+          <div id="packMessage" class="unlock-message" hidden></div>
+        </div>
+      </article>
+
+      <article class="unlock-panel">
+        <h2>Unlock</h2>
+        <p class="unlock-help">The recipient ID comes from the pack manifest after inspection. The passphrase and pepper come from whoever created or handed off the pack.</p>
+        <div class="unlock-controls">
+          <label class="unlock-field" for="recipientId">
+            Recipient ID
+            <input id="recipientId" type="text" autocomplete="off" placeholder="owner">
+          </label>
+          <label class="unlock-field" for="passphrase">
+            Passphrase
+            <input id="passphrase" type="password" autocomplete="current-password">
+          </label>
+          <label class="unlock-field" for="pepper">
+            Pepper
+            <input id="pepper" type="password" autocomplete="off">
+          </label>
+          <div class="unlock-actions">
+            <button class="unlock-button primary" id="unlockButton" type="button" disabled>Unlock</button>
+            <button class="unlock-button" id="receiptButton" type="button" disabled>Receipt</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="unlock-grid" aria-label="Pack output">
+      <article class="unlock-panel">
+        <h2>Manifest</h2>
+        <div id="summary" class="unlock-summary">
+          <div class="unlock-empty">No pack loaded.</div>
+        </div>
+      </article>
+
+      <article class="unlock-panel">
+        <h2>Recipients</h2>
+        <div id="recipients" class="unlock-summary">
+          <div class="unlock-empty">No recipients loaded.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="unlock-panel" style="margin-top:16px">
+      <h2>Restore Files</h2>
+      <div id="files">
+        <div class="unlock-empty">No decrypted payload.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>SkyeSecure Console creates and decrypts passphrase-wrapped `.skyesecrets` packs locally. Production proof is published in the SkySecure FS27 Vault receipt; public-key unlock remains in the Node CLI for operator workflows.</p>
+  </footer>
+  <script src="../script.js"></script>
+  <script src="../assets/skye-secure-app.js"></script>
+<script src="assets/mcp-implementation/mcp-effects.js" data-mcp-generated-js></script>
+</body>
+</html>

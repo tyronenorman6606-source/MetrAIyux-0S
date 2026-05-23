@@ -52,7 +52,15 @@ function startStaticServer(root) {
 }
 
 async function expectText(page, text) {
-  const found = await page.getByText(text, { exact: false }).first().isVisible().catch(() => false);
+  const matches = page.getByText(text, { exact: false });
+  const count = await matches.count().catch(() => 0);
+  let found = false;
+  for (let index = 0; index < count; index += 1) {
+    if (await matches.nth(index).isVisible().catch(() => false)) {
+      found = true;
+      break;
+    }
+  }
   if (!found) throw new Error(`Missing visible text: ${text}`);
 }
 
@@ -89,10 +97,10 @@ async function main() {
     await assertNoHorizontalScroll(page, 'RouteX v0.4.0 hub desktop');
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'routex-v040-hub-desktop.png'), fullPage: true });
 
-    await page.goto(`${baseUrl}/skyeroutex-workforce-command-v0.4.0/index.html`, { waitUntil: 'domcontentloaded' });
-    await expectText(page, 'SkyeRoutex Workforce Command');
-    await expectText(page, 'v0.4.0');
-    await assertNoHorizontalScroll(page, 'RouteX legacy v0.4.0 compatibility path');
+    const legacyResponse = await page.request.get(`${baseUrl}/skyeroutex-workforce-command-v0.4.0/index.html`);
+    if (legacyResponse.status() !== 404) {
+      throw new Error(`RouteX legacy v0.4.0 root path should stay quarantined, got ${legacyResponse.status()}`);
+    }
 
     await page.goto(`${baseUrl}/SkyeRouteX/workforce-command-v0.4.0/public/index.html`, { waitUntil: 'domcontentloaded' });
     await expectText(page, 'City/state job boards');
@@ -102,10 +110,19 @@ async function main() {
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'routex-v040-public-desktop.png'), fullPage: true });
 
     await page.goto(`${baseUrl}/SkyeRouteX/index.html`, { waitUntil: 'domcontentloaded' });
+    if (!page.url().includes('/SkyeRouteX/workforce-command-v0.4.0/public/index.html')) {
+      throw new Error(`RouteX shell did not redirect to canonical public app: ${page.url()}`);
+    }
     await expectText(page, 'SkyeRouteX Workforce Command');
-    await page.locator('[data-action="dashboard-0"]').first().click();
-    await page.locator('#quickRuntime').click();
-    await expectText(page, 'Runtime');
+    const gateOverlay = page.locator('#free99PlatformGate');
+    if (await gateOverlay.isVisible().catch(() => false)) {
+      throw new Error('RouteX public app must not render its own client auth overlay; the 0S Worker owns the gate.');
+    }
+    const authOwner = await page.evaluate(() => window.Free99PlatformGate?.authOwner || '');
+    if (authOwner !== 'main-worker-enforceZeroOsGate') {
+      throw new Error(`RouteX gate helper must declare the main Worker as auth owner, got ${authOwner}`);
+    }
+    await expectText(page, 'waiting for 0S/SkyGate');
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'routex-app-desktop.png'), fullPage: true });
 
     for (const endpoint of ['health', 'status', 'v1/runtime-summary', 'v1/sessions', 'queue', 'handoff-packs', 'review-board', 'execution-board', 'dispatch-board']) {
@@ -142,8 +159,8 @@ async function main() {
         '0S home links SkyeRouteX',
         'RouteX hub renders with runtime boundary copy',
         'RouteX v0.4.0 static hub and API UI render inside the SkyeRouteX folder',
-        'Legacy v0.4.0 path resolves through the compatibility pointer',
-        'RouteX app shell opens and controls respond',
+        'Legacy v0.4.0 root path stays quarantined outside the deployed site tree',
+        'RouteX shell redirects to the canonical gate-owned public app',
         'RouteX static contract endpoints return content',
         'Sales proof router recommends SkyeRouteX for field-route pain',
         'Pricing exposes RouteX Workforce Command',

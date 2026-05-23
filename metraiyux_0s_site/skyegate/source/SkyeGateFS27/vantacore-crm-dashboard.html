@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VantaCore CRM Workspace | SkyeGateFS27</title>
+  <meta name="description" content="FS27-owned VantaCore CRM workspace for leads, bookings, follow-ups, reviews, and service-business intake operations.">
+  <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/vantacore-crm">
+  <link rel="preconnect" href="https://cdn1.sharemyimage.com">
+  <!-- Static Worker route equivalent of the MCP recipe import: import gsap from 'gsap'; -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#07090b;
+      --ink:#f7f4eb;
+      --muted:#aeb8bd;
+      --soft:#d9e3e2;
+      --panel:#101315;
+      --panel-2:#151a1d;
+      --panel-3:#0d1113;
+      --line:rgba(247,244,235,.14);
+      --line-strong:rgba(247,244,235,.26);
+      --gold:#f3c766;
+      --cyan:#5ce7ec;
+      --green:#67e08d;
+      --red:#ff6b73;
+      --violet:#a88cff;
+      --shadow:0 22px 80px rgba(0,0,0,.42);
+      --ease:cubic-bezier(.16,1,.3,1);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scrollbar-gutter:stable;scrollbar-color:var(--cyan) rgba(7,9,11,.78)}
+    ::-webkit-scrollbar{width:14px;height:14px}
+    ::-webkit-scrollbar-track{background:rgba(7,9,11,.82);border-left:1px solid rgba(92,231,236,.18)}
+    ::-webkit-scrollbar-thumb{border:3px solid rgba(7,9,11,.82);border-radius:999px;background:linear-gradient(180deg,var(--gold),var(--cyan),var(--violet));box-shadow:0 0 18px rgba(92,231,236,.4)}
+    body{margin:0;min-height:100vh;background:linear-gradient(145deg,#07090b 0%,#111315 48%,#07090b 100%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.024) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.024) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.92),transparent 88%);z-index:-2}
+    body:after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 8%,rgba(243,199,102,.13),transparent 30%),radial-gradient(circle at 88% 18%,rgba(92,231,236,.12),transparent 32%),linear-gradient(180deg,rgba(255,255,255,.03),transparent 44%);z-index:-1}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.5}
+    label{display:grid;gap:7px;color:var(--muted);font-size:12px;font-weight:800;min-width:0}
+    input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;background:#090d10;color:var(--ink);min-height:42px;padding:10px 11px;outline:none}
+    textarea{min-height:94px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(92,231,236,.72);box-shadow:0 0 0 3px rgba(92,231,236,.11)}
+    .mcp-progress,.neon-scroll-progress{position:fixed;left:0;top:0;width:100%;height:4px;transform-origin:left center;transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--cyan),var(--violet));box-shadow:0 0 22px rgba(92,231,236,.34);z-index:80}
+    .shell{min-height:100vh;display:grid;grid-template-columns:272px minmax(0,1fr)}
+    .side{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:rgba(7,9,11,.76);backdrop-filter:blur(18px);padding:18px}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .brand img{width:42px;height:42px;object-fit:contain}
+    .brand strong{display:block;font-size:15px}
+    .brand span{display:block;margin-top:3px;color:var(--muted);font-size:12px}
+    .gate-state{border:1px solid rgba(92,231,236,.2);border-radius:8px;background:rgba(92,231,236,.06);padding:12px;margin-bottom:14px}
+    .gate-state b{display:block;font-size:13px}
+    .gate-state span{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:4px}
+    .nav{display:grid;gap:8px}
+    .nav button,.nav a{width:100%;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:8px;min-height:40px;text-align:left;padding:0 11px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .nav button:hover,.nav a:hover,.nav button.active{border-color:var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+    .nav small{color:var(--gold);font-size:11px}
+    .main{min-width:0;padding:18px 20px 44px}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+    .headline{max-width:760px}
+    .eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0}
+    h1,h2,h3,p{letter-spacing:0}
+    h1{margin:0;font-size:42px;line-height:1.03}
+    h2{margin:0;font-size:18px;line-height:1.2}
+    h3{margin:0;font-size:15px;line-height:1.25}
+    p{line-height:1.55}
+    .headline p{margin:10px 0 0;color:var(--muted);max-width:640px}
+    .neon-title,.neon-gradient-text{background:linear-gradient(92deg,var(--ink),var(--gold) 34%,var(--cyan) 68%,var(--ink));background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:titleShimmer 7s linear infinite}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{border:1px solid var(--line);border-radius:8px;min-height:39px;padding:0 12px;color:var(--ink);background:rgba(255,255,255,.05);font-weight:850;transition:transform .18s var(--ease),border-color .18s var(--ease),background .18s var(--ease)}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(92,231,236,.52);background:rgba(255,255,255,.08)}
+    .btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--gold),var(--cyan));color:#061014}
+    .btn.danger{border-color:rgba(255,107,115,.38);color:#ffd9dc;background:rgba(255,107,115,.09)}
+    .btn.small{min-height:31px;padding:0 9px;font-size:12px}
+    .btn.ghost{background:transparent}
+    .auth{border:1px solid rgba(243,199,102,.35);border-radius:8px;background:linear-gradient(135deg,rgba(243,199,102,.1),rgba(92,231,236,.06));box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .auth-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}
+    .auth-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .mode-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .mode-tabs button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);min-height:36px;padding:0 12px;font-weight:850}
+    .mode-tabs button.active{color:#061014;border-color:transparent;background:linear-gradient(135deg,var(--gold),var(--cyan))}
+    .auth-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:end}
+    .auth-grid>*{min-width:0}
+    .auth-grid.three{grid-template-columns:1.1fr 1.1fr .9fr auto}
+    .auth-pane{display:none}
+    .auth-pane.active{display:block}
+    .reset-pane{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+    .status{font-size:13px;color:var(--muted)}
+    .status.good{color:var(--green)}
+    .status.bad{color:var(--red)}
+    .workspace{display:grid;gap:14px}
+    .metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .metric,.panel,.stage,.detail-band{border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.028));box-shadow:var(--shadow)}
+    .metric{padding:13px;min-height:90px}
+    .metric span{display:block;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase}
+    .metric b{display:block;font-size:28px;margin-top:9px}
+    .workflow-rail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .stage{min-height:118px;padding:13px;text-align:left;position:relative;overflow:hidden}
+    .stage:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-130%);transition:transform .7s var(--ease);pointer-events:none}
+    .stage:hover:before,.stage.active:before{transform:translateX(130%)}
+    .stage span{display:block;color:var(--gold);font-size:11px;font-weight:900}
+    .stage b{display:block;margin-top:14px;font-size:22px}
+    .stage small{display:block;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.35}
+    .stage.active{border-color:rgba(92,231,236,.58);background:linear-gradient(135deg,rgba(92,231,236,.16),rgba(243,199,102,.08))}
+    .tabbar{display:flex;gap:8px;flex-wrap:wrap}
+    .tabbar button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);min-height:36px;padding:0 12px;font-weight:850}
+    .tabbar button.active{color:var(--ink);border-color:rgba(92,231,236,.52);background:rgba(92,231,236,.08)}
+    .view{display:none}
+    .view.active{display:block}
+    .work-grid{display:grid;grid-template-columns:minmax(0,1.36fr) minmax(330px,.64fr);gap:14px;align-items:start}
+    .panel{padding:14px}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .tools input,.tools select{min-height:36px}
+    .lead-list{display:grid;gap:8px}
+    .lead-card{width:100%;text-align:left;border:1px solid rgba(247,244,235,.11);border-radius:8px;background:rgba(255,255,255,.04);color:var(--ink);padding:11px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}
+    .lead-card:hover,.lead-card.active{border-color:rgba(92,231,236,.55);background:rgba(92,231,236,.065)}
+    .lead-card strong{display:block;font-size:15px}
+    .lead-card span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .lead-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .pill{display:inline-flex;align-items:center;min-height:24px;border-radius:8px;padding:0 8px;border:1px solid var(--line);font-size:11px;font-weight:900;text-transform:uppercase;color:var(--soft)}
+    .pill.new{color:var(--violet);border-color:rgba(168,140,255,.42);background:rgba(168,140,255,.09)}
+    .pill.qualified,.pill.quoted{color:var(--cyan);border-color:rgba(92,231,236,.42);background:rgba(92,231,236,.08)}
+    .pill.booked,.pill.won,.pill.confirmed,.pill.completed{color:var(--green);border-color:rgba(103,224,141,.4);background:rgba(103,224,141,.08)}
+    .pill.filtered,.pill.lost,.pill.cancelled,.pill.no_show{color:var(--red);border-color:rgba(255,107,115,.38);background:rgba(255,107,115,.08)}
+    .pill.urgent,.pill.emergency,.pill.high{color:#071014;background:var(--gold);border-color:transparent}
+    .detail{position:sticky;top:18px}
+    .detail-band{padding:14px;margin-bottom:12px}
+    .detail-band p{margin:7px 0 0;color:var(--muted);font-size:13px}
+    .detail-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .form-grid>*{min-width:0}
+    .form-grid .wide{grid-column:1/-1}
+    .table-wrap{overflow:auto;border:1px solid rgba(247,244,235,.1);border-radius:8px}
+    table{width:100%;border-collapse:collapse;min-width:720px}
+    th,td{padding:10px;border-bottom:1px solid rgba(247,244,235,.09);text-align:left;vertical-align:top;font-size:13px}
+    th{color:var(--muted);font-size:11px;text-transform:uppercase;background:rgba(255,255,255,.035)}
+    tr:hover td{background:rgba(255,255,255,.025)}
+    .list{display:grid;gap:8px}
+    .item{border:1px solid rgba(247,244,235,.1);border-radius:8px;background:rgba(255,255,255,.04);padding:10px}
+    .item strong{display:block;font-size:13px}
+    .item span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+    .provider-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .provider-card{border:1px solid rgba(247,244,235,.1);border-radius:8px;background:rgba(255,255,255,.04);padding:12px;display:grid;gap:8px;min-height:142px}
+    .provider-card strong{font-size:14px}
+    .provider-card span{color:var(--muted);font-size:12px;line-height:1.38}
+    .provider-card.configured{border-color:rgba(103,224,141,.38);background:rgba(103,224,141,.06)}
+    .provider-card.missing_credentials,.provider-card.needs_review_url{border-color:rgba(255,107,115,.34);background:rgba(255,107,115,.06)}
+    .provider-card.alternate_provider_available,.provider-card.operator_route_available{border-color:rgba(243,199,102,.38);background:rgba(243,199,102,.06)}
+    .provider-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .receipt-list{display:grid;gap:8px;max-height:430px;overflow:auto;padding-right:4px}
+    .receipt{border:1px solid rgba(247,244,235,.1);border-radius:8px;background:rgba(255,255,255,.035);padding:10px;display:grid;gap:5px}
+    .receipt strong{font-size:13px}
+    .receipt span{color:var(--muted);font-size:12px}
+    .empty{border:1px dashed rgba(247,244,235,.18);border-radius:8px;color:var(--muted);padding:16px;text-align:center;font-size:13px}
+    .hide{display:none!important}
+    @media(max-width:1160px){
+      .shell{grid-template-columns:1fr}
+      .side{position:static;height:auto}
+      .metrics,.workflow-rail,.work-grid{grid-template-columns:1fr}
+      .detail{position:static}
+    }
+    @media(max-width:760px){
+      .main{padding:15px}
+      .top,.auth-head{flex-direction:column}
+      h1{font-size:30px;line-height:1.1;margin-bottom:16px}
+      .headline p{margin-top:0}
+      .auth-grid,.auth-grid.three,.form-grid{grid-template-columns:1fr}
+      .metrics{grid-template-columns:1fr 1fr}
+      .detail-actions{grid-template-columns:1fr}
+      .lead-card{grid-template-columns:1fr}
+      .provider-grid,.provider-actions{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+    }
+    @keyframes titleShimmer{from{background-position:0 center}to{background-position:220% center}}
+  </style>
+</head>
+<body>
+  <div class="mcp-progress neon-scroll-progress" id="mcpProgress" aria-hidden="true"></div>
+  <div class="shell neon-motion-chrome" data-motion-chrome>
+    <aside class="side">
+      <a class="brand" href="./" aria-label="Back to SkyeGateFS27">
+        <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27">
+        <div><strong>VantaCore CRM</strong><span>Owned by SkyeGateFS27</span></div>
+      </a>
+      <div class="gate-state">
+        <b id="railState">FS27 pending</b>
+        <span id="railDetail">Waiting for inherited 0S or FS27 session.</span>
+      </div>
+      <nav class="nav" aria-label="Workspace navigation">
+        <button class="active" data-jump="ops">Workflow <small>01</small></button>
+        <button data-tab-target="pipeline">Pipeline <small>02</small></button>
+        <button data-tab-target="intake">Intake <small>03</small></button>
+        <button data-tab-target="calendar">Calendar <small>04</small></button>
+        <button data-tab-target="providers">Providers <small>05</small></button>
+        <a href="./vantacore-service-crm">FS27 owner surface <small>Auth</small></a>
+        <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/vantacore-service-crm-operator-proof.html" target="_blank" rel="noreferrer">0S lane <small>Proof</small></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="top" id="ops">
+        <div class="headline">
+          <p class="eyebrow">FS27 service CRM workspace</p>
+          <h1><span class="neon-title neon-gradient-text">Capture the job, move the lead, close the loop.</span></h1>
+          <p id="tenantLabel">No FS27 session loaded.</p>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="refreshBtn" type="button">Refresh</button>
+          <button class="btn danger" id="lockBtn" type="button">Close View</button>
+        </div>
+      </header>
+
+      <section class="auth" id="sessionPanel">
+        <div class="auth-head">
+          <div>
+            <h2>Waiting for inherited FS27 session</h2>
+            <p id="sessionHint">VantaCore does not own login anymore. Open this workspace from the authenticated 0S, Free99, or FS27 surface.</p>
+          </div>
+        </div>
+        <p class="status" id="authStatus">Checking inherited 0S/FS27 authority.</p>
+      </section>
+
+      <section id="app" class="workspace hide">
+        <section class="metrics">
+          <div class="metric"><span>Total leads</span><b id="mLeads">0</b></div>
+          <div class="metric"><span>Active pipeline</span><b id="mPipeline">0</b></div>
+          <div class="metric"><span>Emergency</span><b id="mEmergency">0</b></div>
+          <div class="metric"><span>Filtered</span><b id="mFiltered">0</b></div>
+          <div class="metric"><span>Value</span><b id="mValue">$0</b></div>
+        </section>
+
+        <section class="workflow-rail" id="stageRail" aria-label="CRM workflow stages"></section>
+
+        <div class="tabbar" role="tablist" aria-label="CRM views">
+          <button class="active" data-tab-target="pipeline" type="button">Pipeline</button>
+          <button data-tab-target="intake" type="button">New Intake</button>
+          <button data-tab-target="calendar" type="button">Bookings and Follow-ups</button>
+          <button data-tab-target="providers" type="button">Provider Control</button>
+        </div>
+
+        <section class="view active" id="view-pipeline">
+          <div class="work-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Lead pipeline</h2>
+                <div class="tools">
+                  <input id="leadSearch" aria-label="Search leads" placeholder="Search contact or service">
+                  <select id="statusFilter" aria-label="Filter leads">
+                    <option value="">All statuses</option>
+                    <option value="new">New</option>
+                    <option value="qualified">Qualified</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="quoted">Quoted</option>
+                    <option value="booked">Booked</option>
+                    <option value="filtered">Filtered</option>
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+              </div>
+              <div class="lead-list" id="leadRows"></div>
+            </section>
+
+            <aside class="detail">
+              <section class="detail-band" id="leadDetail">
+                <h2>No lead selected</h2>
+                <p>Select a lead to move status, book the job, and inspect the activity around it.</p>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><h2>Activity</h2></div>
+                <div class="list" id="activityList"></div>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-intake">
+          <section class="panel">
+            <div class="panel-head"><h2>New customer intake</h2><span class="status" id="saveStatus"></span></div>
+            <form class="form-grid" id="leadForm">
+              <label>Name<input name="name" required placeholder="Customer name"></label>
+              <label>Service<input name="service" required placeholder="Requested service"></label>
+              <label>Phone<input name="phone" placeholder="Phone"></label>
+              <label>Email<input name="email" type="email" placeholder="Email"></label>
+              <label>Estimated value<input name="estimated_value" inputmode="decimal" placeholder="450"></label>
+              <label>Source
+                <select name="source">
+                  <option>phone</option>
+                  <option>sms</option>
+                  <option>website</option>
+                  <option>email</option>
+                  <option>manual</option>
+                </select>
+              </label>
+              <label class="wide">Message<textarea name="content" required placeholder="Caller or message content"></textarea></label>
+              <div class="wide actions"><button class="btn primary" type="submit">Capture Lead</button></div>
+            </form>
+          </section>
+        </section>
+
+        <section class="view" id="view-calendar">
+          <div class="work-grid">
+            <div>
+              <section class="panel">
+                <div class="panel-head"><h2>Bookings</h2></div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Contact</th><th>Service</th><th>When</th><th>Status</th><th>Notes</th></tr></thead>
+                    <tbody id="bookingRows"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head"><h2>Follow-up queue</h2></div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Contact</th><th>Lead</th><th>Channel</th><th>Scheduled</th><th>Status</th><th>Template</th></tr></thead>
+                    <tbody id="followupRows"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head"><h2>Reviews</h2></div>
+                <div class="list" id="reviewList"></div>
+              </section>
+            </div>
+
+            <aside>
+              <section class="panel">
+                <div class="panel-head"><h2>Book job</h2></div>
+                <form class="form-grid" id="newBookingForm">
+                  <label class="wide">Lead<select name="lead_id" id="bookingLeadSelect"></select></label>
+                  <label>When<input name="start_at" type="datetime-local" required></label>
+                  <label>Status
+                    <select name="status">
+                      <option value="confirmed">Confirmed</option>
+                      <option value="requested">Requested</option>
+                    </select>
+                  </label>
+                  <label class="wide">Notes<textarea name="notes" placeholder="Crew, address, deposit, or customer notes"></textarea></label>
+                  <div class="wide actions"><button class="btn primary" type="submit">Create Booking</button></div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head"><h2>Schedule follow-up</h2></div>
+                <form class="form-grid" id="newFollowupForm">
+                  <label class="wide">Lead<select name="lead_id" id="followupLeadSelect"></select></label>
+                  <label>Channel
+                    <select name="channel">
+                      <option>sms</option>
+                      <option>email</option>
+                      <option>phone</option>
+                    </select>
+                  </label>
+                  <label>Scheduled<input name="scheduled_at" type="datetime-local" required></label>
+                  <label class="wide">Template<input name="template" value="missed-call-recovery"></label>
+                  <div class="wide actions"><button class="btn primary" type="submit">Add Follow-up</button></div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head"><h2>Log review</h2></div>
+                <form class="form-grid" id="reviewForm">
+                  <label class="wide">Lead<select name="lead_id" id="reviewLeadSelect"></select></label>
+                  <label>Rating
+                    <select name="rating">
+                      <option value="">No rating yet</option>
+                      <option value="5">5</option>
+                      <option value="4">4</option>
+                      <option value="3">3</option>
+                      <option value="2">2</option>
+                      <option value="1">1</option>
+                    </select>
+                  </label>
+                  <label>Status
+                    <select name="status">
+                      <option value="requested">Requested</option>
+                      <option value="sent">Sent</option>
+                      <option value="posted">Posted</option>
+                      <option value="private_feedback">Private feedback</option>
+                    </select>
+                  </label>
+                  <label class="wide">Notes<textarea name="private_notes" placeholder="Feedback notes"></textarea></label>
+                  <div class="wide actions"><button class="btn primary" type="submit">Log Review</button></div>
+                </form>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-providers">
+          <div class="work-grid">
+            <div>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>Provider control plane</h2>
+                  <span class="status" id="providerStatus"></span>
+                </div>
+                <div class="provider-grid" id="providerGrid"></div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head"><h2>External action receipts</h2></div>
+                <div class="receipt-list" id="providerReceipts"></div>
+              </section>
+            </div>
+
+            <aside>
+              <section class="panel">
+                <div class="panel-head"><h2>Run provider proof</h2></div>
+                <div class="provider-actions">
+                  <button class="btn small" type="button" data-provider-action="send-sms">SMS Dry Run</button>
+                  <button class="btn small" type="button" data-provider-action="send-email">Email Dry Run</button>
+                  <button class="btn small" type="button" data-provider-action="create-calendar-event">Calendar Dry Run</button>
+                  <button class="btn small" type="button" data-provider-action="payment-handoff">SkyePay Dry Run</button>
+                  <button class="btn small" type="button" data-provider-action="request-review">Review Dry Run</button>
+                  <button class="btn small" type="button" data-provider-action="provision-workspace">Provision Dry Run</button>
+                  <button class="btn small danger" type="button" data-provider-action="rollback">Rollback Receipt</button>
+                </div>
+              </section>
+
+              <section class="detail-band">
+                <h2>Chosen stack</h2>
+                <p>Twilio owns SMS and voice. Resend and SkyeMail own transactional email. Google Calendar owns booking sync. SkyePay owns payment handoff through Stripe. FS27 records every external action and rollback receipt.</p>
+              </section>
+            </aside>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      const money = (cents) => "$" + (Number(cents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      const cleanToken = (value) => String(value || "").trim().replace(/[^a-zA-Z0-9:_.-]/g, "").slice(0, 4096);
+      const tokenLooksValid = (value) => /^[a-zA-Z0-9:_.-]{8,4096}$/.test(String(value || "").trim());
+      const stages = [
+        ["intake", "Intake", "Capture calls, forms, and manual lead notes."],
+        ["qualified", "Qualify", "Score intent and keep spam out of the board."],
+        ["booked", "Book", "Turn live demand into scheduled work."],
+        ["followup", "Follow", "Recover missed calls and quiet quotes."],
+        ["review", "Review", "Route happy outcomes into proof."]
+      ];
+      const state = {
+        leads: [],
+        bookings: [],
+        followups: [],
+        reviews: [],
+        activity: [],
+        providers: null,
+        providerReceipts: [],
+        summary: null,
+        selectedLeadId: "",
+        authority: null
+      };
+
+      function readJson(store, key) {
+        try { return JSON.parse(store.getItem(key) || "null"); } catch { return null; }
+      }
+
+      function tokenFromRecord(record) {
+        return cleanToken(record?.token || record?.session?.token || record?.session_token || record?.access_token || record?.bearer || "");
+      }
+
+      function tenantFromRecord(record) {
+        return String(record?.tenant || record?.tenant_key || record?.customer_id || record?.claims?.tenant || record?.claims?.customer_id || "fs27-owner").trim().slice(0, 120) || "fs27-owner";
+      }
+
+      function readCookie(name) {
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${escaped}=([^;]*)`));
+        return match ? decodeURIComponent(match[1]) : "";
+      }
+
+      function readInheritedSession() {
+        const query = new URLSearchParams(location.search);
+        const queryToken = cleanToken(query.get("gate_session") || query.get("skygate_session") || query.get("session"));
+        if (tokenLooksValid(queryToken)) {
+          query.delete("gate_session");
+          query.delete("skygate_session");
+          query.delete("session");
+          history.replaceState({}, document.title, location.pathname + (query.toString() ? "?" + query.toString() : "") + (location.hash || ""));
+          return { token: queryToken, source: "url-fs27-session" };
+        }
+
+        const keys = [
+          "FREE99_PLATFORM_GATE_SESSION",
+          "METRAIYUX_GATE_SESSION",
+          "SKYGATEFS27_GATE_SESSION",
+          "SKYGATE_USER_TOKEN",
+          "SKYGATEFS27_SESSION_TOKEN",
+          "SKYE_GATE_SESSION",
+          "adminBrainToken",
+          "adminSecuritySession",
+          "skygate_token"
+        ];
+
+        for (const key of keys) {
+          const parsed = readJson(sessionStorage, key) || readJson(localStorage, key);
+          const token = tokenFromRecord(parsed) || cleanToken(sessionStorage.getItem(key) || localStorage.getItem(key));
+          if (tokenLooksValid(token)) return { token, tenant: tenantFromRecord(parsed), source: parsed?.source || key };
+        }
+
+        const saas = readJson(localStorage, "saas_client_session");
+        if (saas && tokenLooksValid(tokenFromRecord(saas))) return { token: tokenFromRecord(saas), tenant: tenantFromRecord(saas), source: "0s-client-session" };
+
+        const bridge = globalThis.MetrAIyuxGateBridge?.current?.() || globalThis.MetrAIyuxGateBridge?.session?.() || null;
+        const bridgeToken = tokenFromRecord(bridge);
+        if (tokenLooksValid(bridgeToken)) return { token: bridgeToken, tenant: tenantFromRecord(bridge), source: bridge?.source || "metraiyux-gate-bridge" };
+
+        const skyGateToken = cleanToken(globalThis.SkygateAuthBridge?.token?.());
+        if (tokenLooksValid(skyGateToken)) return { token: skyGateToken, source: "skygate-auth-bridge", tenant: "fs27-owner" };
+
+        const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || {};
+        const runtimeToken = cleanToken(runtime.userToken || runtime.sessionToken || runtime.authToken || runtime.bearerToken || runtime.auth?.token || runtime.auth?.bearerToken);
+        if (tokenLooksValid(runtimeToken)) return { token: runtimeToken, tenant: tenantFromRecord(runtime), source: "skygate-runtime" };
+
+        for (const cookieName of ["skyegate_session", "fs27_session", "skygatefs27_session"]) {
+          const cookieToken = cleanToken(readCookie(cookieName));
+          if (tokenLooksValid(cookieToken)) return { token: cookieToken, source: `cookie:${cookieName}`, tenant: "fs27-owner" };
+        }
+
+        return null;
+      }
+
+      function headers(json = true) {
+        const inherited = state.authority || readInheritedSession() || {};
+        const h = { "x-vantacore-tenant": inherited.tenant || "fs27-owner" };
+        if (json) h["content-type"] = "application/json";
+        if (tokenLooksValid(inherited.token)) {
+          h.authorization = "Bearer " + inherited.token;
+          h["x-skye-gate-session"] = inherited.token;
+          h["x-skygate-session"] = inherited.token;
+          h["x-fs27-session"] = inherited.token;
+        }
+        h["x-skye-platform"] = "vantacore-service-crm";
+        h["x-kaixu-platform"] = "vantacore-service-crm";
+        h["x-skye-usage-lane"] = "platform-app";
+        return h;
+      }
+
+      async function api(path, options = {}) {
+        const res = await fetch("/api/vantacore/crm" + path, {
+          method: options.method || "GET",
+          headers: headers(options.body !== undefined),
+          credentials: "include",
+          body: options.body !== undefined ? JSON.stringify(options.body) : undefined
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+        return data;
+      }
+
+      function setStatus(el, text, ok) {
+        if (!el) return;
+        el.textContent = text || "";
+        el.className = "status " + (text ? (ok ? "good" : "bad") : "");
+      }
+
+      function updateRail(open, detail = "") {
+        $("railState").textContent = open ? "FS27 inherited" : "FS27 pending";
+        $("railDetail").textContent = detail || (open ? "Inherited 0S/FS27 session accepted." : "Waiting for inherited 0S or FS27 session.");
+      }
+
+      function updateSessionUi(open) {
+        $("sessionPanel").classList.toggle("hide", open);
+        $("app").classList.toggle("hide", !open);
+        const inherited = state.authority || {};
+        const tenant = state.summary?.tenant_key || inherited.tenant || "fs27-owner";
+        $("tenantLabel").textContent = open ? `Tenant: ${tenant} - Source: ${inherited.source || "FS27 inherited session"}` : "No inherited 0S/FS27 session loaded.";
+        updateRail(open, open ? `Tenant ${tenant} through ${inherited.source || "FS27 inherited session"}.` : "");
+      }
+
+      function setTab(tab) {
+        $$(".tabbar [data-tab-target], .nav [data-tab-target]").forEach((btn) => btn.classList.toggle("active", btn.dataset.tabTarget === tab));
+        $$(".view").forEach((view) => view.classList.toggle("active", view.id === "view-" + tab));
+      }
+
+      function asLocalInputDate(offsetHours = 1) {
+        const d = new Date(Date.now() + offsetHours * 60 * 60 * 1000);
+        d.setMinutes(0, 0, 0);
+        return d.toISOString().slice(0, 16);
+      }
+
+      function leadName(lead) {
+        return `${lead.contact_name || "Unknown"} - ${lead.service || "Service"}`;
+      }
+
+      function leadOption(lead) {
+        return `<option value="${esc(lead.id)}">${esc(leadName(lead))}</option>`;
+      }
+
+      function filteredLeads() {
+        const status = $("statusFilter").value;
+        const search = $("leadSearch").value.trim().toLowerCase();
+        return state.leads.filter((lead) => {
+          const statusOk = !status || lead.status === status;
+          const haystack = `${lead.contact_name || ""} ${lead.contact_phone || ""} ${lead.contact_email || ""} ${lead.service || ""} ${lead.source || ""}`.toLowerCase();
+          return statusOk && (!search || haystack.includes(search));
+        });
+      }
+
+      function renderSummary(data) {
+        const m = data.metrics || {};
+        $("mLeads").textContent = m.leads_total || 0;
+        $("mPipeline").textContent = m.active_pipeline || 0;
+        $("mEmergency").textContent = m.emergency_leads || 0;
+        $("mFiltered").textContent = m.filtered_noise || 0;
+        $("mValue").textContent = money(m.estimated_value_cents || 0);
+      }
+
+      function renderStages() {
+        const counts = new Map();
+        for (const lead of state.leads) counts.set(lead.status, (counts.get(lead.status) || 0) + 1);
+        const followCount = state.followups.filter((row) => row.status === "pending").length;
+        const reviewCount = state.reviews.filter((row) => ["requested", "sent"].includes(row.status)).length;
+        $("stageRail").innerHTML = stages.map(([key, title, body], index) => {
+          const count = key === "intake" ? state.leads.length
+            : key === "followup" ? followCount
+            : key === "review" ? reviewCount
+            : counts.get(key) || 0;
+          return `<button class="stage ${index === 0 ? "active" : ""}" type="button" data-stage="${esc(key)}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(title)} - ${count}</b><small>${esc(body)}</small></button>`;
+        }).join("");
+      }
+
+      function renderLeads() {
+        const rows = filteredLeads();
+        if (!state.selectedLeadId && rows[0]) state.selectedLeadId = rows[0].id;
+        $("leadRows").innerHTML = rows.map((lead) => `
+          <button class="lead-card ${lead.id === state.selectedLeadId ? "active" : ""}" type="button" data-select-lead="${esc(lead.id)}">
+            <div>
+              <strong>${esc(lead.contact_name || "Unknown contact")}</strong>
+              <span>${esc(lead.contact_phone || lead.contact_email || "No contact detail")} - ${esc(lead.service || "Service")} - ${new Date(lead.created_at).toLocaleDateString()}</span>
+              <div class="lead-meta">
+                <span class="pill ${esc(lead.status)}">${esc(lead.status)}</span>
+                <span class="pill ${esc(lead.urgency)}">${esc(lead.urgency)}</span>
+                <span class="pill">${esc(lead.source || "manual")}</span>
+              </div>
+            </div>
+            <div><strong>${money(lead.estimated_value_cents)}</strong><span>Score ${esc(lead.quality_score)}</span></div>
+          </button>
+        `).join("") || `<div class="empty">No leads match this view.</div>`;
+
+        const options = state.leads.map(leadOption).join("");
+        ["bookingLeadSelect", "followupLeadSelect", "reviewLeadSelect"].forEach((id) => {
+          $(id).innerHTML = options || `<option value="">No leads available</option>`;
+        });
+        renderLeadDetail();
+      }
+
+      function selectedLead() {
+        return state.leads.find((lead) => lead.id === state.selectedLeadId) || state.leads[0] || null;
+      }
+
+      function renderLeadDetail() {
+        const lead = selectedLead();
+        if (!lead) {
+          $("leadDetail").innerHTML = `<h2>No lead selected</h2><p>Capture a lead or refresh the workspace.</p>`;
+          return;
+        }
+        state.selectedLeadId = lead.id;
+        $("leadDetail").innerHTML = `
+          <h2>${esc(lead.contact_name || "Unknown contact")}</h2>
+          <p>${esc(lead.service || "Service")} - ${esc(lead.contact_phone || lead.contact_email || "No contact detail")}</p>
+          <div class="lead-meta">
+            <span class="pill ${esc(lead.status)}">${esc(lead.status)}</span>
+            <span class="pill ${esc(lead.urgency)}">${esc(lead.urgency)}</span>
+            <span class="pill">Score ${esc(lead.quality_score)}</span>
+          </div>
+          <p>${esc(lead.owner_next_action || "Qualify and respond")}</p>
+          <div class="detail-actions">
+            <button class="btn small" data-lead-action="qualified" data-id="${esc(lead.id)}">Qualify</button>
+            <button class="btn small" data-lead-action="quoted" data-id="${esc(lead.id)}">Quote</button>
+            <button class="btn small" data-book-lead="${esc(lead.id)}">Book Job</button>
+            <button class="btn small" data-lead-action="won" data-id="${esc(lead.id)}">Won</button>
+            <button class="btn small danger" data-lead-action="lost" data-id="${esc(lead.id)}">Lost</button>
+            <button class="btn small danger" data-lead-action="filtered" data-id="${esc(lead.id)}">Filter</button>
+          </div>
+        `;
+      }
+
+      function renderBookings() {
+        $("bookingRows").innerHTML = state.bookings.map((row) => `
+          <tr>
+            <td><strong>${esc(row.contact_name)}</strong><br><span class="status">${esc(row.contact_phone || row.contact_email || "")}</span></td>
+            <td>${esc(row.service)}</td>
+            <td>${new Date(row.start_at).toLocaleString()}</td>
+            <td><span class="pill ${esc(row.status)}">${esc(row.status)}</span></td>
+            <td>${esc(row.notes || "")}</td>
+          </tr>
+        `).join("") || `<tr><td colspan="5"><div class="empty">No bookings yet.</div></td></tr>`;
+      }
+
+      function renderFollowups() {
+        $("followupRows").innerHTML = state.followups.map((row) => `
+          <tr>
+            <td>${esc(row.contact_name || "Unknown")}</td>
+            <td>${esc(row.lead_service || "")}</td>
+            <td>${esc(row.channel)}</td>
+            <td>${new Date(row.scheduled_at).toLocaleString()}</td>
+            <td><span class="pill ${esc(row.status)}">${esc(row.status)}</span></td>
+            <td>${esc(row.template)}</td>
+          </tr>
+        `).join("") || `<tr><td colspan="6"><div class="empty">No follow-ups scheduled.</div></td></tr>`;
+      }
+
+      function renderReviews() {
+        $("reviewList").innerHTML = state.reviews.map((row) => `
+          <div class="item">
+            <strong>${esc(row.contact_name || "Review")} <span class="pill ${esc(row.status)}">${esc(row.status)}</span></strong>
+            <span>${esc(row.rating ? row.rating + "/5" : "No rating")} - ${esc(row.sentiment || "unknown")}</span>
+          </div>
+        `).join("") || `<div class="empty">No reviews logged.</div>`;
+      }
+
+      function renderActivity() {
+        $("activityList").innerHTML = state.activity.map((row) => `
+          <div class="item">
+            <strong>${esc(row.summary)}</strong>
+            <span>${esc(row.activity_type)} - ${new Date(row.created_at).toLocaleString()}</span>
+          </div>
+        `).join("") || `<div class="empty">No activity yet.</div>`;
+      }
+
+      function renderProviders() {
+        const lanes = state.providers?.lanes || {};
+        const configured = Object.values(lanes).filter((lane) => lane.status === "configured").length;
+        const total = Object.keys(lanes).length;
+        setStatus($("providerStatus"), total ? `${configured}/${total} configured` : "Provider status pending", configured === total);
+        $("providerGrid").innerHTML = Object.entries(lanes).map(([key, lane]) => `
+          <div class="provider-card ${esc(lane.status)}">
+            <strong>${esc(key.replace(/_/g, " "))}</strong>
+            <span>${esc(lane.provider || "")}</span>
+            <span>${esc(lane.owner || "")}</span>
+            <span><span class="pill ${lane.status === "configured" ? "completed" : lane.status === "missing_credentials" ? "lost" : "urgent"}">${esc(lane.status || "unknown")}</span></span>
+          </div>
+        `).join("") || `<div class="empty">No provider policy loaded.</div>`;
+
+        $("providerReceipts").innerHTML = state.providerReceipts.map((row) => `
+          <div class="receipt">
+            <strong>${esc(row.provider)} - ${esc(row.action)} <span class="pill ${row.status === "failed" ? "lost" : row.status === "sent" || row.status === "created" ? "completed" : "new"}">${esc(row.status)}</span></strong>
+            <span>${esc(row.mode)} - ${new Date(row.created_at).toLocaleString()}</span>
+            <span>${esc(row.rollback_action || "No rollback required")}</span>
+          </div>
+        `).join("") || `<div class="empty">No provider receipts yet.</div>`;
+      }
+
+      function renderAll() {
+        renderSummary(state.summary || {});
+        renderStages();
+        renderLeads();
+        renderBookings();
+        renderFollowups();
+        renderReviews();
+        renderActivity();
+        renderProviders();
+      }
+
+      async function loadAll() {
+        const [summary, leads, bookings, followups, reviews, activity, providers, receipts] = await Promise.all([
+          api("/summary"),
+          api("/leads"),
+          api("/bookings"),
+          api("/followups"),
+          api("/reviews"),
+          api("/activity"),
+          api("/providers"),
+          api("/provider-receipts")
+        ]);
+        state.summary = summary;
+        state.leads = leads.leads || [];
+        state.bookings = bookings.bookings || [];
+        state.followups = followups.followups || [];
+        state.reviews = reviews.reviews || [];
+        state.activity = activity.activity || [];
+        state.providers = providers || null;
+        state.providerReceipts = receipts.receipts || [];
+        if (state.selectedLeadId && !state.leads.some((lead) => lead.id === state.selectedLeadId)) state.selectedLeadId = "";
+        renderAll();
+        updateSessionUi(true);
+      }
+
+      async function openInheritedWorkspace(authority = null) {
+        state.authority = authority || readInheritedSession() || { source: "same-origin-fs27-cookie", tenant: "fs27-owner" };
+        await loadAll();
+        setStatus($("authStatus"), "Inherited FS27 session accepted.", true);
+      }
+
+      async function submitForm(form, path, statusEl) {
+        const body = Object.fromEntries(new FormData(form).entries());
+        const data = await api(path, { method: "POST", body });
+        form.reset();
+        $("newBookingForm").elements.start_at.value = asLocalInputDate(2);
+        $("newFollowupForm").elements.scheduled_at.value = asLocalInputDate(1);
+        setStatus(statusEl, "Saved.", true);
+        setTimeout(() => setStatus(statusEl, "", true), 2200);
+        await loadAll();
+        return data;
+      }
+
+      function providerActionPayload(action) {
+        const lead = selectedLead();
+        const booking = state.bookings[0] || null;
+        const base = {
+          lead_id: lead?.id || "",
+          booking_id: booking?.id || "",
+          live: false,
+          mode: "dry_run"
+        };
+        if (action === "create-calendar-event" && !base.booking_id) {
+          base.start_at = $("newBookingForm").elements.start_at.value || asLocalInputDate(2);
+          base.service = lead?.service || "Service appointment";
+        }
+        if (action === "payment-handoff") {
+          base.customer_email = lead?.contact_email || "";
+          base.amount_cents = lead?.estimated_value_cents || 0;
+          base.client_slug = "vantacore-service-crm";
+          base.offer_id = "service-crm-owner-approved";
+        }
+        if (action === "request-review") base.channel = lead?.contact_email ? "email" : "sms";
+        if (action === "provision-workspace") {
+          base.company_name = lead?.contact_company || lead?.contact_name || "VantaCore customer";
+          base.owner_email = lead?.contact_email || "";
+        }
+        if (action === "rollback") {
+          base.receipt_id = state.providerReceipts[0]?.id || "";
+          base.rollback_action = "operator-reviewed-provider-rollback";
+        }
+        return base;
+      }
+
+      async function runProviderAction(action) {
+        setStatus($("providerStatus"), `${action} running`, true);
+        const result = await api("/actions/" + encodeURIComponent(action), { method: "POST", body: providerActionPayload(action) });
+        state.providerReceipts = [result.receipt].concat(state.providerReceipts || []).filter(Boolean);
+        setStatus($("providerStatus"), `${result.provider} ${result.status}`, result.status !== "failed");
+        await loadAll();
+        setTab("providers");
+        return result;
+      }
+
+      function animateChrome() {
+        const progress = $("mcpProgress");
+        const update = () => {
+          const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+          progress.style.transform = `scaleX(${Math.min(1, scrollY / max)})`;
+        };
+        addEventListener("scroll", update, { passive: true });
+        update();
+        if (globalThis.gsap) {
+          const crmIntroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+          crmIntroTimeline.from(".metric,.stage,.panel,.detail-band", { opacity: 0, y: 18, duration: .55, stagger: .035 });
+        }
+      }
+
+      document.addEventListener("click", async (event) => {
+        const tab = event.target.closest("[data-tab-target]");
+        if (tab) setTab(tab.dataset.tabTarget);
+
+        const jump = event.target.closest("[data-jump]");
+        if (jump) $(jump.dataset.jump)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        const stage = event.target.closest("[data-stage]");
+        if (stage) {
+          $$(".stage").forEach((btn) => btn.classList.toggle("active", btn === stage));
+          const key = stage.dataset.stage;
+          setTab(key === "intake" ? "intake" : key === "booked" || key === "followup" || key === "review" ? "calendar" : "pipeline");
+          $("statusFilter").value = ["qualified", "booked"].includes(key) ? key : "";
+          renderLeads();
+        }
+
+        const select = event.target.closest("[data-select-lead]");
+        if (select) {
+          state.selectedLeadId = select.dataset.selectLead;
+          renderLeads();
+        }
+
+        const action = event.target.closest("[data-lead-action]");
+        if (action) {
+          await api("/leads/" + encodeURIComponent(action.dataset.id), { method: "PATCH", body: { status: action.dataset.leadAction } });
+          state.selectedLeadId = action.dataset.id;
+          await loadAll();
+        }
+
+        const book = event.target.closest("[data-book-lead]");
+        if (book) {
+          setTab("calendar");
+          $("bookingLeadSelect").value = book.dataset.bookLead;
+          $("newBookingForm").scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        const provider = event.target.closest("[data-provider-action]");
+        if (provider) {
+          try { await runProviderAction(provider.dataset.providerAction); }
+          catch (error) { setStatus($("providerStatus"), error.message, false); await loadAll().catch(() => {}); }
+        }
+      });
+
+      $("lockBtn").addEventListener("click", () => {
+        state.authority = null;
+        updateSessionUi(false);
+        setStatus($("authStatus"), "View closed. FS27 session was not changed.", true);
+      });
+
+      $("refreshBtn").addEventListener("click", () => openInheritedWorkspace(readInheritedSession()).catch((error) => setStatus($("authStatus"), error.message, false)));
+      $("statusFilter").addEventListener("change", renderLeads);
+      $("leadSearch").addEventListener("input", renderLeads);
+
+      $("leadForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try { await submitForm(event.currentTarget, "/intake", $("saveStatus")); setTab("pipeline"); }
+        catch (error) { setStatus($("saveStatus"), error.message, false); }
+      });
+
+      $("newBookingForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try { await submitForm(event.currentTarget, "/bookings", $("saveStatus")); }
+        catch (error) { setStatus($("saveStatus"), error.message, false); }
+      });
+
+      $("newFollowupForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try { await submitForm(event.currentTarget, "/followups", $("saveStatus")); }
+        catch (error) { setStatus($("saveStatus"), error.message, false); }
+      });
+
+      $("reviewForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try { await submitForm(event.currentTarget, "/reviews", $("saveStatus")); }
+        catch (error) { setStatus($("saveStatus"), error.message, false); }
+      });
+
+      document.addEventListener("free99-platform:gate-ready", async (event) => {
+        const token = cleanToken(event.detail?.token);
+        if (!tokenLooksValid(token)) return;
+        try {
+          await openInheritedWorkspace({ token, source: "free99-platform-fs27", tenant: "fs27-owner" });
+        } catch {}
+      });
+
+      (async function boot() {
+        $("newBookingForm").elements.start_at.value = asLocalInputDate(2);
+        $("newFollowupForm").elements.scheduled_at.value = asLocalInputDate(1);
+        animateChrome();
+        updateSessionUi(false);
+        const inherited = readInheritedSession();
+        $("sessionHint").textContent = inherited ? `Inherited FS27 session found from ${inherited.source}.` : "No inherited 0S/FS27 browser session found on this origin.";
+        if (!inherited) {
+          setStatus($("authStatus"), "No inherited 0S/FS27 authority reached VantaCore. Sign in through the 0S/Free99/FS27 surface and reopen this workspace.", false);
+          return;
+        }
+        try {
+          await openInheritedWorkspace(inherited);
+        } catch (error) {
+          state.authority = null;
+          updateSessionUi(false);
+          setStatus($("authStatus"), error.message === "Unauthorized" || /401/.test(error.message)
+            ? "No inherited 0S/FS27 authority reached VantaCore. Sign in through the 0S/Free99/FS27 surface and reopen this workspace."
+            : error.message, false);
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>

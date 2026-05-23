@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skyes Over London · Sovereign Skye Variables Mini Suite</title>
+  <meta name="description" content="Launch JWT Forge and the full Sovereign Variables app from one branded Skyes Over London suite portal." />
+  <style>
+    :root{--bg:#04050d;--panel:rgba(12,13,28,.72);--panel2:rgba(12,13,28,.88);--line:rgba(255,255,255,.12);--text:#f5f3ff;--muted:#c3c2d8;--gold:#ffcc33;--purple:#7b2cff;--cyan:#66d9ff;--emerald:#36e8a8}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:
+      radial-gradient(900px 600px at 50% -10%, rgba(255,204,51,.14), transparent 55%),
+      radial-gradient(900px 700px at 15% 15%, rgba(123,44,255,.18), transparent 55%),
+      radial-gradient(1000px 700px at 85% 20%, rgba(48,224,161,.10), transparent 55%),
+      linear-gradient(180deg,#03040a,#070816 42%,#04050d);
+      overflow-x:hidden;}
+    .stars,.stars2{position:fixed;inset:0;pointer-events:none}.stars{opacity:.5;background-image:radial-gradient(1px 1px at 9% 16%, rgba(255,255,255,.9), transparent 45%),radial-gradient(1px 1px at 21% 72%, rgba(255,255,255,.8), transparent 45%),radial-gradient(1px 1px at 41% 24%, rgba(255,255,255,.7), transparent 45%),radial-gradient(1px 1px at 63% 64%, rgba(255,255,255,.82), transparent 45%),radial-gradient(1px 1px at 79% 26%, rgba(255,255,255,.75), transparent 45%),radial-gradient(1px 1px at 91% 74%, rgba(255,255,255,.86), transparent 45%);animation:drift 18s linear infinite}.stars2{opacity:.24;background:radial-gradient(circle at 50% 40%, rgba(123,44,255,.22), transparent 24%),radial-gradient(circle at 50% 40%, rgba(255,204,51,.18), transparent 34%)}
+    @keyframes drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-12px,8px,0)}}
+    .intro{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(2,2,5,.92),rgba(5,4,12,.86));z-index:40;transition:opacity .8s ease,visibility .8s ease;--progress:0}.intro.hidden{opacity:0;visibility:hidden}.intro::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 50% 42%, rgba(255,204,51,.15), transparent 24%),radial-gradient(circle at 50% 42%, rgba(123,44,255,.18), transparent 46%);animation:aura 3.2s ease-in-out infinite}.introCard{position:relative;z-index:1;max-width:720px;text-align:center;padding:32px 24px}.introLogo{width:min(520px,72vw);max-width:520px;display:block;margin:0 auto 18px;filter:drop-shadow(0 0 22px rgba(255,204,51,.26)) drop-shadow(0 0 46px rgba(123,44,255,.22));transition:transform .12s linear,filter .12s linear}.eyebrow{font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:#f5df99;margin-bottom:12px}.heroTitle{margin:0;font-size:clamp(32px,6vw,68px);line-height:.98;background:linear-gradient(90deg,#fff7d7 0%,#ffe58c 18%,#ffffff 34%,#ffe58c 52%,#fff7d7 70%,#cda5ff 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 3s linear infinite}.heroSub{max-width:62ch;margin:14px auto 0;color:rgba(240,238,255,.88);line-height:1.65}.load{width:min(520px,82vw);height:10px;border-radius:999px;overflow:hidden;margin:20px auto 0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(123,44,255,.08)}.fill{height:100%;width:100%;transform-origin:left center;transform:scaleX(var(--progress));background:linear-gradient(90deg,#7b2cff,#ffcc33 55%,#f9e8aa);position:relative}.fill::after{content:"";position:absolute;right:-12px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:999px;background:radial-gradient(circle,#fff7d7 0%,rgba(255,204,51,.9) 28%,rgba(123,44,255,.35) 66%,transparent 72%)}.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}.chip{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#ddd7ff;backdrop-filter:blur(10px)}.skip{margin-top:16px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+    @keyframes aura{0%,100%{transform:scale(1);opacity:.68}50%{transform:scale(1.06);opacity:1}} @keyframes shimmer{0%{background-position:220% center}100%{background-position:-220% center}}
+    .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:28px 18px 60px}.nav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}.badge{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);backdrop-filter:blur(12px);font-size:12px;color:var(--muted)}.dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(180deg,var(--gold),#ff8c00);box-shadow:0 0 20px rgba(255,204,51,.5)}.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;margin-top:10px}.brandPanel,.card{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,.45);backdrop-filter:blur(16px)}.brandPanel{padding:24px;min-height:100%}.brandLogo{width:min(420px,100%);display:block;margin:0 auto 12px;filter:drop-shadow(0 0 24px rgba(255,204,51,.26)) drop-shadow(0 0 42px rgba(123,44,255,.2));animation:float 4s ease-in-out infinite,pulse 3.2s ease-in-out infinite}.kicker{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:#f4d77e;margin-bottom:12px}.title{font-size:clamp(30px,4.4vw,58px);line-height:1;letter-spacing:-.03em;margin:0 0 14px}.lede{color:var(--muted);line-height:1.7;max-width:58ch}.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.meta .chip{font-size:12px}.cardGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{padding:22px;position:relative;overflow:hidden}.card::before{content:"";position:absolute;inset:auto auto -30% -10%;width:220px;height:220px;background:radial-gradient(circle,rgba(255,204,51,.12),transparent 70%)}.card h3{margin:0 0 10px;font-size:22px}.card p{margin:0;color:var(--muted);line-height:1.65}.btnRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:16px;border:1px solid var(--line);text-decoration:none;color:var(--text);font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:12px;background:rgba(255,255,255,.05);box-shadow:0 18px 40px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,background .18s ease}.btn:hover{transform:translateY(-2px);border-color:rgba(255,204,51,.45)}.btn.primary{background:linear-gradient(135deg,rgba(123,44,255,.8),rgba(255,204,51,.16));border-color:rgba(255,204,51,.34)}.panelTitle{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#f2dc95;margin:0 0 12px}.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.mini{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035)}.mini b{display:block;margin-bottom:6px}.mini span{color:var(--muted);font-size:14px;line-height:1.5}.footer{margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:13px}.launchers{margin-top:22px}.soundNote{font-size:12px;color:#d4ccff;margin-top:10px}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes pulse{0%,100%{filter:drop-shadow(0 0 24px rgba(255,204,51,.26)) drop-shadow(0 0 42px rgba(123,44,255,.2))}50%{filter:drop-shadow(0 0 30px rgba(255,204,51,.36)) drop-shadow(0 0 58px rgba(123,44,255,.32))}}@media (max-width:980px){.hero,.cardGrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="stars"></div><div class="stars2"></div>
+  <div class="intro" id="suiteIntro" aria-hidden="false">
+    <div class="introCard">
+      <div class="eyebrow">Skyes Over London</div>
+      <img src="SKYESOVERLONDONDIETYLOGO.png" alt="Skyes Over London logo" class="introLogo" id="introLogo" />
+      <h1 class="heroTitle">Sovereign Skye Variables Mini Suite</h1>
+      <p class="heroSub">Launching the bridged sovereign workspace with JWT Forge and the full Sovereign Variables app inside the same suite package.</p>
+      <div class="load"><div class="fill" id="introFill"></div></div>
+      <div class="chips"><span class="chip">JWT</span><span class="chip">Ed25519</span><span class="chip">Vault Sync</span><span class="chip">Sovereign Variables</span></div>
+      <button class="skip" id="introSkip" type="button">Enter Suite</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="nav">
+      <div class="badge"><span class="dot"></span> Shared suite portal · all files included in this package</div>
+      <div class="badge">Bridged local persistence active</div>
+    </div>
+    <section class="hero">
+      <div class="brandPanel">
+        <div class="kicker">Sovereign Operator Surface</div>
+        <h2 class="title">One portal. Two interconnected apps. Zero nonsense.</h2>
+        <p class="lede">This package gives you a branded launcher surface for the mini suite. JWT Forge creates secrets, keypairs, env blocks, browser OpenSSL-style artifacts, and exports. Sovereign Variables stores, organizes, and mirrors variable material so users can move between both surfaces without losing the thread.</p>
+        <div class="meta"><span class="chip">Logo intro</span><span class="chip">Shimmer reveal</span><span class="chip">Sound hooks</span><span class="chip">Wing glow pulse</span></div>
+        <div class="subgrid">
+          <div class="mini"><b>JWT Forge</b><span>Generate HMAC secrets, Ed25519 / RSA / ECDSA PEM keypairs, env blocks, and exportable material.</span></div>
+          <div class="mini"><b>Sovereign Variables</b><span>Create secure variable sets, import from JWT Forge, mirror environments, and keep them reachable later.</span></div>
+        </div>
+        <p class="soundNote">Sound-ready timing hooks fire as browser events: <code>sol:intro:start</code>, <code>sol:intro:halfway</code>, and <code>sol:intro:complete</code>.</p>
+      </div>
+      <div class="cardGrid launchers">
+        <article class="card">
+          <div class="panelTitle">App One</div>
+          <h3>JWT Forge</h3>
+          <p>Use the generator, browser OpenSSL-style runner, vault, and export studio. Push current items or full vault data into Sovereign Variables.</p>
+          <div class="btnRow">
+            <a class="btn primary" href="./JWTSecretGenerator-mini-suite-logo-intro.html">Launch JWT Forge</a>
+            <a class="btn" href="./JWTSecretGenerator-mini-suite-logo-intro.html?from=launcher">Open with context</a>
+          </div>
+        </article>
+        <article class="card">
+          <div class="panelTitle">App Two</div>
+          <h3>Sovereign Variables</h3>
+          <p>Manage environment sets, secure variable storage, queue imports, and push back into the JWT side of the suite.</p>
+          <div class="btnRow">
+            <a class="btn primary" href="./sovereign-variables/index.html">Launch Sovereign Variables</a>
+            <a class="btn" href="./sovereign-variables/index.html?enter=1&from=launcher">Open with context</a>
+          </div>
+        </article>
+      </div>
+    </section>
+    <div class="footer">Package contents: suite portal, JWT Forge, Sovereign Variables, logo asset, and README. Keep all files in the same folder so the cross-links behave like civilized software instead of feral cave goblins.</div>
+  </div>
+  <script>
+    (function(){
+      const KEY='sol_mini_suite_intro_seen_launcher';
+      const intro=document.getElementById('suiteIntro'); const skip=document.getElementById('introSkip'); const fill=document.getElementById('introFill'); const logo=document.getElementById('introLogo');
+      let seen=false; try{seen=!!localStorage.getItem(KEY)}catch(_e){}
+      const duration=seen?1200:3200; let raf=0; let done=false; let halfway=false;
+      const dispatchHook=(name,detail={})=>window.dispatchEvent(new CustomEvent(name,{detail:Object.assign({app:'Suite Launcher',duration,seen},detail)}));
+      const setProgress=(p)=>{ const c=Math.max(0,Math.min(1,p)); intro.style.setProperty('--progress',c.toFixed(4)); if(fill) fill.style.transform=`scaleX(${c})`; if(logo){ const y=-8*Math.sin(c*Math.PI); const scale=1+(c*.05); const glow=22+(c*58); logo.style.transform=`translateY(${y}px) scale(${scale})`; logo.style.filter=`drop-shadow(0 0 ${glow}px rgba(255,204,51,${0.24+c*0.42})) drop-shadow(0 0 ${glow+20}px rgba(123,44,255,${0.20+c*0.32}))`; } if(!halfway && c>=.5){halfway=true; dispatchHook('sol:intro:halfway',{progress:c});} };
+      const dismiss=()=>{ if(done) return; done=true; cancelAnimationFrame(raf); intro.classList.add('hidden'); intro.setAttribute('aria-hidden','true'); dispatchHook('sol:intro:complete',{progress:1}); try{localStorage.setItem(KEY,String(Date.now()))}catch(_e){} setTimeout(()=>intro.remove(),900); };
+      const tick=(start)=>{ const p=Math.min(1,(performance.now()-start)/duration); setProgress(p); if(p<1) raf=requestAnimationFrame(()=>tick(start)); else dismiss(); };
+      if(skip) skip.addEventListener('click',dismiss); window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') dismiss(); }); dispatchHook('sol:intro:start',{progress:0}); setProgress(0); raf=requestAnimationFrame((t)=>tick(t));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CitadelDB mounted inside MetrAIyux 0S for primary-storage mirror status, Citadel catch-up, sovereign tenant export, database operations, and Gate-owned control.">
+  <title>CitadelDB | MetrAIyux 0S</title>
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070b;
+      --panel: rgba(255, 255, 255, .065);
+      --panel-strong: rgba(255, 255, 255, .105);
+      --line: rgba(255, 255, 255, .15);
+      --gold: #f3d483;
+      --cyan: #49c8ff;
+      --mint: #78f2bc;
+      --red: #ff7a90;
+      --text: #f7fbff;
+      --muted: #aeb9c5;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(73, 200, 255, .18), transparent 30%),
+        radial-gradient(circle at 82% 14%, rgba(243, 212, 131, .16), transparent 34%),
+        linear-gradient(180deg, #070a11, var(--bg));
+      color: var(--text);
+    }
+    a { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 70px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 12px 0 28px;
+    }
+    .brand { display: flex; gap: 12px; align-items: center; text-decoration: none; font-weight: 900; letter-spacing: 0; }
+    .brand img { width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(73, 200, 255, .34)); }
+    nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    nav a, button, input {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .055);
+      color: var(--text);
+      padding: 10px 12px;
+      font: inherit;
+    }
+    nav a, button { cursor: pointer; text-decoration: none; font-weight: 800; }
+    button.primary { background: linear-gradient(135deg, rgba(243, 212, 131, .28), rgba(73, 200, 255, .2)); border-color: rgba(243, 212, 131, .48); }
+    button:disabled { opacity: .55; cursor: progress; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 18px; align-items: stretch; }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, var(--panel-strong), rgba(255, 255, 255, .035));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+      padding: 22px;
+      min-width: 0;
+    }
+    .eyebrow { margin: 0 0 8px; color: var(--gold); font-weight: 900; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+    h1 { font-size: clamp(36px, 6vw, 68px); line-height: 1; margin: 0 0 12px; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 32px); letter-spacing: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .link-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+    .link-card {
+      display: grid;
+      gap: 5px;
+      min-height: 96px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .22);
+      padding: 14px;
+      text-decoration: none;
+    }
+    .link-card b { color: var(--text); overflow-wrap: anywhere; }
+    .link-card span { color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+    .stat { border: 1px solid var(--line); border-radius: 8px; background: rgba(0, 0, 0, .24); padding: 14px; min-height: 92px; }
+    .stat strong { display: block; font-size: 28px; color: var(--text); }
+    .stat span { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .status-dot { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 800; }
+    .status-dot::before { content: ""; width: 9px; height: 9px; border-radius: 999px; background: var(--red); box-shadow: 0 0 14px currentColor; }
+    .status-dot.ok::before { background: var(--mint); }
+    .status-dot.warn::before { background: var(--gold); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .stack { display: grid; gap: 12px; margin-top: 18px; }
+    .row {
+      display: grid;
+      grid-template-columns: minmax(120px, .8fr) minmax(0, 1.4fr) minmax(110px, .6fr);
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(0, 0, 0, .18);
+    }
+    .row b { overflow-wrap: anywhere; }
+    .row small { color: var(--muted); overflow-wrap: anywhere; }
+    .form { display: grid; gap: 10px; margin-top: 14px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    input { width: 100%; background: rgba(0, 0, 0, .28); }
+    pre {
+      margin: 14px 0 0;
+      max-height: 280px;
+      overflow: auto;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .26);
+      padding: 14px;
+      color: #d7f7ff;
+      font-size: 12px;
+    }
+    .section-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .notice { border-left: 4px solid var(--gold); padding: 12px 14px; background: rgba(243, 212, 131, .08); color: #efe3bd; margin-top: 14px; border-radius: 0 8px 8px 0; }
+    @media (max-width: 900px) {
+      .hero, .section-grid { grid-template-columns: 1fr; }
+      .grid, .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      header { align-items: flex-start; flex-direction: column; }
+      nav { justify-content: flex-start; }
+    }
+    @media (max-width: 560px) {
+      .grid, .link-grid, .form-grid, .row { grid-template-columns: 1fr; }
+      .shell { width: min(100% - 24px, 1180px); padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="../index.html">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <span>MetrAIyux 0S</span>
+      </a>
+      <nav aria-label="CitadelDB navigation">
+        <a href="../index.html">0S Home</a>
+        <a href="../northstar/">NorthStar</a>
+        <a href="../changelog/">Changelog</a>
+        <a href="./OPERATIONS.md">Ops Runbook</a>
+        <a href="../live/citadeldb-ultimate-v3.0.1-audit-clean/site/dist/">Citadel Public Pack</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="panel">
+          <p class="eyebrow">Gate-owned database lane</p>
+          <h1>CitadelDB Operations</h1>
+          <p>Neon or Worker KV can stay primary while CitadelDB becomes the controlled mirror and eventual cutover target. This page tracks real write receipts, catch-up work, sovereign exports, and readiness without pointing production at local Docker.</p>
+          <div class="actions">
+            <button class="primary" id="refreshBtn" type="button">Refresh Status</button>
+            <button id="catchupBtn" type="button">Queue Catch-Up Job</button>
+            <button id="sampleBtn" type="button">Record Primary Test Receipt</button>
+          </div>
+          <div class="notice">Local Citadel containers are development/runtime proof only. Production must use a remote Citadel gateway or app-owned Postgres credentials after the server is ready.</div>
+        </div>
+        <aside class="panel">
+          <p class="eyebrow">Owner Session</p>
+          <h2>Gate Session</h2>
+          <p id="authState" class="status-dot warn">Owner session not checked</p>
+          <div class="form">
+            <input id="ownerCode" type="password" autocomplete="current-password" placeholder="Owner/admin code">
+            <button id="loginBtn" class="primary" type="button">Unlock Dashboard</button>
+          </div>
+          <pre id="loginOut">{}</pre>
+        </aside>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
+        <p class="eyebrow">Direct Links</p>
+        <h2>Open the Exact Lane</h2>
+        <p>Public links open directly. Gated links require the 0S owner/Gate session or bearer header.</p>
+        <div class="link-grid">
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/citadeldb/">
+            <b>CitadelDB dashboard</b>
+            <span>Live 0S-mounted database operations page.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/health">
+            <b>Public Citadel health</b>
+            <span>Safe public mounted/storage check.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/0s/tenant-map">
+            <b>Canonical tenant map</b>
+            <span>ClientId, workspaceId, Valley ID, Relay inbox, QR route.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/0s/tenant-export?clientId=empire-pallets">
+            <b>Empire Pallets export</b>
+            <span>Gated sovereign JSON export for the tenant.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/0s/tenant-export?clientId=480-realty-property-management">
+            <b>480 Realty export</b>
+            <span>Gated sovereign JSON export for the tenant.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/status">
+            <b>Citadel status</b>
+            <span>Gated mirror counts, primary writes, jobs, catch-up state.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/ledger">
+            <b>Citadel ledger</b>
+            <span>Gated mirror/catch-up receipt ledger.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/catchup-queue">
+            <b>Catch-up queue</b>
+            <span>Gated primary writes waiting for Citadel transfer.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/">
+            <b>NorthStar mount</b>
+            <span>Gate-owned workspace/session route, not separate auth.</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
+        <p class="eyebrow">Mirror Status</p>
+        <h2>Primary Storage to Citadel Parity</h2>
+        <div class="grid">
+          <div class="stat"><strong id="ledgerCount">-</strong><span>Ledger events</span></div>
+          <div class="stat"><strong id="primaryCount">-</strong><span>Primary writes logged</span></div>
+          <div class="stat"><strong id="catchupCount">-</strong><span>Needs Citadel catch-up</span></div>
+          <div class="stat"><strong id="jobCount">-</strong><span>Catch-up jobs</span></div>
+          <div class="stat"><strong id="parityState">-</strong><span>Parity state</span></div>
+        </div>
+        <pre id="statusOut">{}</pre>
+      </section>
+
+      <section class="section-grid">
+        <div class="panel">
+          <p class="eyebrow">Catch-Up Queue</p>
+          <h2>Primary Writes Waiting on Citadel</h2>
+          <div id="queueRows" class="stack"></div>
+        </div>
+        <div class="panel">
+          <p class="eyebrow">Functional Parity</p>
+          <h2>Citadel Platform Checklist</h2>
+          <div class="stack">
+            <div class="row"><b>App onboarding</b><small>Create app DB, app user, scoped DATABASE_URL, smoke write.</small><span class="status-dot ok">Defined</span></div>
+            <div class="row"><b>Mirror ledger</b><small>Every Neon-only write can be recorded and caught up.</small><span class="status-dot ok">Live API</span></div>
+            <div class="row"><b>Catch-up worker</b><small>Queue exists now; remote runner attaches when VPS Citadel is online.</small><span class="status-dot warn">Await VPS</span></div>
+            <div class="row"><b>Cutover gate</b><small>No DATABASE_URL swap until dump/restore, counts, smoke, restore test, rollback pass.</small><span class="status-dot ok">Blocked Safe</span></div>
+            <div class="row"><b>SkyeMail</b><small>Should use the same app-owned Citadel DB pattern when the mail server is online.</small><span class="status-dot warn">Planned</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
+        <p class="eyebrow">Sovereign Export</p>
+        <h2>Pull a Tenant Data Pack</h2>
+        <p>Gate-authenticated exports return the tenant map, event ledger, captured leads, mirror receipts, and Citadel catch-up routes as JSON. This is the off-ramp path if the business ever needs to move data out of the current provider.</p>
+        <div class="form form-grid">
+          <input id="exportClientId" autocomplete="off" placeholder="clientId, for example empire-pallets">
+          <button id="exportBtn" class="primary" type="button">Export Tenant JSON</button>
+        </div>
+        <pre id="exportOut">{}</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/citadel-mirror-client.js"></script>
+  <script>
+    const API = '/api/citadel';
+    let token = localStorage.getItem('metraiyuxOwnerSession') || '';
+    const $ = (id) => document.getElementById(id);
+    const headers = () => token ? { authorization: `Bearer ${token}` } : {};
+    function show(id, value) { $(id).textContent = JSON.stringify(value, null, 2); }
+    function setAuth(ok, text) {
+      $('authState').className = `status-dot ${ok ? 'ok' : 'warn'}`;
+      $('authState').textContent = text;
+    }
+    async function api(path, options = {}) {
+      const res = await fetch(`${API}${path}`, {
+        ...options,
+        headers: {
+          ...(options.body ? { 'content-type': 'application/json' } : {}),
+          ...headers(),
+          ...(options.headers || {})
+        }
+      });
+      const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+      if (!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), { data, status: res.status });
+      return data;
+    }
+    async function refresh() {
+      $('refreshBtn').disabled = true;
+      try {
+        const status = await api('/status');
+        show('statusOut', status);
+        $('ledgerCount').textContent = status.counts?.ledgerEvents ?? 0;
+        $('primaryCount').textContent = status.counts?.primaryWrites ?? 0;
+        $('catchupCount').textContent = status.counts?.needsCitadelCatchup ?? 0;
+        $('jobCount').textContent = status.counts?.jobs ?? 0;
+        $('parityState').textContent = status.catchupRequired ? 'Catch-up' : 'Synced';
+        renderQueue(status.recentEvents || []);
+        setAuth(true, 'Gate-owned owner session active');
+      } catch (error) {
+        show('statusOut', error.data || { ok: false, error: error.message });
+        if (error.status === 401) setAuth(false, 'Owner session required');
+      } finally {
+        $('refreshBtn').disabled = false;
+      }
+    }
+    function renderQueue(events) {
+      const rows = events.filter((event) => event.status === 'needs_citadel_catchup');
+      $('queueRows').innerHTML = rows.length ? rows.map((event) => `
+        <div class="row">
+          <b>${event.appId || 'unknown app'}</b>
+          <small>${event.table || 'unknown table'} / ${event.recordId || event.id}</small>
+          <span class="status-dot warn">Catch-up</span>
+        </div>
+      `).join('') : '<p>No recent catch-up items.</p>';
+    }
+    async function login() {
+      const code = $('ownerCode').value.trim();
+      if (!code) return;
+      $('loginBtn').disabled = true;
+      try {
+        const res = await fetch('/api/owner/admin-login', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        show('loginOut', { ok: data.ok === true, authenticated: data.authenticated === true, owner: data.owner === true, tokenRedacted: Boolean(data.token) });
+        if (!res.ok || !data.token) throw new Error(data.error || 'login_failed');
+        token = data.token;
+        localStorage.setItem('metraiyuxOwnerSession', token);
+        setAuth(true, 'Gate-owned owner session active');
+        $('ownerCode').value = '';
+        await refresh();
+      } catch (error) {
+        show('loginOut', { ok: false, error: error.message });
+        setAuth(false, 'Owner session failed');
+      } finally {
+        $('loginBtn').disabled = false;
+      }
+    }
+    async function recordSample() {
+      const event = await api('/dual-write-receipt', {
+        method: 'POST',
+        body: JSON.stringify({
+          source: 'primary',
+          appId: 'operator-dashboard-proof',
+          table: 'citadel_primary_sync_probe',
+          recordId: `probe-${Date.now()}`,
+          operation: 'insert',
+          primary: { ok: true, system: 'operator_dashboard', receiptId: `dashboard-probe-${Date.now()}`, writtenAt: new Date().toISOString() },
+          note: 'Dashboard proof receipt: primary write exists and Citadel catch-up is required.'
+        })
+      });
+      show('loginOut', { ok: true, eventId: event.event?.id, status: event.event?.status });
+      await refresh();
+    }
+    async function queueCatchup() {
+      const job = await api('/catchup/request', {
+        method: 'POST',
+        body: JSON.stringify({ mode: 'neon_to_citadel', dryRun: true, appId: 'all', table: 'all', limit: 1000 })
+      });
+      show('loginOut', { ok: true, jobId: job.job?.id, status: job.job?.status, dryRun: job.job?.dryRun });
+      await refresh();
+    }
+    async function exportTenant() {
+      const clientId = $('exportClientId').value.trim() || 'empire-pallets';
+      $('exportBtn').disabled = true;
+      try {
+        const res = await fetch(`/api/0s/tenant-export?clientId=${encodeURIComponent(clientId)}&limit=100`, { headers: headers() });
+        const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+        show('exportOut', data);
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      } catch (error) {
+        show('exportOut', error.data || { ok: false, error: error.message });
+      } finally {
+        $('exportBtn').disabled = false;
+      }
+    }
+    $('loginBtn').addEventListener('click', login);
+    $('refreshBtn').addEventListener('click', refresh);
+    $('sampleBtn').addEventListener('click', recordSample);
+    $('catchupBtn').addEventListener('click', queueCatchup);
+    $('exportBtn').addEventListener('click', exportTenant);
+    if (token) refresh();
+    else api('/health').then((data) => show('statusOut', data)).catch((error) => show('statusOut', { ok: false, error: error.message }));
+  </script>
+</body>
+</html>

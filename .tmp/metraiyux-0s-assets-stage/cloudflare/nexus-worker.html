@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NEXUS Cloudflare Worker Deployment for the 13-Cabinet autonomous business website.">
+  <title>NEXUS Cloudflare Worker Deployment</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">MetrAIyux 0S</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../nexus/index.html">Nexus OS</a>
+      <a href="../autonomous-business/index.html">Site Operator</a>
+      <a href="../quantum-ops/index.html">Quantum</a>
+      <a href="../sentinel/index.html">Sentinel</a>
+      <a href="../local-brain.html">Local Brain</a>
+      <a href="../cloudflare/index.html">Cloudflare</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero slim nexus-hero">
+      <p class="eyebrow"><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare worker</span> kit</p>
+      <h1>Deploy the NEXUS <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Site Operator Brain</span> at the edge</h1>
+    </section>
+    <section class="section">
+      <div class="long-copy">
+        <div class="nexus-band">
+          <h2>Worker-backed business brain</h2>
+          <p>This page documents the optional Cloudflare path for taking the static/local NEXUS layer into persistent state. The static site works without this. The Worker adds server-side receipts, D1 ledgers, KV state, and Queue-based handoffs.</p>
+        </div>
+        <table class="nexus-table">
+          <tr>
+            <th>Endpoint</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td><code>GET /api/nexus/status</code></td>
+            <td>Confirms Worker health and bindings.</td>
+          </tr>
+          <tr>
+            <td><code>POST /api/nexus/route</code></td>
+            <td>Classifies a signal and routes it to the correct brain pair.</td>
+          </tr>
+          <tr>
+            <td><code>POST /api/nexus/task</code></td>
+            <td>Creates an operator task.</td>
+          </tr>
+          <tr>
+            <td><code>GET /api/nexus/ledger</code></td>
+            <td>Reads recent D1 events when configured.</td>
+          </tr>
+        </table>
+        <div class="nexus-grid">
+          <a class="nexus-card" href="../nexus/cloudflare-deploy-checklist.html">
+            <h3>Deploy Checklist</h3>
+            <p>Edge launch steps.</p>
+          </a>
+          <a class="nexus-card" href="../nexus/cloudflare-state.html">
+            <h3>Cloudflare State</h3>
+            <p>Binding and environment view.</p>
+          </a>
+          <a class="nexus-card" href="../quantum-ops/worker-api-console.html">
+            <h3>Worker Console</h3>
+            <p>Live route checks.</p>
+          </a>
+          <a class="nexus-card" href="../operator/deployment-runbook.html">
+            <h3>Runbook</h3>
+            <p>Operator release path.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>MetrAIyux 0S Executive Office · NEXUS autonomous business upgrade · Demonstrative until real appointments, approvals, and live provider configuration are completed.</p>
+  </footer>
+  <script src="../nexus/nexus-tools.js"></script>
+<script src="../script.js"></script></body>
+</html>

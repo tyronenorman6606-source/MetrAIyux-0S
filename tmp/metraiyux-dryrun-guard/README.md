@@ -1,1 +1,0 @@
-This folder contains the built output assets for the worker "metraiyux-0s-full-system" generated at 2026-05-17T05:00:34.949Z.

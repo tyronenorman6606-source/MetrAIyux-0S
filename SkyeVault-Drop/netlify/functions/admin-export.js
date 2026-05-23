@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess } from './_lib/security.js';
 import { loadConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 import { toCsv, flattenLedgerEntry, flattenSession, flattenEvent } from './_lib/exporters.js';
 
@@ -13,7 +13,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const type = String(event.queryStringParameters?.type || 'ledger').toLowerCase();
     const format = String(event.queryStringParameters?.format || 'json').toLowerCase();
     const { config, source } = await loadConfig();
@@ -29,13 +29,22 @@ export async function handler(event) {
       exportVersion: 1,
       exportedAt: new Date().toISOString(),
       source,
+      actor: admin,
       type,
       config: type === 'all' || type === 'config' ? config : undefined,
       ledger: type === 'all' || type === 'ledger' ? ledger.entries : undefined,
       sessions: type === 'all' || type === 'sessions' ? sessions : undefined,
       events: type === 'all' || type === 'events' ? events : undefined
     };
-    await writeAuditEventSafe('admin-export-created', { type, format });
+    await writeAuditEventSafe('admin-export-created', {
+      actor: admin.actor,
+      authType: admin.type,
+      workspaceId: admin.workspaceId,
+      customerId: admin.customerId,
+      gateCardId: admin.gateCardId,
+      type,
+      format
+    });
 
     if (format === 'csv') {
       let rows = [];

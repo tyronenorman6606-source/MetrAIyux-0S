@@ -1,0 +1,40 @@
+{
+  "workspace": {
+    "id": "clinic-alpha",
+    "name": "Clinic Alpha Operations",
+    "operator": "Ops Lead",
+    "upstreamMode": "pass-through"
+  },
+  "apps": {
+    "intake-triage-ops": {
+      "records": [
+        {
+          "patientName": "Avery Stone",
+          "arrivalDate": "2026-05-10",
+          "chiefComplaint": "Shortness of breath after exertion",
+          "acuity": "urgent",
+          "vitals": "BP 148/92, HR 104, O2 94%",
+          "assignedRoom": "Room 3",
+          "status": "roomed",
+          "notes": "Synthetic seed record for workflow testing only."
+        }
+      ]
+    },
+    "referral-router": {
+      "records": [
+        {
+          "patientName": "Avery Stone",
+          "referralDate": "2026-05-10",
+          "specialty": "Pulmonology",
+          "referredTo": "North Valley Pulmonary",
+          "priority": "urgent",
+          "authNeeded": "yes",
+          "dueDate": "2026-05-12",
+          "scheduledDate": "",
+          "status": "pending-auth",
+          "reason": "Synthetic referral route paired to intake seed."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyeMediaCenter · Operator Theater</title>
+<meta name="description" content="Experiential operator theater for SkyeMediaCenter review, execution, dispatch, publishing, search, stats, and workflow timeline.">
+<link rel="stylesheet" href="media-experience.css">
+<script defer src="skygate-auth.js"></script>
+<script defer src="../gate-session.js"></script>
+<script defer src="media-experience.js"></script>
+</head>
+<body data-app-surface="admin">
+<div class="app-shell">
+  <header class="portal-top">
+    <div class="brand-orb">SMC</div>
+    <div class="portal-title"><span>SkyeMediaCenter / operator theater</span><h1>Media Control Instrument</h1></div>
+    <div class="portal-actions">
+      <div id="auth-state" class="auth-state">Admin Auth Missing</div>
+      <button class="portal-button" onclick="configureAdminAuth()">Operator Login</button>
+      <button class="portal-button" onclick="bootstrapAdminAuth()">Proof Session</button>
+      <button class="portal-button" onclick="disconnectAdminAuth()">Disconnect</button>
+      <a class="portal-button primary" href="index.html">Intake Portal →</a>
+    </div>
+  </header>
+
+  <section class="operator-hero">
+    <span class="micro">not a dashboard / operating theater</span>
+    <h2>Review the asset. Ignite the execution. Dispatch the drop.</h2>
+    <p>This protected surface exposes the original media contracts as a visual machine: Operator Review Board, Execution Board, Dispatch Board, Workflow Timeline, publishing, upload, search, and file opening.</p>
+  </section>
+
+  <main class="operator-grid">
+    <aside class="side-stack">
+      <section class="panel">
+        <span class="micro">asset search</span>
+        <h3>Library Lens</h3>
+        <div class="field"><label>Search</label><input id="admin-search" placeholder="proof, hero, campaign" oninput="loadAdminAssets()"></div>
+        <div class="field"><label>Type</label><select id="admin-type" onchange="loadAdminAssets()"><option value="">All types</option><option value="image">Image</option><option value="video">Video</option><option value="audio">Audio</option><option value="document">Document</option></select></div>
+        <button onclick="loadAdminEverything()">Refresh Theater</button>
+      </section>
+      <section class="panel">
+        <span class="micro">quick upload</span>
+        <h3>Operator Intake</h3>
+        <input id="admin-file" type="file" multiple onchange="handleAdminFiles(event)">
+        <button class="primary" onclick="document.getElementById('admin-file').click()">Choose Files</button>
+        <div id="admin-file-list" class="file-stack"><p class="muted">No operator files queued.</p></div>
+        <div class="field"><label>Upload Tags</label><input id="admin-tags" placeholder="ops, proof, launch"></div>
+        <button onclick="uploadAdminFiles()">Upload From Theater</button>
+      </section>
+    </aside>
+
+    <section class="side-stack">
+      <section class="panel">
+        <span class="micro">live records</span>
+        <h3>Asset Field</h3>
+        <div id="asset-grid" class="asset-grid"><p class="muted">Loading…</p></div>
+      </section>
+      <section class="panel" id="selected-panel">
+        <span class="micro">selected asset</span>
+        <h3>Asset Console</h3>
+        <div id="selected-asset"><p class="muted">Select an asset to control it.</p></div>
+      </section>
+      <section class="panel full-width">
+        <span class="micro">Operator Review Board</span>
+        <h3>Operator Review Board</h3>
+        <div id="review-board" class="lane-grid"><p class="muted">Auth required for board counts.</p></div>
+      </section>
+      <section class="panel full-width">
+        <span class="micro">Execution Board</span>
+        <h3>Execution Board</h3>
+        <div id="execution-board" class="lane-grid"><p class="muted">Auth required for execution counts.</p></div>
+      </section>
+      <section class="panel full-width">
+        <span class="micro">Dispatch Board</span>
+        <h3>Dispatch Board</h3>
+        <div id="dispatch-board" class="lane-grid"><p class="muted">Auth required for dispatch counts.</p></div>
+      </section>
+      <section class="panel full-width">
+        <span class="micro">Workflow Timeline</span>
+        <h3>Workflow Timeline</h3>
+        <div id="workflow-timeline" class="timeline-list"><p class="muted">Auth required for timeline.</p></div>
+      </section>
+    </section>
+  </main>
+</div>
+</body>
+</html>

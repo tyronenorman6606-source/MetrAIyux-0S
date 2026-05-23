@@ -1,0 +1,12 @@
+{
+  "name": "connectlog-connection-os",
+  "version": "7.7.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed:manifest": "node tools/build-seed-manifest.mjs",
+    "check": "node --check app.js && node --check sw.js && node --check qr-lite.js && node tools/smoke-check.mjs",
+    "test": "npm run check",
+    "build": "npm run check"
+  }
+}

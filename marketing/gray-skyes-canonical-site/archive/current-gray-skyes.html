@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gray Skyes — Builder. Architect. Founder.</title>
+  <meta name="description" content="Gray Skyes built MetrAIyux 0S — a 23-lane sovereign business OS with 17 Cloudflare Workers, 17 AI brains, and 58 live Stripe products. One person. One year. Zero funding.">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ── PAGE RESET ── */
+    .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+
+    /* ── NAV ── */
+    .topbar { position: sticky; top: 0; z-index: 100; background: rgba(5,6,8,.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+    .nav-shell { display: flex; align-items: center; gap: 16px; height: 62px; max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: .95rem; letter-spacing: .01em; }
+    .brand img { width: 38px; height: 38px; object-fit: contain; }
+    .nav-links { display: flex; gap: 2px; margin-left: auto; }
+    .nav-links a { color: var(--soft); text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: color .15s, background .15s; }
+    .nav-links a:hover { color: var(--gold); background: var(--gold-dim); }
+    .nav-links .nav-cta { background: rgba(244,199,91,.12); border: 1px solid rgba(244,199,91,.28); color: var(--gold); font-weight: 600; }
+    .nav-links .nav-cta:hover { background: var(--gold); color: #060810; }
+
+    /* ── HERO ── */
+    .founder-hero {
+      padding: 120px 0 80px;
+      text-align: center;
+      position: relative;
+    }
+    .founder-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(100,217,255,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .kicker {
+      font-family: var(--font-label);
+      font-size: 12px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .founder-name {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 8vw, 112px);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .founder-name span { color: var(--gold); }
+    .founder-title {
+      font-family: var(--font-label);
+      font-size: clamp(16px, 2.5vw, 24px);
+      font-weight: 500;
+      color: var(--cyan);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .founder-lede {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--soft);
+      max-width: 720px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+    .founder-lede strong { color: var(--ink); }
+
+    /* hero stats */
+    .hero-stats {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 52px;
+    }
+    .hero-stat {
+      padding: 20px 36px;
+      border-right: 1px solid var(--line);
+      text-align: center;
+    }
+    .hero-stat:first-child { border-left: 1px solid var(--line); }
+    .hero-stat strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-stat span {
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold); color: #060810; font-weight: 700;
+      padding: 14px 32px; border-radius: 8px; text-decoration: none;
+      font-size: 15px; transition: all .15s;
+    }
+    .btn-primary:hover { background: var(--gold-soft); transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--ink); font-weight: 600;
+      padding: 14px 28px; border-radius: 8px; text-decoration: none;
+      font-size: 15px; border: 1px solid var(--line); transition: all .15s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── SECTION BASE ── */
+    .section { padding: 96px 0; }
+    .section-alt { background: rgba(255,255,255,.018); }
+    .section-kicker {
+      font-family: var(--font-label);
+      font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+    }
+    .section-h2 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900; line-height: 1.1;
+      color: var(--ink); margin-bottom: 20px;
+    }
+    .section-h2 em { font-style: normal; color: var(--gold); }
+    .section-h2 .c { color: var(--cyan); }
+    .section-lead {
+      font-size: 17px; color: var(--soft); max-width: 740px;
+      line-height: 1.75; margin-bottom: 48px;
+    }
+
+    /* ── THE PROOF GRID ── */
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .proof-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color .15s, transform .15s;
+    }
+    .proof-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .proof-card-num {
+      font-family: var(--font-display);
+      font-size: 40px; font-weight: 900;
+      color: var(--gold); line-height: 1;
+      margin-bottom: 8px;
+    }
+    .proof-card-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--ink); margin-bottom: 6px;
+    }
+    .proof-card-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── WHAT I BUILT (timeline list) ── */
+    .lane-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+    .lane-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      transition: border-color .15s;
+    }
+    .lane-item:hover { border-color: var(--cyan); }
+    .lane-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--cyan); flex-shrink: 0; margin-top: 5px;
+    }
+    .lane-name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .lane-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── BRAIN SECTION ── */
+    .brain-hero {
+      background: linear-gradient(135deg, rgba(100,217,255,.06) 0%, rgba(244,199,91,.04) 100%);
+      border: 1px solid rgba(100,217,255,.15);
+      border-radius: 20px;
+      padding: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .brain-hero::before {
+      content: 'GL';
+      position: absolute; right: 48px; top: 40px;
+      font-family: var(--font-display);
+      font-size: 160px; font-weight: 900;
+      color: rgba(100,217,255,.05);
+      pointer-events: none; user-select: none; line-height: 1;
+    }
+    .brain-label {
+      display: inline-block;
+      background: rgba(100,217,255,.1);
+      border: 1px solid rgba(100,217,255,.25);
+      color: var(--cyan);
+      font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .brain-h { font-family: var(--font-display); font-size: clamp(24px, 3vw, 40px); font-weight: 900; color: var(--ink); margin-bottom: 16px; line-height: 1.2; }
+    .brain-h span { color: var(--cyan); }
+    .brain-body { font-size: 16px; color: var(--soft); line-height: 1.8; max-width: 680px; }
+    .brain-body strong { color: var(--ink); }
+
+    /* ── WHAT I CAN DO ── */
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 32px;
+      transition: border-color .2s, transform .2s;
+    }
+    .service-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .service-icon {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(244,199,91,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .service-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+    .service-body { font-size: 14px; color: var(--soft); line-height: 1.7; }
+    .service-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 16px; }
+    .service-tag {
+      font-size: 11px; font-family: var(--font-mono);
+      background: rgba(100,217,255,.07); border: 1px solid rgba(100,217,255,.14);
+      color: var(--cyan); padding: 4px 10px; border-radius: 4px;
+    }
+
+    /* ── RECEIPTS / PROOF BAR ── */
+    .receipts-bar {
+      background: rgba(244,199,91,.05);
+      border: 1px solid rgba(244,199,91,.15);
+      border-radius: 14px;
+      padding: 40px 48px;
+      display: flex; flex-wrap: wrap; gap: 32px; align-items: center;
+    }
+    .receipt-item { display: flex; align-items: center; gap: 10px; }
+    .receipt-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+    .receipt-text { font-size: 14px; color: var(--soft); }
+    .receipt-text strong { color: var(--gold); }
+
+    /* ── QUOTE / PHILOSOPHY ── */
+    .philosophy {
+      text-align: center;
+      padding: 80px 0;
+      position: relative;
+    }
+    .philosophy-quote {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 3.5vw, 42px);
+      font-weight: 800; line-height: 1.25;
+      color: var(--ink);
+      max-width: 900px;
+      margin: 0 auto 24px;
+    }
+    .philosophy-quote em { color: var(--gold); font-style: normal; }
+    .philosophy-attr { font-size: 14px; color: var(--muted); letter-spacing: .06em; }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      padding: 96px 0;
+      text-align: center;
+    }
+    .contact-card {
+      background: linear-gradient(135deg, rgba(244,199,91,.07) 0%, rgba(100,217,255,.04) 100%);
+      border: 1px solid rgba(244,199,91,.2);
+      border-radius: 20px;
+      padding: 72px 48px;
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(244,199,91,.06), transparent 70%);
+      pointer-events: none;
+    }
+    .contact-card h2 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900; color: var(--ink);
+      margin-bottom: 16px; line-height: 1.1;
+    }
+    .contact-card h2 span { color: var(--gold); }
+    .contact-card p { font-size: 17px; color: var(--soft); max-width: 560px; margin: 0 auto 36px; line-height: 1.7; }
+    .contact-email {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--font-mono); font-size: 17px;
+      color: var(--gold); text-decoration: none;
+      background: rgba(244,199,91,.08); border: 1px solid rgba(244,199,91,.25);
+      padding: 14px 28px; border-radius: 8px;
+      transition: all .15s; margin-bottom: 24px;
+    }
+    .contact-email:hover { background: rgba(244,199,91,.15); border-color: var(--gold); }
+    .contact-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .contact-link {
+      font-size: 13px; color: var(--soft); text-decoration: none;
+      padding: 8px 16px; border: 1px solid var(--line); border-radius: 6px;
+      transition: all .15s;
+    }
+    .contact-link:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--line); padding: 32px 0; text-align: center; }
+    footer p { font-size: 12px; color: var(--muted); }
+    footer a { color: var(--soft); text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+
+    /* ── SPLIT LAYOUT ── */
+    .split-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .split-wrap { grid-template-columns: 1fr; gap: 40px; }
+      .hero-stat { padding: 16px 20px; }
+      .brain-hero { padding: 36px 28px; }
+      .receipts-bar { padding: 28px; }
+      .contact-card { padding: 48px 28px; }
+    }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--line); margin: 0; }
+
+    /* ── SKILL CHIPS ── */
+    .skill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+    .chip {
+      font-family: var(--font-mono); font-size: 12px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--line);
+      color: var(--soft); padding: 6px 14px; border-radius: 20px;
+    }
+    .chip.gold { background: rgba(244,199,91,.1); border-color: rgba(244,199,91,.2); color: var(--gold); }
+    .chip.cyan { background: rgba(100,217,255,.07); border-color: rgba(100,217,255,.18); color: var(--cyan); }
+
+    /* ── ANIMATED CANVAS ── */
+    .living-background { position: fixed; inset: 0; z-index: -1; opacity: .4; }
+  </style>
+</head>
+<body>
+
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+
+  <!-- ── NAV ── -->
+  <header class="topbar">
+    <nav class="nav-shell">
+      <a class="brand" href="index.html">
+        <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S">
+        MetrAIyux 0S
+      </a>
+      <div class="nav-links">
+        <a href="index.html">&larr; Marketing Site</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="valuation.html">Valuation</a>
+        <a href="the-gap.html">No Competitors</a>
+        <a href="social.html">Social</a>
+        <a class="nav-cta" href="mailto:graylondonskyes@gmail.com">Work With Me</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ══ HERO ══ -->
+    <section class="founder-hero">
+      <div class="wrap">
+        <p class="kicker">Founder · Architect · Builder</p>
+        <h1 class="founder-name">Gray <span>Skyes.</span></h1>
+        <p class="founder-title">The one who built MetrAIyux 0S</p>
+        <p class="founder-lede">
+          <strong>1 person. 1 year. $0 in funding.</strong> I built a sovereign business operating system
+          from scratch — 17 Cloudflare Workers, 23 platform lanes, 17 AI brain personas,
+          58 live Stripe products, and 875+ deployed HTML surfaces. Pre-revenue.
+          Infrastructure-complete. Zero direct competitors.
+        </p>
+
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>17</strong><span>CF Workers</span></div>
+          <div class="hero-stat"><strong>23</strong><span>Platform Lanes</span></div>
+          <div class="hero-stat"><strong>17</strong><span>AI Brains</span></div>
+          <div class="hero-stat"><strong>58</strong><span>Live Stripe Products</span></div>
+          <div class="hero-stat"><strong>875+</strong><span>Deployed Surfaces</span></div>
+          <div class="hero-stat"><strong>$0</strong><span>Funding</span></div>
+        </div>
+
+        <div class="hero-cta">
+          <a class="btn-primary" href="mailto:graylondonskyes@gmail.com">Work With Me</a>
+          <a class="btn-ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">See the Live System</a>
+          <a class="btn-ghost" href="capabilities.html">Full Capabilities</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ WHAT THIS SAYS ABOUT ME ══ -->
+    <section class="section">
+      <div class="wrap">
+        <div class="split-wrap">
+          <div>
+            <p class="section-kicker">Who I Am</p>
+            <h2 class="section-h2">Not a developer.<br>An <em>architect.</em></h2>
+            <p class="section-lead">
+              Most developers build features. I built an operating system — the kind of thing
+              funded engineering teams spend $3–5M and 18–24 months building.
+              I built it alone, in a year, with no outside capital.
+            </p>
+            <p style="font-size:16px;color:var(--soft);line-height:1.8;margin-bottom:24px">
+              That requires more than code. It requires system thinking — understanding how
+              auth connects to payments connects to AI routing connects to realtime
+              connects to legal connects to staffing, and making it sovereign from the ground up.
+              That's what I built. That's how I think.
+            </p>
+            <p style="font-size:16px;color:var(--soft);line-height:1.8">
+              I'm Gray Skyes. Phoenix, AZ. I run <strong style="color:var(--ink)">Skyes Over London</strong> —
+              the company behind MetrAIyux 0S. The AI brain inside the platform called
+              <strong style="color:var(--cyan)">Gray London Skyes</strong> is the main automation
+              brain that connects all 17 AI personas. The founder is the OS.
+              The OS is the founder.
+            </p>
+            <div class="skill-row">
+              <span class="chip cyan">Cloudflare Workers</span>
+              <span class="chip cyan">Durable Objects</span>
+              <span class="chip">K8s Postgres</span>
+              <span class="chip">Git Protocol</span>
+              <span class="chip gold">AI Architecture</span>
+              <span class="chip">Stripe Billing</span>
+              <span class="chip">Full-Stack</span>
+              <span class="chip cyan">Edge Computing</span>
+              <span class="chip gold">System Design</span>
+              <span class="chip">TypeScript</span>
+              <span class="chip">WebSocket / DO</span>
+              <span class="chip">npm SDK</span>
+            </div>
+          </div>
+          <div>
+            <div class="brain-hero">
+              <div class="brain-label">AI Persona · Central Routing Brain</div>
+              <h3 class="brain-h"><span>Gray London Skyes</span><br>Main Automation Brain</h3>
+              <p class="brain-body">
+                MetrAIyux 0S has 17 AI brain personas — each owns a domain of the business.
+                The central routing brain, the one Auren defers to when connecting all 17,
+                is named <strong>Gray London Skyes</strong>.
+                <br><br>
+                That's me. Encoded into the platform I built. When the OS routes its most
+                complex, cross-domain decisions, it routes them through a digital version
+                of the person who built it.
+                <br><br>
+                <strong>725 knowledge chunks. 17 brains. Zero LLM API cost on routing.</strong>
+                Every decision logged, receipted, and auditable in D1.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ PROOF NUMBERS ══ -->
+    <section class="section section-alt">
+      <div class="wrap">
+        <p class="section-kicker">The receipts</p>
+        <h2 class="section-h2">What <em>"built it"</em> actually means.</h2>
+        <p class="section-lead">
+          These aren't estimates. Every number below has a CF-Ray header, a cs_live session ID,
+          a git clone receipt, or a D1 log entry behind it.
+        </p>
+
+        <div class="proof-grid">
+          <div class="proof-card">
+            <div class="proof-card-num">17</div>
+            <div class="proof-card-label">Cloudflare Workers</div>
+            <div class="proof-card-sub">Live service bindings. CF-Ray verified on every endpoint. Real Workers, not lambda functions behind a name.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">23</div>
+            <div class="proof-card-label">Platform Lanes</div>
+            <div class="proof-card-sub">Auth, email, database, Git vault, AI, payments, realtime, music, staffing, legal, directory, content, marketing — and more.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">58</div>
+            <div class="proof-card-label">Stripe Products — cs_live</div>
+            <div class="proof-card-sub">Not test mode. Not demo. cs_live session IDs confirmed. Music drops, staffing fees, vault access, API tiers, white-label seats.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">875+</div>
+            <div class="proof-card-label">Deployed HTML Surfaces</div>
+            <div class="proof-card-sub">Indexed and functional. 78 of those have verified CF-Ray proof on record. Not wireframes. Not Figma.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">43K+</div>
+            <div class="proof-card-label">Lines — SkyeMail Alone</div>
+            <div class="proof-card-sub">43,395 lines of production email platform code. Stalwart integration + CF Worker + Netlify. SkyeGate FS27: 20,284 lines.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">8</div>
+            <div class="proof-card-label">Active D1 Databases</div>
+            <div class="proof-card-sub">Edge-side. High-frequency transactional. Auth tokens, routing logs, receipt entries, realtime events — all in D1 at the edge.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">K8s</div>
+            <div class="proof-card-label">HA Postgres — CitadelDB</div>
+            <div class="proof-card-sub">Custom K8s operator. PITR. WAL streaming. Hot standby. DR drills run and passed. Not managed cloud. Sovereign.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">Git</div>
+            <div class="proof-card-label">Smart-HTTP in a Worker</div>
+            <div class="proof-card-sub">Full Git protocol: clone, push, fetch, snapshot, restore, policy. D1 as pack store. FS27 auth per workspace. All checks passed.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">18</div>
+            <div class="proof-card-label">Relay13 Proof Checks</div>
+            <div class="proof-card-sub">All 18 passing. WebSocket connect, AI policy, quota, D1 persistence, session receipts, historical replay — every scenario covered.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">npm</div>
+            <div class="proof-card-label">SDK — @metraiyux/0s-sdk</div>
+            <div class="proof-card-sub">Published. TypeScript types. FS27 service binding. 4 legal templates at install. Third-party devs can build on the OS.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">$2M</div>
+            <div class="proof-card-label">Platform Valuation</div>
+            <div class="proof-card-sub">$1.5M–$2.0M. Replacement cost for a funded team: $3–5M over 18–24 months. We're asking less than replacement cost.</div>
+          </div>
+          <div class="proof-card">
+            <div class="proof-card-num">0</div>
+            <div class="proof-card-label">Direct Competitors</div>
+            <div class="proof-card-sub">GoHighLevel, Firebase, Supabase, Retool, Bubble — none of them ship auth + database + AI + payments + music + staffing as a sovereign package.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ WHAT I BUILT (23 LANES) ══ -->
+    <section class="section">
+      <div class="wrap">
+        <p class="section-kicker">The 23 Lanes</p>
+        <h2 class="section-h2">Every lane. <em>Every one built.</em></h2>
+        <p class="section-lead">
+          Not integrated. Not acquired. Not wrapped. Every system below was designed and built
+          from first principles — running live on Cloudflare's global edge.
+        </p>
+
+        <div class="lane-list">
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeGate FS27 — Auth Platform</div><div class="lane-desc">BLAKE3-scoped API keys, OAuth, Twilio, bearer tokens, multi-tenant allowlist. 20,284 lines of production auth.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeMail — Email Platform</div><div class="lane-desc">Stalwart + CF Worker + Netlify. Gmail OAuth integration. Spam filtering. 43,395 lines. Full mailbox sovereignty.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">CitadelDB — Sovereign Database</div><div class="lane-desc">K8s HA Postgres with PITR, WAL streaming, custom operator, DR drills completed. Your data on your infrastructure.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeVault — Git Protocol</div><div class="lane-desc">Real Git smart-HTTP (clone, push, fetch, snapshot, restore, policy) running inside a CF Worker. D1 as pack store.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeSecure FS27 — Secret Custody</div><div class="lane-desc">Encrypted secret packs. Live proof counts. Per-workspace isolation. Every secret auditable and receipted.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">kAIxu 6.7 — Proprietary AI</div><div class="lane-desc">5-variant AI model family (Nano → Max). Plan-gated. White-label branded as yours. Not OpenAI, not Anthropic.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">0meg4kAI — Security Scanner</div><div class="lane-desc">Two-layer edge + browser scanning. Tenant isolation. Quarantine queue. Every public post scanned before release.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Relay13 + ConnectLog — Realtime</div><div class="lane-desc">Durable Objects WebSocket rooms. Per-workspace AI policy. Usage cost ledger. 18 proof checks — all passing.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyePay — Payment OS</div><div class="lane-desc">58 live Stripe products — cs_live. Every revenue surface receipted. Music, staffing, vault, API, white-label billing.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeRouteX — Dispatch OS</div><div class="lane-desc">Workforce routes, contractor management, dispatch ledger, payment integration. Full logistics lane built in.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Auren — Central AI Routing</div><div class="lane-desc">17 brains. 725 knowledge chunks on-device. Deterministic keyword routing. Zero LLM cost per routing decision.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeMusicNexus — Music Platform</div><div class="lane-desc">Native browser DAW, Drops Room, Artist Exchange, Rights Vault (Git-backed), Split Engine, Release Forge.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Valley Verified — Business Directory</div><div class="lane-desc">875+ Phoenix businesses. Every listing a real edge-deployed surface. Custom apps for paying businesses.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Content Forge + SkyeMediaCenter</div><div class="lane-desc">Content creation and media management surfaces. Approval-gated publishing with owner control layer.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Marketing Made Easy</div><div class="lane-desc">Full growth suite: AE flow, brand identity, launch packs, document editing, web creation, Arizona market intelligence.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SkyeProfitConsole + Split Engine</div><div class="lane-desc">Financial intelligence layer. Revenue tracking, royalty splits, profit visibility, real-time margin monitoring.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">HouseOps + SkyeBox</div><div class="lane-desc">Internal operations surface and encrypted secure storage. Operational backbone of the OS.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">SOL Staffing — Workforce Platform</div><div class="lane-desc">89 pages. 10,270+ lines. Intake → Screening → Placement → Payment. Full staffing OS on a CF Worker.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">LegalSkyes + @metraiyux/0s-sdk</div><div class="lane-desc">Contract routing, compliance automation, risk classification. npm SDK with 4 legal templates at install.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">CROWN OS + NEXUS OS</div><div class="lane-desc">Owner control room (CROWN) and CRM record mesh (NEXUS). Nothing moves without explicit approval.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Ascension + APEX</div><div class="lane-desc">Sales OS with buyer intel, deal rooms, revenue war room, proof export. APEX handles expansion and scaling layer.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Free99 + SkyeMerit</div><div class="lane-desc">Permanent free tier — no credit card, no timer. SkyeMerit reputation system active from day one.</div></div></div>
+          <div class="lane-item"><div class="lane-dot"></div><div><div class="lane-name">Admin OS + 0s SkyeWay + Quantum Ops</div><div class="lane-desc">28-lesson deployment tutorial, full route atlas, infrastructure intelligence. See every surface, every lane, every Worker.</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ PHILOSOPHY ══ -->
+    <section class="philosophy">
+      <div class="wrap">
+        <p class="philosophy-quote">
+          "I didn't buy a tool and call it a platform.<br>
+          I built the thing that <em>drag-and-drop tools</em><br>
+          wish they could become."
+        </p>
+        <p class="philosophy-attr">— Gray Skyes, Founder · MetrAIyux 0S</p>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ WHAT I CAN DO FOR YOUR COMPANY ══ -->
+    <section class="section section-alt">
+      <div class="wrap">
+        <p class="section-kicker">What I can build for you</p>
+        <h2 class="section-h2">If I built this <em>for myself</em>,<br>imagine what I build <span class="c">for you.</span></h2>
+        <p class="section-lead">
+          A person who builds a sovereign OS from scratch — alone — has a specific set of
+          capabilities that most agencies and developers don't. Here's what that means for your company.
+        </p>
+
+        <div class="service-grid">
+          <div class="service-card">
+            <div class="service-icon">⚙</div>
+            <div class="service-title">Sovereign Infrastructure Deployment</div>
+            <div class="service-body">
+              Deploy the full MetrAIyux 0S stack — or a custom slice of it — into your Cloudflare account.
+              Your KV, your D1, your Workers, your data. Full white-label. Under 30 minutes with wrangler.
+              $49–$1,997/mo per deployment. Infrastructure you own, not rent.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">CF Workers</span>
+              <span class="service-tag">D1 / KV / R2</span>
+              <span class="service-tag">wrangler</span>
+              <span class="service-tag">edge-native</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🧠</div>
+            <div class="service-title">Custom AI Architecture</div>
+            <div class="service-body">
+              I don't bolt ChatGPT onto a dashboard. I design AI systems with deterministic routing,
+              sovereign data handling, and zero LLM cost on decisions that don't require it.
+              Your AI runs in your infrastructure, branded as yours, accountable to your owners.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">kAIxu 6.7</span>
+              <span class="service-tag">Auren routing</span>
+              <span class="service-tag">on-device corpus</span>
+              <span class="service-tag">D1 receipts</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">💳</div>
+            <div class="service-title">Full Payment Infrastructure</div>
+            <div class="service-body">
+              I built a payment OS with 58 live Stripe products across a dozen revenue types.
+              Subscriptions, one-time, owner-approval flows, royalty splits, staffing fees.
+              Your business has multiple revenue streams — your payment system should too.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">Stripe cs_live</span>
+              <span class="service-tag">SkyePay</span>
+              <span class="service-tag">Split Engine</span>
+              <span class="service-tag">receipted</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🔐</div>
+            <div class="service-title">Multi-Tenant Auth Systems</div>
+            <div class="service-body">
+              BLAKE3-scoped API keys. OAuth. Twilio MFA. Bearer tokens. Per-workspace allowlists.
+              20,284 lines of production auth code are the reference. I can scope, gate, and audit
+              access for any user surface, any operator, any tenant.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">BLAKE3 keys</span>
+              <span class="service-tag">OAuth</span>
+              <span class="service-tag">MFA</span>
+              <span class="service-tag">multi-tenant</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">⚡</div>
+            <div class="service-title">Realtime Systems at Edge</div>
+            <div class="service-body">
+              Durable Objects WebSocket rooms with AI policy enforcement, cost ledgers, and
+              proof receipts. I've shipped 18 verified proof checks in production.
+              Stateful realtime that runs at Cloudflare's 300+ global PoPs.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">Durable Objects</span>
+              <span class="service-tag">WebSocket</span>
+              <span class="service-tag">DO hibernation</span>
+              <span class="service-tag">policy-gated</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🏗</div>
+            <div class="service-title">OS-Level System Design</div>
+            <div class="service-body">
+              If your company needs something that doesn't fit in a SaaS tool —
+              a platform that works the way your business actually works —
+              I design and build the full system. Auth to payments to AI to realtime to legal.
+              Receipted at every layer. Yours to own.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">system design</span>
+              <span class="service-tag">full-stack</span>
+              <span class="service-tag">sovereign</span>
+              <span class="service-tag">custom OS</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🎵</div>
+            <div class="service-title">Vertical-Specific Platforms</div>
+            <div class="service-body">
+              Staffing (SOL Staffing — 89 pages, 10K+ lines). Music (SkyeMusicNexus — native DAW,
+              rights vault, royalty splits). Directory (Valley Verified — 875+ Phoenix businesses).
+              I can build the entire vertical platform for your industry from scratch.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">staffing</span>
+              <span class="service-tag">music</span>
+              <span class="service-tag">directory</span>
+              <span class="service-tag">any vertical</span>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">📦</div>
+            <div class="service-title">White-Label OS for Agencies</div>
+            <div class="service-body">
+              Deploy MetrAIyux 0S under your brand. Your logo. Your domain. Your clients.
+              Your pricing. A 28-lesson tutorial walks you through everything. Zero architecture
+              work on your end. Infrastructure already done. You deploy and sell.
+            </div>
+            <div class="service-tags">
+              <span class="service-tag">white-label</span>
+              <span class="service-tag">$49–$1,997/mo</span>
+              <span class="service-tag">your brand</span>
+              <span class="service-tag">recurring revenue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ PROOF BAR ══ -->
+    <section class="section">
+      <div class="wrap">
+        <p class="section-kicker">Live receipts</p>
+        <h2 class="section-h2" style="margin-bottom:36px">Every claim is <em>verified.</em></h2>
+        <div class="receipts-bar">
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>CF-Ray header</strong> on every Worker endpoint</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>58 cs_live</strong> Stripe session IDs confirmed</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>Git clone/push/fetch</strong> running in a CF Worker — all checks passed</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>18 Relay13</strong> realtime proof checks — all green</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>CitadelDB DR drill</strong> — completed and passed</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>@metraiyux/0s-sdk</strong> live on npm — TypeScript, FS27 baked in</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>78 surfaces</strong> with verified CF-Ray proof on record</div></div>
+          <div class="receipt-item"><div class="receipt-dot"></div><div class="receipt-text"><strong>$1.5M–$2.0M</strong> valuation — replacement cost: $3–5M</div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ CONTACT ══ -->
+    <section class="contact-section">
+      <div class="wrap">
+        <div class="contact-card">
+          <h2>Ready to build<br>something <span>real?</span></h2>
+          <p>
+            If you're an investor, an operator, an agency owner, or a company that needs
+            infrastructure built at this level — reach out.
+            I build things that work, that run, and that belong to you.
+          </p>
+          <a class="contact-email" href="mailto:graylondonskyes@gmail.com">
+            graylondonskyes@gmail.com
+          </a>
+          <div class="contact-links">
+            <a class="contact-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Live Platform</a>
+            <a class="contact-link" href="valuation.html">Platform Valuation</a>
+            <a class="contact-link" href="the-gap.html">No Competitors</a>
+            <a class="contact-link" href="white-label.html">White Label</a>
+            <a class="contact-link" href="capabilities.html">Full Capabilities</a>
+            <a class="contact-link" href="sell-sheet.html">Sell Sheet</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>Gray Skyes · Skyes Over London · Phoenix, AZ · <a href="mailto:graylondonskyes@gmail.com">graylondonskyes@gmail.com</a> · <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">MetrAIyux 0S</a></p>
+    </div>
+  </footer>
+
+  <script src="/script.js" defer></script>
+  <script src="/site-search.js" defer></script>
+</body>
+</html>

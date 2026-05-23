@@ -82,6 +82,55 @@ const diagnosis = [
   ['Gate', 'Every build should record archetype, palette, visual subject, motion language, proof format, and browser QA paths.', TriangleAlert],
   ['Proof', 'Screenshots exist in public assets, and workflow claims still need Playwright/ffmpeg video proof when the page says the product does something.', MonitorPlay]
 ] as const;
+const remoteEndpoints = [
+  ['Public lab', '/', 'The same Skye Design Lab stays as the first surface.'],
+  ['Operator cockpit', 'MCP/operator-console-remix', 'Local Remix control room now lists MCP tools, plans worlds, mines targets, and writes receipts.'],
+  ['Access guide', '/use-mcp.html', 'Users start here, enter the 0S gate, and come back with a gate session.'],
+  ['MCP protocol', '/mcp', 'Streamable HTTP MCP lives under this same Pages domain and validates gate-owned bearer access.'],
+  ['Runtime health', '/health', 'Deployment status reports endpoint, transport, gate introspection, and email-required status.']
+] as const;
+const operatorFlows = [
+  ['Catalog', 'The cockpit connects to the local quantumskyes stdio server and lists live resources/tools.'],
+  ['Plan', 'The cockpit asks the MCP for recipe, component, variety, and quality-gate plans for a selected world.'],
+  ['Build', 'The cockpit writes a portable threshold-world artifact with keypad entry, room reveal, and receipt binding.'],
+  ['Mine', 'The cockpit runs npm run mcp:mine against whitelisted repo targets and records the result.'],
+  ['Proof', 'The cockpit aggregates target receipts, production health, browser artifacts, and live-gate requirements.']
+] as const;
+const thresholdWorlds = [
+  {
+    title: 'House threshold',
+    entry: 'Sidewalk -> door -> keypad -> room reveal',
+    stack: 'Three.js doorway, GSAP scroll beats, owner-admin bearer handoff',
+    proof: 'Door unlock state, bearer introspection, MCP resource list'
+  },
+  {
+    title: 'Barber walkthrough',
+    entry: 'Street sign -> chair -> mirror -> service wall',
+    stack: 'R3F room depth, booking rail, before/after proof reel',
+    proof: 'User books, owner sees lead, browser records workflow'
+  },
+  {
+    title: 'Studio control room',
+    entry: 'Console lights -> stems -> rights vault -> release booth',
+    stack: 'Theatre-directed camera, waveform canvas, gated file lanes',
+    proof: 'Upload, split, ledger, checkout, receipt'
+  },
+  {
+    title: 'Dispatch floor',
+    entry: 'Map table -> route pins -> crew states -> invoice drawer',
+    stack: 'Lenis/GSAP process rail, live data panels, status transitions',
+    proof: 'Route assign, crew update, invoice handoff'
+  }
+] as const;
+const openInfra = [
+  ['Remix 3 beta', 'Model-first control room: routes, controllers, middleware, assets, auth, sessions, and tests under one umbrella.'],
+  ['Three/R3F/Drei', 'Real first-viewport objects, camera movement, spatial interfaces, and product-room inspection.'],
+  ['GSAP + Lenis', 'Scroll-led walkthroughs with scrubbed stage transitions, not anchor links pretending to be cinema.'],
+  ['Theatre.js', 'Director-grade timelines for camera, light, object, and UI state choreography.'],
+  ['Motion / Framer Motion', 'Microinteractions, layout transitions, cursor glow, reduced-motion fallbacks.'],
+  ['MCP TypeScript SDK', 'Resources, tools, prompts, and Streamable HTTP for AI clients that can actually use the world engine.'],
+  ['Cloudflare Workers', 'Same-domain edge runtime for static assets, Worker-first auth, health, and MCP protocol routes.']
+] as const;
 
 function LivingBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -406,6 +455,9 @@ function TopNav() {
         <strong>Skye Design Lab</strong>
       </a>
       <nav aria-label="Preview sections">
+        <a href="#worlds">World OS</a>
+        <a href="#live-world">Live World</a>
+        <a href="#remote">Remote MCP</a>
         <a href="#diagnosis">Diagnosis</a>
         <a href="#stack">Stack</a>
         <a href="#proof">Proof</a>
@@ -423,20 +475,146 @@ function Hero() {
       </div>
       <div className="hero-copy">
         <p>QuantumSkyes MCP design control room</p>
-        <h1><span className="glow-text">Useful lab</span>, not package theater.</h1>
+        <h1><span className="glow-text">Worlds, not pages.</span> Gate-owned MCP access.</h1>
         <span>
-          This surface now shows what the MCP actually requires: living background, real stack imports, pattern receipts, proof assets, and browser QA before anything ships.
+          This surface now carries the public lab, the Streamable HTTP MCP endpoint, the 0S signup handoff, owner-admin bearer flow, health proof, pattern receipts, real stack imports, browser QA, and the new Remix control-room source for immersive threshold worlds.
         </span>
         <div className="actions">
-          <a href="#diagnosis">Open the diagnosis</a>
+          <a href="/use-mcp.html">Use the MCP</a>
+          <a href="#worlds">Build worlds</a>
+          <a href="/worlds/house-threshold/">Open live world</a>
           <a href="#patterns">Inspect recipes</a>
         </div>
       </div>
       <motion.aside className="hero-proof" initial={{ opacity: 0, x: 34 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}>
         <BadgeCheck />
-        <strong>MCP receipt read</strong>
-        <span>Current mine found 12 resources, 21 tools, 27 calls, and two failing audit calls. The lab is real, but its packaging needed a sharper control surface.</span>
+        <strong>Gate-owned remote MCP</strong>
+        <span>The lab stays at root. The protocol endpoint is mounted at /mcp. Unauthenticated users are sent into the 0S gate first, even when access is free.</span>
       </motion.aside>
+    </section>
+  );
+}
+
+function ThresholdWorldSection() {
+  return (
+    <section className="world-section" id="worlds">
+      <div className="section-heading wide">
+        <p>World-building operating system</p>
+        <h2><span className="neon-text">The new standard:</span> every website gets an entry ritual, a room, a state, and a proof receipt.</h2>
+      </div>
+      <div className="threshold-stage">
+        <div className="threshold-path" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="threshold-door">
+          <span className="door-light" />
+          <strong>Owner door</strong>
+          <p>Admin code stays secret. The UI becomes the ritual. The MCP receives the bearer.</p>
+          <div className="door-pin"><span>1</span><span>3</span><span>7</span><span>9</span></div>
+        </div>
+        <div className="threshold-copy">
+          <p>
+            A barbershop should feel like stepping through the storefront. A house product should
+            make the visitor walk up to the door. A studio should open with a control room. The MCP
+            should generate that architecture, then audit the stack and prove the browser did it.
+          </p>
+          <a href="https://remix.run/blog/remix-3-beta-preview">Research-backed Remix control room</a>
+        </div>
+      </div>
+      <div className="world-grid">
+        {thresholdWorlds.map((world) => (
+          <motion.article className="world-card" key={world.title} whileHover={{ y: -8 }}>
+            <strong>{world.title}</strong>
+            <p>{world.entry}</p>
+            <span>{world.stack}</span>
+            <code>{world.proof}</code>
+          </motion.article>
+        ))}
+      </div>
+      <div className="infra-list">
+        {openInfra.map(([name, body]) => (
+          <article key={name}>
+            <strong>{name}</strong>
+            <p>{body}</p>
+          </article>
+        ))}
+      </div>
+      <div className="operator-flow">
+        {operatorFlows.map(([name, body]) => (
+          <article key={name}>
+            <span>{name}</span>
+            <p>{body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LiveWorldSection() {
+  return (
+    <section className="live-world-section" id="live-world">
+      <div className="section-heading">
+        <p>Live generated world</p>
+        <h2><span className="neon-text">The house is not a metaphor anymore.</span> It is a same-domain artifact you can open and operate.</h2>
+      </div>
+      <div className="live-world-grid">
+        <a className="world-preview" href="/worlds/house-threshold/" aria-label="Open House Threshold World">
+          <span className="preview-path" />
+          <span className="preview-house">
+            <span className="preview-door">
+              <span>1379</span>
+            </span>
+          </span>
+        </a>
+        <div className="live-world-copy">
+          <p>
+            The operator console now has a real build lane. It can take a whitelisted repo target
+            plus an archetype, ask the QuantumSkyes MCP for the recipe and quality gate, write a
+            portable generated world, and return the route plus receipt path.
+          </p>
+          <div className="live-world-actions">
+            <a href="/worlds/house-threshold/">Walk the house threshold</a>
+            <a href="/use-mcp.html">Get MCP access</a>
+          </div>
+          <ul>
+            <li>Sidewalk-to-door first viewport</li>
+            <li>Keypad ritual and unlock state</li>
+            <li>Foyer, proof room, and build room reveal</li>
+            <li>Same-domain public proof surface</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RemoteMcpSection() {
+  return (
+    <section className="remote-section" id="remote">
+      <div className="section-heading">
+        <p>Remote MCP, same website</p>
+        <h2><span className="neon-text">No extra domain.</span> The protocol is owned by the 0S gate.</h2>
+      </div>
+      <div className="remote-grid">
+        {remoteEndpoints.map(([title, value, body], index) => (
+          <motion.article className="remote-card" key={title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: index * 0.07 }} viewport={{ once: true }}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <strong>{title}</strong>
+            <code>{value}</code>
+            <p>{body}</p>
+          </motion.article>
+        ))}
+      </div>
+      <div className="remote-console">
+        <TerminalSquare />
+        <div>
+          <span>Consumer config target</span>
+          <code>{'{"mcpServers":{"quantumskyes":{"url":"https://skye-design-mcp.pages.dev/mcp","headers":{"Authorization":"Bearer ${QUANTUMSKYES_MCP_TOKEN_OR_GATE_SESSION}"}}}}'}</code>
+        </div>
+      </div>
     </section>
   );
 }
@@ -639,9 +817,12 @@ function App() {
       <LivingBackground />
       <MotionChrome />
       <CursorTrail />
-      <TopNav />
+        <TopNav />
       <main>
-        <Hero />
+      <Hero />
+      <ThresholdWorldSection />
+      <LiveWorldSection />
+      <RemoteMcpSection />
         <DiagnosisSection />
         <StackSection />
         <PatternSection />

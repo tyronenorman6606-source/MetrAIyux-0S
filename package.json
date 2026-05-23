@@ -17,6 +17,14 @@
     "skye:crawl:worker": "BASE_URL=http://127.0.0.1:4174/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-worker node tools/skye-crawler.mjs",
     "skye:crawl:live": "BASE_URL=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/ REPORT_PATH=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live-report.json ARTIFACT_DIR=/workspaces/MetrAIyux-0S/test-artifacts/skye-crawler-live node tools/skye-crawler.mjs",
     "proof:record": "node tools/record-proof-walkthrough.mjs",
+    "proof:live-browser": "node tools/live-browser-verifier-agent.mjs",
+    "proof:publish-ecology": "node tools/publish-proof-ecology.mjs",
+    "proof:key-gate-13th": "node tools/proof-key-gate-13th-0s-production.mjs",
+    "proof:skyevaultpro-docxmax": "node tools/proof-skyevaultpro-docxmax-production.mjs",
+    "proof:skyevaultpro-backed-claims": "node tools/proof-skyevaultpro-backed-claims.mjs",
+    "build:sovereigndocs-docxmax-lane": "node tools/build-sovereigndocs-docxmax-lane.mjs",
+    "proof:sovereigndocs-docxmax-lane": "node tools/proof-sovereigndocs-docxmax-lean-production.mjs",
+    "proof:live-free99-reported-apps": "node tools/live-free99-reported-apps-proof.mjs",
     "proof:record:metraiyux": "node tools/record-proof-walkthrough.mjs --config proof-recipes/metraiyux-public-proof.json",
     "repo:health": "node scripts/repo-health-check.mjs",
     "repo:health:full": "node scripts/repo-health-check.mjs --full-secret-scan",
@@ -41,7 +49,10 @@
     "0s:skyeroutex:v04": "cd metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0 && npm run smoke:all",
     "0s:skyeroutex:stress": "cd metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0 && npm run stress:concurrency",
     "0s:skyeroutex:e2e": "node metraiyux_0s_site/tests/skyeroutex-integration-e2e.mjs",
-    "0s:skyeroutex:proof": "npm run 0s:skyeroutex:layout && npm run 0s:skyeroutex:runtime && npm run 0s:skyeroutex:v04 && npm run 0s:skyeroutex:e2e",
+    "0s:skyeroutex:worker-parity": "node metraiyux_0s_site/tests/skyeroutex-worker-parity-smoke.mjs",
+    "0s:skyeroutex:worker-stress": "node metraiyux_0s_site/tests/skyeroutex-mounted-worker-stress.mjs",
+    "0s:skyeroutex:live-production-stress": "node metraiyux_0s_site/tests/skyeroutex-live-production-stress-proof.mjs",
+    "0s:skyeroutex:proof": "npm run 0s:skyeroutex:layout && npm run 0s:skyeroutex:runtime && npm run 0s:skyeroutex:v04 && npm run 0s:skyeroutex:e2e && npm run 0s:skyeroutex:worker-parity && npm run 0s:skyeroutex:worker-stress",
     "0s:skyeprofitconsole:smoke": "cd metraiyux_0s_site/SkyeProfitConsole && npm run smoke",
     "0s:skyeprofitconsole:e2e": "node metraiyux_0s_site/tests/skyeprofitconsole-integration-e2e.mjs",
     "0s:skyeprofitconsole:proof": "npm run 0s:skyeprofitconsole:smoke && npm run 0s:skyeprofitconsole:e2e",
@@ -68,6 +79,11 @@
     "0s:free99-platforms:proof": "node metraiyux_0s_site/tests/free99-platform-intake-e2e.mjs",
     "vault:push": "node tools/skyevault-repo-push.mjs",
     "vault:dry-run": "node tools/skyevault-repo-push.mjs --dry-run",
+    "vault:repo:full": "node tools/skyevault-full-repo-push.mjs",
+    "vault:repo:full:dry-run": "node tools/skyevault-full-repo-push.mjs --dry-run",
+    "vault:pro:stage": "node tools/skyevaultpro-local-bridge.mjs stage",
+    "vault:pro:stage:latest": "node tools/skyevaultpro-local-bridge.mjs latest",
+    "vault:pro:from-dev": "node tools/skyevaultpro-local-bridge.mjs from-dev",
     "vault:git:push": "node tools/skyevault-git-vault.mjs",
     "vault:git:dry-run": "node tools/skyevault-git-vault.mjs --dry-run",
     "vault:git:restore": "node tools/skyevault-git-vault.mjs",
@@ -89,12 +105,19 @@
     "0s:platform-accounting": "node tools/audit-platform-integration-ledger.mjs",
     "0s:marketing-made-easy:scan": "node tools/audit-marketing-made-easy.mjs",
     "0s:marketing-made-easy:smoke": "node tools/audit-marketing-made-easy.mjs --smoke",
-    "0s:marketing-made-easy:proof": "npm run 0s:marketing-made-easy:scan && npm run 0s:marketing-made-easy:smoke"
+    "0s:marketing-made-easy:proof": "npm run 0s:marketing-made-easy:scan && npm run 0s:marketing-made-easy:smoke",
+    "agentic-growth:test": "npm --prefix packages/agentic-growth-layer test",
+    "agentic-growth:browser-proof": "npm --prefix packages/agentic-growth-layer run browser-proof",
+    "agentic-growth:0s-proof": "node tools/proof-agentic-growth-0s-production.mjs",
+    "agentic-growth:serve": "npm --prefix packages/agentic-growth-layer run serve",
+    "agentic-growth:site-data": "npm --prefix packages/agentic-growth-layer run build:site-data",
+    "agentic-growth:site": "python3 -m http.server 4328 --directory marketing/agentic-growth-layer"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "esbuild": "^0.28.0",
-    "playwright": "^1.57.0"
+    "playwright": "^1.57.0",
+    "vite": "^8.0.14"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.19.2",
@@ -102,6 +125,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/postprocessing": "^3.0.4",
+    "@remotion/player": "^4.0.464",
     "@rive-app/react-canvas": "^4.28.5",
     "@theatre/core": "^0.7.2",
     "@theatre/studio": "^0.7.2",
@@ -116,6 +140,7 @@
     "qrcode-generator": "^1.4.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "remotion": "^4.0.464",
     "three": "^0.184.0"
   }
 }

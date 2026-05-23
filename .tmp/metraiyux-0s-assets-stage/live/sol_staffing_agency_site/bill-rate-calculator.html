@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bill Rate Calculator | Skyes Over London Staffing</title>
+  <meta name="description" content="Internal staffing bill-rate calculator for rough pay, burden, margin, weekly revenue, and gross profit estimates." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Finance Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Bill Rate Calculator</p>
+      <h1>Estimate staffing bill-rate math without pretending it is final pricing.</h1>
+      <p class="lead">This calculator gives a rough internal estimate. Final pricing must account for payroll taxes, workers comp, insurance, benefits, overhead, market risk, contract terms, overtime, and legal/compliance review.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Estimate Only</div><h2>No final quotes here.</h2><p>Use this to reason about margin. Do not send as a binding quote without review.</p></aside>
+  </div>
+</section>
+<section class="section-pad">
+  <div class="calc-shell reveal">
+    <label>Worker Pay Rate ($/hr)<input id="payRate" type="number" value="18" min="0" step="0.01" /></label>
+    <label>Burden % Estimate<input id="burden" type="number" value="18" min="0" step="0.1" /></label>
+    <label>Target Gross Margin %<input id="margin" type="number" value="28" min="0" step="0.1" /></label>
+    <label>Weekly Hours<input id="hours" type="number" value="40" min="0" step="0.1" /></label>
+    <button class="btn primary" type="button" id="calcBtn">Calculate Estimate</button>
+    <div class="calc-output" id="calcOutput">
+      Enter values and calculate.
+    </div>
+  </div>
+</section>
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const out = document.getElementById("calcOutput");
+    const btn = document.getElementById("calcBtn");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const pay = parseFloat(document.getElementById("payRate").value || "0");
+      const burden = parseFloat(document.getElementById("burden").value || "0") / 100;
+      const margin = parseFloat(document.getElementById("margin").value || "0") / 100;
+      const hours = parseFloat(document.getElementById("hours").value || "0");
+      const loaded = pay * (1 + burden);
+      const bill = margin >= 1 ? 0 : loaded / (1 - margin);
+      const weeklyRevenue = bill * hours;
+      const weeklyPay = pay * hours;
+      const weeklyGross = weeklyRevenue - (loaded * hours);
+      out.innerHTML = `
+        <strong>Estimated loaded cost:</strong> $${loaded.toFixed(2)}/hr<br>
+        <strong>Estimated bill rate:</strong> $${bill.toFixed(2)}/hr<br>
+        <strong>Weekly revenue estimate:</strong> $${weeklyRevenue.toFixed(2)}<br>
+        <strong>Weekly worker gross pay:</strong> $${weeklyPay.toFixed(2)}<br>
+        <strong>Estimated weekly gross profit before overhead:</strong> $${weeklyGross.toFixed(2)}<br>
+        <small>Estimate only. Verify taxes, workers comp, insurance, benefits, overtime, payroll rules, client agreement, and compliance.</small>
+      `;
+    });
+  });
+</script>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

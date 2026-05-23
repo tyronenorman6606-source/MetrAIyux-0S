@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KeyGate 13 · Forge</title>
+  <meta name="description" content="Generate JWT HMAC secrets, Ed25519/RSA/ECDSA PEM keypairs, run OpenSSL-style browser commands, and export full material packages." />
+  <link rel="icon" href="./icon-192.png" />
+  <style>
+    :root{--bg:#070816;--card:#0c1030cc;--card2:#0b0e24cc;--text:#e9ecff;--muted:#b7bce8;--line:#ffffff18;--purple:#7b2cff;--gold:#ffcc33;--ok:#30e0a1;--warn:#ffb020;--bad:#ff4d6d;--cyan:#3bd6ff;--shadow:0 18px 60px rgba(0,0,0,.45);--radius:18px}
+    *{box-sizing:border-box}html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:radial-gradient(1100px 700px at 20% 10%,rgba(123,44,255,.22),transparent 55%),radial-gradient(900px 600px at 80% 20%,rgba(255,204,51,.18),transparent 60%),radial-gradient(1200px 900px at 50% 110%,rgba(48,224,161,.10),transparent 60%),linear-gradient(180deg,#050611,#06071a 40%,#050611);overflow-x:hidden}
+    .stars{position:fixed;inset:0;pointer-events:none;opacity:.45;background-image:radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.8),transparent 45%),radial-gradient(1px 1px at 22% 78%,rgba(255,255,255,.7),transparent 45%),radial-gradient(1px 1px at 64% 34%,rgba(255,255,255,.8),transparent 45%),radial-gradient(1px 1px at 78% 66%,rgba(255,255,255,.75),transparent 45%),radial-gradient(1px 1px at 44% 56%,rgba(255,255,255,.65),transparent 45%),radial-gradient(1px 1px at 90% 22%,rgba(255,255,255,.7),transparent 45%);filter:drop-shadow(0 0 6px rgba(123,44,255,.12));animation:drift 18s linear infinite}
+    @keyframes drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-10px,6px,0)}}
+    .wrap{max-width:1300px;margin:0 auto;padding:22px 18px 100px;position:relative}
+    header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:10px 0 22px;flex-wrap:wrap}
+    .title{display:flex;flex-direction:column;gap:6px}
+    .brandRow{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+    .brandLogo{width:72px;max-width:18vw;height:auto;display:block;filter:drop-shadow(0 0 18px rgba(255,204,51,.24)) drop-shadow(0 0 34px rgba(123,44,255,.2));animation:hdrFloat 3.8s ease-in-out infinite}
+    @keyframes hdrFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .brandText{display:flex;flex-direction:column;gap:4px}
+    .brandKick{font-size:11px;text-transform:uppercase;letter-spacing:.24em;color:#f7d978}
+    h1{margin:0;font-size:clamp(22px,2.8vw,34px);letter-spacing:.2px;line-height:1.1}
+    .subtitle{color:var(--muted);font-size:13.5px;line-height:1.5;max-width:80ch}
+    .statusRow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+    .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));box-shadow:0 10px 40px rgba(0,0,0,.25);user-select:none;white-space:nowrap;height:fit-content}
+    .dot{width:10px;height:10px;border-radius:99px;background:radial-gradient(circle at 30% 30%,#fff,rgba(255,255,255,.2)),linear-gradient(180deg,var(--purple),#3a0fb8);box-shadow:0 0 18px rgba(123,44,255,.5)}
+    .pill span{color:var(--muted);font-size:12px}.pill b{color:var(--text);font-size:12px;font-weight:600}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .full{grid-column:1/-1}
+    @media(max-width:1040px){.grid{grid-template-columns:1fr}header{flex-direction:column}.pill{align-self:flex-start}}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-width:0}
+    .card .head{padding:16px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(123,44,255,.10),rgba(255,255,255,0))}
+    .card .head h2{margin:0;font-size:15px;letter-spacing:.2px}
+    .card .head p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.45}
+    .card .body{padding:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+    @media(max-width:740px){.row,.row3{grid-template-columns:1fr}}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    select,input[type="number"],input[type="text"],input[type="search"]{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);outline:none}
+    textarea{width:100%;min-height:134px;resize:vertical;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--text);outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12.5px;line-height:1.45}
+    textarea.mini{min-height:96px}
+    input[type="range"]{width:100%;accent-color:var(--purple)}
+    .rangeWrap{padding:12px 12px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.20);margin-bottom:12px}
+    .rangeTop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .badge{font-size:12px;color:var(--text);padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);box-shadow:0 0 0 1px rgba(0,0,0,.15) inset;white-space:nowrap}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
+    .sectionTitle{margin:0 0 8px;font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{border:none;cursor:pointer;padding:11px 14px;border-radius:14px;font-weight:650;letter-spacing:.2px;color:#0a0b16;background:linear-gradient(180deg,var(--gold),#ffb703);box-shadow:0 14px 34px rgba(255,204,51,.18),0 10px 30px rgba(0,0,0,.35);transition:transform .12s ease,filter .12s ease}
+    button:hover{transform:translateY(-1px);filter:brightness(1.02)}
+    button:active{transform:translateY(0);filter:brightness(.98)}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+    .btn2{color:var(--text);background:linear-gradient(180deg,rgba(123,44,255,.9),rgba(80,26,200,.92));box-shadow:0 14px 34px rgba(123,44,255,.18),0 10px 30px rgba(0,0,0,.35)}
+    .btn3{color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);box-shadow:none}
+    .btn4{color:var(--text);background:linear-gradient(180deg,rgba(59,214,255,.9),rgba(8,138,180,.92));box-shadow:0 14px 34px rgba(59,214,255,.18),0 10px 30px rgba(0,0,0,.35)}
+    .meter{margin-top:10px;display:flex;align-items:center;gap:10px}
+    .bar{flex:1;height:10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);overflow:hidden}
+    .fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));filter:saturate(1.1);transition:width .25s ease}
+    .meterText{font-size:12px;color:var(--muted);min-width:190px;text-align:right}
+    .note{padding:12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,77,109,.10),rgba(255,255,255,.02));color:var(--muted);font-size:12.5px;line-height:1.5}
+    .note.ok{background:linear-gradient(180deg,rgba(48,224,161,.10),rgba(255,255,255,.02))}
+    .note.info{background:linear-gradient(180deg,rgba(59,214,255,.10),rgba(255,255,255,.02))}
+    .note b{color:var(--text)}
+    .note code,.codeChip{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;color:#f2f3ff;background:rgba(0,0,0,.25);border:1px solid var(--line);padding:2px 6px;border-radius:8px;word-break:break-word}
+    .hidden{display:none!important}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    @media(max-width:900px){.split{grid-template-columns:1fr}}
+    .stack{display:flex;flex-direction:column;gap:12px}
+    .outputBox{padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.18)}
+    .historyTools{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;margin-bottom:14px}
+    @media(max-width:860px){.historyTools{grid-template-columns:1fr 1fr}}
+    .history{display:flex;flex-direction:column;gap:10px}
+    .hitem{padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+    .hmeta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;color:var(--muted);font-size:12px}
+    .hmeta b{color:var(--text);font-weight:650}
+    .hsecret{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .mask{flex:1;min-width:240px;padding:10px 12px;border-radius:12px;border:1px dashed rgba(255,255,255,.20);background:rgba(255,255,255,.04);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .smallbtn{padding:9px 11px;border-radius:12px;font-size:12px;font-weight:650;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);box-shadow:none}
+    .metaChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);opacity:0;pointer-events:none;padding:10px 14px;border-radius:999px;background:rgba(10,12,30,.92);border:1px solid var(--line);color:var(--text);box-shadow:var(--shadow);transition:opacity .2s ease,transform .2s ease;font-size:12px;z-index:200}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .footer{margin-top:16px;color:rgba(183,188,232,.85);font-size:12px;text-align:center}
+
+    /* KeyGate 13 bottom nav */
+    .kg13-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 12px;background:rgba(5,6,18,.94);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)}
+    .kg13-nav a{padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.7);text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+    .kg13-nav a:hover,.kg13-nav a.active{border-color:rgba(255,204,51,.4);color:#ffcc33;background:rgba(255,204,51,.07)}
+    @media(max-width:600px){.kg13-nav a{padding:7px 10px;font-size:10px}}
+  </style>
+<link rel="stylesheet" href="assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+</head>
+<body class="skyesol-living-page">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+<div class="stars"></div>
+<div class="wrap">
+  <header>
+    <div class="title">
+      <div class="brandRow">
+        <img class="brandLogo" src="./skyesoverlondondietylogo.png" alt="Skyes Over London" />
+        <div class="brandText">
+          <div class="brandKick">KeyGate 13 · Skyes Over London</div>
+          <h1 class="neon-gradient-text">Key Forge 🔑</h1>
+        </div>
+      </div>
+      <div class="subtitle">Generate strong HMAC secrets, <b>Ed25519 PEM keypairs</b>, <b>RSA/EC signing keys</b>, and copy-ready env blocks entirely in your browser. Push directly to the Variable Vault. Private material stays on-device.</div>
+    </div>
+    <div class="statusRow">
+      <div class="pill" aria-label="security status"><div class="dot"></div><div><span>Randomness source</span><br /><b id="rngStatus">Checking…</b></div></div>
+      <div class="pill" aria-label="key support"><div class="dot" style="background:radial-gradient(circle at 30% 30%,#fff,rgba(255,255,255,.2)),linear-gradient(180deg,var(--cyan),#0f5fb8);box-shadow:0 0 18px rgba(59,214,255,.5)"></div><div><span>Keypair support</span><br /><b id="keySupportStatus">Checking…</b></div></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <div class="head"><h2>Generator</h2><p>Use HMAC mode for <b>HS256/HS512</b>. Use keypair mode for <b>Ed25519</b>, <b>RS256</b>, or <b>ES256</b>-style workflows.</p></div>
+      <div class="body">
+        <div class="row">
+          <div>
+            <label for="generatorType">Generator type</label>
+            <select id="generatorType"><option value="secret" selected>JWT / HMAC Secret</option><option value="keypair">PEM Keypair</option></select>
+            <div class="hint">Switching modes changes controls and output shape.</div>
+          </div>
+          <div>
+            <label for="itemLabel">Label</label>
+            <input id="itemLabel" type="text" placeholder="e.g., Production signing key" />
+            <div class="hint">Saved with the item so future-you knows what this was.</div>
+          </div>
+        </div>
+
+        <div id="secretControls">
+          <div class="row">
+            <div>
+              <label for="encoding">Output format</label>
+              <select id="encoding"><option value="hex">Hex (env-safe, longer)</option><option value="base64url" selected>Base64URL (compact, env-safe)</option><option value="base64">Base64 (includes + / =)</option></select>
+              <div class="hint">For most .env files, <b>base64url</b> is cleanest.</div>
+            </div>
+            <div>
+              <label for="prefixMode">Prefix</label>
+              <select id="prefixMode"><option value="none" selected>No prefix</option><option value="jwt_secret">JWT_SECRET=</option><option value="custom">Custom…</option></select>
+              <input id="customPrefix" type="text" placeholder="e.g., MY_APP_JWT_SECRET=" style="margin-top:10px;display:none" />
+            </div>
+          </div>
+          <div class="rangeWrap">
+            <div class="rangeTop">
+              <div><label for="bytes" style="margin:0;color:var(--text);font-weight:700">Secret length</label><div class="hint" style="margin-top:6px">More bytes = more entropy.</div></div>
+              <div class="badge"><span id="bytesLabel">64</span> bytes • <span id="bitsLabel">512</span> bits</div>
+            </div>
+            <input id="bytes" type="range" min="16" max="128" step="16" value="64" />
+            <div class="hint">Common: 32 (ok), 64 (strong), 96–128 (overkill in a good way).</div>
+          </div>
+        </div>
+
+        <div id="keypairControls" class="hidden">
+          <div class="row3">
+            <div>
+              <label for="keypairAlgorithm">Keypair algorithm</label>
+              <select id="keypairAlgorithm"><option value="ed25519" selected>Ed25519</option><option value="rs256-2048">RSA (RS256) 2048</option><option value="rs256-4096">RSA (RS256) 4096</option><option value="es256">ECDSA P-256 (ES256)</option></select>
+              <div class="hint">Ed25519 is compact and modern.</div>
+            </div>
+            <div>
+              <label for="envPreset">Env preset</label>
+              <select id="envPreset"><option value="sbom" selected>SBOM signing</option><option value="jwt_signing">JWT signing</option><option value="custom">Custom names…</option><option value="none">No env block</option></select>
+              <div class="hint">Builds private/public env variable names automatically.</div>
+            </div>
+            <div>
+              <label for="toolingPreset">Tooling snippets</label>
+              <select id="toolingPreset"><option value="openssl" selected>OpenSSL</option><option value="node">Node.js crypto</option><option value="both">Both</option></select>
+              <div class="hint">Browser generates PEMs directly.</div>
+            </div>
+          </div>
+          <div id="customEnvWrap" class="row hidden">
+            <div><label for="customPrivateEnv">Private env var name</label><input id="customPrivateEnv" type="text" placeholder="e.g., SBOM_SIGNING_PRIVATE_KEY_PEM" /></div>
+            <div><label for="customPublicEnv">Public env var name</label><input id="customPublicEnv" type="text" placeholder="e.g., SBOM_SIGNING_PUBLIC_KEY_PEM" /></div>
+          </div>
+          <div class="note info"><b>PEM mode:</b> exports real <code>PKCS#8</code> private keys and <code>SPKI</code> public keys in valid PEM wrappers.</div>
+        </div>
+
+        <div class="btns">
+          <button id="genBtn" type="button">Generate</button>
+          <button id="copyPrimaryBtn" type="button" class="btn2">Copy Primary Output</button>
+          <button id="saveBtn" type="button" class="btn4">Save to Vault</button>
+          <button id="clearBtn" type="button" class="btn3">Clear Current</button>
+        </div>
+
+        <div class="meter" aria-label="strength meter"><div class="bar"><div class="fill" id="fill"></div></div><div class="meterText" id="meterText">Strength: —</div></div>
+        <div style="margin-top:12px" class="note"><b>Storage note:</b> vault persists in <code>localStorage</code> on this browser/device. Clear it on shared machines.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="head"><h2>Current Output</h2><p>Main output changes with mode. Secrets get one value. Keypairs get PEMs, env blocks, and snippets.</p></div>
+      <div class="body">
+        <div id="secretOutputWrap">
+          <label for="secretOutput">Secret output</label>
+          <textarea id="secretOutput" readonly spellcheck="false" placeholder="Generated secret will appear here…"></textarea>
+        </div>
+        <div id="keypairOutputWrap" class="hidden stack">
+          <div class="split">
+            <div class="outputBox">
+              <label for="privatePemOutput">Private PEM</label>
+              <textarea id="privatePemOutput" readonly spellcheck="false" placeholder="Private PEM will appear here…"></textarea>
+              <div class="btns"><button type="button" class="smallbtn" id="copyPrivatePemBtn">Copy private PEM</button><button type="button" class="smallbtn" id="copyPrivateEnvValueBtn">Copy private env value</button></div>
+            </div>
+            <div class="outputBox">
+              <label for="publicPemOutput">Public PEM</label>
+              <textarea id="publicPemOutput" readonly spellcheck="false" placeholder="Public PEM will appear here…"></textarea>
+              <div class="btns"><button type="button" class="smallbtn" id="copyPublicPemBtn">Copy public PEM</button><button type="button" class="smallbtn" id="copyPublicEnvValueBtn">Copy public env value</button></div>
+            </div>
+          </div>
+          <div class="outputBox">
+            <label for="envBlockOutput">Env block</label>
+            <textarea id="envBlockOutput" class="mini" readonly spellcheck="false" placeholder="Copy-ready env block will appear here…"></textarea>
+            <div class="btns"><button type="button" class="smallbtn" id="copyEnvBlockBtn">Copy env block</button></div>
+          </div>
+          <div class="split">
+            <div class="outputBox">
+              <label for="opensslOutput">OpenSSL snippet</label>
+              <textarea id="opensslOutput" class="mini" readonly spellcheck="false"></textarea>
+              <div class="btns"><button type="button" class="smallbtn" id="copyOpenSslBtn">Copy OpenSSL</button></div>
+            </div>
+            <div class="outputBox">
+              <label for="nodeOutput">Node.js crypto snippet</label>
+              <textarea id="nodeOutput" class="mini" readonly spellcheck="false"></textarea>
+              <div class="btns"><button type="button" class="smallbtn" id="copyNodeBtn">Copy Node.js</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer" style="margin-top:14px">Browser-generated PEMs are real PKCS#8 / SPKI keys usable in production signing workflows.</div>
+      </div>
+    </section>
+
+    <section class="card full">
+      <div class="head"><h2>OpenSSL-style Browser Runner + Export Studio</h2><p>Run supported OpenSSL-style key-generation commands in-browser, then export as JSON, TXT, HTML, PDF, or DOCX.</p></div>
+      <div class="body">
+        <div class="row">
+          <div class="outputBox">
+            <label for="opensslCommandInput">Browser OpenSSL command input</label>
+            <textarea id="opensslCommandInput" spellcheck="false" placeholder="Paste supported OpenSSL commands here…"></textarea>
+            <div class="btns">
+              <button type="button" class="smallbtn" id="loadOpenSslExampleBtn">Load current example</button>
+              <button type="button" class="smallbtn" id="runOpenSslBtn">Run in browser</button>
+              <button type="button" class="smallbtn" id="clearOpenSslBtn">Clear runner</button>
+            </div>
+            <div class="hint">Runs a supported <b>OpenSSL-compatible browser lane</b> backed by Web Crypto.</div>
+          </div>
+          <div class="outputBox">
+            <label for="opensslRunnerOutput">Runner output</label>
+            <textarea id="opensslRunnerOutput" class="mini" readonly spellcheck="false" placeholder="Runner status will appear here…"></textarea>
+            <div class="history" id="opensslFilesList" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="exportScope">Export scope</label>
+            <select id="exportScope"><option value="current" selected>Current item</option><option value="vault">Full vault</option><option value="opensslfs">OpenSSL browser files</option></select>
+          </div>
+          <div>
+            <label for="exportFormat">Export format</label>
+            <select id="exportFormat"><option value="json">JSON</option><option value="txt">TXT</option><option value="html" selected>HTML</option><option value="pdf">PDF</option><option value="docx">DOCX</option></select>
+          </div>
+        </div>
+        <div class="btns">
+          <button type="button" class="btn2" id="exportArtifactBtn">Export selected format</button>
+          <button type="button" class="btn3" id="exportHtmlPreviewBtn">Open HTML preview</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card full">
+      <div class="head"><h2>Bridge → Variable Vault</h2><p>Push current secret/keypair or full vault into the Variable Vault for secure packaging and storage.</p></div>
+      <div class="body">
+        <div class="row">
+          <div class="note info"><b>Outbound lane:</b> generated secrets and PEM env blocks queue straight into the Variable Vault.</div>
+          <div class="note ok"><b>Inbound lane:</b> Vault pushes environment packs back here as queued .env workspace files for the browser runner.</div>
+        </div>
+        <div class="row">
+          <div class="outputBox">
+            <label>Bridge controls</label>
+            <div class="note info" style="margin-bottom:10px"><div><b>Vault intake:</b> <span id="suiteSovStatus">0 queued packages in Variable Vault.</span></div><div style="margin-top:8px"><b>Forge intake:</b> <span id="suiteJwtInboxStatus">0 queued environment packs from Vault.</span></div></div>
+            <div class="btns">
+              <button type="button" class="btn2" id="pushCurrentToSovBtn">Push current to Vault</button>
+              <button type="button" class="btn3" id="pushVaultToSovBtn">Push vault to Vault</button>
+              <a href="./vault.html" class="btn3" style="display:inline-flex;align-items:center;padding:11px 14px;border-radius:14px;text-decoration:none;color:var(--text);font-weight:650;font-size:14px;border:1px solid var(--line);background:rgba(255,255,255,.06)">Open Variable Vault</a>
+            </div>
+          </div>
+          <div class="outputBox">
+            <label>Queued environment packs from Vault</label>
+            <div id="suiteInboxList" class="history"></div>
+            <div class="btns">
+              <button type="button" class="smallbtn" id="importSuiteInboxBtn">Import queued packs</button>
+              <button type="button" class="smallbtn" id="clearSuiteInboxBtn">Clear intake</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card full">
+      <div class="head"><h2>Vault (persistent local history)</h2><p>Vault stores generated items in localStorage so they survive refreshes. Clear it when done on shared machines.</p></div>
+      <div class="body">
+        <div class="historyTools">
+          <input id="vaultSearch" type="search" placeholder="Search labels, types, algorithms…" />
+          <button type="button" class="btn3" id="exportVaultBtn">Export vault JSON</button>
+          <button type="button" class="btn3" id="importVaultBtn">Import vault JSON</button>
+          <button type="button" class="btn3" id="clearVaultBtn">Clear vault</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" class="hidden" />
+        <div class="history" id="history"></div>
+        <div class="footer" style="margin-top:14px">Vault is local-only unless you export it yourself.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="kg13-nav">
+  <a href="./index.html">Suite</a>
+  <a href="./forge.html" class="active">Forge</a>
+  <a href="./vault.html">Vault</a>
+  <a href="./sovereign-key.html">Key Derive</a>
+  <a href="./passgen.html">Pass Lab</a>
+</nav>
+
+<script>
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+
+  const STORAGE_KEY = 'sol.jwt.generator.vault.v2';
+  const OPENSSL_FS_KEY = 'sol.jwt.generator.openssl.fs.v1';
+  const SOV_INBOX_KEY = 'sovereign.variables.inbox.v1';
+  const JWT_SUITE_INBOX_KEY = 'sol.jwt.generator.inbox.v1';
+  const CURRENT_BRIDGE_KEY = 'sol.jwt.generator.current.v2';
+  const HISTORY_LIMIT = 120;
+
+  const state = { current: null, vault: [], opensslFs: {} };
+
+  const els = {
+    generatorType: $('generatorType'), itemLabel: $('itemLabel'), encoding: $('encoding'),
+    prefixMode: $('prefixMode'), customPrefix: $('customPrefix'), bytes: $('bytes'),
+    bytesLabel: $('bytesLabel'), bitsLabel: $('bitsLabel'), genBtn: $('genBtn'),
+    copyPrimaryBtn: $('copyPrimaryBtn'), saveBtn: $('saveBtn'), clearBtn: $('clearBtn'),
+    fill: $('fill'), meterText: $('meterText'), toast: $('toast'),
+    rngStatus: $('rngStatus'), keySupportStatus: $('keySupportStatus'),
+    secretControls: $('secretControls'), keypairControls: $('keypairControls'),
+    secretOutputWrap: $('secretOutputWrap'), keypairOutputWrap: $('keypairOutputWrap'),
+    secretOutput: $('secretOutput'), keypairAlgorithm: $('keypairAlgorithm'),
+    envPreset: $('envPreset'), toolingPreset: $('toolingPreset'),
+    customEnvWrap: $('customEnvWrap'), customPrivateEnv: $('customPrivateEnv'),
+    customPublicEnv: $('customPublicEnv'), privatePemOutput: $('privatePemOutput'),
+    publicPemOutput: $('publicPemOutput'), envBlockOutput: $('envBlockOutput'),
+    opensslOutput: $('opensslOutput'), nodeOutput: $('nodeOutput'),
+    history: $('history'), vaultSearch: $('vaultSearch'),
+    exportVaultBtn: $('exportVaultBtn'), importVaultBtn: $('importVaultBtn'),
+    clearVaultBtn: $('clearVaultBtn'), importFile: $('importFile'),
+    copyPrivatePemBtn: $('copyPrivatePemBtn'), copyPublicPemBtn: $('copyPublicPemBtn'),
+    copyPrivateEnvValueBtn: $('copyPrivateEnvValueBtn'), copyPublicEnvValueBtn: $('copyPublicEnvValueBtn'),
+    copyEnvBlockBtn: $('copyEnvBlockBtn'), copyOpenSslBtn: $('copyOpenSslBtn'),
+    copyNodeBtn: $('copyNodeBtn'), opensslCommandInput: $('opensslCommandInput'),
+    opensslRunnerOutput: $('opensslRunnerOutput'), opensslFilesList: $('opensslFilesList'),
+    loadOpenSslExampleBtn: $('loadOpenSslExampleBtn'), runOpenSslBtn: $('runOpenSslBtn'),
+    clearOpenSslBtn: $('clearOpenSslBtn'), exportScope: $('exportScope'),
+    exportFormat: $('exportFormat'), exportArtifactBtn: $('exportArtifactBtn'),
+    exportHtmlPreviewBtn: $('exportHtmlPreviewBtn'), pushCurrentToSovBtn: $('pushCurrentToSovBtn'),
+    pushVaultToSovBtn: $('pushVaultToSovBtn'), suiteSovStatus: $('suiteSovStatus'),
+    suiteJwtInboxStatus: $('suiteJwtInboxStatus'), suiteInboxList: $('suiteInboxList'),
+    importSuiteInboxBtn: $('importSuiteInboxBtn'), clearSuiteInboxBtn: $('clearSuiteInboxBtn')
+  };
+
+  function showToast(msg) { els.toast.textContent = msg; els.toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(() => els.toast.classList.remove('show'), 1800); }
+  function hasCrypto() { return !!(window.crypto && window.crypto.getRandomValues); }
+  function hasSubtle() { return !!(window.crypto && window.crypto.subtle && window.isSecureContext); }
+
+  function updateSupportStatus() {
+    els.rngStatus.textContent = hasCrypto() ? 'Secure (Web Crypto)' : 'Unavailable';
+    els.rngStatus.style.color = hasCrypto() ? 'var(--ok)' : 'var(--bad)';
+    let txt = 'Unavailable', color = 'var(--bad)';
+    if (hasSubtle()) { txt = 'Secure context ready'; color = 'var(--ok)'; }
+    else if (window.crypto && window.crypto.subtle) { txt = 'SubtleCrypto needs HTTPS'; color = 'var(--warn)'; }
+    els.keySupportStatus.textContent = txt; els.keySupportStatus.style.color = color;
+  }
+
+  function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+  function entropyBits(byteLen) { return byteLen * 8; }
+
+  function updateMeterForCurrentControls() {
+    if (els.generatorType.value === 'secret') {
+      const bits = entropyBits(parseInt(els.bytes.value, 10));
+      const pct = clamp((bits / 1024) * 100, 0, 100);
+      els.fill.style.width = pct.toFixed(1) + '%';
+      let label = '—', color = 'var(--muted)';
+      if (bits < 128) { label = 'Too small'; color = 'var(--bad)'; }
+      else if (bits < 256) { label = 'Okay'; color = 'var(--warn)'; }
+      else if (bits < 512) { label = 'Strong'; color = 'var(--ok)'; }
+      else { label = 'Very strong'; color = 'var(--ok)'; }
+      els.meterText.textContent = `Strength: ${bits} bits • ${label}`; els.meterText.style.color = color;
+      return;
+    }
+    const alg = els.keypairAlgorithm.value;
+    let pct = 82, detail = 'Modern asymmetric';
+    if (alg === 'ed25519') { pct = 88; detail = 'Fast, compact, modern'; }
+    if (alg === 'rs256-2048') { pct = 76; detail = 'Compatible, heavier'; }
+    if (alg === 'rs256-4096') { pct = 92; detail = 'Large, slower, thorough'; }
+    if (alg === 'es256') { pct = 84; detail = 'Compact EC signing key'; }
+    els.fill.style.width = pct + '%'; els.meterText.textContent = `Strength: Keypair ready • ${detail}`; els.meterText.style.color = 'var(--ok)';
+  }
+
+  function bytesToHex(bytes) { let o = ''; for (let i = 0; i < bytes.length; i++) o += bytes[i].toString(16).padStart(2, '0'); return o; }
+  function bytesToBase64(bytes) { let bin = ''; const chunk = 0x8000; for (let i = 0; i < bytes.length; i += chunk) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk)); return btoa(bin); }
+  function base64ToBase64Url(b64) { return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function makeRandomBytes(n) { const a = new Uint8Array(n); window.crypto.getRandomValues(a); return a; }
+
+  function getPrefix() {
+    const mode = els.prefixMode.value;
+    if (mode === 'jwt_secret') return 'JWT_SECRET=';
+    if (mode === 'custom') return els.customPrefix.value || '';
+    return '';
+  }
+
+  function formatSecret(bytes, enc) {
+    if (enc === 'hex') return bytesToHex(bytes);
+    if (enc === 'base64') return bytesToBase64(bytes);
+    return base64ToBase64Url(bytesToBase64(bytes));
+  }
+
+  function nowStamp() { const d = new Date(); const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+  function safeJsonParse(v, fb) { try { return JSON.parse(v); } catch (_) { return fb; } }
+  function htmlEscape(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function xmlEscape(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); }
+
+  function persistVault() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.vault)); }
+  function loadVault() { const raw = localStorage.getItem(STORAGE_KEY); state.vault = Array.isArray(safeJsonParse(raw, [])) ? safeJsonParse(raw, []) : []; }
+  function persistOpenSslFs() { localStorage.setItem(OPENSSL_FS_KEY, JSON.stringify(state.opensslFs || {})); }
+  function loadOpenSslFs() { state.opensslFs = safeJsonParse(localStorage.getItem(OPENSSL_FS_KEY), {}) || {}; if (typeof state.opensslFs !== 'object' || Array.isArray(state.opensslFs)) state.opensslFs = {}; }
+
+  function sanitizeFileName(name, fallback) { const o = String(name || '').trim().replace(/[\/:*?"<>|]+/g, '_').replace(/^\.+/, ''); return o || fallback || 'file.txt'; }
+  function downloadBlob(blob, filename) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }
+
+  function readLocalJson(key, fallback) { try { const r = localStorage.getItem(key); return r == null ? fallback : (JSON.parse(r) ?? fallback); } catch (_) { return fallback; } }
+  function writeLocalJson(key, value) { if (value == null || (Array.isArray(value) && !value.length)) { localStorage.removeItem(key); return; } localStorage.setItem(key, JSON.stringify(value)); }
+
+  function envSafeName(v, fb) { const o = String(v||'').trim().toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_+|_+$/g,''); return o || fb || 'SECRET_VALUE'; }
+  function parseEnvAssignmentLine(str) { const m = String(str||'').trim().match(/^([A-Za-z_][A-Za-z0-9_.-]*)=(.*)$/); if (!m) return null; let val = String(m[2]||'').trim(); if ((val.startsWith('"')&&val.endsWith('"'))||(val.startsWith("'")&&val.endsWith("'"))) val = val.slice(1,-1); return { key: m[1], value: val.replace(/\\n/g,'\n') }; }
+  function quoteEnvValue(v) { return `"${String(v==null?'':v).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/"/g,'\\"')}"` ; }
+
+  function currentToBridgeSnapshot() { if (!state.current) { localStorage.removeItem(CURRENT_BRIDGE_KEY); return; } localStorage.setItem(CURRENT_BRIDGE_KEY, JSON.stringify(state.current)); }
+
+  function getEnvNames() {
+    const preset = els.envPreset.value;
+    if (preset === 'none') return { privateName: '', publicName: '' };
+    if (preset === 'custom') return { privateName: String(els.customPrivateEnv.value||'').trim(), publicName: String(els.customPublicEnv.value||'').trim() };
+    if (preset === 'jwt_signing') return { privateName: 'JWT_SIGNING_PRIVATE_KEY_PEM', publicName: 'JWT_SIGNING_PUBLIC_KEY_PEM' };
+    return { privateName: 'SBOM_SIGNING_PRIVATE_KEY_PEM', publicName: 'SBOM_SIGNING_PUBLIC_KEY_PEM' };
+  }
+
+  function pemToEnvValue(pem) { return String(pem||'').trim().replace(/\n/g,'\\n'); }
+  function buildEnvBlock(privatePem, publicPem) { const e = getEnvNames(); if (!e.privateName && !e.publicName) return ''; const l = []; if (e.privateName) l.push(`${e.privateName}="${pemToEnvValue(privatePem)}"`); if (e.publicName) l.push(`${e.publicName}="${pemToEnvValue(publicPem)}"`); return l.join('\n'); }
+
+  function opensslSnippet(alg) {
+    if (alg === 'ed25519') return 'openssl genpkey -algorithm Ed25519 -out signing_private.pem\nopenssl pkey -in signing_private.pem -pubout -out signing_public.pem';
+    if (alg === 'rs256-2048') return 'openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out signing_private.pem\nopenssl rsa -in signing_private.pem -pubout -out signing_public.pem';
+    if (alg === 'rs256-4096') return 'openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out signing_private.pem\nopenssl rsa -in signing_private.pem -pubout -out signing_public.pem';
+    return 'openssl ecparam -name prime256v1 -genkey -noout -out signing_private.pem\nopenssl ec -in signing_private.pem -pubout -out signing_public.pem';
+  }
+
+  function nodeSnippet(alg) {
+    if (alg === 'ed25519') return "const { generateKeyPairSync } = require('crypto');\nconst { privateKey, publicKey } = generateKeyPairSync('ed25519', {\n  privateKeyEncoding: { type: 'pkcs8', format: 'pem' },\n  publicKeyEncoding: { type: 'spki', format: 'pem' }\n});";
+    if (alg === 'rs256-2048' || alg === 'rs256-4096') { const bits = alg === 'rs256-4096' ? 4096 : 2048; return `const { generateKeyPairSync } = require('crypto');\nconst { privateKey, publicKey } = generateKeyPairSync('rsa', {\n  modulusLength: ${bits},\n  publicKeyEncoding: { type: 'spki', format: 'pem' },\n  privateKeyEncoding: { type: 'pkcs8', format: 'pem' }\n});`; }
+    return "const { generateKeyPairSync } = require('crypto');\nconst { privateKey, publicKey } = generateKeyPairSync('ec', {\n  namedCurve: 'P-256',\n  publicKeyEncoding: { type: 'spki', format: 'pem' },\n  privateKeyEncoding: { type: 'pkcs8', format: 'pem' }\n});";
+  }
+
+  function arrayBufferToBase64(buffer) { const bytes = new Uint8Array(buffer); let bin = ''; const chunk = 0x8000; for (let i = 0; i < bytes.length; i += chunk) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk)); return btoa(bin); }
+  function chunkString(str, size) { const o = []; for (let i = 0; i < str.length; i += size) o.push(str.slice(i, i + size)); return o.join('\n'); }
+  function toPem(label, buffer) { return `-----BEGIN ${label}-----\n${chunkString(arrayBufferToBase64(buffer), 64)}\n-----END ${label}-----`; }
+
+  async function exportKeyPairToPem(keyPair) {
+    const privateBuf = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+    const publicBuf = await crypto.subtle.exportKey('spki', keyPair.publicKey);
+    return { privatePem: toPem('PRIVATE KEY', privateBuf), publicPem: toPem('PUBLIC KEY', publicBuf) };
+  }
+
+  async function generateBrowserKeypairForAlg(alg) {
+    if (!hasSubtle()) throw new Error('SubtleCrypto unavailable. Use HTTPS or a modern browser.');
+    let keyPair;
+    if (alg === 'ed25519') keyPair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+    else if (alg === 'rs256-2048' || alg === 'rs256-4096') keyPair = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: alg === 'rs256-4096' ? 4096 : 2048, publicExponent: new Uint8Array([1,0,1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
+    else keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+    return exportKeyPairToPem(keyPair);
+  }
+
+  function normalizedPreview(item) { if (item.type === 'secret') return item.value || ''; return item.privatePem ? item.privatePem.split('\n').slice(0,2).join(' ') + ' ...' : ''; }
+
+  async function copyText(text, msg) {
+    if (!text) { showToast('Nothing to copy'); return; }
+    try { await navigator.clipboard.writeText(text); showToast(msg || 'Copied ✅'); }
+    catch (_) { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); try { document.execCommand('copy'); showToast(msg || 'Copied ✅'); } catch (e2) { showToast('Copy blocked — select manually'); } ta.remove(); }
+  }
+
+  function itemToSovereignEntry(item) {
+    if (!item) return null;
+    let content = '';
+    if (item.type === 'secret') { const parsed = parseEnvAssignmentLine(item.value || ''); const key = parsed?.key || envSafeName(item.label || 'JWT_SECRET', 'JWT_SECRET'); const value = parsed ? parsed.value : (item.value || ''); content = `${key}=${quoteEnvValue(value)}`; }
+    else content = item.envBlock || buildEnvBlock(item.privatePem || '', item.publicPem || '');
+    if (!content.trim()) return null;
+    const title = String(item.label || (item.type === 'secret' ? 'Generated Secret' : 'Generated Keypair'));
+    return { id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random()}`, source: 'KeyGate13Forge', title, project_name: title, environment_name: item.type === 'secret' ? 'Secret Material' : String(item.algorithm || 'Keypair').toUpperCase(), created_at: new Date().toISOString(), content };
+  }
+
+  function pushEntriesToSovereign(entries) {
+    const cleaned = (entries || []).filter(Boolean);
+    if (!cleaned.length) { showToast('Nothing valid to push'); return 0; }
+    const existing = readLocalJson(SOV_INBOX_KEY, []);
+    writeLocalJson(SOV_INBOX_KEY, [...cleaned, ...existing].slice(0, 240));
+    updateSuiteBridgeStatus();
+    return cleaned.length;
+  }
+
+  function pushCurrentToSovereign() { if (!state.current) { showToast('Generate or load something first'); return; } const count = pushEntriesToSovereign([itemToSovereignEntry(state.current)]); if (count) showToast('Queued for Variable Vault ✅'); }
+  function pushVaultToSovereign() { if (!state.vault.length) { showToast('Vault is empty'); return; } const count = pushEntriesToSovereign(state.vault.map(itemToSovereignEntry)); if (count) showToast(`Queued ${count} item${count === 1 ? '' : 's'} for Variable Vault ✅`); }
+
+  function renderSuiteInbox(items) {
+    if (!els.suiteInboxList) return;
+    els.suiteInboxList.innerHTML = '';
+    const list = Array.isArray(items) ? items : [];
+    if (!list.length) { const d = document.createElement('div'); d.className = 'note'; d.innerHTML = '<b>No incoming packs.</b> Variable Vault can push environments here.'; els.suiteInboxList.appendChild(d); return; }
+    list.slice(0,6).forEach(entry => {
+      const w = document.createElement('div'); w.className = 'hitem';
+      const m = document.createElement('div'); m.className = 'hmeta'; m.innerHTML = `<div><b>${htmlEscape(entry.title||entry.project_name||'Vault Pack')}</b><br>${htmlEscape(entry.environment_name||entry.source||'Environment Pack')}</div><div>${htmlEscape(String(entry.created_at||'—').slice(0,19).replace('T',' '))}</div>`;
+      const r = document.createElement('div'); r.className = 'hsecret';
+      const mask = document.createElement('div'); mask.className = 'mask'; mask.textContent = String(entry.content||'').split(/\r?\n/).slice(0,2).join('  •  ') || '(empty)';
+      const copyBtn = document.createElement('button'); copyBtn.className = 'smallbtn'; copyBtn.textContent = 'Copy'; copyBtn.addEventListener('click', () => copyText(entry.content||'', 'Pack copied ✅'));
+      r.append(mask, copyBtn); w.append(m, r); els.suiteInboxList.appendChild(w);
+    });
+  }
+
+  function clearSuiteInbox() { writeLocalJson(JWT_SUITE_INBOX_KEY, []); updateSuiteBridgeStatus(); showToast('Forge intake cleared'); }
+
+  function updateSuiteBridgeStatus() {
+    const sovQ = readLocalJson(SOV_INBOX_KEY, []);
+    const jwtInbox = readLocalJson(JWT_SUITE_INBOX_KEY, []);
+    if (els.suiteSovStatus) els.suiteSovStatus.textContent = `${sovQ.length} queued package${sovQ.length === 1 ? '' : 's'} in Variable Vault.`;
+    if (els.suiteJwtInboxStatus) els.suiteJwtInboxStatus.textContent = `${jwtInbox.length} queued pack${jwtInbox.length === 1 ? '' : 's'} from Vault.`;
+    renderSuiteInbox(jwtInbox);
+  }
+
+  function updateBytesUI() { const b = parseInt(els.bytes.value, 10); els.bytesLabel.textContent = b; els.bitsLabel.textContent = entropyBits(b); updateMeterForCurrentControls(); }
+  function updatePrefixUI() { els.customPrefix.style.display = (els.prefixMode.value === 'custom') ? 'block' : 'none'; }
+  function updateEnvUI() { els.customEnvWrap.classList.toggle('hidden', els.envPreset.value !== 'custom'); }
+  function updateModeUI() { const isSec = els.generatorType.value === 'secret'; els.secretControls.classList.toggle('hidden', !isSec); els.keypairControls.classList.toggle('hidden', isSec); els.secretOutputWrap.classList.toggle('hidden', !isSec); els.keypairOutputWrap.classList.toggle('hidden', isSec); els.copyPrimaryBtn.textContent = isSec ? 'Copy Primary Output' : 'Copy Private PEM'; updateMeterForCurrentControls(); }
+
+  function buildSecretCurrent(value, byteLen, enc) { return { id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random(), type: 'secret', label: String(els.itemLabel.value||'').trim(), createdAt: nowStamp(), bytes: byteLen, bits: entropyBits(byteLen), enc, value }; }
+  function buildKeypairCurrentForAlg(alg, payload) { const envNames = getEnvNames(); return { id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random(), type: 'keypair', label: String(els.itemLabel.value||'').trim(), createdAt: nowStamp(), algorithm: alg, envNames, privatePem: payload.privatePem, publicPem: payload.publicPem, envBlock: buildEnvBlock(payload.privatePem, payload.publicPem), openssl: opensslSnippet(alg), node: nodeSnippet(alg) }; }
+  function buildKeypairCurrent(payload) { return buildKeypairCurrentForAlg(els.keypairAlgorithm.value, payload); }
+
+  function setCurrent(item) {
+    state.current = item || null; currentToBridgeSnapshot();
+    if (!item) { els.secretOutput.value = ''; els.privatePemOutput.value = ''; els.publicPemOutput.value = ''; els.envBlockOutput.value = ''; els.opensslOutput.value = ''; els.nodeOutput.value = ''; updateMeterForCurrentControls(); return; }
+    if (item.type === 'secret') { els.secretOutput.value = item.value || ''; }
+    else { els.privatePemOutput.value = item.privatePem||''; els.publicPemOutput.value = item.publicPem||''; els.envBlockOutput.value = item.envBlock||''; els.opensslOutput.value = item.openssl||''; els.nodeOutput.value = item.node||''; if (els.opensslCommandInput && !els.opensslCommandInput.value.trim()) els.opensslCommandInput.value = item.openssl||''; }
+  }
+
+  function saveCurrentToVault() { if (!state.current) { showToast('Nothing to save yet'); return; } const clone = JSON.parse(JSON.stringify(state.current)); state.vault.unshift(clone); state.vault = state.vault.slice(0, HISTORY_LIMIT); persistVault(); renderHistory(); showToast('Saved to vault ✅'); }
+  function removeVaultItem(id) { state.vault = state.vault.filter(i => i.id !== id); persistVault(); renderHistory(); showToast('Removed'); }
+  function loadVaultItem(item) {
+    state.current = JSON.parse(JSON.stringify(item));
+    if (item.label) els.itemLabel.value = item.label;
+    if (item.type === 'secret') { els.generatorType.value = 'secret'; updateModeUI(); if (item.enc) els.encoding.value = item.enc; if (item.bytes) els.bytes.value = item.bytes; updateBytesUI(); setCurrent(item); }
+    else { els.generatorType.value = 'keypair'; updateModeUI(); if (item.algorithm) els.keypairAlgorithm.value = item.algorithm; const e = item.envNames||{}; if (e.privateName==='SBOM_SIGNING_PRIVATE_KEY_PEM') els.envPreset.value='sbom'; else if (e.privateName==='JWT_SIGNING_PRIVATE_KEY_PEM') els.envPreset.value='jwt_signing'; else if (!e.privateName&&!e.publicName) els.envPreset.value='none'; else { els.envPreset.value='custom'; els.customPrivateEnv.value=e.privateName||''; els.customPublicEnv.value=e.publicName||''; } updateEnvUI(); setCurrent(item); }
+    showToast('Loaded into current view ✅');
+  }
+
+  function renderHistory() {
+    els.history.innerHTML = '';
+    const q = String(els.vaultSearch.value||'').trim().toLowerCase();
+    const filtered = state.vault.filter(item => { const hay = [item.label,item.type,item.algorithm,item.enc,item.createdAt,item.envNames?.privateName,item.envNames?.publicName].join(' ').toLowerCase(); return !q || hay.includes(q); });
+    if (!filtered.length) { const d = document.createElement('div'); d.className = 'note'; d.style.background = 'linear-gradient(180deg,rgba(123,44,255,.10),rgba(255,255,255,.02))'; d.innerHTML = '<b>No saved items.</b> Generate and save something.'; els.history.appendChild(d); return; }
+    filtered.forEach(item => {
+      const w = document.createElement('div'); w.className = 'hitem';
+      const title = item.label || (item.type === 'secret' ? 'Unlabeled secret' : 'Unlabeled keypair');
+      const metaLeft = item.type === 'secret' ? `<div><b>${title}</b><br>${item.bytes} bytes • ${item.bits} bits • ${item.enc}</div>` : `<div><b>${title}</b><br>${String(item.algorithm||'').toUpperCase()}</div>`;
+      const m = document.createElement('div'); m.className = 'hmeta'; m.innerHTML = `${metaLeft}<div>${item.createdAt||'—'}</div>`;
+      const r = document.createElement('div'); r.className = 'hsecret';
+      const mask = document.createElement('div'); mask.className = 'mask'; mask.textContent = normalizedPreview(item);
+      const loadBtn = document.createElement('button'); loadBtn.className = 'smallbtn'; loadBtn.textContent = 'Load'; loadBtn.addEventListener('click', () => loadVaultItem(item));
+      const copyBtn = document.createElement('button'); copyBtn.className = 'smallbtn'; copyBtn.textContent = item.type === 'secret' ? 'Copy' : 'Copy private'; copyBtn.addEventListener('click', () => copyText(item.type === 'secret' ? item.value : item.privatePem, 'Copied from vault ✅'));
+      const pushBtn = document.createElement('button'); pushBtn.className = 'smallbtn'; pushBtn.textContent = 'Push Vault'; pushBtn.addEventListener('click', () => { const count = pushEntriesToSovereign([itemToSovereignEntry(item)]); if (count) showToast('Queued for Variable Vault ✅'); });
+      const delBtn = document.createElement('button'); delBtn.className = 'smallbtn'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => removeVaultItem(item.id));
+      r.append(mask, loadBtn, copyBtn, pushBtn, delBtn);
+      const chips = document.createElement('div'); chips.className = 'metaChips';
+      if (item.type === 'keypair') { const n = item.envNames||{}; if (n.privateName) { const c=document.createElement('span');c.className='codeChip';c.textContent=n.privateName;chips.appendChild(c); } if (n.publicName) { const c=document.createElement('span');c.className='codeChip';c.textContent=n.publicName;chips.appendChild(c); } }
+      w.append(m, r); if (chips.children.length) w.appendChild(chips);
+      els.history.appendChild(w);
+    });
+  }
+
+  function exportVaultJson() { downloadBlob(new Blob([JSON.stringify(state.vault, null,2)], {type:'application/json'}), `key-vault-${new Date().toISOString().replace(/[:.]/g,'-')}.json`); }
+  function importVaultJson(file) { const reader = new FileReader(); reader.onload = () => { const inc = safeJsonParse(String(reader.result||'[]'), null); if (!Array.isArray(inc)) { showToast('Not a valid JSON array'); return; } state.vault = [...inc.filter(i=>i&&typeof i==='object'), ...state.vault].slice(0,HISTORY_LIMIT); persistVault(); renderHistory(); showToast('Vault imported ✅'); }; reader.readAsText(file); }
+
+  function renderItemText(item, index) {
+    if (!item) return '';
+    const h = [`Item ${index != null ? index+1 : 1}`, `Type: ${item.type||'—'}`, item.label ? `Label: ${item.label}` : '', item.createdAt ? `Created: ${item.createdAt}` : ''];
+    if (item.type === 'secret') { h.push(`Encoding: ${item.enc||'—'}`, `Bytes: ${item.bytes||'—'}`, `Bits: ${item.bits||'—'}`, '', 'Secret Value:', item.value||''); return h.join('\n'); }
+    h.push(`Algorithm: ${item.algorithm||'—'}`, '', 'Private PEM:', item.privatePem||'', '', 'Public PEM:', item.publicPem||'');
+    if (item.envBlock) h.push('', 'Env Block:', item.envBlock);
+    if (item.openssl) h.push('', 'OpenSSL Snippet:', item.openssl);
+    if (item.node) h.push('', 'Node.js Snippet:', item.node);
+    return h.join('\n');
+  }
+
+  function renderOpenSslFsText(fsObj) { const entries = Object.values(fsObj||{}); if (!entries.length) return 'OpenSSL browser workspace is empty.'; return entries.map((e,i) => [`File ${i+1}`, `Name: ${e.name}`, `Kind: ${e.kind||'pem'}`, `Algorithm: ${e.algorithm||'—'}`, `Created: ${e.createdAt||'—'}`, '', e.content||''].join('\n')).join('\n\n' + '-'.repeat(70) + '\n\n'); }
+
+  function getExportPayload(scope) {
+    if (scope === 'vault') return { title: 'KeyGate 13 Vault Export', filenameBase: `kg13-vault-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}`, json: state.vault, text: state.vault.length ? state.vault.map((item,i) => renderItemText(item,i)).join('\n\n' + '='.repeat(78) + '\n\n') : 'Vault is empty.', items: state.vault };
+    if (scope === 'opensslfs') return { title: 'KeyGate 13 OpenSSL Workspace', filenameBase: `kg13-openssl-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}`, json: Object.values(state.opensslFs||{}), text: renderOpenSslFsText(state.opensslFs), items: Object.values(state.opensslFs||{}) };
+    return { title: 'KeyGate 13 Current Export', filenameBase: `kg13-current-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}`, json: state.current||null, text: state.current ? renderItemText(state.current,0) : 'No current item.', items: state.current ? [state.current] : [] };
+  }
+
+  function toUnixNewlines(s) { return String(s==null?'':s).replace(/\r\n/g,'\n').replace(/\r/g,'\n'); }
+  function wrapTextLine(s, w) { const o=[]; let l=String(s||''); if (!l) return ['']; while(l.length>w){o.push(l.slice(0,w));l=l.slice(w);} o.push(l); return o; }
+
+  function buildExportHtml(title, payload) {
+    const itemsHtml = (payload.items||[]).length ? payload.items.map((item,i) => {
+      if (item.type === 'secret') return `<section class="block"><h2>${htmlEscape(item.label||`Secret ${i+1}`)}</h2><div class="meta">Type: secret · Encoding: ${htmlEscape(item.enc||'—')} · ${htmlEscape(String(item.bits||'—'))} bits · ${htmlEscape(item.createdAt||'—')}</div><pre>${htmlEscape(item.value||'')}</pre></section>`;
+      if (item.type === 'keypair') return `<section class="block"><h2>${htmlEscape(item.label||`Keypair ${i+1}`)}</h2><div class="meta">Type: keypair · Algorithm: ${htmlEscape(item.algorithm||'—')} · ${htmlEscape(item.createdAt||'—')}</div><h3>Private PEM</h3><pre>${htmlEscape(item.privatePem||'')}</pre><h3>Public PEM</h3><pre>${htmlEscape(item.publicPem||'')}</pre><h3>Env Block</h3><pre>${htmlEscape(item.envBlock||'')}</pre></section>`;
+      return `<section class="block"><h2>${htmlEscape(item.name||`File ${i+1}`)}</h2><pre>${htmlEscape(item.content||'')}</pre></section>`;
+    }).join('') : `<section class="block"><h2>Empty</h2><pre>${htmlEscape(payload.text||'')}</pre></section>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><title>${htmlEscape(title)}</title><style>body{font-family:Arial,sans-serif;background:#0c1026;color:#f4f7ff;margin:0;padding:24px}.wrap{max-width:1100px;margin:0 auto}header{margin-bottom:22px;padding:20px;border-radius:16px;background:linear-gradient(180deg,#171d49,#0e1331);border:1px solid rgba(255,255,255,.12)}h1{margin:0 0 8px;font-size:28px}.sub{color:#d7ddff;font-size:14px}.block{margin:0 0 18px;padding:18px;border-radius:16px;background:#12183b;border:1px solid rgba(255,255,255,.12)}h2{margin:0 0 6px;font-size:20px}h3{margin:16px 0 8px;font-size:14px}.meta{font-size:12px;color:#d2d7ff;margin-bottom:12px}pre{white-space:pre-wrap;word-break:break-word;background:#070b1d;color:#f5f7ff;border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,.09);font:12px/1.45 ui-monospace,Menlo,Consolas,monospace}</style></head><body><div class="wrap"><header><h1>${htmlEscape(title)}</h1><div class="sub">Exported ${htmlEscape(nowStamp())} from KeyGate 13.</div></header>${itemsHtml}</div></body></html>`;
+  }
+
+  function crc32(bytes) { let c=-1; for (let i=0;i<bytes.length;i++){c^=bytes[i];for(let k=0;k<8;k++) c=(c>>>1)^(0xEDB88320&-(c&1));} return (c^-1)>>>0; }
+  function u16(n){return[n&255,(n>>>8)&255]} function u32(n){return[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}
+  function concatArrays(parts){const total=parts.reduce((n,p)=>n+p.length,0);const out=new Uint8Array(total);let off=0;parts.forEach(p=>{out.set(p,off);off+=p.length});return out}
+  function encodeUtf8(s){return new TextEncoder().encode(String(s))}
+  function dosDateTime(date){const d=date||new Date();const year=Math.max(1980,d.getFullYear());const time=((d.getHours()&31)<<11)|((d.getMinutes()&63)<<5)|((Math.floor(d.getSeconds()/2))&31);const day=(((year-1980)&127)<<9)|(((d.getMonth()+1)&15)<<5)|(d.getDate()&31);return{time,day}}
+
+  function buildStoredZip(files) {
+    const localParts=[],centralParts=[];let offset=0;const now=new Date();
+    files.forEach(file=>{
+      const nameBytes=encodeUtf8(file.name);const dataBytes=typeof file.data==='string'?encodeUtf8(file.data):new Uint8Array(file.data);const crc=crc32(dataBytes);const{time,day}=dosDateTime(now);
+      const local=concatArrays([Uint8Array.from([0x50,0x4b,0x03,0x04]),Uint8Array.from(u16(20)),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u16(time)),Uint8Array.from(u16(day)),Uint8Array.from(u32(crc)),Uint8Array.from(u32(dataBytes.length)),Uint8Array.from(u32(dataBytes.length)),Uint8Array.from(u16(nameBytes.length)),Uint8Array.from(u16(0)),nameBytes,dataBytes]);
+      localParts.push(local);
+      const central=concatArrays([Uint8Array.from([0x50,0x4b,0x01,0x02]),Uint8Array.from(u16(20)),Uint8Array.from(u16(20)),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u16(time)),Uint8Array.from(u16(day)),Uint8Array.from(u32(crc)),Uint8Array.from(u32(dataBytes.length)),Uint8Array.from(u32(dataBytes.length)),Uint8Array.from(u16(nameBytes.length)),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u32(0)),Uint8Array.from(u32(offset)),nameBytes]);
+      centralParts.push(central);offset+=local.length;
+    });
+    const centralDir=concatArrays(centralParts);const locals=concatArrays(localParts);
+    const end=concatArrays([Uint8Array.from([0x50,0x4b,0x05,0x06]),Uint8Array.from(u16(0)),Uint8Array.from(u16(0)),Uint8Array.from(u16(files.length)),Uint8Array.from(u16(files.length)),Uint8Array.from(u32(centralDir.length)),Uint8Array.from(u32(locals.length)),Uint8Array.from(u16(0))]);
+    return new Blob([locals,centralDir,end],{type:'application/zip'});
+  }
+
+  function buildDocxBlob(title, text) {
+    const paragraphs=toUnixNewlines(text).split('\n').map(line=>{const safe=xmlEscape(line||' ');return`<w:p><w:r><w:rPr><w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">${safe}</w:t></w:r></w:p>`;}).join('');
+    const files=[{name:'[Content_Types].xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`},{name:'_rels/.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`},{name:'docProps/core.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEscape(title)}</dc:title><dc:creator>KeyGate 13</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:created></cp:coreProperties>`},{name:'docProps/app.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>KeyGate 13</Application></Properties>`},{name:'word/styles.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`},{name:'word/document.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${paragraphs}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`}];
+    return buildStoredZip(files);
+  }
+
+  function buildPdfBlob(title, text) {
+    const width=92,maxLines=62;const rawLines=[title,'',...toUnixNewlines(text).split('\n')];const lines=rawLines.flatMap(line=>wrapTextLine(line,width));const pages=[];for(let i=0;i<lines.length;i+=maxLines)pages.push(lines.slice(i,i+maxLines));const objects=[];const pushObj=s=>{objects.push(String(s));return objects.length};const fontObj=pushObj('<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>');const pageObjIds=[],contentObjIds=[];pages.forEach(pageLines=>{const content=['BT','/F1 10 Tf','40 800 Td'];pageLines.forEach((line,idx)=>{const safe=String(line||'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');if(idx===0)content.push(`(${safe}) Tj`);else content.push(`T* (${safe}) Tj`);});content.push('ET');const stream=content.join('\n');const contentObj=pushObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);contentObjIds.push(contentObj);const pageObj=pushObj(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents ${contentObj} 0 R /Resources << /Font << /F1 ${fontObj} 0 R >> >> >>`);pageObjIds.push(pageObj);});const pagesObj=2;objects.unshift('PAGES_PLACEHOLDER');const kids=pageObjIds.map(id=>`${id} 0 R`).join(' ');objects[1]=`<< /Type /Pages /Kids [${kids}] /Count ${pageObjIds.length} >>`;objects.unshift(`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`);const finalized=objects;let pdf='%PDF-1.4\n%âãÏÓ\n';const offsets=[0];finalized.forEach((obj,idx)=>{offsets.push(pdf.length);pdf+=`${idx+1} 0 obj\n${obj}\nendobj\n`;});const xrefStart=pdf.length;pdf+=`xref\n0 ${finalized.length+1}\n`;pdf+=`0000000000 65535 f \n`;for(let i=1;i<offsets.length;i++)pdf+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;pdf+=`trailer\n<< /Size ${finalized.length+1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;return new Blob([pdf],{type:'application/pdf'});
+  }
+
+  function exportArtifact(format, scope) {
+    const payload = getExportPayload(scope);
+    if (scope === 'current' && !state.current) { showToast('No current item loaded'); return; }
+    if ((scope === 'vault' && !state.vault.length) || (scope === 'opensslfs' && !Object.keys(state.opensslFs||{}).length)) { showToast('Nothing there to export'); return; }
+    if (format === 'json') { downloadBlob(new Blob([JSON.stringify(payload.json,null,2)],{type:'application/json'}),`${payload.filenameBase}.json`); showToast('JSON export ready ✅'); return; }
+    if (format === 'txt') { downloadBlob(new Blob([payload.text],{type:'text/plain;charset=utf-8'}),`${payload.filenameBase}.txt`); showToast('TXT export ready ✅'); return; }
+    if (format === 'html') { downloadBlob(new Blob([buildExportHtml(payload.title,payload)],{type:'text/html;charset=utf-8'}),`${payload.filenameBase}.html`); showToast('HTML export ready ✅'); return; }
+    if (format === 'pdf') { downloadBlob(buildPdfBlob(payload.title,payload.text),`${payload.filenameBase}.pdf`); showToast('PDF export ready ✅'); return; }
+    if (format === 'docx') { downloadBlob(buildDocxBlob(payload.title,payload.text),`${payload.filenameBase}.docx`); showToast('DOCX export ready ✅'); return; }
+  }
+
+  function openHtmlPreview() { const payload=getExportPayload(els.exportScope.value);const html=buildExportHtml(payload.title,payload);const win=window.open('','_blank','noopener,noreferrer');if(!win){showToast('Popup blocked');return;}win.document.open();win.document.write(html);win.document.close(); }
+
+  function setRunnerOutput(text) { els.opensslRunnerOutput.value = String(text||''); }
+
+  function writeOpenSslFile(name, content, meta) {
+    const clean = sanitizeFileName(name, 'generated.pem');
+    state.opensslFs[clean] = { name: clean, content: String(content||''), kind: meta?.kind||'pem', algorithm: meta?.algorithm||'', createdAt: nowStamp(), linkedPublicPem: meta?.linkedPublicPem||'' };
+    persistOpenSslFs(); renderOpenSslFs();
+  }
+
+  function renderOpenSslFs() {
+    if (!els.opensslFilesList) return;
+    const entries = Object.values(state.opensslFs||{}).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+    els.opensslFilesList.innerHTML = '';
+    if (!entries.length) { const d=document.createElement('div');d.className='note';d.textContent='No browser OpenSSL files yet.';els.opensslFilesList.appendChild(d);return; }
+    entries.forEach(entry => {
+      const w=document.createElement('div');w.className='hitem';
+      const m=document.createElement('div');m.className='hmeta';m.innerHTML=`<div><b>${htmlEscape(entry.name)}</b><br>${htmlEscape(entry.algorithm||'pem')} · ${htmlEscape(entry.kind||'pem')}</div><div>${htmlEscape(entry.createdAt||'—')}</div>`;
+      const r=document.createElement('div');r.className='hsecret';
+      const mask=document.createElement('div');mask.className='mask';mask.textContent=normalizedPreview({type:'keypair',privatePem:entry.content});
+      const dl=document.createElement('button');dl.className='smallbtn';dl.textContent='Download';dl.addEventListener('click',()=>downloadBlob(new Blob([entry.content],{type:'application/x-pem-file'}),entry.name));
+      const cp=document.createElement('button');cp.className='smallbtn';cp.textContent='Copy';cp.addEventListener('click',()=>copyText(entry.content,'Browser OpenSSL file copied ✅'));
+      const del=document.createElement('button');del.className='smallbtn';del.textContent='Delete';del.addEventListener('click',()=>{delete state.opensslFs[entry.name];persistOpenSslFs();renderOpenSslFs();showToast('File removed');});
+      r.append(mask,dl,cp,del);w.append(m,r);els.opensslFilesList.appendChild(w);
+    });
+  }
+
+  async function runOpenSslInBrowser() {
+    const raw = toUnixNewlines(els.opensslCommandInput.value||'').trim();
+    if (!raw) { showToast('Paste a supported command first'); return; }
+    const lines = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+    const log = []; let lastPair = null;
+    for (const line of lines) {
+      let m;
+      if ((m=line.match(/^openssl\s+genpkey\s+-algorithm\s+Ed25519\s+-out\s+(.+)$/i))) { const out=sanitizeFileName(m[1],'signing_private.pem');const payload=await generateBrowserKeypairForAlg('ed25519');writeOpenSslFile(out,payload.privatePem,{kind:'private',algorithm:'ed25519',linkedPublicPem:payload.publicPem});lastPair={alg:'ed25519',payload};log.push(`Generated Ed25519 private key -> ${out}`);continue; }
+      if ((m=line.match(/^openssl\s+genpkey\s+-algorithm\s+RSA\s+-pkeyopt\s+rsa_keygen_bits:(2048|4096)\s+-out\s+(.+)$/i))) { const bits=m[1];const out=sanitizeFileName(m[2],'signing_private.pem');const alg=bits==='4096'?'rs256-4096':'rs256-2048';const payload=await generateBrowserKeypairForAlg(alg);writeOpenSslFile(out,payload.privatePem,{kind:'private',algorithm:alg,linkedPublicPem:payload.publicPem});lastPair={alg,payload};log.push(`Generated RSA ${bits} private key -> ${out}`);continue; }
+      if ((m=line.match(/^openssl\s+ecparam\s+-name\s+prime256v1\s+-genkey\s+-noout\s+-out\s+(.+)$/i))) { const out=sanitizeFileName(m[1],'signing_private.pem');const payload=await generateBrowserKeypairForAlg('es256');writeOpenSslFile(out,payload.privatePem,{kind:'private',algorithm:'es256',linkedPublicPem:payload.publicPem});lastPair={alg:'es256',payload};log.push(`Generated ECDSA P-256 private key -> ${out}`);continue; }
+      if ((m=line.match(/^openssl\s+(?:pkey|rsa|ec)\s+-in\s+(.+?)\s+-pubout\s+-out\s+(.+)$/i))) { const inFile=sanitizeFileName(m[1],'signing_private.pem');const outFile=sanitizeFileName(m[2],'signing_public.pem');const entry=state.opensslFs[inFile];const publicPem=entry?.linkedPublicPem||(lastPair&&entry&&entry.content===lastPair.payload.privatePem?lastPair.payload.publicPem:'');if(!entry||!publicPem)throw new Error(`Cannot derive public PEM from ${inFile}. Generate the private key in this browser runner first.`);writeOpenSslFile(outFile,publicPem,{kind:'public',algorithm:entry.algorithm||''});lastPair={alg:entry.algorithm||'',payload:{privatePem:entry.content,publicPem}};log.push(`Exported public key -> ${outFile}`);continue; }
+      throw new Error(`Unsupported browser OpenSSL command: ${line}`);
+    }
+    if (lastPair) { if (['ed25519','rs256-2048','rs256-4096','es256'].includes(lastPair.alg)) els.keypairAlgorithm.value=lastPair.alg; const item=buildKeypairCurrentForAlg(lastPair.alg||els.keypairAlgorithm.value,lastPair.payload); setCurrent(item); updateMeterForCurrentControls(); }
+    setRunnerOutput(log.join('\n')+(log.length?'\n\nBrowser OpenSSL lane complete.':''));
+    showToast('Browser OpenSSL ran ✅');
+  }
+
+  async function generateSecret() { if (!hasCrypto()) { showToast('No secure RNG in this browser'); return; } const byteLen=parseInt(els.bytes.value,10);const enc=els.encoding.value;const prefix=getPrefix();const bytes=makeRandomBytes(byteLen);const secret=formatSecret(bytes,enc);const item=buildSecretCurrent(prefix?(prefix+secret):secret,byteLen,enc);setCurrent(item);showToast('Secret generated ✅'); }
+
+  async function generateKeypair() { try { const payload=await generateBrowserKeypairForAlg(els.keypairAlgorithm.value);const item=buildKeypairCurrent(payload);setCurrent(item);showToast('Keypair generated ✅'); } catch(err) { showToast(err?.message||'Keypair generation failed'); } }
+
+  async function generate() { if (els.generatorType.value==='secret') await generateSecret(); else await generateKeypair(); }
+
+  function clearCurrent() { state.current=null;currentToBridgeSnapshot();els.itemLabel.value='';els.secretOutput.value='';els.privatePemOutput.value='';els.publicPemOutput.value='';els.envBlockOutput.value='';els.opensslOutput.value='';els.nodeOutput.value='';showToast('Cleared'); }
+
+  // Wire up events
+  els.genBtn.addEventListener('click', generate);
+  els.copyPrimaryBtn.addEventListener('click', () => { if (!state.current) { showToast('Nothing to copy'); return; } if (state.current.type==='secret') copyText(state.current.value,'Copied ✅'); else copyText(state.current.privatePem,'Private PEM copied ✅'); });
+  els.saveBtn.addEventListener('click', saveCurrentToVault);
+  els.clearBtn.addEventListener('click', clearCurrent);
+  els.bytes.addEventListener('input', updateBytesUI);
+  els.prefixMode.addEventListener('change', updatePrefixUI);
+  els.generatorType.addEventListener('change', updateModeUI);
+  els.keypairAlgorithm.addEventListener('change', () => { updateMeterForCurrentControls(); if (els.opensslCommandInput && (!els.opensslCommandInput.value.trim()||els.opensslCommandInput.value===els.opensslOutput.value)) els.opensslCommandInput.value=opensslSnippet(els.keypairAlgorithm.value); });
+  els.envPreset.addEventListener('change', updateEnvUI);
+  els.vaultSearch.addEventListener('input', renderHistory);
+  els.copyPrivatePemBtn.addEventListener('click', () => copyText(els.privatePemOutput.value,'Private PEM copied ✅'));
+  els.copyPublicPemBtn.addEventListener('click', () => copyText(els.publicPemOutput.value,'Public PEM copied ✅'));
+  els.copyPrivateEnvValueBtn.addEventListener('click', () => { const e=getEnvNames();if(!e.privateName){showToast('No private env preset');return;} copyText(`${e.privateName}="${pemToEnvValue(els.privatePemOutput.value)}"`, 'Private env copied ✅'); });
+  els.copyPublicEnvValueBtn.addEventListener('click', () => { const e=getEnvNames();if(!e.publicName){showToast('No public env preset');return;} copyText(`${e.publicName}="${pemToEnvValue(els.publicPemOutput.value)}"`, 'Public env copied ✅'); });
+  els.copyEnvBlockBtn.addEventListener('click', () => copyText(els.envBlockOutput.value,'Env block copied ✅'));
+  els.copyOpenSslBtn.addEventListener('click', () => copyText(els.opensslOutput.value,'OpenSSL snippet copied ✅'));
+  els.copyNodeBtn.addEventListener('click', () => copyText(els.nodeOutput.value,'Node.js snippet copied ✅'));
+  els.loadOpenSslExampleBtn.addEventListener('click', () => { els.opensslCommandInput.value=state.current&&state.current.type==='keypair'?(state.current.openssl||opensslSnippet(els.keypairAlgorithm.value)):opensslSnippet(els.keypairAlgorithm.value);showToast('OpenSSL example loaded ✅'); });
+  els.runOpenSslBtn.addEventListener('click', async () => { try { await runOpenSslInBrowser(); } catch(err) { showToast(err?.message||'Browser OpenSSL run failed');setRunnerOutput(String(err?.message||err||'Run failed')); } });
+  els.clearOpenSslBtn.addEventListener('click', () => { els.opensslCommandInput.value='';setRunnerOutput('');showToast('Runner cleared'); });
+  els.exportArtifactBtn.addEventListener('click', () => exportArtifact(els.exportFormat.value, els.exportScope.value));
+  els.exportHtmlPreviewBtn.addEventListener('click', openHtmlPreview);
+  els.pushCurrentToSovBtn?.addEventListener('click', pushCurrentToSovereign);
+  els.pushVaultToSovBtn?.addEventListener('click', pushVaultToSovereign);
+  els.importSuiteInboxBtn?.addEventListener('click', () => { const q=readLocalJson(JWT_SUITE_INBOX_KEY,[]);if(!q.length){showToast('No queued packs');return;}q.forEach((e,i)=>{const fn=sanitizeFileName((e.file_name||e.title||e.project_name||`sovereign_pack_${i+1}`).replace(/\s+/g,'_'),`sovereign_pack_${i+1}.env`);const fileName=fn.toLowerCase().endsWith('.env')?fn:`${fn}.env`;state.opensslFs[fileName]=String(e.content||'');});persistOpenSslFs();renderOpenSslFs();writeLocalJson(JWT_SUITE_INBOX_KEY,[]);showToast(`Imported ${q.length} pack${q.length===1?'':'s'} ✅`);updateSuiteBridgeStatus(); });
+  els.clearSuiteInboxBtn?.addEventListener('click', clearSuiteInbox);
+  els.exportVaultBtn.addEventListener('click', exportVaultJson);
+  els.importVaultBtn.addEventListener('click', () => els.importFile.click());
+  els.importFile.addEventListener('change', e => { const file=e.target.files&&e.target.files[0];if(file)importVaultJson(file);e.target.value=''; });
+  els.clearVaultBtn.addEventListener('click', () => { if(!state.vault.length){showToast('Vault already empty');return;}if(!confirm('Clear the entire local vault?'))return;state.vault=[];persistVault();renderHistory();showToast('Vault cleared'); });
+
+  // Init
+  loadVault();
+  loadOpenSslFs();
+  updateSupportStatus();
+  updateBytesUI();
+  updatePrefixUI();
+  updateEnvUI();
+  updateModeUI();
+  renderHistory();
+  renderOpenSslFs();
+  updateSuiteBridgeStatus();
+  currentToBridgeSnapshot();
+  els.opensslCommandInput.value = opensslSnippet(els.keypairAlgorithm.value);
+
+  window.addEventListener('storage', e => { if ([SOV_INBOX_KEY, JWT_SUITE_INBOX_KEY, CURRENT_BRIDGE_KEY].includes(e.key)) updateSuiteBridgeStatus(); });
+  window.addEventListener('focus', updateSuiteBridgeStatus);
+})();
+</script>
+</body>
+</html>

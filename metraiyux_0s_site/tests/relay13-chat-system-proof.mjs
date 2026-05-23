@@ -63,6 +63,61 @@ const accounts = [
     card_id: 'empire-pallets-client-workspace',
     message: 'Empire customer proof: asking about pallet supply, delivery, and recurring orders.',
     followup: 'Empire customer proof follow-up: this second message should persist in the same thread.'
+  },
+  {
+    label: '480 Realty & Property Management',
+    account_code: '480-REALTY-PROPERTY-MANAGEMENT-SKM',
+    workspace: '480-realty-property-management',
+    expected_workspace_id: 'ws_480_realty_property_management',
+    origin: 'https://480-realty-property-management.pages.dev',
+    source_url: 'https://480-realty-property-management.pages.dev/',
+    card_id: '480-realty-property-management-client-workspace',
+    message: '480 Realty proof: property management lead asks about owner onboarding and maintenance routing.',
+    followup: '480 Realty proof follow-up: this second message should persist in the same thread.'
+  },
+  {
+    label: 'Dink & Dine Pickle Park',
+    account_code: 'DINK-AND-DINE-PICKLE-PARK-SKM',
+    workspace: 'dink-and-dine-pickle-park',
+    expected_workspace_id: 'ws_dink_and_dine_pickle_park',
+    origin: 'https://dink-and-dine-pickle-park.pages.dev',
+    source_url: 'https://dink-and-dine-pickle-park.pages.dev/',
+    card_id: 'dink-and-dine-pickle-park-client-workspace',
+    message: 'Dink & Dine proof: group asks about event booking and court timing.',
+    followup: 'Dink & Dine proof follow-up: this second message should persist in the same thread.'
+  },
+  {
+    label: 'Techbros Electronic Recycling & ITAD',
+    account_code: 'TECHBROS-ELECTRONIC-RECYCLING-ITAD-SKM',
+    workspace: 'techbros-electronic-recycling-itad',
+    expected_workspace_id: 'ws_techbros_electronic_recycling_itad',
+    origin: 'https://techbros-electronic-recycling-itad.pages.dev',
+    source_url: 'https://techbros-electronic-recycling-itad.pages.dev/',
+    card_id: 'techbros-electronic-recycling-itad-client-workspace',
+    message: 'Techbros proof: business asks about ITAD pickup and data-destruction intake.',
+    followup: 'Techbros proof follow-up: this second message should persist in the same thread.'
+  },
+  {
+    label: 'ArcLight Pictures',
+    account_code: 'ARCLIGHT-PICTURES-SKM',
+    workspace: 'arclight-pictures',
+    expected_workspace_id: 'ws_arclight_pictures',
+    origin: 'https://arclight-pictures.pages.dev',
+    source_url: 'https://arclight-pictures.pages.dev/',
+    card_id: 'arclight-pictures-client-workspace',
+    message: 'ArcLight proof: production inquiry asks about creative project booking.',
+    followup: 'ArcLight proof follow-up: this second message should persist in the same thread.'
+  },
+  {
+    label: 'Next Level Gaming AZ',
+    account_code: 'NEXT-LEVEL-GAMING-AZ-SKM',
+    workspace: 'next-level-gaming-az',
+    expected_workspace_id: 'ws_next_level_gaming_az',
+    origin: 'https://next-level-gaming-az.pages.dev',
+    source_url: 'https://next-level-gaming-az.pages.dev/',
+    card_id: 'next-level-gaming-az-client-workspace',
+    message: 'Next Level Gaming proof: event lead asks about party booking and tournament routing.',
+    followup: 'Next Level Gaming proof follow-up: this second message should persist in the same thread.'
   }
 ];
 
@@ -100,13 +155,18 @@ function waitForWebSocket(url, name, workspace) {
     }
     const ws = new WebSocket(url);
     const messages = [];
+    let settled = false;
     const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
       try { ws.close(); } catch {}
       reject(new Error(`${name} timed out`));
     }, 9000);
     ws.addEventListener('message', (event) => {
+      if (settled) return;
       messages.push(String(event.data || ''));
       if (messages.some((item) => item.includes('"type":"ready"') || item.includes('"type": "ready"'))) {
+        settled = true;
         clearTimeout(timer);
         try { ws.close(); } catch {}
         checks.push({ name, ok: true, status: 101, workspace });
@@ -114,6 +174,8 @@ function waitForWebSocket(url, name, workspace) {
       }
     });
     ws.addEventListener('error', () => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
       checks.push({ name, ok: false, status: 0, workspace });
       reject(new Error(`${name} websocket error`));
@@ -305,7 +367,8 @@ try {
       'Customer messages persisted through Relay13 D1 and were read back through the message-history API.',
       'Customer WebSocket rooms opened for each account proof conversation.',
       'Bob and Empire SKM intro proof is operator-mediated in one Relay13 room; separate authenticated business-to-business rooms require the next participant-token feature.',
-      'Automatic brain replies require a server-side brain bridge. The current widget stores brain-assisted/direct-operator route metadata without exposing owner secrets.'
+      'Local brain routing and operator review are the default response path.',
+      'AI-generated response drafts require the paid Relay13 AI Response Add-On, owner-approved guardrails, and a monthly cap before provider calls are allowed.'
     ]
   };
   report.skgate_mirror = await mirrorGate(report);

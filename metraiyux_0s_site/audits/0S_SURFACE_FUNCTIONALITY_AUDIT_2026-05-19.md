@@ -26,7 +26,7 @@ The goal is not to shame static proof pages. A static proof page is valid when i
 - HOUSE regression sweep also passed `node --test metraiyux_0s_site/tests/api-routing-convention.test.mjs`, `node --test metraiyux_0s_site/tests/worker-security-audit.test.mjs`, `node proof/static_validation.mjs` from the SkyeBox vault folder, and `node metraiyux_0s_site/HouseOperations/skye-box-authenticator-vault/proof/totp_crypto_vector_test.mjs`.
 - SPLIT closure proof added `node --test metraiyux_0s_site/tests/skyesplitengine-backup-restore.test.mjs`: confirms the visible local-first/exportable runtime label, creates a gated transaction, exports JSON backup, restores JSON without losing people/product/rule/transaction identity, exports transaction CSV, re-imports CSV, and verifies amount/currency/status/memo survive.
 - SPLIT smoke proof also passed `node metraiyux_0s_site/SkyeSplitEngine/smoke/smoke-proof.mjs`: gate-session helper present, app boot waits for gate session, Free99/no-charge copy present, service worker caches the gate helper, manifest parses, and imported no-auth language is absent.
-- MME closure proof added `node --test metraiyux_0s_site/tests/marketing-made-easy-runtime-audit.test.mjs`: inventories all eight Marketing Made Easy surfaces in `Marketing-Made-Easy/MME_RUNTIME_AUDIT.json`, labels same-folder runtimes as `local_static_proof_only`, proves `/api/marketing-made-easy/health` returns a clear 503 when no backend is mounted, proves root `/api/runtime/*` returns `api_root_collision`, and proves representative runtime/function/config source returns private 404.
+- MME closure proof added `node --test metraiyux_0s_site/tests/marketing-made-easy-runtime-audit.test.mjs`: inventories all eight Marketing Made Easy surfaces in `Marketing-Made-Easy/MME_RUNTIME_AUDIT.json`, records the promotion from proof-only suite to mounted same-domain platform adapter, proves `/api/marketing-made-easy/health` returns mounted live JSON, proves `/api/marketing-made-easy/platform/manifest` exposes the 8 internal module rooms, proves unauthenticated session reads return `401`, proves root `/api/runtime/*` still returns `api_root_collision`, and proves representative runtime/function/config source returns private 404.
 - MME regression sweep also passed `node --check metraiyux_0s_site/cloudflare/worker.js`, `node --test metraiyux_0s_site/tests/api-routing-convention.test.mjs`, `node --test metraiyux_0s_site/tests/worker-security-audit.test.mjs`, and `npm run mcp:mine -- metraiyux_0s_site`.
 - RELAY closure proof added `node --test metraiyux_0s_site/tests/relay13-connectlog-adapter.test.mjs`: confirms ConnectLog and the Relay13 console source use `/api/relay13`, proves the 0S namespace rewrites card upsert, scan conversation creation, message inbox reads/replies, operator workspace reads, widget publishing, guardrail updates, guardrail proof, and WebSocket paths back to Relay13's native `/api/*` contract, and proves representative Relay13 source files return private 404.
 - RELAY regression sweep also passed `node --check metraiyux_0s_site/cloudflare/worker.js`, `node --check metraiyux_0s_site/connectlog-v7.7-relay13-operator-proof/app.js`, `node --check metraiyux_0s_site/relay13-core-v1.7-connectlog-operator-proof/public/admin/app.js`, `node --test metraiyux_0s_site/tests/api-routing-convention.test.mjs`, `node --test metraiyux_0s_site/tests/worker-security-audit.test.mjs`, and `npm run mcp:mine -- metraiyux_0s_site`.
@@ -38,6 +38,7 @@ The goal is not to shame static proof pages. A static proof page is valid when i
 - UI regression sweep also passed `node --check metraiyux_0s_site/assets/js/0s-runtime-truth.js`, `node --test metraiyux_0s_site/tests/surface-status-registry.test.mjs`, `node --test metraiyux_0s_site/tests/api-routing-convention.test.mjs`, `node --test metraiyux_0s_site/tests/worker-security-audit.test.mjs`, and `npm run mcp:mine -- metraiyux_0s_site`.
 - QA route-audit proof added `node --test metraiyux_0s_site/tests/0s-qa-route-audit.test.mjs`: serves 0S through the full-system Worker adapter, opens 21 major app shells, captures 42 desktop/mobile screenshots, fails on page runtime errors, fails on unexpected same-origin API 404s, checks horizontal overflow, and writes `proof/0s-runtime-truth-route-audit-2026-05-19.json`.
 - QA source/auth smoke coverage is backed by `node --test metraiyux_0s_site/tests/worker-security-audit.test.mjs`: nested implementation source returns private 404 and representative mutating operator/proxy routes reject missing auth while public intake remains split from operator mutation.
+- VANTACORE owned-lane proof added `metraiyux_0s_site/audits/VANTACORE_OWNED_LANE_LIVE_PROOF_AND_OVERLAP_2026-05-20.md`: functional FS27 Worker version `57d80970-d429-4036-a60d-50c8ec66d479` rejects no-auth and direct Vanta password-header requests, accepts central FS27 inherited authority, passes 8 live CRM write cycles, passes 96 concurrent live reads, and passes Playwright desktop/mobile workflow proof with no Vanta login controls.
 - QA final regression sweep also passed `node --check metraiyux_0s_site/tests/0s-qa-route-audit.test.mjs`, `node --check metraiyux_0s_site/assets/js/0s-runtime-truth.js`, `node --test metraiyux_0s_site/tests/runtime-truth-ui.test.mjs`, `node --test metraiyux_0s_site/tests/surface-status-registry.test.mjs`, `node --test metraiyux_0s_site/tests/api-routing-convention.test.mjs`, and `npm run mcp:mine -- metraiyux_0s_site`.
 
 ## Audit Side Effects
@@ -65,12 +66,12 @@ These side effects are part of the audit evidence and point to auth/rate-limit/v
 ## Executive Findings
 
 1. The core 0S Worker/proxy layer is live. `/api/site-operator/status`, `/api/admin/status`, `/api/saas/status`, `/api/crown/status`, `/api/nexus/status`, `/api/sentinel/status`, and `/api/omega/status` all returned live JSON.
-2. The security boundary is uneven. Admin brain/task routes reject missing auth, but site-operator mutations and crown task creation accepted unauthenticated POSTs.
-3. SovereignDocs is the clearest "fake-feeling" surface. The UI loads and looks premium, but `/api/v18/workspace/dashboard`, `/api/cases`, and `/api/health` return 404 on the live domain.
-4. Several imported app folders include real local runtimes or Netlify/server source. SovereignDocs, SkyeMusicNexus, and SkyeRouteX now have same-domain Worker adapters; remaining imported app families still need either routing or honest local/static labels.
-5. Source exposure was a major gap at initial audit. Completed Worker guards now block the representative SkyeMusicNexus Netlify function source, SkyeMediaCenter Netlify function source, SkyeRouteX server source, and other private source patterns in tests; remaining app-specific source exposure work stays tracked in later checklist items.
-6. SkyeMediaCenter is the strongest Free99 example currently wired into the full-system Worker: `/api/media/session` exists, `/api/media/assets` correctly requires a gate token, and the authenticated upload/review/execution/dispatch/publish/file/stats flow is covered by Worker tests.
-7. SaaS signup is real enough to create a customer, issue SkyeMerit, and send Resend email, but downstream delivery channels are incomplete and public signup needs stronger controls.
+2. The mounted 0S app lanes now follow the Gate-owned mounted-app rule much more closely: Site Operator and Crown task mutations reject missing auth, SovereignDocs and Client App Factory now require the shared gate/operator lane for live control-plane routes, and SkyeRouteX no longer allows app-local signup/login on the mounted production namespace.
+3. NorthStar SignInPro is a canonical mounted app inside the 0S, not a separate auth lane: one namespaced app, one namespaced API base, Gate-owned FS27/SkyGate session authority, workspace-tenant routing, and rate-limited gate ownership even when the user-facing experience is Free99.
+4. Several imported app folders still contain local-first or proof-oriented code on disk, but the live mounted surfaces are now explicitly separated from those source trees. Marketing Made Easy is now mounted as one shared platform shell under the Gate-owned mounted-app rule, while SkyeSplitEngine remains a gate-owned local-first runtime rather than a second auth universe.
+5. Source exposure was a major gap at initial audit. Completed Worker guards now block the representative SkyeMusicNexus Netlify function source, SkyeMediaCenter Netlify function source, SkyeRouteX server source, Marketing Made Easy local runtime source, Relay13 source trees, and other private source patterns in tests.
+6. SkyeMediaCenter remains the strongest Free99 example currently wired into the full-system Worker: `/api/media/session` exists, `/api/media/assets` correctly requires a gate token, and the authenticated upload/review/execution/dispatch/publish/file/stats flow is covered by Worker tests.
+7. SaaS signup is real enough to create a customer, issue SkyeMerit, and send Resend email, but downstream delivery channels are incomplete and the intentionally public signup flow still needs stronger validation, anti-abuse controls, and delivery hardening.
 
 ## Live Surface Matrix
 
@@ -79,19 +80,21 @@ These side effects are part of the audit evidence and point to auth/rate-limit/v
 | Home / main 0S shell | STATIC/PARTIAL | Page loads, no API calls on first render. It is a route atlas and proof shell. | Keep copy honest: route map, not proof every route is live. |
 | 0S Launcher | STATIC/PARTIAL | Loads local registry JSON and opens windows. | Add live health badges per mounted app. |
 | Admin OS / Main Brain | LIVE/GATED | `/api/admin/status` 200; `/api/admin/brain/chat` 401 without token. | Verify logged-in UI forwards FS27 token consistently. |
-| Site Operator API | LIVE/PARTIAL | Status/ledger live; route/task POST accepted without token. | Require admin/SkyGate auth for mutating routes. |
+| Site Operator API | LIVE/PARTIAL | Status/ledger live; no-auth `POST /api/site-operator/task` now returns `401` and mutating routes require the shared operator/gate lane. | Verify every logged-in UI flow forwards the shared gate token consistently. |
 | SaaS / SkyeMerit | LIVE/PARTIAL | `/api/saas/status` 200; signup created test customer and sent Resend. | Add anti-abuse, validation, and configure SkyeMail/Relay13/ConnectLog/FS27 mirror. |
-| Crown/Nexus/Sentinel/Omega proxies | LIVE/PARTIAL | Status routes 200. Crown task accepted unauthenticated POST. | Audit mutating auth on every proxy service. |
+| Client App Factory | LIVE/PARTIAL | Same-domain `/api/client-app-factory/*` adapter now serves intake, Valley import, generation state, reports, and generated runtime routing; `/api/client-app-factory/health` returns `200` mounted true; no-auth control-plane read/write routes now return `401`. | Attach a dedicated factory backend only if generation workloads outgrow the same-domain adapter. |
+| Crown/Nexus/Sentinel/Omega proxies | LIVE/PARTIAL | Status routes 200. No-auth `POST /api/crown/task` now returns `401`, and the shared gate/operator lane fronts the mutating proxy routes. | Keep regression checks on every mutation route as new proxy surfaces get added. |
 | SkyeMediaCenter | LIVE/GATED | `/api/media/session` 200; `/api/media/assets` 401 missing token; MEDIA-03 proves authenticated upload/search/review/execution/dispatch/publish/stats/file delivery and browser `/api/media` path mapping. | Attach dedicated R2/provider credentials later if media storage needs to move beyond the 0S KV adapter. |
-| SovereignDocs | BROKEN/EXPOSED | Closure dashboard calls `/api/v18/workspace/dashboard` 404; server route source public. | Deploy/register backend, update API base, block source files. |
-| kAIxu CodeStudio | LOCAL/PARTIAL | Same-domain `/api/kaixu-codestudio/platform/*` adapter serves catalog/status/read routes; paid/provider/mutating actions require operator auth and are queued instead of fake-executed. | Attach dedicated CodeStudio backend/service binding for real provider execution, or keep labeled as local/static proof. |
+| SovereignDocs | LIVE/GATED | Namespaced `/api/sovereigndocs/*` routes are mounted; `/api/sovereigndocs/health` returns `200`; no-auth case creation and case-list reads now return `401`; source-block proof and workflow proof are already closed. | Keep the shared gate lane in front of all control-plane routes; attach a dedicated backend later only if the same-domain adapter becomes a bottleneck. |
+| kAIxu CodeStudio | LIVE/PARTIAL | Same-domain `/api/kaixu-codestudio/platform/*` adapter serves health, status, manifest, provider-pack catalog, storage stats, project routes, and operator-gated mutations on the main 0S domain. | Attach a dedicated CodeStudio backend/service binding later only if full external provider execution needs to leave the 0S adapter. |
 | SkyeMusicNexus | LIVE/PARTIAL | Same-domain `/api/skymusicnexus/*` maps session, artists, assets, studio, drops, releases, payments, exchange, social, analytics, and provider-hook contracts; browser rooms default to the namespaced 0S base; old Netlify function source returns private 404. | Attach dedicated R2/provider/deploy/DSP/social credentials for real external music-provider execution where needed. |
 | SkyeProfitConsole | LIVE/GATED | `/api/profit/health` 200; `/api/profit/status` 401 without operator auth; PROFIT-03 proves packs, splits, proof, exports, audit, execution, dispatch, and browser `/api/profit` path mapping. | Attach dedicated D1/R2/accounting/payment provider credentials later if profit runtime needs external system execution beyond the 0S KV adapter. |
-| SkyeRouteX | LIVE/PARTIAL | Same-domain `/api/routex/*` maps core workforce contracts; `/api/skyeroutex/*` remains a compatibility alias; root `/api/auth`, `/api/jobs`, `/api/assignments`, `/api/markets`, and `/api/ratings` return collision diagnostics; server source returns private 404. | Attach dedicated RouteX Worker/service binding or D1/R2/provider credentials for full production-grade runtime beyond the 0S KV adapter. |
+| SkyeRouteX | LIVE/PARTIAL | Same-domain `/api/routex/*` maps core workforce contracts; `/api/skyeroutex/*` remains a compatibility alias; root `/api/auth`, `/api/jobs`, `/api/assignments`, `/api/markets`, and `/api/ratings` return collision diagnostics; mounted production now requires the shared gate lane for protected routes and disables app-local signup/login. | Attach dedicated RouteX Worker/service binding or D1/R2/provider credentials for full production-grade runtime beyond the 0S KV adapter. |
 | HouseOperations | LIVE/GATED | `/api/houseops/health` 200; `/api/houseops/status` 401 without operator auth; HOUSE-02 proves task/vendor/schedule/alert/assignment/proof/gate-packet/export/audit routes and browser `/api/houseops` path mapping. | Attach dedicated D1/R2/provider credentials later if HouseOperations needs external system execution beyond the 0S KV adapter. |
-| SkyeSplitEngine | LOCAL/GATED | Local-first and exportable copy is visible; SPLIT-02 proves gated transaction creation, JSON backup/restore, CSV export/import, and no-data-loss on core split records. | Closed as local-first proof. Optional cloud sync can be a future enhancement, not a gap. |
-| Marketing Made Easy suite | LOCAL/STATIC_PROOF | `MME_RUNTIME_AUDIT.json` inventories AE-FlowPro, BrandID Offline PWA, BusinessLaunchGo, SkyeDocxMax, SkyeWebCreatorMax, WebGrowthOperator, Arizona Growth Index, and kAIxU BrandKit; `/api/marketing-made-easy/health` reports `local_static_proof_only`; `/api/runtime/status` returns `api_root_collision`; MME-03 proves runtime/function/config source is blocked. | Closed as local/static proof. Attach `MARKETING_MADE_EASY_WORKER` or `MARKETING_MADE_EASY_WORKER_ORIGIN` later only if the suite needs shared production runtime execution. |
+| SkyeSplitEngine | LIVE/GATED | The app shell is live on the 0S and gate-owned; SPLIT-02 proves gated transaction creation, JSON backup/restore, CSV export/import, and no-data-loss on core split records while preserving the local-first/exportable runtime model. | Keep it under the one shared auth lane. Optional cloud sync is a future enhancement, not an auth-gap repair. |
+| Marketing Made Easy platform | LIVE/GATED | `MME_RUNTIME_AUDIT.json` now records the mounted same-domain platform adapter; `/api/marketing-made-easy/health` returns mounted live JSON with `status: LIVE/GATED`; `/api/marketing-made-easy/platform/manifest` exposes all 8 internal module rooms; unauthenticated `/api/marketing-made-easy/v1/sessions` returns `401`; root `/api/runtime/status` still returns `api_root_collision`; MME-03 proves runtime/function/config source is blocked. | Keep all future MME modules under the same namespaced API and shared gate lane; do not reintroduce standalone production auth or root `/api/runtime/*` ownership. |
 | ConnectLog + Relay13 | LIVE/GATED | `relay13-core` is live in the deployment ledger; ConnectLog defaults to `/api/relay13`; the Relay13 console rewrites root `/api/*` calls into `/api/relay13/*`; RELAY-03 proves card exchange, scan conversation creation, operator inbox, widget config, guardrail update/proof, and WebSocket route forwarding; RELAY-02 proves Relay13 source blocking; live 0S mount refreshed 2026-05-20 so `/api/relay13/health` returns `mounted: true` and `/api/relay13/api/v1/connectlog/health` resolves through the main 0S domain. | Keep `RELAY13_WORKER` or `RELAY13_WORKER_ORIGIN` configured in production so the 0S namespace stays attached to the live Worker. |
+| VantaCore Service CRM | LIVE/GATED | Actual workspace lives at FS27 `/vantacore-crm`; `/api/vantacore/crm` rejects no-auth and direct Vanta password-header requests, accepts inherited FS27 authority, and passed 8 live write cycles plus 96 concurrent live reads. Playwright proved locked/no-session state, inherited unlock, lead capture, pipeline update, booking, follow-up, review, desktop/mobile screenshots, no page errors, no console errors, and no horizontal overflow. | Keep as the service-business intake/VantaCharge lane only. Do not duplicate FS27 auth, NEXUS records, Relay13 messaging, SkyeMail mail, SkyePay billing, RouteX/HouseOps dispatch, or NorthStar provisioning. |
 | Valley Verified | STATIC/PROOF_ONLY | Public directory, business pages, data, and search records stay mounted at `/valley-verified/`; `VALLEY_RUNTIME_DECISION.json` records PHX admin/payment/action/lead functions as not mounted on 0S; admin scripts no longer call dead `.netlify/functions` paths; admin/API/quote pages link the runtime decision and gate-owned SkyePay backend. | Closed as static public directory plus external/gate-owned proof-only admin. Future work can mount a gated Valley backend deliberately, but the 0S mount no longer pretends it has one. |
 | NorthStar SignInPro | LIVE/GATED | Mounted at `/northstar/`; health route live at `/api/northstar/health`; login/session/logout and workspace routes now served through FS27; 11 Valley business overrides hand off into `workspace=<slug>` routes and all sampled/live-swept pages return 200. | Keep rate-limit/gate ownership policy intact, and continue documenting that Valley `api/*` is manifest-only while live directory/search records live under `/valley-verified/data/*`. |
 | SkyeVaultOS / SkySecure Vault Console | LIVE/PROVEN | FS27 exposes `/skysecure/vaultos/proof`, `/commands`, `/inventory`, `/search`, `/restore-points`, and `/audit`; the 0S console loads live metadata; the proof scanned the real `/workspaces/MetrAIyux-0S/about to delete` folder as 1,833 files, encrypted it into four objects, created a restore point, bundled, attached into a fresh vault, reloaded, diffed clean, synced safe metadata to FS27, and covered 18 commands. | Keep public routes metadata-only and secret-free. Do not claim external cryptographic audit certification until a signed third-party audit exists. |
@@ -113,14 +116,22 @@ The full-system Worker blocks some private paths such as `/wrangler.toml` and `/
 
 ### SEC-02 Public mutation endpoints
 
-The following routes accepted unauthenticated mutation during audit:
+The original audit found these public mutation gaps:
 
 - `/api/site-operator/route`
 - `/api/site-operator/task`
 - `/api/crown/task`
 - `/api/saas/signup`
 
-Some public SaaS signup behavior is expected, but it still needs validation, rate limiting, and delivery gating. Site/crown task mutations should require an authenticated operator/session unless intentionally split into a public intake queue.
+Current truth after the 2026-05-20 NorthStar-compliance sweep:
+
+- `/api/site-operator/route` and `/api/site-operator/task` now reject missing auth with `401`
+- `/api/crown/task` now rejects missing auth with `401`
+- mounted SovereignDocs control-plane writes and reads reject missing auth with `401`
+- mounted Client App Factory control-plane writes and reads reject missing auth with `401`
+- mounted SkyeRouteX no longer allows app-local production signup/login on the 0S namespace
+
+The remaining intentionally public mutation lane here is `/api/saas/signup`, which still needs validation, anti-abuse, and delivery hardening rather than a second auth universe.
 
 ### API-01 Unnamespaced app APIs collide at `/api/*`
 
@@ -128,7 +139,7 @@ Multiple imported apps assume their own root `/api/*`:
 
 - SovereignDocs: `/api/cases`, `/api/v18/*`, `/api/templates/*`
 - SkyeRouteX: `/api/auth/*`, `/api/jobs`, `/api/assignments`, `/api/markets`, `/api/ratings` - now covered by ROUTEX-02 collision diagnostics pointing to `/api/routex/*`.
-- Marketing Made Easy local runtimes: `/api/runtime/*` - now covered by MME-02 collision diagnostics pointing to `/api/marketing-made-easy/*` and by `local_static_proof_only` health metadata.
+- Marketing Made Easy legacy local runtimes: `/api/runtime/*` - now covered by MME-02 collision diagnostics pointing to `/api/marketing-made-easy/*`; the mounted platform health route is live while the old root runtime namespace remains blocked.
 - Relay13: `/api/v1/*`, `/api/admin/*` - ConnectLog and Relay13 console now use `/api/relay13/*`; root `/api/v1/*` remains a collision diagnostic, while `/api/admin/*` stays reserved for the 0S admin service.
 - CodeStudio: `/api/platform/*`
 
@@ -200,7 +211,7 @@ On the full-system Worker, only selected top-level 0S APIs are routed. Imported 
 - ✅ SPLIT-02 Add import/export browser proof and no-data-loss tests.
 
 - ✅ MME-01 Audit each Marketing Made Easy app for local runtime APIs.
-- ✅ MME-02 Either deploy runtime endpoints or relabel same-folder runtime as local proof only. Decision: relabeled as local/static proof until a dedicated backend is mounted.
+- ✅ MME-02 Promote Marketing Made Easy into a mounted NorthStar-style platform shell with one namespaced API, one shared gate lane, workspace routing, and collision diagnostics for the old root runtime namespace.
 - ✅ MME-03 Block local runtime server source from public asset serving.
 
 - ✅ RELAY-01 Point ConnectLog app to the live Relay13 Worker through a configured API base.
@@ -250,6 +261,14 @@ Important operator note:
 ## Immediate Next Repair Order
 
 1. No unchecked Phase 0 through Phase 5 checklist items remain in this audit.
+
+## 2026-05-20 Gate Ownership Production Addendum
+
+- ✅ SkyGate source is singular under `metraiyux_0s_site/skyegate/source/SkyeGateFS27/`; the repo-root gate path is absent and root scripts now target the 0S-owned gate folder.
+- ✅ 0S production was redeployed to `metraiyux-0s-full-system` version `bf22ef72-397b-462f-b3ee-8bb4c6d1d112`.
+- ✅ SkyGate FS27 production was redeployed to `skyegatefs27-citadeldb` version `f7d69577-a0a4-40e5-b8a2-30c6db2269d3`.
+- ✅ SkyeMail production was redeployed to `skyemail-platform` version `6b28eec4-1012-4e46-bb42-fcc61abfbc20`.
+- ✅ Live verification confirmed 0S root HTTP `200`, FS27 root HTTP `200`, SkyeMail `/login` HTTP `200`, the 0S SkyGate page showing `Single Gate Source`, the live bridge emitting 0S gate-card/role/customer headers, and SkyeMail using `Continue with 0S/SkyGate` with no manual gate-token field.
 
 ## Definition Of Done For A Surface
 

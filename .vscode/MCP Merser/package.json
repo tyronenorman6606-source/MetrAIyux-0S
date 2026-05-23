@@ -1,0 +1,84 @@
+{
+  "name": "@skyes0verl0nd0n/merser",
+  "version": "1.0.1",
+  "type": "module",
+  "description": "Merser by Skyes Over London: source-pack-based immersive world-site MCP with React, Three/R3F, GSAP, Lenis, Theatre, Remotion, stdio, HTTP, and gate-owned Cloudflare Pages worker access.",
+  "displayName": "Merser by Skyes Over London",
+  "license": "UNLICENSED",
+  "private": false,
+  "homepage": "https://merser.pages.dev/",
+  "author": "Skyes Over London",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "skyes-over-london",
+    "immersive-world",
+    "react-three-fiber",
+    "gsap",
+    "remotion",
+    "framer-motion"
+  ],
+  "bin": {
+    "Merser": "bin/merser",
+    "merser": "bin/merser",
+    "merser-mcp": "bin/merser"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin",
+    "stdio-server.mjs",
+    "http-server.mjs",
+    "mcp4-core.mjs",
+    "remote",
+    "tools",
+    "source-packs",
+    "src",
+    "public",
+    "index.html",
+    "vite.config.js",
+    "SKYE_DESIGN_MCP_ONE_FILE_DIRECTIVE.md",
+    "README.md",
+    "REMOTE_ACCESS.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "start": "node stdio-server.mjs --stdio",
+    "cli": "node stdio-server.mjs",
+    "start:http": "node http-server.mjs",
+    "stress": "node tools/stress-merser.mjs",
+    "build:worker": "vite build && node remote/build-remote-bundle.mjs",
+    "deploy": "npm run build:worker && npx wrangler pages deploy dist --project-name merser"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@react-three/postprocessing": "^3.0.4",
+    "@remotion/player": "^4.0.464",
+    "@theatre/core": "^0.7.2",
+    "framer-motion": "^12.38.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.23",
+    "lucide-react": "^1.16.0",
+    "motion": "^12.38.0",
+    "postprocessing": "^6.39.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "remotion": "^4.0.464",
+    "three": "^0.184.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "esbuild": "^0.28.0",
+    "vite": "^8.0.14"
+  }
+}

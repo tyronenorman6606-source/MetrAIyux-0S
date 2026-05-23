@@ -1,0 +1,105 @@
+/* Additive skin system. Classic remains the untouched base in assets/style.css. */
+html {
+  color-scheme: dark;
+}
+
+.skinPicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.skinPickerLabel {
+  margin: 0;
+  color: var(--muted2);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.skinSelect {
+  min-width: 118px;
+  padding: 7px 28px 7px 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.35);
+  color: var(--text);
+  font: 800 11px/1 var(--sans);
+  outline: none;
+}
+
+.skinSelect:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(39,242,255,0.16);
+}
+
+html[data-skye-skin="classic"] .skinPicker {
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .top-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .skinPicker {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .skinSelect {
+    flex: 1;
+  }
+}
+
+/* Magic UI text highlighter treatment */
+.magic-highlighter,
+.magic-highlight,
+.magic-underline,
+[data-highlight] {
+  --highlighter-color: #87cefa;
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.magic-highlighter[data-highlight="highlight"],
+.magic-highlight,
+[data-highlight="highlight"] {
+  border-radius: .18em;
+  padding: 0 .12em;
+  background:
+    linear-gradient(104deg,
+      transparent .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) .08em,
+      color-mix(in srgb, var(--highlighter-color) 68%, transparent) calc(100% - .08em),
+      transparent calc(100% - .08em));
+  text-shadow: 0 .08em .22em rgba(0, 0, 0, .16);
+}
+
+.magic-highlighter[data-highlight="underline"],
+.magic-underline,
+[data-highlight="underline"] {
+  text-decoration-line: underline;
+  text-decoration-color: var(--highlighter-color);
+  text-decoration-thickness: .16em;
+  text-underline-offset: .13em;
+  text-decoration-skip-ink: none;
+}
+
+@supports not (color: color-mix(in srgb, white 50%, transparent)) {
+  .magic-highlighter[data-highlight="highlight"],
+  .magic-highlight,
+  [data-highlight="highlight"] {
+    background: linear-gradient(104deg, transparent .08em, var(--highlighter-color) .08em, var(--highlighter-color) calc(100% - .08em), transparent calc(100% - .08em));
+  }
+}
+

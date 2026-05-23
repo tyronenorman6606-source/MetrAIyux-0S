@@ -45,8 +45,8 @@ Source files:
 - `metraiyux_0s_site/live/skyeroutex-workforce-command.html`
 - `metraiyux_0s_site/proof/skyeroutex-expansion-receipt.html`
 - `metraiyux_0s_site/SkyeRouteX/PLATFORM_CONTRACT.json`
-- `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/package.json`
-- `metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/README.md`
+- `metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/package.json`
+- `metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/README.md`
 - `metraiyux_0s_site/live/houseoperations-skyebox-operator-proof.html`
 - `metraiyux_0s_site/proof/houseoperations-skyebox-expansion-receipt.html`
 - `metraiyux_0s_site/HouseOperations/PLATFORM_CONTRACT.json`
@@ -62,7 +62,7 @@ Source files:
 - `metraiyux_0s_site/skye-content-repurposer-local/README.md`
 - `metraiyux_0s_site/skye-content-repurposer-local/package.json`
 
-Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRouteX workforce command lane, the held-rate HouseOperations + SkyeBox scope expansion, Free99 SkyeProfitConsole/SkyeMediaCenter/Skye Split Engine/Skye Content Forge, and SkyeMusicNexus Lite plus paid music ops tiers and drop add-ons. Standard plans are ready to create in Stripe. RouteX has a named SkyePay offer, but activation stays owner-approved until production provider proof is selected and verified. SkyeProfitConsole, SkyeMediaCenter, Skye Split Engine, Skye Content Forge, and SkyeMusicNexus Lite are Free99, meaning no charge, and still require a gate session. SkyeMusicNexus Studio, Label Command, Managed Music Ops, and add-ons are paid SkyePay offers.
+Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRouteX workforce command lane, the held-rate HouseOperations + SkyeBox scope expansion, Free99 local/proof lanes, and SkyeMusicNexus Lite plus paid music ops tiers and drop add-ons. Standard plans are ready to create in Stripe. RouteX has a named SkyePay offer, but activation stays owner-approved until production provider proof is selected and verified. SkyeProfitConsole, SkyeMediaCenter, Skye Split Engine, Skye Content Forge, SkyeMusicNexus Lite, SkyeOpsConsole, Still2Vid Forge, MyDrive Offline Vault, SkyePics, BrandForge core, and Social Batch Factory core are Free99, meaning no charge, and still require a gate session. Free99 never includes free AI/model calls, hosted custody, provider actions, outbound sends, payment/identity providers, or white-label resale. SkyeMusicNexus Studio, Label Command, Managed Music Ops, and add-ons are paid SkyePay offers.
 
 ### Create In Stripe
 
@@ -72,7 +72,13 @@ Role: canonical MetrAIyux 0S client subscription plans, owner-approved SkyeRoute
 | MetrAIyux 0S - Starter Command Setup | Starter Command setup | One-time | $1,500.00 | Once | `metraiyux_starter_command_setup` | same as above, `setup_for=starter-command` |
 | MetrAIyux 0S - Growth Cabinet | Growth Cabinet monthly | Recurring | $997.00 | Monthly | `metraiyux_growth_cabinet_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=growth-cabinet`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_workflow_map_content_forge_free99` |
 | MetrAIyux 0S - Growth Cabinet Setup | Growth Cabinet setup | One-time | $3,500.00 | Once | `metraiyux_growth_cabinet_setup` | same as above, `setup_for=growth-cabinet` |
-| MetrAIyux 0S - RouteX Workforce Command | RouteX Workforce Command monthly | Recurring | $1,497.00 | Monthly | `metraiyux_routex_workforce_command_monthly` | `source_folder=metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0`, `plan_id=routex-workforce-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=marcus-vale-brain`, `includes=skyeroutex_v040_api_browser_proof_v83_local_runtime_content_forge_free99` |
+| Agentic Growth Layer - Starter | Starter monthly | Recurring | $497.00 | Monthly | `agentic_growth_starter_monthly` | `source_folder=packages/agentic-growth-layer`, `plan_id=agentic-growth-starter`, `offer_family=agentic_growth`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=no_domain_preview_growth_cycles_seed_keywords_competitor_mapping_static_patch_manifests` |
+| Agentic Growth Layer - Starter Setup | Starter setup | One-time | $1,500.00 | Once | `agentic_growth_starter_setup` | same as above, `setup_for=agentic-growth-starter` |
+| Agentic Growth Layer - Connected | Connected monthly | Recurring | $1,497.00 | Monthly | `agentic_growth_connected_monthly` | `source_folder=packages/agentic-growth-layer`, `plan_id=agentic-growth-connected`, `offer_family=agentic_growth`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=key_gate_13th_encrypted_provider_refs_gsc_semrush_dataforseo_serp_pull_prioritized_tasks_experiment_ledger_proof_packet` |
+| Agentic Growth Layer - Connected Setup | Connected setup | One-time | $3,500.00 | Once | `agentic_growth_connected_setup` | same as above, `setup_for=agentic-growth-connected` |
+| Agentic Growth Layer - Operator | Operator monthly | Recurring | $2,997.00 | Monthly | `agentic_growth_operator_monthly` | `source_folder=packages/agentic-growth-layer`, `plan_id=agentic-growth-operator`, `offer_family=agentic_growth`, `status=approved`, `owner_approval_required=true`, `brain_owner=celeste-monroe-brain`, `includes=key_gate_13th_rotation_test_revoke_audit_managed_adapter_auto_apply_policy_live_browser_proof_monthly_growth_ledger` |
+| Agentic Growth Layer - Operator Setup | Operator setup | One-time | $7,500.00 | Once | `agentic_growth_operator_setup` | same as above, `setup_for=agentic-growth-operator` |
+| MetrAIyux 0S - RouteX Workforce Command | RouteX Workforce Command monthly | Recurring | $1,497.00 | Monthly | `metraiyux_routex_workforce_command_monthly` | `source_folder=metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0`, `plan_id=routex-workforce-command`, `offer_family=metraiyux`, `status=approved`, `owner_approval_required=true`, `brain_owner=marcus-vale-brain`, `includes=skyeroutex_v040_api_browser_proof_v83_local_runtime_content_forge_free99` |
 | MetrAIyux 0S - RouteX Workforce Command Setup | RouteX Workforce Command setup | One-time | $6,500.00 | Once | `metraiyux_routex_workforce_command_setup` | same as above, `setup_for=routex-workforce-command` |
 | MetrAIyux 0S - Autonomous Office | Autonomous Office monthly | Recurring | $2,497.00 | Monthly | `metraiyux_autonomous_office_monthly` | `source_folder=metraiyux_0s_site`, `plan_id=autonomous-office`, `offer_family=metraiyux`, `status=approved`, `brain_owner=celeste-monroe-brain`, `includes=connectlog_relay13_houseops_skyebox_skyeroutex_v040_handoff_content_forge_free99` |
 | MetrAIyux 0S - Autonomous Office Setup | Autonomous Office setup | One-time | $7,500.00 | Once | `metraiyux_autonomous_office_setup` | same as above, `setup_for=autonomous-office` |
@@ -132,6 +138,13 @@ Synced on 2026-05-17 from the root `.env` Stripe credentials into account `acct_
 | Skye Split Engine Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S, FS27, SkyGate, or local admin gate session before app boot. It supports split rules, transactions, reports, CSV/JSON exports, backups, restore snapshots, and repair controls, but does not move money, run payroll, file taxes, or replace accounting/legal review. |
 | Skye Content Forge Free99 gated feature | Do not create a paid Stripe product. | Free99 means no charge. Access still requires a 0S, FS27, SkyGate, or local admin gate session, and source scan, generation, export, scheduler, backup, and deployment routes reject ungated requests. |
 | SkyeMusicNexus Lite Free99 gated feature | Do not create a paid Stripe product for Lite. | Free99 means no charge only for Lite. Access still requires a 0S, FS27, or SkyGate session, and music artist/release/workflow reads reject ungated requests. |
+| SkyeOpsConsole Free99 gated feature | Do not create a paid Stripe product. | Offline operations console; no provider-cost lane. |
+| Still2Vid Forge Free99 gated feature | Do not create a paid Stripe product. | Browser-local motion export from real uploaded, live-surface, open-source, or AI-receipted source assets. No provider generation is included. |
+| MyDrive Offline Vault Free99 gated feature | Do not create a paid Stripe product. | Local encrypted vault only; hosted backup, recovery, sync, or custody is paid scope. |
+| SkyePics Free99 gated feature | Do not create a paid Stripe product. | Local encrypted photo/OCR vault only; hosted sync or AI helper work is paid scope. |
+| BrandForge Core Free99 gated feature | Do not create a paid Stripe product for core. | Local campaign intelligence is Free99; provider-backed AI generation requires a paid SkyPay/FS27 entitlement and usage receipt. |
+| Social Batch Factory Core Free99 gated feature | Do not create a paid Stripe product for core. | Local batch assets, ZIPs, proof sheets, save/load, and brand kits are Free99; AI copy generation requires paid capped entitlement. |
+| White-label 0S resale / branded tenant platform | Enterprise / Managed Gate or custom quote only. | Selling access as the buyer's own SaaS, branded tenant provisioning, custom portal mirroring, custom domains, or managed control-plane use is never Free99. |
 | SkyeMusicNexus Provider Integration Proof Lane | Quote or owner-approved proof lane starting at $2,500. | Do not claim live distributor ingestion, DSP royalty settlement, payment movement, production identity handoff, label/legal authority, or deployed persistence until separate provider integrations are approved and proven. |
 | RouteX production deployment beyond local proof | Use custom scope before activation. | v0.4.0 proves local API/browser flows; production database, storage, payment, notification, identity/compliance, route-intelligence, DNS/SSL, and live operations must be selected and verified. |
 | `metraiyux_0s_site/pricing/*.html` 13-cabinet package pages | Do not create Stripe products yet. | Files explicitly say pricing is demonstrative/placeholder and must be edited before client use. |
@@ -441,6 +454,18 @@ Treat these as non-checkout amounts unless a future edit explicitly promotes the
 ## Brain Sales Rules
 
 The brains should sell from `metraiyux_0s_site/brain/sales-offer-registry.json`, which mirrors this catalog in machine-readable form.
+
+### Live Stripe Sync Receipt
+
+Latest live sync: `2026-05-21T13:37:40.139Z`, account `acct_1Seml2HEgCmnlKPJ`, receipt `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`.
+
+Agentic Growth live prices:
+
+| Plan | Setup price ID | Monthly price ID |
+| --- | --- | --- |
+| `agentic-growth-starter` | `price_1TZWmeHEgCmnlKPJxg9u4y0t` | `price_1TZWmeHEgCmnlKPJ7pVJ9ZRo` |
+| `agentic-growth-connected` | `price_1TZWmfHEgCmnlKPJShJ6WPP9` | `price_1TZWmgHEgCmnlKPJSoEeldWf` |
+| `agentic-growth-operator` | `price_1TZWmhHEgCmnlKPJ4C9Kzply` | `price_1TZWmhHEgCmnlKPJYbktfFeU` |
 
 Rules:
 

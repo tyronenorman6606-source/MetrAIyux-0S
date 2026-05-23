@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyeMail Platform Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/platform.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.164.1",
+        "gsap": "https://esm.sh/gsap@3.12.5",
+        "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+        "lenis": "https://esm.sh/lenis@1.1.18",
+        "motion": "https://esm.sh/motion@11.18.2"
+      }
+    }
+  </script>
+  <script type="module" src="../assets/spectacle-motion.js"></script>
+  <script defer src="assets/platform.js"></script>
+</head>
+<body class="motion-chrome" data-app-id="SkyeMail" data-page="hub" data-suite-base="./" data-root-base="../">
+  <div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+  <div class="cursor-trail" data-cursor-trail aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+  <div class="platform-shell">
+    <header class="platform-topbar">
+      <div class="platform-brand-lockup">
+        <img class="platform-topbar-logo" src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
+        <div>
+          <div class="platform-kicker">Skyes Over London Mail Network</div>
+          <div class="platform-brand">SkyeMail Platform Hub</div>
+        </div>
+      </div>
+      <div class="platform-topbar-actions">
+        <a class="platform-button ghost" href="../index.html">Standalone Home</a>
+        <a class="platform-button" data-nav="command" href="apps/command/index.html">Open Command Workspace</a>
+      </div>
+    </header>
+
+    <nav class="subnav">
+      <a data-page="hub" href="index.html">Hub</a>
+      <a data-page="mailbox" href="apps/mailbox/index.html">Mailbox</a>
+      <a data-page="templates" href="apps/templates/index.html">Compose</a>
+      <a data-page="campaigns" href="apps/campaigns/index.html">Campaigns</a>
+      <a data-page="ops" href="apps/ops/index.html">Ops</a>
+      <a data-page="command" href="apps/command/index.html">Command</a>
+    </nav>
+
+    <main class="platform-main">
+      <section class="hero-panel app-first-panel spectacle-hero" data-motion-section>
+        <canvas class="skymail-webgl" data-skymail-webgl aria-hidden="true"></canvas>
+        <div class="hero-copy-stack">
+          <span class="eyebrow">Secure client email <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span></span>
+          <h1 class="glow-text"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> opens as the working email platform, not a brochure.</h1>
+          <p class="hero-copy">The first screen is the command surface: live inbox routing, compose handoff, sender posture, vault keys, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, and the real standalone SkyeMail pages sitting behind the suite.</p>
+          <div class="hero-actions">
+            <a class="platform-button magnetic" data-nav="mailbox" href="apps/mailbox/index.html">Open Mailbox Control</a>
+            <a class="platform-button ghost magnetic" data-nav="templates" href="apps/templates/index.html">Open Compose Studio</a>
+            <a class="platform-button ghost magnetic" data-nav="campaigns" href="apps/campaigns/index.html">Open Campaign Lanes</a>
+          </div>
+        </div>
+        <aside class="hero-sidecard command-preview command-surface" aria-label="SkyeMail live command preview">
+          <div class="command-preview-top">
+            <img class="platform-emblem" src="/assets/skyes-over-london-deity-logo.png" alt="SkyeMail emblem" />
+            <div>
+              <strong>SkyeMail Control</strong>
+              <span>Live app shell</span>
+            </div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card"><strong>Live Surfaces</strong><span>6 route-safe pages</span></div>
+            <div class="metric-card"><strong>Recent Handoffs</strong><span data-bind="handoffCount">0</span></div>
+            <div class="metric-card"><strong>Draft Queue</strong><span data-bind="draftCount">0</span></div>
+            <div class="metric-card"><strong>Campaigns</strong><span data-bind="campaignCount">0</span></div>
+          </div>
+          <div class="command-lanes">
+            <a data-nav="mailbox" href="apps/mailbox/index.html"><b>Inbox</b><span>triage and selected-message packets</span></a>
+            <a data-nav="templates" href="apps/templates/index.html"><b>Compose</b><span>stage to the real send lane</span></a>
+            <a data-nav="ops" href="apps/ops/index.html"><b>Vault/Ops</b><span>keys, onboarding, sender posture</span></a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel-stack two-up" data-motion-section>
+        <article class="platform-panel proof-video-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Live email proof</span>
+            <h2>Two inboxes send, receive, reply, and receive back.</h2>
+          </div>
+          <video class="suite-proof-video" src="../proof/videos/skymail-live-proof-browser.webm" poster="../proof/screenshots/skymail-live-proof-browser.png" autoplay muted playsinline controls preload="metadata"></video>
+        </article>
+        <article class="platform-panel proof-video-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Build receipt</span>
+            <h2>The platform ships with deployment proof, not vague promises.</h2>
+          </div>
+          <video class="suite-proof-video" src="../proof/videos/skymail-mcp-proof-browser.webm" poster="../proof/screenshots/skymail-mcp-proof-browser.png" autoplay muted playsinline controls preload="metadata"></video>
+        </article>
+      </section>
+
+      <section class="panel-stack two-up" data-motion-section>
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Platform Surfaces</span>
+            <h2>What the standalone suite now owns</h2>
+          </div>
+          <div class="surface-grid">
+            <a class="surface-card" data-nav="mailbox" href="apps/mailbox/index.html">
+              <strong>Mailbox Control</strong>
+              <span>Triage live inbox work, thread pressure, drafts, and recovery activity before acting.</span>
+            </a>
+            <a class="surface-card" data-nav="templates" href="apps/templates/index.html">
+              <strong>Compose Studio</strong>
+              <span>Stage outbound copy and hand it directly into the real standalone compose lane.</span>
+            </a>
+            <a class="surface-card" data-nav="campaigns" href="apps/campaigns/index.html">
+              <strong>Campaign Lanes</strong>
+              <span>Keep follow-up sequences and launch batches separate from the live mailbox.</span>
+            </a>
+            <a class="surface-card" data-nav="ops" href="apps/ops/index.html">
+              <strong>Mail Ops</strong>
+              <span>Track sender posture, onboarding, keys, and recovery notes in one place.</span>
+            </a>
+            <a class="surface-card" data-nav="command" href="apps/command/index.html">
+              <strong>Command Workspace</strong>
+              <span>Launch the real standalone inbox, compose, settings, and contacts surfaces from one command deck.</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Standalone Contract</span>
+            <h2>What still depends on runtime vars</h2>
+          </div>
+          <div class="mini-grid">
+            <div class="mini-card"><strong>Provider Auth</strong><span>Mailbox provider credentials, inbound webhooks, and database credentials still come from env.</span></div>
+            <div class="mini-card"><strong>Route Safety</strong><span>The suite is now self-contained under `suite/` and can also mount under `/SkyeMail/...`.</span></div>
+            <div class="mini-card"><strong>State Model</strong><span>Suite drafts, campaigns, and ops notes persist locally even before provider wiring is live.</span></div>
+            <div class="mini-card"><strong>Real Surfaces</strong><span>The command deck now opens the actual standalone pages instead of dead `/api/skymail-*` mock routes.</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel-stack three-up" data-motion-section>
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Compose Intake</span>
+            <h2>Stage outbound mail from the hub</h2>
+          </div>
+          <form class="composer-form">
+            <div class="field-grid">
+              <label>Source workspace
+                <input id="mailSource" placeholder="SkyeDocxPro, Rescue Ops, Neural" />
+              </label>
+              <label>Recipient
+                <input id="mailTo" placeholder="ops@client.com" />
+              </label>
+            </div>
+            <div class="field-grid">
+              <label>Subject
+                <input id="mailSubject" placeholder="Launch update or support escalation" />
+              </label>
+              <label>Follow-up channel
+                <input id="mailChannel" placeholder="founder-ops" />
+              </label>
+            </div>
+            <label>Mail body
+              <textarea id="mailBody" placeholder="Stage the outbound mail here before handing it to live compose."></textarea>
+            </label>
+            <div class="button-row">
+              <button type="button" data-action="save-compose-draft">Save Draft</button>
+              <button class="ghost" type="button" data-action="route-compose-to-command">Open In Command</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Campaign Planning</span>
+            <h2>Keep sequence work out of the inbox</h2>
+          </div>
+          <form class="composer-form">
+            <div class="field-grid">
+              <label>Campaign name
+                <input id="campaignName" placeholder="Reinstatement follow-up wave" />
+              </label>
+              <label>Audience
+                <input id="campaignAudience" placeholder="priority clients / support queue" />
+              </label>
+            </div>
+            <label>Campaign summary
+              <textarea id="campaignSummary" placeholder="Describe the follow-up sequence, pacing, and goal."></textarea>
+            </label>
+            <div class="button-row">
+              <button type="button" data-action="save-campaign">Save Campaign</button>
+              <button class="ghost" type="button" data-action="route-campaign-to-command">Stage In Command</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Ops Posture</span>
+            <h2>Track sender-health and escalations</h2>
+          </div>
+          <form class="composer-form">
+            <div class="field-grid">
+              <label>Ops title
+                <input id="opsTitle" placeholder="Mailbox authentication watch" />
+              </label>
+              <label>Status
+                <input id="opsStatus" placeholder="watch / blocked / healthy" />
+              </label>
+            </div>
+            <label>Ops note
+              <textarea id="opsNote" placeholder="Capture sender reputation, delivery recovery, or escalation context."></textarea>
+            </label>
+            <div class="button-row">
+              <button type="button" data-action="save-ops-note">Save Ops Note</button>
+              <button class="ghost" type="button" data-action="route-ops-to-command">Open In Command</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section class="panel-stack three-up" data-motion-section>
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Suite Intake</span>
+            <h2>Incoming handoffs</h2>
+          </div>
+          <div class="list-shell" data-bind="recentHandoffs"></div>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Compose Queue</span>
+            <h2>Drafts waiting for live send</h2>
+          </div>
+          <div class="list-shell" data-bind="composeDrafts"></div>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Campaign Queue</span>
+            <h2>Saved outreach waves</h2>
+          </div>
+          <div class="list-shell" data-bind="campaignQueue"></div>
+        </article>
+      </section>
+
+      <section class="panel-stack two-up" data-motion-section>
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Delivery State</span>
+            <h2>Recent outbound activity</h2>
+          </div>
+          <div class="list-shell" data-bind="recentDeliveries"></div>
+        </article>
+
+        <article class="platform-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">Ops Notes</span>
+            <h2>Current sender and escalation posture</h2>
+          </div>
+          <div class="list-shell" data-bind="opsNotes"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

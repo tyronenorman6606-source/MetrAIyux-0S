@@ -1,0 +1,69 @@
+{
+  "effective_date": "2026-05-17",
+  "thesis": "MetrAIyux 0S is a VPS-ready business operating system with FS27 as parent gate, SkyePay as payment unlock lane, CitadelDB as sovereign database option, SkyeVault as file/repo/docs vault, SkyeMail as business email lane, and Skye Content Forge as a Free99 gated content publishing lane.",
+  "lanes": [
+    {
+      "id": "metraiyux-0s-vps",
+      "title": "MetrAIyux 0S VPS",
+      "category": "business_os",
+      "customer_choice": "Owner-operated private business OS instance.",
+      "replaces": ["generic_saas_dashboard"],
+      "fs27_tracking": ["workspace_created", "workspace_unlocked", "customer_command", "client_action", "billing_intent"]
+    },
+    {
+      "id": "fs27-parent-gate",
+      "title": "SkyeGateFS27",
+      "category": "gate",
+      "customer_choice": "Parent auth, billing, AI usage, policy, telemetry, and enforcement.",
+      "replaces": ["loose_api_keys", "manual_usage_tracking"],
+      "fs27_tracking": ["usage_events", "monthly_usage", "platform_event_mirror", "pricing_catalog", "cap_enforcement"]
+    },
+    {
+      "id": "skyepay",
+      "title": "SkyePay",
+      "category": "payments",
+      "customer_choice": "Stripe-backed transaction lane with paid status, SkyeMerit metadata, and controlled activation after confirmed payment.",
+      "replaces": ["loose_payment_links"],
+      "fs27_tracking": ["checkout_created", "stripe_confirmed", "paid_status_recorded", "owner_approval_status", "plan_policy_written"]
+    },
+    {
+      "id": "citadeldb",
+      "title": "CitadelDB",
+      "category": "database",
+      "customer_choice": "Use the sovereign database lane instead of Neon when an owner wants full-stack control.",
+      "replaces": ["neon"],
+      "fs27_tracking": ["database_lane_selected", "migration_started", "migration_verified", "cutover_completed"]
+    },
+    {
+      "id": "skyevault",
+      "title": "SkyeVault",
+      "category": "vault",
+      "customer_choice": "Use SkyeVault for customer files, proof exports, documents, repo/package storage, and handoff packs.",
+      "replaces": ["google_drive", "github_repo_storage", "ad_hoc_file_shares"],
+      "fs27_tracking": ["vault_file_created", "vault_exported", "repo_package_stored", "quota_used", "key_card_issued"]
+    },
+    {
+      "id": "skyemail",
+      "title": "SkyeMail",
+      "category": "email",
+      "customer_choice": "Use the sovereign business email lane for workspace inboxes, approval-sensitive sends, and mailbox keys.",
+      "replaces": ["gmail_only_business_email"],
+      "fs27_tracking": ["mailbox_provisioned", "mailbox_key_issued", "approval_send_requested", "mail_event"]
+    },
+    {
+      "id": "skye-content-forge",
+      "title": "Skye Content Forge",
+      "category": "content_ops",
+      "customer_choice": "Use the Free99 gated content publisher for approved source scanning, original content drafts, exports, scheduler ticks, backups, and deployment hooks without creating a paid checkout product.",
+      "replaces": ["ad_hoc_content_workflow", "anonymous_content_tools"],
+      "fs27_tracking": ["content_gate_opened", "content_source_scanned", "content_draft_created", "content_exported", "publisher_tick", "backup_requested"]
+    }
+  ],
+  "go_live_rules": [
+    "Every customer-facing plan must show setup fee, monthly fee, AI cap, RPM, RPD, devices, workspace count, storage, and file limits.",
+    "Every provider/model lane must show FS27 billable rate and upstream cost basis.",
+    "Every 0S action should log locally and mirror to FS27 when FS27_EVENT_MIRROR_URL is configured.",
+    "CitadelDB, SkyeVault, SkyeMail, and Skye Content Forge must be presented as sovereign choices, not hidden back-office experiments.",
+    "Skye Content Forge is Free99, meaning no charge; API routes and scheduler/backup actions still require a gate session."
+  ]
+}

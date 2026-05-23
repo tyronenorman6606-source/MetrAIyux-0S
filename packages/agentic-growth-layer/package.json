@@ -1,0 +1,21 @@
+{
+  "name": "@metraiyux/agentic-growth-layer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "API-first agentic website growth layer for market-data-driven site improvement proposals.",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./server": "./src/server.mjs",
+    "./static-site-adapter": "./src/adapters/static-site.mjs"
+  },
+  "scripts": {
+    "serve": "node src/server.mjs",
+    "build:site-data": "node scripts/build-product-site-data.mjs",
+    "smoke": "node tests/smoke.mjs",
+    "stress": "node tests/stress.mjs",
+    "browser-proof": "node tests/browser-proof.mjs",
+    "test": "node tests/smoke.mjs && node tests/stress.mjs"
+  }
+}

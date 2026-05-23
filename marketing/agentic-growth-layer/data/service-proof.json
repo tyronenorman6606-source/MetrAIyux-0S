@@ -1,0 +1,254 @@
+{
+  "generatedAt": "2026-05-21T13:36:07.044Z",
+  "product": "Agentic Growth Layer",
+  "modes": {
+    "noDomain": {
+      "mode": "no_gsc_preview_or_no_domain",
+      "actions": 12,
+      "patchOperations": 12,
+      "firstActions": [
+        {
+          "id": "opp_5b139e1f1d32",
+          "type": "cta_rewrite",
+          "score": 58,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/services",
+          "targetPage": "/services",
+          "why": "The page is visible in the site inventory but has no captured CTA.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 1,
+          "label": "Cta Rewrite"
+        },
+        {
+          "id": "opp_39f79717ea6f",
+          "type": "content_refresh",
+          "score": 52,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/",
+          "targetPage": "/",
+          "why": "The page appears thin for a commercial SEO surface.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 2,
+          "label": "Content Refresh"
+        },
+        {
+          "id": "opp_253a745526f5",
+          "type": "content_refresh",
+          "score": 52,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/services",
+          "targetPage": "/services",
+          "why": "The page appears thin for a commercial SEO surface.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 3,
+          "label": "Content Refresh"
+        },
+        {
+          "id": "opp_3d15240eb559",
+          "type": "internal_link_add",
+          "score": 49,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/",
+          "sourceRoutes": [
+            "/services"
+          ],
+          "why": "Link equity should flow from existing relevant pages into the new or refreshed SEO target.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 4,
+          "label": "Internal Link Add"
+        },
+        {
+          "id": "opp_31dfcc665ebe",
+          "type": "internal_link_add",
+          "score": 49,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/services/ceramic-coating",
+          "sourceRoutes": [
+            "/",
+            "/services"
+          ],
+          "why": "Link equity should flow from existing relevant pages into the new or refreshed SEO target.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 5,
+          "label": "Internal Link Add"
+        }
+      ]
+    },
+    "connected": {
+      "mode": "connected_search_console",
+      "actions": 14,
+      "patchOperations": 14,
+      "firstActions": [
+        {
+          "id": "opp_98684baf3b21",
+          "type": "content_refresh",
+          "score": 100,
+          "confidence": 0.95,
+          "source": "gsc",
+          "query": "recycled pallets phoenix",
+          "intent": "local",
+          "targetRoute": "/",
+          "targetPage": "/",
+          "service": "recycled pallets",
+          "location": "Phoenix AZ",
+          "why": "Refresh the existing page around \"recycled pallets phoenix\" because the market data shows reachable demand.",
+          "approval": "auto_draft_allowed",
+          "priority": 1,
+          "label": "Content Refresh"
+        },
+        {
+          "id": "opp_7d4f3c4d2df1",
+          "type": "content_refresh",
+          "score": 100,
+          "confidence": 0.95,
+          "source": "gsc",
+          "query": "custom pallets tolleson",
+          "intent": "local",
+          "targetRoute": "/",
+          "targetPage": "/",
+          "service": "custom pallets",
+          "location": "Phoenix AZ",
+          "why": "Refresh the existing page around \"custom pallets tolleson\" because the market data shows reachable demand.",
+          "approval": "auto_draft_allowed",
+          "priority": 2,
+          "label": "Content Refresh"
+        },
+        {
+          "id": "opp_d224ca65d1fe",
+          "type": "content_refresh",
+          "score": 99.8,
+          "confidence": 0.78,
+          "source": "semrush",
+          "query": "pallet supplier phoenix",
+          "intent": "local",
+          "targetRoute": "/",
+          "targetPage": "/",
+          "service": "recycled pallets",
+          "location": "Phoenix AZ",
+          "why": "Refresh the existing page around \"pallet supplier phoenix\" because the market data shows reachable demand.",
+          "approval": "auto_draft_allowed",
+          "priority": 3,
+          "label": "Content Refresh"
+        },
+        {
+          "id": "opp_f9b376d70249",
+          "type": "proof_page_build",
+          "score": 62,
+          "confidence": 0.64,
+          "source": "semrush",
+          "targetRoute": "/proof/recycled-pallets",
+          "service": "recycled pallets",
+          "competitorCount": 2,
+          "why": "Competitive SERP data shows the site needs a proof surface that backs claims before CTAs ask for conversion.",
+          "risks": [
+            "proof-claims-need-evidence"
+          ],
+          "approval": "human_review_required_before_publish",
+          "priority": 4,
+          "label": "Proof Page Build"
+        },
+        {
+          "id": "opp_5b139e1f1d32",
+          "type": "cta_rewrite",
+          "score": 58,
+          "confidence": 0.7,
+          "source": "site_crawl",
+          "targetRoute": "/services",
+          "targetPage": "/services",
+          "why": "The page is visible in the site inventory but has no captured CTA.",
+          "risks": [],
+          "approval": "auto_draft_allowed",
+          "priority": 5,
+          "label": "Cta Rewrite"
+        }
+      ]
+    }
+  },
+  "stress": {
+    "ok": true,
+    "startedAt": "2026-05-21T13:35:43.701Z",
+    "completedAt": "2026-05-21T13:35:59.077Z",
+    "fixture": {
+      "gscRows": 900,
+      "semrushRows": 900,
+      "serpQueries": 120,
+      "pages": 48,
+      "maxActions": 64
+    },
+    "core": {
+      "iterations": 240,
+      "concurrency": 24,
+      "elapsedMs": 11724,
+      "throughputPerSecond": 20.47,
+      "latencyMs": {
+        "min": 24,
+        "p50": 45,
+        "p95": 89,
+        "max": 161
+      }
+    },
+    "api": {
+      "requests": 80,
+      "concurrency": 16,
+      "elapsedMs": 3641,
+      "throughputPerSecond": 21.97,
+      "latencyMs": {
+        "min": 152,
+        "p50": 500,
+        "p95": 2084,
+        "max": 2517
+      }
+    },
+    "memory": {
+      "rssMb": 277.36,
+      "heapUsedMb": 21.14,
+      "heapTotalMb": 157.77
+    },
+    "assertions": [
+      "Connected Search Console mode selected under high source volume.",
+      "Every generated cycle returned prioritized actions and static-site patch operations.",
+      "Core throughput stayed above 10 large market cycles per second for the synthetic high-volume payload.",
+      "API p95 latency stayed below 2500ms under concurrent POST cycle load.",
+      "Stress receipt written for proof ledger."
+    ]
+  },
+  "endpoints": [
+    "GET /api/agentic-growth/health",
+    "POST /api/agentic-growth/v1/cycles",
+    "POST /api/agentic-growth/v1/cycles/pull",
+    "POST /api/agentic-growth/v1/adapters/static-site/patch"
+  ],
+  "skyepayOffers": [
+    {
+      "id": "agentic-growth-starter",
+      "label": "Agentic Growth Starter",
+      "setup": 1500,
+      "monthly": 497,
+      "checkout": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=agentic-growth-starter"
+    },
+    {
+      "id": "agentic-growth-connected",
+      "label": "Agentic Growth Connected",
+      "setup": 3500,
+      "monthly": 1497,
+      "checkout": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=agentic-growth-connected"
+    },
+    {
+      "id": "agentic-growth-operator",
+      "label": "Agentic Growth Operator",
+      "setup": 7500,
+      "monthly": 2997,
+      "checkout": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=agentic-growth-operator"
+    }
+  ]
+}

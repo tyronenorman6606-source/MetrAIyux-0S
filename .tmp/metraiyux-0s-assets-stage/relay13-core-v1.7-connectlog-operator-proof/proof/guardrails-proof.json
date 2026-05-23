@@ -1,0 +1,161 @@
+{
+  "ok": true,
+  "origin": "https://relay13-core.graylondonskyes.workers.dev",
+  "checked_at": "2026-05-19T00:10:18.157Z",
+  "accounts": [
+    {
+      "account_code": "METRAIYUX-0S-SKM",
+      "workspace_slug": "connectlog-main",
+      "guardrail_profile": "metraiyux-0s-public-site",
+      "ai_mode": "draft_only",
+      "web_search_allowed": false,
+      "allowed_conversation_id": "conv_976b458e-4eaa-4d09-bc80-a3366e5a4eac",
+      "web_search_review_conversation_id": "conv_3981ad1d-3d88-467b-8960-90b7d489a8b0",
+      "blocked_reason": "abuse_or_prompt_attack",
+      "blocked_signals": [
+        "active_content_payload",
+        "prompt_injection",
+        "secret_request"
+      ]
+    },
+    {
+      "account_code": "BOBS-SMOKE-SHOP-SKM",
+      "workspace_slug": "bobs-smoke-shop",
+      "guardrail_profile": "bobs-smoke-shop-client-app",
+      "ai_mode": "draft_only",
+      "web_search_allowed": false,
+      "allowed_conversation_id": "conv_c0d96c9f-f441-413e-ad79-5bdc648e2b13",
+      "web_search_review_conversation_id": "conv_4f101e22-7b7c-4595-8221-7182f7655c34",
+      "blocked_reason": "abuse_or_prompt_attack",
+      "blocked_signals": [
+        "active_content_payload",
+        "prompt_injection",
+        "secret_request"
+      ]
+    },
+    {
+      "account_code": "EMPIRE-PALLETS-SKM",
+      "workspace_slug": "empire-pallets",
+      "guardrail_profile": "empire-pallets-client-app",
+      "ai_mode": "draft_only",
+      "web_search_allowed": false,
+      "allowed_conversation_id": "conv_67d0b16a-af20-4475-bcba-76ab6f2b67e1",
+      "web_search_review_conversation_id": "conv_3ddb0194-abd4-4622-a483-e92368cebec0",
+      "blocked_reason": "abuse_or_prompt_attack",
+      "blocked_signals": [
+        "active_content_payload",
+        "prompt_injection",
+        "secret_request"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "relay13:health",
+      "ok": true,
+      "status": 200,
+      "workspace": null,
+      "reason": null
+    },
+    {
+      "name": "connectlog-main:guardrails_proof",
+      "ok": true,
+      "status": 200,
+      "workspace": "connectlog-main",
+      "reason": null
+    },
+    {
+      "name": "connectlog-main:allowed_app_knowledge_message",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main",
+      "reason": "allowed"
+    },
+    {
+      "name": "connectlog-main:web_search_request_reviewed",
+      "ok": true,
+      "status": 201,
+      "workspace": "connectlog-main",
+      "reason": "web_search_disabled"
+    },
+    {
+      "name": "connectlog-main:prompt_attack_blocked",
+      "ok": true,
+      "status": 422,
+      "workspace": "connectlog-main",
+      "reason": "abuse_or_prompt_attack"
+    },
+    {
+      "name": "bobs-smoke-shop:guardrails_proof",
+      "ok": true,
+      "status": 200,
+      "workspace": "bobs-smoke-shop",
+      "reason": null
+    },
+    {
+      "name": "bobs-smoke-shop:allowed_app_knowledge_message",
+      "ok": true,
+      "status": 201,
+      "workspace": "bobs-smoke-shop",
+      "reason": "allowed"
+    },
+    {
+      "name": "bobs-smoke-shop:web_search_request_reviewed",
+      "ok": true,
+      "status": 201,
+      "workspace": "bobs-smoke-shop",
+      "reason": "web_search_disabled"
+    },
+    {
+      "name": "bobs-smoke-shop:prompt_attack_blocked",
+      "ok": true,
+      "status": 422,
+      "workspace": "bobs-smoke-shop",
+      "reason": "abuse_or_prompt_attack"
+    },
+    {
+      "name": "empire-pallets:guardrails_proof",
+      "ok": true,
+      "status": 200,
+      "workspace": "empire-pallets",
+      "reason": null
+    },
+    {
+      "name": "empire-pallets:allowed_app_knowledge_message",
+      "ok": true,
+      "status": 201,
+      "workspace": "empire-pallets",
+      "reason": "allowed"
+    },
+    {
+      "name": "empire-pallets:web_search_request_reviewed",
+      "ok": true,
+      "status": 201,
+      "workspace": "empire-pallets",
+      "reason": "web_search_disabled"
+    },
+    {
+      "name": "empire-pallets:prompt_attack_blocked",
+      "ok": true,
+      "status": 422,
+      "workspace": "empire-pallets",
+      "reason": "abuse_or_prompt_attack"
+    }
+  ],
+  "boundaries": [
+    "Customer website chat has web search locked off.",
+    "Allowed messages persist with app-knowledge AI policy metadata for the future brain responder.",
+    "Web-search requests are allowed only as operator-review threads with web_search_allowed=false.",
+    "Prompt-injection, secret-extraction, active script payloads, and destructive requests are blocked before persistence.",
+    "Auto-reply remains draft-only unless an admin explicitly changes the workspace policy."
+  ],
+  "skgate_mirror": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "ok": true,
+      "request_id": "6ada88b6-53eb-4dac-83b6-099a969f0000",
+      "accepted": true
+    }
+  }
+}

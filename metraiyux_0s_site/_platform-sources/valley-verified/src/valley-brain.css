@@ -1,0 +1,353 @@
+/* Valley build-aware brains and relay lane */
+.vv-brain-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 10000;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 24px));
+  font-family: var(--sans, system-ui, sans-serif);
+}
+
+.vv-brain-launchers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.vv-brain-launcher,
+.vv-brain-form button,
+.vv-brain-relay button,
+.vv-brain-close {
+  min-height: 42px;
+  border: 1px solid rgba(246, 248, 243, .2);
+  border-radius: 8px;
+  background: #101513;
+  color: #f6f8f3;
+  box-shadow: 0 18px 50px rgba(15, 22, 20, .24);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 850;
+}
+
+.vv-brain-launcher {
+  padding: 0 14px;
+}
+
+.vv-brain-launcher.admin {
+  background: #6f1d2c;
+  border-color: rgba(255, 255, 255, .24);
+}
+
+.vv-brain-launcher.admin-login {
+  background: #221711;
+  border-color: rgba(245, 184, 79, .38);
+  color: #ffe4a3;
+}
+
+.vv-brain-panel {
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(720px, calc(100vh - 92px));
+  overflow: hidden;
+  border: 1px solid rgba(246, 248, 243, .16);
+  border-radius: 8px;
+  background: linear-gradient(150deg, rgba(16, 21, 19, .98), rgba(23, 32, 30, .97) 62%, rgba(42, 20, 26, .96));
+  color: #f6f8f3;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .38);
+}
+
+.vv-brain-panel[hidden] {
+  display: none;
+}
+
+.vv-brain-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 10px;
+  border-bottom: 1px solid rgba(246, 248, 243, .12);
+}
+
+.vv-brain-head h2,
+.vv-brain-answer h3 {
+  margin: 0;
+  color: #fffaf0;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.vv-brain-head h2 {
+  font-family: var(--display, Georgia, serif);
+  font-size: 28px;
+}
+
+.vv-brain-kicker {
+  margin: 0 0 5px;
+  color: #f5b84f;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.vv-brain-close {
+  width: 42px;
+  padding: 0;
+  background: rgba(255, 255, 255, .07);
+  box-shadow: none;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.vv-brain-context {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(245, 184, 79, .08);
+  border-bottom: 1px solid rgba(246, 248, 243, .12);
+}
+
+.vv-brain-context strong {
+  color: #fffaf0;
+}
+
+.vv-brain-context span,
+.vv-brain-message,
+.vv-brain-relay summary,
+.vv-brain-relay p,
+.vv-admin-login p {
+  color: rgba(246, 248, 243, .76);
+  line-height: 1.5;
+}
+
+.vv-admin-login {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid rgba(246, 248, 243, .12);
+}
+
+.vv-admin-login[hidden] {
+  display: none;
+}
+
+.vv-admin-login label {
+  display: grid;
+  gap: 7px;
+  color: rgba(246, 248, 243, .8);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.vv-admin-login input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  box-sizing: border-box;
+  border: 1px solid rgba(245, 184, 79, .24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .08);
+  color: #fffaf0;
+  padding: 10px 11px;
+  font: inherit;
+}
+
+.vv-admin-login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vv-admin-login button {
+  min-height: 38px;
+  border: 1px solid rgba(246, 248, 243, .16);
+  border-radius: 8px;
+  background: rgba(245, 184, 79, .14);
+  color: #fffaf0;
+  padding: 0 12px;
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.vv-admin-login p {
+  min-height: 18px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.vv-brain-feed {
+  display: grid;
+  gap: 10px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 14px 16px;
+}
+
+.vv-brain-feed[hidden],
+.vv-brain-suggestions[hidden],
+.vv-brain-form[hidden],
+.vv-brain-relay[hidden] {
+  display: none;
+}
+
+.vv-brain-message {
+  min-width: 0;
+  border: 1px solid rgba(246, 248, 243, .12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .06);
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+
+.vv-brain-message.me {
+  justify-self: end;
+  max-width: 88%;
+  background: rgba(11, 111, 115, .26);
+  border-color: rgba(126, 230, 255, .22);
+  color: #f6f8f3;
+}
+
+.vv-brain-answer {
+  display: grid;
+  gap: 10px;
+}
+
+.vv-brain-answer p,
+.vv-brain-answer ol {
+  margin: 0;
+}
+
+.vv-brain-answer ol {
+  padding-left: 20px;
+}
+
+.vv-brain-answer li + li {
+  margin-top: 6px;
+}
+
+.vv-brain-links {
+  display: grid;
+  gap: 8px;
+}
+
+.vv-brain-links a {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  border: 1px solid rgba(245, 184, 79, .18);
+  border-radius: 8px;
+  background: rgba(245, 184, 79, .08);
+  padding: 10px;
+  color: #fffaf0;
+  text-decoration: none;
+}
+
+.vv-brain-links a span {
+  color: rgba(246, 248, 243, .68);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.vv-brain-suggestions {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 0 16px 12px;
+}
+
+.vv-brain-suggestions button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  border: 1px solid rgba(246, 248, 243, .15);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  color: #f6f8f3;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.vv-brain-form,
+.vv-brain-relay form {
+  display: grid;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+.vv-brain-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.vv-brain-form input,
+.vv-brain-relay input,
+.vv-brain-relay textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  box-sizing: border-box;
+  border: 1px solid rgba(246, 248, 243, .16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .08);
+  color: #fffaf0;
+  padding: 10px 11px;
+  font: inherit;
+}
+
+.vv-brain-form input::placeholder,
+.vv-brain-relay input::placeholder,
+.vv-brain-relay textarea::placeholder {
+  color: rgba(246, 248, 243, .48);
+}
+
+.vv-brain-relay {
+  border-top: 1px solid rgba(246, 248, 243, .12);
+  padding-top: 12px;
+}
+
+.vv-brain-relay summary {
+  padding: 0 16px 12px;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.vv-brain-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.vv-brain-relay textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.vv-brain-relay p {
+  min-height: 20px;
+  margin: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .vv-brain-dock {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .vv-brain-panel {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 84px);
+  }
+
+  .vv-brain-form,
+  .vv-brain-fields {
+    grid-template-columns: 1fr;
+  }
+}

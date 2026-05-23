@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyePay | SkyeGateFS27</title>
+  <meta name="description" content="SkyePay is the SkyeGateFS27 free trial, Stripe checkout, paid-status ledger, SkyeMerit discount, and controlled workspace activation route." />
+  <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html" />
+  <link rel="stylesheet" href="assets/skyepay.css" />
+  <script type="importmap">
+  {"imports":{"gsap":"https://esm.sh/gsap@3.15.0","gsap/ScrollTrigger":"https://esm.sh/gsap@3.15.0/ScrollTrigger","lenis":"https://esm.sh/lenis@1.3.23"}}
+  </script>
+  <script type="module">
+    import Lenis from "lenis";
+    globalThis.SkyePayLenisPreload = Lenis;
+  </script>
+  <script type="module" src="assets/skyepay.js"></script>
+</head>
+<body class="skypay-gateway-v2">
+  <div class="motion-progress" aria-hidden="true"><span id="skypayProgress"></span></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="pay-nav pay-nav-v2">
+    <a class="pay-brand neon-magnetic" href="index.html" aria-label="Back to SkyeGateFS27">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
+      <span>SkyeGateFS27 / SkyePay</span>
+    </a>
+    <nav>
+      <a href="#checkout">Checkout</a>
+      <a href="skyepay-store.html">Store</a>
+      <a href="#gate-path">Gate Path</a>
+      <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html">0S Features</a>
+      <a href="skyepay-admin.html">Ledger</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="pay-hero" id="checkout">
+      <div class="hero-copy settlement-board">
+        <div class="route-kicker">
+          <p class="eyebrow" id="clientEyebrow">Private preview closeout</p>
+          <span>Live payment lane</span>
+        </div>
+        <h1 id="heroTitle"><span class="neon-gradient-text text-effects">SkyePay</span> is the checkout room before the gate opens.</h1>
+        <p class="lead" id="heroLead">Stripe creates the payment event. FS27 records the order, policy, and owner approval state. The workspace unlock only after the gate says it should.</p>
+        <div class="hero-actions">
+          <a class="primary-action neon-magnetic" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html">Inspect full 0S feature atlas</a>
+        </div>
+        <div class="hero-points proof-ticker" id="heroPoints" aria-label="SkyePay route">
+          <span>Stripe checkout</span>
+          <span>FS27 ledger</span>
+          <span>Owner approval</span>
+          <span>Workspace policy</span>
+        </div>
+        <div class="route-matrix" aria-label="SkyePay settlement path">
+          <div>
+            <span>01</span>
+            <strong>Offer</strong>
+            <small>Catalog price and rate policy load first.</small>
+          </div>
+          <div>
+            <span>02</span>
+            <strong>Checkout</strong>
+            <small>Stripe handles card data outside the app.</small>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>Gate</strong>
+            <small>FS27 writes the order and approval state.</small>
+          </div>
+          <div>
+            <span>04</span>
+            <strong>Unlock</strong>
+            <small>Owner approval controls activation.</small>
+          </div>
+        </div>
+      </div>
+
+      <section class="checkout-console" aria-labelledby="checkoutTitle">
+        <div class="console-head">
+          <div>
+            <p class="eyebrow">Checkout room</p>
+            <h2 id="checkoutTitle">Continue the private app preview</h2>
+          </div>
+          <span class="live-badge" id="proofModeBadge">Stripe backed</span>
+        </div>
+
+        <div class="client-strip">
+          <div>
+            <span class="mini-label">Client</span>
+            <strong id="clientName">Loading...</strong>
+          </div>
+          <div>
+            <span class="mini-label">Preview window</span>
+            <strong id="trialDays">7 days</strong>
+          </div>
+          <div>
+            <span class="mini-label">Approval</span>
+            <strong>Owner gated</strong>
+          </div>
+        </div>
+
+        <form id="skypayForm" class="pay-form">
+          <div class="field-grid">
+            <label>
+              Your name
+              <input name="customer_name" autocomplete="name" placeholder="Bob" required />
+            </label>
+            <label>
+              Email for receipt
+              <input name="customer_email" type="email" autocomplete="email" placeholder="owner@company.com" required />
+            </label>
+            <label class="field-wide">
+              Company
+              <input name="company_name" autocomplete="organization" placeholder="Bob's Smoke Shop" />
+            </label>
+          </div>
+
+          <div class="skyemerit-panel">
+            <label>
+              SkyeMerit
+              <select id="skyemeritCode" name="skyemerit_code">
+                <option value="SKYEMERIT-FIRST-BEST">Auto first-time SkyeMerit</option>
+              </select>
+            </label>
+            <p><strong id="skyemeritCredit">$6 premium kAIxu credit</strong> issues with the first-time pack. Free99 still requires the gate.</p>
+            <p id="skyemeritPreview" class="fine-print">SkyeMerit preview loads with the offer catalog.</p>
+          </div>
+
+          <div class="offer-select" id="offerSelect" aria-label="SkyePay offers"></div>
+
+          <button class="primary-action neon-magnetic" type="submit" id="checkoutBtn">
+            Start secure trial
+          </button>
+          <p class="fine-print" id="clientSpecial">Free preview first. Confirmed Stripe payment waits for owner-approved activation.</p>
+        </form>
+        <div class="client-contact" id="clientContact" hidden></div>
+
+        <div class="status-panel" id="statusPanel" hidden>
+          <p class="eyebrow">Payment status</p>
+          <h3 id="statusTitle">Pending</h3>
+          <p id="statusText">SkyePay is checking the gate ledger.</p>
+        </div>
+
+        <div class="settlement-note" aria-label="SkyePay boundary">
+          <span>Card data stays with Stripe.</span>
+          <span>Activation stays with FS27.</span>
+        </div>
+      </section>
+    </section>
+
+    <section class="usage-band skypay-reveal" id="included">
+      <div>
+        <p class="eyebrow">Included lane</p>
+        <h2 id="includedTitle">The buyer sees exactly what the gate will honor.</h2>
+      </div>
+      <ul id="includedUsage">
+        <li>Private app preview</li>
+        <li>Owner approval before paid activation</li>
+        <li>Workspace handoff after closeout</li>
+      </ul>
+    </section>
+
+    <section class="usage-band skypay-reveal" id="feature-atlas">
+      <div>
+        <p class="eyebrow">Feature atlas linked</p>
+        <h2>The payment room now points back to the full 0S.</h2>
+      </div>
+      <ul>
+        <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html">Open the live feature atlas</a></li>
+        <li>See the app lanes, proof receipts, valuation surface, and claims boundary before checkout.</li>
+        <li>Free99 means no charge only. Gate sessions, owner approval, and workspace policy still apply.</li>
+      </ul>
+    </section>
+
+    <section class="gate-path skypay-reveal" id="gate-path">
+      <p class="eyebrow" id="gateEyebrow">SkyeGateFS27 route</p>
+      <h2 id="gateTitle">Payment is not the finish line. It is the event FS27 turns into a controlled activation record.</h2>
+      <div class="path-rail" id="pathRail">
+        <article>
+          <span>01</span>
+          <h3>Preview accepted</h3>
+          <p>The client chooses to continue from the private app preview through a controlled app lane instead of a loose external payment link.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Stripe Checkout</h3>
+          <p>SkyePay creates a Checkout Session with approved catalog metadata and no card data touching the app.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Gate ledger</h3>
+          <p>The webhook writes the confirmed payment or trial state into FS27, then owner approval controls activation.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Owner approval</h3>
+          <p>You can still void, audit, or manually correct the workspace from the SkyePay ledger.</p>
+        </article>
+        <article>
+          <span>05</span>
+          <h3>Repo platforms</h3>
+          <p>After live proof, the last lane is wiring the repo platforms into SkyePay as billable app routes.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

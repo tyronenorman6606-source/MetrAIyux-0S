@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relay13 Inbox</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="neon-motion-chrome">
+  <div class="actual-inbox-page">
+    <header class="inbox-app-topbar">
+      <a class="surface-brand" href="dashboard.html">
+        <img src="assets/connectlog-logo-192.png" alt="" />
+        <span><strong>Relay13 Inbox</strong><small>ConnectLog message universe</small></span>
+      </a>
+      <nav class="short-nav" aria-label="ConnectLog pages">
+        <a href="dashboard.html">Lobby</a>
+        <a href="tutorial.html">Tutorial</a>
+        <a href="exchange.html">Exchange</a>
+        <a class="active" href="relay13-inbox.html">Inbox</a>
+        <a href="relay13-setup.html">Setup</a>
+        <a href="relay13-proof.html">Proof</a>
+      </nav>
+      <a class="primary-btn small" href="../relay13-core-v1.7-connectlog-operator-proof/public/admin/inbox.html">Admin inbox</a>
+    </header>
+
+    <main class="inbox-app-main" aria-label="Relay13 inbox">
+      <section class="inbox-command-bar" aria-label="Inbox command bar">
+        <div class="command-copy">
+          <p class="eyebrow">Actual inbox</p>
+          <h1>Relay13 conversations</h1>
+          <p>Every scan, widget reply, and operator note lands as a thread with a contact record, source, and next action.</p>
+        </div>
+        <label class="inbox-search">
+          <span>Search</span>
+          <input type="search" placeholder="Search people, source, or next action" aria-label="Search Relay13 inbox" />
+        </label>
+        <div class="inbox-command-actions" aria-label="Inbox actions">
+          <button type="button" data-inbox-filter="Unread">Unread</button>
+          <button type="button" data-inbox-filter="Needs reply">Needs reply</button>
+          <button type="button" data-inbox-filter="Queued">Queued</button>
+          <a href="app.html#relay13">Live console</a>
+        </div>
+      </section>
+
+      <nav class="mobile-inbox-jumps" aria-label="Mobile inbox rooms">
+        <a href="#relay-list">Inbox</a>
+        <a href="#relay-thread">Thread</a>
+        <a href="#relay-context">Context</a>
+      </nav>
+
+      <section class="actual-mail-shell">
+        <aside class="mail-rail" aria-label="Folders and splits">
+          <div class="mail-rail-head">
+            <span class="mail-avatar">R13</span>
+            <div>
+              <strong>MetrAIyux 0S</strong>
+              <small>4 sources connected</small>
+            </div>
+          </div>
+          <div class="folder-group">
+            <p>Folders</p>
+            <a class="active" href="#" data-inbox-filter="All"><span>Inbox</span><b>18</b></a>
+            <a href="#" data-inbox-filter="Needs reply"><span>Needs reply</span><b>6</b></a>
+            <a href="#" data-inbox-filter="Queued"><span>Queued</span><b>4</b></a>
+            <a href="#" data-inbox-filter="Snoozed"><span>Snoozed</span><b>3</b></a>
+            <a href="#" data-inbox-filter="Archived"><span>Archived</span><b>42</b></a>
+          </div>
+          <div class="folder-group">
+            <p>Splits</p>
+            <a href="#" data-inbox-filter="Buyer scan"><span>Buyer scans</span><b>9</b></a>
+            <a href="#" data-inbox-filter="Client support"><span>Client support</span><b>5</b></a>
+            <a href="#" data-inbox-filter="Vendor"><span>Vendor handoff</span><b>2</b></a>
+          </div>
+          <div class="mail-rail-note">
+            <strong>Rule</strong>
+            <span>One thread becomes one relationship record. No hunting through a giant dashboard.</span>
+          </div>
+        </aside>
+
+        <section id="relay-list" class="mail-list-pane" aria-label="Message list">
+          <header class="pane-title">
+            <div>
+              <p class="eyebrow">Focused inbox</p>
+              <h2>Needs attention</h2>
+            </div>
+            <button type="button" data-inbox-action="refresh" aria-label="Refresh inbox">Refresh</button>
+          </header>
+
+          <article class="mail-row unread selected" data-thread="maya" data-tags="Unread Needs reply Buyer scan High intent Owner Gray" role="button" tabindex="0" aria-label="Selected thread from Maya Carter">
+            <span class="priority-dot"></span>
+            <div class="row-main">
+              <div class="row-line"><strong>Maya Carter</strong><time>2m</time></div>
+              <h3>Private access request after card scan</h3>
+              <p>I scanned the card. I need the link, the quote, and the clean next step today.</p>
+              <div class="row-tags"><span>Buyer scan</span><span>High intent</span><span>Owner: Gray</span></div>
+            </div>
+          </article>
+
+          <article class="mail-row unread" data-thread="ocean" data-tags="Unread Needs reply Client support Pending" role="button" tabindex="0" aria-label="Thread from Ocean Ave Studio">
+            <span class="priority-dot cyan"></span>
+            <div class="row-main">
+              <div class="row-line"><strong>Ocean Ave Studio</strong><time>12m</time></div>
+              <h3>Widget install is live but reply routing needs owner</h3>
+              <p>The client sees the launcher. Operator reply should land in the same thread.</p>
+              <div class="row-tags"><span>Client support</span><span>Pending</span></div>
+            </div>
+          </article>
+
+          <article class="mail-row" data-thread="priya" data-tags="Queued Client-ready" role="button" tabindex="0" aria-label="Thread from Priya Shah">
+            <span class="priority-dot green"></span>
+            <div class="row-main">
+              <div class="row-line"><strong>Priya Shah</strong><time>28m</time></div>
+              <h3>Quote approved, waiting on deploy handoff</h3>
+              <p>Send the release link and store the signed scope inside the customer record.</p>
+              <div class="row-tags"><span>Queued</span><span>Client-ready</span></div>
+            </div>
+          </article>
+
+          <article class="mail-row" data-thread="greenroom" data-tags="Needs reply Vendor Blocked" role="button" tabindex="0" aria-label="Thread from Greenroom Ops">
+            <span class="priority-dot"></span>
+            <div class="row-main">
+              <div class="row-line"><strong>Greenroom Ops</strong><time>1h</time></div>
+              <h3>Vendor handoff needs proof link</h3>
+              <p>They need the restored backup note before the final message goes out.</p>
+              <div class="row-tags"><span>Vendor</span><span>Blocked</span></div>
+            </div>
+          </article>
+
+          <article class="mail-row" data-thread="north" data-tags="Snoozed Launch" role="button" tabindex="0" aria-label="Thread from North Pier">
+            <span class="priority-dot muted"></span>
+            <div class="row-main">
+              <div class="row-line"><strong>North Pier</strong><time>3h</time></div>
+              <h3>Follow-up scheduled for launch room</h3>
+              <p>Keep this out of the active lane until the calendar opens.</p>
+              <div class="row-tags"><span>Snoozed</span><span>Launch</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section id="relay-thread" class="reading-pane" aria-label="Selected conversation">
+          <header class="reading-head">
+            <div>
+              <p class="eyebrow">Open thread</p>
+              <h2>Private access request after card scan</h2>
+              <p>Maya Carter - buyer scan - high intent - owner Gray</p>
+            </div>
+            <div class="reading-actions">
+              <button type="button" data-inbox-action="reply">Reply</button>
+              <button type="button" data-inbox-action="snooze">Snooze</button>
+              <button type="button" data-inbox-action="archive">Archive</button>
+            </div>
+          </header>
+
+          <div class="message-timeline">
+            <article class="timeline-message visitor">
+              <div class="message-meta"><strong>Maya Carter</strong><span>2:14 PM</span></div>
+              <p>I scanned the card. I need the link, the quote, and the clean next step today.</p>
+            </article>
+            <article class="timeline-message operator">
+              <div class="message-meta"><strong>Relay13 operator</strong><span>2:15 PM</span></div>
+              <p>I can route that now. I am attaching your request to a private access record and sending the next step.</p>
+            </article>
+            <article class="timeline-message visitor">
+              <div class="message-meta"><strong>Maya Carter</strong><span>2:16 PM</span></div>
+              <p>Perfect. Use this email and mark the project as urgent. I can meet tomorrow morning.</p>
+            </article>
+          </div>
+
+          <form class="reply-composer" aria-label="Reply composer">
+            <div class="composer-toolbar">
+              <span>Reply as operator</span>
+              <button type="button" data-inbox-action="attach-record">Attach record</button>
+              <button type="button" data-inbox-action="insert-link">Insert link</button>
+            </div>
+            <textarea aria-label="Reply text">Maya, I have your private access room ready. I am sending the quote and a morning slot now.</textarea>
+            <div class="composer-footer">
+              <button type="button" data-inbox-action="save-draft">Save draft</button>
+              <button class="send" type="button" data-inbox-action="send-reply">Send reply</button>
+            </div>
+          </form>
+        </section>
+
+        <aside id="relay-context" class="context-rail" aria-label="Thread context">
+          <section class="context-card identity-card">
+            <p class="eyebrow">Contact</p>
+            <h2>Maya Carter</h2>
+            <p>Buyer lead from card scan. High purchase intent, wants private access today.</p>
+            <dl>
+              <div><dt>Email</dt><dd>maya@northline.example</dd></div>
+              <div><dt>Source</dt><dd>QR card - MetrAIyux 0S</dd></div>
+              <div><dt>Lane</dt><dd>Buyer scans</dd></div>
+              <div><dt>Next step</dt><dd>Send quote and access link</dd></div>
+            </dl>
+          </section>
+          <section class="context-card">
+            <p class="eyebrow">Thread state</p>
+            <ol class="state-list">
+              <li><span></span>Contact captured</li>
+              <li><span></span>Workspace matched</li>
+              <li><span></span>Operator reply drafted</li>
+              <li class="waiting"><span></span>Quote link pending</li>
+            </ol>
+          </section>
+          <section class="context-card">
+            <p class="eyebrow">Tutorial cue</p>
+            <h3>What people get here</h3>
+            <p>This page teaches the product by showing the actual loop: open a message, understand the person, reply, and save the record.</p>
+            <a href="tutorial.html">Show tutorial</a>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <div class="inbox-toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="relay13-inbox.js"></script>
+</body>
+</html>

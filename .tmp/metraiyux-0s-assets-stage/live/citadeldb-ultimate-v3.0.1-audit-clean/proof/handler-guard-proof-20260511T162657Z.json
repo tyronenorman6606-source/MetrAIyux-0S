@@ -1,0 +1,107 @@
+{
+  "ok": true,
+  "generatedAt": "2026-05-11T16:26:57.005Z",
+  "checks": [
+    {
+      "key": "self_service_database_provision",
+      "route": "/admin/self-service/projects/:projectSlug/databases",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/self-service/projects/:projectSlug/databases', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const body = z.object({\n    appSlug: z.string().min(2).max(60),\n    engine: z.string().optional().default('vps-postgres')\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_database_provision', projectSlug });\n  if (!gate) return;\n\n  const project = await query(pool, `SELECT project_slug, max_databases FROM self_service.projects WHERE project_slug = $1`, [projectSlug]);\n  if (project.rowCount === 0) return res.status(404).json({ ok: false, error: 'Project not found' });\n\n  const count = await query(pool, `SELECT count(*)::int AS count FROM self_service.project_databases WHERE project_slug = $1`, [projectSlug]);\n  if (count.rows[0].count >= project.rows[0].max_databases) {\n    return res.status(400).json({ ok: false, error: 'Project database quota reached' });\n  }\n\n  const app = appSlug(`${projectSlug}-${body.appSlug}`);\n  const databaseName = `app_${app}`.slice(0, 60);\n  const roleName = `app_${app}_user`.slice(0, 60);\n  const password = generateAppPasswo"
+    },
+    {
+      "key": "self_service_sql_execute",
+      "route": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/sql', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const app = appSlug(req.params.appSlug);\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    sql: z.string().min(1).max(20000)\n  }).parse(req.body);\n\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'self_service_sql_execute', projectSlug });\n  if (!gate) return;\n\n  const policy = validateSqlForConsole(body.sql);\n  if (!policy.ok) {\n    await query(\n      pool,\n      `INSERT INTO self_service.query_history (project_slug, app_slug, database_name, sql_preview, statement_kind, success, error)\n       VALUES ($1, $2, 'unknown', $3, 'BLOCKED', false, $4)`,\n      [projectSlug, app, sqlPreview(body.sql), policy.error]\n    );\n    return res.status(400).json({ ok: false, error: policy.error });\n  }\n\n  const started = Date.now();\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n\n  try {\n    await client.connect();\n    const dbInfo = await client.query('select current_database() as databas"
+    },
+    {
+      "key": "table_browser_list",
+      "route": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/tables', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_list', projectSlug });\n  if (!gate) return;\n  const body = z.object({ databaseUrl: z.string().min(12).max(4000) }).parse(req.body);\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const tables = await client.query(`\n      SELECT table_schema, table_name\n      FROM information_schema.tables\n      WHERE table_schema NOT IN ('pg_catalog','information_schema')\n      ORDER BY table_schema, table_name\n      LIMIT 250\n    `);\n    res.json({ ok: true, tables: tables.rows });\n  } catch (error) {\n    res.status(500).json({ ok: false, error: redactSecrets(error.message) });\n  } finally {\n    try { await client.end(); } catch {}\n  }\n});\n"
+    },
+    {
+      "key": "table_browser_preview",
+      "route": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": "\n  }\n});\n\napp.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'table_browser_preview', projectSlug });\n  if (!gate) return;\n  const body = z.object({\n    databaseUrl: z.string().min(12).max(4000),\n    schema: z.string().min(1).max(80).default('public'),\n    table: z.string().min(1).max(120),\n    limit: z.number().int().min(1).max(100).optional().default(50)\n  }).parse(req.body);\n\n  const client = new Client({ connectionString: body.databaseUrl, statement_timeout: 8000, connectionTimeoutMillis: 8000 });\n  try {\n    await client.connect();\n    const rows = await client.query(`SELECT * FROM ${sqlIdent(body.schema)}.${sqlIdent(body.table)} LIMIT ${Number(body.limit)}`);\n    res.json({ ok: true, fields: rows.fields?.map(f => f.name) || [], rows: rows.rows, rowCount: rows.rowCount });\n  } catch (error) {\n    res.status(500).json({ ok: false, error: redactSecrets(error.message) });\n  } finally {\n    try { await client.end(); } catch {}\n  }\n});\n\n"
+    },
+    {
+      "key": "branch_request",
+      "route": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.projectSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'branch_request', projectSlug });\n  if (!gate) return;\n  const parentApp = appSlug(req.params.appSlug);\n  const body = z.object({\n    branchSlug: z.string().min(2).max(80),\n    sourceKind: z.enum(['snapshot', 'pitr', 'logical_dump']).optional().default('snapshot'),\n    sourceReference: z.string().optional()\n  }).parse(req.body);\n\n  const branchSlug = appSlug(body.branchSlug);\n  const targetDatabaseName = `branch_${projectSlug}_${branchSlug}`.slice(0, 60);\n  const ctx = upstreamContext(req);\n\n  const result = await query(\n    pool,\n    `INSERT INTO platform.database_branches (project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, requested_by)\n     VALUES ($1, $2, $3, $4, $5, $6, $7)\n     RETURNING project_slug, parent_app_slug, branch_slug, target_database_name, source_kind, source_reference, status, requested_by, created_at`,\n    [projectSlug, parentApp, branchSlug, targetDatab"
+    },
+    {
+      "key": "setup_generate_secrets",
+      "route": "/admin/setup/generate-secrets",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/setup/generate-secrets', requireAdmin, async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'setup_generate_secrets' });\n  if (!gate) return;\n  const secrets = {\n    POSTGRES_PASSWORD: crypto.randomBytes(48).toString('base64url'),\n    GATEWAY_ADMIN_TOKEN: crypto.randomBytes(48).toString('hex'),\n    BACKUP_ENCRYPTION_PASSWORD: crypto.randomBytes(64).toString('base64url')\n  };\n\n  const envBlock = Object.entries(secrets).map(([key, value]) => `${key}=${value}`).join('\\n');\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'setup_secrets_generated', 'setup-wizard', $1::jsonb)`,\n    [JSON.stringify({ keys: Object.keys(secrets) })]\n  );\n\n  res.json({\n    ok: true,\n    secrets,\n    envBlock,\n    warning: 'Generated secrets are returned once for operator convenience. Paste them into .env and store them in a secure password manager.'\n  });\n});\n"
+    },
+    {
+      "key": "guided_proof_action",
+      "route": "/admin/guided/proof-action",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/guided/proof-action', requireAdmin, async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'guided_proof_action' });\n  if (!gate) return;\n\n  const body = z.object({\n    action: z.enum(['backup-now', 'restore-test', 'policy-check', 'backup-manifest', 'object-backup-sync', 'validate-env'])\n  }).parse(req.body);\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ($1, '{}'::jsonb, 'guided-ops-dashboard', 1)\n     RETURNING id, job_type, status, requested_at`,\n    [body.action]\n  );\n\n  await query(\n    pool,\n    `INSERT INTO citadel.audit_events (actor, action, target, metadata)\n     VALUES ('gateway', 'guided_proof_action_enqueued', $1, $2::jsonb)`,\n    [body.action, JSON.stringify({ jobId: job.rows[0].id })]\n  );\n\n  res.status(201).json({ ok: true, job: job.rows[0] });\n});\n"
+    },
+    {
+      "key": "app_lifecycle_action",
+      "route": "/admin/apps/:appSlug/lifecycle-action",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/apps/:appSlug/lifecycle-action', requireAdmin, async (req, res) => {\n  const slug = appSlug(req.params.appSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'app_lifecycle_action', projectSlug: slug });\n  if (!gate) return;\n\n  const body = z.object({\n    action: z.enum(['migration-rehearsal', 'app-backup-now', 'app-restore-test', 'app-diagnostic-bundle', 'app-cutover-note'])\n  }).parse(req.body);\n\n  const result = await query(pool, `SELECT app_slug, database_name, role_name FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const jobTypeMap = {\n    'migration-rehearsal': 'validate-env',\n    'app-backup-now': 'backup-now',\n    'app-restore-test': 'restore-test',\n    'app-diagnostic-bundle': 'policy-check',\n    'app-cutover-note': 'validate-env'\n  };\n  const jobType = jobTypeMap[body.action];\n\n  const job = await query(\n    pool,\n    `INSERT INTO citadel.operator_jobs (job_type, payload, requested_by, max_attempts)\n     VALUES ($1, $2::jsonb, 'app-lifecycle-dashboard', 1)\n     RETURNING id, job_"
+    },
+    {
+      "key": "credential_rotation",
+      "route": "/admin/apps/:appSlug/rotate-credential",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": "  }\n});\n\n\napp.post('/admin/apps/:appSlug/rotate-credential', requireAdmin, async (req, res) => {\n  const projectSlug = appSlug(req.params.appSlug);\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'credential_rotation', projectSlug });\n  if (!gate) return;\n  const slug = appSlug(req.params.appSlug);\n  const result = await query(pool, `SELECT app_slug, database_name, role_name, engine, status FROM citadel.apps WHERE app_slug = $1`, [slug]);\n  if (result.rowCount === 0) return res.status(404).json({ ok: false, error: 'App not found' });\n\n  const appRow = result.rows[0];\n  const password = generateAppPassword();\n  await query(pool, `ALTER ROLE ${sqlIdent(appRow.role_name)} WITH PASSWORD ${sqlLiteral(password)}`);\n\n  const parts = safeConnectionParts({ appSlug: appRow.app_slug, databaseName: appRow.database_name, roleName: appRow.role_name });\n  const databaseUrl = buildDatabaseUrl({ role: appRow.role_name, password, host: parts.host, port: parts.port, database: appRow.database_name });\n\n  await query(pool, `INSERT INTO citadel.audit_events (actor, action, target, metadata) VALUES ('gateway', 'app_credential_rotated', $1, $2::jsonb)`, [slug, JSON.stringify("
+    },
+    {
+      "key": "ai_debug",
+      "route": "/admin/ai/debug",
+      "ok": true,
+      "found": true,
+      "hasRequireCommercialGate": true,
+      "hasRouteKey": true,
+      "hasReturnGate": true,
+      "handlerPreview": " });\n});\n\napp.post('/admin/ai/debug', requireAdmin, async (req, res) => {\n  const gate = await requireCommercialGate({ req, res, pool, query, routeKey: 'ai_debug' });\n  if (!gate) return;\n  const body = z.object({\n    provider: z.enum(['openai', 'gemini']),\n    question: z.string().min(4).max(4000),\n    appSlug: z.string().optional()\n  }).parse(req.body);\n\n  if (!aiEnabled()) {\n    return res.status(400).json({\n      ok: false,\n      error: 'AI_ASSISTANT_ENABLED is not true. Set it in .env before using AI debug.'\n    });\n  }\n\n  let app = null;\n  if (body.appSlug) {\n    const slug = appSlug(body.appSlug);\n    const appResult = await query(\n      pool,\n      `SELECT app_slug, database_name, role_name, engine, status, created_at\n       FROM citadel.apps WHERE app_slug = $1`,\n      [slug]\n    );\n    app = appResult.rows[0] || null;\n  }\n\n  const [readiness, capacity, recentJobs, recentBackups, recentRestores] = await Promise.all([\n    query(pool, `SELECT 'readiness must be fetched through /admin/readiness' AS note`),\n    query(pool, `SELECT pg_database_size(current_database()) AS database_bytes`),\n    query(pool, `SELECT id, job_type, status, requested_at, finished_at, error FROM citade"
+    }
+  ],
+  "failed": []
+}

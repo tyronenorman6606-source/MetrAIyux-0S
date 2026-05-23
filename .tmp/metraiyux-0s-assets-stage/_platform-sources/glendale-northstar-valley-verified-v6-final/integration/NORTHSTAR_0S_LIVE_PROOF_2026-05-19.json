@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-05-20T00:00:54.791Z",
+  "project_root": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/_platform-sources/glendale-northstar-valley-verified-v6-final",
+  "canonical": {
+    "northstar_app": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/index.html",
+    "northstar_base": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/",
+    "northstar_api_base": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/northstar",
+    "northstar_health": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/northstar/health",
+    "valley_root": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/"
+  },
+  "live_checks": {
+    "northstar_health": {
+      "status": 200,
+      "ok": true,
+      "app": "northstar-signinpro",
+      "tables": {
+        "workspaces": 11,
+        "workspace_users": 11,
+        "workspace_states": 11
+      }
+    },
+    "northstar_login_proof": {
+      "status": 200,
+      "workspace": "chicken-n-pickle-westgate",
+      "role": "owner",
+      "session_ok": true
+    },
+    "sampled_valley_overrides": [
+      {
+        "slug": "chicken-n-pickle-westgate",
+        "status": 200,
+        "handoff": "/northstar/index.html?workspace=chicken-n-pickle-westgate"
+      },
+      {
+        "slug": "state-farm-stadium",
+        "status": 200,
+        "handoff": "/northstar/index.html?workspace=state-farm-stadium"
+      },
+      {
+        "slug": "goodyear-ballpark",
+        "status": 200,
+        "handoff": "/northstar/index.html?workspace=goodyear-ballpark"
+      }
+    ]
+  },
+  "workspaces": {
+    "count": 11,
+    "slugs": [
+      "chicken-n-pickle-westgate",
+      "as-you-wish-pottery-westgate",
+      "stir-crazy-comedy-club",
+      "escape-westgate",
+      "dave-and-busters-westgate",
+      "popstroke-westgate",
+      "westgate-entertainment-district",
+      "the-wigwam-resort",
+      "state-farm-stadium",
+      "theaterworks-peoria",
+      "goodyear-ballpark"
+    ],
+    "owner_strategy": "placeholder northstar.local owners upgraded to operator Gmail plus-addresses for live gate ownership",
+    "communication_email": "grayskyes@solenterprises.org"
+  },
+  "deployments": {
+    "fs27": {
+      "deployment_id": "70405f8f-be31-460e-af9b-2b8855937b87",
+      "version_id": "8384cfd3-ad77-4bbe-b02c-7f50027cb02d",
+      "url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/"
+    },
+    "metraiyux_0s": {
+      "deployment_id": "28629ed1-48bb-49ac-a5d8-15570ca2fd92",
+      "version_id": "c22e2193-6714-4132-bd06-03cd1debb226",
+      "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/"
+    }
+  },
+  "receipts": {
+    "live_readiness": "metraiyux_0s_site/_platform-sources/glendale-northstar-valley-verified-v6-final/integration/NORTHSTAR_0S_LIVE_READINESS_2026-05-19.json",
+    "workspace_provisioning_secret": "metraiyux_0s_site/_platform-sources/glendale-northstar-valley-verified-v6-final/integration/NORTHSTAR_0S_WORKSPACE_PROVISIONING_2026-05-19.secret.json"
+  },
+  "note": "NorthStar SignInPro is now mounted inside the 0S as a gate-owned, free99-but-rate-limited shared platform. Valley business overrides should use these custom landing pages and hand off into workspace-specific NorthStar routes instead of generator-only fallback pages."
+}

@@ -7,7 +7,7 @@ Usage: python3 cf_pages_deploy.py <project_name> <directory>
 import sys, os, hashlib, mimetypes, json, base64
 import urllib.request, urllib.error
 
-CF_TOKEN   = "cfat_MaP6YebiiwtqWwdkYcGYbjjXPwZricYs24gFSo9N9e24460f"
+CF_TOKEN   = "cfat_piHgsOaeLV5FrRwqdQhE9Aphp3Kgplj8gS6MxZSmef3ffcd8"
 CF_ACCOUNT = "e700b92580cd05de0104128efbd3e676"
 API        = "https://api.cloudflare.com/client/v4"
 
@@ -17,10 +17,12 @@ HEADERS = {
 
 SKIP = {'.git', '.DS_Store', 'node_modules', '.deploy-trigger'}
 
-def api(method, path, data=None, json_body=None):
+def api(method, path, data=None, json_body=None, extra_headers=None):
     url = f"{API}{path}"
     body = None
     headers = dict(HEADERS)
+    if extra_headers:
+        headers.update(extra_headers)
     if json_body is not None:
         body = json.dumps(json_body).encode()
         headers["Content-Type"] = "application/json"
@@ -52,99 +54,77 @@ def collect_files(directory):
             files[rel] = full
     return files
 
-def build_multipart(fields, boundary):
-    parts = []
-    for name, (filename, content, mime) in fields.items():
-        parts.append(
-            f'--{boundary}\r\n'
-            f'Content-Disposition: form-data; name="{name}"; filename="{filename}"\r\n'
-            f'Content-Type: {mime}\r\n\r\n'.encode()
-        )
-        parts.append(content if isinstance(content, bytes) else content.encode())
-        parts.append(b'\r\n')
-    parts.append(f'--{boundary}--\r\n'.encode())
-    return b''.join(p if isinstance(p, bytes) else p.encode() for p in parts)
-
 def deploy(project, directory):
     print(f"\n→ Deploying {directory} → {project}")
 
     files = collect_files(directory)
     print(f"  {len(files)} files collected")
 
-    # Step 1 — get upload URL (new deployment slot)
-    resp = api("POST", f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments")
+    # Build manifest {path: sha256} and cache file contents
+    manifest = {}
+    file_data = {}
+    for rel, full in files.items():
+        h = file_hash(full)
+        manifest[rel] = h
+        file_data[h] = full
+
+    # Step 1 — create deployment with manifest (CF Pages v4 API requires manifest upfront)
+    resp = api("POST",
+        f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments",
+        json_body={"manifest": manifest}
+    )
     if not resp.get('success'):
-        # Try the upload endpoint instead
-        resp = api("POST", f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/uploads")
-        if not resp.get('success'):
-            print("  FAIL creating deployment:", resp.get('errors'))
-            return False
+        print("  FAIL creating deployment:", resp.get('errors'))
+        return False
 
-    dep = resp.get('result', {})
-    upload_url = dep.get('upload_url') or dep.get('jwt')
+    dep    = resp.get('result', {})
     dep_id = dep.get('id', '')
+    jwt    = dep.get('jwt', '')
     print(f"  deployment id: {dep_id}")
-    print(f"  upload_url present: {bool(upload_url)}")
 
-    # Step 2 — upload files in batches using the JWT-based upload endpoint
-    # CF Pages uses: POST /pages/assets/upload with JWT auth
-    jwt = upload_url or dep.get('jwt')
+    # Step 2 — find which files CF still needs
+    check = api("POST",
+        f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}/check-missing",
+        json_body=list(manifest.values())
+    )
+    missing = set(check.get('result') or [])
+    if not missing:
+        missing = set(manifest.values())  # upload all if check-missing unavailable
+    print(f"  {len(missing)} files to upload")
 
-    if not jwt:
-        print("  No upload JWT — trying manifest-based upload")
-        # Build manifest: {file_path: sha256_hash}
-        manifest = {}
-        file_data = {}
-        for rel, full in files.items():
-            h = file_hash(full)
-            manifest[rel] = h
-            file_data[h] = full
+    # Step 3 — upload missing files in batches of 20
+    BATCH = 20
+    items = [(h, file_data[h]) for h in missing if h in file_data]
+    for i in range(0, len(items), BATCH):
+        batch = items[i:i+BATCH]
+        payload = []
+        for h, full in batch:
+            mime = mimetypes.guess_type(full)[0] or 'application/octet-stream'
+            with open(full, 'rb') as f:
+                content = base64.b64encode(f.read()).decode()
+            payload.append({"key": h, "value": content, "metadata": {"contentType": mime}, "base64": True})
 
-        # Check which files CF needs
-        check_resp = api("POST",
-            f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}/check-missing",
-            json_body=list(manifest.values())
+        up_headers = {"Authorization": f"Bearer {jwt}"} if jwt else {}
+        up = api("POST",
+            f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}/upload-assets",
+            json_body=payload,
+            extra_headers=up_headers if jwt else None
         )
-        missing_hashes = set(check_resp.get('result') or manifest.values())
-        print(f"  {len(missing_hashes)} files need uploading")
+        status = "✓" if up.get('success') else f"FAIL {up.get('errors')}"
+        print(f"  batch {i//BATCH+1}: {status}")
 
-        # Upload missing files
-        BATCH = 20
-        hash_to_rel = {v: k for k, v in manifest.items()}
-        missing_files = {h: file_data[h] for h in missing_hashes if h in file_data}
-
-        items = list(missing_files.items())
-        for i in range(0, len(items), BATCH):
-            batch = items[i:i+BATCH]
-            fields = {}
-            for h, full in batch:
-                mime = mimetypes.guess_type(full)[0] or 'application/octet-stream'
-                with open(full, 'rb') as f:
-                    content = f.read()
-                encoded = base64.b64encode(content).decode()
-                fields[h] = encoded
-
-            up = api("POST",
-                f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}/upload-assets",
-                json_body=fields
-            )
-            if not up.get('success'):
-                print(f"  FAIL uploading batch {i//BATCH+1}:", up.get('errors'))
-
-        # Finalize
-        fin = api("PATCH",
-            f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}",
-            json_body={"manifest": manifest}
-        )
-        if fin.get('success'):
-            r = fin.get('result', {})
-            print(f"  ✓ Deployed: {r.get('url', 'ok')}")
-            return True
-        else:
-            print("  FAIL finalizing:", fin.get('errors'))
-            return False
-
-    return False
+    # Step 4 — finalize deployment
+    fin = api("PATCH",
+        f"/accounts/{CF_ACCOUNT}/pages/projects/{project}/deployments/{dep_id}",
+        json_body={"manifest": manifest}
+    )
+    if fin.get('success'):
+        r = fin.get('result', {})
+        print(f"  ✓ Live: {r.get('url', 'deployed')}")
+        return True
+    else:
+        print("  FAIL finalizing:", fin.get('errors'))
+        return False
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

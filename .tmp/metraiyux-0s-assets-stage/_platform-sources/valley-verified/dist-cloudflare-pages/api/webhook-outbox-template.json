@@ -1,0 +1,32 @@
+{
+  "version": "17.0.0",
+  "generated_at": "2026-05-19T05:43:32.106Z",
+  "mode": "outbox_only_no_provider_lockin",
+  "why": "The platform creates signed webhook jobs but does not pretend to send SMS/email/CRM updates until providers are wired.",
+  "job_shape": {
+    "job_id": "webhook-<sha256>",
+    "status": "pending",
+    "target": "platform-webhook",
+    "event_type": "action.queued",
+    "attempts": 0,
+    "headers": {
+      "x-phx-event": "action.queued",
+      "x-phx-signature": "hmac-sha256"
+    },
+    "body": {
+      "action_id": "...",
+      "action_type": "owner_claim",
+      "payload": {
+        "queue": "owner-claims",
+        "risk_level": "medium"
+      }
+    }
+  },
+  "recommended_targets": [
+    "CRM sync endpoint",
+    "AE notification endpoint",
+    "owner claim notification endpoint",
+    "lead routing notification endpoint",
+    "billing/exposure-product intent endpoint"
+  ]
+}

@@ -4,6 +4,14 @@ import path from 'node:path';
 const root = path.resolve(process.cwd(), 'metraiyux_0s_site');
 const output = path.join(root, 'assets', 'skyeway-routes.js');
 const htmlExt = /\.(html|htm)$/i;
+const skippedRoutePatterns = [
+  /^_platform-sources(?:\/|$)/,
+  /^cloudflare(?:-[^/]+)?(?:\/|$)/,
+  /^api(?:\/|$)/,
+  /(?:^|\/)(?:src|server|scripts|smoke|tests?|proof)(?:\/|$)/,
+  /(?:^|\/)(?:netlify|migrations|runtime\/data|runtime\/db|runtime\/state)(?:\/|$)/,
+  /^Free99\/apps\/sovereigndocs\/(?:template-library|templates|build)(?:\/|$)/
+];
 
 const platformRoots = new Set([
   'Auren',
@@ -53,8 +61,26 @@ const proofRoots = new Set([
   'proof-vault',
   'quantum-ops',
   'sentinel',
-  'sentinel-os'
+  'sentinel-os',
+  'skye-vault-os'
 ]);
+
+const externalRoutes = [
+  [
+    'https://merser-mcp.pages.dev/',
+    'Merser MCP by Skyes Over London',
+    'MCP and Developer Tools',
+    'remote-mcp',
+    'fs27-gated-remote-mcp'
+  ],
+  [
+    'https://merser-mcp.pages.dev/health',
+    'Merser MCP Health',
+    'MCP and Developer Tools',
+    'remote-mcp',
+    'fs27-gated-remote-mcp'
+  ]
+];
 
 const governanceRoots = new Set([
   'certification-readiness',
@@ -157,6 +183,7 @@ function categoryFor(routePath) {
   if (routePath === 'skyeway.html') return 'SkyeWay';
   if (!second) return 'Root';
   if (rootName === '_platform-sources') return 'Source Mirrors';
+  if (rootName === 'client-app-factory' && second === 'client-apps') return 'Client Apps';
   if (rootName === 'Free99' && second === 'apps' && third === 'sovereigndocs') return 'SovereignDocs';
   if (rootName === 'Free99') return 'Free99 Apps';
   if (rootName === 'valley-verified' && second === 'business') return 'Valley Verified Businesses';
@@ -185,13 +212,31 @@ function folderFor(routePath) {
   return parts.length > 1 ? parts[0] : 'root';
 }
 
+function shouldSkipRoute(routePath) {
+  return skippedRoutePatterns.some(pattern => pattern.test(routePath));
+}
+
+function gatePolicyFor(routePath) {
+  if (routePath === 'skyeway.html') return 'fs27-owner-gated';
+  if (routePath.startsWith('client-app-factory/client-apps/')) return 'fs27-owner-gated-client-app';
+  if (routePath.startsWith('Free99/apps/')) return 'fs27-free99-gated-app';
+  if (routePath.startsWith('Free99/')) return 'fs27-free99-gated';
+  if (routePath.startsWith('admin/')) return 'fs27-owner-gated-admin';
+  if (routePath.startsWith('valley-verified/business/')) return 'public-valley-profile';
+  if (routePath.startsWith('valley-verified/')) return 'fs27-gated-valley-ops';
+  if (routePath.startsWith('live/')) return 'fs27-gated-live-surface';
+  return 'fs27-owner-gated';
+}
+
 const routes = walk(root)
   .map(file => path.relative(root, file).split(path.sep).join('/'))
+  .filter(routePath => !shouldSkipRoute(routePath))
   .sort((a, b) => a.localeCompare(b))
   .map(routePath => {
     const file = path.join(root, routePath);
-    return [routePath, titleFor(file, routePath), categoryFor(routePath), folderFor(routePath)];
-  });
+    return [routePath, titleFor(file, routePath), categoryFor(routePath), folderFor(routePath), gatePolicyFor(routePath)];
+  })
+  .concat(externalRoutes);
 
 const categories = routes.reduce((counts, route) => {
   counts[route[2]] = (counts[route[2]] || 0) + 1;
@@ -200,6 +245,8 @@ const categories = routes.reduce((counts, route) => {
 
 const payload = JSON.stringify({
   generatedAt: new Date().toISOString(),
+  gateAuthority: 'FS27 / 0S owner gate',
+  gateRule: 'All 0S mounted app and platform routes require the FS27/0S gate unless explicitly marked as a public Valley profile or public proof/documentation route.',
   total: routes.length,
   categories,
   routes

@@ -1,0 +1,1 @@
+(() => { window.techbrosDropIn = { business: "Techbros Electronic Recycling & ITAD", openIntake: () => { location.href = '/quote.html'; } }; })();

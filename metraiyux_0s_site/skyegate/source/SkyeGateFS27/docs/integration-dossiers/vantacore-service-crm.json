@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-05-19T22:45:00Z",
+  "app_id": "vantacore-service-crm",
+  "app_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/_platform-sources/vanta-core-mvp-master",
+  "gate_project_path": "/workspaces/MetrAIyux-0S/SkyeGateFS27",
+  "gate_env_var": "SKYGATEFS27_ORIGIN",
+  "summary": {
+    "status": "actual_workspace_integrated_with_gate_boundary",
+    "workspace": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/vantacore-crm",
+    "api_base": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/api/vantacore/crm",
+    "local_build": "passed",
+    "preflight": "20/20 passed",
+    "actual_crm_browser_workflow": "passed",
+    "browser_ownership_sweep": "18/18 passed",
+    "stress": "240 requests, 0 failures",
+    "protected_worker": "https://vantacore.graylondonskyes.workers.dev/"
+  },
+  "recommendations": [
+    "Route primary identity through SkyeGateFS27 `/auth/*`, `/oauth/*`, and `/.well-known/*`.",
+    "Set SKYGATEFS27_ORIGIN in the consumer runtime so VantaCore can call the deployed SkyeGateFS27/FS27 gate.",
+    "Use the FS27-owned VantaCore CRM workspace for current customer-visible lead, booking, follow-up, review, summary, and activity operations.",
+    "Mirror customer workspace activation, provider activation, admin decisions, and proof runs into the parent gate audit/usage tables through `/platform/events` with source_app `vantacore-service-crm`.",
+    "Keep provider secrets, payment authority, telephony, email, calendar, storage, and VANTA13 credentials server-side or operator-only."
+  ]
+}

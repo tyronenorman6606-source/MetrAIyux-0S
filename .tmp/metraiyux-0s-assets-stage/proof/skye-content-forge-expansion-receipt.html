@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof receipt for the MetrAIyux 0S Skye Content Forge Free99 gated expansion.">
+  <title>Skye Content Forge Expansion Receipt · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S Proof</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../live/skye-content-forge-publisher.html">Hub</a>
+      <a href="http://localhost:4399/">App</a>
+      <a href="../saas/pricing.html#skyecontentforge-free99">Pricing</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero">
+      <p class="eyebrow">Free99 gated expansion receipt</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Skye Content Forge was imported as a Free99, gated content platform.</h1>
+      <p class="hero-copy">The no-charge content repurposer is now represented across the 0S, pricing, SaaS selector, admin, proof, and Stripe catalog surfaces. The app still requires a gate session before dashboard boot and API usage.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="../live/skye-content-forge-publisher.html">Open expansion hub</a>
+        <a class="button" href="http://localhost:4399/">Open running gated app</a>
+        <a class="button" href="../saas/pricing.html#skyecontentforge-free99">Open Free99 card</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Receipt checks</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>App inventory</td><td>Passed</td><td><code>skye-content-repurposer-local</code> includes server, public app, JSON state, scheduler, Docker, Netlify, Cloudflare, PM2, systemd, and docs.</td></tr>
+            <tr><td>Gate session</td><td>Passed</td><td>The app loads <code>public/gate-session.js</code>, labels Free99 as no charge, and requires a 0S/FS27/SkyGate/local admin gate session before boot.</td></tr>
+            <tr><td>API auth boundary</td><td>Passed</td><td>The server rejects ungated <code>/api/health</code> requests with 401 when the gate is enabled and accepts the configured gate token.</td></tr>
+            <tr><td>Smoke test</td><td>Passed</td><td><code>npm run smoke</code> starts the local server, checks protected API routes, source registry, export, queue, scheduler tick, static rebuild, app HTML, storage, and Free99 wording.</td></tr>
+            <tr><td>Browser gate proof</td><td>Passed</td><td><code>test-artifacts/skye-content-forge-e2e/browser-qa.json</code> records desktop gate copy, local admin unlock, mobile gate rendering, no horizontal overflow, authenticated runtime, scheduler token proof, and nonblank living-background pixels.</td></tr>
+            <tr><td>Action recording</td><td>Passed</td><td><code>test-artifacts/skye-content-forge-e2e/content-forge-gate-unlock-workflow.webm</code> records the browser opening the gate, unlocking the Free99 session, checking the engine, and scrolling the dashboard. Playback is verified through <code>video-proof.html</code>.</td></tr>
+            <tr><td>Root env import</td><td>Passed</td><td>The app now loads repo-root <code>.env</code>, then app-local <code>.env</code>, and normalizes 0S aliases such as <code>GOOGLE_CLIENT_EMAIL</code>, <code>BACKUPS_FOLDER_ID</code>, <code>personal_access_token</code>, <code>netlify_personal_access_token</code>, and <code>cloudflare_api_token</code>.</td></tr>
+            <tr><td>OpenAI generation</td><td>Passed</td><td>The live <code>/api/repurpose</code> route returned 200 using the root OpenAI key, saved draft <code>30b197b6-7bf5-401c-9617-b77c0a1813ca</code>, and produced a 7,922-character Markdown asset with compliance notes.</td></tr>
+            <tr><td>SkyeVault/R2 route</td><td>Passed</td><td>The live <code>/api/export/skyevault-r2</code> route wrote Markdown into Cloudflare R2 bucket <code>client-drop-vault</code> under <code>content-forge-exports</code> and returned a signed download URL.</td></tr>
+            <tr><td>Publisher R2 target</td><td>Passed</td><td>The scheduled publisher accepted target <code>skyevault-r2</code>, processed item <code>439246bc-6c0a-4cb1-b4eb-e71d02c0085d</code>, and stored a published Markdown object in SkyeVault/R2.</td></tr>
+            <tr><td>Google Drive route</td><td>Legacy optional</td><td>Google Drive credentials load, but the current service-account target is a normal My Drive folder and Google blocks service-account storage ownership there. Use a Shared Drive/delegated OAuth if the legacy Drive path is needed; SkyeVault/R2 is now the primary cloud storage lane.</td></tr>
+            <tr><td>MCP audit pass</td><td>Passed</td><td>The local MCP receipts were regenerated. The app keeps MCP browser effects in <code>public/mcp-effects.js</code> while the Cloudflare scheduler worker remains worker-safe.</td></tr>
+            <tr><td>Commercial posture</td><td>Passed</td><td>The rate card says Free99, $0/month, $0 setup, no paid checkout, no charge, and gate session required.</td></tr>
+            <tr><td>Provider boundary</td><td>Passed</td><td>OpenAI generation and SkyeVault/R2 storage are verified. GitHub backup, Netlify/Cloudflare deployment, optional Google Drive, and social publishing still depend on each provider accepting the configured account, folder, repo, hook, project, approval, and OAuth permissions.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Honest boundary</h2>
+      <p class="wide">Skye Content Forge proves local app wiring, gate-session enforcement, scheduler route shape, JSON persistence, root env import, OpenAI generation, local export, SkyeVault/R2 upload, scheduled R2 publishing, static rebuild, and backup/deploy/publishing control surfaces. The legacy Google Drive path remains optional for Shared Drive or delegated OAuth setups. GitHub backup, Netlify/Cloudflare deployment, and social posting still require the matching provider permissions and account approvals before live claims.</p>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S · Skye Content Forge Free99 expansion receipt.</p></footer>
+  <script src="../script.js"></script>
+</body>
+</html>

@@ -1,12 +1,12 @@
 {
   "version": "20.0.0",
-  "generated_at": "2026-05-18T21:43:39.898Z",
+  "generated_at": "2026-05-20T13:15:16.758Z",
   "purpose": "Ranks quote/lead requests against seeded businesses, stages quote_request and lead_route_decision actions, and keeps delivery claims separate from routing suggestions.",
   "service": {
     "version": "20.0.0",
     "endpoints": [
-      "/.netlify/functions/phx-lead",
-      "/.netlify/functions/phx-admin operation=route_lead"
+      "/valley-verified/.netlify/functions/phx-lead",
+      "/valley-verified/.netlify/functions/phx-admin operation=route_lead"
     ],
     "actions": [
       "quote_request",
@@ -101,21 +101,21 @@
   "sample_lead": {
     "buyer_name": "Sample Buyer",
     "buyer_contact": "buyer@example.com",
-    "city": "Tempe",
-    "category": "Video Production",
-    "details": "Need Video Production help from verified local providers with a clear response path.",
+    "city": "Phoenix",
+    "category": "Haircuts",
+    "details": "Need Haircuts help from verified local providers with a clear response path.",
     "timeline": "this week",
     "budget": "open"
   },
   "sample_route": {
-    "lead_id": "lead-58574820c464cc40c7f1c385",
+    "lead_id": "lead-7c5a5fff2affa409c6a263b8",
     "selected": [
       {
-        "business_id": "arclight-event-films-tempe-85281-04b822a",
-        "name": "ArcLight Event Films",
-        "city": "Tempe",
-        "category": "Video Production",
-        "score": 113,
+        "business_id": "fade-masters-phx",
+        "name": "Fade Masters PHX",
+        "city": "Phoenix",
+        "category": "Haircuts",
+        "score": 115,
         "reasons": [
           "same city",
           "category/niche match",
@@ -124,17 +124,33 @@
           "business verified badge",
           "routable contact path",
           "accepts requests",
-          "high verification score",
-          "moderation flags present"
+          "high verification score"
         ],
         "contact_ready": true,
-        "url": "/business/arclight-event-films-tempe-85281-04b822a/"
+        "url": "/valley-verified/business/fade-masters-phx/"
       },
       {
-        "business_id": "arizona-state-university-tempe-education-childcare-d5b33c6",
-        "name": "Arizona State University",
-        "city": "Tempe",
-        "category": "Education And Childcare",
+        "business_id": "empire-pallets-phoenix",
+        "name": "Empire Pallets",
+        "city": "Phoenix",
+        "category": "Business Services",
+        "score": 74,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "business verified badge",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/empire-pallets-phoenix/"
+      },
+      {
+        "business_id": "amazon-phoenix-major-employer-adc4ff0",
+        "name": "Amazon",
+        "city": "Phoenix",
+        "category": "Major Employers",
         "score": 66,
         "reasons": [
           "same city",
@@ -144,320 +160,311 @@
           "accepts requests"
         ],
         "contact_ready": true,
-        "url": "/business/arizona-state-university-tempe-education-childcare-d5b33c6/"
-      },
-      {
-        "business_id": "desert-frame-studio",
-        "name": "Desert Frame Studio",
-        "city": "Tempe",
-        "category": "Photography",
-        "score": 60,
-        "reasons": [
-          "same city",
-          "business verified badge",
-          "routable contact path",
-          "accepts requests",
-          "high verification score",
-          "moderation flags present"
-        ],
-        "contact_ready": true,
-        "url": "/business/desert-frame-studio/"
-      },
-      {
-        "business_id": "bobs-smoke-shop-litchfield-park",
-        "name": "Bob's Smoke Shop",
-        "city": "Litchfield Park",
-        "category": "Retail And Specialty",
-        "score": 39,
-        "reasons": [
-          "details keyword overlap",
-          "featured supply",
-          "business verified badge",
-          "routable contact path",
-          "accepts requests"
-        ],
-        "contact_ready": true,
-        "url": "/business/bobs-smoke-shop-litchfield-park/"
-      },
-      {
-        "business_id": "empire-pallets-phoenix",
-        "name": "Empire Pallets",
-        "city": "Phoenix",
-        "category": "Business Services",
-        "score": 39,
-        "reasons": [
-          "details keyword overlap",
-          "featured supply",
-          "business verified badge",
-          "routable contact path",
-          "accepts requests"
-        ],
-        "contact_ready": true,
-        "url": "/business/empire-pallets-phoenix/"
-      },
-      {
-        "business_id": "az-exotic-bird-supplies-tempe-85281-1b0259a",
-        "name": "Az Exotic Bird Supplies",
-        "city": "Tempe",
-        "category": "Retail And Specialty",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/az-exotic-bird-supplies-tempe-85281-1b0259a/"
-      },
-      {
-        "business_id": "hulxe-constructions-services-tempe-85282-ee048b2",
-        "name": "Hulxe Constructions Services",
-        "city": "Tempe",
-        "category": "Home Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/hulxe-constructions-services-tempe-85282-ee048b2/"
-      },
-      {
-        "business_id": "integrity-building-corp-tempe-85282-2dbf93a",
-        "name": "Integrity Building Corp",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/integrity-building-corp-tempe-85282-2dbf93a/"
-      }
-    ],
-    "alternates": [
-      {
-        "business_id": "nexus-alarm-and-suppression-inc-tempe-85283-247f88d",
-        "name": "Nexus Alarm And Suppression, Inc.",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/nexus-alarm-and-suppression-inc-tempe-85283-247f88d/"
-      },
-      {
-        "business_id": "sundial-solar-tempe-85282-9b3de0b",
-        "name": "Sundial Solar",
-        "city": "Tempe",
-        "category": "Home Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/sundial-solar-tempe-85282-9b3de0b/"
-      },
-      {
-        "business_id": "sunstate-mechanical-services-tempe-85282-cfd491e",
-        "name": "Sunstate Mechanical Services",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/sunstate-mechanical-services-tempe-85282-cfd491e/"
-      },
-      {
-        "business_id": "suntria-tempe-85282-815c1c5",
-        "name": "Suntria",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/suntria-tempe-85282-815c1c5/"
-      },
-      {
-        "business_id": "temcon-concrete-construction-tempe-85284-1dcac37",
-        "name": "Temcon Concrete Construction",
-        "city": "Tempe",
-        "category": "Home Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/temcon-concrete-construction-tempe-85284-1dcac37/"
-      },
-      {
-        "business_id": "tlw-construction-tempe-85284-c9880f2",
-        "name": "Tlw Construction",
-        "city": "Tempe",
-        "category": "Home Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/tlw-construction-tempe-85284-c9880f2/"
-      },
-      {
-        "business_id": "victory-steel-llc-tempe-85284-2fb98c7",
-        "name": "Victory Steel Llc",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/victory-steel-llc-tempe-85284-2fb98c7/"
-      },
-      {
-        "business_id": "vortex-industries-llc-tempe-85284-bb6f757",
-        "name": "Vortex Industries, Llc",
-        "city": "Tempe",
-        "category": "Business Services",
-        "score": 34,
-        "reasons": [
-          "same city",
-          "details keyword overlap",
-          "accepts requests",
-          "thin contact data",
-          "moderation flags present"
-        ],
-        "contact_ready": false,
-        "url": "/business/vortex-industries-llc-tempe-85284-bb6f757/"
-      },
-      {
-        "business_id": "fade-masters-phx",
-        "name": "Fade Masters PHX",
-        "city": "Phoenix",
-        "category": "Haircuts",
-        "score": 33,
-        "reasons": [
-          "featured supply",
-          "business verified badge",
-          "routable contact path",
-          "accepts requests",
-          "high verification score"
-        ],
-        "contact_ready": true,
-        "url": "/business/fade-masters-phx/"
-      },
-      {
-        "business_id": "amazon-phoenix-major-employer-adc4ff0",
-        "name": "Amazon",
-        "city": "Phoenix",
-        "category": "Major Employers",
-        "score": 31,
-        "reasons": [
-          "details keyword overlap",
-          "featured supply",
-          "routable contact path",
-          "accepts requests"
-        ],
-        "contact_ready": true,
-        "url": "/business/amazon-phoenix-major-employer-adc4ff0/"
+        "url": "/valley-verified/business/amazon-phoenix-major-employer-adc4ff0/"
       },
       {
         "business_id": "american-express-phoenix-legal-financial-services-accebed",
         "name": "American Express",
         "city": "Phoenix",
         "category": "Legal And Financial",
-        "score": 31,
+        "score": 66,
         "reasons": [
+          "same city",
           "details keyword overlap",
           "featured supply",
           "routable contact path",
           "accepts requests"
         ],
         "contact_ready": true,
-        "url": "/business/american-express-phoenix-legal-financial-services-accebed/"
+        "url": "/valley-verified/business/american-express-phoenix-legal-financial-services-accebed/"
       },
       {
         "business_id": "avnet-phoenix-contractor-home-service-014d78b",
         "name": "Avnet",
         "city": "Phoenix",
         "category": "Home Services",
-        "score": 31,
+        "score": 66,
         "reasons": [
+          "same city",
           "details keyword overlap",
           "featured supply",
           "routable contact path",
           "accepts requests"
         ],
         "contact_ready": true,
-        "url": "/business/avnet-phoenix-contractor-home-service-014d78b/"
+        "url": "/valley-verified/business/avnet-phoenix-contractor-home-service-014d78b/"
+      },
+      {
+        "business_id": "banner-health-phoenix-healthcare-wellness-e134708",
+        "name": "Banner Health",
+        "city": "Phoenix",
+        "category": "Health And Care",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/banner-health-phoenix-healthcare-wellness-e134708/"
+      },
+      {
+        "business_id": "dignity-health-phoenix-healthcare-wellness-449a910",
+        "name": "Dignity Health",
+        "city": "Phoenix",
+        "category": "Health And Care",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/dignity-health-phoenix-healthcare-wellness-449a910/"
+      },
+      {
+        "business_id": "freeport-mcmoran-phoenix-major-employer-5d1daf7",
+        "name": "Freeport-McMoRan",
+        "city": "Phoenix",
+        "category": "Major Employers",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/freeport-mcmoran-phoenix-major-employer-5d1daf7/"
+      }
+    ],
+    "alternates": [
+      {
+        "business_id": "honeywell-aerospace-phoenix-salon-personal-care-5eb247f",
+        "name": "Honeywell Aerospace",
+        "city": "Phoenix",
+        "category": "Beauty And Wellness",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/honeywell-aerospace-phoenix-salon-personal-care-5eb247f/"
+      },
+      {
+        "business_id": "phoenix-children-s-hospital-phoenix-healthcare-wellness-79b5f94",
+        "name": "Phoenix Children’s Hospital",
+        "city": "Phoenix",
+        "category": "Health And Care",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/phoenix-children-s-hospital-phoenix-healthcare-wellness-79b5f94/"
+      },
+      {
+        "business_id": "republic-services-phoenix-business-professional-services-8a067e4",
+        "name": "Republic Services",
+        "city": "Phoenix",
+        "category": "Business Services",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/republic-services-phoenix-business-professional-services-8a067e4/"
+      },
+      {
+        "business_id": "sprouts-farmers-market-phoenix-retail-specialty-store-10c03b9",
+        "name": "Sprouts Farmers Market",
+        "city": "Phoenix",
+        "category": "Retail And Specialty",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/sprouts-farmers-market-phoenix-retail-specialty-store-10c03b9/"
+      },
+      {
+        "business_id": "state-of-arizona-phoenix-major-employer-d1d307f",
+        "name": "State of Arizona",
+        "city": "Phoenix",
+        "category": "Major Employers",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/state-of-arizona-phoenix-major-employer-d1d307f/"
+      },
+      {
+        "business_id": "usaa-phoenix-legal-financial-services-7ae1e09",
+        "name": "USAA",
+        "city": "Phoenix",
+        "category": "Legal And Financial",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/usaa-phoenix-legal-financial-services-7ae1e09/"
+      },
+      {
+        "business_id": "wells-fargo-phoenix-legal-financial-services-e21b245",
+        "name": "Wells Fargo",
+        "city": "Phoenix",
+        "category": "Legal And Financial",
+        "score": 66,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/wells-fargo-phoenix-legal-financial-services-e21b245/"
+      },
+      {
+        "business_id": "alerus-phoenix-85008-783cb2b",
+        "name": "Alerus",
+        "city": "Phoenix",
+        "category": "Legal And Financial",
+        "score": 64,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/alerus-phoenix-85008-783cb2b/"
+      },
+      {
+        "business_id": "apartment-hunters-phoenix-85051-4a7265c",
+        "name": "Apartment Hunters",
+        "city": "Phoenix",
+        "category": "Real Estate And Property",
+        "score": 64,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/apartment-hunters-phoenix-85051-4a7265c/"
+      },
+      {
+        "business_id": "arizona-alliance-for-community-health-centers-phoenix-85034-c9af822",
+        "name": "Arizona Alliance for Community Health Centers",
+        "city": "Phoenix",
+        "category": "Health And Care",
+        "score": 64,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/arizona-alliance-for-community-health-centers-phoenix-85034-c9af822/"
+      },
+      {
+        "business_id": "austin-commercial-l-p-phoenix-85027-474a9c5",
+        "name": "Austin Commercial, L.P.",
+        "city": "Phoenix",
+        "category": "Home Services",
+        "score": 64,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/austin-commercial-l-p-phoenix-85027-474a9c5/"
+      },
+      {
+        "business_id": "aventura-catering-phoenix-85004-352fe2c",
+        "name": "Aventura Catering",
+        "city": "Phoenix",
+        "category": "Food And Events",
+        "score": 64,
+        "reasons": [
+          "same city",
+          "details keyword overlap",
+          "featured supply",
+          "routable contact path",
+          "accepts requests",
+          "moderation flags present"
+        ],
+        "contact_ready": true,
+        "url": "/valley-verified/business/aventura-catering-phoenix-85004-352fe2c/"
       }
     ],
     "decision": {
-      "lead_id": "lead-58574820c464cc40c7f1c385",
+      "lead_id": "lead-7c5a5fff2affa409c6a263b8",
       "business_ids": [
-        "arclight-event-films-tempe-85281-04b822a",
-        "arizona-state-university-tempe-education-childcare-d5b33c6",
-        "desert-frame-studio",
-        "bobs-smoke-shop-litchfield-park",
+        "fade-masters-phx",
         "empire-pallets-phoenix",
-        "az-exotic-bird-supplies-tempe-85281-1b0259a",
-        "hulxe-constructions-services-tempe-85282-ee048b2",
-        "integrity-building-corp-tempe-85282-2dbf93a"
+        "amazon-phoenix-major-employer-adc4ff0",
+        "american-express-phoenix-legal-financial-services-accebed",
+        "avnet-phoenix-contractor-home-service-014d78b",
+        "banner-health-phoenix-healthcare-wellness-e134708",
+        "dignity-health-phoenix-healthcare-wellness-449a910",
+        "freeport-mcmoran-phoenix-major-employer-5d1daf7"
       ],
       "route_reason": "Top 8 matches by city/category/contact readiness/verification signals.",
-      "assigned_to": "ae-tempe-video-production",
-      "city": "Tempe",
-      "category": "Video Production",
-      "score_summary": "arclight-event-films-tempe-85281-04b822a:113|arizona-state-university-tempe-education-childcare-d5b33c6:66|desert-frame-studio:60|bobs-smoke-shop-litchfield-park:39|empire-pallets-phoenix:39|az-exotic-bird-supplies-tempe-85281-1b0259a:34|hulxe-constructions-services-tempe-85282-ee048b2:34|integrity-building-corp-tempe-85282-2dbf93a:34",
+      "assigned_to": "ae-phoenix-haircuts",
+      "city": "Phoenix",
+      "category": "Haircuts",
+      "score_summary": "fade-masters-phx:115|empire-pallets-phoenix:74|amazon-phoenix-major-employer-adc4ff0:66|american-express-phoenix-legal-financial-services-accebed:66|avnet-phoenix-contractor-home-service-014d78b:66|banner-health-phoenix-healthcare-wellness-e134708:66|dignity-health-phoenix-healthcare-wellness-449a910:66|freeport-mcmoran-phoenix-major-employer-5d1daf7:66",
       "sla": "next_business_day",
       "notes": "Route candidates require AE/admin approval before owner delivery."
     },
-    "generated_at": "2026-05-18T21:43:41.423Z",
-    "total_candidates": 26415,
-    "considered": 31
+    "generated_at": "2026-05-20T13:15:16.866Z",
+    "total_candidates": 339,
+    "considered": 327
   },
   "anti_theater_rules": [
     "A route is not a delivered lead.",

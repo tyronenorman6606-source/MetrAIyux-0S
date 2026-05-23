@@ -1,0 +1,89 @@
+{
+  "version": "0.7.0",
+  "default_engine": "citadel-postgres",
+  "public_architecture_rule": "Public/product surfaces use CitadelDB engine names only. Upstream implementation names belong in internal research/vendor notes.",
+  "engines": {
+    "citadel-postgres": {
+      "status": "implemented-config",
+      "runtime_class": "single-node",
+      "public_label": "Citadel Postgres Runtime",
+      "purpose": "Immediate serious database runtime for VPS/private server infrastructure",
+      "modules": [
+        "Citadel Core",
+        "Reliquary",
+        "SceptR",
+        "Veyra3.1",
+        "Aegis",
+        "SkyLedger"
+      ],
+      "proof_required": [
+        "health",
+        "provision",
+        "backup",
+        "restore-test",
+        "smoke-all"
+      ]
+    },
+    "citadel-replicated": {
+      "status": "planned",
+      "runtime_class": "replicated",
+      "public_label": "Citadel Replicated Runtime",
+      "purpose": "Primary/standby database runtime with route promotion and restore discipline",
+      "modules": [
+        "Citadel Core",
+        "Reliquary",
+        "SceptR",
+        "Veyra3.1",
+        "Aegis",
+        "SkyLedger"
+      ],
+      "proof_required": [
+        "replica status",
+        "promotion drill",
+        "app reconnect",
+        "backup receipt"
+      ]
+    },
+    "citadel-ha": {
+      "status": "manifest-ready",
+      "runtime_class": "ha-cluster",
+      "public_label": "Citadel HA Runtime",
+      "purpose": "High-availability cluster lane for serious client infrastructure",
+      "modules": [
+        "Citadel Core",
+        "Reliquary",
+        "SceptR",
+        "Veyra3.1",
+        "Aegis",
+        "SkyLedger"
+      ],
+      "proof_required": [
+        "cluster status",
+        "before write",
+        "primary kill",
+        "after write",
+        "backup receipt"
+      ]
+    },
+    "citadel-service-pack": {
+      "status": "optional-pack-boundary",
+      "runtime_class": "service-pack",
+      "public_label": "Citadel Service Pack",
+      "purpose": "Optional API, realtime, dashboard, and storage service layer attached behind CitadelDB ownership",
+      "proof_required": [
+        "service startup",
+        "API smoke",
+        "CitadelDB backup ownership"
+      ]
+    },
+    "citadel-lab": {
+      "status": "research-only",
+      "runtime_class": "lab",
+      "public_label": "Citadel Lab Runtime",
+      "purpose": "Internal research lane for branching, preview databases, and storage/compute experiments",
+      "proof_required": [
+        "lab experiment docs only; no production claim"
+      ]
+    }
+  }
+}

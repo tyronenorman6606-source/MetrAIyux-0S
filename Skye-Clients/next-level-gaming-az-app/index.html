@@ -1,183 +1,394 @@
 <!doctype html>
-<html lang="en" data-mcp-neon-scrollbar>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Next Level Gaming AZ | Event Command App</title>
-  <meta name="description" content="Next Level Gaming AZ app for weekly TCG events, player actions, table visits, event requests, QR handoff, and TCGPlayer shopping in Goodyear, Arizona.">
-  <meta name="theme-color" content="#07100e">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Next Level Gaming | Goodyear TCG & Gaming Shop</title>
+  <meta name="description" content="Next Level Gaming in Goodyear, Arizona brings trading cards, tournaments, 58 seats, free tables, collectibles, video games, snacks, and a direct TCGplayer lane into one shop app.">
+  <meta name="theme-color" content="#02050a">
+  <meta property="og:title" content="Next Level Gaming | Goodyear TCG & Gaming Shop">
+  <meta property="og:description" content="Trading cards, tournaments, free tables, collectibles, video games, snacks, and a direct TCGplayer lane in one place.">
+  <meta property="og:image" content="assets/white-label/banners/interior-showcase-banner.png">
+  <link rel="preload" as="image" href="assets/brand/client-brand-logo.png">
+  <link rel="preload" as="image" href="assets/client-media/videos/next-level-hero-poster.jpg">
+  <link rel="preload" as="video" href="assets/client-media/videos/next-level-hero.mp4" type="video/mp4">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="canonical" href="https://next-level-gaming-az.pages.dev/">
-  <link rel="preload" as="image" href="/assets/media/next-level-logo.png">
-  <link rel="preload" as="image" href="/assets/media/cyber-city-hero.jpg">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script type="importmap">{"imports":{"react":"https://esm.sh/react@19.2.6","react-dom/client":"https://esm.sh/react-dom@19.2.6/client","framer-motion":"https://esm.sh/framer-motion@12.38.0","motion":"https://esm.sh/motion@12.38.0","gsap":"https://esm.sh/gsap@3.15.0","gsap/ScrollTrigger":"https://esm.sh/gsap@3.15.0/ScrollTrigger","lenis":"https://esm.sh/lenis@1.3.23"}}</script>
-  <script type="module" src="/assets/app.js"></script>
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Next Level Gaming","alternateName":"Next Level Gaming Card Shop","url":"https://www.nextlevelgamingaz.com/","sameAs":["https://www.instagram.com/nextlevelgaming_az","https://btdgamingtcg.tcgplayerpro.com/"],"address":{"@type":"PostalAddress","streetAddress":"756 N. Dysart Rd","addressLocality":"Goodyear","addressRegion":"AZ","postalCode":"85338","addressCountry":"US"},"telephone":"+1-623-248-7458"}</script>
 </head>
-<body data-page="home" class="skyesol-living-page">
+<body class="app-intro-running skyesol-living-page">
 <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
-  <canvas class="living-background" data-living-background aria-hidden="true"></canvas>
-  <div class="scanline" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="scroll-progress" aria-hidden="true"></div>
-
-  <header class="topbar">
-    <a class="brand" href="/" aria-label="Next Level Gaming app home">
-      <img src="/assets/media/next-level-logo.png" alt="Next Level Gaming">
-      <span>Event Command</span>
-    </a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
-    <nav id="primary-nav" class="navlinks" aria-label="Primary navigation">
-      <a href="/events.html">Events</a>
-      <a href="/shop.html">Shop</a>
-      <a href="/scan.html">Scan</a>
-      <a href="/preview.html">Preview</a>
-      <a class="nav-cta" href="/quote.html">Request Event</a>
-    </nav>
-  </header>
-
-  <main>
-    <section class="command-hero" aria-labelledby="app-title">
-      <img class="hero-bg" src="/assets/media/cyber-city-hero.jpg" alt="" aria-hidden="true">
-      <div class="hero-wash" aria-hidden="true"></div>
-      <div class="hero-grid">
-        <div class="hero-copy" data-reveal>
-          <span class="eyebrow">Goodyear trading card shop</span>
-          <h1 id="app-title" class="neon-title neon-gradient-text">Next Level Gaming AZ</h1>
-          <p class="lead">Weekly tournaments, free casual tables, TCGPlayer card hunting, and event requests for a shop built for gamers by gamers.</p>
-          <div class="action-row" aria-label="Primary app actions">
-            <a class="btn primary magnetic" href="#weekly-board">See This Week</a>
-            <a class="btn green magnetic" href="/quote.html">Request Event</a>
-            <a class="btn dark" href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">Shop TCG Online</a>
-            <a class="btn dark" href="tel:6232487458">Call Shop</a>
-          </div>
-        </div>
-
-        <section class="event-console" aria-label="Next Level event console" data-reveal>
-          <div class="console-head">
-            <div>
-              <span class="eyebrow">Live schedule board</span>
-              <h2 data-next-event-title>Loading schedule</h2>
-            </div>
-            <span class="status-pill" data-open-status>Checking hours</span>
-          </div>
-          <div class="today-strip" data-next-event-detail>Finding the next recurring event.</div>
-          <div class="mini-actions">
-            <button type="button" class="chip active" data-day-filter="all">All</button>
-            <button type="button" class="chip" data-day-filter="Wednesday">Wed</button>
-            <button type="button" class="chip" data-day-filter="Thursday">Thu</button>
-            <button type="button" class="chip" data-day-filter="Friday">Fri</button>
-            <button type="button" class="chip" data-day-filter="Saturday">Sat</button>
-            <button type="button" class="chip" data-day-filter="Sunday">Sun</button>
-          </div>
-          <div class="event-list compact" data-schedule-board data-limit="4"></div>
-        </section>
-      </div>
-
-      <div class="quick-stats" aria-label="Shop facts">
-        <a href="https://maps.google.com/?q=756%20N.%20Dysart%20Rd%2C%20Goodyear%2C%20AZ%2085338" target="_blank" rel="noopener"><strong>756 N. Dysart Rd</strong><span>Goodyear, AZ 85338</span></a>
-        <a href="/shop.html"><strong>58 seats</strong><span>Free tables for casual play</span></a>
-        <a href="mailto:nlgaming2023@gmail.com"><strong>Email the shop</strong><span>nlgaming2023@gmail.com</span></a>
-        <a href="/scan.html"><strong>QR route</strong><span>Install and quick actions</span></a>
-      </div>
-    </section>
-
-    <section id="weekly-board" class="band" aria-labelledby="weekly-title">
-      <div class="section-head" data-reveal>
-        <div>
-          <span class="eyebrow">Weekly tournament board</span>
-          <h2 id="weekly-title">Pick the game night, then move.</h2>
-        </div>
-        <p>Events are shaped from the public Next Level Gaming schedule and recent announcement language. Players should still confirm details with the shop before driving in.</p>
-      </div>
-      <div class="control-row" data-reveal>
-        <button type="button" class="chip active" data-day-filter="all">All games</button>
-        <button type="button" class="chip" data-day-filter="Wednesday">Wednesday</button>
-        <button type="button" class="chip" data-day-filter="Thursday">Thursday</button>
-        <button type="button" class="chip" data-day-filter="Friday">Friday</button>
-        <button type="button" class="chip" data-day-filter="Saturday">Saturday</button>
-        <button type="button" class="chip" data-day-filter="Sunday">Sunday</button>
-      </div>
-      <div class="event-list full" data-schedule-board></div>
-    </section>
-
-    <section class="band tools-band" aria-labelledby="tools-title">
-      <div class="section-head" data-reveal>
-        <div>
-          <span class="eyebrow">Player tools</span>
-          <h2 id="tools-title">Fast paths for people already ready to play.</h2>
-        </div>
-        <p>Built like a shop app: fewer explanations, more buttons that help a player or organizer act.</p>
-      </div>
-      <div class="tool-grid">
-        <article class="tool-card" data-reveal>
-          <img src="/assets/media/shop-photo-1.jpg" alt="Next Level Gaming shop interior and table space" loading="lazy" decoding="async">
-          <div>
-            <span class="badge">Casual play</span>
-            <h3>Find a table</h3>
-            <p>Tables are free for opening packs, trading, tabletop games, and casual matches.</p>
-            <a class="btn green" href="tel:6232487458">Call Before You Go</a>
-          </div>
-        </article>
-        <article class="tool-card" data-reveal>
-          <img src="/assets/media/tcg-banner.png" alt="Trading card game banner from Next Level Gaming source media" loading="lazy" decoding="async">
-          <div>
-            <span class="badge">Card hunting</span>
-            <h3>Search inventory</h3>
-            <p>Use the online TCGPlayer shop lane when you need a specific card for a deck or collection.</p>
-            <a class="btn dark" href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">Open TCGPlayer</a>
-          </div>
-        </article>
-        <article class="tool-card" data-reveal>
-          <img src="/assets/media/shop-photo-3.jpg" alt="Next Level Gaming shop photo from public site" loading="lazy" decoding="async">
-          <div>
-            <span class="badge">Organizer lane</span>
-            <h3>Host an event</h3>
-            <p>Send the shop a clean event idea with game, date, expected players, and prize notes.</p>
-            <a class="btn primary" href="/quote.html">Start Request</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="band split-band" aria-labelledby="shop-title">
-      <div class="split-copy" data-reveal>
-        <span class="eyebrow">Shop and community</span>
-        <h2 id="shop-title">TCG nights, collectibles, snacks, and the local crew in one app route.</h2>
-        <p>Next Level lists Pokemon, Magic: The Gathering, Lorcana, Yu-Gi-Oh!, One Piece, Union Arena, Grand Archive, Dragon Ball Super, OMNI TCG, video games, collectibles, and more.</p>
-        <div class="game-tags" aria-label="Game tags">
-          <span>Pokemon</span><span>MTG</span><span>Lorcana</span><span>Yu-Gi-Oh!</span><span>One Piece</span><span>Union Arena</span><span>Digimon</span><span>Dragon Ball</span>
-        </div>
-      </div>
-      <div class="photo-stack" data-reveal>
-        <img src="/assets/media/shop-photo-2.jpg" alt="Next Level Gaming display photo from public site" loading="lazy" decoding="async">
-        <img src="/assets/media/next-level-logo.png" alt="Next Level Gaming logo">
-      </div>
-    </section>
-  </main>
-
-  <aside class="install-banner" data-install-banner aria-label="Install app prompt">
-    <strong>Keep the event app handy</strong>
-    <span>Use the scan route or browser install option for quick access from the shop.</span>
-    <button class="btn primary" type="button" data-install-app>Install</button>
-    <button class="btn dark" type="button" data-dismiss-install>Dismiss</button>
-  </aside>
-
-  <div class="floating-actions" aria-label="Floating actions">
-    <a class="btn dark" href="tel:6232487458">Call</a>
-    <a class="btn primary" href="/quote.html">Event</a>
+<canvas class="living-background" data-living-background aria-hidden="true"></canvas>
+<div class="site-intro is-hidden" data-site-intro aria-label="Next Level Gaming intro">
+  <div class="intro-vignette" aria-hidden="true"></div>
+  <div class="intro-door" aria-hidden="true"><span></span><span></span></div>
+  <div class="intro-shop-depth" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="intro-atmosphere-field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro-grid" aria-hidden="true"></div>
+  <div class="intro-beam" aria-hidden="true"></div>
+  <div class="intro-rings" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="intro-card">
+    <div class="intro-logo-wrap"><img src="assets/brand/client-brand-logo.png" alt="Next Level Gaming"></div>
+    <b>Step Inside</b>
+    <span class="intro-brand-name">Goodyear card shop</span>
+    <small>TCG, tournaments, collectibles, and 58 seats</small>
   </div>
+  <div class="intro-status" aria-hidden="true"><span>Products</span><span>Services</span><span>Gallery</span><span>Workspace</span></div>
+</div>
+<div class="site-shell">
+<div class="scroll-progress" aria-hidden="true"></div>
+<header class="topbar">
+  <nav class="nav">
+    <a href="/" class="brand"><img src="assets/brand/client-brand-mark.png" alt="Next Level Gaming logo"><span>NEXT LEVEL GAMING</span></a>
+    <div class="navlinks"><a href="/">Home</a><a href="/inventory.html">Inventory</a><a href="/local-seo.html">Local</a><a href="/blog/">Blog</a><a href="/specials.html">Specials</a><a href="/gallery.html">Gallery</a><a href="/workspace-preview/">Workspace</a><a href="/contact.html">Visit</a><a href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">TCGplayer Shop</a><a class="btn" href="tel:6232487458">Call (623) 248-7458</a></div>
+    <div class="mobile-note">Goodyear, Arizona</div>
+  </nav>
+</header>
 
-  <footer class="footer">
-    <div>
-      <img src="/assets/media/next-level-logo.png" alt="Next Level Gaming">
-      <p>Trading card shop in Goodyear, AZ. Popular TCGs, video games, collectibles, weekly tournaments, and casual table space.</p>
+<main>
+  <section class="hero">
+    <div class="hero-video-bg" aria-hidden="true">
+      <video class="hero-video-loop" data-hero-video src="assets/client-media/videos/next-level-hero.mp4" poster="assets/client-media/videos/next-level-hero-poster.jpg" autoplay muted loop playsinline preload="auto"></video>
     </div>
-    <div>
-      <h2>Contact</h2>
-      <p><a href="tel:6232487458">(623) 248-7458</a><br><a href="mailto:nlgaming2023@gmail.com">nlgaming2023@gmail.com</a><br>756 N. Dysart Rd, Goodyear, AZ 85338</p>
+    <div class="hero-video-scrim" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="hero-minimal">
+        <span class="notice">Trading cards • <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Goodyear</span>, Arizona</span>
+        <div class="kicker">West Valley TCG and gaming shop</div>
+        <h1 class="text-effect-shimmer neon-gradient-text split-text premium-text-effects-lab">Next Level Gaming</h1>
+        <p>Trading cards, tournaments, free tables, collectibles, video games, snacks, and a direct TCGplayer lane in one Goodyear shop app.</p>
+      </div>
+      <aside class="preview-window is-hidden" data-preview-window aria-label="Next Level Gaming walkthrough and workspace window">
+        <button class="preview-tab" type="button" data-preview-open aria-expanded="false">
+          <span>Shop Window</span>
+          <strong>Open walkthrough + workspace</strong>
+        </button>
+        <div class="preview-panel">
+          <div class="preview-panel-head">
+            <div>
+              <span class="kicker">Next Level Gaming app walkthrough</span>
+              <h2>See the shop flow first.</h2>
+            </div>
+            <button class="preview-minimize" type="button" data-preview-minimize aria-label="Minimize preview window">Minimize</button>
+          </div>
+          <p>Walk the Next Level shop app first, then jump into the attached <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">MetrAIyux 0S</span> workspace and the on-site QR route built around the store.</p>
+          <div class="hero-actions"><a class="btn" href="/workspace-preview/">Open Your Free Workspace</a><a class="btn secondary" href="/inventory.html">Browse Sections</a></div>
+          <figure class="hero-walkthrough preview-walkthrough">
+            <video src="assets/client-media/videos/next-level-hero.mp4" poster="assets/client-media/videos/next-level-hero-poster.jpg" autoplay muted loop playsinline controls></video>
+            <figcaption>
+              <strong>Store Walkthrough</strong>
+              <span>Built from real Next Level shop media so the intro window feels like the actual store.</span>
+            </figcaption>
+          </figure>
+          <div class="offer-ribbon preview-offer-ribbon">
+            <div><strong>Workspace Included</strong><span>One tap into the live ops layer behind the site.</span></div>
+            <div><strong>QR Ready</strong><span>App, flyer, and in-store scan route are already wired.</span></div>
+            <div><strong>Fast Updates</strong><span>Use the workspace to push specials, copy, and proof changes.</span></div>
+            <div><strong>Built To Grow</strong><span>Add loyalty, intake, and event ops when the shop needs more.</span></div>
+          </div>
+        </div>
+      </aside>
+      <div class="stats">
+        <div class="stat"><strong>58 Seats</strong><span>Free tables and community play</span></div>
+        <div class="stat"><strong>Pokémon to Gundam</strong><span>TCGs, collectibles, and video games</span></div>
+        <div class="stat"><strong>756 N. Dysart Rd</strong><span>Goodyear, AZ 85338</span></div>
+        <div class="stat"><strong>Check Instagram</strong><span>Call for today's hours and events</span></div>
+      </div>
+    
     </div>
-  </footer>
+  </section>
+
+  <div class="hero-black-divider" aria-hidden="true"></div>
+  <section class="section post-hero-section">
+    <div class="wrap divider-caption">
+      <p>Pokémon, Magic, One Piece, Lorcana, Yu-Gi-Oh!, Gundam, Digimon, Dragon Ball, OMNI, collectibles, video games, snacks, and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">58 seats</span> of play space all live inside one bold shop experience.</p>
+    </div>
+    <div class="wrap split">
+      <div class="panel">
+        <div class="kicker">West Valley card shop</div>
+        <h2>Singles, sealed, events, tables, and the free client workspace in one place.</h2>
+        <p>Next Level Gaming is built for the players who want a local lane for fresh releases, tournament nights, free casual tables, collectible finds, snacks, and fast follow-through when a card or game night matters now.</p>
+        <div class="hero-actions"><a class="btn" href="/contact.html">Visit Info</a><a class="btn secondary" href="/specials.html">Current Specials</a><a class="btn secondary" href="/workspace-preview/">Free Workspace</a><a class="btn secondary" href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">TCGplayer Shop</a><button class="btn secondary" type="button" data-share-site data-share-title="Next Level Gaming app preview" data-share-url="https://www.nextlevelgamingaz.com/">Share App</button></div>
+        <div class="social-share-strip" aria-label="Share Next Level Gaming app">
+          <span>Share Next Level Gaming:</span>
+          <a href="mailto:?subject=Next%20Level%20Gaming%20app&body=Next%20Level%20Gaming%20app%20https%3A%2F%2Fwww.nextlevelgamingaz.com%2F">Email</a>
+          <a href="sms:?&body=Next%20Level%20Gaming%20app%20https%3A%2F%2Fwww.nextlevelgamingaz.com%2F">Text</a>
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.nextlevelgamingaz.com%2F" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.nextlevelgamingaz.com%2F" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.nextlevelgamingaz.com%2F&text=Next%20Level%20Gaming%20app" target="_blank" rel="noopener">X</a>
+        </div>
+      </div>
+      <div class="glow-img"><img src="assets/white-label/banners/interior-showcase-banner.png" alt="Next Level Gaming interior showcase"></div>
+    </div>
+  </section>
+
+  <section class="section tcg-card-lab" id="deck-mode">
+    <div class="wrap">
+      <div class="tcg-card-lab-head">
+        <div>
+          <div class="kicker">Deck Mode</div>
+          <h2>The website lands like a stack of cards.</h2>
+          <p>Next Level should not feel like a flat shell with buttons. This section turns the biggest shop lanes into animated trading cards so the app feels like the business it belongs to: sealed drops, live tables, collectibles, and the online store all presented like part of the deck.</p>
+        </div>
+        <div class="hero-actions">
+          <a class="btn" href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">Shop TCG Online</a>
+          <a class="btn secondary" href="/inventory.html">Browse Inventory</a>
+        </div>
+      </div>
+      <div class="tcg-card-lab-grid">
+        <div class="tcg-card-stage" data-card-stage>
+          <button class="tcg-feature-card is-active" type="button" data-tcg-card data-card-title="Shop TCG Online" data-card-copy="Move straight from the app into the official live TCGplayer storefront for singles, sealed product, and current online stock without a dead-end handoff." data-card-href="https://btdgamingtcg.tcgplayerpro.com/" data-card-label="Open storefront" data-card-stat-one="Live storefront" data-card-stat-two="Direct TCGplayer lane" style="--card-x:2%;--card-y:7%;--card-rotate:-11deg;z-index:4">
+            <div class="tcg-feature-card__hud"><span class="tcg-feature-card__serial">NLG-01</span><span class="tcg-feature-card__rarity">Online lane</span></div>
+            <strong>Shop TCG Online</strong>
+            <p>Use the live storefront when a player wants inventory now, not after a phone call.</p>
+            <div class="tcg-feature-card__art"><img src="assets/white-label/banners/client-product-detail.png" alt="Trading cards and products at Next Level Gaming"></div>
+            <div class="tcg-feature-card__footer"><em>Storefront</em><b>Tap to launch</b></div>
+            <span class="tcg-feature-card__gloss" aria-hidden="true"></span>
+          </button>
+          <button class="tcg-feature-card" type="button" data-tcg-card data-card-title="Fresh Releases & Singles" data-card-copy="Put the hot sets, featured singles, and fast-moving sealed product in a front-row lane that feels like a real card pull instead of a stock product grid." data-card-href="/inventory.html#featured-products" data-card-label="Open release lane" data-card-stat-one="Sealed drops" data-card-stat-two="Singles on deck" style="--card-x:40%;--card-y:2%;--card-rotate:8deg;z-index:5">
+            <div class="tcg-feature-card__hud"><span class="tcg-feature-card__serial">NLG-02</span><span class="tcg-feature-card__rarity">Hot pulls</span></div>
+            <strong>Fresh Releases</strong>
+            <p>Highlight the cards and sealed product the room is asking for right now.</p>
+            <div class="tcg-feature-card__art"><img src="assets/white-label/inventory/featured-products.png" alt="Featured releases and singles"></div>
+            <div class="tcg-feature-card__footer"><em>Featured lane</em><b>Tap to inspect</b></div>
+            <span class="tcg-feature-card__gloss" aria-hidden="true"></span>
+          </button>
+          <button class="tcg-feature-card" type="button" data-tcg-card data-card-title="Tables, Tournaments & 58 Seats" data-card-copy="Treat the play space like a hero feature. This card points people to events, learn-to-play nights, and the free table setup that makes the shop feel alive." data-card-href="/specials.html" data-card-label="See events and specials" data-card-stat-one="58 seats" data-card-stat-two="Free tables" style="--card-x:10%;--card-y:38%;--card-rotate:-5deg;z-index:3">
+            <div class="tcg-feature-card__hud"><span class="tcg-feature-card__serial">NLG-03</span><span class="tcg-feature-card__rarity">Community play</span></div>
+            <strong>Tables & Events</strong>
+            <p>Show that the room is for more than shopping: it is where people stay and play.</p>
+            <div class="tcg-feature-card__art"><img src="assets/white-label/inventory/experience-setup.png" alt="Next Level play space and community tables"></div>
+            <div class="tcg-feature-card__footer"><em>Play space</em><b>Tap to explore</b></div>
+            <span class="tcg-feature-card__gloss" aria-hidden="true"></span>
+          </button>
+          <button class="tcg-feature-card" type="button" data-tcg-card data-card-title="Collectibles, Video Games & Extras" data-card-copy="Next Level is bigger than one category, so this card keeps the collectibles, video game trade lane, and accessory side visible instead of burying it under generic card-shop copy." data-card-href="/inventory.html#tools-devices" data-card-label="Open collector lane" data-card-stat-one="Games + gear" data-card-stat-two="Collector finds" style="--card-x:50%;--card-y:31%;--card-rotate:12deg;z-index:2">
+            <div class="tcg-feature-card__hud"><span class="tcg-feature-card__serial">NLG-04</span><span class="tcg-feature-card__rarity">Side quest</span></div>
+            <strong>Collectibles & Games</strong>
+            <p>Keep the side lanes visible so the app feels like the whole shop, not one shelf.</p>
+            <div class="tcg-feature-card__art"><img src="assets/white-label/inventory/tools-devices.png" alt="Video games, accessories, and trade tools"></div>
+            <div class="tcg-feature-card__footer"><em>Collector lane</em><b>Tap to reveal</b></div>
+            <span class="tcg-feature-card__gloss" aria-hidden="true"></span>
+          </button>
+        </div>
+        <aside class="tcg-card-console">
+          <div class="tcg-card-console__screen">
+            <span class="kicker">Selected Card</span>
+            <h3 data-card-console-title>Shop TCG Online</h3>
+            <p data-card-console-copy>Move straight from the app into the official live TCGplayer storefront for singles, sealed product, and current online stock without a dead-end handoff.</p>
+            <div class="tcg-card-console__stats">
+              <div><strong data-card-console-stat-one>Live storefront</strong><span>Current focus</span></div>
+              <div><strong data-card-console-stat-two>Direct TCGplayer lane</strong><span>Fast handoff</span></div>
+            </div>
+            <a class="btn" data-card-console-link href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">Open storefront</a>
+          </div>
+          <div class="tcg-card-console__rail">
+            <span>Foil shine</span>
+            <span>Live tilt</span>
+            <span>Deck fan</span>
+            <span>Real shop media</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section live-upgrade-section">
+    <div class="wrap live-upgrade">
+      <div class="live-copy">
+        <div class="kicker">Media Upgrade Pass</div>
+        <h2>Real shop media now drives the same app structure.</h2>
+        <p>The white-label shell is now wearing Next Level assets: logo, interior photos, storefront cues, product banners, and video-backed customer paths without losing the reusable system underneath.</p>
+        <div class="live-facts">
+          <div><strong>Logo</strong><span>Next Level branding across app and QR</span></div>
+          <div><strong>Photos</strong><span>Store, product wall, and table-space visuals</span></div>
+          <div><strong>Videos</strong><span>Hero loop, walkthrough, and vertical cut</span></div>
+          <div><strong>Proof</strong><span>Client review stays easy before launch</span></div>
+        </div>
+        <div class="service-strip">
+          <span class="service-pill">Fresh releases</span>
+          <span class="service-pill">Tournaments</span>
+          <span class="service-pill">Singles & sealed</span>
+          <span class="service-pill">Video games</span>
+          <span class="service-pill">Free tables</span>
+          <span class="service-pill">Fast handoff</span>
+        </div>
+        <div class="hero-actions"><a class="btn" href="/gallery.html">See Gallery</a><a class="btn secondary" href="#media-reels">Watch Videos</a></div>
+      </div>
+      <div class="live-media">
+        <img class="live-storefront" src="assets/white-label/banners/client-storefront.png" alt="Next Level Gaming storefront">
+        <div class="live-gallery">
+          <img src="assets/white-label/banners/client-product-detail.png" alt="Next Level Gaming product detail">
+          <img src="assets/white-label/inventory/featured-products.png" alt="Featured TCG releases">
+          <img src="assets/white-label/inventory/service-packages.png" alt="Tournaments and entry events">
+          <img src="assets/white-label/inventory/add-on-products.png" alt="Snacks and grab-and-go extras">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="inventory" class="section">
+    <div class="wrap">
+      <div class="kicker">Inventory</div>
+      <h2>Show the lanes people actually shop.</h2>
+      <p>These cards now map to how Next Level gets used in real life: new releases, organized play, premium stock, table gear, niche games, and the little extras that keep people in the room longer.</p>
+      <div class="grid"><article class="card">
+      <img src="assets/white-label/inventory/featured-products.png" alt="Featured products at Next Level Gaming">
+      <div class="card-body"><h3>Featured TCG Releases</h3><p>Highlight the hottest restocks, sealed drops, singles movement, and the games the room is asking about this week.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/service-packages.png" alt="Service packages at Next Level Gaming">
+      <div class="card-body"><h3>Tournaments & Entry Events</h3><p>Point players toward weekly events, learn-to-play nights, prereleases, and organized-play entry paths.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/premium-collection.png" alt="Premium collection at Next Level Gaming">
+      <div class="card-body"><h3>Premium Singles & Sealed</h3><p>Split out high-end singles, chase cards, booster boxes, and sealed product worth calling ahead for.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/accessories.png" alt="Sleeves, Deck Boxes & Binders at Next Level Gaming">
+      <div class="card-body"><h3>Sleeves, Deck Boxes & Binders</h3><p>Show the support gear that turns a quick stop into a full pickup for league night or casual play.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/tools-devices.png" alt="Tools and devices at Next Level Gaming">
+      <div class="card-body"><h3>Consoles, Accessories & Trade Tools</h3><p>Keep the video game side, trade tools, and utility gear visible instead of burying them under card-only copy.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/specialty-products.png" alt="Specialty products at Next Level Gaming">
+      <div class="card-body"><h3>Collector Picks & Niche TCGs</h3><p>Give Gundam, Digimon, Dragon Ball, OMNI, and harder-to-find collector inventory its own lane.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/core-inventory.png" alt="Core inventory at Next Level Gaming">
+      <div class="card-body"><h3>Daily Singles, Packs & Boxes</h3><p>Keep the staple inventory front and center for the players who stop by every week.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/experience-setup.png" alt="Experience setup at Next Level Gaming">
+      <div class="card-body"><h3>Play Space & Learn-to-Play</h3><p>Make the 58 seats, free tables, and beginner-friendly environment obvious before anyone has to ask.</p></div>
+    </article>
+<article class="card">
+      <img src="assets/white-label/inventory/add-on-products.png" alt="Add-on products at Next Level Gaming">
+      <div class="card-body"><h3>Snacks, Drinks & Grab-and-Go</h3><p>Show the quick extras that keep longer sessions easy and turn small visits into better tickets.</p></div>
+    </article></div>
+    </div>
+  </section>
+
+  <section id="media-reels" class="section">
+    <div class="wrap">
+      <div class="kicker">Featured Sections</div>
+      <h2>Quick lanes into the shop.</h2>
+      <div class="bands">
+        <a class="banner-card" href="/inventory.html#featured-products"><img src="assets/white-label/heroes/products-services-hero.png" alt="New releases and events"><div><h3>New Releases & Events</h3><p>Jump straight into the games and nights that move fastest.</p></div></a>
+        <a class="banner-card" href="/inventory.html#premium-collection"><img src="assets/white-label/heroes/premium-core-hero.png" alt="Premium and core offers"><div><h3>Singles & Sealed</h3><p>Split premium chase inventory from daily staples and sealed boxes.</p></div></a>
+        <a class="banner-card" href="/inventory.html#specialty-products"><img src="assets/white-label/heroes/specialty-experience-hero.png" alt="Specialty games and play space"><div><h3>Niche Games & Tables</h3><p>Show specialty lines, learn-to-play space, and in-store community lanes.</p></div></a>
+        <a class="banner-card" href="/local-seo.html"><img src="assets/white-label/heroes/local-business-hero.png" alt="West Valley trust section"><div><h3>Visit & Trust</h3><p>Keep location, contact details, FAQs, and shop expectations easy to reach.</p></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+      <div class="wrap">
+      <div class="kicker">Showcase Reels</div>
+      <h2>See the business before you visit.</h2>
+      <p>The hero loop and walkthrough now use real Next Level media, and the extra reel slots are ready for future event-night cuts and shop-specific socials.</p>
+      <div class="reel-grid">
+        <figure class="reel-stage">
+          <video src="assets/client-media/videos/next-level-hero.mp4" poster="assets/client-media/videos/next-level-hero-poster.jpg" autoplay muted loop playsinline controls></video>
+          <figcaption class="reel-caption">
+            <h3>Store Walkthrough</h3>
+            <p>A real pass through the Next Level storefront and play-space feel.</p>
+          </figcaption>
+        </figure>
+        <div class="reel-stack">
+          <figure>
+            <video src="assets/white-label/videos/inventory-sizzle.mp4" poster="assets/white-label/videos/inventory-sizzle-poster.jpg" autoplay muted loop playsinline controls></video>
+            <figcaption>
+              <h3>Inventory Sizzle</h3>
+              <p>Products, services, premium offers, specialty sections, tools, and add-ons.</p>
+            </figcaption>
+          </figure>
+          <figure>
+            <video src="assets/white-label/videos/social-vertical.mp4" poster="assets/white-label/videos/social-vertical-poster.jpg" autoplay muted loop playsinline controls></video>
+            <figcaption>
+              <h3>Vertical Social Cut</h3>
+              <p>A phone-first social cut built for fast posting, stories, and event-night promotion.</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap workspace-strip">
+      <div>
+        <div class="kicker">Shop workspace</div>
+        <h2>The ops workspace is already attached.</h2>
+        <p>Use the workspace to scan the app, queue small updates, and export <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span> when the site needs a fast tweak, media swap, or event-night refresh.</p>
+      </div>
+      <div class="workspace-actions">
+        <div class="home-qr-card">
+          <img src="assets/qr/next-level-gaming-app-qr.png" alt="QR code to open the Next Level Gaming app">
+          <span>On-site QR</span>
+          <strong>Open Next Level Gaming app</strong>
+        </div>
+        <a class="btn" href="/workspace-preview/">Open Workspace</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="visit" class="section">
+    <div class="wrap split">
+      <div class="panel">
+        <div class="kicker">Visit</div>
+        <h2>Next Level Gaming</h2>
+        <p><strong>756 N. Dysart Rd, Goodyear, AZ 85338</strong></p>
+        <p><a href="tel:6232487458">(623) 248-7458</a></p>
+        <div class="hours"><div class="day"><b>Mon</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Tue</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Wed</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Thu</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Fri</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Sat</b><span>Check Instagram / call</span></div>
+<div class="day"><b>Sun</b><span>Check Instagram / call</span></div></div>
+        <div class="callout">For the most accurate prices, specials, events, and inventory, call the shop or check Instagram before heading over.</div>
+      </div>
+      <div class="glow-img"><img src="assets/white-label/heroes/local-business-hero.png" alt="Next Level Gaming West Valley trust section"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap cta-band">
+      <span class="notice">Questions before visiting?</span>
+      <h2>Call, check the FAQ, or stop by.</h2>
+      <p>Exact stock and pricing can change. Call the business or visit in person for the fastest answer.</p>
+      <div class="hero-actions">
+        <a class="btn" href="/faq.html">Read FAQ</a>
+        <a class="btn secondary" href="/local-seo.html">Local Info</a>
+        <a class="btn secondary" href="/contact.html">Visit Page</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>© Next Level Gaming.</div>
+    <div class="footer-links"><a href="/blog/">Blog</a><span>•</span><a href="/specials.html">Specials</a><span>•</span><a href="/workspace-preview/">Workspace</a><span>•</span><a href="/contact.html">Visit</a><span>•</span><a href="https://btdgamingtcg.tcgplayerpro.com/" target="_blank" rel="noopener">TCGplayer Shop</a></div>
+  </div>
+</footer>
+</div>
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script type="importmap">{"imports":{"gsap":"https://esm.sh/gsap@3.12.5","gsap/ScrollTrigger":"https://esm.sh/gsap@3.12.5/ScrollTrigger","lenis":"https://unpkg.com/lenis@1.1.20/dist/lenis.mjs"}}</script>
+<script type="module">
+  import { gsap } from 'gsap';
+  import Lenis from 'lenis';
+  window.__skyeTemplateMcpImportedStack = { gsap, Lenis };
+  window.__skyeTemplateCreateLenis = window.__skyeTemplateCreateLenis || ((options) => new Lenis(options));
+  window.Lenis = window.Lenis || Lenis;
+</script>
+<script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

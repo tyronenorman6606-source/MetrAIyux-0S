@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0S Devs Playbook | MetrAIyux</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{color-scheme:dark;--bg:#07100f;--panel:#101818;--panel2:#0c1313;--line:rgba(255,255,255,.14);--text:#f8fbff;--muted:#a9b6b6;--gold:#f4d57b;--cyan:#7ae7ff;--green:#8ff0bf;--bad:#ff7188}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#07100f;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(145deg,#050908,#0d1716 56%,#100f08);pointer-events:none}
+    header{position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:rgba(7,16,15,.92);backdrop-filter:blur(16px)}
+    .bar{width:min(1220px,calc(100% - 32px));margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0}
+    .brand{font-weight:950;letter-spacing:0;color:#fff;text-decoration:none}
+    nav{display:flex;flex-wrap:wrap;gap:8px}
+    nav a,.button,button{border:1px solid var(--line);border-radius:8px;background:#182525;color:var(--text);padding:9px 11px;font:inherit;font-weight:850;text-decoration:none;cursor:pointer}
+    nav a{font-size:13px}
+    main{width:min(1220px,calc(100% - 32px));margin:0 auto;padding:28px 0 82px}
+    .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.44fr);gap:16px;align-items:stretch;margin-bottom:16px}
+    section,.panel{border:1px solid var(--line);border-radius:8px;background:rgba(16,24,24,.88);box-shadow:0 24px 80px rgba(0,0,0,.24)}
+    section{padding:22px;margin:16px 0}
+    .panel{padding:18px}
+    .eyebrow{margin:0 0 9px;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    h1{margin:0 0 12px;font-size:clamp(38px,7vw,72px);line-height:.97;letter-spacing:0}
+    h2{margin:0 0 10px;font-size:clamp(25px,4vw,38px);line-height:1.06;letter-spacing:0}
+    h3{margin:0 0 8px;font-size:20px;letter-spacing:0}
+    p{margin:0 0 12px;color:var(--muted)}
+    code,pre{border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(0,0,0,.32);color:#c6f8ff}
+    code{padding:3px 6px;word-break:break-word}
+    pre{margin:10px 0 0;padding:12px;overflow:auto;white-space:pre-wrap}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .stat{border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:14px}
+    .stat strong{display:block;color:#fff;font-size:24px;line-height:1.1}
+    .stat span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.1);padding:10px 8px;text-align:left;vertical-align:top}
+    th{color:var(--gold);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+    .callout{border-left:4px solid var(--gold);border-radius:8px;background:rgba(244,213,123,.08);padding:13px 14px;color:#eadfbd}
+    .good{color:var(--green)}
+    .bad{color:var(--bad)}
+    .muted{color:var(--muted)}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    @media(max-width:900px){.hero,.grid,.two{grid-template-columns:1fr}.bar{align-items:flex-start;flex-direction:column}nav a{font-size:12px}main{padding-top:18px}section{padding:16px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brand" href="/devs-playbook/">0S Devs Playbook</a>
+      <nav aria-label="Playbook sections">
+        <a href="#keys">Keys</a>
+        <a href="#gate">Gate</a>
+        <a href="#drive">Drive</a>
+        <a href="#commands">Commands</a>
+        <a href="#proof">Proof</a>
+        <a href="#handoffs">Handoffs</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="hero">
+      <section>
+        <p class="eyebrow">Email-gated operator page</p>
+        <h1>Developer playbook for the 0S.</h1>
+        <p>This page keeps the working map in one place: gate lanes, secret names, Free99 demos, SkyeVault and MyDrive flows, MCP commands, deploy commands, and proof receipts.</p>
+        <p class="callout">Actual secret values are not rendered here. This page is gated with email only, so it documents key names, storage locations, rotation paths, and commands without exposing live credentials.</p>
+      </section>
+      <aside class="panel">
+        <p class="eyebrow">Current gate card</p>
+        <div class="grid" style="grid-template-columns:1fr">
+          <div class="stat"><strong id="gate-email">Checking...</strong><span>Email</span></div>
+          <div class="stat"><strong id="gate-key">skdevpbk</strong><span>Marketing key</span></div>
+          <div class="stat"><strong id="gate-user">email-skdevpbk</strong><span>Tracked gate user</span></div>
+        </div>
+        <div class="actions">
+          <a class="button" href="/devs-playbook/login.html?key=skdevpbk">Switch Email</a>
+          <button id="logout" type="button">Log Out</button>
+        </div>
+      </aside>
+    </div>
+
+    <section id="keys">
+      <p class="eyebrow">Key map</p>
+      <h2>Credential inventory without leaking values.</h2>
+      <table>
+        <thead><tr><th>Lane</th><th>Names to know</th><th>Where value lives</th><th>Rotation path</th></tr></thead>
+        <tbody>
+          <tr><td>0S owner gate</td><td><code>FREE99_ADMIN_CODE</code>, <code>OWNER_ADMIN_CODE</code>, <code>ADMIN_TOKEN</code></td><td>Cloudflare Worker secrets and local private env references</td><td><code>npx wrangler secret put FREE99_ADMIN_CODE --name metraiyux-0s-full-system</code></td></tr>
+          <tr><td>Owner sessions</td><td><code>OWNER_ADMIN_SESSION_SECRET</code></td><td>Worker secret</td><td>Rotate with Wrangler, then re-login at <code>/admin/login.html</code></td></tr>
+          <tr><td>Free99 Sign In Pro demo</td><td><code>FREE99_DEMO_SESSION_SECRET</code>, <code>FREE99_DEMO_OWNER_EMAIL</code>, <code>FREE99_DEMO_CODE</code></td><td>Worker secrets plus hashed active code in KV</td><td>Owner page <code>/admin/free99-demo-code.html</code></td></tr>
+          <tr><td>Marketing keys</td><td><code>MARKETING_KEY_SESSION_SECRET</code>, <code>skdevpbk</code></td><td>Worker secret for sessions, <code>SITE_EVENTS_KV</code> for signups</td><td>Set session secret with Wrangler; campaign tags are URL/form values</td></tr>
+          <tr><td>Resend</td><td><code>RESEND_API_KEY</code>, <code>RESEND_FROM_EMAIL</code>, <code>RESEND_TO_EMAIL</code></td><td>Worker secrets or provider dashboard</td><td>Resend dashboard plus Wrangler secret update</td></tr>
+          <tr><td>Cloudflare deploy</td><td><code>CLOUDFLARE_API_TOKEN</code>, <code>CLOUDFLARE_ACCOUNT_ID</code></td><td>Local private env or CI secret manager</td><td>Cloudflare dashboard token rotation, then local env refresh</td></tr>
+          <tr><td>Stripe / SkyePay</td><td><code>STRIPE_SECRET_KEY</code>, <code>STRIPE_WEBHOOK_SECRET</code></td><td>FS27 / SkyePay Worker secrets</td><td>Stripe dashboard and Wrangler secret update</td></tr>
+          <tr><td>SkyeVault / R2</td><td><code>R2_ACCESS_KEY_ID</code>, <code>R2_SECRET_ACCESS_KEY</code>, bucket bindings</td><td>Cloudflare R2 credentials and Worker bindings</td><td>Cloudflare R2 token rotation and redeploy</td></tr>
+          <tr><td>MCP remote</td><td><code>MCP_HTTP_BEARER_TOKEN</code>, <code>QUANTUMSKYES_MCP_TOKEN</code>, <code>MCP_GATE_SESSION</code></td><td>Owner session export or Worker secret</td><td>Use <code>/admin/login.html</code> to mint a fresh owner bearer</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="gate">
+      <p class="eyebrow">Gate lanes</p>
+      <h2>Which login opens what.</h2>
+      <div class="grid">
+        <div class="stat"><strong>Owner</strong><span><code>/admin/login.html</code> creates the real 0S owner session.</span></div>
+        <div class="stat"><strong>Free99 demo</strong><span><code>/Free99/demo?return=/northstar/index.html</code> opens Sign In Pro only as demo.</span></div>
+        <div class="stat"><strong>Marketing key</strong><span><code>/devs-playbook/login.html?key=skdevpbk</code> records email interest only.</span></div>
+      </div>
+      <pre><code>Owner login:
+https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html
+
+Sign In Pro Free99 business demo:
+https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/demo?return=/northstar/index.html
+
+Devs Playbook marketing gate:
+https://metraiyux-0s-full-system.graylondonskyes.workers.dev/devs-playbook/login.html?key=skdevpbk</code></pre>
+    </section>
+
+    <section id="drive">
+      <p class="eyebrow">Drive and vault</p>
+      <h2>How the repo, SkyeVault, and MyDrive split responsibilities.</h2>
+      <div class="grid">
+        <div class="stat"><strong>MyDrive</strong><span>Local/offline IndexedDB vault with encrypted JSON backup export and import.</span></div>
+        <div class="stat"><strong>SkyeVault Pro</strong><span>Customer/operator local vault, SkyeDocxMax bridge, and local import folder workflow.</span></div>
+        <div class="stat"><strong>SkyeVault Drop</strong><span>Developer/repo push lane with sanitized archives, R2/SkyDrive streaming, and secret boundary receipts.</span></div>
+      </div>
+      <pre><code># Stage sanitized local material for SkyeVault Pro import
+npm run vault:pro:stage -- --source &lt;folder&gt; --out &lt;local-import-folder&gt;
+npm run vault:pro:from-dev -- --out &lt;local-import-folder&gt;
+npm run vault:pro:stage:latest -- --out &lt;local-import-folder&gt;
+
+# Safe smaller repo archive lane
+npm run vault:dry-run
+npm run vault:push
+
+# Full repo SkyDrive / R2 streaming lane
+npm run vault:repo:full:dry-run -- --max-gb=100
+npm run vault:repo:full -- --max-gb=100
+
+# Secret boundary manifest
+npm run vault:secrets:manifest</code></pre>
+    </section>
+
+    <section id="commands">
+      <p class="eyebrow">Command deck</p>
+      <h2>Commands you keep reaching for.</h2>
+      <div class="grid two">
+        <div>
+          <h3>Local 0S</h3>
+          <pre><code>npm run skye:serve:site
+npm run skye:crawl:static
+npm run skye:crawl:worker
+npm run repo:health</code></pre>
+        </div>
+        <div>
+          <h3>MCP</h3>
+          <pre><code>npm run mcp:mine -- &lt;target-folder&gt;
+npm run mcp:smoke
+npm run mcp:skyesol
+MCP_TRANSPORT=remote QUANTUMSKYES_MCP_TOKEN="$MCP_GATE_SESSION" npm run mcp:mine:remote -- &lt;target-folder&gt;</code></pre>
+        </div>
+        <div>
+          <h3>Free99 / app proofs</h3>
+          <pre><code>npm run 0s:free99-platforms:proof
+node metraiyux_0s_site/tests/free99-demo-code-flow.mjs
+node metraiyux_0s_site/tests/marketing-keys-dev-playbook-flow.mjs</code></pre>
+        </div>
+        <div>
+          <h3>Deploy</h3>
+          <pre><code>cd metraiyux_0s_site
+npx wrangler deploy
+npx wrangler secret list --name metraiyux-0s-full-system
+npx wrangler secret put MARKETING_KEY_SESSION_SECRET --name metraiyux-0s-full-system</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="proof">
+      <p class="eyebrow">Proof policy</p>
+      <h2>Deep smoke is not live proof.</h2>
+      <p>The repo rule still stands: production-facing changes need a deployed headed-browser pass on desktop and mobile before a live link is called ready.</p>
+      <pre><code># Required after deploy for production closure
+npm run proof:live-browser -- --url https://metraiyux-0s-full-system.graylondonskyes.workers.dev/devs-playbook/login.html?key=skdevpbk --expect "Devs Playbook access"
+
+# This closure only ran local/deep smoke unless a later handoff says otherwise
+node --check metraiyux_0s_site/cloudflare/worker.js
+node metraiyux_0s_site/tests/marketing-keys-dev-playbook-flow.mjs</code></pre>
+      <p class="callout">Status for this page at creation: source wired and locally smoke-tested; live deployment and headed proof still required.</p>
+    </section>
+
+    <section id="handoffs">
+      <p class="eyebrow">Handoff map</p>
+      <h2>Where the receipts live.</h2>
+      <table>
+        <thead><tr><th>Topic</th><th>Path</th></tr></thead>
+        <tbody>
+          <tr><td>Sign In Pro Free99 demo closure</td><td><code>.vscode/Handoffs/2026-05-22-signinpro-free99-demo-code-handoff.md</code></td></tr>
+          <tr><td>Full repo SkyDrive and secret-pack model</td><td><code>.vscode/Handoffs/FULL_REPO_VAULT_AND_SECRET_PACK_HANDOFF_20260522.md</code></td></tr>
+          <tr><td>Marketing key Devs Playbook closure</td><td><code>.vscode/Handoffs/2026-05-22-devs-playbook-marketing-keys-handoff.md</code></td></tr>
+          <tr><td>Private demo code receipt</td><td><code>test-artifacts/free99-signinpro-closure/production-demo-code-proof.json</code></td></tr>
+          <tr><td>Marketing key local smoke receipt</td><td><code>test-artifacts/marketing-keys-dev-playbook/smoke-report.json</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    async function loadGate() {
+      try {
+        const response = await fetch('/api/marketing-keys/me', {credentials:'include'});
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'No session');
+        const email = data.gate_user && data.gate_user.email ? data.gate_user.email : 'email gate';
+        const key = data.tracking_tag || data.marketing_key || 'skdevpbk';
+        const id = data.gate_user && data.gate_user.id ? data.gate_user.id : 'email-' + key;
+        document.getElementById('gate-email').textContent = email;
+        document.getElementById('gate-key').textContent = key;
+        document.getElementById('gate-user').textContent = id;
+      } catch (error) {
+        location.assign('/devs-playbook/login.html?key=skdevpbk&return=/devs-playbook/');
+      }
+    }
+
+    document.getElementById('logout').addEventListener('click', async () => {
+      await fetch('/api/marketing-keys/logout', {method:'POST', credentials:'include'}).catch(() => null);
+      location.assign('/devs-playbook/login.html?key=skdevpbk');
+    });
+
+    loadGate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "version": "1.7.0",
+  "generatedAt": "2026-05-20T18:25:00Z",
+  "scope": "Integrated approved cinematic intro sequence into the SkyePics app launch flow, replaced logo asset with transparent version, added intro replay from landing, updated service worker cache and docs.",
+  "noSaaS": true,
+  "noExternalDatabase": true,
+  "commands": {
+    "npm install": "passed; 0 vulnerabilities",
+    "npm test": "passed",
+    "npm run smoke": "passed",
+    "npm run build": "passed"
+  },
+  "verifiedFeatures": [
+    "first-run intro before landing",
+    "transparent-logo intro reveal",
+    "vault rings and scan-pass animation",
+    "skip/replay/enter controls",
+    "intro seen stored in localStorage",
+    "landing replay intro control",
+    "transparent logo used as app brand asset",
+    "PWA icons rebuilt from transparent logo",
+    "service worker cache updated to skyepics-shell-v17",
+    "existing camera vault, OCR, encrypted backup, tutorial, audit, and recovery lanes preserved"
+  ],
+  "honestRemainingGates": [
+    "physical camera capture must be tested on a real device over localhost or HTTPS",
+    "OCR quality must be tested with real secret/password photos",
+    "restore drill should be run in a second browser profile/device",
+    "PWA install behavior should be tested in the target browser"
+  ]
+}

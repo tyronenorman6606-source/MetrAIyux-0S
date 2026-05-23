@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Live Deployment Atlas - MetrAIyux Empire</title>
-<meta name="description" content="Live-only deployment atlas for MetrAIyux, Skyes Over London, Cloudflare Pages, Cloudflare Workers, Netlify surfaces, and access-gated systems.">
+<meta name="description" content="Live-only deployment atlas for MetrAIyux, Skyes Over London, Cloudflare Pages, Cloudflare Workers, Netlify surfaces, access-gated systems, and the gate-owned QuantumSkyes MCP lane.">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#020509">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -786,7 +786,7 @@ h1 {
 <div class="shell">
   <header class="topbar">
     <a class="brand" href="/operator/" aria-label="Open operator portal">
-      <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="">
+      <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="" loading="eager" decoding="async">
       <span>
         <strong>MetrAIyux Live Deployment Atlas</strong>
         <span>Skyes Over London / verified production map</span>
@@ -805,9 +805,9 @@ h1 {
   <main>
     <section class="atlas-hero" aria-label="Live deployment atlas">
       <div class="hero-copy">
-        <p class="eyebrow">Verified live layer / 2026-05-17 UTC</p>
+        <p class="eyebrow">Verified live layer / 2026-05-20 UTC</p>
         <h1><span class="shimmer neon-gradient-text">Deployment atlas</span></h1>
-        <p>I keep this public map clean: open production surfaces, live worker roots, resolved Netlify sites, and access gates that answer on purpose.</p>
+        <p>I keep this public map clean: open production surfaces, live worker roots, resolved Netlify sites, gate-owned MCP infrastructure, and access gates that answer on purpose.</p>
         <div class="hero-actions">
           <a class="primary-action" href="#surfaces">Open live stream</a>
           <a class="ghost-action" href="https://metraiyux-0s-marketing.pages.dev/#pricing" target="_blank" rel="noopener">Pricing proof</a>
@@ -830,7 +830,7 @@ h1 {
         </div>
         <div class="stage-caption">
           <span id="atlasStamp">Refresh pending</span>
-          <span>78 surfaces / 8 live checks</span>
+          <span>78 surfaces / 9 live checks</span>
         </div>
       </div>
     </section>
@@ -876,14 +876,14 @@ h1 {
   <footer class="footer">
     <span>MetrAIyux Empire Deployment Atlas - Skyes Over London LC</span>
     <span>Evidence artifact: test-artifacts/live-deployment-ledger/public-live-link-probe.json</span>
-    <span id="footerClock">Generated 2026-05-17</span>
+    <span id="footerClock">Generated 2026-05-20</span>
   </footer>
 </div>
 
 <script>
 const SURFACES = [
   { n: "PHX Verified Network", u: "https://phx-verified-network.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "PHX", proof: "Deployment 1daa4796-a81a-4c75-967d-df7f019f0918: /insights/ now has seven longform operator articles and renderer-backed business URLs returned HTTP 200 with zero browser 404s." },
-  { n: "MetrAIyux 0S Marketing", u: "https://metraiyux-0s-marketing.pages.dev/#pricing", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "M0", proof: "Pricing section is browser proved after the neon artifact fix." },
+  { n: "MetrAIyux 0S Marketing", u: "https://metraiyux-0s-marketing.pages.dev/valuation.html", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "M0", proof: "Valuation surface is live with gate-owned remote MCP infrastructure and updated replacement-cost language." },
   { n: "MetrAIyux 0S Full System", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "0S", proof: "Worker root returned HTTP 200." },
   { n: "MetrAIyux 0S / ConnectLog + Relay13 Proof", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html", p: "0S Worker Route", lane: "worker", signal: "verified", k: "CL", proof: "Operator proof page returned HTTP 200 and shows production video proof." },
   { n: "ConnectLog Relay13 App", u: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/connectlog-v7.7-relay13-operator-proof/app.html", p: "0S Worker Route", lane: "worker", signal: "verified", k: "CA", proof: "ConnectLog app surface returned HTTP 200 with the Relay13 bridge panel." },
@@ -901,7 +901,8 @@ const SURFACES = [
   { n: "SOL Staffing Marketing", u: "https://sol-staffing-marketing.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "SM", proof: "Marketing lane returned HTTP 200." },
   { n: "SOL Staffing Agency Site", u: "https://sol-staffing-agency-site.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "SS", proof: "Agency site returned HTTP 200." },
   { n: "CitadelDB Ultimate", u: "https://citadeldb-ultimate.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "DB", proof: "Production branch returned HTTP 200." },
-  { n: "Skye Design MCP", u: "https://skye-design-mcp.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "UI", proof: "Design MCP surface returned HTTP 200." },
+  { n: "Skye Design MCP", u: "https://skye-design-mcp.pages.dev/use-mcp.html", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "UI", proof: "Gate-owned QuantumSkyes MCP guide is live; `/mcp` is Streamable HTTP behind 0S/FS27 bearer-session validation." },
+  { n: "QuantumSkyes MCP Health", u: "https://skye-design-mcp.pages.dev/health", p: "Cloudflare Pages Worker", lane: "cloudflare", signal: "verified", k: "MH", proof: "Health JSON proves gate-introspection auth, gateOwned true, emailRequired true, and the 0S gate return URL." },
   { n: "MetrAIyux Logo Rollout", u: "https://metraiyux-0s-logo-rollout.pages.dev/", p: "Cloudflare Pages", lane: "cloudflare", signal: "verified", k: "LR", proof: "Logo rollout mirror returned HTTP 200." },
   { n: "kAIxu 6.7 Brain", u: "https://kaixu-6-7-brain.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "K6", proof: "Latest Worker deployment is reachable." },
   { n: "SkyGateFS13 Super Gate", u: "https://skyegatefs13-super-gate.graylondonskyes.workers.dev/", p: "Cloudflare Worker", lane: "worker", signal: "verified", k: "13", proof: "Root and v1 health answer live." },
@@ -968,6 +969,7 @@ const CHECKS = [
   { n: "SkyeDexia ops health", u: "https://skydexia-ops-control.graylondonskyes.workers.dev/health", code: "OK", proof: "Ops control health responds live." },
   { n: "FS13 Super Gate v1 health", u: "https://skyegatefs13-super-gate.graylondonskyes.workers.dev/v1/health", code: "OK", proof: "Worker v1 health responds live." },
   { n: "Relay13 Core health", u: "https://relay13-core.graylondonskyes.workers.dev/api/health", code: "OK", proof: "Relay13 health JSON responds live." },
+  { n: "QuantumSkyes MCP health", u: "https://skye-design-mcp.pages.dev/health", code: "OK", proof: "Health JSON reports gate-introspection auth, gateOwned true, and emailRequired true for the remote MCP lane." },
   { n: "SaaS provisioning billing status", u: "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev/api/saas/status", code: "OK", proof: "SaaS Worker status responds after live Stripe Price ID sync." },
   { n: "VantaCore access gate", u: "https://vantacore.graylondonskyes.workers.dev/health", code: "ACCESS", proof: "Cloudflare Access sign-in responds live." }
 ];

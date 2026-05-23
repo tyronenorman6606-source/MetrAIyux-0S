@@ -1,0 +1,204 @@
+{
+  "ok": true,
+  "generatedAt": "2026-05-21T17:12:06.934Z",
+  "productionUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  "publicSurfaceUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/company-knowledge-layer-proof.html",
+  "version": "company-knowledge-production-stress-v1",
+  "scope": {
+    "baseId": "metraiyux-0s",
+    "ownerType": "platform",
+    "concurrency": 8,
+    "writes": 32,
+    "vaultIngests": 8,
+    "contexts": 20,
+    "lists": 24,
+    "itemGets": 10,
+    "deletes": 4,
+    "statusReads": 8,
+    "queryToken": "ck-stress-2026-05-21t17-12-06-486z"
+  },
+  "storage": {
+    "primary": "cloudflare_r2",
+    "metadata": "cloudflare_r2_metadata",
+    "r2": true,
+    "kv": true,
+    "drive": "backup_reference_only",
+    "skyeVault": "source_or_backup_reference"
+  },
+  "requestSummary": {
+    "total": 108,
+    "ok": 108,
+    "failed": 0,
+    "statuses": {
+      "200": 66,
+      "201": 41,
+      "401": 1
+    }
+  },
+  "latencyMs": {
+    "min": 100,
+    "max": 10472,
+    "p50": 1168,
+    "p90": 7849,
+    "p95": 9499,
+    "duration": 38846
+  },
+  "checks": [
+    {
+      "id": "shared-gate-denies-unauthenticated-api",
+      "ok": true,
+      "status": 401
+    },
+    {
+      "id": "cloudflare-r2-and-kv-configured",
+      "ok": true,
+      "storage": {
+        "primary": "cloudflare_r2",
+        "metadata": "cloudflare_r2_metadata",
+        "r2": true,
+        "kv": true,
+        "drive": "backup_reference_only",
+        "skyeVault": "source_or_backup_reference"
+      }
+    },
+    {
+      "id": "platform-base-upserted-through-shared-gate",
+      "ok": true,
+      "status": 201
+    },
+    {
+      "id": "concurrent-r2-writes-created",
+      "ok": true,
+      "expected": 32,
+      "actual": 32
+    },
+    {
+      "id": "vault-ingest-route-created-references",
+      "ok": true,
+      "expected": 8,
+      "actual": 8
+    },
+    {
+      "id": "concurrent-list-reads-returned-items",
+      "ok": true,
+      "expected": 24,
+      "actualOk": 24
+    },
+    {
+      "id": "context-search-finds-stress-knowledge",
+      "ok": true,
+      "contexts": 20,
+      "minHits": 8
+    },
+    {
+      "id": "item-content-readback-works",
+      "ok": true,
+      "expected": 10,
+      "actualOk": 10
+    },
+    {
+      "id": "cleanup-delete-route-works",
+      "ok": true,
+      "expected": 4,
+      "actualOk": 4
+    }
+  ],
+  "sampleItems": [
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-00",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 0",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-00.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "8b4825c81105"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-01",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 1",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-01.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "9fec81b3def2"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-02",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 2",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-02.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "8cdc19314641"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-03",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 3",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-03.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "10e6c2d0f5f0"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-04",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 4",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-04.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "6f629cb8d2ef"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-item-05",
+      "baseId": "metraiyux-0s",
+      "title": "Company Knowledge Stress Proof 5",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-item-05.json",
+      "sourceKind": "manual_drop",
+      "sha256Prefix": "e362e35f1993"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-vault-00",
+      "baseId": "metraiyux-0s",
+      "title": "Vault receipt stress reference 0",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-vault-00.json",
+      "sourceKind": "skyevault_receipt",
+      "sha256Prefix": "3695727f032f"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-vault-01",
+      "baseId": "metraiyux-0s",
+      "title": "Vault receipt stress reference 1",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-vault-01.json",
+      "sourceKind": "skyevault_receipt",
+      "sha256Prefix": "5c5cfda553e6"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-vault-02",
+      "baseId": "metraiyux-0s",
+      "title": "Vault receipt stress reference 2",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-vault-02.json",
+      "sourceKind": "skyevault_receipt",
+      "sha256Prefix": "b111995dfdab"
+    },
+    {
+      "id": "ck-stress-2026-05-21t17-12-06-486z-vault-03",
+      "baseId": "metraiyux-0s",
+      "title": "Vault receipt stress reference 3",
+      "storage": "cloudflare_r2",
+      "objectKey": "company-knowledge/v1/metraiyux-0s/ck-stress-2026-05-21t17-12-06-486z-vault-03.json",
+      "sourceKind": "skyevault_receipt",
+      "sha256Prefix": "ee44e38dbcf2"
+    }
+  ],
+  "failures": [],
+  "artifact": {
+    "localReceipt": "/workspaces/MetrAIyux-0S/test-artifacts/company-knowledge-stress/2026-05-21T17-12-06-486Z/receipt.json",
+    "publicJsonPath": "/proof/live-company-knowledge-stress-latest.json"
+  },
+  "boundary": "No private customer knowledge, bearer tokens, cookies, or root env values are included in this public proof."
+}

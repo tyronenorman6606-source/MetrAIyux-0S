@@ -1,0 +1,8 @@
+[Unit]
+Description=CitadelDB Policy Check
+After=citadeldb.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/citadeldb
+ExecStart=/opt/citadeldb/cli/citadel policy-check

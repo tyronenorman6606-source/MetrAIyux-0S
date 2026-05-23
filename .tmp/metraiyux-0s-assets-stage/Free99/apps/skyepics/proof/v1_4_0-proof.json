@@ -1,0 +1,35 @@
+{
+  "version": "1.4.0",
+  "implemented": [
+    "local camera capture lane",
+    "encrypted local photo storage",
+    "client-side OCR extraction lane",
+    "editable encrypted secret records",
+    "encrypted backup export and restore",
+    "backup checksum verification",
+    "password rotation",
+    "vault health checks with encrypted-file checksums",
+    "integrity ledger",
+    "backup recovery drill",
+    "redacted recovery receipt",
+    "redacted secret-risk audit",
+    "redacted secret-risk ledger export",
+    "printable emergency recovery kit export",
+    "auto-lock after inactivity",
+    "optional lock when app/tab is hidden",
+    "privacy shield for thumbnails and secret reveals",
+    "configurable clipboard clear timer",
+    "PWA install/readiness lane"
+  ],
+  "notImplementedByDesign": [
+    "SaaS tenant authentication",
+    "external database",
+    "server-side OCR",
+    "cloud sync"
+  ],
+  "honestLimitations": [
+    "physical camera capture requires real-device testing over localhost or HTTPS",
+    "browser storage can be lost if site data or the browser profile is deleted; encrypted backups are mandatory for durable recovery",
+    "OCR output must be manually reviewed before using saved secrets"
+  ]
+}

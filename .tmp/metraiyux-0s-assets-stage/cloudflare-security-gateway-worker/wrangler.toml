@@ -1,0 +1,21 @@
+name = "omeg4kai-security-gateway"
+main = "src/worker.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+PUBLIC_ADMIN_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
+RESEND_FROM_EMAIL = "MetrAIyux 0S Approval Desk <approvals@solenterprises.org>"
+ADMIN_APPROVAL_EMAIL = "graylondonskyes@gmail.com"
+
+[[kv_namespaces]]
+binding = "OMEGA_KV"
+id = "cf5866b7f1f247afad918fb5595eec24"
+
+[[d1_databases]]
+binding = "OMEGA_DB"
+database_name = "metraiyux-omega-db"
+database_id = "95464d88-44c1-4752-92f1-8c4bb25d049e"
+
+[[queues.producers]]
+binding = "OMEGA_QUEUE"
+queue = "omeg4kai-review-queue"

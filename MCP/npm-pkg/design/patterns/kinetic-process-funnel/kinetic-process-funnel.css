@@ -1,0 +1,63 @@
+.kinetic-funnel {
+  min-height: 100svh;
+  padding: clamp(8rem, 14vw, 12rem) clamp(2rem, 6vw, 6rem);
+  color: #f6f2e8;
+  background:
+    linear-gradient(90deg, rgba(246, 242, 232, .08) 1px, transparent 1px),
+    linear-gradient(180deg, #101014, #020204);
+  background-size: 72px 72px, auto;
+}
+
+.kinetic-funnel__intro {
+  max-width: 980px;
+  margin-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.kinetic-funnel__intro p {
+  color: #f4c75b;
+  font: 900 .82rem/1 ui-monospace, monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.kinetic-funnel h1 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(3.7rem, 8vw, 8.5rem);
+  line-height: .92;
+  letter-spacing: 0;
+}
+
+.kinetic-funnel__stages {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.kinetic-funnel__stage {
+  min-height: 32rem;
+  display: grid;
+  align-content: end;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgba(244, 199, 91, .18);
+  background:
+    radial-gradient(circle at 80% 18%, rgba(39, 242, 255, .16), transparent 30%),
+    linear-gradient(135deg, rgba(244, 199, 91, .09), rgba(255, 255, 255, .025));
+}
+
+.kinetic-funnel__stage span {
+  color: #f4c75b;
+  font-family: ui-monospace, monospace;
+}
+
+.kinetic-funnel__stage h2 {
+  margin: 1rem 0 .6rem;
+  font-size: clamp(3rem, 8vw, 9rem);
+  line-height: .86;
+}
+
+.kinetic-funnel__stage p {
+  max-width: 42rem;
+  color: rgba(246, 242, 232, .72);
+  font-size: 1.1rem;
+  line-height: 1.65;
+}

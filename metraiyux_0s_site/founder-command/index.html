@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Founder Command | MetrAIyux 0S</title>
+  <meta name="theme-color" content="#080b0f" />
+  <link rel="icon" href="data:," />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="phone-shell">
+    <header class="command-top">
+      <div>
+        <p class="eyebrow">MetrAIyux 0S</p>
+        <h1>Founder Command</h1>
+      </div>
+      <span id="gateState" class="state-pill">Locked</span>
+    </header>
+
+    <section class="login-card" id="loginCard">
+      <p class="eyebrow">Owner gate</p>
+      <h2>Unlock mobile command.</h2>
+      <form id="loginForm">
+        <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Free99 / 0S gate code" required />
+        <button type="submit">Unlock</button>
+      </form>
+      <p id="loginStatus" class="muted"></p>
+    </section>
+
+    <section class="dash-grid" id="dashGrid">
+      <article class="status-card">
+        <span>Gate</span>
+        <strong id="gateConfigured">Locked</strong>
+      </article>
+      <article class="status-card">
+        <span>Queue</span>
+        <strong id="queueConfigured">Login</strong>
+      </article>
+      <article class="status-card">
+        <span>Storage</span>
+        <strong id="kvConfigured">Login</strong>
+      </article>
+    </section>
+
+    <nav class="tabbar" id="tabbar">
+      <button type="button" data-tab="command" aria-pressed="true">Command</button>
+      <button type="button" data-tab="inbox">Inbox</button>
+      <button type="button" data-tab="codes">Codes</button>
+      <button type="button" data-tab="recovery">Recovery</button>
+      <button type="button" data-tab="routes">Routes</button>
+    </nav>
+
+    <section class="panel active" data-panel="command">
+      <div class="panel-head">
+        <p class="eyebrow">Chat command</p>
+        <h2>Check live status and open controls.</h2>
+      </div>
+      <div id="chatFeed" class="chat-feed"></div>
+      <form id="commandForm" class="command-form">
+        <textarea id="commandInput" placeholder="Ask for status, open a route, or prepare a recovery/code action."></textarea>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <section class="panel" data-panel="inbox">
+      <div class="panel-head">
+        <p class="eyebrow">Relay13 inbox</p>
+        <h2>Open and answer live site conversations.</h2>
+      </div>
+      <form id="inboxForm" class="code-form">
+        <label>Workspace
+          <input name="workspace" value="connectlog-main" />
+        </label>
+        <label>Subject
+          <input name="subject" placeholder="What should the Worker open?" />
+        </label>
+        <label>Contact name
+          <input name="customer_name" value="Founder Command" />
+        </label>
+        <label>Contact email
+          <input name="customer_email" type="email" placeholder="optional" />
+        </label>
+        <label>Message
+          <textarea name="message" placeholder="Tell Relay13 what this thread is for." required></textarea>
+        </label>
+        <button type="submit">Create Relay13 conversation</button>
+      </form>
+      <div id="inboxOutput" class="code-output"></div>
+      <div id="inboxList" class="conversation-list"></div>
+      <form id="inboxMessageForm" class="code-form compact-form">
+        <label>Conversation ID
+          <input name="conversation_id" id="inboxConversationId" placeholder="Select a thread below" />
+        </label>
+        <label>Workspace ID
+          <input name="workspace_id" id="inboxWorkspaceId" placeholder="Loaded from Relay13" />
+        </label>
+        <label>Reply as
+          <select name="sender_role">
+            <option value="operator" selected>Operator</option>
+            <option value="system">System</option>
+          </select>
+        </label>
+        <label>Reply
+          <textarea name="message" placeholder="Send an operator reply into Relay13."></textarea>
+        </label>
+        <button type="submit">Send Relay13 reply</button>
+      </form>
+      <div id="messageList" class="message-list"></div>
+    </section>
+
+    <section class="panel" data-panel="codes">
+      <div class="panel-head">
+        <p class="eyebrow">Gate codes</p>
+        <h2>Provision access with limits.</h2>
+      </div>
+      <form id="codeForm" class="code-form">
+        <label>Preset
+          <select name="code_type">
+            <option value="emergency">Emergency</option>
+            <option value="client" selected>Client</option>
+            <option value="operator">Operator</option>
+            <option value="prospect">Prospect</option>
+          </select>
+        </label>
+        <label>Client or workspace
+          <input name="client" placeholder="Valley Verified, Bob's, new client..." />
+        </label>
+        <div class="mini-grid">
+          <label>Uses <input name="max_uses" type="number" min="1" max="500" value="3" /></label>
+          <label>TTL min <input name="ttl_minutes" type="number" min="5" max="43200" value="1440" /></label>
+          <label>Seats <input name="seats" type="number" min="1" max="250" value="3" /></label>
+          <label>Actions/mo <input name="monthly_actions" type="number" min="1" max="100000" value="250" /></label>
+        </div>
+        <label>Scope
+          <input name="scope" value="gate.login provision emergency" />
+        </label>
+        <label>Custom rules
+          <textarea name="custom_rules" placeholder="One rule per line"></textarea>
+        </label>
+        <button type="submit">Generate reveal-once code</button>
+      </form>
+      <div id="codeOutput" class="code-output"></div>
+      <div id="codeList" class="code-list"></div>
+    </section>
+
+    <section class="panel" data-panel="recovery">
+      <div class="panel-head">
+        <p class="eyebrow">Lockout recovery</p>
+        <h2>Issue restore keys and backup codes.</h2>
+      </div>
+      <form id="recoveryForm" class="code-form">
+        <label>Locked surface
+          <select name="surface">
+            <option value="skyebox">SkyeBox Authenticator</option>
+            <option value="gate">0S / Free99 Gate</option>
+            <option value="customer-onboarding">Customer onboarding</option>
+            <option value="founder-admin">Founder admin</option>
+          </select>
+        </label>
+        <label>Client, workspace, or company
+          <input name="client" placeholder="Valley Verified, Bob's, new client..." />
+        </label>
+        <label>Owner email
+          <input name="email" type="email" placeholder="owner@example.com" />
+        </label>
+        <div class="mini-grid">
+          <label>Backup codes <input name="backup_count" type="number" min="2" max="20" value="8" /></label>
+          <label>TTL min <input name="ttl_minutes" type="number" min="5" max="43200" value="1440" /></label>
+          <label>Uses <input name="max_uses" type="number" min="1" max="500" value="1" /></label>
+          <label>Seats <input name="seats" type="number" min="1" max="250" value="1" /></label>
+        </div>
+        <label>Reason
+          <textarea name="notes" placeholder="Forgot SkyeBox password, locked client out, lost device, new owner handoff..."></textarea>
+        </label>
+        <button type="submit">Generate reveal-once recovery packet</button>
+      </form>
+      <div id="recoveryOutput" class="code-output"></div>
+      <div id="recoveryList" class="code-list"></div>
+    </section>
+
+    <section class="panel" data-panel="routes">
+      <div class="panel-head">
+        <p class="eyebrow">Direct controls</p>
+        <h2>Open the live 0S surfaces.</h2>
+      </div>
+      <div id="routeList" class="route-list"></div>
+    </section>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>

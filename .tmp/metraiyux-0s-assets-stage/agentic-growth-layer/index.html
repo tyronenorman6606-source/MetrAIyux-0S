@@ -1,0 +1,184 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agentic Growth Layer | 0S Operator</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="FS27-gated 0S operator surface for Agentic Growth Layer cycles, no-domain fallback, source pulls, developer-agent patches, and proof receipts.">
+  <link rel="icon" href="./assets/favicon-32.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/agentic-growth-layer/" aria-label="Agentic Growth Layer home">
+      <img src="./assets/favicon-32.png" alt="">
+      <span>Agentic Growth Layer</span>
+    </a>
+    <nav class="topnav" aria-label="Agentic Growth navigation">
+      <a href="#cycle">Cycle</a>
+      <a href="#queues">Queues</a>
+      <a href="#patch">Patch</a>
+      <a href="#ledger">Ledger</a>
+      <a href="/key-gate-13th/">Key Gate 13th</a>
+      <a href="/api/0s/route-manifest">0S Manifest</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">0S mounted, FS27 authenticated</p>
+        <h1 class="neon-gradient-text">Agentic websites that keep improving after launch.</h1>
+        <p class="lede">Run a market-data cycle, generate developer-agent tasks, export reviewable static patch manifests, and keep a receipt ledger under the shared 0S gate.</p>
+        <div class="hero-actions">
+          <button class="primary" type="button" id="runCycle">Run cycle</button>
+          <button type="button" id="runFallback">No-domain brief</button>
+          <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&amp;offer=agentic-growth-connected" target="_blank" rel="noopener">Open SkyePay lane</a>
+        </div>
+      </div>
+      <div class="hero-media" aria-label="Agentic proof router preview">
+        <img src="./assets/agentic-growth-proof-router.png" alt="Agentic Growth Layer proof router preview">
+      </div>
+    </section>
+
+    <section class="status-grid" aria-label="Runtime status">
+      <article>
+        <span>Auth</span>
+        <strong id="authState">FS27 gate required</strong>
+      </article>
+      <article>
+        <span>Engine</span>
+        <strong id="engineState">Checking...</strong>
+      </article>
+      <article>
+        <span>Fallback</span>
+        <strong>No GSC required</strong>
+      </article>
+      <article>
+        <span>Apply Policy</span>
+        <strong>Owner review</strong>
+      </article>
+    </section>
+
+    <section class="workspace" id="cycle">
+      <div class="panel input-panel">
+        <div class="section-head">
+          <p class="eyebrow">Cycle input</p>
+          <h2>Market, site, and proof signals</h2>
+        </div>
+        <form id="cycleForm">
+          <div class="form-grid">
+            <label>Business name
+              <input id="businessName" name="businessName" value="Skyes Over London LC">
+            </label>
+            <label>Workspace
+              <input id="workspaceId" name="workspaceId" value="0s-primary-workspace">
+            </label>
+            <label>Industry
+              <input id="industry" name="industry" value="agentic website growth">
+            </label>
+            <label>Services
+              <textarea id="services" name="services">self improving websites, local SEO automation, developer agent patching, proof backed conversion systems</textarea>
+            </label>
+            <label>Locations
+              <textarea id="locations" name="locations">Phoenix AZ, Glendale AZ, Mesa AZ</textarea>
+            </label>
+            <label>Seed keywords
+              <textarea id="keywords" name="keywords">agentic website, self improving website, ai seo agents, local seo automation phoenix</textarea>
+            </label>
+            <label>Competitors
+              <textarea id="competitors" name="competitors">https://www.webfx.com, https://www.brightedge.com, https://www.semrush.com</textarea>
+            </label>
+            <label>Preview or live URL
+              <input id="previewUrl" name="previewUrl" value="https://agentic-growth-layer.pages.dev/">
+            </label>
+            <label>Page inventory
+              <textarea id="pages" name="pages">/, /services/agentic-growth-layer, /proof/, /pricing/</textarea>
+            </label>
+            <label>GSC credential ref
+              <select id="gscRef" name="gscRef"><option value="">None</option></select>
+            </label>
+            <label>SEMrush credential ref
+              <select id="semrushRef" name="semrushRef"><option value="">None</option></select>
+            </label>
+            <label>DataForSEO credential ref
+              <select id="dataForSeoRef" name="dataForSeoRef"><option value="">None</option></select>
+            </label>
+            <label>GSC site URL
+              <input id="gscSiteUrl" name="gscSiteUrl" value="sc-domain:example.com">
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="primary" type="submit">Generate plan</button>
+            <button type="button" id="pullSources">Pull connected sources</button>
+            <button type="button" id="schemaBtn">Schema</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="panel output-panel">
+        <div class="section-head">
+          <p class="eyebrow">Latest receipt</p>
+          <h2 id="receiptTitle">Waiting for cycle</h2>
+        </div>
+        <div id="summary" class="summary">The operator cycle will appear here after the FS27-gated API responds.</div>
+        <pre id="jsonOut" class="json-out">{}</pre>
+      </aside>
+    </section>
+
+    <section class="queues" id="queues">
+      <div class="section-head">
+        <p class="eyebrow">Developer-agent queues</p>
+        <h2>What the engine wants changed next</h2>
+      </div>
+      <div class="queue-grid">
+        <article class="queue-card">
+          <h3>Service pages</h3>
+          <ul id="serviceQueue"></ul>
+        </article>
+        <article class="queue-card">
+          <h3>Location pages</h3>
+          <ul id="locationQueue"></ul>
+        </article>
+        <article class="queue-card">
+          <h3>FAQs</h3>
+          <ul id="faqQueue"></ul>
+        </article>
+        <article class="queue-card">
+          <h3>Internal links</h3>
+          <ul id="linkQueue"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="patch-ledger">
+      <article class="panel" id="patch">
+        <div class="section-head">
+          <p class="eyebrow">Patch manifest</p>
+          <h2>Reviewable static-site output</h2>
+        </div>
+        <div class="form-actions">
+          <button class="primary" type="button" id="buildPatch">Build patch</button>
+          <button type="button" id="copyJson">Copy JSON</button>
+        </div>
+        <pre id="patchOut" class="json-out compact">{}</pre>
+      </article>
+
+      <article class="panel" id="ledger">
+        <div class="section-head">
+          <p class="eyebrow">0S proof ledger</p>
+          <h2>Recent Agentic Growth receipts</h2>
+        </div>
+        <button type="button" id="refreshLedger">Refresh ledger</button>
+        <div id="ledgerList" class="ledger-list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/assets/js/metraiyux-api-bases.js"></script>
+  <script src="./operator.js"></script>
+</body>
+</html>

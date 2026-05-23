@@ -21,6 +21,48 @@ function positiveNumber(value, fallback = null) {
   return Number.isFinite(number) && number > 0 ? number : fallback;
 }
 
+function repoPlanDefaults(planName) {
+  const plan = String(planName || '').toLowerCase();
+  if (/(founder|owner|admin|unlimited|fs27|free99-god)/.test(plan)) {
+    return {
+      repoPushMode: 'unlimited',
+      repoPushPlan: 'owner-unlimited',
+      maxTotalSubmissionGb: 5000,
+      maxFileSizeGb: 5000,
+      repoPushesPerWindow: 0,
+      repoPushWindowDays: 30
+    };
+  }
+  if (/(100\s*gb|100gb|repo-100|brain-100)/.test(plan)) {
+    return {
+      repoPushMode: 'metered',
+      repoPushPlan: 'repo-100gb',
+      maxTotalSubmissionGb: 100,
+      maxFileSizeGb: 100,
+      repoPushesPerWindow: Number(process.env.SKYEVAULT_REPO_100GB_PUSHES_PER_WINDOW || 10),
+      repoPushWindowDays: Number(process.env.SKYEVAULT_REPO_PUSH_WINDOW_DAYS || 30)
+    };
+  }
+  if (/(50\s*gb|50gb|repo-50)/.test(plan)) {
+    return {
+      repoPushMode: 'metered',
+      repoPushPlan: 'repo-50gb',
+      maxTotalSubmissionGb: 50,
+      maxFileSizeGb: 50,
+      repoPushesPerWindow: Number(process.env.SKYEVAULT_REPO_50GB_PUSHES_PER_WINDOW || 5),
+      repoPushWindowDays: Number(process.env.SKYEVAULT_REPO_PUSH_WINDOW_DAYS || 30)
+    };
+  }
+  return {
+    repoPushMode: 'metered',
+    repoPushPlan: 'repo-standard',
+    maxTotalSubmissionGb: Number(process.env.SKYEVAULT_DEFAULT_REPO_PUSH_GB || 50),
+    maxFileSizeGb: Number(process.env.SKYEVAULT_DEFAULT_REPO_PUSH_GB || 50),
+    repoPushesPerWindow: Number(process.env.SKYEVAULT_DEFAULT_REPO_PUSHES_PER_WINDOW || 1),
+    repoPushWindowDays: Number(process.env.SKYEVAULT_REPO_PUSH_WINDOW_DAYS || 30)
+  };
+}
+
 function configFolderId() {
   const id = process.env.R2_CONFIG_PREFIX || process.env.R2_CONFIG_FOLDER_ID || process.env.GOOGLE_CONFIG_FOLDER_ID;
   if (!id) {
@@ -44,6 +86,8 @@ function normalizeWorkspace(input = {}, source = 'registry') {
   if (!workspaceId) return null;
   const portalKey = cleanText(input.key || input.portalKey || input.uploadCode || '', 240);
   const keyHash = cleanText(input.keyHash || input.portalKeyHash || (portalKey ? hashWorkspaceKey(portalKey) : ''), 128);
+  const planName = cleanText(input.planName || input.plan_name || input.plan || '', 80);
+  const repoDefaults = repoPlanDefaults(planName);
   return {
     source,
     workspaceId,
@@ -53,7 +97,9 @@ function normalizeWorkspace(input = {}, source = 'registry') {
     clientEmail: cleanText(input.clientEmail || input.client_email || input.email, 180).toLowerCase(),
     projectName: cleanText(input.projectName || input.project_name || input.workspaceName || input.workspace_name || workspaceId, 180),
     destinationId: safeId(input.destinationId || input.destination_id || input.destination || ''),
-    planName: cleanText(input.planName || input.plan_name || input.plan || '', 80),
+    planName,
+    repoPushPlan: cleanText(input.repoPushPlan || input.repo_push_plan || repoDefaults.repoPushPlan, 80),
+    repoPushMode: cleanText(input.repoPushMode || input.repo_push_mode || repoDefaults.repoPushMode, 40),
     offerId: cleanText(input.offerId || input.offer_id || '', 140),
     subscriptionStatus: cleanText(input.subscriptionStatus || input.subscription_status || input.status || 'active', 80),
     stripeCustomerId: cleanText(input.stripeCustomerId || input.stripe_customer_id || '', 160),
@@ -63,8 +109,10 @@ function normalizeWorkspace(input = {}, source = 'registry') {
     key: source === 'env' ? portalKey : '',
     keyHash,
     maxFilesPerSubmission: positiveNumber(input.maxFilesPerSubmission || input.max_files_per_submission),
-    maxTotalSubmissionGb: positiveNumber(input.maxTotalSubmissionGb || input.max_total_submission_gb),
-    maxFileSizeGb: positiveNumber(input.maxFileSizeGb || input.max_file_size_gb),
+    maxTotalSubmissionGb: positiveNumber(input.maxTotalSubmissionGb || input.max_total_submission_gb, repoDefaults.maxTotalSubmissionGb),
+    maxFileSizeGb: positiveNumber(input.maxFileSizeGb || input.max_file_size_gb, repoDefaults.maxFileSizeGb),
+    repoPushesPerWindow: positiveNumber(input.repoPushesPerWindow || input.repo_pushes_per_window, repoDefaults.repoPushesPerWindow),
+    repoPushWindowDays: positiveNumber(input.repoPushWindowDays || input.repo_push_window_days, repoDefaults.repoPushWindowDays),
     rateLimitUploadSessionsPerWindow: positiveNumber(input.rateLimitUploadSessionsPerWindow || input.rate_limit_upload_sessions_per_window),
     rateLimitStatusPerWindow: positiveNumber(input.rateLimitStatusPerWindow || input.rate_limit_status_per_window),
     rateLimitWindowMs: positiveNumber(input.rateLimitWindowMs || input.rate_limit_window_ms),

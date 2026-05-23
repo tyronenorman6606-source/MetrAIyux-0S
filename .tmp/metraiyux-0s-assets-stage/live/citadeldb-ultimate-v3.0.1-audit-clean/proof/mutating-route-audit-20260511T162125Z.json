@@ -1,0 +1,250 @@
+{
+  "ok": true,
+  "generatedAt": "2026-05-11T16:21:25.870Z",
+  "adminMutations": [
+    {
+      "method": "POST",
+      "path": "/admin/apps",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/migrations/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/restore/receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/claim",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/start",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/jobs/:id/finish",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tenants",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/write-smoke-job",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/ai/debug",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "ai_debug",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/rotate-credential",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "credential_rotation",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/database/test-url",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/guided/proof-action",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "guided_proof_action",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/setup/generate-secrets",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "setup_generate_secrets",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/apps/:appSlug/lifecycle-action",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "app_lifecycle_action",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "self_service_database_provision",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/sql",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "self_service_sql_execute",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/accounts",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/platform/teams/:teamSlug/projects/:projectSlug/attach",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/tables",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "table_browser_list",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/table-preview",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "table_browser_preview",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/commercial/subscriptions",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request",
+      "security": "admin",
+      "type": "paid_or_sensitive_guarded",
+      "protectedKey": "branch_request",
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/live-gates/check",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    },
+    {
+      "method": "POST",
+      "path": "/admin/self-service/projects/:projectSlug/databases/:appSlug/branch-request/:branchSlug/record-receipt",
+      "security": "admin",
+      "type": "admin_mutation",
+      "protectedKey": null,
+      "mutating": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "admin_mutations_exist",
+      "ok": true,
+      "count": 28
+    },
+    {
+      "name": "global_admin_mutation_audit_middleware",
+      "ok": true
+    },
+    {
+      "name": "global_admin_mutation_audit_inserts_audit_events",
+      "ok": true
+    },
+    {
+      "name": "admin_mutation_contract_security",
+      "ok": true
+    }
+  ],
+  "failed": []
+}

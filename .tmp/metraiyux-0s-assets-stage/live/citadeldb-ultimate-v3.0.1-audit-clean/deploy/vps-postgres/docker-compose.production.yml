@@ -1,0 +1,49 @@
+# Production override for private VPS use.
+# Use with:
+# docker compose -f deploy/vps-postgres/docker-compose.yml -f deploy/vps-postgres/docker-compose.production.yml up -d
+
+services:
+  postgres:
+    ports: []
+    restart: unless-stopped
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=replica"
+      - "-c"
+      - "archive_mode=on"
+      - "-c"
+      - "archive_command=test ! -f /var/lib/postgresql/wal_archive/%f && cp %p /var/lib/postgresql/wal_archive/%f"
+      - "-c"
+      - "max_wal_senders=10"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "effective_cache_size=2GB"
+      - "-c"
+      - "log_min_duration_statement=750"
+      - "-c"
+      - "log_connections=on"
+      - "-c"
+      - "log_disconnections=on"
+
+  pgbouncer:
+    ports:
+      - "127.0.0.1:${PGBOUNCER_PORT:-6432}:5432"
+
+  gateway:
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-7313}:7313"
+    environment:
+      UPSTREAM_AUTH_MODE: ${UPSTREAM_AUTH_MODE:-token}
+      TRUSTED_OPERATOR_HEADER: ${TRUSTED_OPERATOR_HEADER:-x-skyes-operator}
+      REQUIRE_OPERATOR_HEADER: ${REQUIRE_OPERATOR_HEADER:-false}
+
+  dashboard:
+    ports:
+      - "127.0.0.1:${DASHBOARD_PORT:-7413}:7413"
+
+  job-runner:
+    restart: unless-stopped

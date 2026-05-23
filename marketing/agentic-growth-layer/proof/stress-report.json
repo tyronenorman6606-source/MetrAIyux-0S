@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "startedAt": "2026-05-21T13:35:43.701Z",
+  "completedAt": "2026-05-21T13:35:59.077Z",
+  "fixture": {
+    "gscRows": 900,
+    "semrushRows": 900,
+    "serpQueries": 120,
+    "pages": 48,
+    "maxActions": 64
+  },
+  "core": {
+    "iterations": 240,
+    "concurrency": 24,
+    "elapsedMs": 11724,
+    "throughputPerSecond": 20.47,
+    "latencyMs": {
+      "min": 24,
+      "p50": 45,
+      "p95": 89,
+      "max": 161
+    }
+  },
+  "api": {
+    "requests": 80,
+    "concurrency": 16,
+    "elapsedMs": 3641,
+    "throughputPerSecond": 21.97,
+    "latencyMs": {
+      "min": 152,
+      "p50": 500,
+      "p95": 2084,
+      "max": 2517
+    }
+  },
+  "memory": {
+    "rssMb": 277.36,
+    "heapUsedMb": 21.14,
+    "heapTotalMb": 157.77
+  },
+  "assertions": [
+    "Connected Search Console mode selected under high source volume.",
+    "Every generated cycle returned prioritized actions and static-site patch operations.",
+    "Core throughput stayed above 10 large market cycles per second for the synthetic high-volume payload.",
+    "API p95 latency stayed below 2500ms under concurrent POST cycle load.",
+    "Stress receipt written for proof ledger."
+  ]
+}

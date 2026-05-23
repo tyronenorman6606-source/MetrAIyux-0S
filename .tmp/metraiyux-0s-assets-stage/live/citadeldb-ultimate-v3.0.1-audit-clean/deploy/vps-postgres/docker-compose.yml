@@ -1,0 +1,136 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: citadeldb-postgres
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-citadel}
+      POSTGRES_USER: ${POSTGRES_USER:-citadel_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=replica"
+      - "-c"
+      - "archive_mode=on"
+      - "-c"
+      - "archive_command=test ! -f /var/lib/postgresql/wal_archive/%f && cp %p /var/lib/postgresql/wal_archive/%f"
+      - "-c"
+      - "max_wal_senders=10"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+    volumes:
+      - citadel_pg_data:/var/lib/postgresql/data
+      - ../../init:/docker-entrypoint-initdb.d:ro
+      - ../../backups:/backups
+      - ../../deploy/vps-postgres/wal_archive:/var/lib/postgresql/wal_archive
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-citadel_admin} -d ${POSTGRES_DB:-citadel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.24.1-p1
+    container_name: citadeldb-pgbouncer
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-citadel_admin}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB:-citadel}
+      AUTH_TYPE: ${PGBOUNCER_AUTH_TYPE:-scram-sha-256}
+      POOL_MODE: ${PGBOUNCER_POOL_MODE:-transaction}
+      MAX_CLIENT_CONN: ${PGBOUNCER_MAX_CLIENT_CONN:-500}
+      DEFAULT_POOL_SIZE: ${PGBOUNCER_DEFAULT_POOL_SIZE:-30}
+    ports:
+      - "127.0.0.1:6432:5432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: ../../control-plane/gateway
+      dockerfile: Dockerfile
+    container_name: citadeldb-gateway
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-7313}:7313"
+    volumes:
+      - ../../proof:/workspace/proof
+      - ../../receipts:/workspace/receipts
+      - ../../backups:/workspace/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  dashboard:
+    build:
+      context: ../../operator-dashboard
+      dockerfile: Dockerfile
+    container_name: citadeldb-dashboard
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      GATEWAY_BASE_URL: http://gateway:7313
+      GATEWAY_ADMIN_TOKEN: ${GATEWAY_ADMIN_TOKEN}
+      DASHBOARD_PORT: 7413
+    ports:
+      - "127.0.0.1:7413:7413"
+    depends_on:
+      - gateway
+
+
+  job-runner:
+    build:
+      context: ../../workers/job-runner
+      dockerfile: Dockerfile
+    container_name: citadeldb-job-runner
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      GATEWAY_BASE_URL: http://gateway:7313
+      GATEWAY_ADMIN_TOKEN: ${GATEWAY_ADMIN_TOKEN}
+      WORKER_ID: vps-job-runner
+      JOB_RUNNER_POLL_MS: 5000
+      POSTGRES_HOST: postgres
+    volumes:
+      - ../../:/workspace
+    depends_on:
+      - gateway
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: citadeldb-postgres-exporter
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+    ports:
+      - "127.0.0.1:${POSTGRES_EXPORTER_PORT:-9187}:9187"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  citadel_pg_data:

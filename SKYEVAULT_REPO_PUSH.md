@@ -13,6 +13,20 @@ Successful uploads also append `.skyevault-out/vault-ledger.jsonl` so operators 
 
 It excludes `.env*`, `.git`, `node_modules`, `.netlify`, `.wrangler`, backups, WAL archives, database dumps/files, private keys, existing archive bundles, generated test artifacts, and any text file that matches the credential scanner.
 
+## SkyeVault Pro local import bridge
+
+SkyeVault-Drop and SkyeVault Pro are separate systems. SkyeVault-Drop is the dev/repo push lane. SkyeVault Pro is the local customer/operator vault mounted inside the 0S.
+
+To move a safe local copy from the dev lane into SkyeVault Pro without backing customer data up to company servers, stage an import folder:
+
+```bash
+npm run vault:pro:stage -- --source <folder> --out <local-import-folder>
+npm run vault:pro:from-dev -- --out <local-import-folder>
+npm run vault:pro:stage:latest -- --out <local-import-folder>
+```
+
+Then open SkyeVault Pro in the gated 0S, open Settings, and use **Disk sync -> Import folder**. The staged folder includes `.skye-vault-manifest.json` and excludes secret-looking files with the same scanner family used by repo push.
+
 Required local env values:
 
 - `SKYEVAULT_DROP_URL` in root `.env`, or it falls back to `https://skyevault-drop.netlify.app`.

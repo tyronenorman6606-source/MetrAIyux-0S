@@ -1,0 +1,36 @@
+[
+  {
+    "id": "stripe-checkout-completed-to-crm-note",
+    "provider": "stripe",
+    "type": "checkout.session.completed",
+    "workflowId": "db_query_ai_summary",
+    "mode": "run",
+    "inputMap": {
+      "sql": "select 'stripe_checkout_completed' as event_type",
+      "prompt": "Summarize the checkout completion webhook and identify follow-up actions."
+    },
+    "enabled": true
+  },
+  {
+    "id": "resend-email-events-to-lead-qualification",
+    "provider": "resend",
+    "type": "email.delivered",
+    "workflowId": "qualify_lead",
+    "mode": "enqueue",
+    "inputMap": {
+      "source": "resend_webhook"
+    },
+    "enabled": true
+  },
+  {
+    "id": "twilio-message-events-to-audit-summary",
+    "provider": "twilio",
+    "type": "message.status",
+    "workflowId": "db_query_ai_summary",
+    "mode": "enqueue",
+    "inputMap": {
+      "sql": "select 'twilio_message_status' as event_type"
+    },
+    "enabled": true
+  }
+]

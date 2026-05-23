@@ -1,0 +1,145 @@
+{
+  "started_at": "2026-05-17T18:11:17.710Z",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "health_version_0_4_0",
+      "data": {
+        "ok": true,
+        "app": "SkyeRoutexFlow Workforce Command",
+        "version": "0.4.0",
+        "database_driver": "local-json",
+        "storage_driver": "local-json",
+        "production_mode": false,
+        "jobs_open": 0,
+        "assignments_open": 0,
+        "routes_open": 0,
+        "sessions_active": 0,
+        "workflow_board": {
+          "total": 0,
+          "queued": 0,
+          "assigned": 0,
+          "active": 0,
+          "blocked": 0,
+          "completed": 0,
+          "retry": 0,
+          "dead": 0,
+          "unassigned": 0,
+          "job": 0,
+          "job_assignment": 0,
+          "route_job": 0
+        },
+        "workflow_timeline": {
+          "total": 0,
+          "queued": 0,
+          "assigned": 0,
+          "active": 0,
+          "blocked": 0,
+          "completed": 0,
+          "retry": 0,
+          "dead": 0,
+          "unassigned": 0,
+          "job": 0,
+          "job_assignment": 0,
+          "route_job": 0
+        },
+        "workflow_timeline_source": "workflow_board_fallback"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "admin_login",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "storage_status_reports_local_driver",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "provider_and_contractor_login",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "job_created",
+      "data": {
+        "jobId": "job_6547b11c9d78b7b1fc"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "assignment_created",
+      "data": {
+        "assignmentId": "asg_251f85626cd6b9b2dd"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "proof_media_persisted_with_sha256",
+      "data": {
+        "mediaId": "med_6d3dc41aa8d16740a9",
+        "bytes": 41,
+        "sha256": "0ce3bc56873b28c0487f3f77d0a55ddb2559aea150b59078121d45a536d35725"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "storage_integrity_verifies_media_bytes_and_sha256",
+      "data": {
+        "ok": true,
+        "media_count": 1,
+        "checks": [
+          {
+            "ok": true,
+            "id": "med_6d3dc41aa8d16740a9",
+            "storage_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/storage-export-media/prf_3155591e2469fbe4b9.txt",
+            "expected_bytes": 41,
+            "actual_bytes": 41,
+            "expected_sha256": "0ce3bc56873b28c0487f3f77d0a55ddb2559aea150b59078121d45a536d35725",
+            "actual_sha256": "0ce3bc56873b28c0487f3f77d0a55ddb2559aea150b59078121d45a536d35725"
+          }
+        ]
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "payment_advanced_after_media_proof",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "job_packet_exported_with_sha256",
+      "data": {
+        "exportId": "exp_6660d30d2776afc84b",
+        "mediaCount": 1,
+        "sha256": "8421bdfdaa9e6cd07140de8336dd6307a52e3aa21bc825289a831750a6a333b6"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "market_report_exported_with_sha256",
+      "data": {
+        "exportId": "exp_96723cea07eae6c5ff",
+        "jobs": 1,
+        "sha256": "84bed9e757c2cfd244a9540400a723af41cf43961887a85a4c334f8073567453"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "storage_counters_updated",
+      "data": {
+        "driver": "local-json",
+        "database_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/storage-export-smoke-db.json",
+        "media_root": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/storage-export-media",
+        "export_root": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/skyeroutex-workforce-command-v0.4.0/data/storage-export-packets",
+        "proof_media_count": 1,
+        "export_packet_count": 2
+      }
+    }
+  ],
+  "completed_at": "2026-05-17T18:11:18.457Z",
+  "status": "PASS",
+  "server_log_excerpt": "server spawned with stdio ignored for deterministic smoke exit."
+}

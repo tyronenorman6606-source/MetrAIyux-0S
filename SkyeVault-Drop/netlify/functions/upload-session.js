@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
 import { resolvePortalAccess, safeFileName, cleanText, safeId } from './_lib/security.js';
-import { loadConfig, chooseDestinations, assertFileAllowed, newSessionId, saveSessionManifest, writeAuditEventSafe } from './_lib/config.js';
-import { createResumableSession } from './_lib/google-drive.js';
+import { loadConfig, chooseDestinations, assertFileAllowed, newSessionId, saveSessionManifest, writeAuditEventSafe, loadLedger } from './_lib/config.js';
+import { createResumableSession, createStreamingMultipartSession } from './_lib/google-drive.js';
 import { applyNamedRateLimit, applyRateLimit, assertHoneypot, verifyTurnstile } from './_lib/rate-limit.js';
 
 function fail(message, statusCode = 400) {
@@ -142,6 +142,75 @@ function descriptionForIntake(fields) {
   ].filter(Boolean).join('\n');
 }
 
+function wantsStreamingMultipart(body = {}) {
+  const mode = cleanText(body.uploadMode || body.uploadModeRequested || '', 80).toLowerCase();
+  return body.streamingMultipart === true || mode === 's3-multipart-streaming' || mode === 'streaming-s3-multipart';
+}
+
+function isRepoPushRequest(body = {}, fileName = '') {
+  const text = [
+    body.assetType,
+    body.clientReference,
+    body.projectName,
+    body.notes,
+    fileName
+  ].map((item) => String(item || '').toLowerCase()).join(' ');
+  return /full[- ]?repo|repo[- ]?push|repo[- ]?custody|full[- ]?custody|brain[- ]?vault|workspace[- ]?snapshot/.test(text);
+}
+
+function repoPushEntryMatches(entry = {}) {
+  return isRepoPushRequest({
+    assetType: entry.assetType,
+    clientReference: entry.clientReference,
+    projectName: entry.projectName,
+    notes: entry.notes
+  }, entry.fileName || '');
+}
+
+function sameRepoMeterSubject(entry = {}, fields = {}) {
+  if (fields.workspaceId) return entry.workspaceId === fields.workspaceId;
+  if (fields.developerId) return entry.developerId === fields.developerId;
+  if (fields.clientEmail) return String(entry.clientEmail || '').toLowerCase() === fields.clientEmail;
+  return false;
+}
+
+async function enforceRepoPushMeter(portalAccess = {}, fields = {}, body = {}, fileName = '') {
+  if (!isRepoPushRequest(body, fileName)) return null;
+  if (String(portalAccess.repoPushMode || '').toLowerCase() === 'unlimited' || portalAccess.type === 'owner-admin') {
+    return {
+      kind: 'full-repo-push',
+      mode: 'unlimited',
+      plan: portalAccess.repoPushPlan || portalAccess.planName || 'owner-unlimited',
+      maxGb: Number(portalAccess.maxTotalSubmissionGb || 5000)
+    };
+  }
+  const limit = Number(portalAccess.repoPushesPerWindow || process.env.SKYEVAULT_DEFAULT_REPO_PUSHES_PER_WINDOW || 1);
+  const windowDays = Number(portalAccess.repoPushWindowDays || process.env.SKYEVAULT_REPO_PUSH_WINDOW_DAYS || 30);
+  const windowMs = Math.max(1, windowDays) * 24 * 60 * 60 * 1000;
+  const since = Date.now() - windowMs;
+  const ledger = await loadLedger(2500).catch(() => ({ entries: [] }));
+  const used = (ledger.entries || []).filter((entry) => {
+    const completedAt = Date.parse(entry.completedAt || entry.createdAt || '');
+    return Number.isFinite(completedAt)
+      && completedAt >= since
+      && sameRepoMeterSubject(entry, fields)
+      && repoPushEntryMatches(entry);
+  }).length;
+  if (limit > 0 && used >= limit) {
+    fail(`This plan allows ${limit} full repo push${limit === 1 ? '' : 'es'} every ${windowDays} day${windowDays === 1 ? '' : 's'}.`, 429);
+  }
+  return {
+    kind: 'full-repo-push',
+    mode: 'metered',
+    plan: portalAccess.repoPushPlan || portalAccess.planName || 'repo-standard',
+    limit,
+    used,
+    remaining: limit > 0 ? Math.max(0, limit - used - 1) : null,
+    windowDays,
+    maxGb: Number(portalAccess.maxTotalSubmissionGb || 0)
+  };
+}
+
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return handleOptions(event);
   const wrongMethod = method(event, ['POST']);
@@ -170,12 +239,14 @@ export async function handler(event) {
     requireIntakeConsent(config, body);
 
     const fileName = safeFileName(body.fileName);
-    const fileSize = Number(body.fileSize);
+    const streamingMultipart = wantsStreamingMultipart(body);
+    const fileSize = Number(body.fileSize || body.expectedMaxBytes || body.declaredMaxBytes);
     const mimeType = cleanText(body.mimeType || 'application/octet-stream', 160) || 'application/octet-stream';
     const sessionId = newSessionId();
     const submissionPolicy = validateSubmissionPolicy(config, body, fileSize, portalAccess);
     const fields = intakeFields(config, body, portalAccess);
     const fileFingerprint = normalizeFingerprint(body.fileFingerprint);
+    const repoPushPolicy = await enforceRepoPushMeter(portalAccess, fields, body, fileName);
 
     const destinations = chooseDestinations(config, portalAccess.destinationId || body.destinationId, body.failedDestinationIds || []);
     if (!destinations.length) {
@@ -189,7 +260,7 @@ export async function handler(event) {
           ? { ...destination, maxFileSizeGb: Math.min(Number(destination.maxFileSizeGb || portalAccess.maxFileSizeGb), Number(portalAccess.maxFileSizeGb)) }
           : destination;
         assertFileAllowed(scopedDestination, fileSize, mimeType, fileName, config);
-        const session = await createResumableSession(destination, {
+        const uploadInput = {
           sessionId,
           fileName,
           fileSize,
@@ -200,7 +271,10 @@ export async function handler(event) {
           description: descriptionForIntake(fields),
           fileFingerprint,
           ...fields
-        });
+        };
+        const session = streamingMultipart
+          ? await createStreamingMultipartSession(scopedDestination, uploadInput)
+          : await createResumableSession(scopedDestination, uploadInput);
 
         const manifestResult = await saveSessionManifest({
           sessionId,
@@ -222,8 +296,10 @@ export async function handler(event) {
             submissionFileCount: submissionPolicy.fileCount,
             submissionTotalBytes: submissionPolicy.totalBytes,
             blockedExtensions: config.blockedExtensions || [],
-            maxFileSizeGb: destination.maxFileSizeGb,
-            accept: destination.accept || '*'
+            maxFileSizeGb: scopedDestination.maxFileSizeGb,
+            accept: scopedDestination.accept || '*',
+            streamingMultipart,
+            repoPushPolicy
           },
           attempts,
           uploadUrlHash: hashSecret(session.uploadUrl)
@@ -242,6 +318,8 @@ export async function handler(event) {
           mimeType,
           submissionFileCount: submissionPolicy.fileCount,
           submissionTotalBytes: submissionPolicy.totalBytes,
+          streamingMultipart,
+          repoPushPolicy,
           manifestFileId: manifestResult.saved?.id || null
         });
 
@@ -256,12 +334,14 @@ export async function handler(event) {
           objectKey: session.objectKey || '',
           bucket: session.bucket || '',
           parts: session.parts || [],
-          chunkSize: Math.floor(Number(config.chunkSizeMb || 8) * 1024 * 1024),
+          chunkSize: session.chunkSize || Math.floor(Number(config.chunkSizeMb || 8) * 1024 * 1024),
+          maxParts: session.maxParts || null,
+          partUrlEndpoint: session.partUrlEndpoint || '',
           destination: {
-            id: destination.id,
-            name: destination.name,
-            role: destination.role,
-            priority: destination.priority
+            id: scopedDestination.id,
+            name: scopedDestination.name,
+            role: scopedDestination.role,
+            priority: scopedDestination.priority
           },
           workspace: fields.workspaceId ? {
             id: fields.workspaceId,
@@ -282,7 +362,9 @@ export async function handler(event) {
             status: manifestResult.manifest.status
           },
           policy: {
-            blockedExtensions: config.blockedExtensions || []
+            blockedExtensions: config.blockedExtensions || [],
+            streamingMultipart,
+            repoPushPolicy
           },
           abuseControls: {
             turnstile: humanGate?.configured ? { configured: true, ok: true } : { configured: false, skipped: true }

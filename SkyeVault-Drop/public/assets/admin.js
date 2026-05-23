@@ -50,6 +50,7 @@ const vaultSearch = document.querySelector('#vaultSearch');
 const vaultClientFilter = document.querySelector('#vaultClientFilter');
 const vaultStatusFilter = document.querySelector('#vaultStatusFilter');
 const vaultClearFilters = document.querySelector('#vaultClearFilters');
+const skyeSecureConsoleUrl = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-secure-secret-packs/app.html';
 
 const fields = {
   brandName: document.querySelector('#configBrandName'),
@@ -158,13 +159,47 @@ function renderVaultSummary(entries = state.ledger) {
   }
 }
 
-async function api(path, options = {}) {
+function skygateBearer() {
+  return sessionStorage.getItem('adminBrainToken') || window.MetrAIyuxGateBridge?.current?.()?.token || '';
+}
+
+function adminAuthHeaders(extra = {}) {
   const token = adminToken.value.trim() || localStorage.getItem('cdv-admin-token') || '';
-  const headers = {
+  const bearer = skygateBearer();
+  const headers = { ...extra };
+  if (token) headers['x-admin-token'] = token;
+  else if (bearer) {
+    headers.authorization = `Bearer ${bearer}`;
+    headers['x-skye-platform'] = 'metraiyux-0s-admin';
+    headers['x-skye-usage-lane'] = 'skyevault-admin-dashboard';
+  }
+  return headers;
+}
+
+function isSecretPack(entry = {}) {
+  const file = entry.driveFile || {};
+  const name = String(entry.fileName || file.name || '').toLowerCase();
+  const type = String(entry.assetType || '').toLowerCase();
+  return name.endsWith('.skyesecrets') || type.includes('secret pack') || type.includes('skyesecure');
+}
+
+function skyeSecureUnlockHref(entry = {}) {
+  const file = entry.driveFile || {};
+  const params = new URLSearchParams({
+    receipt: entry.id || '',
+    session: entry.sessionId || '',
+    file: entry.fileName || file.name || 'secret-pack.skyesecrets'
+  });
+  const fingerprint = entry.fileFingerprint?.value || entry.sha256 || '';
+  if (fingerprint) params.set('sha256', fingerprint);
+  return `${skyeSecureConsoleUrl}?${params.toString()}`;
+}
+
+async function api(path, options = {}) {
+  const headers = adminAuthHeaders({
     'content-type': 'application/json',
     ...(options.headers || {})
-  };
-  if (token) headers['x-admin-token'] = token;
+  });
   const response = await fetch(path, {
     ...options,
     headers
@@ -449,6 +484,15 @@ function renderLedger(entries = []) {
     replayClient.textContent = 'Replay + client receipt';
     replayClient.addEventListener('click', () => replayNotification(entry.id, true).catch((error) => showStatus(error.message, 'error')));
     actions.append(download, replay, replayClient);
+    if (isSecretPack(entry)) {
+      const unlock = document.createElement('a');
+      unlock.className = 'secondary-btn compact';
+      unlock.href = skyeSecureUnlockHref(entry);
+      unlock.target = '_blank';
+      unlock.rel = 'noopener';
+      unlock.textContent = 'Unlock in SkyeSecure';
+      actions.append(unlock);
+    }
     row.append(title, clientLine, detailLine, metaLine, actions);
     ledgerList.append(row);
   }
@@ -463,8 +507,7 @@ function refreshVaultBrowser() {
 
 
 async function downloadAdminExport(type, format) {
-  const token = adminToken.value.trim() || localStorage.getItem('cdv-admin-token') || '';
-  const headers = token ? { 'x-admin-token': token } : {};
+  const headers = adminAuthHeaders();
   const response = await fetch(`/api/admin-export?type=${encodeURIComponent(type)}&format=${encodeURIComponent(format)}`, { headers });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
@@ -505,7 +548,7 @@ async function loadDashboard() {
   if (eventsPanel) eventsPanel.classList.remove('hidden');
   if (exportPanel) exportPanel.classList.remove('hidden');
   ledgerPanel.classList.remove('hidden');
-  showStatus(`Loaded config from ${data.source}.`, 'success');
+  showStatus(`Loaded config from ${data.source}. Actor: ${data.actor?.actor || data.actor?.type || 'admin'}.`, 'success');
 }
 
 loadButton.addEventListener('click', () => {

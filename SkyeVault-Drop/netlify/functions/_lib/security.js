@@ -85,10 +85,11 @@ export function hasValidOperatorSession(event) {
 }
 
 export function assertAllowedOrigin(event) {
-  const allowed = String(process.env.ALLOWED_ORIGINS || '')
+  const configured = String(process.env.ALLOWED_ORIGINS || '')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+  const allowed = configured.length ? Array.from(new Set([...configured, ...defaultFirstPartyOrigins()])) : configured;
   const origin = getHeader(event, 'origin');
   if (!allowed.length || allowed.includes('*')) return;
   if (!origin) return;
@@ -117,6 +118,144 @@ export function assertAllowedOrigin(event) {
   }
 }
 
+function defaultFirstPartyOrigins() {
+  return [
+    process.env.METRAIYUX_0S_ORIGIN,
+    process.env.METRAIYUX_0S_WORKER_ORIGIN,
+    process.env.SKYEVAULT_0S_ORIGIN,
+    'https://metraiyux-0s-full-system.graylondonskyes.workers.dev',
+    'https://skyevault-drop.graylondonskyes.workers.dev',
+    'https://skyevault-drop.netlify.app',
+    process.env.URL,
+    process.env.DEPLOY_URL,
+    process.env.DEPLOY_PRIME_URL
+  ].map((origin) => String(origin || '').trim().replace(/\/+$/, '')).filter(Boolean);
+}
+
+function workerEnv() {
+  return globalThis.__SKYEVAULT_WORKER_ENV || {};
+}
+
+function bearerToken(event) {
+  const raw = getHeader(event, 'authorization')
+    || getHeader(event, 'x-skye-gate-session')
+    || getHeader(event, 'x-free99-gate-session')
+    || getHeader(event, 'x-free99-admin-code')
+    || '';
+  return String(raw || '').replace(/^Bearer\s+/i, '').trim();
+}
+
+function skygateOrigin() {
+  return String(
+    process.env.SKYGATEFS27_ORIGIN
+    || process.env.SKYEGATEFS27_URL
+    || process.env.FS27_LIVE_BASE
+    || process.env.SKYGATE_ORIGIN
+    || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev'
+  ).replace(/\/+$/, '');
+}
+
+async function skygateFetch(path, token) {
+  const body = JSON.stringify({ token });
+  const init = {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body
+  };
+  const binding = workerEnv().SKYGATEFS27_WORKER;
+  if (binding?.fetch) {
+    return binding.fetch(new Request(`https://skyegatefs27.internal${path}`, init));
+  }
+  return fetch(`${skygateOrigin()}${path}`, init);
+}
+
+function scopeList(scope) {
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope || '').split(/\s+/).filter(Boolean);
+}
+
+function emailAllowlist() {
+  return String(
+    process.env.SKYEVAULT_ADMIN_EMAILS
+    || process.env.METRAIYUX_0S_SKYGATE_ADMIN_EMAILS
+    || process.env.SKYGATE_ADMIN_EMAILS
+    || process.env.METRAIYUX_ADMIN_EMAILS
+    || process.env.ADMIN_EMAILS
+    || ''
+  ).split(',').map((email) => email.trim().toLowerCase()).filter(Boolean);
+}
+
+function allowsSkyeVaultAdmin(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = String(claims.role || claims.user?.role || '').toLowerCase();
+  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
+  const email = String(claims.email || claims.username || claims.user?.email || '').toLowerCase();
+  const allowedEmails = emailAllowlist();
+  return ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)
+    || scopes.has('admin.write')
+    || scopes.has('admin.read')
+    || scopes.has('keys.write')
+    || scopes.has('gateway.invoke')
+    || scopes.has('skyevault.admin')
+    || scopes.has('vault.admin')
+    || scopes.has('vault.download')
+    || (allowedEmails.length > 0 && allowedEmails.includes(email));
+}
+
+function publicAdminActor(type, claims = {}) {
+  const scopes = scopeList(claims.scope || claims.scopes || claims.user?.scope);
+  const email = cleanText(claims.email || claims.username || claims.user?.email || '', 180).toLowerCase();
+  const subject = cleanText(claims.sub || claims.user_id || claims.userId || claims.user?.id || email || type, 180);
+  const gateCard = claims.gate_card || {};
+  return {
+    type,
+    actor: email || subject || type,
+    subject,
+    email,
+    role: cleanText(claims.role || claims.user?.role || '', 80).toLowerCase(),
+    customerId: safeId(claims.customer_id || claims.customerId || claims.org || gateCard.customer_id || ''),
+    workspaceId: safeId(claims.workspace_id || claims.workspaceId || claims.ws_id || ''),
+    sessionId: cleanText(claims.session_id || claims.sid || gateCard.session_id || '', 160),
+    apiKeyId: cleanText(claims.api_key_id || claims.apiKeyId || '', 160),
+    gateCardId: cleanText(claims.gate_card_id || gateCard.id || '', 160),
+    scopes
+  };
+}
+
+export async function introspectSkygateBearer(event) {
+  const token = bearerToken(event);
+  if (!token) return { ok: false, statusCode: 401, error: 'Missing FS27 bearer token.' };
+  const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
+  let last = null;
+  for (const path of paths) {
+    try {
+      const response = await skygateFetch(path, token);
+      const data = await response.json().catch(() => ({ active: false, error: 'Invalid FS27 introspection response.' }));
+      last = { response, data, path };
+      if (response.status === 404) continue;
+      const ok = response.ok && data.active === true;
+      return {
+        ok,
+        active: Boolean(data.active),
+        statusCode: ok ? 200 : (response.ok ? 401 : response.status),
+        path,
+        claims: data,
+        error: ok ? '' : (data.error || 'FS27 bearer is inactive or not accepted.')
+      };
+    } catch (error) {
+      last = { error, path };
+    }
+  }
+  return {
+    ok: false,
+    active: false,
+    statusCode: 401,
+    path: last?.path || '',
+    claims: last?.data || null,
+    error: last?.error?.message || `FS27 introspection endpoint was not reachable at ${skygateOrigin()}.`
+  };
+}
+
 export function requireAdmin(event) {
   assertAllowedOrigin(event);
   const configured = process.env.ADMIN_TOKEN;
@@ -133,6 +272,38 @@ export function requireAdmin(event) {
     error.statusCode = 401;
     throw error;
   }
+}
+
+export async function requireAdminAccess(event) {
+  assertAllowedOrigin(event);
+  const configured = process.env.ADMIN_TOKEN;
+  const provided = getHeader(event, 'x-admin-token');
+  if (configured && provided && constantTimeEqual(provided, configured)) {
+    return publicAdminActor('legacy-admin-token', { role: 'admin', sub: 'legacy-admin-token' });
+  }
+  if (hasValidOperatorSession(event)) {
+    return publicAdminActor('operator-session', { role: 'admin', sub: 'operator-session' });
+  }
+
+  const bearer = bearerToken(event);
+  if (bearer) {
+    const gate = await introspectSkygateBearer(event);
+    if (!gate.ok) {
+      const error = new Error(gate.error || 'FS27 bearer is invalid or inactive.');
+      error.statusCode = gate.statusCode || 401;
+      throw error;
+    }
+    if (!allowsSkyeVaultAdmin(gate.claims)) {
+      const error = new Error('FS27 bearer is active, but it is not admin-scoped for SkyeVault.');
+      error.statusCode = 403;
+      throw error;
+    }
+    return publicAdminActor('fs27-skygate', gate.claims);
+  }
+
+  const error = new Error('Admin token, protected operator session, or FS27 admin bearer is invalid or missing.');
+  error.statusCode = 401;
+  throw error;
 }
 
 export function requirePortalKey(event, body = {}) {
@@ -153,6 +324,10 @@ function publicWorkspaceAccess(item) {
     maxFilesPerSubmission: item.maxFilesPerSubmission,
     maxTotalSubmissionGb: item.maxTotalSubmissionGb,
     maxFileSizeGb: item.maxFileSizeGb,
+    repoPushPlan: item.repoPushPlan,
+    repoPushMode: item.repoPushMode,
+    repoPushesPerWindow: item.repoPushesPerWindow,
+    repoPushWindowDays: item.repoPushWindowDays,
     rateLimitUploadSessionsPerWindow: item.rateLimitUploadSessionsPerWindow,
     rateLimitStatusPerWindow: item.rateLimitStatusPerWindow,
     rateLimitWindowMs: item.rateLimitWindowMs,
@@ -170,6 +345,38 @@ function workspaceKeyMatches(provided, workspace) {
 
 export async function resolvePortalAccess(event, body = {}) {
   assertAllowedOrigin(event);
+  const adminMaterial = getHeader(event, 'authorization')
+    || getHeader(event, 'x-admin-token')
+    || getHeader(event, 'x-skye-gate-session')
+    || getHeader(event, 'x-free99-gate-session')
+    || getHeader(event, 'x-free99-admin-code');
+  if (adminMaterial) {
+    try {
+      const admin = await requireAdminAccess(event);
+      recordPortalKeySuccess(event);
+      return {
+        type: 'owner-admin',
+        workspaceId: safeId(body.workspaceId || admin.workspaceId || 'owner-admin'),
+        developerId: safeId(body.developerId || admin.subject || admin.actor || 'owner-admin'),
+        developerName: cleanText(body.developerName || admin.email || admin.actor || 'Owner Admin', 120),
+        clientName: cleanText(body.clientName || 'Owner Admin', 180),
+        clientEmail: cleanText(body.clientEmail || admin.email || 'owner-admin@metraiyux.local', 180).toLowerCase(),
+        projectName: cleanText(body.projectName || 'Owner Admin Vault', 180),
+        maxFilesPerSubmission: 1000000,
+        maxTotalSubmissionGb: 5000,
+        maxFileSizeGb: 5000,
+        repoPushPlan: 'owner-unlimited',
+        repoPushMode: 'unlimited',
+        repoPushesPerWindow: 0,
+        repoPushWindowDays: 30,
+        subscriptionStatus: 'active',
+        planName: 'owner-admin-unlimited',
+        admin
+      };
+    } catch {
+      // A non-admin bearer may still be paired with a valid portal key below.
+    }
+  }
   const configured = process.env.CLIENT_PORTAL_KEY;
   const developerWorkspaces = await loadDeveloperWorkspaces();
   if (!configured && !developerWorkspaces.length) return { type: 'open' };
@@ -187,7 +394,13 @@ export async function resolvePortalAccess(event, body = {}) {
       type: 'portal',
       workspaceId: safeId(body.workspaceId || ''),
       developerId: safeId(body.developerId || ''),
-      developerName: cleanText(body.developerName || '', 120)
+      developerName: cleanText(body.developerName || '', 120),
+      maxTotalSubmissionGb: Number(process.env.SKYEVAULT_DEFAULT_PORTAL_MAX_TOTAL_GB || process.env.SKYEVAULT_DEFAULT_REPO_PUSH_GB || 50),
+      maxFileSizeGb: Number(process.env.SKYEVAULT_DEFAULT_PORTAL_MAX_FILE_GB || process.env.SKYEVAULT_DEFAULT_REPO_PUSH_GB || 50),
+      repoPushPlan: process.env.SKYEVAULT_DEFAULT_PORTAL_REPO_PLAN || 'repo-standard',
+      repoPushMode: 'metered',
+      repoPushesPerWindow: Number(process.env.SKYEVAULT_DEFAULT_REPO_PUSHES_PER_WINDOW || 1),
+      repoPushWindowDays: Number(process.env.SKYEVAULT_REPO_PUSH_WINDOW_DAYS || 30)
     };
   }
   if (!constantTimeEqual(provided, configured)) {

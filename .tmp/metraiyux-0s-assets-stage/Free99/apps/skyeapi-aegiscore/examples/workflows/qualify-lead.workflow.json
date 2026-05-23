@@ -1,0 +1,27 @@
+{
+  "workflowId": "qualify-lead",
+  "input": {
+    "leadName": "Mesa Roofing Co",
+    "leadNotes": "Needs better intake, missed calls, and follow-up automation.",
+    "ownerEmail": "owner@example.com"
+  },
+  "steps": [
+    {
+      "id": "score",
+      "capability": "ai.generate_text",
+      "input": {
+        "system": "Return concise JSON only.",
+        "prompt": "Score this lead from 1-100 and summarize the best next action: {{input.leadName}} — {{input.leadNotes}}"
+      }
+    },
+    {
+      "id": "notify",
+      "capability": "email.send",
+      "input": {
+        "to": "{{input.ownerEmail}}",
+        "subject": "Lead qualification result: {{input.leadName}}",
+        "body": "{{steps.score.data.text}}"
+      }
+    }
+  ]
+}

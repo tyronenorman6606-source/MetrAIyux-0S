@@ -1,11 +1,11 @@
 (function () {
-  const ACCESS_TOKEN_KEY = "kx.api.accessToken";
-  const TOKEN_EMAIL_KEY = "kx.api.tokenEmail";
-  const KEY_ALIAS = "kaixu_api_key";
-  const APP_BRIDGE_EVENT_KEY = "kx.app.bridge";
+  const TOKEN_EMAIL_KEY = "metraiyux.gate.email";
+  const APP_BRIDGE_EVENT_KEY = "metraiyux.app.bridge";
   const SUITE_LEDGER_ENDPOINT = "/api/suite-events";
   const SUITE_INTENT_VERSION = "suite-intent-v1";
   const SUITE_CARD_ID = "skye-suite-integration-card";
+  const PLATFORM_ID = "skye-docx-max";
+  const USAGE_LANE = "document-ai-analysis";
 
   const APP_TITLE_ALIASES = {
     "API Playground": "API-Playground",
@@ -25,18 +25,45 @@
     "SkyeAnalytics": "SkyeAnalytics",
   };
 
+  function gateBridge() {
+    if (window.MetrAIyuxGateBridge) return window.MetrAIyuxGateBridge;
+    try {
+      if (window.parent && window.parent !== window && window.parent.MetrAIyuxGateBridge) {
+        return window.parent.MetrAIyuxGateBridge;
+      }
+    } catch {}
+    return null;
+  }
+
+  function gateSession() {
+    const bridge = gateBridge();
+    if (!bridge) return null;
+    return bridge.requireSession?.({ platformId: PLATFORM_ID, usageLane: USAGE_LANE }) || bridge.current?.() || null;
+  }
+
+  function gateCards() {
+    return [
+      { id: "0s-core", status: "active", scope: "platform" },
+      { id: "fs27", status: "active", scope: "auth" },
+      { id: "skye-docx-max", status: "active", scope: "document-ai" },
+      { id: "sovereigndocs", status: "active", scope: "document-suite" }
+    ];
+  }
+
   function readToken() {
     if (window.SkyeAuthUnlock && typeof window.SkyeAuthUnlock.readToken === "function") {
       return window.SkyeAuthUnlock.readToken();
     }
-    return String(localStorage.getItem(ACCESS_TOKEN_KEY) || localStorage.getItem(KEY_ALIAS) || "").trim();
+    return String(gateSession()?.token || "").trim();
   }
 
   function readTokenEmail() {
     if (window.SkyeAuthUnlock && typeof window.SkyeAuthUnlock.readTokenEmail === "function") {
       return window.SkyeAuthUnlock.readTokenEmail();
     }
-    return String(localStorage.getItem(TOKEN_EMAIL_KEY) || "").trim().toLowerCase();
+    const session = gateSession() || {};
+    const claims = session.claims || {};
+    return String(claims.email || session.email || session.actor || localStorage.getItem(TOKEN_EMAIL_KEY) || "").trim().toLowerCase();
   }
 
   function persistToken(token, email) {
@@ -44,39 +71,48 @@
     const nextEmail = String(email || "").trim().toLowerCase();
     if (window.SkyeAuthUnlock && typeof window.SkyeAuthUnlock.persistUnlockedToken === "function") {
       window.SkyeAuthUnlock.persistUnlockedToken(nextToken, nextEmail);
-    } else {
-      localStorage.setItem(ACCESS_TOKEN_KEY, nextToken);
-      localStorage.setItem(TOKEN_EMAIL_KEY, nextEmail);
+    } else if (nextToken) {
+      gateBridge()?.persist?.({
+        token: nextToken,
+        actor: nextEmail || "0s-operator",
+        source: "skye-docx-max-standalone-adapter",
+        platform_id: PLATFORM_ID,
+        usage_lane: USAGE_LANE,
+        gate_cards: gateCards()
+      });
+      if (nextEmail) localStorage.setItem(TOKEN_EMAIL_KEY, nextEmail);
     }
-    if (nextToken) localStorage.setItem(KEY_ALIAS, nextToken);
-    else localStorage.removeItem(KEY_ALIAS);
+    gateBridge()?.record?.("skye_docx_standalone_session_synced", { platform_id: PLATFORM_ID, usage_lane: USAGE_LANE });
   }
 
   function clearToken() {
     if (window.SkyeAuthUnlock && typeof window.SkyeAuthUnlock.clearUnlockedToken === "function") {
       window.SkyeAuthUnlock.clearUnlockedToken();
     } else {
-      localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(TOKEN_EMAIL_KEY);
     }
-    localStorage.removeItem(KEY_ALIAS);
   }
 
   function authHeaders(appId) {
-    const headers = {};
+    const headers = gateBridge()?.headers?.({
+      "x-skye-platform": PLATFORM_ID,
+      "x-skye-usage-lane": USAGE_LANE,
+      "x-skye-app-id": appId || PLATFORM_ID
+    }) || {};
     const token = readToken();
     const email = readTokenEmail();
     const corr = window.SkyeCorrelation && typeof window.SkyeCorrelation.next === "function"
       ? window.SkyeCorrelation.next(appId || "standalone")
       : "";
-    if (token) headers.Authorization = `Bearer ${token}`;
+    if (token && !headers.Authorization && !headers.authorization) headers.Authorization = `Bearer ${token}`;
     if (email) headers["X-Token-Email"] = email;
     if (corr) headers["X-Correlation-Id"] = corr;
     return headers;
   }
 
   function remoteApiEnabled() {
-    return window.SKYE_REMOTE_API_ENABLED === true ||
+    return Boolean(gateSession()) ||
+      window.SKYE_REMOTE_API_ENABLED === true ||
       (document.body && document.body.getAttribute("data-skye-remote-api") === "on");
   }
 
@@ -169,29 +205,7 @@
 
   async function ensureSignedIn(options) {
     const settings = options || {};
-    const email = String(settings.email || "").trim();
-    const password = String(settings.password || "");
-    const orgName = String(settings.orgName || "").trim() || settings.defaultOrgName || "Skye Workspace";
     const labelPrefix = String(settings.labelPrefix || settings.appId || "standalone-session").trim();
-
-    if (email && password) {
-      try {
-        await basicRequest("/api/auth-login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }, settings.appId);
-      } catch {
-        const signup = await basicRequest("/api/auth-signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, orgName }),
-        }, settings.appId);
-        if (signup && signup.kaixu_token && signup.kaixu_token.token) {
-          persistToken(signup.kaixu_token.token, signup.kaixu_token.locked_email || email.toLowerCase());
-        }
-      }
-    }
 
     if (window.SkyeAuthUnlock && typeof window.SkyeAuthUnlock.ensureUnlockedAccess === "function") {
       return window.SkyeAuthUnlock.ensureUnlockedAccess({
@@ -200,8 +214,10 @@
       });
     }
 
-    if (!readToken()) throw new Error("Sign in first.");
-    return { ok: true, reused: true, token: readToken(), locked_email: readTokenEmail() || null };
+    const session = gateSession();
+    if (!session?.token) throw new Error("Sign into 0S/SkyGate first.");
+    gateBridge()?.record?.("skye_docx_gate_signed_in", { platform_id: PLATFORM_ID, usage_lane: USAGE_LANE, label_prefix: labelPrefix });
+    return { ok: true, reused: true, token: session.token, locked_email: readTokenEmail() || null, gate_cards: session.gate_cards || [] };
   }
 
   async function request(path, options, settings) {
@@ -220,7 +236,7 @@
   function hydrateInputs(keyId, emailId) {
     const keyEl = typeof keyId === "string" ? document.getElementById(keyId) : keyId;
     const emailEl = typeof emailId === "string" ? document.getElementById(emailId) : emailId;
-    if (keyEl) keyEl.value = readToken() || localStorage.getItem(KEY_ALIAS) || "";
+    if (keyEl) keyEl.value = readToken() ? "0S/SkyGate session active" : "";
     if (emailEl) emailEl.value = readTokenEmail() || "";
   }
 
@@ -528,7 +544,6 @@
     openApp,
     recordSuiteIntent,
     reportAction,
-    readKaixuKey: readToken,
     readToken,
     readTokenEmail,
     request,

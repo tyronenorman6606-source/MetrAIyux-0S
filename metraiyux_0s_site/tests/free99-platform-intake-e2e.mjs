@@ -9,8 +9,9 @@ const manifestPath = path.join(siteDir, "Free99", "app-manifest.json");
 const mountedAppsDir = path.join(siteDir, "Free99", "apps");
 const artifactDir = path.join(root, "test-artifacts", "free99-platform-intake");
 const reportPath = path.join(artifactDir, "free99-platform-intake-e2e-report.json");
-const proofToken = "FREE99-PLATFORM-LOCAL-PROOF";
+const proofToken = "FS27-SHARED-LOCAL-PROOF";
 const checks = [];
+const moving20sPlatformIds = new Set(["mydrive-offline-vault", "skyepics", "brandforge", "jobping", "skyeopsconsole", "skyeapi-aegiscore", "documorph", "social-batch-factory", "keygate13"]);
 
 function expect(condition, message) {
   if (!condition) throw new Error(message);
@@ -78,13 +79,26 @@ async function startServer() {
       return {
         baseUrl,
         stop: async () => {
+          if (child.exitCode !== null || child.signalCode !== null) return;
+          const exited = new Promise((resolve) => child.once("exit", resolve));
           child.kill("SIGTERM");
-          await new Promise((resolve) => child.once("exit", resolve));
+          await Promise.race([
+            exited,
+            new Promise((resolve) => setTimeout(resolve, 3000))
+          ]);
+          if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
         }
       };
     } catch {
+      const exited = child.exitCode !== null || child.signalCode !== null
+        ? Promise.resolve()
+        : new Promise((resolve) => child.once("exit", resolve));
       child.kill("SIGTERM");
-      await new Promise((resolve) => child.once("exit", resolve));
+      await Promise.race([
+        exited,
+        new Promise((resolve) => setTimeout(resolve, 3000))
+      ]);
+      if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
       if (attempt === 9) {
         throw new Error(`Could not start local 0S server.\nstdout:\n${stdout}\nstderr:\n${stderr}`);
       }
@@ -126,9 +140,22 @@ async function installHeaderProbe(page) {
   });
 }
 
+async function installSharedGateSession(page, platformId = "metraiyux-0s") {
+  await page.addInitScript(({ token, platformId }) => {
+    const shared = {
+      token,
+      source: "shared-0s-test-session",
+      platform_id: platformId,
+      usage_lane: "fs27-owner-gate",
+      issued_at: new Date().toISOString()
+    };
+    sessionStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
+  }, { token: proofToken, platformId });
+}
+
 async function readHeaderProbe(page) {
   return page.evaluate(async () => {
-    const response = await fetch("/__free99_header_probe__", { headers: { "x-existing-proof": "kept" } });
+    const response = await fetch("/__free99_header_probe__", { method: "POST", headers: { "x-existing-proof": "kept" } });
     return response.json();
   });
 }
@@ -138,7 +165,7 @@ async function checkHub(browser, baseUrl, apps) {
   await withTrackedPage(context, "free99-hub-desktop-mobile", async (page, entry) => {
     const response = await page.goto(urlFor(baseUrl, "Free99/index.html"), { waitUntil: "domcontentloaded", timeout: 20000 });
     entry.checks.push({ name: "hub_http_ok", ok: Boolean(response?.ok()), status: response?.status() || 0 });
-    await page.getByText("Free99 has one free app", { exact: false }).first().waitFor({ state: "visible", timeout: 12000 });
+    await page.getByText("Free99 apps are no-charge", { exact: false }).first().waitFor({ state: "visible", timeout: 12000 });
     entry.checks.push({ name: "hub_free99_policy_copy", ok: true });
     const cardCount = await page.locator(".app-card").count();
     entry.checks.push({ name: "all_manifest_apps_rendered", ok: cardCount === apps.length, count: cardCount });
@@ -185,7 +212,7 @@ async function checkPublicListingSources(baseUrl) {
     const listingFiles = [
       ["public_home", path.join(siteDir, "index.html"), ["Free99 Intake", "Free99 Platform Intake", "Free99/index.html"]],
       ["feature_atlas", path.join(siteDir, "feature-atlas.html"), ["Free99 Platform Intake", "Free99/index.html", "proof/free99-platform-intake-receipt.html", "SovereignDocs Library"]],
-      ["changelog", path.join(siteDir, "changelog", "index.html"), ["Free99/Paid-Apps Intake", "free99-platform-intake", "../Free99/index.html", "SkyeOpsConsole is the only no-charge app"]],
+      ["changelog", path.join(siteDir, "changelog", "index.html"), ["Free99/Paid-Apps Intake", "free99-platform-intake", "../Free99/index.html", "Still2Vid Forge"]],
       ["ecosystem_map", path.join(siteDir, "assets", "system-map.js"), ["Free99 Platform Intake", "SovereignDocs library", "Feature Atlas entry", "Changelog entry", "usage_lane"]],
       ["sales_router", path.join(siteDir, "sales", "live-proof-router.html"), ["free99-platform-intake", "what was imported from Free99/Paid-Apps", "../Free99/index.html"]],
       ["operator_index", path.join(siteDir, "operator", "index.html"), ["Free99 Platform Intake", "../Free99/index.html"]],
@@ -229,18 +256,19 @@ async function checkAllMountedHtmlRoutes(baseUrl) {
   const entry = { id: "all-mounted-html-static-smoke", checks: [], page_errors: [] };
   try {
     const files = await walkHtmlFiles(mountedAppsDir);
-    const missingGate = [];
+    const redundantMoving20sGate = [];
     const failedRoutes = [];
     const routes = [];
     for (const file of files) {
       const source = await fs.readFile(file, "utf8");
-      if (!source.includes("free99-gate.js")) missingGate.push(path.relative(siteDir, file));
       const route = path.relative(siteDir, file).split(path.sep).join("/");
+      const moving20sApp = [...moving20sPlatformIds].find((platformId) => route.startsWith(`Free99/apps/${platformId}/`));
+      if (moving20sApp && source.includes("free99-gate.js")) redundantMoving20sGate.push(route);
       routes.push(route);
     }
     const smokeRoute = async (route) => {
       try {
-        const response = await fetch(urlFor(baseUrl, `${route}?gate_session=${proofToken}`), {
+        const response = await fetch(urlFor(baseUrl, route), {
           method: "HEAD",
           signal: AbortSignal.timeout(5000)
         });
@@ -253,7 +281,7 @@ async function checkAllMountedHtmlRoutes(baseUrl) {
     for (let index = 0; index < routes.length; index += batchSize) {
       await Promise.all(routes.slice(index, index + batchSize).map(smokeRoute));
     }
-    entry.checks.push({ name: "all_mounted_html_gate_injected", ok: missingGate.length === 0, count: files.length, missingGate: missingGate.slice(0, 25) });
+    entry.checks.push({ name: "moving20s_no_redundant_client_gate", ok: redundantMoving20sGate.length === 0, count: files.length, redundantMoving20sGate: redundantMoving20sGate.slice(0, 25) });
     entry.checks.push({ name: "all_mounted_html_routes_http_ok", ok: failedRoutes.length === 0, count: files.length, failedRoutes: failedRoutes.slice(0, 25) });
     entry.checks.push({ name: "generated_corpus_smoked_by_library_render", ok: true, skippedDirs: [...generatedCorpusDirs].sort() });
     entry.ok = entry.checks.every((item) => item.ok);
@@ -264,6 +292,26 @@ async function checkAllMountedHtmlRoutes(baseUrl) {
   checks.push(entry);
 }
 
+async function checkMoving20sNoClientGate(browser, baseUrl, apps) {
+  const context = await browser.newContext({ viewport: { width: 1366, height: 880 } });
+  for (const app of apps.filter((item) => moving20sPlatformIds.has(item.platform_id))) {
+    await withTrackedPage(context, `worker-owned-gate-${app.slug}`, async (page, entry) => {
+      const route = appRoute(app);
+      const response = await page.goto(urlFor(baseUrl, route), { waitUntil: "domcontentloaded", timeout: 25000 });
+      entry.checks.push({ name: "app_http_ok", ok: Boolean(response?.ok()), status: response?.status() || 0, route });
+      const state = await page.evaluate(() => ({
+        free99GateGlobal: typeof window.Free99PlatformGate,
+        free99GateOverlay: Boolean(document.querySelector("#free99PlatformGate")),
+        lockedClass: document.documentElement.classList.contains("free99-platform-gate-locked"),
+        title: document.title
+      }));
+      entry.checks.push({ name: "no_client_gate_global", ok: state.free99GateGlobal === "undefined", state });
+      entry.checks.push({ name: "no_client_gate_overlay", ok: state.free99GateOverlay === false && state.lockedClass === false, state });
+    });
+  }
+  await context.close();
+}
+
 async function checkAppGate(browser, baseUrl, app) {
   const route = appRoute(app);
   const lockedContext = await browser.newContext({ viewport: { width: 1366, height: 880 } });
@@ -271,28 +319,45 @@ async function checkAppGate(browser, baseUrl, app) {
     await installHeaderProbe(page);
     const response = await page.goto(urlFor(baseUrl, route), { waitUntil: "domcontentloaded", timeout: 25000 });
     entry.checks.push({ name: "app_http_ok", ok: Boolean(response?.ok()), status: response?.status() || 0, route });
-    await page.locator("#free99PlatformGate").waitFor({ state: "visible", timeout: 15000 });
     const gate = await page.evaluate(() => ({
       platformId: window.Free99PlatformGate?.platformId,
       billingMode: window.Free99PlatformGate?.billingMode,
+      authOwner: window.Free99PlatformGate?.authOwner,
       locked: document.documentElement.classList.contains("free99-platform-gate-locked"),
-      badge: document.querySelector(".free99-platform-gate-badge")?.textContent || "",
-      backHref: document.querySelector("#free99PlatformGate a[href]")?.getAttribute("href") || ""
+      overlay: Boolean(document.querySelector("#free99PlatformGate")),
+      fallbackInput: Boolean(document.querySelector("#free99PlatformGateToken")),
+      localProofButton: Boolean(document.querySelector("#free99PlatformLocalProof")),
+      bodyMissing: document.body.classList.contains("free99-platform-gate-missing")
     }));
     entry.checks.push({ name: "gate_platform_id", ok: gate.platformId === app.platform_id, value: gate.platformId });
     entry.checks.push({ name: "gate_billing_mode", ok: gate.billingMode === app.billing, value: gate.billingMode });
-    entry.checks.push({ name: "gate_locked_ui", ok: gate.locked === true });
-    entry.checks.push({
-      name: "gate_free_vs_paid_badge",
-      ok: app.billing === "free99" ? gate.badge.includes("Free99 gated app") : gate.badge.includes("Paid platform lane"),
-      value: gate.badge
-    });
-    entry.checks.push({ name: "gate_back_link_absolute", ok: gate.backHref === "/Free99/index.html", value: gate.backHref });
+    entry.checks.push({ name: "auth_owner_is_main_worker", ok: gate.authOwner === "main-worker-enforceZeroOsGate", value: gate.authOwner });
+    entry.checks.push({ name: "no_client_gate_overlay", ok: gate.overlay === false && gate.locked === false && gate.fallbackInput === false && gate.localProofButton === false, gate });
     const probe = await readHeaderProbe(page);
     entry.checks.push({ name: "fetch_header_platform", ok: probe.headers["x-skye-platform"] === app.platform_id, headers: probe.headers });
     entry.checks.push({ name: "fetch_header_billing", ok: probe.headers["x-free99-billing-mode"] === app.billing });
     entry.checks.push({ name: "fetch_header_existing_preserved", ok: probe.headers["x-existing-proof"] === "kept" });
-    if (["skyeopsconsole", "sovereigndocs"].includes(app.slug)) {
+    if (app.platform_id === "skyeopsconsole") {
+      const localPinState = await page.evaluate(() => ({
+        localLockOverlay: Boolean(document.querySelector("#lockOverlay") || document.querySelector(".lockOverlay")),
+        localUnlockInput: Boolean(document.querySelector("#unlockPin")),
+        localLockAction: Boolean(document.querySelector('[data-action="lockNow"]')),
+        localUnlockAction: Boolean(document.querySelector('[data-action="unlock"]')),
+        localPinSetting: document.body.innerText.includes("App lock PIN"),
+        gateOwnedBadge: document.body.innerText.includes("0S gate-owned")
+      }));
+      entry.checks.push({
+        name: "skyeops_no_local_pin_gate",
+        ok: !localPinState.localLockOverlay
+          && !localPinState.localUnlockInput
+          && !localPinState.localLockAction
+          && !localPinState.localUnlockAction
+          && !localPinState.localPinSetting
+          && localPinState.gateOwnedBadge,
+        localPinState
+      });
+    }
+    if (["skyeopsconsole", "sovereigndocs", "brandforge", "jobping"].includes(app.slug)) {
       const screenshot = path.join(artifactDir, `gate-${app.slug}.png`);
       await page.screenshot({ path: screenshot, fullPage: false });
       entry.checks.push({ name: "gate_screenshot", ok: true, path: screenshot });
@@ -303,28 +368,55 @@ async function checkAppGate(browser, baseUrl, app) {
   const unlockedContext = await browser.newContext({ viewport: { width: 1366, height: 880 } });
   await withTrackedPage(unlockedContext, `unlocked-${app.slug}`, async (page, entry) => {
     await installHeaderProbe(page);
-    const response = await page.goto(urlFor(baseUrl, `${route}?gate_session=${proofToken}`), { waitUntil: "domcontentloaded", timeout: 25000 });
+    await installSharedGateSession(page);
+    const response = await page.goto(urlFor(baseUrl, route), { waitUntil: "domcontentloaded", timeout: 25000 });
     entry.checks.push({ name: "app_http_ok", ok: Boolean(response?.ok()), status: response?.status() || 0, route });
     await page.waitForFunction(() => Boolean(window.Free99PlatformGate?.requireSession?.()?.token), null, { timeout: 15000 });
-    await page.locator("#free99PlatformGate").waitFor({ state: "detached", timeout: 15000 }).catch(async () => {
-      const count = await page.locator("#free99PlatformGate").count();
-      expect(count === 0, "Gate overlay remained visible after proof session.");
-    });
     const state = await page.evaluate(() => {
       const session = window.Free99PlatformGate.requireSession();
+      const appSpecificKeys = Object.keys(sessionStorage).filter((key) => /^FREE99_PLATFORM_GATE_SESSION_/.test(key));
       return {
         platformId: window.Free99PlatformGate.platformId,
         billingMode: window.Free99PlatformGate.billingMode,
+        authOwner: window.Free99PlatformGate.authOwner,
         token: session?.token,
         source: session?.source,
         locationSearch: location.search,
-        stored: JSON.parse(sessionStorage.getItem("FREE99_PLATFORM_GATE_SESSION") || "null")
+        overlay: Boolean(document.querySelector("#free99PlatformGate")),
+        locked: document.documentElement.classList.contains("free99-platform-gate-locked"),
+        stored: JSON.parse(sessionStorage.getItem("FREE99_PLATFORM_GATE_SESSION") || "null"),
+        appSpecificKeys
       };
     });
     entry.checks.push({ name: "proof_session_platform_id", ok: state.platformId === app.platform_id, value: state.platformId });
     entry.checks.push({ name: "proof_session_billing", ok: state.billingMode === app.billing, value: state.billingMode });
+    entry.checks.push({ name: "auth_owner_is_main_worker", ok: state.authOwner === "main-worker-enforceZeroOsGate", value: state.authOwner });
     entry.checks.push({ name: "proof_token_persisted", ok: state.token === proofToken && state.stored?.token === proofToken, state });
     entry.checks.push({ name: "proof_token_scrubbed_from_url", ok: state.locationSearch === "", value: state.locationSearch });
+    entry.checks.push({ name: "no_client_gate_overlay", ok: state.overlay === false && state.locked === false, state });
+    entry.checks.push({ name: "no_app_specific_gate_session_key", ok: state.appSpecificKeys.length === 0, state });
+    if (app.platform_id === "skyeopsconsole") {
+      const localPinState = await page.evaluate(() => ({
+        localLockOverlay: Boolean(document.querySelector("#lockOverlay") || document.querySelector(".lockOverlay")),
+        localUnlockInput: Boolean(document.querySelector("#unlockPin")),
+        localLockAction: Boolean(document.querySelector('[data-action="lockNow"]')),
+        localUnlockAction: Boolean(document.querySelector('[data-action="unlock"]')),
+        localPinSetting: document.body.innerText.includes("App lock PIN"),
+        gateOwnedBadge: document.body.innerText.includes("0S gate-owned"),
+        stalePinHash: Boolean(JSON.parse(localStorage.getItem("skyeops_offline_singlefile_v2") || "{}")?.settings?.pin_hash)
+      }));
+      entry.checks.push({
+        name: "skyeops_no_local_pin_gate",
+        ok: !localPinState.localLockOverlay
+          && !localPinState.localUnlockInput
+          && !localPinState.localLockAction
+          && !localPinState.localUnlockAction
+          && !localPinState.localPinSetting
+          && localPinState.gateOwnedBadge
+          && !localPinState.stalePinHash,
+        localPinState
+      });
+    }
     const probe = await readHeaderProbe(page);
     entry.checks.push({ name: "fetch_header_authorization", ok: probe.headers.authorization === `Bearer ${proofToken}` });
     entry.checks.push({ name: "fetch_header_gate_session", ok: probe.headers["x-skye-gate-session"] === proofToken });
@@ -338,7 +430,8 @@ async function checkSovereignDocsLibrary(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
   await withTrackedPage(context, "sovereigndocs-library-static-data", async (page, entry) => {
     await installHeaderProbe(page);
-    const response = await page.goto(urlFor(baseUrl, `Free99/apps/sovereigndocs/documents/index.html?gate_session=${proofToken}`), { waitUntil: "domcontentloaded", timeout: 25000 });
+    await installSharedGateSession(page);
+    const response = await page.goto(urlFor(baseUrl, "Free99/apps/sovereigndocs/documents/index.html"), { waitUntil: "domcontentloaded", timeout: 25000 });
     entry.checks.push({ name: "documents_http_ok", ok: Boolean(response?.ok()), status: response?.status() || 0 });
     await page.waitForFunction(() => document.querySelectorAll("#libraryGrid .document-card").length > 0, null, { timeout: 20000 });
     const state = await page.evaluate(async () => {
@@ -374,9 +467,14 @@ async function checkSovereignDocsLibrary(browser, baseUrl) {
 await fs.mkdir(artifactDir, { recursive: true });
 const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
 const apps = manifest.apps || [];
-expect(apps.length === 11, `Expected 11 mounted Free99 apps, got ${apps.length}.`);
-expect(apps.filter((app) => app.billing === "free99").map((app) => app.platform_id).join(",") === "skyeopsconsole", "SkyeOpsConsole must be the only Free99 app.");
+expect(apps.length >= 16, `Expected at least 16 mounted Free99 apps after Moving20s intake, got ${apps.length}.`);
+const freePlatforms = apps.filter((app) => app.billing === "free99").map((app) => app.platform_id);
+const expectedFreePlatforms = ["skyeopsconsole", "still2vid-forge", "mydrive-offline-vault", "skyepics", "brandforge", "social-batch-factory", "keygate13"];
+expect(expectedFreePlatforms.every((platform) => freePlatforms.includes(platform)), `Missing expected Free99 platforms: ${expectedFreePlatforms.filter((platform) => !freePlatforms.includes(platform)).join(",")}`);
 expect(apps.some((app) => app.platform_id === "sovereigndocs"), "SovereignDocs is missing from the mounted app manifest.");
+expect(apps.some((app) => app.platform_id === "still2vid-forge"), "Still2Vid Forge is missing from the mounted app manifest.");
+expect(apps.some((app) => app.platform_id === "jobping" && app.billing !== "free99"), "JobPing must stay outside the Free99 billing lane.");
+expect(apps.some((app) => app.platform_id === "brandforge" && /SkyPay/i.test(app.price || "")), "BrandForge must expose the SkyPay AI generation tier in the manifest.");
 
 const server = await startServer();
 let browser;
@@ -386,7 +484,8 @@ try {
   await checkIndexSurfaces(browser, server.baseUrl);
   await checkHub(browser, server.baseUrl, apps);
   await checkAllMountedHtmlRoutes(server.baseUrl);
-  for (const app of apps) await checkAppGate(browser, server.baseUrl, app);
+  await checkMoving20sNoClientGate(browser, server.baseUrl, apps);
+  for (const app of apps.filter((item) => !moving20sPlatformIds.has(item.platform_id))) await checkAppGate(browser, server.baseUrl, app);
   await checkSovereignDocsLibrary(browser, server.baseUrl);
 } finally {
   if (browser) await browser.close().catch(() => {});

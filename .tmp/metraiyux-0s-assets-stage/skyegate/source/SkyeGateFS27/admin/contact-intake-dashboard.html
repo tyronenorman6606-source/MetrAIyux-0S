@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FS27 Contact Intake Admin</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    body { background:#070a13; color:#eef6ff; }
+    .intake-shell { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:28px 0 70px; }
+    .intake-hero, .intake-panel, .intake-card { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); border-radius:18px; box-shadow:0 24px 80px rgba(0,0,0,.28); }
+    .intake-hero { padding:28px; margin-bottom:16px; }
+    .intake-hero h1 { margin:0; font-size:clamp(34px, 5vw, 60px); letter-spacing:0; }
+    .intake-hero p, .muted { color:rgba(238,246,255,.72); line-height:1.55; }
+    .intake-panel { padding:18px; display:grid; gap:12px; margin-bottom:16px; }
+    .intake-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:end; }
+    label { display:grid; gap:7px; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:#f6d477; font-weight:800; }
+    input, select, textarea { border:1px solid rgba(255,255,255,.16); background:rgba(0,0,0,.28); color:#fff; border-radius:12px; padding:12px; min-height:44px; }
+    button, .button { border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); color:#fff; border-radius:12px; padding:12px 14px; font-weight:850; cursor:pointer; text-decoration:none; }
+    button.primary { color:#071019; border:0; background:linear-gradient(90deg,#4fc3ff,#f6c758); }
+    .intake-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .intake-card { padding:16px; display:grid; gap:12px; }
+    .intake-card header { display:flex; justify-content:space-between; gap:10px; align-items:start; border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:10px; }
+    .intake-card h3 { margin:0; letter-spacing:0; }
+    .pill { display:inline-flex; width:max-content; border:1px solid rgba(79,195,255,.28); border-radius:999px; padding:6px 9px; color:#bdeaff; font-size:12px; font-weight:850; }
+    .kv { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .kv div { background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.09); border-radius:12px; padding:10px; overflow-wrap:anywhere; }
+    .kv b { display:block; color:#f6d477; font-size:11px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .status { min-height:20px; color:#a7f3d0; }
+    @media (max-width: 800px) { .intake-grid, .kv { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="intake-shell">
+    <section class="intake-hero">
+      <p class="muted">SkyeGateFS27 private operator lane</p>
+      <h1>Contact Intake Admin</h1>
+      <p>Service requests, contact messages, support notes, partnerships, and review submissions land here first. Resend/Gmail is backup notification; public mail links are fallback only.</p>
+      <p class="muted">Review publication still requires 0S QA, consent check, and a five-review batch before the static proof wall is rebuilt.</p>
+    </section>
+
+    <section class="intake-panel">
+      <div class="intake-controls">
+        <label>FS27 admin password or session token
+          <input id="adminToken" type="password" autocomplete="off" placeholder="Admin password or bearer session" />
+        </label>
+        <label>Kind
+          <select id="kindFilter">
+            <option value="">All</option>
+            <option value="service_request">Service requests</option>
+            <option value="review">Reviews</option>
+            <option value="contact">Contact</option>
+            <option value="support">Support</option>
+            <option value="partnership">Partnership</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="statusFilter">
+            <option value="">All</option>
+            <option value="pending_admin_triage">Pending admin triage</option>
+            <option value="pending_0s_qa">Pending 0S QA</option>
+            <option value="approved_0s_qa">Approved</option>
+            <option value="ready_for_production">Ready for production</option>
+            <option value="rejected">Rejected</option>
+            <option value="triaged">Triaged</option>
+          </select>
+        </label>
+        <button class="primary" id="loadQueue" type="button">Load Intake</button>
+        <button id="markBatch" type="button">Mark Review Batch Ready</button>
+        <button id="exportReady" type="button">Export Ready Reviews</button>
+      </div>
+      <p class="status" id="statusLine">Waiting for FS27 authority.</p>
+      <p class="muted" id="summaryLine">No queue loaded.</p>
+    </section>
+
+    <section class="intake-grid" id="intakeList" aria-live="polite"></section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const api = "/admin/contact-intake";
+      const tokenKey = "FS27_CONTACT_INTAKE_ADMIN_TOKEN";
+      let lastItems = [];
+
+      function esc(value = "") {
+        return String(value).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      }
+
+      function headers() {
+        const token = $("adminToken").value.trim();
+        return {
+          "content-type": "application/json",
+          "x-admin-password": token,
+          authorization: `Bearer ${token}`
+        };
+      }
+
+      function status(text, ok = true) {
+        $("statusLine").textContent = text;
+        $("statusLine").style.color = ok ? "#a7f3d0" : "#ffb4c2";
+      }
+
+      function summarize(summary = {}) {
+        $("summaryLine").textContent = `${summary.total || 0} total / ${summary.pendingAdminTriage || 0} pending triage / ${summary.pending0sQa || 0} review QA / ${summary.approvedUnpublished || 0} approved-unpublished`;
+      }
+
+      function render(items = []) {
+        lastItems = items;
+        $("intakeList").innerHTML = items.map((item) => `
+          <article class="intake-card" data-id="${esc(item.id)}">
+            <header>
+              <div>
+                <span class="pill">${esc(item.kind)} / ${esc(item.status)}</span>
+                <h3>${esc(item.name || "Unknown contact")}</h3>
+                <p class="muted">${esc(item.service || item.lane || "")}</p>
+              </div>
+              <small>${esc(item.created_at ? new Date(item.created_at).toLocaleString() : "")}</small>
+            </header>
+            <p>${esc(item.message || "")}</p>
+            <div class="kv">
+              <div><b>Email</b>${esc(item.email || "")}</div>
+              <div><b>Phone</b>${esc(item.phone || "")}</div>
+              <div><b>Company</b>${esc(item.company || "")}</div>
+              <div><b>Source</b>${esc(item.source_url || "")}</div>
+              <div><b>Relay</b>${esc(item.relay_status || "")}</div>
+              <div><b>Backup mail</b>${esc(item.backup_email_status || "")}</div>
+            </div>
+            <label>Operator note
+              <textarea data-note rows="2" placeholder="Private FS27 admin note"></textarea>
+            </label>
+            <div class="actions">
+              <button type="button" data-action="mark_triaged">Mark Triaged</button>
+              ${item.kind === "review" ? '<button type="button" data-action="approve">Approve Review</button><button type="button" data-action="reject">Reject Review</button>' : ""}
+            </div>
+          </article>
+        `).join("") || '<article class="intake-card"><h3>No intake records found.</h3><p class="muted">Try another filter or submit a proof request.</p></article>';
+      }
+
+      async function load() {
+        localStorage.setItem(tokenKey, $("adminToken").value.trim());
+        const qs = new URLSearchParams();
+        if ($("kindFilter").value) qs.set("kind", $("kindFilter").value);
+        if ($("statusFilter").value) qs.set("status", $("statusFilter").value);
+        status("Loading FS27 contact intake...");
+        const res = await fetch(`${api}?${qs.toString()}`, { headers: headers() });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "Queue load failed");
+        summarize(data.summary);
+        render(data.contacts || data.submissions || []);
+        status("FS27 contact intake loaded.");
+      }
+
+      async function patch(action, id = "", qaNotes = "") {
+        const res = await fetch(api, {
+          method: "PATCH",
+          headers: headers(),
+          body: JSON.stringify({ action, id, qaNotes })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "Action failed");
+        return data;
+      }
+
+      $("loadQueue").addEventListener("click", () => load().catch((error) => status(error.message, false)));
+      $("markBatch").addEventListener("click", async () => {
+        try {
+          const data = await patch("mark_batch_ready");
+          status(`Batch ${data.batchId} is ready for static proof-wall publish.`);
+          await load();
+        } catch (error) {
+          status(error.message, false);
+        }
+      });
+      $("exportReady").addEventListener("click", () => {
+        const ready = lastItems.filter((item) => item.status === "ready_for_production");
+        const blob = new Blob([JSON.stringify({ submissions: ready }, null, 2)], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `fs27-ready-review-batch-${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+      $("intakeList").addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+        const card = event.target.closest("[data-id]");
+        const note = card.querySelector("[data-note]")?.value || "";
+        try {
+          await patch(button.dataset.action, card.dataset.id, note);
+          await load();
+        } catch (error) {
+          status(error.message, false);
+        }
+      });
+
+      $("adminToken").value = localStorage.getItem(tokenKey) || "";
+    })();
+  </script>
+</body>
+</html>

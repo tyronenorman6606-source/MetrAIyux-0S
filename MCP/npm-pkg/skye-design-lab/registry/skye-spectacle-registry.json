@@ -1,0 +1,183 @@
+{
+  "$schema": "./skye-spectacle-schema.json",
+  "name": "skye-spectacle-registry",
+  "version": "0.1.0",
+  "purpose": "Reference-aware design patterns for cinematic product sites and MCP-assisted frontend generation.",
+  "sourceReferences": [
+    "../skyesol_spectacle_reference/notes/spectacle-style-system.md",
+    "../skyesol_spectacle_reference/notes/deep-scan-summary.md",
+    "../skyesol_spectacle_reference/assets"
+  ],
+  "globalRules": {
+    "forbiddenPatterns": [
+      "Hero pages with a long left column and a disconnected image on the right",
+      "Huge paragraphs in the first viewport",
+      "Decorative images that do not explain the product, person, place, or offer",
+      "Mentioning MCP smoke tests, internal proof files, or build internals on public marketing pages",
+      "Negative letter spacing or oversized display text inside compact panels",
+      "Mobile layouts with horizontal scroll, clipped labels, or hero images pushed out of view"
+    ],
+    "requiredChecks": [
+      "Desktop screenshot at 1440x1000",
+      "Mobile screenshot at 390x844",
+      "No horizontal scroll on mobile",
+      "Hero subject visible in first viewport",
+      "H1 no more than 2 lines desktop and 3 lines mobile unless intentionally editorial",
+      "Primary CTA visible in first viewport",
+      "No internal MCP/test/proof wording on public pages unless user explicitly requests developer proof copy"
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "dark": "#08080f",
+      "darker": "#030306",
+      "text": "#f4f0e8",
+      "muted": "#aaa49a",
+      "gold": "#f4c75b",
+      "goldSoft": "#f8df96",
+      "cyan": "#7ee7ff",
+      "violet": "#8b5cf6",
+      "fire": "#e84c30"
+    },
+    "typography": {
+      "displaySerif": "Playfair Display or a similar high-contrast editorial serif",
+      "labelDisplay": "Bebas Neue or a compact uppercase display face",
+      "body": "DM Sans, Inter, or a clean system sans",
+      "code": "Fira Code or ui-monospace"
+    },
+    "shape": {
+      "radius": "6px to 8px for cards and controls",
+      "sectionWidth": "min(1180px, calc(100% - 40px))",
+      "hairline": "1px solid rgba(244,199,91,.18)"
+    }
+  },
+  "designVarietySystem": {
+    "rule": "The lab is not one SkyeSol style. It must expose multiple design engines and record design DNA before generation.",
+    "requiredDna": [
+      "archetype",
+      "firstViewportStructure",
+      "visualSubject",
+      "motionLanguage",
+      "proofFormat",
+      "paletteDiscipline",
+      "typographyPosture",
+      "conversionPath"
+    ],
+    "archetypes": [
+      "editorial-proof-atlas",
+      "spatial-product-lab",
+      "kinetic-process-funnel",
+      "app-operating-surface",
+      "cinematic-command",
+      "founder-authority",
+      "minimal-luxury",
+      "field-report"
+    ],
+    "antiSamenessGate": [
+      "Reject repeated dark command-card output.",
+      "Reject SkyeSol-only restyling when a different archetype fits.",
+      "Reject fake variety that only changes copy.",
+      "Use design_variety_plan before implementation."
+    ]
+  },
+  "patterns": [
+    {
+      "id": "cinematic-command-hero",
+      "title": "Cinematic Command Hero",
+      "bestFor": ["AI platforms", "database control planes", "operator dashboards", "premium service offers"],
+      "description": "A first viewport built around one living subject: 3D object, founder, product, venue, or proof artifact. Copy is short and arranged around the subject.",
+      "recommendedStack": ["react", "motion", "three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing"],
+      "compositionRules": [
+        "One main visual subject",
+        "H1 is short and forceful",
+        "Primary CTA and secondary CTA are visible without scrolling",
+        "Canvas or image subject must be fully visible on mobile"
+      ],
+      "qualityGate": "Screenshot first viewport on desktop and mobile before shipping."
+    },
+    {
+      "id": "scrolling-proof-funnel",
+      "title": "Scrolling Proof Funnel",
+      "bestFor": ["sales pages", "signup flows", "technical products", "service offers"],
+      "description": "Pinned or staged sections that walk buyers through transformation, proof, and conversion.",
+      "recommendedStack": ["gsap", "ScrollTrigger", "lenis", "motion"],
+      "compositionRules": [
+        "Each stage gets one sentence and one visual/proof artifact",
+        "Avoid card dumping",
+        "Use pinned sections only when the story benefits",
+        "Always provide reduced-motion fallback"
+      ],
+      "qualityGate": "Scroll through full page in browser and confirm no section traps the user."
+    },
+    {
+      "id": "operator-proof-panel",
+      "title": "Operator Proof Panel",
+      "bestFor": ["audit-ready tools", "managed services", "deployment offers", "B2B trust surfaces"],
+      "description": "A compact evidence panel showing live status, checks, metrics, receipts, and handoff state without exposing internal implementation clutter.",
+      "recommendedStack": ["react", "motion", "lucide-react"],
+      "compositionRules": [
+        "Use proof labels a client understands",
+        "Keep raw smoke-test wording out of public copy",
+        "Use checklists, statuses, and timestamps",
+        "Link deeper technical proof only for qualified/admin users"
+      ],
+      "qualityGate": "Public copy reads like trust evidence, not dev logs."
+    },
+    {
+      "id": "founder-authority-scene",
+      "title": "Founder Authority Scene",
+      "bestFor": ["personal brand", "agency pages", "operator-led businesses"],
+      "description": "Transparent founder media, proof metrics, and editorial copy presented as a premium authority scene.",
+      "recommendedStack": ["motion", "lenis"],
+      "compositionRules": [
+        "Founder media remains transparent and unboxed when possible",
+        "Authority claims are tied to proof or outcomes",
+        "Use editorial serif headings and compact label text",
+        "Do not over-card the section"
+      ],
+      "qualityGate": "Founder image is visible, crisp, and not cropped awkwardly on mobile."
+    },
+    {
+      "id": "editorial-proof-atlas",
+      "title": "Editorial Proof Atlas",
+      "bestFor": ["case studies", "proof-heavy offers", "service proof", "founder-built systems"],
+      "description": "A magazine-like proof surface with warm palette, large real media, sparse evidence, and no repeated dashboard grid.",
+      "recommendedStack": ["motion", "lucide-react", "playwright screenshots"],
+      "compositionRules": [
+        "Use one dominant proof/media subject",
+        "Use sparse receipt panels",
+        "Prefer light/warm palette when the last page was dark",
+        "No card grid as the main idea"
+      ],
+      "qualityGate": "Proof media is real and browser-checked."
+    },
+    {
+      "id": "spatial-product-lab",
+      "title": "Spatial Product Lab",
+      "bestFor": ["AI products", "developer tools", "infrastructure", "technical systems"],
+      "description": "An interactive product-inspection scene with a WebGL object, controls, specs, and a non-SkyeSol palette.",
+      "recommendedStack": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "motion"],
+      "compositionRules": [
+        "One object/system core dominates",
+        "Pair with controls or spec chips",
+        "Use pointer-reactive inspection motion",
+        "Avoid generic SaaS feature cards"
+      ],
+      "qualityGate": "Canvas renders nonblank on desktop and mobile."
+    },
+    {
+      "id": "kinetic-process-funnel",
+      "title": "Kinetic Process Funnel",
+      "bestFor": ["signup flows", "auth/gate flows", "provisioning", "staffing workflows", "mail onboarding"],
+      "description": "A scroll-led workflow stage system where each viewport moves the buyer through one action.",
+      "recommendedStack": ["gsap", "ScrollTrigger", "lenis", "motion"],
+      "compositionRules": [
+        "One stage per section",
+        "Use scrubbed motion only to clarify progression",
+        "Each stage has one action",
+        "Mobile remains readable without traps"
+      ],
+      "qualityGate": "Scroll through the full funnel in browser."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "app": "SkyePics",
+  "version": "1.3.0",
+  "createdAt": "2026-05-20T06:19:00Z",
+  "closureState": "static local-first encrypted vault build; no SaaS, no backend database, no external storage service",
+  "implemented": [
+    "photo vault search",
+    "backup v4 payload metadata",
+    "encrypted integrity report ledger",
+    "encrypted-file checksum recording during health checks",
+    "redacted integrity ledger export",
+    "recovery drill report",
+    "backup reminder settings",
+    "install/readiness lane",
+    "PWA PNG icons",
+    "service worker v13 cache update"
+  ],
+  "commands": [
+    { "cmd": "npm install", "ok": true, "result": "added/audited packages; 0 vulnerabilities" },
+    { "cmd": "npm test", "ok": true, "result": "crypto and detector unit checks passed" },
+    { "cmd": "npm run smoke", "ok": true, "result": "28 static closure checks passed" },
+    { "cmd": "npm run build", "ok": true, "result": "Vite production dist regenerated" }
+  ],
+  "honestLimits": [
+    "Sandbox has no physical camera, so camera permission and real image capture must be verified on a real device over localhost or HTTPS.",
+    "OCR accuracy depends on image quality and must be human-verified before saving credentials.",
+    "Clipboard clearing and PWA install prompting can be blocked or varied by browser policy."
+  ]
+}

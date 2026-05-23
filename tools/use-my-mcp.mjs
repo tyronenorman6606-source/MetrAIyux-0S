@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -13,11 +14,17 @@ const targetFolder = path.resolve(repoRoot, targetArg);
 const targetFolderExistsAtStart = fs.existsSync(targetFolder);
 const mcpConfigPath = path.join(repoRoot, '.mcp.json');
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'direct-mcp');
-const defaultWalkSkipDirs = new Set(['node_modules', 'dist', '.git', '.wrangler', '.netlify']);
+const defaultWalkSkipDirs = new Set(['node_modules', 'dist', '.git', '.wrangler', '.netlify', 'operator-receipts']);
+const remoteDefaultEndpoint = 'https://skye-design-mcp.pages.dev/mcp';
+const remoteGateUrl = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/index.html?workspace=quantumskyes-mcp&source=skye-design-mcp&return=https%3A%2F%2Fskye-design-mcp.pages.dev%2Fuse-mcp.html';
 const extraWalkSkipDirs = new Set((process.env.MCP_SKIP_DIRS || '')
   .split(',')
   .map((item) => item.trim())
   .filter(Boolean));
+const transportMode = String(process.env.MCP_TRANSPORT || '').trim().toLowerCase();
+const useRemoteTransport = transportMode === 'remote'
+  || process.env.MCP_REMOTE === '1'
+  || Boolean(process.env.QUANTUMSKYES_MCP_URL);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -66,11 +73,44 @@ if (!quantumskyes) {
 }
 
 const serverArgs = quantumskyes.args.map((arg) => arg.replace('/workspaces/MetrAIyux-0S', repoRoot));
-const transport = new StdioClientTransport({
-  command: quantumskyes.command,
-  args: serverArgs,
-  env: { ...process.env, REPO_ROOT: repoRoot }
-});
+const remoteEndpoint = process.env.QUANTUMSKYES_MCP_URL || remoteDefaultEndpoint;
+const remoteBearerToken = process.env.QUANTUMSKYES_MCP_TOKEN
+  || process.env.MCP_GATE_SESSION
+  || process.env.NORTHSTAR_SESSION_TOKEN
+  || process.env.MCP_HTTP_BEARER_TOKEN
+  || '';
+const transport = useRemoteTransport
+  ? (() => {
+      if (!remoteBearerToken) {
+        throw new Error(`Remote quantumskyes MCP requires QUANTUMSKYES_MCP_TOKEN, MCP_GATE_SESSION, NORTHSTAR_SESSION_TOKEN, or MCP_HTTP_BEARER_TOKEN. Gate users through ${remoteGateUrl}`);
+      }
+      return new StreamableHTTPClientTransport(new URL(remoteEndpoint), {
+        requestInit: {
+          headers: {
+            Authorization: `Bearer ${remoteBearerToken}`
+          }
+        }
+      });
+    })()
+  : new StdioClientTransport({
+      command: quantumskyes.command,
+      args: serverArgs,
+      env: { ...process.env, REPO_ROOT: repoRoot }
+    });
+const transportReceipt = useRemoteTransport
+  ? {
+      name: 'quantumskyes',
+      url: remoteEndpoint,
+      gateUrl: remoteGateUrl,
+      auth: 'bearer-token-redacted',
+      connectedDirectlyVia: '@modelcontextprotocol/sdk/client/streamableHttp'
+    }
+  : {
+      name: 'quantumskyes',
+      command: quantumskyes.command,
+      args: serverArgs,
+      connectedDirectlyVia: '@modelcontextprotocol/sdk/client/stdio'
+    };
 
 const client = new Client({
   name: 'metraiyux-direct-my-mcp-runner',
@@ -443,14 +483,11 @@ toolCalls.push(await callTool('production_ledger', {}));
 
 const receipt = {
   generatedAt: new Date().toISOString(),
-  rule: 'When the user says "my MCP", use .mcp.json -> mcpServers.quantumskyes -> MCP/stdio-server.mjs directly.',
+  rule: useRemoteTransport
+    ? 'Remote proof mode: use the deployed gate-owned quantumskyes MCP endpoint only with a valid 0S/FS27/NorthStar bearer session. Local .mcp.json remains the repo source of truth.'
+    : 'When the user says "my MCP", use .mcp.json -> mcpServers.quantumskyes -> MCP/stdio-server.mjs directly.',
   targetFolder,
-  mcpServer: {
-    name: 'quantumskyes',
-    command: quantumskyes.command,
-    args: serverArgs,
-    connectedDirectlyVia: '@modelcontextprotocol/sdk/client/stdio'
-  },
+  mcpServer: transportReceipt,
   inventory: {
     targetFolderExistsAtStart,
     targetHasPublicSource,

@@ -1,0 +1,33 @@
+{
+  "id": "neon",
+  "title": "Neon Postgres",
+  "lane": "database",
+  "requiredSecrets": [
+    "DATABASE_URL or NEON_SQL_HTTP_URL"
+  ],
+  "routes": [
+    "db.query"
+  ],
+  "backend": "server/adapters/provider-registry.mjs#NeonAdapter",
+  "description": "Executable provider pack for Neon Postgres routes inside the kAIxu platform engine.",
+  "capabilities": [
+    "postgres-query",
+    "migration",
+    "snapshot"
+  ],
+  "metering": {
+    "unit": "query",
+    "defaultCostCents": 0
+  },
+  "policyTags": [
+    "database",
+    "neon"
+  ],
+  "executableActions": [
+    {
+      "route": "db.query",
+      "runner": "server/lib/action-registry.mjs#runProviderAction",
+      "requiresInstalledProvider": true
+    }
+  ]
+}

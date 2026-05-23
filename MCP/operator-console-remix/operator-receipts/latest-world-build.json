@@ -1,0 +1,563 @@
+{
+  "ok": true,
+  "generatedAt": "2026-05-20T15:27:05.879Z",
+  "startedAt": "2026-05-20T15:27:05.276Z",
+  "target": {
+    "id": "operator-console",
+    "label": "MCP Operator Console",
+    "path": "MCP/operator-console-remix",
+    "purpose": "local cockpit for catalog, planning, mining, and proof receipts"
+  },
+  "targetPath": "/workspaces/MetrAIyux-0S/MCP/operator-console-remix",
+  "inventory": {
+    "exists": true,
+    "relativePath": "MCP/operator-console-remix",
+    "counts": {
+      "html": 1,
+      "css": 1,
+      "js": 9,
+      "tsx": 5,
+      "json": 7,
+      "total": 39
+    },
+    "sampleFiles": [
+      "MCP/operator-console-remix/.agents/skills/remix/SKILL.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/animate-elements.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/assets-and-browser-modules.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/auth-and-sessions.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/component-model.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/create-mixins.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/data-and-validation.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/hydration-frames-navigation.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/middleware-and-server.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/mixins-styling-events.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/routing-and-controllers.md",
+      "MCP/operator-console-remix/.agents/skills/remix/references/testing-patterns.md",
+      "MCP/operator-console-remix/.gitignore",
+      "MCP/operator-console-remix/AGENTS.md",
+      "MCP/operator-console-remix/MCP_TOOLING_RECEIPT.json",
+      "MCP/operator-console-remix/README.md",
+      "MCP/operator-console-remix/app/actions/controller.tsx",
+      "MCP/operator-console-remix/app/assets/entry.ts",
+      "MCP/operator-console-remix/app/assets/prompt-button.tsx",
+      "MCP/operator-console-remix/app/assets/world-runtime.ts",
+      "MCP/operator-console-remix/app/assets.ts",
+      "MCP/operator-console-remix/app/middleware/render.tsx",
+      "MCP/operator-console-remix/app/operator.server.ts",
+      "MCP/operator-console-remix/app/router.ts"
+    ],
+    "packageJson": {
+      "name": "quantumskyes-mcp-control-room",
+      "private": true,
+      "type": "module",
+      "scripts": {
+        "dev": "node --watch --import remix/node-tsx server.ts",
+        "start": "node --import remix/node-tsx server.ts",
+        "test": "node --import remix/node-tsx --test",
+        "typecheck": "tsc --noEmit",
+        "proof:local": "node scripts/proof-operator-console.mjs"
+      },
+      "engines": {
+        "node": ">=24.3.0"
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.29.0",
+        "gsap": "latest",
+        "lenis": "latest",
+        "remix": "^3.0.0-beta.1",
+        "three": "latest"
+      },
+      "devDependencies": {
+        "@types/node": "latest",
+        "pngjs": "^7.0.0",
+        "typescript": "latest"
+      }
+    },
+    "receipt": {
+      "path": "MCP/operator-console-remix/MCP_TOOLING_RECEIPT.json",
+      "ok": true,
+      "generatedAt": "2026-05-20T15:13:21.716Z",
+      "listedTools": 27,
+      "resourcesRead": 18,
+      "toolCalls": 30,
+      "failedCalls": [],
+      "inventory": {
+        "targetFolderExistsAtStart": true,
+        "targetHasPublicSource": true,
+        "htmlFiles": 0,
+        "cssFiles": 1,
+        "jsFiles": 14,
+        "legacyCssImportShims": 0,
+        "htmlInjectedWithMcpCss": 0,
+        "sourceIndex": "/workspaces/MetrAIyux-0S/MCP/operator-console-remix/index.html",
+        "sourceCss": "/workspaces/MetrAIyux-0S/MCP/operator-console-remix/src/styles.css",
+        "sourceJs": "/workspaces/MetrAIyux-0S/MCP/operator-console-remix/src",
+        "canonicalIndex": null,
+        "canonicalCss": null,
+        "canonicalStackSource": null,
+        "canonicalBundle": null,
+        "canonicalJs": null
+      }
+    }
+  },
+  "archetype": {
+    "id": "barber-shop",
+    "label": "Barber Shop Walkthrough",
+    "product": "barber booking and proof world",
+    "metaphor": "storefront to chair to mirror to service wall",
+    "entryRitual": "walk in, choose chair, pick service",
+    "firstViewportSubject": "shopfront with a chair visible through the glass",
+    "surface": "booking site, client walkthrough, and owner lead lane",
+    "goal": "turn a local-service site into a room people can navigate",
+    "audience": "barber clients and shop owner",
+    "effects": [
+      "threeCanvas",
+      "gsapScroll",
+      "surfaceScreenshots",
+      "motionChrome",
+      "textEffects"
+    ],
+    "requiredStack": [
+      "three",
+      "gsap",
+      "lenis"
+    ],
+    "useCases": [
+      "public-landing-hero",
+      "webgl-product-scene",
+      "scroll-story",
+      "proof-surface",
+      "content-sections"
+    ]
+  },
+  "build": {
+    "slug": "operator-console-barber-shop",
+    "route": "/generated-worlds/operator-console-barber-shop",
+    "file": "MCP/operator-console-remix/generated-worlds/operator-console-barber-shop/index.html",
+    "absoluteFile": "/workspaces/MetrAIyux-0S/MCP/operator-console-remix/generated-worlds/operator-console-barber-shop/index.html",
+    "entryRitual": "walk in, choose chair, pick service",
+    "firstViewportSubject": "shopfront with a chair visible through the glass",
+    "mcpBacked": true
+  },
+  "mcp": {
+    "recipe": {
+      "name": "design_recipe_plan",
+      "args": {
+        "product": "barber booking and proof world",
+        "surface": "booking site, client walkthrough, and owner lead lane",
+        "goal": "turn a local-service site into a room people can navigate",
+        "audience": "barber clients and shop owner",
+        "effects": [
+          "threeCanvas",
+          "gsapScroll",
+          "surfaceScreenshots",
+          "motionChrome",
+          "textEffects"
+        ]
+      },
+      "text": "{\n  \"product\": \"barber booking and proof world\",\n  \"surface\": \"booking site, client walkthrough, and owner lead lane\",\n  \"goal\": \"turn a local-service site into a room people can navigate\",\n  \"audience\": \"barber clients and shop owner\",\n  \"requestedEffects\": [\n    \"threeCanvas\",\n    \"gsapScroll\",\n    \"surfaceScreenshots\",\n    \"motionChrome\",\n    \"textEffects\"\n  ],\n  \"requiredOpenSourceRecipes\": [\n    \"three-r3f-shader-scene\",\n    \"drei-postprocessing-cinema\",\n    \"gsap-lenis-scroll-stage\",\n    \"actual-surface-screenshot-stage\",\n    \"actual-surface-video-reel\",\n    \"neon-motion-chrome-kit\",\n    \"framer-motion-interaction-system\",\n    \"premium-text-effects-lab\"\n  ],\n  \"requiredStack\": [\n    \"three\",\n    \"r3f\",\n    \"gsap\",\n    \"lenis\",\n    \"framerMotion\"\n  ],\n  \"selectedRecipes\": [\n    {\n      \"id\": \"three-r3f-shader-scene\",\n      \"tags\": [\n        \"three\",\n        \"r3f\",\n        \"webgl\",\n        \"shader\",\n        \"3d\",\n        \"canvas\"\n      ],\n      \"packages\": [\n        \"three\",\n        \"@react-three/fiber\"\n      ],\n      \"imports\": [\n        \"import { Canvas, useFrame } from '@react-three/fiber';\",\n        \"import * as THREE from 'three';\"\n      ],\n      \"useWhen\": \"The first viewport needs a living object, shader field, spatial product symbol, particle system, or interactive canvas.\",\n      \"mustShow\": [\n        \"Canvas in first viewport\",\n        \"useFrame runtime motion\",\n        \"Three object/material/geometry\"\n      ],\n      \"avoid\": [\n        \"flat CSS glow sold as Three.js\",\n        \"canvas hidden below fold\"\n      ],\n      \"starter\": \"Build one dominant product object or shader field; bind camera/object motion to pointer and time.\"\n    },\n    {\n      \"id\": \"drei-postprocessing-cinema\",\n      \"tags\": [\n        \"drei\",\n        \"postprocessing\",\n        \"bloom\",\n        \"camera\",\n        \"stars\",\n        \"float\"\n      ],\n      \"packages\": [\n        \"@react-three/drei\",\n        \"@react-three/postprocessing\"\n      ],\n      \"imports\": [\n        \"import { Float, PerspectiveCamera, Stars } from '@react-three/drei';\",\n        \"import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';\"\n      ],\n      \"useWhen\": \"A Three/R3F scene needs cinematic lighting, depth, bloom, floating objects, stars, camera helpers, or visual finish.\",\n      \"mustShow\": [\n        \"EffectComposer\",\n        \"Bloom or Vignette\",\n        \"Drei helper used visibly\"\n      ],\n      \"avoid\": [\n        \"postprocessing import unused\",\n        \"over-bloom that hides the product\"\n      ],\n      \"starter\": \"Wrap the scene with EffectComposer, add Bloom/Vignette, use Float/Stars/PerspectiveCamera to make the visual feel staged.\"\n    },\n    {\n      \"id\": \"gsap-lenis-scroll-stage\",\n      \"tags\": [\n        \"gsap\",\n        \"ScrollTrigger\",\n        \"lenis\",\n        \"scroll\",\n        \"pinning\",\n        \"scrub\"\n      ],\n      \"packages\": [\n        \"gsap\",\n        \"lenis\"\n      ],\n      \"imports\": [\n        \"import gsap from 'gsap';\",\n        \"import { ScrollTrigger } from 'gsap/ScrollTrigger';\",\n        \"import Lenis from 'lenis';\"\n      ],\n      \"useWhen\": \"The page needs a scroll-led story, sticky/pinned sections, scrubbed transitions, rails, staged proof, or cinematic funnel.\",\n      \"mustShow\": [\n        \"gsap.registerPlugin(ScrollTrigger)\",\n        \"new Lenis()\",\n        \"at least one scrub/pin/reveal timeline\"\n      ],\n      \"avoid\": [\n        \"basic anchor scroll presented as GSAP\",\n        \"scroll-jacking forms or core workflows\"\n      ],\n      \"starter\": \"Create Lenis raf loop, bind ScrollTrigger.update, and stage sections with scrubbed opacity/position/progress rails.\"\n    },\n    {\n      \"id\": \"actual-surface-screenshot-stage\",\n      \"tags\": [\n        \"screenshot\",\n        \"surface\",\n        \"app-preview\",\n        \"browser-proof\"\n      ],\n      \"packages\": [\n        \"playwright for capture\",\n        \"frontend image rendering\"\n      ],\n      \"imports\": [\n        \"Use generated screenshot assets from browser QA; render them as first-class product media.\"\n      ],\n      \"useWhen\": \"The user has an app, dashboard, website, game, or tool where the real surface matters.\",\n      \"mustShow\": [\n        \"desktop screenshot\",\n        \"mobile screenshot when relevant\",\n        \"caption proving what surface is shown\"\n      ],\n      \"avoid\": [\n        \"stock imagery\",\n        \"random logos\",\n        \"fake UI if real UI exists\"\n      ],\n      \"starter\": \"Capture real surfaces with Playwright, place them in an angled/staged gallery or first viewport subject.\"\n    },\n    {\n      \"id\": \"actual-surface-video-reel\",\n      \"tags\": [\n        \"screenshot\",\n        \"surface\",\n        \"video\",\n        \"ffmpeg\",\n        \"browser-proof\",\n        \"app-preview\",\n        \"e2e-proof\",\n        \"workflow-recording\"\n      ],\n      \"packages\": [\n        \"ffmpeg\",\n        \"playwright recordVideo\",\n        \"HTML video\"\n      ],\n      \"imports\": [\n        \"Use Playwright recordVideo or dense browser-action frames, encode with ffmpeg, render with <video autoplay muted loop playsinline>.\"\n      ],\n      \"useWhen\": \"The user asks for actual screenshots to become animated proof, or the page claims the app performs a workflow.\",\n      \"mustShow\": [\n        \"real browser action path\",\n        \"generated MP4 or WebM asset\",\n        \"video first in the proof stage\",\n        \"poster image\",\n        \"browser check that video is visible and playing\",\n        \"design_e2e_proof_audit passes for workflow claims\"\n      ],\n      \"avoid\": [\n        \"CSS-only video claims\",\n        \"fake UI reels\",\n        \"static landing screenshots called workflow proof\",\n        \"headline-first hero when actual surface proof was requested\"\n      ],\n      \"starter\": \"Use Playwright to goto/click/fill/scroll/submit through the claimed flow, record video or dense frames, encode H.264 with -movflags +faststart, render MP4/WebM, then verify readyState/currentTime/paused/visible in browser E2E.\"\n    },\n    {\n      \"id\": \"neon-motion-chrome-kit\",\n      \"tags\": [\n        \"scrollbar\",\n        \"scroll-progress\",\n        \"cursor-trail\",\n        \"scanline\",\n        \"shimmer\",\n        \"magnetic\",\n        \"neon\",\n        \"motion-chrome\"\n      ],\n      \"packages\": [\n        \"framer-motion\"\n      ],\n      \"imports\": [\n        \"import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';\"\n      ],\n      \"useWhen\": \"The page needs the Legal Skyes neon scrollbar plus stronger full-page motion polish: top scroll progress, pointer-reactive glow, animated scanline, shimmer display type, and magnetic hover utilities.\",\n      \"mustShow\": [\n        \"NeonMotionChrome wrapper or equivalent\",\n        \"custom 14px+ scrollbar\",\n        \"scroll progress rail bound to useScroll\",\n        \"desktop cursor glow with pointer-events none\",\n        \"mobile and prefers-reduced-motion fallbacks\"\n      ],\n      \"avoid\": [\n        \"decorative overlays that block clicks\",\n        \"global motion with no reduced-motion escape\",\n        \"using chrome to hide a weak layout\",\n        \"one-color purple/blue glow everywhere\"\n      ],\n      \"starter\": \"Use the neon-motion-chrome pattern pack. Wrap the page once, put .neon-gradient-text only on the hero/display line, use .neon-glow-panel for one or two proof surfaces, and add .neon-magnetic only to real controls.\",\n      \"sourceUrls\": [\n        \"https://skyes-over-london-legal.pages.dev/legal/\",\n        \"https://motion.dev/\"\n      ]\n    },\n    {\n      \"id\": \"framer-motion-interaction-system\",\n      \"tags\": [\n        \"framer-motion\",\n        \"hover\",\n        \"layout\",\n        \"cursor\",\n        \"microinteraction\"\n      ],\n      \"packages\": [\n        \"framer-motion\"\n      ],\n      \"imports\": [\n        \"import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion';\"\n      ],\n      \"useWhen\": \"The page needs premium UI interaction, cursor-responsive layers, spring movement, layout transitions, or scroll-bound transforms.\",\n      \"mustShow\": [\n        \"visible motion component\",\n        \"spring or scroll value\",\n        \"reduced-motion/mobile fallback\"\n      ],\n      \"avoid\": [\n        \"static CSS pretending to be Framer Motion\",\n        \"animating every element at once\"\n      ],\n      \"starter\": \"Use motion components for CTA/surface panels; use useMotionValue/useSpring for cursor glow; use useScroll/useTransform for scroll-bound depth.\"\n    },\n    {\n      \"id\": \"premium-text-effects-lab\",\n      \"tags\": [\n        \"text-effects\",\n        \"glow\",\n        \"shimmer\",\n        \"split-text\",\n        \"typography\",\n        \"neon\"\n      ],\n      \"packages\": [\n        \"framer-motion\",\n        \"gsap optional\"\n      ],\n      \"imports\": [\n        \"import { motion } from 'framer-motion';\",\n        \"import gsap from 'gsap';\"\n      ],\n      \"useWhen\": \"The user asks for glowing text, neon text, text effects, split reveals, or high-impact display type.\",\n      \"mustShow\": [\n        \"one deliberate display text effect\",\n        \"no negative letter spacing\",\n        \"mobile text fit verified\"\n      ],\n      \"avoid\": [\n        \"every heading glowing\",\n        \"illegible bloom\",\n        \"text columns dragging down mobile\"\n      ],\n      \"starter\": \"Use one hero-scale glow/shimmer effect; animate reveal with Framer Motion or GSAP split-line timing.\"\n    }\n  ],\n  \"implementationOrder\": [\n    \"Pick one dominant visual subject before styling.\",\n    \"Call design_logo_manifest before drawing or replacing any logo.\",\n    \"Wire the open-source recipes in source code.\",\n    \"Capture real app/browser screenshots when surfaceScreenshots is requested.\",\n    \"When the copy says the app does XYZ, record the browser doing XYZ with Playwright before calling it proof.\",\n    \"Encode an actual MP4/WebM browser-action reel for live proof; screenshot reels are secondary fallback proof.\",\n    \"Run design_stack_audit for required imports.\",\n    \"Run design_logo_audit when a logo/wordmark/brand mark exists in source.\",\n    \"Run design_effect_audit for requested effects.\",\n    \"Run design_e2e_proof_audit for action claims, product workflows, signup/auth, dashboards, restores, routing, and proof surfaces.\",\n    \"Run design_performance_audit for scroll/WebGL/image/motion responsiveness.\",\n    \"Run desktop/mobile browser screenshots and fix visible failures.\"\n  ],\n  \"failIfMissing\": [\n    \"No source import/runtime proof for requested libraries.\",\n    \"No visible source signal for requested effects.\",\n    \"Generated initial logo badge when an existing logo asset or clean wordmark should be used.\",\n    \"Static screenshot proof for app behavior claims.\",\n    \"CSS-only animated screenshot claims when Playwright/ffmpeg can generate a real browser-action video reel.\",\n    \"Lazy scroll, high DPR, high particles, eager screenshots, or missing reduced-motion/mobile fallbacks.\",\n    \"No browser screenshot proof.\",\n    \"SkyeSol-only restyling without recipe-driven implementation.\"\n  ]\n}",
+      "json": {
+        "product": "barber booking and proof world",
+        "surface": "booking site, client walkthrough, and owner lead lane",
+        "goal": "turn a local-service site into a room people can navigate",
+        "audience": "barber clients and shop owner",
+        "requestedEffects": [
+          "threeCanvas",
+          "gsapScroll",
+          "surfaceScreenshots",
+          "motionChrome",
+          "textEffects"
+        ],
+        "requiredOpenSourceRecipes": [
+          "three-r3f-shader-scene",
+          "drei-postprocessing-cinema",
+          "gsap-lenis-scroll-stage",
+          "actual-surface-screenshot-stage",
+          "actual-surface-video-reel",
+          "neon-motion-chrome-kit",
+          "framer-motion-interaction-system",
+          "premium-text-effects-lab"
+        ],
+        "requiredStack": [
+          "three",
+          "r3f",
+          "gsap",
+          "lenis",
+          "framerMotion"
+        ],
+        "selectedRecipes": [
+          {
+            "id": "three-r3f-shader-scene",
+            "tags": [
+              "three",
+              "r3f",
+              "webgl",
+              "shader",
+              "3d",
+              "canvas"
+            ],
+            "packages": [
+              "three",
+              "@react-three/fiber"
+            ],
+            "imports": [
+              "import { Canvas, useFrame } from '@react-three/fiber';",
+              "import * as THREE from 'three';"
+            ],
+            "useWhen": "The first viewport needs a living object, shader field, spatial product symbol, particle system, or interactive canvas.",
+            "mustShow": [
+              "Canvas in first viewport",
+              "useFrame runtime motion",
+              "Three object/material/geometry"
+            ],
+            "avoid": [
+              "flat CSS glow sold as Three.js",
+              "canvas hidden below fold"
+            ],
+            "starter": "Build one dominant product object or shader field; bind camera/object motion to pointer and time."
+          },
+          {
+            "id": "drei-postprocessing-cinema",
+            "tags": [
+              "drei",
+              "postprocessing",
+              "bloom",
+              "camera",
+              "stars",
+              "float"
+            ],
+            "packages": [
+              "@react-three/drei",
+              "@react-three/postprocessing"
+            ],
+            "imports": [
+              "import { Float, PerspectiveCamera, Stars } from '@react-three/drei';",
+              "import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';"
+            ],
+            "useWhen": "A Three/R3F scene needs cinematic lighting, depth, bloom, floating objects, stars, camera helpers, or visual finish.",
+            "mustShow": [
+              "EffectComposer",
+              "Bloom or Vignette",
+              "Drei helper used visibly"
+            ],
+            "avoid": [
+              "postprocessing import unused",
+              "over-bloom that hides the product"
+            ],
+            "starter": "Wrap the scene with EffectComposer, add Bloom/Vignette, use Float/Stars/PerspectiveCamera to make the visual feel staged."
+          },
+          {
+            "id": "gsap-lenis-scroll-stage",
+            "tags": [
+              "gsap",
+              "ScrollTrigger",
+              "lenis",
+              "scroll",
+              "pinning",
+              "scrub"
+            ],
+            "packages": [
+              "gsap",
+              "lenis"
+            ],
+            "imports": [
+              "import gsap from 'gsap';",
+              "import { ScrollTrigger } from 'gsap/ScrollTrigger';",
+              "import Lenis from 'lenis';"
+            ],
+            "useWhen": "The page needs a scroll-led story, sticky/pinned sections, scrubbed transitions, rails, staged proof, or cinematic funnel.",
+            "mustShow": [
+              "gsap.registerPlugin(ScrollTrigger)",
+              "new Lenis()",
+              "at least one scrub/pin/reveal timeline"
+            ],
+            "avoid": [
+              "basic anchor scroll presented as GSAP",
+              "scroll-jacking forms or core workflows"
+            ],
+            "starter": "Create Lenis raf loop, bind ScrollTrigger.update, and stage sections with scrubbed opacity/position/progress rails."
+          },
+          {
+            "id": "actual-surface-screenshot-stage",
+            "tags": [
+              "screenshot",
+              "surface",
+              "app-preview",
+              "browser-proof"
+            ],
+            "packages": [
+              "playwright for capture",
+              "frontend image rendering"
+            ],
+            "imports": [
+              "Use generated screenshot assets from browser QA; render them as first-class product media."
+            ],
+            "useWhen": "The user has an app, dashboard, website, game, or tool where the real surface matters.",
+            "mustShow": [
+              "desktop screenshot",
+              "mobile screenshot when relevant",
+              "caption proving what surface is shown"
+            ],
+            "avoid": [
+              "stock imagery",
+              "random logos",
+              "fake UI if real UI exists"
+            ],
+            "starter": "Capture real surfaces with Playwright, place them in an angled/staged gallery or first viewport subject."
+          },
+          {
+            "id": "actual-surface-video-reel",
+            "tags": [
+              "screenshot",
+              "surface",
+              "video",
+              "ffmpeg",
+              "browser-proof",
+              "app-preview",
+              "e2e-proof",
+              "workflow-recording"
+            ],
+            "packages": [
+              "ffmpeg",
+              "playwright recordVideo",
+              "HTML video"
+            ],
+            "imports": [
+              "Use Playwright recordVideo or dense browser-action frames, encode with ffmpeg, render with <video autoplay muted loop playsinline>."
+            ],
+            "useWhen": "The user asks for actual screenshots to become animated proof, or the page claims the app performs a workflow.",
+            "mustShow": [
+              "real browser action path",
+              "generated MP4 or WebM asset",
+              "video first in the proof stage",
+              "poster image",
+              "browser check that video is visible and playing",
+              "design_e2e_proof_audit passes for workflow claims"
+            ],
+            "avoid": [
+              "CSS-only video claims",
+              "fake UI reels",
+              "static landing screenshots called workflow proof",
+              "headline-first hero when actual surface proof was requested"
+            ],
+            "starter": "Use Playwright to goto/click/fill/scroll/submit through the claimed flow, record video or dense frames, encode H.264 with -movflags +faststart, render MP4/WebM, then verify readyState/currentTime/paused/visible in browser E2E."
+          },
+          {
+            "id": "neon-motion-chrome-kit",
+            "tags": [
+              "scrollbar",
+              "scroll-progress",
+              "cursor-trail",
+              "scanline",
+              "shimmer",
+              "magnetic",
+              "neon",
+              "motion-chrome"
+            ],
+            "packages": [
+              "framer-motion"
+            ],
+            "imports": [
+              "import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';"
+            ],
+            "useWhen": "The page needs the Legal Skyes neon scrollbar plus stronger full-page motion polish: top scroll progress, pointer-reactive glow, animated scanline, shimmer display type, and magnetic hover utilities.",
+            "mustShow": [
+              "NeonMotionChrome wrapper or equivalent",
+              "custom 14px+ scrollbar",
+              "scroll progress rail bound to useScroll",
+              "desktop cursor glow with pointer-events none",
+              "mobile and prefers-reduced-motion fallbacks"
+            ],
+            "avoid": [
+              "decorative overlays that block clicks",
+              "global motion with no reduced-motion escape",
+              "using chrome to hide a weak layout",
+              "one-color purple/blue glow everywhere"
+            ],
+            "starter": "Use the neon-motion-chrome pattern pack. Wrap the page once, put .neon-gradient-text only on the hero/display line, use .neon-glow-panel for one or two proof surfaces, and add .neon-magnetic only to real controls.",
+            "sourceUrls": [
+              "https://skyes-over-london-legal.pages.dev/legal/",
+              "https://motion.dev/"
+            ]
+          },
+          {
+            "id": "framer-motion-interaction-system",
+            "tags": [
+              "framer-motion",
+              "hover",
+              "layout",
+              "cursor",
+              "microinteraction"
+            ],
+            "packages": [
+              "framer-motion"
+            ],
+            "imports": [
+              "import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion';"
+            ],
+            "useWhen": "The page needs premium UI interaction, cursor-responsive layers, spring movement, layout transitions, or scroll-bound transforms.",
+            "mustShow": [
+              "visible motion component",
+              "spring or scroll value",
+              "reduced-motion/mobile fallback"
+            ],
+            "avoid": [
+              "static CSS pretending to be Framer Motion",
+              "animating every element at once"
+            ],
+            "starter": "Use motion components for CTA/surface panels; use useMotionValue/useSpring for cursor glow; use useScroll/useTransform for scroll-bound depth."
+          },
+          {
+            "id": "premium-text-effects-lab",
+            "tags": [
+              "text-effects",
+              "glow",
+              "shimmer",
+              "split-text",
+              "typography",
+              "neon"
+            ],
+            "packages": [
+              "framer-motion",
+              "gsap optional"
+            ],
+            "imports": [
+              "import { motion } from 'framer-motion';",
+              "import gsap from 'gsap';"
+            ],
+            "useWhen": "The user asks for glowing text, neon text, text effects, split reveals, or high-impact display type.",
+            "mustShow": [
+              "one deliberate display text effect",
+              "no negative letter spacing",
+              "mobile text fit verified"
+            ],
+            "avoid": [
+              "every heading glowing",
+              "illegible bloom",
+              "text columns dragging down mobile"
+            ],
+            "starter": "Use one hero-scale glow/shimmer effect; animate reveal with Framer Motion or GSAP split-line timing."
+          }
+        ],
+        "implementationOrder": [
+          "Pick one dominant visual subject before styling.",
+          "Call design_logo_manifest before drawing or replacing any logo.",
+          "Wire the open-source recipes in source code.",
+          "Capture real app/browser screenshots when surfaceScreenshots is requested.",
+          "When the copy says the app does XYZ, record the browser doing XYZ with Playwright before calling it proof.",
+          "Encode an actual MP4/WebM browser-action reel for live proof; screenshot reels are secondary fallback proof.",
+          "Run design_stack_audit for required imports.",
+          "Run design_logo_audit when a logo/wordmark/brand mark exists in source.",
+          "Run design_effect_audit for requested effects.",
+          "Run design_e2e_proof_audit for action claims, product workflows, signup/auth, dashboards, restores, routing, and proof surfaces.",
+          "Run design_performance_audit for scroll/WebGL/image/motion responsiveness.",
+          "Run desktop/mobile browser screenshots and fix visible failures."
+        ],
+        "failIfMissing": [
+          "No source import/runtime proof for requested libraries.",
+          "No visible source signal for requested effects.",
+          "Generated initial logo badge when an existing logo asset or clean wordmark should be used.",
+          "Static screenshot proof for app behavior claims.",
+          "CSS-only animated screenshot claims when Playwright/ffmpeg can generate a real browser-action video reel.",
+          "Lazy scroll, high DPR, high particles, eager screenshots, or missing reduced-motion/mobile fallbacks.",
+          "No browser screenshot proof.",
+          "SkyeSol-only restyling without recipe-driven implementation."
+        ]
+      }
+    },
+    "qualityGate": {
+      "name": "design_quality_gate",
+      "args": {
+        "surface": "MCP Operator Console Barber Shop Walkthrough generated world"
+      },
+      "text": "{\n  \"surface\": \"MCP Operator Console Barber Shop Walkthrough generated world\",\n  \"required\": [\n    \"Read quantumskyes://directives/index\",\n    \"Read quantumskyes://design/registry\",\n    \"Read quantumskyes://design/component-use-cases\",\n    \"Read quantumskyes://design/variety-system\",\n    \"Read quantumskyes://design/templates when the user asks for changelog, blog, portfolio, release receipt, field notes, or operator-profile work\",\n    \"Read quantumskyes://design/lab/registry for Skye Design Lab patterns and do not ignore MCP/skye-design-lab\",\n    \"Call design_variety_plan and record the chosen design DNA before coding\",\n    \"Read quantumskyes://design/logo-standards before creating or replacing any logo/mark\",\n    \"Pick an approved first-viewport pattern\",\n    \"Call design_component_plan and record selected use cases/components before coding\",\n    \"Call design_recipe_plan for the requested product/effects\",\n    \"Call design_open_source_stack and select concrete open-source recipes before applying brand styling\",\n    \"Call design_logo_manifest and use existing logo assets before inventing a new mark\",\n    \"Call design_template_manifest or design_template_pack when a revised template can serve the requested surface\",\n    \"Call design_logo_audit when a logo, brand mark, wordmark, or nav identity appears in source\",\n    \"Read quantumskyes://design/surface-video-reel when app surfaces, workflows, screenshots, or proof video are requested\",\n    \"Read quantumskyes://content/first-person-operator-voice for founder/operator public copy\",\n    \"Run design_content_generate or design_content_audit when writing public copy\",\n    \"Run design_validate on public copy/markup\",\n    \"Run design_stack_audit when the brief requires Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing\",\n    \"Run design_runtime_stack_gate with source, packageJson, selected components/required stack, and browserReport proving the stack is active in the rendered app\",\n    \"Run design_effect_audit when screenshots, cursor trail, neon scrollbar, motion chrome, text effects, Theatre, scroll stage, or Three/R3F canvas are requested\",\n    \"Run design_e2e_proof_audit whenever copy says the app routes, logs in, signs up, restores, monitors, filters, deploys, or does another workflow\",\n    \"Run design_performance_audit before browser QA; reject lazy Lenis, high DPR, high particles, eager screenshots, and missing reduced-motion/mobile fallbacks\",\n    \"Capture browser screenshot at 1440x1000\",\n    \"Capture browser screenshot at 390x844\",\n    \"Include runtime evidence in browser QA: motion transforms changed, GSAP/ScrollTrigger progressed, Lenis is active, WebGL canvas has nonblank pixels, and vector/scene assets reported ready when selected\",\n    \"For workflow proof, record the browser doing the workflow and verify video readyState, currentTime, paused === false, and visibility\",\n    \"Verify no mobile horizontal scroll\",\n    \"Verify main subject and CTA are visible\",\n    \"Verify no MCP smoke/debug/build text on public page\",\n    \"Reject repeated dark SaaS/card-template output even if the build passes\"\n  ]\n}",
+      "json": {
+        "surface": "MCP Operator Console Barber Shop Walkthrough generated world",
+        "required": [
+          "Read quantumskyes://directives/index",
+          "Read quantumskyes://design/registry",
+          "Read quantumskyes://design/component-use-cases",
+          "Read quantumskyes://design/variety-system",
+          "Read quantumskyes://design/templates when the user asks for changelog, blog, portfolio, release receipt, field notes, or operator-profile work",
+          "Read quantumskyes://design/lab/registry for Skye Design Lab patterns and do not ignore MCP/skye-design-lab",
+          "Call design_variety_plan and record the chosen design DNA before coding",
+          "Read quantumskyes://design/logo-standards before creating or replacing any logo/mark",
+          "Pick an approved first-viewport pattern",
+          "Call design_component_plan and record selected use cases/components before coding",
+          "Call design_recipe_plan for the requested product/effects",
+          "Call design_open_source_stack and select concrete open-source recipes before applying brand styling",
+          "Call design_logo_manifest and use existing logo assets before inventing a new mark",
+          "Call design_template_manifest or design_template_pack when a revised template can serve the requested surface",
+          "Call design_logo_audit when a logo, brand mark, wordmark, or nav identity appears in source",
+          "Read quantumskyes://design/surface-video-reel when app surfaces, workflows, screenshots, or proof video are requested",
+          "Read quantumskyes://content/first-person-operator-voice for founder/operator public copy",
+          "Run design_content_generate or design_content_audit when writing public copy",
+          "Run design_validate on public copy/markup",
+          "Run design_stack_audit when the brief requires Motion, GSAP, Lenis, Three, R3F, Drei, or postprocessing",
+          "Run design_runtime_stack_gate with source, packageJson, selected components/required stack, and browserReport proving the stack is active in the rendered app",
+          "Run design_effect_audit when screenshots, cursor trail, neon scrollbar, motion chrome, text effects, Theatre, scroll stage, or Three/R3F canvas are requested",
+          "Run design_e2e_proof_audit whenever copy says the app routes, logs in, signs up, restores, monitors, filters, deploys, or does another workflow",
+          "Run design_performance_audit before browser QA; reject lazy Lenis, high DPR, high particles, eager screenshots, and missing reduced-motion/mobile fallbacks",
+          "Capture browser screenshot at 1440x1000",
+          "Capture browser screenshot at 390x844",
+          "Include runtime evidence in browser QA: motion transforms changed, GSAP/ScrollTrigger progressed, Lenis is active, WebGL canvas has nonblank pixels, and vector/scene assets reported ready when selected",
+          "For workflow proof, record the browser doing the workflow and verify video readyState, currentTime, paused === false, and visibility",
+          "Verify no mobile horizontal scroll",
+          "Verify main subject and CTA are visible",
+          "Verify no MCP smoke/debug/build text on public page",
+          "Reject repeated dark SaaS/card-template output even if the build passes"
+        ]
+      }
+    },
+    "effectAudit": {
+      "name": "design_effect_audit",
+      "args": {
+        "requested": [
+          "threeCanvas",
+          "gsapScroll",
+          "surfaceScreenshots",
+          "motionChrome",
+          "textEffects"
+        ],
+        "source": "import * as THREE from 'three';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\nimport Lenis from 'lenis';\ngsap.registerPlugin(ScrollTrigger);\nconst renderer = new THREE.WebGLRenderer({ canvas });\nconst lenis = new Lenis();\nScrollTrigger.create({ trigger: '.room-card', scrub: true });\n<Canvas><mesh><boxGeometry /></mesh></Canvas>\nfunction useFrame() {}\ndata-mcp-cursor-trail\ndata-mcp-motion-chrome\ndata-mcp-text-scan\ndata-mcp-living-background\n<canvas id=\"three-canvas\" data-mcp-three-canvas aria-hidden=\"true\">\n<canvas id=\"world-canvas\" data-mcp-living-background aria-hidden=\"true\">"
+      },
+      "text": "{\n  \"ok\": false,\n  \"requested\": [\n    \"threeCanvas\",\n    \"gsapScroll\",\n    \"surfaceScreenshots\",\n    \"motionChrome\",\n    \"textEffects\"\n  ],\n  \"detected\": {\n    \"cursorTrail\": true,\n    \"neonScrollbar\": false,\n    \"textEffects\": true,\n    \"motionChrome\": true,\n    \"livingBackground\": true,\n    \"surfaceScreenshots\": false,\n    \"theatre\": false,\n    \"gsapScroll\": true,\n    \"threeCanvas\": true\n  },\n  \"missingEffects\": [\n    \"surfaceScreenshots\"\n  ],\n  \"issues\": [],\n  \"rule\": \"Requested visual/interactivity effects must be visible in source and browser screenshots, not merely named in copy.\"\n}",
+      "json": {
+        "ok": false,
+        "requested": [
+          "threeCanvas",
+          "gsapScroll",
+          "surfaceScreenshots",
+          "motionChrome",
+          "textEffects"
+        ],
+        "detected": {
+          "cursorTrail": true,
+          "neonScrollbar": false,
+          "textEffects": true,
+          "motionChrome": true,
+          "livingBackground": true,
+          "surfaceScreenshots": false,
+          "theatre": false,
+          "gsapScroll": true,
+          "threeCanvas": true
+        },
+        "missingEffects": [
+          "surfaceScreenshots"
+        ],
+        "issues": [],
+        "rule": "Requested visual/interactivity effects must be visible in source and browser screenshots, not merely named in copy."
+      }
+    }
+  },
+  "proofExpectation": {
+    "codeRitual": "click keypad digits 1 3 7 9, press Enter, verify unlocked room reveal",
+    "desktopMobile": true,
+    "browserActions": [
+      "scroll walkway",
+      "enter demo threshold code",
+      "open first room",
+      "verify proof rail"
+    ]
+  }
+}

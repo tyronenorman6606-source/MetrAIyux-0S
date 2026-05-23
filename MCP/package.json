@@ -1,6 +1,6 @@
 {
   "name": "quantumskyes-design-mcp",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "MCP server exposing Skye/Spectacle design resources, template packs, directives, registry patterns, and QA tools.",
@@ -15,7 +15,19 @@
   },
   "scripts": {
     "start": "node stdio-server.mjs",
+    "start:http": "node http-server.mjs",
+    "build:remote": "node remote/build-remote-bundle.mjs",
+    "build:remote:worker": "node remote/build-remote-bundle.mjs",
+    "build:remote:full": "cd skye-design-lab && npm run build && node ../remote/build-remote-bundle.mjs",
+    "console:remix:dev": "cd operator-console-remix && npm run dev",
+    "console:remix:start": "cd operator-console-remix && npm run start",
+    "console:remix:typecheck": "cd operator-console-remix && npm run typecheck",
+    "console:remix:proof": "cd operator-console-remix && npm run proof:local",
     "smoke:stdio": "node scripts/stdio-smoke.mjs",
+    "smoke:http": "node scripts/http-smoke.mjs",
+    "smoke:pages-worker": "node scripts/pages-worker-smoke.mjs",
+    "smoke:remote": "node scripts/remote-production-smoke.mjs",
+    "smoke:remote:gate": "node scripts/remote-gate-token-smoke.mjs",
     "proof:skyevault": "node scripts/skye-vault-mcp-proof.mjs"
   },
   "dependencies": {

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloudflare Worker Kit · Site Operator Brain</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">Cloudflare Worker Kit</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../autonomous-business/index.html">Autonomous Command</a>
+      <a href="../operator/deployment-runbook.html">Deploy</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Optional edge brain layer</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Cloudflare Worker</span> API for the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Site Operator Brain</span>.</h1>
+        <p class="hero-lede">This kit lets the static website become a lightweight business <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span>. The Worker can serve static assets, route messages, accept events, generate task receipts, and later connect to KV, Queues, Durable Objects, or Workers AI.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="../operator/deployment-runbook.html">Open Deployment Runbook</a>
+          <a class="button" href="../quantum-ops/worker-api-console.html">Open Worker Console</a>
+          <a class="button" href="../nexus/cloudflare-state.html">View Cloudflare State</a>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <p class="eyebrow">Endpoints included</p>
+      <div class="route-grid">
+        <article class="route-card">
+          <h3>GET /api/site-operator/status</h3>
+          <p>Returns version, brain count, and deployment mode.</p>
+        </article>
+        <article class="route-card">
+          <h3>POST /api/site-operator/route</h3>
+          <p>Routes a message to a primary and secondary cabinet brain.</p>
+        </article>
+        <article class="route-card">
+          <h3>POST /api/site-operator/event</h3>
+          <p>Accepts operating events and stores them if KV is bound.</p>
+        </article>
+        <article class="route-card">
+          <h3>POST /api/site-operator/task</h3>
+          <p>Creates task receipts and can publish to a Queue if bound.</p>
+        </article>
+      </div>
+    </section>
+    <section class="section">
+      <p class="eyebrow">Recommended production path</p>
+      <ol class="big-list">
+        <li>Deploy static assets with the Worker asset binding.</li>
+        <li>Add KV for event/task receipts once you want durable memory.</li>
+        <li>Add Queues when tasks need async processing.</li>
+        <li>Add Durable Objects only when you need real-time coordinated rooms.</li>
+        <li>Add Workers AI only when you want edge LLM generation beyond local routing.</li>
+      </ol>
+    </section>
+  </main>
+  <footer>
+    <p>Cloudflare Worker Kit · Site Operator Brain</p>
+  </footer>
+<script src="../script.js"></script></body>
+</html>

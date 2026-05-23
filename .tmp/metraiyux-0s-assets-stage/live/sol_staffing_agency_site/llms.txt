@@ -1,0 +1,104 @@
+# Skyes Over London Staffing
+
+Skyes Over London Staffing is a staffing, recruiting, workforce operations, AE-powered account growth, and government-ready workforce support brand.
+
+Core services:
+- Temporary staffing
+- Temp-to-hire
+- Direct placement
+- Project crew staffing
+- Administrative staffing
+- Customer service staffing
+- Warehouse and logistics staffing
+- Sales support staffing
+- Government staff augmentation
+- Prime-contractor subcontracting support
+
+Government contracting posture:
+- The website includes capability statement and NAICS candidate content.
+- The company should not claim UEI, CAGE, SAM registration, set-aside certifications, GSA Schedule, bonding, insurance, or past federal performance unless verified.
+- Government pages are written for agencies, municipalities, and prime contractors that need workforce support.
+
+Contact:
+- Email: SkyesOverLondonLC@solenterprises.org
+
+
+Additional site surfaces:
+- Jobs board shell
+- Candidate application
+- Employer portal preview
+- Engagement model / quote page
+- Contact hub
+- FAQ
+- Privacy and terms placeholders
+- Government opportunity tracker
+- Arizona service-area pages for Phoenix, Glendale, Mesa, Tempe, Scottsdale, and Chandler
+- Additional long-form staffing articles about job orders, prime contractor staffing support, quality control, and Arizona staffing strategy
+
+Important limitations:
+- Static forms need Netlify Forms or a backend to receive submissions.
+- Candidate file upload is not implemented in this static package.
+- Employer portal is a preview shell, not a secure authenticated portal.
+- Government opportunity tracker is static/internal and should not expose sensitive pursuit notes.
+
+
+Sales and operations expansion:
+- proposal-builder.html for internal client proposal intake
+- case-studies.html for verified proof and public case-study shells
+- ae-recruiting.html for Account Executive recruiting
+- sales-scripts.html for internal AE sales scripts
+- candidate-onboarding.html for candidate readiness
+- procurement-packet.html for government/prime buyer packet organization
+- quality-control-plan.html for staffing quality-control plan
+- deployment-command.html for operator setup and smoke testing
+
+Internal pages should be locked behind auth before production:
+- ae-command.html
+- sales-scripts.html
+- proposal-builder.html
+- employer-portal.html
+- government-opportunities.html
+- deployment-command.html
+
+
+Operations/data/vendor expansion:
+- operations hub maps employer, candidate, AE, government, proof, and launch workflows
+- client welcome packet supports employer onboarding
+- vendor packet supports subcontractor/vendor onboarding
+- contract vehicles page educates buyers without claiming unverified vehicles
+- forms directory maps form routing and owners
+- email sequences provide internal follow-up copy
+- JSON scaffolds document forms routing, sample job orders, NAICS candidates, and internal pages to lock
+
+
+Finance/training/risk expansion:
+- recruiter-desk.html for internal recruiter workflow
+- training-academy.html for AE/recruiter/operator training
+- bill-rate-calculator.html for internal estimate math
+- timesheet-invoice-control.html for time and billing workflow
+- risk-register.html for operational risk tracking
+- compliance-posture.html for public compliance posture
+- CSV templates for job orders, candidates, clients, government pursuits, and risk register
+
+
+Sales delivery automation scaffold:
+- CRM pipeline page tracks employer account stages.
+- Placement tracker page tracks candidate movement.
+- Agreement packet organizes legal/contracting document topics.
+- Campaign landing pages include urgent staffing, candidate pool, and prime contractor support funnels.
+- Data scaffolds include CRM stages, placement stages, campaigns, CSV trackers, and templates.
+
+
+Local brain layer:
+- The site includes a local-first browser assistant called SOL Staffing Local Brain.
+- It lives in brain.html and uses brain/brain-corpus.json plus brain/brain.js.
+- It can answer staffing questions, route users, provide checklists, provide AE scripts, and enforce safe-claim reminders.
+- It uses localStorage for optional browser-local memory.
+- It does not call an external AI provider by default.
+- It is not a true LLM until connected to a backend/GPU/Ollama/vLLM endpoint.
+
+
+System overview:
+- `system-overview.html` and `SYSTEM_WALKTHROUGH_AND_UPGRADES.md` explain the full staffing site, what works now, what is static, the local brain truth label, production gates, and upgrade roadmap.
+- The current site is deployable as a static marketing/content/lead-capture/local-brain system.
+- Full live staffing platform behavior requires auth, database, CRM/ATS, secure uploads, email notifications, payroll/insurance/legal operations, and verified government data.

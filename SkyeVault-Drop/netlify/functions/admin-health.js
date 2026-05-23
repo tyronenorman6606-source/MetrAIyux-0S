@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess } from './_lib/security.js';
 import { loadConfig, getConfigFolderId, CONFIG_FILE, LEDGER_FILE, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 import { getAccessToken, getFolderMetadata, createAndTrashHealthcheck, findFileInFolder } from './_lib/google-drive.js';
 import { notificationConfigSummary } from './_lib/notifications.js';
@@ -54,7 +54,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event);
     const writeTest = body.writeTest !== false;
     const checks = [];
@@ -96,6 +96,11 @@ export async function handler(event) {
     const abuse = abusePolicySummary();
     const recentEvents = await loadAuditEvents(20).catch(() => []);
     const audit = await writeAuditEventSafe('admin-health-ran', {
+      actor: admin.actor,
+      authType: admin.type,
+      workspaceId: admin.workspaceId,
+      customerId: admin.customerId,
+      gateCardId: admin.gateCardId,
       writeTest,
       checkCount: checks.length,
       destinationCount: destinationResults.length,
@@ -106,6 +111,7 @@ export async function handler(event) {
       + destinationResults.flatMap((item) => item.checks).filter((item) => item.severity === 'required' && !item.ok).length;
     return json(200, {
       ok: requiredFailed === 0,
+      actor: admin,
       source,
       checks,
       destinations: destinationResults,

@@ -1,0 +1,33 @@
+{
+  "app": "SkyePics App",
+  "version": "1.1.0",
+  "generatedAt": "2026-05-20T05:00:00.000Z",
+  "commands": {
+    "npm install": "passed; 0 vulnerabilities reported",
+    "npm test": "passed; detector and Web Crypto round-trip proof",
+    "npm run smoke": "passed; 14 closure checks",
+    "npm run build": "passed; dist generated"
+  },
+  "closureChecks": [
+    "camera capture",
+    "AES-GCM encryption",
+    "PBKDF2 key derivation",
+    "Origin Private File System storage",
+    "encrypted backup export",
+    "restore import",
+    "backup verifier",
+    "password rotation",
+    "vault health check",
+    "masked secret display",
+    "persistent storage request",
+    "local OCR worker",
+    "secret/key detector",
+    "PWA manifest registration"
+  ],
+  "honestLimits": [
+    "Browser-local storage can be deleted by browser/user profile cleanup.",
+    "Encrypted backups are required for durable recovery.",
+    "OCR must be verified by the user before saving secrets.",
+    "No cross-device sync is included because no backend/database/SaaS layer was requested."
+  ]
+}

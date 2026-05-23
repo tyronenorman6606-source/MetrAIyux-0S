@@ -1,56 +1,90 @@
 (function () {
-  const ACCESS_TOKEN_KEY = "kx.api.accessToken";
-  const TOKEN_EMAIL_KEY = "kx.api.tokenEmail";
-  const KEY_ALIAS = "kaixu_api_key";
-  const HAS_PIN_KEY = "kx.auth.hasPin";
-  const PIN_UNLOCKED_AT_KEY = "kx.auth.pinUnlockedAt";
-  const KAIXU_SYNC_EVENT = "kaixu:key-sync";
+  const TOKEN_EMAIL_KEY = "metraiyux.gate.email";
+  const GATE_SYNC_EVENT = "metraiyux:gate-sync";
+  const PLATFORM_ID = "skye-docx-max";
+  const USAGE_LANE = "document-ai-analysis";
+
+  function gateBridge() {
+    if (window.MetrAIyuxGateBridge) return window.MetrAIyuxGateBridge;
+    try {
+      if (window.parent && window.parent !== window && window.parent.MetrAIyuxGateBridge) {
+        return window.parent.MetrAIyuxGateBridge;
+      }
+    } catch {}
+    return null;
+  }
+
+  function gateCards() {
+    return [
+      { id: "0s-core", status: "active", scope: "platform" },
+      { id: "fs27", status: "active", scope: "auth" },
+      { id: "skye-docx-max", status: "active", scope: "document-ai" },
+      { id: "sovereigndocs", status: "active", scope: "document-suite" }
+    ];
+  }
+
+  function gateSession() {
+    const bridge = gateBridge();
+    if (!bridge) return null;
+    return bridge.requireSession?.({ platformId: PLATFORM_ID, usageLane: USAGE_LANE }) || bridge.current?.() || null;
+  }
 
   function readToken() {
-    return String(localStorage.getItem(ACCESS_TOKEN_KEY) || localStorage.getItem(KEY_ALIAS) || "").trim();
+    return String(gateSession()?.token || "").trim();
   }
 
   function readTokenEmail() {
-    return String(localStorage.getItem(TOKEN_EMAIL_KEY) || "").trim().toLowerCase();
+    const session = gateSession() || {};
+    const claims = session.claims || {};
+    return String(claims.email || session.email || session.actor || localStorage.getItem(TOKEN_EMAIL_KEY) || "").trim().toLowerCase();
   }
 
-  function broadcastKeySync(token, lockedEmail) {
+  function broadcastGateSync(token, lockedEmail) {
     const detail = {
-      hasKey: Boolean(String(token || "").trim()),
-      lockedEmail: String(lockedEmail || "").trim().toLowerCase(),
+      hasSession: Boolean(String(token || "").trim()),
+      actor: String(lockedEmail || "").trim().toLowerCase(),
+      platform_id: PLATFORM_ID,
+      usage_lane: USAGE_LANE
     };
     try {
-      window.dispatchEvent(new CustomEvent(KAIXU_SYNC_EVENT, { detail }));
+      window.dispatchEvent(new CustomEvent(GATE_SYNC_EVENT, { detail }));
     } catch {}
   }
 
   function persistUnlockedToken(token, lockedEmail) {
     const nextToken = String(token || "").trim();
     const nextEmail = String(lockedEmail || "").trim().toLowerCase();
-    localStorage.setItem(ACCESS_TOKEN_KEY, nextToken);
-    localStorage.setItem(TOKEN_EMAIL_KEY, nextEmail);
-    localStorage.setItem(PIN_UNLOCKED_AT_KEY, new Date().toISOString());
-    if (nextToken) localStorage.setItem(KEY_ALIAS, nextToken);
-    else localStorage.removeItem(KEY_ALIAS);
-    broadcastKeySync(nextToken, nextEmail);
+    if (nextEmail) localStorage.setItem(TOKEN_EMAIL_KEY, nextEmail);
+    const bridge = gateBridge();
+    if (bridge && nextToken) {
+      bridge.persist?.({
+        token: nextToken,
+        actor: nextEmail || "0s-operator",
+        source: "skye-docx-max-gate-adapter",
+        platform_id: PLATFORM_ID,
+        usage_lane: USAGE_LANE,
+        gate_cards: gateCards()
+      });
+      bridge.record?.("skye_docx_gate_session_synced", { platform_id: PLATFORM_ID, usage_lane: USAGE_LANE });
+    }
+    broadcastGateSync(nextToken, nextEmail);
   }
 
   function clearUnlockedToken() {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(TOKEN_EMAIL_KEY);
-    localStorage.removeItem(PIN_UNLOCKED_AT_KEY);
-    localStorage.removeItem(KEY_ALIAS);
-    broadcastKeySync("", "");
+    broadcastGateSync("", "");
   }
 
   async function jsonRequest(path, body, method) {
     if (!(window.SKYE_REMOTE_API_ENABLED === true || (document.body && document.body.getAttribute("data-skye-remote-api") === "on"))) {
-      throw new Error("Remote Skye API disabled for standalone static mode.");
+      throw new Error("Remote Skye API disabled for static mode.");
     }
+    const headers = authHeaders();
+    if (body) headers["Content-Type"] = "application/json";
     const res = await fetch(path, {
       method: method || (body ? "POST" : "GET"),
       credentials: "include",
-      headers: body ? { "Content-Type": "application/json" } : undefined,
+      headers,
       body: body ? JSON.stringify(body) : undefined,
     });
     let data = {};
@@ -62,95 +96,65 @@
   }
 
   async function readSessionMeta() {
-    const data = await jsonRequest("/api/auth-me", null, "GET");
-    localStorage.setItem(HAS_PIN_KEY, data && data.has_pin ? "1" : "0");
-    return data;
+    const session = gateSession();
+    if (!session) throw new Error("Sign into 0S/SkyGate first.");
+    return {
+      ok: true,
+      email: readTokenEmail(),
+      actor: session.actor || readTokenEmail() || "0s-operator",
+      gate_cards: session.gate_cards || [],
+      platform_id: PLATFORM_ID,
+      usage_lane: USAGE_LANE
+    };
   }
 
   async function issueSessionToken(email, labelPrefix) {
-    const data = await jsonRequest("/api/token-issue", {
-      count: 1,
-      ttl_preset: "quarter",
-      label_prefix: labelPrefix || "standalone-auto",
-      locked_email: String(email || "").trim().toLowerCase() || undefined,
-      scopes: ["generate"],
-    }, "POST");
-    const issued = data && Array.isArray(data.issued) ? data.issued[0] : null;
-    if (!issued || !issued.token) throw new Error("Token issue succeeded but no token was returned.");
-    persistUnlockedToken(issued.token, issued.locked_email || email || "");
-    return issued;
+    const token = readToken();
+    if (!token) throw new Error("0S/SkyGate session required before document AI can issue a platform lane.");
+    persistUnlockedToken(token, email || readTokenEmail());
+    return { token, locked_email: email || readTokenEmail(), label_prefix: labelPrefix || "0s-gate-session" };
   }
 
-  async function unlockWithPin(pin, labelPrefix) {
-    const data = await jsonRequest("/api/auth-pin-unlock", {
-      pin: String(pin || "").trim(),
-      label_prefix: labelPrefix || "session-unlock",
-      ttl_preset: "day",
-    }, "POST");
-    if (!data || !data.token) throw new Error("Unlock succeeded but no token was returned.");
-    persistUnlockedToken(data.token, data.locked_email || "");
-    localStorage.setItem(HAS_PIN_KEY, "1");
-    return data;
+  async function unlockWithPin() {
+    const token = readToken();
+    if (!token) throw new Error("PIN unlock is retired here. Use the active 0S/SkyGate login.");
+    return { token, locked_email: readTokenEmail(), unlocked_by: "0s-skygate" };
   }
 
   async function ensureUnlockedAccess(options) {
-    const token = readToken();
-    if (token) {
-      return {
-        ok: true,
-        reused: true,
-        token,
-        locked_email: readTokenEmail() || null,
-      };
-    }
-
     const settings = options || {};
-    const me = await readSessionMeta();
-    if (!me || !me.email) throw new Error("Sign in first.");
-
-    if (me.has_pin) {
-      if (settings.prompt === false) {
-        return { ok: false, pin_required: true, email: me.email };
-      }
-      const pin = window.prompt(settings.pinPrompt || `Enter your session PIN for ${me.email}`) || "";
-      if (!String(pin).trim()) throw new Error("PIN unlock canceled.");
-      const unlocked = await unlockWithPin(pin, settings.labelPrefix || "session-unlock");
-      return {
-        ok: true,
-        reused: false,
-        unlocked: true,
-        token: unlocked.token,
-        locked_email: unlocked.locked_email || me.email,
-      };
+    const session = gateSession();
+    if (!session?.token) {
+      if (settings.prompt === false) return { ok: false, gate_required: true };
+      throw new Error("Sign into 0S/SkyGate first.");
     }
-
-    const issued = await issueSessionToken(me.email, settings.labelPrefix || "session-auto");
+    gateBridge()?.record?.("skye_docx_gate_access_ok", { platform_id: PLATFORM_ID, usage_lane: USAGE_LANE, label_prefix: settings.labelPrefix || "skye-docx-max" });
     return {
       ok: true,
-      reused: false,
-      unlocked: false,
-      token: issued.token,
-      locked_email: issued.locked_email || me.email,
+      reused: true,
+      token: session.token,
+      locked_email: readTokenEmail() || null,
+      gate_cards: session.gate_cards || []
     };
   }
 
   function authHeaders() {
-    const headers = { "Content-Type": "application/json" };
+    const bridge = gateBridge();
+    const headers = bridge?.headers?.({ "x-skye-platform": PLATFORM_ID, "x-skye-usage-lane": USAGE_LANE }) || {};
     const token = readToken();
     const email = readTokenEmail();
-    if (token) headers.Authorization = `Bearer ${token}`;
+    if (token && !headers.Authorization && !headers.authorization) headers.Authorization = `Bearer ${token}`;
     if (email) headers["X-Token-Email"] = email;
     return headers;
   }
 
   window.SkyeAuthUnlock = {
+    GATE_SYNC_EVENT,
     authHeaders,
     clearUnlockedToken,
     ensureUnlockedAccess,
     issueSessionToken,
-    KAIXU_SYNC_EVENT,
     persistUnlockedToken,
-    readKaixuKey: readToken,
     readSessionMeta,
     readToken,
     readTokenEmail,

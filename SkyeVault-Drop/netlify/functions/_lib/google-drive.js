@@ -6,6 +6,9 @@ const DEFAULT_BUCKET = 'client-drop-vault';
 const DEFAULT_CONFIG_PREFIX = 'vault-system';
 const DEFAULT_UPLOAD_PREFIX = 'client-uploads';
 const MAX_SINGLE_OBJECT_BYTES = 5 * 1024 * 1024 * 1024 * 1024;
+const MIN_MULTIPART_PART_BYTES = 5 * 1024 * 1024;
+const MAX_MULTIPART_PARTS = 10000;
+const MAX_MULTIPART_CHUNK_BYTES = 512 * 1024 * 1024;
 
 function env(name, fallback = '') {
   return String(process.env[name] || fallback).trim();
@@ -414,10 +417,24 @@ function metadataHeaders(upload, destination) {
   };
 }
 
+function chooseMultipartChunkSize(fileSize, chunkSizeBytes) {
+  const size = Number(fileSize || 0);
+  const requested = Math.max(MIN_MULTIPART_PART_BYTES, Number(chunkSizeBytes || 8 * 1024 * 1024));
+  if (!Number.isFinite(size) || size <= 0) return requested;
+  const minimumForPartCount = Math.ceil(size / MAX_MULTIPART_PARTS);
+  const chunk = Math.min(MAX_MULTIPART_CHUNK_BYTES, Math.max(requested, minimumForPartCount, MIN_MULTIPART_PART_BYTES));
+  return Math.ceil(chunk / (256 * 1024)) * 256 * 1024;
+}
+
 function partPlan(fileSize, chunkSizeBytes) {
   const size = Number(fileSize || 0);
-  const chunk = Math.max(5 * 1024 * 1024, Number(chunkSizeBytes || 8 * 1024 * 1024));
+  const chunk = chooseMultipartChunkSize(size, chunkSizeBytes);
   const count = Math.max(1, Math.ceil(size / chunk));
+  if (count > MAX_MULTIPART_PARTS) {
+    const error = new Error(`Multipart upload would require ${count} parts; the maximum is ${MAX_MULTIPART_PARTS}. Increase the chunk size or split the artifact.`);
+    error.statusCode = 413;
+    throw error;
+  }
   return Array.from({ length: count }, (_, index) => {
     const start = index * chunk;
     const end = Math.min(size, start + chunk) - 1;
@@ -444,7 +461,7 @@ export async function createResumableSession(destination, upload) {
   }
 
   const expires = Number(process.env.R2_PRESIGNED_URL_TTL_SECONDS || 6 * 60 * 60);
-  const chunkSizeBytes = Math.floor(Number(upload.chunkSizeMb || 8) * 1024 * 1024);
+  const chunkSizeBytes = chooseMultipartChunkSize(upload.fileSize, Math.floor(Number(upload.chunkSizeMb || 8) * 1024 * 1024));
   const parts = partPlan(upload.fileSize, chunkSizeBytes).map((part) => ({
     ...part,
     uploadUrl: presignUrl('PUT', key, {
@@ -471,6 +488,66 @@ export async function createResumableSession(destination, upload) {
       mimeType: upload.mimeType || 'application/octet-stream'
     }
   };
+}
+
+export async function createStreamingMultipartSession(destination, upload) {
+  const prefix = normalizePrefix(destination.folderId || destination.prefix || DEFAULT_UPLOAD_PREFIX, DEFAULT_UPLOAD_PREFIX);
+  const workspacePrefix = upload.workspaceId ? `workspaces/${upload.workspaceId}` : '';
+  const key = objectKey(prefix, [workspacePrefix, upload.sessionId, objectName(upload.fileName)].filter(Boolean).join('/'));
+  const headers = {
+    'content-type': upload.mimeType || 'application/octet-stream',
+    ...metadataHeaders(upload, destination)
+  };
+  const response = await r2Request('POST', key, { query: new URLSearchParams({ uploads: '' }), headers, body: '' });
+  const xml = await r2JsonResponse(response, `Could not create R2 streaming multipart upload for ${destination.name}.`);
+  const uploadId = parseXmlValue(xml, 'UploadId');
+  if (!uploadId) {
+    const error = new Error('R2 did not return a multipart upload ID.');
+    error.statusCode = 502;
+    throw error;
+  }
+  const expires = Number(process.env.R2_PRESIGNED_URL_TTL_SECONDS || 6 * 60 * 60);
+  const chunkSizeBytes = chooseMultipartChunkSize(upload.fileSize, Math.floor(Number(upload.chunkSizeMb || 64) * 1024 * 1024));
+  return {
+    storageProvider: 'cloudflare-r2',
+    uploadMode: 's3-multipart-streaming',
+    uploadId,
+    uploadUrl: '',
+    objectKey: key,
+    bucket: bucketName(),
+    parts: [],
+    chunkSize: chunkSizeBytes,
+    maxParts: MAX_MULTIPART_PARTS,
+    partUrlEndpoint: '/api/upload-part-url',
+    expiresAt: new Date(Date.now() + expires * 1000).toISOString(),
+    r2Object: {
+      id: key,
+      key,
+      bucket: bucketName(),
+      name: upload.fileName,
+      size: String(upload.fileSize),
+      mimeType: upload.mimeType || 'application/octet-stream'
+    }
+  };
+}
+
+export function createMultipartPartUrl(objectKeyValue, uploadId, partNumber, { expires = null } = {}) {
+  const cleanPart = Number(partNumber);
+  if (!Number.isInteger(cleanPart) || cleanPart < 1 || cleanPart > MAX_MULTIPART_PARTS) {
+    const error = new Error(`Multipart part number must be between 1 and ${MAX_MULTIPART_PARTS}.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  const cleanUploadId = String(uploadId || '').trim();
+  if (!cleanUploadId) {
+    const error = new Error('Multipart uploadId is required.');
+    error.statusCode = 400;
+    throw error;
+  }
+  return presignUrl('PUT', objectKeyValue, {
+    expires: Number(expires || process.env.R2_PRESIGNED_URL_TTL_SECONDS || 6 * 60 * 60),
+    query: new URLSearchParams({ partNumber: String(cleanPart), uploadId: cleanUploadId })
+  });
 }
 
 export async function completeMultipartUpload(objectKeyValue, uploadId, parts = []) {

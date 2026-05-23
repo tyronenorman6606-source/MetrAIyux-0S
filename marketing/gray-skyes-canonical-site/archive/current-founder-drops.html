@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Founder Drops — Gray Skyes · MetrAIyux 0S</title>
+  <meta name="description" content="Gray Skyes founder content drops — Instagram, LinkedIn, Facebook, Reddit posts showing what MetrAIyux 0S actually solves. Real proof. No pitch.">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ── NAV — inherits from style.css, minimal overrides ── */
+    .topbar { position: sticky; top: 0; z-index: 100; background: rgba(5,6,8,.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); isolation: isolate; }
+    .nav-shell { min-height: 76px; padding: 0 24px; }
+    .nav-links { display: flex; gap: 2px; margin-left: auto; }
+    .nav-links a { color: var(--soft); text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: color .15s, background .15s; white-space: nowrap; }
+    .nav-links a:hover { color: var(--gold); background: var(--gold-dim); }
+    .nav-links .is-active { color: var(--ink); }
+    .nav-links .nav-cta { background: rgba(244,199,91,.12); border: 1px solid rgba(244,199,91,.28); color: var(--gold); font-weight: 600; }
+    .nav-links .nav-cta:hover { background: var(--gold); color: #060810; }
+    .menu-button { display: none; flex-direction: column; gap: 5px; padding: 8px; background: none; border: none; cursor: pointer; margin-left: auto; }
+    .menu-button span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: all .2s; }
+    @media (max-width: 768px) {
+      .menu-button { display: flex; }
+      .nav-links { display: none; position: absolute; top: 76px; left: 0; right: 0; background: rgba(5,6,8,.98); border-bottom: 1px solid var(--line); flex-direction: column; padding: 12px 16px 20px; gap: 4px; z-index: 99; }
+      .nav-links.is-open { display: flex; }
+      .nav-links a { padding: 10px 14px; font-size: 15px; }
+    }
+
+    /* ── HERO ── */
+    .drops-hero {
+      position: relative; overflow: hidden;
+      padding: 96px 0 72px;
+      text-align: center;
+    }
+    .drops-hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(244,199,91,.07) 0%, transparent 65%),
+                  radial-gradient(ellipse 40% 50% at 80% 80%, rgba(0,200,255,.05) 0%, transparent 60%);
+    }
+    .drops-hero-inner { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 0 24px; }
+    .drops-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+      padding: 6px 18px; border: 1px solid rgba(244,199,91,.22); border-radius: 100px;
+      background: rgba(244,199,91,.07);
+    }
+    .drops-kicker-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .drops-h1 {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(40px, 6vw, 80px); line-height: 1.0;
+      color: var(--ink); margin-bottom: 18px; letter-spacing: -.02em;
+    }
+    .drops-h1 em { color: var(--gold); font-style: normal; }
+    .drops-desc {
+      font-size: clamp(16px, 2vw, 19px); color: var(--soft);
+      line-height: 1.75; margin-bottom: 40px; max-width: 640px; margin-left: auto; margin-right: auto;
+    }
+    .drops-desc strong { color: var(--ink); }
+
+    /* ── FOUNDER RIBBON ── */
+    .founder-ribbon {
+      display: flex; align-items: center; gap: 20px; justify-content: center;
+      margin-bottom: 56px; flex-wrap: wrap;
+    }
+    .founder-ribbon-photo {
+      width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: top;
+      border: 2px solid rgba(244,199,91,.4);
+    }
+    .founder-ribbon-info { text-align: left; }
+    .founder-ribbon-name { font-weight: 800; font-size: 16px; color: var(--ink); }
+    .founder-ribbon-role { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); margin-top: 2px; }
+    .founder-ribbon-stats { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+    .ribbon-stat { text-align: center; padding: 12px 20px; border: 1px solid var(--line); border-radius: 10px; }
+    .ribbon-stat strong { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--gold); line-height: 1; margin-bottom: 3px; }
+    .ribbon-stat span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── PLATFORM TABS ── */
+    .platform-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .ptab {
+      padding: 9px 22px; border-radius: 30px; border: 1px solid var(--border);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      background: var(--surface); color: var(--soft); transition: all .15s;
+    }
+    .ptab:hover { border-color: var(--soft); color: var(--ink); }
+    .ptab.active { background: var(--gold); color: #060810; border-color: var(--gold); }
+    .ptab[data-platform="instagram"].active { background: linear-gradient(135deg,#f58529,#dd2a7b,#8134af); border-color: transparent; color: #fff; }
+    .ptab[data-platform="linkedin"].active { background: #0a66c2; border-color: #0a66c2; color: #fff; }
+    .ptab[data-platform="facebook"].active { background: #1877f2; border-color: #1877f2; color: #fff; }
+    .ptab[data-platform="reddit"].active { background: #ff4500; border-color: #ff4500; color: #fff; }
+
+    /* ── PLATFORM SECTIONS ── */
+    .platform-section { display: none; }
+    .platform-section.visible { display: block; }
+
+    /* ── POSTS GRID ── */
+    .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+    .post-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; transition: border-color .15s, box-shadow .15s;
+    }
+    .post-card:hover { border-color: rgba(244,199,91,.4); box-shadow: 0 8px 40px rgba(0,0,0,.3); }
+    .post-visual { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+    .post-body { padding: 20px 22px 24px; }
+    .post-platform-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .badge-ig { background: rgba(221,42,123,.12); color: #dd2a7b; border: 1px solid rgba(221,42,123,.2); }
+    .badge-li { background: rgba(10,102,194,.12); color: #5b9bd5; border: 1px solid rgba(10,102,194,.2); }
+    .badge-fb { background: rgba(24,119,242,.12); color: #5b9bd5; border: 1px solid rgba(24,119,242,.2); }
+    .badge-rd { background: rgba(255,69,0,.1); color: #ff6a30; border: 1px solid rgba(255,69,0,.2); }
+    .post-problem {
+      font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .post-title { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 12px; line-height: 1.35; }
+    .post-caption {
+      font-size: 13px; color: var(--soft); line-height: 1.7;
+      white-space: pre-wrap; max-height: 150px; overflow: hidden;
+      position: relative; margin-bottom: 16px;
+    }
+    .post-caption::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
+      background: linear-gradient(transparent, var(--surface));
+    }
+    .post-card.expanded .post-caption { max-height: none; }
+    .post-card.expanded .post-caption::after { display: none; }
+    .post-hashtags { font-size: 11px; color: rgba(56,189,248,.7); line-height: 1.8; margin-bottom: 16px; }
+    .post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-copy {
+      padding: 8px 16px; border-radius: 7px; border: 1px solid var(--border);
+      background: transparent; color: var(--ink); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .btn-copy:hover { background: var(--gold); color: #060810; border-color: var(--gold); }
+    .btn-copy.copied { background: rgba(26,74,26,.7); border-color: #2a7a2a; color: #6ff2c7; }
+    .btn-expand {
+      padding: 8px 16px; border-radius: 7px; border: 1px solid var(--border);
+      background: transparent; color: var(--soft); font-size: 12px; cursor: pointer; transition: all .15s;
+    }
+    .btn-expand:hover { border-color: var(--soft); color: var(--ink); }
+    .btn-dl {
+      padding: 8px 16px; border-radius: 7px; border: 1px solid rgba(244,199,91,.2);
+      background: rgba(244,199,91,.06); color: var(--gold); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-dl:hover { background: rgba(244,199,91,.14); border-color: var(--gold); }
+
+    /* ── SECTION HEADER ── */
+    .section-header { margin-bottom: 32px; }
+    .section-header h2 { font-family: var(--font-display); font-size: clamp(24px,3vw,36px); font-weight: 900; color: var(--ink); margin-bottom: 8px; }
+    .section-header h2 em { color: var(--gold); font-style: normal; }
+    .section-header p { font-size: 15px; color: var(--soft); max-width: 600px; line-height: 1.6; }
+    .platform-count { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ── INSTAGRAM GRID VARIANT ── */
+    #instagram-section .posts-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+    /* ── LINKEDIN / FACEBOOK GRID ── */
+    #linkedin-section .posts-grid,
+    #facebook-section .posts-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+    #linkedin-section .post-visual,
+    #facebook-section .post-visual { aspect-ratio: 16/9; }
+
+    /* ── REDDIT ── */
+    #reddit-section .posts-grid { grid-template-columns: 1fr; max-width: 820px; margin: 0 auto; }
+    #reddit-section .post-caption { max-height: 240px; }
+    #reddit-section .post-card.expanded .post-caption { max-height: none; }
+
+    .section-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 96px; }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--line); max-width: var(--wrap); margin: 0 auto 64px; }
+
+    /* ── HOW TO USE STRIP ── */
+    .how-strip {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+      padding: 40px 48px; display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 32px;
+      max-width: 1240px; margin: 0 auto 64px;
+    }
+    .how-item h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .how-item p { font-size: 13px; color: var(--soft); line-height: 1.6; }
+    .how-num { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: rgba(244,199,91,.25); line-height: 1; margin-bottom: 8px; }
+  </style>
+</head>
+<body class="skyesol-living-page">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+<div class="skyesol-grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <nav class="nav-shell" aria-label="Primary navigation">
+    <a class="brand" href="index.html">
+      <img src="/assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S emblem">
+      MetrAIyux 0S
+    </a>
+    <button class="menu-button" type="button" data-menu-button aria-label="Open navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" data-nav-links>
+      <a href="index.html">&larr; Main</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="proof.html">Live Proof</a>
+      <a href="valuation.html">Valuation</a>
+      <a href="social.html">Social</a>
+      <a class="is-active" href="founder-drops.html">Founder Drops</a>
+      <a href="gray-skyes.html">Gray Skyes</a>
+      <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
+      <a class="nav-cta" href="index.html#pricing">Pricing</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ══ HERO ══ -->
+<section class="drops-hero">
+  <div class="drops-hero-inner">
+    <div class="drops-kicker"><span class="drops-kicker-dot"></span>Gray Skyes · Founder Content Drops</div>
+    <h1 class="drops-h1">The problem I solved.<br><em>Here's the proof.</em></h1>
+    <p class="drops-desc">
+      No pitch. No pitch deck. No "buy now." Just the real problems MetrAIyux 0S solves —
+      <strong>with live receipts behind every claim.</strong>
+      Download, post, let the infrastructure speak.
+    </p>
+    <div class="founder-ribbon">
+      <img class="founder-ribbon-photo" src="/assets/SkyesOverLondonFounder.png" alt="Gray Skyes">
+      <div class="founder-ribbon-info">
+        <div class="founder-ribbon-name">Gray Skyes</div>
+        <div class="founder-ribbon-role">Builder · Architect · Founder of MetrAIyux 0S</div>
+      </div>
+    </div>
+    <div class="founder-ribbon-stats">
+      <div class="ribbon-stat"><strong>28</strong><span>Platform Lanes</span></div>
+      <div class="ribbon-stat"><strong>58</strong><span>Live Products</span></div>
+      <div class="ribbon-stat"><strong>$2.5M</strong><span>Built Value</span></div>
+      <div class="ribbon-stat"><strong>$0</strong><span>Funding</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW TO USE ══ -->
+<div class="section-wrap">
+  <div class="how-strip">
+    <div class="how-item">
+      <div class="how-num">01</div>
+      <h3>Pick your platform</h3>
+      <p>Tabs below. Instagram-first. All cards are 1080×1080 and ready to post as-is or cropped for stories.</p>
+    </div>
+    <div class="how-item">
+      <div class="how-num">02</div>
+      <h3>Download the card</h3>
+      <p>Hit the gold download button on any card. Save to camera roll. This is your visual asset — already designed.</p>
+    </div>
+    <div class="how-item">
+      <div class="how-num">03</div>
+      <h3>Copy the caption</h3>
+      <p>Every post has a full caption written in the founder voice. Copy it, paste it, post it. Hashtags included.</p>
+    </div>
+    <div class="how-item">
+      <div class="how-num">04</div>
+      <h3>Don't sell. Show.</h3>
+      <p>None of these posts are "buy this." They show the problem, show the proof, let the audience make the connection.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLATFORM TABS ══ -->
+<div class="section-wrap" style="padding-bottom: 0;">
+  <div class="platform-tabs">
+    <button class="ptab active" data-platform="instagram" onclick="switchPlatform('instagram', this)">📸 Instagram</button>
+    <button class="ptab" data-platform="linkedin" onclick="switchPlatform('linkedin', this)">💼 LinkedIn</button>
+    <button class="ptab" data-platform="facebook" onclick="switchPlatform('facebook', this)">📘 Facebook</button>
+    <button class="ptab" data-platform="reddit" onclick="switchPlatform('reddit', this)">🔸 Reddit</button>
+  </div>
+</div>
+
+<!-- ══ INSTAGRAM SECTION ══ -->
+<section id="instagram-section" class="platform-section visible">
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Instagram Drops — <em>Founder Perspective</em></h2>
+      <p>Problem-proof format. Each card isolates one real problem MetrAIyux 0S solves — then shows the live receipt behind it.</p>
+      <div class="platform-count">12 posts · 1080×1080 · Ready to post</div>
+    </div>
+    <div class="posts-grid" id="ig-grid"></div>
+  </div>
+</section>
+
+<!-- ══ LINKEDIN SECTION ══ -->
+<section id="linkedin-section" class="platform-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>LinkedIn Drops — <em>Founder Authority</em></h2>
+      <p>Long-form perspective posts for LinkedIn. Technical depth meets founder story. Position Gray Skyes as the builder, not the salesperson.</p>
+      <div class="platform-count">8 posts · Long-form · Professional network</div>
+    </div>
+    <div class="posts-grid" id="li-grid"></div>
+  </div>
+</section>
+
+<!-- ══ FACEBOOK SECTION ══ -->
+<section id="facebook-section" class="platform-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Facebook Drops — <em>Community Voice</em></h2>
+      <p>Conversational posts for entrepreneur groups and communities. The tone shifts from authority to relatability — "here's what I found out."</p>
+      <div class="platform-count">6 posts · Community tone · Groups and feed</div>
+    </div>
+    <div class="posts-grid" id="fb-grid"></div>
+  </div>
+</section>
+
+<!-- ══ REDDIT SECTION ══ -->
+<section id="reddit-section" class="platform-section">
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Reddit Drops — <em>No BS Technical Posts</em></h2>
+      <p>Reddit rewards specificity and honesty. These posts share real implementation details, real numbers, real trade-offs — built for r/entrepreneur, r/selfhosted, r/webdev.</p>
+      <div class="platform-count">4 posts · r/entrepreneur, r/webdev, r/selfhosted</div>
+    </div>
+    <div class="posts-grid" id="rd-grid"></div>
+  </div>
+</section>
+
+<script>
+// ── Post Data ──
+const POSTS = {
+  instagram: [
+    {
+      img: '/assets/social/founder/ig-01.png',
+      problem: 'The hosting bill problem',
+      title: 'You\'re paying $3,000/month for hosting. I pay $0.',
+      caption: `Everyone told me hosting was expensive. They were paying $3,000/month for what I run at $0.
+
+17 live Cloudflare Workers. Globally distributed. Zero cold starts. CF-Ray verified on every single endpoint.
+
+This isn't a flex — it's architecture. When you build at the edge you stop renting compute and start owning infrastructure.
+
+That's the difference between a SaaS and a sovereign OS.`,
+      hashtags: '#cloudflare #serverless #infrastructure #buildinpublic #solofounder #edgecomputing #metraiyux0s #zeroinfracost'
+    },
+    {
+      img: '/assets/social/founder/ig-02.png',
+      problem: 'The "you need a team" myth',
+      title: '28 lanes. 17 brains. 58 products. 1 person.',
+      caption: `If you've been told you need a team to build something real — that's a lie they tell people who might compete with them.
+
+The truth is most startup teams are solving a coordination problem that solo execution eliminates.
+
+28 platform lanes. 17 AI brains. 58 Stripe products live. $0 funding. Zero investors.
+
+MetrAIyux 0S is a sovereign business operating system. Built by me. Owned by me. No dilution.`,
+      hashtags: '#solofounder #buildinpublic #bootstrapped #startuplife #entrepreneurship #metraiyux0s #grayskyes #nocode'
+    },
+    {
+      img: '/assets/social/founder/ig-03.png',
+      problem: 'The dev agency quote problem',
+      title: 'Agencies quote $180K. I built the same thing. Here\'s the receipt.',
+      caption: `A dev agency quoted my client $180K for a custom platform. I looked at the spec.
+
+I build that in 8 weeks.
+
+This isn't a hot take — MetrAIyux 0S has a full replacement cost audit. $2.0M–$2.5M based on section-level methodology at CF-edge specialist rates.
+
+875+ deployed HTML surfaces. Every one verifiable with a CF-Ray header or a git receipt.
+
+The agency model survives because most founders don't know what's actually possible.`,
+      hashtags: '#devagency #agencykiller #buildinpublic #softwaredevelopment #founders #cloudflare #metraiyux0s #replaceagencies'
+    },
+    {
+      img: '/assets/social/founder/ig-04.png',
+      problem: 'The auth outage problem',
+      title: 'Your auth just went down. Mine hasn\'t. Once.',
+      caption: `It's 2am. Your auth is down. Your users can't log in.
+
+This has never happened to MetrAIyux 0S. Not once.
+
+NorthStar SignInPro runs on Cloudflare Workers at the edge. No centralized auth server. No single point of failure. CF-Ray on every session.
+
+Auth that lives where your users are, not on a server someone manages somewhere.`,
+      hashtags: '#authentication #devops #cloudflare #saas #infrastructure #northstar #metraiyux0s #buildinpublic'
+    },
+    {
+      img: '/assets/social/founder/ig-05.png',
+      problem: 'The ChatGPT subscription lie',
+      title: 'You pay $200/mo for generic AI. I have 17 custom brains.',
+      caption: `I hear founders bragging about using ChatGPT.
+
+I have 17 custom AI brains. Trained on my actual business. 725 knowledge chunks. $0 on routing.
+
+The difference: generic AI knows the internet. My AI knows MetrAIyux 0S — the code, the clients, the decisions, the receipts.
+
+When your AI actually knows your business, it stops being a tool and starts being infrastructure.`,
+      hashtags: '#ai #artificialintelligence #llm #brainsync #metraiyux0s #buildinpublic #aifounder #customai'
+    },
+    {
+      img: '/assets/social/founder/ig-06.png',
+      problem: 'The "websites take months" problem',
+      title: '8 client sites. 14 days. All live. Zero hosting bills.',
+      caption: `Client asked: "How long does it take to get a live website?"
+
+I said 14 days. They laughed.
+
+Then I deployed 8 of them in 14 days. Live on Cloudflare Pages. Custom domain. Custom branding. Live Stripe. Live Workers.
+
+Not wireframes. Not "almost done." Deployed. Running. CF-Ray verified.
+
+Client App Factory is how MetrAIyux 0S turns infrastructure into client deliverables at speed.`,
+      hashtags: '#webdesign #webdevelopment #cloudflare #clientwork #freelance #metraiyux0s #solofounder #shipfast'
+    },
+    {
+      img: '/assets/social/founder/ig-07.png',
+      problem: 'The VC funding myth',
+      title: 'VCs raise $2M to build what I built in 12 months solo.',
+      caption: `VCs invest $2M to build what I built in 12 months.
+
+Zero investors. Zero dilution. Zero agency. $2.0M–$2.5M in deployed replacement cost.
+
+The funding-to-build ratio matters. Most startups aren't underfunded — they're over-headcounted.
+
+When you own 100% of a $2.5M platform, you don't need permission to make decisions.`,
+      hashtags: '#startupfunding #bootstrap #vc #venturecapital #solofounder #metraiyux0s #grayskyes #founder'
+    },
+    {
+      img: '/assets/social/founder/ig-08.png',
+      problem: 'The "demo mode" credibility problem',
+      title: '58 Stripe products. cs_live session IDs. Not test mode.',
+      caption: `Not test mode. Not sandbox. cs_live session IDs.
+
+58 Stripe products. Music drops. Staffing fees. Vault access. API tiers. White-label seats.
+
+When someone says their product "has Stripe integration" — ask them for the cs_live session ID.
+
+That's how you know if it's real. MetrAIyux 0S commerce is verified.`,
+      hashtags: '#stripe #payments #ecommerce #buildinpublic #saas #metraiyux0s #liveproduct #founder'
+    },
+    {
+      img: '/assets/social/founder/ig-09.png',
+      problem: 'The $5K/month marketing agency problem',
+      title: 'Marketing agencies charge $5K/month. I automated it.',
+      caption: `Marketing agencies charge $5,000/month.
+
+For what? Content calendars, social posts, scheduling. I automated all of it.
+
+Marketing Made Easy is an 8-room content automation platform built into the OS. 93 posts across 4 platforms. Scheduled. Ready to drop.
+
+I'm not against marketing agencies. I just built the tool they use.`,
+      hashtags: '#marketing #socialmedia #contentcreator #contentmarketing #automation #metraiyux0s #marketingautomation #buildinpublic'
+    },
+    {
+      img: '/assets/social/founder/ig-10.png',
+      problem: 'The dev tools subscription problem',
+      title: 'You\'re still buying dev tools. I built my own.',
+      caption: `Every developer tool you subscribe to used to not exist.
+
+Someone built it.
+
+kAIxu CodeStudio is a browser-based AI-powered development environment. Runs at the edge. Owned by MetrAIyux 0S. No third-party dependency.
+
+Stop renting the tools. Start owning the stack.`,
+      hashtags: '#developer #buildinpublic #browseride #ai #cloudflare #kaixu #metraiyux0s #devtools'
+    },
+    {
+      img: '/assets/social/founder/ig-11.png',
+      problem: 'The "will it scale?" problem',
+      title: '10,000 users at once? My infrastructure doesn\'t care.',
+      caption: `The question founders always ask: "Will it scale?"
+
+Wrong question.
+
+The right question: does your infrastructure auto-scale without configuration?
+
+MetrAIyux 0S runs on Cloudflare Workers. Serverless. Stateless at the router. 200+ edge nodes.
+
+When 10,000 users hit it simultaneously — the infrastructure doesn't notice.`,
+      hashtags: '#scalability #serverless #cloudflare #infrastructure #saas #metraiyux0s #buildinpublic #edgecomputing'
+    },
+    {
+      img: '/assets/social/founder/ig-12.png',
+      problem: 'The founder identity',
+      title: 'I didn\'t build a startup. I built a sovereign business OS.',
+      caption: `I didn't build a startup.
+
+I built a sovereign business operating system.
+
+Software. Automation. Infrastructure. Freedom.
+
+MetrAIyux 0S is what happens when one person builds without permission, without funding, without a plan to ask anyone for approval.
+
+One year. One person. One OS.`,
+      hashtags: '#metraiyux0s #grayskyes #solofounder #buildinpublic #entrepreneur #founder #tech #sovereignos'
+    }
+  ],
+  linkedin: [
+    {
+      img: '/assets/social/founder/ig-02.png',
+      problem: 'The team myth',
+      title: 'I built 28 platform lanes in 12 months. Solo. Here\'s what that actually taught me.',
+      caption: `Everyone in VC-land tells you that you need a team to build something real.
+
+I spent 12 months building MetrAIyux 0S — a 28-lane sovereign business operating system — by myself. Here's the honest breakdown:
+
+What a team would have added:
+→ More coordination overhead
+→ More equity dilution
+→ More consensus-seeking
+→ More "wait for the designer / wait for the backend dev"
+
+What building solo forced me to do:
+→ Learn every layer of the stack
+→ Make architectural decisions without a committee
+→ Ship ugly first and refine later
+→ Never blame a dependency on another person
+
+The result: 17 live Cloudflare Workers, 58 Stripe products in cs_live mode, 875+ deployed surfaces, $2.0M–$2.5M replacement cost.
+
+I'm not saying solo is better for every project. I'm saying it was better for this one, at this stage.
+
+The "you need a team" advice is real — but so is the coordination tax.`,
+      hashtags: '#founder #solofounder #entrepreneurship #buildinpublic #startup #leadership #metraiyux0s #softwareengineering'
+    },
+    {
+      img: '/assets/social/founder/ig-07.png',
+      problem: 'The funding myth',
+      title: 'The honest math on VC funding vs building solo.',
+      caption: `Let's do honest math on startup funding.
+
+Average seed round: $2M
+Average seed team: 4–6 people
+Average time to first deployable product: 12–18 months
+Average founder dilution: 15–25%
+
+My situation:
+Funding: $0
+Team: 1
+Time to live system: 12 months
+Dilution: 0%
+Replacement cost audit: $2.0M–$2.5M
+
+I'm not saying this is scalable for every company. I'm saying the model of "raise money to hire people to build what one disciplined person could build" deserves scrutiny.
+
+The question isn't "how much can you raise?" The question is: what is the minimum viable team to build the maximum viable product?
+
+For MetrAIyux 0S, that number was 1.`,
+      hashtags: '#venturecapital #startup #founder #bootstrap #entrepreneurship #metraiyux0s #grayskyes #buildvsraise'
+    },
+    {
+      img: '/assets/social/founder/ig-01.png',
+      problem: 'The infrastructure cost',
+      title: 'Why I run 17 live services for $0/month (and how you can too).',
+      caption: `The infrastructure cost conversation is broken.
+
+Most SaaS founders budget $500–$3,000/month for hosting before they've validated a single user.
+
+MetrAIyux 0S runs 17 live Cloudflare Workers, 7 D1 databases, KV stores, and 875+ deployed HTML surfaces. Monthly infrastructure cost: $0.
+
+Here's the actual architecture:
+→ CF Workers: $0 (free tier covers 100K requests/day)
+→ CF Pages: $0 (unlimited deployments)
+→ CF D1: $0 (5GB free tier)
+→ CF KV: $0 (1M reads/day free)
+
+The edge compute model fundamentally changes the unit economics of SaaS.
+
+You don't need to pre-pay for servers you haven't filled yet. You pay for what you use, when you use it — and at this scale, that's $0.`,
+      hashtags: '#cloudflare #serverless #infrastructure #saas #devops #metraiyux0s #edgecomputing #buildinpublic'
+    },
+    {
+      img: '/assets/social/founder/ig-05.png',
+      problem: 'The generic AI problem',
+      title: 'Why I stopped using ChatGPT and built 17 custom AI brains instead.',
+      caption: `The generic AI problem: ChatGPT knows the internet. Your business isn't on the internet in the way that matters.
+
+I have 17 custom AI brains in MetrAIyux 0S. Each one trained on real operational data: code, decisions, receipts, client notes, system docs.
+
+Why this matters:
+→ Generic AI gives generic advice
+→ Trained AI gives specific, actionable, context-aware responses
+→ Trained AI knows your actual constraints, not hypothetical ones
+
+Implementation:
+725 knowledge chunks. Each brain is domain-specific (auth, payments, marketing, dev, etc).
+Routing is zero-cost. Every decision is logged in D1. Fully auditable.
+
+The question isn't "should I use AI?" The question is "what specifically should my AI know?"
+
+Until you answer that, you're using a generic tool for a specific problem.`,
+      hashtags: '#ai #llm #artificialintelligence #machinelearning #businessai #metraiyux0s #brainsync #buildinpublic'
+    },
+    {
+      img: '/assets/social/founder/ig-03.png',
+      problem: 'The agency pricing problem',
+      title: 'The agency pricing model relies on you not knowing what\'s possible.',
+      caption: `I had a conversation with a founder last month.
+
+Agency quote: $180K for a custom SaaS platform.
+Timeline: 8–12 months.
+What they were actually building: a CRUD app with auth, payments, and a dashboard.
+
+I asked: "What's the $180K buying you?"
+Answer: Project management overhead, designer retainers, developer hours, QA cycles, stakeholder reviews.
+
+This is the agency model. It's not a scam — it's just heavily padded to account for coordination costs.
+
+The alternative: build with modern infrastructure and eliminate the coordination tax.
+
+MetrAIyux 0S cost audit: $2.0M–$2.5M replacement cost. $0 in agency fees. Every surface has a CF-Ray or git receipt.
+
+I'm not saying agencies are wrong. I'm saying you should know what "the other path" looks like before you sign.`,
+      hashtags: '#devagency #saas #startup #founder #entrepreneurship #cloudflare #metraiyux0s #buildinpublic'
+    },
+    {
+      img: '/assets/social/founder/ig-12.png',
+      problem: 'The founder identity',
+      title: 'What "sovereign infrastructure" actually means for a solo founder.',
+      caption: `"Sovereign infrastructure" sounds abstract. Let me make it concrete.
+
+When I say MetrAIyux 0S is a sovereign business OS, I mean:
+
+1. I don't pay Shopify 2% of every transaction
+2. My auth isn't controlled by Auth0's pricing model
+3. My email isn't Mailchimp's data
+4. My AI isn't OpenAI's rate limit
+5. My storage isn't AWS's egress fee
+6. My deployments aren't Vercel's bandwidth cap
+
+Every critical piece of infrastructure is owned, operated, and verifiable by me.
+
+This isn't anti-SaaS. It's pro-ownership. There's a massive difference between using a tool and being dependent on a tool.
+
+When you control the infrastructure, you control the business. That's what sovereign means.`,
+      hashtags: '#infrastructure #saas #founder #startup #cloudflare #selfhosted #metraiyux0s #grayskyes'
+    },
+    {
+      img: '/assets/social/founder/ig-11.png',
+      problem: 'The scaling question',
+      title: 'The "will it scale?" question asked wrong.',
+      caption: `Every investor, every advisor, every well-meaning senior dev asks: "Will it scale?"
+
+Here's the thing — it's the wrong question.
+
+The right questions:
+1. Does the architecture auto-scale without configuration?
+2. What's the failure mode at 10× current load?
+3. Where are the centralized bottlenecks?
+
+MetrAIyux 0S architecture answers:
+1. Cloudflare Workers — yes, auto-scales to the request
+2. Stateless design — no session server to overload
+3. Edge distribution — no single region to saturate
+
+When someone asks "will it scale?" they usually mean "will your server crash?"
+
+That's a centralized server question. I'm not running a centralized server.
+
+Build at the edge. The scaling question stops being a question.`,
+      hashtags: '#scalability #cloudflare #serverless #saas #devops #metraiyux0s #buildinpublic #architecture'
+    },
+    {
+      img: '/assets/social/founder/ig-09.png',
+      problem: 'The marketing cost problem',
+      title: 'I replaced a $5K/month marketing agency with one Cloudflare Worker.',
+      caption: `Marketing Made Easy is one of the 28 lanes in MetrAIyux 0S.
+
+It's an 8-room content platform. Social post creation, content scheduling, platform-specific formatting, hashtag generation — all automated.
+
+Cost: included in the OS. Monthly agency equivalent: $0.
+
+What this replaced:
+→ Social media manager retainer: $2,500/month
+→ Content calendar tool: $200/month
+→ Scheduling platform: $300/month
+→ Copywriting: $1,500/month
+
+Total monthly savings: ~$4,500+
+
+I'm not against marketing agencies. Some clients need hands-on management. But the operational layer — content creation, scheduling, formatting — is fully automatable.
+
+93 posts across 4 platforms. Scheduled. Ready. $0 in agency fees.`,
+      hashtags: '#marketing #marketingautomation #socialmedia #contentmarketing #metraiyux0s #founder #businessautomation #buildinpublic'
+    }
+  ],
+  facebook: [
+    {
+      img: '/assets/social/founder/ig-02.png',
+      problem: 'The solo build story',
+      title: 'Spent 12 months building this. No team, no investors. Here\'s what happened.',
+      caption: `Honest story time for this group.
+
+12 months ago I started building MetrAIyux 0S. No co-founder, no investors, no agency.
+
+People kept telling me I needed a team to build something real.
+
+Today I have:
+• 28 platform lanes live
+• 17 Cloudflare Workers running
+• 58 Stripe products in live mode (cs_live verified — not test mode)
+• $2.0M–$2.5M replacement cost audit
+• $0 funding raised
+
+I'm not posting this to flex. I'm posting this because I was this close to listening to the people who said "you can't do it alone."
+
+You probably can do more than you think. The question is whether you're willing to push through the part where it looks impossible.`,
+      hashtags: '#entrepreneur #solofounder #buildinpublic #startuplife #smallbusiness #metraiyux0s'
+    },
+    {
+      img: '/assets/social/founder/ig-01.png',
+      problem: 'The hosting cost truth',
+      title: 'I\'ve been running 17 live services for $0/month. Here\'s the honest breakdown.',
+      caption: `Real question for this group: how much are you spending on hosting?
+
+I have 17 live Cloudflare Workers, databases, KV stores, and 875+ deployed web surfaces.
+
+Monthly hosting cost: literally $0.
+
+Before anyone calls BS — here's the actual breakdown:
+
+Cloudflare Workers free tier: 100,000 requests/day
+CF Pages: unlimited deployments and bandwidth
+CF D1 database: 5GB free
+CF KV: 1M reads/day free
+
+Most solo founders and small business owners are massively overpaying for hosting because nobody taught them the Cloudflare edge model.
+
+Happy to answer questions. Not trying to sell anything — just think more people should know this is an option.`,
+      hashtags: '#webhosting #cloudflare #entrepreneur #savemoney #smallbusiness #metraiyux0s #hosting'
+    },
+    {
+      img: '/assets/social/founder/ig-06.png',
+      problem: 'The client delivery speed',
+      title: 'Deployed 8 client websites in 14 days. Here\'s how.',
+      caption: `Someone asked me how long it takes to build and deploy a client website.
+
+I said: "Depends on complexity, but usually 3–5 days for a standard build."
+
+They didn't believe me.
+
+Then I showed them: 8 client sites deployed in 14 days. All live on Cloudflare Pages. All with custom branding, live payment processing, and working contact forms.
+
+No outsourcing. No templates from Wix. Real code, real infrastructure.
+
+The secret: Client App Factory is one of the 28 lanes in MetrAIyux 0S. It's a deploy system built specifically for fast client turnarounds.
+
+If you're a freelancer or agency and delivery speed is your bottleneck, happy to talk architecture.`,
+      hashtags: '#webdesign #clientwork #freelance #webdevelopment #cloudflare #metraiyux0s #agencylife'
+    },
+    {
+      img: '/assets/social/founder/ig-07.png',
+      problem: 'The funding question',
+      title: 'Everyone asks about funding. Here\'s my honest answer.',
+      caption: `The most common question I get: "How much did you raise?"
+
+Answer: $0.
+
+Follow-up: "So how did you build all this?"
+
+Answer: I built it. Like, I actually sat down and built it.
+
+I know that sounds simple. But there's a gap between "wanting to build a company" and "sitting down every day and building." Most people are stuck in the first one, waiting for funding to justify moving to the second one.
+
+MetrAIyux 0S — 28 platform lanes, $2.0M–$2.5M replacement cost — was built on the second model.
+
+No funding round is going to build the thing. You building the thing builds the thing.`,
+      hashtags: '#entrepreneur #startup #funding #bootstrap #founder #metraiyux0s #grayskyes #businessgrowth'
+    },
+    {
+      img: '/assets/social/founder/ig-09.png',
+      problem: 'The marketing cost',
+      title: 'I stopped paying for marketing agencies. Here\'s what I built instead.',
+      caption: `I used to think marketing required a team or an agency.
+
+Then I built Marketing Made Easy — 8 rooms of automated content creation built directly into MetrAIyux 0S.
+
+What it does:
+• Generates social posts by platform (IG, LinkedIn, Facebook, Reddit)
+• Formats content for each platform's algorithm
+• Schedules and stages posts
+• Tracks engagement context
+
+What it costs me: $0/month in agency fees.
+
+93 posts scheduled across 4 platforms. I'm posting this post using the same system.
+
+If you're a small business owner spending $2K–$5K/month on marketing agencies, I'd genuinely encourage you to look at what's automatable before signing another retainer.`,
+      hashtags: '#marketing #smallbusiness #marketingautomation #entrepreneur #socialmedia #metraiyux0s'
+    },
+    {
+      img: '/assets/social/founder/ig-12.png',
+      problem: 'The ownership question',
+      title: 'The question nobody asks about their tech stack: who owns it?',
+      caption: `Nobody asks this question about their software: who actually owns this?
+
+Your Shopify store — Shopify owns the platform. You rent space.
+Your Mailchimp list — Mailchimp owns the delivery relationship.
+Your Auth0 login — Auth0 owns the session logic.
+Your Vercel deployment — Vercel owns the edge.
+
+I'm not saying these products are bad. I use some of them. I'm saying you should ask the ownership question before you build critical business logic on rented infrastructure.
+
+MetrAIyux 0S is a sovereign OS because everything critical runs on infrastructure I control. CF Workers I deploy. Databases I own. Auth systems I built.
+
+The more sovereign your stack, the less leverage third parties have over your business.`,
+      hashtags: '#entrepreneur #businessowner #software #infrastructure #cloudflare #metraiyux0s #sovereignty #ownyourstack'
+    }
+  ],
+  reddit: [
+    {
+      img: '/assets/social/founder/ig-01.png',
+      problem: 'r/selfhosted · Infrastructure',
+      title: 'Built a 28-lane business OS on Cloudflare for $0/month infra cost — breakdown',
+      caption: `I've been building MetrAIyux 0S for 12 months and recently did a cost audit. Thought the selfhosted community might find the architecture interesting.
+
+**What's running:**
+- 17 Cloudflare Workers (auth, email, payments, AI routing, Git vault, etc.)
+- 7 D1 SQLite databases
+- KV stores for session and config data
+- 875+ HTML surfaces deployed to CF Pages
+- Stripe webhooks processing via Workers
+
+**Monthly infra cost: $0**
+
+CF Workers free tier is 100K requests/day, which covers current load. Pages is unlimited. D1 is 5GB free. KV is 1M reads/day free.
+
+**What's not free:**
+- Custom domain: $12/year
+- Stripe fees on actual transactions
+- That's genuinely it
+
+The tradeoff: you're on Cloudflare's platform, not truly self-hosted. But the pricing model and developer experience are genuinely excellent for this use case.
+
+Happy to answer specific architecture questions. Not selling anything — just sharing what's worked.`,
+      hashtags: 'r/selfhosted r/cloudflare r/webdev r/devops'
+    },
+    {
+      img: '/assets/social/founder/ig-05.png',
+      problem: 'r/artificial · AI Implementation',
+      title: '17 domain-specific AI brains vs one generic LLM — 12 months of real usage data',
+      caption: `**Background:** I run MetrAIyux 0S, a 28-lane business OS. 12 months ago I made a deliberate architecture choice: instead of calling GPT-4 for everything, I built 17 domain-specific knowledge bases (I call them "brains") trained on actual operational data.
+
+**Why I did this:**
+Generic LLMs give generic advice. My AI needed to know MetrAIyux-specific context — not "how do you do auth" but "how does NorthStar SignInPro handle the FS27 service binding specifically."
+
+**Implementation:**
+- 725 knowledge chunks across 17 domains
+- Routing is done via lightweight classifier — $0 cost
+- Each brain is a RAG implementation with domain-specific embeddings
+- All decisions logged in D1 (Cloudflare's SQLite)
+
+**What I learned:**
+1. Specificity beats capability. A specific brain on a weaker model beats a generic brain on GPT-4 for domain tasks.
+2. The routing cost matters. If every query hits a big model, costs compound fast. My routing is nearly free.
+3. Auditability is underrated. Logging every AI decision to D1 has saved me countless debugging hours.
+
+**What didn't work:**
+- Trying to make one brain handle too many domains (quality degraded)
+- Over-engineering the embedding pipeline early (premature optimization)
+
+AMA on the implementation if useful.`,
+      hashtags: 'r/artificial r/MachineLearning r/LocalLLaMA r/selfhosted'
+    },
+    {
+      img: '/assets/social/founder/ig-03.png',
+      problem: 'r/entrepreneur · Agency vs DIY',
+      title: 'Dev agency wanted $180K for a platform I built in 8 weeks. Breakdown of what the gap actually is.',
+      caption: `A client showed me a quote from a dev agency: $180K for a custom SaaS platform with auth, payments, dashboard, and API.
+
+8-week timeline (they wanted 12 months).
+
+I offered to build it as part of MetrAIyux 0S deployment. Here's my honest breakdown of where the $180K goes and what the alternative is:
+
+**Where agency $180K goes:**
+- PM overhead and stakeholder management: ~$25K
+- Designer (UI/UX iterations, review cycles): ~$30K
+- Frontend dev hours: ~$35K
+- Backend dev hours: ~$35K
+- QA and testing cycles: ~$20K
+- Infrastructure setup and DevOps: ~$15K
+- Buffer/risk contingency: ~$20K
+
+**Why it's not a scam:**
+This is real work. The coordination overhead is real. The iteration cycles are real. The PM time is real.
+
+**What the alternative actually requires:**
+1. You or someone on your team needs to understand the full stack
+2. You need to make architectural decisions without a committee
+3. You need to accept "ugly and working" before "polished and done"
+4. You need CF Workers / modern edge infra knowledge
+
+Most of that $180K is paying for coordination costs that don't exist when one person knows the whole stack.
+
+MetrAIyux 0S replacement cost audit: $2.0M–$2.5M. Agency fees paid: $0.
+
+Not saying this is replicable for every team/project. Saying the gap between "agency quote" and "reality" is mostly coordination overhead, not actual complexity.`,
+      hashtags: 'r/entrepreneur r/startups r/webdev r/freelance'
+    },
+    {
+      img: '/assets/social/founder/ig-11.png',
+      problem: 'r/webdev · Scaling Architecture',
+      title: 'How I built for scale from day 1 without thinking about scale (Cloudflare Workers architecture post)',
+      caption: `The "will it scale?" conversation is broken in most startup discussions.
+
+Here's what actually matters:
+
+**The wrong question:** "Will it scale?"
+**The right questions:**
+1. Is my architecture stateless at the request level?
+2. Am I depending on a single-region compute resource?
+3. Does my database have a connection limit problem?
+4. What's the failure mode at 10× current load?
+
+**MetrAIyux 0S architecture (for context):**
+- All request handling: Cloudflare Workers (stateless, edge-distributed)
+- Database: CF D1 (SQLite, edge-collocated reads)
+- Session state: CF KV (globally replicated)
+- Static assets: CF Pages (CDN-native)
+
+**What this means practically:**
+- No centralized server to overload
+- No connection pool to saturate
+- No cold start penalty under load
+- Auto-scales to the request, not to the server
+
+**Tradeoffs I accepted:**
+1. Workers have a 10ms CPU time limit on free tier (not wall clock time — actual CPU)
+2. D1 isn't a Postgres replacement for complex relational queries
+3. KV has eventual consistency (not strong consistency)
+4. You're in Cloudflare's ecosystem — that's a vendor lock consideration
+
+For most solo founders and small teams, these tradeoffs are irrelevant at early scale and the benefits are massive.
+
+The "scalability" anxiety most early-stage founders have is about centralized server architecture. If you're not on centralized servers, the anxiety mostly goes away.`,
+      hashtags: 'r/webdev r/selfhosted r/devops r/cloudflare'
+    }
+  ]
+};
+
+// ── Render Functions ──
+function buildPostCard(post, idx, platform) {
+  const badgeClass = { instagram: 'badge-ig', linkedin: 'badge-li', facebook: 'badge-fb', reddit: 'badge-rd' }[platform];
+  const badgeLabel = { instagram: '📸 Instagram', linkedin: '💼 LinkedIn', facebook: '📘 Facebook', reddit: '🔸 Reddit' }[platform];
+  const num = String(idx + 1).padStart(2, '0');
+  const imgSrc = post.img;
+
+  return `<div class="post-card" data-idx="${idx}">
+    <img class="post-visual" src="${imgSrc}" alt="${post.problem}" loading="lazy">
+    <div class="post-body">
+      <span class="post-platform-badge ${badgeClass}">${badgeLabel}</span>
+      <div class="post-problem">${post.problem}</div>
+      <div class="post-title">${post.title}</div>
+      <div class="post-caption">${escHtml(post.caption)}</div>
+      <div class="post-hashtags">${escHtml(post.hashtags)}</div>
+      <div class="post-actions">
+        <button class="btn-copy" onclick="copyCaption(this, ${JSON.stringify(post.caption + '\n\n' + post.hashtags)})">Copy Caption</button>
+        <button class="btn-expand" onclick="toggleExpand(this)">Read more</button>
+        <a class="btn-dl" href="${imgSrc}" download="founder-${platform}-${num}.png">↓ Download Card</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderGrid(gridId, platform) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = POSTS[platform].map((p, i) => buildPostCard(p, i, platform)).join('');
+}
+
+function copyCaption(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Caption'; btn.classList.remove('copied'); }, 2200);
+  });
+}
+
+function toggleExpand(btn) {
+  const card = btn.closest('.post-card');
+  const expanded = card.classList.toggle('expanded');
+  btn.textContent = expanded ? 'Show less' : 'Read more';
+}
+
+function switchPlatform(platform, btn) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.platform-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById(platform + '-section').classList.add('visible');
+}
+
+// ── Init ──
+renderGrid('ig-grid', 'instagram');
+renderGrid('li-grid', 'linkedin');
+renderGrid('fb-grid', 'facebook');
+renderGrid('rd-grid', 'reddit');
+
+// Hamburger nav
+(function() {
+  var btn = document.querySelector('[data-menu-button]');
+  var links = document.querySelector('[data-nav-links]');
+  if (btn && links) {
+    btn.addEventListener('click', function() {
+      var open = links.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  }
+})();
+</script>
+</body>
+</html>

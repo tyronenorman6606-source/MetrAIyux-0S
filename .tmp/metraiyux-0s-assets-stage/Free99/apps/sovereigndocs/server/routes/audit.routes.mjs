@@ -1,0 +1,2 @@
+export const name='audit.routes'; export const area='audit'; export const owns=['audit status','ledger verification']; export const routes=['GET /api/v17/audit/status'];
+export async function handle(ctx){ const { method,url,sendJSON,verifyAuditLedger,AUDIT_LEDGER_FILE }=ctx; if(method==='GET' && url.pathname==='/api/v17/audit/status') return sendJSON(200,{ok:true,ledger:await verifyAuditLedger(AUDIT_LEDGER_FILE)}); return {handled:false}; }

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CRM Pipeline | Skyes Over London Staffing</title>
+  <meta name="description" content="Internal CRM pipeline page for employer accounts, AE lead stages, proposals, agreements, delivery, and repeat orders." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="internal-banner">Internal/operator page. Lock behind auth before production.</div>
+  <header class="topbar">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">SOL</span>
+      <span>
+        <strong>Skyes Over London</strong>
+        <small>Sales Ops</small>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation">☰</button>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a href="./services.html">Services</a>
+      <a href="./employers.html">Employers</a>
+      <a href="./candidates.html">Candidates</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./blog.html">Insights</a>
+      <a class="nav-cta" href="./contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+<section class="hero section-pad compact">
+  <div class="hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">CRM Pipeline</p>
+      <h1>Track employer accounts from lead to repeat order.</h1>
+      <p class="lead">This internal CRM-style page defines the commercial pipeline for AEs and operators: prospect, qualified need, proposal, agreement, first order, placement, repeat account.</p>
+    </div>
+    <aside class="hero-card reveal"><div class="card-topline">Revenue Control</div><h2>Every account needs a stage.</h2><p>Static shell only. Connect to CRM/database before real usage.</p></aside>
+  </div>
+</section>
+<section class="section-pad kanban reveal">
+  <div class="kanban-col"><h3>Prospect</h3><p>Local businesses, primes, departments, referrals.</p></div>
+  <div class="kanban-col"><h3>Qualified Need</h3><p>Role, headcount, urgency, decision maker, budget.</p></div>
+  <div class="kanban-col"><h3>Proposal</h3><p>Model, quote, terms, next action.</p></div>
+  <div class="kanban-col"><h3>Agreement</h3><p>Signed terms, billing, timesheets, kickoff.</p></div>
+  <div class="kanban-col"><h3>Delivery</h3><p>Sourcing, submissions, starts, quality control.</p></div>
+</section>
+<section class="section-pad contact-section">
+  <div class="contact-copy reveal"><p class="eyebrow">Pipeline Entry</p><h2>Add employer opportunity.</h2><p>Internal AE/ops form for account tracking.</p></div>
+  <form class="contact-form reveal" name="crm-pipeline-entry" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="crm-pipeline-entry" />
+    <label>Company<input name="company" required /></label>
+    <label>Contact<input name="contact" /></label>
+    <label>Email<input name="email" type="email" /></label>
+    <label>Pipeline Stage<select name="stage"><option>Prospect</option><option>Qualified Need</option><option>Proposal</option><option>Agreement</option><option>Delivery</option><option>Repeat Account</option><option>Closed Lost</option></select></label>
+    <label>Owner<input name="owner" /></label>
+    <label>Notes<textarea name="notes" rows="7" placeholder="Pain, roles, timeline, budget, next action, objections, decision maker"></textarea></label>
+    <button class="btn primary" type="submit">Add Pipeline Entry</button>
+  </form>
+</section>
+</main>
+  <footer class="footer">
+    <div>
+      <strong>Skyes Over London Staffing</strong>
+      <p>Commercial staffing, government-ready workforce support, recruiting, AE-powered account growth, and workforce operations.</p>
+    </div>
+    <div class="footer-links">
+      <a href="./services.html">Services</a>
+      <a href="./jobs.html">Jobs</a>
+      <a href="./government.html">Government</a>
+      <a href="./contact.html">Contact</a>
+      <a href="mailto:SkyesOverLondonLC@solenterprises.org">SkyesOverLondonLC@solenterprises.org</a>
+    </div>
+  </footer>
+  <script src="./script.js"></script>
+</body>
+</html>

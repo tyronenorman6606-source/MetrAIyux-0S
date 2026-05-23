@@ -31,10 +31,28 @@ function env(overrides = {}) {
   };
 }
 
-function req(path, {method = 'GET', body} = {}) {
+function gateWorker() {
+  return {
+    async fetch(request) {
+      const body = await request.json().catch(() => ({}));
+      return Response.json({
+        active: body.token === 'gate-token',
+        sub: 'sovereigndocs-test',
+        email: 'sovereigndocs-test@example.invalid',
+        role: 'admin',
+        scope: 'admin.read admin.write gateway.invoke'
+      });
+    }
+  };
+}
+
+function req(path, {method = 'GET', body, token} = {}) {
   return new Request(`https://metraiyux.example${path}`, {
     method,
-    headers: body ? {'content-type':'application/json'} : {},
+    headers: {
+      ...(body ? {'content-type':'application/json'} : {}),
+      ...(token ? {authorization:`Bearer ${token}`} : {})
+    },
     body: body ? JSON.stringify(body) : undefined
   });
 }
@@ -55,9 +73,16 @@ test('SD-01/SD-05 SovereignDocs adapter exposes health with explicit storage mod
 });
 
 test('SD-05 SovereignDocs mutations fail closed when storage is not configured', async () => {
-  const noStorage = env({SITE_EVENTS_KV:null});
+  const noStorage = env({SITE_EVENTS_KV:null, SKYGATEFS27_WORKER:gateWorker()});
+  const noAuth = await siteWorker.fetch(req('/api/sovereigndocs/cases/start', {
+    method:'POST',
+    body:{title:'No storage case'}
+  }), noStorage, ctx());
+  assert.equal(noAuth.status, 401);
+
   const res = await siteWorker.fetch(req('/api/sovereigndocs/cases/start', {
     method:'POST',
+    token:'gate-token',
     body:{title:'No storage case'}
   }), noStorage, ctx());
   assert.equal(res.status, 503);
@@ -67,14 +92,16 @@ test('SD-05 SovereignDocs mutations fail closed when storage is not configured',
 });
 
 test('SD-04 proves dashboard, case, packet, reminders, partner review, editor handoff, return, and closure summary', async () => {
-  const e = env();
+  const e = env({SKYGATEFS27_WORKER:gateWorker()});
 
-  const templates = await call(e, '/api/sovereigndocs/templates/search?risk=low&pageSize=2');
+  const gate = {token:'gate-token'};
+  const templates = await call(e, '/api/sovereigndocs/templates/search?risk=low&pageSize=2', gate);
   assert.equal(templates.items.length >= 1, true);
   const templateId = templates.items[0].id;
 
   const started = await call(e, '/api/sovereigndocs/cases/start', {
     method:'POST',
+    token:'gate-token',
     body:{
       title:'SovereignDocs adapter proof case',
       caseType:'document_packet_to_skye_docx_max',
@@ -89,55 +116,61 @@ test('SD-04 proves dashboard, case, packet, reminders, partner review, editor ha
   assert.ok(started.packet.id);
   assert.ok(started.review.id);
 
-  const cases = await call(e, '/api/sovereigndocs/cases');
+  const cases = await call(e, '/api/sovereigndocs/cases', gate);
   assert.equal(cases.count, 1);
 
   const packet = await call(e, '/api/sovereigndocs/packets/assemble', {
     method:'POST',
+    token:'gate-token',
     body:{title:'Standalone proof packet', templateIds:[templateId], acceptBoundary:true}
   });
   assert.equal(packet.packet.status, 'assembled');
 
   const reminder = await call(e, '/api/sovereigndocs/reminders', {
     method:'POST',
+    token:'gate-token',
     body:{title:'Annual report check', dueDate:'2026-06-01', sourceType:'compliance', jurisdiction:'US-AZ'}
   });
   assert.equal(reminder.reminder.status, 'open');
 
   const transitioned = await call(e, `/api/sovereigndocs/reminders/${encodeURIComponent(reminder.reminder.id)}/transition`, {
     method:'POST',
+    token:'gate-token',
     body:{status:'completed', note:'Proof transition'}
   });
   assert.equal(transitioned.reminder.status, 'completed');
 
-  const reviews = await call(e, '/api/sovereigndocs/legal-review/submissions');
+  const reviews = await call(e, '/api/sovereigndocs/legal-review/submissions', gate);
   assert.equal(reviews.items.length, 1);
 
   const routed = await call(e, `/api/sovereigndocs/legal-review/submissions/${encodeURIComponent(reviews.items[0].id)}/route`, {
     method:'POST',
+    token:'gate-token',
     body:{partnerId:'operator-configured-legal-network', routingNote:'Proof route'}
   });
-  assert.equal(routed.review.status, 'partner_review_routed');
+  assert.equal(routed.review.status, 'routed_to_partner');
 
-  const dashboard = await call(e, '/api/sovereigndocs/v18/workspace/dashboard');
+  const dashboard = await call(e, '/api/sovereigndocs/v18/workspace/dashboard', gate);
   assert.equal(dashboard.counts.cases, 1);
   assert.equal(dashboard.counts.packets, 2);
 
-  const state = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}/state`);
+  const state = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}/state`, gate);
   assert.equal(state.case.id, started.case.id);
   assert.equal(state.documents.length, 2);
 
   const handoff = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}/open-in-skye-docx-max`, {
     method:'POST',
+    token:'gate-token',
     body:{}
   });
   assert.match(handoff.launchUrl, /sd_handoff=/);
 
-  const handoffMap = await call(e, `/api/sovereigndocs/v18/editor/skye-docx-max/handoff/${encodeURIComponent(handoff.handoff.id)}/map`);
+  const handoffMap = await call(e, `/api/sovereigndocs/v18/editor/skye-docx-max/handoff/${encodeURIComponent(handoff.handoff.id)}/map`, gate);
   assert.equal(handoffMap.caseContext.caseId, started.case.id);
 
   const returned = await call(e, '/api/sovereigndocs/v18/editor/skye-docx-max/return-to-case', {
     method:'POST',
+    token:'gate-token',
     body:{handoffId:handoff.handoff.id, title:'Returned closure draft', html:'<h1>Returned</h1>', text:'Returned'}
   });
   assert.equal(returned.case.id, started.case.id);
@@ -145,14 +178,15 @@ test('SD-04 proves dashboard, case, packet, reminders, partner review, editor ha
 
   const completed = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}`, {
     method:'PATCH',
+    token:'gate-token',
     body:{status:'completed', note:'Proof closure complete'}
   });
   assert.equal(completed.case.status, 'completed');
 
-  const closure = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}/closure-summary`);
+  const closure = await call(e, `/api/sovereigndocs/v18/cases/${encodeURIComponent(started.case.id)}/closure-summary`, gate);
   assert.equal(closure.exportBundle.case.id, started.case.id);
   assert.match(closure.partnerPacket.markdown, /Partner Packet/);
 
-  const queues = await call(e, '/api/sovereigndocs/work-queues');
+  const queues = await call(e, '/api/sovereigndocs/work-queues', gate);
   assert.equal(queues.queues.packets.count, 2);
 });

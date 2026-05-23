@@ -1,0 +1,3 @@
+import { filterTenantRecords, tenantScopeFromSession } from '../runtime/tenant-scope.mjs';
+export const name='review.routes'; export const area='review'; export const owns=['legal review queues','review summaries']; export const routes=['GET /api/v17/review/queue'];
+export async function handle(ctx){ const { method,url,sendJSON,loadLegalReviewSubmissions,session }=ctx; if(method==='GET' && url.pathname==='/api/v17/review/queue'){ const rows=filterTenantRecords(session, await loadLegalReviewSubmissions()); const status=url.searchParams.get('status'); const filtered=status?rows.filter(r=>r.status===status):rows; return sendJSON(200,{ok:true,scope:tenantScopeFromSession(session),count:filtered.length,items:filtered.slice(0,250)}); } return {handled:false}; }

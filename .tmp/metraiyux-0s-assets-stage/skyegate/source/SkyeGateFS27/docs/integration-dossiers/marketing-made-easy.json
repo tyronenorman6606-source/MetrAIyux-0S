@@ -1,0 +1,51 @@
+{
+  "id": "marketing-made-easy",
+  "name": "Marketing Made Easy Growth Suite",
+  "generated_at": "2026-05-18T00:00:00Z",
+  "app_path": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy",
+  "gate_env_var": "SKYGATEFS27_ORIGIN",
+  "source_mcp_receipt": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/MCP_TOOLING_RECEIPT.json",
+  "zero_s_routes": {
+    "suite_hub": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/Marketing-Made-Easy/index.html",
+    "live_hub": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/live/marketing-made-easy-growth-suite.html",
+    "deep_scan_receipt": "/workspaces/MetrAIyux-0S/metraiyux_0s_site/proof/marketing-made-easy-deep-scan-receipt.html"
+  },
+  "platform_folders": [
+    "AE-FlowPro",
+    "BrandID-Offline-PWA",
+    "BusinessLaunchGo",
+    "SkyeDocxMax",
+    "SkyeWebCreatorMax",
+    "WebGrowthOperator",
+    "arizona-growth-index",
+    "kAIxUBrandKit"
+  ],
+  "gateway_routes": [
+    "platform-event-ingest",
+    "gateway-chat",
+    "auth-app-login",
+    "skyepay/offers"
+  ],
+  "event_types": [
+    "marketing_made_easy.deep_scan.completed",
+    "marketing_made_easy.ae_flow.handoff",
+    "marketing_made_easy.brand_identity.archived",
+    "marketing_made_easy.launch_pack.created",
+    "marketing_made_easy.document_package.exported",
+    "marketing_made_easy.webcreator.delivery_queued",
+    "marketing_made_easy.growth_ops.intake",
+    "marketing_made_easy.market_intelligence.requested",
+    "marketing_made_easy.kaixu_brandkit.generated"
+  ],
+  "production_blockers": [
+    "Gate session path must be configured before production handoff claims.",
+    "External provider credentials must stay in protected bindings.",
+    "Stripe checkout routes require approved SkyePay catalog entries.",
+    "Drive, GitHub, Netlify, Cloudflare, ad-platform, or social publishing writes require separate proof.",
+    "Owner-approved actions should mirror into FS27 platform events."
+  ],
+  "verification": [
+    "npm run 0s:marketing-made-easy:proof",
+    "npm run mcp:mine -- metraiyux_0s_site/Marketing-Made-Easy"
+  ]
+}
