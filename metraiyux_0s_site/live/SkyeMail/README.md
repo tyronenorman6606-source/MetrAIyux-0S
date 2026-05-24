@@ -13,16 +13,16 @@ What lives here:
 Operational reality:
 - The root pages (`dashboard.html`, `compose.html`, `settings.html`, `contacts.html`, and related pages) are the real standalone mail surfaces.
 - The suite now wraps those real surfaces instead of depending on external shared auth or dead `/api/skymail-*` routes.
-- Deployed Functions, Neon/Postgres, Gmail OAuth, and Resend webhook credentials are required. If the backend is missing, SkyeMail fails loudly instead of simulating a mailbox.
+- The Cloudflare Worker deploy now has a Zoho provider-backed lane for live hosted-mail send/read proof. Gmail OAuth, Resend inbound, Stalwart, and external provisioner lanes remain in source for compatibility and later scale-up.
 - `_redirects` maps `/SkyeMail/...` requests into `suite/` so subpath deployment works without touching other platforms.
 - `npm run build:suite` copies `suite/` into `dist/SkyeMail/` for flat route-safe syncs into another host tree.
 - The service implementation is the fuller standalone mail backend.
 - SkyeGateFS27 can now be used as the primary auth gate through `auth-fs27-session`; SkyeMail mints an app session only after FS27 introspection succeeds.
 - The missing hosted mailbox provisioning endpoints now exist: `mailbox-domains`, `mail-status`, and `mailbox-provision`.
-- The remaining gap to live hosted mail is provider/runtime configuration, DNS, MX/SPF/DKIM/DMARC, and Stalwart or external mailbox provider setup.
+- The current live hosted-mail proof runs through Zoho for `solenterprises.org`: token refresh, provider account discovery, send, and inbox readback are green. DNS/MX/SPF/DKIM/DMARC still must remain correct per domain before selling broad customer-domain mail.
 
 Provider note:
-- The service layer in this folder is provider-backed. Gmail remains available as a compatibility lane, but the hosted-mailbox lane is now explicit and can provision through Stalwart's management API or an external provisioner webhook.
+- The service layer in this folder is provider-backed. Zoho is the active deployed provider lane. Gmail remains available as a compatibility lane, and Stalwart/external provisioner support remains for later direct-control mailbox-server paths.
 - FS27 event mirroring sends auth and mailbox provisioning events into the parent gate through `/platform/events` when `SKYGATEFS27_ORIGIN` and `SKYGATE_EVENT_MIRROR_SECRET` are configured.
 
 Suite/runtime note:
@@ -40,4 +40,6 @@ Enable these Resend events for production monitoring: `email.received`, `email.s
 Proof coverage:
 - Run `npm run smoke:standalone-proof` for the bounded local proof.
 - That proof covers the standalone page tree, suite mounts, key backend source lanes, FS27 login markers, hosted mailbox endpoint files, required provider markers, and `dist/SkyeMail` regeneration.
-- It does not certify live Gmail OAuth, deployed Functions, inbound mail bridges, or delivery to provider-backed inboxes until the production environment and webhooks are configured.
+- Run `npm run smoke:zoho-provider` to confirm the deployed provider API posture.
+- Run `npm run proof:live-email -- --provider=zoho` to send live proof mail and verify inbox readback.
+- It does not certify live Gmail OAuth, Stalwart, or inbound third-party webhooks until those provider lanes are separately configured and exercised.

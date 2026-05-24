@@ -38,6 +38,32 @@
 
     <section class="section timeline">
       <article class="release-card current">
+        <p class="eyebrow">2026-05-24 • Live</p>
+        <h2>Zoho-backed inbox send/read proof is deployed.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li>The live proof runner now follows the active SkyeMail provider instead of assuming the old Resend-only proof lane.</li>
+              <li>Zoho proof mode refreshes the provider token, discovers the hosted mailbox, sends proof mail, and reads it back from the provider-backed inbox.</li>
+              <li>The deployed proof page now publishes the sanitized provider/inbox result without exposing OAuth tokens, private keys, passphrases, or mailbox secrets.</li>
+              <li>The Worker asset build now includes the public proof JSON, proof video, and proof screenshot.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>The dedicated SkyeMail Worker is deployed and serving the provider-backed proof lane.</li>
+              <li>Run <code>codex-20260524-zoho-live-final</code> passed with both proof messages visible in the provider-backed inbox.</li>
+              <li><code>/.netlify/functions/mailbox-domains</code> reports Zoho API, org, and provisioning readiness.</li>
+              <li>Local smokes passed for standalone proof, proof surface, and Zoho provider readiness.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: SkyeMail is the public product. Zoho is the active hosted-mail implementation behind the SkyeMail lane for this release.</div>
+      </article>
+
+      <article class="release-card current">
         <p class="eyebrow">2026-05-16 • Live</p>
         <h2>FS27 Gate Card Onboarding + SkyeMail Proof Loop</h2>
         <div class="grid two">
@@ -66,7 +92,7 @@
             </ul>
           </div>
         </div>
-        <div class="notice-strip">Production truth: Resend-backed SkyeMail inbox routing is active now. Stalwart is optional later for traditional hosted mailbox-server features such as IMAP/SMTP/JMAP accounts.</div>
+        <div class="notice-strip">Production truth: provider-backed SkyeMail inbox routing is active now. Stalwart is optional later for traditional hosted mailbox-server features such as IMAP/SMTP/JMAP accounts.</div>
       </article>
 
       <article class="release-card">

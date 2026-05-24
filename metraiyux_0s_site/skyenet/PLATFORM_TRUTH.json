@@ -1,0 +1,135 @@
+{
+  "platform": "SkyeNet",
+  "owned_by": "FS27/SkyGate/Free99 shared gate",
+  "status": "real_static_drop_lane",
+  "mounted_surface": "/skyenet/index.html",
+  "api_base": "/api/skyenet",
+  "fs27_base": "/deploy",
+  "auth": {
+    "separate_skynet_password": false,
+    "accepted_lane": "shared 0S FS27/SkyGate/Free99 owner/operator session"
+  },
+  "live_capabilities": {
+    "static_drop_hosting": true,
+    "browser_folder_drop_console": true,
+    "bash_api_push": true,
+    "r2_asset_storage": true,
+    "kv_route_registry": true,
+    "host_path_routing": true,
+    "branded_subdomain_routing": "route_registry_ready_dns_required",
+    "fallback_origin_proxy": true,
+    "first_party_worker_functions": true,
+    "skynet_edge_primary_release_lane": true,
+    "skynet_sovereign_runtime_compatible": true,
+    "uploaded_function_bundle_intake": true,
+    "netlify_function_bundle_converter": true,
+    "signed_function_bundle_manifest": true,
+    "owned_skyenet_functions_runtime_v1": true,
+    "function_runtime_env_isolation": true,
+    "function_runtime_timeout_caps": true,
+    "function_runtime_memory_caps": true,
+    "function_runtime_body_caps": true,
+    "function_runtime_egress_default_deny": true,
+    "netlify_handler_event_parity": true,
+    "citadeldb_cloudflare_d1_database": true,
+    "neon_to_citadeldb_sync_lane": true,
+    "arbitrary_uploaded_serverless_functions": false
+  },
+  "url_model": {
+    "path_routes_live": "https://<skyenet-host>/skyenet/<project>",
+    "branded_subdomains": "https://<project>.skyenet.<company-domain>",
+    "custom_domains": "owner_verified_hostnames_use_the_same_route_registry",
+    "free99_policy": "path_route_only_until_owner_approves_custom_domain"
+  },
+  "public_language": {
+    "customer_facing_product": "SkyeNet",
+    "allowed_runtime_names": [
+      "SkyeNet Edge",
+      "SkyeNet Deploy",
+      "SkyeNet Functions",
+      "SkyeNet Sovereign Runtime",
+      "CitadelDB Edge"
+    ],
+    "provider_split_customer_facing": false,
+    "provider_details_internal_only": true,
+    "copy_rule": "Do not describe customer lanes as Cloudflare versus SkyeNet. Provider primitives are implementation details behind SkyeNet."
+  },
+  "hybrid_release": {
+    "release_today_lane": "SkyeNet Edge",
+    "private_runtime_lane": "SkyeNet Sovereign Runtime",
+    "private_runtime_required_for_untrusted_customer_code": true,
+    "private_runtime_optional_for_static_and_managed_functions": true,
+    "fallback_when_private_runtime_offline": "SkyeNet Edge keeps static drops, managed functions, route registry, auth, observability, and staged function bundles online."
+  },
+  "citadeldb": {
+    "product": "CitadelDB",
+    "cloudflare_database_binding": "CITADELDB",
+    "database_name": "metraiyux-citadeldb",
+    "database_id": "5b572a90-75e0-4126-8d91-0bf370a8ba9d",
+    "primary_storage": "Cloudflare D1",
+    "receipt_mirror": "SITE_EVENTS_KV",
+    "local_database_required": false,
+    "neon_role": "upstream sync source during cutover",
+    "proof": "npm run audit:citadeldb-runtime && node metraiyux_0s_site/tests/citadeldb-adapter.test.mjs"
+  },
+  "netlify_parity_direction": {
+    "needed": true,
+    "own_ip_required": true,
+    "cloudflare_workers_for_platforms_core_dependency": false,
+    "compatibility_targets": [
+      "netlify/functions",
+      "/.netlify/functions/<name>",
+      "handler(event, context)",
+      "static drop plus function bundle"
+    ],
+    "starter_runtime": {
+      "converter": "tools/skyenet-functions-convert.mjs",
+      "local_runtime": "tools/skyenet-functions-runtime.mjs",
+      "bundle_contract": "signed manifest, tenant id, route map, timeout/memory/body caps, env grants, default-deny egress",
+      "current_scope": "controlled signed-runtime preview for trusted/approved function bundles",
+      "production_boundary": "rootless container or microVM isolation still required before unlimited hostile customer code is sold",
+      "proof": "npm run 0s:skyenet:functions-proof"
+    }
+  },
+  "skypay_products": {
+    "free99_checkout_product": false,
+    "free99_policy": "capped_static_demo_lane_only",
+    "paid_offers": [
+      {
+        "offer_id": "skyenet-edge-starter",
+        "setup_cents": 29700,
+        "monthly_cents": 9700,
+        "lookup_keys": ["skyenet_edge_starter_setup", "skyenet_edge_starter_monthly"],
+        "activation_path": "paid_pending_owner_approval"
+      },
+      {
+        "offer_id": "skyenet-edge-growth",
+        "setup_cents": 99700,
+        "monthly_cents": 29700,
+        "lookup_keys": ["skyenet_edge_growth_setup", "skyenet_edge_growth_monthly"],
+        "activation_path": "owner_approved_after_route_scope"
+      },
+      {
+        "offer_id": "skyenet-functions-managed",
+        "setup_cents": 150000,
+        "monthly_cents": 49700,
+        "lookup_keys": ["skyenet_functions_managed_setup", "skyenet_functions_managed_monthly"],
+        "activation_path": "owner_approved_after_function_scope"
+      },
+      {
+        "offer_id": "skyenet-sovereign-runtime-reserve",
+        "setup_cents": 500000,
+        "monthly_cents": 99700,
+        "lookup_keys": ["skyenet_sovereign_runtime_setup", "skyenet_sovereign_runtime_monthly"],
+        "activation_path": "owner_approved_after_sovereign_runtime_scope"
+      }
+    ],
+    "proof": "npm run 0s:skyenet:skyepay"
+  },
+  "internal_requirements": {
+    "cost_model_required_before_public_pricing": true,
+    "free99_caps_required": true,
+    "observability_required": true,
+    "live_browser_proof_required_after_deploy": true
+  }
+}

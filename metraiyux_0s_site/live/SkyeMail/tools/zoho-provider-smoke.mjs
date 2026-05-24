@@ -17,9 +17,9 @@ function findRepoRoot(start) {
 const aliases = {
   ZOHO_CLIENT_ID: ["Client_ID", "ZOHO_MAIL_CLIENT_ID"],
   ZOHO_CLIENT_SECRET: ["Client_Secret", "ZOHO_MAIL_CLIENT_SECRET"],
-  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
+  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token_ID2", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
   ZOHO_ORG_ID: ["Org_ID", "Organization_ID", "ZOHO_ORGANIZATION_ID", "ZOHO_ZOID"],
-  ZOHO_ACCOUNT_ID: ["Account_ID", "ZOHO_MAIL_ACCOUNT_ID"],
+  ZOHO_ACCOUNT_ID: ["Account_ID", "Zoho_User_ID", "ZOHO_MAIL_ACCOUNT_ID"],
   ZOHO_DEFAULT_FROM: ["Default_From_Email", "ZOHO_FROM_EMAIL", "ZOHO_MAIL_FROM"],
 };
 
@@ -146,7 +146,7 @@ const report = {
     org_id_present: Boolean(env.ZOHO_ORG_ID),
     account_id_present: Boolean(env.ZOHO_ACCOUNT_ID),
     default_from_present: Boolean(env.ZOHO_DEFAULT_FROM),
-    aliases_accepted: Boolean(env.Client_ID || env.Client_Secret || env.Refresh_Token_ID),
+    aliases_accepted: Boolean(env.Client_ID || env.Client_Secret || env.Refresh_Token_ID || env.Refresh_Token_ID2),
   },
   token: { ok: false, attempted_datacenters: [] },
   accounts: { ok: false },
@@ -186,13 +186,14 @@ if (missing.length) {
     }
     lastTokenError = publicError(data);
   }
-  report.token.ok = Boolean(tokenData?.access_token);
-  report.token.selected_datacenter = selected?.id || "";
-  if (!report.token.ok) {
-    report.token.error = lastTokenError || {};
-  } else {
-    const auth = { authorization: `Zoho-oauthtoken ${tokenData.access_token}`, accept: "application/json" };
-    const accountsRes = await fetch(`${selected.mailBase}/api/accounts`, { headers: auth });
+    report.token.ok = Boolean(tokenData?.access_token);
+    report.token.selected_datacenter = selected?.id || "";
+    report.token.api_domain = tokenData?.api_domain || "";
+    if (!report.token.ok) {
+      report.token.error = lastTokenError || {};
+    } else {
+      const auth = { authorization: `Zoho-oauthtoken ${tokenData.access_token}`, accept: "application/json" };
+      const accountsRes = await fetch(`${selected.mailBase}/api/accounts`, { headers: auth });
     const accountsData = await readJsonResponse(accountsRes);
     report.accounts = {
       ok: accountsRes.ok,
@@ -203,11 +204,20 @@ if (missing.length) {
     report.result.account_id_discovered = extractAccountId(accountsData) || Boolean(env.ZOHO_ACCOUNT_ID);
     report.result.default_from_discovered = extractDefaultFrom(accountsData) || Boolean(env.ZOHO_DEFAULT_FROM);
 
-    const organizationRes = await fetch(`${selected.mailBase}/api/organization`, { headers: auth });
-    const organizationData = await readJsonResponse(organizationRes);
-    report.organization = { ok: organizationRes.ok, status: organizationRes.status };
-    if (!organizationRes.ok) report.organization.error = publicError(organizationData);
-    report.result.organization_id_discovered = extractOrgId(organizationData) || Boolean(env.ZOHO_ORG_ID);
+    if (env.ZOHO_ORG_ID) {
+      const organizationRes = await fetch(`${selected.mailBase}/api/organization/${encodeURIComponent(env.ZOHO_ORG_ID)}`, { headers: auth });
+      const organizationData = await readJsonResponse(organizationRes);
+      report.organization = { ok: organizationRes.ok, status: organizationRes.status };
+      if (!organizationRes.ok) report.organization.error = publicError(organizationData);
+      report.result.organization_id_discovered = extractOrgId(organizationData) || Boolean(env.ZOHO_ORG_ID);
+    } else {
+      report.organization = {
+        ok: false,
+        skipped: true,
+        reason: "ZOHO_ORG_ID is not configured; Zoho organization details require /api/organization/{zoid}.",
+      };
+      report.result.organization_id_discovered = false;
+    }
     report.result.api_ready = report.token.ok && report.accounts.ok && report.result.account_id_discovered;
     report.result.provisioning_ready = report.result.api_ready && report.organization.ok && report.result.organization_id_discovered;
     report.ok = report.result.provisioning_ready;

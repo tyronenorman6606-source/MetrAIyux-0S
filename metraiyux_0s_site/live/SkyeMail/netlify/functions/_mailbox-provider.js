@@ -45,9 +45,9 @@ function validateMailboxInput(localPart, domain) {
 const ZOHO_ENV_ALIASES = {
   ZOHO_CLIENT_ID: ["Client_ID", "ZOHO_MAIL_CLIENT_ID"],
   ZOHO_CLIENT_SECRET: ["Client_Secret", "ZOHO_MAIL_CLIENT_SECRET"],
-  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
+  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token_ID2", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
   ZOHO_ORG_ID: ["Org_ID", "Organization_ID", "ZOHO_ORGANIZATION_ID", "ZOHO_ZOID"],
-  ZOHO_ACCOUNT_ID: ["Account_ID", "ZOHO_MAIL_ACCOUNT_ID"],
+  ZOHO_ACCOUNT_ID: ["Account_ID", "Zoho_User_ID", "ZOHO_MAIL_ACCOUNT_ID"],
   ZOHO_DEFAULT_FROM: ["Default_From_Email", "ZOHO_FROM_EMAIL", "ZOHO_MAIL_FROM"],
 };
 

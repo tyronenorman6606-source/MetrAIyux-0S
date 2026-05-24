@@ -394,6 +394,28 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="skyemail-zoho-skynet-functions-parity">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">SkyEmail + SkyeNet</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyEmail</span><span>Zoho inbox proof</span><span>SkyeNet Functions</span><span>Netlify parity</span><span>Signed runtime</span><span>Stress proof</span></div>
+            <h2>SkyEmail now has live hosted-mail inbox proof, and SkyeNet Functions has a signed Netlify-compatible runtime.</h2>
+            <p>The SkyEmail proof lane was corrected from the old Resend-only assumption to the active provider-backed mailbox. SkyeNet's Netlify parity path now converts function folders into signed SkyeNet bundles and proves the owned runtime guardrails instead of only staging the idea.</p>
+            <ul class="release-points">
+              <li>SkyEmail Worker version <code>abad47ce-89e9-4153-98fd-15eefcc833af</code> is deployed at <code>https://skyemail-platform.graylondonskyes.workers.dev/</code>.</li>
+              <li>The live proof run <code>codex-20260524-zoho-live-final</code> sent two messages through the active Zoho-backed hosted-mail lane and read both messages back from the provider-backed inbox.</li>
+              <li>The public proof page and receipt now publish sanitized provider/inbox results at <code>/live-proof</code> and <code>/proof/live-email-proof.json</code> without exposing OAuth tokens, private keys, passphrases, or mailbox secrets.</li>
+              <li>SkyEmail smokes passed for standalone proof, proof surface, and Zoho provider readiness; the live provider status reports Zoho API, organization, and provisioning readiness.</li>
+              <li>SkyeNet Functions now signs bundle manifests with tenant IDs, route maps, limits, runtime contract metadata, and HMAC signatures when the signing key is present.</li>
+              <li>The SkyeNet runtime proof now covers Netlify route compatibility, repeated query params, cookies, binary request bodies, request body caps, invocation timeouts, env grant isolation, default-deny outbound fetch, and manifest tamper rejection.</li>
+              <li>The product boundary remains honest: controlled signed-runtime execution is real for trusted or owner-approved bundles; unlimited hostile customer-uploaded code still waits for rootless container or microVM isolation in the SkyeNet Sovereign Runtime.</li>
+            </ul>
+            <div class="receipt-row"><span><code>metraiyux_0s_site/live/SkyeMail/proof/live-email-proof.json</code></span><span><code>metraiyux_0s_site/live/SkyeMail/proof/live-email-runs/codex-20260524-zoho-live-final.json</code></span><span><code>tools/skyenet-functions-convert.mjs</code></span><span><code>tools/skyenet-functions-runtime.mjs</code></span><span><code>npm run 0s:skyenet:functions-proof</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="devooderator-cards-mirror-script-repair">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-24">May 24, 2026</time>

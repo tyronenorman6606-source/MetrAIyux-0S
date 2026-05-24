@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { Webhook } from "svix";
+import bcrypt from "bcryptjs";
 
 const TEXT_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -58,6 +59,10 @@ function normalizeHandle(value) {
     .replace(/^[._-]+|[._-]+$/g, "")
     .replace(/[._-]{2,}/g, "-")
     .slice(0, 32) || "skyemail-user";
+}
+
+function validHandle(value) {
+  return /^[a-z0-9][a-z0-9._-]{2,31}$/i.test(String(value || ""));
 }
 
 function stableHex(value, length = 16) {
@@ -514,9 +519,9 @@ function mailboxLocalFromWorkspace(body = {}) {
 const ZOHO_ENV_ALIASES = {
   ZOHO_CLIENT_ID: ["Client_ID", "ZOHO_MAIL_CLIENT_ID"],
   ZOHO_CLIENT_SECRET: ["Client_Secret", "ZOHO_MAIL_CLIENT_SECRET"],
-  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
+  ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token_ID2", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
   ZOHO_ORG_ID: ["Org_ID", "Organization_ID", "ZOHO_ORGANIZATION_ID", "ZOHO_ZOID"],
-  ZOHO_ACCOUNT_ID: ["Account_ID", "ZOHO_MAIL_ACCOUNT_ID"],
+  ZOHO_ACCOUNT_ID: ["Account_ID", "Zoho_User_ID", "ZOHO_MAIL_ACCOUNT_ID"],
   ZOHO_DEFAULT_FROM: ["Default_From_Email", "ZOHO_FROM_EMAIL", "ZOHO_MAIL_FROM"],
 };
 
@@ -530,21 +535,32 @@ function envValue(env, key) {
   return "";
 }
 
+function resendApiKey(env) {
+  return clean(
+    env?.RESEND_API_KEY
+    || env?.BACKUP_RESEND_API_TOKEN
+    || env?.backup_resend_api_token
+    || env?.bacup_resend_api_token
+    || ""
+  ).replace(/^['"]|['"]$/g, "");
+}
+
 function providerConfigured(env) {
   const provider = clean(env.MAILBOX_PROVIDER || "stalwart").toLowerCase();
   const stalwartReady = Boolean(env.STALWART_BASE_URL && env.STALWART_MANAGEMENT_API_KEY);
   const externalReady = Boolean(env.MAILBOX_PROVISION_WEBHOOK_URL && env.MAILBOX_PROVISION_WEBHOOK_SECRET);
   const zohoApiReady = Boolean(envValue(env, "ZOHO_CLIENT_ID") && envValue(env, "ZOHO_CLIENT_SECRET") && envValue(env, "ZOHO_REFRESH_TOKEN"));
   const zohoOrgReady = Boolean(envValue(env, "ZOHO_ORG_ID"));
-  const zohoReady = Boolean(zohoApiReady && zohoOrgReady);
+  const zohoReady = zohoApiReady;
+  const zohoProvisioningReady = Boolean(zohoApiReady && zohoOrgReady);
   let configured = stalwartReady;
   if (provider === "external-webhook") configured = externalReady;
   if (provider === "zoho") configured = zohoReady;
-  return { provider, configured, stalwartReady, externalReady, zohoReady, zohoApiReady, zohoOrgReady };
+  return { provider, configured, stalwartReady, externalReady, zohoReady, zohoApiReady, zohoOrgReady, zohoProvisioningReady };
 }
 
 function providerSetupMessage(provider = "stalwart") {
-  if (provider === "zoho") return "Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN, or use the root env aliases Client_ID, Client_Secret, and Refresh_Token_ID. ZOHO_ORG_ID is optional when the token can read /api/organization.";
+  if (provider === "zoho") return "Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN for Zoho API access. Set ZOHO_ORG_ID when provisioning new organization mailboxes through Zoho admin APIs.";
   if (provider === "external-webhook") return "Set MAILBOX_PROVISION_WEBHOOK_URL and MAILBOX_PROVISION_WEBHOOK_SECRET before live mailbox account creation.";
   return "Set STALWART_BASE_URL and STALWART_MANAGEMENT_API_KEY before live mailbox account creation.";
 }
@@ -576,7 +592,7 @@ async function parseZohoResponse(res) {
   return data;
 }
 
-async function getZohoAccessToken(env) {
+async function getZohoTokenData(env) {
   if (!zohoApiConfigured(env)) throw Object.assign(new Error("Zoho API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
   const params = new URLSearchParams({
     refresh_token: envValue(env, "ZOHO_REFRESH_TOKEN"),
@@ -589,6 +605,11 @@ async function getZohoAccessToken(env) {
     headers: { accept: "application/json" },
   }));
   if (!data?.access_token) throw Object.assign(new Error(data?.error || "Zoho did not return an access token."), { statusCode: 502, providerResponse: data });
+  return data;
+}
+
+async function getZohoAccessToken(env) {
+  const data = await getZohoTokenData(env);
   return data.access_token;
 }
 
@@ -635,6 +656,23 @@ function extractZohoOrganizationId(payload) {
   return match != null ? String(match) : null;
 }
 
+function extractZohoDefaultFrom(payload) {
+  const data = payload?.data || payload;
+  const candidates = [
+    data?.primaryEmailAddress,
+    data?.mailboxAddress,
+    data?.emailAddress,
+    data?.email,
+    data?.mailbox?.emailAddress,
+    Array.isArray(data) ? data[0]?.primaryEmailAddress : null,
+    Array.isArray(data) ? data[0]?.mailboxAddress : null,
+    Array.isArray(data) ? data[0]?.emailAddress : null,
+    Array.isArray(data) ? data[0]?.email : null,
+  ];
+  const match = candidates.find((value) => value != null && String(value).includes("@"));
+  return match != null ? String(match) : null;
+}
+
 function extractZohoMessageId(payload) {
   const data = payload?.data || payload;
   const candidates = [data?.messageId, data?.message_id, data?.id, payload?.messageId, payload?.id];
@@ -658,6 +696,46 @@ async function getZohoMailAccountId(env, preferredAccountId = null) {
   const accountId = extractZohoAccountId(payload);
   if (!accountId) throw Object.assign(new Error("No Zoho Mail accountId found. Set ZOHO_ACCOUNT_ID manually."), { statusCode: 502, providerResponse: payload });
   return accountId;
+}
+
+function zohoResponseSummary(payload) {
+  const data = payload?.data || payload;
+  return {
+    status_code: payload?.status?.code || null,
+    status_description: payload?.status?.description || null,
+    error_code: payload?.data?.errorCode || payload?.error || null,
+    data_shape: Array.isArray(data) ? "array" : (data && typeof data === "object" ? "object" : typeof data),
+    data_count: Array.isArray(data) ? data.length : (data ? 1 : 0),
+    top_keys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 8) : [],
+    data_keys: data && !Array.isArray(data) && typeof data === "object" ? Object.keys(data).slice(0, 12) : [],
+    account_id_detected: Boolean(extractZohoAccountId(payload)),
+    default_from_detected: Boolean(extractZohoDefaultFrom(payload)),
+    organization_id_detected: Boolean(extractZohoOrganizationId(payload)),
+  };
+}
+
+async function zohoDiagnosticFetch(env, accessToken, path) {
+  const url = `${zohoMailBase(env)}${path}`;
+  const res = await fetch(url, {
+    headers: {
+      accept: "application/json",
+      authorization: `Zoho-oauthtoken ${accessToken}`,
+    },
+  });
+  const text = await res.text();
+  let payload = null;
+  try { payload = text ? JSON.parse(text) : null; } catch { payload = { raw_status_only: Boolean(text) }; }
+  return {
+    path,
+    status: res.status,
+    ok: res.ok,
+    content_type: res.headers.get("content-type") || "",
+    summary: zohoResponseSummary(payload),
+  };
+}
+
+function zohoProviderCanProvision(env) {
+  return Boolean(zohoApiConfigured(env) && envValue(env, "ZOHO_ORG_ID"));
 }
 
 function randomMailboxPassword() {
@@ -902,6 +980,9 @@ async function postJson(url, body, headers = {}) {
 async function provisionMailbox(env, { email, localPart, domain, user, fs27 }) {
   const provider = providerConfigured(env);
   if (!provider.configured) throw Object.assign(new Error("Hosted mailbox provider is not configured."), { statusCode: 501 });
+  if (provider.provider === "zoho" && !zohoProviderCanProvision(env)) {
+    throw Object.assign(new Error("Zoho API token is configured, but ZOHO_ORG_ID is required before SkyeMail can create new Zoho organization mailboxes."), { statusCode: 501 });
+  }
 
   if (provider.provider === "external-webhook") {
     const data = await postJson(env.MAILBOX_PROVISION_WEBHOOK_URL, {
@@ -1107,9 +1188,10 @@ async function verifyResendWebhook(request, env) {
 }
 
 async function resendGet(env, path) {
-  if (!env.RESEND_API_KEY) throw Object.assign(new Error("RESEND_API_KEY is missing."), { statusCode: 501 });
+  const apiKey = resendApiKey(env);
+  if (!apiKey) throw Object.assign(new Error("RESEND_API_KEY or backup Resend token is missing."), { statusCode: 501 });
   const res = await fetch(`https://api.resend.com${path}`, {
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}` },
+    headers: { authorization: `Bearer ${apiKey}` },
   });
   const text = await res.text();
   let data = null;
@@ -1575,18 +1657,218 @@ async function handleAuthFs27(request, env, ctx) {
   });
 }
 
+function publicUser(user = {}) {
+  return {
+    handle: user.handle || null,
+    email: user.email || null,
+    skymail_id: user.skymail_id || null,
+    workspace_id: user.workspace_id || null,
+  };
+}
+
+async function handleAdminPublicKey(_request, env) {
+  const pem = clean(env.ADMIN_RECOVERY_PUBLIC_KEY_PEM);
+  return json({ enabled: Boolean(pem), public_key_pem: pem || null });
+}
+
+async function handleAuthSignup(request, env, ctx) {
+  const body = await request.json().catch(() => ({}));
+  const fs27Token = bearer(request) || clean(body.fs27_token || body.skygate_token);
+  const requireFs27 = clean(env.SKYMAIL_SIGNUP_REQUIRES_FS27).toLowerCase() === "true";
+  const fs27 = fs27Token ? await introspectFs27(env, fs27Token) : null;
+  if (requireFs27 && !fs27) throw Object.assign(new Error("SkyGate FS27 auth is required before SkyeMail signup."), { statusCode: 401 });
+
+  const handle = normalizeHandle(body.handle || fs27?.email || fs27?.username || body.email);
+  const email = normalizeEmail(fs27?.email || fs27?.username || body.email);
+  const password = String(body.password || "");
+  if (!validHandle(handle)) throw Object.assign(new Error("Invalid handle format."), { statusCode: 400 });
+  if (!email || !email.includes("@")) throw Object.assign(new Error("Valid email required."), { statusCode: 400 });
+  if (password.length < 10) throw Object.assign(new Error("Password must be at least 10 characters."), { statusCode: 400 });
+  if (!clean(body.rsa_public_key_pem).includes("BEGIN PUBLIC KEY")) throw Object.assign(new Error("rsa_public_key_pem required (PEM)."), { statusCode: 400 });
+  if (!body.vault_wrap_json) throw Object.assign(new Error("vault_wrap_json required."), { statusCode: 400 });
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const fs27Sub = fs27?.sub || null;
+  const fs27CustomerId = fs27?.customer_id || fs27?.org || null;
+  const fs27GateCardId = makeGateCardId({
+    fs27CardId: fs27?.gate_card_id || fs27?.card?.id || fs27?.gate_card?.id || null,
+    fs27Sub,
+    email,
+    handle,
+  });
+  const skymailId = makeSkyeMailId({ email, handle, fs27Sub });
+  const workspaceId = makeWorkspaceId({ email, handle, fs27CustomerId, fs27Sub });
+  const recoveryEnabled = Boolean(body.recovery_enabled);
+  const recoveryBlob = recoveryEnabled ? (body.recovery_blob_json || null) : null;
+
+  let rows;
+  try {
+    rows = await query(env, `
+      insert into users(
+        handle, email, password_hash, skymail_id, workspace_id,
+        fs27_sub, fs27_customer_id, fs27_gate_card_id, fs27_card_json,
+        recovery_enabled, recovery_blob_json
+      )
+      values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10,$11)
+      returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id
+    `, [
+      handle,
+      email,
+      passwordHash,
+      skymailId,
+      workspaceId,
+      fs27Sub,
+      fs27CustomerId,
+      fs27GateCardId,
+      fs27 ? JSON.stringify(fs27.card || fs27.gate_card || fs27.skyegate_card || null) : null,
+      recoveryEnabled,
+      recoveryBlob,
+    ]);
+  } catch (error) {
+    if (/duplicate key value violates unique constraint/i.test(error.message || "")) {
+      throw Object.assign(new Error("Handle or email already exists."), { statusCode: 409 });
+    }
+    throw error;
+  }
+  const user = rows[0];
+  await query(env, `
+    insert into user_keys(user_id, version, is_active, rsa_public_key_pem, vault_wrap_json)
+    values($1, 1, true, $2, $3)
+  `, [user.id, body.rsa_public_key_pem, typeof body.vault_wrap_json === "string" ? body.vault_wrap_json : JSON.stringify(body.vault_wrap_json)]);
+
+  const token = await signJwt({
+    sub: user.id,
+    handle: user.handle,
+    email: user.email,
+    skymail_id: user.skymail_id || null,
+    workspace_id: user.workspace_id || null,
+    auth_provider: fs27 ? "skygatefs27_signup" : "skymail_signup",
+    fs27_sub: fs27Sub,
+    fs27_customer_id: fs27CustomerId,
+    fs27_gate_card_id: fs27GateCardId,
+  }, env.JWT_SECRET);
+  const event = { type: "skymail.auth.signup", actor: user.email, org_id: fs27CustomerId, ws_id: user.id, meta: { skymail_id: user.skymail_id, workspace_id: user.workspace_id, fs27_sub: fs27Sub } };
+  ctx.waitUntil(mirrorFs27(env, event));
+  ctx.waitUntil(backupCitadel(env, { ...event, id: `signup_${user.id}_${Date.now()}` }));
+  return json({ ok: true, token, ...publicUser(user) });
+}
+
+async function handleAuthLogin(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const ident = normalizeEmail(body.ident || "");
+  const password = String(body.password || "");
+  if (!ident) throw Object.assign(new Error("Email or handle required."), { statusCode: 400 });
+  if (!password) throw Object.assign(new Error("Password required."), { statusCode: 400 });
+  const rows = await query(env, `
+    select id, handle, email, password_hash, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id
+      from users
+     where lower(email)=$1 or lower(handle)=$1
+     limit 1
+  `, [ident]);
+  if (!rows.length) throw Object.assign(new Error("Invalid credentials."), { statusCode: 401 });
+  const user = rows[0];
+  const ok = String(user.password_hash || "").startsWith("$2")
+    ? await bcrypt.compare(password, user.password_hash)
+    : false;
+  if (!ok) throw Object.assign(new Error("Invalid credentials."), { statusCode: 401 });
+  const token = await signJwt({
+    sub: user.id,
+    handle: user.handle,
+    email: user.email,
+    skymail_id: user.skymail_id || null,
+    workspace_id: user.workspace_id || null,
+    auth_provider: "skymail_password",
+    fs27_sub: user.fs27_sub || null,
+    fs27_customer_id: user.fs27_customer_id || null,
+    fs27_gate_card_id: user.fs27_gate_card_id || null,
+  }, env.JWT_SECRET);
+  return json({ token, ...publicUser(user) });
+}
+
 async function handleMailboxDomains(_request, env) {
   const provider = providerConfigured(env);
+  const zohoProvisioningReady = provider.provider === "zoho" ? zohoProviderCanProvision(env) : provider.configured;
   return json({
     ok: true,
     domains: configuredDomains(env),
     primary_domain: configuredDomains(env)[0] || null,
-    provisioning_configured: provider.configured,
+    api_configured: provider.configured,
+    provisioning_configured: zohoProvisioningReady,
     provider: provider.provider,
     provider_configured: provider,
     fs27_configured: Boolean(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN),
     citadel_backup_configured: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL),
   });
+}
+
+async function handleZohoProviderSmoke(request, env) {
+  serviceAuth(request, env);
+  const provider = providerConfigured(env);
+  const report = {
+    ok: false,
+    at: new Date().toISOString(),
+    source: "cloudflare-worker",
+    provider: provider.provider,
+    bases: {
+      accounts: zohoAccountsBase(env),
+      mail: zohoMailBase(env),
+    },
+    env: {
+      client_id_present: Boolean(envValue(env, "ZOHO_CLIENT_ID")),
+      client_secret_present: Boolean(envValue(env, "ZOHO_CLIENT_SECRET")),
+      refresh_token_present: Boolean(envValue(env, "ZOHO_REFRESH_TOKEN")),
+      org_id_present: Boolean(envValue(env, "ZOHO_ORG_ID")),
+      account_id_present: Boolean(envValue(env, "ZOHO_ACCOUNT_ID")),
+      default_from_present: Boolean(envValue(env, "ZOHO_DEFAULT_FROM")),
+      api_configured: provider.configured,
+      provisioning_configured: provider.provider === "zoho" ? zohoProviderCanProvision(env) : provider.configured,
+    },
+    token: { ok: false },
+    accounts: { ok: false },
+    signature: { ok: false },
+    organization: { skipped: true, reason: "ZOHO_ORG_ID is not configured, and Zoho organization detail endpoints require /api/organization/{zoid}." },
+    result: {
+      token_exchange_ready: false,
+      mail_account_ready: false,
+      default_from_discovered: false,
+      organization_probe_ready: false,
+      provisioning_ready: false,
+    },
+  };
+
+  try {
+    const tokenData = await getZohoTokenData(env);
+    report.token = {
+      ok: true,
+      api_domain: tokenData.api_domain || null,
+      expires_in: tokenData.expires_in || null,
+      token_type_present: Boolean(tokenData.token_type),
+    };
+    report.result.token_exchange_ready = true;
+
+    const accessToken = tokenData.access_token;
+    report.accounts = await zohoDiagnosticFetch(env, accessToken, "/api/accounts");
+    report.signature = await zohoDiagnosticFetch(env, accessToken, "/api/accounts/signature");
+
+    const orgId = envValue(env, "ZOHO_ORG_ID");
+    if (orgId) {
+      report.organization = await zohoDiagnosticFetch(env, accessToken, `/api/organization/${encodeURIComponent(orgId)}`);
+    }
+
+    report.result.mail_account_ready = Boolean(report.accounts.ok && report.accounts.summary.account_id_detected);
+    report.result.default_from_discovered = Boolean(report.accounts.summary.default_from_detected || report.signature.summary.default_from_detected || envValue(env, "ZOHO_DEFAULT_FROM"));
+    report.result.organization_probe_ready = Boolean(report.organization.ok && report.organization.summary?.organization_id_detected);
+    report.result.provisioning_ready = Boolean(report.result.token_exchange_ready && report.result.organization_probe_ready);
+    report.ok = report.result.token_exchange_ready;
+  } catch (error) {
+    report.error = {
+      statusCode: error.statusCode || 500,
+      message: error.message || "Zoho provider smoke failed.",
+      provider_summary: zohoResponseSummary(error.providerResponse || {}),
+    };
+  }
+
+  return json(report, report.ok ? 200 : (report.error?.statusCode || 502));
 }
 
 async function getHostedMailbox(env, userId) {
@@ -1671,18 +1953,20 @@ async function handleMailStatus(request, env) {
   const auth = await requireAuth(request, env);
   const mailbox = await getHostedMailbox(env, auth.sub);
   const provider = providerConfigured(env);
+  const provisioningReady = provider.provider === "zoho" ? zohoProviderCanProvision(env) : provider.configured;
   return json({
     ok: true,
     connected: Boolean(mailbox),
     mode: mailbox ? "hosted-provider" : "not-connected",
     mailbox,
     provisioning: {
-      status: provider.configured ? "ready" : "missing-provider-env",
+      status: provider.configured ? (provisioningReady ? "ready" : "api-ready-org-id-required") : "missing-provider-env",
       provider: provider.provider,
-      configured: provider.configured,
+      api_configured: provider.configured,
+      configured: provisioningReady,
       domains: configuredDomains(env),
       citadel_backup_configured: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL),
-      error: provider.configured ? null : providerSetupMessage(provider.provider),
+      error: provisioningReady ? null : providerSetupMessage(provider.provider),
     },
   });
 }
@@ -2269,10 +2553,11 @@ async function handleWorkspaceProvision(request, env, ctx) {
 }
 
 async function resendSend(env, payload) {
-  if (!env.RESEND_API_KEY) throw Object.assign(new Error("RESEND_API_KEY is missing."), { statusCode: 501 });
+  const apiKey = resendApiKey(env);
+  if (!apiKey) throw Object.assign(new Error("RESEND_API_KEY or backup Resend token is missing."), { statusCode: 501 });
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
     body: JSON.stringify(payload),
   });
   const text = await res.text();
@@ -2379,7 +2664,7 @@ async function handleRuntimeCompat(request, env, name) {
 function apiNameFromPath(pathname) {
   const netlify = pathname.match(/^\/\.netlify\/functions\/(.+)$/);
   const api = pathname.match(/^\/api\/(.+)$/);
-  const direct = pathname.match(/^\/(auth-fs27-session|mailbox-domains|mail-status|mailbox-provision|mailbox-aliases|mail-settings-get|mail-settings-save|workspace-provision|mail-send|mail-proof-loop|gmail-list|gmail-labels|gmail-get|gmail-thread-get|inbound-resend|gateway-chat|gateway-stream|citadel-backup-test)$/);
+  const direct = pathname.match(/^\/(admin-public-key|auth-signup|auth-login|auth-fs27-session|mailbox-domains|mail-status|mailbox-provision|mailbox-aliases|mail-settings-get|mail-settings-save|workspace-provision|mail-send|mail-proof-loop|gmail-list|gmail-labels|gmail-get|gmail-thread-get|inbound-resend|gateway-chat|gateway-stream|citadel-backup-test|zoho-provider-smoke)$/);
   const raw = netlify?.[1] || api?.[1] || direct?.[1] || "";
   return raw.replace(/^skymail-standalone-/, "");
 }
@@ -2388,8 +2673,12 @@ async function routeApi(request, env, ctx, name) {
   if (request.method === "OPTIONS") return json({ ok: true });
   if (name.startsWith("runtime/")) return await handleRuntimeCompat(request, env, name);
   if (name === "health") return json({ ok: true, platform: "SkyeMail Cloudflare Worker", primary_database: Boolean(env.NEON_DATABASE_URL || env.DATABASE_URL), citadel_backup: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL) });
+  if (name === "admin-public-key" && request.method === "GET") return await handleAdminPublicKey(request, env);
+  if (name === "auth-signup" && request.method === "POST") return await handleAuthSignup(request, env, ctx);
+  if (name === "auth-login" && request.method === "POST") return await handleAuthLogin(request, env);
   if (name === "auth-fs27-session" && request.method === "POST") return await handleAuthFs27(request, env, ctx);
   if (name === "mailbox-domains" && request.method === "GET") return await handleMailboxDomains(request, env);
+  if (name === "zoho-provider-smoke" && (request.method === "GET" || request.method === "POST")) return await handleZohoProviderSmoke(request, env);
   if (name === "mail-status" && request.method === "GET") return await handleMailStatus(request, env);
   if (name === "mailbox-provision" && request.method === "POST") return await handleMailboxProvision(request, env, ctx);
   if (name === "mailbox-aliases" && (request.method === "GET" || request.method === "POST")) return await handleMailboxAliases(request, env, ctx);

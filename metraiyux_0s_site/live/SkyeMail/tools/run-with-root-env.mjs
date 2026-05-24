@@ -4,7 +4,16 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "../../..");
+function findRepoRoot(start) {
+  let current = start;
+  while (current && current !== path.dirname(current)) {
+    if (fs.existsSync(path.join(current, ".git"))) return current;
+    current = path.dirname(current);
+  }
+  return path.resolve(start, "../../../..");
+}
+
+const repoRoot = findRepoRoot(__dirname);
 const envFile = path.join(repoRoot, ".env");
 const args = process.argv.slice(2);
 

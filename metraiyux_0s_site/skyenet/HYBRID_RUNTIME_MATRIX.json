@@ -1,0 +1,130 @@
+{
+  "schema": "metraiyux.skynet.hybrid_runtime_matrix.v1",
+  "updated_at": "2026-05-24",
+  "public_product": "SkyeNet",
+  "public_language_rule": "Customer-facing copy says SkyeNet. It does not split the platform into provider-branded lanes.",
+  "runtime_lanes": [
+    {
+      "id": "skynet_edge",
+      "public_name": "SkyeNet Edge",
+      "status": "live_release_lane",
+      "customer_facing": true,
+      "private_server_required": false,
+      "keeps_working_when_private_server_offline": true,
+      "supports": [
+        "static build drops",
+        "host/path routes",
+        "SkyeNet path URLs",
+        "branded subdomain route records after DNS approval",
+        "shared 0S gate",
+        "managed SkyeNet functions",
+        "observability receipts",
+        "cost guardrails",
+        "staged Netlify-compatible function bundles"
+      ],
+      "internal_provider_notes": [
+        "Cloudflare Worker",
+        "R2",
+        "KV",
+        "D1 or Durable Objects where configured",
+        "Queues or Analytics Engine where configured"
+      ]
+    },
+    {
+      "id": "skynet_functions",
+      "public_name": "SkyeNet Functions",
+      "status": "signed_owned_runtime_v1_proven",
+      "customer_facing": true,
+      "private_server_required": "required before unlimited untrusted customer execution",
+      "keeps_working_when_private_server_offline": "bundles remain staged; approved managed functions and static surfaces keep serving through SkyeNet Edge",
+      "supports": [
+        "netlify/functions folder intake",
+        "/.netlify/functions/<name> compatibility",
+        "handler(event, context) return shape",
+        "signed bundle manifest",
+        "tenant bundle ids",
+        "timeout caps",
+        "memory caps",
+        "request body caps",
+        "deny-by-default environment grants",
+        "default-deny outbound fetch policy",
+        "local proof runtime"
+      ],
+      "proof": "npm run 0s:skyenet:functions-proof"
+    },
+    {
+      "id": "skynet_sovereign_runtime",
+      "public_name": "SkyeNet Sovereign Runtime",
+      "status": "private_node_compatibility_target",
+      "customer_facing": true,
+      "private_server_required": true,
+      "keeps_working_when_private_server_offline": false,
+      "supports": [
+        "untrusted customer function execution",
+        "per-tenant CPU and memory caps",
+        "secret isolation",
+        "egress policy",
+        "abuse controls",
+        "billing cutoffs"
+      ],
+      "recommended_starter_hosts": [
+        "OVHcloud VPS-2",
+        "DigitalOcean 4 GiB Droplet",
+        "owned dedicated node when revenue supports it"
+      ]
+    },
+    {
+      "id": "citadeldb_edge",
+      "public_name": "CitadelDB Edge",
+      "status": "cloudflare_native_control_plane_possible",
+      "customer_facing": true,
+      "private_server_required": false,
+      "keeps_working_when_private_server_offline": true,
+      "supports": [
+        "tenant ledgers",
+        "mirror receipts",
+        "catch-up queues",
+        "app onboarding registry",
+        "proof dashboards",
+        "edge SQL workloads that fit SQLite semantics"
+      ],
+      "internal_provider_notes": [
+        "D1 for relational ledgers",
+        "Durable Objects SQLite for stateful per-tenant coordinators",
+        "R2 for backups/artifacts",
+        "Queues/Workflows for catch-up jobs",
+        "Hyperdrive bridge if Postgres remains behind it"
+      ]
+    },
+    {
+      "id": "citadeldb_postgres_engine",
+      "public_name": "CitadelDB Sovereign Postgres",
+      "status": "hybrid_or_private_engine_lane",
+      "customer_facing": true,
+      "private_server_required": "required for owned Postgres engine, WAL/PITR, replicas, and Postgres wire compatibility",
+      "keeps_working_when_private_server_offline": "edge control plane stays online; Postgres-engine writes pause or route to configured managed Postgres fallback",
+      "supports": [
+        "Postgres wire protocol",
+        "WAL archiving",
+        "PITR",
+        "replicas",
+        "Kubernetes HA",
+        "database provisioning"
+      ]
+    }
+  ],
+  "release_offer_boundary": {
+    "sell_today": [
+      "SkyeNet Deploy",
+      "SkyeNet Edge static hosting",
+      "managed SkyeNet functions",
+      "SkyeNet Functions compatible intake in controlled preview",
+      "CitadelDB Edge control-plane and mirror receipts"
+    ],
+    "do_not_sell_as_unlimited_until_runtime_proof": [
+      "untrusted arbitrary uploaded function execution",
+      "unbounded Free99 function usage",
+      "full Postgres-engine replacement without Postgres compatibility proof"
+    ]
+  }
+}

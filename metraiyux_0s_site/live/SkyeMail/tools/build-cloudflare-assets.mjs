@@ -61,6 +61,12 @@ function copyDir(src, dest) {
   }
 }
 
+function copyOptionalProofFile(relativePath) {
+  const src = path.join(root, "proof", relativePath);
+  if (!fs.existsSync(src)) return;
+  copyFile(src, path.join(out, "proof", relativePath));
+}
+
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 
@@ -75,5 +81,8 @@ for (const page of pages) {
 copyDir(path.join(root, "assets"), path.join(out, "assets"));
 copyDir(path.join(root, "suite"), path.join(out, "suite"));
 copyDir(path.join(root, "dist"), path.join(out, "dist"));
+copyOptionalProofFile("live-email-proof.json");
+copyOptionalProofFile("videos/skymail-live-proof-browser.webm");
+copyOptionalProofFile("screenshots/skymail-live-proof-video-frame.png");
 
 console.log(`Built Cloudflare assets in ${path.relative(root, out)}.`);

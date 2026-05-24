@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeNet Deploy Console | MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="./skyenet.css">
+</head>
+<body class="skyenet-shell">
+  <header class="skynet-topbar">
+    <a class="skynet-brand" href="../0s/index.html" aria-label="Back to 0S">
+      <span class="skynet-brand-mark">SN</span>
+      <span>
+        <strong>SkyeNet Deploy</strong>
+        <small>SkyeNet edge hosting lane</small>
+      </span>
+    </a>
+    <nav aria-label="SkyeNet navigation">
+      <a href="../admin/index.html">Admin</a>
+      <a href="../0s/index.html">0S Desktop</a>
+      <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyenet-edge-starter" target="_blank" rel="noopener">SkyePay</a>
+      <a href="/api/0s/route-manifest">Route Manifest</a>
+    </nav>
+  </header>
+
+  <main class="skynet-main">
+    <section class="skynet-hero" aria-labelledby="skynet-title">
+      <div>
+        <p class="eyebrow">Gated platform surface</p>
+        <h1 id="skynet-title">Drop a build, route it, and watch the cost lane.</h1>
+      </div>
+      <div class="health-strip" aria-live="polite">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Checking SkyeNet...</span>
+      </div>
+    </section>
+
+    <section id="authPanel" class="operator-panel auth-panel" hidden>
+      <div>
+        <h2>Shared Gate Session</h2>
+        <p>Use the same FS27/SkyGate/Free99 owner session. SkyeNet does not have a separate admin password.</p>
+      </div>
+      <label>
+        <span>Session token</span>
+        <input id="manualToken" type="password" autocomplete="current-password" placeholder="Paste a shared gate session">
+      </label>
+      <button id="saveTokenButton" type="button">Use Session</button>
+      <a class="button-link" href="../admin/login.html?return=/skyenet/index.html">Owner Login</a>
+    </section>
+
+    <section class="metric-grid" aria-label="SkyeNet status">
+      <article>
+        <span>Hosting</span>
+        <strong id="metricHosting">--</strong>
+        <small>SkyeNet asset vault and route registry</small>
+      </article>
+      <article>
+        <span>Functions</span>
+        <strong id="metricFunctions">--</strong>
+        <small>Signed runtime v1 plus managed functions</small>
+      </article>
+      <article>
+        <span>Routes</span>
+        <strong id="metricRoutes">--</strong>
+        <small>Mounted host/path records</small>
+      </article>
+      <article>
+        <span>Free99</span>
+        <strong id="metricFree99">--</strong>
+        <small>Internal caps before public offer</small>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="operator-panel deploy-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Deploy</p>
+            <h2>Build Drop</h2>
+          </div>
+          <button id="refreshButton" type="button">Refresh</button>
+        </div>
+        <form id="deployForm" class="deploy-form">
+          <label>
+            <span>Project ID</span>
+            <input id="projectId" name="projectId" required pattern="[a-z0-9][a-z0-9-]{1,62}" value="skyenet-demo">
+          </label>
+          <label>
+            <span>Deployment ID</span>
+            <input id="deploymentId" name="deploymentId" required value="">
+          </label>
+          <label>
+            <span>Route hostname</span>
+            <input id="routeHost" name="routeHost" required placeholder="metraiyux-0s-full-system.graylondonskyes.workers.dev">
+          </label>
+          <label>
+            <span>Mount path</span>
+            <input id="mountPath" name="mountPath" required value="/skyenet/demo">
+          </label>
+          <label>
+            <span>Default auth</span>
+            <select id="defaultAuth" name="defaultAuth">
+              <option value="gate">Gate</option>
+              <option value="public">Public</option>
+            </select>
+          </label>
+          <label class="check-row">
+            <input id="publicAccess" name="publicAccess" type="checkbox">
+            <span>Public asset route</span>
+          </label>
+          <label class="file-drop">
+            <span>Build files</span>
+            <input id="buildFiles" name="buildFiles" type="file" multiple webkitdirectory>
+            <small id="fileSummary">Choose a folder or files.</small>
+          </label>
+          <button id="deployButton" class="primary-action" type="submit">Publish Drop</button>
+        </form>
+        <pre id="deployLog" class="deploy-log" aria-live="polite">Awaiting build drop.</pre>
+      </article>
+
+      <article class="operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Truth Table</p>
+            <h2>Platform Lane</h2>
+          </div>
+        </div>
+        <dl id="truthList" class="truth-list"></dl>
+      </article>
+    </section>
+
+    <section class="workspace-grid lower-grid">
+      <article class="operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Routes</p>
+            <h2>Mounted Drops</h2>
+          </div>
+        </div>
+        <div id="routeList" class="route-list" aria-live="polite"></div>
+      </article>
+      <article class="operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Costs</p>
+            <h2>Internal Guardrails</h2>
+          </div>
+        </div>
+        <div id="costPanel" class="cost-panel" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section class="operator-panel observability-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Observability</p>
+          <h2>Runtime Receipts</h2>
+        </div>
+      </div>
+      <div id="observabilityPanel" class="observability-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="./skyenet.js" type="module"></script>
+</body>
+</html>

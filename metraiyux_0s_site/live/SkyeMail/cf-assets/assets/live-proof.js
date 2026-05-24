@@ -38,11 +38,13 @@
     const ok = Boolean(proof.ok);
     set("[data-proof-status]", ok ? "Passed" : "Needs attention");
     set("[data-proof-title]", ok ? "SkyeMail passed the two-way proof run." : "SkyeMail proof run needs attention.");
-    set("[data-proof-summary]", `Run ${safe(proof.run_id)} completed at ${safe(proof.completed_at)} on ${safe(proof.domain)}.`);
+    set("[data-proof-summary]", `Run ${safe(proof.run_id)} completed at ${safe(proof.completed_at)} on ${safe(proof.domain)} through ${safe(proof.provider || "the active provider")}.`);
     const ab = proof.runs?.[0];
     const ba = proof.runs?.[1];
-    set("[data-proof-ab]", ab?.imported_to_inbox ? `Imported message ${ab.imported_message_id}` : "Not imported");
-    set("[data-proof-ba]", ba?.imported_to_inbox ? `Imported message ${ba.imported_message_id}` : "Not imported");
+    const confirmed = (run) => Boolean(run?.imported_to_inbox || run?.provider_inbox_visible);
+    const providerId = (run) => run?.zoho_id || run?.resend_id || run?.provider_message_id || "";
+    set("[data-proof-ab]", confirmed(ab) ? `Inbox confirmed ${ab.imported_message_id || ab.provider_message_id || ""}` : "Inbox not confirmed");
+    set("[data-proof-ba]", confirmed(ba) ? `Inbox confirmed ${ba.imported_message_id || ba.provider_message_id || ""}` : "Inbox not confirmed");
     const runBox = qs("[data-proof-runs]");
     if (runBox) {
       runBox.innerHTML = (proof.runs || []).map((run) => `
@@ -50,8 +52,9 @@
           <b>${escapeHtml(run.label)}</b>
           <span>${escapeHtml(run.from)} to ${escapeHtml(run.to)}</span><br>
           <span>Subject: ${escapeHtml(run.subject)}</span><br>
-          <span>Resend ID: ${escapeHtml(run.resend_id)}</span><br>
-          <span class="${run.imported_to_inbox ? "status-ok" : "status-warn"}">${run.imported_to_inbox ? "Encrypted inbox import confirmed" : "Inbox import missing"}</span>
+          <span>Provider: ${escapeHtml(run.provider || proof.provider || "active provider")}</span><br>
+          <span>Provider ID: ${escapeHtml(providerId(run))}</span><br>
+          <span class="${confirmed(run) ? "status-ok" : "status-warn"}">${confirmed(run) ? "Provider-backed inbox confirmed" : "Inbox confirmation missing"}</span>
         </article>
       `).join("");
     }

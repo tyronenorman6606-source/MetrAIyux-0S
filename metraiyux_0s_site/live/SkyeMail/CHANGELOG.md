@@ -1,5 +1,36 @@
 # SkyeMail Public Changelog
 
+## 2026-05-24 - Zoho Inbox Send/Read Proof Deployed
+
+Status: Deployed to the SkyeMail Cloudflare Worker.
+
+Production surface:
+
+- SkyeMail Worker: `https://skyemail-platform.graylondonskyes.workers.dev/`
+- Worker version: `abad47ce-89e9-4153-98fd-15eefcc833af`
+- Live proof page: `https://skyemail-platform.graylondonskyes.workers.dev/live-proof`
+- Sanitized proof receipt: `https://skyemail-platform.graylondonskyes.workers.dev/proof/live-email-proof.json`
+
+What changed:
+
+- Rebuilt the live email proof runner so it follows the active provider instead of assuming the old Resend-only proof lane.
+- Added Zoho send/read proof mode: token refresh, provider account/default-from discovery, live provider sends, provider sent visibility, inbox search, and inbox readback.
+- Made proof generation fail closed when inbox import/readback does not pass.
+- Updated the public live-proof page and browser-side proof renderer to show provider-backed inbox visibility without exposing OAuth tokens, private keys, or mailbox secrets.
+- Updated the Cloudflare asset build so the public proof JSON, proof video, and proof screenshot are actually included in deployed Worker assets.
+
+Production truth:
+
+- The live proof run `codex-20260524-zoho-live-final` passed with `provider: "zoho"`, `proof_mode: "zoho-provider-send-and-inbox-read"`, and both proof messages marked `imported_to_inbox: true`, `provider_inbox_visible: true`, and `provider_sent_visible: true`.
+- `/.netlify/functions/mailbox-domains` reports `provider: "zoho"`, `zohoReady: true`, `zohoApiReady: true`, `zohoOrgReady: true`, and `zohoProvisioningReady: true`.
+- SkyeMail remains the public product name. Zoho is an internal provider implementation behind SkyeMail.
+
+Proof:
+
+- Live proof receipt: `metraiyux_0s_site/live/SkyeMail/proof/live-email-proof.json`
+- Run archive: `metraiyux_0s_site/live/SkyeMail/proof/live-email-runs/codex-20260524-zoho-live-final.json`
+- Local smokes passed: `npm run smoke:standalone-proof`, `npm run smoke:proof`, and `npm run smoke:zoho-provider`.
+
 ## 2026-05-22 - Zoho Provider Lane + Shared 0S Gate Bridge
 
 Status: Deployed to the SkyeMail Cloudflare Worker.

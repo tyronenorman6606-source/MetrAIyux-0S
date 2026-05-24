@@ -10,7 +10,8 @@ function cleanText(value, max = 500) {
 }
 
 function randomId(prefix) {
-  const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const runtimeCrypto = globalThis.crypto || {};
+  const id = runtimeCrypto.randomUUID ? runtimeCrypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   return `${prefix}_${id.replace(/-/g, '').slice(0, 24)}`;
 }
 
@@ -20,6 +21,10 @@ function deploymentBucket(env) {
 
 function routeKv(env) {
   return env.ROUTING_KV || env.FS27_ROUTING_KV || null;
+}
+
+function requestLogBucket(env) {
+  return env.REQUEST_LOG_BUCKET || env.FS27_REQUEST_LOG_BUCKET || null;
 }
 
 function normalizeSlug(value, fallback, max = MAX_PROJECT) {
@@ -34,6 +39,69 @@ function normalizeMountPath(value) {
   const raw = cleanText(value || '', 240).replace(/\\/g, '/').replace(/\/+/g, '/');
   if (!raw || raw === '/') return '';
   return `/${raw.replace(/^\/+/, '').replace(/\/+$/, '')}`;
+}
+
+function skynetRootDomain(env) {
+  return cleanText(env.SKYENET_ROOT_DOMAIN || env.SKYENET_APEX_DOMAIN || env.SKYENET_PUBLIC_DOMAIN || '', 260)
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/^\*\./, '');
+}
+
+function defaultSkynetHost(env, request, projectId = '') {
+  const explicit = cleanText(env.SKYENET_DEFAULT_HOST || env.SKYENET_EDGE_HOST || env.SKYENET_PUBLIC_HOST || '', 260)
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '');
+  if (explicit) return explicit;
+  const root = skynetRootDomain(env);
+  if (root && projectId) return `${projectId}.${root}`;
+  return new URL(request.url).hostname.toLowerCase();
+}
+
+function urlModeFromBody(body = {}) {
+  const value = cleanText(body.url_mode || body.urlMode || body.route_mode || body.routeMode || '', 80).toLowerCase();
+  if (value === 'subdomain' || value === 'host' || body.subdomain === true) return 'subdomain';
+  return 'path';
+}
+
+function liveUrlForRoute(record) {
+  const host = cleanText(record?.hostname || '', 260);
+  if (!host) return '';
+  const mount = normalizeMountPath(record?.mount_path || '');
+  return `https://${host}${mount || '/'}`;
+}
+
+function skynetUrlModel(env, request, projectId = 'my-project') {
+  const root = skynetRootDomain(env);
+  const defaultHost = defaultSkynetHost(env, request, projectId);
+  return {
+    schema: 'fs27.skynet.url_model.v1',
+    public_product_name: 'SkyeNet',
+    current_release_default: 'host_path_route',
+    path_route_pattern: `https://${defaultHost}/skyenet/${projectId}`,
+    branded_subdomain_pattern: root ? `https://${projectId}.${root}` : 'https://<project>.<your-skynet-domain>',
+    url_modes: [
+      {
+        id: 'path',
+        label: 'SkyeNet path route',
+        status: 'live_now',
+        example: `https://${defaultHost}/skyenet/${projectId}`,
+        required_fields: ['project_id', 'deployment_id'],
+        optional_fields: ['hostname', 'mount_path']
+      },
+      {
+        id: 'subdomain',
+        label: 'SkyeNet branded subdomain',
+        status: root ? 'ready_when_dns_routes_to_skynet' : 'requires_wildcard_domain',
+        example: root ? `https://${projectId}.${root}` : 'https://my-site.skynet.example',
+        required_fields: ['project_id', 'deployment_id', 'hostname or SKYENET_ROOT_DOMAIN'],
+        optional_fields: ['custom_domain']
+      }
+    ],
+    copy_rule: 'Customer-facing copy says SkyeNet. Runtime provider details stay internal.'
+  };
 }
 
 function normalizeAssetPath(value) {
@@ -90,6 +158,108 @@ async function readJson(request) {
   }
 }
 
+async function objectJson(object, fallback = null) {
+  if (!object) return fallback;
+  try {
+    if (typeof object.json === 'function') return await object.json();
+    if (typeof object.text === 'function') return JSON.parse(await object.text());
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+async function listRouteRecords(kv, prefix, limit) {
+  if (!kv?.list) return { routes: [], list_supported: false };
+  const listed = await kv.list({ prefix, limit });
+  const routes = [];
+  for (const key of listed.keys || []) {
+    const value = await kv.get(key.name, { type: 'json' }).catch(async () => {
+      const raw = await kv.get(key.name).catch(() => null);
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch { return null; }
+    });
+    if (value && typeof value === 'object') routes.push({ key: key.name, route: value, metadata: key.metadata || null });
+  }
+  return { routes, list_supported: true, cursor: listed.cursor || null, list_complete: listed.list_complete !== false };
+}
+
+function skynetCostModel() {
+  return {
+    schema: 'fs27.skynet.cost_model.v1',
+    generated_at: new Date().toISOString(),
+    currency: 'usd',
+    pricing_review_required: true,
+    purpose: 'Internal planning model for SkyeNet. Do not publish as final customer pricing without a fresh provider billing review.',
+    public_naming_rule: 'Public/customer copy should describe the product as SkyeNet Edge, SkyeNet Deploy, SkyeNet Functions, and SkyeNet Sovereign Runtime. Provider primitive names stay in internal proof, ops, and cost ledgers.',
+    free99_policy: {
+      default: 'Free99 can allow gated builder access and tiny public demos, but it must be quota-capped and owner-observable.',
+      recommended_caps: {
+        public_routes_per_workspace: 1,
+        storage_mb_per_workspace: 25,
+        monthly_requests_per_workspace: 10000,
+        deployments_per_month: 3,
+        retention_days: 30,
+        custom_domains: 0,
+        serverless_functions: 0
+      }
+    },
+    assumptions: {
+      worker_requests: 'SkyeNet Edge requests should be cached and quota-capped per workspace.',
+      r2_storage: 'SkyeNet asset vault storage stays low when Free99 bundles are small and old deployments expire.',
+      kv_routing_reads: 'Route registry reads should be cached at the edge where safe.',
+      function_execution: 'Untrusted uploaded functions need SkyeNet isolated runtime caps before unlimited sales copy.',
+      private_runtime: 'A VPS is optional for static/managed SkyeNet Edge release and required for owned arbitrary-code execution.'
+    },
+    cost_inputs: [
+      { id: 'workers_paid_floor', label: 'Workers paid plan floor', unit: 'month', assumed_usd: 5.00, notes: 'Shared across the account when already paid.' },
+      { id: 'worker_requests', label: 'Worker request overage', unit: 'million_requests', assumed_usd: 0.30, notes: 'Applies after included request pool on the paid plan.' },
+      { id: 'r2_storage', label: 'R2 standard storage', unit: 'gb_month', assumed_usd: 0.015, notes: 'Deployment assets and archived runtime logs.' },
+      { id: 'r2_class_a', label: 'R2 Class A operations', unit: 'million_writes_lists', assumed_usd: 4.50, notes: 'Uploads, list operations, route/admin inspections.' },
+      { id: 'r2_class_b', label: 'R2 Class B operations', unit: 'million_reads', assumed_usd: 0.36, notes: 'Public asset reads from deployed bundles.' },
+      { id: 'kv_reads', label: 'KV route reads', unit: 'million_reads', assumed_usd: 0.50, notes: 'Route lookup for mapped host/path requests.' },
+      { id: 'kv_writes', label: 'KV route writes', unit: 'million_writes', assumed_usd: 5.00, notes: 'Deployment route registration and metadata updates.' },
+      { id: 'analytics_events', label: 'Analytics Engine/runtime ledger', unit: 'million_events', assumed_usd: 0.25, notes: 'Telemetry pricing must be verified before customer billing.' }
+    ],
+    example_months: [
+      {
+        id: 'free99_tiny',
+        label: 'Free99 tiny workspace',
+        storage_gb: 0.025,
+        requests: 10000,
+        deploy_writes: 100,
+        estimated_variable_usd: 0.02,
+        pricing_posture: 'absorbed only while owner-approved and quota-capped'
+      },
+      {
+        id: 'starter_surface',
+        label: 'Starter hosted surface',
+        storage_gb: 1,
+        requests: 250000,
+        deploy_writes: 1000,
+        estimated_variable_usd: 0.25,
+        pricing_posture: 'bundle with maintenance margin; do not sell at raw infra cost'
+      },
+      {
+        id: 'growth_workspace',
+        label: 'Growth workspace',
+        storage_gb: 10,
+        requests: 2500000,
+        deploy_writes: 10000,
+        estimated_variable_usd: 2.15,
+        pricing_posture: 'charge for support, proof, domains, and managed ops, not just bytes'
+      }
+    ],
+    guardrails: [
+      'Keep Free99 static-first: no arbitrary uploaded functions, no custom domains, no large media hosting by default.',
+      'Cache immutable JS/CSS/image/font assets long-term so R2 Class B reads do not become the hidden bill.',
+      'Require owner/admin approval before increasing route count, retention, storage, function proxying, or paid provider calls.',
+      'Use per-workspace caps and runtime ledger receipts before offering usage-based customer dashboards.',
+      'Separate raw infrastructure cost from customer pricing; support, QA, security, and proof work are the real margin line.'
+    ]
+  };
+}
+
 async function requireDeployAuth(request, cors) {
   try {
     return await requireGateAuth(request, 'deployer');
@@ -112,14 +282,19 @@ function routeKeyForRecord(record) {
     : `route:v1:host:${host}`;
 }
 
-function routeRecordFromBody(body, auth) {
+function routeRecordFromBody(body, auth, env, request) {
   const projectId = normalizeSlug(body.project_id || body.projectId, 'project', MAX_PROJECT);
   const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId, randomId('dep'), MAX_DEPLOYMENT);
-  const mountPath = normalizeMountPath(body.mount_path || body.mountPath || '');
+  const urlMode = urlModeFromBody(body);
+  const mountPath = urlMode === 'subdomain'
+    ? normalizeMountPath(body.mount_path || body.mountPath || '')
+    : normalizeMountPath(body.mount_path || body.mountPath || `/skyenet/${projectId}`);
+  const hostname = cleanText(body.hostname || body.host || defaultSkynetHost(env, request, projectId), 260).toLowerCase();
   const record = {
     schema: 'fs27.route.v1',
-    hostname: cleanText(body.hostname || body.host || '', 260).toLowerCase(),
+    hostname,
     mount_path: mountPath,
+    url_mode: urlMode,
     strip_mount_path: body.strip_mount_path !== false && body.stripMountPath !== false,
     customer_id: cleanText(body.customer_id || body.customerId || auth?.customer_id || '', 160),
     project_id: projectId,
@@ -147,7 +322,7 @@ async function handleInit(request, env, cors) {
   const auth = await requireDeployAuth(request, cors);
   const body = await readJson(request);
   const projectId = normalizeSlug(body.project_id || body.projectId, 'project', MAX_PROJECT);
-  const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId, randomId('dep'), MAX_DEPLOYMENT);
+  const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId || randomId('dep'), 'deployment', MAX_DEPLOYMENT);
   const prefix = assetPrefix(projectId, deploymentId, body.asset_prefix || body.assetPrefix || '');
   const bucket = deploymentBucket(env);
   if (bucket?.put) {
@@ -185,7 +360,7 @@ async function handleUpload(request, env, cors) {
   const deployPath = normalizeAssetPath(url.searchParams.get('path') || url.searchParams.get('assetPath') || '');
   const prefix = assetPrefix(projectId, deploymentId, url.searchParams.get('assetPrefix') || '');
   const body = await request.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', body);
+  const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', body);
   const sha256 = [...new Uint8Array(hashBuffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
   const key = `${prefix}/${deployPath}`.replace(/\/+/g, '/');
   const contentType = contentTypeForPath(deployPath, request.headers.get('content-type') || '');
@@ -241,7 +416,7 @@ async function handleRoute(request, env, cors) {
   const kv = routeKv(env);
   if (!kv?.put) return httpJson(500, { error: 'ROUTING_KV is not configured', code: 'NO_ROUTING_KV' }, cors);
   const body = await readJson(request);
-  const record = routeRecordFromBody(body, auth);
+  const record = routeRecordFromBody(body, auth, env, request);
   const key = routeKeyForRecord(record);
   await kv.put(key, JSON.stringify(record, null, 2), {
     metadata: {
@@ -251,7 +426,157 @@ async function handleRoute(request, env, cors) {
       mount_path: record.mount_path
     }
   });
-  return httpJson(200, { ok: true, key, route: record }, cors);
+  return httpJson(200, {
+    ok: true,
+    key,
+    route: record,
+    live_url: liveUrlForRoute(record),
+    url_model: skynetUrlModel(env, request, record.project_id)
+  }, cors);
+}
+
+async function handleStatus(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const url = new URL(request.url);
+  const bucket = deploymentBucket(env);
+  const kv = routeKv(env);
+  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
+  const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), '', MAX_DEPLOYMENT);
+  const prefix = projectId && deploymentId ? assetPrefix(projectId, deploymentId, url.searchParams.get('assetPrefix') || '') : '';
+  const manifest = prefix && bucket?.get
+    ? {
+      init: await objectJson(await bucket.get(`${prefix}/.fs27/deployment-init.json`).catch(() => null)),
+      complete: await objectJson(await bucket.get(`${prefix}/.fs27/deployment-complete.json`).catch(() => null))
+    }
+    : null;
+  return httpJson(200, {
+    ok: true,
+    service: 'fs27-skynet',
+    status: bucket?.put && kv?.put ? 'ready' : 'needs_configuration',
+    auth: {
+      customer_id: cleanText(auth.customer_id || '', 160),
+      role: cleanText(auth.role || '', 80),
+      source: cleanText(auth.gate_auth_source || '', 120)
+    },
+    configured: {
+      deployment_asset_bucket: Boolean(bucket?.put),
+      deployment_asset_reads: Boolean(bucket?.get),
+      routing_kv: Boolean(kv?.put),
+      routing_kv_reads: Boolean(kv?.get),
+      routing_kv_list: Boolean(kv?.list),
+      request_log_bucket: Boolean(requestLogBucket(env)?.put),
+      analytics_engine: Boolean(env.REQUEST_ANALYTICS?.writeDataPoint || env.FS27_REQUEST_ANALYTICS?.writeDataPoint),
+      request_event_queue: Boolean(env.REQUEST_EVENT_QUEUE?.send || env.FS27_REQUEST_EVENT_QUEUE?.send),
+      runtime_rollup_db: Boolean(env.RUNTIME_ROLLUP_DB?.prepare || env.FS27_RUNTIME_ROLLUP_DB?.prepare)
+    },
+    endpoints: [
+      'POST /deploy/init',
+      'PUT /deploy/upload',
+      'POST /deploy/complete',
+      'POST /deploy/route',
+      'GET /deploy/status',
+      'GET /deploy/routes',
+      'GET /deploy/observability',
+      'GET /deploy/cost-model'
+    ],
+    capabilities: {
+      static_drop_hosting: true,
+      r2_asset_deployments: true,
+      host_path_routing: true,
+      gated_routes: true,
+      public_routes: true,
+      fallback_origin_proxy: true,
+      first_party_worker_functions: true,
+      skynet_edge_primary_release_lane: true,
+      skynet_sovereign_runtime_compatible: true,
+      netlify_function_bundle_converter: true,
+      uploaded_function_bundle_intake: true,
+      signed_function_bundle_manifest: true,
+      owned_skyenet_functions_runtime_v1: true,
+      function_runtime_env_isolation: true,
+      function_runtime_timeout_caps: true,
+      function_runtime_memory_caps: true,
+      function_runtime_body_caps: true,
+      function_runtime_egress_default_deny: true,
+      netlify_handler_event_parity: true,
+      arbitrary_uploaded_serverless_functions: false,
+      function_boundary: 'SkyeNet Edge is live for static deployments, route registration, fallback-origin proxying, managed SkyeNet function lanes, Netlify-compatible bundle intake, and signed controlled runtime v1 execution for trusted or owner-approved bundles. Unlimited hostile customer-uploaded function execution requires the SkyeNet isolated runtime lane before it should be sold as unrestricted Netlify Functions parity.'
+    },
+    runtime_targets: {
+      public_product_name: 'SkyeNet',
+      always_on_lane: 'SkyeNet Edge',
+      uploaded_functions_lane: 'SkyeNet Functions',
+      owned_execution_lane: 'SkyeNet Sovereign Runtime',
+      provider_split_customer_facing: false,
+      provider_details_internal_only: true,
+      cloudflare_workers_for_platforms_core_dependency: false,
+      private_runtime_required_for_untrusted_customer_code: true,
+      private_runtime_optional_for_static_and_managed_functions: true
+    },
+    url_model: skynetUrlModel(env, request, projectId || 'my-project'),
+    requested_deployment: prefix ? { project_id: projectId, deployment_id: deploymentId, asset_prefix: prefix, manifest } : null
+  }, cors);
+}
+
+async function handleRoutes(request, env, cors) {
+  await requireDeployAuth(request, cors);
+  const kv = routeKv(env);
+  if (!kv?.list) return httpJson(501, { ok: false, error: 'ROUTING_KV list is not configured', code: 'NO_ROUTE_LIST' }, cors);
+  const url = new URL(request.url);
+  const host = cleanText(url.searchParams.get('host') || '', 260).toLowerCase();
+  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
+  const limit = Math.max(1, Math.min(500, Number(url.searchParams.get('limit') || 100)));
+  const prefix = host
+    ? `route:v1:host:${host}`
+    : projectId
+      ? 'route:v1:'
+      : cleanText(url.searchParams.get('prefix') || 'route:v1:', 500);
+  const listed = await listRouteRecords(kv, prefix, limit);
+  const routes = projectId
+    ? listed.routes.filter((item) => normalizeSlug(item.route?.project_id || item.route?.projectId || '', '', MAX_PROJECT) === projectId)
+    : listed.routes;
+  return httpJson(200, { ok: true, prefix, count: routes.length, routes, cursor: listed.cursor || null, list_complete: listed.list_complete !== false }, cors);
+}
+
+async function handleObservability(request, env, cors) {
+  await requireDeployAuth(request, cors);
+  const url = new URL(request.url);
+  const limit = Math.max(1, Math.min(100, Number(url.searchParams.get('limit') || 25)));
+  const logBucket = requestLogBucket(env);
+  let logs = [];
+  if (logBucket?.list) {
+    const listed = await logBucket.list({ prefix: 'runtime-logs/', limit }).catch(() => null);
+    logs = (listed?.objects || []).map((object) => ({
+      key: object.key,
+      size: object.size || 0,
+      uploaded: object.uploaded ? new Date(object.uploaded).toISOString() : ''
+    }));
+  }
+  return httpJson(200, {
+    ok: true,
+    service: 'fs27-skynet-observability',
+    sinks: {
+      request_header: 'x-0s-request-id',
+      analytics_engine: Boolean(env.REQUEST_ANALYTICS?.writeDataPoint || env.FS27_REQUEST_ANALYTICS?.writeDataPoint),
+      queue: Boolean(env.REQUEST_EVENT_QUEUE?.send || env.FS27_REQUEST_EVENT_QUEUE?.send),
+      r2_runtime_logs: Boolean(logBucket?.put),
+      r2_runtime_log_list: Boolean(logBucket?.list),
+      d1_rollups: Boolean(env.RUNTIME_ROLLUP_DB?.prepare || env.FS27_RUNTIME_ROLLUP_DB?.prepare),
+      citadel_ingest: Boolean(env.CITADEL_RUNTIME_INGEST_URL || env.CITADELDB_RUNTIME_INGEST_URL)
+    },
+    runtime_event_schema: 'fs27.runtime_request.v1',
+    latest_log_objects: logs,
+    dashboard_boundaries: [
+      'Owner/admin dashboards may show route, request, error, byte, and deployment counts.',
+      'Customer dashboards should be scoped by customer_id/project_id and must not expose bearer tokens, cookies, IP addresses, or raw private request bodies.',
+      'Function/runtime logs are redacted before R2 archive and D1 rollups.'
+    ]
+  }, cors);
+}
+
+async function handleCostModel(request, env, cors) {
+  await requireDeployAuth(request, cors);
+  return httpJson(200, { ok: true, cost_model: skynetCostModel() }, cors);
 }
 
 export async function handleSkyeNetDeployRequest(request, context = {}) {
@@ -260,6 +585,10 @@ export async function handleSkyeNetDeployRequest(request, context = {}) {
   const env = context.env || {};
   const url = new URL(request.url);
   try {
+    if (url.pathname === '/deploy/status' && request.method === 'GET') return await handleStatus(request, env, cors);
+    if (url.pathname === '/deploy/routes' && request.method === 'GET') return await handleRoutes(request, env, cors);
+    if (url.pathname === '/deploy/observability' && request.method === 'GET') return await handleObservability(request, env, cors);
+    if (url.pathname === '/deploy/cost-model' && request.method === 'GET') return await handleCostModel(request, env, cors);
     if (url.pathname === '/deploy/init' && request.method === 'POST') return await handleInit(request, env, cors);
     if (url.pathname === '/deploy/upload' && ['PUT', 'POST'].includes(request.method)) return await handleUpload(request, env, cors);
     if (url.pathname === '/deploy/complete' && request.method === 'POST') return await handleComplete(request, env, cors);

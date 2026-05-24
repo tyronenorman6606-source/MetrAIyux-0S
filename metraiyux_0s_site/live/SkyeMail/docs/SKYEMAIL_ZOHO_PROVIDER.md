@@ -2,6 +2,18 @@
 
 Zoho is now an additive hosted-mailbox provider for SkyEmail. It does not replace the existing Stalwart, external webhook, Resend, Gmail compatibility, or local proof lanes.
 
+## Current Live Status
+
+As of 2026-05-24, the deployed SkyeMail Worker uses Zoho as the active provider for the hosted-mail proof lane.
+
+- Public Worker: `https://skyemail-platform.graylondonskyes.workers.dev/`
+- Public proof: `https://skyemail-platform.graylondonskyes.workers.dev/live-proof`
+- Sanitized proof JSON: `https://skyemail-platform.graylondonskyes.workers.dev/proof/live-email-proof.json`
+- Latest run id: `codex-20260524-zoho-live-final`
+- Proof mode: `zoho-provider-send-and-inbox-read`
+
+The live proof sends two messages through Zoho and confirms the provider-backed inbox can read them back. Secrets, OAuth tokens, private keys, and raw mailbox credentials are not published.
+
 ## What Zoho Replaces
 
 When `MAILBOX_PROVIDER=zoho`, SkyEmail provisions hosted mailbox accounts through Zoho Mail Admin APIs instead of requiring a self-hosted Stalwart/Mailu/Postal server on a VPS.
