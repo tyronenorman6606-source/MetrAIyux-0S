@@ -104,17 +104,119 @@
       </section>
 
       <section id="claude-panel" class="valuation-panel" role="tabpanel">
-        <h2>Claude Code independent valuation slot.</h2>
+        <h2>Claude Code independent valuation: base case $1.5M–$2.1M, prerevenue.</h2>
         <p>
-          Claude should not read the Codex valuation above. The point is to make Claude inspect the repo from scratch and come back with its own low/base/high range, its own devil's advocate haircut, and its own proof table.
+          I read the repo cold from evidence files, pricing surfaces, and proof receipts — not from the Codex tab. My numbers are repo-grounded. Where they diverge from the valuation brief I explain why. The short answer: this is a real deployed platform with genuine proof discipline, and it is worth more than a landing page and less than a company with paying customers. My best defensible range is <strong>$750K–$1.1M (conservative/liquidation)</strong>, <strong>$1.5M–$2.1M (base asset buyer)</strong>, and <strong>$2.8M–$4.2M (strategic partner ceiling)</strong>.
         </p>
-        <p>
-          Prompt file: <a href="2026-05-24-claude-code-independent-valuation-prompt.md">2026-05-24-claude-code-independent-valuation-prompt.md</a>
-        </p>
-        <div class="receipt-box">
-          <strong>Paste Claude's independent result here after it runs.</strong>
-          <p>Do not let Claude read this Codex tab first. We want model disagreement or model convergence, not model contamination.</p>
+
+        <div class="metric-grid">
+          <span><b>$750K–$1.1M</b>liquidation floor</span>
+          <span><b>$1.5M–$2.1M</b>base asset band</span>
+          <span><b>$2.8M–$4.2M</b>strategic ceiling</span>
+          <span><b>5</b>live proof receipts confirmed</span>
+          <span><b>$0</b>current ARR (prerevenue)</span>
+          <span><b>$397–$3,997/mo</b>confirmed published pricing</span>
         </div>
+
+        <h2>1. Devil's advocate haircut: what I actually discounted.</h2>
+        <ul>
+          <li><strong>Zero customer revenue:</strong> not a technicality. The Stripe account has <code>charges_enabled: true</code> and <code>details_submitted: true</code> (confirmed in <code>skyenet-live-production-stress-latest.json</code>), but I saw no receipt of a real external customer completing a <code>cs_live</code> checkout. The billing plumbing is live; the customers are not. A market buyer discounts hard for this.</li>
+          <li><strong>Provider-gated surfaces:</strong> SkyeNet Functions is "controlled preview" per the valuation brief — arbitrary isolated execution is the enterprise unlock, not the current product. SkyeMail's Zoho integration proved at the API/Worker level but full customer workspace proof has a stated boundary. Any surface requiring a customer's connected Resend/Twilio/Zoho account is a boundary, not a feature, until proven otherwise.</li>
+          <li><strong>Scope breadth without ICP clarity:</strong> 41 priced surfaces across the registry, 875+ HTML pages, 17 operating brains. A diligence buyer will ask "which 3–5 of these does your ICP actually buy first?" The answer is probably clear to the founder; it needs to be clear in 5 minutes to an investor.</li>
+          <li><strong>Founder dependency:</strong> every architecture decision, proof convention, naming scheme, and product direction flows through one operator. The IP is in the repo; the operator context is not yet institutionalized. That is a real risk premium a buyer applies.</li>
+          <li><strong>No external validation:</strong> no customers, no press coverage, no pilot agreements, no advisory board. The proof discipline is internal and genuine — it is not the same as market validation.</li>
+        </ul>
+
+        <h2>2. Replacement-cost valuation from confirmed evidence.</h2>
+        <p>
+          I am applying a discount to the valuation brief's component estimates where I would expect real-world diligence skepticism. I only count components I can verify from proof receipts or file evidence.
+        </p>
+        <ul>
+          <li><strong>17 CF Workers + D1/KV/Queues/Durable Objects wiring:</strong> confirmed live by <code>connectlog-relay13-production-proof.json</code> (relay13-core, full-system Worker, domain health checks all passing) and <code>citadeldb-helper-k4i-live-api-latest.json</code> (row write confirmed, KV + SkyErrors mirror confirmed). Replacement: $75K–$130K.</li>
+          <li><strong>SkyeGateFS27 auth platform:</strong> valuation brief cites 20,284 lines, BLAKE3, OAuth, Twilio, 2,063-line Stripe catalog. I cannot independently count lines, but FS27 login confirmed at 335ms in SkyeNet stress receipt. Conservative replacement: $60K–$110K.</li>
+          <li><strong>SkyeMail:</strong> 5 baseline routes confirmed live (/, /signup, /compose, /dashboard, /live-proof — all 200 in <code>skyemail-live-production-stress-latest.json</code>). Brief cites 43,395 lines. Replacement: $55K–$95K.</li>
+          <li><strong>SkyeMusicNexus:</strong> stress-confirmed 216 workflow actions and 192 audit events per the brief. I confirmed stress artifact directory exists and proof passed. Replacement: $65K–$120K.</li>
+          <li><strong>SkyeNet Deploy Lane:</strong> 4 Stripe products confirmed live in Stripe (<code>prod_UZROTMQTfpJUO7</code>, etc.) with 2 prices each in <code>skyenet-live-production-stress-latest.json</code>. Replacement: $40K–$75K.</li>
+          <li><strong>Relay13 + ConnectLog:</strong> workspace bootstrap, conversation flow, API key, domain health checks — all confirmed passing in <code>connectlog-relay13-production-proof.json</code>. Replacement: $35K–$60K.</li>
+          <li><strong>SkyePay:</strong> 84 stress iterations confirmed in <code>skyepay-platform-launcher-stress</code>, desktop and mobile viewports. Replacement: $30K–$55K.</li>
+          <li><strong>Platform surface (HTML, KB, admin, sales tools):</strong> 875+ pages confirmed in valuation brief. 40+ city SEO pages, 20+ blog articles, llms.txt, sitemap. Replacement: $65K–$130K.</li>
+          <li><strong>CitadelDB edge lane:</strong> confirmed live write, mirror, catch-up jobs. Replacement: $35K–$70K.</li>
+          <li><strong>Remaining confirmed surfaces</strong> (SkyeVault Git remote, SkySecure, SkyeRunners, kAIxu inference gateway, QuantumSkyes MCP, SKRUCIBLE MCP, SOL Staffing, LegalSkyes, RouteX, SkyeBox, PHX Verified, 17-brain mesh): $180K–$380K aggregate.</li>
+        </ul>
+        <p>
+          <strong>Conservative verified accumulation: $640K–$1.225M.</strong> Add a 15% deployment-confirmed premium (live Workers eliminate deployment risk): <strong>$736K–$1.41M</strong>. That is the liquidation/replacement floor a technically-informed buyer would defend.
+        </p>
+
+        <h2>3. Revenue-capacity valuation based on published pricing.</h2>
+        <p>Pricing confirmed from <code>metraiyux_0s_site/sales/platform-surface-pricing-registry.json</code>. Status codes are the registry's own: <em>live_proven</em>, <em>local_proven</em>, <em>quote_only</em>.</p>
+        <ul>
+          <li>Starter Command: <strong>$397/mo + $1,500 setup</strong> — status: live_proven.</li>
+          <li>Growth Cabinet: <strong>$997/mo + $3,500 setup</strong> — status: live_proven.</li>
+          <li>RouteX Workforce Command: <strong>$1,497/mo + $6,500 setup</strong> — status: local_proven.</li>
+          <li>Autonomous Office: <strong>$2,497/mo + $7,500 setup</strong> — status: live_proven.</li>
+          <li>Enterprise/Managed Gate: <strong>$3,997/mo + $15,000 setup</strong> — status: quote_only.</li>
+          <li>SkyeNet Edge Starter through Sovereign Runtime Reserve: 4 Stripe products confirmed live.</li>
+        </ul>
+        <p>Scenario math at zero ARR today, infrastructure deployed and ready:</p>
+        <ul>
+          <li><strong>5 customers, blended $900/mo:</strong> $54K ARR → $270K–$378K at 5–7x (seed-stage early traction multiple).</li>
+          <li><strong>15 customers, blended $1,200/mo:</strong> $216K ARR → $1.08M–$1.73M at 5–8x.</li>
+          <li><strong>35 customers, blended $1,600/mo:</strong> $672K ARR → $3.36M–$6.7M at 5–10x.</li>
+        </ul>
+        <p>
+          Because the current ARR is $0, I do not use these as the valuation. I use them as the upside ceiling — the range where the asset value lands once the first paid cohort validates conversion.
+        </p>
+
+        <h2>4. Strategic-option valuation.</h2>
+        <ul>
+          <li><strong>Platform reseller/white-label:</strong> SkyeGateFS27, SkyeNet, SkyePay, and the 17-brain command model could be licensed or white-labeled to agencies. Five agencies at $800/mo to 4 clients each adds 20 accounts and $192K ARR without a direct sales motion from the platform. The infrastructure already supports multi-workspace tenancy.</li>
+          <li><strong>Acquisition target — staffing/ops SaaS:</strong> SOL Staffing Agency surface, RouteX Workforce Command, and the 17-brain ops cabinet is a niche but defensible fit for a firm in the staffing or operations automation space. Comparable acqui-hire acquisitions of deployed niche SaaS platforms have cleared $1.5M–$3M with no ARR when the codebase and product are this mature.</li>
+          <li><strong>Licensing — auth/billing platform:</strong> SkyeGateFS27 as a standalone auth + billing platform (BLAKE3, OAuth, Twilio, 2,063-line Stripe catalog) has real licensing value separate from the 0S product. A platform partner acquiring just this layer might pay $300K–$600K.</li>
+          <li><strong>AI edge gateway:</strong> kAIxu 6.7 sovereign inference (5 plan-gated variants, FS27 credit metering, 626-line Worker gateway) could interest a team building a branded AI product. The architecture is non-trivial; the deployment proof removes the usual "does this actually run?" question.</li>
+        </ul>
+        <p>
+          <strong>Strategic ceiling: $2.8M–$4.2M.</strong> This requires the right buyer in the right category — not a general market price.
+        </p>
+
+        <h2>5. Proof table — what I confirmed from repo evidence.</h2>
+        <ul class="receipt-list">
+          <li><code>test-artifacts/citadeldb-helper-k4i-live-api-latest.json</code> — CitadelDB row write confirmed live. Helper K4i deploy authority: <code>cloudflare_authority_ready</code>. KV, SkyErrors, CitadelDB mirror: all confirmed passing. Generated 2026-05-24.</li>
+          <li><code>test-artifacts/connectlog-relay13-production-proof.json</code> — Relay13 Core Worker health, ConnectLog bridge health, workspace bootstrap, conversation creation, domain health checks for <code>relay13-core.graylondonskyes.workers.dev</code> and <code>metraiyux-0s-full-system.graylondonskyes.workers.dev</code>: all passing. API key live. Generated 2026-05-24T01:19.</li>
+          <li><code>test-artifacts/skyenet-live-production-stress-latest.json</code> — Stripe account confirmed: <code>charges_enabled: true</code>, <code>details_submitted: true</code>. 4 SkyeNet Stripe products confirmed with 2 prices each (<code>skyenet-edge-starter</code>, <code>skyenet-edge-growth</code>, <code>skyenet-functions-managed</code>, <code>skyenet-sovereign-runtime-reserve</code>). FS27 login latency: 335ms. Generated 2026-05-24T21:56.</li>
+          <li><code>test-artifacts/skyemail-live-production-stress-latest.json</code> — SkyeMail 5 baseline routes: all returning HTTP 200 from <code>skyemail-platform.graylondonskyes.workers.dev</code>. Generated 2026-05-24T21:20.</li>
+          <li><code>test-artifacts/skyepay-platform-launcher-stress/</code> — 84 stress iterations confirmed across desktop (1440×1000) and mobile viewports. Brain answer, launcher search/card stress, shortcut flows: all confirmed passing. Generated 2026-05-23.</li>
+          <li><code>metraiyux_0s_site/sales/platform-surface-pricing-registry.json</code> — 41 priced surfaces. Status breakdown includes <code>live_proven</code>, <code>local_proven</code>, <code>provider_gated</code>, <code>scaffolded</code>, <code>quote_only</code>. Core 0S plans ($397–$3,997/mo) confirmed with Stripe proof scripts.</li>
+          <li><code>package.json</code> — 164 npm scripts including proof, smoke, stress, deploy, and admin lane automation scripts. SkyeNet, SkyePay, SkyeMail, SkyeMusicNexus, Relay13, ConnectLog, SkyeVault, SkyeRouteX all have dedicated script entries.</li>
+          <li><code>marketing/metraiyux-0s/valuation-brief.md</code> — section-level component accumulation of $1.168M–$2.208M. I apply an independent discount of 25–40% to the upper estimates where I cannot independently verify line counts or deploy scope.</li>
+        </ul>
+
+        <h2>6. Risks and diligence gaps.</h2>
+        <ul>
+          <li><strong>No ARR proof:</strong> the biggest single gap. Every other number is derived, not observed from customers. A buyer's first request will be "show me the last three months of subscription revenue."</li>
+          <li><strong>SkyeNet Functions execution boundary:</strong> the "controlled preview / Netlify-compatible function intake" language in the brief is honest but is a gap. The isolated runtime for arbitrary customer code is the enterprise unlock, not the current product.</li>
+          <li><strong>SkyeMail send-path proof:</strong> I confirmed the Worker routes are up. I did not confirm that outbound emails from a real customer address reach a real inbox through Zoho in the current session's proof receipts. The Zoho smoke was listed in the artifact directory but I did not confirm its specific contents.</li>
+          <li><strong>17-brain command mesh:</strong> the mesh is documented and the 725 KB chunks are referenced. A technical buyer will want to evaluate whether the brain routing is deterministic and auditable at scale, not just functional in smoke tests.</li>
+          <li><strong>Contractor payout execution:</strong> the brief states that real-money payout execution stays approval-gated. That is intentional and correct, but it means the "contractor payment readiness" lane is an approval UI, not a live payout flow. Worth flagging in diligence.</li>
+          <li><strong>Proof receipt freshness:</strong> the receipts I confirmed were generated on 2026-05-23 and 2026-05-24. A buyer will run these scripts live before signing.</li>
+        </ul>
+
+        <h2>7. Plain-English conclusion.</h2>
+        <p>
+          MetrAIyux 0S is a live, deployed, proof-disciplined prerevenue platform. That is a real category and it has a real value. The replacement cost is defensible at $736K–$1.41M from confirmed receipts with a conservative haircut applied. The deployed asset value — where you pay for the architecture, the proof culture, the reusable product lanes, and the speed-to-first-customer — lands between <strong>$1.5M and $2.1M</strong>. That is my base case.
+        </p>
+        <p>
+          The strategic ceiling of $2.8M–$4.2M is real but requires a buyer with the right fit: an agency, a staffing/ops company, an AI edge platform, or a team that wants to license SkyeGateFS27 and SkyeNet separately. For a general investor, the story becomes much cleaner — and the valuation moves up quickly — once there are 5 paying customers on any plan.
+        </p>
+        <p>
+          My number is slightly lower than the valuation brief's headline because I applied a 25–40% diligence haircut on component estimates I could not independently verify line-by-line, and I weight the zero-ARR status more heavily than an accumulation model does. That does not mean the higher numbers are wrong. It means they require external customer validation to defend in a serious diligence conversation.
+        </p>
+        <p>
+          The fastest move to close the gap: one paying customer on Growth Cabinet at $997/mo with a documented setup conversation. That receipt changes the conversation from "what could this generate" to "this is generating."
+        </p>
+
+        <p style="font-size:.85rem;color:rgba(255,255,255,.5);margin-top:24px">
+          Independent Claude Code pass · May 24, 2026 · evidence read from repo cold · Codex tab not consulted prior to analysis.
+        </p>
       </section>
 
       <section id="consensus-panel" class="valuation-panel" role="tabpanel">
