@@ -394,6 +394,27 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="devooderator-cards-mirror-script-repair">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">DevodeRator</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Cards</span><span>Mirror scripts</span><span>Founder blog</span><span>Pages deploy</span><span>Stress proof</span></div>
+            <h2>DevodeRator cards, social mirrors, and the SkyeNet blog got a production repair pass.</h2>
+            <p>The DevodeRator public site now shows the Gray Skyes founder poster without the old framed image container, restores the copied social/founder mirror scripts, and gives the SkyeNet / Helper K4i blog the same emoji-heavy founder-note texture as the public SkyeVault note.</p>
+            <ul class="release-points">
+              <li>The `/cards` hero moved the Gray founder image into an unframed poster lockup, renders the whole image with `object-fit: contain`, and places founder contact info under the picture.</li>
+              <li>The copied `/mirrors/social` and `/mirrors/founder-drops` surfaces now load the correct DevodeRator stylesheet, local shared scripts, search helper, effect helper, and copied founder/SkyeVault assets instead of falling through broken mirror-relative references.</li>
+              <li>The social mirror inline JavaScript object separators were repaired, so the platform tabs, dynamic post grids, copy buttons, and expand controls can initialize again.</li>
+              <li>The SkyeNet / Helper K4i DevodeRator blog now carries emoji markers in the title, metadata, section headings, proof boxes, and closeout quote.</li>
+              <li>Cloudflare Pages production deployment <code>992ad2c2-6fb8-4642-b73a-3bf584fa50da</code> is live at <code>https://devooderator.pages.dev/</code>; direct HTTP checks returned <code>200</code> for the edited routes, shared scripts, and copied assets.</li>
+              <li>Deployment-agent smoke passed 4/4, and deployment-agent stress passed 80/80 with zero failures, p50 699ms, p95 1681ms, max 1705ms. Owner is handling final headed browser verification.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/deployment-agent/2026-05-24T08-23-30-372Z-smoke-devooderator.json</code></span><span><code>test-artifacts/deployment-agent/2026-05-24T08-23-48-329Z-stress-devooderator.json</code></span><span><code>marketing/devooderator/cards.html</code></span><span><code>marketing/devooderator/mirrors/social.html</code></span><span><code>marketing/devooderator/mirrors/founder-drops.html</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="helper-k4i-skynet-deployment-agent-live">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-24">May 24, 2026</time>

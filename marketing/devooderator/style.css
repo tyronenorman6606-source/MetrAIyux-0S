@@ -465,6 +465,42 @@ h3 {
   object-position: center center;
 }
 
+.founder-poster-lockup {
+  justify-self: end;
+  width: min(100%, 560px);
+  margin: 0;
+}
+
+.founder-poster-lockup img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(72svh, 760px);
+  object-fit: contain;
+  object-position: center;
+  filter:
+    drop-shadow(0 28px 34px rgba(0,0,0,.46))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--ice) 24%, transparent));
+}
+
+.founder-contact-strip {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--stroke);
+  color: var(--ink);
+}
+
+.founder-contact-strip strong {
+  display: block;
+  font-size: 1.04rem;
+}
+
+.founder-contact-strip p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .founder-card .tag {
   position: absolute;
   left: 18px;
@@ -943,6 +979,11 @@ h3 {
     right: -2%;
     top: 3%;
     width: clamp(66px, 19vw, 106px);
+  }
+
+  .founder-poster-lockup {
+    justify-self: center;
+    width: min(100%, 620px);
   }
 
   .cards-logo-header {
