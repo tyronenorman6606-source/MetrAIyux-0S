@@ -5,14 +5,18 @@
   const cursor = document.getElementById('forge-cursor');
   const canvas = document.getElementById('forge-plasma');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const initialMode = 'refined';
   const pointer = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
 
   function setMode(nextMode) {
-    root.setAttribute('data-forge-mode', nextMode);
+    const mode = nextMode === 'raw' ? 'raw' : 'refined';
+    root.setAttribute('data-forge-mode', mode);
     if (modeButton) {
-      modeButton.lastChild.textContent = nextMode === 'raw' ? 'Raw' : 'Refined';
+      modeButton.lastChild.textContent = mode === 'raw' ? 'Raw' : 'Refined';
     }
   }
+
+  setMode(initialMode);
 
   if (modeButton) {
     modeButton.addEventListener('click', () => {
