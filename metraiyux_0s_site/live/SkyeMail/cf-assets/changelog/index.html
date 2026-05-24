@@ -39,6 +39,32 @@
     <section class="section timeline">
       <article class="release-card current">
         <p class="eyebrow">2026-05-24 • Live</p>
+        <h2>Founder identity and contact routing corrected.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li>The public founder page now names Gray Skyes directly.</li>
+              <li>Founder/contact routing now uses grayskyes@solenterprises.org, skyemail@solenterprises.org, metraiyux-0s@solenterprises.org, and MediaOverLondon@solenterprises.org.</li>
+              <li>The shared SkyeMail in-app contact footer now uses the same current public contact lane.</li>
+              <li>The founder surface now includes the current operating lanes: SkyEmail/SkyeMail, SkyeNet, CitadelDB Edge, SkyePay + FS27, Media Over London, Valley Verified, and SkyeMusicNexus.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>Deployed on the latest SkyeMail production Worker release for this correction.</li>
+              <li>Live HTTP smoke on <code>/founder</code> returned <code>200</code> from Cloudflare.</li>
+              <li>The live response contains Gray Skyes and the updated contact set.</li>
+              <li>The live response no longer contains the stale identity string or the old contact emails.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: the founder surface is still the same SkyeMail page, now carrying the current Gray Skyes identity, contact lane, and platform-lane summary.</div>
+      </article>
+
+      <article class="release-card current">
+        <p class="eyebrow">2026-05-24 • Live</p>
         <h2>Zoho-backed inbox send/read proof is deployed.</h2>
         <div class="grid two">
           <div>

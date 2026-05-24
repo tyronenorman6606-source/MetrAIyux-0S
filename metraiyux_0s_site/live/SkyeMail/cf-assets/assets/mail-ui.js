@@ -1,5 +1,5 @@
 window.SMV = (function(){
-  const CONTACT_HTML = 'Skyes Over London LC • SkyesOverLondonLC@SOLEnterprises.org • SkyesOverLondon@gmail.com • B2B@solenterprises.org • (480) 469-5416';
+  const CONTACT_HTML = 'Skyes Over London LC • Gray Skyes • grayskyes@solenterprises.org • skyemail@solenterprises.org • metraiyux-0s@solenterprises.org • 1-(800)-484-4788 • Company main 1-(800)-484-4783';
   const runtime = window.SMVRuntime || { href: (value) => value, redirect: (value) => { location.href = value; } };
   const NAV_ITEMS = [
     { id:'dashboard', href:'dashboard.html', label:'Inbox', labelId:'INBOX', hint:'Primary mailbox lane' },

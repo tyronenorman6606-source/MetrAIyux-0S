@@ -1,5 +1,28 @@
 # SkyeMail Public Changelog
 
+## 2026-05-24 - Founder Contact Surface Corrected
+
+Status: Deployed to the SkyeMail Cloudflare Worker.
+
+Production surface:
+
+- Founder page: `https://skyemail-platform.graylondonskyes.workers.dev/founder`
+- Worker version: latest SkyeMail production deployment receipt from this release.
+
+What changed:
+
+- Corrected the public founder identity from the old legal-name display to `Gray Skyes`.
+- Updated the founder/contact routing to use the current public lanes: `grayskyes@solenterprises.org`, `skyemail@solenterprises.org`, `metraiyux-0s@solenterprises.org`, and `MediaOverLondon@solenterprises.org`.
+- Replaced the old direct contact strip with the current direct and company-main numbers from the public business-card/media surfaces.
+- Added a compact current-lanes block covering SkyEmail/SkyeMail, SkyeNet, CitadelDB Edge, SkyePay + FS27, Media Over London, Valley Verified, and SkyeMusicNexus.
+- Updated the shared SkyeMail in-app contact footer so operator contact panels no longer show the stale contact set.
+
+Proof:
+
+- Live HTTP smoke on `/founder` returned `200`, `server: cloudflare`, and `content-type: text/html`.
+- Live response contains `Gray Skyes`, the updated emails, `SkyeNet`, and `CitadelDB Edge`.
+- Live response no longer contains the stale identity string, stale SkyesOverLondon/B2B email set, or the old direct phone number.
+
 ## 2026-05-24 - Zoho Inbox Send/Read Proof Deployed
 
 Status: Deployed to the SkyeMail Cloudflare Worker.
