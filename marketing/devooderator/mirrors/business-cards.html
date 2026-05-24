@@ -1,0 +1,1714 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Print-Ready Business Cards | ☣️ DevodeRator ☣️</title>
+  <meta name="description" content="Print-ready business cards for Gray London Skyes, Valley Verified clients, and MetrAIyux 0S platforms.">
+  <link rel="icon" href="/assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/assets/vendor/qrcode-generator.js"></script>
+
+  <style>
+    :root {
+      --card-w: 336px;
+      --card-h: 192px;
+      --preview-w: 600px;
+      --preview-h: 343px;
+    }
+
+    .bc-page {
+      padding-bottom: 72px;
+    }
+
+    .nav-shell {
+      width: var(--wrap);
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-inline: clamp(2rem, 2rem, 6rem);
+    }
+
+    .nav-shell .brand {
+      flex: 0 1 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      max-width: min(100%, 360px);
+      color: var(--chrome);
+      font-size: 12px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .nav-shell .brand img {
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .nav-shell .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .nav-shell .nav-links a {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .nav-shell .nav-links a:hover,
+    .nav-shell .nav-links a:focus-visible,
+    .nav-shell .nav-links .nav-cta {
+      border-color: rgba(244,199,91,.28);
+      color: var(--ink);
+      background: rgba(244,199,91,.08);
+    }
+
+    .bc-hero {
+      width: var(--wrap);
+      margin: 0 auto;
+      padding: 72px 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: end;
+    }
+
+    .bc-kicker {
+      margin: 0 0 12px;
+      font-family: var(--font-label);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bc-hero h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 4.6rem);
+      font-weight: 900;
+      line-height: .95;
+      color: var(--ink);
+      text-wrap: balance;
+    }
+
+    .bc-hero-copy {
+      max-width: 700px;
+      margin: 18px 0 0;
+      color: var(--soft);
+      line-height: 1.55;
+      font-size: 1rem;
+    }
+
+    .bc-command {
+      display: grid;
+      gap: 10px;
+      min-width: 250px;
+      padding: 14px;
+      border: 1px solid rgba(244,199,91,.26);
+      border-radius: 8px;
+      background: rgba(5,8,12,.74);
+      box-shadow: 0 18px 54px rgba(0,0,0,.34);
+    }
+
+    .bc-command strong {
+      font-family: var(--font-display);
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    .bc-command span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .bc-section {
+      width: var(--wrap);
+      margin: 0 auto;
+      padding: 56px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2vw, 1.65rem);
+      color: var(--ink);
+    }
+
+    .section-head p {
+      margin: 8px 0 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .section-action {
+      flex: 0 0 auto;
+    }
+
+    .bc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
+      gap: 42px 38px;
+    }
+
+    .bc-wrap {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .bc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 22px;
+    }
+
+    .bc-label {
+      color: var(--soft);
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .bc-size {
+      color: rgba(216,224,234,.48);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .bc-display {
+      position: relative;
+      width: min(var(--preview-w), 100%);
+      height: var(--preview-h);
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.52), 0 0 0 1px rgba(255,255,255,.08);
+      background: #030406;
+      contain: layout paint;
+    }
+
+    .bc {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--card-w);
+      height: var(--card-h);
+      overflow: hidden;
+      border-radius: 8px;
+      transform: scale(var(--screen-scale, 1.786));
+      transform-origin: top left;
+      color: #f8f5ed;
+      font-family: var(--font-body);
+      isolation: isolate;
+      background: #050608;
+    }
+
+    .bc::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: .55;
+    }
+
+    .bc::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .bc-layer,
+    .bc-plate,
+    .bc-rule,
+    .bc-corner,
+    .bc-mark-strip,
+    .bc-logo-watermark,
+    .bc-founder-photo,
+    .vv-rail-logo {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .bc-logo-watermark {
+      object-fit: contain;
+      opacity: .16;
+      background: transparent;
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    .bc-founder-photo {
+      overflow: hidden;
+      z-index: 1;
+      border: 1px solid color-mix(in srgb, var(--accent) 46%, transparent);
+      background: rgba(255,255,255,.055);
+      box-shadow: 0 10px 24px rgba(0,0,0,.34);
+    }
+
+    .bc-founder-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .bc-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 15px 17px;
+      z-index: 2;
+    }
+
+    .bc-top,
+    .bc-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .bc-bottom {
+      align-items: end;
+    }
+
+    .bc-brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .bc-logo {
+      width: 25px;
+      height: 25px;
+      object-fit: contain;
+      flex: 0 0 auto;
+      background: transparent;
+    }
+
+    .bc-logo.logo-wide {
+      width: 42px;
+      height: 26px;
+    }
+
+    .bc-logo.logo-skyes {
+      width: 35px;
+      height: 25px;
+    }
+
+    .bc-brand-text {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .bc-brand-text strong,
+    .bc-eyebrow,
+    .bc-access,
+    .bc-small {
+      font-family: var(--font-label);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bc-brand-text strong {
+      color: var(--accent);
+      font-size: 7px;
+    }
+
+    .bc-brand-text span {
+      color: rgba(248,245,237,.45);
+      font-size: 5.6px;
+      line-height: 1.2;
+    }
+
+    .bc-qr canvas {
+      display: block !important;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .bc-title-block {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .bc-eyebrow {
+      color: var(--accent);
+      font-size: 6px;
+    }
+
+    .bc-name {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 21px;
+      line-height: .98;
+      font-weight: 900;
+      color: var(--name, #fff7df);
+      text-wrap: balance;
+    }
+
+    .bc-title {
+      margin: 0;
+      color: var(--sub, rgba(248,245,237,.72));
+      font-size: 7.3px;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .bc-line {
+      width: 44px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .bc-contact {
+      display: grid;
+      gap: 2.5px;
+      min-width: 0;
+    }
+
+    .bc-contact span {
+      display: block;
+      max-width: 222px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 6.7px;
+      color: rgba(248,245,237,.78);
+    }
+
+    .bc-contact .bc-url {
+      color: var(--accent);
+    }
+
+    .bc-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 14px;
+      padding: 2px 6px;
+      border: 1px solid color-mix(in srgb, var(--accent) 44%, transparent);
+      border-radius: 4px;
+      color: var(--accent);
+      font-family: var(--font-label);
+      font-size: 6px;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.045);
+      white-space: nowrap;
+    }
+
+    .bc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bc-btn {
+      border: 1px solid rgba(244,199,91,.36);
+      border-radius: 6px;
+      color: var(--gold);
+      background: rgba(244,199,91,.095);
+      padding: 8px 13px;
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .bc-btn:hover,
+    .bc-btn:focus-visible {
+      color: #050608;
+      background: var(--gold);
+      outline: none;
+    }
+
+    .bc-btn.secondary {
+      color: var(--cyan);
+      border-color: rgba(100,217,255,.32);
+      background: rgba(100,217,255,.08);
+    }
+
+    .bc-btn.secondary:hover,
+    .bc-btn.secondary:focus-visible {
+      color: #02060a;
+      background: var(--cyan);
+    }
+
+    .bc-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .bc--founder-night {
+      --accent: #f4c75b;
+      --name: #fff4cf;
+      --sub: rgba(248,245,237,.72);
+      background:
+        linear-gradient(115deg, #050608 0%, #0c0b08 52%, #151006 100%);
+    }
+
+    .bc--founder-night .bc-plate {
+      inset: 0 auto 0 0;
+      width: 96px;
+      background: linear-gradient(180deg, rgba(244,199,91,.92), rgba(151,103,20,.88));
+    }
+
+    .bc--founder-night .bc-mark-strip {
+      top: 14px;
+      left: 12px;
+      width: 72px;
+      height: 122px;
+      border: 1px solid rgba(5,8,12,.45);
+    }
+
+    .bc--founder-night .bc-founder-photo {
+      left: 14px;
+      top: 16px;
+      width: 68px;
+      height: 84px;
+      border-radius: 9px;
+      border-color: rgba(5,8,12,.46);
+      background: rgba(5,8,12,.16);
+    }
+
+    .bc--founder-night .bc-logo-watermark {
+      left: 7px;
+      bottom: 6px;
+      width: 86px;
+      height: 58px;
+      opacity: .48;
+      filter: saturate(1.1) contrast(1.08) drop-shadow(0 4px 10px rgba(0,0,0,.2));
+    }
+
+    .bc--founder-night .bc-monogram {
+      position: absolute;
+      left: 21px;
+      top: 106px;
+      width: 54px;
+      display: grid;
+      place-items: center;
+      padding-top: 4px;
+      border-top: 1px solid rgba(5,8,12,.34);
+      font-family: var(--font-display);
+      font-size: 13px;
+      line-height: .9;
+      font-weight: 900;
+      color: rgba(5,8,12,.78);
+      z-index: 2;
+    }
+
+    .bc--founder-night .bc-inner {
+      padding-left: 112px;
+    }
+
+    .bc--founder-paper {
+      --accent: #1d5f74;
+      --name: #0a0c10;
+      --sub: rgba(10,12,16,.68);
+      color: #0a0c10;
+      background:
+        linear-gradient(90deg, #f5efe2 0%, #efe2c9 100%);
+    }
+
+    .bc--founder-paper::before {
+      background:
+        linear-gradient(90deg, rgba(10,12,16,.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(10,12,16,.04) 1px, transparent 1px);
+      background-size: 18px 18px;
+      opacity: .45;
+    }
+
+    .bc--founder-paper .bc-rule {
+      left: 17px;
+      right: 17px;
+      top: 54px;
+      height: 1px;
+      background: rgba(10,12,16,.18);
+    }
+
+    .bc--founder-paper .bc-inner {
+      padding-right: 86px;
+    }
+
+    .bc--founder-paper .bc-founder-photo {
+      right: 18px;
+      top: 68px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border-color: rgba(29,95,116,.36);
+      background: rgba(10,12,16,.08);
+    }
+
+    .bc--founder-paper .bc-logo-watermark {
+      right: -10px;
+      bottom: 1px;
+      width: 116px;
+      height: 92px;
+      opacity: .18;
+      mix-blend-mode: multiply;
+    }
+
+    .bc--founder-paper .bc-contact span,
+    .bc--founder-paper .bc-brand-text span {
+      color: rgba(10,12,16,.68);
+    }
+
+    .bc--founder-paper .bc-pill {
+      background: rgba(10,12,16,.045);
+    }
+
+    .bc--founder-systems {
+      --accent: #64d9ff;
+      --name: #eaf9ff;
+      --sub: rgba(220,246,255,.7);
+      background:
+        linear-gradient(135deg, #020811 0%, #061723 58%, #08101a 100%);
+    }
+
+    .bc--founder-systems .bc-plate {
+      right: 0;
+      top: 0;
+      width: 102px;
+      height: 100%;
+      background:
+        linear-gradient(180deg, rgba(100,217,255,.13), rgba(111,242,199,.08)),
+        repeating-linear-gradient(0deg, rgba(100,217,255,.28) 0 1px, transparent 1px 13px);
+      border-left: 1px solid rgba(100,217,255,.22);
+    }
+
+    .bc--founder-systems .bc-inner {
+      padding-right: 112px;
+    }
+
+    .bc--founder-systems .bc-founder-photo {
+      right: 2px;
+      bottom: -6px;
+      width: 100px;
+      height: 148px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .bc--founder-systems .bc-founder-photo img {
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 18px 24px rgba(0,0,0,.46));
+    }
+
+    .bc--founder-systems .bc-logo-watermark {
+      right: -11px;
+      top: 5px;
+      width: 124px;
+      height: 108px;
+      opacity: .18;
+    }
+
+    .bc--vv {
+      --accent: #f4c75b;
+      --name: #fff2c6;
+      --sub: rgba(248,245,237,.74);
+      background: linear-gradient(90deg, #08090b 0 41%, #111006 41% 100%);
+    }
+
+    .bc--vv .bc-plate {
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 118px;
+      background:
+        linear-gradient(180deg, rgba(244,199,91,.92), rgba(162,107,18,.92));
+    }
+
+    .vv-seal {
+      position: absolute;
+      left: 18px;
+      top: 17px;
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(5,8,12,.48);
+      border-radius: 999px;
+      color: rgba(5,8,12,.84);
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 900;
+      overflow: hidden;
+      background: rgba(5,8,12,.18);
+    }
+
+    .vv-seal img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .vv-rail-logo {
+      left: 12px;
+      bottom: 35px;
+      width: 92px;
+      height: 48px;
+      object-fit: contain;
+      opacity: .84;
+      background: transparent;
+      filter: drop-shadow(0 5px 10px rgba(5,8,12,.2));
+    }
+
+    .bc-company-contact-list {
+      display: grid;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .bc-company-contact-list a,
+    .bc-company-contact-list span {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+
+    .bc-company-contact-list a:first-child,
+    .bc-company-contact-list a:nth-child(2) {
+      color: var(--gold);
+    }
+
+    .vv-rail-text {
+      position: absolute;
+      left: 18px;
+      bottom: 13px;
+      width: 76px;
+      color: rgba(5,8,12,.76);
+      font-family: var(--font-label);
+      font-size: 7.2px;
+      font-weight: 800;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .bc--vv .bc-inner {
+      padding-left: 136px;
+    }
+
+    .bc--platform .bc-logo-watermark {
+      left: 14px;
+      bottom: 14px;
+      width: 116px;
+      height: 74px;
+      opacity: .13;
+      transform: rotate(-5deg);
+      filter: saturate(1.1) contrast(1.08);
+    }
+
+    .bc--platform {
+      --accent: #64d9ff;
+      --name: #f8fbff;
+      --sub: rgba(248,245,237,.7);
+      background: linear-gradient(135deg, #050608, #0a1118 56%, #08090d);
+    }
+
+    .bc--platform.platform-gold { --accent: #f4c75b; }
+    .bc--platform.platform-cyan { --accent: #64d9ff; }
+    .bc--platform.platform-mint { --accent: #6ff2c7; }
+    .bc--platform.platform-violet { --accent: #a88cff; }
+    .bc--platform.platform-rose { --accent: #ff7a90; }
+
+    .bc--platform .bc-plate {
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 34px;
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 35%, transparent), transparent 72%);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+
+    .bc--platform .bc-mark-strip {
+      right: 15px;
+      bottom: 15px;
+      width: 74px;
+      height: 26px;
+      border-top: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    .platform-index {
+      position: absolute;
+      right: 17px;
+      top: 12px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 9px;
+    }
+
+    .vv-builder {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+      gap: 34px;
+      align-items: start;
+    }
+
+    .vv-panel {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid rgba(160,205,226,.22);
+      border-radius: 8px;
+      background: rgba(5,8,12,.66);
+      box-shadow: 0 18px 54px rgba(0,0,0,.28);
+    }
+
+    .vv-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .vv-field label {
+      color: var(--muted);
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .vv-field input {
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid rgba(160,205,226,.22);
+      border-radius: 6px;
+      color: var(--ink);
+      background: rgba(255,255,255,.045);
+      outline: none;
+    }
+
+    .vv-field input:focus {
+      border-color: rgba(244,199,91,.56);
+    }
+
+    .vv-directory-results {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .vv-directory-card {
+      display: grid;
+      gap: 3px;
+      width: 100%;
+      min-height: 62px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 7px;
+      color: var(--ink);
+      background: rgba(255,255,255,.045);
+      text-align: left;
+    }
+
+    .vv-directory-card:hover,
+    .vv-directory-card.is-active {
+      border-color: rgba(244,199,91,.54);
+      background: rgba(244,199,91,.08);
+    }
+
+    .vv-directory-card strong {
+      font-size: 13px;
+      line-height: 1.15;
+    }
+
+    .vv-directory-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .vv-code-card strong.is-link {
+      overflow-wrap: anywhere;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .vv-code-card {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid rgba(244,199,91,.22);
+      border-radius: 6px;
+      background: rgba(244,199,91,.07);
+    }
+
+    .vv-code-card span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .vv-code-card strong {
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .nav-shell {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px 0;
+      }
+
+      .nav-shell .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        margin-left: 0;
+      }
+
+      .bc-hero,
+      .section-head,
+      .vv-builder {
+        grid-template-columns: 1fr;
+      }
+
+      .bc-command,
+      .section-action {
+        min-width: 0;
+      }
+
+      .bc-section {
+        padding: 42px 0;
+      }
+
+      .bc-grid {
+        gap: 34px;
+      }
+    }
+
+    @media print {
+      @page {
+        size: 3.5in 2in;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 3.5in;
+        height: 2in;
+        margin: 0 !important;
+        background: #fff !important;
+      }
+
+      body.printing * {
+        visibility: hidden !important;
+      }
+
+      body.printing .bc.print-active,
+      body.printing .bc.print-active * {
+        visibility: visible !important;
+      }
+
+      body.printing .bc.print-active {
+        position: fixed !important;
+        inset: 0 auto auto 0 !important;
+        width: 3.5in !important;
+        height: 2in !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+
+      body.printing-collection {
+        width: auto;
+        height: auto;
+      }
+
+      body.printing-collection * {
+        visibility: hidden !important;
+      }
+
+      body.printing-collection .bc.print-included,
+      body.printing-collection .bc.print-included * {
+        visibility: visible !important;
+      }
+
+      body.printing-collection .bc.print-included {
+        position: relative !important;
+        inset: auto !important;
+        width: 3.5in !important;
+        height: 2in !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        page-break-after: always;
+        break-after: page;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav-shell">
+    <a class="brand" href="/">
+      <img src="/assets/DevodeRator-logo.png" alt="☣️ DevodeRator ☣️ logo">
+      ☣️ DevodeRator ☣️
+    </a>
+    <div class="nav-links">
+      <a href="/gray-skyes.html">Gray Skyes</a>
+      <a href="/social.html">Social</a>
+      <a href="/founder-drops.html">Founder Drops</a>
+      <a href="/ecosystem.html">Ecosystem</a>
+      <a href="/" class="nav-cta">Marketing Hub</a>
+    </div>
+  </nav>
+</header>
+
+<main class="bc-page">
+  <section class="bc-hero">
+    <div>
+      <p class="bc-kicker">Print-Ready Business Cards</p>
+      <h1>Founder cards, client access passes, and platform cards.</h1>
+      <p class="bc-hero-copy">A browser-ready card studio for Gray London Skyes, selected Valley Verified client access, and the live MetrAIyux platform stack. Every card is built at standard 3.5in x 2in print size with a QR code and a dedicated PDF/print action.</p>
+    </div>
+    <aside class="bc-command" aria-label="Business card production state">
+      <strong>Card Studio</strong>
+      <span>16 cards loaded: 3 founder directions, 1 client access builder, 12 platform cards.</span>
+      <div class="bc-company-contact-list" aria-label="Skyes Over London card contact">
+        <a href="mailto:grayskyes@solenterprises.org">grayskyes@solenterprises.org</a>
+        <a href="tel:+18004844788">1-(800)-484-4788</a>
+        <a href="tel:+18004844783">Company main: 1-(800)-484-4783</a>
+        <span>Skyes Over London / SOLEnterprises International Nexus &amp; Holdings</span>
+      </div>
+      <button class="bc-btn secondary" type="button" onclick="printCollection('.bc')">Print Full Set</button>
+    </aside>
+  </section>
+
+  <section class="bc-section" aria-labelledby="founderCards">
+    <div class="section-head">
+      <div>
+        <h2 id="founderCards">Founder Cards</h2>
+        <p>Three finished directions for different rooms: premium founder handoff, clean executive intro, and systems/operator context.</p>
+      </div>
+    </div>
+    <div class="bc-grid" id="founderGrid"></div>
+  </section>
+
+  <section class="bc-section" aria-labelledby="clientCard">
+    <div class="section-head">
+      <div>
+        <h2 id="clientCard">Valley Verified Priority Access Card</h2>
+        <p>Search the Valley Verified directory, select the business in front of the owner, and generate a card whose QR opens the gated ConnectLog handoff with the client page, company contact packet, and 31% SkyeMerit activation credit.</p>
+      </div>
+    </div>
+    <div class="vv-builder">
+      <form class="vv-panel" onsubmit="event.preventDefault(); printCard('card-vv');">
+        <div class="vv-field">
+          <label for="vv-directory-search">Valley Verified directory</label>
+          <input id="vv-directory-search" type="search" placeholder="Search Bob, city, category, niche..." autocomplete="off">
+          <div class="vv-directory-results" id="vv-directory-results" aria-live="polite"></div>
+        </div>
+        <div class="vv-field">
+          <label for="vv-biz">Business name</label>
+          <input id="vv-biz" type="text" value="Bob's Smoke Shop" autocomplete="organization">
+        </div>
+        <div class="vv-field">
+          <label for="vv-city">City</label>
+          <input id="vv-city" type="text" value="Litchfield Park" autocomplete="address-level2">
+        </div>
+        <div class="vv-field">
+          <label for="vv-cat">Category</label>
+          <input id="vv-cat" type="text" value="Retail & Specialty">
+        </div>
+        <div class="vv-field">
+          <label for="vv-contact">Contact name</label>
+          <input id="vv-contact" type="text" value="Owner">
+        </div>
+        <div class="vv-code-card">
+          <span>Priority access code</span>
+          <strong id="vv-code-control">VV-BOBS-LP</strong>
+        </div>
+        <div class="vv-code-card">
+          <span>ConnectLog handoff QR</span>
+          <strong class="is-link" id="vv-connectlog-control">Loading directory...</strong>
+        </div>
+        <div class="vv-code-card">
+          <span>SkyeMerit activation credit</span>
+          <strong id="vv-skyemerit-control">31% for 7 days</strong>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-btn" type="submit" onclick="printCard('card-vv')">Save PDF</button>
+          <button class="bc-btn secondary" type="button" id="vv-open-connectlog">Open ConnectLog</button>
+          <button class="bc-btn secondary" type="button" id="vv-open-client">Open Client Page</button>
+          <button class="bc-btn secondary" type="button" onclick="resetVV()">Reset</button>
+        </div>
+        <a class="bc-btn secondary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/business-card-factory/" target="_blank" rel="noopener">Open 0S Factory</a>
+      </form>
+
+      <div class="bc-wrap">
+        <div class="bc-meta">
+          <span class="bc-label">Valley Verified client access pass</span>
+          <span class="bc-size">3.5in x 2in</span>
+        </div>
+        <div class="bc-display">
+          <div class="bc bc--vv" id="card-vv">
+            <div class="bc-plate"></div>
+            <div class="vv-seal"><img src="/assets/gray-skyes-headshot.png" alt=""></div>
+            <img class="vv-rail-logo" src="/assets/DevodeRator-logo.png" alt="">
+            <div class="vv-rail-text">Priority Access<br>Direct Operator Line</div>
+            <div class="bc-inner">
+              <div class="bc-top">
+                <div class="bc-title-block">
+                  <span class="bc-eyebrow">Valley Verified Access</span>
+                  <span class="bc-pill">Direct Access</span>
+                </div>
+                <div class="bc-qr">
+                  <canvas id="vv-qr" data-url="mailto:grayskyes@solenterprises.org?subject=Valley%20Verified%20Priority%20Access" data-fg="#f4c75b" data-bg="#09070c"></canvas>
+                </div>
+              </div>
+              <div class="bc-title-block">
+                <div class="bc-line"></div>
+                <h2 class="bc-name" id="vv-biz-display">BOB'S SMOKE SHOP</h2>
+                <p class="bc-title" id="vv-city-display">Litchfield Park / Retail & Specialty</p>
+              </div>
+              <div class="bc-bottom">
+                <div class="bc-contact">
+                  <span id="vv-contact-display">Contact: Owner</span>
+                  <span>grayskyes@solenterprises.org</span>
+                  <span>1-(800)-484-4788</span>
+                  <span class="bc-url">Priority code: <b id="vv-code-display">VV-BOBS-LP</b></span>
+                </div>
+                <span class="bc-pill">Gray London Skyes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-btn" type="button" onclick="printCard('card-vv')">Save PDF</button>
+          <span class="bc-note">QR opens the ConnectLog handoff with Gray's company contact packet, the selected Valley page, and the seven-day 31% SkyeMerit activation lane.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bc-section" aria-labelledby="platformCards">
+    <div class="section-head">
+      <div>
+        <h2 id="platformCards">Platform Cards</h2>
+        <p>One clean handoff card per platform, each with a live QR, category, and direct operator contact.</p>
+      </div>
+      <div class="section-action">
+        <button class="bc-btn secondary" type="button" onclick="printCollection('.platform-card .bc')">Print Platform Set</button>
+      </div>
+    </div>
+    <div class="bc-grid" id="platformGrid"></div>
+  </section>
+</main>
+
+<footer style="border-top:1px solid var(--line);padding:32px 0;text-align:center">
+  <p style="color:var(--muted);font-size:12px;margin:0">☣️ DevodeRator ☣️ / Print-Ready Business Cards / 3.5in x 2in / <a href="/" style="color:var(--gold)">Marketing Hub</a></p>
+</footer>
+
+<template id="cardWrapTemplate">
+  <article class="bc-wrap">
+    <div class="bc-meta">
+      <span class="bc-label"></span>
+      <span class="bc-size">3.5in x 2in</span>
+    </div>
+    <div class="bc-display"></div>
+    <div class="bc-actions">
+      <button class="bc-btn" type="button">Save PDF</button>
+      <button class="bc-btn secondary" type="button">Print Card</button>
+    </div>
+  </article>
+</template>
+
+<script>
+const contactEmail = 'grayskyes@solenterprises.org';
+const contactPhone = '1-(800)-484-4788';
+const companyLine = 'Skyes Over London / SOLEnterprises International Nexus & Holdings';
+const founderUrl = 'https://metraiyux-0s-marketing.pages.dev/gray-skyes.html';
+const devodeRatorLogoUrl = '/assets/DevodeRator-logo.png';
+const metraiyuxMarkUrl = devodeRatorLogoUrl;
+const metraiyuxLogoUrl = devodeRatorLogoUrl;
+const skyesLogoUrl = devodeRatorLogoUrl;
+const founderHeadshotUrl = '/assets/gray-skyes-headshot.png';
+const founderPortraitUrl = '/assets/gray-skyes-portrait.jpg';
+const founderCutoutUrl = '/assets/founder-skyes-over-london.png';
+const zeroOsOrigin = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+const connectLogAppUrl = `${zeroOsOrigin}/connectlog-v7.7-relay13-operator-proof/app.html`;
+const valleyDirectoryUrl = '/assets/valley-verified/businesses-lite.json';
+let valleyBusinesses = [];
+let selectedValleyBusiness = null;
+let activeConnectLogUrl = connectLogAppUrl;
+let activeClientUrl = `${zeroOsOrigin}/valley-verified/business/bobs-smoke-shop-litchfield-park/`;
+
+function buildCardConnectLogUrl({
+  source = 'business-cards',
+  kind = 'business-card',
+  business = '',
+  city = '',
+  category = '',
+  clientId = '',
+  priorityCode = '',
+  cardTitle = '',
+  cardUrl = '',
+  valleyUrl = '',
+  contact = '',
+  skyemerit = '',
+  expires = ''
+} = {}) {
+  const url = new URL(connectLogAppUrl);
+  const targetUrl = valleyUrl || cardUrl;
+  url.searchParams.set('source', source);
+  url.searchParams.set('sourceLabel', 'Business Cards Studio');
+  url.searchParams.set('cardKind', kind);
+  url.searchParams.set('cardTitle', cardTitle || business || 'Skyes Over London business card');
+  if (clientId) url.searchParams.set('clientId', clientId);
+  if (business) url.searchParams.set('business', business);
+  if (city) url.searchParams.set('city', city);
+  if (category) url.searchParams.set('category', category);
+  if (contact) url.searchParams.set('contact', contact);
+  if (priorityCode) url.searchParams.set('priorityCode', priorityCode);
+  if (targetUrl) url.searchParams.set('cardUrl', targetUrl);
+  if (valleyUrl) url.searchParams.set('valleyUrl', valleyUrl);
+  if (skyemerit) url.searchParams.set('skyemerit', skyemerit);
+  if (expires) url.searchParams.set('expires', expires);
+  url.searchParams.set('install', '1');
+  url.searchParams.set('operator', 'Gray London Skyes');
+  url.searchParams.set('operatorEmail', contactEmail);
+  url.searchParams.set('operatorPhone', contactPhone);
+  return url.toString();
+}
+
+const founderCards = [
+  {
+    id: 'card-personal-gold',
+    label: 'Founder Signature',
+    theme: 'bc--founder-night',
+    eyebrow: 'Skyes Over London',
+    name: 'GRAY LONDON SKYES',
+    title: 'Founder / Sole Operator',
+    tag: 'SOLEnterprises International Nexus & Holdings',
+    url: 'metraiyux-0s-marketing.pages.dev/gray-skyes',
+    qr: buildCardConnectLogUrl({
+      kind: 'founder',
+      business: 'Gray London Skyes',
+      category: 'Skyes Over London founder card',
+      clientId: 'gray-london-skyes-founder-signature',
+      cardTitle: 'Founder Signature',
+      cardUrl: founderUrl,
+      contact: 'Gray London Skyes'
+    }),
+    fg: '#f4c75b',
+    bg: '#07060a',
+    badge: 'Founder Card',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
+    photo: founderHeadshotUrl,
+    watermark: skyesLogoUrl
+  },
+  {
+    id: 'card-founder-paper',
+    label: 'Executive Intro',
+    theme: 'bc--founder-paper',
+    eyebrow: 'Skyes Over London',
+    name: 'GRAY LONDON SKYES',
+    title: 'Founder, builder, operator',
+    tag: 'Business systems / client platforms / production proof',
+    url: 'metraiyux-0s-marketing.pages.dev',
+    qr: buildCardConnectLogUrl({
+      kind: 'founder',
+      business: 'Gray London Skyes',
+      category: 'Skyes Over London executive intro',
+      clientId: 'gray-london-skyes-executive-intro',
+      cardTitle: 'Executive Intro',
+      cardUrl: founderUrl,
+      contact: 'Gray London Skyes'
+    }),
+    fg: '#1d5f74',
+    bg: '#f5efe2',
+    badge: 'Executive',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
+    photo: founderPortraitUrl,
+    watermark: skyesLogoUrl
+  },
+  {
+    id: 'card-personal-cyan',
+    label: 'Systems Operator',
+    theme: 'bc--founder-systems',
+    eyebrow: '17 Workers / 62 live products',
+    name: 'GRAY LONDON SKYES',
+    title: 'Cloudflare operator / AI platform builder',
+    tag: 'One-person production stack with live receipts',
+    url: 'metraiyux-0s-marketing.pages.dev',
+    qr: buildCardConnectLogUrl({
+      kind: 'founder',
+      business: 'Gray London Skyes',
+      category: 'Cloudflare operator / AI platform builder',
+      clientId: 'gray-london-skyes-systems-operator',
+      cardTitle: 'Systems Operator',
+      cardUrl: founderUrl,
+      contact: 'Gray London Skyes'
+    }),
+    fg: '#64d9ff',
+    bg: '#020811',
+    badge: 'Operator',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
+    photo: founderCutoutUrl,
+    watermark: skyesLogoUrl
+  }
+];
+
+const platformCards = [
+  ['card-0s', 'MetrAIyux 0S', 'Sovereign business operating system', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / July 2026 launch', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', 'https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/flyer-overview.html', 'platform-violet'],
+  ['card-srx', 'SkyeRouteX', 'Workforce command / IC routing / live jobs', 'metraiyux-0s-marketing.pages.dev/skyeroutex', 'https://metraiyux-0s-marketing.pages.dev/skyeroutex.html', 'platform-mint'],
+  ['card-phx', 'PHX Verified Network', 'Valley visibility network / local business proof', 'phx-verified-network.pages.dev', 'https://phx-verified-network.pages.dev', 'platform-gold'],
+  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate / workspace sessions', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-mint'],
+  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev/legal', 'https://skyes-over-london-legal.pages.dev/legal/', 'platform-gold'],
+  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev', 'https://skye-design-mcp.pages.dev/use-mcp.html', 'platform-violet'],
+  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / 0S cockpit / builder lane', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-agl', 'Agentic Growth Layer', 'AI growth operations / starter to operator', 'agentic-growth-layer.pages.dev', 'https://agentic-growth-layer.pages.dev', 'platform-mint'],
+  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / secure receipts', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-rose'],
+  ['card-merser', 'Merser', 'World registry MCP / npm CLI / source packs', 'merser.pages.dev', 'https://merser.pages.dev', 'platform-violet']
+].map(([id, name, title, displayUrl, qr, theme], index) => ({
+  id,
+  name,
+  title,
+  displayUrl,
+  qr: buildCardConnectLogUrl({
+    kind: 'platform',
+    business: name,
+    category: title,
+    clientId: id,
+    cardTitle: `${name} platform card`,
+    cardUrl: qr,
+    contact: 'Gray London Skyes'
+  }),
+  theme,
+  index: String(index + 1).padStart(2, '0')
+}));
+
+function cardShell(card, innerHtml) {
+  return `
+    <div class="bc ${card.theme}" id="${card.id}">
+      <div class="bc-plate"></div>
+      <div class="bc-mark-strip"></div>
+      ${innerHtml}
+    </div>
+  `;
+}
+
+function founderCard(card) {
+  const plate = card.theme === 'bc--founder-night' ? '<div class="bc-monogram">GLS</div>' : '';
+  const rule = card.theme === 'bc--founder-paper' ? '<div class="bc-rule"></div>' : '';
+  const photo = card.photo ? `<div class="bc-founder-photo"><img src="${card.photo}" alt=""></div>` : '';
+  const watermark = card.watermark ? `<img class="bc-logo-watermark" src="${card.watermark}" alt="">` : '';
+  const logoClass = card.logoClass ? ` ${card.logoClass}` : '';
+  return cardShell(card, `
+    ${watermark}${photo}
+    ${plate}${rule}
+    <div class="bc-inner">
+      <div class="bc-top">
+        <div class="bc-brand">
+          <img class="bc-logo${logoClass}" src="${card.logo || metraiyuxMarkUrl}" alt="">
+          <div class="bc-brand-text">
+            <strong>${card.eyebrow}</strong>
+            <span>${card.tag}</span>
+          </div>
+        </div>
+        <span class="bc-pill">${card.badge}</span>
+      </div>
+      <div class="bc-title-block">
+        <div class="bc-line"></div>
+        <h2 class="bc-name">${card.name}</h2>
+        <p class="bc-title">${card.title}</p>
+      </div>
+      <div class="bc-bottom">
+        <div class="bc-contact">
+          <span>${contactEmail}</span>
+          <span>${contactPhone}</span>
+          <span class="bc-url">${card.url}</span>
+        </div>
+        <div class="bc-qr">
+          <canvas data-url="${card.qr}" data-fg="${card.fg}" data-bg="${card.bg}"></canvas>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function platformCard(card) {
+  const accentMap = {
+    'platform-gold': ['#f4c75b', '#07060a'],
+    'platform-cyan': ['#64d9ff', '#020811'],
+    'platform-mint': ['#6ff2c7', '#020f0b'],
+    'platform-violet': ['#a88cff', '#07040e'],
+    'platform-rose': ['#ff7a90', '#110407']
+  };
+  const colors = accentMap[card.theme] || accentMap['platform-cyan'];
+  return cardShell({ id: card.id, theme: `bc--platform ${card.theme}` }, `
+    <img class="bc-logo-watermark" src="${skyesLogoUrl}" alt="">
+    <span class="platform-index">${card.index}</span>
+    <div class="bc-inner">
+      <div class="bc-top">
+        <div class="bc-brand">
+          <img class="bc-logo logo-skyes" src="${skyesLogoUrl}" alt="">
+          <div class="bc-brand-text">
+            <strong>Skyes Over London</strong>
+            <span>${companyLine}</span>
+          </div>
+        </div>
+        <div class="bc-qr">
+          <canvas data-url="${card.qr}" data-fg="${colors[0]}" data-bg="${colors[1]}"></canvas>
+        </div>
+      </div>
+      <div class="bc-title-block">
+        <div class="bc-line"></div>
+        <h2 class="bc-name">${card.name.toUpperCase()}</h2>
+        <p class="bc-title">${card.title}</p>
+      </div>
+      <div class="bc-bottom">
+        <div class="bc-contact">
+          <span>${contactEmail}</span>
+          <span>${contactPhone}</span>
+          <span class="bc-url">${card.displayUrl}</span>
+        </div>
+        <span class="bc-pill">Live QR</span>
+      </div>
+    </div>
+  `);
+}
+
+function renderCards() {
+  renderCardGroup(document.getElementById('founderGrid'), founderCards, founderCard);
+  renderCardGroup(document.getElementById('platformGrid'), platformCards, platformCard, 'platform-card');
+}
+
+function renderCardGroup(target, cards, renderer, wrapClass) {
+  const template = document.getElementById('cardWrapTemplate');
+  target.innerHTML = '';
+  cards.forEach((card) => {
+    const node = template.content.firstElementChild.cloneNode(true);
+    if (wrapClass) node.classList.add(wrapClass);
+    node.querySelector('.bc-label').textContent = card.label || card.name;
+    node.querySelector('.bc-display').innerHTML = renderer(card);
+    const buttons = node.querySelectorAll('button');
+    buttons[0].setAttribute('onclick', `printCard('${card.id}')`);
+    buttons[1].setAttribute('onclick', `printCard('${card.id}')`);
+    target.appendChild(node);
+  });
+}
+
+function genQR(canvas) {
+  if (!canvas || !window.qrcode) return;
+  const url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
+  const fg = canvas.dataset.fg || '#f4c75b';
+  const bg = canvas.dataset.bg || '#07060a';
+  const qr = qrcode(0, 'M');
+  qr.addData(url);
+  qr.make();
+  const size = 224;
+  const margin = 2;
+  const count = qr.getModuleCount();
+  const cell = size / (count + margin * 2);
+  const ctx = canvas.getContext('2d');
+  canvas.width = size;
+  canvas.height = size;
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = fg;
+  for (let row = 0; row < count; row += 1) {
+    for (let col = 0; col < count; col += 1) {
+      if (!qr.isDark(row, col)) continue;
+      const x = Math.floor((col + margin) * cell);
+      const y = Math.floor((row + margin) * cell);
+      const nextX = Math.ceil((col + margin + 1) * cell);
+      const nextY = Math.ceil((row + margin + 1) * cell);
+      ctx.fillRect(x, y, Math.max(1, nextX - x), Math.max(1, nextY - y));
+    }
+  }
+}
+
+function refreshQR() {
+  document.querySelectorAll('.bc canvas').forEach(genQR);
+}
+
+function fitCardPreviews() {
+  document.querySelectorAll('.bc-display').forEach((wrap) => {
+    const available = wrap.parentElement.getBoundingClientRect().width;
+    const width = Math.min(600, Math.max(280, available));
+    wrap.style.width = `${width}px`;
+    wrap.style.height = `${Math.round(width * 343 / 600)}px`;
+    wrap.style.setProperty('--screen-scale', String(width / 336));
+  });
+}
+
+function printCard(id) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  card.classList.add('print-active');
+  document.body.classList.add('printing');
+  window.print();
+  document.body.classList.remove('printing');
+  card.classList.remove('print-active');
+}
+
+function printCollection(selector) {
+  const cards = [...document.querySelectorAll(selector)];
+  cards.forEach((card) => card.classList.add('print-included'));
+  document.body.classList.add('printing-collection');
+  window.print();
+  document.body.classList.remove('printing-collection');
+  cards.forEach((card) => card.classList.remove('print-included'));
+}
+
+function slugPart(value, fallback) {
+  return (value || fallback)
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.slice(0, 4))
+    .join('');
+}
+
+function addDaysIso(days) {
+  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  return date.toISOString().slice(0, 10);
+}
+
+function titleText(value) {
+  return String(value || '').replace(/\bAnd\b/g, '&');
+}
+
+function valleyBusinessUrl(business) {
+  const raw = business?.landing_page_url || business?.url || '';
+  if (!raw) return `${zeroOsOrigin}/valley-verified/`;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return `${zeroOsOrigin}${raw.startsWith('/') ? raw : `/${raw}`}`;
+}
+
+function directoryText(business) {
+  return [
+    business.name,
+    business.city,
+    business.category,
+    business.niche,
+    business.zip,
+    business.id
+  ].join(' ').toLowerCase();
+}
+
+function fallbackBusiness() {
+  return {
+    id: 'bobs-smoke-shop-litchfield-park',
+    name: "Bob's Smoke Shop",
+    city: 'Litchfield Park',
+    category: 'Retail & Specialty',
+    niche: 'Smoke Shop',
+    phone: '(623) 935-0786',
+    email: 'bobsmokeshopaz@gmail.com',
+    url: '/valley-verified/business/bobs-smoke-shop-litchfield-park/'
+  };
+}
+
+function buildConnectLogHandoff({ business, code, contact, expires }) {
+  const biz = business || {};
+  const url = new URL(connectLogAppUrl);
+  url.searchParams.set('source', 'business-cards');
+  url.searchParams.set('sourceLabel', 'Business Cards Studio');
+  url.searchParams.set('cardKind', 'valley-verified');
+  url.searchParams.set('cardTitle', 'Valley Verified Priority Access');
+  url.searchParams.set('clientId', biz.id || code.toLowerCase());
+  url.searchParams.set('business', document.getElementById('vv-biz').value || biz.name || 'Valley Verified client');
+  url.searchParams.set('city', document.getElementById('vv-city').value || biz.city || 'Phoenix Metro');
+  url.searchParams.set('category', document.getElementById('vv-cat').value || biz.category || 'Valley Verified');
+  url.searchParams.set('contact', contact || 'Owner');
+  url.searchParams.set('priorityCode', code);
+  url.searchParams.set('valleyUrl', activeClientUrl);
+  url.searchParams.set('cardUrl', activeClientUrl);
+  url.searchParams.set('skyemerit', '31');
+  url.searchParams.set('expires', expires);
+  url.searchParams.set('install', '1');
+  url.searchParams.set('operator', 'Gray London Skyes');
+  url.searchParams.set('operatorEmail', contactEmail);
+  url.searchParams.set('operatorPhone', contactPhone);
+  return url.toString();
+}
+
+async function loadValleyDirectory() {
+  const results = document.getElementById('vv-directory-results');
+  try {
+    const response = await fetch(valleyDirectoryUrl, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Directory HTTP ${response.status}`);
+    const payload = await response.json();
+    valleyBusinesses = Array.isArray(payload) ? payload : Array.isArray(payload.businesses) ? payload.businesses : [];
+  } catch (error) {
+    console.warn('Valley directory load failed:', error);
+    valleyBusinesses = [fallbackBusiness()];
+    if (results) results.textContent = 'Directory fallback loaded. Bob is ready.';
+  }
+  const bob = valleyBusinesses.find((item) => item.id === 'bobs-smoke-shop-litchfield-park') || valleyBusinesses[0] || fallbackBusiness();
+  applyValleyBusiness(bob, { keepSearch: true });
+  renderValleyDirectory('');
+}
+
+function renderValleyDirectory(query = '') {
+  const results = document.getElementById('vv-directory-results');
+  if (!results) return;
+  const q = query.trim().toLowerCase();
+  const matches = (q ? valleyBusinesses.filter((item) => directoryText(item).includes(q)) : valleyBusinesses)
+    .slice(0, 8);
+  results.replaceChildren();
+  if (!matches.length) {
+    const empty = document.createElement('span');
+    empty.className = 'bc-note';
+    empty.textContent = 'No client match yet. Keep typing or use the fields below.';
+    results.append(empty);
+    return;
+  }
+  matches.forEach((business) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `vv-directory-card${selectedValleyBusiness?.id === business.id ? ' is-active' : ''}`;
+    const name = document.createElement('strong');
+    name.textContent = business.name || 'Unnamed business';
+    const meta = document.createElement('span');
+    meta.textContent = [business.city, titleText(business.category), business.niche].filter(Boolean).join(' / ');
+    button.append(name, meta);
+    button.addEventListener('click', () => applyValleyBusiness(business));
+    results.append(button);
+  });
+}
+
+function applyValleyBusiness(business, options = {}) {
+  selectedValleyBusiness = business || fallbackBusiness();
+  document.getElementById('vv-biz').value = selectedValleyBusiness.name || "Bob's Smoke Shop";
+  document.getElementById('vv-city').value = selectedValleyBusiness.city || 'Litchfield Park';
+  document.getElementById('vv-cat').value = titleText(selectedValleyBusiness.category || selectedValleyBusiness.niche || 'Retail & Specialty');
+  document.getElementById('vv-contact').value = selectedValleyBusiness.contact || 'Owner';
+  if (!options.keepSearch) document.getElementById('vv-directory-search').value = selectedValleyBusiness.name || '';
+  updateVV();
+  renderValleyDirectory(document.getElementById('vv-directory-search').value || '');
+}
+
+function updateVV() {
+  const biz = document.getElementById('vv-biz').value || "Bob's Smoke Shop";
+  const city = document.getElementById('vv-city').value || 'Litchfield Park';
+  const cat = document.getElementById('vv-cat').value || 'Retail & Specialty';
+  const contact = document.getElementById('vv-contact').value || 'Owner';
+  const cityInitials = city.split(/\s+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 3).toUpperCase() || 'AZ';
+  const code = `VV-${slugPart(biz, 'CLIENT')}-${cityInitials}`;
+  const matchedSelection = selectedValleyBusiness && (selectedValleyBusiness.name || '').toLowerCase() === biz.toLowerCase();
+  activeClientUrl = matchedSelection ? valleyBusinessUrl(selectedValleyBusiness) : `${zeroOsOrigin}/valley-verified/?q=${encodeURIComponent(biz)}`;
+  const expires = addDaysIso(7);
+  const handoff = buildConnectLogHandoff({ business: matchedSelection ? selectedValleyBusiness : null, code, contact, expires });
+  activeConnectLogUrl = handoff;
+
+  document.getElementById('vv-biz-display').textContent = biz.toUpperCase();
+  document.getElementById('vv-city-display').textContent = `${city} / ${cat}`;
+  document.getElementById('vv-contact-display').textContent = `Contact: ${contact}`;
+  document.getElementById('vv-code-display').textContent = code;
+  document.getElementById('vv-code-control').textContent = code;
+  document.getElementById('vv-connectlog-control').textContent = handoff;
+  document.getElementById('vv-skyemerit-control').textContent = `31% through ${expires}`;
+  const name = document.getElementById('vv-biz-display');
+  name.style.fontSize = biz.length > 24 ? '13px' : biz.length > 18 ? '15px' : '17px';
+  const qr = document.getElementById('vv-qr');
+  qr.dataset.url = handoff;
+  genQR(qr);
+}
+
+function resetVV() {
+  const bob = valleyBusinesses.find((item) => item.id === 'bobs-smoke-shop-litchfield-park') || fallbackBusiness();
+  document.getElementById('vv-directory-search').value = '';
+  applyValleyBusiness(bob, { keepSearch: true });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderCards();
+  refreshQR();
+  fitCardPreviews();
+  loadValleyDirectory();
+  ['vv-biz', 'vv-city', 'vv-cat', 'vv-contact'].forEach((id) => {
+    document.getElementById(id).addEventListener('input', updateVV);
+  });
+  document.getElementById('vv-directory-search').addEventListener('input', (event) => {
+    renderValleyDirectory(event.target.value);
+  });
+  document.getElementById('vv-open-connectlog').addEventListener('click', () => {
+    window.open(activeConnectLogUrl, '_blank', 'noopener');
+  });
+  document.getElementById('vv-open-client').addEventListener('click', () => {
+    window.open(activeClientUrl, '_blank', 'noopener');
+  });
+});
+
+window.addEventListener('resize', fitCardPreviews);
+</script>
+</body>
+</html>

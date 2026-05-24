@@ -372,7 +372,7 @@
         </div>
       </div>
       <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
-        <p class="eyebrow">Updated May 23 2026 UTC</p>
+        <p class="eyebrow">Updated May 24 2026 UTC</p>
         <h2>Full production in the changelog.</h2>
         <p>The current production ledger records live surfaces, Cloudflare routes, SkyeNet deploy proof, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, Company Knowledge ingest receipts, SkySecure FS27 Vault proof, and public-safe receipts without exposing private controls.</p>
         <div class="proof-grid">
@@ -394,6 +394,54 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="helper-k4i-skynet-deployment-agent-live">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">Deploy Agent</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Helper K4i</span><span>SkyeNet</span><span>0S Worker</span><span>Gray Skyes Brain</span><span>SkyePay</span><span>Stress proof</span></div>
+            <h2>Helper K4i now has a live SkyeNet deployment agent with Worker-side authority checks.</h2>
+            <p>The deployment lane now has a real operator agent that can diagnose production deploy authority, sync scoped Worker secrets through the secure deploy path, log deployment-assist receipts, prepare secret-rotation plans, and hand off proof/stress results without exposing raw keys.</p>
+            <ul class="release-points">
+              <li>The 0S Worker now exposes gated Helper K4i deployment endpoints at <code>/api/helper-k4i/deploy-authority</code>, <code>/api/helper-k4i/deploy-assist</code>, and <code>/api/helper-k4i/secret-rotation-plan</code>.</li>
+              <li>The local SkyeNet Deployment Agent now supports <code>diagnose</code>, <code>deploy-pages</code>, <code>sync-worker-secrets</code>, <code>smoke-devooderator</code>, and <code>stress-devooderator</code> modes.</li>
+              <li>DevodeRator was redeployed to production with Pages deployment <code>c8fc598b-7d85-4976-aaee-e2c66fe8e34b</code>; the new founder blog is live at <code>https://devooderator.pages.dev/blog/2026-05-24-skynet-helper-k4i-production-lane</code> and the canonical home now points Today / Read today's drop / Open post into that SkyeNet + Helper K4i entry.</li>
+              <li>The 0S Worker deployment lane published Helper K4i and the deployment-agent module, then live API proof confirmed the Worker-side SkyeNet authority lane was ready.</li>
+              <li>The Gray London Skyes brain, Helper K4i brain, Site Operator brain, and 18-brain persona registry now route design/deploy/key-rotation work into the deployment agent instead of leaving it as an operator-only manual lane.</li>
+              <li>SkyeNet and SkyePay were stress-checked together across gated SkyeNet routes, Citadel runtime metadata, FS27 SkyePay offers, and live Stripe product/price receipts; the recorded SkyeNet stress pass covered 48 production requests with zero failures.</li>
+              <li>Owner is handling the final live browser verification for DevodeRator. The Codex-side release proof is backed by Cloudflare production deploy, live HTTP checks, deployment-agent smoke, and deployment-agent stress receipts.</li>
+            </ul>
+            <div class="receipt-row"><span><code>tools/deployment-agent.mjs</code></span><span><code>test-artifacts/cloudflare-pages/devooderator-direct-upload-receipt.json</code></span><span><code>test-artifacts/deployment-agent/2026-05-24T07-19-00-845Z-smoke-devooderator.json</code></span><span><code>test-artifacts/deployment-agent/2026-05-24T07-19-02-934Z-stress-devooderator.json</code></span><span><code>test-artifacts/deployment-agent/2026-05-24T03-12-45-040Z-sync-worker-secrets.json</code></span><span><code>test-artifacts/citadeldb-helper-k4i-live-api/2026-05-24T03-16-24-498Z/receipt.json</code></span><span><code>test-artifacts/skyenet-live-production-stress/2026-05-24T03-16-25-247Z/receipt.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyevault-devoderator-bins-closeout">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">Vault Bins</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeVault</span><span>Delta journal</span><span>DevodeRator</span><span>SkyeAgents Bin</span><span>Autosync daemon</span><span>Owner signoff</span></div>
+            <h2>I closed the repo-continuity lane around encrypted full-repo custody, fast delta journals, and scoped agent bins.</h2>
+            <p>The owner repo stays protected by the full encrypted SkyeVault autosync lane, while the new delta journal seals changed/untracked/local-critical files first and companion bin exports protect focused work like DevodeRator and SkyeAgents without packing shared files twice. The vault was not wiped for this closeout; the existing vault remains intact.</p>
+            <ul class="release-points">
+              <li>The active autosync daemon keeps the ten-minute local scan loop running from the workspace filesystem and now runs the encrypted delta journal before the heavier full custody pass.</li>
+              <li>The new fast-lane commands are <code>npm run vault:delta:dry-run</code>, <code>npm run vault:delta:upload</code>, and <code>npm run vault:delta:status</code>; autosync can disable or require the lane with <code>--skip-delta</code>, <code>--no-delta-upload</code>, or <code>--require-delta</code>.</li>
+              <li>The new bin export commands are <code>npm run vault:bins:export:dry-run</code>, <code>npm run vault:bins:export</code>, and <code>npm run vault:agents:export</code>; companion bin upload remains opt-in through <code>--upload-bins</code> or <code>SKYEVAULT_AUTOSYNC_BIN_UPLOAD=1</code>.</li>
+              <li>The DevodeRator Field Scribe agent now has a dedicated agent lane with <code>npm run devooderator:agent:brief</code> and <code>npm run devooderator:agent:draft</code> so daily founder/dev blogs can be drafted from changed paths, receipts, deploy proof, and vault state.</li>
+              <li>SkyeVault-Drop's public AI/dev install page now explains the local agent, recovery boundary, delta journal behavior, bin export behavior, proof commands, and no-perfect-tech positioning for new developers and coding AIs.</li>
+              <li>DevodeRator is live on Cloudflare Pages with the floating Gray cards logo, MCP receipts, the Bins page, and the blog proof lane; the latest direct upload ID is recorded in <code>test-artifacts/cloudflare-pages/devooderator-direct-upload-receipt.json</code>.</li>
+              <li>SkyeVault-Drop is live on Cloudflare Workers version <code>71bb1cf4-3802-4b54-bc7c-abc3425cff34</code>.</li>
+              <li>The 0S marketing Pages surface is live at <code>https://metraiyux-0s-marketing.pages.dev/</code> with closeout direct upload <code>8e008ed4-d8cf-488c-955a-ce02418597c1</code>.</li>
+              <li>The Legal Skyes Pages surface is live at <code>https://skyes-over-london-legal.pages.dev/</code> with closeout direct upload <code>95e0cd7b-d5e4-4482-bf17-2765dbf8b1e5</code>.</li>
+              <li>The main 0S Worker was redeployed after regenerating the public proof/changelog module; Wrangler records the exact final version in the closeout output.</li>
+              <li>Verification for this closeout used CLI checks, delta dry-run, bin export stress, autosync proof publishing, and live HTTP smokes. Headed browser proof was stopped and owner-waived, with the owner performing live visual signoff directly.</li>
+            </ul>
+            <div class="receipt-row"><span><code>tools/skyevault-delta-journal.mjs</code></span><span><code>SkyeVault-Drop/CHANGELOG.md</code></span><span><code>docs/SKYEVAULT_BINS_BETA.md</code></span><span><code>docs/SKYEVAULT_AUTOSYNC_PARITY.md</code></span><span><code>marketing/devooderator/</code></span><span><code>https://skyevault-drop.graylondonskyes.workers.dev/agent-install.html</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="media-over-london-artist-nexus-order-correction">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-23">May 23, 2026</time>

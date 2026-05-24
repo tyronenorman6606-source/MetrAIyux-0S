@@ -1,0 +1,162 @@
+{
+  "schema": "skye.skrucible.devooderator.direct-tool-receipt.v1",
+  "generatedAt": "2026-05-24T01:43:48.661Z",
+  "endpoint": "https://skrucible.pages.dev/mcp",
+  "targetFolder": "marketing/devooderator",
+  "directMcpTransport": "@modelcontextprotocol/sdk/client/streamableHttp",
+  "toolCallCount": 18,
+  "toolsCalled": [
+    "forge_index",
+    "forge_stack",
+    "forge_palette",
+    "forge_shader",
+    "forge_mode",
+    "forge_css",
+    "forge_component:glass",
+    "forge_component:crystal",
+    "forge_component:floor",
+    "forge_component:pixi",
+    "forge_component:anime",
+    "forge_component:chrome",
+    "forge_animation:spring",
+    "forge_animation:gsap-scroll",
+    "forge_animation:lenis",
+    "forge_animation:kinetic-wordmark",
+    "forge_animation:glitch-text",
+    "forge_animation:gooey"
+  ],
+  "calls": [
+    {
+      "name": "forge_index",
+      "args": {},
+      "ok": true,
+      "resultText": "{\n  \"tools\": [\n    {\n      \"name\": \"forge_index\",\n      \"desc\": \"List all available SKRUCIBLE Forge tools with descriptions.\"\n    },\n    {\n      \"name\": \"forge_stack\",\n      \"desc\": \"Return the full MCP3 package.json + vite.config.js design stack — every dependency, version, and chunk config.\"\n    },\n    {\n      \"name\": \"forge_palette\",\n      \"desc\": \"Return the Forge color system: CSS custom properties, hex values, both Raw and Refined modes.\"\n    },\n    {\n      \"name\": \"forge_shader\",\n      \"desc\": \"Return the custom GLSL PlasmaMaterial shader recipe with extend() wiring and uniform definitions.\"\n    },\n    {\n      \"name\": \"forge_component\",\n      \"desc\": \"Return a named component recipe from the Forge. Available: glass, crystal, floor, pixi, anime, chrome.\"\n    },\n    {\n      \"name\": \"forge_animation\",\n      \"desc\": \"Return an animation recipe. Available: spring, gsap-scroll, lenis, kinetic-wordmark, glitch-text, gooey.\"\n    },\n    {\n      \"name\": \"forge_mode\",\n      \"desc\": \"Return the Raw/Refined dual-mode design system spec: zustand state, CSS data attributes, palette shifts.\"\n    },\n    {\n      \"name\": \"forge_css\",\n      \"desc\": \"Return the full MCP3 CSS custom property system and key class definitions.\"\n    }\n  ]\n}"
+    },
+    {
+      "name": "forge_stack",
+      "args": {},
+      "ok": true,
+      "resultText": "{\n  \"name\": \"skrucible-mcp\",\n  \"version\": \"1.0.3\",\n  \"dependencies\": {\n    \"@react-three/fiber\": \"^8.17.6\",\n    \"@react-three/drei\": \"^9.111.3\",\n    \"@react-three/postprocessing\": \"^2.16.2\",\n    \"@react-three/rapier\": \"^1.5.0\",\n    \"@react-spring/three\": \"^9.7.4\",\n    \"@use-gesture/react\": \"^10.3.1\",\n    \"three\": \"^0.168.0\",\n    \"maath\": \"^0.10.8\",\n    \"framer-motion\": \"^11.5.4\",\n    \"gsap\": \"^3.12.5\",\n    \"lenis\": \"^1.1.14\",\n    \"animejs\": \"^3.2.2\",\n    \"pixi.js\": \"^7.4.2\",\n    \"@theatre/core\": \"^0.7.2\",\n    \"tone\": \"^15.1.22\",\n    \"zustand\": \"^4.5.5\",\n    \"lucide-react\": \"^0.417.0\",\n    \"@modelcontextprotocol/sdk\": \"^1.21.0\",\n    \"zod\": \"^4.1.12\"\n  },\n  \"viteConfig\": {\n    \"manualChunks\": {\n      \"three\": [\n        \"three\",\n        \"@react-three/fiber\",\n        \"@react-three/drei\",\n        \"@react-three/postprocessing\"\n      ],\n      \"motion\": [\n        \"framer-motion\",\n        \"gsap\",\n        \"lenis\",\n        \"animejs\"\n      ],\n      \"spring\": [\n        \"@react-spring/three\",\n        \"@use-gesture/react\"\n      ],\n      \"pixi\": [\n        \"pixi.js\"\n      ],\n      \"rapier\": [\n        \"@react-three/rapier\"\n      ]\n    }\n  }\n}"
+    },
+    {
+      "name": "forge_palette",
+      "args": {},
+      "ok": true,
+      "resultText": "{\n  \"modes\": {\n    \"refined\": {\n      \"plasma\": \"#b47dff\",\n      \"forge\": \"#ff6b35\",\n      \"ice\": \"#7dd3fc\",\n      \"gold\": \"#f4c75b\",\n      \"mint\": \"#8ff0a4\",\n      \"chrome\": \"#c8c4ff\",\n      \"bg\": \"#04030a\",\n      \"ink\": \"#eef0ff\"\n    },\n    \"raw\": {\n      \"plasma\": \"#ff6b35\",\n      \"forge\": \"#b47dff\",\n      \"ice\": \"#f4c75b\",\n      \"gold\": \"#f4c75b\",\n      \"mint\": \"#8ff0a4\",\n      \"chrome\": \"#c8c4ff\",\n      \"bg\": \"#090206\",\n      \"ink\": \"#fff8ee\"\n    }\n  },\n  \"css\": \"  --plasma: #b47dff;\\n  --forge: #ff6b35;\\n  --ice: #7dd3fc;\\n  --gold: #f4c75b;\\n  --mint: #8ff0a4;\\n  --chrome: #c8c4ff;\\n  --bg: #04030a;\\n  --ink: #eef0ff;\",\n  \"rawCss\": \"  --plasma: #ff6b35;\\n  --forge: #b47dff;\\n  --ice: #f4c75b;\\n  --gold: #f4c75b;\\n  --mint: #8ff0a4;\\n  --chrome: #c8c4ff;\\n  --bg: #090206;\\n  --ink: #fff8ee;\",\n  \"usage\": \"Set data-forge-mode=\\\"raw\\\" or \\\"refined\\\" on <html> to switch palette via CSS custom properties.\"\n}"
+    },
+    {
+      "name": "forge_shader",
+      "args": {},
+      "ok": true,
+      "resultText": "// PlasmaMaterial — custom GLSL shaderMaterial for @react-three/fiber\n// deps: three, @react-three/fiber, @react-three/drei\nimport { shaderMaterial } from '@react-three/drei';\nimport { extend } from '@react-three/fiber';\nimport * as THREE from 'three';\n\nconst PlasmaMaterial = shaderMaterial(\n  { uTime: 0, uIntensity: 0.7, uMouse: new THREE.Vector2(0.5, 0.5) },\n  `varying vec2 vUv;\n   void main() {\n     vUv = uv;\n     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n   }`,\n  `uniform float uTime;\n   uniform float uIntensity;\n   uniform vec2 uMouse;\n   varying vec2 vUv;\n   #define PI 3.14159265358979\n   void main() {\n     vec2 uv = vUv - 0.5;\n     vec2 m = uMouse - 0.5;\n     float t = uTime * 0.28;\n     float v = sin(uv.x * 10.0 + t) * 0.5\n             + sin(uv.y * 8.0 + t * 1.1) * 0.5\n             + sin((uv.x + uv.y) * 7.0 + t * 0.92) * 0.5\n             + sin(length(uv) * 14.0 - t * 1.5) * 0.5\n             + sin(length(uv - m) * 18.0 - t * 2.1) * 0.3;\n     vec3 c1 = vec3(0.706, 0.490, 1.0);\n     vec3 c2 = vec3(0.490, 0.831, 1.0);\n     vec3 c3 = vec3(1.0, 0.420, 0.208);\n     float s = sin(v * PI) * 0.5 + 0.5;\n     float cs = cos(v * PI * 0.7) * 0.5 + 0.5;\n     vec3 color = c1 * s + c2 * cs * (1.0 - s) + c3 * (1.0 - s) * (1.0 - cs) * 0.7;\n     color *= uIntensity * 0.55;\n     gl_FragColor = vec4(color, 0.72 * uIntensity);\n   }`\n);\nextend({ PlasmaMaterial });\n\n// Usage in JSX — drives uTime in useFrame:\n// const matRef = useRef();\n// useFrame((state) => { if (matRef.current) matRef.current.uTime = state.clock.elapsedTime; });\n// <mesh><planeGeometry args={[4,4,1,1]} /><plasmaMaterial ref={matRef} /></mesh>"
+    },
+    {
+      "name": "forge_mode",
+      "args": {},
+      "ok": true,
+      "resultText": "{\n  \"description\": \"SKRUCIBLE Forge dual-mode identity system. Raw = hot orange primary, violet secondary. Refined = electric violet primary, hot orange accent.\",\n  \"zustandState\": \"mode: 'refined', toggleMode: () => set(s => ({ mode: s.mode === 'refined' ? 'raw' : 'refined' }))\",\n  \"htmlIntegration\": \"useEffect(() => { document.documentElement.setAttribute('data-forge-mode', mode); }, [mode]);\",\n  \"cssSelectors\": {\n    \"[data-forge-mode=\\\"raw\\\"]\": {\n      \"plasma\": \"#ff6b35\",\n      \"forge\": \"#b47dff\",\n      \"ice\": \"#f4c75b\",\n      \"gold\": \"#f4c75b\",\n      \"mint\": \"#8ff0a4\",\n      \"chrome\": \"#c8c4ff\",\n      \"bg\": \"#090206\",\n      \"ink\": \"#fff8ee\"\n    },\n    \"[data-forge-mode=\\\"refined\\\"]\": {\n      \"plasma\": \"#b47dff\",\n      \"forge\": \"#ff6b35\",\n      \"ice\": \"#7dd3fc\",\n      \"gold\": \"#f4c75b\",\n      \"mint\": \"#8ff0a4\",\n      \"chrome\": \"#c8c4ff\",\n      \"bg\": \"#04030a\",\n      \"ink\": \"#eef0ff\"\n    }\n  },\n  \"uiPattern\": \"A .mode-toggle button with ::before indicator dot that shifts color on click. Font: Archivo Black, letter-spacing: 0.16em, uppercase label.\"\n}"
+    },
+    {
+      "name": "forge_css",
+      "args": {},
+      "ok": true,
+      "resultText": ":root {\n  --bg: #04030a;\n  --ink: #eef0ff;\n  --muted: rgba(238, 240, 255, 0.68);\n  --faint: rgba(238, 240, 255, 0.12);\n  --plasma: #b47dff;\n  --forge: #ff6b35;\n  --ice: #7dd3fc;\n  --gold: #f4c75b;\n  --mint: #8ff0a4;\n  --chrome: #c8c4ff;\n  --panel: rgba(4, 3, 18, 0.72);\n  --panel-strong: rgba(6, 4, 20, 0.88);\n  --stroke: rgba(238, 240, 255, 0.12);\n  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);\n  --ambient-breathe: 1;\n  --scroll-progress: 0;\n}\n\n[data-forge-mode=\"raw\"] {\n  --plasma: #ff6b35;\n  --forge: #b47dff;\n  --ice: #f4c75b;\n  --bg: #090206;\n  --ink: #fff8ee;\n}\n\n/* Key layout classes */\n.forge-app { min-height: 100svh; background: var(--bg); color: var(--ink); font-family: Inter, sans-serif; }\n.canvas-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; }\n.hero-shell { position: relative; z-index: 10; padding: clamp(1.5rem, 4vw, 3rem); min-height: 100svh; display: flex; flex-direction: column; gap: 1.5rem; }\n.forge-canvas { width: 100% !important; height: 100% !important; display: block; }\n\n/* Tool picker */\n.tool-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border: 1px solid var(--stroke); border-radius: 999px; background: var(--panel); color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }\n.tool-btn.active { color: var(--plasma); border-color: var(--plasma); }\n.tool-btn i { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }\n\n/* Kinetic wordmark */\n.kinetic-wordmark { font-family: 'Archivo Black', sans-serif; font-size: clamp(3.5rem, 9vw, 8.5rem); letter-spacing: -0.04em; line-height: 0.95; color: var(--ink); }\n.wm-char { display: inline-block; transform-origin: center bottom; opacity: 0; }\n\n/* Glitch text */\n.glitch-text { display: inline; }\n.glitch-char { display: inline-block; animation: glitch-drift 4s ease-in-out infinite alternate; animation-delay: calc(var(--gd) * 1s); transform: translateY(calc(var(--go) * 0.3)); }\n@keyframes glitch-drift { 0% { transform: translateY(0); } 100% { transform: translateY(var(--go)); } }\n\n/* Scroll sections */\n.forge-scroll { position: relative; z-index: 5; padding: 8rem 0; min-height: 500svh; }\n.chapter { max-width: 680px; margin: 0 auto 14rem; padding: 0 clamp(1.5rem, 5vw, 4rem); }\n.chapter h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); color: var(--ink); margin-bottom: 1rem; }\n.chapter p { font-size: 1.05rem; line-height: 1.72; color: var(--muted); }\n\n/* Panel */\n.arsenal-panel { background: var(--panel); border: 1px solid var(--stroke); border-radius: 1rem; padding: 1rem 1.25rem; max-width: 320px; }\n.arsenal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.35rem 1rem; font-size: 0.72rem; }\n.arsenal-grid b { color: var(--plasma); margin-right: 0.35rem; }\n\n/* Motion paused state */\nbody.motion-paused .glitch-char { animation-play-state: paused; }\nbody.motion-paused .kinetic-wordmark { animation-play-state: paused; }"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "glass"
+      },
+      "ok": true,
+      "resultText": "// GlassOrb — MeshTransmissionMaterial real glass refraction\n// deps: @react-three/drei, @react-spring/three\nimport { MeshTransmissionMaterial } from '@react-three/drei';\nimport { useSpring, a } from '@react-spring/three';\n\nfunction GlassOrb() {\n  const [{ scale }, api] = useSpring(() => ({ scale: 1, config: { tension: 220, friction: 18 } }));\n  return (\n    <a.mesh scale={scale}\n      onPointerEnter={() => api.start({ scale: 1.08 })}\n      onPointerLeave={() => api.start({ scale: 1 })}\n    >\n      <sphereGeometry args={[1.15, 64, 64]} />\n      <MeshTransmissionMaterial\n        backside samples={6} resolution={512}\n        transmission={1} roughness={0.04} thickness={1.8} ior={1.6}\n        chromaticAberration={0.08} anisotropy={0.3}\n        distortion={0.4} distortionScale={0.28} temporalDistortion={0.14}\n        color=\"#c0a0ff\" attenuationColor=\"#7dd3fc\" attenuationDistance={0.8}\n      />\n    </a.mesh>\n  );\n}"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "crystal"
+      },
+      "ok": true,
+      "resultText": "// Crystal — @react-spring/three physics on hover with emissive lerp\n// deps: @react-spring/three, three, maath\nimport { useSpring, a } from '@react-spring/three';\nimport { easing } from 'maath';\n\nfunction Crystal({ pos, color, delay, active }) {\n  const matRef = useRef();\n  const [hovered, setHovered] = useState(false);\n  const colorObj = useMemo(() => new THREE.Color(color), [color]);\n  const { scale } = useSpring({\n    scale: active ? (hovered ? 1.65 : 1.1) : 0.3,\n    delay, config: { tension: 160, friction: 14 },\n  });\n  useFrame((_, delta) => {\n    if (!matRef.current) return;\n    const target = hovered ? 3.5 : active ? 1.4 : 0.2;\n    matRef.current.emissiveIntensity += (target - matRef.current.emissiveIntensity) * Math.min(delta * 6, 1);\n  });\n  return (\n    <a.mesh position={pos} scale={scale}\n      onPointerEnter={() => setHovered(true)}\n      onPointerLeave={() => setHovered(false)}\n    >\n      <octahedronGeometry args={[0.38, 0]} />\n      <meshStandardMaterial ref={matRef} color={colorObj} metalness={0.86} roughness={0.07}\n        emissive={colorObj} emissiveIntensity={0.2} />\n    </a.mesh>\n  );\n}"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "floor"
+      },
+      "ok": true,
+      "resultText": "// ForgeFloor — MeshReflectorMaterial mirror floor\n// deps: @react-three/drei\nimport { MeshReflectorMaterial } from '@react-three/drei';\n\nfunction ForgeFloor() {\n  return (\n    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.85, 0]}>\n      <planeGeometry args={[30, 30]} />\n      <MeshReflectorMaterial\n        blur={[400, 40]} resolution={1024} mixBlur={0.88} mixStrength={55}\n        roughness={0.9} depthScale={1} minDepthThreshold={0.3} maxDepthThreshold={1.5}\n        color=\"#060418\" metalness={0.55}\n      />\n    </mesh>\n  );\n}"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "pixi"
+      },
+      "ok": true,
+      "resultText": "// PixiPanel — Pixi.js v7 2D GPU canvas overlay with particle trail\n// deps: pixi.js (dynamic import)\nfunction PixiPanel({ active }) {\n  const containerRef = useRef();\n  useEffect(() => {\n    if (!active) return;\n    const el = containerRef.current;\n    let app = null;\n    const particles = [];\n    const MAX = 90;\n    const mouse = { x: 0, y: 0 };\n    const COLORS = [0xb47dff, 0x7dd3fc, 0x8ff0a4, 0xff6b35, 0xf4c75b];\n    let cleanup = () => {};\n    import('pixi.js').then(({ Application, Graphics }) => {\n      app = new Application({ width: el.offsetWidth, height: el.offsetHeight, backgroundAlpha: 0, antialias: true });\n      el.appendChild(app.view);\n      app.view.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';\n      const onMove = (e) => {\n        const r = el.getBoundingClientRect();\n        mouse.x = e.clientX - r.left;\n        mouse.y = e.clientY - r.top;\n      };\n      el.addEventListener('mousemove', onMove, { passive: true });\n      app.ticker.add(() => {\n        if (particles.length < MAX) {\n          const g = new Graphics();\n          g.beginFill(COLORS[Math.floor(Math.random() * COLORS.length)], 0.85);\n          g.drawCircle(0, 0, Math.random() * 7 + 2);\n          g.endFill();\n          Object.assign(g, { x: mouse.x, y: mouse.y,\n            _vx: (Math.random() - 0.5) * 2.4, _vy: (Math.random() - 0.5) * 2.4 - 1.2,\n            _life: 1, _decay: 0.011 + Math.random() * 0.012 });\n          app.stage.addChild(g);\n          particles.push(g);\n        }\n        for (let i = particles.length - 1; i >= 0; i--) {\n          const p = particles[i];\n          p._life -= p._decay; p._vy += 0.045;\n          p.x += p._vx; p.y += p._vy;\n          p.alpha = p._life; p.scale.set(p._life * 0.9 + 0.1);\n          if (p._life <= 0) { app.stage.removeChild(p); p.destroy(); particles.splice(i, 1); }\n        }\n      });\n      cleanup = () => { el.removeEventListener('mousemove', onMove); app?.destroy(true, { children: true }); };\n    });\n    return () => cleanup();\n  }, [active]);\n  return <div ref={containerRef} style={{ position:'absolute', inset:0, opacity: active ? 1 : 0, transition:'opacity 0.4s' }} />;\n}"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "anime"
+      },
+      "ok": true,
+      "resultText": "// AnimePanel — anime.js staggered letter morphing cycle\n// deps: animejs\nimport anime from 'animejs';\nconst WORDS = ['DESIGN','BUILD','ANIMATE','DEPLOY','FORGE','WIELD','RENDER'];\n\nfunction AnimePanel({ active }) {\n  const elRef = useRef();\n  const animeRef = useRef(null);\n  const idx = useRef(0);\n  const mounted = useRef(false);\n  useEffect(() => {\n    mounted.current = true;\n    if (!active || !elRef.current) return;\n    function run() {\n      if (!mounted.current || !elRef.current) return;\n      const word = WORDS[idx.current++ % WORDS.length];\n      elRef.current.innerHTML = word.split('').map(c =>\n        `<span style=\"display:inline-block;opacity:0\">${c}</span>`).join('');\n      animeRef.current = anime({\n        targets: elRef.current.querySelectorAll('span'),\n        opacity: [0,1], translateY: [-30,0], rotateX: [-90,0],\n        delay: anime.stagger(55), duration: 640, easing: 'easeOutExpo',\n        complete: () => {\n          if (!mounted.current) return;\n          setTimeout(() => {\n            animeRef.current = anime({\n              targets: elRef.current?.querySelectorAll('span'),\n              opacity: 0, translateY: 28,\n              delay: anime.stagger(38, { direction:'reverse' }),\n              duration: 480, easing: 'easeInExpo',\n              complete: () => { if (mounted.current) run(); }\n            });\n          }, 1100);\n        }\n      });\n    }\n    run();\n    return () => { mounted.current = false; animeRef.current?.pause?.(); };\n  }, [active]);\n  return (\n    <div aria-live=\"polite\">\n      <div ref={elRef} style={{ fontFamily:'\"Archivo Black\",sans-serif', fontSize:'clamp(2.8rem,7vw,7.2rem)',\n        letterSpacing:'-0.04em', background:'linear-gradient(90deg,#b47dff,#7dd3fc,#f4c75b)',\n        WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', perspective:'800px' }} />\n    </div>\n  );\n}"
+    },
+    {
+      "name": "forge_component",
+      "args": {
+        "name": "chrome"
+      },
+      "ok": true,
+      "resultText": "// ForgeChrome — framer-motion scroll progress bar + cursor aura\n// deps: framer-motion\nimport { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';\n\nfunction ForgeChrome({ toolColor = '#b47dff' }) {\n  const x = useMotionValue(-120);\n  const y = useMotionValue(-120);\n  const sx = useSpring(x, { stiffness: 140, damping: 26, mass: 0.6 });\n  const sy = useSpring(y, { stiffness: 140, damping: 26, mass: 0.6 });\n  const { scrollYProgress } = useScroll();\n  const progress = useSpring(scrollYProgress, { stiffness: 110, damping: 24 });\n  useEffect(() => {\n    const h = (e) => { x.set(e.clientX); y.set(e.clientY); };\n    window.addEventListener('pointermove', h, { passive: true });\n    return () => window.removeEventListener('pointermove', h);\n  }, []);\n  return (\n    <>\n      <motion.div style={{ position:'fixed', top:0, left:0, right:0, height:'2px',\n        background:'linear-gradient(90deg,#b47dff,#7dd3fc)', scaleX:progress, transformOrigin:'left', zIndex:1000 }} />\n      <motion.div aria-hidden=\"true\" style={{ position:'fixed', top:0, left:0, borderRadius:'50%',\n        width:180, height:180, pointerEvents:'none', zIndex:999,\n        background:`radial-gradient(circle, ${toolColor}50, transparent 64%)`,\n        x: useTransform(sx, v => v - 90), y: useTransform(sy, v => v - 90) }} />\n    </>\n  );\n}"
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "spring"
+      },
+      "ok": true,
+      "resultText": "// @react-spring/three — physics spring in R3F\n// deps: @react-spring/three, @react-three/fiber, three\n// config: tension (stiffness), friction (damping), mass\n\nimport { useSpring, a } from '@react-spring/three';\nimport { useFrame } from '@react-three/fiber';\nimport { useState, useRef } from 'react';\n\nfunction SpringCrystal({ position, color = '#b47dff', active = true }) {\n  const meshRef = useRef();\n  const matRef = useRef();\n  const [hovered, setHovered] = useState(false);\n\n  // spring drives scale — tension/friction = stiffness/damping\n  const { scale } = useSpring({\n    scale: active ? (hovered ? 1.65 : 1.1) : 0.3,\n    config: { tension: 160, friction: 14 },\n    delay: 80,\n  });\n\n  // emissive lerp in useFrame — independent of spring\n  useFrame((_, delta) => {\n    if (!matRef.current) return;\n    const target = hovered ? 3.5 : active ? 1.4 : 0.2;\n    matRef.current.emissiveIntensity +=\n      (target - matRef.current.emissiveIntensity) * Math.min(delta * 6, 1);\n    if (meshRef.current && active && !hovered) {\n      meshRef.current.rotation.y += delta * 0.55;\n    }\n  });\n\n  return (\n    <a.mesh\n      ref={meshRef}\n      position={position}\n      scale={scale}\n      onPointerEnter={() => { setHovered(true); document.body.style.cursor = 'pointer'; }}\n      onPointerLeave={() => { setHovered(false); document.body.style.cursor = ''; }}\n    >\n      <octahedronGeometry args={[0.38, 0]} />\n      <meshStandardMaterial\n        ref={matRef}\n        color={color}\n        metalness={0.86}\n        roughness={0.07}\n        emissive={color}\n        emissiveIntensity={0.2}\n      />\n    </a.mesh>\n  );\n}\n\n// Key: use a.mesh (animated.mesh) — not plain mesh — to accept spring-interpolated values.\n// tension = spring stiffness, friction = damping. Low friction = bouncy overshoot."
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "gsap-scroll"
+      },
+      "ok": true,
+      "resultText": "// GSAP ScrollTrigger — scroll-driven chapter reveals\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\ngsap.registerPlugin(ScrollTrigger);\n\ngsap.set('.chapter', { autoAlpha: 0.24, y: 34 });\ngsap.to('.chapter', {\n  autoAlpha: 1, y: 0, duration: 0.88, ease: 'power3.out', stagger: 0.12,\n  scrollTrigger: { trigger: '.forge-scroll', start: 'top 74%', end: 'bottom bottom', scrub: 0.8 },\n});\n\nScrollTrigger.create({\n  trigger: '.forge-scroll', start: 'top top', end: 'bottom bottom', scrub: true,\n  onUpdate: (self) => {\n    const idx = Math.floor(self.progress * BEATS.length);\n    setActiveTool(BEATS[idx]?.tool || 'glass');\n  },\n});"
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "lenis"
+      },
+      "ok": true,
+      "resultText": "// Lenis smooth scroll wired to GSAP ticker\n// CRITICAL: set autoRaf:false — Lenis v1.1+ defaults autoRaf:true.\n// Without it, Lenis runs its own RAF loop AND GSAP fires it again —\n// double-firing breaks smooth scroll and desynchronises ScrollTrigger.\nimport Lenis from 'lenis';\nimport gsap from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\n\nconst lenis = new Lenis({\n  autoRaf: false,       // GSAP ticker is the RAF driver\n  duration: 1.18,\n  lerp: 0.12,\n  smoothWheel: true,\n  wheelMultiplier: 0.92,\n  touchMultiplier: 1.8,\n});\n\nlenis.on('scroll', () => ScrollTrigger.update());\nconst tick = (time) => lenis.raf(time * 1000);\ngsap.ticker.add(tick);\ngsap.ticker.lagSmoothing(0);\n\n// cleanup\ngsap.ticker.remove(tick);\nlenis.destroy();"
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "kinetic-wordmark"
+      },
+      "ok": true,
+      "resultText": "// KineticWordmark — GSAP 3D letter-by-letter reveal + perpetual float\n// deps: gsap\nfunction KineticWordmark({ text = 'THE FORGE' }) {\n  const ref = useRef();\n  useEffect(() => {\n    const chars = ref.current?.querySelectorAll('.wm-char');\n    if (!chars?.length) return;\n    const tl = gsap.timeline({ delay: 0.25 });\n    tl.fromTo(chars,\n      { y: 80, opacity: 0, rotateX: -90, filter: 'blur(14px)' },\n      { y: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)',\n        stagger: 0.048, duration: 1.15, ease: 'expo.out' }\n    ).add(() => {\n      gsap.to(chars, {\n        y: (i) => Math.sin(i * 0.95) * 5, repeat: -1, yoyo: true,\n        duration: 2.4, ease: 'sine.inOut', stagger: { each: 0.09, repeat: -1, yoyo: true },\n      });\n    });\n    return () => tl.kill();\n  }, []);\n  return (\n    <h1 ref={ref} style={{ display:'flex', fontFamily:'\"Archivo Black\",sans-serif',\n      fontSize:'clamp(3.2rem,9vw,9rem)', letterSpacing:'-0.04em',\n      background:'linear-gradient(105deg,#b47dff,#7dd3fc,#ff6b35)',\n      WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', perspective:'900px' }}>\n      {text.split('').map((c, i) => (\n        <span key={i} className=\"wm-char\" style={{ display:'inline-block', opacity:0, transformStyle:'preserve-3d' }}>\n          {c === ' ' ? '\\u00a0' : c}\n        </span>\n      ))}\n    </h1>\n  );\n}"
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "glitch-text"
+      },
+      "ok": true,
+      "resultText": "// GlitchText — character-level CSS keyframe glitch, word-safe wrapping\n// CRITICAL: wrap each word in whiteSpace:nowrap to prevent mid-word line breaks.\n// Splitting chars into inline-block removes natural word boundaries — browser\n// will break inside words without the word-level wrapper.\nfunction GlitchText({ children, tag: Tag = 'span' }) {\n  const str = String(children);\n  const words = str.split(' ');\n  const wordData = useMemo(\n    () => words.map((word) =>\n      word.split('').map(() => ({\n        d: (Math.random() * 3.4).toFixed(2),\n        o: (Math.random() * 7 - 3.5).toFixed(1),\n      }))\n    ),\n    [str]\n  );\n  return (\n    <Tag aria-label={str}>\n      {words.map((word, wi) => (\n        <React.Fragment key={wi}>\n          <span style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>\n            {word.split('').map((c, ci) => (\n              <span key={ci} style={{\n                display: 'inline-block',\n                animation: `char-glitch 5s ${wordData[wi]?.[ci]?.d ?? 0}s infinite`,\n                '--go': `${wordData[wi]?.[ci]?.o ?? 0}px`,\n              }}>\n                {c}\n              </span>\n            ))}\n          </span>\n          {wi < words.length - 1 && ' '}\n        </React.Fragment>\n      ))}\n    </Tag>\n  );\n}\n/* CSS:\n@keyframes char-glitch {\n  0%,80%,100% { font-weight:inherit; font-style:normal; transform:none; color:inherit; }\n  81%  { font-weight:900; color:#b47dff; transform:translateY(var(--go,0px)) scaleX(1.04); }\n  83%  { font-style:italic; font-weight:200; color:#7dd3fc; opacity:0.72; }\n  85%  { font-weight:inherit; font-style:normal; transform:none; color:inherit; }\n}\n*/"
+    },
+    {
+      "name": "forge_animation",
+      "args": {
+        "name": "gooey"
+      },
+      "ok": true,
+      "resultText": "// Gooey morph zones — SVG feGaussianBlur + feColorMatrix for blob merging\n// Pure SVG + CSS — no deps\nfunction GooeyFilter() {\n  return (\n    <svg width=\"0\" height=\"0\" style={{ position:'fixed', pointerEvents:'none' }} aria-hidden=\"true\">\n      <defs>\n        <filter id=\"forge-gooey\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">\n          <feGaussianBlur in=\"SourceGraphic\" stdDeviation=\"12\" result=\"blur\" />\n          <feColorMatrix in=\"blur\" mode=\"matrix\"\n            values=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10\" result=\"goo\" />\n          <feComposite in=\"SourceGraphic\" in2=\"goo\" operator=\"atop\" />\n        </filter>\n      </defs>\n    </svg>\n  );\n}\n// Apply: style={{ filter:'url(#forge-gooey)' }}\n// .blob { position:absolute; border-radius:50%; opacity:0.45; mix-blend-mode:screen;\n//         animation: blob-drift 6s ease-in-out infinite alternate; }\n// @keyframes blob-drift { 0%{transform:translate(-40px,0) scale(1)} 100%{transform:translate(40px,8px) scale(1.18)} }"
+    }
+  ]
+}

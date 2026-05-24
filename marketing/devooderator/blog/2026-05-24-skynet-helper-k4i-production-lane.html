@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I Made SkyeNet Stop Folding at the First Bad Key | ☣️ DevodeRator ☣️</title>
+  <meta name="description" content="Gray London Skyes writes the DevodeRator build log for the SkyeNet deployment agent, Helper K4i, 0S Worker deploys, root env token scanning, stress proof, and the production lane that came out of a brutal build day.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="☣️ DevodeRator ☣️ logo"><span>☣️ DevodeRator ☣️</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-24-skynet-helper-k4i-production-lane.html">SkyeNet</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 24, 2026 · SkyeNet · Helper K4i · 0S Worker · DevodeRator field log</p>
+    <h1>I made SkyeNet stop folding at the first bad key.</h1>
+    <p class="lede">
+      Today was not a cute checklist day. Today was the kind of day where the operating system had to prove it was actually alive: deploy lanes, root env chaos, Worker secrets, Helper K4i, SkyeNet functions, SkyePay stress, Citadel proof, DevodeRator, and the part where I had to keep saying, "bro, try every damn key before you ask me."
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        The win today was not just that something deployed. The win was making the system smarter about how it survives a blocked deploy, finds another authority lane, records proof, and keeps moving.
+      </blockquote>
+
+      <h2>The first lie was that one rejected key meant the road was closed.</h2>
+      <p>
+        The day started with friction that felt stupid because it was stupid. A deploy path hit a token self-check that said no, and the tooling wanted to act like that was the whole truth. But I knew better because the root env has more than one Cloudflare-related lane in it. Some keys are for one job. Some keys are for another. Some look invalid on token verify but still have real project or Worker access. That is not a theory anymore. We proved it.
+      </p>
+      <p>
+        The old behavior was too fragile. It would find a bad formal token or stop too early, then the whole production push would start acting blocked. That is not acceptable for SkyeNet. If my own operating system cannot try the usable keys already sitting in root env before bothering me, then the helper brain is not helping enough.
+      </p>
+
+      <h2>So I made the deployment lane act like an operator.</h2>
+      <p>
+        The fix was to stop treating Cloudflare access as one magic variable and start treating it like an authority search. The deployment agent now scans the real root env sources, including <code>.env</code>, <code>env.txt</code>, explicit env-file overrides, and the Codespaces workspace paths. It checks deploy tokens, management tokens, account IDs, prose-labeled token blocks, and the formal token names.
+      </p>
+      <p>
+        More importantly, it does not quit because token self-verify is ugly. It checks the actual thing we need: can this credential reach the Pages project, and can it reach the 0S Worker service? That was the ingenuity of the day. Do not worship the wrong health check. Ask the system what it can actually do.
+      </p>
+
+      <div class="receipt-box">
+        <strong>What changed in the deploy tooling</strong>
+        <ul>
+          <li><code>tools/deployment-agent.mjs</code> became the local SkyeNet Deployment Agent with diagnose, deploy, secret sync, smoke, and stress modes.</li>
+          <li><code>tools/cloudflare-pages-direct-upload.mjs</code> now probes credential candidates instead of getting stuck on the first bad token path.</li>
+          <li><code>scripts/deploy-0s-worker.mjs</code> now scans all root env sources before deciding production deploy authority is blocked.</li>
+          <li><code>cf_pages_deploy.py</code> was kept from forcing a brittle env-only path when the direct uploader can find the real lane itself.</li>
+          <li>No raw token values belong in receipts, public pages, or chat output. The receipts use source labels, hashes, statuses, and account suffixes only.</li>
+        </ul>
+      </div>
+
+      <h2>Helper K4i had to become more than a cute proof bot.</h2>
+      <p>
+        I also needed the 0S itself to understand what was happening. If the deploy lane gets blocked, Helper K4i should not sit there looking decorative. It should check authority, create a deploy-assist receipt, prepare a secret-rotation plan, and log the whole thing where I can observe it.
+      </p>
+      <p>
+        So Helper K4i now has gated endpoints for deploy authority, deploy assist, and secret rotation planning. It can tell whether the 0S Worker has the SkyeNet deploy authority it needs. It can write receipts. It can hand me a plan without leaking raw secrets. That is the difference between an agent as branding and an agent as infrastructure.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Helper K4i production lane</strong>
+        <ul>
+          <li><code>/api/helper-k4i/deploy-authority</code> checks the live deployment authority path behind the shared 0S gate.</li>
+          <li><code>/api/helper-k4i/deploy-assist</code> records deployment-assist receipts instead of leaving deploy trouble as loose conversation.</li>
+          <li><code>/api/helper-k4i/secret-rotation-plan</code> prepares a rotation plan without returning secret values.</li>
+          <li>The live proof later came back with the Worker-side deployment authority ready.</li>
+          <li>That proof lives in <code>test-artifacts/citadeldb-helper-k4i-live-api-latest.json</code>.</li>
+        </ul>
+      </div>
+
+      <h2>The 0S Worker got the brain mounted into the actual system.</h2>
+      <p>
+        This could not just be a local script sitting on the side. I needed it baked into the 0S. The route manifest, the live surface registry, the Site Operator brain, the persona registry, Helper K4i's brain, and my Gray London Skyes brain all had to understand that deployment trouble is a real lane now.
+      </p>
+      <p>
+        That matters because the 0S is supposed to feel like one operating system. SkyeNet, Helper K4i, Gray Skyes Brain, Citadel, SkyePay, and the deployment receipts cannot be five separate mental tabs. They have to orchestrate. If the deploy path blocks, the system should know who to ask, what to verify, where to log it, and how to proceed.
+      </p>
+
+      <h2>DevodeRator had its own production mess too.</h2>
+      <p>
+        In the middle of the SkyeNet work, DevodeRator itself still needed production polish. The home hero had image wrapping that did not respect what I asked for, so that got corrected. The business-card mirror had a live rendering problem where the 0S logo could cover the rest of the page, so that got fixed with proper header/nav sizing and missing static assets copied into the DevodeRator build.
+      </p>
+      <p>
+        Then DevodeRator got deployed through the new deployment agent. That matters because the agent was not just theoretical. It pushed the actual Pages project, then smoked and stressed it.
+      </p>
+
+      <div class="receipt-box">
+        <strong>DevodeRator production receipts</strong>
+        <ul>
+          <li>Production site: <code>https://devooderator.pages.dev/</code></li>
+          <li>Business-card mirror: <code>https://devooderator.pages.dev/mirrors/business-cards</code></li>
+          <li>Deployment agent deploy receipt: <code>test-artifacts/deployment-agent/2026-05-24T03-04-35-003Z-deploy-pages.json</code></li>
+          <li>Final DevodeRator smoke receipt: <code>test-artifacts/deployment-agent/2026-05-24T03-21-52-070Z-smoke-devooderator.json</code></li>
+          <li>DevodeRator stress receipt: <code>test-artifacts/deployment-agent/2026-05-24T03-16-28-518Z-stress-devooderator.json</code></li>
+          <li>The stress pass hit 80 live HTTP requests with zero failures.</li>
+        </ul>
+      </div>
+
+      <h2>SkyeNet and SkyePay had to prove they were a money lane, not a slogan.</h2>
+      <p>
+        SkyeNet is not small infra. It is the lane where people can bring builds, where the 0S can route deployments, where functions parity starts becoming real product, and where SkyePay has to make the paid offers accountable. If there is no product in Stripe, there is no sellable lane. If there is no stress proof, there is no production confidence.
+      </p>
+      <p>
+        The live stress proof hit gated SkyeNet routes, Citadel runtime metadata, FS27 SkyePay offers, and live Stripe product/price receipt validation. That is the part I care about. Not just "the page loads." The money and deploy rails have to agree with each other.
+      </p>
+
+      <div class="receipt-box">
+        <strong>SkyeNet and SkyePay proof</strong>
+        <ul>
+          <li>SkyeNet status, routes, observability, cost model, and Citadel runtime metadata were stress checked behind the gate.</li>
+          <li>FS27 SkyePay offer endpoints and store routes were checked live.</li>
+          <li>The live stress receipt recorded 48 production requests with zero failures.</li>
+          <li>Latest proof summary lives at <code>test-artifacts/skyenet-live-production-stress-latest.json</code>.</li>
+          <li>The public changelog was updated with the deployment-agent release entry.</li>
+        </ul>
+      </div>
+
+      <h2>The browser proof boundary stayed honest.</h2>
+      <p>
+        I also want this part in the record because I do not want fake proof culture in my company. For the SkyeNet/Helper K4i infrastructure pass, the instruction was no headed browser proof yet. So I did not call API smoke "browser proof." I called it what it was: Worker deploy, live HTTP smoke, gated API proof, and live stress receipts.
+      </p>
+      <p>
+        That is how this has to work. If something was waived, say it was waived. If something was stress tested, say how many requests. If a Worker secret was synced, say the secret lane was used without printing the value. If a token self-check lied about usefulness, say the actual Pages and Worker APIs still proved authority.
+      </p>
+
+      <h2>The root env lesson was the whole architecture lesson.</h2>
+      <p>
+        The most annoying part of the day became the most important product rule: do not ask me for help until you have tried the tools and the keys already available to the system. That is why the deployment agent now scans every root env lane it is allowed to scan. That is why Helper K4i has the deploy-assist path. That is why the 0S Worker has the brain route. That is why the changelog has receipts instead of vibes.
+      </p>
+      <p>
+        I had to use ingenuity at every level: read the actual repo, keep the public/private boundary clean, use the deploy token that worked for the real API, sync Worker secrets without printing them, stress the live routes, update the brain registry, and publish the proof without making SkyeNet look like two disconnected systems.
+      </p>
+
+      <blockquote>
+        Today I did not just push code. I taught the system to stop panicking at the first blocked key, ask Helper K4i, find the real authority lane, log the proof, and keep SkyeNet moving.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">☣️ DevodeRator ☣️ · Gray London Skyes · daily build receipts and sovereign dev infrastructure.</footer>
+</body>
+</html>

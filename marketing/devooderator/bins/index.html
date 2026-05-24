@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Bins Beta | ☣️ DevodeRator ☣️</title>
+  <meta name="description" content="Beta concept for scoped SkyeVault folders, agent bins, and secure source-custody lanes.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="☣️ DevodeRator ☣️ logo"><span>☣️ DevodeRator ☣️</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../blog/2026-05-23-skyevault-0s-production-day.html">Today</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a class="active" href="index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+  <main class="post-shell">
+    <p class="post-meta">Beta lane · scoped vault folders</p>
+    <h1>SkyeVault Bins are scoped custody folders for work that is bigger than Git.</h1>
+    <p class="lede">A Bin is a named folder lane: DevodeRator Bin, SkyeAgents Bin, Client Portal Builds Bin, SupaBoy Build Bin. The point is to protect, export, import, and eventually deploy focused workspaces without forcing them through public Git before they are ready.</p>
+    <article class="post-body">
+      <h2>What exists now</h2>
+      <p>The repo now includes a beta manifest and local pack command. It can list configured bins, scan files, write a receipt, and prepare a SkyeSecure encrypted pack for a bin so sensitive work can be protected without printing values.</p>
+      <div class="receipt-box">
+        <strong>Local commands</strong>
+      <ul>
+        <li><code>npm run vault:bins:list</code></li>
+        <li><code>npm run vault:bins:export:dry-run</code></li>
+        <li><code>npm run vault:agents:export</code></li>
+        <li><code>npm run vault:bins:pack -- --bin=devooderator-blog</code></li>
+        <li><code>npm run vault:bins:pack -- --bin=skyeagents-bin</code></li>
+        <li><code>npm run devooderator:agent:brief</code></li>
+        <li><code>npm run devooderator:agent:draft</code></li>
+      </ul>
+      </div>
+      <h2>Agent lane</h2>
+      <p>The DevodeRator Field Scribe now lives in the SkyeAgents Bin. It collects the day's changed files, recent receipts, MCP proof, deploy evidence, and vault state before writing a founder/dev blog in Gray's voice. Autosync can still run the normal repo custody export and then write the companion agent/site bins with dedupe so agent-owned files are not double-written across bin packs.</p>
+      <h2>What stays beta</h2>
+      <p>Import/export/deploy straight from vault bins is the future feature lane. It needs more stress proof before being sold as production. For now, Bins give us the structure, receipts, and encrypted pack path to start using the idea safely.</p>
+      <h2>Security posture</h2>
+      <p>Agents can read bin manifests and receipts. They must not print secrets, passphrases, bearer tokens, private unlock material, or raw env values. Any generated public page should link to gated proof or receipt IDs, not expose private content.</p>
+    </article>
+  </main>
+  <footer class="footer">SkyeVault Bins beta · scoped custody for agents, blogs, client builds, and future CDE imports.</footer>
+</body>
+</html>

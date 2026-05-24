@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Today I Pushed the 0S Into the Vault Again | ☣️ DevodeRator ☣️</title>
+  <meta name="description" content="Gray London Skyes writes a day-in-the-life dev blog about SkyeVault autosync, production deploys, smoke checks, proof receipts, and another encrypted full 0S push to the secured vault.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="☣️ DevodeRator ☣️ logo"><span>☣️ DevodeRator ☣️</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-23-skyevault-0s-production-day.html">Today</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 23, 2026 · SkyeVault · Cloudflare · 0S production · founder day log</p>
+    <h1>Today I fought the repo-loss demon and pushed the full 0S into the secured vault again.</h1>
+    <p class="lede">
+      This was one of those dev days where the product, the proof, the pain, and the pitch all became the same thing. I was not writing a theoretical backup feature. I was using my own 0S repo as the stress test, the recovery proof, the marketing story, and the architecture checkpoint.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        ShYT may crash, but Skye keeps the sKache. No perfect-tech promises. Just receipts, recovery prompts, encrypted custody, and proof that the last clean move does not have to disappear.
+      </blockquote>
+
+      <h2>The day started with a simple fear: I never want to lose my repo again.</h2>
+      <p>
+        That sounds dramatic until you have actually lived inside a massive codebase across Codespaces, VS Code, local terminals, Worker deploys, generated proof files, untracked scratch scripts, root env notes, and app folders that are too sensitive or too unfinished to shove into a public Git remote.
+      </p>
+      <p>
+        Git is good. GitHub is useful. But Git does not automatically care about the untracked file you forgot to add. GitHub does not want your secret-bearing operator files. Public source control is not the same thing as source custody. Today was about making that difference real inside SkyeVault.
+      </p>
+
+      <h2>The first struggle was language.</h2>
+      <p>
+        I kept saying I wanted the vault to have everything, secrets and all, because the vault is protected by passphrase and encryption. That does not mean I want secrets on GitHub. It means I want the owner recovery lane to hold the repo the way the workspace actually exists, wrapped before storage, not sanitized into a public sharing shape.
+      </p>
+      <p>
+        That became the whole architecture split: public Git hygiene stays clean, client handoff lanes stay sanitized, and the owner source-custody lane is allowed to carry tracked files, untracked files, local-only material, and secret-like operator files inside an encrypted artifact.
+      </p>
+
+      <h2>Then we had to get honest about the daemon.</h2>
+      <p>
+        A daemon is not a magic cloud promise. It is a background process. If VS Code closes but the workspace is still alive, it can keep running. If the whole machine, Codespace, or container dies before the next completed upload, the daemon cannot read a filesystem that is gone. That is not a weak infrastructure problem. That is the boundary of reality.
+      </p>
+      <p>
+        So the product claim became sharper: the autosync lane reduces the loss window and proves the latest completed recovery point. Roughly every ten minutes, it checks the repo, detects whether the current digest matches the last successful encrypted artifact, and pushes only when the repo/vault parity changed.
+      </p>
+
+      <h2>The part that took time is exactly the part that matters.</h2>
+      <p>
+        The Pages deploy was quick because it only had to upload changed web assets. The 0S Worker deploy was slower because the 0S asset tree is enormous. But the SkyeVault source-custody push was the heavy lift because it was not uploading a page. It was packaging, encrypting, streaming, finalizing, and receipt-writing the full repo state.
+      </p>
+      <p>
+        That is why a tar/zstd encrypted artifact can feel less "clickable" than a zip but still be the right tool for a serious repo. Zip is familiar. Tar/zstd is strong for streaming and large source custody. The user-facing goal is still easy recovery, but the data plane needs to be built for a massive repo, not nostalgia.
+      </p>
+
+      <h2>Today’s production flow was real.</h2>
+      <p>
+        We wrote and deployed the founder longform page explaining SkyeVault autosync, daemon behavior, VS Code/workspace boundaries, encrypted source custody, revision rounds, and the no-guarantee line. Then we put that page into the 0S marketing surfaces and Founder Drops hub with a direct link and screenshot asset.
+      </p>
+      <p>
+        We added emoji style guidance to the 0S brains too. Not childish. Not sprayed over serious surfaces. Just enough glyph language so the 0S feels alive in help text, proof labels, and routing cards while legal, auth, payment, code, and security language stays sober.
+      </p>
+      <p>
+        Then we pushed production. MetrAIyux 0S went live again on Cloudflare Workers. The marketing site went live again on Cloudflare Pages. The public blog page smoke-checked. The Founder Drops promo smoke-checked. The screenshot asset smoke-checked. The 0S proof endpoint correctly stayed owner-gated behind FS27.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Receipts from the day</strong>
+        <ul>
+          <li>SkyeVault encrypted full-repo receipt: <code>cdv_8a81acb05f6eb0e88e4b4ee7</code></li>
+          <li>SkyeVault control pack receipt: <code>cdv_65abd2a543df96bedbc55462</code></li>
+          <li>Artifact bytes: <code>1,384,905,312</code></li>
+          <li>Artifact SHA-256: <code>2e0212ad572cbb5fce22496ebf048a2f358199ad3c97e5d4f8f73f688a410144</code></li>
+          <li>0S Worker version deployed during the pass: <code>bfa7c890-28b0-4fdf-be10-50f5c92237ef</code></li>
+          <li>Marketing Pages preview after the proof-link correction: <code>https://a1737a2a.metraiyux-0s-marketing.pages.dev</code></li>
+          <li>Formal headed browser proof was skipped because I chose to live-check it myself; HTTP smoke checks passed for the public pages/assets and owner-gated proof behavior.</li>
+        </ul>
+      </div>
+
+      <h2>The real win is bigger than a backup.</h2>
+      <p>
+        What happened today is that SkyeVault got closer to being the dev custody layer I actually need. Not a "remember to commit" reminder. Not a GitHub clone. A sovereign recovery lane where a dev can move between workspaces, protect local-only work, keep secrets out of public remotes, and still have a serious encrypted path back.
+      </p>
+      <p>
+        That is also why DevodeRator exists now. Every day like this has a story inside it: the bug, the architecture gap, the workflow stress, the tool decision, the proof, the deployment, the receipt. I want that written while the heat is still on it, not six months later in a sterile changelog.
+      </p>
+
+      <h2>Next: SkyeVault Bins.</h2>
+      <p>
+        The next idea is specific vault folders. I am calling them Bins. SkyeAgents Bin. DevodeRator Bin. Client Portal Build Bin. SupaBoy Build Bin. The point is that not every important folder should be forced into a Git-shaped workflow before it is protected. Some folders need encrypted custody first, Git later, deploy when ready.
+      </p>
+      <p>
+        That is a beta lane right now because import/export/deploy straight from the vault is serious infrastructure. But the direction is clear: keep workspaces cleaner, let agents operate from scoped bins, protect files without leaking values, and make the vault a source of deployable recovery, not just cold storage.
+      </p>
+
+      <blockquote>
+        Today was another successful full 0S push to the secured vault. That is not a small win. That is the company proving its own doctrine on its own codebase.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">☣️ DevodeRator ☣️ · Gray London Skyes · daily build receipts and sovereign dev infrastructure.</footer>
+</body>
+</html>

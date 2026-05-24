@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Today SkyeMail Kicked Through Zoho OAuth | ☣️ DevodeRator ☣️</title>
+  <meta name="description" content="Gray London Skyes writes the real SkyeMail dev log: Zoho OAuth scope hell, Worker secrets, account IDs, proof smoke, and why SkyeMail is becoming a Free99 bridge to the greater Skyes.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="☣️ DevodeRator ☣️ logo"><span>☣️ DevodeRator ☣️</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-24-skyemail-zoho-oauth-war.html">SkyeMail</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 24, 2026 · SkyeMail · Zoho OAuth · Cloudflare Workers · founder dev log</p>
+    <h1>Today SkyeMail kicked through Zoho OAuth, and yes, the whole process was fucking gruesome.</h1>
+    <p class="lede">
+      I am writing this one while the smoke is still in the room because this is exactly why DevodeRator exists. Some days the product is not born from a clean checklist. Some days the product is born from getting smacked by a dashboard that swears you checked every box while the API still tells you to go to hell.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        SkyeMail is not just email. It is a bridge to the greater Skyes. My clients, my company, and honestly the world deserve an inbox that belongs inside the operating system instead of being another lonely tab people still have to log into somewhere else.
+      </blockquote>
+
+      <h2>The problem was not "do we have Zoho credentials?"</h2>
+      <p>
+        We had Zoho client IDs. We had secrets. We had refresh tokens. We had user IDs. We had an org ID. We had Cloudflare Worker secrets. We had a backup Resend token sitting in the root env. On paper, this shit looked handled.
+      </p>
+      <p>
+        But the Worker was still not cleanly proving Zoho Mail account access. The token exchange worked, but the Mail API returned <code>INVALID_OAUTHSCOPE</code>. That is a special kind of annoying because it means the credential can successfully produce an access token, but that access token does not have permission to touch the thing you actually need.
+      </p>
+
+      <h2>The dashboard made the wrong thing feel like the right thing.</h2>
+      <p>
+        The redirect OAuth lane was a dead end for this setup. It wanted a registered redirect URI and kept turning a simple backend-owner job into a browser handoff problem. That was not the right shape for SkyeMail. What finally broke the wall was the Zoho API Console Self Client flow: generate a one-time code with the exact Mail scopes, exchange it server-side, then push the resulting refresh token into the Worker.
+      </p>
+      <p>
+        So yeah, we had to make a whole ass helper script because the missing actual parts were not obvious in the Zoho dashboard. The script now prints the exact Self Client instructions, exchanges the code, tries the known client pairs from root env, updates the canonical Zoho env keys, and verifies the Mail API without exposing raw tokens.
+      </p>
+
+      <div class="receipt-box">
+        <strong>The helper lane we added</strong>
+        <ul>
+          <li><code>tools/zoho-mail-scope-fix.mjs</code> now handles Self Client scopes, code exchange, and no-secret verification.</li>
+          <li><code>npm run zoho:self-client</code> prints the exact Self Client steps and required scopes.</li>
+          <li><code>npm run zoho:exchange -- '&lt;code&gt;'</code> exchanges the one-time Zoho code and locks the repo onto the matching client pair.</li>
+          <li><code>npm run zoho:verify</code> checks accounts, folders, messages, and organization access without printing credential values.</li>
+          <li>The SkyeMail Worker has a protected <code>/api/zoho-provider-smoke</code> route so proof hits Cloudflare, not just a local shell.</li>
+        </ul>
+      </div>
+
+      <h2>The real bug was identity shape.</h2>
+      <p>
+        Line 1232 in root env was a Zoho user id. It was not the real Zoho Mail account id. That difference mattered. The user id was 9 digits. The Mail account id returned by <code>/api/accounts</code> was 19 digits. Once we stopped treating the user id like the mailbox account id, the folder and message checks stopped acting possessed.
+      </p>
+      <p>
+        That is the kind of bug that makes you feel like the system is gaslighting you. Nothing is "missing" until you learn that the platform has two IDs that look official, both are real, and only one belongs in the send/read route.
+      </p>
+
+      <h2>The proof finally landed.</h2>
+      <p>
+        After the Self Client code exchange, the live Worker smoke went green: token exchange ready, mail account ready, default sender discovered, organization probe ready, and provisioning ready. Then the local Zoho verification returned success for account lookup, folders, message view, and organization lookup.
+      </p>
+      <p>
+        We also ran a controlled self-send proof through Zoho Mail. The API returned success and a message id. That is the line where the day stopped being "OAuth troubleshooting" and became "SkyeMail can actually hit mail now."
+      </p>
+
+      <div class="receipt-box">
+        <strong>Receipts from the SkyeMail pass</strong>
+        <ul>
+          <li>Root env now has canonical <code>ZOHO_CLIENT_ID</code>, <code>ZOHO_CLIENT_SECRET</code>, <code>ZOHO_REFRESH_TOKEN</code>, <code>ZOHO_ORG_ID</code>, <code>ZOHO_ACCOUNT_ID</code>, and <code>ZOHO_DEFAULT_FROM</code>.</li>
+          <li>Default sender is <code>grayskyes@solenterprises.org</code>.</li>
+          <li>Cloudflare Worker secret push reported <code>ZOHO_CLIENT_ID</code>, <code>ZOHO_CLIENT_SECRET</code>, <code>ZOHO_REFRESH_TOKEN</code>, <code>ZOHO_ORG_ID</code>, <code>ZOHO_ACCOUNT_ID</code>, and <code>ZOHO_DEFAULT_FROM</code> pushed.</li>
+          <li>Live Worker smoke returned account, signature, and organization checks as HTTP <code>200</code>.</li>
+          <li><code>npm run zoho:verify</code> returned <code>ok: true</code> for account, folders, messages, and organization checks.</li>
+          <li>Controlled Zoho self-send proof returned HTTP <code>200</code> and confirmed a message id was present.</li>
+          <li>Formal headed browser proof was not run for this API-only pass; the proof here is Worker/API smoke plus a real Zoho send check.</li>
+        </ul>
+      </div>
+
+      <h2>SkyeMail is staying Free99, baby.</h2>
+      <p>
+        This is the reason I keep pushing it. People should not have to overpay just to end up logging into another disconnected inbox. If I made the blog in the 0S, I should be able to send, chat, follow up, and interact from the same system. That is not a random feature. That is the whole point.
+      </p>
+      <p>
+        SkyeMail should become the communication browser for the 0S: inbox, outbound mail, chat, Relay13, ConnectLog, customer handoffs, operator receipts, paid build updates, and the soft human parts of running a real company.
+      </p>
+
+      <h2>The next SkyeMail idea is music in the bottom browser.</h2>
+      <p>
+        This part hit me while fighting the inbox: SkyeMail should not feel like dead office software. It should feel like a living workspace. The bottom browser can carry an Artist Nexus media player. Users can mute, pause, skip, pick artists, or let a small Skye radio loop rotate cleared songs.
+      </p>
+      <p>
+        The bank-safe version is not "stream every famous song on Earth for free." That is how you get crushed by licensing. The smart version is owned music, artist-cleared tracks, Music Nexus releases, and maybe partner catalog APIs where the rights are explicit. Start with Gray Skyes and invited artists. Let the platform prove the experience with music we can actually use.
+      </p>
+
+      <h2>My model kAIxU earned its name today.</h2>
+      <p>
+        I am not saying that lightly. Today was annoying as hell. But the solve came from staying in the receipts: inspect the root env without leaking secrets, find the second Zoho client pair, stop trusting labels blindly, build the helper, verify the scopes, prove the Worker lane, discover the real account id, push the Worker secrets, and run the send proof.
+      </p>
+      <p>
+        That is the kind of day that turns into product architecture. Not because it was cute. Because it was real. SkyeMail got closer to being a sovereign communication layer today, and I am keeping it Free99 because the people who need an operating system do not need another subscription trap before they can even talk to their customers.
+      </p>
+
+      <blockquote>
+        Today was a war with OAuth, a Worker secret rescue, a mailbox identity lesson, and a proof receipt. The bridge to the greater Skyes is open wider now.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">☣️ DevodeRator ☣️ · Gray London Skyes · daily build receipts and sovereign dev infrastructure.</footer>
+</body>
+</html>
