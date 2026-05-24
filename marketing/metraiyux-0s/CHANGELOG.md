@@ -2,6 +2,8 @@
 
 ## 2026-05-23
 
+- Corrected the Media Over London Source Build Wall to the intended Artist Nexus order: SupaBoy now appears above Gray, and Gray now embeds the already-deployed FS27 SkyeNet Artist Nexus build at `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/GRAY-SKYES/hero-video-universe.html` instead of the standalone Gray marketing/canonical page.
+
 - Linked the public Business Cards studio and the gated 0S Business Card Factory as one workflow. Both now load the full 339-business Valley Verified directory, show the visible “showing X of 339” count, stop truncating the client list, and pass selected-client params back and forth between the public card page and the gated factory.
 - Added the Skyes Over London deity logo to the gated 0S Business Card Factory SkyeMerit lane: the SkyeMerit field, card rail, and generated proof strip now all show the real deity mark from `/assets/skyes-over-london-deity-logo.png`.
 - Corrected Valley Verified count language across active public/proof surfaces: the live source of truth is **339 unique published business profiles** with **one canonical public page per business**. Removed stale 26,413-style claims and stopped presenting import-audit cleanup counts as the public headline.
