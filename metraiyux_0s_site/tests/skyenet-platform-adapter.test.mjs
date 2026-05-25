@@ -6,6 +6,7 @@ if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 const siteWorker = (await import('../cloudflare/worker.js')).default;
 const { handleSkyeNetDeployRequest } = await import('../skyegate/source/SkyeGateFS27/cloudflare/skynet-deploy-api.mjs');
+const fs27Worker = (await import('../skyegate/source/SkyeGateFS27/cloudflare/worker.mjs')).default;
 
 class MemoryKV {
   constructor() {
@@ -52,6 +53,7 @@ class MemoryR2 {
     const body = stored.body;
     return {
       key,
+      body,
       size: stored.size,
       uploaded: stored.uploaded,
       customMetadata: stored.options?.customMetadata || {},
@@ -123,6 +125,30 @@ function fs27ServiceBinding(fsEnv) {
   };
 }
 
+function actualFs27ServiceBinding(fsEnv) {
+  return {
+    async fetch(request) {
+      const url = new URL(request.url);
+      if (url.pathname === '/auth-introspect') {
+        const body = await request.json().catch(() => ({}));
+        if (body.token === 'gate-token') {
+          return Response.json({
+            active: true,
+            sub: 'owner',
+            email: 'owner@example.invalid',
+            role: 'admin',
+            scope: 'admin.read admin.write gateway.invoke',
+            customer_id: 31,
+            workspace_id: 'metraiyux-0s-owner'
+          });
+        }
+        return Response.json({ active: false });
+      }
+      return fs27Worker.fetch(request, fsEnv, ctx());
+    }
+  };
+}
+
 function env() {
   const fsEnv = {
     DEPLOYMENT_ASSET_BUCKET: new MemoryR2(),
@@ -136,6 +162,30 @@ function env() {
       }
     },
     SKYGATEFS27_WORKER: fs27ServiceBinding(fsEnv),
+    __fsEnv: fsEnv
+  };
+}
+
+function envWithActualFs27() {
+  const fsEnv = {
+    DEPLOYMENT_ASSET_BUCKET: new MemoryR2(),
+    ROUTING_KV: new MemoryKV(),
+    SKYENET_WORKSPACES_KV: new MemoryKV(),
+    SKYENET_RECEIPTS_KV: new MemoryKV(),
+    REQUEST_LOG_BUCKET: new MemoryR2(),
+    ASSETS: {
+      async fetch(request) {
+        return new Response(`fs27-asset:${new URL(request.url).pathname}`, { status: 404 });
+      }
+    }
+  };
+  return {
+    ASSETS: {
+      async fetch(request) {
+        return new Response(`asset:${new URL(request.url).pathname}`, { status: 404 });
+      }
+    },
+    SKYGATEFS27_WORKER: actualFs27ServiceBinding(fsEnv),
     __fsEnv: fsEnv
   };
 }
@@ -288,4 +338,55 @@ test('SN-04 SkyeNet published path serves uploaded asset without 0S gate redirec
   assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
   assert.equal(live.headers.get('x-skynet-route'), 'r2-deployment');
   assert.match(text, /Public SkyeNet Asset/);
+});
+
+test('SN-05 SkyeNet public resolver serves routes with human mount names and legacy internal host fallback', async () => {
+  const e = envWithActualFs27();
+  const token = 'gate-token';
+  const projectId = 'human-name-public';
+  const deploymentId = 'dep_human_public';
+  const rawMount = '/skyenet/Gray Skyes Demo';
+
+  assert.equal((await call(e, '/api/skyenet/deploy/init', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, title: 'Human Name Public' }
+  })).response.status, 200);
+
+  const uploadParams = new URLSearchParams({ projectId, deploymentId, path: 'index.html' });
+  assert.equal((await call(e, `/api/skyenet/deploy/upload?${uploadParams.toString()}`, {
+    method: 'PUT',
+    token,
+    headers: { 'content-type': 'text/html; charset=utf-8' },
+    body: '<h1>Human route SkyeNet Asset</h1>'
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/complete', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, files: ['index.html'] }
+  })).response.status, 200);
+
+  const route = await call(e, '/api/skyenet/deploy/route', {
+    method: 'POST',
+    token,
+    body: {
+      mount_path: rawMount,
+      project_id: projectId,
+      deployment_id: deploymentId,
+      public_access: true,
+      default_auth: 'public'
+    }
+  });
+  assert.equal(route.response.status, 200);
+  assert.equal(route.data.skynet.route.hostname, 'metraiyux.example');
+  assert.equal(route.data.skynet.route.mount_path, '/skyenet/Gray%20Skyes%20Demo');
+  assert.match(route.data.skynet.live_url, /\/skyenet\/Gray%20Skyes%20Demo\/$/);
+
+  const live = await siteWorker.fetch(req('/skyenet/Gray%20Skyes%20Demo/'), e, ctx());
+  const text = await live.text();
+  assert.equal(live.status, 200);
+  assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
+  assert.equal(live.headers.get('x-skynet-route'), 'r2-deployment');
+  assert.match(text, /Human route SkyeNet Asset/);
 });

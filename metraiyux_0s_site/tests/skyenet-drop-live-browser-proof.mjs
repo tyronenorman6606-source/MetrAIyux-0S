@@ -314,8 +314,8 @@ async function runViewport(browser, owner, viewport, viewportLabel) {
     entry.actions.push('edited deployment id');
     await fillControl(page, '#routeHost', new URL(baseUrl).hostname);
     entry.actions.push('edited route host');
-    await fillControl(page, '#mountPath', `/skyenet/proof-${suffix}`);
-    entry.actions.push('edited mount path');
+    await fillControl(page, '#mountPath', `/skyenet/Proof ${suffix}`);
+    entry.actions.push('edited mount path with human spaces');
     await page.selectOption('#defaultAuth', 'public');
     entry.actions.push('selected public default auth');
     await clickControl(page, '#publicAccess');
@@ -355,7 +355,6 @@ async function runViewport(browser, owner, viewport, viewportLabel) {
     if (!match) throw new Error(`SkyeNet deploy did not return a live URL: ${deployLog}`);
     await publicRouteProof(browser, match[1], viewport, entry);
 
-    await openSkyeNetConsole(page, entry, `${viewportLabel}-return`);
     await scrollProof(page, entry);
   } catch (error) {
     entry.failureUrl = page.url();

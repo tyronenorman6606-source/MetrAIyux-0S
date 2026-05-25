@@ -100,22 +100,85 @@ function routeKv(env) {
 }
 
 function normalizeMountPath(value) {
-  const raw = cleanText(value || '', 300).replace(/\\/g, '/').replace(/\/+/g, '/');
+  const raw = cleanText(value || '', 300)
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/\\/g, '/')
+    .replace(/\/+/g, '/');
+  if (!raw || raw === '/') return '';
+  const parts = raw.replace(/^\/+/, '').replace(/\/+$/, '').split('/').filter(Boolean);
+  if (!parts.length) return '';
+  return `/${parts.map((part) => {
+    let decoded = part;
+    try { decoded = decodeURIComponent(part); } catch {}
+    return encodeURIComponent(decoded);
+  }).join('/')}`;
+}
+
+function normalizeLegacyMountPath(value) {
+  const raw = cleanText(value || '', 300)
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/\\/g, '/')
+    .replace(/\/+/g, '/');
   if (!raw || raw === '/') return '';
   return `/${raw.replace(/^\/+/, '').replace(/\/+$/, '')}`;
 }
 
-function pathRouteKeys(host, pathname) {
-  const cleanPath = normalizeMountPath(pathname) || '/';
-  const segments = cleanPath.split('/').filter(Boolean);
-  const keys = [];
+function safeDecodeURIComponent(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function normalizeHostname(value) {
+  const raw = cleanText(value || '', 260).toLowerCase();
+  if (!raw) return '';
+  try {
+    if (/^https?:\/\//i.test(raw)) return new URL(raw).hostname.toLowerCase();
+  } catch {}
+  return raw
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/^\*\./, '')
+    .replace(/:\d+$/, '')
+    .toLowerCase();
+}
+
+function hostCandidates(request, env) {
+  const url = new URL(request.url);
+  const candidates = [
+    normalizeHostname(url.hostname),
+    normalizeHostname(request.headers.get('x-forwarded-host') || ''),
+    normalizeHostname(request.headers.get('x-0s-original-host') || ''),
+    normalizeHostname(request.headers.get('x-skynet-public-host') || ''),
+    normalizeHostname(env?.SKYENET_DEFAULT_HOST || env?.SKYENET_EDGE_HOST || env?.SKYENET_PUBLIC_HOST || '')
+  ];
+  if (candidates.includes('skyegatefs27.internal') || request.headers.get('x-0s-skynet-surface-proxy')) {
+    candidates.push('skyegatefs27.internal');
+  }
+  return [...new Set(candidates.filter(Boolean))];
+}
+
+function pushPathRouteKeys(keys, seen, host, cleanPath) {
+  const path = cleanPath || '/';
+  const segments = path.split('/').filter(Boolean);
   for (let index = segments.length; index >= 1; index -= 1) {
     const mountPath = `/${segments.slice(0, index).join('/')}`;
-    keys.push({
-      key: `route:v1:host:${host}:path:${mountPath}`,
-      mountPath
-    });
+    const key = `route:v1:host:${host}:path:${mountPath}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    keys.push({ key, mountPath });
   }
+}
+
+function pathRouteKeys(host, pathname) {
+  const cleanPath = normalizeMountPath(pathname) || '/';
+  const keys = [];
+  const seen = new Set();
+  pushPathRouteKeys(keys, seen, host, cleanPath);
+  const legacyDecodedPath = normalizeLegacyMountPath(safeDecodeURIComponent(pathname)) || '/';
+  pushPathRouteKeys(keys, seen, host, legacyDecodedPath);
   return keys;
 }
 
@@ -149,27 +212,38 @@ export async function resolveGatewayRoute(request, env) {
   const kv = routeKv(env);
   if (!kv?.get) return null;
   const url = new URL(request.url);
-  const host = url.hostname.toLowerCase();
+  const hosts = hostCandidates(request, env);
   let record = null;
   let routeKeySource = '';
   let matchedMountPath = '';
-  for (const candidate of pathRouteKeys(host, url.pathname)) {
-    record = await readRouteRecord(kv, candidate.key);
-    if (record && typeof record === 'object') {
-      routeKeySource = candidate.key;
-      matchedMountPath = candidate.mountPath;
-      break;
+  let matchedHost = hosts[0] || normalizeHostname(url.hostname);
+  for (const host of hosts) {
+    for (const candidate of pathRouteKeys(host, url.pathname)) {
+      record = await readRouteRecord(kv, candidate.key);
+      if (record && typeof record === 'object') {
+        routeKeySource = candidate.key;
+        matchedMountPath = candidate.mountPath;
+        matchedHost = host;
+        break;
+      }
     }
+    if (record) break;
   }
   if (!record) {
-    routeKeySource = `route:v1:host:${host}`;
-    record = await readRouteRecord(kv, routeKeySource);
+    for (const host of hosts) {
+      routeKeySource = `route:v1:host:${host}`;
+      record = await readRouteRecord(kv, routeKeySource);
+      if (record && typeof record === 'object') {
+        matchedHost = host;
+        break;
+      }
+    }
   }
   if (!record || typeof record !== 'object') return null;
   const mountPath = normalizeMountPath(record.mount_path || record.mountPath || matchedMountPath);
   return {
     schema: cleanText(record.schema || 'fs27.route.v1', 80),
-    hostname: cleanText(record.hostname || host, 260).toLowerCase(),
+    hostname: normalizeHostname(record.hostname || matchedHost),
     route_key: cleanText(routeKeySource, 500),
     mount_path: mountPath,
     strip_mount_path: record.strip_mount_path !== false && record.stripMountPath !== false,

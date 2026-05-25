@@ -372,7 +372,7 @@
         </div>
       </div>
       <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
-        <p class="eyebrow">Updated May 24 2026 UTC</p>
+        <p class="eyebrow">Updated May 25 2026 UTC</p>
         <h2>Full production in the changelog.</h2>
         <p>The current production ledger records live surfaces, Cloudflare routes, SkyeNet deploy proof, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, Company Knowledge ingest receipts, SkySecure FS27 Vault proof, and public-safe receipts without exposing private controls.</p>
         <div class="proof-grid">
@@ -394,6 +394,27 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="skyenet-route-normalization-repair">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeNet Route Normalization Repair</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeNet</span><span>Route resolver</span><span>Folder drop</span><span>Human mount names</span><span>Production repair</span></div>
+            <h2>SkyeNet published links now survive real human project names instead of falling into `SkyeNet route not found`.</h2>
+            <p>The live issue was a route-key mismatch: friendly mount paths with spaces, pasted host values, or service-binding defaults could save under a shape the public resolver did not search. SkyeNet now canonicalizes hostnames, URL-encodes human mount names, forwards the original 0S host into FS27, and searches legacy records that were already saved with raw spaces or the internal worker host.</p>
+            <ul class="release-points">
+              <li>The deploy API now normalizes route host input, including pasted full URLs, before writing the KV route record.</li>
+              <li>Mount paths are encoded consistently, so `/skyenet/Gray Skyes Demo` returns a working `/skyenet/Gray%20Skyes%20Demo/` live URL.</li>
+              <li>The 0S SkyeNet proxy forwards `x-forwarded-host`, `x-0s-original-host`, and the SkyeNet public host into FS27 so blank-host publishes do not default to the internal service-binding hostname.</li>
+              <li>The FS27 runtime resolver now checks current host, forwarded host, configured SkyeNet host, and legacy internal host candidates, plus encoded and older raw-space route keys.</li>
+              <li>The browser console retries transient deploy API failures before surfacing an error, which protects folder drops from one-off edge/upload fetch flakes during manifest upload or route sealing.</li>
+              <li>Regression proof adds a real FS27 runtime route test for a human mount name and keeps static/function guardrail stress green.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../skyenet/index.html">SkyeNet Console</a></span><span><a href="../skyenet/PLATFORM_TRUTH.json">Platform Truth</a></span><span><code>node --test metraiyux_0s_site/tests/skyenet-platform-adapter.test.mjs</code></span><span><code>node --test metraiyux_0s_site/tests/skyenet-self-service-stress.mjs</code></span><span><code>node --test metraiyux_0s_site/tests/skyenet-functions-runtime.test.mjs</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="skyecommerce-0s-skyepay-sovereigndocs">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-24">May 24, 2026</time>

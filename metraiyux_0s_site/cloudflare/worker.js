@@ -1778,6 +1778,12 @@ function skynetForwardHeaders(request, auth, contentType = '', env = null) {
   headers.set('x-0s-customer-id', customerId);
   headers.set('x-0s-email', String(auth.gate?.data?.email || identity.email || auth.actor || 'skyenet-user'));
   headers.set('x-metraiyux-session-source', 'metraiyux-0s-skynet-console');
+  try {
+    const sourceUrl = new URL(request.url);
+    headers.set('x-forwarded-host', sourceUrl.hostname);
+    headers.set('x-0s-original-host', sourceUrl.hostname);
+    headers.set('x-skynet-public-host', sourceUrl.hostname);
+  } catch {}
   if (adminOverride) {
     headers.set('x-0s-admin-override', 'true');
     headers.set('x-skye-admin-override', 'true');

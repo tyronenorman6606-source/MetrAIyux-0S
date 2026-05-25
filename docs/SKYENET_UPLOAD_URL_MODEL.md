@@ -98,6 +98,8 @@ The route registry already stores arbitrary hostnames, so a wildcard SkyeNet dom
 
 Custom domains use the same route table after owner verification. Free99 should stay path-route only unless an owner approves a custom domain.
 
+Route safety rule: SkyeNet canonicalizes host input and URL-encodes human mount names before saving the route. A user can type a friendly mount like `/skyenet/Gray Skyes Demo`; SkyeNet stores and returns `/skyenet/Gray%20Skyes%20Demo/`, and the public resolver also recognizes older records that were saved with raw spaces or the internal service-binding host.
+
 ## Admin Unlock And Free99
 
 Free99 remains capped for normal users so the platform cannot quietly run up storage, request, route, or deployment cost.

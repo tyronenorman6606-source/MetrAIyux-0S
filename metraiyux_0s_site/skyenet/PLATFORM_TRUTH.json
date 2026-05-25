@@ -23,6 +23,7 @@
     "self_service_workspace": true,
     "customer_dashboard": true,
     "deploy_receipts": true,
+    "deploy_api_transient_retry": true,
     "quota_enforcement": true,
     "owner_admin_quota_override": true,
     "free99_normal_users_remain_capped": true,
@@ -30,6 +31,10 @@
     "r2_asset_storage": true,
     "kv_route_registry": true,
     "host_path_routing": true,
+    "route_mount_path_url_safe": true,
+    "human_mount_names_resolve": true,
+    "legacy_internal_host_route_fallback": true,
+    "live_url_path_encoding": true,
     "branded_subdomain_routing": "route_registry_ready_dns_required",
     "fallback_origin_proxy": true,
     "first_party_worker_functions": true,
@@ -60,6 +65,7 @@
   "url_model": {
     "path_routes_live": "https://<skyenet-host>/skyenet/<project>/",
     "path_route_runtime": "0S forwards non-console /skyenet/<project>/ paths into the FS27 SkyeNet runtime resolver so public live URLs serve uploaded R2 bundle assets with relative asset paths preserved.",
+    "route_normalization": "SkyeNet canonicalizes host input, URL-encodes human mount names, preserves trailing slashes, and resolves older records saved with raw spaces or the internal service-binding host.",
     "branded_subdomains": "https://<project>.skyenet.<company-domain>",
     "custom_domains": "owner_verified_hostnames_use_the_same_route_registry",
     "free99_policy": "path_route_only_until_owner_approves_custom_domain"

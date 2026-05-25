@@ -66,6 +66,42 @@ function hostGuess() {
   return window.location.hostname || 'metraiyux-0s-full-system.graylondonskyes.workers.dev';
 }
 
+function slugValue(value, fallback = 'site') {
+  const slug = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+  return slug || fallback;
+}
+
+function normalizeHostInput(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  if (!raw) return hostGuess();
+  try {
+    if (/^https?:\/\//i.test(raw)) return new URL(raw).hostname;
+  } catch {}
+  return raw.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').replace(/:\d+$/, '') || hostGuess();
+}
+
+function normalizeMountInput(value, projectId) {
+  const fallback = `/skyenet/${projectId || 'site'}`;
+  const raw = String(value || fallback)
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/\\/g, '/')
+    .replace(/\/+/g, '/');
+  const parts = raw.replace(/^\/+/, '').replace(/\/+$/, '').split('/').filter(Boolean);
+  const encoded = (parts.length ? parts : fallback.replace(/^\/+/, '').split('/'))
+    .map((part) => {
+      try { return encodeURIComponent(decodeURIComponent(part)); }
+      catch { return encodeURIComponent(part); }
+    })
+    .join('/');
+  return `/${encoded}`;
+}
+
 function workspaceQuery() {
   const params = new URLSearchParams();
   const workspaceId = String(els.workspaceId?.value || 'default-workspace').trim();
@@ -90,13 +126,26 @@ function authHeaders(extra = {}) {
   return headers;
 }
 
-async function api(path, options = {}) {
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function api(path, options = {}, attempt = 0) {
   const headers = authHeaders(options.headers || {});
-  const response = await fetch(path, {
-    ...options,
-    headers,
-    credentials: 'include'
-  });
+  let response = null;
+  try {
+    response = await fetch(path, {
+      ...options,
+      headers,
+      credentials: 'include'
+    });
+  } catch (error) {
+    if (attempt < 2) {
+      await delay(650 * (attempt + 1));
+      return api(path, options, attempt + 1);
+    }
+    throw error;
+  }
   let body = null;
   const contentType = response.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
@@ -106,6 +155,10 @@ async function api(path, options = {}) {
   }
   if (response.status === 401 || response.status === 403) {
     els.authPanel.hidden = false;
+  }
+  if (response.status >= 500 && attempt < 2) {
+    await delay(650 * (attempt + 1));
+    return api(path, options, attempt + 1);
   }
   if (!response.ok) {
     const error = new Error(body?.error || body?.skynet?.error || `HTTP ${response.status}`);
@@ -546,10 +599,10 @@ async function deploy(event) {
     return;
   }
 
-  const projectId = String(form.get('projectId') || '').trim();
-  const deploymentId = String(form.get('deploymentId') || '').trim();
-  const routeHost = String(form.get('routeHost') || '').trim();
-  const mountPath = String(form.get('mountPath') || '').trim();
+  const projectId = slugValue(form.get('projectId'), 'site');
+  const deploymentId = slugValue(form.get('deploymentId'), nowDeploymentId());
+  const routeHost = normalizeHostInput(form.get('routeHost'));
+  const mountPath = normalizeMountInput(form.get('mountPath'), projectId);
   const defaultAuth = String(form.get('defaultAuth') || 'gate');
   const publicAccess = Boolean(form.get('publicAccess')) || defaultAuth === 'public';
   const workspaceId = String(form.get('workspaceId') || els.workspaceId?.value || 'default-workspace').trim();
@@ -562,6 +615,10 @@ async function deploy(event) {
 
   try {
     els.deployButton.disabled = true;
+    els.projectId.value = projectId;
+    els.deploymentId.value = deploymentId;
+    els.routeHost.value = routeHost;
+    els.mountPath.value = mountPath;
     const prepared = await prepareFilesForDeploy(rawFiles);
     const files = prepared.files;
     write(prepared.meta.skrucible_forge_pass
@@ -674,7 +731,7 @@ els.workspaceForm.addEventListener('change', () => {
 });
 els.deployForm.addEventListener('submit', deploy);
 els.projectId.addEventListener('input', () => {
-  const slug = String(els.projectId.value || '').trim();
+  const slug = slugValue(els.projectId.value || '', '');
   if (slug && (!els.mountPath.value || els.mountPath.value === '/skyenet/demo')) {
     els.mountPath.value = `/skyenet/${slug}`;
   }

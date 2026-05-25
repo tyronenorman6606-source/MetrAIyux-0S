@@ -240,9 +240,32 @@ function receiptPrefix(customerId, workspaceId) {
 }
 
 function normalizeMountPath(value) {
-  const raw = cleanText(value || '', 240).replace(/\\/g, '/').replace(/\/+/g, '/');
+  const raw = cleanText(value || '', 240)
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/\\/g, '/')
+    .replace(/\/+/g, '/');
   if (!raw || raw === '/') return '';
-  return `/${raw.replace(/^\/+/, '').replace(/\/+$/, '')}`;
+  const parts = raw.replace(/^\/+/, '').replace(/\/+$/, '').split('/').filter(Boolean);
+  if (!parts.length) return '';
+  return `/${parts.map((part) => {
+    let decoded = part;
+    try { decoded = decodeURIComponent(part); } catch {}
+    return encodeURIComponent(decoded);
+  }).join('/')}`;
+}
+
+function normalizeHostname(value) {
+  const raw = cleanText(value || '', 260).toLowerCase();
+  if (!raw) return '';
+  try {
+    if (/^https?:\/\//i.test(raw)) return new URL(raw).hostname.toLowerCase();
+  } catch {}
+  return raw
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/^\*\./, '')
+    .replace(/:\d+$/, '')
+    .toLowerCase();
 }
 
 function skynetRootDomain(env) {
@@ -254,14 +277,21 @@ function skynetRootDomain(env) {
 }
 
 function defaultSkynetHost(env, request, projectId = '') {
-  const explicit = cleanText(env.SKYENET_DEFAULT_HOST || env.SKYENET_EDGE_HOST || env.SKYENET_PUBLIC_HOST || '', 260)
-    .toLowerCase()
-    .replace(/^https?:\/\//, '')
-    .replace(/\/.*$/, '');
+  const explicit = normalizeHostname(env.SKYENET_DEFAULT_HOST || env.SKYENET_EDGE_HOST || env.SKYENET_PUBLIC_HOST || '');
   if (explicit) return explicit;
   const root = skynetRootDomain(env);
   if (root && projectId) return `${projectId}.${root}`;
-  return new URL(request.url).hostname.toLowerCase();
+  const requestHost = normalizeHostname(new URL(request.url).hostname);
+  if (requestHost === 'skyegatefs27.internal') {
+    const forwarded = normalizeHostname(
+      request.headers.get('x-forwarded-host') ||
+      request.headers.get('x-0s-original-host') ||
+      request.headers.get('x-skynet-public-host') ||
+      ''
+    );
+    if (forwarded) return forwarded;
+  }
+  return requestHost;
 }
 
 function urlModeFromBody(body = {}) {
@@ -709,7 +739,7 @@ function routeRecordFromBody(body, auth, env, request) {
   const mountPath = urlMode === 'subdomain'
     ? normalizeMountPath(body.mount_path || body.mountPath || '')
     : normalizeMountPath(body.mount_path || body.mountPath || `/skyenet/${projectId}`);
-  const hostname = cleanText(body.hostname || body.host || defaultSkynetHost(env, request, projectId), 260).toLowerCase();
+  const hostname = normalizeHostname(body.hostname || body.host || defaultSkynetHost(env, request, projectId));
   const record = {
     schema: 'fs27.route.v1',
     hostname,
