@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,10 +7,12 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="./skyenet.css">
 </head>
-<body class="skyenet-shell">
+<body class="skyenet-shell skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
   <header class="skynet-topbar">
     <a class="skynet-brand" href="../0s/index.html" aria-label="Back to 0S">
-      <span class="skynet-brand-mark">SN</span>
+      <span class="skynet-brand-mark"><img src="../assets/metraiyux-0s-emblem-transparent.png" alt=""></span>
       <span>
         <strong>SkyeNet Deploy</strong>
         <small>SkyeNet edge hosting lane</small>
@@ -28,11 +30,16 @@
     <section class="skynet-hero" aria-labelledby="skynet-title">
       <div>
         <p class="eyebrow">Gated platform surface</p>
-        <h1 id="skynet-title">Drop a build, route it, and watch the cost lane.</h1>
+        <h1 id="skynet-title" class="neon-gradient-text">Drop a build, route it, and watch the cost lane.</h1>
       </div>
       <div class="health-strip" aria-live="polite">
         <span id="statusDot" class="status-dot"></span>
         <span id="statusText">Checking SkyeNet...</span>
+      </div>
+      <div class="hero-pipeline" aria-label="SkyeNet deploy flow">
+        <span>Drop</span>
+        <span>Forge</span>
+        <span>Route</span>
       </div>
     </section>
 
@@ -47,6 +54,80 @@
       </label>
       <button id="saveTokenButton" type="button">Use Session</button>
       <a class="button-link" href="../admin/login.html?return=/skyenet/index.html">Owner Login</a>
+    </section>
+
+    <section class="workspace-grid drop-first-grid" aria-label="SkyeNet publish drop">
+      <article class="operator-panel deploy-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Deploy</p>
+            <h2>Build Drop</h2>
+          </div>
+          <button id="refreshButton" type="button">Refresh</button>
+        </div>
+        <form id="deployForm" class="deploy-form">
+          <label>
+            <span>Project ID</span>
+            <input id="projectId" name="projectId" required pattern="[a-z0-9][a-z0-9\-]{1,62}" value="skyenet-demo">
+          </label>
+          <label>
+            <span>Deployment ID</span>
+            <input id="deploymentId" name="deploymentId" required value="">
+          </label>
+          <label>
+            <span>Route hostname</span>
+            <input id="routeHost" name="routeHost" required placeholder="metraiyux-0s-full-system.graylondonskyes.workers.dev">
+          </label>
+          <label>
+            <span>Mount path</span>
+            <input id="mountPath" name="mountPath" required value="/skyenet/demo">
+          </label>
+          <label>
+            <span>Default auth</span>
+            <select id="defaultAuth" name="defaultAuth">
+              <option value="gate">Gate</option>
+              <option value="public">Public</option>
+            </select>
+          </label>
+          <label class="check-row">
+            <input id="publicAccess" name="publicAccess" type="checkbox">
+            <span>Public asset route</span>
+          </label>
+          <div id="dropZone" class="file-drop" tabindex="0" role="button" aria-label="Drop a build folder or choose files">
+            <span>Build folder</span>
+            <strong>Drop folder here</strong>
+            <small id="fileSummary">Choose a folder or files.</small>
+            <input id="buildFiles" name="buildFiles" type="file" multiple webkitdirectory>
+          </div>
+          <label class="check-row enhance-toggle">
+            <input id="skrucibleEnhance" name="skrucibleEnhance" type="checkbox" checked>
+            <span>Skrucible forge pass</span>
+          </label>
+          <div id="dropStats" class="drop-stats" aria-live="polite"></div>
+          <div id="surfacePreview" class="surface-preview" aria-live="polite"></div>
+          <input id="deployWorkspaceId" name="workspaceId" type="hidden" value="default-workspace">
+          <input id="deployPlanName" name="planName" type="hidden" value="free99">
+          <button id="deployButton" class="primary-action" type="submit">Publish Drop</button>
+        </form>
+        <pre id="deployLog" class="deploy-log" aria-live="polite">Awaiting build drop.</pre>
+        <div id="publishResult" class="publish-result" hidden aria-live="polite"></div>
+      </article>
+
+      <article class="operator-panel skynet-tutorial-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Tutorial</p>
+            <h2>Publish Path</h2>
+          </div>
+        </div>
+        <ol class="tutorial-list">
+          <li><strong>Gate</strong><span>Use the shared 0S session or Owner Login, then provision the workspace once.</span></li>
+          <li><strong>Drop</strong><span>Choose the folder that contains <code>index.html</code>. Parent folders with <code>dist</code>, <code>build</code>, <code>out</code>, or <code>public</code> are promoted automatically.</span></li>
+          <li><strong>Publish</strong><span>Set Public asset route when the site should open without a 0S gate session.</span></li>
+          <li><strong>Open</strong><span>After publish, use the blue live link returned by SkyeNet.</span></li>
+        </ol>
+        <a class="tutorial-blue-link" href="#dropZone">Start with the drop zone</a>
+      </article>
     </section>
 
     <section class="metric-grid" aria-label="SkyeNet status">
@@ -72,53 +153,45 @@
       </article>
     </section>
 
-    <section class="workspace-grid">
-      <article class="operator-panel deploy-panel">
+    <section class="workspace-grid account-grid">
+      <article class="operator-panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Deploy</p>
-            <h2>Build Drop</h2>
+            <p class="eyebrow">Account</p>
+            <h2>Workspace</h2>
           </div>
-          <button id="refreshButton" type="button">Refresh</button>
+          <button id="workspaceButton" type="button">Provision</button>
         </div>
-        <form id="deployForm" class="deploy-form">
+        <form id="workspaceForm" class="deploy-form compact-form">
           <label>
-            <span>Project ID</span>
-            <input id="projectId" name="projectId" required pattern="[a-z0-9][a-z0-9-]{1,62}" value="skyenet-demo">
+            <span>Workspace ID</span>
+            <input id="workspaceId" name="workspaceId" required pattern="[a-z0-9][a-z0-9._\-]{1,118}" value="default-workspace">
           </label>
           <label>
-            <span>Deployment ID</span>
-            <input id="deploymentId" name="deploymentId" required value="">
-          </label>
-          <label>
-            <span>Route hostname</span>
-            <input id="routeHost" name="routeHost" required placeholder="metraiyux-0s-full-system.graylondonskyes.workers.dev">
-          </label>
-          <label>
-            <span>Mount path</span>
-            <input id="mountPath" name="mountPath" required value="/skyenet/demo">
-          </label>
-          <label>
-            <span>Default auth</span>
-            <select id="defaultAuth" name="defaultAuth">
-              <option value="gate">Gate</option>
-              <option value="public">Public</option>
+            <span>Plan</span>
+            <select id="planName" name="planName">
+              <option value="free99">Free99</option>
+              <option value="skyenet-edge-starter">Edge Starter</option>
+              <option value="skyenet-edge-growth">Edge Growth</option>
+              <option value="skyenet-functions-managed">Functions Managed</option>
+              <option value="skyenet-sovereign-runtime-reserve">Sovereign Runtime</option>
             </select>
           </label>
-          <label class="check-row">
-            <input id="publicAccess" name="publicAccess" type="checkbox">
-            <span>Public asset route</span>
-          </label>
-          <label class="file-drop">
-            <span>Build files</span>
-            <input id="buildFiles" name="buildFiles" type="file" multiple webkitdirectory>
-            <small id="fileSummary">Choose a folder or files.</small>
-          </label>
-          <button id="deployButton" class="primary-action" type="submit">Publish Drop</button>
         </form>
-        <pre id="deployLog" class="deploy-log" aria-live="polite">Awaiting build drop.</pre>
+        <div id="workspacePanel" class="workspace-summary" aria-live="polite"></div>
       </article>
+      <article class="operator-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2>Deployments</h2>
+          </div>
+        </div>
+        <div id="deploymentPanel" class="deployment-list" aria-live="polite"></div>
+      </article>
+    </section>
 
+    <section class="workspace-grid">
       <article class="operator-panel">
         <div class="panel-heading">
           <div>
@@ -159,6 +232,16 @@
         </div>
       </div>
       <div id="observabilityPanel" class="observability-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="operator-panel observability-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Receipts</p>
+          <h2>Customer Ledger</h2>
+        </div>
+      </div>
+      <div id="receiptPanel" class="receipt-list" aria-live="polite"></div>
     </section>
   </main>
 

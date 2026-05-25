@@ -266,6 +266,10 @@ button,
   color: var(--skynet-muted);
 }
 
+.drop-first-grid {
+  margin-bottom: 18px;
+}
+
 .panel-heading {
   justify-content: space-between;
   gap: 14px;
@@ -423,6 +427,67 @@ select {
   gap: 10px;
 }
 
+.publish-result {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(39, 111, 167, .28);
+  border-radius: 8px;
+  background: rgba(59, 130, 246, .08);
+}
+
+.publish-result[hidden] {
+  display: none;
+}
+
+.publish-result span {
+  color: var(--skynet-muted);
+  font-size: .78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.direct-live-link,
+.tutorial-blue-link {
+  color: var(--skynet-blue);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.skynet-tutorial-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.tutorial-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tutorial-list li {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(23, 23, 19, .1);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, .62);
+}
+
+.tutorial-list strong {
+  color: var(--skynet-ink);
+}
+
+.tutorial-list span {
+  color: var(--skynet-muted);
+  line-height: 1.45;
+}
+
 .preview-browser,
 .preview-forge {
   min-height: 108px;
@@ -550,7 +615,8 @@ select {
   overflow-wrap: anywhere;
 }
 
-.route-live-link {
+.route-live-link,
+.direct-live-link {
   display: inline-block;
   margin-top: 8px;
   color: var(--skynet-blue);
@@ -1327,6 +1393,8 @@ button:hover {
 .workspace-card,
 .quota-grid div,
 .receipt-card,
+.tutorial-list li,
+.publish-result,
 .preview-browser,
 .preview-forge,
 .check-row {
@@ -1430,8 +1498,14 @@ select:focus-visible {
 }
 
 .route-live-link,
+.direct-live-link,
+.tutorial-blue-link,
 .workspace-card span {
   color: #8ab4ff;
+}
+
+.tutorial-list strong {
+  color: #f7f7f8;
 }
 
 .empty-state {

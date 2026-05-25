@@ -390,3 +390,38 @@ test('SN-05 SkyeNet public resolver serves routes with human mount names and leg
   assert.equal(live.headers.get('x-skynet-route'), 'r2-deployment');
   assert.match(text, /Human route SkyeNet Asset/);
 });
+
+test('SN-06 SkyeNet registered routes with missing root assets return a diagnostic instead of a fake route miss', async () => {
+  const e = envWithActualFs27();
+  const token = 'gate-token';
+  const projectId = 'missing-root-public';
+  const deploymentId = 'dep_missing_root_public';
+
+  assert.equal((await call(e, '/api/skyenet/deploy/init', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, title: 'Missing Root Public' }
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/route', {
+    method: 'POST',
+    token,
+    body: {
+      hostname: 'metraiyux.example',
+      mount_path: '/skyenet/missing-root-public',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      public_access: true,
+      default_auth: 'public'
+    }
+  })).response.status, 200);
+
+  const live = await siteWorker.fetch(req('/skyenet/missing-root-public'), e, ctx());
+  const text = await live.text();
+  assert.equal(live.status, 404);
+  assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
+  assert.equal(live.headers.get('x-skynet-route'), 'asset-missing');
+  assert.match(text, /route found, asset missing/i);
+  assert.match(text, /index\.html/i);
+  assert.doesNotMatch(text, /^SkyeNet route not found$/i);
+});

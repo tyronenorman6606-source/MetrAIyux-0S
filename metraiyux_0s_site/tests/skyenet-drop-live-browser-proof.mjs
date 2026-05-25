@@ -248,8 +248,8 @@ async function dropProofFolder(page) {
       return file;
     };
     const transfer = new DataTransfer();
-    transfer.items.add(makeFile('<!doctype html><html><head><title>Proof Drop</title></head><body><main><h1>Proof Drop</h1><p>SkyeNet live folder proof.</p></main></body></html>', 'index.html', 'text/html', 'proof-site/index.html'));
-    transfer.items.add(makeFile('body{font-family:system-ui;background:#08111d;color:#fff}', 'style.css', 'text/css', 'proof-site/assets/style.css'));
+    transfer.items.add(makeFile('<!doctype html><html><head><title>Proof Drop</title></head><body><main><h1>Proof Drop</h1><p>SkyeNet live folder proof.</p></main></body></html>', 'index.html', 'text/html', 'proof-site/dist/index.html'));
+    transfer.items.add(makeFile('body{font-family:system-ui;background:#08111d;color:#fff}', 'style.css', 'text/css', 'proof-site/dist/assets/style.css'));
     transfer.items.add(makeFile('SHOULD_NOT_UPLOAD=true', '.env', 'text/plain', 'proof-site/.env'));
     const zone = document.querySelector('#dropZone');
     zone.dispatchEvent(new DragEvent('dragenter', { bubbles: true, cancelable: true, dataTransfer: transfer }));
@@ -325,7 +325,7 @@ async function runViewport(browser, owner, viewport, viewportLabel) {
     await clickControl(page, '#skrucibleEnhance');
     entry.actions.push('toggled Skrucible on');
     await dropProofFolder(page);
-    entry.actions.push('dropped proof folder with index, css, and filtered env file');
+    entry.actions.push('dropped parent proof folder with dist index, css, and filtered env file');
     await page.waitForFunction(() => /2 files/i.test(document.querySelector('#fileSummary')?.textContent || ''), null, { timeout: 45000 });
     await screenshot(page, entry, 'after-folder-drop');
 
@@ -337,7 +337,7 @@ async function runViewport(browser, owner, viewport, viewportLabel) {
       truth: document.querySelector('#truthList')?.textContent || '',
       body: document.body.innerText
     }));
-    entry.checks.push({ name: 'wrapper folder stripped to publishable root files', ok: /2 files/i.test(state.fileSummary) && !/proof-site\/index\.html/i.test(state.preview), state });
+    entry.checks.push({ name: 'wrapper folder stripped and dist promoted to publishable root files', ok: /2 files/i.test(state.fileSummary) && /dist promoted/i.test(`${state.fileSummary} ${state.preview}`) && !/dist\/index\.html/i.test(state.preview), state });
     entry.checks.push({ name: 'private env file skipped', ok: /1 skipped/i.test(state.dropStats) && !/\.env/i.test(state.preview), state });
     entry.checks.push({ name: 'surface preview sees root index', ok: /root index (ready|detected)/i.test(state.preview), state });
     entry.checks.push({ name: 'Skrucible forge armed in preview', ok: /Forge pass armed/i.test(state.preview), state });
@@ -350,9 +350,12 @@ async function runViewport(browser, owner, viewport, viewportLabel) {
     const deployLog = await page.locator('#deployLog').innerText({ timeout: 45000 });
     entry.deployLog = redact(deployLog);
     entry.checks.push({ name: 'deploy log reports published route', ok: /Published and routed:/i.test(deployLog), deployLog: entry.deployLog });
+    entry.checks.push({ name: 'promoted build root uploaded as root index', ok: /Promoted dist to deployment root/i.test(deployLog) && /Upload index\.html/i.test(deployLog) && !/Upload dist\/index\.html/i.test(deployLog), deployLog: entry.deployLog });
     if (/Failed:/i.test(deployLog)) throw new Error(`SkyeNet deploy failed: ${deployLog}`);
     const match = deployLog.match(/Published and routed:\s*(https?:\/\/\S+)/i);
     if (!match) throw new Error(`SkyeNet deploy did not return a live URL: ${deployLog}`);
+    const directHref = await page.locator('#publishResult a.direct-live-link').getAttribute('href', { timeout: 45000 }).catch(() => '');
+    entry.checks.push({ name: 'direct blue live link appears after publish', ok: directHref === match[1], directHref, expected: match[1] });
     await publicRouteProof(browser, match[1], viewport, entry);
 
     await scrollProof(page, entry);

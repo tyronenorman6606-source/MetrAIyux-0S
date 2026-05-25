@@ -394,6 +394,26 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="skyenet-drop-root-repair">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeNet Drop Root Repair</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeNet</span><span>Folder drop</span><span>Build roots</span><span>Live links</span><span>Runtime diagnostic</span></div>
+            <h2>SkyeNet now promotes real build folders before publish and shows the live blue link directly in the console.</h2>
+            <p>This pass closes the real user-drop failure where a parent folder containing <code>dist/index.html</code>, <code>build/index.html</code>, <code>out/index.html</code>, or <code>public/index.html</code> could publish a route record without a root asset, then fall through to <code>SkyeNet route not found</code>.</p>
+            <ul class="release-points">
+              <li>The drop console now sits immediately under the shared gate login region, with a compact publish tutorial beside the drop zone.</li>
+              <li>Browser drops strip wrapper folders, promote common build output roots to deployment root, hold back source/private paths, and block publish when no root <code>index.html</code> remains.</li>
+              <li>After route sealing, the console renders the returned <code>live_url</code> as a direct blue link so the user can open the exact published surface immediately.</li>
+              <li>FS27 now returns an <code>x-skynet-route: asset-missing</code> diagnostic for historical route records whose deployment vault lacks the requested root asset, instead of letting the 0S bridge mislabel it as a route miss.</li>
+              <li>SkyeNet status and truth manifests now advertise build-root promotion, root-index enforcement, direct publish links, and asset-missing diagnostics as live capabilities.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../skyenet/index.html">SkyeNet Console</a></span><span><a href="../skyenet/PLATFORM_TRUTH.json">Platform Truth</a></span><span><code>docs/SKYENET_UPLOAD_URL_MODEL.md</code></span><span><code>node metraiyux_0s_site/tests/skyenet-drop-ui-proof.mjs</code></span><span><code>node --test metraiyux_0s_site/tests/skyenet-platform-adapter.test.mjs</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="skyenet-route-normalization-repair">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-25">May 25, 2026</time>

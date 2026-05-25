@@ -452,6 +452,43 @@ async function serveDeploymentAsset(request, env, routeRecord, runtimeMeta) {
   return null;
 }
 
+function missingDeploymentAssetResponse(request, routeRecord, runtimeMeta) {
+  const url = new URL(request.url);
+  const assetPath = mountedAssetPath(url.pathname, routeRecord);
+  const headers = new Headers({
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store'
+  });
+  headers.set('x-skynet-route', 'asset-missing');
+  headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+  headers.set('x-skynet-deployment-id', cleanText(routeRecord.active_deployment_id || '', 180));
+  runtimeMeta.runtime_type = 'static';
+  runtimeMeta.route_decision = 'r2.deployment_asset_missing';
+  runtimeMeta.error_code = 'SKYENET_DEPLOYMENT_ASSET_MISSING';
+  return new Response(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeNet deployment asset missing</title>
+  <style>
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#050505;color:#f7f7f8;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+    main{width:min(720px,calc(100% - 32px));border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:24px;background:rgba(255,255,255,.055)}
+    h1{margin:0 0 12px;font-size:clamp(1.8rem,5vw,3.4rem);letter-spacing:0}
+    p{color:#c7c7cc;line-height:1.5}
+    code{color:#8ab4ff;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SkyeNet route found, asset missing.</h1>
+    <p>This route is registered, but the deployment vault does not have the requested root asset. Publish a bundle with <code>index.html</code> at the deployment root, or drop the <code>dist</code>, <code>build</code>, <code>out</code>, or <code>public</code> folder directly.</p>
+    <p><code>${cleanText(assetPath || '/', 300)}</code></p>
+  </main>
+</body>
+</html>`, { status: 404, headers });
+}
+
 async function proxyFallbackOrigin(request, routeRecord, runtimeMeta) {
   if (!routeRecord?.fallback_origin) return null;
   const incomingUrl = new URL(request.url);
@@ -492,6 +529,7 @@ async function serveMappedRoute(request, env, routeRecord, runtimeMeta) {
   if (routeRecord.asset_mode === 'r2' || routeRecord.asset_prefix) {
     const asset = await serveDeploymentAsset(request, env, routeRecord, runtimeMeta);
     if (asset) return asset;
+    if (!routeRecord.fallback_origin) return missingDeploymentAssetResponse(request, routeRecord, runtimeMeta);
   }
   return proxyFallbackOrigin(request, routeRecord, runtimeMeta);
 }

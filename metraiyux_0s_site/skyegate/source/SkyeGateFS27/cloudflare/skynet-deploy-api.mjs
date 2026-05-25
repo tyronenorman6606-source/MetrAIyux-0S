@@ -907,6 +907,15 @@ async function handleComplete(request, env, cors) {
   const files = Array.isArray(body.files)
     ? body.files.map((item) => normalizeAssetPath(item)).slice(0, 20000)
     : [];
+  const hasRootIndex = files.some((file) => file.toLowerCase() === 'index.html');
+  if (!hasRootIndex && body.require_root_index !== false && body.requireRootIndex !== false) {
+    return httpJson(400, {
+      ok: false,
+      error: 'Root index.html is required for SkyeNet static deployment routes. Upload the contents of dist/build/out/public or promote that folder before completing.',
+      code: 'ROOT_INDEX_REQUIRED',
+      files
+    }, cors);
+  }
   const manifest = {
     schema: 'fs27.deployment_complete.v1',
     project_id: projectId,
@@ -915,7 +924,10 @@ async function handleComplete(request, env, cors) {
     workspace_id: workspaceResult.workspace.workspace_id,
     completed_at: new Date().toISOString(),
     files,
-    meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
+    meta: {
+      ...(body.meta && typeof body.meta === 'object' ? body.meta : {}),
+      has_root_index: hasRootIndex
+    }
   };
   await bucket.put(`${prefix}/.fs27/deployment-complete.json`, JSON.stringify(manifest, null, 2), {
     httpMetadata: { contentType: 'application/json; charset=utf-8' }
@@ -1192,6 +1204,11 @@ async function handleStatus(request, env, cors) {
       self_service_workspace: true,
       browser_drag_folder_drop: true,
       drop_root_folder_stripping: true,
+      drop_build_root_auto_promotion: true,
+      static_deploy_root_index_required: true,
+      asset_missing_route_diagnostic: true,
+      direct_live_link_after_publish: true,
+      in_console_publish_tutorial: true,
       drop_private_source_path_filter: true,
       skrucible_forge_static_surface_pass: true,
       deploy_receipts: true,

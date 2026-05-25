@@ -11,13 +11,14 @@ The browser console at `/skyenet/index.html` supports a real build drop:
 3. The console loads the customer dashboard through `GET /api/skyenet/dashboard`.
 4. The console calls `POST /api/skyenet/deploy/init`.
 5. The user drops a folder into the visible SkyeNet Drop zone or selects a build folder.
-6. The console strips the wrapper folder automatically, skips private/source-only paths, and previews root/index readiness.
+6. The console strips the wrapper folder automatically, promotes common build roots (`dist`, `build`, `out`, `public`) to the deployment root, skips private/source-only paths, and previews root/index readiness.
 7. If the Skrucible forge pass is enabled, the console injects `assets/skyenet-skrucible.css`, `assets/skyenet-skrucible.js`, and `skyenet-skrucible-manifest.json` so plain static surfaces get living SkyeNet motion chrome without a rebuild.
 8. The console uploads each file through `PUT /api/skyenet/deploy/upload?workspaceId=...&projectId=...&deploymentId=...&path=...`.
-9. The console seals the manifest through `POST /api/skyenet/deploy/complete`.
+9. The console seals the manifest through `POST /api/skyenet/deploy/complete`; SkyeNet requires a root `index.html` for static public routes so a bad bundle cannot quietly publish a dead link.
 10. The console registers the route through `POST /api/skyenet/deploy/route`.
-11. The 0S host hands `/skyenet/<project>/` public surface requests to the SkyeNet runtime resolver, so the returned `live_url` serves the uploaded R2 bundle instead of falling back to the 0S static shell. SkyeNet returns the trailing slash for mounted folders so relative assets like `assets/app.css` resolve inside the deployed bundle.
-12. SkyeNet writes customer receipts, updates the scoped dashboard, and serves the mapped route from the asset vault or fallback origin.
+11. The console renders the returned `live_url` as a direct blue link immediately after publish.
+12. The 0S host hands `/skyenet/<project>/` public surface requests to the SkyeNet runtime resolver, so the returned `live_url` serves the uploaded R2 bundle instead of falling back to the 0S static shell. SkyeNet returns the trailing slash for mounted folders so relative assets like `assets/app.css` resolve inside the deployed bundle.
+13. SkyeNet writes customer receipts, updates the scoped dashboard, and serves the mapped route from the asset vault or fallback origin. If a historical route record exists but the root asset is missing, the runtime returns a SkyeNet asset-missing diagnostic instead of the misleading `SkyeNet route not found` bridge message.
 
 Chromebook users can use the same flow from the browser, or use bash/curl if they have a 0S session token.
 
@@ -128,12 +129,15 @@ Sell today:
 
 - Static build drops.
 - Browser folder drops with automatic root-folder stripping.
+- Automatic promotion of common build output folders such as `dist`, `build`, `out`, and `public`.
+- Root `index.html` enforcement before publish and asset-missing diagnostics for old bad routes.
 - Source/private path filtering for dropped bundles.
 - Skrucible-enhanced static surfaces through generated CSS, JS, and manifest assets.
 - Customer workspace provisioning through the shared 0S gate.
 - Customer-scoped dashboard with deployments, routes, receipts, and quota posture.
 - First-party CLI directory and zip bundle push.
 - SkyeNet route registration.
+- Direct blue live link returned in-console after publish.
 - Public or gate-protected hosted pages.
 - Live `/skyenet/<project>/` public route serving from the uploaded SkyeNet asset vault.
 - Fallback origin proxying.

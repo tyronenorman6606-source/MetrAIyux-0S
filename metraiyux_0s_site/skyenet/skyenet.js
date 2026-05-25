@@ -34,6 +34,7 @@ const els = {
   observabilityPanel: document.querySelector('#observabilityPanel'),
   deployForm: document.querySelector('#deployForm'),
   deployLog: document.querySelector('#deployLog'),
+  publishResult: document.querySelector('#publishResult'),
   deploymentId: document.querySelector('#deploymentId'),
   projectId: document.querySelector('#projectId'),
   mountPath: document.querySelector('#mountPath'),
@@ -56,6 +57,8 @@ const tokenKeys = [
   'skygate_session',
   'quantumskyes_mcp_owner_token'
 ];
+
+const buildRootNames = new Set(['dist', 'build', 'out', 'public', 'site', 'www', 'static']);
 
 function nowDeploymentId() {
   const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
@@ -402,6 +405,58 @@ function stripSharedRoot(items) {
   return { items: stripped, strippedRoot: root };
 }
 
+function scoreBuildRoot(root) {
+  const parts = normalizeUploadPath(root).toLowerCase().split('/').filter(Boolean);
+  if (!parts.length) return 0;
+  const first = parts[0];
+  const last = parts.at(-1);
+  const named = buildRootNames.has(first) || buildRootNames.has(last);
+  if (!named) return 0;
+  let score = buildRootNames.has(first) ? 100 : 70;
+  score -= Math.max(0, parts.length - 1) * 4;
+  if (first === 'dist' || last === 'dist') score += 10;
+  if (first === 'build' || last === 'build') score += 8;
+  if (first === 'out' || last === 'out') score += 6;
+  return score;
+}
+
+function promoteBuildRoot(items) {
+  const cleanItems = items
+    .map((item) => ({ ...item, path: normalizeUploadPath(item.path || item.file?.webkitRelativePath || item.file?.name) }))
+    .filter((item) => item.file && item.path);
+  if (cleanItems.some((item) => item.path.toLowerCase() === 'index.html')) {
+    return { items: cleanItems, promotedRoot: '', heldBack: [] };
+  }
+
+  const candidates = [];
+  for (const item of cleanItems) {
+    if (!/\/index\.html?$/i.test(item.path)) continue;
+    const root = item.path.split('/').slice(0, -1).join('/');
+    const score = scoreBuildRoot(root);
+    if (score > 0) candidates.push({ root, score, depth: root.split('/').length });
+  }
+  candidates.sort((a, b) => b.score - a.score || a.depth - b.depth || a.root.localeCompare(b.root));
+  const promotedRoot = candidates[0]?.root || '';
+  if (!promotedRoot) return { items: cleanItems, promotedRoot: '', heldBack: [] };
+
+  const prefix = `${promotedRoot}/`;
+  const promoted = [];
+  const heldBack = [];
+  for (const item of cleanItems) {
+    if (item.path === promotedRoot) continue;
+    if (item.path.startsWith(prefix)) {
+      const path = item.path.slice(prefix.length);
+      if (path) promoted.push({ ...item, path });
+    } else {
+      heldBack.push(item.path);
+    }
+  }
+  if (!promoted.some((item) => item.path.toLowerCase() === 'index.html')) {
+    return { items: cleanItems, promotedRoot: '', heldBack: [] };
+  }
+  return { items: promoted, promotedRoot, heldBack };
+}
+
 function shouldSkipUploadPath(pathname) {
   const path = normalizeUploadPath(pathname).toLowerCase();
   if (!path) return true;
@@ -425,11 +480,12 @@ function selectedFiles() {
     if (shouldSkipUploadPath(item.path)) skipped.push(item.path);
     else kept.push(item);
   }
-  state.dropMeta = scanFiles(kept, skipped, normalized.strippedRoot);
-  return kept;
+  const promoted = promoteBuildRoot(kept);
+  state.dropMeta = scanFiles(promoted.items, [...skipped, ...promoted.heldBack], normalized.strippedRoot, promoted.promotedRoot);
+  return promoted.items;
 }
 
-function scanFiles(files, skipped = [], strippedRoot = '') {
+function scanFiles(files, skipped = [], strippedRoot = '', promotedRoot = '') {
   const paths = files.map((item) => item.path);
   const html = paths.filter((path) => /\.html?$/i.test(path));
   const css = paths.filter((path) => /\.css$/i.test(path));
@@ -441,6 +497,7 @@ function scanFiles(files, skipped = [], strippedRoot = '') {
     skipped_count: skipped.length,
     skipped_files: skipped.slice(0, 40),
     stripped_root: strippedRoot,
+    promoted_root: promotedRoot,
     total_bytes: totalBytes,
     total_label: bytesLabel(totalBytes),
     has_index: paths.some((path) => path.toLowerCase() === 'index.html'),
@@ -456,8 +513,12 @@ function renderDropSummary() {
   const files = selectedFiles();
   const meta = state.dropMeta || scanFiles(files);
   const fileWord = meta.file_count === 1 ? 'file' : 'files';
+  const sourceBits = [
+    meta.stripped_root ? `from ${meta.stripped_root}` : '',
+    meta.promoted_root ? `${meta.promoted_root} promoted to root` : ''
+  ].filter(Boolean);
   els.fileSummary.textContent = meta.file_count
-    ? `${meta.file_count} ${fileWord} ready${meta.stripped_root ? ` from ${meta.stripped_root}` : ''}.`
+    ? `${meta.file_count} ${fileWord} ready${sourceBits.length ? ` (${sourceBits.join(', ')})` : ''}.`
     : 'Choose a folder or files.';
   els.dropStats.innerHTML = `
     <span>${escapeHtml(String(meta.file_count))} files</span>
@@ -473,7 +534,7 @@ function renderDropSummary() {
     <div class="preview-browser">
       <div class="preview-dots"><i></i><i></i><i></i></div>
       <strong>${escapeHtml(meta.first_html || 'Surface root')}</strong>
-      <small>${escapeHtml(meta.has_index ? 'root index detected' : 'add index.html for clean root routing')}</small>
+      <small>${escapeHtml(meta.has_index ? (meta.promoted_root ? `root index detected from ${meta.promoted_root}` : 'root index detected') : 'add index.html for clean root routing')}</small>
     </div>
     <div class="preview-forge ${forgeState}">
       <span>Skrucible</span>
@@ -594,6 +655,10 @@ async function deploy(event) {
   event.preventDefault();
   const form = new FormData(els.deployForm);
   const rawFiles = selectedFiles();
+  if (els.publishResult) {
+    els.publishResult.hidden = true;
+    els.publishResult.innerHTML = '';
+  }
   if (!rawFiles.length) {
     els.deployLog.textContent = 'Choose at least one file before publishing.';
     return;
@@ -620,7 +685,15 @@ async function deploy(event) {
     els.routeHost.value = routeHost;
     els.mountPath.value = mountPath;
     const prepared = await prepareFilesForDeploy(rawFiles);
+    if (!prepared.meta.has_index) {
+      write('Failed: no root index.html found. Drop the dist/build/out/public folder, or include index.html at the top of the bundle.');
+      renderDropSummary();
+      return;
+    }
     const files = prepared.files;
+    if (prepared.meta.promoted_root) {
+      write(`Promoted ${prepared.meta.promoted_root} to deployment root`);
+    }
     write(prepared.meta.skrucible_forge_pass
       ? `Skrucible forge pass: ${prepared.meta.skrucible_enhanced_html} HTML surface${prepared.meta.skrucible_enhanced_html === 1 ? '' : 's'} enhanced`
       : 'Skrucible forge pass: off');
@@ -688,6 +761,13 @@ async function deploy(event) {
 
     const liveUrl = routeResult?.skynet?.live_url || routeResult?.live_url || `https://${routeHost}${mountPath}`;
     write(`Published and routed: ${liveUrl}`);
+    if (els.publishResult) {
+      els.publishResult.hidden = false;
+      els.publishResult.innerHTML = `
+        <span>Live URL</span>
+        <a class="direct-live-link" href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener">${escapeHtml(liveUrl)}</a>
+      `;
+    }
     await refresh();
   } catch (error) {
     write(`Failed: ${error.message}`);
