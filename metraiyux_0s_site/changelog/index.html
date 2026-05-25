@@ -394,6 +394,96 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="skyecommerce-0s-skyepay-sovereigndocs">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">SkyeCommerce + SkyPay + SovereignDocs</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeCommerce</span><span>0S gate</span><span>SkyPay</span><span>SovereignDocs</span><span>AE handoff</span><span>Production stress</span></div>
+            <h2>SkyeCommerce is now a mounted 0S commerce platform with SkyPay dynamic checkout and a SovereignDocs document desk.</h2>
+            <p>The Shopify-replacement foundation was moved into the 0S as a gate-owned platform instead of a separate admin island. It now exposes merchant, design, storefront, document, and API surfaces through the main Worker; retires its isolated AE lane into canonical AE-FlowPro; and connects commerce checkout to SkyPay/FS27 with receivable ledgering.</p>
+            <ul class="release-points">
+              <li>SkyeCommerce lives at <code>/SkyeCommerce/</code> behind the shared FS27/Free99 gate, with app-local owner/admin registration blocked for mounted owner access.</li>
+              <li>Dynamic checkout now builds HMAC-signed SkyeCommerce cart payloads, dispatches through the <code>SKYGATEFS27_WORKER</code> service binding, maps paid status back to payment state, and records merchant receivables in <code>merchant_payout_ledger</code>.</li>
+              <li>The new Document Desk exposes SovereignDocs commerce templates and SkyeDocxMax drafting handoff for terms, privacy, refund, shipping, seller, subscription, cookie, accessibility, acceptable-use, license, creator-platform, and community-guideline drafts.</li>
+              <li>The isolated SkyeCommerce AE lane is retired: <code>/SkyeCommerce/ae/</code> redirects/hands off to canonical <code>/Marketing-Made-Easy/AE-FlowPro/</code>.</li>
+              <li>D1 migration <code>0028_skyepay_merchant_payouts.sql</code> was applied to remote <code>skyecommerce-foundation</code>; FS27 Worker version <code>39fd8b05-8798-4245-8e03-618afaabfdb2</code> and 0S Worker version <code>e1019af0-114a-49e5-bad5-0f44c6766b09</code> are deployed.</li>
+              <li>Production HTTP stress passed 270/270 scenario checks with p95 495 ms; SkyeCommerce-to-SkyPay loop stress passed 240/240 calls at concurrency 32 with p95 618 ms.</li>
+              <li>Boundary remains honest: automatic Stripe Connect/KYC/1099 merchant payout disbursement and SkyPay-originated refund automation are not complete yet.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeCommerce/">SkyeCommerce</a></span><span><a href="../SkyeCommerce/docs/">Document Desk</a></span><span><a href="../Marketing-Made-Easy/AE-FlowPro/">Canonical AE-FlowPro</a></span><span><code>test-artifacts/skyecommerce-live-production-stress/2026-05-24T23-02-25-441Z-stress.json</code></span><span><code>test-artifacts/skyecommerce-skyepay-loop-stress/2026-05-24T23-02-18-121Z-stress.json</code></span><span><code>metraiyux_0s_site/docs/SKYECOMMERCE_0S_SKYEPAY_SOVEREIGNDOCS_LIVE_REPORT.md</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyenet-admin-unlock-real-route-bridge">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">SkyeNet Route Bridge</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeNet</span><span>Admin unlock</span><span>Free99 guardrails</span><span>Live asset routes</span><span>Function caps</span><span>Resend-style UI</span></div>
+            <h2>SkyeNet now treats owner/admin deploys like owner/admin deploys, and dropped builds route to the actual uploaded bundle.</h2>
+            <p>This pass closed the two operational gaps found during live use: the owner-unlocked 0S session was still being counted like a capped Free99 customer, and public `/skyenet/&lt;project&gt;` paths on the main 0S host were not guaranteed to enter the FS27 SkyeNet runtime resolver. Both paths are now explicit and test-backed.</p>
+            <ul class="release-points">
+              <li>The 0S SkyeNet proxy now forwards owner/admin sessions into FS27 with an explicit admin override header, owner role, and gate-card context, so admin deploys do not burn or block on Free99 route/deployment credits.</li>
+              <li>Normal customer workspaces still keep Free99 and paid-plan caps: the stress proof confirms regular Free99 route overage returns `429 SKYENET_PUBLIC_ROUTE_QUOTA` while owner/admin can continue publishing.</li>
+              <li>The main 0S Worker now hands non-console `/skyenet/&lt;project&gt;` requests to the FS27 SkyeNet runtime through the service binding, and FS27 marks R2/fallback/gate decisions with SkyeNet runtime headers so route misses cannot silently serve the wrong shell.</li>
+              <li>Mounted folder live URLs now return the canonical trailing slash, so dropped sites load their relative CSS, JavaScript, images, and Skrucible runtime assets from the uploaded SkyeNet bundle instead of leaking to `/skyenet/assets/...`.</li>
+              <li>The SkyeNet console and generated Skrucible pass were rethemed into a restrained black/white/blue control surface inspired by Resend's homepage color lane: hairline borders, dark product-console surfaces, white primary action, and blue runtime accents.</li>
+              <li>Function policy is now visible in API truth, docs, and dashboard copy: functions are off by default, managed functions are paid/owner-approved only, bundles require manifest plus signature, secrets are redacted, timeout/memory/body/subrequest/egress caps are required, invocation receipts are required, and abuse/billing guards stay on before scale.</li>
+              <li>The sovereign isolated functions boundary is documented in plain English: arbitrary hostile customer code waits for a per-tenant isolate/container/microVM runtime, while today's sellable lane is static deploys plus controlled signed/managed functions.</li>
+              <li>Local proof passed syntax checks, FS27 worker check, SkyeNet drop UI proof, deploy API TAP tests, self-service stress, and the full `npm run 0s:skyenet:hybrid-proof` suite.</li>
+            </ul>
+            <div class="receipt-row"><span><code>docs/SKYENET_UPLOAD_URL_MODEL.md</code></span><span><code>test-artifacts/skyenet-self-service-stress-latest.json</code></span><span><code>test-artifacts/skyenet-drop-ui-proof.json</code></span><span><code>npm run 0s:skyenet:hybrid-proof</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyenet-skyemail-enterprise-self-service">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">SkyeNet + SkyEmail</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeNet</span><span>Self-service deploys</span><span>Customer dashboard</span><span>Deploy receipts</span><span>SkyEmail inbox sync</span><span>Production stress</span></div>
+            <h2>SkyeNet moved from proof lane into a sellable self-service deploy lane, and SkyEmail got enterprise inbox closure.</h2>
+            <p>SkyeNet now has the core customer path needed to sell static deploy hosting under the 0S gate: literal browser folder drop, root-folder stripping, private/source path filtering, Skrucible static-surface forge enhancement, workspace provisioning, route publication, live URL return, customer dashboard records, quota guards, rollback targeting, CLI upload, and per-deploy receipts. SkyEmail now has hosted reply routing, provider inbox import, mutation compatibility, and scheduled sync behind the SkyeMail product surface.</p>
+            <ul class="release-points">
+              <li>FS27 SkyeNet deploy API Worker version <code>67e340c3-083c-4854-afef-f14a36a7e6ea</code> is deployed, and the main 0S Worker proxies the SkyeNet workspace, dashboard, receipts, rollback, folder-drop, and proof routes through shared FS27/SkyGate auth.</li>
+              <li>The SkyeNet API now supports <code>GET/POST /deploy/workspace</code>, <code>GET /deploy/dashboard</code>, <code>GET /deploy/receipts</code>, and <code>POST /deploy/rollback</code>, with workspace identity, plan caps, bundle byte limits, monthly deployment limits, route limits, and Free99 public-route guards.</li>
+              <li>The 0S SkyeNet console now lets an authenticated user choose workspace and plan, drag/drop a full site folder, preview root/index readiness, upload the bundle, publish a route, inspect account usage, see deployment records, and read receipt history.</li>
+              <li>The browser drop lane strips the wrapper folder from real drops such as <code>my-site/index.html</code>, filters private/source-only files like <code>.env</code>, <code>.git</code>, <code>node_modules</code>, runtime scripts, SQL, and Netlify function source, then sends only the publishable surface into the deploy API.</li>
+              <li>The optional Skrucible forge pass injects generated SkyeNet CSS, generated SkyeNet JavaScript, and a <code>skyenet-skrucible-manifest.json</code> receipt into static HTML bundles so raw customer folders come out with a livelier first visual pass instead of plain dropped files.</li>
+              <li>The first-party <code>tools/skyenet-deploy.mjs</code> CLI can upload a directory or zip bundle into SkyeNet with project, workspace, plan, host, mount, and public-route options.</li>
+              <li>SkyEmail Worker version <code>4e761bf8-fcec-4fc0-bef9-b48337a8aac7</code> is deployed with hosted reply send, provider inbox sync import, 15-minute cron sync, Gmail-compatible mutation routes, attachment lookup, and richer FS27/Citadel backup receipts.</li>
+              <li>Local SkyeNet proof passed deploy proof, functions proof, drop UI proof, SkyPay proof, Citadel adapter tests, and self-service stress: 12 deploys, 12 dashboard deployment records, 12 route records, 50 receipts, and the Free99 public-route quota block.</li>
+              <li>Production stress receipts record the deployed request counts and p95 timings for SkyeNet baseline/status/dashboard/receipt routes and SkyEmail public/provider/proof routes.</li>
+              <li>Product boundary remains precise: SkyeNet is sellable now for static/self-service deploys, dashboarded receipts, quotas, rollback routing, and controlled signed Netlify-style function bundles. Unrestricted hostile customer-uploaded server code remains reserved for the sovereign isolate/runtime phase.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyenet-drop-ui-proof.json</code></span><span><code>test-artifacts/skyenet-self-service-stress-latest.json</code></span><span><code>test-artifacts/skyenet-live-production-stress-latest.json</code></span><span><code>test-artifacts/skyemail-live-production-stress-latest.json</code></span><span><code>tools/skyenet-deploy.mjs</code></span><span><code>docs/SKYENET_UPLOAD_URL_MODEL.md</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-artist-store-local-brain-skyemeter">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-24">May 24, 2026</time>
+            <span class="release-version">Music Nexus</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Artist stores</span><span>Local artist brain</span><span>Network listening</span><span>SkyeMeter</span><span>Giveaways</span><span>Browser proof</span></div>
+            <h2>SkyeMusicNexus now has living artist stores, local brains, SkyeMeter, and giveaway motion in production.</h2>
+            <p>The artist layer is mounted inside the existing 0S gate instead of creating a separate app password or provider dependency. Artists can now carry storefront products, order intents, local memory, planned social motion, network listening/engagement receipts, SkyeMeter progress, merits, and giveaway entries as first-party Music Nexus state.</p>
+            <ul class="release-points">
+              <li>The main 0S Worker was redeployed as version <code>9b7395f5-8c8c-43b5-8caf-0ee503da442a</code> with new <code>music-store</code>, <code>music-brain</code>, and <code>music-gamify</code> API lanes behind the shared FS27/SkyGate/Free99 gate.</li>
+              <li><code>/SkyeMusicNexus/public/store.html</code> now surfaces artist storefront profiles, products, SkyePay checkout intent metadata, fulfillment status, and platform-fee math.</li>
+              <li><code>/SkyeMusicNexus/public/brain.html</code> now surfaces provider-free local artist memory, objectives, planned posts, network-release listening, feed posting, and engagement receipts.</li>
+              <li>The live proof created a network artist and release, had the local artist brain listen to it, posted/engaged inside the Nexus feed, created and fulfilled an artist store order, issued a SkyeMerit from SkyeMeter activity, and awarded a content-launch giveaway.</li>
+              <li>Desktop and mobile headed browser proof passed with full scroll screenshots, zero material console errors, zero failed requests, and zero HTTP errors.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyemusicnexus-store-brain-live-browser/2026-05-24T12-26-16-482Z/receipt.json</code></span><span><code>node --test metraiyux_0s_site/tests/skymusicnexus-adapter.test.mjs</code></span><span><code>npm --prefix metraiyux_0s_site/SkyeMusicNexus run smoke:ui</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="skyemail-zoho-skynet-functions-parity">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-24">May 24, 2026</time>

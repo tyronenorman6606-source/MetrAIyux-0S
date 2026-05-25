@@ -3,9 +3,10 @@ import { handleClientAppFactoryGeneratedRoute, handleClientAppFactoryRoute } fro
 import { AGENTIC_GROWTH_ROUTE_FAMILIES, handleAgenticGrowthRoute, runAgenticGrowthScheduleTick } from './agentic-growth-adapter.mjs';
 import { KEY_GATE_13_ROUTE_FAMILIES, handleKeyGate13Route } from './key-gate-13th-adapter.mjs';
 import { handleCitadelDbRoute } from './citadeldb-adapter.mjs';
+import { handleHelperK4iRoute } from './helper-k4i-adapter.mjs';
 import { handleCompanyKnowledgeRoute } from './company-knowledge.mjs';
+import { handleSkyeCommerceRoute } from './skyecommerce-adapter.mjs';
 import adminLoginHtml from './generated-admin-login-page.mjs';
-import changelogHtml from './generated-changelog-page.mjs';
 import contractorPacketInboxHtml from './generated-contractor-packet-inbox-page.mjs';
 // Changelog bundle refresh: 2026-05-20 gate-owned remote QuantumSkyes MCP lane.
 import { handleMarketingMadeEasyRoute } from './marketing-made-easy-adapter.mjs';
@@ -20,7 +21,7 @@ import {
   handleTenantBackboneRoute
 } from './tenant-backbone.mjs';
 
-const VERSION = 'AUTONOMOUS_BUSINESS_SITE_OPERATOR_1.0.0';
+const VERSION = 'AUTONOMOUS_BUSINESS_SITE_OPERATOR_1.1.0_HELPER_K4I_DEPLOYMENT_AGENT';
 const SOVEREIGNDOCS_STATIC_MOUNT = '/Free99/apps/sovereigndocs';
 const SOVEREIGNDOCS_DOCXMAX_STATIC_MOUNT = `${SOVEREIGNDOCS_STATIC_MOUNT}/skye-docx-max`;
 const DEFAULT_SOVEREIGNDOCS_LANE_ORIGIN = 'https://sovereigndocs-0s-lane.pages.dev';
@@ -32,6 +33,7 @@ const ROUTES = [
   ['vendor_partner', /\bvendor\b|\bpartner\b|subcontractor|referral|alliance/i, 'helena-ward-brain', 'julian-mercer-brain', 'Partner/vendor intake and risk review'],
   ['client_onboarding', /\bclient\b|onboard|renewal|escalation|\blaunch\b|status/i, 'adrian-cross-brain', 'marcus-vale-brain', 'Client onboarding and delivery status setup'],
   ['compliance_or_contracting', /\bcontract\b|legal|compliance|policy|filing|incorporation|insurance|\brisk\b/i, 'julian-mercer-brain', 'donovan-pierce-brain', 'Compliance routing and professional review flag'],
+  ['deployment_agent_cloudflare', /cloudflare|deploy|deployment|pages|worker|wrangler|skyenet|secret|token|key rotation|rotate.*key|production push|smoke|stress/i, 'skyenet-deployment-agent', 'helper-k4i-proof-ops-brain', 'Cloudflare deployment authority, SkyeNet deploy assist, secret rotation plan, smoke, and stress receipts'],
   ['technology_or_site', /cloudflare|deploy|deployment|\bworker\b|automation|brain|\bapi\b|system|skygate|fs27|\bgate\b|\bauth\b|introspect|platform event/i, 'orion-hayes-brain', 'site-operator-autonomous-business-brain', 'Technology, deployment, automation, gate, or site operation review'],
   ['media_center_free99', /skyemediacenter|skye media|media center|asset intake|asset search|file delivery|publish asset|media publish|review board|execution board|dispatch board/i, 'valentina-reyes-brain', 'victor-saint-brain', 'Free99 gated media intake, review, publish, and proof routing'],
   ['marketing_or_content', /marketing|brand|copy|seo|content|campaign|public claim/i, 'valentina-reyes-brain', 'victor-saint-brain', 'Marketing copy, content control, or public claim review'],
@@ -96,6 +98,13 @@ const LIVE_SURFACES = [
     url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html',
     purpose: 'Protected owner/admin command brain for authenticated operator sessions, approval flows, cabinet routing, and receipts.',
     route_when: ['admin','operator','automation brain','approval','token','private']
+  },
+  {
+    id: 'skyenet-deployment-agent',
+    name: 'SkyeNet Deployment Agent',
+    url: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/helper-k4i/deploy-authority',
+    purpose: 'Protected Helper K4i deployment lane for Cloudflare authority checks, SkyeNet deploy assist receipts, secret rotation plans, and smoke/stress handoffs without exposing raw secrets.',
+    route_when: ['deployment agent','cloudflare deploy','pages deploy','worker deploy','key rotation','secret rotation','skyenet deploy','production push','smoke','stress']
   },
   {
     id: 'agentic-growth-layer-0s',
@@ -303,6 +312,17 @@ const APP_API_MOUNTS = [
     targetBase: '/api',
     status: 'LIVE/GATED',
     note: 'ConnectLog and Relay13 console calls use this configured 0S API base, which rewrites to the live Relay13 Worker contract when RELAY13_WORKER or RELAY13_WORKER_ORIGIN is configured.'
+  },
+  {
+    id: 'skyerrors',
+    name: 'SkyErrors',
+    base: '/api/skyerrors',
+    serviceBinding: null,
+    originEnv: null,
+    targetBase: '/api/skyerrors',
+    status: 'LIVE/GATED/SCAFFOLD',
+    builtin: true,
+    note: 'Gate-owned Sentry-style capture lane backed by Helper K4i, SkyErrors KV, and CitadelDB mirroring. SDK clients pass the shared FS27/0S gate session, not an app-specific DSN.'
   },
   {
     id: 'media',
@@ -1006,12 +1026,21 @@ function free99DemoEmailRecipients(env) {
 function free99DemoEmailFrom(env) {
   return String(env.RESEND_FROM_EMAIL || env.NOTIFY_EMAIL_FROM || env.RESEND_FROM || '').trim();
 }
+function resendApiKey(env) {
+  return String(
+    env.RESEND_API_KEY
+    || env.BACKUP_RESEND_API_TOKEN
+    || env.backup_resend_api_token
+    || env.bacup_resend_api_token
+    || ''
+  ).trim();
+}
 async function sendFree99DemoResendEmail(env, message) {
-  const apiKey = String(env.RESEND_API_KEY || '').trim();
+  const apiKey = resendApiKey(env);
   const from = free99DemoEmailFrom(env);
   const to = free99DemoEmailRecipients(env);
   if (!apiKey || !from || !to.length) {
-    return {ok:false, skipped:true, reason:'RESEND_API_KEY, RESEND_FROM_EMAIL, or owner recipient is not configured.'};
+    return {ok:false, skipped:true, reason:'RESEND_API_KEY or backup Resend token, RESEND_FROM_EMAIL, or owner recipient is not configured.'};
   }
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -1637,6 +1666,220 @@ function skygateRequest(env, path, init = {}) {
   const origin = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
   return fetch(`${origin}${path}`, init);
 }
+function skynetLocalCostModel() {
+  return {
+    schema: 'metraiyux.0s.skynet.cost_model.v1',
+    generated_at: new Date().toISOString(),
+    currency: 'usd',
+    audience: 'owner-admin-internal',
+    pricing_review_required: true,
+    free99_policy: {
+      posture: 'allowed only as a small gated static-demo lane with hard quotas',
+      caps: {
+        public_routes_per_workspace: 1,
+        storage_mb_per_workspace: 25,
+        monthly_requests_per_workspace: 10000,
+        deployments_per_month: 3,
+        retention_days: 30,
+        custom_domains: 0,
+        arbitrary_functions: 0
+      }
+    },
+    assumptions: [
+      { id: 'workers_paid_floor', label: 'Workers paid plan floor', unit: 'month', assumed_usd: 5.00 },
+      { id: 'worker_requests', label: 'Worker request overage', unit: 'million_requests', assumed_usd: 0.30 },
+      { id: 'r2_storage', label: 'R2 storage', unit: 'gb_month', assumed_usd: 0.015 },
+      { id: 'r2_writes_lists', label: 'R2 Class A operations', unit: 'million_ops', assumed_usd: 4.50 },
+      { id: 'r2_reads', label: 'R2 Class B operations', unit: 'million_ops', assumed_usd: 0.36 },
+      { id: 'kv_reads', label: 'KV route reads', unit: 'million_reads', assumed_usd: 0.50 },
+      { id: 'kv_writes', label: 'KV route writes', unit: 'million_writes', assumed_usd: 5.00 }
+    ],
+    guardrails: [
+      'Free99 must stay quota-capped so public demos do not turn into an owner-funded hosting bill.',
+      'Static/R2 drops are live. Generic uploaded serverless functions are not sold until a Worker dispatch/isolate lane exists.',
+      'Customer pricing should include support, QA, security, proof, and owner review instead of billing only at raw Cloudflare cost.'
+    ]
+  };
+}
+function skynetAppPublic(env) {
+  return {
+    id: 'skyenet',
+    name: 'SkyeNet Deploy',
+    base: '/api/skyenet',
+    aliases: [],
+    health: '/api/skyenet/status',
+    mounted: Boolean(env.SKYGATEFS27_WORKER?.fetch || skygateOrigin(env)),
+    status: 'LIVE/GATED',
+    routing_model: '0s_to_fs27_service_binding',
+    service_binding: 'SKYGATEFS27_WORKER',
+    origin_env: 'SKYGATEFS27_ORIGIN',
+    target_base: '/deploy',
+    note: 'Gated 0S admin proxy to the FS27 SkyeNet deploy API for static/R2 drops, route registration, observability, and internal cost controls.'
+  };
+}
+function citadelDbAppPublic(env) {
+  return {
+    id: 'citadeldb',
+    name: 'CitadelDB',
+    base: '/api/citadel',
+    aliases: ['/api/citadel/dev'],
+    health: '/api/citadel/health',
+    mounted: Boolean(env.CITADELDB?.prepare || env.CITADELDB_D1?.prepare || env.METRAIYUX_CITADELDB?.prepare || env.SITE_EVENTS_KV?.put),
+    status: 'LIVE/GATED',
+    routing_model: '0s_builtin_adapter',
+    service_binding: null,
+    origin_env: null,
+    target_base: '/api/citadel',
+    note: 'Gated CitadelDB control plane with mirror receipts, row storage, catch-up jobs, developer HTTPS database URL, and safe SELECT compatibility.'
+  };
+}
+function helperK4iAppPublic(env) {
+  return {
+    id: 'helperK4i',
+    name: 'Helper K4i',
+    base: '/api/helper-k4i',
+    aliases: [],
+    health: '/api/helper-k4i/status',
+    mounted: true,
+    status: 'LIVE/GATED',
+    routing_model: '0s_builtin_adapter',
+    service_binding: null,
+    origin_env: null,
+    target_base: '/api/helper-k4i',
+    note: 'Gated proof-ops brain for health scans, SkyErrors, Resend owner alerts, CitadelDB receipts, deployment authority checks, secret rotation plans, and vault patch-plan handoffs.'
+  };
+}
+function deploymentAgentAppPublic(env) {
+  return {
+    id: 'skyenetDeploymentAgent',
+    name: 'SkyeNet Deployment Agent',
+    base: '/api/helper-k4i',
+    aliases: ['/api/helper-k4i/deploy-authority', '/api/helper-k4i/deploy-assist', '/api/helper-k4i/secret-rotation-plan'],
+    health: '/api/helper-k4i/deploy-authority',
+    mounted: true,
+    status: 'LIVE/GATED',
+    routing_model: '0s_builtin_helper_k4i_adapter',
+    service_binding: null,
+    origin_env: null,
+    target_base: '/api/helper-k4i',
+    note: 'Gated deployment agent for Cloudflare authority probes, SkyeNet production deploy handoffs, secret rotation planning, smoke receipts, and stress receipts. It never returns raw secrets.'
+  };
+}
+function skynetForwardHeaders(request, auth, contentType = '', env = null) {
+  const headers = new Headers();
+  const incoming = new Headers(request.headers);
+  const token = bearer(request) || presentedGateCredentials(request)[0] || '0s-skynet-admin';
+  const identity = auth.identity || gateIdentity(auth.gate?.data || {}, {});
+  const adminOverride = Boolean(identity.isAdmin || allowsAdminGate(auth.gate?.data || {}, env || {}));
+  const rawCustomerId = String(auth.gate?.data?.customer_id || auth.gate?.data?.customerId || identity.customer_id || identity.id || auth.actor || '1');
+  const customerId = /^\d+$/.test(rawCustomerId) ? rawCustomerId : String((parseInt(founderShortHash(rawCustomerId), 36) % 2147483646) + 1);
+  headers.set('authorization', token.startsWith('Bearer ') ? token : `Bearer ${token}`);
+  headers.set('x-0s-role', adminOverride ? 'owner' : 'deployer');
+  headers.set('x-0s-customer-id', customerId);
+  headers.set('x-0s-email', String(auth.gate?.data?.email || identity.email || auth.actor || 'skyenet-user'));
+  headers.set('x-metraiyux-session-source', 'metraiyux-0s-skynet-console');
+  if (adminOverride) {
+    headers.set('x-0s-admin-override', 'true');
+    headers.set('x-skye-admin-override', 'true');
+    headers.set('x-0s-gate-cards', 'owner,admin,skyenet-admin');
+  }
+  const sourceContentType = contentType || incoming.get('content-type') || '';
+  if (sourceContentType) headers.set('content-type', sourceContentType);
+  const accept = incoming.get('accept');
+  if (accept) headers.set('accept', accept);
+  return headers;
+}
+function skynetDeployPath(url) {
+  const suffix = url.pathname.slice('/api/skyenet'.length) || '/status';
+  if (suffix === '/' || suffix === '/status' || suffix === '/health') return '/deploy/status';
+  if (suffix === '/routes') return '/deploy/routes';
+  if (suffix === '/workspace') return '/deploy/workspace';
+  if (suffix === '/dashboard') return '/deploy/dashboard';
+  if (suffix === '/receipts') return '/deploy/receipts';
+  if (suffix === '/rollback') return '/deploy/rollback';
+  if (suffix === '/observability') return '/deploy/observability';
+  if (suffix === '/cost-model') return '/deploy/cost-model';
+  if (suffix.startsWith('/deploy/')) return suffix;
+  return '';
+}
+async function handleSkyeNetRoute(request, env, ctx, url) {
+  if (!url.pathname.startsWith('/api/skyenet')) return null;
+  if (request.method === 'OPTIONS') return json({ ok: true });
+  const auth = await requireGateAuth(request, env, 'SkyeNet deploy control');
+  if (!auth.ok) return auth.response;
+  if (url.pathname === '/api/skyenet/cost-model' && !env.SKYGATEFS27_WORKER?.fetch && !skygateOrigin(env)) {
+    return json({ ok: true, source: '0s-local-cost-model', cost_model: skynetLocalCostModel() });
+  }
+  const targetPath = skynetDeployPath(url);
+  if (!targetPath) return json({ ok: false, error: 'skynet_route_not_found', base: '/api/skyenet', requested_path: url.pathname }, 404);
+  const target = `${targetPath}${url.search || ''}`;
+  const body = ['GET', 'HEAD'].includes(request.method) ? undefined : await request.arrayBuffer();
+  const response = await skygateRequest(env, target, {
+    method: request.method,
+    headers: skynetForwardHeaders(request, auth, '', env),
+    body
+  });
+  const contentType = response.headers.get('content-type') || '';
+  const payload = contentType.includes('application/json')
+    ? await response.json().catch(() => ({ ok: false, error: 'invalid_skynet_json_response' }))
+    : { ok: response.ok, text: await response.text().catch(() => '') };
+  if (request.method !== 'GET') {
+    ctx?.waitUntil?.(mirrorSkygateEvent(env, {
+      type: 'skynet.deploy.proxy',
+      meta: {
+        path: targetPath,
+        status: response.status,
+        ok: response.ok,
+        actor: auth.actor || 'owner-admin'
+      }
+    }, auth.gate || null));
+  }
+  return json({
+    ok: response.ok && payload?.ok !== false,
+    via: env.SKYGATEFS27_WORKER?.fetch ? 'fs27-service-binding' : 'fs27-origin',
+    target_path: targetPath,
+    skynet: payload
+  }, response.status);
+}
+function isSkyeNetPublishedSurfacePath(pathname) {
+  const path = String(pathname || '').replace(/\/+$/, '') || '/';
+  if (!path.startsWith('/skyenet/')) return false;
+  if (/^\/skyenet\/(?:index\.html|skyenet\.(?:css|js)|platform_truth\.json|mcp_tooling_receipt\.json)$/i.test(path)) return false;
+  return path.split('/').filter(Boolean).length >= 2;
+}
+async function handleSkyeNetPublishedSurfaceRoute(request, env, url) {
+  if (!isSkyeNetPublishedSurfacePath(url.pathname)) return null;
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method.toUpperCase())) {
+    return json({ok:false, error:'SkyeNet static routes only accept GET, HEAD, and OPTIONS today.'}, 405);
+  }
+  if (!env.SKYGATEFS27_WORKER?.fetch) return null;
+  const headers = new Headers(request.headers);
+  headers.set('x-0s-skynet-surface-proxy', 'metraiyux-0s');
+  headers.set('x-forwarded-host', url.hostname);
+  const response = await env.SKYGATEFS27_WORKER.fetch(new Request(request.url, {
+    method: request.method,
+    headers,
+    redirect: 'manual'
+  }));
+  if (!response.headers.get('x-skynet-route')) {
+    return new Response('SkyeNet route not found', {
+      status: 404,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'no-store',
+        'x-0s-skynet-route-miss': 'true'
+      }
+    });
+  }
+  const out = new Headers(response.headers);
+  out.set('x-0s-skynet-surface-proxy', 'fs27-service-binding');
+  out.delete('content-length');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: out
+  });
+}
 function sovereignDocsLaneOrigin(env) {
   return String(env.SOVEREIGNDOCS_LANE_ORIGIN || DEFAULT_SOVEREIGNDOCS_LANE_ORIGIN).replace(/\/+$/, '');
 }
@@ -1884,8 +2127,8 @@ function siteOperatorStatus(env) {
   return {
     ok: true,
     version: VERSION,
-    total_system_brains: 16,
-    connected_brains: 16,
+    total_system_brains: 18,
+    connected_brains: 18,
     mode: 'worker-ready',
     live_surface_count: LIVE_SURFACES.length,
     storage: {
@@ -1942,6 +2185,10 @@ function apiBaseMap() {
     if (mount.id === 'keyGate13th') out.key_gate_13th = mount.base;
     return out;
   }, {
+    skynet: '/api/skyenet',
+    citadeldb: '/api/citadel',
+    helperK4i: '/api/helper-k4i',
+    deploymentAgent: '/api/helper-k4i',
     companyKnowledge: '/api/0s/company-knowledge',
     siteOperator: '/api/site-operator',
     admin: '/api/admin',
@@ -1956,7 +2203,7 @@ function apiRouteManifest(env) {
     ok: true,
     routing_model: ROUTING_MODEL,
     api_bases: apiBaseMap(),
-    apps: APP_API_MOUNTS.map((mount) => appMountPublic(mount, env)),
+    apps: [...APP_API_MOUNTS.map((mount) => appMountPublic(mount, env)), skynetAppPublic(env), citadelDbAppPublic(env), helperK4iAppPublic(env), deploymentAgentAppPublic(env)],
     legacy_root_collisions: LEGACY_ROOT_API_COLLISIONS.map((entry) => {
       const mount = APP_API_MOUNTS.find((candidate) => candidate.id === entry.appId);
       return { app_id: entry.appId, base: mount?.base || null, pattern: String(entry.pattern) };
@@ -3491,6 +3738,252 @@ async function handleJobPingRoute(request, env, url, matchedBase, mount) {
 	    return jobpingMissingRuntimeResponse({disabled_endpoint:'/api/jobping/ai/match', input_chars: JSON.stringify(body || {}).length}, 409);
 	  }
   return json({ok:false, error:'jobping_route_not_found', requested_path:url.pathname, base:matchedBase}, 404);
+}
+const BUSINESS_CARD_FACTORY_API_BASE = '/api/business-card-factory';
+function businessCardFactoryGatewayToken(env) {
+  return firstCredential([
+    env.BUSINESS_CARD_FACTORY_KAIXU_GATEWAY_KEY,
+    env.BUSINESS_CARD_FACTORY_GATEWAY_KEY,
+    env.BUSINESSCARDFACTORY_KAIXU_GATEWAY_KEY,
+    env.BUSINESSCARDFACTORY_GATEWAY_KEY,
+    env.KAIXU_GATEWAY_KEY,
+    env.KAIXU_GATEWAY_SUBKEY,
+    env.SKYGATEFS27_GATEWAY_KEY
+  ]);
+}
+function businessCardFactoryClean(value, max = 900) {
+  return brandforgeClean(value, max);
+}
+function businessCardFactoryProfile(body = {}) {
+  return {
+    business: businessCardFactoryClean(body.business || body.business_name || body.name, 180),
+    city: businessCardFactoryClean(body.city, 120),
+    category: businessCardFactoryClean(body.category || body.niche, 180),
+    contact: businessCardFactoryClean(body.contact || 'Owner', 120) || 'Owner',
+    priority_code: businessCardFactoryClean(body.priority_code || body.priorityCode, 90),
+    skyemerit: businessCardFactoryClean(body.skyemerit || '31% for seven days', 80),
+    client_id: businessCardFactoryClean(body.client_id || body.clientId, 120),
+    client_url: businessCardFactoryClean(body.client_url || body.clientUrl, 800),
+    connectlog_handoff_url: businessCardFactoryClean(body.connectlog_handoff_url || body.connectLogHandoffUrl, 1000),
+    source: businessCardFactoryClean(body.source || '0s-business-card-factory', 120)
+  };
+}
+function businessCardFactoryFallbackCopy(profile = {}) {
+  const name = profile.business || 'your business';
+  const city = profile.city || 'the Valley';
+  const code = profile.priority_code || 'your priority code';
+  const merit = profile.skyemerit || '31% for seven days';
+  return {
+    card_script: `I already built the Valley Verified surface for ${name}. Scan this card and it opens your ConnectLog packet with my direct contact, your live page for ${city}, and the ${merit} activation credit.`,
+    connectlog_welcome: `Thank you for working with Skyes Over London. Your ${name} record, client page, ${code}, company contacts, legal links, Media Over London lane, and SkyeMerit activation credit are saved in this ConnectLog workspace.`,
+    follow_up_message: `Appreciate you taking a look today. Your Valley Verified page and ConnectLog packet are live. Use ${code} within the seven-day window to activate the 31% SkyeMerit lane for your 0S/content-engine setup.`,
+    qr_pitch: 'Scan to open your live page and saved Skyes Over London contact packet.',
+    offer_positioning: '31% SkyeMerit activation credit tied to this in-store card handoff.'
+  };
+}
+function businessCardFactoryNormalizeCopy(raw = {}, profile = {}) {
+  const fallback = businessCardFactoryFallbackCopy(profile);
+  return {
+    card_script: businessCardFactoryClean(raw.card_script || raw.cardScript, 700) || fallback.card_script,
+    connectlog_welcome: businessCardFactoryClean(raw.connectlog_welcome || raw.connectLogWelcome || raw.welcome, 800) || fallback.connectlog_welcome,
+    follow_up_message: businessCardFactoryClean(raw.follow_up_message || raw.followUpMessage || raw.follow_up, 800) || fallback.follow_up_message,
+    qr_pitch: businessCardFactoryClean(raw.qr_pitch || raw.qrPitch, 260) || fallback.qr_pitch,
+    offer_positioning: businessCardFactoryClean(raw.offer_positioning || raw.offerPositioning, 360) || fallback.offer_positioning
+  };
+}
+async function businessCardFactoryOpenAiCopy(env, model, messages, profile) {
+  if (!env.OPENAI_API_KEY) return null;
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens: 900,
+      temperature: 0.62,
+      response_format: {type: 'json_object'}
+    })
+  });
+  const data = await response.json().catch(() => ({error: {message: 'invalid_openai_response'}}));
+  if (!response.ok) {
+    return {
+      ok: true,
+      gateway_configured: false,
+      openai_direct_configured: true,
+      gateway_failed: true,
+      gateway_status: response.status,
+      gateway_error: data.error?.message || data.error || 'openai_request_failed',
+      provider_path: 'local-deterministic-copy-after-openai-failure',
+      copy: businessCardFactoryFallbackCopy(profile)
+    };
+  }
+  const outputText = data.choices?.[0]?.message?.content || '';
+  return {
+    ok: true,
+    gateway_configured: false,
+    openai_direct_configured: true,
+    provider_path: '0s-openai-direct',
+    copy: businessCardFactoryNormalizeCopy(paidLaneJsonFromText(outputText), profile),
+    usage: data.usage ? {
+      input_tokens: data.usage.prompt_tokens || 0,
+      output_tokens: data.usage.completion_tokens || 0,
+      total_tokens: data.usage.total_tokens || 0
+    } : null
+  };
+}
+async function businessCardFactoryGatewayCopy(request, env, profile) {
+  const gatewayToken = businessCardFactoryGatewayToken(env);
+  const model = businessCardFactoryClean(env.OPENAI_MODEL || PAID_AI_MODEL_FALLBACK, 80) || PAID_AI_MODEL_FALLBACK;
+  const messages = [
+    {
+      role: 'system',
+      content: [
+        'You write as Gray London Skyes for Skyes Over London and the MetrAIyux 0S.',
+        'Return JSON only with keys: card_script, connectlog_welcome, follow_up_message, qr_pitch, offer_positioning.',
+        'The voice is direct, confident, in-store, founder/operator energy. Do not mention prompts, AI, MCP, or internal tooling.',
+        'Make the buyer understand the page already exists, the QR opens ConnectLog, Gray contact details are saved, and the 31% SkyeMerit is valid for seven days.'
+      ].join(' ')
+    },
+    {
+      role: 'user',
+      content: JSON.stringify({
+        task: 'Generate a business-card handoff copy pass for an in-store Valley Verified client.',
+        profile,
+        company_contact: {
+          operator: 'Gray London Skyes',
+          company: 'Skyes Over London',
+          holding_company: 'SOLEnterprises International Nexus & Holdings',
+          email: 'grayskyes@solenterprises.org',
+          phone: '1-(800)-484-4788',
+          company_main: '1-(800)-484-4783',
+          media: 'MediaOverLondon@solenterprises.org',
+          zero_os: 'metraiyux-0s@solenterprises.org',
+          legal: 'https://skyes-over-london-legal.pages.dev/legal/'
+        }
+      })
+    }
+  ];
+  if (!gatewayToken) {
+    const direct = await businessCardFactoryOpenAiCopy(env, model, messages, profile);
+    if (direct) return direct;
+    return {
+      ok: true,
+      gateway_configured: false,
+      openai_direct_configured: false,
+      provider_path: 'local-deterministic-copy',
+      copy: businessCardFactoryFallbackCopy(profile)
+    };
+  }
+  const response = await skygateRequest(env, '/gateway-chat', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${gatewayToken}`,
+      'x-skye-platform': 'metraiyux-0s',
+      'x-0s-platform': 'business-card-factory',
+      'x-skye-usage-lane': 'business-card-factory-copy-pass',
+      'x-free99-billing-mode': 'owner-gated-0s',
+      'x-kaixu-app': 'business-card-factory',
+      'x-kaixu-request-id': `business_card_factory_${Date.now()}`,
+      'x-0s-gate-session': bearer(request)
+    },
+    body: JSON.stringify({provider:'openai', model, messages, max_tokens:900, temperature:0.62, platform_id:'metraiyux-0s', usage_lane:'business-card-factory-copy-pass'})
+  });
+  const data = await response.json().catch(() => ({error:'invalid_gateway_response'}));
+  if (!response.ok) {
+    const direct = await businessCardFactoryOpenAiCopy(env, model, messages, profile);
+    if (direct) return {...direct, provider_path: direct.provider_path === '0s-openai-direct' ? '0s-openai-direct-after-fs27-gateway-failure' : direct.provider_path};
+    return {
+      ok: true,
+      gateway_configured: true,
+      openai_direct_configured: Boolean(env.OPENAI_API_KEY),
+      gateway_failed: true,
+      gateway_status: response.status,
+      gateway_error: data.error || 'fs27_gateway_failed',
+      provider_path: 'local-deterministic-copy-after-gateway-failure',
+      copy: businessCardFactoryFallbackCopy(profile)
+    };
+  }
+  const parsed = paidLaneJsonFromText(data.output_text || '') || data.result || data.copy || {};
+  return {
+    ok: true,
+    gateway_configured: true,
+    openai_direct_configured: Boolean(env.OPENAI_API_KEY),
+    provider_path: 'fs27-gateway-chat',
+    copy: businessCardFactoryNormalizeCopy(parsed, profile),
+    usage: data.usage || null,
+    telemetry: data.telemetry || null
+  };
+}
+async function handleBusinessCardFactoryApiRoute(request, env, ctx, url) {
+  if (!url.pathname.startsWith(BUSINESS_CARD_FACTORY_API_BASE)) return null;
+  const auth = await requireGateAuth(request, env, 'Business Card Factory');
+  if (!auth.ok) return auth.response;
+  const suffix = url.pathname.slice(BUSINESS_CARD_FACTORY_API_BASE.length) || '/';
+  if ((suffix === '/' || suffix === '/status') && request.method === 'GET') {
+    return json({
+      ok: true,
+      app_id: 'business-card-factory',
+      gated: true,
+      gateway_configured: Boolean(businessCardFactoryGatewayToken(env)),
+      openai_direct_configured: Boolean(env.OPENAI_API_KEY),
+      ai_provider_configured: Boolean(businessCardFactoryGatewayToken(env) || env.OPENAI_API_KEY),
+      directory: '/valley-verified/data/businesses-lite.json',
+      copy_pass: `${BUSINESS_CARD_FACTORY_API_BASE}/copy-pass`,
+      connectlog_handoff: '/connectlog-v7.7-relay13-operator-proof/app.html'
+    });
+  }
+  if (suffix === '/copy-pass' && request.method === 'POST') {
+    const body = await readJson(request);
+    const profile = businessCardFactoryProfile(body);
+    const stressMode = body.stress_mode === true || body.dry_run === true;
+    const gateway = stressMode
+      ? {ok:true, gateway_configured:Boolean(businessCardFactoryGatewayToken(env)), provider_path:'stress-local-copy-no-provider', copy:businessCardFactoryFallbackCopy(profile)}
+      : await businessCardFactoryGatewayCopy(request, env, profile);
+    const receiptId = `business_card_factory_copy_${Date.now()}_${crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(16).slice(2)}`;
+    const receipt = {
+      id: receiptId,
+      type: 'business-card-factory.copy_pass',
+      app_id: 'business-card-factory',
+      actor: auth.actor || auth.identity?.email || 'gated-0s-user',
+      client_id: profile.client_id,
+      business: profile.business,
+      priority_code: profile.priority_code,
+      provider_path: gateway.provider_path,
+      gateway_configured: gateway.gateway_configured,
+      gateway_failed: gateway.gateway_failed === true,
+      stress_mode: stressMode,
+      usage: gateway.usage || null,
+      created_at: new Date().toISOString()
+    };
+    await saveKV(env, `business-card-factory:copy-pass:${receiptId}`, receipt).catch(() => null);
+    ctx?.waitUntil?.(mirrorSkygateEvent(env, {
+      source_app: 'metraiyux-0s',
+      actor: receipt.actor,
+      type: receipt.type,
+      resource_type: 'business-card-factory',
+      resource_id: receiptId,
+      lane: 'business-card-factory-copy-pass',
+      billable: false,
+      status: gateway.gateway_failed ? 'fallback' : 'completed',
+      summary: `Business Card Factory copy pass for ${profile.business || 'Valley client'}`,
+      meta: {receipt_id:receiptId, provider_path:gateway.provider_path, priority_code:profile.priority_code}
+    }, auth.gate || null).catch(() => null));
+    return json({
+      ok: true,
+      receipt_id: receiptId,
+      provider_path: gateway.provider_path,
+      gateway_configured: gateway.gateway_configured,
+      gateway_failed: gateway.gateway_failed === true,
+      stress_mode: stressMode,
+      copy: businessCardFactoryNormalizeCopy(gateway.copy, profile),
+      usage: gateway.usage || null
+    });
+  }
+  return json({ok:false, error:'business_card_factory_route_not_found', path:url.pathname}, 404);
 }
 async function handleAppApiRoute(request, env, ctx, url) {
   const match = appApiMatchFor(url.pathname);
@@ -9302,21 +9795,26 @@ const MUSIC_FUNCTIONS = Object.freeze([
   'skygate-session',
   'music-artists',
   'music-assets',
+  'music-brain',
+  'music-gamify',
   'music-studio',
   'music-drops',
   'music-releases',
   'music-payments',
   'music-exchange',
   'music-social',
+  'music-store',
   'music-analytics',
   'music-provider-hooks'
 ]);
 const MUSIC_OPERATOR_ACTIONS = Object.freeze({
   'music-artists': new Set(['approve']),
   'music-releases': new Set(['review', 'publish', 'report-streams', 'queue-operations', 'update-operations']),
-  'music-payments': new Set(['credit', 'payout', 'complete-payout']),
+  'music-payments': new Set(['credit', 'payout', 'complete-payout', 'record-referral']),
   'music-drops': new Set(['send-approval', 'approve-batch', 'run-approval-brain', 'build-static-bundle', 'publish-batch', 'hold-drop', 'reject-drop', 'revoke-private-delivery']),
-  'music-social': new Set(['save-connector', 'publish-post', 'moderate-post', 'sync-feed'])
+  'music-social': new Set(['save-connector', 'publish-post', 'moderate-post', 'sync-feed']),
+  'music-store': new Set(['fulfill-order']),
+  'music-gamify': new Set(['award-merits', 'draw-giveaway', 'close-giveaway'])
 });
 const MUSIC_SOCIAL_CATALOG = Object.freeze([
   {id:'pixelfed', name:'Pixelfed', lane:'instagram-like-photo-feed', protocol:'ActivityPub plus Mastodon-compatible REST posting', productionBoundary:'Provider tokens stay in server env before publishing.'},
@@ -9613,9 +10111,12 @@ function musicDefaultState() {
     studio:{projects:[], exports:[], engines:[]},
     drops:{items:[], batches:[], approvals:[], deploys:[], traffic:[]},
     releases:[],
-    payments:{ledger:[], payouts:[]},
+    payments:{ledger:[], payouts:[], referrals:[]},
     exchange:{contentRequests:[], threads:[], communityPosts:[], campaigns:[]},
     social:{connectors:[], postQueue:[], feedItems:[], stories:[], feedPulls:[], moderation:[]},
+    store:{stores:[], products:[], orders:[], fulfillments:[]},
+    brains:{profiles:[], memory:[], actions:[], cycles:[]},
+    gamify:{meters:[], merits:[], events:[], giveaways:[], entries:[]},
     receipts:[],
     auditEvents:[]
   };
@@ -9629,11 +10130,17 @@ function musicNormalizeState(raw) {
   state.payments = state.payments && typeof state.payments === 'object' ? {...base.payments, ...state.payments} : base.payments;
   state.exchange = state.exchange && typeof state.exchange === 'object' ? {...base.exchange, ...state.exchange} : base.exchange;
   state.social = state.social && typeof state.social === 'object' ? {...base.social, ...state.social} : base.social;
+  state.store = state.store && typeof state.store === 'object' ? {...base.store, ...state.store} : base.store;
+  state.brains = state.brains && typeof state.brains === 'object' ? {...base.brains, ...state.brains} : base.brains;
+  state.gamify = state.gamify && typeof state.gamify === 'object' ? {...base.gamify, ...state.gamify} : base.gamify;
   for (const key of ['projects','exports','engines']) if (!Array.isArray(state.studio[key])) state.studio[key] = [];
   for (const key of ['items','batches','approvals','deploys','traffic']) if (!Array.isArray(state.drops[key])) state.drops[key] = [];
-  for (const key of ['ledger','payouts']) if (!Array.isArray(state.payments[key])) state.payments[key] = [];
+  for (const key of ['ledger','payouts','referrals']) if (!Array.isArray(state.payments[key])) state.payments[key] = [];
   for (const key of ['contentRequests','threads','communityPosts','campaigns']) if (!Array.isArray(state.exchange[key])) state.exchange[key] = [];
   for (const key of ['connectors','postQueue','feedItems','stories','feedPulls','moderation']) if (!Array.isArray(state.social[key])) state.social[key] = [];
+  for (const key of ['stores','products','orders','fulfillments']) if (!Array.isArray(state.store[key])) state.store[key] = [];
+  for (const key of ['profiles','memory','actions','cycles']) if (!Array.isArray(state.brains[key])) state.brains[key] = [];
+  for (const key of ['meters','merits','events','giveaways','entries']) if (!Array.isArray(state.gamify[key])) state.gamify[key] = [];
   return state;
 }
 async function musicReadState(env) {
@@ -9645,7 +10152,7 @@ async function musicReadState(env) {
 function musicMergeRows(existing = [], incoming = [], deleted = []) {
   const deletedKeys = new Set(deleted.map(String));
   const keyFor = (item) => {
-    for (const key of ['id','eventId','dropId','batchId','approvalId','deployReceiptId','releaseId','artistId','threadId']) {
+    for (const key of ['id','eventId','assetId','dropId','batchId','approvalId','deployReceiptId','releaseId','threadId','connectorId','postId','payoutId','storeId','productId','orderId','fulfillmentId','brainId','memoryId','actionId','cycleId','meterId','meritId','gamifyEventId','entryId','giveawayId','artistId']) {
       if (item && item[key]) return `${key}:${item[key]}`;
     }
     return `row:${JSON.stringify(item)}`;
@@ -9683,6 +10190,7 @@ function musicMergeState(latest, incoming) {
   next.drops.traffic = musicMergeRows(prior.drops.traffic, nextInput.drops.traffic, deleted.dropTraffic);
   next.payments.ledger = musicMergeRows(prior.payments.ledger, nextInput.payments.ledger, deleted.paymentLedger);
   next.payments.payouts = musicMergeRows(prior.payments.payouts, nextInput.payments.payouts, deleted.payouts);
+  next.payments.referrals = musicMergeRows(prior.payments.referrals, nextInput.payments.referrals, deleted.referrals);
   next.exchange.contentRequests = musicMergeRows(prior.exchange.contentRequests, nextInput.exchange.contentRequests, deleted.contentRequests);
   next.exchange.threads = musicMergeRows(prior.exchange.threads, nextInput.exchange.threads, deleted.threads);
   next.exchange.communityPosts = musicMergeRows(prior.exchange.communityPosts, nextInput.exchange.communityPosts, deleted.communityPosts);
@@ -9693,6 +10201,19 @@ function musicMergeState(latest, incoming) {
   next.social.stories = musicMergeRows(prior.social.stories, nextInput.social.stories, deleted.stories);
   next.social.feedPulls = musicMergeRows(prior.social.feedPulls, nextInput.social.feedPulls, deleted.feedPulls);
   next.social.moderation = musicMergeRows(prior.social.moderation, nextInput.social.moderation, deleted.moderation);
+  next.store.stores = musicMergeRows(prior.store.stores, nextInput.store.stores, deleted.stores);
+  next.store.products = musicMergeRows(prior.store.products, nextInput.store.products, deleted.products);
+  next.store.orders = musicMergeRows(prior.store.orders, nextInput.store.orders, deleted.orders);
+  next.store.fulfillments = musicMergeRows(prior.store.fulfillments, nextInput.store.fulfillments, deleted.fulfillments);
+  next.brains.profiles = musicMergeRows(prior.brains.profiles, nextInput.brains.profiles, deleted.brainProfiles);
+  next.brains.memory = musicMergeRows(prior.brains.memory, nextInput.brains.memory, deleted.brainMemory);
+  next.brains.actions = musicMergeRows(prior.brains.actions, nextInput.brains.actions, deleted.brainActions);
+  next.brains.cycles = musicMergeRows(prior.brains.cycles, nextInput.brains.cycles, deleted.brainCycles);
+  next.gamify.meters = musicMergeRows(prior.gamify.meters, nextInput.gamify.meters, deleted.skyeMeters);
+  next.gamify.merits = musicMergeRows(prior.gamify.merits, nextInput.gamify.merits, deleted.skyeMerits);
+  next.gamify.events = musicMergeRows(prior.gamify.events, nextInput.gamify.events, deleted.gamifyEvents);
+  next.gamify.giveaways = musicMergeRows(prior.gamify.giveaways, nextInput.gamify.giveaways, deleted.giveaways);
+  next.gamify.entries = musicMergeRows(prior.gamify.entries, nextInput.gamify.entries, deleted.giveawayEntries);
   delete next.__musicDeleted;
   return next;
 }
@@ -9710,7 +10231,7 @@ function musicStorageRequired() {
 }
 function musicUpsert(rows, item) {
   const list = Array.isArray(rows) ? rows : [];
-  const keys = ['id','dropId','batchId','releaseId','artistId'].filter(key => item[key]);
+  const keys = ['id','assetId','dropId','batchId','releaseId','threadId','connectorId','postId','payoutId','storeId','productId','orderId','fulfillmentId','brainId','memoryId','actionId','cycleId','meterId','meritId','gamifyEventId','entryId','giveawayId','artistId'].filter(key => item[key]);
   const index = list.findIndex(row => keys.some(key => row[key] === item[key]));
   if (index >= 0) list[index] = {...list[index], ...item};
   else list.unshift(item);
@@ -9770,6 +10291,44 @@ function musicRights(input = {}, fallback = {}) {
   else if (ownership && preview) status = 'preview-ready';
   return {...rights, ownershipAttested:ownership, previewUseAuthorized:preview, distributionAuthorized:distribution, status};
 }
+const MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD = 1000;
+function musicMetricCount(value) {
+  const next = Number(value || 0);
+  return Number.isFinite(next) && next > 0 ? next : 0;
+}
+function musicPublicMetricLabel(value, noun) {
+  const total = musicMetricCount(value);
+  const format = new Intl.NumberFormat('en-US');
+  if (total >= MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD) return `${format.format(total)} ${noun}`;
+  return `building toward first ${format.format(MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD)} ${noun}`;
+}
+function musicPublicMetrics(release) {
+  const analytics = release.analytics || {};
+  const streams = musicMetricCount(analytics.streams);
+  const plays = musicMetricCount(analytics.plays);
+  const trackStats = analytics.trackStats && typeof analytics.trackStats === 'object' ? analytics.trackStats : {};
+  const tracks = musicTrackList(release.tracks).map((track, index) => {
+    const stat = trackStats[String(index)] || {};
+    const trackPlays = Math.max(musicMetricCount(track.plays), musicMetricCount(stat.plays));
+    return {
+      trackIndex:index,
+      title:track.title,
+      playsVisible:trackPlays >= MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD,
+      playsLabel:musicPublicMetricLabel(trackPlays, 'plays')
+    };
+  });
+  return {
+    playCountThreshold:MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD,
+    streamsVisible:streams >= MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD,
+    streamsLabel:musicPublicMetricLabel(streams, 'streams'),
+    playsVisible:plays >= MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD,
+    playsLabel:musicPublicMetricLabel(plays, 'plays'),
+    tracks
+  };
+}
+function musicWithPublicMetrics(release) {
+  return release && typeof release === 'object' ? {...release, publicMetrics:musicPublicMetrics(release)} : release;
+}
 function musicReleaseSummary(release) {
   const rights = musicRights(release.rights || {});
   return {
@@ -9798,6 +10357,15 @@ function musicAnalytics(state) {
     assets:state.assets.length,
     drops:state.drops.items.length,
     feedItems:state.social.feedItems.length,
+    storeProducts:state.store.products.length,
+    storeOrders:state.store.orders.length,
+    artistBrains:state.brains.profiles.length,
+    brainActions:state.brains.actions.length,
+    skyeMeters:state.gamify.meters.length,
+    skyeMerits:state.gamify.merits.length,
+    gamifyEvents:state.gamify.events.length,
+    giveaways:state.gamify.giveaways.length,
+    giveawayEntries:state.gamify.entries.length,
     auditEvents:state.auditEvents.length
   };
 }
@@ -9807,16 +10375,16 @@ async function musicResponseJson(response) {
 function musicPayloadIds(payload = {}) {
   const ids = {};
   const scan = (source = {}) => {
-    for (const key of ['id','artistId','assetId','releaseId','dropId','batchId','threadId','connectorId','postId','payoutId','approvalId','deployReceiptId']) {
+    for (const key of ['id','artistId','assetId','releaseId','dropId','batchId','threadId','connectorId','postId','payoutId','approvalId','deployReceiptId','storeId','productId','orderId','brainId','memoryId','actionId','cycleId','meterId','meritId','gamifyEventId','giveawayId','entryId']) {
       if (source && source[key] && !ids[key]) ids[key] = source[key];
     }
   };
   scan(payload);
-  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export']) scan(payload[key]);
+  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export','store','product','order','profile','memory','action','cycle','meter','merit','giveaway']) scan(payload[key]);
   return ids;
 }
 function musicPayloadResult(payload = {}) {
-  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export']) {
+  for (const key of ['artist','asset','release','drop','batch','request','thread','post','connector','event','entry','payout','approval','deploy','workflow','project','export','store','product','order','profile','memory','action','cycle','meter','merit','giveaway']) {
     if (payload[key]) return key;
   }
   return payload.ok === true ? 'ok' : 'unknown';
@@ -9869,6 +10437,15 @@ function musicObservability(state, env) {
       payouts:state.payments.payouts.length,
       exchangeRequests:state.exchange.contentRequests.length,
       feedItems:state.social.feedItems.length,
+      storeProducts:state.store.products.length,
+      storeOrders:state.store.orders.length,
+      artistBrains:state.brains.profiles.length,
+      brainActions:state.brains.actions.length,
+      skyeMeters:state.gamify.meters.length,
+      skyeMerits:state.gamify.merits.length,
+      gamifyEvents:state.gamify.events.length,
+      giveaways:state.gamify.giveaways.length,
+      giveawayEntries:state.gamify.entries.length,
       auditEvents:state.auditEvents.length,
     },
     latestEvents:state.auditEvents.slice(0, 50),
@@ -9881,6 +10458,11 @@ function musicObservability(state, env) {
     readiness:{
       clientFacing:true,
       dawBeta:true,
+      localArtistBrains:true,
+      artistStores:true,
+      networkEngagementCycles:true,
+      skyeMeterMerits:true,
+      giveaways:true,
       publicEntryRequiresGate:true,
       adminBehindSharedGate:true,
       liveDspDistributionBoundary:true,
@@ -9906,16 +10488,19 @@ function musicVisuals(state, env) {
     auth:fnName === 'skygate-session' ? 'shared_gate_session' : 'shared_gate_required',
     storage:fnName === 'music-provider-hooks' ? 'provider_boundary' : musicStorageMode(env)
   }));
-  const flows = [
-    {id:'artist-intake', label:'Artist Intake', screen:'Releases', api:'music-artists', count:analytics.totalArtists, status:analytics.totalArtists ? 'active' : 'ready'},
-    {id:'audio-upload', label:'Audio Upload', screen:'Upload Studio', api:'music-assets', count:analytics.assets, status:analytics.assets ? 'active' : 'ready'},
-    {id:'native-daw', label:'Native DAW Beta', screen:'DAW', api:'music-studio', count:state.studio.projects.length + state.studio.exports.length, status:'beta-labeled'},
-    {id:'release-forge', label:'Release Forge', screen:'Releases', api:'music-releases', count:analytics.totalReleases, status:analytics.totalReleases ? 'active' : 'ready'},
-    {id:'rights-vault', label:'Rights Vault', screen:'Rights', api:'music-releases', count:state.releases.filter(release => musicRights(release.rights || {}).status !== 'needs-clearance').length, status:'rights-visible'},
-    {id:'drop-room', label:'Drop Room', screen:'Drops', api:'music-drops', count:analytics.drops, status:analytics.drops ? 'active' : 'ready'},
-    {id:'exchange', label:'Creator Exchange', screen:'Exchange', api:'music-exchange', count:state.exchange.contentRequests.length + state.exchange.threads.length + state.exchange.campaigns.length, status:'wired'},
-    {id:'feed', label:'Open Social Feed', screen:'Feed', api:'music-social', count:analytics.feedItems, status:'wired'},
-    {id:'operator', label:'Operator Command', screen:'Operator', api:'music-analytics', count:analytics.auditEvents, status:'gated-observable'}
+    const flows = [
+      {id:'artist-intake', label:'Artist Intake', screen:'Releases', api:'music-artists', count:analytics.totalArtists, status:analytics.totalArtists ? 'active' : 'ready'},
+      {id:'audio-upload', label:'Audio Upload', screen:'Upload Studio', api:'music-assets', count:analytics.assets, status:analytics.assets ? 'active' : 'ready'},
+      {id:'artist-brains', label:'Artist Local Brains', screen:'Brain', api:'music-brain', count:analytics.artistBrains + analytics.brainActions, status:'provider-free'},
+      {id:'skye-meter', label:'SkyeMeter + Merits', screen:'Brain', api:'music-gamify', count:analytics.gamifyEvents + analytics.skyeMerits + analytics.giveawayEntries, status:'engagement-loop'},
+      {id:'native-daw', label:'Native DAW Beta', screen:'DAW', api:'music-studio', count:state.studio.projects.length + state.studio.exports.length, status:'beta-labeled'},
+      {id:'release-forge', label:'Release Forge', screen:'Releases', api:'music-releases', count:analytics.totalReleases, status:analytics.totalReleases ? 'active' : 'ready'},
+      {id:'rights-vault', label:'Rights Vault', screen:'Rights', api:'music-releases', count:state.releases.filter(release => musicRights(release.rights || {}).status !== 'needs-clearance').length, status:'rights-visible'},
+      {id:'drop-room', label:'Drop Room', screen:'Drops', api:'music-drops', count:analytics.drops, status:analytics.drops ? 'active' : 'ready'},
+      {id:'artist-store', label:'Artist Store', screen:'Store', api:'music-store', count:analytics.storeProducts + analytics.storeOrders, status:'skypay-intent-ready'},
+      {id:'exchange', label:'Creator Exchange', screen:'Exchange', api:'music-exchange', count:state.exchange.contentRequests.length + state.exchange.threads.length + state.exchange.campaigns.length, status:'wired'},
+      {id:'feed', label:'Open Social Feed', screen:'Feed', api:'music-social', count:analytics.feedItems, status:'wired'},
+      {id:'operator', label:'Operator Command', screen:'Operator', api:'music-analytics', count:analytics.auditEvents, status:'gated-observable'}
   ];
   const eventMix = Object.entries(auditByFunction)
     .sort((a, b) => b[1] - a[1])
@@ -9944,6 +10529,9 @@ function musicVisuals(state, env) {
       {label:'Artists', value:String(analytics.totalArtists), detail:`${analytics.activeArtists} active`, tone:'cyan'},
       {label:'Releases', value:String(analytics.totalReleases), detail:`${analytics.liveReleases} live`, tone:'gold'},
       {label:'Uploads', value:String(analytics.assets), detail:'gated music-assets records', tone:'mint'},
+      {label:'Stores', value:String(analytics.storeProducts), detail:`${analytics.storeOrders} order intents`, tone:'pink'},
+      {label:'Brains', value:String(analytics.artistBrains), detail:`${analytics.brainActions} local actions`, tone:'violet'},
+      {label:'SkyeMerits', value:String(analytics.skyeMerits), detail:`${analytics.gamifyEvents} meter events`, tone:'gold'},
       {label:'Audit events', value:String(analytics.auditEvents), detail:`latest ${Math.min(50, analytics.auditEvents)} visible`, tone:'violet'}
     ],
     progress:[
@@ -9957,6 +10545,9 @@ function musicVisuals(state, env) {
       {label:'Assets', value:analytics.assets, limit:Math.max(12, analytics.assets), unit:'records'},
       {label:'Releases', value:analytics.totalReleases, limit:Math.max(12, analytics.totalReleases), unit:'records'},
       {label:'Drops', value:analytics.drops, limit:Math.max(12, analytics.drops), unit:'records'},
+      {label:'Store products', value:analytics.storeProducts, limit:Math.max(12, analytics.storeProducts), unit:'records'},
+      {label:'Brain actions', value:analytics.brainActions, limit:Math.max(12, analytics.brainActions), unit:'records'},
+      {label:'SkyeMeter events', value:analytics.gamifyEvents, limit:Math.max(12, analytics.gamifyEvents), unit:'events'},
       {label:'Events', value:analytics.auditEvents, limit:MUSIC_AUDIT_LIMIT, unit:'events'}
     ],
     donut:[
@@ -9964,7 +10555,10 @@ function musicVisuals(state, env) {
       {label:'Uploads', value:analytics.assets, tone:'mint'},
       {label:'Releases', value:analytics.totalReleases, tone:'gold'},
       {label:'Drops', value:analytics.drops, tone:'violet'},
-      {label:'Feed', value:analytics.feedItems, tone:'pink'}
+      {label:'Feed', value:analytics.feedItems, tone:'pink'},
+      {label:'Stores', value:analytics.storeProducts, tone:'mint'},
+      {label:'Brains', value:analytics.artistBrains, tone:'cyan'},
+      {label:'Merits', value:analytics.skyeMerits, tone:'gold'}
     ].filter(row => Number(row.value || 0) > 0),
     timeline:timeline.length ? timeline : [{time:musicNow(), title:'No music actions recorded yet', detail:'The first successful gated mutation will appear here as a live audit event.', status:'ready'}],
     sovereign_stack:[
@@ -9990,6 +10584,173 @@ function musicSocialSummary(social) {
     providerTokenRequired:social.postQueue.filter(post => post.status === 'provider-token-required').length
   };
 }
+const MUSIC_SKYEMETER_THRESHOLD = 100;
+const MUSIC_GAMIFY_POINTS = {
+  stream_other_artist:18, stream_received:4, stream_own_release:8, qualified_stream:30, listen_release:18,
+  feed_post:14, feed_comment:8, feed_like:3, feed_save:5, feed_boost:7, engagement_received:3, follow:6,
+  store_product:20, store_order:30, drop_create:25, brain_cycle:15, giveaway_enter:10, giveaway_win:50, operator_award:100
+};
+function musicStoreSummary(store = {}) {
+  const orders = Array.isArray(store.orders) ? store.orders : [];
+  const products = Array.isArray(store.products) ? store.products : [];
+  const sum = (key) => orders.reduce((total, order) => total + Number(order[key] || 0), 0);
+  return {stores:(store.stores || []).length, products:products.length, activeProducts:products.filter(product => product.status === 'active').length, orders:orders.length, pendingOrders:orders.filter(order => !['fulfilled','refunded'].includes(order.status)).length, grossCents:sum('subtotalCents'), platformFeeCents:sum('platformFeeCents'), artistNetCents:sum('artistNetCents'), providerRequired:false, checkoutProvider:'skypay-intent'};
+}
+function musicBrainSummary(brains = {}) {
+  const actions = Array.isArray(brains.actions) ? brains.actions : [];
+  return {profiles:(brains.profiles || []).length, memory:(brains.memory || []).length, actions:actions.length, executedActions:actions.filter(action => action.status === 'executed').length, cycles:(brains.cycles || []).length, providerRequired:false, mode:'local-rule-memory'};
+}
+function musicGamifySummary(gamify = {}) {
+  const meters = gamify.meters || [];
+  const merits = gamify.merits || [];
+  const giveaways = gamify.giveaways || [];
+  return {meters:meters.length, merits:merits.length, events:(gamify.events || []).length, openGiveaways:giveaways.filter(giveaway => giveaway.status === 'open').length, giveaways:giveaways.length, entries:(gamify.entries || []).length, totalLifetimePoints:meters.reduce((sum, meter) => sum + Number(meter.lifetimePoints || 0), 0), totalMeritBalance:meters.reduce((sum, meter) => sum + Number(meter.meritBalance || 0), 0), nextMeritAt:MUSIC_SKYEMETER_THRESHOLD, providerRequired:false, mode:'local-engagement-meter'};
+}
+function musicGamifyPoints(activityType, override) {
+  const explicit = Number(override);
+  if (Number.isFinite(explicit) && explicit > 0) return Math.min(500, Math.round(explicit));
+  const key = musicText(activityType || 'activity', 'activity', 80).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  return MUSIC_GAMIFY_POINTS[key] || 5;
+}
+function musicMeterPercent(meter) {
+  return Math.max(0, Math.min(100, Math.round((Number(meter.cyclePoints || 0) / MUSIC_SKYEMETER_THRESHOLD) * 100)));
+}
+function musicEnsureGamify(state) {
+  state.gamify = state.gamify && typeof state.gamify === 'object' ? state.gamify : {meters:[], merits:[], events:[], giveaways:[], entries:[]};
+  for (const key of ['meters','merits','events','giveaways','entries']) if (!Array.isArray(state.gamify[key])) state.gamify[key] = [];
+  return state.gamify;
+}
+function musicEnsureMeter(state, artistId) {
+  const gamify = musicEnsureGamify(state);
+  let meter = state.gamify.meters.find(item => item.artistId === artistId);
+  if (!meter) {
+    const artist = musicArtistById(state, artistId);
+    meter = {meterId:musicId('skyemeter'), artistId, artistName:artist?.name || artistId, lifetimePoints:0, cyclePoints:0, level:1, meritBalance:0, meritCount:0, nextMeritAt:MUSIC_SKYEMETER_THRESHOLD, status:'active', createdAt:musicNow(), updatedAt:musicNow()};
+    gamify.meters.unshift(meter);
+  }
+  return meter;
+}
+function musicIssueMerit(state, meter, source = {}) {
+  const merit = {meritId:musicId('skye_merit'), artistId:meter.artistId, artistName:meter.artistName || meter.artistId, denomination:Number(source.denomination || 1) || 1, reason:musicText(source.reason || 'SkyeMeter filled', 'SkyeMeter filled', 220), sourceEventId:source.gamifyEventId || source.eventId || '', sourceType:source.activityType || source.type || 'skyemeter', status:'issued', createdAt:musicNow()};
+  musicEnsureGamify(state).merits.unshift(merit);
+  meter.meritBalance = Number(meter.meritBalance || 0) + merit.denomination;
+  meter.meritCount = Number(meter.meritCount || 0) + 1;
+  return merit;
+}
+function musicGamifyRecordActivity(state, payload = {}) {
+  const artistId = musicText(payload.artistId, '', 120);
+  if (!artistId) return null;
+  const activityType = musicText(payload.activityType || payload.type || 'activity', 'activity', 100).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const points = musicGamifyPoints(activityType, payload.points);
+  const meter = musicEnsureMeter(state, artistId);
+  const eventId = payload.gamifyEventId || payload.id || musicId('skye_evt');
+  const event = {gamifyEventId:eventId, id:eventId, artistId, artistName:meter.artistName || artistId, activityType, points, releaseId:musicText(payload.releaseId || '', '', 120), targetArtistId:musicText(payload.targetArtistId || '', '', 120), postId:musicText(payload.postId || payload.targetId || '', '', 120), source:musicText(payload.source || 'skymusicnexus', 'skymusicnexus', 120), note:musicText(payload.note || '', '', 500), metadata:payload.metadata && typeof payload.metadata === 'object' ? payload.metadata : {}, createdAt:musicNow()};
+  meter.lifetimePoints = Number(meter.lifetimePoints || 0) + points;
+  meter.cyclePoints = Number(meter.cyclePoints || 0) + points;
+  meter.level = Math.max(1, Math.floor(Number(meter.lifetimePoints || 0) / 500) + 1);
+  meter.updatedAt = event.createdAt;
+  const issuedMerits = [];
+  while (meter.cyclePoints >= MUSIC_SKYEMETER_THRESHOLD) {
+    meter.cyclePoints -= MUSIC_SKYEMETER_THRESHOLD;
+    issuedMerits.push(musicIssueMerit(state, meter, {...event, reason:`SkyeMeter filled by ${activityType.replace(/_/g, ' ')}`}));
+  }
+  event.meterPercent = musicMeterPercent(meter);
+  event.issuedMerits = issuedMerits.map(merit => merit.meritId);
+  musicEnsureGamify(state).events.unshift(event);
+  state.gamify.events = state.gamify.events.slice(0, 1000);
+  return {event, meter:{...meter, percent:musicMeterPercent(meter)}, merits:issuedMerits};
+}
+function musicScopedGamify(gamify, artistId = '') {
+  gamify = gamify || {};
+  return {
+    meters:(gamify.meters || []).filter(item => !artistId || item.artistId === artistId).map(item => ({...item, percent:musicMeterPercent(item)})),
+    merits:(gamify.merits || []).filter(item => !artistId || item.artistId === artistId),
+    events:(gamify.events || []).filter(item => !artistId || item.artistId === artistId),
+    giveaways:(gamify.giveaways || []).filter(item => !artistId || item.status === 'open' || item.artistId === artistId || item.sponsorArtistId === artistId),
+    entries:(gamify.entries || []).filter(item => !artistId || item.artistId === artistId)
+  };
+}
+function musicPrizeType(value) {
+  const type = musicText(value || 'content_launch_drop_package', 'content_launch_drop_package', 100).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  return ['content_launch_drop_package','new_drop_package','artist_store_makeover','agentic_website_boost','featured_feed_push','studio_session_pack'].includes(type) ? type : 'content_launch_drop_package';
+}
+async function musicHandleGamify(method, url, state, body, access) {
+  const params = musicReadQuery(url);
+  const action = method === 'GET' ? (params.action || 'hub') : musicBodyAction(body, url);
+  const gamify = musicEnsureGamify(state);
+  if (method === 'GET') {
+    const scoped = musicScopedGamify(gamify, params.artistId || '');
+    return musicJson({ok:true, providerRequired:false, gateSessionRequired:true, ...scoped, summary:musicGamifySummary(scoped), generatedAt:musicNow()});
+  }
+  if (action === 'record-activity') {
+    const recorded = musicGamifyRecordActivity(state, {...body, source:body.source || 'manual-gated-activity'});
+    if (!recorded) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    return musicJson({ok:true, ...recorded}, 201);
+  }
+  if (action === 'award-merits') {
+    const artistId = musicText(body.artistId, '', 120);
+    if (!artistId) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    const meter = musicEnsureMeter(state, artistId);
+    const count = Math.max(1, Math.min(25, Number(body.count || body.denomination || 1) || 1));
+    const merits = [];
+    for (let index = 0; index < count; index += 1) {
+      merits.push(musicIssueMerit(state, meter, {reason:body.reason || 'Operator SkyeMerit award', activityType:'operator_award'}));
+    }
+    meter.updatedAt = musicNow();
+    return musicJson({ok:true, meter:{...meter, percent:musicMeterPercent(meter)}, merits});
+  }
+  if (action === 'open-giveaway') {
+    const giveawayId = body.giveawayId || musicId('giveaway');
+    const giveaway = {giveawayId, id:giveawayId, title:musicText(body.title || 'Content launch drop package giveaway', '', 180), prizeType:musicPrizeType(body.prizeType), prizeDescription:musicText(body.prizeDescription || 'Owner-approved content launch, new drop, or agentic website growth package.', '', 1000), sponsorArtistId:musicText(body.sponsorArtistId || body.artistId || '', '', 120), entryCostPoints:Math.max(0, Number(body.entryCostPoints || 0) || 0), maxEntries:Math.max(1, Math.min(5000, Number(body.maxEntries || 250) || 250)), status:'open', winnerEntryId:'', winnerArtistId:'', createdBy:access?.actor || 'operator', createdAt:musicNow(), updatedAt:musicNow()};
+    gamify.giveaways = musicUpsert(gamify.giveaways, giveaway);
+    return musicJson({ok:true, giveaway}, 201);
+  }
+  if (action === 'enter-giveaway') {
+    const giveawayId = musicText(body.giveawayId, '', 120);
+    const artistId = musicText(body.artistId, '', 120);
+    if (!giveawayId || !artistId) return musicJson({ok:false, error:'giveawayId and artistId are required.'}, 400);
+    const giveaway = gamify.giveaways.find(item => item.giveawayId === giveawayId || item.id === giveawayId);
+    if (!giveaway) return musicJson({ok:false, error:'giveaway_not_found'}, 404);
+    if (giveaway.status !== 'open') return musicJson({ok:false, error:'giveaway_not_open'}, 409);
+    const existing = gamify.entries.find(item => item.giveawayId === giveawayId && item.artistId === artistId);
+    const meter = musicEnsureMeter(state, artistId);
+    if (Number(giveaway.entryCostPoints || 0) > Number(meter.lifetimePoints || 0)) return musicJson({ok:false, error:'skyemeter_points_required', required:giveaway.entryCostPoints, current:meter.lifetimePoints}, 409);
+    const entry = existing || {entryId:body.entryId || musicId('giveaway_entry'), id:'', giveawayId:giveaway.giveawayId, artistId, artistName:meter.artistName || artistId, status:'entered', createdAt:musicNow()};
+    entry.id = entry.entryId;
+    entry.note = musicText(body.note || entry.note || '', '', 500);
+    entry.meterSnapshot = {lifetimePoints:meter.lifetimePoints, cyclePoints:meter.cyclePoints, meritBalance:meter.meritBalance};
+    entry.updatedAt = musicNow();
+    gamify.entries = musicUpsert(gamify.entries, entry);
+    const recorded = musicGamifyRecordActivity(state, {artistId, activityType:'giveaway_enter', source:'music-gamify', note:`Entered ${giveaway.title}`, metadata:{giveawayId:giveaway.giveawayId}});
+    return musicJson({ok:true, giveaway, entry, meter:recorded?.meter || {...meter, percent:musicMeterPercent(meter)}}, existing ? 200 : 201);
+  }
+  if (action === 'draw-giveaway') {
+    const giveawayId = musicText(body.giveawayId, '', 120);
+    const giveaway = gamify.giveaways.find(item => item.giveawayId === giveawayId || item.id === giveawayId);
+    if (!giveaway) return musicJson({ok:false, error:'giveaway_not_found'}, 404);
+    const entries = gamify.entries.filter(item => item.giveawayId === (giveaway.giveawayId || giveaway.id) && item.status !== 'withdrawn');
+    if (!entries.length) return musicJson({ok:false, error:'giveaway_has_no_entries'}, 409);
+    const winner = entries[Math.max(0, Math.min(entries.length - 1, Number(body.winnerIndex || 0) || 0))];
+    winner.status = 'winner';
+    winner.wonAt = musicNow();
+    giveaway.status = 'awarded';
+    giveaway.winnerEntryId = winner.entryId || winner.id;
+    giveaway.winnerArtistId = winner.artistId;
+    giveaway.awardedAt = winner.wonAt;
+    giveaway.updatedAt = winner.wonAt;
+    const recorded = musicGamifyRecordActivity(state, {artistId:winner.artistId, activityType:'giveaway_win', source:'music-gamify', note:`Won ${giveaway.title}`, metadata:{giveawayId:giveaway.giveawayId, prizeType:giveaway.prizeType}});
+    return musicJson({ok:true, giveaway, winner, meter:recorded?.meter || null, prizeReceipt:{status:'owner_approval_required', prizeType:giveaway.prizeType, route:'agentic-growth-or-drop-package-handoff'}});
+  }
+  if (action === 'close-giveaway') {
+    const giveawayId = musicText(body.giveawayId, '', 120);
+    const giveaway = gamify.giveaways.find(item => item.giveawayId === giveawayId || item.id === giveawayId);
+    if (!giveaway) return musicJson({ok:false, error:'giveaway_not_found'}, 404);
+    giveaway.status = body.status === 'cancelled' ? 'cancelled' : 'closed';
+    giveaway.updatedAt = musicNow();
+    return musicJson({ok:true, giveaway});
+  }
+  return musicJson({ok:false, error:`Unknown gamify action: ${action}`}, 400);
+}
 function musicExchangeProgress(exchange) {
   const counts = {
     contentRequests:exchange.contentRequests.length,
@@ -10011,6 +10772,9 @@ function musicHubEnvelope(state) {
     workflows:state.releases.filter(release => release.operationsWorkflow).map(release => ({releaseId:release.id, title:release.title, ...release.operationsWorkflow})),
     payouts:state.payments.payouts.slice(0, 25),
     social:musicSocialSummary(state.social),
+    store:musicStoreSummary(state.store),
+    brains:musicBrainSummary(state.brains),
+    gamify:musicGamifySummary(state.gamify),
     analytics:musicAnalytics(state),
     latestAuditEvents:state.auditEvents.slice(0, 8),
     storage_mode:'kv'
@@ -10142,7 +10906,7 @@ async function musicHandleReleases(method, url, state, body, gate) {
   if (method === 'GET') {
     if (action === 'get') {
       const release = state.releases.find(item => item.id === params.id);
-      return musicJson(release ? {ok:true, release} : {ok:false, error:'release_not_found'}, release ? 200 : 404);
+      return musicJson(release ? {ok:true, release:musicWithPublicMetrics(release)} : {ok:false, error:'release_not_found'}, release ? 200 : 404);
     }
     if (action === 'operations-board') return musicJson({ok:true, workflows:state.releases.filter(release => release.operationsWorkflow).map(release => ({releaseId:release.id, title:release.title, ...release.operationsWorkflow})), summary:musicAnalytics(state)});
     if (action === 'workflow-timeline') return musicJson({ok:true, events:state.releases.flatMap(release => (release.workflowTimeline || []).map(event => ({releaseId:release.id, title:release.title, ...event})))});
@@ -10150,12 +10914,12 @@ async function musicHandleReleases(method, url, state, body, gate) {
       const rights = state.releases.map(musicReleaseSummary);
       return musicJson({ok:true, rights, summary:{total:rights.length, ready:rights.filter(item => item.status === 'preview-ready' || item.status === 'distribution-ready').length, blocked:rights.filter(item => item.playbackBlocked).length, needsClearance:rights.filter(item => item.status === 'needs-clearance').length}});
     }
-    return musicJson({ok:true, releases:state.releases, total:state.releases.length});
+    return musicJson({ok:true, releases:state.releases.map(musicWithPublicMetrics), total:state.releases.length});
   }
   if (action === 'submit') {
     const release = {id:body.id || musicId('rel'), artistId:body.artistId || '', title:body.title || 'Untitled Release', type:body.type || 'single', releaseDate:body.releaseDate || null, distributionTargets:Array.isArray(body.distributionTargets) ? body.distributionTargets : [], tracks:musicTrackList(body.tracks), rights:musicRights(body.rights || {}), status:'submitted', analytics:{streams:0, downloads:0, saves:0, plays:0, listenSeconds:0}, workflowTimeline:[{category:'submission', status:'submitted', note:'Release submitted for distribution review', actor:body.artistId || gate.actor, at:musicNow()}], submittedAt:musicNow(), updatedAt:musicNow()};
     state.releases = musicUpsert(state.releases, release);
-    return musicJson({ok:true, release}, 201);
+    return musicJson({ok:true, release:musicWithPublicMetrics(release)}, 201);
   }
   const release = state.releases.find(item => item.id === (body.id || params.id));
   if (!release) return musicJson({ok:false, error:'release_not_found'}, 404);
@@ -10166,7 +10930,7 @@ async function musicHandleReleases(method, url, state, body, gate) {
     release.reviewNotes = body.notes || '';
     release.reviewedAt = musicNow();
     pushEvent('review', `Review ${release.status}`);
-    return musicJson({ok:true, release});
+    return musicJson({ok:true, release:musicWithPublicMetrics(release)});
   }
   if (action === 'publish') {
     if (release.status !== 'approved') return musicJson({ok:false, error:`Release must be in "approved" status before publishing (current: "${release.status}")`}, 409);
@@ -10175,7 +10939,7 @@ async function musicHandleReleases(method, url, state, body, gate) {
     release.status = 'live';
     release.publishedAt = musicNow();
     pushEvent('publish', 'Release published inside SkyeMusicNexus proof lane.');
-    return musicJson({ok:true, release});
+    return musicJson({ok:true, release:musicWithPublicMetrics(release)});
   }
   if (action === 'report-streams') {
     release.analytics = release.analytics || {};
@@ -10183,7 +10947,7 @@ async function musicHandleReleases(method, url, state, body, gate) {
     release.analytics.downloads = Number(release.analytics.downloads || 0) + Number(body.downloads || 0);
     release.analytics.saves = Number(release.analytics.saves || 0) + Number(body.saves || 0);
     pushEvent('analytics', 'Stream report recorded.');
-    return musicJson({ok:true, release});
+    return musicJson({ok:true, release:musicWithPublicMetrics(release)});
   }
   if (action === 'playback-stream') {
     const index = Number(body.trackIndex || params.trackIndex || 0) || 0;
@@ -10196,30 +10960,51 @@ async function musicHandleReleases(method, url, state, body, gate) {
     release.analytics = release.analytics || {};
     release.analytics.plays = Number(release.analytics.plays || 0) + 1;
     release.analytics.listenSeconds = Number(release.analytics.listenSeconds || 0) + Number(body.listenSeconds || 24);
-    return musicJson({ok:true, release, playback:{releaseId:release.id, trackIndex:index, title:track.title, playbackKind:track.previewUrl ? 'rights-cleared-linked-preview' : 'generated-proof-preview', plays:track.plays, at:musicNow()}});
+    const listenerArtistId = musicText(body.listenerArtistId || body.listenerId || body.artistId || '', '', 120);
+    if (listenerArtistId) {
+      musicGamifyRecordActivity(state, {
+        artistId:listenerArtistId,
+        activityType:listenerArtistId && listenerArtistId !== release.artistId ? 'stream_other_artist' : 'stream_own_release',
+        releaseId:release.id,
+        targetArtistId:release.artistId || '',
+        source:'music-releases:playback-stream',
+        note:`Played ${track.title || release.title}`
+      });
+      if (release.artistId && listenerArtistId !== release.artistId) {
+        musicGamifyRecordActivity(state, {
+          artistId:release.artistId,
+          activityType:'stream_received',
+          releaseId:release.id,
+          targetArtistId:listenerArtistId,
+          source:'music-releases:playback-stream',
+          note:`Stream received from ${listenerArtistId}`
+        });
+      }
+    }
+    return musicJson({ok:true, release:musicWithPublicMetrics(release), playback:{releaseId:release.id, trackIndex:index, title:track.title, playbackKind:track.previewUrl ? 'rights-cleared-linked-preview' : 'generated-proof-preview', plays:track.plays, playCountThreshold:MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD, trackPlaysVisible:musicMetricCount(track.plays) >= MUSIC_PUBLIC_PLAY_COUNT_THRESHOLD, trackPlaysLabel:musicPublicMetricLabel(track.plays, 'plays'), at:musicNow()}});
   }
   if (action === 'update-rights') {
     release.rights = musicRights(body.rights || body, release.rights || {});
     pushEvent('rights', `Rights gate updated to ${release.rights.status}`);
-    return musicJson({ok:true, release, rights:release.rights, summary:musicReleaseSummary(release)});
+    return musicJson({ok:true, release:musicWithPublicMetrics(release), rights:release.rights, summary:musicReleaseSummary(release)});
   }
   if (action === 'takedown-request') {
     const requestRecord = {id:musicId('takedown'), requesterEmail:body.requesterEmail || '', reason:body.reason || '', createdAt:musicNow()};
     release.rights = musicRights({playbackBlocked:true, takedownHold:true, takedownRequests:[...(release.rights?.takedownRequests || []), requestRecord]}, release.rights || {});
     if (release.status === 'live') release.status = 'takedown-review';
     pushEvent('rights', requestRecord.reason || 'Playback blocked pending operator rights review.');
-    return musicJson({ok:true, release, request:requestRecord, rights:release.rights}, 202);
+    return musicJson({ok:true, release:musicWithPublicMetrics(release), request:requestRecord, rights:release.rights}, 202);
   }
   if (action === 'queue-operations') {
     release.operationsWorkflow = {id:musicId('ops'), status:body.status || 'queued', owner:body.owner || gate.actor || 'operator', checkpoint:body.checkpoint || 'intake', notes:body.notes || '', createdAt:musicNow(), updatedAt:musicNow()};
     pushEvent('operations', `Operations queued at ${release.operationsWorkflow.checkpoint}`);
-    return musicJson({ok:true, release, workflow:release.operationsWorkflow}, 201);
+    return musicJson({ok:true, release:musicWithPublicMetrics(release), workflow:release.operationsWorkflow}, 201);
   }
   if (action === 'update-operations') {
     if (!release.operationsWorkflow) return musicJson({ok:false, error:'Operations workflow has not been queued for this release'}, 409);
     Object.assign(release.operationsWorkflow, {status:body.status || release.operationsWorkflow.status, checkpoint:body.checkpoint || release.operationsWorkflow.checkpoint, notes:body.notes || release.operationsWorkflow.notes, updatedAt:musicNow()});
     pushEvent('operations', `Operations moved to ${release.operationsWorkflow.checkpoint}`);
-    return musicJson({ok:true, release, workflow:release.operationsWorkflow});
+    return musicJson({ok:true, release:musicWithPublicMetrics(release), workflow:release.operationsWorkflow});
   }
   return musicJson({ok:false, error:`Unknown release action: ${action}`}, 400);
 }
@@ -10248,6 +11033,7 @@ async function musicHandleDrops(method, url, state, body, gate, env) {
     const drop = {dropId:body.dropId || musicId('drop'), artistId:body.artistId || '', artistName:body.artistName || '', releaseId:body.releaseId || '', title:body.title || 'Untitled Drop', slug:musicSlug(body.title, 'drop'), dropType:body.dropType || 'single_drop', visibility:body.visibility || 'public', rightsStatus:body.rightsStatus || 'needs-clearance', tierPolicy:body.tierPolicy || 'free99-lite', story:body.story || '', coverArtUrl:body.coverArtUrl || '', downloadAllowed:body.downloadAllowed === true, tracks:musicTrackList(body.tracks), status:'draft', createdAt:musicNow(), updatedAt:musicNow()};
     drop.id = drop.dropId;
     state.drops.items = musicUpsert(state.drops.items, drop);
+    if (drop.artistId) musicGamifyRecordActivity(state, {artistId:drop.artistId, activityType:'drop_create', releaseId:drop.releaseId, source:'music-drops:create-drop', note:`Created drop ${drop.title}`});
     return musicJson({ok:true, drop}, 201);
   }
   const dropId = body.dropId || params.dropId || body.id;
@@ -10381,6 +11167,7 @@ async function musicHandleSocial(method, url, state, body) {
   if (action === 'create-feed-post') {
     const post = {id:body.id || musicId('feed'), artistId:body.artistId || '', releaseId:body.releaseId || '', caption:body.caption || '', hashtags:body.hashtags || '', mediaUrl:body.mediaUrl || '', altText:body.altText || '', visibility:body.visibility || 'local-feed', status:'published', stats:{likes:0, saves:0, boosts:0, comments:[]}, createdAt:musicNow(), updatedAt:musicNow()};
     state.social.feedItems.unshift(post);
+    if (post.artistId) musicGamifyRecordActivity(state, {artistId:post.artistId, activityType:'feed_post', releaseId:post.releaseId, postId:post.id, source:'music-social:create-feed-post', note:'Posted to the local Nexus feed.'});
     return musicJson({ok:true, post}, 201);
   }
   if (action === 'queue-post') {
@@ -10414,14 +11201,299 @@ async function musicHandleSocial(method, url, state, body) {
     if (body.feedAction === 'like') post.stats.likes += 1;
     if (body.feedAction === 'save') post.stats.saves += 1;
     if (body.feedAction === 'boost') post.stats.boosts += 1;
+    if (body.artistId) {
+      musicGamifyRecordActivity(state, {artistId:body.artistId, activityType:`feed_${body.feedAction || 'action'}`, postId:post.id, releaseId:post.releaseId || '', targetArtistId:post.artistId || '', source:'music-social:feed-action'});
+      if (post.artistId && post.artistId !== body.artistId) musicGamifyRecordActivity(state, {artistId:post.artistId, activityType:'engagement_received', postId:post.id, releaseId:post.releaseId || '', targetArtistId:body.artistId, source:'music-social:feed-action'});
+    }
     return musicJson({ok:true, post});
   }
   return musicJson({ok:false, error:`Unknown social action: ${action}`}, 400);
+}
+function musicText(value, fallback = '', limit = 1000) {
+  return String(value == null ? fallback : value).trim().slice(0, limit);
+}
+function musicCents(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.round(number)) : 0;
+}
+function musicFeeMode(value) {
+  const mode = musicText(value || 'buyer_covered', 'buyer_covered', 60).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  return ['buyer_covered','artist_absorbed'].includes(mode) ? mode : 'buyer_covered';
+}
+function musicProductType(value) {
+  const type = musicText(value || 'digital', 'digital', 60).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  return ['digital','merch','ticket','tip','booking','membership','private_access'].includes(type) ? type : 'digital';
+}
+function musicArtistById(state, artistId) {
+  return state.artists.find(artist => artist.id === artistId || artist.artistId === artistId || artist.skyeId === artistId || artist.identityId === artistId) || null;
+}
+function musicEnsureStore(state, artistId, body = {}) {
+  let store = state.store.stores.find(item => item.artistId === artistId || item.storeId === body.storeId);
+  if (store) return store;
+  const artist = musicArtistById(state, artistId);
+  store = {storeId:body.storeId || musicId('store'), artistId, artistName:musicText(body.artistName || artist?.name || artistId, '', 180), name:musicText(body.name || `${artist?.name || artistId} Nexus Store`, '', 180), slug:musicSlug(body.slug || body.name || artist?.name || artistId, artistId), status:'active', feeMode:musicFeeMode(body.feeMode), fulfillmentEmail:musicText(body.fulfillmentEmail || artist?.email || '', '', 180).toLowerCase(), createdAt:musicNow(), updatedAt:musicNow()};
+  state.store.stores = musicUpsert(state.store.stores, store);
+  return store;
+}
+function musicPublicStore(store, state) {
+  const products = state.store.products.filter(product => product.artistId === store.artistId);
+  const orders = state.store.orders.filter(order => order.artistId === store.artistId);
+  return {...store, productCount:products.length, activeProductCount:products.filter(product => product.status === 'active').length, orderCount:orders.length, grossCents:orders.reduce((sum, order) => sum + Number(order.subtotalCents || 0), 0), artistNetCents:orders.reduce((sum, order) => sum + Number(order.artistNetCents || 0), 0)};
+}
+function musicStoreCheckoutUrl(order) {
+  const params = new URLSearchParams({client:'metraiyux-0s', offer:'skyemusicnexus-artist-store', artistId:order.artistId || '', orderId:order.orderId || '', productId:order.productId || '', amountCents:String(order.totalCents || 0)});
+  return `/skyepay-store.html?${params.toString()}`;
+}
+async function musicHandleStore(method, url, state, body) {
+  const params = musicReadQuery(url);
+  const action = method === 'GET' ? (params.action || 'hub') : musicBodyAction(body, url);
+  state.store = state.store || {stores:[], products:[], orders:[], fulfillments:[]};
+  if (method === 'GET') {
+    const artistId = params.artistId || '';
+    const stores = state.store.stores.filter(store => !artistId || store.artistId === artistId).map(store => musicPublicStore(store, state));
+    const products = state.store.products.filter(product => !artistId || product.artistId === artistId);
+    const orders = state.store.orders.filter(order => !artistId || order.artistId === artistId);
+    return musicJson({ok:true, gateSessionRequired:true, providerRequired:false, platformFeeBps:1300, stores, products, orders, fulfillments:state.store.fulfillments.filter(item => !artistId || item.artistId === artistId), summary:musicStoreSummary({stores, products, orders, fulfillments:state.store.fulfillments})});
+  }
+  if (action === 'upsert-store') {
+    const artistId = musicText(body.artistId, '', 120);
+    if (!artistId) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    const existing = state.store.stores.find(store => store.artistId === artistId || store.storeId === body.storeId) || {};
+    const artist = musicArtistById(state, artistId);
+    const store = {...existing, storeId:body.storeId || existing.storeId || musicId('store'), artistId, artistName:musicText(body.artistName || artist?.name || existing.artistName || artistId, '', 180), name:musicText(body.name || existing.name || `${artist?.name || artistId} Nexus Store`, '', 180), slug:musicSlug(body.slug || existing.slug || body.name || artist?.name || artistId, artistId), bio:musicText(body.bio || existing.bio || '', '', 1600), status:musicText(body.status || existing.status || 'active', 'active', 60).toLowerCase(), feeMode:musicFeeMode(body.feeMode || existing.feeMode), fulfillmentEmail:musicText(body.fulfillmentEmail || existing.fulfillmentEmail || artist?.email || '', '', 180).toLowerCase(), supportUrl:musicText(body.supportUrl || existing.supportUrl || '', '', 800), payoutPolicy:musicText(body.payoutPolicy || existing.payoutPolicy || 'Biweekly owner-approved payout review after refunds, disputes, paperwork holds, and rights holds.', '', 500), createdAt:existing.createdAt || musicNow(), updatedAt:musicNow()};
+    state.store.stores = musicUpsert(state.store.stores, store);
+    return musicJson({ok:true, store:musicPublicStore(store, state)}, existing.storeId ? 200 : 201);
+  }
+  if (action === 'create-product') {
+    const artistId = musicText(body.artistId, '', 120);
+    const title = musicText(body.title, '', 220);
+    if (!artistId || !title) return musicJson({ok:false, error:'artistId and title are required.'}, 400);
+    const store = musicEnsureStore(state, artistId, body);
+    const productId = body.productId || body.id || musicId('prod');
+    const product = {productId, id:productId, storeId:store.storeId, artistId, releaseId:musicText(body.releaseId, '', 120), dropId:musicText(body.dropId, '', 120), title, description:musicText(body.description || '', '', 1400), productType:musicProductType(body.productType || body.type), priceCents:musicCents(body.priceCents || body.amountCents), currency:musicText(body.currency || 'USD', 'USD', 8).toUpperCase(), inventory:body.inventory === '' || body.inventory == null ? null : Math.max(0, Number(body.inventory) || 0), imageUrl:musicText(body.imageUrl || body.coverArtUrl || '', '', 800), fulfillmentType:musicText(body.fulfillmentType || 'manual', 'manual', 80), status:musicText(body.status || 'active', 'active', 60).toLowerCase(), createdAt:musicNow(), updatedAt:musicNow()};
+    state.store.products = musicUpsert(state.store.products, product);
+    musicGamifyRecordActivity(state, {artistId, activityType:'store_product', releaseId:product.releaseId, source:'music-store:create-product', note:`Created store product ${product.title}`});
+    return musicJson({ok:true, product, store:musicPublicStore(store, state)}, 201);
+  }
+  if (action === 'record-order') {
+    const productId = musicText(body.productId || body.id, '', 120);
+    const product = state.store.products.find(item => item.productId === productId || item.id === productId);
+    if (!product) return musicJson({ok:false, error:'product_not_found'}, 404);
+    const store = state.store.stores.find(item => item.storeId === product.storeId || item.artistId === product.artistId) || {};
+    const quantity = Math.max(1, Math.min(100, Number(body.quantity || 1) || 1));
+    const feeMode = musicFeeMode(body.feeMode || store.feeMode);
+    const subtotalCents = musicCents(product.priceCents) * quantity;
+    const platformFeeCents = Math.round(subtotalCents * 1300 / 10000);
+    const totalCents = feeMode === 'buyer_covered' ? subtotalCents + platformFeeCents : subtotalCents;
+    const artistNetCents = feeMode === 'buyer_covered' ? subtotalCents : Math.max(0, subtotalCents - platformFeeCents);
+    const order = {orderId:body.orderId || musicId('order'), artistId:product.artistId, storeId:product.storeId, productId:product.productId || product.id, title:product.title, quantity, currency:product.currency || 'USD', subtotalCents, platformFeeBps:1300, platformFeeCents, totalCents, artistNetCents, feeMode, buyerEmail:musicText(body.buyerEmail || '', '', 180).toLowerCase(), fanNote:musicText(body.fanNote || body.note || '', '', 800), status:musicText(body.status || 'pending_skyepay_checkout', 'pending_skyepay_checkout', 80), fulfillmentStatus:'not_started', metadata:{source:'SkyeMusicNexus Nexus Store', artistId:product.artistId, storeId:product.storeId, productId:product.productId || product.id, releaseId:product.releaseId || '', dropId:product.dropId || ''}, createdAt:musicNow(), updatedAt:musicNow()};
+    order.checkoutIntent = {provider:'skypay', providerRequiredForMoneyMovement:true, url:musicStoreCheckoutUrl(order), metadata:order.metadata};
+    state.store.orders.unshift(order);
+    musicGamifyRecordActivity(state, {artistId:order.artistId, activityType:'store_order', releaseId:product.releaseId || '', source:'music-store:record-order', note:`Store order intent for ${order.title}`});
+    return musicJson({ok:true, order, checkoutIntent:order.checkoutIntent}, 201);
+  }
+  if (action === 'fulfill-order') {
+    const orderId = musicText(body.orderId || body.id, '', 120);
+    const order = state.store.orders.find(item => item.orderId === orderId || item.id === orderId);
+    if (!order) return musicJson({ok:false, error:'order_not_found'}, 404);
+    const fulfillment = {fulfillmentId:musicId('fulfill'), orderId, artistId:order.artistId, status:musicText(body.status || 'fulfilled', 'fulfilled', 80), note:musicText(body.note || '', '', 1000), trackingUrl:musicText(body.trackingUrl || '', '', 800), createdAt:musicNow()};
+    order.status = fulfillment.status === 'fulfilled' ? 'fulfilled' : order.status;
+    order.fulfillmentStatus = fulfillment.status;
+    order.updatedAt = fulfillment.createdAt;
+    state.store.fulfillments.unshift(fulfillment);
+    return musicJson({ok:true, order, fulfillment});
+  }
+  return musicJson({ok:false, error:`Unknown store action: ${action}`}, 400);
+}
+function musicNormalizeList(value, limit = 16) {
+  const source = Array.isArray(value) ? value : String(value || '').split(',');
+  return source.map(item => musicText(item, '', 120)).filter(Boolean).slice(0, limit);
+}
+function musicBrainProfile(state, artistId) {
+  return state.brains.profiles.find(profile => profile.artistId === artistId || profile.brainId === artistId) || null;
+}
+function musicBrainContext(state, artistId) {
+  const social = state.social || {feedItems:[]};
+  return {artist:musicArtistById(state, artistId) || {id:artistId, name:artistId}, releases:state.releases.filter(release => release.artistId === artistId), store:state.store.stores.find(store => store.artistId === artistId) || null, products:state.store.products.filter(product => product.artistId === artistId), orders:state.store.orders.filter(order => order.artistId === artistId), feedItems:social.feedItems.filter(item => item.artistId === artistId), comments:social.feedItems.flatMap(item => (item.stats?.comments || []).map(comment => ({...comment, targetId:item.id}))).filter(comment => !artistId || comment.artistId === artistId || !comment.artistId)};
+}
+function musicBrainSeedMemory(state, artistId, profile) {
+  const ctx = musicBrainContext(state, artistId);
+  const chunks = [];
+  if (ctx.artist.name || ctx.artist.bio) chunks.push({memoryId:musicId('mem'), artistId, title:'Artist identity', text:`${ctx.artist.name || artistId}: ${ctx.artist.bio || 'Artist profile is live in MusicNexus.'}`, tags:['identity','profile'], source:'artist-record', createdAt:musicNow()});
+  for (const release of ctx.releases.slice(0, 5)) chunks.push({memoryId:musicId('mem'), artistId, title:`Release: ${release.title || release.id}`, text:`${release.title || release.id} is a ${release.type || 'release'} with status ${release.status || 'draft'} and rights ${release.rights?.status || 'needs-clearance'}.`, tags:['release', release.status || 'draft'], source:'release-record', releaseId:release.id, createdAt:musicNow()});
+  for (const product of ctx.products.slice(0, 5)) chunks.push({memoryId:musicId('mem'), artistId, title:`Store item: ${product.title}`, text:`${product.title} is available as ${product.productType || 'product'} for ${product.priceCents || 0} cents.`, tags:['store', product.productType || 'product'], source:'store-record', productId:product.productId || product.id, createdAt:musicNow()});
+  if (profile.objectives?.length) chunks.push({memoryId:musicId('mem'), artistId, title:'Current objectives', text:profile.objectives.join(', '), tags:['objective'], source:'brain-profile', createdAt:musicNow()});
+  state.brains.memory.unshift(...chunks);
+  state.brains.memory = state.brains.memory.slice(0, 500);
+  return chunks;
+}
+function musicBrainUpsertProfile(state, body) {
+  const artistId = musicText(body.artistId, '', 120);
+  if (!artistId) return null;
+  const existing = musicBrainProfile(state, artistId);
+  const artist = musicArtistById(state, artistId);
+  const profile = {brainId:existing?.brainId || musicId('artist_brain'), artistId, artistName:musicText(body.artistName || artist?.name || existing?.artistName || artistId, '', 180), status:musicText(body.status || existing?.status || 'active', 'active', 60), localOnly:true, providerRequired:false, autopilot:body.autopilot === true || body.autopilot === 'true', voice:{tone:musicText(body.tone || existing?.voice?.tone || 'direct, grateful, release-focused', '', 180), bannedClaims:musicNormalizeList(body.bannedClaims || existing?.voice?.bannedClaims || ['guaranteed streams','fake chart claims','rights claims not approved'], 12)}, objectives:musicNormalizeList(body.objectives || existing?.objectives || ['post release updates','reply to fans','route fans to store','surface operator tasks'], 12), playbooks:existing?.playbooks || [{id:'release-signal', trigger:'release', action:'feed_post'}, {id:'store-spotlight', trigger:'store', action:'feed_post'}, {id:'network-listen', trigger:'network_release', action:'listen_release'}, {id:'network-engage', trigger:'network_feed', action:'engage_post'}], createdAt:existing?.createdAt || musicNow(), updatedAt:musicNow()};
+  state.brains.profiles = musicUpsert(state.brains.profiles, profile);
+  if (body.seedMemory !== false) musicBrainSeedMemory(state, artistId, profile);
+  return profile;
+}
+function musicBrainLatestRelease(ctx) {
+  return ctx.releases.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0] || null;
+}
+function musicBrainPickNetworkRelease(state, artistId) {
+  return state.releases.filter(release => release.id && release.artistId && release.artistId !== artistId && !['blocked','rejected','takedown-review'].includes(release.status || '')).sort((a, b) => ((b.status === 'live') - (a.status === 'live')) || String(b.publishedAt || b.updatedAt || b.createdAt || '').localeCompare(String(a.publishedAt || a.updatedAt || a.createdAt || '')))[0] || null;
+}
+function musicBrainCaption(profile, ctx, release) {
+  const name = profile.artistName || ctx.artist.name || ctx.artist.id || 'MusicNexus artist';
+  if (release) return `${name}: ${release.title || 'the new release'} ${release.status === 'live' ? 'is live' : `is in ${release.status || 'release'} mode`}. Tap in, save it, and watch the next drop path here in the Nexus.`;
+  const product = ctx.products.find(item => item.status === 'active') || ctx.products[0];
+  if (product) return `${name}: ${product.title} is open in the Nexus Store. Support the drop, grab access, or book the next move from the artist lane.`;
+  return `${name}: the artist lane is active. Music, store, feed, and fan replies are moving from the Nexus.`;
+}
+function musicBrainReply(profile, body) {
+  const text = musicText(body, '', 800).toLowerCase();
+  if (text.includes('price') || text.includes('buy') || text.includes('shop') || text.includes('merch')) return `${profile.artistName || 'Artist'} store link is in the Nexus lane. I appreciate you tapping in.`;
+  if (text.includes('song') || text.includes('release') || text.includes('drop')) return 'Appreciate you listening. The release path and next drop updates are staying live here.';
+  if (text.includes('book') || text.includes('show') || text.includes('feature')) return 'Send the booking or collab details through the Nexus contact lane and we can route it clean.';
+  return 'Love for the signal. I see you, and the next update is coming through the Nexus.';
+}
+function musicBrainNetworkComment(profile, releaseOrPost = {}) {
+  const name = profile.artistName || 'MusicNexus artist';
+  const title = releaseOrPost.title || releaseOrPost.releaseTitle || 'this drop';
+  return `${name} tapped in. ${title} has motion in the Nexus.`;
+}
+function musicBrainPlanActions(state, profile) {
+  const ctx = musicBrainContext(state, profile.artistId);
+  const plans = [];
+  const release = musicBrainLatestRelease(ctx);
+  if (release) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'feed_post', status:'planned', title:`Post release signal for ${release.title || release.id}`, caption:musicBrainCaption(profile, ctx, release), releaseId:release.id || '', hashtags:['musicnexus','newmusic', release.type || 'release'], createdAt:musicNow()});
+  const product = ctx.products.find(item => item.status === 'active') || ctx.products[0];
+  if (product) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'feed_post', status:'planned', title:`Spotlight store item ${product.title}`, caption:musicBrainCaption(profile, ctx, null), productId:product.productId || product.id, hashtags:['artiststore','musicnexus'], createdAt:musicNow()});
+  const networkRelease = musicBrainPickNetworkRelease(state, profile.artistId);
+  if (networkRelease) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'listen_release', status:'planned', title:`Stream ${networkRelease.title || networkRelease.id}`, releaseId:networkRelease.id, targetArtistId:networkRelease.artistId || '', listenSeconds:Math.max(24, Math.min(90, Number(networkRelease.tracks?.[0]?.duration || 45) || 45)), body:`Run a local Nexus listen on ${networkRelease.title || networkRelease.id}.`, createdAt:musicNow()});
+  const networkPost = state.social.feedItems.find(item => item.id && item.artistId && item.artistId !== profile.artistId);
+  if (networkPost) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'engage_post', status:'planned', title:`Engage ${networkPost.title || 'network post'}`, targetId:networkPost.id, targetArtistId:networkPost.artistId || '', feedAction:'comment', body:musicBrainNetworkComment(profile, networkPost), createdAt:musicNow()});
+  const comment = ctx.comments[0];
+  if (comment) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'reply_comment', status:'planned', title:'Reply to fan comment', targetId:comment.targetId || comment.postId || '', body:musicBrainReply(profile, comment.body || ''), createdAt:musicNow()});
+  if (!ctx.store) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'task', status:'planned', title:'Create artist store', body:'Open the Store room and create the artist store before public rollout.', createdAt:musicNow()});
+  else if (!ctx.products.length) plans.push({actionId:musicId('brain_action'), artistId:profile.artistId, brainId:profile.brainId, type:'task', status:'planned', title:'Add first store product', body:'Add a digital access, merch, tip, booking, or private access item.', createdAt:musicNow()});
+  return plans;
+}
+function musicBrainExecute(state, action, profile) {
+  if (action.type === 'feed_post') {
+    const post = {id:musicId('feed'), artistId:action.artistId, releaseId:action.releaseId || '', caption:action.caption || action.body || '', hashtags:action.hashtags || [], visibility:'local-feed', status:'published', source:'artist-local-brain', stats:{likes:0, saves:0, boosts:0, comments:[]}, createdAt:musicNow(), updatedAt:musicNow()};
+    state.social.feedItems.unshift(post);
+    musicGamifyRecordActivity(state, {artistId:action.artistId, activityType:'feed_post', releaseId:action.releaseId || '', postId:post.id, source:'music-brain:feed-post', note:action.title || 'Artist brain feed post'});
+    return {ok:true, kind:'feed_post', postId:post.id};
+  }
+  if (action.type === 'listen_release') {
+    const release = state.releases.find(item => item.id === action.releaseId);
+    if (!release) return {ok:false, kind:'listen_release', error:'release_not_found'};
+    const listenSeconds = Math.max(1, Number(action.listenSeconds || 30) || 30);
+    const tracks = musicTrackList(release.tracks);
+    const track = tracks[0] || {title:release.title || 'Track 1', plays:0, listenSeconds:0};
+    track.plays = Number(track.plays || 0) + 1;
+    track.listenSeconds = Number(track.listenSeconds || 0) + listenSeconds;
+    if (tracks.length) tracks[0] = track;
+    else tracks.push(track);
+    release.tracks = tracks;
+    release.analytics = release.analytics || {};
+    release.analytics.plays = Number(release.analytics.plays || 0) + 1;
+    release.analytics.streams = Number(release.analytics.streams || 0) + 1;
+    release.analytics.listenSeconds = Number(release.analytics.listenSeconds || 0) + listenSeconds;
+    release.updatedAt = musicNow();
+    musicGamifyRecordActivity(state, {artistId:action.artistId, activityType:'stream_other_artist', releaseId:release.id, targetArtistId:release.artistId || action.targetArtistId || '', source:'music-brain:listen-release', note:`Listened to ${release.title || release.id}`});
+    if (release.artistId && release.artistId !== action.artistId) musicGamifyRecordActivity(state, {artistId:release.artistId, activityType:'stream_received', releaseId:release.id, targetArtistId:action.artistId, source:'music-brain:listen-release', note:`Local artist brain stream from ${profile.artistName || action.artistId}`});
+    return {ok:true, kind:'listen_release', releaseId:release.id, targetArtistId:release.artistId || '', plays:release.analytics.plays, streams:release.analytics.streams};
+  }
+  if (action.type === 'engage_post') {
+    const post = state.social.feedItems.find(item => item.id === action.targetId) || state.social.feedItems[0];
+    if (!post) return {ok:false, kind:'engage_post', error:'feed_post_not_found'};
+    const feedAction = ['comment','like','save','boost'].includes(action.feedAction) ? action.feedAction : 'comment';
+    post.stats = post.stats || {likes:0, saves:0, boosts:0, comments:[]};
+    if (feedAction === 'comment') post.stats.comments.push({id:musicId('comment'), artistId:action.artistId, body:action.body || musicBrainNetworkComment(profile, post), source:'artist-local-brain', createdAt:musicNow()});
+    if (feedAction === 'like') post.stats.likes += 1;
+    if (feedAction === 'save') post.stats.saves += 1;
+    if (feedAction === 'boost') post.stats.boosts += 1;
+    musicGamifyRecordActivity(state, {artistId:action.artistId, activityType:`feed_${feedAction}`, postId:post.id, releaseId:post.releaseId || '', targetArtistId:post.artistId || action.targetArtistId || '', source:'music-brain:engage-post', note:`${feedAction} on ${post.title || post.id}`});
+    if (post.artistId && post.artistId !== action.artistId) musicGamifyRecordActivity(state, {artistId:post.artistId, activityType:'engagement_received', postId:post.id, releaseId:post.releaseId || '', targetArtistId:action.artistId, source:'music-brain:engage-post'});
+    return {ok:true, kind:'engage_post', postId:post.id, feedAction};
+  }
+  if (action.type === 'reply_comment') {
+    const post = state.social.feedItems.find(item => item.id === action.targetId) || state.social.feedItems[0];
+    if (!post) return {ok:false, kind:'reply_comment', error:'feed_post_not_found'};
+    post.stats = post.stats || {likes:0, saves:0, boosts:0, comments:[]};
+    post.stats.comments.push({id:musicId('comment'), artistId:action.artistId, body:action.body || musicBrainReply(profile, ''), source:'artist-local-brain', createdAt:musicNow()});
+    musicGamifyRecordActivity(state, {artistId:action.artistId, activityType:'feed_comment', postId:post.id, releaseId:post.releaseId || '', targetArtistId:post.artistId || '', source:'music-brain:reply-comment'});
+    return {ok:true, kind:'reply_comment', postId:post.id};
+  }
+  return {ok:true, kind:'task', note:action.body || action.title};
+}
+async function musicHandleBrain(method, url, state, body) {
+  const params = musicReadQuery(url);
+  const action = method === 'GET' ? (params.action || 'hub') : musicBodyAction(body, url);
+  state.brains = state.brains || {profiles:[], memory:[], actions:[], cycles:[]};
+  if (method === 'GET') {
+    const artistId = params.artistId || '';
+    const profiles = state.brains.profiles.filter(profile => !artistId || profile.artistId === artistId);
+    const memory = state.brains.memory.filter(item => !artistId || item.artistId === artistId);
+    const actions = state.brains.actions.filter(item => !artistId || item.artistId === artistId);
+    const cycles = state.brains.cycles.filter(item => !artistId || item.artistId === artistId);
+    return musicJson({ok:true, providerRequired:false, localOnly:true, profiles, memory, actions, cycles, summary:musicBrainSummary({profiles, memory, actions, cycles})});
+  }
+  if (action === 'seed-artist-brain') {
+    const profile = musicBrainUpsertProfile(state, body);
+    if (!profile) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    const plannedActions = musicBrainPlanActions(state, profile);
+    state.brains.actions.unshift(...plannedActions);
+    return musicJson({ok:true, profile, plannedActions, memory:state.brains.memory.filter(item => item.artistId === profile.artistId).slice(0, 12)}, 201);
+  }
+  if (action === 'add-memory') {
+    const artistId = musicText(body.artistId, '', 120);
+    if (!artistId) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    if (!musicBrainProfile(state, artistId)) musicBrainUpsertProfile(state, {artistId, seedMemory:false});
+    const memory = {memoryId:body.memoryId || musicId('mem'), artistId, title:musicText(body.title || 'Memory chunk', '', 160), text:musicText(body.text || body.body || '', '', 3000), tags:musicNormalizeList(body.tags, 16), source:musicText(body.source || 'operator', '', 80), createdAt:musicNow()};
+    state.brains.memory.unshift(memory);
+    return musicJson({ok:true, memory}, 201);
+  }
+  if (action === 'plan-post') {
+    const artistId = musicText(body.artistId, '', 120);
+    const profile = musicBrainProfile(state, artistId) || musicBrainUpsertProfile(state, {artistId, seedMemory:false});
+    if (!profile) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    const ctx = musicBrainContext(state, artistId);
+    const release = body.releaseId ? ctx.releases.find(item => item.id === body.releaseId) : musicBrainLatestRelease(ctx);
+    const planned = {actionId:musicId('brain_action'), artistId, brainId:profile.brainId, type:'feed_post', status:'planned', title:musicText(body.title || 'Artist brain feed post', '', 160), caption:musicText(body.caption || musicBrainCaption(profile, ctx, release), '', 950), releaseId:release?.id || body.releaseId || '', hashtags:musicNormalizeList(body.hashtags || ['musicnexus'], 12), createdAt:musicNow()};
+    state.brains.actions.unshift(planned);
+    return musicJson({ok:true, action:planned}, 201);
+  }
+  if (action === 'run-local-cycle') {
+    const artistId = musicText(body.artistId, '', 120);
+    if (!artistId) return musicJson({ok:false, error:'artistId is required.'}, 400);
+    const profile = musicBrainProfile(state, artistId) || musicBrainUpsertProfile(state, {artistId, seedMemory:true});
+    const planned = musicBrainPlanActions(state, profile).slice(0, Math.max(1, Math.min(8, Number(body.limit || 4) || 4)));
+    const execute = body.execute === true || body.execute === 'true';
+    const receipts = [];
+    for (const item of planned) {
+      if (execute && item.type !== 'task') {
+        item.execution = musicBrainExecute(state, item, profile);
+        item.status = 'executed';
+        item.executedAt = musicNow();
+        receipts.push(item.execution);
+      }
+    }
+    state.brains.actions.unshift(...planned);
+    const cycle = {cycleId:musicId('cycle'), artistId, brainId:profile.brainId, goal:musicText(body.goal || 'local artist brain cycle', '', 200), providerRequired:false, executed:execute, actionIds:planned.map(item => item.actionId), receipts, createdAt:musicNow()};
+    state.brains.cycles.unshift(cycle);
+    musicGamifyRecordActivity(state, {artistId, activityType:'brain_cycle', source:'music-brain:run-local-cycle', note:cycle.goal, metadata:{executed:execute, actionCount:planned.length}});
+    return musicJson({ok:true, profile, cycle, actions:planned, receipts}, 201);
+  }
+  return musicJson({ok:false, error:`Unknown brain action: ${action}`}, 400);
 }
 async function musicHandlePayments(method, url, state, body) {
   const action = method === 'GET' ? (url.searchParams.get('action') || '') : musicBodyAction(body, url);
   if (method === 'GET' && action === 'ledger') return musicJson({ok:true, ledger:state.payments.ledger});
   if (method === 'GET' && action === 'payouts') return musicJson({ok:true, payouts:state.payments.payouts});
+  if (method === 'GET' && action === 'referrals') return musicJson({ok:true, referrals:state.payments.referrals, policy:{qualifiedPayoutRateBps:4000, eligibleRevenueBasis:'onboarded spend after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval'}});
   if (action === 'credit') {
     const entry = {id:musicId('credit'), artistId:body.artistId || '', amount:Number(body.amount || 0), reason:body.reason || '', referenceId:body.referenceId || '', createdAt:musicNow()};
     state.payments.ledger.unshift(entry);
@@ -10432,6 +11504,24 @@ async function musicHandlePayments(method, url, state, body) {
     const payout = {id:body.payoutId || musicId('payout'), artistId:body.artistId || '', amount:Number(body.amount || 0), status:'pending', createdAt:musicNow(), updatedAt:musicNow()};
     state.payments.payouts.unshift(payout);
     return musicJson({ok:true, payout});
+  }
+  if (action === 'record-referral') {
+    const spend = Math.max(0, Number(body.eligibleSpend || body.eligible_spend || body.amount || 0));
+    const referral = {
+      id:body.referralId || musicId('referral'),
+      referringArtistId:body.referringArtistId || body.artistId || '',
+      referredCustomerId:body.referredCustomerId || body.customerId || '',
+      offerId:body.offerId || '',
+      eligibleSpend:spend,
+      qualifiedPayoutRateBps:4000,
+      estimatedPayout:Math.round(spend * 0.4 * 100) / 100,
+      status:body.status || 'pending_owner_approval',
+      basis:'40% of eligible onboarded spend after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval',
+      createdAt:musicNow(),
+      updatedAt:musicNow()
+    };
+    state.payments.referrals.unshift(referral);
+    return musicJson({ok:true, referral, policy:{qualifiedPayoutRateBps:4000}});
   }
   if (action === 'complete-payout') {
     const payout = state.payments.payouts.find(item => item.id === body.payoutId);
@@ -10454,11 +11544,14 @@ async function musicHandleFunction(request, env, url, fnName) {
   let response;
   if (fnName === 'music-artists') response = await musicHandleArtists(method, url, state, body, access);
   else if (fnName === 'music-assets') response = await musicHandleAssets(method, url, state, body, access);
+  else if (fnName === 'music-brain') response = await musicHandleBrain(method, url, state, body, access);
+  else if (fnName === 'music-gamify') response = await musicHandleGamify(method, url, state, body, access);
   else if (fnName === 'music-studio') response = await musicHandleStudio(method, state, body, access);
   else if (fnName === 'music-releases') response = await musicHandleReleases(method, url, state, body, access);
   else if (fnName === 'music-drops') response = await musicHandleDrops(method, url, state, body, access, env);
   else if (fnName === 'music-exchange') response = await musicHandleExchange(method, url, state, body, access);
   else if (fnName === 'music-social') response = await musicHandleSocial(method, url, state, body, access);
+  else if (fnName === 'music-store') response = await musicHandleStore(method, url, state, body, access);
   else if (fnName === 'music-payments') response = await musicHandlePayments(method, url, state, body, access);
   else if (fnName === 'music-analytics') response = method === 'GET'
     ? (url.searchParams.get('action') === 'observability' ? musicJson(musicObservability(state, env)) : url.searchParams.get('action') === 'visuals' ? musicJson({ok:true, visuals:musicVisuals(state, env)}) : musicJson({ok:true, ...musicAnalytics(state)}))
@@ -10499,6 +11592,19 @@ async function musicHandleRoute(request, env, url) {
 }
 
 const SD_BASE = '/api/sovereigndocs';
+const SD_CANONICAL_SKYEDOCXMAX_EDITOR = '/Marketing-Made-Easy/SkyeDocxMax/editor.html';
+function sdSkyeDocxMaxLaunchUrl(handoffId, params = {}) {
+  const query = new URLSearchParams({
+    source: 'sovereigndocs',
+    ws_id: 'sovereigndocs',
+    returnTo: '/Free99/apps/sovereigndocs/vault/'
+  });
+  if (handoffId) query.set('sd_handoff', handoffId);
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') query.set(key, String(value));
+  });
+  return `${SD_CANONICAL_SKYEDOCXMAX_EDITOR}?${query.toString()}`;
+}
 const SD_KEY_PREFIX = 'sovereigndocs:v1:';
 const SD_TEMPLATES = [
   { id:'sd_tpl_operating_agreement_az', title:'Arizona LLC Operating Agreement', jurisdiction:'US-AZ', risk_level:'low', category:'business_formation' },
@@ -11254,13 +12360,13 @@ ${doc.contentMarkdown || sdTemplateDraftMarkdown(sdTemplateById(doc.templateId |
 ## Boundary
 
 This handoff opens the actual SovereignDocs case documents into SkyeDocxMax for editing and export. It does not create legal advice, attorney-client relationship, filing, approval, or outcome guarantees.`);
-	    const handoff = {id:sdId('sd_handoff'), caseId:c.id, title:c.title, status:'handoff_created', markdown:caseMarkdown, metadata:{brand:sdBrandingMeta(), documentIds:documents.map(doc => doc.id), packetId:packet?.id || null}, createdAt:sdNow(), launchUrl:`/Free99/apps/sovereigndocs/skye-docx-max/app/?sd_handoff=`};
-	    handoff.launchUrl += encodeURIComponent(handoff.id);
+	    const handoff = {id:sdId('sd_handoff'), caseId:c.id, title:c.title, status:'handoff_created', markdown:caseMarkdown, metadata:{brand:sdBrandingMeta(), documentIds:documents.map(doc => doc.id), packetId:packet?.id || null}, createdAt:sdNow(), launchUrl:null};
+	    handoff.launchUrl = sdSkyeDocxMaxLaunchUrl(handoff.id, { caseId:c.id });
     state.handoffs.push(handoff);
     await sdPut(env, 'handoffs', state.handoffs);
     return json({ok:true, handoff, launchUrl:handoff.launchUrl});
   }
-  if (path === '/editor/skye-docx-max/config' && method === 'GET') return json({ok:true, editor:'skye-docx-max', storage_mode:sdStorageMode(env), sessionEndpoint:`${SD_BASE}/editor/skye-docx-max/session`, returnEndpoint:`${SD_BASE}/editor/skye-docx-max/return`, persistence:['handoffs','returns','documents','vault_records']});
+  if (path === '/editor/skye-docx-max/config' && method === 'GET') return json({ok:true, editor:'skye-docx-max', canonicalEditor:SD_CANONICAL_SKYEDOCXMAX_EDITOR, appPath:SD_CANONICAL_SKYEDOCXMAX_EDITOR, routing_model:'canonical-0s-skydocxmax', storage_mode:sdStorageMode(env), sessionEndpoint:`${SD_BASE}/editor/skye-docx-max/session`, returnEndpoint:`${SD_BASE}/editor/skye-docx-max/return`, persistence:['handoffs','returns','documents','vault_records']});
   if ((path === '/editor/skye-docx-max/sessions' || path === '/editor/skye-docx-max/handoffs') && method === 'GET') {
     const items = await sdGet(env, 'handoffs');
     return json({ok:true, storage_mode:sdStorageMode(env), count:items.length, items:items.slice().reverse()});
@@ -11274,8 +12380,8 @@ This handoff opens the actual SovereignDocs case documents into SkyeDocxMax for 
 	    if (blocked) return blocked;
 	    const payload = await readJson(request);
 	    const handoffs = await sdGet(env, 'handoffs');
-	    const handoff = {id:sdId('sd_handoff'), format:'sovereigndocs-skye-docx-max-handoff-v3', target:'SkyeDocxMax', title:payload.title || 'SovereignDocs Document', markdown:sdBrandMarkdown(payload.title || 'SovereignDocs Document', payload.markdown || ''), html:payload.html || '', metadata:{...(payload.metadata || {}), brand:sdBrandingMeta(), generatedForSkyeDocxMax:true, integrationVersion:'0s-worker-v1'}, status:'standalone_handoff_created', createdAt:sdNow(), updatedAt:sdNow(), launchUrl:`/Free99/apps/sovereigndocs/skye-docx-max/app/?sd_handoff=`};
-    handoff.launchUrl += encodeURIComponent(handoff.id);
+	    const handoff = {id:sdId('sd_handoff'), format:'sovereigndocs-skye-docx-max-handoff-v3', target:'SkyeDocxMax', title:payload.title || 'SovereignDocs Document', markdown:sdBrandMarkdown(payload.title || 'SovereignDocs Document', payload.markdown || ''), html:payload.html || '', metadata:{...(payload.metadata || {}), brand:sdBrandingMeta(), generatedForSkyeDocxMax:true, integrationVersion:'0s-worker-v1'}, status:'standalone_handoff_created', createdAt:sdNow(), updatedAt:sdNow(), launchUrl:null};
+    handoff.launchUrl = sdSkyeDocxMaxLaunchUrl(handoff.id);
     handoffs.push(handoff);
     await sdPut(env, 'handoffs', handoffs);
     return json({ok:true, handoff, launchUrl:handoff.launchUrl}, 201);
@@ -11468,6 +12574,7 @@ const ZERO_OS_GATE_PREFIXES = [
   '/Marketing-Made-Easy',
   '/SkyeMediaCenter',
   '/SkyeMusicNexus',
+  '/SkyeCommerce',
   '/SkyeProfitConsole',
   '/SkyeRouteX',
   '/SkyeSplitEngine',
@@ -11485,6 +12592,7 @@ const ZERO_OS_GATE_PREFIXES = [
   '/brain-governance',
   '/branch-expansion',
   '/buyer-intelligence',
+  '/business-card-factory',
   '/cabinet-dashboards',
   '/calculators',
   '/candidates',
@@ -11546,6 +12654,8 @@ const ZERO_OS_GATE_PREFIXES = [
   '/skye-secure-platform',
   '/skye-secure-secret-packs',
   '/skye-vault-os',
+  '/skyerrors',
+  '/skyenet',
   '/skyegate',
   '/services',
   '/training-academy',
@@ -11656,7 +12766,38 @@ async function proxySovereignDocsStaticLane(request, env, url) {
   headers.set('x-0s-static-lane', isDocxMaxLane ? 'sovereigndocs-docxmax' : 'sovereigndocs');
   headers.set('x-0s-static-lane-origin', origin);
   headers.set('x-0s-api-base', SD_BASE);
+  const rewritten = await rewriteSovereignDocsStaticLaneResponse(response, headers, url);
+  if (rewritten) return rewritten;
   return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+async function rewriteSovereignDocsStaticLaneResponse(response, headers, url) {
+  const contentType = String(headers.get('content-type') || '').toLowerCase();
+  const isText = contentType.includes('text/html')
+    || contentType.includes('javascript')
+    || contentType.includes('text/css')
+    || url.pathname.endsWith('.js')
+    || url.pathname.endsWith('/')
+    || url.pathname.endsWith('.html');
+  if (!isText) return null;
+  let body = await response.text();
+  const skyeDocxHref = '/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs&ws_id=sovereigndocs&returnTo=/Free99/apps/sovereigndocs/vault/';
+  body = body
+    .replaceAll('<a href="/Free99/apps/sovereigndocs/builder/">Builder</a>', `<a href="${skyeDocxHref}">SkyeDocxMax</a>`)
+    .replaceAll('<span class="eyebrow">Review Queue</span><h1>Elevated review controls.</h1><p class="lede">Templates flagged for elevated review stay guarded as prep worksheets until owner or legal review clears completed export.</p>', '<span class="eyebrow">Document Governance</span><h1>Operator review workspace.</h1><p class="lede">Sensitive document workflows route through internal QA, SkyeDocxMax editing, vault return, and operator proof before public export.</p>')
+    .replaceAll('<title>SovereignDocs Elevated Review Queue</title>', '<title>SovereignDocs Document Governance Workspace</title>')
+    .replaceAll('Elevated review queue loaded from governed review workflow data.', 'Document governance workspace loaded from governed workflow data.')
+    .replaceAll('<strong>${(data.count||0).toLocaleString()}</strong> templates are flagged for elevated review before completed public export. Showing a representative operator triage set of 300.', '<strong>Document governance workspace</strong> Sensitive templates route through internal QA and SkyeDocxMax before public export. Open items from this lane for canonical editing, vault return, and operator proof.')
+    .replaceAll('<span class="chip">${esc(r.recommended_next_status)}</span>', '<span class="chip">SkyeDocxMax review lane</span>')
+    .replaceAll('Static mode is active. Optional Node API is offline until you run npm start.', '0S workspace mode is active through the shared FS27/SkyGate lane.')
+    .replaceAll('Open Guided Builder', 'Open in SkyeDocxMax')
+    .replaceAll('/Free99/apps/sovereigndocs/builder/', skyeDocxHref);
+  headers.delete('content-length');
+  headers.set('x-0s-sovereigndocs-rewrite', 'canonical-skydocxmax-governance-copy');
+  return new Response(body, {
     status: response.status,
     statusText: response.statusText,
     headers
@@ -11713,6 +12854,62 @@ async function handleSuiteEventsRoute(request, env, ctx, url) {
   }
   return json({ ok: false, error: 'Method not allowed' }, 405);
 }
+const SKYEVAULT_AUTOSYNC_NOTIFY_SETTINGS_KEY = 'skyevault:autosync:notify-settings:v1';
+function skyeVaultAutosyncDefaultNotifySettings() {
+  return {
+    schema: 'skyevault.autosync-notify-settings.v1',
+    enabled: false,
+    notifyTo: '',
+    throttleMinutes: 10,
+    updatedAt: null,
+    updatedBy: null,
+    source: '0s-worker-default'
+  };
+}
+function skyeVaultAutosyncCleanEmailList(value) {
+  return String(value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+    .filter(item => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item))
+    .slice(0, 8)
+    .join(',');
+}
+async function handleSkyeVaultAutosyncSettingsRoute(request, env, url) {
+  if (url.pathname !== '/api/skyevault/autosync-notify-settings') return null;
+  const auth = await requireOperatorAuth(request, env, 'SkyeVault autosync notification settings');
+  if (!auth.ok) return auth.response;
+  const kv = env.SITE_EVENTS_KV;
+  const stored = kv?.get ? await kv.get(SKYEVAULT_AUTOSYNC_NOTIFY_SETTINGS_KEY, { type: 'json' }).catch(() => null) : null;
+  if (request.method === 'GET') {
+    const settings = { ...skyeVaultAutosyncDefaultNotifySettings(), ...(stored || {}) };
+    return json({
+      ok: true,
+      settings,
+      storage: kv?.put ? 'SITE_EVENTS_KV' : 'unavailable',
+      localCli: {
+        enable: 'npm run vault:autosync:notify:on -- --to=you@example.com',
+        disable: 'npm run vault:autosync:notify:off',
+        status: 'npm run vault:autosync:notify:status'
+      }
+    });
+  }
+  if (request.method !== 'POST') return json({ ok: false, error: 'Method not allowed' }, 405);
+  if (!kv?.put) return json({ ok: false, error: 'SITE_EVENTS_KV is required to persist autosync notification settings.' }, 503);
+  const body = await readJson(request);
+  const settings = {
+    ...skyeVaultAutosyncDefaultNotifySettings(),
+    ...(stored || {}),
+    enabled: body.enabled === true || body.enabled === 'true' || body.enabled === 1 || body.enabled === '1',
+    notifyTo: skyeVaultAutosyncCleanEmailList(body.notifyTo || body.notify_to || ''),
+    throttleMinutes: Math.max(1, Math.min(1440, Number(body.throttleMinutes || body.throttle_minutes || 10) || 10)),
+    updatedAt: new Date().toISOString(),
+    updatedBy: auth.actor || 'owner-admin',
+    source: '0s-worker-dashboard'
+  };
+  await kv.put(SKYEVAULT_AUTOSYNC_NOTIFY_SETTINGS_KEY, JSON.stringify(settings), { expirationTtl: 60 * 60 * 24 * 365 });
+  return json({ ok: true, settings, storage: 'SITE_EVENTS_KV' });
+}
 function pathMatchesPrefix(pathname, prefix) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
@@ -11724,6 +12921,7 @@ function isZeroOsGateEntryPath(pathname) {
 function isZeroOsGatedSurface(pathname) {
   if (isZeroOsGateEntryPath(pathname)) return false;
   if (isPublicStaticAllowlisted(pathname)) return false;
+  if (isSkyeNetPublishedSurfacePath(pathname)) return false;
   // FS27 owns the 0S perimeter. The prefix list above is the named-surface
   // manifest, but this Worker now gates by default so generated apps,
   // customer previews, sub-platforms, and newly added folders cannot slip
@@ -11754,6 +12952,46 @@ function legacySkyeVaultProDocxRedirectResponse(url) {
       location: target.toString(),
       'cache-control': 'no-store',
       'x-0s-legacy-docx': 'redirected-to-current-skyedocxmax'
+    }
+  });
+}
+function removedSovereignDocsDocxMaxAppRedirectResponse(url) {
+  if (!url.pathname.startsWith('/Free99/apps/sovereigndocs/skye-docx-max')) return null;
+  const target = new URL(SD_CANONICAL_SKYEDOCXMAX_EDITOR, url.origin);
+  url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+  if (!target.searchParams.has('source')) target.searchParams.set('source', 'sovereigndocs');
+  if (!target.searchParams.has('ws_id')) target.searchParams.set('ws_id', 'sovereigndocs');
+  if (!target.searchParams.has('returnTo')) target.searchParams.set('returnTo', '/Free99/apps/sovereigndocs/vault/');
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: target.toString(),
+      'cache-control': 'no-store',
+      'x-0s-removed-editor': 'sovereigndocs-uses-canonical-skydocxmax'
+    }
+  });
+}
+function sovereignDocsBuilderRedirectResponse(url) {
+  const builderPath =
+    url.pathname === '/Free99/apps/sovereigndocs/builder'
+    || url.pathname === '/Free99/apps/sovereigndocs/builder/'
+    || url.pathname.startsWith('/Free99/apps/sovereigndocs/build/');
+  if (!builderPath) return null;
+  const target = new URL(SD_CANONICAL_SKYEDOCXMAX_EDITOR, url.origin);
+  url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+  if (url.pathname.startsWith('/Free99/apps/sovereigndocs/build/')) {
+    target.searchParams.set('templatePath', url.pathname.slice('/Free99/apps/sovereigndocs/build/'.length));
+  }
+  if (!target.searchParams.has('source')) target.searchParams.set('source', 'sovereigndocs');
+  if (!target.searchParams.has('ws_id')) target.searchParams.set('ws_id', 'sovereigndocs');
+  if (!target.searchParams.has('returnTo')) target.searchParams.set('returnTo', '/Free99/apps/sovereigndocs/vault/');
+  if (!target.searchParams.has('sd_mode')) target.searchParams.set('sd_mode', 'build');
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: target.toString(),
+      'cache-control': 'no-store',
+      'x-0s-sovereigndocs-builder': 'canonical-skydocxmax'
     }
   });
 }
@@ -11844,9 +13082,19 @@ export default {
     }
     const legacySkyeVaultProDocxRedirect = legacySkyeVaultProDocxRedirectResponse(url);
     if (legacySkyeVaultProDocxRedirect) return legacySkyeVaultProDocxRedirect;
+    const removedSovereignDocsDocxMaxRedirect = removedSovereignDocsDocxMaxAppRedirectResponse(url);
+    if (removedSovereignDocsDocxMaxRedirect) return removedSovereignDocsDocxMaxRedirect;
+    const sovereignDocsBuilderRedirect = sovereignDocsBuilderRedirectResponse(url);
+    if (sovereignDocsBuilderRedirect) return sovereignDocsBuilderRedirect;
     const publicLiveRedirect = publicLiveRedirectResponse(url, request.method);
     if (publicLiveRedirect) return publicLiveRedirect;
     if (isPrivateSourcePath(url.pathname)) return privateSourceResponse();
+    const skyeCommerceRoute = await handleSkyeCommerceRoute(request, env, ctx, url, {
+      requireGateAuth,
+      requireOperatorAuth,
+      mirrorSkygateEvent
+    });
+    if (skyeCommerceRoute) return skyeCommerceRoute;
     if ((url.pathname === '/favicon.ico' || url.pathname === '/favicon-32.png') && env.ASSETS) {
       return env.ASSETS.fetch(assetBindingRequest(request, '/favicon-32.png', url.search));
     }
@@ -11866,6 +13114,10 @@ export default {
     if (url.pathname === '/api/0s/route-manifest' || url.pathname === '/api/routes/manifest' || url.pathname === '/api/manifest') {
       return json(apiRouteManifest(env));
     }
+    const skynetRoute = await handleSkyeNetRoute(request, env, ctx, url);
+    if (skynetRoute) return skynetRoute;
+    const skynetPublishedSurface = await handleSkyeNetPublishedSurfaceRoute(request, env, url);
+    if (skynetPublishedSurface) return skynetPublishedSurface;
     const companyKnowledge = await handleCompanyKnowledgeRoute(request, env, ctx, url, {
       requireGateAuth,
       requireOperatorAuth,
@@ -11878,6 +13130,12 @@ export default {
       mirrorSkygateEvent
     });
     if (tenantBackbone) return tenantBackbone;
+    const helperK4i = await handleHelperK4iRoute(request, env, ctx, url, {
+      requireGateAuth,
+      requireOperatorAuth,
+      mirrorSkygateEvent
+    });
+    if (helperK4i) return helperK4i;
     const citadelDb = await handleCitadelDbRoute(request, env, ctx, url, {
       requireGateAuth,
       requireOperatorAuth,
@@ -11886,12 +13144,16 @@ export default {
     if (citadelDb) return citadelDb;
     const valleyLegalRoute = handleValleyLegalReviewLaneRoute(url);
     if (valleyLegalRoute) return valleyLegalRoute;
+    const businessCardFactoryApi = await handleBusinessCardFactoryApiRoute(request, env, ctx, url);
+    if (businessCardFactoryApi) return businessCardFactoryApi;
     const appApiResponse = await handleAppApiRoute(request, env, ctx, url);
     if (appApiResponse) return appApiResponse;
     const clientAppFactoryGenerated = await handleClientAppFactoryGeneratedRoute(request, env, url);
     if (clientAppFactoryGenerated) return clientAppFactoryGenerated;
     const suiteEvents = await handleSuiteEventsRoute(request, env, ctx, url);
     if (suiteEvents) return suiteEvents;
+    const skyeVaultAutosyncSettings = await handleSkyeVaultAutosyncSettingsRoute(request, env, url);
+    if (skyeVaultAutosyncSettings) return skyeVaultAutosyncSettings;
     if (url.pathname === '/api/skygate/auth-introspect' && request.method === 'POST') return handleCombinedGateIntrospect(request, env);
     if (url.pathname === '/api/skygate/platform-event' && request.method === 'POST') {
       const gate = await introspectSkygate(request, env);
@@ -11982,14 +13244,14 @@ export default {
       const events = await readKVLedger(env);
       return json({ok:true, persistence: Boolean(env.SITE_OPERATOR_WORKER || env.SITE_OPERATOR_WORKER_ORIGIN) ? 'd1' : 'kv', events});
     }
-    if (url.pathname === '/changelog' || url.pathname === '/changelog/' || url.pathname === '/changelog/index.html') {
-      return new Response(changelogHtml, {
-        status: 200,
-        headers: {
-          'content-type': 'text/html; charset=utf-8',
-          'cache-control': 'public, max-age=0, must-revalidate'
-        }
-      });
+    if (url.pathname === '/changelog' || url.pathname === '/changelog/index.html') {
+      const canonical = new URL('/changelog/', url.origin);
+      url.searchParams.forEach((value, key) => canonical.searchParams.append(key, value));
+      return new Response(null, { status: 307, headers: { location: canonical.toString(), 'cache-control': 'no-store' } });
+    }
+    if (url.pathname === '/changelog/') {
+      if (env.ASSETS) return env.ASSETS.fetch(assetBindingRequest(request, '/changelog/', url.search));
+      return new Response('Changelog asset binding is not configured.', {status: 503});
     }
     const proxyMutationBlock = await protectedProxyMutationResponse(request, env, url);
     if (proxyMutationBlock) return proxyMutationBlock;

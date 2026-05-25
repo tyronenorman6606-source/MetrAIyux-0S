@@ -195,6 +195,23 @@ const ROUTES = [
   ['POST', '/.netlify/functions/northstar-operator-provision', northstarOperatorProvision],
   ['GET', '/northstar/operator/workspaces', northstarOperatorWorkspaces],
   ['GET', '/.netlify/functions/northstar-operator-workspaces', northstarOperatorWorkspaces],
+  ['OPTIONS', '/deploy/status', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/status', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/routes', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/routes', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/workspace', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/workspace', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/workspace', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/dashboard', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/dashboard', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/receipts', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/receipts', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/rollback', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/rollback', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/observability', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/observability', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/cost-model', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/cost-model', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/init', handleSkyeNetDeployRequest],
   ['POST', '/deploy/init', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/upload', handleSkyeNetDeployRequest],
@@ -325,6 +342,14 @@ function contentTypeForPath(pathname) {
   return 'application/octet-stream';
 }
 
+function cacheControlForDeploymentAsset(pathname) {
+  const path = String(pathname || '').toLowerCase();
+  if (path.endsWith('.html') || path.endsWith('.json') || path.endsWith('.xml') || path.endsWith('.txt')) {
+    return 'public, max-age=60';
+  }
+  return 'public, max-age=31536000, immutable';
+}
+
 function assetPrefix(routeRecord) {
   const explicit = cleanText(routeRecord?.asset_prefix || '', 700).replace(/^\/+/, '').replace(/\/+$/, '');
   if (explicit) return `${explicit}/`;
@@ -395,7 +420,10 @@ async function ensureMappedRouteAccess(request, routeRecord, runtimeMeta) {
   } catch (error) {
     runtimeMeta.auth_state = 'denied';
     runtimeMeta.error_code = error?.code || 'GATE_AUTH_REQUIRED';
-    return gateRequiredResponse(request, error);
+    const response = gateRequiredResponse(request, error);
+    response.headers.set('x-skynet-route', 'gate-required');
+    response.headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+    return response;
   }
 }
 
@@ -413,7 +441,10 @@ async function serveDeploymentAsset(request, env, routeRecord, runtimeMeta) {
     object.writeHttpMetadata?.(headers);
     if (!headers.has('content-type')) headers.set('content-type', contentTypeForPath(candidate));
     if (object.httpEtag) headers.set('etag', object.httpEtag);
-    headers.set('cache-control', headers.get('cache-control') || 'public, max-age=60');
+    headers.set('cache-control', headers.get('cache-control') || cacheControlForDeploymentAsset(candidate));
+    headers.set('x-skynet-route', 'r2-deployment');
+    headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+    headers.set('x-skynet-deployment-id', cleanText(routeRecord.active_deployment_id || '', 180));
     runtimeMeta.runtime_type = 'static';
     runtimeMeta.route_decision = 'r2.deployment_asset';
     return new Response(object.body, { headers });
@@ -440,10 +471,18 @@ async function proxyFallbackOrigin(request, routeRecord, runtimeMeta) {
     redirect: 'manual'
   });
   const response = await fetch(proxied);
+  const responseHeaders = new Headers(response.headers);
+  responseHeaders.set('x-skynet-route', 'fallback-origin');
+  responseHeaders.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+  responseHeaders.delete('content-length');
   runtimeMeta.runtime_type = 'static_proxy';
   runtimeMeta.route_decision = 'fallback_origin.proxy';
   runtimeMeta.origin_status = response.status;
-  return response;
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: responseHeaders
+  });
 }
 
 async function serveMappedRoute(request, env, routeRecord, runtimeMeta) {

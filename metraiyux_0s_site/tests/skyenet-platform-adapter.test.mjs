@@ -105,6 +105,19 @@ function fs27ServiceBinding(fsEnv) {
         }
         return Response.json({ active: false });
       }
+      if (url.pathname.startsWith('/skyenet/')) {
+        const route = await fsEnv.ROUTING_KV.get(`route:v1:host:${url.hostname}:path:/skyenet/demo-public`, { type: 'json' });
+        if (!route) return new Response('missing route', { status: 404 });
+        const object = await fsEnv.DEPLOYMENT_ASSET_BUCKET.get(`${route.asset_prefix}/index.html`);
+        if (!object) return new Response('missing asset', { status: 404 });
+        return new Response(await object.text(), {
+          headers: {
+            'content-type': 'text/html; charset=utf-8',
+            'x-skynet-route': 'r2-deployment',
+            'x-skynet-project-id': route.project_id
+          }
+        });
+      }
       return handleSkyeNetDeployRequest(request, { env: fsEnv });
     }
   };
@@ -228,4 +241,51 @@ test('SN-03 SkyeNet proxy initializes, uploads, completes, and registers a route
   assert.equal(routes.response.status, 200);
   assert.equal(routes.data.skynet.count, 1);
   assert.equal(routes.data.skynet.routes[0].route.active_deployment_id, deploymentId);
+});
+
+test('SN-04 SkyeNet published path serves uploaded asset without 0S gate redirect', async () => {
+  const e = env();
+  const token = 'gate-token';
+  const projectId = 'demo-public';
+  const deploymentId = 'dep_demo_public';
+
+  assert.equal((await call(e, '/api/skyenet/deploy/init', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, title: 'Demo Public' }
+  })).response.status, 200);
+
+  const uploadParams = new URLSearchParams({ projectId, deploymentId, path: 'index.html' });
+  assert.equal((await call(e, `/api/skyenet/deploy/upload?${uploadParams.toString()}`, {
+    method: 'PUT',
+    token,
+    headers: { 'content-type': 'text/html; charset=utf-8' },
+    body: '<h1>Public SkyeNet Asset</h1>'
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/complete', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, files: ['index.html'] }
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/route', {
+    method: 'POST',
+    token,
+    body: {
+      hostname: 'metraiyux.example',
+      mount_path: '/skyenet/demo-public',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      public_access: true,
+      default_auth: 'public'
+    }
+  })).response.status, 200);
+
+  const live = await siteWorker.fetch(req('/skyenet/demo-public'), e, ctx());
+  const text = await live.text();
+  assert.equal(live.status, 200);
+  assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
+  assert.equal(live.headers.get('x-skynet-route'), 'r2-deployment');
+  assert.match(text, /Public SkyeNet Asset/);
 });
