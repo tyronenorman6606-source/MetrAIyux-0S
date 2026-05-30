@@ -148,6 +148,20 @@ async function fetchAny(url, init = {}) {
   };
 }
 
+async function fetchFollow(url, init = {}, limit = 4) {
+  const chain = [];
+  let current = url;
+  let last = null;
+  for (let attempt = 0; attempt < limit; attempt += 1) {
+    last = await fetchAny(current, init);
+    chain.push({ url: current, status: last.status, location: last.location || '' });
+    if (![301, 302, 303, 307, 308].includes(last.status) || !last.location) break;
+    current = new URL(last.location, current).toString();
+    if (chain.some((item) => item.url === current)) break;
+  }
+  return { ...last, redirect_chain: chain };
+}
+
 function check(checks, id, ok, extra = {}) {
   checks.push({ id, ok: Boolean(ok), ...extra });
 }
@@ -454,19 +468,31 @@ async function liveProof() {
     'content-type': 'application/json'
   };
 
-  const authedNorthstar = await fetchAny(`${origin}/northstar/index.html`, { headers: authHeaders });
-  check(checks, 'live_northstar_shared_gate_renders', authedNorthstar.status === 200, {
+  const authedNorthstar = await fetchFollow(`${origin}/northstar/index.html`, { headers: authHeaders });
+  check(checks, 'live_northstar_shared_gate_renders', authedNorthstar.status === 200
+    && /SignIn Pro|NorthStar|asset:\/northstar/i.test(authedNorthstar.text_sample || ''), {
     status: authedNorthstar.status,
     content_type: authedNorthstar.content_type,
+    redirect_chain: authedNorthstar.redirect_chain,
     sample: authedNorthstar.text_sample
   });
 
   const authSession = await fetchAny(`${origin}/api/northstar/auth-session`, { headers: authHeaders });
   check(checks, 'live_northstar_auth_session_shared_gate', authSession.status === 200
     && authSession.body?.authenticated === true
-    && authSession.body?.platform_id === 'signinpro-northstar', {
+    && (
+      authSession.body?.platform_id === 'signinpro-northstar'
+      || (
+        authSession.body?.product === 'SignIn Pro'
+        && authSession.body?.provider === 'NorthStar Office & Accounting'
+        && authSession.body?.bridge?.auth === 'FS27/SkyGate/Free99'
+      )
+    ), {
     status: authSession.status,
     platform_id: authSession.body?.platform_id,
+    product: authSession.body?.product,
+    provider: authSession.body?.provider,
+    bridge_auth: authSession.body?.bridge?.auth,
     authenticated: authSession.body?.authenticated
   });
 
@@ -489,20 +515,24 @@ async function liveProof() {
     error: authedPasswordLogin.body?.error
   });
 
-  const signinProAlias = await fetchAny(`${origin}/signinpro/`, { headers: authHeaders });
+  const signinProAlias = await fetchFollow(`${origin}/signinpro/`, { headers: authHeaders });
   check(checks, 'live_signinpro_alias_renders_or_routes_under_shared_gate', signinProAlias.status === 200
-    || [301, 302, 303, 307, 308].includes(signinProAlias.status), {
+    && /SignIn Pro|NorthStar|Opening SignIn Pro/i.test(signinProAlias.text_sample || ''), {
     status: signinProAlias.status,
+    redirect_chain: signinProAlias.redirect_chain,
     location: signinProAlias.location,
-    content_type: signinProAlias.content_type
+    content_type: signinProAlias.content_type,
+    deploy_blocker_if_failed: 'scripts/deploy-0s-worker.mjs must stage signinpro and the main 0S Worker deploy must complete before this alias can be live.'
   });
 
-  const signinHyphenAlias = await fetchAny(`${origin}/signin-pro/`, { headers: authHeaders });
+  const signinHyphenAlias = await fetchFollow(`${origin}/signin-pro/`, { headers: authHeaders });
   check(checks, 'live_signin_pro_alias_renders_or_routes_under_shared_gate', signinHyphenAlias.status === 200
-    || [301, 302, 303, 307, 308].includes(signinHyphenAlias.status), {
+    && /SignIn Pro|NorthStar|Opening SignIn Pro/i.test(signinHyphenAlias.text_sample || ''), {
     status: signinHyphenAlias.status,
+    redirect_chain: signinHyphenAlias.redirect_chain,
     location: signinHyphenAlias.location,
-    content_type: signinHyphenAlias.content_type
+    content_type: signinHyphenAlias.content_type,
+    deploy_blocker_if_failed: 'scripts/deploy-0s-worker.mjs must stage signin-pro and the main 0S Worker deploy must complete before this alias can be live.'
   });
 
   return {

@@ -58,6 +58,8 @@ const WORKER_ASSET_DIR_INCLUDES = [
   'relay13-core-v1.7-connectlog-operator-proof',
   'saas',
   'sales',
+  'signin-pro',
+  'signinpro',
   'nexus',
   'skye-vault-os',
   'skye-content-repurposer-local',

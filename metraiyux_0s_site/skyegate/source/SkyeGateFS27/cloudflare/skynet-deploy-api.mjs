@@ -422,6 +422,25 @@ function sourceTextFileLikely(pathname = '', contentType = '') {
     || /\.(txt|md|markdown|json|js|mjs|cjs|ts|tsx|jsx|css|html|htm|svg|xml|yml|yaml|toml|ini|env|sh|bash|zsh|fish|py|rb|go|rs|java|c|cc|cpp|h|hpp|cs|php|sql|mjs|vue|svelte)$/i.test(path);
 }
 
+function sourcePackageSummary(sourcePackage = null) {
+  if (!sourcePackage) return null;
+  return {
+    mode: sourcePackage.mode || 'private-full-project',
+    prefix: sourcePackage.prefix || '',
+    file_count: Number(sourcePackage.file_count || 0),
+    total_bytes: Number(sourcePackage.total_bytes || 0),
+    downloadable: sourcePackage.downloadable !== false,
+    manifest_key: sourcePackage.manifest_key || sourceManifestKeyForPackage(sourcePackage),
+    index_key: sourcePackage.index_key || sourceIndexKeyForPackage(sourcePackage),
+    index_file_count: Number(sourcePackage.index_file_count || sourcePackage.file_count || 0),
+    files_inline: Array.isArray(sourcePackage.files) ? sourcePackage.files.length : 0,
+    files_truncated: Boolean(sourcePackage.files_truncated),
+    public_asset_exposure: sourcePackage.public_asset_exposure === false ? false : 'public_assets_only',
+    completed_at: sourcePackage.completed_at || '',
+    updated_at: sourcePackage.updated_at || ''
+  };
+}
+
 function storageSegment(value, fallback = 'item') {
   return normalizeSlug(value || fallback, fallback, 180);
 }
