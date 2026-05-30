@@ -416,6 +416,66 @@ function sourceRecordListForResponse(records = []) {
   }).filter(Boolean);
 }
 
+function sourceIndexTextForRecords(records = []) {
+  const lines = [];
+  for (const record of records) {
+    const item = sourceFileRecord(record);
+    if (item) lines.push(JSON.stringify(item));
+  }
+  return lines.length ? `${lines.join('\n')}\n` : '';
+}
+
+function sourceIndexSummaryFromText(text = '') {
+  const seen = new Set();
+  const inlineFiles = [];
+  const sampleFiles = [];
+  let fileCount = 0;
+  let duplicateCount = 0;
+  let totalBytes = 0;
+  let lineNumber = 0;
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    lineNumber += 1;
+    const line = raw.trim();
+    if (!line) continue;
+    let value = line;
+    if (line.startsWith('{') || line.startsWith('"')) {
+      try {
+        value = JSON.parse(line);
+      } catch {
+        const error = new Error(`Invalid source index JSONL at line ${lineNumber}`);
+        error.status = 400;
+        error.code = 'BAD_SOURCE_INDEX_LINE';
+        throw error;
+      }
+    }
+    const record = sourceFileRecord(value);
+    if (!record?.path) continue;
+    if (seen.has(record.path)) {
+      duplicateCount += 1;
+      continue;
+    }
+    seen.add(record.path);
+    fileCount += 1;
+    if (fileCount > MAX_SOURCE_INDEX_FILES) {
+      const error = new Error(`SkyeNet private source index has more than ${MAX_SOURCE_INDEX_FILES} files.`);
+      error.status = 413;
+      error.code = 'SOURCE_INDEX_FILE_LIMIT';
+      throw error;
+    }
+    totalBytes += Number(record.size || 0);
+    if (inlineFiles.length < MAX_SOURCE_PACKAGE_FILES) inlineFiles.push(record);
+    if (sampleFiles.length < 1000) sampleFiles.push(record);
+  }
+  return {
+    file_count: fileCount,
+    duplicate_count: duplicateCount,
+    total_bytes: totalBytes,
+    files: inlineFiles,
+    sample_files: sampleFiles,
+    files_truncated: fileCount > inlineFiles.length
+  };
+}
+
 function sourceTextFileLikely(pathname = '', contentType = '') {
   const type = String(contentType || '').toLowerCase();
   const path = String(pathname || '').toLowerCase();
@@ -468,6 +528,36 @@ function sourceArchiveForPackage(sourcePackage = {}) {
     bucket_binding: cleanText(archive.bucket_binding || archive.bucketBinding || '', 120),
     downloadable: archive.downloadable !== false,
     uploaded_at: archive.uploaded_at || archive.created_at || ''
+  };
+}
+
+function parseByteRangeHeader(value = '', size = 0) {
+  const raw = cleanText(value || '', 120);
+  if (!raw) return null;
+  const match = raw.match(/^bytes=(\d*)-(\d*)$/i);
+  if (!match) return { invalid: true };
+  const total = Number(size || 0);
+  if (!Number.isFinite(total) || total <= 0) return { invalid: true };
+  const startText = match[1];
+  const endText = match[2];
+  if (!startText && !endText) return { invalid: true };
+  let start;
+  let end;
+  if (!startText) {
+    const suffixLength = Number(endText);
+    if (!Number.isFinite(suffixLength) || suffixLength <= 0) return { invalid: true };
+    start = Math.max(0, total - suffixLength);
+    end = total - 1;
+  } else {
+    start = Number(startText);
+    end = endText ? Number(endText) : total - 1;
+  }
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end < start || start >= total) return { invalid: true };
+  return {
+    start,
+    end: Math.min(end, total - 1),
+    size: total,
+    length: Math.min(end, total - 1) - start + 1
   };
 }
 
@@ -724,7 +814,7 @@ function normalizeSourcePath(value) {
     throw error;
   }
   const normalized = parts.join('/');
-  if (/(^|\/)(\.git|node_modules|\.wrangler|\.next\/cache|dist\/cache|tmp|temp)(\/|$)/i.test(normalized)
+  if (/(^|\/)(\.git|\.wrangler)(\/|$)/i.test(normalized)
     || /(^|\/)\.env(\.|$|\/)/i.test(normalized)
     || /(^|\/)(id_rsa|id_dsa|id_ecdsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)(\/|$)/i.test(normalized)
     || /\.(pem|key|p12|pfx|crt|sqlite|sqlite3|db)$/i.test(normalized)) {
@@ -1258,7 +1348,7 @@ async function sourceFilesForDeployment(env, deployment = {}) {
       ? manifestFiles
       : indexFiles.length
         ? dedupeSourceFiles(indexFiles)
-        : dedupeSourceFiles(privatePackage.files || privatePackage.sample_files || []);
+        : dedupeSourceFiles(privatePackage.files || privatePackage.sample_files || manifest?.sample_files || []);
     return {
       source_mode: 'private-full-project',
       source_package: privatePackage,
@@ -1305,13 +1395,24 @@ async function sourceQueryContext(request, env, cors) {
   const prefix = source.prefix || (source.source_package
     ? cleanText(source.source_package.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '')
     : assetPrefix(projectId, deploymentId));
-  return { auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
+  return { request, auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
 }
 
 async function sourceArchiveResponse(env, archive, context, cors) {
   const bucket = sourceTransferBucket(env) || deploymentBucket(env);
   if (!bucket?.get) return null;
-  const object = await bucket.get(archive.key).catch(() => null);
+  const rangeHeader = context.request?.headers?.get('range') || '';
+  const knownSize = Number(archive.bytes || 0);
+  const requestedRange = rangeHeader ? parseByteRangeHeader(rangeHeader, knownSize) : null;
+  if (requestedRange?.invalid) {
+    const headers = new Headers(cors);
+    headers.set('content-range', `bytes */${knownSize || '*'}`);
+    headers.set('accept-ranges', 'bytes');
+    return new Response('', { status: 416, headers });
+  }
+  const object = requestedRange
+    ? await bucket.get(archive.key, { range: { offset: requestedRange.start, length: requestedRange.length } }).catch(() => null)
+    : await bucket.get(archive.key).catch(() => null);
   if (!object) return null;
   const headers = new Headers(cors);
   const objectHeaders = new Headers();
@@ -1319,11 +1420,22 @@ async function sourceArchiveResponse(env, archive, context, cors) {
   headers.set('content-type', archive.content_type || objectHeaders.get('content-type') || 'application/octet-stream');
   headers.set('content-disposition', `attachment; filename="${normalizeArchiveFilename(archive.filename, context.projectId, context.deploymentId)}"`);
   headers.set('cache-control', 'no-store');
+  headers.set('accept-ranges', 'bytes');
   headers.set('x-skynet-source-download', 'stored-archive');
   headers.set('x-skynet-project-id', context.projectId);
   headers.set('x-skynet-deployment-id', context.deploymentId);
   headers.set('x-skynet-workspace-id', context.workspaceId);
   if (archive.sha256) headers.set('x-skynet-source-archive-sha256', archive.sha256);
+  if (requestedRange) {
+    const bytes = await readObjectBytes(object);
+    const body = bytes.byteLength === requestedRange.length
+      ? bytes
+      : bytes.slice(requestedRange.start, requestedRange.end + 1);
+    headers.set('content-range', `bytes ${requestedRange.start}-${requestedRange.end}/${requestedRange.size}`);
+    headers.set('content-length', String(body.byteLength));
+    return new Response(body, { status: 206, headers });
+  }
+  if (knownSize > 0) headers.set('content-length', String(knownSize));
   const body = object.body && typeof object.body.getReader === 'function' ? object.body : await readObjectBytes(object);
   return new Response(body, { status: 200, headers });
 }
@@ -1912,11 +2024,19 @@ async function handleSourceUpload(request, env, cors) {
       sha256
     }
   });
-  const sourceFiles = Array.from(new Set([...(priorPackage.files || []), sourcePath]));
-  if (sourceFiles.length > MAX_SOURCE_PACKAGE_FILES) {
-    const error = new Error(`SkyeNet private source package has too many files; max is ${MAX_SOURCE_PACKAGE_FILES}.`);
+  const priorFiles = Array.isArray(priorPackage.files) ? priorPackage.files : [];
+  const priorPaths = new Set(priorFiles.map((file) => {
+    try { return sourcePathFromRecord(file); } catch { return ''; }
+  }).filter(Boolean));
+  const sourceFiles = priorPaths.has(sourcePath)
+    ? priorFiles.slice(0, MAX_SOURCE_PACKAGE_FILES)
+    : [...priorFiles, sourceFileRecord({ path: sourcePath, size: body.byteLength, sha256, content_type: contentType })].slice(0, MAX_SOURCE_PACKAGE_FILES);
+  const knownCount = Number(priorPackage.file_count || priorFiles.length || 0);
+  const nextFileCount = priorPaths.has(sourcePath) ? Math.max(knownCount, sourceFiles.length) : Math.max(knownCount + 1, sourceFiles.length);
+  if (nextFileCount > MAX_SOURCE_INDEX_FILES) {
+    const error = new Error(`SkyeNet private source index has too many files; max is ${MAX_SOURCE_INDEX_FILES}.`);
     error.status = 413;
-    error.code = 'SOURCE_PACKAGE_FILE_LIMIT';
+    error.code = 'SOURCE_INDEX_FILE_LIMIT';
     throw error;
   }
   const sourcePackage = {
@@ -1924,9 +2044,14 @@ async function handleSourceUpload(request, env, cors) {
     mode: 'private-full-project',
     prefix,
     files: sourceFiles,
-    file_count: sourceFiles.length,
+    sample_files: sourceFiles.slice(0, Math.min(1000, sourceFiles.length)),
+    files_truncated: nextFileCount > sourceFiles.length || Boolean(priorPackage.files_truncated),
+    file_count: nextFileCount,
     total_bytes: nextBytes,
     downloadable: true,
+    manifest_key: priorPackage.manifest_key || sourceManifestKeyForPackage({ prefix }),
+    index_key: priorPackage.index_key || sourceIndexKeyForPackage({ prefix }),
+    index_file_count: Number(priorPackage.index_file_count || 0),
     public_asset_exposure: false,
     completed_at: priorPackage.completed_at || null,
     updated_at: new Date().toISOString()
@@ -1969,27 +2094,68 @@ async function handleSourceComplete(request, env, cors) {
     deployment_id: deploymentId
   })).deployment;
   const priorPackage = existing.source_package || {};
-  const files = Array.isArray(body.files)
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, body.source_prefix || body.sourcePrefix || priorPackage.prefix || '');
+  const defaultManifestKey = `${prefix}/.skyenet/source-package.json`;
+  const defaultIndexKey = `${prefix}/.skyenet/source-index.jsonl`;
+  const requestedIndexKey = cleanText(body.index_key || body.indexKey || priorPackage.index_key || '', MAX_PATH * 2).replace(/^\/+/, '');
+  const indexKey = requestedIndexKey || defaultIndexKey;
+  if (indexKey && !indexKey.startsWith(`${prefix}/`)) {
+    return httpJson(400, {
+      ok: false,
+      error: 'Source index key must stay inside this deployment source package prefix.',
+      code: 'SOURCE_INDEX_PREFIX_MISMATCH',
+      expected_prefix: prefix,
+      index_key: indexKey
+    }, cors);
+  }
+  const filesFromBody = Array.isArray(body.files);
+  const files = filesFromBody
     ? dedupeSourceFiles(body.files)
-    : dedupeSourceFiles(priorPackage.files || priorPackage.sample_files || []);
-  if (!files.length) return httpJson(400, { ok: false, error: 'Private source package requires at least one source file.', code: 'SOURCE_PACKAGE_EMPTY' }, cors);
-  if (files.length > MAX_SOURCE_INDEX_FILES) {
+    : [];
+  let indexSummary = null;
+  if (!filesFromBody && indexKey && bucket?.get) {
+    const indexObject = await bucket.get(indexKey).catch(() => null);
+    if (indexObject) {
+      const indexText = typeof indexObject.text === 'function'
+        ? await indexObject.text()
+        : new TextDecoder().decode(await readObjectBytes(indexObject));
+      indexSummary = sourceIndexSummaryFromText(indexText);
+    }
+  }
+  const bodySampleFiles = Array.isArray(body.sample_files || body.sampleFiles)
+    ? dedupeSourceFiles(body.sample_files || body.sampleFiles)
+    : [];
+  const sampleFiles = filesFromBody
+    ? files.slice(0, 1000)
+    : (indexSummary?.sample_files?.length
+        ? dedupeSourceFiles(indexSummary.sample_files)
+        : (bodySampleFiles.length ? bodySampleFiles : dedupeSourceFiles(priorPackage.sample_files || priorPackage.files || [])));
+  const fileCount = filesFromBody
+    ? files.length
+    : Number(body.file_count || body.fileCount || indexSummary?.file_count || priorPackage.file_count || sampleFiles.length || 0);
+  if (!fileCount) return httpJson(400, { ok: false, error: 'Private source package requires at least one source file or an uploaded source index.', code: 'SOURCE_PACKAGE_EMPTY' }, cors);
+  if (fileCount > MAX_SOURCE_INDEX_FILES) {
     return httpJson(413, {
       ok: false,
-      error: `SkyeNet private source index has ${files.length} files; max indexed files per source package is ${MAX_SOURCE_INDEX_FILES}.`,
+      error: `SkyeNet private source index has ${fileCount} files; max indexed files per source package is ${MAX_SOURCE_INDEX_FILES}.`,
       code: 'SOURCE_INDEX_FILE_LIMIT',
-      file_count: files.length,
+      file_count: fileCount,
       limit: MAX_SOURCE_INDEX_FILES
     }, cors);
   }
-  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, body.source_prefix || body.sourcePrefix || priorPackage.prefix || '');
   const archiveInput = body.archive && typeof body.archive === 'object' ? body.archive : null;
   const archive = archiveInput
     ? sourceArchiveForPackage({ archive: archiveInput })
     : sourceArchiveForPackage(priorPackage);
-  const manifestKey = `${prefix}/.skyenet/source-package.json`;
-  const indexKey = `${prefix}/.skyenet/source-index.jsonl`;
-  const responseFiles = sourceRecordListForResponse(files);
+  const manifestKey = defaultManifestKey;
+  const canKeepInlineFiles = fileCount <= MAX_SOURCE_PACKAGE_FILES;
+  const inlineRecords = filesFromBody
+    ? (canKeepInlineFiles ? files : [])
+    : (canKeepInlineFiles && indexSummary?.files?.length === fileCount ? indexSummary.files : dedupeSourceFiles(priorPackage.files || []));
+  const candidateResponseFiles = sourceRecordListForResponse(inlineRecords);
+  const responseFiles = candidateResponseFiles.length === fileCount ? candidateResponseFiles : [];
+  const responseSamples = sourceRecordListForResponse(sampleFiles);
+  const filesTruncated = fileCount > responseFiles.length;
   const manifest = {
     schema: 'fs27.skynet.source_package_manifest.v1',
     mode: 'private-full-project',
@@ -1999,33 +2165,36 @@ async function handleSourceComplete(request, env, cors) {
     workspace_id: workspaceId,
     completed_at: new Date().toISOString(),
     public_asset_exposure: false,
-    file_count: files.length,
+    file_count: fileCount,
     files: responseFiles,
+    sample_files: responseSamples,
+    files_truncated: filesTruncated,
     index_key: indexKey,
+    index_file_count: Number(indexSummary?.file_count || fileCount),
     archive,
     meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
   };
   await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
     httpMetadata: { contentType: 'application/json; charset=utf-8' }
   });
-  const indexBody = files.map((file) => JSON.stringify(file)).join('\n');
-  await bucket.put(indexKey, `${indexBody}\n`, {
-    httpMetadata: { contentType: 'application/x-ndjson; charset=utf-8' }
-  });
-  const keepInlineFiles = files.length <= MAX_SOURCE_PACKAGE_FILES;
+  if (filesFromBody) {
+    await bucket.put(indexKey, sourceIndexTextForRecords(files), {
+      httpMetadata: { contentType: 'application/x-ndjson; charset=utf-8' }
+    });
+  }
   const sourcePackage = {
     schema: 'fs27.skynet.source_package.v1',
     mode: 'private-full-project',
     prefix,
-    files: keepInlineFiles ? responseFiles : [],
-    sample_files: responseFiles.slice(0, Math.min(1000, responseFiles.length)),
-    files_truncated: !keepInlineFiles,
-    file_count: files.length,
-    total_bytes: Number(body.total_bytes ?? body.totalBytes ?? priorPackage.total_bytes ?? 0),
+    files: responseFiles,
+    sample_files: responseSamples,
+    files_truncated: filesTruncated,
+    file_count: fileCount,
+    total_bytes: Number(body.total_bytes ?? body.totalBytes ?? indexSummary?.total_bytes ?? priorPackage.total_bytes ?? 0),
     downloadable: true,
     manifest_key: manifestKey,
     index_key: indexKey,
-    index_file_count: files.length,
+    index_file_count: Number(indexSummary?.file_count || fileCount),
     archive,
     public_asset_exposure: false,
     completed_at: manifest.completed_at,
@@ -2041,7 +2210,7 @@ async function handleSourceComplete(request, env, cors) {
     project_id: projectId,
     deployment_id: deploymentId,
     source_prefix: prefix,
-    files: files.length,
+    files: fileCount,
     total_bytes: sourcePackage.total_bytes,
     manifest_key: manifestKey,
     index_key: indexKey,

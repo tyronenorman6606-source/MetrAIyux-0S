@@ -90,7 +90,7 @@ async function collectFiles(root, options = {}) {
 function isSafeSourcePath(rel) {
   const normalized = String(rel || '').replace(/\\/g, '/');
   if (!normalized || normalized.includes('../')) return false;
-  if (/(^|\/)(\.git|node_modules|\.wrangler|\.next\/cache|dist\/cache|tmp|temp)(\/|$)/i.test(normalized)) return false;
+  if (/(^|\/)(\.git|\.wrangler)(\/|$)/i.test(normalized)) return false;
   if (/(^|\/)\.env(\.|$|\/)/i.test(normalized)) return false;
   if (/(^|\/)(id_rsa|id_dsa|id_ecdsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)(\/|$)/i.test(normalized)) return false;
   if (/\.(pem|key|p12|pfx|crt|sqlite|sqlite3|db)$/i.test(normalized)) return false;
