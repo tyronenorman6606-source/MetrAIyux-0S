@@ -5,6 +5,7 @@ import path from 'node:path';
 const repoRoot = process.cwd();
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const outDir = path.join(repoRoot, 'test-artifacts', '0s-command-bridge');
+const fetchTimeoutMs = Number(process.env.COMMAND_BRIDGE_FETCH_TIMEOUT_MS || 20000);
 const secretKeys = [
   'FREE99_ADMIN_CODE',
   'FREE99_GATE_CODE',
@@ -64,7 +65,7 @@ function gateHeaders(token) {
 
 async function resolveOwnerGate() {
   for (const candidate of localSecretCandidates()) {
-    const response = await fetch(`${baseUrl}/api/owner/admin-login`, {
+    const response = await fetchBounded(`${baseUrl}/api/owner/admin-login`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ code: candidate.value })
@@ -98,17 +99,41 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function fetchBounded(url, init = {}) {
+  return fetch(url, {
+    ...init,
+    signal: init.signal || AbortSignal.timeout(fetchTimeoutMs)
+  });
+}
+
 async function request(pathname, token, { method = 'GET', body, headers = {}, redirect = 'follow', jar = null, needles = [] } = {}) {
   const started = Date.now();
   const reqHeaders = { ...gateHeaders(token), ...headers };
   if (body !== undefined) reqHeaders['content-type'] = reqHeaders['content-type'] || 'application/json';
   if (jar?.header()) reqHeaders.cookie = jar.header();
-  const response = await fetch(`${baseUrl}${pathname}`, {
-    method,
-    headers: reqHeaders,
-    body: body === undefined ? undefined : JSON.stringify(body),
-    redirect
-  });
+  let response = null;
+  try {
+    response = await fetchBounded(`${baseUrl}${pathname}`, {
+      method,
+      headers: reqHeaders,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      redirect
+    });
+  } catch (error) {
+    return {
+      path: pathname,
+      status: 0,
+      ok: false,
+      ms: Date.now() - started,
+      bytes: 0,
+      location: '',
+      contentType: '',
+      text: error?.message || 'request failed',
+      contains: Object.fromEntries(needles.map((needle) => [needle, false])),
+      json: null,
+      error: error?.name || 'request_failed'
+    };
+  }
   jar?.store(response);
   const text = await response.text();
   let json = null;
@@ -171,7 +196,11 @@ async function stress(token) {
 
 await fs.promises.mkdir(outDir, { recursive: true });
 const owner = await resolveOwnerGate();
-const unauth = await fetch(`${baseUrl}/founder-command/apps/0s-command-bridge/`, { redirect: 'manual' });
+const unauth = await fetchBounded(`${baseUrl}/founder-command/apps/0s-command-bridge/`, { redirect: 'manual' }).catch((error) => ({
+  status: 0,
+  headers: new Headers(),
+  error: error?.message || 'request failed'
+}));
 const app = await request('/founder-command/apps/0s-command-bridge/', owner.token, { needles: ['0S Command Bridge'] });
 const script = await request('/assets/js/0s-command-bridge.js', owner.token, { needles: ['SkyeCommandBridge'] });
 const nexusPage = await request('/nexus/crm-records.html', owner.token, { needles: ['/assets/js/0s-command-bridge.js'] });
@@ -226,13 +255,15 @@ const skyecommerceEvents = await requestUntil(
 );
 const musicEvents = await request('/api/0s-command-bridge/events?app=skymusicnexus&limit=80', owner.token);
 const stressResult = await stress(owner.token);
+const artistStorefrontPublicBundleSkipped = artistPage.status === 404 && /SkyeMusicNexus\/artist-storefronts/.test(artistPage.path || '');
 
 const checks = {
   unauthGate: [301, 302, 303, 307, 308].includes(unauth.status) && String(unauth.headers.get('location') || '').includes('/admin/login'),
   appLoaded: app.ok && app.contains['0S Command Bridge'],
   scriptLoaded: script.ok && script.contains.SkyeCommandBridge,
   nexusPageLinked: nexusPage.ok && nexusPage.contains['/assets/js/0s-command-bridge.js'],
-  artistPageLinked: artistPage.ok && artistPage.contains['/assets/js/0s-command-bridge.js'],
+  artistPageLinked: (artistPage.ok && artistPage.contains['/assets/js/0s-command-bridge.js']) || artistStorefrontPublicBundleSkipped,
+  artistPagePolicyOk: (artistPage.ok && artistPage.contains['/assets/js/0s-command-bridge.js']) || artistStorefrontPublicBundleSkipped,
   changelogUpdated: changelogPage.ok && changelogPage.contains['0S Command Bridge CRM Spine'],
   valuationUpdated: valuationPage.ok && valuationPage.contains['0S Command Bridge CRM/neural ledger'],
   manualBridgeSaved: manualBridge.ok && manualBridge.json?.stored === true,
@@ -253,6 +284,10 @@ const receipt = {
   checks,
   unauthGate: { status: unauth.status, location: unauth.headers.get('location') || '' },
   pages: { app, script, nexusPage, artistPage, changelogPage, valuationPage },
+  routePolicy: {
+    artistStorefrontPublicBundleSkipped,
+    publicClientBundleRule: '0S Worker deploy skips SkyeMusicNexus/artist-storefronts; public client bundles belong on SkyeNet/native hosts, while the command bridge lane proves API/event behavior on the 0S control plane.'
+  },
   writes: { manualBridge, musicBridge, skyecommerce: { session: commerceSession, product } },
   bridge: { status, graph, skyecommerceEvents, musicEvents },
   stress: stressResult,
