@@ -1,6 +1,6 @@
 # 0S Truth Ledger
 
-Generated: 2026-05-30T19:06:55.274Z
+Generated: 2026-05-30T19:44:12.393Z
 
 This ledger is intentionally strict: a lane is `built` only when the declared proof command exists, the declared receipt exists and is `ok:true`, and no open gaps remain in `metraiyux_0s_site/data/0s-closure-workflows.json`.
 
@@ -9,9 +9,9 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 ## Summary
 
 - Total workflows: 22
-- Built: 20
+- Built: 21
 - Partial: 1
-- Failing proof: 1
+- Failing proof: 0
 - Unproven: 0
 - Not built or untracked: 0
 - Provider/real-world gated gaps: 11
@@ -25,10 +25,6 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
   Proof: npm run 0s:operating-proof-matrix
   Receipt: test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json
   Next: Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models.
-- **P1 command-bridge-all-lanes** - failing_proof
-  Proof: node tools/proof-0s-command-bridge-live-direct.mjs
-  Receipt: test-artifacts/0s-command-bridge/live-direct-proof-latest.json
-  Next: Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.
 
 ## External Boundaries
 
@@ -59,7 +55,7 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 | P0 | admin-brain-automation | green | built | none | missing |
 | P0 | broad-real-user-saas-skymail-skynet | green | built | none | missing |
 | P0 | per-app-operating-proof-matrix | green | partial | none | missing |
-| P1 | command-bridge-all-lanes | green | failing_proof | none | missing |
+| P1 | command-bridge-all-lanes | green | built | none | missing |
 | P1 | skyeroutex-workforce-depth | green | built | none | missing |
 | P1 | skymail-company-crm-lane | green | built | none | missing |
 | P1 | skyenet-full-runtime | green | built | none | missing |

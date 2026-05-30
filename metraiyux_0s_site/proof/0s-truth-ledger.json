@@ -1,7 +1,7 @@
 {
   "ok": false,
   "schema": "metraiyux.0s.truth-ledger.v1",
-  "generated_at": "2026-05-30T19:06:55.274Z",
+  "generated_at": "2026-05-30T19:44:12.393Z",
   "source_manifest": "metraiyux_0s_site/data/0s-closure-workflows.json",
   "no_browser_proof_run": true,
   "owner_manual_live_check": true,
@@ -10,7 +10,7 @@
     "operating_matrix": {
       "path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "ok": true,
-      "generated_at": "2026-05-30T19:06:39.277Z",
+      "generated_at": "2026-05-30T19:43:30.793Z",
       "route_failures": 0,
       "behavior_green": 22,
       "behavior_yellow": 0,
@@ -24,7 +24,7 @@
     "live_capability_watch": {
       "path": "test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json",
       "ok": true,
-      "generated_at": "2026-05-30T19:04:38.724Z",
+      "generated_at": "2026-05-30T19:11:16.667Z",
       "summary": {
         "total": 2,
         "pass": 2,
@@ -42,9 +42,9 @@
   },
   "summary": {
     "total": 22,
-    "built": 20,
+    "built": 21,
     "partial": 1,
-    "failing_proof": 1,
+    "failing_proof": 0,
     "unproven": 0,
     "not_built_or_untracked": 0,
     "not_tracked": 0,
@@ -53,9 +53,7 @@
     "p0_not_built": [
       "per-app-operating-proof-matrix"
     ],
-    "p1_not_built": [
-      "command-bridge-all-lanes"
-    ]
+    "p1_not_built": []
   },
   "repair_queue": [
     {
@@ -67,16 +65,6 @@
       "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "external_boundaries": [],
       "next_step": "Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models."
-    },
-    {
-      "id": "command-bridge-all-lanes",
-      "priority": "P1",
-      "computed_truth": "failing_proof",
-      "gap_class": "none",
-      "proof_command": "node tools/proof-0s-command-bridge-live-direct.mjs",
-      "receipt_path": "test-artifacts/0s-command-bridge/live-direct-proof-latest.json",
-      "external_boundaries": [],
-      "next_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state."
     }
   ],
   "workflows": [
@@ -202,7 +190,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-30T19:01:53.391Z",
+      "receipt_generated_at": "2026-05-30T19:09:36.385Z",
       "evidence_receipts": [
         {
           "id": "llc-to-0s-business-workflow-live-http",
@@ -342,7 +330,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-30T19:06:39.277Z",
+      "receipt_generated_at": "2026-05-30T19:43:30.793Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.blocking_gaps",
       "blocking_gaps": [],
@@ -357,20 +345,20 @@
       "priority": "P1",
       "surface": "0S Command Bridge CRM/proof event spine",
       "claimed_truth": "green",
-      "computed_truth": "failing_proof",
+      "computed_truth": "built",
       "gap_class": "none",
       "declared_gap_type": "none",
       "proof_command": "node tools/proof-0s-command-bridge-live-direct.mjs",
       "proof_exists": true,
       "receipt_path": "test-artifacts/0s-command-bridge/live-direct-proof-latest.json",
-      "receipt_ok": false,
-      "receipt_generated_at": "2026-05-30T19:04:14.820Z",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-30T19:41:33.186Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.blocking_gaps",
       "blocking_gaps": [],
       "external_boundaries": [],
       "open_gaps": [],
-      "next_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.",
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
       "next_build_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.",
       "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-command-bridge/"
     },

@@ -216,6 +216,7 @@ async function writeAll(receipt) {
 async function main() {
   const localTruth = readJson(localTruthPath, {});
   const deploy = readJson(deployReceiptPath, {});
+  const deployAccepted = deploy.ok === true && deploy.stage_only !== true && Boolean(deploy.currentVersionId || deploy.versionId);
   const owner = await resolveGateToken();
   const receipt = {
     ok: false,
@@ -227,9 +228,10 @@ async function main() {
     credential_source: owner?.source_key || 'missing',
     worker_deploy: {
       path: path.relative(repoRoot, deployReceiptPath).split(path.sep).join('/'),
-      ok: deploy.ok === true,
+      ok: deployAccepted,
       version: deploy.currentVersionId || deploy.versionId || '',
-      generated_at: deploy.generatedAt || deploy.generated_at || ''
+      generated_at: deploy.generatedAt || deploy.generated_at || '',
+      stage_only: deploy.stage_only === true
     },
     local_truth: {
       path: path.relative(repoRoot, localTruthPath).split(path.sep).join('/'),
@@ -271,7 +273,7 @@ async function main() {
   const ledgerMatchesLocal = Boolean(liveTruth?.generated_at && localTruth?.generated_at && liveTruth.generated_at === localTruth.generated_at);
   const ledgerSummaryMatchesLocal = Boolean(liveTruth?.summary && stableJson(liveTruth.summary) === stableJson(localTruth.summary || {}));
   receipt.closure_state = localTruth.ok === true ? 'green' : 'guarded_partial';
-  receipt.production_ready_for_owner_manual_browser_check = gatesOk && liveOk && deploy.ok === true;
+  receipt.production_ready_for_owner_manual_browser_check = gatesOk && liveOk && deployAccepted && localTruth.ok === true;
   receipt.truth_ledger_matches_local = ledgerMatchesLocal;
   receipt.truth_ledger_summary_matches_local = ledgerSummaryMatchesLocal;
   receipt.skyerrors_watch_live_generated_at = liveWatch?.generated_at || '';
@@ -301,7 +303,8 @@ async function main() {
     ...receipt.unauthenticated_gate_checks.filter((item) => !item.ok).map((item) => `Unauth gate check failed for ${item.path}`),
     ...receipt.authenticated_live_checks.filter((item) => !item.ok).map((item) => `Authenticated live check failed for ${item.path}`),
     ...(ledgerSummaryMatchesLocal ? [] : ['Live truth ledger summary does not match local truth ledger summary; redeploy latest proof assets or regenerate the ledger.']),
-    ...(deploy.ok === true ? [] : ['Latest Worker deploy receipt is missing or not ok.'])
+    ...(deployAccepted ? [] : ['Latest Worker deploy receipt is missing, stage-only, lacks a version id, or is not ok.']),
+    ...(localTruth.ok === true ? [] : ['Local truth ledger is not ok; production closure cannot be green while tracked P0/P1 truth items remain partial or failing.'])
   );
   receipt.ok = receipt.production_ready_for_owner_manual_browser_check && receipt.failures.length === 0;
   await writeAll(receipt);

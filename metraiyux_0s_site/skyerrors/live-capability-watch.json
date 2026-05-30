@@ -1,7 +1,7 @@
 {
   "ok": true,
   "schema": "metraiyux.0s.live-capability-watch.receipt.v1",
-  "generated_at": "2026-05-30T19:11:16.667Z",
+  "generated_at": "2026-05-30T19:44:25.295Z",
   "profile": "core",
   "base_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
   "no_browser_proof_run": true,
@@ -21,7 +21,7 @@
   },
   "health_watch": {
     "schema": "metraiyux.0s.health-watch-rollup.v1",
-    "generated_at": "2026-05-30T19:11:16.726Z",
+    "generated_at": "2026-05-30T19:44:25.329Z",
     "source": "tools/0s-live-capability-watch.mjs",
     "recent_receipts": [
       {
@@ -32,7 +32,7 @@
         "ok": true,
         "status": "ok",
         "schema": "metraiyux.0s.operating-proof-matrix.receipt.v1",
-        "generated_at": "2026-05-30T19:06:39.277Z",
+        "generated_at": "2026-05-30T19:43:30.793Z",
         "no_browser_proof_run": true,
         "owner_manual_live_check": true,
         "proves": "mounted route gate checks and behavior matrix",
@@ -62,16 +62,16 @@
         "ok": false,
         "status": "attention",
         "schema": "metraiyux.0s.truth-ledger.v1",
-        "generated_at": "2026-05-30T19:06:55.274Z",
+        "generated_at": "2026-05-30T19:44:12.393Z",
         "no_browser_proof_run": true,
         "owner_manual_live_check": true,
         "proves": "computed workflow truth and external boundary inventory",
         "summary": {
           "summary": {
             "total": 22,
-            "built": 20,
+            "built": 21,
             "partial": 1,
-            "failing_proof": 1,
+            "failing_proof": 0,
             "unproven": 0,
             "not_built_or_untracked": 0,
             "not_tracked": 0,
@@ -80,9 +80,7 @@
             "p0_not_built": [
               "per-app-operating-proof-matrix"
             ],
-            "p1_not_built": [
-              "command-bridge-all-lanes"
-            ]
+            "p1_not_built": []
           },
           "route_failures": 0,
           "gate_failures": 0,
@@ -148,7 +146,7 @@
         "ok": true,
         "status": "ok",
         "schema": "metraiyux.0s.provider-runtime-smoke.v1",
-        "generated_at": "2026-05-30T19:11:16.069Z",
+        "generated_at": "2026-05-30T19:44:24.672Z",
         "no_browser_proof_run": true,
         "owner_manual_live_check": true,
         "proves": "shared provider runtime sandbox receipt behavior",
@@ -454,7 +452,7 @@
       {
         "id": "truth-ledger",
         "path": "test-artifacts/0s-truth-ledger/0s-truth-ledger-latest.json",
-        "generated_at": "2026-05-30T19:06:55.274Z",
+        "generated_at": "2026-05-30T19:44:12.393Z",
         "failures": [],
         "warnings": []
       },
@@ -494,8 +492,8 @@
     "reason": "push_not_requested"
   },
   "catalog": {
-    "script_count": 245,
-    "relevant_count": 138,
+    "script_count": 246,
+    "relevant_count": 139,
     "missing_references": [],
     "browser_disabled_count": 33,
     "live_http_or_api_count": 20,
@@ -513,9 +511,9 @@
       "classification": "local_behavior",
       "live_action_observed": true,
       "real_time_observed": true,
-      "duration_ms": 1797.49,
-      "started_at": "2026-05-30T19:11:12.710Z",
-      "finished_at": "2026-05-30T19:11:14.508Z",
+      "duration_ms": 2258.8,
+      "started_at": "2026-05-30T19:44:20.743Z",
+      "finished_at": "2026-05-30T19:44:23.002Z",
       "claim": "SkyErrors captures gated events and Helper K4i records health scans into KV/CitadelDB-compatible stores.",
       "observation": "Runs Worker route tests that login through the shared gate, post SkyErrors events, scan Helper K4i health, and read receipts back.",
       "boundary": "Uses in-memory test bindings, not production Cloudflare storage unless live API proof is selected.",
@@ -534,9 +532,9 @@
       "classification": "smoke",
       "live_action_observed": true,
       "real_time_observed": true,
-      "duration_ms": 2157.77,
-      "started_at": "2026-05-30T19:11:14.509Z",
-      "finished_at": "2026-05-30T19:11:16.667Z",
+      "duration_ms": 2291.02,
+      "started_at": "2026-05-30T19:44:23.003Z",
+      "finished_at": "2026-05-30T19:44:25.294Z",
       "claim": "The whole-0S provider runtime can execute its shared provider action catalog through sandbox receipts without app-local provider auth lanes.",
       "observation": "Runs the provider-runtime smoke suite across Twilio, Resend, Stripe, PayPal, UPS, catalog, DNS, AI, calendar, SkyeNet, Relay13, SkyeMail, storage, and commerce-http actions.",
       "boundary": "Provider spend remains owner-approved; smoke uses sandbox/live-gated provider receipts and does not force real sends, calls, payouts, or external publishing.",
